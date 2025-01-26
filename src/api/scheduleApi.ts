@@ -12,7 +12,11 @@ export class ScheduleApi extends AppApi {
 
         const myHeaders = new Headers();
         const tilerBearerToken = localStorage.getItem('tiler_bearer'); // write
-        myHeaders.append("Authorization", tilerBearerToken);
+        if (tilerBearerToken) {
+            myHeaders.append("Authorization", tilerBearerToken);
+        } else {
+            throw new Error("No bearer token found");
+        }
         // myHeaders.append("mode", "cors");
         
         const queryParameters = {

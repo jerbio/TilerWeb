@@ -4,12 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { UserApi } from './api/userApi'
 import { ScheduleApi } from './api/scheduleApi'
-
-
-interface Tile {
-  id: string;
-  name: string;
-}
+import {Tile} from './util/interface'
 
 function renderTileNames(tiles: Array<Tile>) {
   if (tiles != null && tiles.length > 0) {
