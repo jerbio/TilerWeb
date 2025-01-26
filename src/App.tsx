@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import { useState }  from 'react';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -6,9 +6,14 @@ import { UserApi } from './api/userApi'
 import { ScheduleApi } from './api/scheduleApi'
 
 
-function renderTileNames(tiles:Array<unknown>) {
-  if(tiles!=null && tiles.length > 0 ) {
-    return tiles.map((eachTile:unknown) => {
+interface Tile {
+  id: string;
+  name: string;
+}
+
+function renderTileNames(tiles: Array<Tile>) {
+  if (tiles != null && tiles.length > 0) {
+    return tiles.map((eachTile: Tile) => {
       return <div className="indent" key={eachTile.id}>
         {eachTile.name}
       </div>
@@ -16,6 +21,7 @@ function renderTileNames(tiles:Array<unknown>) {
   }
   return [];
 }
+
 function App() {
   const [count, setCount] = useState(0)
   const [tilesForTheNextWeek, setTiles] = useState([])
