@@ -1,6 +1,4 @@
 import { useState }  from 'react';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { UserApi } from './api/userApi'
 import { ScheduleApi } from './api/scheduleApi'
@@ -19,7 +17,7 @@ function renderTileNames(tiles: Array<Tile>) {
 }
 
 function App() {
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
   const [tilesForTheNextWeek, setTiles] = useState([])
 
 
@@ -27,7 +25,6 @@ function App() {
   return (
     <>
       <Navigation />
-
       <div className="card">
         <button onClick={() => {
           const userApi = new UserApi();

@@ -7,7 +7,7 @@ const styles = {
         border: '#bdc3c7',
     },
     typography: {
-        fontFamily: 'Inter',
+        fontFamily: 'Inter Sans, sans-serif',
         fontSize: '16px',
         fontWeight: 'normal',
         textXs: '12px',
@@ -26,10 +26,12 @@ const styles = {
         lineHeightMd: '24px',
         lineHeightLg: '28px',
         lineHeightXl: '30px',
-        lineHeightDisplayXs: '32px'
-
-        // 38, 44, 60 72
-
+        lineHeightDisplayXs: '32px',
+        lineHeightDisplaySm: '38px',
+        lineHeightDisplayMd: '44px',
+        lineHeightDisplayLg: '60px',
+        lineHeightDisplayXl: '72px',
+        lineHeightDisplayXxl: '90px',
     },
     buttonWidths: {
         small: '80px',
@@ -50,6 +52,8 @@ const styles = {
         small: '4px',
         medium: '8px',
         large: '12px',
+        xLarge: '16px',
+        xxLarge: '30px',
     },
     container: {
         small: '640px',
