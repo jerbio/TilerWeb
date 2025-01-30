@@ -3,7 +3,7 @@ const styles = {
         primary: '#3498db',
         secondary: '#2ecc71',
         background: '#ecf0f1',
-        text: '#2c3e50',
+        text: '#A1A1A1',
         border: '#bdc3c7',
     },
     typography: {
