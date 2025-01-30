@@ -5,6 +5,8 @@ const styles = {
         background: '#ecf0f1',
         text: '#A1A1A1',
         border: '#bdc3c7',
+        buttonPrimary: '#000000',
+        buttonSecondary: '#ffffff',
     },
     typography: {
         fontFamily: 'Inter Sans, sans-serif',
@@ -37,6 +39,11 @@ const styles = {
         small: '80px',
         medium: '120px',
         large: '160px',
+    },
+    buttonHeights: {
+        small: '20px',
+        medium: '32px',
+        large: '48px',
     },
     space: {
         small: '8px',

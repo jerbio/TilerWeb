@@ -11,16 +11,19 @@ interface ButtonProps {
 }
 
 const StyledButton = styled.button<ButtonProps>`
-    background-color: ${props => props.primary ? '#007bff' : '#6c757d'};
-    color: white;
-    padding: 0.5rem 1rem;
+    background-color: ${props => props.primary ? styles.colors.buttonPrimary : styles.colors.buttonSecondary};
+    color: ${props => props.primary ? styles.colors.buttonSecondary : styles.colors.buttonPrimary};
+    padding: 0;  // Olamide TODO: create a getPadding function for custom padding values. THe default should not be zero.
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
-    font-size: 1rem;
-    width: ${props => props.width === 'small' ? styles.buttonWidths.small : props.width === 'large' ? styles.buttonWidths.large : styles.buttonWidths.medium};
+    font-size: ${styles.typography.textXs};
+    font-family: ${styles.typography.fontFamily};
+    height: ${styles.buttonHeights.medium};
+    width: ${props => props.width === 'small' ? styles.buttonWidths.small : props.width === 'large' ? styles.buttonWidths.large : props.width === 'large' ? styles.buttonWidths.medium : props.width};
     &:hover {
-        background-color: ${props => props.primary ? styles.colors.primary : styles.colors.secondary};
+        background-color: ${props => props.primary ? styles.colors.buttonSecondary : styles.colors.buttonPrimary};
+        color: ${props => props.primary ? styles.colors.buttonPrimary : styles.colors.buttonSecondary};
     }
     &:disabled {
         background-color: ${styles.colors.background};

@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import styles from './styles';
 import Button from './button';
@@ -45,7 +44,10 @@ const NavItems = styled.ul`
 
 const ButtonsWrapper = styled.div`
     display: flex;
-    border: 1px solid ${styles.colors.border};
+    justify-content: space-evenly;
+    align-items: center;
+    width: 210px;
+    // border: 1px solid ${styles.colors.border};
 `
 
 const Navigation = () => {
@@ -68,8 +70,8 @@ const Navigation = () => {
                 <li className="nav-item">Download</li>
             </NavItems>
             <ButtonsWrapper>
-                <Button>Try Tiler for free</Button>
-                <Button>Sign Up</Button>
+                <Button primary={true} width="113px">Try Tiler for free</Button>
+                <Button width="65px">Sign Up</Button>
             </ButtonsWrapper>
         </NavigationWrapper>
     );
