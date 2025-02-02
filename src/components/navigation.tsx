@@ -9,18 +9,7 @@ const NavigationWrapper = styled.nav`
     height: 60px;
     border-radius: ${styles.borderRadius.xxLarge};
     background: #1A1A1A80;
-    border: 1px solid #2A2A2A
-
-
-//     width: Fixed (800px)px;
-// height: Hug (60px)px;
-// padding: 12px 32px 12px 32px;
-// gap: 0px;
-// border-radius: 30px 0px 0px 0px;
-// border: 1px 0px 0px 0px;
-// justify: space-between;
-// opacity: 0px;
-
+    border: 1px solid #2A2A2A;
 `
 const SvgWrapper = styled.div`
     display: flex;
@@ -28,7 +17,6 @@ const SvgWrapper = styled.div`
     justify-content: center;
     cursor: pointer;
 `
-
 const NavItems = styled.ul`
     display: flex;
     justify-content: space-evenly;
@@ -41,7 +29,6 @@ const NavItems = styled.ul`
     font-family: ${styles.typography.fontFamily};
     cursor: pointer;
 `
-
 const ButtonsWrapper = styled.div`
     display: flex;
     justify-content: space-evenly;
@@ -49,7 +36,6 @@ const ButtonsWrapper = styled.div`
     width: 210px;
     // border: 1px solid ${styles.colors.border};
 `
-
 const Navigation = () => {
     return (
         <NavigationWrapper>

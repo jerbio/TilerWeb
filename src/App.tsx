@@ -3,7 +3,8 @@ import './App.css'
 import { UserApi } from './api/userApi'
 import { ScheduleApi } from './api/scheduleApi'
 import Navigation from './components/navigation'
-import {Tile} from './util/interface'
+import TileCard from './components/tile_card';
+import {Tile, TileCardProps} from './util/interface'
 
 function renderTileNames(tiles: Array<Tile>) {
   if (tiles != null && tiles.length > 0) {
@@ -16,6 +17,12 @@ function renderTileNames(tiles: Array<Tile>) {
   return [];
 }
 
+const sampleTiles: Array<TileCardProps> = [
+  {heading: "Tile 1", location: "Location 1", startTime: "09:00 AM", endTime: "10:00 AM" },
+  {heading: "Tile 2", location: "Location 2", startTime: "10:00 AM", endTime: "11:00 AM" },
+  {heading: "Tile 3", location: "Location 3", startTime: "11:00 AM", endTime: "12:00 PM" },
+  {heading: "Tile 4", location: "Location 4", startTime: "12:00 PM", endTime: "01:00 PM" }
+];
 function App() {
   // const [count, setCount] = useState(0)
   const [tilesForTheNextWeek, setTiles] = useState([])
@@ -57,7 +64,9 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       </div>
-      
+      {sampleTiles.map((tile) => {
+        return <TileCard key={tile.heading} {...tile} />
+      })}
     </>
   )
 }
