@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import styles from './styles';
+import styles from '../util/styles';
 import Button from './button';
 
 const NavigationWrapper = styled.nav`

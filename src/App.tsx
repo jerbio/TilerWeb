@@ -24,7 +24,6 @@ const sampleTiles: Array<TileCardProps> = [
   {heading: "Tile 4", location: "Location 4", startTime: "12:00 PM", endTime: "01:00 PM" }
 ];
 function App() {
-  // const [count, setCount] = useState(0)
   const [tilesForTheNextWeek, setTiles] = useState([])
 
 
@@ -64,6 +63,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       </div>
+
       {sampleTiles.map((tile) => {
         return <TileCard key={tile.heading} {...tile} />
       })}
