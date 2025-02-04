@@ -7,6 +7,9 @@ const styles = {
         border: '#bdc3c7',
         buttonPrimary: '#000000',
         buttonSecondary: '#ffffff',
+        tileBackgroundPrimary: '#37FF00',
+        tileBackgroundSecondary: '#222222',
+        tileBackgroundTertiary: '#0077FF',
     },
     typography: {
         fontFamily: 'Inter Sans, sans-serif',

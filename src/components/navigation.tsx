@@ -10,6 +10,7 @@ const NavigationWrapper = styled.nav`
     border-radius: ${styles.borderRadius.xxLarge};
     background: #1A1A1A80;
     border: 1px solid #2A2A2A;
+    margin: 0 auto;
 `
 const SvgWrapper = styled.div`
     display: flex;

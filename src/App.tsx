@@ -5,6 +5,17 @@ import { ScheduleApi } from './api/scheduleApi'
 import Navigation from './components/navigation'
 import TileCard from './components/tile_card';
 import {Tile, TileCardProps} from './util/interface'
+import styled from 'styled-components';
+import styles from './util/styles';
+
+const TileCardWrapper = styled.div`
+  display: flex;
+  max-width: 1200px;
+  height: 101px;
+  // border: 1px solid rgb(202, 20, 20);
+  padding-left: 40px;
+  margin: 1.5rem auto;
+`
 
 function renderTileNames(tiles: Array<Tile>) {
   if (tiles != null && tiles.length > 0) {
@@ -18,15 +29,28 @@ function renderTileNames(tiles: Array<Tile>) {
 }
 
 const sampleTiles: Array<TileCardProps> = [
-  {heading: "Tile 1", location: "Location 1", startTime: "09:00 AM", endTime: "10:00 AM" },
-  {heading: "Tile 2", location: "Location 2", startTime: "10:00 AM", endTime: "11:00 AM" },
-  {heading: "Tile 3", location: "Location 3", startTime: "11:00 AM", endTime: "12:00 PM" },
-  {heading: "Tile 4", location: "Location 4", startTime: "12:00 PM", endTime: "01:00 PM" }
+  {heading: "Meeting With Charles", location: "Conference Room A", startTime: "09:00 AM", endTime: "10:00 AM", backgroundColor: styles.colors.tileBackgroundPrimary },
+  {heading: "Morning Meeting", location: "Conference Room A", startTime: "10:00 AM", endTime: "11:00 AM", backgroundColor: styles.colors.tileBackgroundSecondary },
+  {heading: "Client Call", location: "Conference Room A", startTime: "11:00 AM", endTime: "12:00 PM", backgroundColor: styles.colors.tileBackgroundTertiary },
+  {heading: "Lunch Break", location: "Conference Room A", startTime: "12:00 PM", endTime: "01:00 PM", backgroundColor: styles.colors.tileBackgroundSecondary }
 ];
+
+const sampleTiles2: Array<TileCardProps> = [
+  {heading: "Meeting With Charles", location: "Conference Room A", startTime: "09:00 AM", endTime: "10:00 AM", backgroundColor: styles.colors.tileBackgroundSecondary },
+  {heading: "Team Sync", location: "Conference Room A", startTime: "10:00 AM", endTime: "11:00 AM", backgroundColor: styles.colors.tileBackgroundTertiary },
+  {heading: "Project Review", location: "Conference Room A", startTime: "11:00 AM", endTime: "12:00 PM", backgroundColor: styles.colors.tileBackgroundSecondary },
+  {heading: "Happy Hour", location: "Conference Room A", startTime: "12:00 PM", endTime: "01:00 PM", backgroundColor: styles.colors.tileBackgroundPrimary }
+];
+
+const sampleTiles3: Array<TileCardProps> = [
+  {heading: "Breakfast with Friends", location: "Restaurants", startTime: "09:00 AM", endTime: "10:00 AM", backgroundColor: styles.colors.tileBackgroundPrimary },
+  {heading: "Grocery Shopping", location: "Grocery Store", startTime: "10:00 AM", endTime: "11:00 AM", backgroundColor: styles.colors.tileBackgroundSecondary },
+  {heading: "Gym Workouts", location: "Gym", startTime: "11:00 AM", endTime: "12:00 PM", backgroundColor: styles.colors.tileBackgroundTertiary },
+  {heading: "Meeting With Charles", location: "Zoom", startTime: "12:00 PM", endTime: "01:00 PM", backgroundColor: styles.colors.tileBackgroundSecondary }
+];
+
 function App() {
   const [tilesForTheNextWeek, setTiles] = useState([])
-
-
 
   return (
     <>
@@ -63,10 +87,23 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       </div>
+      <TileCardWrapper>
+        {sampleTiles.map((tile) => {
+          return <TileCard key={tile.heading} {...tile} />
+        })}
+      </TileCardWrapper>
 
-      {sampleTiles.map((tile) => {
-        return <TileCard key={tile.heading} {...tile} />
-      })}
+      <TileCardWrapper>
+        {sampleTiles2.map((tile) => {
+          return <TileCard key={tile.heading} {...tile} />
+        })}
+      </TileCardWrapper>
+
+      <TileCardWrapper>
+        {sampleTiles3.map((tile) => {
+          return <TileCard key={tile.heading} {...tile} />
+        })}
+      </TileCardWrapper>
     </>
   )
 }
