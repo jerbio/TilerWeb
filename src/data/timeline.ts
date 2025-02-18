@@ -1,3 +1,1 @@
-export class Timeline {
-    
-}
+export class Timeline {}

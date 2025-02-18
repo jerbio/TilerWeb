@@ -39,7 +39,7 @@ const StyledButton = styled.button<ButtonProps>`
 					? styles.buttonWidths.medium
 					: props.width};
 	&:hover {
-		background-color: ${(props) =>{
+		background-color: ${(props) => {
 			if (typeof props.primary === 'boolean' && props.primary) {
 				return styles.colors.buttonSecondary;
 			} else if (typeof props.primary === 'boolean') {

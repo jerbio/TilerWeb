@@ -1,12 +1,12 @@
 export interface Tile {
-    id: string;
-    name: string;
-  }
+	id: string;
+	name: string;
+}
 
 export interface TileCardProps {
-    heading: string;
-    location: string;
-    startTime: string;
-    endTime: string;
-    background_color: string;
+	heading: string;
+	location: string;
+	startTime: string;
+	endTime: string;
+	background_color: string;
 }
