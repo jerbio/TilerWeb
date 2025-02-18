@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import styles from '../util/styles';
 import { TileCardProps } from '../util/interface';
 
-const TileWrapper = styled.div<{ backgroundColor: string }>`
+const TileWrapper = styled.div<{ background_color: string }>`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -13,7 +13,7 @@ const TileWrapper = styled.div<{ backgroundColor: string }>`
     border-radius: ${styles.borderRadius.xLarge};
     border: 1px solid #2A2A2A;
     color: ${styles.colors.text};
-    background: ${(props) => `linear-gradient(102.27deg, rgba(26, 26, 26, 0.1) 41.07%, ${props.backgroundColor}80 124.88%)`}; /* Added opacity */
+    background: ${(props) => `linear-gradient(102.27deg, rgba(26, 26, 26, 0.1) 41.07%, ${props.background_color}80 124.88%)`}; /* Added opacity */
     margin-right: 20px;
 
     h2 {
@@ -43,9 +43,9 @@ const TileWrapper = styled.div<{ backgroundColor: string }>`
     }
 `;
 
-const TileCard: React.FC<TileCardProps> = ({ heading, location, startTime, endTime, backgroundColor }) => {
+const TileCard: React.FC<TileCardProps> = ({ heading, location, startTime, endTime, background_color }) => {
     return (
-        <TileWrapper backgroundColor={backgroundColor}>
+        <TileWrapper background_color={background_color}>
             <h2>{heading}</h2>
             <span>
                 <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">

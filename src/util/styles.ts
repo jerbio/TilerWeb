@@ -3,6 +3,7 @@ const styles = {
         primary: '#3498db',
         secondary: '#2ecc71',
         background: '#ecf0f1',
+        backgroundRed: '#ED123B',
         text: '#A1A1A1',
         border: '#bdc3c7',
         buttonPrimary: '#000000',

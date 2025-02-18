@@ -8,5 +8,5 @@ export interface TileCardProps {
     location: string;
     startTime: string;
     endTime: string;
-    backgroundColor: string;
+    background_color: string;
 }
