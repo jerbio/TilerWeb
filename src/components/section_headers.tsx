@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import styles from '../util/styles';
 
 interface SectionHeadersProps {
 	headerText: string;
@@ -22,10 +23,14 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 
 const Header = styled.h1`
 	margin: 0;
+	font-size: ${styles.typography.displaySm};
 `;
 
 const SubHeader = styled.p`
 	margin: 0;
+	color: ${styles.colors.textGrey};
+	font-size: ${styles.typography.textMd};
+	width: 480px;
 `;
 
 const SectionHeaders: React.FC<SectionHeadersProps> = ({

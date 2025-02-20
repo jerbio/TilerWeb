@@ -43,10 +43,38 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 	padding: 20px;
 	margin: 10px;
 	color: white;
-	width: 250px;
-	height: 262px;
+	width: 262px;
+	height: 250px;
 	border-radius: 16px;
 	border: 1px solid ${styles.colors.borderRed};
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	text-align: left;
+`;
+
+const MiniTitle = styled.p`
+	// border: 1px solid ${styles.colors.borderRed};
+	color: ${styles.colors.textRed};
+	font-size: ${styles.typography.textXxs};
+	margin: 0;
+`;
+
+const Title = styled.h2`
+	margin: 0;
+	padding: 0;
+	font-size: ${styles.typography.displayXs};
+	line-height: ${styles.typography.lineHeightMd};
+	font-family: ${styles.typography.fontUrbanist};
+	font-weight: 700;
+`;
+
+const Body = styled.p`
+	margin: 0;
+	padding: 0;
+	padding-top: 10px;
+	font-size: ${styles.typography.textSm};
+	color: #ffffffbf;
 `;
 
 const FeatureHighlightsSection: React.FC = () => {
@@ -63,8 +91,11 @@ const FeatureHighlightsSection: React.FC = () => {
 						key={index}
 						backgroundImage={highlight.backgroundImage}
 					>
-						<h2>{highlight.header}</h2>
-						<p>{highlight.body}</p>
+						<MiniTitle>{highlight.subHeader}</MiniTitle>
+						<div style={{ height: '97px', width: '218px' }}>
+							<Title>{highlight.header}</Title>
+							<Body>{highlight.body}</Body>
+						</div>
 					</HighlightCard>
 				))}
 			</HighlightCardWrapper>
