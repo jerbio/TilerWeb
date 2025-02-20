@@ -4,7 +4,6 @@ import { ScheduleApi } from '../api/scheduleApi';
 
 import { Tile } from '../util/interface';
 
-
 function renderTileNames(tiles: Array<Tile>) {
 	if (tiles != null && tiles.length > 0) {
 		return tiles.map((eachTile: Tile) => {
@@ -19,10 +18,10 @@ function renderTileNames(tiles: Array<Tile>) {
 }
 
 const TileFromApi: React.FC = () => {
-    const [tilesForTheNextWeek, setTiles] = useState([]);
-    return(
-        <>
-        <div className="card">
+	const [tilesForTheNextWeek, setTiles] = useState([]);
+	return (
+		<>
+			<div className="card">
 				<button
 					onClick={() => {
 						const userApi = new UserApi();
@@ -59,8 +58,8 @@ const TileFromApi: React.FC = () => {
 					Click on the Vite and React logos to learn more
 				</p>
 			</div>
-        </>
-    )
-}
+		</>
+	);
+};
 
 export default TileFromApi;

@@ -11,6 +11,7 @@ const styles = {
 		tileBackgroundPrimary: '#37FF00',
 		tileBackgroundSecondary: '#222222',
 		tileBackgroundTertiary: '#0077FF',
+		borderRed: '#F03D5F',
 	},
 	typography: {
 		fontFamily: 'Inter Sans, sans-serif',

@@ -10,3 +10,10 @@ export interface TileCardProps {
 	endTime: string;
 	background_color: string;
 }
+
+export interface Highlight {
+	subHeader: string;
+	header: string;
+	body: string;
+	backgroundImage: string;
+}

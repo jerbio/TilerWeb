@@ -1,7 +1,8 @@
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
-	public async getSchedule() { // : Promise<Schedule>
+	public async getSchedule() {
+		// : Promise<Schedule>
 		const oneWeekInMs = 24 * 7 * 86400000;
 		const start = Date.now();
 		const end = start + oneWeekInMs;
