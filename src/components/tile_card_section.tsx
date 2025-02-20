@@ -4,8 +4,9 @@ import TileCard from './tile_card';
 import { TileCardProps } from '../util/interface';
 import styles from '../util/styles';
 import Button from './button';
+import SectionHeaders from './section_headers';
 
-const Section = styled.div`
+const TileSectionWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -115,7 +116,12 @@ const sampleTiles3: Array<TileCardProps> = [
 
 const TileCardSection: React.FC = () => {
 	return (
-		<Section>
+		<TileSectionWrapper>
+			<SectionHeaders
+				headerText="Visualize your tasks and appointments"
+				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
+				align="center"
+			/>
 			<TileCardWrapper>
 				{sampleTiles.map((tile) => {
 					return <TileCard key={tile.heading} {...tile} />;
@@ -137,7 +143,7 @@ const TileCardSection: React.FC = () => {
 			<Button primary={styles.colors.backgroundRed} width="large">
 				Create your own tiles
 			</Button>
-		</Section>
+		</TileSectionWrapper>
 	);
 };
 export default TileCardSection;

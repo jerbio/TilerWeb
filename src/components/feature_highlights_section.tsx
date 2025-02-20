@@ -5,6 +5,7 @@ import { Highlight } from '../util/interface';
 import MountainBackground from '../util/image_assets/mountain.jpg';
 import FitnessBackground from '../util/image_assets/fitness.jpg';
 import TilesBackground from '../util/image_assets/tiles.jpg';
+import SectionHeaders from './section_headers';
 
 const highlights: Highlight[] = [
 	{
@@ -29,7 +30,9 @@ const highlights: Highlight[] = [
 
 const HighlightCardWrapper = styled.div`
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
+	width: 846px;
+	margin: 0 auto;
 	// border: 1px solid red;
 `;
 
@@ -48,17 +51,24 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 
 const FeatureHighlightsSection: React.FC = () => {
 	return (
-		<HighlightCardWrapper>
-			{highlights.map((highlight, index) => (
-				<HighlightCard
-					key={index}
-					backgroundImage={highlight.backgroundImage}
-				>
-					<h2>{highlight.header}</h2>
-					<p>{highlight.body}</p>
-				</HighlightCard>
-			))}
-		</HighlightCardWrapper>
+		<>
+			<SectionHeaders
+				headerText="Feature Highlights"
+				subHeaderText="Simplify your life with Tiler, Here's what we can do to help you."
+				align="center"
+			/>
+			<HighlightCardWrapper>
+				{highlights.map((highlight, index) => (
+					<HighlightCard
+						key={index}
+						backgroundImage={highlight.backgroundImage}
+					>
+						<h2>{highlight.header}</h2>
+						<p>{highlight.body}</p>
+					</HighlightCard>
+				))}
+			</HighlightCardWrapper>
+		</>
 	);
 };
 
