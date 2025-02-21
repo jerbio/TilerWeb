@@ -10,6 +10,8 @@ const TileSectionWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+  margin: 50px 0;
+  // border: 1px solid ${styles.colors.borderRed};
 `;
 
 const TileCardWrapper = styled.div`

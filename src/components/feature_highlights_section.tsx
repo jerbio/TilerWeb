@@ -28,6 +28,11 @@ const highlights: Highlight[] = [
 	},
 ];
 
+const HighlightRootWrapper = styled.div`
+    margin: 50px 0;
+    // border: 1px solid ${styles.colors.borderRed};
+`;
+
 const HighlightCardWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
@@ -40,7 +45,7 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 	background-image: url(${(props) => props.backgroundImage});
 	background-size: cover;
 	background-position: center;
-	padding: 20px;
+	padding: 15px;
 	margin: 10px;
 	color: white;
 	width: 262px;
@@ -79,7 +84,7 @@ const Body = styled.p`
 
 const FeatureHighlightsSection: React.FC = () => {
 	return (
-		<>
+		<HighlightRootWrapper>
 			<SectionHeaders
 				headerText="Feature Highlights"
 				subHeaderText="Simplify your life with Tiler, Here's what we can do to help you."
@@ -99,7 +104,7 @@ const FeatureHighlightsSection: React.FC = () => {
 					</HighlightCard>
 				))}
 			</HighlightCardWrapper>
-		</>
+		</HighlightRootWrapper>
 	);
 };
 
