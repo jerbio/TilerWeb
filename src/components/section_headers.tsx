@@ -5,6 +5,7 @@ import styles from '../util/styles';
 interface SectionHeadersProps {
 	headerText: string;
 	subHeaderText: string;
+	spanText?: string;
 	align?: 'left' | 'center' | 'right';
 }
 
@@ -24,6 +25,9 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 const Header = styled.h1`
 	margin: 0;
 	font-size: ${styles.typography.displaySm};
+	span {
+		color: ${styles.colors.backgroundRed};
+	}
 `;
 
 const SubHeader = styled.p`
@@ -36,11 +40,16 @@ const SubHeader = styled.p`
 const SectionHeaders: React.FC<SectionHeadersProps> = ({
 	headerText,
 	subHeaderText,
+	spanText,
 	align = 'center',
 }) => {
 	return (
 		<Container align={align}>
-			<Header>{headerText}</Header>
+			<Header>
+				{headerText}
+				<br />
+				{spanText && <span>{spanText}</span>}
+			</Header>
 			<SubHeader>{subHeaderText}</SubHeader>
 		</Container>
 	);

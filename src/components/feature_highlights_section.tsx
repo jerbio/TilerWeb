@@ -29,8 +29,8 @@ const highlights: Highlight[] = [
 ];
 
 const HighlightRootWrapper = styled.div`
-    margin: 50px 0;
-    // border: 1px solid ${styles.colors.borderRed};
+	margin: 50px 0;
+	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const HighlightCardWrapper = styled.div`

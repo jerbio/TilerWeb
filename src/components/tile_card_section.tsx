@@ -10,17 +10,16 @@ const TileSectionWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-  margin: 50px 0;
-  // border: 1px solid ${styles.colors.borderRed};
+	margin: 50px 0;
+	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const TileCardWrapper = styled.div`
 	display: flex;
 	max-width: 1200px;
 	height: 101px;
-	// border: 1px solid rgb(202, 20, 20);
-	padding-left: 40px;
-	margin: 1.5rem auto;
+	margin: 0.75rem auto;
+	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const sampleTiles: Array<TileCardProps> = [
