@@ -3,6 +3,10 @@ import styled from 'styled-components';
 import styles from '../util/styles';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
+import InstagramLogo from '../util/image_assets/instagram_logo.png';
+import FacebookLogo from '../util/image_assets/facebook_logo.png';
+import LinkedInLogo from '../util/image_assets/linkedin_logo.png';
+import XLogo from '../util/image_assets/x_logo.png';
 
 const FooterContainer = styled.div`
 	background: #1a1a1a80;
@@ -30,6 +34,11 @@ const FooterRow = styled.div`
 
 const TilerLogo = styled.img`
 	width: 100px;
+`;
+
+const SocialLogo = styled.img<{ src: string }>`
+	width: auto;
+	height: 16px;
 `;
 
 const FooterLink = styled.a`
@@ -86,7 +95,7 @@ const FooterSection: React.FC = () => {
 						</SvgWrapper>
 					</FooterRow>
 					<FooterRow>
-						<p>&copy; 2023 Tiler. All rights reserved.</p>
+						<p>&copy; {new Date().getFullYear()} Tiler. All rights reserved.</p>
 					</FooterRow>
 					<FooterRow>
 						<FooterLink
@@ -94,28 +103,28 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Facebook
+							<SocialLogo src={FacebookLogo} alt="Facebook Logo"/>
 						</FooterLink>
 						<FooterLink
 							href="https://www.linkedin.com/company/tiler"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							LinkedIn
+							<SocialLogo src={LinkedInLogo} alt="LinkedIn Logo"/>
 						</FooterLink>
 						<FooterLink
 							href="https://www.instagram.com/tiler"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Instagram
+							<SocialLogo src={InstagramLogo} alt="Instagram Logo" />
 						</FooterLink>
 						<FooterLink
 							href="https://www.twitter.com/tiler"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							X
+							<SocialLogo src={XLogo} alt="X Logo" />
 						</FooterLink>
 					</FooterRow>
 				</FooterColumn>

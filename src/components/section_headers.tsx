@@ -6,6 +6,8 @@ interface SectionHeadersProps {
 	headerText: string;
 	subHeaderText: string;
 	spanText?: string;
+	image?: string;
+	imageAlt?: string;
 	align?: 'left' | 'center' | 'right';
 }
 
@@ -28,6 +30,11 @@ const Header = styled.h1`
 	span {
 		color: ${styles.colors.backgroundRed};
 	}
+	img {
+		width: 20px;
+		height: auto;
+		margin-left: 10px;
+	}
 `;
 
 const SubHeader = styled.p`
@@ -41,6 +48,8 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 	headerText,
 	subHeaderText,
 	spanText,
+	image,
+	imageAlt,
 	align = 'center',
 }) => {
 	return (
@@ -49,6 +58,7 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 				{headerText}
 				<br />
 				{spanText && <span>{spanText}</span>}
+				{image && <img src={image} alt={imageAlt} />}
 			</Header>
 			<SubHeader>{subHeaderText}</SubHeader>
 		</Container>
