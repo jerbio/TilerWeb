@@ -95,7 +95,10 @@ const FooterSection: React.FC = () => {
 						</SvgWrapper>
 					</FooterRow>
 					<FooterRow>
-						<p>&copy; {new Date().getFullYear()} Tiler. All rights reserved.</p>
+						<p>
+							&copy; {new Date().getFullYear()} Tiler. All rights
+							reserved.
+						</p>
 					</FooterRow>
 					<FooterRow>
 						<FooterLink
@@ -103,21 +106,30 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo src={FacebookLogo} alt="Facebook Logo"/>
+							<SocialLogo
+								src={FacebookLogo}
+								alt="Facebook Logo"
+							/>
 						</FooterLink>
 						<FooterLink
 							href="https://www.linkedin.com/company/tiler"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo src={LinkedInLogo} alt="LinkedIn Logo"/>
+							<SocialLogo
+								src={LinkedInLogo}
+								alt="LinkedIn Logo"
+							/>
 						</FooterLink>
 						<FooterLink
 							href="https://www.instagram.com/tiler"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo src={InstagramLogo} alt="Instagram Logo" />
+							<SocialLogo
+								src={InstagramLogo}
+								alt="Instagram Logo"
+							/>
 						</FooterLink>
 						<FooterLink
 							href="https://www.twitter.com/tiler"
