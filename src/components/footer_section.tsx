@@ -102,7 +102,7 @@ const FooterSection: React.FC = () => {
 					</FooterRow>
 					<FooterRow>
 						<FooterLink
-							href="https://www.facebook.com/tiler"
+							href="https://www.facebook.com/profile.php?id=100094419297775"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -112,7 +112,7 @@ const FooterSection: React.FC = () => {
 							/>
 						</FooterLink>
 						<FooterLink
-							href="https://www.linkedin.com/company/tiler"
+							href="https://www.linkedin.com/company/tilerapp"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -122,7 +122,7 @@ const FooterSection: React.FC = () => {
 							/>
 						</FooterLink>
 						<FooterLink
-							href="https://www.instagram.com/tiler"
+							href="https://www.instagram.com/tiler.app/"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -132,7 +132,7 @@ const FooterSection: React.FC = () => {
 							/>
 						</FooterLink>
 						<FooterLink
-							href="https://www.twitter.com/tiler"
+							href="https://x.com/Tiler_app"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -142,15 +142,25 @@ const FooterSection: React.FC = () => {
 				</FooterColumn>
 				<FooterColumn>
 					<FooterRow>
-						<FooterLink href="/legal">Legal</FooterLink>
+						Legal
 					</FooterRow>
 					<FooterRow>
-						<FooterLink href="/terms-of-use">
+						<FooterLink
+							href="https://tiler.app/tos"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							Terms of Use
 						</FooterLink>
 					</FooterRow>
 					<FooterRow>
-						<FooterLink href="/privacy">Privacy</FooterLink>
+						<FooterLink
+							href="https://tiler.app/privacy"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Privacy
+						</FooterLink>
 					</FooterRow>
 				</FooterColumn>
 			</FooterSubContainer>

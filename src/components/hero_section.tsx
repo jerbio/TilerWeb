@@ -26,7 +26,7 @@ const HeroSection: React.FC = () => {
 				align="center"
 			/>
 			<ButtonContainer>
-				<Button primary={true} width="large">
+				<Button primary={true} width="large" onClick={() => window.open('https://tiler.app/account/login', '_blank')}>
 					Get Started with Tiler
 				</Button>
 				<Button primary={styles.colors.backgroundRed} width="large">
