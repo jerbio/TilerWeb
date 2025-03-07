@@ -135,7 +135,7 @@ const TileCardSection: React.FC = () => {
 				})}
 			</TileCardWrapper>
 
-			<TileCardWrapper>
+			<TileCardWrapper style={{ marginBottom: '50px' }}>
 				{sampleTiles3.map((tile) => {
 					return <TileCard key={tile.heading} {...tile} />;
 				})}
