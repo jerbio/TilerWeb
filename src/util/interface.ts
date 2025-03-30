@@ -9,6 +9,8 @@ export interface TileCardProps {
 	startTime: string;
 	endTime: string;
 	background_color: string;
+	style?: React.CSSProperties;
+	index?: number;
 }
 
 export interface Highlight {

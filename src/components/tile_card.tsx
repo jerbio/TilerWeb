@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import styles from '../util/styles';
 import { TileCardProps } from '../util/interface';
 
-const TileWrapper = styled.div<{ background_color: string }>`
+const TileWrapper = styled.div<{ background_color: string, index?: number }>`
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -50,9 +50,10 @@ const TileCard: React.FC<TileCardProps> = ({
 	startTime,
 	endTime,
 	background_color,
+	index,
 }) => {
 	return (
-		<TileWrapper background_color={background_color}>
+		<TileWrapper background_color={background_color} index={index}>
 			<h2>{heading}</h2>
 			<span>
 				<svg
