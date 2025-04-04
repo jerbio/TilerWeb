@@ -8,6 +8,9 @@ const NavigationContainer = styled.div`
 	padding: 1.5rem;
   display: flex;
   justify-content: center;
+  position: sticky;
+  top: 0px;
+  z-index: 999;
 `;
 
 const NavigationWrapper = styled.nav`
@@ -17,8 +20,9 @@ const NavigationWrapper = styled.nav`
 	padding: 14px 32px;
 	max-width: 800px;
 	border-radius: ${styles.borderRadius.xxLarge};
-	background: #1a1a1a80;
+	background-color: #1A1A1Ad2;
 	border: 1px solid #2a2a2a;
+  backdrop-filter: blur(16px);
 `;
 const NavItems = styled.ul`
 	display: flex;
