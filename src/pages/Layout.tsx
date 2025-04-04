@@ -7,12 +7,11 @@ function Layout() {
 	return (
 		<React.Fragment>
 			<Navigation />
-			<main>
-				<Outlet />
-			</main>
+			<Outlet />
 			<FooterSection />
 		</React.Fragment>
 	);
 }
 
 export default Layout;
+
