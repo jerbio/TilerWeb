@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import MountainBackground from '../util/image_assets/mountain.jpg';
-import SWE from '../util/image_assets/swe.png';
-import Engineer from '../util/image_assets/engineer.png';
-import Healthcare from '../util/image_assets/healthcare.png';
+import MountainBackground from '../../util/image_assets/mountain.jpg';
+import SWE from '../../util/image_assets/swe.png';
+import Engineer from '../../util/image_assets/engineer.png';
+import Healthcare from '../../util/image_assets/healthcare.png';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 // import 'swiper/swiper-bundle.min.css'

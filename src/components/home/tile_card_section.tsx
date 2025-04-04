@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import TileCard from './tile_card';
-import { TileCardProps } from '../util/interface';
-import styles from '../util/styles';
-import Button from './button';
+import { TileCardProps } from '../../util/interface';
+import styles from '../../util/styles';
+import Button from '../shared/button';
 import SectionHeaders from './section_headers';
 
 const TileSectionWrapper = styled.div`
