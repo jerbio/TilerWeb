@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from './section_headers';
-import Button from './button';
-import styles from '../util/styles';
+import Button from '../shared/button';
+import styles from '../../util/styles';
 
 const HeroSectionContainer = styled.div`
 	display: flex;

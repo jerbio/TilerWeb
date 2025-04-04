@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import styles from '../util/styles';
-import Button from './button';
+import Button from './shared/button';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
 
@@ -14,7 +14,6 @@ const NavigationWrapper = styled.nav`
 	border: 1px solid #2a2a2a;
 	margin: 0 auto;
 `;
-
 const NavItems = styled.ul`
 	display: flex;
 	justify-content: space-evenly;
@@ -34,6 +33,7 @@ const ButtonsWrapper = styled.div`
 	width: 210px;
 	// border: 1px solid ${styles.colors.border};
 `;
+
 const Navigation = () => {
 	return (
 		<NavigationWrapper>
@@ -78,10 +78,10 @@ const Navigation = () => {
 					<a href="#about" style={{ color: 'inherit', textDecoration: 'none' }}>About Tiler</a>
 				</li>
 				<li className="nav-item">
-					<a href="#contact" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</a>
+					<a href="/features" style={{ color: 'inherit', textDecoration: 'none' }}>Features</a>
 				</li>
 				<li className="nav-item">
-					<a href="#download" style={{ color: 'inherit', textDecoration: 'none' }}>Download</a>
+					<a href="#contact" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</a>
 				</li>
 			</NavItems>
 			<ButtonsWrapper>

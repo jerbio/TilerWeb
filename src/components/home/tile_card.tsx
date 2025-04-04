@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../util/styles';
-import { TileCardProps } from '../util/interface';
+import styles from '../../util/styles';
+import { TileCardProps } from '../../util/interface';
 
 const TileWrapper = styled.div<{ background_color: string, index?: number }>`
 	display: flex;

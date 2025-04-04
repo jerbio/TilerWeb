@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../util/styles';
-import { Highlight } from '../util/interface';
-import MountainBackground from '../util/image_assets/mountain.jpg';
-import FitnessBackground from '../util/image_assets/fitness.jpg';
-import TilesBackground from '../util/image_assets/tiles.jpg';
+import styles from '../../util/styles';
+import { Highlight } from '../../util/interface';
+import MountainBackground from '../../util/image_assets/mountain.jpg';
+import FitnessBackground from '../../util/image_assets/fitness.jpg';
+import TilesBackground from '../../util/image_assets/tiles.jpg';
 import SectionHeaders from './section_headers';
 
 const highlights: Highlight[] = [
@@ -109,3 +109,4 @@ const FeatureHighlightsSection: React.FC = () => {
 };
 
 export default FeatureHighlightsSection;
+
