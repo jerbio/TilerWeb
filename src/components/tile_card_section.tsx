@@ -11,7 +11,7 @@ const TileSectionWrapper = styled.div`
 	flex-direction: column;
 	align-items: center;
 	margin: 50px 0;
-	// border: 1px solid ${styles.colors.borderRed};
+	// border: 1px solid ${styles.colors.borderRed};s
 `;
 
 const TileCardWrapper = styled.div`
@@ -21,6 +21,14 @@ const TileCardWrapper = styled.div`
 	margin: 0.75rem auto;
 	// border: 1px solid ${styles.colors.borderRed};
 `;
+
+const TileFadeDiv = styled.div`
+	width: 300px;
+	height: 101px;
+	position: absolute;
+	background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 70%, rgba(0,212,255,0) 0%)
+
+`
 
 const sampleTiles: Array<TileCardProps> = [
 	{
@@ -123,11 +131,14 @@ const TileCardSection: React.FC = () => {
 				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
 				align="center"
 			/>
+			<div>
 			<TileCardWrapper style={{marginRight: '50px'}}>
 				{sampleTiles.map((tile, index) => {
 					return <TileCard key={index} {...tile} index={index} />;
 				})}
 			</TileCardWrapper>
+			{/* <TileFadeDiv/> */}
+			</div>
 
 			<TileCardWrapper style={{marginLeft: '50px'}}>
 				{sampleTiles2.map((tile, index) => {
