@@ -26,9 +26,13 @@ const TileFadeDiv = styled.div`
 	width: 300px;
 	height: 101px;
 	position: absolute;
-	background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 70%, rgba(0,212,255,0) 0%)
-
-`
+	background: linear-gradient(
+		90deg,
+		rgba(2, 0, 36, 1) 0%,
+		rgba(9, 9, 121, 1) 70%,
+		rgba(0, 212, 255, 0) 0%
+	);
+`;
 
 const sampleTiles: Array<TileCardProps> = [
 	{
@@ -132,23 +136,25 @@ const TileCardSection: React.FC = () => {
 				align="center"
 			/>
 			<div>
-			<TileCardWrapper style={{marginRight: '50px'}}>
-				{sampleTiles.map((tile, index) => {
+				<TileCardWrapper style={{ marginRight: '50px' }}>
+					{sampleTiles.map((tile, index) => {
+						return <TileCard key={index} {...tile} index={index} />;
+					})}
+				</TileCardWrapper>
+				{/* <TileFadeDiv/> */}
+			</div>
+
+			<TileCardWrapper style={{ marginLeft: '50px' }}>
+				{sampleTiles2.map((tile, index) => {
 					return <TileCard key={index} {...tile} index={index} />;
 				})}
 			</TileCardWrapper>
-			{/* <TileFadeDiv/> */}
-			</div>
 
-			<TileCardWrapper style={{marginLeft: '50px'}}>
-				{sampleTiles2.map((tile, index) => {
-					return <TileCard key={index} {...tile} index={index}/>;
-				})}
-			</TileCardWrapper>
-
-			<TileCardWrapper style={{ marginBottom: '50px', marginRight: '50px'}}>
+			<TileCardWrapper
+				style={{ marginBottom: '50px', marginRight: '50px' }}
+			>
 				{sampleTiles3.map((tile, index) => {
-					return <TileCard  key={index} {...tile} index={index}/>;
+					return <TileCard key={index} {...tile} index={index} />;
 				})}
 			</TileCardWrapper>
 

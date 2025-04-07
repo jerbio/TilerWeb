@@ -75,20 +75,46 @@ const Navigation = () => {
 			</SvgWrapper>
 			<NavItems>
 				<li className="nav-item">
-					<a href="#about" style={{ color: 'inherit', textDecoration: 'none' }}>About Tiler</a>
+					<a
+						href="#about"
+						style={{ color: 'inherit', textDecoration: 'none' }}
+					>
+						About Tiler
+					</a>
 				</li>
 				<li className="nav-item">
-					<a href="#contact" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</a>
+					<a
+						href="#contact"
+						style={{ color: 'inherit', textDecoration: 'none' }}
+					>
+						Contact
+					</a>
 				</li>
 				<li className="nav-item">
-					<a href="#download" style={{ color: 'inherit', textDecoration: 'none' }}>Download</a>
+					<a
+						href="#download"
+						style={{ color: 'inherit', textDecoration: 'none' }}
+					>
+						Download
+					</a>
 				</li>
 			</NavItems>
 			<ButtonsWrapper>
-				<Button primary={true} width="113px" onClick={() => window.open('https://tiler.app/', '_blank')}>
+				<Button
+					primary={true}
+					width="113px"
+					onClick={() => window.open('https://tiler.app/', '_blank')}
+				>
 					Try Tiler for free
 				</Button>
-				<Button width="65px" onClick={() => window.open('https://tiler.app/account/login', '_blank')}>Sign Up</Button>
+				<Button
+					width="65px"
+					onClick={() =>
+						window.open('https://tiler.app/account/login', '_blank')
+					}
+				>
+					Sign Up
+				</Button>
 			</ButtonsWrapper>
 		</NavigationWrapper>
 	);

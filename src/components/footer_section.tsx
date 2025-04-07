@@ -141,9 +141,7 @@ const FooterSection: React.FC = () => {
 					</FooterRow>
 				</FooterColumn>
 				<FooterColumn>
-					<FooterRow>
-						Legal
-					</FooterRow>
+					<FooterRow>Legal</FooterRow>
 					<FooterRow>
 						<FooterLink
 							href="https://tiler.app/tos"
