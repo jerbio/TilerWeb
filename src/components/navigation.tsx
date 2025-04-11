@@ -24,6 +24,7 @@ const NavigationWrapper = styled.nav`
 	border: 1px solid #2a2a2a;
   backdrop-filter: blur(16px);
 `;
+
 const NavItems = styled.ul`
 	display: flex;
 	justify-content: space-evenly;
@@ -32,16 +33,34 @@ const NavItems = styled.ul`
 	padding: 0;
 	margin: 0;
 	width: 210px;
-	font-size: ${styles.typography.textSm};
-	font-family: ${styles.typography.fontFamily};
+	font-size: ${styles.typography.fontSize.sm};
+	font-family: ${styles.typography.fontFamily.inter};
 	cursor: pointer;
 `;
+
 const ButtonsWrapper = styled.div`
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
 	width: 210px;
 	// border: 1px solid ${styles.colors.border};
+`;
+
+const NavItem = styled.li`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`;
+
+const NavLink = styled.a`
+  color: ${styles.colors.text};
+  text-decoration: none;
+  font-size: ${styles.typography.fontSize.sm};
+  font-family: ${styles.typography.fontFamily.inter};
+  cursor: pointer;
+  &:hover {
+    color: ${styles.colors.brand[500]};
+  }
 `;
 
 const Navigation = () => {
@@ -85,30 +104,15 @@ const Navigation = () => {
 					</svg>
 				</SvgWrapper>
 				<NavItems>
-					<li className="nav-item">
-						<a
-							href="/"
-							style={{ color: 'inherit', textDecoration: 'none' }}
-						>
-							About Tiler
-						</a>
-					</li>
-					<li className="nav-item">
-						<a
-							href="/features"
-							style={{ color: 'inherit', textDecoration: 'none' }}
-						>
-							Features
-						</a>
-					</li>
-					<li className="nav-item">
-						<a
-							href="#contact"
-							style={{ color: 'inherit', textDecoration: 'none' }}
-						>
-							Contact
-						</a>
-					</li>
+					<NavItem>
+						<NavLink href="/">Home</NavLink>
+					</NavItem>
+					<NavItem>
+						<NavLink href="/features">Features</NavLink>
+					</NavItem>
+					<NavItem>
+						<NavLink href="/about">About</NavLink>
+					</NavItem>
 				</NavItems>
 				<ButtonsWrapper>
 					<Button

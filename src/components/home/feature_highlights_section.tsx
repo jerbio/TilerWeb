@@ -61,16 +61,16 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 const MiniTitle = styled.p`
 	// border: 1px solid ${styles.colors.borderRed};
 	color: ${styles.colors.textRed};
-	font-size: ${styles.typography.textXxs};
+	font-size: ${styles.typography.fontSize.xs};
 	margin: 0;
 `;
 
 const Title = styled.h2`
 	margin: 0;
 	padding: 0;
-	font-size: ${styles.typography.displayXs};
-	line-height: ${styles.typography.lineHeightMd};
-	font-family: ${styles.typography.fontUrbanist};
+	font-size: ${styles.typography.fontSize.displayXs};
+	line-height: ${styles.typography.lineHeight.displayXs};
+	font-family: ${styles.typography.fontFamily.urban};
 	font-weight: 700;
 `;
 
@@ -78,7 +78,7 @@ const Body = styled.p`
 	margin: 0;
 	padding: 0;
 	padding-top: 10px;
-	font-size: ${styles.typography.textSm};
+	font-size: ${styles.typography.fontSize.sm};
 	color: #ffffffbf;
 `;
 

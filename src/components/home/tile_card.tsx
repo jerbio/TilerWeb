@@ -18,12 +18,12 @@ const TileWrapper = styled.div<{ background_color: string, index?: number }>`
 	margin-right: 20px;
 
 	h2 {
-		font-size: ${styles.typography.textMd};
+		font-size: ${styles.typography.fontSize.base};
 		font-weight: 600;
 		margin: 0 0.75rem;
 		margin-top: 1rem;
 		padding: 3px 5px 0 5px;
-		line-height: 19.36px;
+		line-height: ${styles.typography.lineHeight.sm};
 	}
 
 	span {
@@ -38,7 +38,7 @@ const TileWrapper = styled.div<{ background_color: string, index?: number }>`
 	}
 
 	p {
-		font-size: ${styles.typography.textSm};
+		font-size: ${styles.typography.fontSize.sm};
 		margin: 0 0.25rem;
 		padding: 0;
 	}

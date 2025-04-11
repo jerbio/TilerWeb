@@ -1,11 +1,97 @@
-import React from 'react';
+import styled from 'styled-components';
+import styles from '../../util/styles';
 
-type FeatureCardProps = {
+const Article = styled.article<{ $reversed: boolean }>`
+	display: flex;
+	color: ${styles.colors.gray[400]};
+	flex-direction: column-reverse;
+	justify-center: center;
+	max-width: 400px;
+	background-color: ${styles.colors.gray[900]};
+	border-radius: ${styles.borderRadius.large};
+	position: relative;
+	border: 1px solid ${styles.colors.gray[800]};
+
+	@media (min-width: ${styles.screens.lg}) {
+		flex-direction: ${props => props.$reversed ? 'row-reverse' : 'row'};
+		max-width: none;
+		background-color: transparent;
+		border-radius: 0;
+		border: none;
+		gap: 4rem;
+	}
+`;
+
+const ContentWrapper = styled.div`
+	max-width: 450px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	justify-content: center;
+	padding: 1rem;
+
+	@media (min-width: ${styles.screens.lg}) {
+		padding: 0;
+	}
+`;
+
+const Title = styled.h2`
+	font-family: ${styles.typography.fontFamily.urban};
+	font-size: ${styles.typography.fontSize.displayXs};
+	font-weight: bold;
+	background: linear-gradient(to bottom, white, ${styles.colors.gray[400]});
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	line-height: 1.1;
+
+	@media (min-width: ${styles.screens.lg}) {
+		font-size: ${styles.typography.fontSize.displaySm};
+	}
+`;
+
+const Description = styled.p`
+	font-size: ${styles.typography.fontSize.base};
+
+	@media (min-width: ${styles.screens.lg}) {
+		font-size: ${styles.typography.fontSize.lg};
+	}
+`;
+
+const ImageContainer = styled.div`
+	overflow: hidden;
+	border: 1px solid ${styles.colors.gray[800]};
+	border-radius: ${styles.borderRadius.large};
+	width: 100%;
+
+	@media (min-width: ${styles.screens.lg}) {
+		width: 450px;
+	}
+`;
+
+const RedDot = styled.div`
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: none;
+	border-radius: 50%;
+  box-shadow: 0 0 0 2px ${styles.colors.brand[500]} inset;
+  background-color: ${styles.colors.brand[500]}50;
+
+	@media (min-width: ${styles.screens.lg}) {
+		display: block;
+	}
+`;
+
+interface FeatureCardProps {
 	title: string;
 	image: string;
 	children: React.ReactNode;
 	reversed: boolean;
-};
+}
 
 export default function FeatureCard({
 	title,
@@ -14,20 +100,16 @@ export default function FeatureCard({
 	reversed,
 }: FeatureCardProps) {
 	return (
-		<article
-			className={`flex text-gray-400 flex-col-reverse ${reversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} justify-center lg:gap-16 ring-1 lg:ring-0 ring-white/30 rounded-lg lg:rounded-none max-w-[400px] lg:max-w-none bg-white/10 lg:bg-white/0 relative`}
-		>
-			<div className="max-w-[450px] flex flex-col gap-2 justify-center p-4 lg:p-0">
-				<h2 className="font-urban text-display-xs lg:text-display-sm font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent leading-[1.1]">
-					{title}
-				</h2>
-				<p className="text-base lg:text-lg">{children}</p>
-			</div>
-			<div className="overflow-hidden ring-1 ring-[#E6E6E6]/20 rounded-lg w-full lg:w-[450px]">
+		<Article $reversed={reversed}>
+			<ContentWrapper>
+				<Title>{title}</Title>
+				<Description>{children}</Description>
+			</ContentWrapper>
+			<ImageContainer>
 				<img src={image} alt={`${title} image`} />
-			</div>
-      <div className='red-dot w-[12px] h-[12px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block rounded-full bg-brand-500'></div>
-		</article>
+			</ImageContainer>
+			<RedDot />
+		</Article>
 	);
 }
 

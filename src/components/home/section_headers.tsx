@@ -26,7 +26,7 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 
 const Header = styled.h1`
 	margin: 0;
-	font-size: ${styles.typography.displaySm};
+	font-size: ${styles.typography.fontSize.displaySm};
 	span {
 		color: ${styles.colors.backgroundRed};
 	}
@@ -40,7 +40,7 @@ const Header = styled.h1`
 const SubHeader = styled.p`
 	margin: 0;
 	color: ${styles.colors.textGrey};
-	font-size: ${styles.typography.textMd};
+	font-size: ${styles.typography.fontSize.base};
 	width: 480px;
 `;
 
