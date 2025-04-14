@@ -6,12 +6,21 @@ import CalendarIntegrationSection from './components/integration_section';
 import HeroSection from './components/hero_section';
 import FooterSection from './components/footer_section';
 import PersonaCarousel from './components/persona_carousel_section';
+import VideoIframeSection from './components/video_iframe_section';
 
 function App() {
 	return (
 		<>
 			<Navigation />
 			<PersonaCarousel />
+			<VideoIframeSection
+				src="https://www.youtube.com/embed/N3L49xMBZ60?si=BmQ0wHBvThDCh5Zc"
+				title="YouTube video player"
+				width="1200"
+				height="808"
+				allowFullScreen={true}
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+			/>
 			<FeatureHighlightsSection />
 			<TileCardSection />
 			<CalendarIntegrationSection />

@@ -11,27 +11,45 @@ const TileSectionWrapper = styled.div`
 	flex-direction: column;
 	align-items: center;
 	margin: 50px 0;
-	// border: 1px solid ${styles.colors.borderRed};s
+	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const TileCardWrapper = styled.div`
 	display: flex;
 	max-width: 1200px;
 	height: 101px;
-	margin: 0.75rem auto;
+	// margin: 0.75rem auto;
 	// border: 1px solid ${styles.colors.borderRed};
 `;
 
-const TileFadeDiv = styled.div`
+const TileFadeDivRight = styled.div`
+	top: 0;
+	right: 0;
 	width: 300px;
-	height: 101px;
+	height: 103px;
 	position: absolute;
 	background: linear-gradient(
 		90deg,
-		rgba(2, 0, 36, 1) 0%,
-		rgba(9, 9, 121, 1) 70%,
-		rgba(0, 212, 255, 0) 0%
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 0.7) 60%,
+		rgba(0, 0, 0, 0.95) 100%
 	);
+	// border: 6px solid red;
+`;
+
+const TileFadeDivLeft = styled.div`
+	top: 0;
+	left: 0;
+	width: 300px;
+	height: 103px;
+	position: absolute;
+	background: linear-gradient(
+		270deg,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 0.78) 60%,
+		rgba(0, 0, 0, 0.95) 100%
+	);
+	// border: 6px solid red;
 `;
 
 const sampleTiles: Array<TileCardProps> = [
@@ -135,28 +153,52 @@ const TileCardSection: React.FC = () => {
 				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
 				align="center"
 			/>
-			<div>
-				<TileCardWrapper style={{ marginRight: '50px' }}>
+			<div
+				style={{
+					position: 'relative',
+					marginTop: '0.75rem',
+					marginBottom: '0.75rem',
+					marginLeft: '100px',
+				}}
+			>
+				<TileCardWrapper>
 					{sampleTiles.map((tile, index) => {
 						return <TileCard key={index} {...tile} index={index} />;
 					})}
 				</TileCardWrapper>
-				{/* <TileFadeDiv/> */}
+				<TileFadeDivRight />
+			</div>
+			<div
+				style={{
+					position: 'relative',
+					marginTop: '0.75rem',
+					marginBottom: '0.75rem',
+					marginRight: '100px',
+				}}
+			>
+				<TileCardWrapper>
+					{sampleTiles2.map((tile, index) => {
+						return <TileCard key={index} {...tile} index={index} />;
+					})}
+				</TileCardWrapper>
+				<TileFadeDivLeft />
 			</div>
 
-			<TileCardWrapper style={{ marginLeft: '50px' }}>
-				{sampleTiles2.map((tile, index) => {
-					return <TileCard key={index} {...tile} index={index} />;
-				})}
-			</TileCardWrapper>
-
-			<TileCardWrapper
-				style={{ marginBottom: '50px', marginRight: '50px' }}
+			<div
+				style={{
+					position: 'relative',
+					marginTop: '0.75rem',
+					marginBottom: '0.75rem',
+					marginLeft: '100px',
+				}}
 			>
-				{sampleTiles3.map((tile, index) => {
-					return <TileCard key={index} {...tile} index={index} />;
-				})}
-			</TileCardWrapper>
+				<TileCardWrapper>
+					{sampleTiles3.map((tile, index) => {
+						return <TileCard key={index} {...tile} index={index} />;
+					})}
+				</TileCardWrapper>
+				<TileFadeDivRight />
+			</div>
 
 			<Button primary={styles.colors.backgroundRed} width="large">
 				Create your own tiles

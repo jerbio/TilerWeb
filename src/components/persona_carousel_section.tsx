@@ -4,6 +4,7 @@ import MountainBackground from '../assets/image_assets/mountain.jpg';
 import SWE from '../assets/image_assets/swe.png';
 import Engineer from '../assets/image_assets/engineer.png';
 import Healthcare from '../assets/image_assets/healthcare.png';
+import Custom from '../assets/image_assets/custom.png';
 import PersonaCard from './persona_card';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -35,15 +36,15 @@ const Container = styled.div`
 
 const personas = [
 	{
-		occupation: 'Data Scientist',
-		image: MountainBackground,
+		occupation: 'Custom Profile',
+		image: Custom,
 	},
 	{
 		occupation: 'Developer',
 		image: SWE,
 	},
 	{
-		occupation: 'Healtcare',
+		occupation: 'Healtcare Worker',
 		image: Healthcare,
 	},
 	{
