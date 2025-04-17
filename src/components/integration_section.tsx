@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from './section_headers';
-import MicrosoftLogo from '../util/image_assets/microsoft_logo.png';
-import GoogleLogo from '../util/image_assets/google_logo.png';
-import CalendarIcon from '../util/image_assets/calendar_icon.png';
+import MicrosoftLogo from '../assets/image_assets/microsoft_logo.png';
+import GoogleLogo from '../assets/image_assets/google_logo.png';
+import CalendarIcon from '../assets/image_assets/calendar_icon.png';
 
 const Section = styled.section`
 	background-color: #000;
