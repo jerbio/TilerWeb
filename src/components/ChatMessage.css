@@ -1,0 +1,41 @@
+.chat-message {
+    padding: 12px 16px;
+    border-radius: 12px;
+    max-width: 70%;
+    position: relative;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: #007AFF;
+    color: white;
+}
+
+.model-message {
+    align-self: flex-start;
+    background-color: #F0F0F0;
+    color: #333;
+}
+
+.message-content {
+    font-size: 16px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.message-metadata {
+    font-size: 12px;
+    margin-top: 8px;
+    opacity: 0.7;
+    display: flex;
+    gap: 8px;
+}
+
+.message-origin {
+    text-transform: capitalize;
+}
+
+.message-id {
+    font-family: monospace;
+} 
