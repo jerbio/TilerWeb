@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import MountainBackground from '../../util/image_assets/mountain.jpg';
 import SWE from '../../util/image_assets/swe.png';
 import Engineer from '../../util/image_assets/engineer.png';
 import Healthcare from '../../util/image_assets/healthcare.png';
+import Custom from '../../util/image_assets/custom.png';
+import PersonaCard from './persona_card';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
-// import 'swiper/swiper-bundle.min.css'
 import 'swiper/css';
 
 const Container = styled.div`
@@ -17,33 +17,33 @@ const Container = styled.div`
 	margin: 3rem auto;
 `;
 
-const PersonaCard = styled.div<{ backgroundImage: string }>`
-	width: 315px;
-	height: 680px;
-	background-image: url(${(props) => props.backgroundImage});
-	background-size: cover;
-	background-position: center;
-	border-radius: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: white;
-	font-size: 1.5rem;
-	font-weight: bold;
-	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-`;
+// const PersonaCard = styled.div<{ backgroundImage: string }>`
+//     width: 315px;
+//     height: 680px;
+//     background-image: url(${props => props.backgroundImage});
+//     background-size: cover;
+//     background-position: center;
+//     border-radius: 10px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     color: white;
+//     font-size: 1.5rem;
+//     font-weight: bold;
+//     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+// `;
 
 const personas = [
 	{
-		occupation: 'Data Scientist',
-		image: MountainBackground,
+		occupation: 'Custom Profile',
+		image: Custom,
 	},
 	{
 		occupation: 'Developer',
 		image: SWE,
 	},
 	{
-		occupation: 'Healtcare',
+		occupation: 'Healtcare Worker',
 		image: Healthcare,
 	},
 	{
@@ -69,9 +69,10 @@ const PersonaCarousel: React.FC = () => {
 			>
 				{personas.map((persona, index) => (
 					<SwiperSlide key={index}>
-						<PersonaCard backgroundImage={persona.image}>
-							{persona.occupation}
-						</PersonaCard>
+						<PersonaCard
+							occupation={persona.occupation}
+							backgroundImage={persona.image}
+						/>
 					</SwiperSlide>
 				))}
 			</Swiper>
