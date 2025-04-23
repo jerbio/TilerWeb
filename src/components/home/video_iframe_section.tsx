@@ -22,7 +22,7 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 	return (
 		<div>
 			<iframe
-                style={{margin: '0 auto'}} //Olamide TODO: Make this a styled component and pass in a prop to specify middle, left, or right justification.
+                style={{margin: '0 auto', border: '10px solid grey', borderRadius: '15x'}} //Olamide TODO: Make this a styled component and pass in a prop to specify middle, left, or right justification.
 				src={src}
 				title={title}
 				width={width}
