@@ -13,7 +13,7 @@ const Article = styled.article<{ $reversed: boolean }>`
 	border: 1px solid ${styles.colors.gray[800]};
 
 	@media (min-width: ${styles.screens.lg}) {
-		flex-direction: ${props => props.$reversed ? 'row-reverse' : 'row'};
+		flex-direction: ${(props) => (props.$reversed ? 'row-reverse' : 'row')};
 		max-width: none;
 		background-color: transparent;
 		border-radius: 0;
@@ -78,8 +78,8 @@ const RedDot = styled.div`
 	transform: translate(-50%, -50%);
 	display: none;
 	border-radius: 50%;
-  box-shadow: 0 0 0 2px ${styles.colors.brand[500]} inset;
-  background-color: ${styles.colors.brand[500]}50;
+	box-shadow: 0 0 0 2px ${styles.colors.brand[500]} inset;
+	background-color: ${styles.colors.brand[500]}50;
 
 	@media (min-width: ${styles.screens.lg}) {
 		display: block;
@@ -112,4 +112,3 @@ export default function FeatureCard({
 		</Article>
 	);
 }
-

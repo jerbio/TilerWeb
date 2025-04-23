@@ -123,21 +123,23 @@ const TileCardSection: React.FC = () => {
 				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
 				align="center"
 			/>
-			<TileCardWrapper style={{marginRight: '50px'}}>
+			<TileCardWrapper style={{ marginRight: '50px' }}>
 				{sampleTiles.map((tile, index) => {
 					return <TileCard key={index} {...tile} index={index} />;
 				})}
 			</TileCardWrapper>
 
-			<TileCardWrapper style={{marginLeft: '50px'}}>
+			<TileCardWrapper style={{ marginLeft: '50px' }}>
 				{sampleTiles2.map((tile, index) => {
-					return <TileCard key={index} {...tile} index={index}/>;
+					return <TileCard key={index} {...tile} index={index} />;
 				})}
 			</TileCardWrapper>
 
-			<TileCardWrapper style={{ marginBottom: '50px', marginRight: '50px'}}>
+			<TileCardWrapper
+				style={{ marginBottom: '50px', marginRight: '50px' }}
+			>
 				{sampleTiles3.map((tile, index) => {
-					return <TileCard  key={index} {...tile} index={index}/>;
+					return <TileCard key={index} {...tile} index={index} />;
 				})}
 			</TileCardWrapper>
 

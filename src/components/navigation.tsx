@@ -6,11 +6,11 @@ import { TILER_LOGO } from '../util/constants';
 
 const NavigationContainer = styled.div`
 	padding: 1.5rem;
-  display: flex;
-  justify-content: center;
-  position: sticky;
-  top: 0px;
-  z-index: 999;
+	display: flex;
+	justify-content: center;
+	position: sticky;
+	top: 0px;
+	z-index: 999;
 `;
 
 const NavigationWrapper = styled.nav`
@@ -20,9 +20,9 @@ const NavigationWrapper = styled.nav`
 	padding: 14px 32px;
 	max-width: 800px;
 	border-radius: ${styles.borderRadius.xxLarge};
-	background-color: #1A1A1Ad2;
+	background-color: #1a1a1ad2;
 	border: 1px solid #2a2a2a;
-  backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
 `;
 
 const NavItems = styled.ul`
@@ -47,20 +47,20 @@ const ButtonsWrapper = styled.div`
 `;
 
 const NavItem = styled.li`
-  list-style: none;
-  margin: 0;
-  padding: 0;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 `;
 
 const NavLink = styled.a`
-  color: ${styles.colors.text};
-  text-decoration: none;
-  font-size: ${styles.typography.fontSize.sm};
-  font-family: ${styles.typography.fontFamily.inter};
-  cursor: pointer;
-  &:hover {
-    color: ${styles.colors.brand[500]};
-  }
+	color: ${styles.colors.text};
+	text-decoration: none;
+	font-size: ${styles.typography.fontSize.sm};
+	font-family: ${styles.typography.fontFamily.inter};
+	cursor: pointer;
+	&:hover {
+		color: ${styles.colors.brand[500]};
+	}
 `;
 
 const Navigation = () => {
@@ -142,4 +142,3 @@ const Navigation = () => {
 };
 
 export default Navigation;
-

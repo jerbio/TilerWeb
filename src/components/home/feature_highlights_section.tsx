@@ -36,7 +36,7 @@ const HighlightRootWrapper = styled.div`
 const HighlightCardWrapper = styled.div`
 	display: flex;
 	justify-content: center;
-  gap: 2rem;
+	gap: 2rem;
 `;
 
 const HighlightCard = styled.div<{ backgroundImage: string }>`
@@ -66,7 +66,7 @@ const Title = styled.h2`
 	line-height: ${styles.typography.lineHeight.lg};
 	font-family: ${styles.typography.fontFamily.urban};
 	font-weight: 700;
-  margin-bottom: .75rem;
+	margin-bottom: 0.75rem;
 `;
 
 const Body = styled.p`
@@ -101,4 +101,3 @@ const FeatureHighlightsSection: React.FC = () => {
 };
 
 export default FeatureHighlightsSection;
-
