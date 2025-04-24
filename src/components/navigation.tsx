@@ -43,7 +43,6 @@ const ButtonsWrapper = styled.div`
 	justify-content: space-evenly;
 	align-items: center;
 	width: 210px;
-	// border: 1px solid ${styles.colors.border};
 `;
 
 const NavItem = styled.li`

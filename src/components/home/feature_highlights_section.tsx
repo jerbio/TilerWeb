@@ -30,7 +30,6 @@ const highlights: Highlight[] = [
 
 const HighlightRootWrapper = styled.div`
 	margin: 50px 0;
-	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const HighlightCardWrapper = styled.div`
@@ -55,7 +54,6 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 `;
 
 const MiniTitle = styled.p`
-	// border: 1px solid ${styles.colors.borderRed};
 	color: ${styles.colors.textRed};
 	font-size: ${styles.typography.fontSize.xs};
 	margin: 0;
