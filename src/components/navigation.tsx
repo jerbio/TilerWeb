@@ -109,9 +109,9 @@ const Navigation = () => {
 					<NavItem>
 						<NavLink href="/features">Features</NavLink>
 					</NavItem>
-					<NavItem>
+					{/* <NavItem>
 						<NavLink href="/about">About</NavLink>
-					</NavItem>
+					</NavItem> */}
 				</NavItems>
 				<ButtonsWrapper>
 					<Button
