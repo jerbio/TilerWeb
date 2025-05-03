@@ -9,11 +9,11 @@ import '../i18n/config';
 import { useTranslation } from 'react-i18next';
 
 const Home: React.FC = () => {
-	const { t, i18n  } = useTranslation();
+	const { t, i18n } = useTranslation();
 
 	const changeLanguage = (lng: string | undefined) => {
 		i18n.changeLanguage(lng);
-	  };
+	};
 	return (
 		<>
 			<PersonaCarousel />
@@ -23,7 +23,6 @@ const Home: React.FC = () => {
 			<HeroSection />
 		</>
 	);
-}
+};
 
 export default Home;
-

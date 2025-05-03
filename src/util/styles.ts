@@ -269,7 +269,7 @@ const styles = {
 			medium: '768px',
 			large: '1024px',
 			xLarge: '1280px',
-		}
+		},
 	},
 	screens: {
 		xs: '480px',
