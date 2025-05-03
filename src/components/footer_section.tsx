@@ -41,6 +41,11 @@ const SocialLogo = styled.img<{ src: string }>`
 	height: 16px;
 `;
 
+const FooterLinks = styled.div`
+	display: flex;
+	gap: 0.5rem;
+`;
+
 const FooterLink = styled.a`
 	margin-right: 10px;
 	text-decoration: none;
@@ -100,7 +105,7 @@ const FooterSection: React.FC = () => {
 							reserved.
 						</p>
 					</FooterRow>
-					<FooterRow>
+					<FooterLinks>
 						<FooterLink
 							href="https://www.facebook.com/profile.php?id=100094419297775"
 							target="_blank"
@@ -138,7 +143,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo src={XLogo} alt="X Logo" />
 						</FooterLink>
-					</FooterRow>
+					</FooterLinks>
 				</FooterColumn>
 				<FooterColumn>
 					<FooterRow>Legal</FooterRow>
@@ -167,3 +172,4 @@ const FooterSection: React.FC = () => {
 };
 
 export default FooterSection;
+

@@ -35,50 +35,42 @@ const HighlightRootWrapper = styled.div`
 
 const HighlightCardWrapper = styled.div`
 	display: flex;
-	justify-content: space-between;
-	width: 846px;
-	margin: 0 auto;
-	// border: 1px solid red;
+	justify-content: center;
+  gap: 2rem;
 `;
 
 const HighlightCard = styled.div<{ backgroundImage: string }>`
 	background-image: url(${(props) => props.backgroundImage});
 	background-size: cover;
 	background-position: center;
-	padding: 15px;
-	margin: 10px;
+	padding: 1rem;
 	color: white;
 	width: 262px;
-	height: 250px;
+	min-height: 250px;
 	border-radius: 16px;
 	border: 1px solid ${styles.colors.borderRed};
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	text-align: left;
 `;
 
 const MiniTitle = styled.p`
 	// border: 1px solid ${styles.colors.borderRed};
 	color: ${styles.colors.textRed};
-	font-size: ${styles.typography.textXxs};
+	font-size: ${styles.typography.fontSize.xs};
 	margin: 0;
 `;
 
 const Title = styled.h2`
-	margin: 0;
-	padding: 0;
-	font-size: ${styles.typography.displayXs};
-	line-height: ${styles.typography.lineHeightMd};
-	font-family: ${styles.typography.fontUrbanist};
+	font-size: ${styles.typography.fontSize.displayXs};
+	line-height: ${styles.typography.lineHeight.lg};
+	font-family: ${styles.typography.fontFamily.urban};
 	font-weight: 700;
+  margin-bottom: .75rem;
 `;
 
 const Body = styled.p`
-	margin: 0;
-	padding: 0;
-	padding-top: 10px;
-	font-size: ${styles.typography.textSm};
+	font-size: ${styles.typography.fontSize.sm};
 	color: #ffffffbf;
 `;
 
@@ -97,7 +89,7 @@ const FeatureHighlightsSection: React.FC = () => {
 						backgroundImage={highlight.backgroundImage}
 					>
 						<MiniTitle>{highlight.subHeader}</MiniTitle>
-						<div style={{ height: '97px', width: '218px' }}>
+						<div>
 							<Title>{highlight.header}</Title>
 							<Body>{highlight.body}</Body>
 						</div>
@@ -109,3 +101,4 @@ const FeatureHighlightsSection: React.FC = () => {
 };
 
 export default FeatureHighlightsSection;
+

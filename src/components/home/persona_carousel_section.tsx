@@ -1,11 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
+<<<<<<< HEAD:src/components/persona_carousel_section.tsx
 import MountainBackground from '../assets/image_assets/mountain.jpg';
 import SWE from '../assets/image_assets/swe.png';
 import Engineer from '../assets/image_assets/engineer.png';
 import Healthcare from '../assets/image_assets/healthcare.png';
 import Custom from '../assets/image_assets/custom.png';
 import PersonaCard from './persona_card';
+=======
+import MountainBackground from '../../util/image_assets/mountain.jpg';
+import SWE from '../../util/image_assets/swe.png';
+import Engineer from '../../util/image_assets/engineer.png';
+import Healthcare from '../../util/image_assets/healthcare.png';
+>>>>>>> d85edde77fa49f84a0703c31aeb814b1937a1594:src/components/home/persona_carousel_section.tsx
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';

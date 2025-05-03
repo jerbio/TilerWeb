@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../util/styles';
+import styles from '../../util/styles';
 
 interface ButtonProps {
 	children: React.ReactNode;
@@ -27,8 +27,8 @@ const StyledButton = styled.button<ButtonProps>`
 	border: none;
 	border-radius: 0.25rem;
 	cursor: pointer;
-	font-size: ${styles.typography.textXs};
-	font-family: ${styles.typography.fontFamily};
+	font-size: ${styles.typography.fontSize.xs};
+	font-family: ${styles.typography.fontFamily.inter};
 	height: ${styles.buttonHeights.medium};
 	width: ${(props) =>
 		props.width === 'small'
