@@ -16,13 +16,6 @@ const Home: React.FC = () => {
 	  };
 	return (
 		<>
-			<div>{t('welcome')}</div>
-			<button type="button" onClick={() => changeLanguage('es')}>
-          es
-        </button>
-		<button type="button" onClick={() => changeLanguage('en')}>
-          en
-        </button>
 			<PersonaCarousel />
 			<FeatureHighlightsSection />
 			<TileCardSection />
