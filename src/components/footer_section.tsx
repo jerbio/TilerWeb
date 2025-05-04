@@ -18,18 +18,34 @@ const FooterSubContainer = styled.div`
 	justify-content: space-between;
 	padding: 20px;
 	color: ${styles.colors.text};
-	width: 1200px;
+	width: 100%;
 	margin: 0 auto;
+
+	@media (max-width: 768px) {
+		flex-direction: column-reverse;
+		align-items: center;
+		text-align: center;
+	}
 `;
 
 const FooterColumn = styled.div`
 	display: flex;
 	flex-direction: column;
 	text-align: left;
+
+	@media (max-width: 768px) {
+		margin: 1rem;
+		text-align: center;
+	}
 `;
 
 const FooterRow = styled.div`
 	margin-bottom: 10px;
+
+	@media (max-width: 768px) {
+		display: flex;
+		justify-content: center;
+	}
 `;
 
 const SocialLogo = styled.img<{ src: string }>`
@@ -40,6 +56,11 @@ const SocialLogo = styled.img<{ src: string }>`
 const FooterLinks = styled.div`
 	display: flex;
 	gap: 0.5rem;
+
+	@media (max-width: 768px) {
+		display: flex;
+		justify-content: center;
+	}
 `;
 
 const FooterLink = styled.a`

@@ -11,12 +11,14 @@ const TileSectionWrapper = styled.div`
 	flex-direction: column;
 	align-items: center;
 	margin: 50px 0;
+	border: 1px solid ${styles.colors.borderRed};
 `;
 
 const TileCardWrapper = styled.div`
 	display: flex;
 	max-width: 1200px;
 	height: 101px;
+	border: 1px solid ${styles.colors.borderRed};
 `;
 
 const TileFadeDivRight = styled.div`
