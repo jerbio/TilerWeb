@@ -11,15 +11,40 @@ const TileSectionWrapper = styled.div`
 	flex-direction: column;
 	align-items: center;
 	margin: 50px 0;
-	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const TileCardWrapper = styled.div`
 	display: flex;
 	max-width: 1200px;
 	height: 101px;
-	// margin: 0.75rem auto;
-	// border: 1px solid ${styles.colors.borderRed};
+`;
+
+const TileFadeDivRight = styled.div`
+	top: 0;
+	right: 0;
+	width: 300px;
+	height: 103px;
+	position: absolute;
+	background: linear-gradient(
+		90deg,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 0.7) 60%,
+		rgba(0, 0, 0, 0.95) 100%
+	);
+`;
+
+const TileFadeDivLeft = styled.div`
+	top: 0;
+	left: 0;
+	width: 300px;
+	height: 103px;
+	position: absolute;
+	background: linear-gradient(
+		270deg,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 0.78) 60%,
+		rgba(0, 0, 0, 0.95) 100%
+	);
 `;
 
 const TileFadeDivRight = styled.div`

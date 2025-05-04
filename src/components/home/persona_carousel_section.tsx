@@ -16,6 +16,7 @@ const Container = styled.div`
 	width: 90%;
 	margin: 3rem auto;
 `;
+
 const personas = [
 	{
 		occupation: 'Custom Profile',

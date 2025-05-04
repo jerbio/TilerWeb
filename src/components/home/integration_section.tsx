@@ -18,7 +18,6 @@ const Section = styled.section`
 
 const TextContent = styled.div`
 	max-width: 50%;
-	//   border: 1px solid #ccc;
 `;
 
 const LogoContainer = styled.div`

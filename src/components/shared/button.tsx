@@ -65,7 +65,6 @@ const Button: React.FC<ButtonProps> = ({
 	primary = false,
 	width = 'medium',
 }) => {
-	// console.log('Button rendered', primary, typeof primary);
 	return (
 		<StyledButton
 			onClick={onClick}
