@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import SWE from '../../util/image_assets/swe.png';
-import Engineer from '../../util/image_assets/engineer.png';
-import Healthcare from '../../util/image_assets/healthcare.png';
-import Custom from '../../util/image_assets/custom.png';
-import PersonaCard from './persona_card';
+import SWE from '../../assets/image_assets/swe.png';
+import Engineer from '../../assets/image_assets/engineer.png';
+import Healthcare from '../../assets/image_assets/healthcare.png';
+import Custom from '../../assets/image_assets/custom.png';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
+import PersonaCard from './persona_card';
 import 'swiper/css';
 
 const Container = styled.div`

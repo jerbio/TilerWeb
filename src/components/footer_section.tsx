@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import styles from '../util/styles';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
-import InstagramLogo from '../util/image_assets/instagram_logo.png';
-import FacebookLogo from '../util/image_assets/facebook_logo.png';
-import LinkedInLogo from '../util/image_assets/linkedin_logo.png';
-import XLogo from '../util/image_assets/x_logo.png';
+import InstagramLogo from '../assets/image_assets/instagram_logo.png';
+import FacebookLogo from '../assets/image_assets/facebook_logo.png';
+import LinkedInLogo from '../assets/image_assets/linkedin_logo.png';
+import XLogo from '../assets/image_assets/x_logo.png';
 
 const FooterContainer = styled.div`
 	background: #1a1a1a80;
