@@ -22,6 +22,11 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 				: 'center'};
 	text-align: ${({ align }) => align};
 	padding: 20px;
+
+	@media (max-width: 768px) {
+		align-items: center;
+		text-align: center;
+	}
 `;
 
 const Header = styled.h1`
@@ -57,8 +62,10 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 			<Header>
 				{headerText}
 				<br />
-				{spanText && <span>{spanText}</span>}
-				{image && <img src={image} alt={imageAlt} />}
+				<div style={{ display: 'inline-flex', alignItems: 'center' }}>
+					{spanText && <span>{spanText}</span>}
+					{image && <img src={image} alt={imageAlt} style={{ marginLeft: '10px' }} />}
+				</div>
 			</Header>
 			<SubHeader>{subHeaderText}</SubHeader>
 		</Container>

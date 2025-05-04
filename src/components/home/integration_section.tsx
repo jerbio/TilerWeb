@@ -5,17 +5,6 @@ import MicrosoftLogo from '../../assets/image_assets/microsoft_logo.png';
 import GoogleLogo from '../../assets/image_assets/google_logo.png';
 import CalendarIcon from '../../assets/image_assets/calendar_icon.png';
 
-const Section = styled.section`
-	background-color: #000;
-	color: white;
-	padding: 40px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 1200px;
-	margin: 0 auto;
-`;
-
 const TextContent = styled.div`
 	max-width: 50%;
 `;
@@ -36,6 +25,35 @@ const Logo = styled.img`
   width: 50px
   height: auto;
   margin-bottom: 5px;
+`;
+
+const Section = styled.section`
+	background-color: #000;
+	color: white;
+	padding: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	margin: 0 auto;
+
+	@media (max-width: 768px) {
+		flex-direction: column;
+		text-align: center;
+
+		${TextContent} {
+			max-width: 100%;
+			margin-bottom: 20px;
+		}
+
+		${LogoContainer} {
+			justify-content: center;
+		}
+
+		${LogoWrapper} {
+			margin-left: 10px;
+		}
+	}
 `;
 
 const CalendarIntegrationSection: React.FC = () => {
