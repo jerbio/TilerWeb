@@ -36,6 +36,11 @@ const HighlightCardWrapper = styled.div`
 	display: flex;
 	justify-content: center;
 	gap: 2rem;
+
+	@media (max-width: 768px) {
+		flex-direction: column;
+		align-items: center;
+	}
 `;
 
 const HighlightCard = styled.div<{ backgroundImage: string }>`

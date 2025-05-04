@@ -32,10 +32,6 @@ const FooterRow = styled.div`
 	margin-bottom: 10px;
 `;
 
-const TilerLogo = styled.img`
-	width: 100px;
-`;
-
 const SocialLogo = styled.img<{ src: string }>`
 	width: auto;
 	height: 16px;
