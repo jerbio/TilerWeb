@@ -47,36 +47,6 @@ const TileFadeDivLeft = styled.div`
 	);
 `;
 
-const TileFadeDivRight = styled.div`
-	top: 0;
-	right: 0;
-	width: 300px;
-	height: 103px;
-	position: absolute;
-	background: linear-gradient(
-		90deg,
-		rgba(0, 0, 0, 0) 0%,
-		rgba(0, 0, 0, 0.7) 60%,
-		rgba(0, 0, 0, 0.95) 100%
-	);
-	// border: 6px solid red;
-`;
-
-const TileFadeDivLeft = styled.div`
-	top: 0;
-	left: 0;
-	width: 300px;
-	height: 103px;
-	position: absolute;
-	background: linear-gradient(
-		270deg,
-		rgba(0, 0, 0, 0) 0%,
-		rgba(0, 0, 0, 0.78) 60%,
-		rgba(0, 0, 0, 0.95) 100%
-	);
-	// border: 6px solid red;
-`;
-
 const sampleTiles: Array<TileCardProps> = [
 	{
 		heading: 'Meeting With Charles',
