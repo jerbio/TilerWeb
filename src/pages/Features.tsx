@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import styles from '../util/styles';
 import FeatureCard from '../components/features/FeatureCard';
-import DottedLine from '../util/image_assets/dotted-line.svg';
+import DottedLine from '../assets/image_assets/dotted-line.svg';
 
 const Main = styled.main`
 	display: grid;
