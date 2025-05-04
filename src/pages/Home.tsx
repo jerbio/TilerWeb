@@ -4,7 +4,7 @@ import TileCardSection from '../components/home/tile_card_section';
 import CalendarIntegrationSection from '../components/home/integration_section';
 import HeroSection from '../components/home/hero_section';
 import VideoIframeSection from '../components/home/video_iframe_section';
-import EmailSignup from '../components/home/waitlist_input';
+import Waitlist from '../components/home/waitlist_input';
 
 function Home() {
 	return (
@@ -18,7 +18,7 @@ function Home() {
 				allowFullScreen={true}
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 			/>
-			<EmailSignup />
+			<Waitlist />
 			<FeatureHighlightsSection />
 			<TileCardSection />
 			<CalendarIntegrationSection />
