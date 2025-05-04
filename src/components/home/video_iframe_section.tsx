@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 
 interface VideoIframeProps {
 	src: string; // URL of the video
@@ -9,6 +10,9 @@ interface VideoIframeProps {
 	allow?: string; // Additional allow attributes for the iframe (default: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture")
 	referrerPolicy?: React.HTMLAttributeReferrerPolicy; // Referrer policy for the iframe (default: "strict-origin-when-cross-origin")
 }
+
+const IframeDiv = styled.iframe`
+margin: 0 auto;`
 
 const VideoIframeSection: React.FC<VideoIframeProps> = ({
 	src,
@@ -21,12 +25,7 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 }) => {
 	return (
 		<div>
-			<iframe
-				style={{
-					margin: '0 auto',
-					border: '10px solid grey',
-					borderRadius: '15x',
-				}} //Olamide TODO: Make this a styled component and pass in a prop to specify middle, left, or right justification.
+			<IframeDiv
 				src={src}
 				title={title}
 				width={width}
@@ -35,7 +34,7 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 				frameBorder="0"
 				allow={allow}
 				referrerPolicy={referrerPolicy}
-			></iframe>
+			></IframeDiv>
 		</div>
 	);
 };
