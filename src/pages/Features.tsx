@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import styles from '../util/styles';
 import FeatureCard from '../components/features/FeatureCard';
-import DottedLine from '../util/image_assets/dotted-line.svg';
+import DottedLine from '../assets/image_assets/dotted-line.svg';
 
 const Main = styled.main`
 	display: grid;
@@ -54,15 +54,15 @@ const GridContainer = styled.div`
 `;
 
 const DottedLineImage = styled.img`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: none;
 
-  @media (min-width: ${styles.screens.lg}) {
-    display: block;
-  }
+	@media (min-width: ${styles.screens.lg}) {
+		display: block;
+	}
 `;
 
 const featureList = [
@@ -96,7 +96,7 @@ export default function Features() {
 	return (
 		<Main>
 			<Container>
-				<BackgroundBlur/>
+				<BackgroundBlur />
 				<DottedLineImage src={DottedLine} alt="null" />
 				<GridContainer>
 					{featureList.map((item, itemIndex) => (
@@ -114,4 +114,3 @@ export default function Features() {
 		</Main>
 	);
 }
-

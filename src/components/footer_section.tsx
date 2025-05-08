@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import styles from '../util/styles';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
-import InstagramLogo from '../util/image_assets/instagram_logo.png';
-import FacebookLogo from '../util/image_assets/facebook_logo.png';
-import LinkedInLogo from '../util/image_assets/linkedin_logo.png';
-import XLogo from '../util/image_assets/x_logo.png';
+import InstagramLogo from '../assets/image_assets/instagram_logo.png';
+import FacebookLogo from '../assets/image_assets/facebook_logo.png';
+import LinkedInLogo from '../assets/image_assets/linkedin_logo.png';
+import XLogo from '../assets/image_assets/x_logo.png';
 
 const FooterContainer = styled.div`
 	background: #1a1a1a80;
@@ -18,22 +18,34 @@ const FooterSubContainer = styled.div`
 	justify-content: space-between;
 	padding: 20px;
 	color: ${styles.colors.text};
-	width: 1200px;
+	width: 100%;
 	margin: 0 auto;
+
+	@media (max-width: 768px) {
+		flex-direction: column-reverse;
+		align-items: center;
+		text-align: center;
+	}
 `;
 
 const FooterColumn = styled.div`
 	display: flex;
 	flex-direction: column;
 	text-align: left;
+
+	@media (max-width: 768px) {
+		margin: 1rem;
+		text-align: center;
+	}
 `;
 
 const FooterRow = styled.div`
 	margin-bottom: 10px;
-`;
 
-const TilerLogo = styled.img`
-	width: 100px;
+	@media (max-width: 768px) {
+		display: flex;
+		justify-content: center;
+	}
 `;
 
 const SocialLogo = styled.img<{ src: string }>`
@@ -44,6 +56,11 @@ const SocialLogo = styled.img<{ src: string }>`
 const FooterLinks = styled.div`
 	display: flex;
 	gap: 0.5rem;
+
+	@media (max-width: 768px) {
+		display: flex;
+		justify-content: center;
+	}
 `;
 
 const FooterLink = styled.a`
@@ -172,4 +189,3 @@ const FooterSection: React.FC = () => {
 };
 
 export default FooterSection;
-

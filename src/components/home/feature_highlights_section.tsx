@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import styles from '../../util/styles';
 import { Highlight } from '../../util/interface';
-import MountainBackground from '../../util/image_assets/mountain.jpg';
-import FitnessBackground from '../../util/image_assets/fitness.jpg';
-import TilesBackground from '../../util/image_assets/tiles.jpg';
+import MountainBackground from '../../assets/image_assets/mountain.jpg';
+import FitnessBackground from '../../assets/image_assets/fitness.jpg';
+import TilesBackground from '../../assets/image_assets/tiles.jpg';
 import SectionHeaders from './section_headers';
 
 const highlights: Highlight[] = [
@@ -30,13 +30,17 @@ const highlights: Highlight[] = [
 
 const HighlightRootWrapper = styled.div`
 	margin: 50px 0;
-	// border: 1px solid ${styles.colors.borderRed};
 `;
 
 const HighlightCardWrapper = styled.div`
 	display: flex;
 	justify-content: center;
-  gap: 2rem;
+	gap: 2rem;
+
+	@media (max-width: 768px) {
+		flex-direction: column;
+		align-items: center;
+	}
 `;
 
 const HighlightCard = styled.div<{ backgroundImage: string }>`
@@ -55,7 +59,6 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 `;
 
 const MiniTitle = styled.p`
-	// border: 1px solid ${styles.colors.borderRed};
 	color: ${styles.colors.textRed};
 	font-size: ${styles.typography.fontSize.xs};
 	margin: 0;
@@ -66,7 +69,7 @@ const Title = styled.h2`
 	line-height: ${styles.typography.lineHeight.lg};
 	font-family: ${styles.typography.fontFamily.urban};
 	font-weight: 700;
-  margin-bottom: .75rem;
+	margin-bottom: 0.75rem;
 `;
 
 const Body = styled.p`
@@ -101,4 +104,3 @@ const FeatureHighlightsSection: React.FC = () => {
 };
 
 export default FeatureHighlightsSection;
-

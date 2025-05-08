@@ -14,12 +14,70 @@ const TileSectionWrapper = styled.div`
 	// border: 1px solid ${styles.colors.borderRed};
 `;
 
+const TileCardWrapperLeftOffset = styled.div`
+	position: relative;
+	margin-top: 0.75rem;
+	margin-bottom: 0.75rem;
+	margin-left: 100px;
+	// border: 1px solid ${styles.colors.borderRed};
+
+	@media (max-width: 768px) {
+		margin-left: 10px;
+	}
+`;
+
+const TileCardWrapperRightOffset = styled.div`
+	position: relative;
+	margin-top: 0.75rem;
+	margin-bottom: 0.75rem;
+	margin-right: 100px;
+	@media (max-width: 768px) {
+		margin-right: 10px;
+	}
+`;
+
 const TileCardWrapper = styled.div`
 	display: flex;
 	max-width: 1200px;
 	height: 101px;
-	margin: 0.75rem auto;
 	// border: 1px solid ${styles.colors.borderRed};
+
+	@media (max-width: 768px) {
+		& > *:nth-child(2),
+		& > *:nth-child(3),
+		& > *:nth-child(4),
+		& > *:nth-child(5) {
+			display: none;
+		}
+	}
+`;
+
+const TileFadeDivRight = styled.div`
+	top: 0;
+	right: 0;
+	width: 300px;
+	height: 103px;
+	position: absolute;
+	background: linear-gradient(
+		90deg,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 0.7) 60%,
+		rgba(0, 0, 0, 0.95) 100%
+	);
+`;
+
+const TileFadeDivLeft = styled.div`
+	top: 0;
+	left: 0;
+	width: 300px;
+	height: 103px;
+	position: absolute;
+	background: linear-gradient(
+		270deg,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 0.78) 60%,
+		rgba(0, 0, 0, 0.95) 100%
+	);
 `;
 
 const sampleTiles: Array<TileCardProps> = [
@@ -123,23 +181,32 @@ const TileCardSection: React.FC = () => {
 				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
 				align="center"
 			/>
-			<TileCardWrapper style={{marginRight: '50px'}}>
-				{sampleTiles.map((tile, index) => {
-					return <TileCard key={index} {...tile} index={index} />;
-				})}
-			</TileCardWrapper>
+			<TileCardWrapperLeftOffset>
+				<TileCardWrapper>
+					{sampleTiles.map((tile, index) => {
+						return <TileCard key={index} {...tile} index={index} />;
+					})}
+				</TileCardWrapper>
+				<TileFadeDivRight />
+			</TileCardWrapperLeftOffset>
 
-			<TileCardWrapper style={{marginLeft: '50px'}}>
-				{sampleTiles2.map((tile, index) => {
-					return <TileCard key={index} {...tile} index={index}/>;
-				})}
-			</TileCardWrapper>
+			<TileCardWrapperRightOffset>
+				<TileCardWrapper>
+					{sampleTiles2.map((tile, index) => {
+						return <TileCard key={index} {...tile} index={index} />;
+					})}
+				</TileCardWrapper>
+				<TileFadeDivLeft />
+			</TileCardWrapperRightOffset>
 
-			<TileCardWrapper style={{ marginBottom: '50px', marginRight: '50px'}}>
-				{sampleTiles3.map((tile, index) => {
-					return <TileCard  key={index} {...tile} index={index}/>;
-				})}
-			</TileCardWrapper>
+			<TileCardWrapperLeftOffset>
+				<TileCardWrapper>
+					{sampleTiles3.map((tile, index) => {
+						return <TileCard key={index} {...tile} index={index} />;
+					})}
+				</TileCardWrapper>
+				<TileFadeDivRight />
+			</TileCardWrapperLeftOffset>
 
 			<Button primary={styles.colors.backgroundRed} width="large">
 				Create your own tiles
