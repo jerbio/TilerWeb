@@ -56,6 +56,10 @@ const StyledButton = styled.button<ButtonProps>`
 		background_color: ${styles.colors.background};
 		cursor: not-allowed;
 	}
+
+	@media (max-width: 768px) {	
+			margin: 0.5rem auto;
+		}
 `;
 
 const Button: React.FC<ButtonProps> = ({

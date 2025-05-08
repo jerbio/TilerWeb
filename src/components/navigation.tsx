@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import styles from '../util/styles';
 import Button from './shared/button';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
+import { Menu, X } from 'lucide-react';
 
 const NavigationContainer = styled.div`
 	padding: 1.5rem;
@@ -11,18 +13,21 @@ const NavigationContainer = styled.div`
 	position: sticky;
 	top: 0px;
 	z-index: 999;
+	background: transparent;
 `;
 
 const NavigationWrapper = styled.nav`
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	width: 100%;
 	padding: 14px 32px;
 	max-width: 800px;
-	border-radius: ${styles.borderRadius.xxLarge};
 	background-color: #1a1a1ad2;
 	border: 1px solid #2a2a2a;
 	backdrop-filter: blur(16px);
+	position: relative;
+	border-radius: ${styles.borderRadius.xxLarge};
 `;
 
 const NavItems = styled.ul`
@@ -33,23 +38,13 @@ const NavItems = styled.ul`
 	padding: 0;
 	margin: 0;
 	width: 210px;
-	font-size: ${styles.typography.fontSize.sm};
-	font-family: ${styles.typography.fontFamily.inter};
-	cursor: pointer;
+
+	@media (max-width: 768px) {
+		display: none;
+	}
 `;
 
-const ButtonsWrapper = styled.div`
-	display: flex;
-	justify-content: space-evenly;
-	align-items: center;
-	width: 210px;
-`;
-
-const NavItem = styled.li`
-	list-style: none;
-	margin: 0;
-	padding: 0;
-`;
+const NavItem = styled.li``;
 
 const NavLink = styled.a`
 	color: ${styles.colors.text};
@@ -62,7 +57,56 @@ const NavLink = styled.a`
 	}
 `;
 
+const ButtonsWrapper = styled.div`
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	width: 210px;
+
+	@media (max-width: 768px) {
+		display: none;
+	}
+`;
+
+const MobileMenuToggle = styled.div`
+	display: none;
+	cursor: pointer;
+
+	@media (max-width: 768px) {
+		display: block;
+	}
+`;
+
+const MobileNav = styled.div<{ isOpen: boolean }>`
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: #1a1a1ad2;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 100%;
+	padding: ${({ isOpen }) => (isOpen ? '16px' : '0 16px')};
+	max-height: ${({ isOpen }) => (isOpen ? '300px' : '0')};
+	overflow: hidden;
+	transition: all 0.3s ease-in-out;
+	z-index: 998;
+
+	a {
+		padding: 12px 0;
+		color: ${styles.colors.text};
+		text-decoration: none;
+		font-size: ${styles.typography.fontSize.sm};
+		&:hover {
+			color: ${styles.colors.brand[500]};
+		}
+	}
+`;
+
 const Navigation = () => {
+	const [isOpen, setIsOpen] = useState(false);
+
 	return (
 		<NavigationContainer>
 			<NavigationWrapper>
@@ -102,6 +146,7 @@ const Navigation = () => {
 						</defs>
 					</svg>
 				</SvgWrapper>
+
 				<NavItems>
 					<NavItem>
 						<NavLink href="/">Home</NavLink>
@@ -109,33 +154,46 @@ const Navigation = () => {
 					<NavItem>
 						<NavLink href="/features">Features</NavLink>
 					</NavItem>
-					{/* <NavItem>
-						<NavLink href="/about">About</NavLink>
-					</NavItem> */}
 				</NavItems>
+
 				<ButtonsWrapper>
 					<Button
 						primary={true}
 						width="113px"
-						onClick={() =>
-							window.open('https://tiler.app/', '_blank')
-						}
+						onClick={() => window.open('https://tiler.app/', '_blank')}
 					>
 						Try Tiler for free
 					</Button>
 					<Button
 						width="65px"
-						onClick={() =>
-							window.open(
-								'https://tiler.app/account/login',
-								'_blank'
-							)
-						}
+						onClick={() => window.open('https://tiler.app/account/login', '_blank')}
 					>
 						Sign Up
 					</Button>
 				</ButtonsWrapper>
+
+				<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
+					{isOpen ? <X size={24} color="white" /> : <Menu size={24} color="white" />}
+				</MobileMenuToggle>
 			</NavigationWrapper>
+
+			<MobileNav isOpen={isOpen}>
+				<NavLink href="/">Home</NavLink>
+				<NavLink href="/features">Features</NavLink>
+				<Button
+					primary={true}
+					width="120px"
+					onClick={() => window.open('https://tiler.app/', '_blank')}
+				>
+					Try Tiler for free
+				</Button>
+				<Button
+					width="120px"
+					onClick={() => window.open('https://tiler.app/account/login', '_blank')}
+				>
+					Sign Up
+				</Button>
+			</MobileNav>
 		</NavigationContainer>
 	);
 };
