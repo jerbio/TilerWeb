@@ -15,6 +15,11 @@ const Container = styled.div`
 	align-items: center;
 	width: 90%;
 	margin: 3rem auto;
+
+	@media (max-width: 640px) {
+		width: 100%;
+		margin: 3rem 0;
+	}
 `;
 
 const personas = [
@@ -37,19 +42,49 @@ const personas = [
 ];
 
 const PersonaCarousel: React.FC = () => {
+
+	const handleSwiperStyle = () => {
+		const screenWidth = window.innerWidth;
+		// Image width is 315px, so we need to set the margin to center the image in the screen
+		// (screenWidth - 315px) / 2 should be the margin. This is for mobile devices.
+		if (screenWidth < 640) {
+			let centerMargin = (screenWidth - 315) / 2;
+			return { marginLeft: `${centerMargin}px` };
+		} else {
+			return { marginLeft: '5rem' }
+		}
+
+		console.log(`Screen width: ${screenWidth}px`);
+	}
 	return (
 		<Container>
 			<Swiper
 				spaceBetween={5}
 				centeredSlides={true}
-				slidesPerView={3}
+				slidesPerView={'auto'}
 				loop={true}
 				autoplay={{
 					delay: 2500,
 					disableOnInteraction: false,
 				}}
 				modules={[Autoplay]}
-				style={{ marginLeft: '5rem' }}
+				style={handleSwiperStyle()}
+				breakpoints={{
+					0: {
+						slidesPerView: 1,
+						spaceBetween: 10,
+						navigation: false,
+						pagination: { clickable: true },
+					},
+					640: {
+						slidesPerView: 1,
+						spaceBetween: 15,
+					},
+					1024: {
+						slidesPerView: 3,
+						spaceBetween: 20,
+					},
+				}}
 			>
 				{personas.map((persona, index) => (
 					<SwiperSlide key={index}>

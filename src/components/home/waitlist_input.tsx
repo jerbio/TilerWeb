@@ -4,11 +4,10 @@ import { WaitlistApi } from '../../api/WaitlistApi';
 
 const Wrapper = styled.form`
 	margin: 5rem auto;
-
 	display: flex;
 	border-radius: 9999px;
 	overflow: hidden;
-	width: fit-content;
+	width: 90%;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 

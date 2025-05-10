@@ -70,25 +70,25 @@ const featureList = [
 		title: 'Share the load with TileShare!',
 		description:
 			'Effortlessly assign, share, and track tasks with TileShare—where teamwork meets smart scheduling.',
-		image: '/src/util/image_assets/features/collab.png',
+		image: '/src/assets/image_assets/features/collab.png',
 	},
 	{
 		title: 'Find your route with Transit',
 		description:
 			"Navigate like a pro! Get real-time routes, travel estimates, and transit options to keep you on track. Whether you're commuting by car, bike, or public transport",
-		image: '/src/util/image_assets/features/transit.png',
+		image: '/src/assets/image_assets/features/transit.png',
 	},
 	{
 		title: 'Stop searching for time, Forecast!',
 		description:
 			"Find free time in your day for activities you love and easily slot them in. Whether it's a quick workout, a coffee break, or time to unwind.",
-		image: '/src/util/image_assets/features/timely.png',
+		image: '/src/assets/image_assets/features/timely.png',
 	},
 	{
 		title: 'Auto Location in 2 secs',
 		description:
 			'Need to assign location-based tasks or coordinate with your team geographically? Auto Location provides your precise location in an instant.',
-		image: '/src/util/image_assets/features/auto-loc.png',
+		image: '/src/assets/image_assets/features/auto-loc.png',
 	},
 ];
 
