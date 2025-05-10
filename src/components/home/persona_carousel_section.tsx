@@ -42,7 +42,6 @@ const personas = [
 ];
 
 const PersonaCarousel: React.FC = () => {
-
 	const handleSwiperStyle = () => {
 		const screenWidth = window.innerWidth;
 		// Image width is 315px, so we need to set the margin to center the image in the screen
@@ -51,11 +50,11 @@ const PersonaCarousel: React.FC = () => {
 			let centerMargin = (screenWidth - 315) / 2;
 			return { marginLeft: `${centerMargin}px` };
 		} else {
-			return { marginLeft: '5rem' }
+			return { marginLeft: '5rem' };
 		}
 
 		console.log(`Screen width: ${screenWidth}px`);
-	}
+	};
 	return (
 		<Container>
 			<Swiper

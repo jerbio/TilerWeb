@@ -7,6 +7,7 @@ import InstagramLogo from '../assets/image_assets/instagram_logo.png';
 import FacebookLogo from '../assets/image_assets/facebook_logo.png';
 import LinkedInLogo from '../assets/image_assets/linkedin_logo.png';
 import XLogo from '../assets/image_assets/x_logo.png';
+import FounderUniversity from '../assets/image_assets/founder_university.png';
 
 const FooterContainer = styled.div`
 	background: #1a1a1a80;
@@ -32,6 +33,7 @@ const FooterColumn = styled.div`
 	display: flex;
 	flex-direction: column;
 	text-align: left;
+	width: 200px;
 
 	@media (max-width: 768px) {
 		margin: 1rem;
@@ -41,9 +43,13 @@ const FooterColumn = styled.div`
 
 const FooterRow = styled.div`
 	margin-bottom: 10px;
+	display: flex;
+
+	div {
+		padding: 0.15rem;
+	}
 
 	@media (max-width: 768px) {
-		display: flex;
 		justify-content: center;
 	}
 `;
@@ -181,6 +187,14 @@ const FooterSection: React.FC = () => {
 						>
 							Privacy
 						</FooterLink>
+					</FooterRow>
+					<FooterRow>
+						<img
+							src={FounderUniversity}
+							alt="Founder University Logo"
+							style={{ width: '80px', height: 'auto' }}
+						/>
+						<div>Partners</div>
 					</FooterRow>
 				</FooterColumn>
 			</FooterSubContainer>

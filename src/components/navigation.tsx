@@ -160,20 +160,31 @@ const Navigation = () => {
 					<Button
 						primary={true}
 						width="113px"
-						onClick={() => window.open('https://tiler.app/', '_blank')}
+						onClick={() =>
+							window.open('https://tiler.app/', '_blank')
+						}
 					>
 						Try Tiler for free
 					</Button>
 					<Button
 						width="65px"
-						onClick={() => window.open('https://tiler.app/account/login', '_blank')}
+						onClick={() =>
+							window.open(
+								'https://tiler.app/account/login',
+								'_blank'
+							)
+						}
 					>
 						Sign Up
 					</Button>
 				</ButtonsWrapper>
 
 				<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
-					{isOpen ? <X size={24} color="white" /> : <Menu size={24} color="white" />}
+					{isOpen ? (
+						<X size={24} color="white" />
+					) : (
+						<Menu size={24} color="white" />
+					)}
 				</MobileMenuToggle>
 			</NavigationWrapper>
 
@@ -189,7 +200,9 @@ const Navigation = () => {
 				</Button>
 				<Button
 					width="120px"
-					onClick={() => window.open('https://tiler.app/account/login', '_blank')}
+					onClick={() =>
+						window.open('https://tiler.app/account/login', '_blank')
+					}
 				>
 					Sign Up
 				</Button>

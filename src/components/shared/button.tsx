@@ -57,9 +57,9 @@ const StyledButton = styled.button<ButtonProps>`
 		cursor: not-allowed;
 	}
 
-	@media (max-width: 768px) {	
-			margin: 0.5rem auto;
-		}
+	@media (max-width: 768px) {
+		margin: 0.5rem auto;
+	}
 `;
 
 const Button: React.FC<ButtonProps> = ({
