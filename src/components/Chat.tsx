@@ -1,10 +1,11 @@
 import React, { useEffect, useState, FormEvent, useRef } from 'react';
-import { Prompt } from '../types/chat';
+import { Prompt, VibeAction, VibeActionStatus } from '../types/chat';
 import { 
     fetchChatMessages, 
     sendChatMessage, 
     getStoredSessionId, 
-    clearStoredSessionId 
+    clearStoredSessionId,
+    fetchAction
 } from '../services/chatService';
 import './Chat.css';
 
@@ -16,6 +17,7 @@ const Chat: React.FC = () => {
     const [sessionId, setSessionId] = useState<string>('');
     const [isSending, setIsSending] = useState(false);
     const [messages, setMessages] = useState<Prompt[]>([]);
+    const [lastFetchedAction, setLastFetchedAction] = useState<VibeAction | null>(null);
 
     // Load session ID from local storage on mount
     useEffect(() => {
@@ -50,6 +52,32 @@ const Chat: React.FC = () => {
         }
     };
 
+    const handleActionFetch = async (actionId: string) => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const action = await fetchAction(actionId);
+            console.log('Fetched action:', action);
+
+            setLastFetchedAction(action); // Set the entire VibeAction object
+
+            return action;
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to fetch action');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (messages.length > 0) {
+            const latestMessage = messages[0];
+            if (latestMessage.actionId) {
+                handleActionFetch(latestMessage.actionId);
+            }
+        }
+    }, [messages]);
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!message.trim() || isSending) return;
@@ -57,11 +85,22 @@ const Chat: React.FC = () => {
         try {
             setIsSending(true);
             setError(null);
+
+            // Determine if actionId should be included
+            const actionIdToSend =
+                lastFetchedAction &&
+                (lastFetchedAction.status === VibeActionStatus.Clarification ||
+                    lastFetchedAction.status === VibeActionStatus.None)
+                    ? lastFetchedAction.id
+                    : undefined;
+
             const response = await sendChatMessage(
                 message,
-                sessionId
+                sessionId,
+                undefined, // requestId
+                actionIdToSend // Conditionally include actionId
             );
-            
+
             const responseMessages: Prompt[] = [];
             const actions = response?.Content?.vibeResponse?.actions || [];
             for (const action of actions) {
@@ -88,7 +127,7 @@ const Chat: React.FC = () => {
             if (sessionIdFromResponse) {
                 setSessionId(sessionIdFromResponse);
             }
-            
+
             // Clear input field after successful response
             setMessage('');
         } catch (err) {
@@ -157,4 +196,4 @@ const Chat: React.FC = () => {
     );
 };
 
-export default Chat; 
+export default Chat;

@@ -18,13 +18,23 @@ interface Prompt {
     sessionId: string;
 }
 
+// Enum for VibeAction status
+export enum VibeActionStatus {
+    None = 'None',
+    Parsed = 'parsed',
+    Clarification = 'clarification',
+    Executed = 'executed',
+    Failed = 'failed',
+    Exited = 'exited'
+}
+
 // Action interface
 interface VibeAction {
     id: string;
     descriptions: string;
     type: string;
     creationTimeInMs: number;
-    status: 'parsed' | 'clarification';
+    status: VibeActionStatus;
     prompts: Prompt[];
 }
 
@@ -54,8 +64,8 @@ export type {
     ServerResponse, 
     ChatVibeResponse, 
     VibeResponse, 
-    VibeAction, 
+    VibeAction,
     Prompt,
     ChatPromptResponse,
-    Prompt as Message 
-}; 
+    Prompt as Message
+};
