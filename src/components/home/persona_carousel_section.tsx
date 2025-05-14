@@ -7,6 +7,7 @@ import Custom from '../../assets/image_assets/custom.png';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
+// @ts-expect-error
 import 'swiper/css';
 
 const Container = styled.div`

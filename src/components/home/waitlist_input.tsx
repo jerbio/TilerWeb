@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { WaitlistApi } from '../../api/WaitlistApi';
+import { WaitlistApi } from '../../api/waitlistApi';
 
 const Wrapper = styled.form`
 	margin: 5rem auto;
@@ -8,6 +8,7 @@ const Wrapper = styled.form`
 	border-radius: 9999px;
 	overflow: hidden;
 	width: 90%;
+	max-width: 1024px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
