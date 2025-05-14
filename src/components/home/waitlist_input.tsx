@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { WaitlistApi } from '../../api/WaitlistApi';
+import { WaitlistApi } from '../../api/waitlistApi';
 
 const Wrapper = styled.form`
 	margin: 5rem auto;

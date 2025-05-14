@@ -16,14 +16,21 @@ export class ScheduleApi extends AppApi {
 		}
 		// myHeaders.append("mode", "cors");
 
-		const queryParameters = {
-			StartRange: start,
-			EndRange: end,
+		// const queryParameters = {
+		// 	StartRange: start,
+		// 	EndRange: end,
+		// 	Version: 'v2',
+		// 	MobileApp: true.toString(),
+		// };
+
+		
+
+		const urlParams = new URLSearchParams({
+			StartRange: start.toString(),
+			EndRange: end.toString(),
 			Version: 'v2',
 			MobileApp: true.toString(),
-		};
-
-		const urlParams = new URLSearchParams(queryParameters).toString();
+		}).toString();
 
 		const requestOptions = {
 			method: 'GET',

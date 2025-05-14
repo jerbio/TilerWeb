@@ -2,24 +2,7 @@ import { useState } from 'react';
 import { UserApi } from '../api/userApi';
 import { ScheduleApi } from '../api/scheduleApi';
 import { Tile } from '../util/interface';
-import styled from 'styled-components';
-import styles from '../util/styles';
 
-const Indent = styled.div`
-	text-indent: 2em;
-`;
-
-const Card = styled.div`
-	background: ${styles.colors.tileBackgroundSecondary};
-	border-radius: ${styles.borderRadius.medium};
-	padding: ${styles.space.medium};
-	margin: ${styles.space.medium} 0;
-`;
-
-const ReadTheDocs = styled.p`
-	color: ${styles.colors.textGrey};
-	font-size: ${styles.typography.fontSize.sm};
-`;
 
 function renderTileNames(tiles: Array<Tile>) {
 	if (tiles != null && tiles.length > 0) {
