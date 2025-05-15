@@ -9,11 +9,13 @@ interface SectionHeadersProps {
 	image?: string;
 	imageAlt?: string;
 	align?: 'left' | 'center' | 'right';
+  size?: 'base' | 'large';
 }
 
 const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 	display: flex;
 	flex-direction: column;
+	gap: 0.5rem;
 	align-items: ${({ align }) =>
 		align === 'left'
 			? 'flex-start'
@@ -21,8 +23,8 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 				? 'flex-end'
 				: 'center'};
 	text-align: ${({ align }) => align};
-	padding: 20px;
 	max-width: 100%;
+	margin-bottom: 2rem;
 
 	@media (max-width: 768px) {
 		align-items: center;
@@ -30,12 +32,24 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 	}
 `;
 
-const Header = styled.h1`
-	margin: 0;
-	font-size: ${styles.typography.fontSize.displaySm};
-	span {
-		color: ${styles.colors.backgroundRed};
-	}
+const Header = styled.h2<{ size: 'base' | 'large' }>`
+	font-family: ${styles.typography.fontFamily.urban};
+  font-size: ${({ size }) =>
+    size === 'large'
+      ? styles.typography.fontSize.displayBase
+      : styles.typography.fontSize.displaySm};
+	font-weight: bold;
+	background: linear-gradient(
+		to bottom,
+		white,
+		70%,
+		${styles.colors.gray[400]}
+	);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	line-height: 1.1;
+
 	img {
 		width: 20px;
 		height: auto;
@@ -44,14 +58,18 @@ const Header = styled.h1`
 `;
 
 const SubHeader = styled.p`
-	margin: 0;
-	color: ${styles.colors.textGrey};
-	font-size: ${styles.typography.fontSize.base};
-	width: 480px;
+	color: ${styles.colors.gray[500]};
+	max-width: 480px;
+`;
 
-	@media (max-width: 768px) {
-		max-width: 100%;
-	}
+const SpanText = styled.span`
+	color: ${styles.colors.brand[500]};
+`;
+
+const Image = styled.img`
+  display: inline-block;
+	height: 32px;
+  width: 32px;
 `;
 
 const SectionHeaders: React.FC<SectionHeadersProps> = ({
@@ -61,22 +79,19 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 	image,
 	imageAlt,
 	align = 'center',
+  size = 'base',
 }) => {
 	return (
 		<Container align={align}>
-			<Header>
+			<Header size={size}>
 				{headerText}
-				<br />
-				<div style={{ display: 'inline-flex', alignItems: 'center' }}>
-					{spanText && <span>{spanText}</span>}
-					{image && (
-						<img
-							src={image}
-							alt={imageAlt}
-							style={{ marginLeft: '10px' }}
-						/>
-					)}
-				</div>
+				{spanText && (
+					<>
+						<br />
+						<SpanText>{spanText}</SpanText>
+					</>
+				)}
+				{image && <Image src={image} alt={imageAlt} width={32} height={32} />}
 			</Header>
 			<SubHeader>{subHeaderText}</SubHeader>
 		</Container>
@@ -84,3 +99,4 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 };
 
 export default SectionHeaders;
+

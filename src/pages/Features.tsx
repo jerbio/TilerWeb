@@ -3,6 +3,12 @@ import styles from '../util/styles';
 import FeatureCard from '../components/features/FeatureCard';
 import DottedLine from '../assets/image_assets/dotted-line.svg';
 
+// Image imports
+import FeatureCollab from '../assets/image_assets/features/collab.png';
+import FeatureTransit from '../assets/image_assets/features/transit.png';
+import FeatureTimely from '../assets/image_assets/features/timely.png';
+import FeatureAutoLoc from '../assets/image_assets/features/auto-loc.png';
+
 const Main = styled.main`
 	display: grid;
 	place-items: center;
@@ -70,25 +76,25 @@ const featureList = [
 		title: 'Share the load with TileShare!',
 		description:
 			'Effortlessly assign, share, and track tasks with TileShare—where teamwork meets smart scheduling.',
-		image: '/src/assets/image_assets/features/collab.png',
+		image: FeatureCollab,
 	},
 	{
 		title: 'Find your route with Transit',
 		description:
 			"Navigate like a pro! Get real-time routes, travel estimates, and transit options to keep you on track. Whether you're commuting by car, bike, or public transport",
-		image: '/src/assets/image_assets/features/transit.png',
+		image: FeatureTransit,
 	},
 	{
 		title: 'Stop searching for time, Forecast!',
 		description:
 			"Find free time in your day for activities you love and easily slot them in. Whether it's a quick workout, a coffee break, or time to unwind.",
-		image: '/src/assets/image_assets/features/timely.png',
+		image: FeatureTimely,
 	},
 	{
 		title: 'Auto Location in 2 secs',
 		description:
 			'Need to assign location-based tasks or coordinate with your team geographically? Auto Location provides your precise location in an instant.',
-		image: '/src/assets/image_assets/features/auto-loc.png',
+		image: FeatureAutoLoc,
 	},
 ];
 

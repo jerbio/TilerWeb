@@ -24,6 +24,7 @@ const HeroSection: React.FC = () => {
 				headerText="Visualize Your Schedule, Simplify Your Life."
 				subHeaderText="The ultimate tool for creating personalized and interactive timelines."
 				align="center"
+        size='large'
 			/>
 			<ButtonContainer>
 				<Button
