@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { WaitlistApi } from '../../api/waitlistApi';
+import { toast } from 'sonner';
 
 const Wrapper = styled.form`
 	margin: 5rem auto;
@@ -44,11 +45,12 @@ const Waitlist: React.FC = () => {
 		try {
 			const waitlistApi = new WaitlistApi();
 			await waitlistApi.joinWaitlist(email);
-			alert('Signed up successfully!');
+			toast('Signed up successfully!', {
+				duration: 2000,});
 			setEmail('');
 		} catch (error) {
 			setEmail('');
-			alert('Failed to sign up.');
+			toast('Failed to sign up.');
 		}
 	};
 

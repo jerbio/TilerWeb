@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import Home from './pages/Home';
 import Layout from './pages/Layout';
 import Features from './pages/Features';
+import { Toaster } from 'sonner';
 
 function App() {
 	return (
@@ -13,6 +14,7 @@ function App() {
 					<Route path="/features" element={<Features />} />
 				</Route>
 			</Routes>
+			<Toaster position="bottom-left" theme="system"/>
 		</BrowserRouter>
 	);
 }
