@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import styles from '../../util/styles';
 
 interface VideoIframeProps {
 	src: string; // URL of the video
@@ -13,6 +14,7 @@ interface VideoIframeProps {
 const IframeContainer = styled.div`
 	display: flex;
 	justify-content: center;
+  margin: 0 ${styles.container.padding.default};
 `;
 
 const Iframe = styled.iframe<{ $width: string }>`

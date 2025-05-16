@@ -55,6 +55,14 @@ const Header = styled.h2<{ size: 'base' | 'large' }>`
 		height: auto;
 		margin-left: 10px;
 	}
+
+  @media (max-width: 768px) {
+    font-size: ${({ size }) =>
+      size === 'large'
+        ? styles.typography.fontSize.displaySm
+        : styles.typography.fontSize.displayXs};
+    text-align: center;
+  }
 `;
 
 const SubHeader = styled.p`

@@ -30,6 +30,7 @@ const highlights: Highlight[] = [
 
 const HighlightRootWrapper = styled.div`
 	margin: 50px 0;
+  padding: 0 ${styles.container.padding.default};
 `;
 
 const HighlightCardWrapper = styled.div`

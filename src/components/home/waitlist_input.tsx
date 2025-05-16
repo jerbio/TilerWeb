@@ -4,14 +4,20 @@ import { WaitlistApi } from '../../api/waitlistApi';
 import styles from '../../util/styles';
 import { toast } from 'sonner';
 
-const Wrapper = styled.form`
-  margin: 4rem auto;
+const Wrapper = styled.div`
+	margin: 4rem auto;
+  max-width: 1024px;
+  display: flex;
+`;
+
+const Form = styled.form`
 	display: flex;
-  overflow: hidden;
-  border-radius: 4rem;
-	width: 100%;
-	max-width: 1024px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	margin: 0 ${styles.container.padding.default};
+  border-radius: 4rem;
+  overflow: hidden;
+  width: 100%;
+  background-color: ${styles.colors.gray[800]};
 `;
 
 const Input = styled.input`
@@ -19,13 +25,19 @@ const Input = styled.input`
 	font-size: 1rem;
 	border: none;
 	outline: none;
+  width: 100%;
 	flex: 1;
-  color: ${styles.colors.gray[300]};
+  
+	color: ${styles.colors.gray[300]};
 `;
 
 const Button = styled.button`
-	background: linear-gradient(90deg, ${styles.colors.brand[500]}, ${styles.colors.brand[600]});
-  border-radius: 0;
+	background: linear-gradient(
+		90deg,
+		${styles.colors.brand[500]},
+		${styles.colors.brand[600]}
+	);
+	border-radius: 0;
 	color: ${styles.colors.brand[50]};
 	border: none;
 	padding: 0 1.5rem;
@@ -33,7 +45,11 @@ const Button = styled.button`
 	transition: 0.35s ease;
 
 	&:hover {
-		background: linear-gradient(90deg, ${styles.colors.brand[600]}, ${styles.colors.brand[500]});
+		background: linear-gradient(
+			90deg,
+			${styles.colors.brand[600]},
+			${styles.colors.brand[500]}
+		);
 	}
 `;
 
@@ -47,7 +63,8 @@ const Waitlist: React.FC = () => {
 			const waitlistApi = new WaitlistApi();
 			await waitlistApi.joinWaitlist(email);
 			toast('Signed up successfully!', {
-				duration: 2000,});
+				duration: 2000,
+			});
 			setEmail('');
 		} catch (error) {
 			setEmail('');
@@ -56,17 +73,20 @@ const Waitlist: React.FC = () => {
 	};
 
 	return (
-		<Wrapper onSubmit={handleSubmit}>
-			<Input
-				type="email"
-				placeholder="Your email"
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-				required
-			/>
-			<Button type="submit">Join Waitlist</Button>
+		<Wrapper>
+			<Form onSubmit={handleSubmit}>
+				<Input
+					type="email"
+					placeholder="Your email"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
+					required
+				/>
+				<Button type="submit">Join Waitlist</Button>
+			</Form>
 		</Wrapper>
 	);
 };
 
 export default Waitlist;
+

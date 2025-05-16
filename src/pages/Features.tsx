@@ -21,6 +21,7 @@ const Container = styled.div`
 	position: relative;
 	isolation: isolate;
 	width: 100%;
+  overflow: hidden;
 	max-width: ${styles.container.sizes.xLarge};
 	margin: 0 auto;
 	padding: 0 ${styles.container.padding.default};

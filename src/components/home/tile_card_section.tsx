@@ -11,6 +11,7 @@ const TileSectionWrapper = styled.div`
 	flex-direction: column;
 	align-items: center;
 	margin: 50px 0;
+  padding: 0 ${styles.container.padding.default};
 	// border: 1px solid ${styles.colors.borderRed};
 `;
 
