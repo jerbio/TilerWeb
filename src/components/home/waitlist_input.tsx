@@ -1,36 +1,39 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { WaitlistApi } from '../../api/waitlistApi';
+import styles from '../../util/styles';
+import { toast } from 'sonner';
 
 const Wrapper = styled.form`
-	margin: 5rem auto;
+  margin: 4rem auto;
 	display: flex;
-	border-radius: 9999px;
-	overflow: hidden;
-	width: 90%;
+  overflow: hidden;
+  border-radius: 4rem;
+	width: 100%;
+	max-width: 1024px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const Input = styled.input`
-	padding: 0.75rem 1rem;
+	padding: 0.75rem 1.5rem;
 	font-size: 1rem;
 	border: none;
 	outline: none;
 	flex: 1;
-	font-weight: 600;
+  color: ${styles.colors.gray[300]};
 `;
 
 const Button = styled.button`
-	background: linear-gradient(90deg, #e60073, #cc0066);
-	color: white;
+	background: linear-gradient(90deg, ${styles.colors.brand[500]}, ${styles.colors.brand[600]});
+  border-radius: 0;
+	color: ${styles.colors.brand[50]};
 	border: none;
 	padding: 0 1.5rem;
-	font-weight: 700;
 	cursor: pointer;
-	transition: background 0.3s ease;
+	transition: 0.35s ease;
 
 	&:hover {
-		background: linear-gradient(90deg, #cc0066, #e60073);
+		background: linear-gradient(90deg, ${styles.colors.brand[600]}, ${styles.colors.brand[500]});
 	}
 `;
 
@@ -43,11 +46,12 @@ const Waitlist: React.FC = () => {
 		try {
 			const waitlistApi = new WaitlistApi();
 			await waitlistApi.joinWaitlist(email);
-			alert('Signed up successfully!');
+			toast('Signed up successfully!', {
+				duration: 2000,});
 			setEmail('');
 		} catch (error) {
 			setEmail('');
-			alert('Failed to sign up.');
+			toast('Failed to sign up.');
 		}
 	};
 

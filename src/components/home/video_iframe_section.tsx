@@ -10,21 +10,15 @@ interface VideoIframeProps {
 	referrerPolicy?: React.HTMLAttributeReferrerPolicy; // Referrer policy for the iframe (default: "strict-origin-when-cross-origin")
 }
 
-const IframeDiv = styled.iframe<{ $width: string }>`
-	margin: 0 auto;
-	aspect-ratio: 16 / 9; // Maintain 16:9 aspect ratio
+const IframeContainer = styled.div`
+	display: flex;
+	justify-content: center;
+`;
 
-	@media (max-width: 768px) {
-		width: 70%;
-	}
-
-	@media (min-width: 769px) and (max-width: 1024px) {
-		width: 90%;
-	}
-
-	@media (min-width: 1025px) {
-		width: ${(props) => props.width || '80%'};
-	}
+const Iframe = styled.iframe<{ $width: string }>`
+	width: 100%;
+  aspect-ratio: 16 / 9; // Maintain a 16:9 aspect ratio
+	max-width: ${(props) => props.$width}px;
 `;
 
 const VideoIframeSection: React.FC<VideoIframeProps> = ({
@@ -36,8 +30,8 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 	referrerPolicy = 'strict-origin-when-cross-origin',
 }) => {
 	return (
-		<div>
-			<IframeDiv
+		<IframeContainer>
+			<Iframe
 				src={src}
 				title={title}
 				$width={width} // spelled this way to avoid conflict with the native width prop
@@ -45,9 +39,10 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 				frameBorder="0"
 				allow={allow}
 				referrerPolicy={referrerPolicy}
-			></IframeDiv>
-		</div>
+			></Iframe>
+		</IframeContainer>
 	);
 };
 
 export default VideoIframeSection;
+

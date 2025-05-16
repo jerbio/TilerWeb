@@ -15,13 +15,8 @@ const Container = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 90%;
+	width: 100%;
 	margin: 3rem auto;
-
-	@media (max-width: 640px) {
-		width: 100%;
-		margin: 3rem 0;
-	}
 `;
 
 const personas = [
