@@ -161,7 +161,7 @@ const Navigation = () => {
 						primary={true}
 						width="113px"
 						onClick={() =>
-							window.open('https://tiler.app/', '_blank')
+							window.open('https://launch.tiler.app/', '_blank')
 						}
 					>
 						Try Tiler for free
