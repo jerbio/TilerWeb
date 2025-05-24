@@ -1,5 +1,5 @@
 export class AppApi {
-	#defaultUrl = 'https://localhost-44322-tiler-prod.conveyor.cloud/';
+	#defaultUrl = 'https://tiler.app/';
 	getUri(path: string): string {
 		return this.defaultDomain + path;
 	}
