@@ -35,14 +35,14 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 }) => {
 	useEffect(() => {
 		if (waitlistSignUp) {
-			const el = document.getElementById('waitlistSignUp');
+			const el = document.getElementById('tiler-video-player');
 			if (el) {
 				el.scrollIntoView({ behavior: 'smooth' });
 			}
 		}
 	}, [waitlistSignUp]);
 	return (
-		<IframeContainer id='waitlistSignUp'>
+		<IframeContainer id='tiler-video-player'>
 			<Iframe
 				src={src}
 				title={title}
