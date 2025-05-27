@@ -1,3 +1,4 @@
+import React from 'react';
 import PersonaCarousel from '../components/home/persona_carousel_section';
 import FeatureHighlightsSection from '../components/home/feature_highlights_section';
 import TileCardSection from '../components/home/tile_card_section';
@@ -7,6 +8,8 @@ import VideoIframeSection from '../components/home/video_iframe_section';
 import Waitlist from '../components/home/waitlist_input';
 
 function Home() {
+	const params = new URLSearchParams(window.location.search);
+	const waitlistSignUp = params.get('waitlistSignUp') === 'true';
 	return (
 		<>
 				<PersonaCarousel />
@@ -16,6 +19,7 @@ function Home() {
 					width="1024"
 					allowFullScreen={true}
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+					waitlistSignUp={waitlistSignUp}
 				/>
 				<Waitlist />
 				<FeatureHighlightsSection />

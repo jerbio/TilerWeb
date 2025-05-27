@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import styles from '../../util/styles';
 
@@ -9,6 +9,7 @@ interface VideoIframeProps {
 	allowFullScreen?: boolean; // Allow fullscreen mode (default: true)
 	allow?: string; // Additional allow attributes for the iframe (default: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture")
 	referrerPolicy?: React.HTMLAttributeReferrerPolicy; // Referrer policy for the iframe (default: "strict-origin-when-cross-origin")
+	waitlistSignUp?: boolean; // If true, scroll to the section after mount
 }
 
 const IframeContainer = styled.div`
@@ -30,9 +31,18 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 	allowFullScreen = true,
 	allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
 	referrerPolicy = 'strict-origin-when-cross-origin',
+	waitlistSignUp = false,
 }) => {
+	useEffect(() => {
+		if (waitlistSignUp) {
+			const el = document.getElementById('waitlistSignUp');
+			if (el) {
+				el.scrollIntoView({ behavior: 'smooth' });
+			}
+		}
+	}, [waitlistSignUp]);
 	return (
-		<IframeContainer>
+		<IframeContainer id='waitlistSignUp'>
 			<Iframe
 				src={src}
 				title={title}
