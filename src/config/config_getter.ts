@@ -2,8 +2,6 @@
 
 const rawEnv = {
     BASE_URL: import.meta.env.VITE_BASE_URL,
-    API_KEY: import.meta.env.VITE_API_KEY,
-    ANALYTICS_ID: import.meta.env.VITE_ANALYTICS_ID,
     // Add more here without needing to update types
   } as const;
   
