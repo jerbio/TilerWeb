@@ -1,3 +1,5 @@
+import { a } from "@react-spring/web";
+
 const styles = {
 	colors: {
 		primary: '#3498db',
@@ -204,6 +206,7 @@ const styles = {
 			urban: 'Urbanist, sans-serif',
 		},
 		fontSize: {
+      xxs: '10px',
 			xs: '12px',
 			sm: '14px',
 			base: '16px',
@@ -216,6 +219,17 @@ const styles = {
 			displayXl: '60px',
 			displayXxl: '72px',
 		},
+    fontWeight: {
+      thin: '100',
+      extralight: '200',
+      light: '300',
+      normal: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '800',
+      black: '900',
+    },
 		lineHeight: {
 			xs: '18px',
 			sm: '20px',
@@ -229,7 +243,6 @@ const styles = {
 			displayXl: '72px',
 			displayXxl: '90px',
 		},
-		fontWeight: 'normal',
 	},
 	buttonWidths: {
 		small: '80px',
@@ -279,6 +292,6 @@ const styles = {
 		xl: '1292px',
 		xxl: '1500px',
 	},
-};
+} as const;
 
 export default styles;

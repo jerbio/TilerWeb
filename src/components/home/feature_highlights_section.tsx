@@ -2,16 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import styles from '../../util/styles';
 import { Highlight } from '../../util/interface';
-import MountainBackground from '../../assets/image_assets/mountain.jpg';
-import FitnessBackground from '../../assets/image_assets/fitness.jpg';
-import TilesBackground from '../../assets/image_assets/tiles.jpg';
+import MountainBackground from '../../assets/image_assets/highlights/mountain.jpg';
+import FitnessBackground from '../../assets/image_assets/highlights/fitness.jpg';
+import TilesBackground from '../../assets/image_assets/highlights/tiles.jpg';
+import LocationBackground from '../../assets/image_assets/highlights/location.jpg';
 import SectionHeaders from './section_headers';
 
 const highlights: Highlight[] = [
 	{
 		subHeader: 'OPTIMIZE YOUR DAY',
-		header: 'Travel & Business Hours',
-		body: 'Automatically calculate optimal business hours and travel times',
+		header: 'Transit',
+		body: 'Plan your day efficiently with detailed transit routes on a map, showing tiles and stops to make between activities.',
 		backgroundImage: MountainBackground,
 	},
 	{
@@ -21,27 +22,39 @@ const highlights: Highlight[] = [
 		backgroundImage: FitnessBackground,
 	},
 	{
-		subHeader: 'PERSONALIZED RECCOMENDATIONS',
+		subHeader: 'PERSONALIZED RECOMMENDATIONS',
 		header: 'Tile Suggestions',
 		body: 'Let Tiler handle the complex scheduling tasks, Prioritize tasks and allocate time effectively.',
 		backgroundImage: TilesBackground,
+	},
+	{
+		subHeader: 'SMART LOCATION',
+		header: 'Auto Location',
+		body: 'Tiler intelligently detects and automatically adds relevant locations to your tiles.',
+		backgroundImage: LocationBackground,
 	},
 ];
 
 const HighlightRootWrapper = styled.div`
 	margin: 50px 0;
   padding: 0 ${styles.container.padding.default};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const HighlightCardWrapper = styled.div`
-	display: flex;
-	justify-content: center;
-	gap: 2rem;
+	display: grid;
+  place-items: center;
+  gap: 1.5rem;
 
-	@media (max-width: 768px) {
-		flex-direction: column;
-		align-items: center;
-	}
+  @media (min-width: ${styles.screens.sm}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: ${styles.screens.xl}) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 const HighlightCard = styled.div<{ backgroundImage: string }>`
@@ -60,8 +73,9 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 `;
 
 const MiniTitle = styled.p`
-	color: ${styles.colors.textRed};
-	font-size: ${styles.typography.fontSize.xs};
+	color: ${styles.colors.brand['300']};
+  font-weight: ${styles.typography.fontWeight.medium};
+	font-size: ${styles.typography.fontSize.xxs};
 	margin: 0;
 `;
 
