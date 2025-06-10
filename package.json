@@ -11,6 +11,7 @@
 		"format": "npx prettier --write ."
 	},
 	"dependencies": {
+		"@react-spring/web": "^10.0.1",
 		"lucide-react": "^0.508.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
