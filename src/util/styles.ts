@@ -265,7 +265,7 @@ const styles = {
 		medium: '8px',
 		large: '12px',
 		xLarge: '16px',
-		xxLarge: '30px',
+		xxLarge: '32px',
 	},
 	container: {
 		center: true,

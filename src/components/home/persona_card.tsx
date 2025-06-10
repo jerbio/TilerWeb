@@ -13,15 +13,30 @@ const Card = styled.div<{ backgroundImage: string }>`
 	background-image: url(${(props) => props.backgroundImage});
 	background-size: cover;
 	background-position: center;
-	border-radius: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	border-radius: ${styles.borderRadius.xxLarge};
+  font-family: ${styles.typography.fontFamily.urban};
 	color: white;
-	font-size: 1.5rem;
+	font-size: ${styles.typography.fontSize.displayXs};
 	font-weight: bold;
 	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 	position: relative;
+	isolation: isolate;
+  overflow: hidden;
+  border: 2px solid ${styles.colors.gray[800]};
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: linear-gradient(
+			transparent,
+			66%,
+			rgba(0, 0, 0, 0.6),
+			88%,
+			rgba(0, 0, 0, 0.9)
+		);
+	}
 `;
 
 const Occupation = styled.h3`
@@ -29,11 +44,8 @@ const Occupation = styled.h3`
 	font-size: 1.5rem;
 	font-weight: bold;
 	position: absolute;
-	bottom: 20px;
-	left: 20px;
-	background-color: rgba(0, 0, 0, 0.71);
-	padding: ${styles.space.small};
-	border-radius: ${styles.borderRadius.medium};
+	bottom: 1.5rem;
+	left: 1.5rem;
 `;
 
 const PersonaCard: React.FC<PersonaCardProps> = ({
@@ -48,3 +60,4 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 };
 
 export default PersonaCard;
+
