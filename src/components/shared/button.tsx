@@ -6,59 +6,109 @@ interface ButtonProps {
 	children: React.ReactNode;
 	onClick?: () => void;
 	disabled?: boolean;
-	primary?: boolean | string;
-	width?: string;
+	variant?: 'primary' | 'secondary' | 'brand' | string;
+	size?: 'small' | 'medium' | 'large';
+	borderGradient?: Array<string>; // Array of colors for border gradient
 }
 
 const StyledButton = styled.button<ButtonProps>`
-	background-color: ${(props) => {
-		if (typeof props.primary === 'boolean' && props.primary) {
-			return styles.colors.buttonPrimary;
-		} else if (typeof props.primary === 'boolean') {
-			return styles.colors.buttonSecondary;
-		}
-		return props.primary;
-	}};
-	color: ${(props) =>
-		props.primary
-			? styles.colors.buttonSecondary
-			: styles.colors.buttonPrimary};
-	padding: 0; // Olamide TODO: create a getPadding function for custom padding values. THe default should not be zero.
-	border: none;
-	border-radius: 0.25rem;
-	cursor: pointer;
-	font-size: ${styles.typography.fontSize.xs};
-	font-family: ${styles.typography.fontFamily.inter};
-	height: ${styles.buttonHeights.medium};
-	width: ${(props) =>
-		props.width === 'small'
-			? styles.buttonWidths.small
-			: props.width === 'large'
-				? styles.buttonWidths.large
-				: props.width === 'large'
-					? styles.buttonWidths.medium
-					: props.width};
-	&:hover {
-		background-color: ${(props) => {
-			if (typeof props.primary === 'boolean' && props.primary) {
-				return styles.colors.buttonSecondary;
-			} else if (typeof props.primary === 'boolean') {
-				return styles.colors.buttonPrimary;
-			}
-			return props.primary;
-		}};
-		color: ${(props) =>
-			props.primary
-				? styles.colors.buttonPrimary
-				: styles.colors.buttonSecondary};
-	}
-	&:disabled {
-		background_color: ${styles.colors.background};
-		cursor: not-allowed;
+	/* Background color */
+	position: relative;
+	isolation: isolate;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 1px;
+		background: ${(props) =>
+			props.variant === 'primary'
+				? styles.colors.black
+				: props.variant === 'secondary'
+					? styles.colors.white
+					: props.variant === 'brand'
+						? styles.colors.brand[500]
+						: props.variant};
+		border-radius: ${(props) =>
+			props.size === 'small'
+				? styles.borderRadius.little
+				: styles.borderRadius.medium};
+		z-index: -1;
 	}
 
-	@media (max-width: 768px) {
-		margin: 0.5rem auto;
+  ${(props) => props.borderGradient &&
+    `@property --rotation {
+      inherits: false;
+      initial-value: 0deg;
+      syntax: '<angle>';
+    }
+    @keyframes rotate {
+      100% {
+        --rotation: 360deg;
+      }
+    }
+    animation: rotate 3s linear infinite;`
+  }
+
+	/* Border color and gradient */
+	background: ${(props) =>
+		props.borderGradient
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.borderGradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.borderGradient[0]})`
+			: props.variant === 'primary'
+				? styles.colors.gray[700]
+				: 'transparent'};
+
+
+	color: ${(props) =>
+		props.variant === 'primary'
+			? styles.colors.white
+			: props.variant === 'secondary'
+				? styles.colors.black
+				: props.variant === 'brand'
+					? styles.colors.white
+					: styles.colors.white};
+	border-radius: ${(props) =>
+		props.size === 'small'
+			? styles.borderRadius.little
+			: styles.borderRadius.medium};
+	font-family: ${styles.typography.fontFamily.inter};
+	font-weight: ${styles.typography.fontWeight.medium};
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 1ch;
+	height: ${(props) =>
+		props.size === 'small'
+			? styles.buttonHeights.small
+			: props.size === 'medium'
+				? styles.buttonHeights.medium
+				: styles.buttonHeights.large};
+	padding-inline: ${(props) =>
+		props.size === 'small'
+			? styles.space.small
+			: props.size === 'medium'
+				? styles.space.medium
+				: styles.space.large};
+	font-size: ${(props) =>
+		props.size === 'small'
+			? styles.typography.fontSize.xs
+			: props.size === 'medium'
+				? styles.typography.fontSize.sm
+				: styles.typography.fontSize.base};
+	&:hover {
+    &::before {
+      background-color: ${(props) =>
+        props.variant === 'primary'
+          ? styles.colors.gray[900]
+          : props.variant === 'secondary'
+            ? styles.colors.gray[200]
+            : props.variant === 'brand'
+              ? styles.colors.brand[600]
+              : props.variant + '80'};
+    }
+	}
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 `;
 
@@ -66,15 +116,17 @@ const Button: React.FC<ButtonProps> = ({
 	children,
 	onClick,
 	disabled = false,
-	primary = false,
-	width = 'medium',
+	variant = 'primary',
+	size = 'medium',
+	borderGradient,
 }) => {
 	return (
 		<StyledButton
 			onClick={onClick}
 			disabled={disabled}
-			primary={primary}
-			width={width}
+			variant={variant}
+			size={size}
+			borderGradient={borderGradient}
 		>
 			{children}
 		</StyledButton>
@@ -82,3 +134,4 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
+
