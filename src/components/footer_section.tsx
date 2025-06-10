@@ -10,30 +10,37 @@ import XLogo from '../assets/image_assets/x_logo.png';
 import FounderUniversity from '../assets/image_assets/founder_university.png';
 
 const FooterContainer = styled.div`
-	background: #1a1a1a80;
-	width: 100%;
+  border-top: 1px solid ${styles.colors.gray[800]};
+	background: #111;
+  display: flex;
+  justify-content: center;
 `;
 
 const FooterSubContainer = styled.div`
+  width: 100%;
+	max-width: ${styles.container.sizes.xLarge};
+
 	display: flex;
 	justify-content: space-between;
-	padding: 20px;
-	color: ${styles.colors.text};
-	width: 100%;
-	margin: 0 auto;
+	padding-block: ${styles.container.padding.lg};
+	margin-inline: ${styles.container.padding.lg};
+	color: ${styles.colors.gray[500]};
 
 	@media (max-width: 768px) {
 		flex-direction: column-reverse;
 		align-items: center;
 		text-align: center;
+		padding-block: ${styles.container.padding.default};
+		margin-inline: ${styles.container.padding.default};
 	}
 `;
 
 const FooterColumn = styled.div`
 	display: flex;
 	flex-direction: column;
+	gap: 1rem;
 	text-align: left;
-	width: 200px;
+	font-size: ${styles.typography.fontSize.sm};
 
 	@media (max-width: 768px) {
 		margin: 1rem;
@@ -42,12 +49,8 @@ const FooterColumn = styled.div`
 `;
 
 const FooterRow = styled.div`
-	margin-bottom: 10px;
 	display: flex;
-
-	div {
-		padding: 0.15rem;
-	}
+  gap: .5rem;
 
 	@media (max-width: 768px) {
 		justify-content: center;
@@ -122,12 +125,17 @@ const FooterSection: React.FC = () => {
 							</svg>
 						</SvgWrapper>
 					</FooterRow>
-					<FooterRow>
-						<p>
-							&copy; {new Date().getFullYear()} Tiler. All rights
-							reserved.
-						</p>
-					</FooterRow>
+
+					<p
+						style={{
+							fontSize: styles.typography.fontSize.sm,
+							margin: 'auto 0 0',
+						}}
+					>
+						&copy; {new Date().getFullYear()} Tiler. All rights
+						reserved.
+					</p>
+
 					<FooterLinks>
 						<FooterLink
 							href="https://www.facebook.com/profile.php?id=100094419297775"
@@ -168,9 +176,18 @@ const FooterSection: React.FC = () => {
 						</FooterLink>
 					</FooterLinks>
 				</FooterColumn>
+
 				<FooterColumn>
-					<FooterRow>Legal</FooterRow>
-					<FooterRow>
+					<h3 style={{ color: styles.colors.white }}>Legal</h3>
+
+					<ul
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							gap: '0.25rem',
+							margin: '0 0 auto',
+						}}
+					>
 						<FooterLink
 							href="https://tiler.app/tos"
 							target="_blank"
@@ -178,8 +195,7 @@ const FooterSection: React.FC = () => {
 						>
 							Terms of Use
 						</FooterLink>
-					</FooterRow>
-					<FooterRow>
+
 						<FooterLink
 							href="https://tiler.app/privacy"
 							target="_blank"
@@ -187,14 +203,15 @@ const FooterSection: React.FC = () => {
 						>
 							Privacy
 						</FooterLink>
-					</FooterRow>
+					</ul>
+
 					<FooterRow>
 						<img
 							src={FounderUniversity}
 							alt="Founder University Logo"
 							style={{ width: '80px', height: 'auto' }}
 						/>
-						<div>Partners</div>
+						<span>Partners</span>
 					</FooterRow>
 				</FooterColumn>
 			</FooterSubContainer>
@@ -203,3 +220,4 @@ const FooterSection: React.FC = () => {
 };
 
 export default FooterSection;
+
