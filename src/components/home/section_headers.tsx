@@ -24,7 +24,7 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 				: 'center'};
 	text-align: ${({ align }) => align};
 	max-width: 100%;
-	margin-bottom: 1rem;
+	margin-bottom: 2rem;
 
 	@media (max-width: 768px) {
 		align-items: center;
