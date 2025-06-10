@@ -4,6 +4,7 @@ import SectionHeaders from './section_headers';
 import MicrosoftLogo from '../../assets/image_assets/microsoft_logo.png';
 import GoogleLogo from '../../assets/image_assets/google_logo.png';
 import CalendarIcon from '../../assets/image_assets/calendar_icon.png';
+import styles from '../../util/styles';
 
 const TextContent = styled.div`
 	max-width: 50%;
@@ -29,13 +30,14 @@ const Logo = styled.img`
 
 const Section = styled.section`
 	background-color: #000;
-	color: white;
+	color: ${styles.colors.gray[500]};
 	padding: 40px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
 	margin: 0 auto;
+  max-width: ${styles.container.sizes.xLarge};
 
 	@media (max-width: 768px) {
 		flex-direction: column;

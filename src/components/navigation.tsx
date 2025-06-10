@@ -61,7 +61,7 @@ const ButtonsWrapper = styled.div`
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
-	width: 210px;
+	gap: 1rem;
 
 	@media (max-width: 768px) {
 		display: none;
@@ -82,6 +82,7 @@ const MobileNav = styled.div<{ isOpen: boolean }>`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	gap: 16px;
 	background-color: #1a1a1ad2;
 	position: absolute;
 	top: 100%;
@@ -158,16 +159,17 @@ const Navigation = () => {
 
 				<ButtonsWrapper>
 					<Button
-						primary={true}
-						width="113px"
+						size="small"
 						onClick={() =>
 							window.open('https://launch.tiler.app/', '_blank')
 						}
+						borderGradient={[styles.colors.brand[400]]}
 					>
 						Try Tiler for free
 					</Button>
 					<Button
-						width="65px"
+						size="small"
+						variant="secondary"
 						onClick={() =>
 							window.open(
 								'https://tiler.app/account/login',
@@ -192,14 +194,13 @@ const Navigation = () => {
 				<NavLink href="/">Home</NavLink>
 				<NavLink href="/features">Features</NavLink>
 				<Button
-					primary={true}
-					width="120px"
 					onClick={() => window.open('https://tiler.app/', '_blank')}
+					borderGradient={[styles.colors.brand[500]]}
 				>
 					Try Tiler for free
 				</Button>
 				<Button
-					width="120px"
+					variant="secondary"
 					onClick={() =>
 						window.open('https://tiler.app/account/login', '_blank')
 					}
@@ -212,3 +213,4 @@ const Navigation = () => {
 };
 
 export default Navigation;
+

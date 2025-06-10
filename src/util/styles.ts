@@ -244,20 +244,15 @@ const styles = {
 			displayXxl: '90px',
 		},
 	},
-	buttonWidths: {
-		small: '80px',
-		medium: '120px',
-		large: '160px',
-	},
 	buttonHeights: {
-		small: '20px',
-		medium: '32px',
-		large: '48px',
+		small: '32px',
+		medium: '36px',
+		large: '40px',
 	},
 	space: {
-		small: '8px',
-		medium: '16px',
-		large: '24px',
+		small: '16px',
+		medium: '24px',
+		large: '32px',
 	},
 	inputs: {
 		height: '40px',
@@ -266,6 +261,7 @@ const styles = {
 	},
 	borderRadius: {
 		small: '4px',
+    little: '6px',
 		medium: '8px',
 		large: '12px',
 		xLarge: '16px',

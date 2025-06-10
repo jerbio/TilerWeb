@@ -36,7 +36,7 @@ const highlights: Highlight[] = [
 ];
 
 const HighlightRootWrapper = styled.div`
-	margin: 50px 0;
+	margin: 6rem 0;
   padding: 0 ${styles.container.padding.default};
   display: flex;
   flex-direction: column;
