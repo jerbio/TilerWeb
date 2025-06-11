@@ -213,7 +213,7 @@ const styles = {
 			lg: '18px',
 			xl: '20px',
 			displayXs: '24px',
-			displaySm: '30px',
+			displaySm: '32px',
 			displayBase: '36px',
 			displayLg: '48px',
 			displayXl: '60px',
@@ -249,6 +249,11 @@ const styles = {
 		medium: '36px',
 		large: '40px',
 	},
+  inputHeights: {
+    small: '36px',
+    medium: '40px',
+    large: '44px',
+  },
 	space: {
 		small: '16px',
 		medium: '24px',
@@ -274,8 +279,8 @@ const styles = {
 			lg: '2rem',
 		},
 		paddingBlock: {
-			default: '2rem',
-			lg: '2.5rem',
+			default: '3rem',
+			lg: '4rem',
 		},
 		sizes: {
 			small: '640px',

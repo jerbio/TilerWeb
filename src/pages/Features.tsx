@@ -9,6 +9,7 @@ import FeatureTransit from '../assets/image_assets/features/transit.png';
 import FeatureTimely from '../assets/image_assets/features/timely.png';
 import FeatureAutoLoc from '../assets/image_assets/features/auto-loc.png';
 import Section from '../components/layout/section';
+import UpdatesSection from '../components/home/updates_section';
 
 const BackgroundBlur = styled.div`
 	position: absolute;
@@ -80,22 +81,25 @@ const featureList = [
 
 export default function Features() {
 	return (
-		<Section>
-			<BackgroundBlur />
-			<DottedLineImage src={DottedLine} alt="null" />
-			<GridContainer>
-				{featureList.map((item, itemIndex) => (
-					<FeatureCard
-						key={item.title}
-						title={item.title}
-						image={item.image}
-						reversed={itemIndex % 2 !== 0}
-					>
-						{item.description}
-					</FeatureCard>
-				))}
-			</GridContainer>
-		</Section>
+		<>
+			<Section>
+				<BackgroundBlur />
+				<DottedLineImage src={DottedLine} alt="null" />
+				<GridContainer>
+					{featureList.map((item, itemIndex) => (
+						<FeatureCard
+							key={item.title}
+							title={item.title}
+							image={item.image}
+							reversed={itemIndex % 2 !== 0}
+						>
+							{item.description}
+						</FeatureCard>
+					))}
+				</GridContainer>
+			</Section>
+			<UpdatesSection />
+		</>
 	);
 }
 

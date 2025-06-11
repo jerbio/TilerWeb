@@ -8,6 +8,7 @@ import VideoIframeSection from '../components/home/video_iframe_section';
 import Waitlist from '../components/home/waitlist_input';
 import iosIcon from '../assets/image_assets/features/ios.png';
 import androidIcon from '../assets/image_assets/features/android.png';
+import UpdatesSection from '../components/home/updates_section';
 
 // Simple i18n object for demonstration
 const i18n = {
@@ -63,6 +64,7 @@ const Home: React.FC = () => {
 			<TileCardSection />
 			<CalendarIntegrationSection />
 			<HeroSection />
+      
 		</>
 	);
 };
