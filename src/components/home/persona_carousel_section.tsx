@@ -23,6 +23,7 @@ const personas = [
 	{
 		occupation: 'Custom Profile',
 		image: Custom,
+    highlight: true,
 	},
 	{
 		occupation: 'Developer',
@@ -49,8 +50,6 @@ const PersonaCarousel: React.FC = () => {
 		} else {
 			return { marginLeft: '5rem' };
 		}
-
-		console.log(`Screen width: ${screenWidth}px`);
 	};
 	return (
 		<Container>
@@ -87,6 +86,7 @@ const PersonaCarousel: React.FC = () => {
 						<PersonaCard
 							occupation={persona.occupation}
 							backgroundImage={persona.image}
+              gradient={persona.highlight}
 						/>
 					</SwiperSlide>
 				))}

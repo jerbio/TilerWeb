@@ -48,7 +48,7 @@ const Header = styled.h2<{ size: 'base' | 'large' }>`
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
-	line-height: 1.1;
+	line-height: 1.1;xp
 
 	img {
 		width: 20px;
@@ -71,13 +71,14 @@ const SubHeader = styled.p`
 `;
 
 const SpanText = styled.span`
-	color: ${styles.colors.brand[500]};
+	color: ${styles.colors.brand[400]};
 `;
 
 const Image = styled.img`
   display: inline-block;
 	height: 32px;
   width: 32px;
+  margin-left: .5ch;
 `;
 
 const SectionHeaders: React.FC<SectionHeadersProps> = ({
