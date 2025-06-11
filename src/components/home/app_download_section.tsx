@@ -1,9 +1,9 @@
-import ArrowOut from '../../assets/image_assets/icons/arrow_out.svg';
 import Section from '../layout/section';
 import styled from 'styled-components';
 import styles from '../../util/styles';
 import AppStore from '../../assets/image_assets/icons/app_store.svg';
 import PlayStore from '../../assets/image_assets/icons/play_store.svg';
+import ArrowOut from '../icons/arrow_out';
 
 // Simple i18n object for demonstration
 const i18n = {
@@ -64,12 +64,7 @@ const AppDownloadSection = () => {
 					/>
 					<DownloadLinkLabel>
 						<span>{i18n[lang].downloadIOS}</span>
-            <img
-              src={ArrowOut}
-              alt="External Link"
-              width={15}
-              height={22.5}
-            />
+            <ArrowOut />
 					</DownloadLinkLabel>
 				</DownloadLink>
 				<DownloadLink
@@ -86,12 +81,7 @@ const AppDownloadSection = () => {
 					/>
 					<DownloadLinkLabel>
 						<span>{i18n[lang].downloadAndroid}</span>
-            <img
-              src={ArrowOut}
-              alt="External Link"
-              width={15}
-              height={22.5}
-            />
+            <ArrowOut />
 					</DownloadLinkLabel>
 				</DownloadLink>
 			</FlexWrapper>

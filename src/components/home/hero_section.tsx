@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
 import Button from '../shared/button';
-import ArrowRight from '../../assets/image_assets/icons/arrow_right.svg';
 import Section from '../layout/section';
+import ArrowRight from '../icons/arrow_right';
 
 const ButtonContainer = styled.div`
 	display: flex;
@@ -35,7 +35,7 @@ const HeroSection: React.FC = () => {
 					]}
 				>
 					<span>Get Started with Tiler</span>
-					<img src={ArrowRight} alt="Arrow Right" />
+					<ArrowRight />
 				</Button>
 				<Button variant="brand">Learn More</Button>
 			</ButtonContainer>

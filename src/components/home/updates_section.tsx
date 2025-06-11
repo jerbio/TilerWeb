@@ -1,11 +1,10 @@
-import React from 'react';
 import Section from '../layout/section';
 import SectionHeaders from '../layout/section_headers';
 import styled from 'styled-components';
-import ArrowRight from '../../assets/image_assets/icons/arrow_right.svg';
 import Button from '../shared/button';
 import Input from '../shared/input';
 import styles from '../../util/styles';
+import { ArrowRight } from 'lucide-react';
 
 const Form = styled.form`
 	display: flex;
@@ -39,7 +38,7 @@ const UpdatesSection = () => {
 				/>
 				<Button type="submit" variant="brand" height={40}>
 					<ButtonText>Subscribe</ButtonText>
-					<img src={ArrowRight} alt="Arrow Right" />
+          <ArrowRight />
 				</Button>
 			</Form>
 		</Section>

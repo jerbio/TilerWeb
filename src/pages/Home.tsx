@@ -7,6 +7,7 @@ import HeroSection from '../components/home/hero_section';
 import VideoIframeSection from '../components/home/video_iframe_section';
 import Waitlist from '../components/home/waitlist_input';
 import AppDownloadSection from '../components/home/app_download_section';
+import FAQ from '../components/home/faq_section';
 
 
 const Home: React.FC = () => {
@@ -30,7 +31,7 @@ const Home: React.FC = () => {
 			<TileCardSection />
 			<CalendarIntegrationSection />
 			<HeroSection />
-      
+      <FAQ />
 		</>
 	);
 };

@@ -5,8 +5,8 @@ import { TileCardProps } from '../../util/interface';
 import styles from '../../util/styles';
 import Button from '../shared/button';
 import SectionHeaders from '../layout/section_headers';
-import ArrowRight from '../../assets/image_assets/icons/arrow_right.svg';
 import Section from '../layout/section';
+import ArrowRight from '../icons/arrow_right';
 
 const TileCardContainer = styled.div`
 	display: flex;
@@ -194,7 +194,7 @@ const TileCardSection: React.FC = () => {
 			<ButtonContainer>
 				<Button variant="brand">
 					<span>Create your own tiles</span>{' '}
-					<img src={ArrowRight} alt="Arrow Right" />
+					<ArrowRight />
 				</Button>
 			</ButtonContainer>
 		</Section>
