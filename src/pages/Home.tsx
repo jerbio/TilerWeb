@@ -34,7 +34,7 @@ const Home: React.FC = () => {
 			<VideoIframeSection
 				src="https://www.youtube.com/embed/N3L49xMBZ60?si=BmQ0wHBvThDCh5Zc"
 				title="YouTube video player"
-				width="1024"
+				width={1024}
 				allowFullScreen={true}
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 				waitlistSignUp={waitlistSignUp}

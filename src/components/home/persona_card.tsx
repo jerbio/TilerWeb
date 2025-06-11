@@ -43,17 +43,18 @@ const Card = styled.div<{ gradient?: boolean }>`
 	&::after {
 		${(props) =>
 			props.gradient &&
-			`@property --rotation {
-      inherits: false;
-      initial-value: 0deg;
-      syntax: '<angle>';
-    }
-    @keyframes rotate {
-      100% {
-        --rotation: 360deg;
+        `@property --rotation {
+        inherits: false;
+        initial-value: 0deg;
+        syntax: '<angle>';
       }
+      @keyframes rotate {
+        100% {
+          --rotation: 360deg;
+        }
+      }
+      animation: rotate 5s linear infinite;`
     }
-    animation: rotate 5s linear infinite;`}
 
 		content: '';
 		position: absolute;

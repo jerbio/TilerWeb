@@ -3,17 +3,11 @@ import styled from 'styled-components';
 import { WaitlistApi } from '../../api/waitlistApi';
 import styles from '../../util/styles';
 import { toast } from 'sonner';
-
-const Wrapper = styled.div`
-	margin: 4rem auto;
-  max-width: 1024px;
-  display: flex;
-`;
+import Section from '../layout/section';
 
 const Form = styled.form`
 	display: flex;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	margin: 0 ${styles.container.padding.default};
   border-radius: 4rem;
   overflow: hidden;
   width: 100%;
@@ -73,7 +67,7 @@ const Waitlist: React.FC = () => {
 	};
 
 	return (
-		<Wrapper>
+		<Section width={1024} noPaddingBlock>
 			<Form onSubmit={handleSubmit}>
 				<Input
 					type="email"
@@ -84,7 +78,7 @@ const Waitlist: React.FC = () => {
 				/>
 				<Button type="submit">Join Waitlist</Button>
 			</Form>
-		</Wrapper>
+		</Section>
 	);
 };
 

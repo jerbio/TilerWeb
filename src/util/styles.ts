@@ -202,7 +202,7 @@ const styles = {
 	},
 	typography: {
 		fontFamily: {
-			inter: 'Inter Sans, sans-serif',
+			inter: 'Inter, sans-serif',
 			urban: 'Urbanist, sans-serif',
 		},
 		fontSize: {
@@ -269,9 +269,13 @@ const styles = {
 	},
 	container: {
 		center: true,
-		padding: {
-			default: '20px',
-			lg: '32px',
+		paddingInline: {
+			default: '1.5rem',
+			lg: '2rem',
+		},
+		paddingBlock: {
+			default: '2rem',
+			lg: '2.5rem',
 		},
 		sizes: {
 			small: '640px',

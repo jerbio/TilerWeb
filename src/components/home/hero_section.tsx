@@ -1,27 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
-import SectionHeaders from './section_headers';
+import SectionHeaders from '../layout/section_headers';
 import Button from '../shared/button';
 import ArrowRight from '../../assets/image_assets/icons/arrow_right.svg';
-import styles from '../../util/styles';
-
-const HeroSectionContainer = styled.div`
-	margin: 4rem auto;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 20px;
-`;
+import Section from '../layout/section';
 
 const ButtonContainer = styled.div`
 	display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 	gap: 10px;
 	margin-top: 20px;
 `;
 
 const HeroSection: React.FC = () => {
 	return (
-		<HeroSectionContainer>
+		<Section>
 			<SectionHeaders
 				headerText="Visualize Your Schedule, Simplify Your Life."
 				subHeaderText="The ultimate tool for creating personalized and interactive timelines."
@@ -45,7 +39,7 @@ const HeroSection: React.FC = () => {
 				</Button>
 				<Button variant="brand">Learn More</Button>
 			</ButtonContainer>
-		</HeroSectionContainer>
+		</Section>
 	);
 };
 

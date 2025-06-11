@@ -71,7 +71,7 @@ const StyledButton = styled.button<ButtonProps>`
 			? styles.borderRadius.little
 			: styles.borderRadius.medium};
 	font-family: ${styles.typography.fontFamily.inter};
-	font-weight: ${styles.typography.fontWeight.medium};
+	font-weight: ${styles.typography.fontWeight.normal};
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;

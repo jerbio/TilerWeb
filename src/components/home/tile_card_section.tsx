@@ -4,8 +4,9 @@ import TileCard from './tile_card';
 import { TileCardProps } from '../../util/interface';
 import styles from '../../util/styles';
 import Button from '../shared/button';
-import SectionHeaders from './section_headers';
+import SectionHeaders from '../layout/section_headers';
 import ArrowRight from '../../assets/image_assets/icons/arrow_right.svg';
+import Section from '../layout/section';
 
 const TileCardContainer = styled.div`
 	display: flex;
@@ -14,21 +15,11 @@ const TileCardContainer = styled.div`
 	margin-bottom: 3rem;
 `;
 
-const TileSectionWrapper = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	margin: 50px 0;
-	padding: 0 ${styles.container.padding.default};
-	// border: 1px solid ${styles.colors.borderRed};
-`;
-
 const TileCardWrapperScroll = styled.div`
 	position: relative;
-	width: calc(100vw - 36px);
-	max-width: ${styles.container.sizes.xLarge};
-	height: 101px;
-  overflow: hidden;
+	width: 100%;
+	height: 105px;
+	overflow: hidden;
 `;
 
 const slideInAnimation = (direction: 'left' | 'right') => keyframes`
@@ -41,12 +32,18 @@ const slideInAnimation = (direction: 'left' | 'right') => keyframes`
 `;
 
 const TileCardWrapper = styled.div<{ direction: 'left' | 'right' }>`
-  display: flex;
-  position: absolute;
-  ${(props) => (props.direction === 'left' ? 'left: 0;' : 'right: 0;')}
+	display: flex;
+	position: absolute;
+	${(props) => (props.direction === 'left' ? 'left: 0;' : 'right: 0;')}
 
-  animation: ${(props) => slideInAnimation(props.direction)} 64s linear infinite;
-  transform: translateX(-50%);
+	animation: ${(props) =>
+		slideInAnimation(props.direction)} 64s linear infinite;
+	transform: translateX(-50%);
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
 `;
 
 const TileFadeDivRight = styled.div`
@@ -166,7 +163,7 @@ const tileGrid: Array<Array<TileCardProps>> = [
 
 const TileCardSection: React.FC = () => {
 	return (
-		<TileSectionWrapper>
+		<Section>
 			<SectionHeaders
 				headerText="Visualize your tasks and appointments"
 				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
@@ -194,11 +191,13 @@ const TileCardSection: React.FC = () => {
 				))}
 			</TileCardContainer>
 
-			<Button variant="brand">
-				<span>Create your own tiles</span>{' '}
-				<img src={ArrowRight} alt="Arrow Right" />
-			</Button>
-		</TileSectionWrapper>
+			<ButtonContainer>
+				<Button variant="brand">
+					<span>Create your own tiles</span>{' '}
+					<img src={ArrowRight} alt="Arrow Right" />
+				</Button>
+			</ButtonContainer>
+		</Section>
 	);
 };
 export default TileCardSection;

@@ -6,7 +6,8 @@ import MountainBackground from '../../assets/image_assets/highlights/mountain.jp
 import FitnessBackground from '../../assets/image_assets/highlights/fitness.jpg';
 import TilesBackground from '../../assets/image_assets/highlights/tiles.jpg';
 import LocationBackground from '../../assets/image_assets/highlights/location.jpg';
-import SectionHeaders from './section_headers';
+import SectionHeaders from '../layout/section_headers';
+import Section from '../layout/section';
 
 const highlights: Highlight[] = [
 	{
@@ -35,18 +36,12 @@ const highlights: Highlight[] = [
 	},
 ];
 
-const HighlightRootWrapper = styled.div`
-	margin: 6rem 0;
-  padding: 0 ${styles.container.padding.default};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
 const HighlightCardWrapper = styled.div`
 	display: grid;
   place-items: center;
   gap: 1.5rem;
+  width: fit-content;
+  margin: 0 auto;
 
   @media (min-width: ${styles.screens.sm}) {
     grid-template-columns: repeat(2, 1fr);
@@ -94,7 +89,7 @@ const Body = styled.p`
 
 const FeatureHighlightsSection: React.FC = () => {
 	return (
-		<HighlightRootWrapper>
+		<Section>
 			<SectionHeaders
 				headerText="Feature Highlights"
 				subHeaderText="Simplify your life with Tiler, Here's what we can do to help you."
@@ -114,7 +109,7 @@ const FeatureHighlightsSection: React.FC = () => {
 					</HighlightCard>
 				))}
 			</HighlightCardWrapper>
-		</HighlightRootWrapper>
+		</Section>
 	);
 };
 

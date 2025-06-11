@@ -22,16 +22,16 @@ const FooterSubContainer = styled.div`
 
 	display: flex;
 	justify-content: space-between;
-	padding-block: ${styles.container.padding.lg};
-	margin-inline: ${styles.container.padding.lg};
+	padding-block: ${styles.container.paddingInline.lg};
+	margin-inline: ${styles.container.paddingInline.lg};
 	color: ${styles.colors.gray[500]};
 
 	@media (max-width: 768px) {
 		flex-direction: column-reverse;
 		align-items: center;
 		text-align: center;
-		padding-block: ${styles.container.padding.default};
-		margin-inline: ${styles.container.padding.default};
+		padding-block: ${styles.container.paddingInline.default};
+		margin-inline: ${styles.container.paddingInline.default};
 	}
 `;
 
