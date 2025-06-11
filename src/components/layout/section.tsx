@@ -11,7 +11,7 @@ const StyledSectionWrapper = styled.div`
 
 const StyledSection = styled.section<{
 	maxWidth?: number;
-	paddingBlock?: string;
+	paddingBlock?: number;
 }>`
 	position: relative;
 	isolation: isolate;
@@ -21,11 +21,16 @@ const StyledSection = styled.section<{
 		props.maxWidth ? `${props.maxWidth}px` : styles.container.sizes.xLarge};
 	margin: 0 auto;
 	padding: ${(props) =>
-			props.paddingBlock || styles.container.paddingBlock.default}
+			props.paddingBlock !== undefined
+				? `${props.paddingBlock}px`
+				: styles.container.paddingBlock.default}
 		${styles.container.paddingInline.default};
 
 	@media (min-width: ${styles.screens.lg}) {
-		padding: ${styles.container.paddingBlock.lg}
+		padding: ${(props) =>
+				props.paddingBlock !== undefined
+					? `${props.paddingBlock}px`
+					: styles.container.paddingBlock.lg}
 			${styles.container.paddingInline.lg};
 	}
 `;
@@ -33,16 +38,16 @@ const StyledSection = styled.section<{
 type SectionProps = {
 	children: React.ReactNode;
 	width?: number;
-	noPaddingBlock?: boolean;
+	paddingBlock?: number;
 };
 
-const Section = ({ children, width, noPaddingBlock }: SectionProps) => {
+const Section = ({ children, width, paddingBlock }: SectionProps) => {
 	return (
 		<StyledSectionWrapper>
 			<StyledSection
 				style={{
 					maxWidth: width,
-					paddingBlock: noPaddingBlock ? '0' : undefined,
+					paddingBlock: paddingBlock,
 				}}
 			>
 				{children}

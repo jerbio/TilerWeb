@@ -6,6 +6,7 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	disabled?: boolean;
 	variant?: 'default' | 'brand';
 	sized?: 'small' | 'medium' | 'large';
+	height?: number; // Optional height override
 	borderGradient?: Array<string>; // Array of colors for border gradient
 };
 
@@ -16,11 +17,13 @@ const StyledInputWrapper = styled.div<InputProps>`
 	isolation: isolate;
 	padding: 1px;
 	height: ${(props) =>
-		props.sized === 'small'
-			? styles.inputHeights.small
-			: props.sized === 'medium'
-				? styles.inputHeights.medium
-				: styles.inputHeights.large};
+		props.height
+			? `${props.height}px`
+			: props.sized === 'small'
+				? styles.inputHeights.small
+				: props.sized === 'medium'
+					? styles.inputHeights.medium
+					: styles.inputHeights.large};
 
 	${(props) =>
 		props.borderGradient &&
