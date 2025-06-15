@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import SectionHeaders from './section_headers';
+import SectionHeaders from '../layout/section_headers';
 import MicrosoftLogo from '../../assets/image_assets/microsoft_logo.png';
 import GoogleLogo from '../../assets/image_assets/google_logo.png';
 import CalendarIcon from '../../assets/image_assets/calendar_icon.png';
-
-const TextContent = styled.div`
-	max-width: 50%;
-`;
+import styles from '../../util/styles';
+import Section from '../layout/section';
+import { useTranslation } from 'react-i18next';
 
 const LogoContainer = styled.div`
 	display: flex;
@@ -27,58 +26,45 @@ const Logo = styled.img`
   margin-bottom: 5px;
 `;
 
-const Section = styled.section`
-	background-color: #000;
-	color: white;
-	padding: 40px;
+const FlexWrapper = styled.div`
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	margin: 0 auto;
+	justify-content: center;
 
-	@media (max-width: 768px) {
-		flex-direction: column;
-		text-align: center;
-
-		${TextContent} {
-			max-width: 100%;
-			margin-bottom: 20px;
-		}
-
-		${LogoContainer} {
-			justify-content: center;
-		}
-
-		${LogoWrapper} {
-			margin-left: 10px;
-		}
-	}
+  @media (min-width: ${styles.screens.md}) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 `;
 
 const CalendarIntegrationSection: React.FC = () => {
+	const { t } = useTranslation();
+	
 	return (
 		<Section>
-			<TextContent>
+			<FlexWrapper>
 				<SectionHeaders
-					headerText="Integrate with your favorite"
-					spanText="calendar"
+					headerText={t('home.integration.title')}
+					spanText={t('home.integration.spanText')}
 					image={CalendarIcon}
-					imageAlt="Calendar Icon"
-					subHeaderText="These apps are available to integrate seamlessly with Tiler."
+					imageAlt={t('home.integration.title')}
+					subHeaderText={t('home.integration.subtitle')}
 					align="left"
 				/>
-			</TextContent>
-			<LogoContainer>
-				<LogoWrapper>
-					<Logo src={MicrosoftLogo} alt="Microsoft Logo" />
-				</LogoWrapper>
-				<LogoWrapper>
-					<Logo src={GoogleLogo} alt="Google Logo" />
-				</LogoWrapper>
-			</LogoContainer>
+
+				<LogoContainer>
+					<LogoWrapper>
+						<Logo src={MicrosoftLogo} alt="Microsoft Logo" />
+					</LogoWrapper>
+					<LogoWrapper>
+						<Logo src={GoogleLogo} alt="Google Logo" />
+					</LogoWrapper>
+				</LogoContainer>
+			</FlexWrapper>
 		</Section>
 	);
 };
 
 export default CalendarIntegrationSection;
+

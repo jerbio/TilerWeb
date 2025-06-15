@@ -2,46 +2,28 @@ import React from 'react';
 import styled from 'styled-components';
 import styles from '../../util/styles';
 import { Highlight } from '../../util/interface';
-import MountainBackground from '../../assets/image_assets/mountain.jpg';
-import FitnessBackground from '../../assets/image_assets/fitness.jpg';
-import TilesBackground from '../../assets/image_assets/tiles.jpg';
-import SectionHeaders from './section_headers';
-
-const highlights: Highlight[] = [
-	{
-		subHeader: 'OPTIMIZE YOUR DAY',
-		header: 'Travel & Business Hours',
-		body: 'Automatically calculate optimal business hours and travel times',
-		backgroundImage: MountainBackground,
-	},
-	{
-		subHeader: 'ANTICIPATE THE FUTURE',
-		header: 'Forecast & Predictions',
-		body: 'Make strategic choices based on data-driven insights.',
-		backgroundImage: FitnessBackground,
-	},
-	{
-		subHeader: 'PERSONALIZED RECCOMENDATIONS',
-		header: 'Tile Suggestions',
-		body: 'Let Tiler handle the complex scheduling tasks, Prioritize tasks and allocate time effectively.',
-		backgroundImage: TilesBackground,
-	},
-];
-
-const HighlightRootWrapper = styled.div`
-	margin: 50px 0;
-  padding: 0 ${styles.container.padding.default};
-`;
+import MountainBackground from '../../assets/image_assets/highlights/mountain.jpg';
+import FitnessBackground from '../../assets/image_assets/highlights/fitness.jpg';
+import TilesBackground from '../../assets/image_assets/highlights/tiles.jpg';
+import LocationBackground from '../../assets/image_assets/highlights/location.jpg';
+import SectionHeaders from '../layout/section_headers';
+import Section from '../layout/section';
+import { useTranslation } from 'react-i18next';
 
 const HighlightCardWrapper = styled.div`
-	display: flex;
-	justify-content: center;
-	gap: 2rem;
+	display: grid;
+  place-items: center;
+  gap: 1.5rem;
+  width: fit-content;
+  margin: 0 auto;
 
-	@media (max-width: 768px) {
-		flex-direction: column;
-		align-items: center;
-	}
+  @media (min-width: ${styles.screens.sm}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: ${styles.screens.xl}) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 const HighlightCard = styled.div<{ backgroundImage: string }>`
@@ -60,8 +42,9 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 `;
 
 const MiniTitle = styled.p`
-	color: ${styles.colors.textRed};
-	font-size: ${styles.typography.fontSize.xs};
+	color: ${styles.colors.brand['300']};
+  font-weight: ${styles.typography.fontWeight.medium};
+	font-size: ${styles.typography.fontSize.xxs};
 	margin: 0;
 `;
 
@@ -79,8 +62,37 @@ const Body = styled.p`
 `;
 
 const FeatureHighlightsSection: React.FC = () => {
+	const { t } = useTranslation();
+	
+	const highlights: Highlight[] = [
+		{
+			subHeader: t('home.features.transit.subtitle'),
+			header: t('home.features.transit.title'),
+			body: t('home.features.transit.description'),
+			backgroundImage: MountainBackground,
+		},
+		{
+			subHeader: t('home.features.forecast.subtitle'),
+			header: t('home.features.forecast.title'),
+			body: t('home.features.forecast.description'),
+			backgroundImage: FitnessBackground,
+		},
+		{
+			subHeader: t('home.features.suggestions.subtitle'),
+			header: t('home.features.suggestions.title'),
+			body: t('home.features.suggestions.description'),
+			backgroundImage: TilesBackground,
+		},
+		{
+			subHeader: t('home.features.location.subtitle'),
+			header: t('home.features.location.title'),
+			body: t('home.features.location.description'),
+			backgroundImage: LocationBackground,
+		},
+	];
+
 	return (
-		<HighlightRootWrapper>
+		<Section>
 			<SectionHeaders
 				headerText="Feature Highlights"
 				subHeaderText="Simplify your life with Tiler, Here's what we can do to help you."
@@ -100,7 +112,7 @@ const FeatureHighlightsSection: React.FC = () => {
 					</HighlightCard>
 				))}
 			</HighlightCardWrapper>
-		</HighlightRootWrapper>
+		</Section>
 	);
 };
 
