@@ -8,9 +8,10 @@ import VideoIframeSection from '../components/home/video_iframe_section';
 import Waitlist from '../components/home/waitlist_input';
 import AppDownloadSection from '../components/home/app_download_section';
 import FAQ from '../components/home/faq_section';
-
+import { useTranslation } from 'react-i18next';
 
 const Home: React.FC = () => {
+	const { t } = useTranslation();
 	const params = new URLSearchParams(window.location.search);
 	const waitlistSignUp = params.get('waitlistSignUp') === 'true';
 
@@ -19,7 +20,7 @@ const Home: React.FC = () => {
 			<PersonaCarousel />
 			<VideoIframeSection
 				src="https://www.youtube.com/embed/N3L49xMBZ60?si=BmQ0wHBvThDCh5Zc"
-				title="YouTube video player"
+				title={t('home.video.title')}
 				width={1024}
 				allowFullScreen={true}
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

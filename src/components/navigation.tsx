@@ -6,6 +6,7 @@ import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
 import { Menu, X } from 'lucide-react';
 import { a } from '@react-spring/web';
+import { useTranslation } from 'react-i18next';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -142,6 +143,7 @@ const MobileNav = styled.div<{ isOpen: boolean; shrink: boolean }>`
 `;
 
 const Navigation = () => {
+	const { t } = useTranslation();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isAtTop, setIsAtTop] = useState(true);
 
@@ -202,68 +204,47 @@ const Navigation = () => {
 						</SvgWrapper>
 						<NavItems>
 							<NavItem>
-								<NavLink href="/">Home</NavLink>
+								<NavLink href="/">{t('common.navigation.home')}</NavLink>
 							</NavItem>
 							<NavItem>
-								<NavLink href="/features">Features</NavLink>
+								<NavLink href="/features">{t('common.navigation.features')}</NavLink>
 							</NavItem>
 						</NavItems>
 						<ButtonsWrapper>
 							<Button
 								size="small"
-								onClick={() =>
-									window.open(
-										'https://launch.tiler.app/',
-										'_blank'
-									)
-								}
+								onClick={() => window.open('https://launch.tiler.app/', '_blank')}
 								borderGradient={[styles.colors.brand[400]]}
 							>
-								Try Tiler for free
+								{t('common.buttons.tryFree')}
 							</Button>
 							<Button
 								size="small"
 								variant="secondary"
-								onClick={() =>
-									window.open(
-										'https://tiler.app/account/login',
-										'_blank'
-									)
-								}
+								onClick={() => window.open('https://tiler.app/account/login', '_blank')}
 							>
-								Sign Up
+								{t('common.buttons.signUp')}
 							</Button>
 						</ButtonsWrapper>
 						<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
-							{isOpen ? (
-								<X size={24} color="white" />
-							) : (
-								<Menu size={24} color="white" />
-							)}
+							{isOpen ? <X size={24} color="white" /> : <Menu size={24} color="white" />}
 						</MobileMenuToggle>
 					</NavigationItemsWrapper>
 				</NavigationWrapper>
 				<MobileNav isOpen={isOpen} shrink={!isAtTop}>
-					<NavLink href="/">Home</NavLink>
-					<NavLink href="/features">Features</NavLink>
+					<NavLink href="/">{t('common.navigation.home')}</NavLink>
+					<NavLink href="/features">{t('common.navigation.features')}</NavLink>
 					<Button
-						onClick={() =>
-							window.open('https://tiler.app/', '_blank')
-						}
+						onClick={() => window.open('https://tiler.app/', '_blank')}
 						borderGradient={[styles.colors.brand[500]]}
 					>
-						Try Tiler for free
+						{t('common.buttons.tryFree')}
 					</Button>
 					<Button
 						variant="secondary"
-						onClick={() =>
-							window.open(
-								'https://tiler.app/account/login',
-								'_blank'
-							)
-						}
+						onClick={() => window.open('https://tiler.app/account/login', '_blank')}
 					>
-						Sign Up
+						{t('common.buttons.signUp')}
 					</Button>
 				</MobileNav>
 			</NavigationContainer>

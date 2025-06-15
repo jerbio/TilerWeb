@@ -1,13 +1,131 @@
 {
+  "common": {
+    "buttons": {
+      "getStarted": "Get Started with Tiler",
+      "learnMore": "Learn More",
+      "subscribe": "Subscribe",
+      "tryFree": "Try Tiler for free",
+      "signUp": "Sign Up"
+    },
+    "navigation": {
+      "home": "Home",
+      "features": "Features"
+    },
+    "copyright": "© {{year}} Tiler. All rights reserved.",
+    "social": {
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram",
+      "x": "X (Twitter)"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms of Use",
+      "privacy": "Privacy"
+    },
+    "partners": {
+      "title": "Partners",
+      "founderUniversity": "Founder University"
+    }
+  },
   "home": {
+    "persona": {
+      "custom": "Custom Profile",
+      "developer": "Developer",
+      "healthcare": "Healthcare Worker",
+      "engineer": "Engineer"
+    },
+    "waitlist": {
+      "title": "Join the Waitlist",
+      "subtitle": "Be among the first to experience Tiler's powerful scheduling features.",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Join Waitlist",
+      "success": "Thanks for joining! We'll notify you when Tiler is ready.",
+      "error": "Something went wrong. Please try again."
+    },
+    "hero": {
+      "title": "Visualize Your Schedule, Simplify Your Life.",
+      "subtitle": "The ultimate tool for creating personalized and interactive timelines."
+    },
+    "video": {
+      "title": "YouTube video player"
+    },
     "appDownload": {
       "ios": {
         "title": "Download on App Store",
-        "alt": "IOS App Store"
+        "alt": "iOS App Store"
       },
       "android": {
         "title": "Get it on Google Play",
         "alt": "Android Play Store"
+      }
+    },
+    "updates": {
+      "title": "Get the Latest Tiler News & Updates",
+      "subtitle": "Want to get more out of your schedule? Subscribe for tips, tricks, and updates delivered straight to your inbox.",
+      "emailPlaceholder": "Your Email Address..."
+    },
+    "integration": {
+      "title": "Integrate with your favorite",
+      "spanText": "calendars",
+      "subtitle": "These apps are available to integrate seamlessly with Tiler."
+    },
+    "features": {
+      "transit": {
+        "subtitle": "OPTIMIZE YOUR DAY",
+        "title": "Transit",
+        "description": "Plan your day efficiently with detailed transit routes on a map, showing tiles and stops to make between activities."
+      },
+      "forecast": {
+        "subtitle": "ANTICIPATE THE FUTURE",
+        "title": "Forecast & Predictions",
+        "description": "Make strategic choices based on data-driven insights."
+      },
+      "suggestions": {
+        "subtitle": "PERSONALIZED RECOMMENDATIONS",
+        "title": "Tile Suggestions",
+        "description": "Let Tiler handle the complex scheduling tasks, Prioritize tasks and allocate time effectively."
+      },
+      "location": {
+        "subtitle": "SMART LOCATION",
+        "title": "Auto Location",
+        "description": "Tiler intelligently detects and automatically adds relevant locations to your tiles."
+      }
+    },
+    "faq": {
+      "items": {
+        "whatIsTiler": {
+          "question": "What is Tiler, and how does it work?",
+          "answer": "Tiler is not a calendar, it is an AI-powered scheduling app that not only manages your tasks but also optimizes your time. It creates smart, flexible schedules using AutoTiles that adjust as your day shifts, while also letting you lock in non-negotiable tasks using Blocks."
+        },
+        "calendarIntegration": {
+          "question": "Why do I need to integrate my calendar?",
+          "answer": "Integrating your calendar with Tiler lets you see all your tasks, events, and schedules in one place. No more juggling multiple apps or risking double bookings—Tiler automatically syncs everything and optimizes your day for maximum productivity."
+        },
+        "multipleCalendars": {
+          "question": "Can I integrate multiple calendars to my Tiler account?",
+          "answer": "Yes! You can integrate multiple calendars into your Tiler account. This way, all your events and tasks are in one place."
+        },
+        "tileVsBlock": {
+          "question": "What's the difference between a Tile and a Block?",
+          "answer": "Tiles are flexible tasks that Tiler automatically schedules and adjusts based on your availability. Blocks are fixed tasks that stay exactly where you set them—perfect for meetings or tasks that can't be moved."
+        },
+        "tileShare": {
+          "question": "How does TileShare work?",
+          "answer": "TileShare lets you share tasks with others—friends, family, teammates—so everyone knows what needs to be done and who's handling it. Assign tasks, track progress, and sync schedules effortlessly."
+        },
+        "missedTask": {
+          "question": "What if I miss a task or need to reschedule?",
+          "answer": "No worries! Tiler's Defer feature automatically finds the next best time to complete a missed task. You can also manually reschedule with a simple drag-and-drop."
+        },
+        "habitTracking": {
+          "question": "Can Tiler help with habit tracking?",
+          "answer": "Yes! You can use Tiler to schedule and track daily habits. Tiler auto-fits them into your schedule, so you stay consistent."
+        },
+        "transitFeature": {
+          "question": "How can I use the Transit feature?",
+          "answer": "The transit feature goes beyond just calculating travel time — it acts as your navigation assistant. It helps you plan routes, suggests the best modes of transportation, and provides real-time directions for seamless transitions between tasks and locations. Just tap the travel icon to get instant navigation, ensuring you're always on time and on track."
+        }
       }
     }
   }

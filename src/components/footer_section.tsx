@@ -8,6 +8,7 @@ import FacebookLogo from '../assets/image_assets/facebook_logo.png';
 import LinkedInLogo from '../assets/image_assets/linkedin_logo.png';
 import XLogo from '../assets/image_assets/x_logo.png';
 import FounderUniversity from '../assets/image_assets/founder_university.png';
+import { useTranslation } from 'react-i18next';
 
 const FooterContainer = styled.div`
 	border-top: 1px solid ${styles.colors.gray[800]};
@@ -83,6 +84,8 @@ const FooterLink = styled.a`
 `;
 
 const FooterSection: React.FC = () => {
+	const { t } = useTranslation();
+	
 	return (
 		<FooterContainer>
 			<FooterSubContainer>
@@ -132,8 +135,7 @@ const FooterSection: React.FC = () => {
 							margin: 'auto 0 0',
 						}}
 					>
-						&copy; {new Date().getFullYear()} Tiler. All rights
-						reserved.
+						{t('common.copyright', { year: new Date().getFullYear() })}
 					</p>
 
 					<FooterLinks>
@@ -144,7 +146,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo
 								src={FacebookLogo}
-								alt="Facebook Logo"
+								alt={t('common.social.facebook')}
 							/>
 						</FooterLink>
 						<FooterLink
@@ -154,7 +156,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo
 								src={LinkedInLogo}
-								alt="LinkedIn Logo"
+								alt={t('common.social.linkedin')}
 							/>
 						</FooterLink>
 						<FooterLink
@@ -164,7 +166,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo
 								src={InstagramLogo}
-								alt="Instagram Logo"
+								alt={t('common.social.instagram')}
 							/>
 						</FooterLink>
 						<FooterLink
@@ -172,13 +174,16 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo src={XLogo} alt="X Logo" />
+							<SocialLogo 
+								src={XLogo} 
+								alt={t('common.social.x')} 
+							/>
 						</FooterLink>
 					</FooterLinks>
 				</FooterColumn>
 
 				<FooterColumn>
-					<h3 style={{ color: styles.colors.white }}>Legal</h3>
+					<h3 style={{ color: styles.colors.white }}>{t('common.legal.title')}</h3>
 
 					<ul
 						style={{
@@ -193,7 +198,7 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Terms of Use
+							{t('common.legal.terms')}
 						</FooterLink>
 
 						<FooterLink
@@ -201,17 +206,17 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Privacy
+							{t('common.legal.privacy')}
 						</FooterLink>
 					</ul>
 
 					<FooterRow>
 						<img
 							src={FounderUniversity}
-							alt="Founder University Logo"
+							alt={t('common.partners.founderUniversity')}
 							style={{ width: '80px', height: 'auto' }}
 						/>
-						<span>Partners</span>
+						<span>{t('common.partners.title')}</span>
 					</FooterRow>
 				</FooterColumn>
 			</FooterSubContainer>

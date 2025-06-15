@@ -4,6 +4,7 @@ import SectionHeaders from '../layout/section_headers';
 import Button from '../shared/button';
 import Section from '../layout/section';
 import ArrowRight from '../icons/arrow_right';
+import { useTranslation } from 'react-i18next';
 
 const ButtonContainer = styled.div`
 	display: flex;
@@ -14,11 +15,13 @@ const ButtonContainer = styled.div`
 `;
 
 const HeroSection: React.FC = () => {
+	const { t } = useTranslation();
+	
 	return (
 		<Section>
 			<SectionHeaders
-				headerText="Visualize Your Schedule, Simplify Your Life."
-				subHeaderText="The ultimate tool for creating personalized and interactive timelines."
+				headerText={t('home.hero.title')}
+				subHeaderText={t('home.hero.subtitle')}
 				align="center"
 				size="large"
 			/>
@@ -34,10 +37,10 @@ const HeroSection: React.FC = () => {
 						'#FEC83780',
 					]}
 				>
-					<span>Get Started with Tiler</span>
+					<span>{t('common.buttons.getStarted')}</span>
 					<ArrowRight />
 				</Button>
-				<Button variant="brand">Learn More</Button>
+				<Button variant="brand">{t('common.buttons.learnMore')}</Button>
 			</ButtonContainer>
 		</Section>
 	);

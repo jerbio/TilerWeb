@@ -8,33 +8,7 @@ import TilesBackground from '../../assets/image_assets/highlights/tiles.jpg';
 import LocationBackground from '../../assets/image_assets/highlights/location.jpg';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';
-
-const highlights: Highlight[] = [
-	{
-		subHeader: 'OPTIMIZE YOUR DAY',
-		header: 'Transit',
-		body: 'Plan your day efficiently with detailed transit routes on a map, showing tiles and stops to make between activities.',
-		backgroundImage: MountainBackground,
-	},
-	{
-		subHeader: 'ANTICIPATE THE FUTURE',
-		header: 'Forecast & Predictions',
-		body: 'Make strategic choices based on data-driven insights.',
-		backgroundImage: FitnessBackground,
-	},
-	{
-		subHeader: 'PERSONALIZED RECOMMENDATIONS',
-		header: 'Tile Suggestions',
-		body: 'Let Tiler handle the complex scheduling tasks, Prioritize tasks and allocate time effectively.',
-		backgroundImage: TilesBackground,
-	},
-	{
-		subHeader: 'SMART LOCATION',
-		header: 'Auto Location',
-		body: 'Tiler intelligently detects and automatically adds relevant locations to your tiles.',
-		backgroundImage: LocationBackground,
-	},
-];
+import { useTranslation } from 'react-i18next';
 
 const HighlightCardWrapper = styled.div`
 	display: grid;
@@ -88,6 +62,35 @@ const Body = styled.p`
 `;
 
 const FeatureHighlightsSection: React.FC = () => {
+	const { t } = useTranslation();
+	
+	const highlights: Highlight[] = [
+		{
+			subHeader: t('home.features.transit.subtitle'),
+			header: t('home.features.transit.title'),
+			body: t('home.features.transit.description'),
+			backgroundImage: MountainBackground,
+		},
+		{
+			subHeader: t('home.features.forecast.subtitle'),
+			header: t('home.features.forecast.title'),
+			body: t('home.features.forecast.description'),
+			backgroundImage: FitnessBackground,
+		},
+		{
+			subHeader: t('home.features.suggestions.subtitle'),
+			header: t('home.features.suggestions.title'),
+			body: t('home.features.suggestions.description'),
+			backgroundImage: TilesBackground,
+		},
+		{
+			subHeader: t('home.features.location.subtitle'),
+			header: t('home.features.location.title'),
+			body: t('home.features.location.description'),
+			backgroundImage: LocationBackground,
+		},
+	];
+
 	return (
 		<Section>
 			<SectionHeaders

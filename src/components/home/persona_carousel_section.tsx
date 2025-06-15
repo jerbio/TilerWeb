@@ -7,6 +7,7 @@ import Custom from '../../assets/image_assets/custom.png';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
+import { useTranslation } from 'react-i18next';
 
 // @ts-expect-error
 import 'swiper/css';
@@ -19,27 +20,29 @@ const Container = styled.div`
 	margin: 3rem auto;
 `;
 
-const personas = [
-	{
-		occupation: 'Custom Profile',
-		image: Custom,
-    highlight: true,
-	},
-	{
-		occupation: 'Developer',
-		image: SWE,
-	},
-	{
-		occupation: 'Healtcare Worker',
-		image: Healthcare,
-	},
-	{
-		occupation: 'Engineer',
-		image: Engineer,
-	},
-];
-
 const PersonaCarousel: React.FC = () => {
+	const { t } = useTranslation();
+	
+	const personas = [
+		{
+			occupation: t('home.persona.custom'),
+			image: Custom,
+			highlight: true,
+		},
+		{
+			occupation: t('home.persona.developer'),
+			image: SWE,
+		},
+		{
+			occupation: t('home.persona.healthcare'),
+			image: Healthcare,
+		},
+		{
+			occupation: t('home.persona.engineer'),
+			image: Engineer,
+		},
+	];
+
 	const handleSwiperStyle = () => {
 		const screenWidth = window.innerWidth;
 		// Image width is 315px, so we need to set the margin to center the image in the screen
@@ -86,7 +89,7 @@ const PersonaCarousel: React.FC = () => {
 						<PersonaCard
 							occupation={persona.occupation}
 							backgroundImage={persona.image}
-              gradient={persona.highlight}
+							gradient={persona.highlight}
 						/>
 					</SwiperSlide>
 				))}

@@ -6,6 +6,7 @@ import GoogleLogo from '../../assets/image_assets/google_logo.png';
 import CalendarIcon from '../../assets/image_assets/calendar_icon.png';
 import styles from '../../util/styles';
 import Section from '../layout/section';
+import { useTranslation } from 'react-i18next';
 
 const LogoContainer = styled.div`
 	display: flex;
@@ -38,15 +39,17 @@ const FlexWrapper = styled.div`
 `;
 
 const CalendarIntegrationSection: React.FC = () => {
+	const { t } = useTranslation();
+	
 	return (
 		<Section>
 			<FlexWrapper>
 				<SectionHeaders
-					headerText="Integrate with your favorite"
-					spanText="calendars"
+					headerText={t('home.integration.title')}
+					spanText={t('home.integration.spanText')}
 					image={CalendarIcon}
-					imageAlt="Calendar Icon"
-					subHeaderText="These apps are available to integrate seamlessly with Tiler."
+					imageAlt={t('home.integration.title')}
+					subHeaderText={t('home.integration.subtitle')}
 					align="left"
 				/>
 
