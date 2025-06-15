@@ -1,0 +1,14 @@
+{
+  "home": {
+    "appDownload": {
+      "ios": {
+        "title": "Download on App Store",
+        "alt": "IOS App Store"
+      },
+      "android": {
+        "title": "Get it on Google Play",
+        "alt": "Android Play Store"
+      }
+    }
+  }
+}

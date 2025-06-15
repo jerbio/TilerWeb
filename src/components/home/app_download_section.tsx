@@ -4,17 +4,7 @@ import styles from '../../util/styles';
 import AppStore from '../../assets/image_assets/icons/app_store.svg';
 import PlayStore from '../../assets/image_assets/icons/play_store.svg';
 import ArrowOut from '../icons/arrow_out';
-
-// Simple i18n object for demonstration
-const i18n = {
-	en: {
-		downloadIOS: 'Download on App Store',
-    downloadAndroid: 'Get it on Google Play',
-	},
-	// Add more languages as needed
-};
-const lang = 'en'; // This could be dynamic
-
+import { useTranslation } from 'react-i18next';
 
 const FlexWrapper = styled.div`
 	display: flex;
@@ -46,41 +36,42 @@ const DownloadLinkLabel = styled.span`
 `;
 
 const AppDownloadSection = () => {
-  
+	const { t } = useTranslation();
+	
 	return (
 		<Section paddingBlock={36}>
 			<FlexWrapper>
 				<DownloadLink
           href="https://apps.apple.com/us/app/tiler-assistant/id1663594789"
-					title={i18n[lang].downloadIOS}
+					title={t('home.appDownload.ios.title')}
           rel="noopener noreferrer"
           target="_blank"
 				>
 					<img
 						src={AppStore}
-						alt="iOS"
+						alt={t('home.appDownload.ios.alt')}
             width={56}
             height={56}
 					/>
 					<DownloadLinkLabel>
-						<span>{i18n[lang].downloadIOS}</span>
+						<span>{t('home.appDownload.ios.title')}</span>
             <ArrowOut />
 					</DownloadLinkLabel>
 				</DownloadLink>
 				<DownloadLink
 					href="https://play.google.com/store/apps/details?id=app.tiler.app"
-					title={i18n[lang].downloadAndroid}
+					title={t('home.appDownload.android.title')}
           rel="noopener noreferrer"
           target="_blank"
 				>
 					<img
 						src={PlayStore}
-						alt="Android"
+						alt={t('home.appDownload.android.alt')}
             width={56}
             height={56}
 					/>
 					<DownloadLinkLabel>
-						<span>{i18n[lang].downloadAndroid}</span>
+						<span>{t('home.appDownload.android.title')}</span>
             <ArrowOut />
 					</DownloadLinkLabel>
 				</DownloadLink>
