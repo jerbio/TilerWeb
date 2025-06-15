@@ -40,7 +40,7 @@ const NavigationWrapper = styled(a.nav)<{ shrink: boolean }>`
 			? `1px solid ${styles.colors.gray[800]}`
 			: '1px solid transparent'};
 	background-color: ${(props) =>
-		props.shrink ? '#1a1a1ad2' : 'transparent'};
+		props.shrink ? styles.colors.glass : 'transparent'};
 	border-radius: ${(props) =>
 		props.shrink ? styles.borderRadius.xxLarge : 0};
 	height: ${(props) => (props.shrink ? '60px' : '80px')};
@@ -111,7 +111,8 @@ const MobileNav = styled.div<{ isOpen: boolean; shrink: boolean }>`
 	align-items: center;
 	gap: 16px;
 	backdrop-filter: blur(16px);
-	background-color: ${(props) => (props.shrink ? '#1a1a1ad2' : '#000000')};
+	background-color: ${(props) =>
+		props.shrink ? styles.colors.glass : '#000000'};
 
 	position: absolute;
 	top: 50%;

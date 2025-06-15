@@ -10,14 +10,14 @@ import XLogo from '../assets/image_assets/x_logo.png';
 import FounderUniversity from '../assets/image_assets/founder_university.png';
 
 const FooterContainer = styled.div`
-  border-top: 1px solid ${styles.colors.gray[800]};
+	border-top: 1px solid ${styles.colors.gray[800]};
 	background: #111;
-  display: flex;
-  justify-content: center;
+	display: flex;
+	justify-content: center;
 `;
 
 const FooterSubContainer = styled.div`
-  width: 100%;
+	width: 100%;
 	max-width: ${styles.container.sizes.xLarge};
 
 	display: flex;
@@ -50,7 +50,7 @@ const FooterColumn = styled.div`
 
 const FooterRow = styled.div`
 	display: flex;
-  gap: .5rem;
+	gap: 0.5rem;
 
 	@media (max-width: 768px) {
 		justify-content: center;
