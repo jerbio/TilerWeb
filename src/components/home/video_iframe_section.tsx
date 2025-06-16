@@ -32,7 +32,7 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 	referrerPolicy = 'strict-origin-when-cross-origin',
 	waitlistSignUp = false,
 }) => {
-	const { t } = useTranslation();
+	useTranslation();
 
 	useEffect(() => {
 		if (waitlistSignUp) {

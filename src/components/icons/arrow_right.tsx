@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ArrowRight = () => {
+const ArrowRight : React.FC = () => {
 	return (
 		<svg
 			width="19"

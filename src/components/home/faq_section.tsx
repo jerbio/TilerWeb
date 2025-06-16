@@ -3,7 +3,7 @@ import Section from '../layout/section';
 import Collapse from '../shared/collapse';
 import { useTranslation } from 'react-i18next';
 
-const FAQ = () => {
+const FAQ : React.FC = () => {
   const { t } = useTranslation();
   
   const FAQItems = [

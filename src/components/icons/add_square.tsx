@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AddSquare = () => {
+const AddSquare : React.FC = () => {
 	return (
 		<svg
 			width="25"

@@ -1,5 +1,3 @@
-import { a } from "@react-spring/web";
-
 const styles = {
 	colors: {
 		primary: '#3498db',

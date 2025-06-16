@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AddSquare from '../icons/add_square';
 import styled from 'styled-components';
 import styles from '../../util/styles';
-import { a, useSpring } from '@react-spring/web';
+import { a } from '@react-spring/web';
 import CloseSquare from '../icons/close_square';
 
 type CollapseProps = {

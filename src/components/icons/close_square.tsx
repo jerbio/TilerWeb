@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CloseSquare = () => {
+const CloseSquare : React.FC = () => {
 	return (
 		<svg
 			width="25"

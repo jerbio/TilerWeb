@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { WaitlistApi } from '../../api/waitlistApi';
-import styles from '../../util/styles';
 import { toast } from 'sonner';
 import Section from '../layout/section';
 import Input from '../shared/input';
