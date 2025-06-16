@@ -170,7 +170,7 @@ const Navigation = () => {
 						width="65px"
 						onClick={() =>
 							window.open(
-								'https://tiler.app/account/login',
+								'https://tiler.app/?waitlistSignUp=true',
 								'_blank'
 							)
 						}
@@ -201,7 +201,7 @@ const Navigation = () => {
 				<Button
 					width="120px"
 					onClick={() =>
-						window.open('https://tiler.app/account/login', '_blank')
+						window.open('https://tiler.app/?waitlistSignUp=true', '_blank')
 					}
 				>
 					Sign Up
