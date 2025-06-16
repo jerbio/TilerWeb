@@ -1,38 +1,39 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import styles from '../../util/styles';
+import Section from '../layout/section';
+import { useTranslation } from 'react-i18next';
 
 interface VideoIframeProps {
 	src: string; // URL of the video
 	title: string; // Title for accessibility
-	width?: string; // Width of the iframe (default: "100%")
+	width?: number;
 	allowFullScreen?: boolean; // Allow fullscreen mode (default: true)
-	allow?: string; // Additional allow attributes for the iframe (default: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture")
+	allow?: string; // Additional allow attributes for the iframe (default: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share")
 	referrerPolicy?: React.HTMLAttributeReferrerPolicy; // Referrer policy for the iframe (default: "strict-origin-when-cross-origin")
 	waitlistSignUp?: boolean; // If true, scroll to the section after mount
 }
 
-const IframeContainer = styled.div`
-	display: flex;
-	justify-content: center;
-  margin: 0 ${styles.container.padding.default};
-`;
-
-const Iframe = styled.iframe<{ $width: string }>`
+const Iframe = styled.iframe`
 	width: 100%;
-  aspect-ratio: 16 / 9; // Maintain a 16:9 aspect ratio
-	max-width: ${(props) => props.$width}px;
+  aspect-ratio: 16 / 9;
+  height: 100%;
+  margin: 0 auto;
+  border-radius: ${styles.borderRadius.large};
+  border: .25rem solid ${styles.colors.gray[900]};
 `;
 
 const VideoIframeSection: React.FC<VideoIframeProps> = ({
 	src,
 	title,
-	width = '100%',
+	width = 1024,
 	allowFullScreen = true,
-	allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+	allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
 	referrerPolicy = 'strict-origin-when-cross-origin',
 	waitlistSignUp = false,
 }) => {
+	useTranslation();
+
 	useEffect(() => {
 		if (waitlistSignUp) {
 			const el = document.getElementById('tiler-video-player');
@@ -41,18 +42,20 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 			}
 		}
 	}, [waitlistSignUp]);
+
 	return (
-		<IframeContainer id='tiler-video-player'>
+		<Section width={width}>
 			<Iframe
 				src={src}
 				title={title}
-				$width={width} // spelled this way to avoid conflict with the native width prop
+				width={width}
+				height={width * 0.5625}
 				allowFullScreen={allowFullScreen}
 				frameBorder="0"
 				allow={allow}
 				referrerPolicy={referrerPolicy}
 			></Iframe>
-		</IframeContainer>
+		</Section>
 	);
 };
 

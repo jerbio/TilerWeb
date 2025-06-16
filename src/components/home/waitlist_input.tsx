@@ -1,56 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { WaitlistApi } from '../../api/waitlistApi';
-import styles from '../../util/styles';
 import { toast } from 'sonner';
-
-const Wrapper = styled.div`
-	margin: 4rem auto;
-  max-width: 1024px;
-  display: flex;
-`;
+import Section from '../layout/section';
+import Input from '../shared/input';
+import Button from '../shared/button';
 
 const Form = styled.form`
 	display: flex;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	margin: 0 ${styles.container.padding.default};
-  border-radius: 4rem;
-  overflow: hidden;
+	gap: 0.5rem;
   width: 100%;
-  background-color: ${styles.colors.gray[800]};
-`;
-
-const Input = styled.input`
-	padding: 0.75rem 1.5rem;
-	font-size: 1rem;
-	border: none;
-	outline: none;
-  width: 100%;
-	flex: 1;
-  
-	color: ${styles.colors.gray[300]};
-`;
-
-const Button = styled.button`
-	background: linear-gradient(
-		90deg,
-		${styles.colors.brand[500]},
-		${styles.colors.brand[600]}
-	);
-	border-radius: 0;
-	color: ${styles.colors.brand[50]};
-	border: none;
-	padding: 0 1.5rem;
-	cursor: pointer;
-	transition: 0.35s ease;
-
-	&:hover {
-		background: linear-gradient(
-			90deg,
-			${styles.colors.brand[600]},
-			${styles.colors.brand[500]}
-		);
-	}
+  margin: 0 auto;
 `;
 
 const Waitlist: React.FC = () => {
@@ -73,18 +33,26 @@ const Waitlist: React.FC = () => {
 	};
 
 	return (
-		<Wrapper>
+		<Section width={1024} paddingBlock={0}>
 			<Form onSubmit={handleSubmit}>
 				<Input
+					sized="large"
 					type="email"
 					placeholder="Your email"
 					value={email}
 					onChange={(e) => setEmail(e.target.value)}
 					required
 				/>
-				<Button type="submit">Join Waitlist</Button>
+				<Button
+					type="submit"
+					size="large"
+					height={44}
+					variant="brand"
+				>
+					Join Waitlist
+				</Button>
 			</Form>
-		</Wrapper>
+		</Section>
 	);
 };
 

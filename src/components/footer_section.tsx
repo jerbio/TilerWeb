@@ -8,32 +8,40 @@ import FacebookLogo from '../assets/image_assets/facebook_logo.png';
 import LinkedInLogo from '../assets/image_assets/linkedin_logo.png';
 import XLogo from '../assets/image_assets/x_logo.png';
 import FounderUniversity from '../assets/image_assets/founder_university.png';
+import { useTranslation } from 'react-i18next';
 
 const FooterContainer = styled.div`
-	background: #1a1a1a80;
-	width: 100%;
+	border-top: 1px solid ${styles.colors.gray[800]};
+	background: #111;
+	display: flex;
+	justify-content: center;
 `;
 
 const FooterSubContainer = styled.div`
+	width: 100%;
+	max-width: ${styles.container.sizes.xLarge};
+
 	display: flex;
 	justify-content: space-between;
-	padding: 20px;
-	color: ${styles.colors.text};
-	width: 100%;
-	margin: 0 auto;
+	padding-block: ${styles.container.paddingInline.lg};
+	margin-inline: ${styles.container.paddingInline.lg};
+	color: ${styles.colors.gray[500]};
 
 	@media (max-width: 768px) {
 		flex-direction: column-reverse;
 		align-items: center;
 		text-align: center;
+		padding-block: ${styles.container.paddingInline.default};
+		margin-inline: ${styles.container.paddingInline.default};
 	}
 `;
 
 const FooterColumn = styled.div`
 	display: flex;
 	flex-direction: column;
+	gap: 1rem;
 	text-align: left;
-	width: 200px;
+	font-size: ${styles.typography.fontSize.sm};
 
 	@media (max-width: 768px) {
 		margin: 1rem;
@@ -42,12 +50,8 @@ const FooterColumn = styled.div`
 `;
 
 const FooterRow = styled.div`
-	margin-bottom: 10px;
 	display: flex;
-
-	div {
-		padding: 0.15rem;
-	}
+	gap: 0.5rem;
 
 	@media (max-width: 768px) {
 		justify-content: center;
@@ -80,6 +84,8 @@ const FooterLink = styled.a`
 `;
 
 const FooterSection: React.FC = () => {
+	const { t } = useTranslation();
+	
 	return (
 		<FooterContainer>
 			<FooterSubContainer>
@@ -122,12 +128,16 @@ const FooterSection: React.FC = () => {
 							</svg>
 						</SvgWrapper>
 					</FooterRow>
-					<FooterRow>
-						<p>
-							&copy; {new Date().getFullYear()} Tiler. All rights
-							reserved.
-						</p>
-					</FooterRow>
+
+					<p
+						style={{
+							fontSize: styles.typography.fontSize.sm,
+							margin: 'auto 0 0',
+						}}
+					>
+						{t('common.copyright', { year: new Date().getFullYear() })}
+					</p>
+
 					<FooterLinks>
 						<FooterLink
 							href="https://www.facebook.com/profile.php?id=100094419297775"
@@ -136,7 +146,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo
 								src={FacebookLogo}
-								alt="Facebook Logo"
+								alt={t('common.social.facebook')}
 							/>
 						</FooterLink>
 						<FooterLink
@@ -146,7 +156,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo
 								src={LinkedInLogo}
-								alt="LinkedIn Logo"
+								alt={t('common.social.linkedin')}
 							/>
 						</FooterLink>
 						<FooterLink
@@ -156,7 +166,7 @@ const FooterSection: React.FC = () => {
 						>
 							<SocialLogo
 								src={InstagramLogo}
-								alt="Instagram Logo"
+								alt={t('common.social.instagram')}
 							/>
 						</FooterLink>
 						<FooterLink
@@ -164,37 +174,49 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo src={XLogo} alt="X Logo" />
+							<SocialLogo 
+								src={XLogo} 
+								alt={t('common.social.x')} 
+							/>
 						</FooterLink>
 					</FooterLinks>
 				</FooterColumn>
+
 				<FooterColumn>
-					<FooterRow>Legal</FooterRow>
-					<FooterRow>
+					<h3 style={{ color: styles.colors.white }}>{t('common.legal.title')}</h3>
+
+					<ul
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							gap: '0.25rem',
+							margin: '0 0 auto',
+						}}
+					>
 						<FooterLink
 							href="https://tiler.app/tos"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Terms of Use
+							{t('common.legal.terms')}
 						</FooterLink>
-					</FooterRow>
-					<FooterRow>
+
 						<FooterLink
 							href="https://tiler.app/privacy"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Privacy
+							{t('common.legal.privacy')}
 						</FooterLink>
-					</FooterRow>
+					</ul>
+
 					<FooterRow>
 						<img
 							src={FounderUniversity}
-							alt="Founder University Logo"
+							alt={t('common.partners.founderUniversity')}
 							style={{ width: '80px', height: 'auto' }}
 						/>
-						<div>Partners</div>
+						<span>{t('common.partners.title')}</span>
 					</FooterRow>
 				</FooterColumn>
 			</FooterSubContainer>
@@ -203,3 +225,4 @@ const FooterSection: React.FC = () => {
 };
 
 export default FooterSection;
+

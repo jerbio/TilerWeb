@@ -8,28 +8,8 @@ import FeatureCollab from '../assets/image_assets/features/collab.png';
 import FeatureTransit from '../assets/image_assets/features/transit.png';
 import FeatureTimely from '../assets/image_assets/features/timely.png';
 import FeatureAutoLoc from '../assets/image_assets/features/auto-loc.png';
-
-const Main = styled.main`
-	display: grid;
-	place-items: center;
-	position: relative;
-	width: 100%;
-	min-height: 100vh;
-`;
-
-const Container = styled.div`
-	position: relative;
-	isolation: isolate;
-	width: 100%;
-  overflow: hidden;
-	max-width: ${styles.container.sizes.xLarge};
-	margin: 0 auto;
-	padding: 0 ${styles.container.padding.default};
-
-	@media (min-width: ${styles.screens.lg}) {
-		padding: 0 ${styles.container.padding.lg};
-	}
-`;
+import Section from '../components/layout/section';
+import UpdatesSection from '../components/home/updates_section';
 
 const BackgroundBlur = styled.div`
 	position: absolute;
@@ -101,8 +81,8 @@ const featureList = [
 
 export default function Features() {
 	return (
-		<Main>
-			<Container>
+		<>
+			<Section>
 				<BackgroundBlur />
 				<DottedLineImage src={DottedLine} alt="null" />
 				<GridContainer>
@@ -117,7 +97,9 @@ export default function Features() {
 						</FeatureCard>
 					))}
 				</GridContainer>
-			</Container>
-		</Main>
+			</Section>
+			<UpdatesSection />
+		</>
 	);
 }
+

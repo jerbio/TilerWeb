@@ -16,6 +16,7 @@ const styles = {
 		borderRed: '#F03D5F',
 		white: '#fff',
 		black: '#000',
+    glass: '#1a1a1a99',
 		gray: {
 			25: '#FCFCFC',
 			50: '#FAFAFA',
@@ -200,22 +201,34 @@ const styles = {
 	},
 	typography: {
 		fontFamily: {
-			inter: 'Inter Sans, sans-serif',
+			inter: 'Inter, sans-serif',
 			urban: 'Urbanist, sans-serif',
 		},
 		fontSize: {
+      xxs: '10px',
 			xs: '12px',
 			sm: '14px',
 			base: '16px',
 			lg: '18px',
 			xl: '20px',
 			displayXs: '24px',
-			displaySm: '30px',
+			displaySm: '32px',
 			displayBase: '36px',
 			displayLg: '48px',
 			displayXl: '60px',
 			displayXxl: '72px',
 		},
+    fontWeight: {
+      thin: '100',
+      extralight: '200',
+      light: '300',
+      normal: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '800',
+      black: '900',
+    },
 		lineHeight: {
 			xs: '18px',
 			sm: '20px',
@@ -229,22 +242,21 @@ const styles = {
 			displayXl: '72px',
 			displayXxl: '90px',
 		},
-		fontWeight: 'normal',
-	},
-	buttonWidths: {
-		small: '80px',
-		medium: '120px',
-		large: '160px',
 	},
 	buttonHeights: {
-		small: '20px',
-		medium: '32px',
-		large: '48px',
+		small: '32px',
+		medium: '36px',
+		large: '40px',
 	},
+  inputHeights: {
+    small: '36px',
+    medium: '40px',
+    large: '44px',
+  },
 	space: {
-		small: '8px',
-		medium: '16px',
-		large: '24px',
+		small: '16px',
+		medium: '24px',
+		large: '32px',
 	},
 	inputs: {
 		height: '40px',
@@ -253,16 +265,21 @@ const styles = {
 	},
 	borderRadius: {
 		small: '4px',
+    little: '6px',
 		medium: '8px',
 		large: '12px',
 		xLarge: '16px',
-		xxLarge: '30px',
+		xxLarge: '32px',
 	},
 	container: {
 		center: true,
-		padding: {
-			default: '20px',
-			lg: '32px',
+		paddingInline: {
+			default: '1.5rem',
+			lg: '2rem',
+		},
+		paddingBlock: {
+			default: '3rem',
+			lg: '4rem',
 		},
 		sizes: {
 			small: '640px',
@@ -279,6 +296,6 @@ const styles = {
 		xl: '1292px',
 		xxl: '1500px',
 	},
-};
+} as const;
 
 export default styles;
