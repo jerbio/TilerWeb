@@ -47,6 +47,7 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 		<Section width={width}>
 			<Iframe
 				src={src}
+				id="tiler-video-player"
 				title={title}
 				width={width}
 				height={width * 0.5625}

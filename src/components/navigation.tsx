@@ -219,13 +219,13 @@ const Navigation : React.FC = () => {
 							>
 								{t('common.buttons.tryFree')}
 							</Button>
-							<Button
+							{/* <Button
 								size="small"
 								variant="secondary"
-								onClick={() => window.open('https://tiler.app/account/login', '_blank')}
+								onClick={() => window.open('https://tiler.app/?waitlistSignUp=true', '_blank')}
 							>
 								{t('common.buttons.signUp')}
-							</Button>
+							</Button> */}
 						</ButtonsWrapper>
 						<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
 							{isOpen ? <X size={24} color="white" /> : <Menu size={24} color="white" />}

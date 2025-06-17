@@ -1,3 +1,4 @@
+import React from 'react';
 import Section from '../layout/section';
 import styled from 'styled-components';
 import styles from '../../util/styles';
@@ -35,7 +36,7 @@ const DownloadLinkLabel = styled.span`
   transition: color 0.2s ease-in-out;
 `;
 
-const AppDownloadSection = () => {
+const AppDownloadSection: React.FC = () => {
 	const { t } = useTranslation();
 	
 	return (

@@ -1,3 +1,4 @@
+import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import Home from './pages/Home';
@@ -5,7 +6,7 @@ import Layout from './pages/Layout';
 import Features from './pages/Features';
 import { Toaster } from 'sonner';
 
-function App() {
+const App: React.FC = () => {
 	return (
 		<BrowserRouter>
 			<Routes>
