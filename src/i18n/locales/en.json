@@ -32,7 +32,7 @@
     "persona": {
       "custom": "Custom Profile",
       "developer": "Developer",
-      "healthcare": "Healthcare Worker",
+      "healthcare": "Healthcare",
       "engineer": "Engineer"
     },
     "waitlist": {

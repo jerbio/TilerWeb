@@ -28,8 +28,8 @@ const DownloadLink = styled.a`
 
 const DownloadLinkLabel = styled.span`
   display: flex;
-  gap: 0.25ch;
-  align-items: flex-start;
+  gap: 0.5ch;
+  align-items: center;
   font-size: ${styles.typography.fontSize.sm};
   font-weight: ${styles.typography.fontWeight.normal};
 
@@ -37,48 +37,48 @@ const DownloadLinkLabel = styled.span`
 `;
 
 const AppDownloadSection: React.FC = () => {
-	const { t } = useTranslation();
-	
-	return (
-		<Section paddingBlock={36}>
-			<FlexWrapper>
-				<DownloadLink
+  const { t } = useTranslation();
+
+  return (
+    <Section paddingBlock={36}>
+      <FlexWrapper>
+        <DownloadLink
           href="https://apps.apple.com/us/app/tiler-assistant/id1663594789"
-					title={t('home.appDownload.ios.title')}
+          title={t('home.appDownload.ios.title')}
           rel="noopener noreferrer"
           target="_blank"
-				>
-					<img
-						src={AppStore}
-						alt={t('home.appDownload.ios.alt')}
+        >
+          <img
+            src={AppStore}
+            alt={t('home.appDownload.ios.alt')}
             width={56}
             height={56}
-					/>
-					<DownloadLinkLabel>
-						<span>{t('home.appDownload.ios.title')}</span>
-            <ArrowOut />
-					</DownloadLinkLabel>
-				</DownloadLink>
-				<DownloadLink
-					href="https://play.google.com/store/apps/details?id=app.tiler.app"
-					title={t('home.appDownload.android.title')}
+          />
+          <DownloadLinkLabel>
+            <span>{t('home.appDownload.ios.title')}</span>
+            <ArrowOut size={16} />
+          </DownloadLinkLabel>
+        </DownloadLink>
+        <DownloadLink
+          href="https://play.google.com/store/apps/details?id=app.tiler.app"
+          title={t('home.appDownload.android.title')}
           rel="noopener noreferrer"
           target="_blank"
-				>
-					<img
-						src={PlayStore}
-						alt={t('home.appDownload.android.alt')}
+        >
+          <img
+            src={PlayStore}
+            alt={t('home.appDownload.android.alt')}
             width={56}
             height={56}
-					/>
-					<DownloadLinkLabel>
-						<span>{t('home.appDownload.android.title')}</span>
-            <ArrowOut />
-					</DownloadLinkLabel>
-				</DownloadLink>
-			</FlexWrapper>
-		</Section>
-	);
+          />
+          <DownloadLinkLabel>
+            <span>{t('home.appDownload.android.title')}</span>
+            <ArrowOut size={16} />
+          </DownloadLinkLabel>
+        </DownloadLink>
+      </FlexWrapper>
+    </Section>
+  );
 };
 
 export default AppDownloadSection;
