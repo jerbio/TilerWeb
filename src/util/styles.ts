@@ -16,7 +16,7 @@ const styles = {
 		borderRed: '#F03D5F',
 		white: '#fff',
 		black: '#000',
-    glass: '#1a1a1a99',
+    glass: '#232323a7',
 		gray: {
 			25: '#FCFCFC',
 			50: '#FAFAFA',

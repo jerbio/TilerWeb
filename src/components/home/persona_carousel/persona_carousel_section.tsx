@@ -102,7 +102,7 @@ const PersonaCarousel: React.FC = () => {
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
 
   return (
-    <Section>
+    <Section paddingBlock={16}>
       <FadeRightLeft>
         <Swiper
           modules={[Autoplay]}

@@ -27,7 +27,7 @@ const NavigationContainer = styled.div`
 const NavigationWrapper = styled(a.nav)<{ shrink: boolean }>`
 	display: grid;
 	place-items: center;
-	padding: 14px 32px;
+	padding: 14px 1.5rem;;
 	backdrop-filter: blur(16px);
 	border-radius: ${styles.borderRadius.xxLarge};
 
