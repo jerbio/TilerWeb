@@ -3,7 +3,7 @@ import SWE from '../../../assets/image_assets/swe.png';
 import Engineer from '../../../assets/image_assets/engineer.png';
 import Healthcare from '../../../assets/image_assets/healthcare.png';
 import Custom from '../../../assets/image_assets/custom.png';
-import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
 import { useTranslation } from 'react-i18next';
@@ -12,20 +12,22 @@ import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import Section from '../../layout/section';
 import styled from 'styled-components';
-import Button from '../../shared/button';
+import useIsMobile from '../../../hooks/useIsMobile';
 
-const FadeRightLeft = styled.div`
-  position: relative;
+const FadeRightLeft = styled.div<{ $visible: boolean }>`
+  position: relative; 
   width: 100%;
   height: 100%;
   isolation: isolate;
+  border: 1px solid red;
 
   &::before {
+    opacity: ${(props) => (props.$visible ? 1 : 0)};
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: clamp(1.5rem, 4vw, 4rem);
+    width: 1.5rem;
     height: 100%;
     background: linear-gradient(
       to right,
@@ -36,6 +38,7 @@ const FadeRightLeft = styled.div`
   }
 
   &::after {
+    opacity: ${(props) => (props.$visible ? 1 : 0)};
     content: '';
     position: absolute;
     top: 0;
@@ -100,43 +103,58 @@ const PersonaCarousel: React.FC = () => {
   ];
 
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
+  const isMobile = useIsMobile();
+  const isTablet = useIsMobile(1100);
+  const [slidesPerView, setSlidesPerView] = useState(1);
+
+  function handleUpdateSlides() {
+    if (isMobile) {
+      setSlidesPerView(1);
+    } else if (isTablet) {
+      setSlidesPerView(2);
+    } else {
+      setSlidesPerView(3);
+    }
+  }
+  useEffect(() => {
+    handleUpdateSlides();
+  }, [isMobile, isTablet]);
+
+  useEffect(() => {
+    if (selectedPersona !== null) {
+      setSlidesPerView(1);
+      console.log('Selected persona changed:', selectedPersona);
+    } else {
+      handleUpdateSlides();
+    }
+  }, [selectedPersona]);
 
   return (
-    <Section paddingBlock={16}>
-      <FadeRightLeft>
+    <Section paddingBlock={0}>
+      <FadeRightLeft $visible={selectedPersona === null}>
         <Swiper
           modules={[Autoplay]}
           centeredSlides={true}
-          slidesPerView={'auto'}
+          slidesPerView={slidesPerView}
           loop={true}
           autoplay={{
-            delay: 2500,
+            delay: 3000,
             disableOnInteraction: false,
-          }}
-          breakpoints={{
-            0: {
-              slidesPerView: 1,
-              navigation: false,
-              pagination: { clickable: true },
-            },
-            768: {
-              slidesPerView: 2,
-            },
-            1100: {
-              slidesPerView: 3,
-            },
           }}
         >
           {personas.map((persona) => (
-            <SwiperSlide key={persona.key} style={{ display: 'grid', placeItems: 'center' }}>
-              <PersonaCard
-                slideIndex={persona.key}
-                occupation={persona.occupation}
-                backgroundImage={persona.image}
-                gradient={persona.highlight}
-                selected={selectedPersona === persona.key}
-                setSelected={setSelectedPersona}
-              />
+            <SwiperSlide key={persona.key} style={{ position: 'relative', height: 'calc(100svh - 100px)', maxHeight: '680px', minHeight: '500px' }}>
+              <div style={{ position: 'absolute', top: 0, height: '100%', transform: 'translateX(-50%)', left: '50%' }}>
+                <PersonaCard
+                  slideIndex={persona.key}
+                  occupation={persona.occupation}
+                  backgroundImage={persona.image}
+                  gradient={persona.highlight}
+                  notCurrentSelected={selectedPersona !== null && selectedPersona !== persona.key}
+                  selected={selectedPersona === persona.key}
+                  setSelected={setSelectedPersona}
+                />
+              </div>
             </SwiperSlide>
           ))}
         </Swiper>

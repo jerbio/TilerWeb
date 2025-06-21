@@ -30,7 +30,7 @@ const HeroSection: React.FC = () => {
 					onClick={() =>
 						window.open('https://tiler.app/account/login', '_blank')
 					}
-					borderGradient={[
+					bordergradient={[
 						'#FC278780',
 						'#2C90FC80',
 						'#B8FD3380',

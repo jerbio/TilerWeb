@@ -9,7 +9,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	variant?: 'primary' | 'secondary' | 'brand' | string;
 	size?: 'small' | 'medium' | 'large';
   height?: number; // Optional height prop for custom button height
-	borderGradient?: Array<string>; // Array of colors for border gradient
+	bordergradient?: Array<string>; // Array of colors for border gradient
 };
 
 const StyledButton = styled.button<ButtonProps>`
@@ -37,7 +37,7 @@ const StyledButton = styled.button<ButtonProps>`
 	}
 
 	${(props) =>
-		props.borderGradient &&
+		props.bordergradient &&
 		`@property --rotation {
       inherits: false;
       initial-value: 0deg;
@@ -52,8 +52,8 @@ const StyledButton = styled.button<ButtonProps>`
 
 	/* Border color and gradient */
 	background: ${(props) =>
-		props.borderGradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.borderGradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.borderGradient[0]})`
+		props.bordergradient
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
 			: props.variant === 'primary'
 				? styles.colors.gray[700]
 				: 'transparent'};
@@ -98,7 +98,7 @@ const StyledButton = styled.button<ButtonProps>`
 							: props.variant + '80'};
 		}
 		${(props) =>
-			props.borderGradient &&
+			props.bordergradient &&
 			`animation: rotate 3s linear infinite paused;`}
 	}
 	&:disabled {
@@ -113,7 +113,7 @@ const Button: React.FC<ButtonProps> = ({
 	disabled = false,
 	variant = 'primary',
 	size = 'medium',
-	borderGradient,
+	bordergradient: bordergradient,
 	...props
 }) => {
 	return (
@@ -123,7 +123,7 @@ const Button: React.FC<ButtonProps> = ({
 			disabled={disabled}
 			variant={variant}
 			size={size}
-			borderGradient={borderGradient}
+			bordergradient={bordergradient}
 		>
 			{children}
 		</StyledButton>

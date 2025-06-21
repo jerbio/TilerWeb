@@ -24,7 +24,7 @@ const NavigationContainer = styled.div`
 	isolation: isolate;
 `;
 
-const NavigationWrapper = styled(a.nav)<{ shrink: boolean }>`
+const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 	display: grid;
 	place-items: center;
 	padding: 14px 1.5rem;;
@@ -38,15 +38,15 @@ const NavigationWrapper = styled(a.nav)<{ shrink: boolean }>`
 	width: calc(100% - 64px);
 
 	border: ${(props) =>
-		props.shrink
+		props.$shrink
 			? `1px solid ${styles.colors.gray[800]}`
 			: '1px solid transparent'};
 	background-color: ${(props) =>
-		props.shrink ? styles.colors.glass : 'transparent'};
+		props.$shrink ? styles.colors.glass : 'transparent'};
 	border-radius: ${(props) =>
-		props.shrink ? styles.borderRadius.xxLarge : 0};
-	height: ${(props) => (props.shrink ? '60px' : '80px')};
-	max-width: ${(props) => (props.shrink ? '800px' : '100%')};
+		props.$shrink ? styles.borderRadius.xxLarge : 0};
+	height: ${(props) => (props.$shrink ? '60px' : '80px')};
+	max-width: ${(props) => (props.$shrink ? '800px' : '100%')};
 	transition: all 0.5s ease-in-out;
 `;
 
@@ -106,7 +106,7 @@ const MobileMenuToggle = styled.div`
 	}
 `;
 
-const MobileNav = styled.div<{ isOpen: boolean; shrink: boolean }>`
+const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -114,21 +114,21 @@ const MobileNav = styled.div<{ isOpen: boolean; shrink: boolean }>`
 	gap: 16px;
 	backdrop-filter: blur(16px);
 	background-color: ${(props) =>
-		props.shrink ? styles.colors.glass : '#000000'};
+		props.$shrink ? styles.colors.glass : '#000000'};
 
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: -1;
-	width: ${(props) => (props.shrink ? 'calc(100% - 64px)' : '100%')};
+	width: ${(props) => (props.$shrink ? 'calc(100% - 64px)' : '100%')};
 	border-radius: ${(props) =>
-		props.shrink
+		props.$shrink
 			? `0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge}`
 			: 0};
 
-	padding: ${({ isOpen }) => (isOpen ? '56px 16px 16px' : '0 16px')};
-	max-height: ${({ isOpen }) => (isOpen ? '300px' : '0')};
+	padding: ${({ $isopen: isOpen }) => (isOpen ? '56px 16px 16px' : '0 16px')};
+	max-height: ${({ $isopen: isOpen }) => (isOpen ? '300px' : '0')};
 	overflow: hidden;
 	transition: all 0.5s ease-in-out;
 
@@ -165,7 +165,7 @@ const Navigation : React.FC = () => {
 	return (
 		<NavigationContainerSticky>
 			<NavigationContainer>
-				<NavigationWrapper shrink={!isAtTop}>
+				<NavigationWrapper $shrink={!isAtTop}>
 					<NavigationItemsWrapper>
 						<SvgWrapper>
 							<svg
@@ -215,7 +215,7 @@ const Navigation : React.FC = () => {
 							<Button
 								size="small"
 								onClick={() => window.open('https://launch.tiler.app/', '_blank')}
-								borderGradient={[styles.colors.brand[400]]}
+								bordergradient={[styles.colors.brand[400]]}
 							>
 								{t('common.buttons.tryFree')}
 							</Button>
@@ -232,12 +232,12 @@ const Navigation : React.FC = () => {
 						</MobileMenuToggle>
 					</NavigationItemsWrapper>
 				</NavigationWrapper>
-				<MobileNav isOpen={isOpen} shrink={!isAtTop}>
+				<MobileNav $isopen={isOpen} $shrink={!isAtTop}>
 					<NavLink href="/">{t('common.navigation.home')}</NavLink>
 					<NavLink href="/features">{t('common.navigation.features')}</NavLink>
 					<Button
 						onClick={() => window.open('https://tiler.app/', '_blank')}
-						borderGradient={[styles.colors.brand[500]]}
+						bordergradient={[styles.colors.brand[500]]}
 					>
 						{t('common.buttons.tryFree')}
 					</Button>
