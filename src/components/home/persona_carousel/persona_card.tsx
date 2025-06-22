@@ -12,6 +12,7 @@ import {
   useTransition,
 } from '@react-spring/web';
 import useIsMobile from '../../../hooks/useIsMobile';
+import PersonaExpandedCard from './persona_expanded_card';
 
 interface PersonaCardProps {
   slideIndex: number;
@@ -31,7 +32,6 @@ const Card = styled(animated.div) <{ gradient?: number; $active: boolean }>`
 	border-radius: ${styles.borderRadius.xxLarge};
 	color: white;
 	position: relative;
-	isolation: isolate;
 	opacity: ${(props) => (props.$active ? 1 : 0.5)};
 	transition: opacity 0.3s ease-in-out;
 
@@ -52,7 +52,6 @@ const Card = styled(animated.div) <{ gradient?: number; $active: boolean }>`
 	}
 
 	/* Gradient effect */
-
 	&::after {
 		${(props) =>
     props.gradient &&
@@ -77,7 +76,6 @@ const Card = styled(animated.div) <{ gradient?: number; $active: boolean }>`
     props.gradient
       ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
       : styles.colors.gray[800]};
-		opacity: ${(props) => (props.gradient ? 0.75 : 1)};
 	}
 `;
 
@@ -181,8 +179,7 @@ const ButtonContainer = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: end;
-	border-radius: 0 0 ${styles.borderRadius.xxLarge}
-		${styles.borderRadius.xxLarge};
+	border-radius: 0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge};
 `;
 
 const ButtonStyled = styled(animated.button)`
@@ -226,6 +223,26 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     setSelected(null); // Clear the selected state
   }
 
+  useEffect(() => {
+    if (selected && !notCurrentSelected) {
+      // Enable the swiper when a card is selected
+      swiper.disable();
+      console.log('Swiper disabled due to card selection');
+      // Enable if user clicks outside the card
+      requestAnimationFrame(() => {
+        document.addEventListener(
+          'click',
+          () => {
+            onDeselect();
+            swiper.enable();
+            console.log('Swiper enabled due to click outside card');
+          },
+          { once: true }
+        );
+      });
+    }
+  }, [selected]);
+
   // isActive animation hooks
   const tileListTransApi = useSpringRef();
   const tileListTransition = useTransition(displayUI ? dummyTiles : [], {
@@ -260,34 +277,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     config: { tension: 250, friction: 30 },
   });
 
-  useEffect(() => {
-    if (!selected) {
-      if (mouseHovered) {
-        swiper.autoplay.pause();
-      } else {
-        swiper.autoplay?.resume();
-      }
-    }
-  }, [mouseHovered]);
-
-  useEffect(() => {
-    if (selected && !notCurrentSelected) {
-      // Enable the swiper when a card is selected
-      swiper.disable();
-      // Enable if user clicks outside the card
-      requestAnimationFrame(() => {
-        document.addEventListener(
-          'click',
-          () => {
-            onDeselect();
-            swiper.enable();
-          },
-          { once: true }
-        );
-      });
-    }
-  }, [selected]);
-
   useChain(
     displayUI
       ? [tileListApi, buttonApi, tileListTransApi, overlayTagApi]
@@ -299,7 +288,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   // Expanding animation hooks
   const CARD_WIDTH = 315;
   const MAX_CARD_WIDTH = 1000;
-  const PADDING = 128;
+  const PADDING = 64;
   const cardSpring = useSpring({
     from: { width: CARD_WIDTH },
     to: {
@@ -307,8 +296,8 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
         ? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
         : CARD_WIDTH,
     },
-    delay: selected ? 0 : 100,
-    config: { tension: 300, friction: 30 },
+    delay: selected ? 0 : 300,
+    config: { tension: 300, friction: 27.5 },
   });
 
   return (
@@ -345,6 +334,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
           </ButtonContainer>
         </Overlay>
       </OverlayContainer>
+      <PersonaExpandedCard occupation={occupation} display={selected} />
     </Card>
   );
 };
