@@ -31,7 +31,7 @@ const DownloadLinkLabel = styled.span`
   gap: 0.5ch;
   align-items: center;
   font-size: ${styles.typography.fontSize.sm};
-  font-weight: ${styles.typography.fontWeight.normal};
+  font-weight: ${styles.typography.fontWeight.medium};
 
   transition: color 0.2s ease-in-out;
 `;

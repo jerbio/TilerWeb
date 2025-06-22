@@ -43,7 +43,7 @@ const HighlightCard = styled.div<{ backgroundimage: string }>`
 
 const MiniTitle = styled.p`
 	color: ${styles.colors.brand['300']};
-  font-weight: ${styles.typography.fontWeight.medium};
+  font-weight: ${styles.typography.fontWeight.semibold};
 	font-size: ${styles.typography.fontSize.xxs};
 	margin: 0;
 `;

@@ -55,7 +55,7 @@ const Header = styled.header`
 
 	h2 {
 		line-height: 1.2;
-		font-weight: ${styles.typography.fontWeight.semibold};
+		font-weight: ${styles.typography.fontWeight.bold};
 		font-size: ${styles.typography.fontSize.xl};
 		font-family: ${styles.typography.fontFamily.urban};
 	}

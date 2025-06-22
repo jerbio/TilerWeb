@@ -73,7 +73,7 @@ const StyledButton = styled.button<ButtonProps>`
 						? styles.colors.gray[300]
 						: styles.colors.white};
 	border-radius: ${styles.borderRadius.little};
-	font-weight: ${styles.typography.fontWeight.normal};
+	font-weight: ${styles.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;

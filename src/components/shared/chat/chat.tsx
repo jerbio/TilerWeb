@@ -41,7 +41,7 @@ const ChatHeader = styled.header`
 const ChatTitle = styled.h2`
 	font-family: 'Urbanist', sans-serif;
 	font-size: ${styles.typography.fontSize.lg};
-	font-weight: ${styles.typography.fontWeight.semibold};
+	font-weight: ${styles.typography.fontWeight.bold};
 	line-height: 1;
 	color: ${styles.colors.gray[300]};
 `;
@@ -78,7 +78,7 @@ const EmptyChat = styled.div`
 
   h3 {
     font-size: ${styles.typography.fontSize.displayXs};
-    font-weight: ${styles.typography.fontWeight.semibold};
+    font-weight: ${styles.typography.fontWeight.bold};
     color: ${styles.colors.white};
     font-family: ${styles.typography.fontFamily.urban};
     text-align: center;
@@ -87,7 +87,7 @@ const EmptyChat = styled.div`
   p {
     font-size: ${styles.typography.fontSize.sm};
     color: ${styles.colors.gray[500]};
-    font-weight: ${styles.typography.fontWeight.normal};
+    font-weight: ${styles.typography.fontWeight.medium};
     text-align: center;
   }
 `;
@@ -112,7 +112,7 @@ const Chat = ({ onClose }: ChatProps) => {
 				<EmptyChat>
           <Logo size={48} />
           <h3>What would you like to do?</h3>
-          <p>Describe a task, We’ll handle the tiling. </p>
+          <p>Describe a task, We'll handle the tiling. </p>
         </EmptyChat>
 			</ChatContent>
 			<ChatForm action="">

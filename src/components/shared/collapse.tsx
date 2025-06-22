@@ -32,7 +32,7 @@ const StyledCollapseHeader = styled.button<{ $active: boolean }>`
 	gap: 0.75rem;
 	color: ${(props) =>
 		props.$active ? styles.colors.brand[400] : styles.colors.gray[300]};
-	font-weight: ${styles.typography.fontWeight.medium};
+	font-weight: ${styles.typography.fontWeight.semibold};
 	font-size: ${styles.typography.fontSize.lg};
 	transition: color 0.3s ease;
 

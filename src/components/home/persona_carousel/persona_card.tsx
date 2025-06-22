@@ -127,7 +127,7 @@ const OverlayTitle = styled.h3`
 
 const OverlayHeaderTag = styled(animated.span)`
 	font-size: ${styles.typography.fontSize.sm};
-	font-weight: ${styles.typography.fontWeight.medium};
+	font-weight: ${styles.typography.fontWeight.semibold};
 	background: ${styles.colors.white};
 	color: ${styles.colors.gray[800]};
 	padding: 6px 1rem;
@@ -149,7 +149,6 @@ const OverlayListItem = styled(animated.li)`
 	justify-content: space-between;
 	align-items: center;
 	font-size: ${styles.typography.fontSize.sm};
-	font-weight: ${styles.typography.fontWeight.light};
 	color: ${styles.colors.white};
 
 	background: ${styles.colors.gray[800]};
