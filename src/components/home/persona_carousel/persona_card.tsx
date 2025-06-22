@@ -221,25 +221,13 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   }
   function onDeselect() {
     setSelected(null); // Clear the selected state
+    swiper.enable(); // Re-enable the swiper
   }
 
   useEffect(() => {
     if (selected && !notCurrentSelected) {
       // Enable the swiper when a card is selected
       swiper.disable();
-      console.log('Swiper disabled due to card selection');
-      // Enable if user clicks outside the card
-      requestAnimationFrame(() => {
-        document.addEventListener(
-          'click',
-          () => {
-            onDeselect();
-            swiper.enable();
-            console.log('Swiper enabled due to click outside card');
-          },
-          { once: true }
-        );
-      });
     }
   }, [selected]);
 
@@ -334,7 +322,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
           </ButtonContainer>
         </Overlay>
       </OverlayContainer>
-      <PersonaExpandedCard occupation={occupation} display={selected} />
+      <PersonaExpandedCard occupation={occupation} display={selected} onCollapse={onDeselect} />
     </Card>
   );
 };
