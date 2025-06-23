@@ -5,26 +5,26 @@ import { useSwiper, useSwiperSlide } from 'swiper/react';
 import Add from '../../icons/add';
 import ArrowRight2 from '../../icons/arrow_right2';
 import {
-  animated,
-  useChain,
-  useSpring,
-  useSpringRef,
-  useTransition,
+	animated,
+	useChain,
+	useSpring,
+	useSpringRef,
+	useTransition,
 } from '@react-spring/web';
 import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaExpandedCard from './persona_expanded_card';
 
 interface PersonaCardProps {
-  slideIndex: number;
-  occupation: string;
-  backgroundImage: string;
-  gradient?: boolean;
-  notCurrentSelected: boolean;
-  selected: boolean;
-  setSelected: React.Dispatch<React.SetStateAction<number | null>>;
+	slideIndex: number;
+	occupation: string;
+	backgroundImage: string;
+	gradient?: boolean;
+	notCurrentSelected: boolean;
+	selected: boolean;
+	setSelected: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const Card = styled(animated.div) <{ gradient?: number; $active: boolean }>`
+const Card = styled(animated.div)<{ gradient?: number; $active: boolean }>`
 	min-width: 315px;
 	height: 100%;
 	background-size: cover;
@@ -54,8 +54,8 @@ const Card = styled(animated.div) <{ gradient?: number; $active: boolean }>`
 	/* Gradient effect */
 	&::after {
 		${(props) =>
-    props.gradient &&
-    `@property --rotation {
+			props.gradient &&
+			`@property --rotation {
         inherits: false;
         initial-value: 0deg;
         syntax: '<angle>';
@@ -73,9 +73,9 @@ const Card = styled(animated.div) <{ gradient?: number; $active: boolean }>`
 		z-index: -3;
 		border-radius: ${styles.borderRadius.xxLarge};
 		background: ${(props) =>
-    props.gradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
-      : styles.colors.gray[800]};
+			props.gradient
+				? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
+				: styles.colors.gray[800]};
 	}
 `;
 
@@ -187,143 +187,167 @@ const ButtonStyled = styled(animated.button)`
 	display: grid;
 	place-items: center;
 	border-radius: ${styles.borderRadius.xxLarge};
-	background: ${styles.colors.brand[600]};
+	background-color: ${styles.colors.brand[600]};
 
 	&:hover {
-		background: ${styles.colors.brand[700]};
+		background-color: ${styles.colors.brand[700]};
 	}
-	transition: background 0.3s ease-in-out;
+	transition: background-color 0.3s ease-in-out;
 `;
 
 const dummyTiles = [
-  { id: 1, name: 'Dummy Tile 1' },
-  { id: 2, name: 'Dummy Tile 2' },
+	{ id: 1, name: 'Dummy Tile 1' },
+	{ id: 2, name: 'Dummy Tile 2' },
 ];
 
 const PersonaCard: React.FC<PersonaCardProps> = ({
-  slideIndex,
-  occupation,
-  backgroundImage,
-  gradient,
-  selected,
-  notCurrentSelected,
-  setSelected,
+	slideIndex,
+	occupation,
+	backgroundImage,
+	gradient,
+	selected,
+	notCurrentSelected,
+	setSelected,
 }) => {
-  const swiper = useSwiper();
-  const swiperSlide = useSwiperSlide();
-  const [mouseHovered, setHovered] = useState(false);
-  const isMobile = useIsMobile();
-  const displayUI = swiperSlide.isActive && (mouseHovered || isMobile);
+	const swiper = useSwiper();
+	const swiperSlide = useSwiperSlide();
+	const [mouseHovered, setHovered] = useState(false);
+	const isMobile = useIsMobile();
+	const displayUI = swiperSlide.isActive && (mouseHovered || isMobile);
 
-  function onSelect() {
-    setSelected(slideIndex); // Update the selected state
-  }
-  function onDeselect() {
-    setSelected(null); // Clear the selected state
-    swiper.enable(); // Re-enable the swiper
-  }
+	function onSelect() {
+		setSelected(slideIndex); // Update the selected state
+	}
+	function onDeselect() {
+		setSelected(null); // Clear the selected state
+		swiper.enable(); // Re-enable the swiper
+	}
 
-  useEffect(() => {
-    if (selected && !notCurrentSelected) {
-      // Enable the swiper when a card is selected
-      swiper.disable();
-    }
-  }, [selected]);
+	useEffect(() => {
+		if (selected && !notCurrentSelected) {
+			// Enable the swiper when a card is selected
+			swiper.disable();
+		}
+	}, [selected]);
 
-  // isActive animation hooks
-  const tileListTransApi = useSpringRef();
-  const tileListTransition = useTransition(displayUI ? dummyTiles : [], {
-    ref: tileListTransApi,
-    keys: (tile) => tile.id,
-    trail: 150 / dummyTiles.length,
-    from: { opacity: 0, scale: 0.8, y: 20 },
-    enter: { opacity: 1, scale: 1, y: 0 },
-    leave: { opacity: 0, scale: 0.8, y: -20 },
-  });
+	// isActive animation hooks
+	const tileListTransApi = useSpringRef();
+	const tileListTransition = useTransition(displayUI ? dummyTiles : [], {
+		ref: tileListTransApi,
+		keys: (tile) => tile.id,
+		trail: 150 / dummyTiles.length,
+		from: { opacity: 0, scale: 0.8, y: 20 },
+		enter: { opacity: 1, scale: 1, y: 0 },
+		leave: { opacity: 0, scale: 0.8, y: -20 },
+	});
 
-  const tileListApi = useSpringRef();
-  const tileListSpring = useSpring({
-    ref: tileListApi,
-    from: { height: 0 },
-    to: { height: displayUI ? 40 * dummyTiles.length + 16 : 0 },
-    config: { tension: 200, friction: 30 },
-  });
+	const tileListApi = useSpringRef();
+	const tileListSpring = useSpring({
+		ref: tileListApi,
+		from: { height: 0 },
+		to: { height: displayUI ? 40 * dummyTiles.length + 16 : 0 },
+		config: { tension: 200, friction: 30 },
+	});
 
-  const buttonApi = useSpringRef();
-  const buttonSpring = useSpring({
-    ref: buttonApi,
-    from: { x: -32, opacity: 0 },
-    to: { x: displayUI ? 0 : -32, opacity: displayUI ? 1 : 0 },
-  });
+	const buttonApi = useSpringRef();
+	const buttonSpring = useSpring({
+		ref: buttonApi,
+		from: { x: -32, opacity: 0 },
+		to: { x: displayUI ? 0 : -32, opacity: displayUI ? 1 : 0 },
+	});
 
-  const overlayTagApi = useSpringRef();
-  const overlayTagSpring = useSpring({
-    ref: overlayTagApi,
-    from: { opacity: 0, scale: 0.9 },
-    to: { opacity: displayUI ? 1 : 0, scale: displayUI ? 1 : 0.9 },
-    config: { tension: 250, friction: 30 },
-  });
+	const overlayTagApi = useSpringRef();
+	const overlayTagSpring = useSpring({
+		ref: overlayTagApi,
+		from: { opacity: 0, scale: 0.9 },
+		to: { opacity: displayUI ? 1 : 0, scale: displayUI ? 1 : 0.9 },
+		config: { tension: 250, friction: 30 },
+	});
 
-  useChain(
-    displayUI
-      ? [tileListApi, buttonApi, tileListTransApi, overlayTagApi]
-      : [overlayTagApi, tileListTransApi, buttonApi, tileListApi],
-    displayUI ? [0, 0.2, 0.4, 0.6] : [0, 0, 0.1, 0.4],
-    500
-  );
+	useChain(
+		displayUI
+			? [tileListApi, buttonApi, tileListTransApi, overlayTagApi]
+			: [overlayTagApi, tileListTransApi, buttonApi, tileListApi],
+		displayUI ? [0, 0.2, 0.4, 0.6] : [0, 0, 0.1, 0.4],
+		500
+	);
 
-  // Expanding animation hooks
-  const CARD_WIDTH = 315;
-  const MAX_CARD_WIDTH = 1000;
-  const PADDING = 64;
-  const cardSpring = useSpring({
-    from: { width: CARD_WIDTH },
-    to: {
-      width: selected
-        ? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
-        : CARD_WIDTH,
-    },
-    delay: selected ? 0 : 300,
-    config: { tension: 300, friction: 27.5 },
-  });
+	// Expanding animation hooks
+	const CARD_WIDTH = 315;
+	const MAX_CARD_WIDTH = 1000;
+	const PADDING = 64;
+	const [expandedWidth, setExpandedWidth] = useState(CARD_WIDTH);
+	const cardSpring = useSpring({
+		from: { width: CARD_WIDTH },
+		to: {
+			width: selected
+				? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
+				: CARD_WIDTH,
+		},
+		onRest: () => {
+			if (selected) {
+				console.log(
+					'rested',
+					Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
+				);
+        // Set expanded width to the final width of animation
+        // Setting twice for react to re-render
+				setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1);
+				setTimeout(() => {
+					setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH));
+				}, 0);
+			}
+		},
+		delay: selected ? 0 : 300,
+		config: { tension: 300, friction: 27.5 },
+	});
 
-  return (
-    <Card
-      gradient={gradient && !selected ? 1 : 0}
-      $active={swiperSlide.isActive}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={cardSpring}
-    >
-      <CardImage $backgroundImage={backgroundImage} $selected={selected} />
-      <OverlayContainer $selected={selected}>
-        <Overlay>
-          <OverlayHeader>
-            <OverlayTitle>{occupation}</OverlayTitle>
-            <OverlayHeaderTag style={overlayTagSpring}>
-              Tiles
-            </OverlayHeaderTag>
-          </OverlayHeader>
-          <OverlayList style={tileListSpring}>
-            {tileListTransition((style, tile) => (
-              <OverlayListItem key={tile.id} style={style}>
-                <span>{tile.name}</span>
-                <button>
-                  <Add size={12} />
-                </button>
-              </OverlayListItem>
-            ))}
-          </OverlayList>
-          <ButtonContainer>
-            <ButtonStyled style={buttonSpring} onClick={onSelect}>
-              <ArrowRight2 />
-            </ButtonStyled>
-          </ButtonContainer>
-        </Overlay>
-      </OverlayContainer>
-      <PersonaExpandedCard occupation={occupation} display={selected} onCollapse={onDeselect} />
-    </Card>
-  );
+	return (
+		<Card
+			gradient={gradient && !selected ? 1 : 0}
+			$active={swiperSlide.isActive}
+			onMouseEnter={() => setHovered(true)}
+			onMouseLeave={() => setHovered(false)}
+			style={cardSpring}
+		>
+			<CardImage
+				$backgroundImage={backgroundImage}
+				$selected={selected}
+			/>
+			<OverlayContainer $selected={selected}>
+				<Overlay>
+					<OverlayHeader>
+						<OverlayTitle>{occupation}</OverlayTitle>
+						<OverlayHeaderTag style={overlayTagSpring}>
+							Tiles
+						</OverlayHeaderTag>
+					</OverlayHeader>
+					<OverlayList style={tileListSpring}>
+						{tileListTransition((style, tile) => (
+							<OverlayListItem key={tile.id} style={style}>
+								<span>{tile.name}</span>
+								<button>
+									<Add size={12} />
+								</button>
+							</OverlayListItem>
+						))}
+					</OverlayList>
+					<ButtonContainer>
+						<ButtonStyled style={buttonSpring} onClick={onSelect}>
+							<ArrowRight2 />
+						</ButtonStyled>
+					</ButtonContainer>
+				</Overlay>
+			</OverlayContainer>
+			{/* Set expanded width to the final width of animation */}
+			<PersonaExpandedCard
+				occupation={occupation}
+				display={selected}
+				onCollapse={onDeselect}
+				expandedWidth={expandedWidth}
+			/>
+		</Card>
+	);
 };
 
 export default PersonaCard;

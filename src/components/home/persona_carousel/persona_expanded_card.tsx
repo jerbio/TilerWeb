@@ -13,12 +13,7 @@ import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
 import useIsMobile from '../../../hooks/useIsMobile';
-
-type PersonaExpandedCardProps = {
-	display: boolean;
-	occupation: string;
-	onCollapse: () => void;
-};
+import Calendar from '../../shared/calendar/calendar';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
@@ -137,10 +132,18 @@ const MobileCloseButtonContainer = styled.div`
 	}
 `;
 
+type PersonaExpandedCardProps = {
+	display: boolean;
+	occupation: string;
+	onCollapse: () => void;
+	expandedWidth: number;
+};
+
 function PersonaExpandedCard({
-	display,
+  display,
 	occupation,
 	onCollapse,
+  expandedWidth,
 }: PersonaExpandedCardProps) {
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
@@ -152,7 +155,7 @@ function PersonaExpandedCard({
 			container: CalendarContainer,
 			content: (
 				<React.Fragment>
-					<p style={{ color: styles.colors.gray[500], padding: '1rem', textAlign: 'center' }}>Calendar for {occupation} will be displayed here.</p>
+					<Calendar width={expandedWidth} />
 					<CalendarContainerActionButtons>
 						<MobileShowChatButton
 							onClick={() =>
