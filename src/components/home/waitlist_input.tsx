@@ -5,12 +5,19 @@ import { toast } from 'sonner';
 import Section from '../layout/section';
 import Input from '../shared/input';
 import Button from '../shared/button';
+import styles from '../../util/styles';
 
 const Form = styled.form`
 	display: flex;
+  flex-direction: column;
 	gap: 0.5rem;
   width: 100%;
   margin: 0 auto;
+
+  @media screen and (min-width: ${styles.screens.sm}) {
+    flex-direction: row;
+    max-width: 600px;
+  }
 `;
 
 const Waitlist: React.FC = () => {

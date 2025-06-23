@@ -77,11 +77,17 @@ const EmptyChat = styled.div`
   height: 100%;
 
   h3 {
-    font-size: ${styles.typography.fontSize.displayXs};
+    font-size: ${styles.typography.fontSize.xl};
     font-weight: ${styles.typography.fontWeight.bold};
-    color: ${styles.colors.white};
+    color: ${styles.colors.white}; 
     font-family: ${styles.typography.fontFamily.urban};
     text-align: center;
+
+    @media screen and (min-width: ${styles.screens.lg}) {
+      h3 {
+        font-size: ${styles.typography.fontSize.displayXs};
+      }
+    }
   }
 
   p {

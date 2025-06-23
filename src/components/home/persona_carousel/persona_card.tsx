@@ -213,7 +213,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   const swiperSlide = useSwiperSlide();
   const [mouseHovered, setHovered] = useState(false);
   const isMobile = useIsMobile();
-  const displayUI = mouseHovered || (isMobile && swiperSlide.isActive);
+  const displayUI = swiperSlide.isActive && (mouseHovered || isMobile);
 
   function onSelect() {
     setSelected(slideIndex); // Update the selected state

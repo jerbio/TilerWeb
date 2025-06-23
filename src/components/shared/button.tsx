@@ -77,6 +77,7 @@ const StyledButton = styled.button<ButtonProps>`
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
+  justify-content: center;
   line-height: 1;
 	gap: 1ch;
 	height: ${(props) =>

@@ -80,6 +80,7 @@ const StyledInput = styled.input<InputProps>`
 	font-weight: ${styles.typography.fontWeight.normal};
 	line-height: 1;
 	color: ${styles.colors.white};
+  height: 100%;
 
 	padding-inline: calc(
 		${(props) =>

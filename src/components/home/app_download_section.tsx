@@ -28,10 +28,11 @@ const DownloadLink = styled.a`
 
 const DownloadLinkLabel = styled.span`
   display: flex;
-  gap: 0.5ch;
-  align-items: center;
+  gap: 0.25ch;
+  align-items: flex-start;
   font-size: ${styles.typography.fontSize.sm};
   font-weight: ${styles.typography.fontWeight.medium};
+  text-align: center;
 
   transition: color 0.2s ease-in-out;
 `;
@@ -56,7 +57,7 @@ const AppDownloadSection: React.FC = () => {
           />
           <DownloadLinkLabel>
             <span>{t('home.appDownload.ios.title')}</span>
-            <ArrowOut size={16} />
+            <ArrowOut size={12} />
           </DownloadLinkLabel>
         </DownloadLink>
         <DownloadLink
@@ -73,7 +74,7 @@ const AppDownloadSection: React.FC = () => {
           />
           <DownloadLinkLabel>
             <span>{t('home.appDownload.android.title')}</span>
-            <ArrowOut size={16} />
+            <ArrowOut size={12} />
           </DownloadLinkLabel>
         </DownloadLink>
       </FlexWrapper>

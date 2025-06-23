@@ -224,9 +224,9 @@ const styles = {
       normal: '300',
       medium: '400',
       semibold: '500',
-      bold: '600',
-      extrabold: '700',
-      black: '800',
+      bold: '700',
+      extrabold: '800',
+      black: '900',
     },
 		lineHeight: {
 			xs: '18px',
