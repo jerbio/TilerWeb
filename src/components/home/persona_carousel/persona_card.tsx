@@ -14,17 +14,11 @@ import {
 import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaExpandedCard from './persona_expanded_card';
 
-interface PersonaCardProps {
-	slideIndex: number;
-	occupation: string;
-	backgroundImage: string;
-	gradient?: boolean;
-	notCurrentSelected: boolean;
-	selected: boolean;
-	setSelected: React.Dispatch<React.SetStateAction<number | null>>;
-}
-
-const Card = styled(animated.div)<{ gradient?: number; $active: boolean }>`
+const Card = styled(animated.div)<{
+	gradient?: number;
+	$active: boolean;
+	$selected?: boolean;
+}>`
 	min-width: 315px;
 	height: 100%;
 	background-size: cover;
@@ -34,6 +28,7 @@ const Card = styled(animated.div)<{ gradient?: number; $active: boolean }>`
 	position: relative;
 	opacity: ${(props) => (props.$active ? 1 : 0.5)};
 	transition: opacity 0.3s ease-in-out;
+	cursor: ${(props) => (props.$selected ? 'default' : 'pointer')};
 
 	/* Dark fade effect */
 	&::before {
@@ -200,35 +195,69 @@ const dummyTiles = [
 	{ id: 2, name: 'Dummy Tile 2' },
 ];
 
+interface PersonaCardProps {
+	persona: number;
+	occupation: string;
+	backgroundImage: string;
+	gradient?: boolean;
+	selectedPersona: number | null;
+	setSelectedPersona: React.Dispatch<React.SetStateAction<number | null>>;
+}
+
 const PersonaCard: React.FC<PersonaCardProps> = ({
-	slideIndex,
+	persona,
 	occupation,
 	backgroundImage,
 	gradient,
-	selected,
-	notCurrentSelected,
-	setSelected,
+	selectedPersona,
+	setSelectedPersona,
 }) => {
+	const isSelected = selectedPersona === persona; // Check if this card is selected
+	const isNotCurrentSelected =
+		selectedPersona !== null && selectedPersona !== persona; // Check if another card is selected
+
 	const swiper = useSwiper();
 	const swiperSlide = useSwiperSlide();
 	const [mouseHovered, setHovered] = useState(false);
 	const isMobile = useIsMobile();
-	const displayUI = swiperSlide.isActive && (mouseHovered || isMobile);
+	const displayUI = mouseHovered || (swiperSlide.isActive && isMobile);
 
 	function onSelect() {
-		setSelected(slideIndex); // Update the selected state
+		setSelectedPersona(persona); // Update the selected state
 	}
 	function onDeselect() {
-		setSelected(null); // Clear the selected state
+		setSelectedPersona(null); // Clear the selected state
 		swiper.enable(); // Re-enable the swiper
 	}
 
 	useEffect(() => {
-		if (selected && !notCurrentSelected) {
-			// Enable the swiper when a card is selected
-			swiper.disable();
+		if (isNotCurrentSelected && swiperSlide.isActive) {
+			let diff = selectedPersona - persona;
+			// if difference is greater than 1
+			if (Math.abs(diff) > 1) {
+				if (diff > 1) {
+					diff = -1;
+				} else {
+					diff = 1;
+				}
+			}
+			console.table({
+				selectedPersona,
+				persona,
+				diff,
+				slideToThe: diff === 1 ? 'next' : 'prev',
+			});
+			if (diff === -1) {
+				swiper.slidePrev();
+			} else {
+				swiper.slideNext();
+			}
 		}
-	}, [selected]);
+		if (selectedPersona !== null) {
+			// Enable the swiper when this card is selected
+			setTimeout(() => swiper.disable(), 0);
+		}
+	}, [selectedPersona]);
 
 	// isActive animation hooks
 	const tileListTransApi = useSpringRef();
@@ -274,47 +303,48 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
 	// Expanding animation hooks
 	const CARD_WIDTH = 315;
-	const MAX_CARD_WIDTH = 1000;
-	const PADDING = 64;
+	const MAX_CARD_WIDTH = 1128;
+	const PADDING = 80;
 	const [expandedWidth, setExpandedWidth] = useState(CARD_WIDTH);
 	const cardSpring = useSpring({
 		from: { width: CARD_WIDTH },
 		to: {
-			width: selected
+			width: isSelected
 				? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
 				: CARD_WIDTH,
 		},
 		onRest: () => {
-			if (selected) {
-				console.log(
-					'rested',
-					Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
+			if (isSelected) {
+				// Set expanded width to the final width of animation
+				// Setting twice for react to re-render
+				setExpandedWidth(
+					Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1
 				);
-        // Set expanded width to the final width of animation
-        // Setting twice for react to re-render
-				setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1);
 				setTimeout(() => {
-					setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH));
+					setExpandedWidth(
+						Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
+					);
 				}, 0);
 			}
 		},
-		delay: selected ? 0 : 300,
+		delay: isSelected ? 0 : 300,
 		config: { tension: 300, friction: 27.5 },
 	});
 
 	return (
 		<Card
-			gradient={gradient && !selected ? 1 : 0}
+			gradient={gradient && !isSelected ? 1 : 0}
 			$active={swiperSlide.isActive}
+			$selected={isSelected}
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
 			style={cardSpring}
 		>
 			<CardImage
 				$backgroundImage={backgroundImage}
-				$selected={selected}
+				$selected={isSelected}
 			/>
-			<OverlayContainer $selected={selected}>
+			<OverlayContainer $selected={isSelected}>
 				<Overlay>
 					<OverlayHeader>
 						<OverlayTitle>{occupation}</OverlayTitle>
@@ -342,7 +372,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			{/* Set expanded width to the final width of animation */}
 			<PersonaExpandedCard
 				occupation={occupation}
-				display={selected}
+				display={isSelected}
 				onCollapse={onDeselect}
 				expandedWidth={expandedWidth}
 			/>

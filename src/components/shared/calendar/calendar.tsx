@@ -98,6 +98,7 @@ const CalendarHeaderDateItem = styled.li<{ today: boolean }>`
 
 const CalendarContentContainer = styled.div`
 	position: absolute;
+  overflow-x: hidden;
 	overflow-y: scroll;
 	top: ${CALENDAR_HEADER_HEIGHT};
 	bottom: 0;
@@ -161,7 +162,7 @@ const CalendarCellTime = styled.div<{ hourIndex: number }>`
     span {
       position: absolute;
       line-height: 1;
-      top: 2px;
+      top: 4px;
       right: 2px;
       font-size: ${styles.typography.fontSize.xs};
       color: ${styles.colors.gray[500]};
