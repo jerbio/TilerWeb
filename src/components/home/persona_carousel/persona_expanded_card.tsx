@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import styles from '../../../util/styles';
 import {
 	animated,
-	config,
 	useChain,
 	useSpring,
 	useSpringRef,

@@ -35,6 +35,7 @@ const Waitlist: React.FC = () => {
 			setEmail('');
 		} catch (error) {
 			setEmail('');
+      console.error('Error signing up for waitlist:', error);
 			toast('Failed to sign up.');
 		}
 	};

@@ -1,4 +1,3 @@
-import React from 'react';
 import Icon from './_icon';
 
 const ArrowOut = ({ size = 21 }: { size?: number }) => {

@@ -9,7 +9,7 @@ const formatter = {
 		] as const;
 
     // Approximate to the nearest second
-    let totalSeconds = end.diff(start, 'second');
+    const totalSeconds = end.diff(start, 'second');
     let totalMinutes = Math.ceil(totalSeconds / 60);
 
     const parts = quantities.map(([unit, divisor]) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import Icon from './_icon';
 
 const Add = ({ size = 24 }: { size?: number }) => {

@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Swiper, SwiperClass, SwiperRef, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
-import { useTranslation } from 'react-i18next';
 
-// @ts-expect-error
+// @ts-expect-error Swiper styles are not typed
 import 'swiper/css';
 import Section from '../../layout/section';
 import styled from 'styled-components';
 import useIsMobile from '../../../hooks/useIsMobile';
-import personas from '../../../data/persona';
 import usePersonas from '../../../data/persona';
 
 const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
@@ -49,7 +47,6 @@ const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 `;
 
 const PersonaCarousel: React.FC = () => {
-	const { t } = useTranslation();
 	const { personas } = usePersonas();
 
 	const [selectedPersona, setSelectedPersona] = useState<number | null>(null);

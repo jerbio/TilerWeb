@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';

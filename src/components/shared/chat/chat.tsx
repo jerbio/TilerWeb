@@ -1,16 +1,9 @@
-import React from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import Button from '../button';
 import {
-	ArrowLeft,
-	ArrowLeftIcon,
 	ChevronLeftIcon,
-	EyeClosed,
 	Plus,
-	X,
-	XCircleIcon,
-	XIcon,
 } from 'lucide-react';
 import Input from '../input';
 import Logo from '../../icons/logo';
@@ -118,7 +111,7 @@ const Chat = ({ onClose }: ChatProps) => {
 				<EmptyChat>
           <Logo size={48} />
           <h3>What would you like to do?</h3>
-          <p>Describe a task, We'll handle the tiling. </p>
+          <p>Describe a task, We&apos;ll handle the tiling. </p>
         </EmptyChat>
 			</ChatContent>
 			<ChatForm action="">

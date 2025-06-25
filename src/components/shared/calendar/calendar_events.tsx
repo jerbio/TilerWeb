@@ -327,7 +327,7 @@ const CalendarEvents = ({
 									ry="0.08"
 									width="1"
 									height="2"
-									vector-effect="non-scaling-stroke"
+									vectorEffect="non-scaling-stroke"
 								/>
 							</svg>
 						</EventContainer>

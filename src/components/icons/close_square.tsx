@@ -1,4 +1,3 @@
-import React from 'react';
 import Icon from './_icon';
 
 const CloseSquare = ({ size = 25 }: { size?: number }) => {
