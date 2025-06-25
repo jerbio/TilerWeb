@@ -28,7 +28,7 @@ const Card = styled(animated.div)<{
 	position: relative;
 	opacity: ${(props) => (props.$active ? 1 : 0.5)};
 	transition: opacity 0.3s ease-in-out;
-	cursor: ${(props) => (props.$selected ? 'default' : 'pointer')};
+	cursor: ${(props) => (props.$selected ? 'auto' : 'pointer')};
 
 	/* Dark fade effect */
 	&::before {

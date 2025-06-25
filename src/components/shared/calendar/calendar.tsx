@@ -3,13 +3,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-
-const CALENDAR_HEADER_DATE_MIN_WIDTH = '150px';
-const CALENDAR_HEADER_HEIGHT = '34px';
-const CALENDAR_TIMELINE_WIDTH = '70px';
-const CALENDAR_BORDER_COLOR = styles.colors.gray[700];
-
-const CALENDAR_CELL_HEIGHT = '80px';
+import calendarConfig from './config';
+import CalendarEvents from './calendar_events';
+import dummySchedule from '../../../data/dummySchedule';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
 	position: relative;
@@ -25,20 +21,20 @@ const CalendarHeader = styled.div`
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: ${CALENDAR_HEADER_HEIGHT};
+	height: ${calendarConfig.HEADER_HEIGHT};
 	background-color: ${styles.colors.gray[800]};
 
 	display: flex;
 `;
 
 const CalendarHeaderActions = styled.div`
-	width: ${CALENDAR_TIMELINE_WIDTH};
+	width: ${calendarConfig.TIMELINE_WIDTH};
 	height: 100%;
 	display: flex;
 	align-items: center;
 	overflow: hidden;
-	border-right: 1px solid ${CALENDAR_BORDER_COLOR};
-	border-top: 1px solid ${CALENDAR_BORDER_COLOR};
+	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
+	border-top: 1px solid ${calendarConfig.BORDER_COLOR};
 	border-radius: 0 ${styles.borderRadius.medium} 0 0;
 	background-color: #1f1f1f;
 `;
@@ -82,7 +78,7 @@ const CalendarHeaderDateItem = styled.li<{ today: boolean }>`
 	color: ${styles.colors.gray[400]};
 
 	&:not(:last-child) {
-		border-right: 1px solid ${CALENDAR_BORDER_COLOR};
+		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	}
 
 	display: flex;
@@ -100,7 +96,7 @@ const CalendarContentContainer = styled.div`
 	position: absolute;
   overflow-x: hidden;
 	overflow-y: scroll;
-	top: ${CALENDAR_HEADER_HEIGHT};
+	top: ${calendarConfig.HEADER_HEIGHT};
 	bottom: 0;
 	left: 0;
 	width: 100%;
@@ -120,12 +116,12 @@ const CalendarCellBg = styled.div<{
 }>`
 	position: absolute;
 	width: ${({ width }) => width}px;
-	height: ${CALENDAR_CELL_HEIGHT};
-	top: ${({ hourIndex }) => hourIndex * parseInt(CALENDAR_CELL_HEIGHT)}px;
-	left: calc(${({ dayIndex, width }) => dayIndex * width}px + ${CALENDAR_TIMELINE_WIDTH});
+	height: ${calendarConfig.CELL_HEIGHT};
+	top: ${({ hourIndex }) => hourIndex * parseInt(calendarConfig.CELL_HEIGHT)}px;
+	left: calc(${({ dayIndex, width }) => dayIndex * width}px + ${calendarConfig.TIMELINE_WIDTH});
 	z-index: -1;
 
-	border-right: 1px solid ${CALENDAR_BORDER_COLOR};
+	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	background-image: linear-gradient(
 		to right,
 		#2a2a2a 33%,
@@ -138,12 +134,12 @@ const CalendarCellBg = styled.div<{
 
 const CalendarCellTime = styled.div<{ hourIndex: number }>`
 	position: absolute;
-	top: ${({ hourIndex }) => hourIndex * parseInt(CALENDAR_CELL_HEIGHT)}px;
+	top: ${({ hourIndex }) => hourIndex * parseInt(calendarConfig.CELL_HEIGHT)}px;
 	left: 0;
-	width: ${CALENDAR_TIMELINE_WIDTH};
-	height: ${CALENDAR_CELL_HEIGHT};
+	width: ${calendarConfig.TIMELINE_WIDTH};
+	height: ${calendarConfig.CELL_HEIGHT};
 
-	border-right: 1px solid ${CALENDAR_BORDER_COLOR};
+	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	background-color: #1f1f1f;
 	background-image: linear-gradient(
 		to right,
@@ -170,17 +166,20 @@ const CalendarCellTime = styled.div<{ hourIndex: number }>`
 	}
 `;
 
+export type CalendarViewOptions = {
+  startDay: dayjs.Dayjs;
+  daysInView: number;
+};
 type CalendarProps = {
 	width: number;
 };
 const Calendar = ({ width }: CalendarProps) => {
 	const [headerWidth, setHeaderWidth] = useState(0);
 	const [startDay, setStartDay] = useState(dayjs().startOf('week'));
-	const viewOptions = useMemo(() => {
+	const viewOptions = useMemo<CalendarViewOptions>(() => {
     const daysInView = Math.floor(
-      headerWidth / parseInt(CALENDAR_HEADER_DATE_MIN_WIDTH)
+      headerWidth / parseInt(calendarConfig.HEADER_DATE_MIN_WIDTH)
 		);
-    console.log('Days in view:', daysInView, headerWidth);
 		return {
 			startDay,
 			daysInView,
@@ -204,6 +203,13 @@ const Calendar = ({ width }: CalendarProps) => {
 	}
 
   const isMounted = headerWidth > 0;
+  const events = useMemo(() => {
+    // TODO: Fetch events from an API or state management
+    // For now, we will use dummy data
+    const events = dummySchedule.Content.subCalendarEvents;
+    return events;
+  }, []);
+  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
 	return (
 		<CalendarContainer mounted={isMounted}>
@@ -236,7 +242,7 @@ const Calendar = ({ width }: CalendarProps) => {
 				</CalendarHeaderDateList>
 			</CalendarHeader>
 			<CalendarContentContainer>
-				<CalendarContent height={parseInt(CALENDAR_CELL_HEIGHT) * 24}>
+				<CalendarContent height={parseInt(calendarConfig.CELL_HEIGHT) * 24}>
 					{/* Background */}
 					{(
 						Array.from({ length: viewOptions.daysInView }).fill(
@@ -270,6 +276,8 @@ const Calendar = ({ width }: CalendarProps) => {
 							</CalendarCellTime>
 						);
 					})}
+          {/* Events */}
+          <CalendarEvents events={events} viewOptions={viewOptions} headerWidth={headerWidth} selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} />
 				</CalendarContent>
 			</CalendarContentContainer>
 		</CalendarContainer>
