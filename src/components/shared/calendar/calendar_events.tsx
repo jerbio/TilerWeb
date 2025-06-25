@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import calendarConfig from './config';
 import { DummyScheduleEventType } from '../../../data/dummySchedule';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
-import { animated, useTransition } from '@react-spring/web';
+import { animated, SpringValue, useTransition } from '@react-spring/web';
 import formatter from '../../../utils/formatter';
 import colorUtil from '../../../utils/colors';
 import { Clock, LockKeyhole } from 'lucide-react';
@@ -70,7 +70,7 @@ const EventContainer = styled(animated.div)<{
 `;
 
 const EventLockIcon = styled(LockKeyhole)`
-  margin-top: 4px;
+	margin-top: 4px;
 `;
 
 const EventContent = styled.div<{
@@ -120,7 +120,7 @@ const EventContent = styled.div<{
 		}
 
 		${EventLockIcon} {
-      opacity: ${({ variant }) => (variant === 'block' ? 1 : 0)};
+			opacity: ${({ variant }) => (variant === 'block' ? 1 : 0)};
 		}
 	}
 
@@ -145,6 +145,9 @@ type CalendarEventsProps = {
 	headerWidth: number;
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
+	cellHeight: number;
+	cellHeightAnimated: SpringValue<number>;
+	setCellHeight: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const CalendarEvents = ({
@@ -153,6 +156,9 @@ const CalendarEvents = ({
 	headerWidth,
 	selectedEvent,
 	setSelectedEvent,
+	cellHeight,
+	cellHeightAnimated,
+	setCellHeight,
 }: CalendarEventsProps) => {
 	type CurrentViewEvent = DummyScheduleEventType & { key: string };
 	const currentViewEvents = useMemo(() => {
@@ -202,6 +208,21 @@ const CalendarEvents = ({
 		}, [] as Array<CurrentViewEvent>);
 	}, [events, viewOptions]);
 
+  // Set Cell Height based on the event with minimum duration
+  useEffect(() => {
+    if (currentViewEvents.length > 0) {
+      const minDurationEvent = currentViewEvents.reduce((minEvent, event) => {
+        const duration = dayjs(event.end, 'unix').diff(dayjs(event.start, 'unix'), 'minute');
+        return duration < minEvent.duration ? { event, duration } : minEvent;
+      }, { event: currentViewEvents[0], duration: Infinity });
+
+      const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
+      const minDurationInMinutes = minDurationEvent.duration;
+
+      setCellHeight(minCellHeight * (60 / minDurationInMinutes));
+    }
+  }, [currentViewEvents, setCellHeight]);
+
 	const styledEvents = useMemo(() => {
 		const width = headerWidth / viewOptions.daysInView;
 		return currentViewEvents.map((event) => {
@@ -215,11 +236,9 @@ const CalendarEvents = ({
 				...event,
 				springStyles: {
 					x: dayIndex * width,
-					y: startHourFraction * parseInt(calendarConfig.CELL_HEIGHT),
-					height:
-						(endHourFraction - startHourFraction) *
-						parseInt(calendarConfig.CELL_HEIGHT),
 					width,
+					startHourFraction,
+					endHourFraction,
 				},
 			};
 		});
@@ -227,31 +246,25 @@ const CalendarEvents = ({
 
 	const eventTransition = useTransition(styledEvents, {
 		keys: (event) => event.key,
-		from: ({ springStyles: { x, y, height, width } }) => ({
+		from: ({ springStyles: { x, width } }) => ({
 			opacity: 0,
 			scale: 0.9,
 			x,
-			y,
-			height,
 			width,
 		}),
-		leave: ({ springStyles: { x, y, height, width } }) => ({
+		leave: ({ springStyles: { x, width } }) => ({
 			opacity: 0,
 			scale: 0.9,
 			x,
-			y,
-			height,
 			width,
 		}),
-		enter: ({ springStyles: { x, y, height, width } }) => ({
+		enter: ({ springStyles: { x, width } }) => ({
 			opacity: 1,
 			scale: 1,
 			x,
-			y,
-			height,
 			width,
 		}),
-		update: ({ springStyles: { x, y, height, width } }) => ({ x, y, height, width }),
+		update: ({ springStyles: { x, width } }) => ({ x, width }),
 		config: { tension: 300, friction: 25 },
 	});
 
@@ -261,7 +274,18 @@ const CalendarEvents = ({
 				{eventTransition((style, event) => {
 					return (
 						<EventContainer
-							style={style}
+							style={{
+								...style,
+								y: cellHeightAnimated.to(
+									(h) => event.springStyles.startHourFraction * h
+								),
+								height: cellHeightAnimated.to(
+									(h) =>
+										h *
+										(event.springStyles.endHourFraction -
+											event.springStyles.startHourFraction)
+								),
+							}}
 							key={event.id}
 							$selected={selectedEvent === event.id}
 							colors={{
@@ -271,7 +295,7 @@ const CalendarEvents = ({
 							}}
 						>
 							<EventContent
-								height={event.springStyles.height}
+								height={cellHeight}
 								colors={{ r: 18, g: 183, b: 106 }}
 								onClick={() => setSelectedEvent(event.id)}
 								variant={event.isRigid ? 'block' : 'tile'}

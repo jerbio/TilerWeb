@@ -16,12 +16,12 @@ const formatter = {
       const value = Math.floor(totalMinutes / divisor);
       if (value > 0) {
         totalMinutes -= value * divisor;
-        return `${value}${unit}`;
+        return `${value} ${unit}`;
       }
       return '';
     }).filter(Boolean);
 
-		return parts.join(' + ') || '0m';
+		return parts.join(' ') || '0m';
 	},
 };
 

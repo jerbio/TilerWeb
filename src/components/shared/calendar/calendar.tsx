@@ -6,14 +6,15 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
 import dummySchedule from '../../../data/dummySchedule';
+import { animated, useSpring } from '@react-spring/web';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
 	position: relative;
 	width: 100%;
 	height: 100%;
 	background-color: ${styles.colors.gray[900]};
-  opacity: ${({ mounted }) => (mounted ? 1 : 0)};
-  transition: opacity 0.3s 0.5s ease-in-out;
+	opacity: ${({ mounted }) => (mounted ? 1 : 0)};
+	transition: opacity 0.3s 0.5s ease-in-out;
 `;
 
 const CalendarHeader = styled.div`
@@ -87,14 +88,13 @@ const CalendarHeaderDateItem = styled.li<{ today: boolean }>`
 	gap: 0.5ch;
 
 	span {
-		color: ${({ today }) =>
-			today ? styles.colors.brand[400] : styles.colors.gray[200]};
+		color: ${({ today }) => (today ? styles.colors.brand[400] : styles.colors.gray[200])};
 	}
 `;
 
 const CalendarContentContainer = styled.div`
 	position: absolute;
-  overflow-x: hidden;
+	overflow-x: hidden;
 	overflow-y: scroll;
 	top: ${calendarConfig.HEADER_HEIGHT};
 	bottom: 0;
@@ -102,50 +102,38 @@ const CalendarContentContainer = styled.div`
 	width: 100%;
 `;
 
-const CalendarContent = styled.div<{ height: number }>`
+const CalendarContent = styled(animated.div)`
 	width: 100%;
-	height: ${({ height }) => height}px;
 	position: relative;
 	isolation: isolate;
 `;
 
-const CalendarCellBg = styled.div<{
+const CalendarCellBg = styled(animated.div)<{
 	width: number;
 	dayIndex: number;
-	hourIndex: number;
 }>`
 	position: absolute;
 	width: ${({ width }) => width}px;
-	height: ${calendarConfig.CELL_HEIGHT};
-	top: ${({ hourIndex }) => hourIndex * parseInt(calendarConfig.CELL_HEIGHT)}px;
+	top: 0;
 	left: calc(${({ dayIndex, width }) => dayIndex * width}px + ${calendarConfig.TIMELINE_WIDTH});
 	z-index: -1;
 
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-image: linear-gradient(
-		to right,
-		#2a2a2a 33%,
-		rgba(255, 255, 255, 0) 0%
-	);
+	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;
 `;
 
-const CalendarCellTime = styled.div<{ hourIndex: number }>`
+const CalendarCellTime = styled(animated.div)`
 	position: absolute;
-	top: ${({ hourIndex }) => hourIndex * parseInt(calendarConfig.CELL_HEIGHT)}px;
+	top: 0;
 	left: 0;
 	width: ${calendarConfig.TIMELINE_WIDTH};
-	height: ${calendarConfig.CELL_HEIGHT};
 
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	background-color: #1f1f1f;
-	background-image: linear-gradient(
-		to right,
-		#2a2a2a 33%,
-		rgba(255, 255, 255, 0) 0%
-	);
+	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;
@@ -155,37 +143,27 @@ const CalendarCellTime = styled.div<{ hourIndex: number }>`
 		width: 100%;
 		position: relative;
 
-    span {
-      position: absolute;
-      line-height: 1;
-      top: 4px;
-      right: 2px;
-      font-size: ${styles.typography.fontSize.xs};
-      color: ${styles.colors.gray[500]};
-    }
+		span {
+			position: absolute;
+			line-height: 1;
+			top: 4px;
+			right: 2px;
+			font-size: ${styles.typography.fontSize.xs};
+			color: ${styles.colors.gray[500]};
+		}
 	}
 `;
 
 export type CalendarViewOptions = {
-  startDay: dayjs.Dayjs;
-  daysInView: number;
+	startDay: dayjs.Dayjs;
+	daysInView: number;
 };
 type CalendarProps = {
 	width: number;
 };
 const Calendar = ({ width }: CalendarProps) => {
+	// State to manage the width of the header
 	const [headerWidth, setHeaderWidth] = useState(0);
-	const [startDay, setStartDay] = useState(dayjs().startOf('week'));
-	const viewOptions = useMemo<CalendarViewOptions>(() => {
-    const daysInView = Math.floor(
-      headerWidth / parseInt(calendarConfig.HEADER_DATE_MIN_WIDTH)
-		);
-		return {
-			startDay,
-			daysInView,
-		};
-	}, [headerWidth, startDay]);
-
 	const calendarHeaderDateListRef = useRef<HTMLUListElement>(null);
 	useEffect(() => {
 		if (calendarHeaderDateListRef.current) {
@@ -193,23 +171,35 @@ const Calendar = ({ width }: CalendarProps) => {
 		}
 	}, [width, calendarHeaderDateListRef.current]);
 
+	// State to manage view options
+	const [startDay, setStartDay] = useState(dayjs());
+	const viewOptions = useMemo<CalendarViewOptions>(() => {
+		const daysInView = Math.floor(headerWidth / parseInt(calendarConfig.HEADER_DATE_MIN_WIDTH));
+		return {
+			startDay,
+			daysInView,
+		};
+	}, [headerWidth, startDay]);
 	function changeDayView(dir: 'left' | 'right') {
 		setStartDay((prev) => {
-			return prev.add(
-				(dir === 'left' ? -1 : 1) * viewOptions.daysInView,
-				'day'
-			);
+			return prev.add((dir === 'left' ? -1 : 1) * viewOptions.daysInView, 'day');
 		});
 	}
 
-  const isMounted = headerWidth > 0;
-  const events = useMemo(() => {
-    // TODO: Fetch events from an API or state management
-    // For now, we will use dummy data
-    const events = dummySchedule.Content.subCalendarEvents;
-    return events;
-  }, []);
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+	const [cellHeight, setCellHeight] = useState(parseInt(calendarConfig.MIN_CELL_HEIGHT));
+	const { height: cellHeightAnimated } = useSpring({
+		height: cellHeight,
+		config: { tension: 300, friction: 30 },
+	});
+
+	const isMounted = headerWidth > 0;
+	const events = useMemo(() => {
+		// TODO: Fetch events from an API or state management
+		// For now, we will use dummy data
+		const events = dummySchedule.Content.subCalendarEvents;
+		return events;
+	}, []);
+	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
 	return (
 		<CalendarContainer mounted={isMounted}>
@@ -223,26 +213,21 @@ const Calendar = ({ width }: CalendarProps) => {
 					</ChangeViewButton>
 				</CalendarHeaderActions>
 				<CalendarHeaderDateList ref={calendarHeaderDateListRef}>
-					{Array.from({ length: viewOptions.daysInView }).map(
-						(_, index) => {
-							const date = viewOptions.startDay.add(index, 'day');
-							return (
-								<CalendarHeaderDateItem
-									key={index}
-									today={date.isSame(dayjs(), 'day')}
-								>
-									{/* 3 letter day */}
-									<h3>{date.format('ddd')}</h3>
-									{/* 2 number date */}
-									<span>{date.format('DD')}</span>
-								</CalendarHeaderDateItem>
-							);
-						}
-					)}
+					{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
+						const date = viewOptions.startDay.add(index, 'day');
+						return (
+							<CalendarHeaderDateItem key={index} today={date.isSame(dayjs(), 'day')}>
+								{/* 3 letter day */}
+								<h3>{date.format('ddd')}</h3>
+								{/* 2 number date */}
+								<span>{date.format('DD')}</span>
+							</CalendarHeaderDateItem>
+						);
+					})}
 				</CalendarHeaderDateList>
 			</CalendarHeader>
 			<CalendarContentContainer>
-				<CalendarContent height={parseInt(calendarConfig.CELL_HEIGHT) * 24}>
+				<CalendarContent style={{ height: cellHeightAnimated.to((h) => `${h * 24}px`) }}>
 					{/* Background */}
 					{(
 						Array.from({ length: viewOptions.daysInView }).fill(
@@ -254,8 +239,11 @@ const Calendar = ({ width }: CalendarProps) => {
 								<CalendarCellBg
 									key={`${dayIndex}-${hourIndex}`}
 									dayIndex={dayIndex}
-									hourIndex={hourIndex}
 									width={headerWidth / viewOptions.daysInView}
+									style={{
+										height: cellHeightAnimated,
+										y: cellHeightAnimated.to((h) => `${hourIndex * h}px`),
+									}}
 								/>
 							);
 						});
@@ -265,19 +253,29 @@ const Calendar = ({ width }: CalendarProps) => {
 						return (
 							<CalendarCellTime
 								key={hourIndex}
-								hourIndex={hourIndex}
+								style={{
+									height: cellHeightAnimated,
+									y: cellHeightAnimated.to((h) => `${hourIndex * h}px`),
+								}}
 							>
 								<div>
 									{/* eg. "8 AM" */}
-									<span>
-										{dayjs().hour(hourIndex).format('h A')}
-									</span>
+									<span>{dayjs().hour(hourIndex).format('h A')}</span>
 								</div>
 							</CalendarCellTime>
 						);
 					})}
-          {/* Events */}
-          <CalendarEvents events={events} viewOptions={viewOptions} headerWidth={headerWidth} selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} />
+					{/* Events */}
+					<CalendarEvents
+						events={events}
+						viewOptions={viewOptions}
+						headerWidth={headerWidth}
+						selectedEvent={selectedEvent}
+						setSelectedEvent={setSelectedEvent}
+            cellHeight={cellHeight}
+            cellHeightAnimated={cellHeightAnimated}
+            setCellHeight={setCellHeight}
+					/>
 				</CalendarContent>
 			</CalendarContentContainer>
 		</CalendarContainer>
