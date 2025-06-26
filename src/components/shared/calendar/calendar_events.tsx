@@ -208,20 +208,26 @@ const CalendarEvents = ({
 		}, [] as Array<CurrentViewEvent>);
 	}, [events, viewOptions]);
 
-  // Set Cell Height based on the event with minimum duration
-  useEffect(() => {
-    if (currentViewEvents.length > 0) {
-      const minDurationEvent = currentViewEvents.reduce((minEvent, event) => {
-        const duration = dayjs(event.end, 'unix').diff(dayjs(event.start, 'unix'), 'minute');
-        return duration < minEvent.duration ? { event, duration } : minEvent;
-      }, { event: currentViewEvents[0], duration: Infinity });
+	// Set Cell Height based on the event with minimum duration
+	useEffect(() => {
+		if (currentViewEvents.length > 0) {
+			const minDurationEvent = currentViewEvents.reduce(
+				(minEvent, event) => {
+					const duration = dayjs(event.end, 'unix').diff(
+						dayjs(event.start, 'unix'),
+						'minute'
+					);
+					return duration < minEvent.duration ? { event, duration } : minEvent;
+				},
+				{ event: currentViewEvents[0], duration: Infinity }
+			);
 
-      const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
-      const minDurationInMinutes = minDurationEvent.duration;
+			const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
+			const minDurationInMinutes = minDurationEvent.duration;
 
-      setCellHeight(minCellHeight * (60 / minDurationInMinutes));
-    }
-  }, [currentViewEvents, setCellHeight]);
+			setCellHeight(minCellHeight * (60 / minDurationInMinutes));
+		}
+	}, [currentViewEvents, setCellHeight]);
 
 	const styledEvents = useMemo(() => {
 		const width = headerWidth / viewOptions.daysInView;
@@ -295,12 +301,15 @@ const CalendarEvents = ({
 							}}
 						>
 							<EventContent
-								height={cellHeight}
+								height={
+									cellHeight *
+									(event.springStyles.endHourFraction -
+										event.springStyles.startHourFraction)
+								}
 								colors={{ r: 18, g: 183, b: 106 }}
 								onClick={() => setSelectedEvent(event.id)}
 								variant={event.isRigid ? 'block' : 'tile'}
 							>
-                {cellHeightAnimated.get()}
 								<header>
 									<h3>{event.name}</h3>
 									<EventLockIcon className="lock-icon" size={14} />
