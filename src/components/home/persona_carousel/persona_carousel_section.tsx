@@ -58,19 +58,15 @@ const PersonaCarousel: React.FC = () => {
 	function handleUpdateSlides() {
 		if (isMobile) {
 			setSlidesPerView(1);
-			console.log('Mobile view: 1 slide per view');
 		} else if (isTablet) {
 			setSlidesPerView(2);
-			console.log('Tablet view: 2 slides per view');
 		} else {
 			setSlidesPerView(3);
-			console.log('Desktop view: 3 slides per view');
 		}
 		setTimeout(() => {
 			if (swiperRef.current) {
 				swiperRef.current.swiper.autoplay.pause();
 				swiperRef.current.swiper.autoplay.resume();
-				console.log('Swiper updated:', slidesPerView);
 			}
 		}, 0);
 	}

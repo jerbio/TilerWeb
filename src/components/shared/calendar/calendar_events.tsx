@@ -300,6 +300,7 @@ const CalendarEvents = ({
 								onClick={() => setSelectedEvent(event.id)}
 								variant={event.isRigid ? 'block' : 'tile'}
 							>
+                {cellHeightAnimated.get()}
 								<header>
 									<h3>{event.name}</h3>
 									<EventLockIcon className="lock-icon" size={14} />

@@ -190,9 +190,9 @@ const ButtonStyled = styled(animated.button)`
 	transition: background-color 0.3s ease-in-out;
 `;
 
-const dummyTiles = [
-	{ id: 1, name: 'Dummy Tile 1' },
-	{ id: 2, name: 'Dummy Tile 2' },
+const tileSuggestions = [
+	{ id: 1, name: 'Tile Suggestion 1' },
+	{ id: 2, name: 'Tile Suggestion 2' },
 ];
 
 interface PersonaCardProps {
@@ -241,12 +241,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 					diff = 1;
 				}
 			}
-			console.table({
-				selectedPersona,
-				persona,
-				diff,
-				slideToThe: diff === 1 ? 'next' : 'prev',
-			});
 			if (diff === -1) {
 				swiper.slidePrev();
 			} else {
@@ -261,10 +255,10 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
 	// isActive animation hooks
 	const tileListTransApi = useSpringRef();
-	const tileListTransition = useTransition(displayUI ? dummyTiles : [], {
+	const tileListTransition = useTransition(displayUI ? tileSuggestions : [], {
 		ref: tileListTransApi,
 		keys: (tile) => tile.id,
-		trail: 150 / dummyTiles.length,
+		trail: 150 / tileSuggestions.length,
 		from: { opacity: 0, scale: 0.8, y: 20 },
 		enter: { opacity: 1, scale: 1, y: 0 },
 		leave: { opacity: 0, scale: 0.8, y: -20 },
@@ -274,7 +268,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const tileListSpring = useSpring({
 		ref: tileListApi,
 		from: { height: 0 },
-		to: { height: displayUI ? 40 * dummyTiles.length + 16 : 0 },
+		to: { height: displayUI ? 40 * tileSuggestions.length + 16 : 0 },
 		config: { tension: 200, friction: 30 },
 	});
 
