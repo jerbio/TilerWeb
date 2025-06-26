@@ -181,6 +181,7 @@ const Calendar = ({ width }: CalendarProps) => {
 		};
 	}, [headerWidth, startDay]);
 	function changeDayView(dir: 'left' | 'right') {
+    
 		setStartDay((prev) => {
 			return prev.add((dir === 'left' ? -1 : 1) * viewOptions.daysInView, 'day');
 		});

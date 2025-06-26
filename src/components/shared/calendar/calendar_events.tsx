@@ -6,8 +6,8 @@ import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, SpringValue, useTransition } from '@react-spring/web';
-import formatter from '../../../utils/formatter';
-import colorUtil from '../../../utils/colors';
+import formatter from '../../../util/helpers/formatter';
+import colorUtil from '../../../util/helpers/colors';
 import { Clock, LockKeyhole } from 'lucide-react';
 
 const dashRotate = keyframes`
