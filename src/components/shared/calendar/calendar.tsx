@@ -1,3 +1,4 @@
+import React from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -76,12 +77,13 @@ const CalendarHeaderDateItem = styled.li<{ today: boolean }>`
 	font-weight: ${styles.typography.fontWeight.bold};
 	font-size: ${styles.typography.fontSize.lg};
 	text-transform: uppercase;
-	color: ${styles.colors.gray[400]};
+	color: ${({ today }) => (today ? styles.colors.white : styles.colors.gray[400])};
 
 	&:not(:last-child) {
 		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	}
 
+	background-color: ${({ today }) => (today ? styles.colors.gray[700] : 'transparent')};
 	display: flex;
 	justify-content: center;
 	align-items: center;
