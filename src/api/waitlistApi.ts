@@ -1,7 +1,7 @@
 import { AppApi } from './appApi';
 
 export class WaitlistApi extends AppApi {
-	public async joinWaitlist(email: string): Promise<any> {
+	public async joinWaitlist(email: string): Promise<unknown> {
 		const myHeaders = new Headers();
 		myHeaders.append('Content-Type', 'application/json');
 

@@ -77,9 +77,10 @@ const StyledInput = styled.input<InputProps>`
 
 	width: 100%;
 	border-radius: 5px;
-	font-weight: ${styles.typography.fontWeight.light};
+	font-weight: ${styles.typography.fontWeight.normal};
 	line-height: 1;
 	color: ${styles.colors.white};
+  height: 100%;
 
 	padding-inline: calc(
 		${(props) =>

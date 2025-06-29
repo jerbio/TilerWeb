@@ -9,6 +9,13 @@
 }
 
 html {
+	--scrollbar-bg: #11111100;
+	--scrollbar-border: #26262600;
+	--scrollbar-thumb-bg: #525252;
+	--scrollbar-thumb-border: #525252;
+	--scrollbar-thumb-hover-bg: #737373;
+	--scrollbar-thumb-hover-border: #737373;
+
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
 	-moz-tab-size: 4;
@@ -24,7 +31,7 @@ html {
 		Arial,
 		'Noto Sans',
 		sans-serif;
-  font-weight: 300;
+	font-weight: 300;
 }
 
 body {
@@ -242,4 +249,30 @@ video {
 /* Custom styles */
 :root {
 	color-scheme: light dark;
+}
+
+::-webkit-scrollbar {
+	width: 16px;
+	background-color: var(--scrollbar-bg);
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 0 1px var(--scrollbar-border);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	border: solid 4px transparent;
+	box-shadow:
+		inset 0 0 0 1px var(--scrollbar-thumb-border),
+		inset 0 0 0 8px var(--scrollbar-thumb-bg);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	box-shadow:
+		inset 0 0 0 1px var(--scrollbar-thumb-hover-border),
+		inset 0 0 0 8px var(--scrollbar-thumb-hover-bg);
 }

@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import styles from '../util/styles';
+import styled from 'styled-components';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
 import InstagramLogo from '../assets/image_assets/instagram_logo.png';
