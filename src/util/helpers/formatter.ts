@@ -8,18 +8,20 @@ const formatter = {
 			['m', 1], // minute
 		] as const;
 
-    // Approximate to the nearest second
-    const totalSeconds = end.diff(start, 'second');
-    let totalMinutes = Math.ceil(totalSeconds / 60);
+		// Approximate to the nearest second
+		const totalSeconds = end.diff(start, 'second');
+		let totalMinutes = Math.ceil(totalSeconds / 60);
 
-    const parts = quantities.map(([unit, divisor]) => {
-      const value = Math.floor(totalMinutes / divisor);
-      if (value > 0) {
-        totalMinutes -= value * divisor;
-        return `${value} ${unit}`;
-      }
-      return '';
-    }).filter(Boolean);
+		const parts = quantities
+			.map(([unit, divisor]) => {
+				const value = Math.floor(totalMinutes / divisor);
+				if (value > 0) {
+					totalMinutes -= value * divisor;
+					return `${value} ${unit}`;
+				}
+				return '';
+			})
+			.filter(Boolean);
 
 		return parts.join(' ') || '0m';
 	},

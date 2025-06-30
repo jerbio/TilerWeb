@@ -44,4 +44,3 @@ const Logo = ({ size = 24 }: { size: number }) => {
 };
 
 export default Logo;
-

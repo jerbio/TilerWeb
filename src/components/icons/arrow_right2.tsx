@@ -1,13 +1,25 @@
 import Icon from './_icon';
 
 const ArrowRight2 = ({ size = 14 }: { size?: number }) => {
-  return (
-    <Icon size={size} defaultSize={14}>
-      <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1 13L7 7L1 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </Icon>
-  )
-}
+	return (
+		<Icon size={size} defaultSize={14}>
+			<svg
+				width="8"
+				height="14"
+				viewBox="0 0 8 14"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M1 13L7 7L1 1"
+					stroke="white"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</svg>
+		</Icon>
+	);
+};
 
 export default ArrowRight2;

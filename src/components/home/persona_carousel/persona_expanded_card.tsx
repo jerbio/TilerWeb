@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
-import {
-	animated,
-	useChain,
-	useSpring,
-	useSpringRef,
-	useTransition,
-} from '@react-spring/web';
+import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
@@ -16,11 +10,7 @@ import Calendar from '../../shared/calendar/calendar';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
-	background: linear-gradient(
-		to right,
-		${styles.colors.black},
-		${styles.colors.gray[900]}
-	);
+	background: linear-gradient(to right, ${styles.colors.black}, ${styles.colors.gray[900]});
 	border-radius: ${styles.borderRadius.xxLarge};
 	border: 2px solid ${styles.colors.gray[800]};
 	pointer-events: ${(props) => (props.$display ? 'auto' : 'none')};
@@ -81,8 +71,7 @@ const CalendarContainer = styled(animated.div)`
 		grid-column: span 8;
 		border: 1px solid ${styles.colors.gray[700]};
 		border-left: none;
-		border-radius: 0 ${styles.borderRadius.large}
-			${styles.borderRadius.large} 0;
+		border-radius: 0 ${styles.borderRadius.large} ${styles.borderRadius.large} 0;
 	}
 `;
 
@@ -139,10 +128,10 @@ type PersonaExpandedCardProps = {
 };
 
 function PersonaExpandedCard({
-  display,
+	display,
 	occupation,
 	onCollapse,
-  expandedWidth,
+	expandedWidth,
 }: PersonaExpandedCardProps) {
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
@@ -157,9 +146,7 @@ function PersonaExpandedCard({
 					<Calendar width={expandedWidth} />
 					<CalendarContainerActionButtons>
 						<MobileShowChatButton
-							onClick={() =>
-								setMobileChatVisible(!mobileChatVisible)
-							}
+							onClick={() => setMobileChatVisible(!mobileChatVisible)}
 						>
 							<Plus size={20} />
 						</MobileShowChatButton>
@@ -207,9 +194,7 @@ function PersonaExpandedCard({
 	);
 
 	useChain(
-		display
-			? [cardSpringRef, contentTransRef]
-			: [contentTransRef, cardSpringRef],
+		display ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
 		display ? [0, 0.75] : [0, 1],
 		300
 	);
@@ -237,4 +222,3 @@ function PersonaExpandedCard({
 }
 
 export default PersonaExpandedCard;
-
