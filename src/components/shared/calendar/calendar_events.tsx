@@ -5,7 +5,7 @@ import { DummyScheduleEventType } from '../../../data/dummySchedule';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
-import { animated, SpringValue, useTransition } from '@react-spring/web';
+import { animated, useTransition } from '@react-spring/web';
 import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
 import { Clock, LockKeyhole } from 'lucide-react';
@@ -35,7 +35,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div) <{
+const EventContainer = styled(animated.div)<{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -56,11 +56,11 @@ const EventContainer = styled(animated.div) <{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-		const newColor = colorUtil.darken(colors, 0.1);
-		return $selected
-			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-			: 'transparent';
-	}};
+				const newColor = colorUtil.darken(colors, 0.1);
+				return $selected
+					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+					: 'transparent';
+			}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -89,10 +89,10 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-		return variant === 'block'
-			? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
-			: 'transparent';
-	}};
+			return variant === 'block'
+				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
+				: 'transparent';
+		}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -133,9 +133,9 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-		const newColor = colorUtil.lighten(colors, 0.1);
-		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-	}};
+			const newColor = colorUtil.lighten(colors, 0.1);
+			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+		}};
 	}
 `;
 
@@ -251,30 +251,21 @@ const CalendarEvents = ({
 
 	const eventTransition = useTransition(styledEvents, {
 		keys: (event) => event.key,
-		from: ({ springStyles: { x, y, width, height } }) => ({
+		from: ({ springStyles }) => ({
 			opacity: 0,
 			scale: 0.9,
-			x,
-			y,
-			width,
-			height,
+			...springStyles,
 		}),
-		leave: ({ springStyles: { x, y, width, height } }) => ({
+		leave: ({ springStyles }) => ({
 			opacity: 0,
-			x,
-			y,
-			width,
-			height,
+			...springStyles,
 		}),
-		enter: ({ springStyles: { x, y, width, height } }) => ({
+		enter: ({ springStyles }) => ({
 			opacity: 1,
 			scale: 1,
-			x,
-			y,
-			width,
-			height,
+			...springStyles,
 		}),
-		update: ({ springStyles: { x, y, width, height } }) => ({ x, y, width, height }),
+		update: ({ springStyles }) => ({ ...springStyles }),
 		config: { tension: 300, friction: 30 },
 	});
 
@@ -287,11 +278,7 @@ const CalendarEvents = ({
 							style={style}
 							key={event.id}
 							$selected={selectedEvent === event.id}
-							colors={{
-								r: 18,
-								g: 183,
-								b: 106,
-							}}
+							colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
 						>
 							<EventContent
 								height={
@@ -299,7 +286,11 @@ const CalendarEvents = ({
 									(event.properties.endHourFraction -
 										event.properties.startHourFraction)
 								}
-								colors={{ r: 18, g: 183, b: 106 }}
+								colors={{
+									r: event.colorRed,
+									g: event.colorGreen,
+									b: event.colorBlue,
+								}}
 								onClick={() => setSelectedEvent(event.id)}
 								variant={event.isRigid ? 'block' : 'tile'}
 							>
