@@ -14,7 +14,7 @@ const dashRotate = keyframes`
   0% {
     stroke-dashoffset: 0;
   }
-  100% {
+ 100% {
     stroke-dashoffset: 12;
   }
 `;
@@ -35,7 +35,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div)<{
+const EventContainer = styled(animated.div) <{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -56,11 +56,11 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.darken(colors, 0.1);
-				return $selected
-					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-					: 'transparent';
-			}};
+		const newColor = colorUtil.darken(colors, 0.1);
+		return $selected
+			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+			: 'transparent';
+	}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -89,10 +89,10 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			return variant === 'block'
-				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
-				: 'transparent';
-		}};
+		return variant === 'block'
+			? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
+			: 'transparent';
+	}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -133,9 +133,9 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-			const newColor = colorUtil.lighten(colors, 0.1);
-			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const newColor = colorUtil.lighten(colors, 0.1);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 	}
 `;
 
@@ -146,7 +146,6 @@ type CalendarEventsProps = {
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
 	cellHeight: number;
-	cellHeightAnimated: SpringValue<number>;
 	setCellHeight: React.Dispatch<React.SetStateAction<number>>;
 };
 
@@ -157,7 +156,6 @@ const CalendarEvents = ({
 	selectedEvent,
 	setSelectedEvent,
 	cellHeight,
-	cellHeightAnimated,
 	setCellHeight,
 }: CalendarEventsProps) => {
 	type CurrentViewEvent = DummyScheduleEventType & { key: string };
@@ -230,7 +228,6 @@ const CalendarEvents = ({
 	}, [currentViewEvents, setCellHeight]);
 
 	const styledEvents = useMemo(() => {
-		const width = headerWidth / viewOptions.daysInView;
 		return currentViewEvents.map((event) => {
 			const start = dayjs(event.start, 'unix');
 			const end = dayjs(event.end, 'unix');
@@ -238,40 +235,47 @@ const CalendarEvents = ({
 			const endHourFraction = end.hour() + end.minute() / 60;
 			const dayIndex = start.diff(viewOptions.startDay.startOf('day'), 'day');
 
+			// Positioning the event based on the day index and width
+			const height = cellHeight * (endHourFraction - startHourFraction);
+			const width = headerWidth / viewOptions.daysInView;
+			const x = dayIndex * width;
+			const y = cellHeight * startHourFraction;
+
 			return {
 				...event,
-				springStyles: {
-					x: dayIndex * width,
-					width,
-					startHourFraction,
-					endHourFraction,
-				},
+				properties: { startHourFraction, endHourFraction },
+				springStyles: { x, y, width, height },
 			};
 		});
-	}, [currentViewEvents]);
+	}, [currentViewEvents, cellHeight]);
 
 	const eventTransition = useTransition(styledEvents, {
 		keys: (event) => event.key,
-		from: ({ springStyles: { x, width } }) => ({
+		from: ({ springStyles: { x, y, width, height } }) => ({
 			opacity: 0,
 			scale: 0.9,
 			x,
+			y,
 			width,
+			height,
 		}),
-		leave: ({ springStyles: { x, width } }) => ({
+		leave: ({ springStyles: { x, y, width, height } }) => ({
 			opacity: 0,
-			scale: 0.9,
 			x,
+			y,
 			width,
+			height,
 		}),
-		enter: ({ springStyles: { x, width } }) => ({
+		enter: ({ springStyles: { x, y, width, height } }) => ({
 			opacity: 1,
 			scale: 1,
 			x,
+			y,
 			width,
+			height,
 		}),
-		update: ({ springStyles: { x, width } }) => ({ x, width }),
-		config: { tension: 300, friction: 25 },
+		update: ({ springStyles: { x, y, width, height } }) => ({ x, y, width, height }),
+		config: { tension: 300, friction: 30 },
 	});
 
 	return (
@@ -280,18 +284,7 @@ const CalendarEvents = ({
 				{eventTransition((style, event) => {
 					return (
 						<EventContainer
-							style={{
-								...style,
-								y: cellHeightAnimated.to(
-									(h) => event.springStyles.startHourFraction * h
-								),
-								height: cellHeightAnimated.to(
-									(h) =>
-										h *
-										(event.springStyles.endHourFraction -
-											event.springStyles.startHourFraction)
-								),
-							}}
+							style={style}
 							key={event.id}
 							$selected={selectedEvent === event.id}
 							colors={{
@@ -303,8 +296,8 @@ const CalendarEvents = ({
 							<EventContent
 								height={
 									cellHeight *
-									(event.springStyles.endHourFraction -
-										event.springStyles.startHourFraction)
+									(event.properties.endHourFraction -
+										event.properties.startHourFraction)
 								}
 								colors={{ r: 18, g: 183, b: 106 }}
 								onClick={() => setSelectedEvent(event.id)}

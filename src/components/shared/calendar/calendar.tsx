@@ -6,7 +6,7 @@ import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
-import dummySchedule from '../../../data/dummySchedule';
+import dummySchedule, { DummyScheduleEventType, DummyScheduleKeys } from '../../../data/dummySchedule';
 import { animated, useSpring } from '@react-spring/web';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
@@ -162,8 +162,9 @@ export type CalendarViewOptions = {
 };
 type CalendarProps = {
 	width: number;
+	events: Array<DummyScheduleEventType>;
 };
-const Calendar = ({ width }: CalendarProps) => {
+const Calendar = ({ width, events }: CalendarProps) => {
 	// State to manage the width of the header
 	const [headerWidth, setHeaderWidth] = useState(0);
 	const calendarHeaderDateListRef = useRef<HTMLUListElement>(null);
@@ -194,17 +195,15 @@ const Calendar = ({ width }: CalendarProps) => {
 		config: { tension: 300, friction: 30 },
 	});
 
-	const isMounted = headerWidth > 0;
-	const events = useMemo(() => {
-		// TODO: Fetch events from an API or state management
-		// For now, we will use dummy data
-		const events = dummySchedule.Content.subCalendarEvents;
-		return events;
-	}, []);
+	const contentMounted = headerWidth > 0;
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+	useEffect(() => {
+		// Reset selected event when events change
+		setSelectedEvent(null);
+	}, [events]);
 
 	return (
-		<CalendarContainer mounted={isMounted}>
+		<CalendarContainer mounted={contentMounted}>
 			<CalendarHeader>
 				<CalendarHeaderActions>
 					<ChangeViewButton onClick={() => changeDayView('left')}>
@@ -275,7 +274,6 @@ const Calendar = ({ width }: CalendarProps) => {
 						selectedEvent={selectedEvent}
 						setSelectedEvent={setSelectedEvent}
 						cellHeight={cellHeight}
-						cellHeightAnimated={cellHeightAnimated}
 						setCellHeight={setCellHeight}
 					/>
 				</CalendarContent>
