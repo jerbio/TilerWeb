@@ -1,6 +1,6 @@
 import { ChatVibeResponse, ChatPromptResponse } from './chat';
 
-const API_URL = 'https://localhost-44388-x-if7.conveyor.cloud/api/Vibe/Chat';
+const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
 const STORAGE_KEY = 'chat_session_id';
 
 interface SendMessageRequest {

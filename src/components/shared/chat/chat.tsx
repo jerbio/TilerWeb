@@ -224,10 +224,26 @@ const Chat = ({ onClose }: ChatProps) => {
 						<p>Describe a task, We&apos;ll handle the tiling. </p>
 					</EmptyChat>
 				)}
+				<div className="messages-list">
+					{[...messages].reverse().map((message) => (
+						<div
+							key={message.id}
+							className={`message ${message.origin === 'user' ? 'user-message' : 'model-message'}`}
+						>
+							<div className="message-content">{message.content}</div>
+							<div className="message-timestamp">
+								{new Date(
+									parseInt(message.id.split('_').slice(-2, -1)[0])
+								).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+							</div>
+						</div>
+					))}
+				</div>
+				<div ref={messagesEndRef} />
 			</ChatContent>
 
 			{/* Render chatContext buttons */}
-			<div style={{ marginBottom: '1rem' }}>
+			<div style={{ marginBottom: '0.25rem' }}>
 				{chatContext.map((context, index) => (
 					<Button
 						key={index}
@@ -236,8 +252,8 @@ const Chat = ({ onClose }: ChatProps) => {
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'space-between',
-							marginBottom: '0.5rem',
-							padding: '0.5rem 1rem',
+							padding: '0.5rem',
+							border: `1px solid ${styles.colors.gray[300]}`,
 						}}
 					>
 						<span>{context}</span>
@@ -251,14 +267,17 @@ const Chat = ({ onClose }: ChatProps) => {
 				))}
 			</div>
 
-			<ChatForm action="">
+			<ChatForm onSubmit={handleSubmit}>
 				<Input
 					type="text"
+					value={message}
+					onChange={(e) => setMessage(e.target.value)}
 					height={48}
 					placeholder="Tell Tiler what you do..."
+					disabled={isSending}
 					borderGradient={[styles.colors.brand[500]]}
 				/>
-				<ChatButton type="submit">
+				<ChatButton type="submit" disabled={isSending || !message.trim()}>
 					<Plus size={20} />
 				</ChatButton>
 			</ChatForm>
