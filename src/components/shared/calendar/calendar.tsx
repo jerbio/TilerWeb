@@ -183,7 +183,6 @@ const Calendar = ({ width }: CalendarProps) => {
 		};
 	}, [headerWidth, startDay]);
 	function changeDayView(dir: 'left' | 'right') {
-    
 		setStartDay((prev) => {
 			return prev.add((dir === 'left' ? -1 : 1) * viewOptions.daysInView, 'day');
 		});
@@ -275,9 +274,9 @@ const Calendar = ({ width }: CalendarProps) => {
 						headerWidth={headerWidth}
 						selectedEvent={selectedEvent}
 						setSelectedEvent={setSelectedEvent}
-            cellHeight={cellHeight}
-            cellHeightAnimated={cellHeightAnimated}
-            setCellHeight={setCellHeight}
+						cellHeight={cellHeight}
+						cellHeightAnimated={cellHeightAnimated}
+						setCellHeight={setCellHeight}
 					/>
 				</CalendarContent>
 			</CalendarContentContainer>
@@ -286,4 +285,3 @@ const Calendar = ({ width }: CalendarProps) => {
 };
 
 export default Calendar;
-

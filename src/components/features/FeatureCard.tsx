@@ -94,12 +94,7 @@ interface FeatureCardProps {
 	reversed: boolean;
 }
 
-export default function FeatureCard({
-	title,
-	image,
-	children,
-	reversed,
-}: FeatureCardProps) {
+export default function FeatureCard({ title, image, children, reversed }: FeatureCardProps) {
 	return (
 		<Article $reversed={reversed}>
 			<ContentWrapper>

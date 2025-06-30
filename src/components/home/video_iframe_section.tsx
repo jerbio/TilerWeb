@@ -16,11 +16,11 @@ interface VideoIframeProps {
 
 const Iframe = styled.iframe`
 	width: 100%;
-  aspect-ratio: 16 / 9;
-  height: 100%;
-  margin: 0 auto;
-  border-radius: ${styles.borderRadius.large};
-  border: .25rem solid ${styles.colors.gray[900]};
+	aspect-ratio: 16 / 9;
+	height: 100%;
+	margin: 0 auto;
+	border-radius: ${styles.borderRadius.large};
+	border: 0.25rem solid ${styles.colors.gray[900]};
 `;
 
 const VideoIframeSection: React.FC<VideoIframeProps> = ({
@@ -61,4 +61,3 @@ const VideoIframeSection: React.FC<VideoIframeProps> = ({
 };
 
 export default VideoIframeSection;
-

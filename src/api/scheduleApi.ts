@@ -23,8 +23,6 @@ export class ScheduleApi extends AppApi {
 		// 	MobileApp: true.toString(),
 		// };
 
-		
-
 		const urlParams = new URLSearchParams({
 			StartRange: start.toString(),
 			EndRange: end.toString(),

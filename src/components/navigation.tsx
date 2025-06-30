@@ -27,7 +27,7 @@ const NavigationContainer = styled.div`
 const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 	display: grid;
 	place-items: center;
-	padding: 14px 1.5rem;;
+	padding: 14px 1.5rem;
 	backdrop-filter: blur(16px);
 	border-radius: ${styles.borderRadius.xxLarge};
 
@@ -38,13 +38,9 @@ const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 	width: calc(100% - 64px);
 
 	border: ${(props) =>
-		props.$shrink
-			? `1px solid ${styles.colors.gray[800]}`
-			: '1px solid transparent'};
-	background-color: ${(props) =>
-		props.$shrink ? styles.colors.glass : 'transparent'};
-	border-radius: ${(props) =>
-		props.$shrink ? styles.borderRadius.xxLarge : 0};
+		props.$shrink ? `1px solid ${styles.colors.gray[800]}` : '1px solid transparent'};
+	background-color: ${(props) => (props.$shrink ? styles.colors.glass : 'transparent')};
+	border-radius: ${(props) => (props.$shrink ? styles.borderRadius.xxLarge : 0)};
 	height: ${(props) => (props.$shrink ? '60px' : '80px')};
 	max-width: ${(props) => (props.$shrink ? '800px' : '100%')};
 	transition: all 0.5s ease-in-out;
@@ -113,8 +109,7 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	align-items: center;
 	gap: 16px;
 	backdrop-filter: blur(16px);
-	background-color: ${(props) =>
-		props.$shrink ? styles.colors.glass : '#000000'};
+	background-color: ${(props) => (props.$shrink ? styles.colors.glass : '#000000')};
 
 	position: absolute;
 	top: 50%;
@@ -123,9 +118,7 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	z-index: -1;
 	width: ${(props) => (props.$shrink ? 'calc(100% - 64px)' : '100%')};
 	border-radius: ${(props) =>
-		props.$shrink
-			? `0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge}`
-			: 0};
+		props.$shrink ? `0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge}` : 0};
 
 	padding: ${({ $isopen: isOpen }) => (isOpen ? '56px 16px 16px' : '0 16px')};
 	max-height: ${({ $isopen: isOpen }) => (isOpen ? '300px' : '0')};
@@ -143,7 +136,7 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	}
 `;
 
-const Navigation : React.FC = () => {
+const Navigation: React.FC = () => {
 	const { t } = useTranslation();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isAtTop, setIsAtTop] = useState(true);
@@ -208,7 +201,9 @@ const Navigation : React.FC = () => {
 								<NavLink href="/">{t('common.navigation.home')}</NavLink>
 							</NavItem>
 							<NavItem>
-								<NavLink href="/features">{t('common.navigation.features')}</NavLink>
+								<NavLink href="/features">
+									{t('common.navigation.features')}
+								</NavLink>
 							</NavItem>
 						</NavItems>
 						<ButtonsWrapper>
@@ -228,7 +223,11 @@ const Navigation : React.FC = () => {
 							</Button> */}
 						</ButtonsWrapper>
 						<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
-							{isOpen ? <X size={24} color="white" /> : <Menu size={24} color="white" />}
+							{isOpen ? (
+								<X size={24} color="white" />
+							) : (
+								<Menu size={24} color="white" />
+							)}
 						</MobileMenuToggle>
 					</NavigationItemsWrapper>
 				</NavigationWrapper>
@@ -243,7 +242,9 @@ const Navigation : React.FC = () => {
 					</Button>
 					<Button
 						variant="secondary"
-						onClick={() => window.open('https://tiler.app/?waitlistSignUp=true', '_blank')}
+						onClick={() =>
+							window.open('https://tiler.app/?waitlistSignUp=true', '_blank')
+						}
 					>
 						{t('common.buttons.signUp')}
 					</Button>
@@ -254,4 +255,3 @@ const Navigation : React.FC = () => {
 };
 
 export default Navigation;
-

@@ -4,7 +4,6 @@ import { UserApi } from '../api/userApi';
 import { ScheduleApi } from '../api/scheduleApi';
 import { Tile } from '../util/interface';
 
-
 function renderTileNames(tiles: Array<Tile>) {
 	if (tiles != null && tiles.length > 0) {
 		return tiles.map((eachTile: Tile) => {
@@ -26,9 +25,7 @@ const TileFromApi: React.FC = () => {
 				<button
 					onClick={() => {
 						const userApi = new UserApi();
-						userApi
-							.signIn('testuser', 'TestUser1234#')
-							.then(() => {});
+						userApi.signIn('testuser', 'TestUser1234#').then(() => {});
 					}}
 				>
 					sign into test user Account
@@ -42,9 +39,7 @@ const TileFromApi: React.FC = () => {
 					onClick={() => {
 						const scheduleApi = new ScheduleApi();
 						scheduleApi.getSchedule().then((tiles) => {
-							setTiles(
-								(tiles?.subCalendarEvents ?? []).slice(0, 5)
-							);
+							setTiles((tiles?.subCalendarEvents ?? []).slice(0, 5));
 						});
 					}}
 				>
@@ -55,9 +50,7 @@ const TileFromApi: React.FC = () => {
 				</p>
 				<div>{renderTileNames(tilesForTheNextWeek)}</div>
 
-				<p className="read-the-docs">
-					Click on the Vite and React logos to learn more
-				</p>
+				<p className="read-the-docs">Click on the Vite and React logos to learn more</p>
 			</div>
 		</>
 	);

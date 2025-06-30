@@ -32,12 +32,10 @@ const StyledButton = styled.button<ButtonProps>`
 							? 'transparent'
 							: props.variant};
 		border-radius: ${(props) =>
-			props.size === 'small'
-				? styles.borderRadius.little
-				: styles.borderRadius.medium};
+			props.size === 'small' ? styles.borderRadius.little : styles.borderRadius.medium};
 		z-index: -1;
 
-    transition: background-color 0.2s ease-in-out;
+		transition: background-color 0.2s ease-in-out;
 	}
 
 	${(props) =>
@@ -77,8 +75,8 @@ const StyledButton = styled.button<ButtonProps>`
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
-  justify-content: center;
-  line-height: 1;
+	justify-content: center;
+	line-height: 1;
 	gap: 1ch;
 	height: ${(props) =>
 		props.height
@@ -89,7 +87,9 @@ const StyledButton = styled.button<ButtonProps>`
 					? styles.buttonHeights.medium
 					: styles.buttonHeights.large};
 	padding-inline: ${(props) =>
-		props.size === 'small' || props.variant === 'ghost' ? styles.space.small : styles.space.medium};
+		props.size === 'small' || props.variant === 'ghost'
+			? styles.space.small
+			: styles.space.medium};
 	font-size: ${(props) =>
 		props.size === 'small'
 			? styles.typography.fontSize.xs
@@ -105,13 +105,11 @@ const StyledButton = styled.button<ButtonProps>`
 						? styles.colors.gray[200]
 						: props.variant === 'brand'
 							? styles.colors.brand[600]
-              : props.variant === 'ghost'
-                ? '#ffffff12'
-							: props.variant + '80'};
+							: props.variant === 'ghost'
+								? '#ffffff12'
+								: props.variant + '80'};
 		}
-		${(props) =>
-			props.bordergradient &&
-			`animation: rotate 3s linear infinite paused;`}
+		${(props) => props.bordergradient && `animation: rotate 3s linear infinite paused;`}
 	}
 	&:disabled {
 		opacity: 0.6;
@@ -143,4 +141,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-

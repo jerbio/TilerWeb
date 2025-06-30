@@ -4,13 +4,7 @@ import styles from '../../../util/styles';
 import { useSwiper, useSwiperSlide } from 'swiper/react';
 import Add from '../../icons/add';
 import ArrowRight2 from '../../icons/arrow_right2';
-import {
-	animated,
-	useChain,
-	useSpring,
-	useSpringRef,
-	useTransition,
-} from '@react-spring/web';
+import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaExpandedCard from './persona_expanded_card';
 
@@ -37,13 +31,7 @@ const Card = styled(animated.div)<{
 		inset: 2px;
 		z-index: -1;
 		border-radius: calc(${styles.borderRadius.xxLarge} - 2.5px);
-		background: linear-gradient(
-			transparent,
-			66%,
-			rgba(0, 0, 0, 0.6),
-			88%,
-			rgba(0, 0, 0, 0.9)
-		);
+		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.6), 88%, rgba(0, 0, 0, 0.9));
 	}
 
 	/* Gradient effect */
@@ -213,8 +201,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	setSelectedPersona,
 }) => {
 	const isSelected = selectedPersona === persona; // Check if this card is selected
-	const isNotCurrentSelected =
-		selectedPersona !== null && selectedPersona !== persona; // Check if another card is selected
+	const isNotCurrentSelected = selectedPersona !== null && selectedPersona !== persona; // Check if another card is selected
 
 	const swiper = useSwiper();
 	const swiperSlide = useSwiperSlide();
@@ -303,21 +290,15 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const cardSpring = useSpring({
 		from: { width: CARD_WIDTH },
 		to: {
-			width: isSelected
-				? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
-				: CARD_WIDTH,
+			width: isSelected ? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) : CARD_WIDTH,
 		},
 		onRest: () => {
 			if (isSelected) {
 				// Set expanded width to the final width of animation
 				// Setting twice for react to re-render
-				setExpandedWidth(
-					Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1
-				);
+				setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1);
 				setTimeout(() => {
-					setExpandedWidth(
-						Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH)
-					);
+					setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH));
 				}, 0);
 			}
 		},
@@ -334,17 +315,12 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			onMouseLeave={() => setHovered(false)}
 			style={cardSpring}
 		>
-			<CardImage
-				$backgroundImage={backgroundImage}
-				$selected={isSelected}
-			/>
+			<CardImage $backgroundImage={backgroundImage} $selected={isSelected} />
 			<OverlayContainer $selected={isSelected}>
 				<Overlay>
 					<OverlayHeader>
 						<OverlayTitle>{occupation}</OverlayTitle>
-						<OverlayHeaderTag style={overlayTagSpring}>
-							Tiles
-						</OverlayHeaderTag>
+						<OverlayHeaderTag style={overlayTagSpring}>Tiles</OverlayHeaderTag>
 					</OverlayHeader>
 					<OverlayList style={tileListSpring}>
 						{tileListTransition((style, tile) => (
@@ -375,4 +351,3 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 };
 
 export default PersonaCard;
-

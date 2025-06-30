@@ -1,14 +1,14 @@
 {
-  "home": {
-    "appDownload": {
-      "ios": {
-        "title": "Télécharger sur l'App Store",
-        "alt": "App Store"
-      },
-      "android": {
-        "title": "Télécharger sur Google Play",
-        "alt": "Google Play"
-      }
-    }
-  }
+	"home": {
+		"appDownload": {
+			"ios": {
+				"title": "Télécharger sur l'App Store",
+				"alt": "App Store"
+			},
+			"android": {
+				"title": "Télécharger sur Google Play",
+				"alt": "Google Play"
+			}
+		}
+	}
 }

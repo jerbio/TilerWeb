@@ -15,9 +15,9 @@ const App: React.FC = () => {
 					<Route path="/features" element={<Features />} />
 				</Route>
 			</Routes>
-			<Toaster position="bottom-left" theme="system"/>
+			<Toaster position="bottom-left" theme="system" />
 		</BrowserRouter>
 	);
-}
+};
 
 export default App;

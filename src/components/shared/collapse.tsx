@@ -30,8 +30,7 @@ const StyledCollapseHeader = styled.button<{ $active: boolean }>`
 	display: flex;
 	padding: 1rem 0;
 	gap: 0.75rem;
-	color: ${(props) =>
-		props.$active ? styles.colors.brand[400] : styles.colors.gray[300]};
+	color: ${(props) => (props.$active ? styles.colors.brand[400] : styles.colors.gray[300])};
 	font-weight: ${styles.typography.fontWeight.semibold};
 	font-size: ${styles.typography.fontSize.lg};
 	transition: color 0.3s ease;
@@ -45,8 +44,7 @@ const StyledCollapseHeader = styled.button<{ $active: boolean }>`
 		width: 25px;
 		position: relative;
 		padding-block: 1.5px;
-		color: ${(props) =>
-			props.$active ? styles.colors.brand[400] : styles.colors.gray[500]};
+		color: ${(props) => (props.$active ? styles.colors.brand[400] : styles.colors.gray[500])};
 		transition: color 0.3s ease;
 	}
 
@@ -88,16 +86,9 @@ const StyledCollapseHeaderIcon = styled.span<{
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%)
-		rotate(${(props) => (props.$active ? '0deg' : '90deg')});
+	transform: translate(-50%, -50%) rotate(${(props) => (props.$active ? '0deg' : '90deg')});
 	opacity: ${(props) =>
-		props.$active
-			? props.mode === 'add'
-				? 0
-				: 1
-			: props.mode === 'add'
-				? 1
-				: 0};
+		props.$active ? (props.mode === 'add' ? 0 : 1) : props.mode === 'add' ? 1 : 0};
 
 	transition: transform 0.3s ease-in-out;
 `;
@@ -116,17 +107,10 @@ const Collapse: React.FC<CollapseProps> = ({ items }) => {
 				<StyledCollapseItem key={item.key}>
 					<StyledCollapseHeader
 						$active={item.key === currentKey}
-						onClick={() =>
-							setCurrentKey(
-								currentKey === item.key ? null : item.key
-							)
-						}
+						onClick={() => setCurrentKey(currentKey === item.key ? null : item.key)}
 					>
 						<div>
-							<StyledCollapseHeaderIcon
-								mode="add"
-								$active={item.key === currentKey}
-							>
+							<StyledCollapseHeaderIcon mode="add" $active={item.key === currentKey}>
 								<AddSquare />
 							</StyledCollapseHeaderIcon>
 							<StyledCollapseHeaderIcon
@@ -148,4 +132,3 @@ const Collapse: React.FC<CollapseProps> = ({ items }) => {
 };
 
 export default Collapse;
-

@@ -28,20 +28,12 @@ const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 	}
 
 	&::before {
-		background: linear-gradient(
-			to right,
-			rgba(0, 0, 0, 1),
-			rgba(0, 0, 0, 0)
-		);
+		background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 		left: 0;
 	}
 
 	&::after {
-		background: linear-gradient(
-			to left,
-			rgba(0, 0, 0, 1),
-			rgba(0, 0, 0, 0)
-		);
+		background: linear-gradient(to left, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 		right: 0;
 	}
 `;
@@ -125,4 +117,3 @@ const PersonaCarousel: React.FC = () => {
 };
 
 export default PersonaCarousel;
-

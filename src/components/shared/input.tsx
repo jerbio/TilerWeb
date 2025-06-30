@@ -80,14 +80,10 @@ const StyledInput = styled.input<InputProps>`
 	font-weight: ${styles.typography.fontWeight.normal};
 	line-height: 1;
 	color: ${styles.colors.white};
-  height: 100%;
+	height: 100%;
 
 	padding-inline: calc(
-		${(props) =>
-				props.sized === 'small'
-					? styles.space.small
-					: styles.space.medium} -
-			6px
+		${(props) => (props.sized === 'small' ? styles.space.small : styles.space.medium)} - 6px
 	);
 	font-size: ${(props) =>
 		props.sized === 'small'
@@ -128,4 +124,3 @@ const Input: React.FC<InputProps> = ({
 };
 
 export default Input;
-

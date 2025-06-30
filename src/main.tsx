@@ -3,6 +3,4 @@ import './index.css';
 import App from './App.tsx';
 import './i18n/config';
 
-createRoot(document.getElementById('root')!).render(
-		<App />
-);
+createRoot(document.getElementById('root')!).render(<App />);

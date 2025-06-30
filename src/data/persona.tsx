@@ -30,9 +30,9 @@ function usePersonas() {
 		},
 	];
 
-  return {
-    personas,
-  };
+	return {
+		personas,
+	};
 }
 
 export default usePersonas;

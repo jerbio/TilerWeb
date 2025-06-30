@@ -36,8 +36,8 @@
 
 /* Swiper JS */
 .swiper-slide {
-    z-index: -1 !important;
-  &.swiper-slide-active {
-    z-index: 1 !important;
-  }
+	z-index: -1 !important;
+	&.swiper-slide-active {
+		z-index: 1 !important;
+	}
 }
