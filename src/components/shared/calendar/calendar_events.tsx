@@ -9,6 +9,7 @@ import { animated, useTransition } from '@react-spring/web';
 import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
 import { Clock, LockKeyhole } from 'lucide-react';
+import calendarEventUtil from '../../../util/helpers/calendar_events';
 
 const dashRotate = keyframes`
   0% {
@@ -35,7 +36,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div)<{
+const EventContainer = styled(animated.div) <{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -43,6 +44,7 @@ const EventContainer = styled(animated.div)<{
 	top: 0;
 	left: 0;
 	padding: 4px;
+	z-index: ${({ $selected }) => ($selected ? 999 : 'auto')};
 
 	> svg {
 		position: absolute;
@@ -56,11 +58,11 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.darken(colors, 0.1);
-				return $selected
-					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-					: 'transparent';
-			}};
+		const newColor = colorUtil.darken(colors, 0.1);
+		return $selected
+			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+			: 'transparent';
+	}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -71,6 +73,8 @@ const EventContainer = styled(animated.div)<{
 
 const EventLockIcon = styled(LockKeyhole)`
 	margin-top: 4px;
+	margin-left: 4px;
+	min-width: 14px;
 `;
 
 const EventContent = styled.div<{
@@ -89,10 +93,11 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			return variant === 'block'
-				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
-				: 'transparent';
-		}};
+		const newColor = colorUtil.darken(colors, 0.2);
+		return variant === 'block'
+			? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
+			: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -102,25 +107,23 @@ const EventContent = styled.div<{
 	justify-content: space-between;
 
 	header {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 8px;
+		display: flex;
 
 		h3 {
+			flex: 1;
 			display: -webkit-box;
 			line-height: 21px;
 			-webkit-box-orient: vertical;
 			-webkit-line-clamp: ${({ height }) => Math.floor((height - 46) / 21)};
 			max-height: calc(${({ height }) => height}px - 46px);
-			font-weight: ${styles.typography.fontWeight.medium};
-			font-size: ${styles.typography.fontSize.sm};
-			grid-column: span 5;
 			text-overflow: ellipsis;
 			overflow: hidden;
+			font-weight: ${styles.typography.fontWeight.medium};
+			font-size: ${styles.typography.fontSize.sm};
 		}
 
 		${EventLockIcon} {
-			opacity: ${({ variant }) => (variant === 'block' ? 1 : 0)};
+			display: ${({ variant }) => (variant === 'block' ? 'block' : 'block')};
 		}
 	}
 
@@ -133,9 +136,9 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-			const newColor = colorUtil.lighten(colors, 0.1);
-			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const newColor = colorUtil.lighten(colors, 0.1);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 	}
 `;
 
@@ -227,8 +230,30 @@ const CalendarEvents = ({
 		}
 	}, [currentViewEvents, setCellHeight]);
 
+	type StyledEvent = CurrentViewEvent & {
+		properties: {
+			layerGroupKey: string;
+			layerIndex: number;
+			layerGroupLength: number;
+			startHourFraction: number;
+			endHourFraction: number;
+		};
+		springStyles: {
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+		};
+	};
 	const styledEvents = useMemo(() => {
-		return currentViewEvents.map((event) => {
+		const result = [] as Array<StyledEvent>;
+
+		// sort by start time
+		currentViewEvents.sort((a, b) => {
+			return dayjs(a.start, 'unix').diff(dayjs(b.start, 'unix'));
+		});
+
+		currentViewEvents.forEach((event) => {
 			const start = dayjs(event.start, 'unix');
 			const end = dayjs(event.end, 'unix');
 			const startHourFraction = start.hour() + start.minute() / 60;
@@ -241,12 +266,69 @@ const CalendarEvents = ({
 			const x = dayIndex * width;
 			const y = cellHeight * startHourFraction;
 
-			return {
+			// Layering intersected events
+			const lastEvent = result[result.length - 1] as StyledEvent | undefined;
+			const isOverlapping = calendarEventUtil.isInterseting(event, lastEvent);
+			const layerGroupKey =
+				isOverlapping && lastEvent ? lastEvent.properties.layerGroupKey || '' : event.key;
+
+			const styledEvent = {
 				...event,
-				properties: { startHourFraction, endHourFraction },
+				properties: {
+					startHourFraction,
+					endHourFraction,
+					layerGroupKey,
+					layerIndex: 0,
+					layerGroupLength: 1,
+				},
 				springStyles: { x, y, width, height },
 			};
+			result.push(styledEvent);
 		});
+
+		// Sort by start time ascending
+		// If events have the same layerGroupKey, sort descending by duration
+		result.sort((a, b) => {
+			if (a.properties.layerGroupKey === b.properties.layerGroupKey) {
+				return (
+					dayjs(b.end, 'unix').diff(dayjs(b.start, 'unix')) -
+					dayjs(a.end, 'unix').diff(dayjs(a.start, 'unix'))
+				);
+			}
+			return dayjs(a.start, 'unix').diff(dayjs(b.start, 'unix'));
+		});
+
+		// Calculating the layerGroupLength and and layerIndex
+		const layerEventMap = new Map<string, Array<string>>();
+		result.forEach((event) => {
+			const layerGroupKey = event.properties.layerGroupKey;
+			if (!layerEventMap.has(layerGroupKey)) {
+				layerEventMap.set(layerGroupKey, []);
+			}
+			layerEventMap.get(layerGroupKey)?.push(event.key);
+		});
+
+		// Assigning layerGroupLength and layerIndex / updating springStyles
+		result.forEach((event) => {
+			const layerGroupKey = event.properties.layerGroupKey;
+			const layerEvents = layerEventMap.get(layerGroupKey) || [];
+			const layerIndex = layerEvents.indexOf(event.key);
+			const layerGroupLength = layerEvents.length;
+			if (layerGroupLength > 1) {
+				event.properties.layerIndex = layerIndex;
+				event.properties.layerGroupLength = layerGroupLength;
+
+				// Update springStyles
+				const fullWidth = event.springStyles.width;
+				event.springStyles.x += layerIndex * (fullWidth / layerGroupLength);
+				const lastGroupItemWidth = fullWidth / layerGroupLength;
+				const groupItemWidth = (lastGroupItemWidth * 3) / 2;
+				event.springStyles.width =
+					layerIndex === layerGroupLength - 1 ? lastGroupItemWidth : groupItemWidth;
+			}
+		});
+
+		return result;
 	}, [currentViewEvents, cellHeight]);
 
 	const eventTransition = useTransition(styledEvents, {
@@ -299,13 +381,13 @@ const CalendarEvents = ({
 									<EventLockIcon className="lock-icon" size={14} />
 								</header>
 								<div className="duration">
-									<Clock size={14} />
 									<span>
 										{formatter.timeDuration(
 											dayjs(event.start, 'unix'),
 											dayjs(event.end, 'unix')
 										)}
 									</span>
+									<Clock size={14} />
 								</div>
 							</EventContent>
 							{/* Border SVG for styling */}
