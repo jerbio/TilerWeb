@@ -36,7 +36,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div) <{
+const EventContainer = styled(animated.div)<{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -58,11 +58,11 @@ const EventContainer = styled(animated.div) <{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-		const newColor = colorUtil.darken(colors, 0.1);
-		return $selected
-			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-			: 'transparent';
-	}};
+				const newColor = colorUtil.darken(colors, 0.1);
+				return $selected
+					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+					: 'transparent';
+			}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -93,11 +93,11 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-		const newColor = colorUtil.darken(colors, 0.2);
-		return variant === 'block'
-			? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
-			: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-	}};
+			const newColor = colorUtil.darken(colors, 0.2);
+			return variant === 'block'
+				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
+				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+		}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -123,7 +123,7 @@ const EventContent = styled.div<{
 		}
 
 		${EventLockIcon} {
-			display: ${({ variant }) => (variant === 'block' ? 'block' : 'block')};
+			display: ${({ variant }) => (variant === 'block' ? 'block' : 'none')};
 		}
 	}
 
@@ -136,9 +136,9 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-		const newColor = colorUtil.lighten(colors, 0.1);
-		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-	}};
+			const newColor = colorUtil.lighten(colors, 0.1);
+			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+		}};
 	}
 `;
 
@@ -163,7 +163,7 @@ const CalendarEvents = ({
 }: CalendarEventsProps) => {
 	type CurrentViewEvent = DummyScheduleEventType & { key: string };
 	const currentViewEvents = useMemo(() => {
-		return events.reduce((acc, event) => {
+		const res = events.reduce((acc, event) => {
 			const viewStart = viewOptions.startDay;
 			const viewEnd = dayjs(viewOptions.startDay)
 				.add(viewOptions.daysInView - 1, 'day')
@@ -207,6 +207,7 @@ const CalendarEvents = ({
 
 			return acc;
 		}, [] as Array<CurrentViewEvent>);
+		return res;
 	}, [events, viewOptions]);
 
 	// Set Cell Height based on the event with minimum duration
