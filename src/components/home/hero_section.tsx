@@ -8,15 +8,15 @@ import { useTranslation } from 'react-i18next';
 
 const ButtonContainer = styled.div`
 	display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+	flex-wrap: wrap;
+	justify-content: center;
 	gap: 10px;
 	margin-top: 20px;
 `;
 
 const HeroSection: React.FC = () => {
 	const { t } = useTranslation();
-	
+
 	return (
 		<Section>
 			<SectionHeaders
@@ -27,15 +27,8 @@ const HeroSection: React.FC = () => {
 			/>
 			<ButtonContainer>
 				<Button
-					onClick={() =>
-						window.open('https://tiler.app/account/login', '_blank')
-					}
-					borderGradient={[
-						'#FC278780',
-						'#2C90FC80',
-						'#B8FD3380',
-						'#FEC83780',
-					]}
+					onClick={() => window.open('https://tiler.app/account/login', '_blank')}
+					bordergradient={['#FC278780', '#2C90FC80', '#B8FD3380', '#FEC83780']}
 				>
 					<span>{t('common.buttons.getStarted')}</span>
 					<ArrowRight />
@@ -47,4 +40,3 @@ const HeroSection: React.FC = () => {
 };
 
 export default HeroSection;
-

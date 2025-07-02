@@ -9,17 +9,17 @@ import { ArrowRight } from 'lucide-react';
 const Form = styled.form`
 	display: flex;
 	gap: 0.5rem;
-  width: 100%;
-  max-width: 625px;
-  margin: 0 auto;
+	width: 100%;
+	max-width: 625px;
+	margin: 0 auto;
 `;
 
 const ButtonText = styled.span`
-  display: none;
+	display: none;
 
-  @media (min-width: ${styles.screens.sm}) {
-    display: inline;
-  }
+	@media (min-width: ${styles.screens.sm}) {
+		display: inline;
+	}
 `;
 
 const UpdatesSection = () => {
@@ -30,15 +30,11 @@ const UpdatesSection = () => {
 				subHeaderText="Want to get more out of your schedule? Subscribe for tips, tricks, and updates delivered straight to your inbox."
 				align="center"
 			/>
-			<Form action=''>
-				<Input
-					type="email"
-					placeholder="Your Email Address..."
-					variant="brand"
-				/>
+			<Form action="">
+				<Input type="email" placeholder="Your Email Address..." variant="brand" />
 				<Button type="submit" variant="brand" height={40}>
 					<ButtonText>Subscribe</ButtonText>
-          <ArrowRight />
+					<ArrowRight />
 				</Button>
 			</Form>
 		</Section>
@@ -46,4 +42,3 @@ const UpdatesSection = () => {
 };
 
 export default UpdatesSection;
-

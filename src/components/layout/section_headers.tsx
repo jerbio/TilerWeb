@@ -9,7 +9,7 @@ interface SectionHeadersProps {
 	image?: string;
 	imageAlt?: string;
 	align?: 'left' | 'center' | 'right';
-  size?: 'base' | 'large';
+	size?: 'base' | 'large';
 }
 
 const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
@@ -17,11 +17,7 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 	flex-direction: column;
 	gap: 0.5rem;
 	align-items: ${({ align }) =>
-		align === 'left'
-			? 'flex-start'
-			: align === 'right'
-				? 'flex-end'
-				: 'center'};
+		align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center'};
 	text-align: ${({ align }) => align};
 	max-width: 100%;
 	margin-bottom: 2rem;
@@ -34,35 +30,29 @@ const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
 
 const Header = styled.h2<{ size: 'base' | 'large' }>`
 	font-family: ${styles.typography.fontFamily.urban};
-  font-size: ${({ size }) =>
-    size === 'large'
-      ? styles.typography.fontSize.displayBase
-      : styles.typography.fontSize.displaySm};
+	font-size: ${({ size }) =>
+		size === 'large'
+			? styles.typography.fontSize.displayBase
+			: styles.typography.fontSize.displaySm};
 	font-weight: bold;
-	background: linear-gradient(
-		to bottom,
-		white,
-		70%,
-		${styles.colors.gray[400]}
-	);
+	background: linear-gradient(to bottom, white, 70%, ${styles.colors.gray[400]});
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
-	line-height: 1.1;xp
-
-	img {
+	line-height: 1.1;
+	xp img {
 		width: 20px;
 		height: auto;
 		margin-left: 10px;
 	}
 
-  @media (max-width: 768px) {
-    font-size: ${({ size }) =>
-      size === 'large'
-        ? styles.typography.fontSize.displaySm
-        : styles.typography.fontSize.displayXs};
-    text-align: center;
-  }
+	@media (max-width: 768px) {
+		font-size: ${({ size }) =>
+			size === 'large'
+				? styles.typography.fontSize.displaySm
+				: styles.typography.fontSize.displayXs};
+		text-align: center;
+	}
 `;
 
 const SubHeader = styled.p`
@@ -75,10 +65,10 @@ const SpanText = styled.span`
 `;
 
 const Image = styled.img`
-  display: inline-block;
+	display: inline-block;
 	height: 32px;
-  width: 32px;
-  margin-left: .5ch;
+	width: 32px;
+	margin-left: 0.5ch;
 `;
 
 const SectionHeaders: React.FC<SectionHeadersProps> = ({
@@ -88,7 +78,7 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 	image,
 	imageAlt,
 	align = 'center',
-  size = 'base',
+	size = 'base',
 }) => {
 	return (
 		<Container align={align}>
@@ -108,4 +98,3 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 };
 
 export default SectionHeaders;
-

@@ -16,7 +16,7 @@ const styles = {
 		borderRed: '#F03D5F',
 		white: '#fff',
 		black: '#000',
-    glass: '#1a1a1a99',
+		glass: '#232323a7',
 		gray: {
 			25: '#FCFCFC',
 			50: '#FAFAFA',
@@ -205,7 +205,7 @@ const styles = {
 			urban: 'Urbanist, sans-serif',
 		},
 		fontSize: {
-      xxs: '10px',
+			xxs: '10px',
 			xs: '12px',
 			sm: '14px',
 			base: '16px',
@@ -218,17 +218,16 @@ const styles = {
 			displayXl: '60px',
 			displayXxl: '72px',
 		},
-    fontWeight: {
-      thin: '100',
-      extralight: '200',
-      light: '300',
-      normal: '400',
-      medium: '500',
-      semibold: '600',
-      bold: '700',
-      extrabold: '800',
-      black: '900',
-    },
+		fontWeight: {
+			extralight: '100',
+			light: '200',
+			normal: '300',
+			medium: '400',
+			semibold: '500',
+			bold: '700',
+			extrabold: '800',
+			black: '900',
+		},
 		lineHeight: {
 			xs: '18px',
 			sm: '20px',
@@ -248,11 +247,11 @@ const styles = {
 		medium: '36px',
 		large: '40px',
 	},
-  inputHeights: {
-    small: '36px',
-    medium: '40px',
-    large: '44px',
-  },
+	inputHeights: {
+		small: '36px',
+		medium: '40px',
+		large: '44px',
+	},
 	space: {
 		small: '16px',
 		medium: '24px',
@@ -265,7 +264,7 @@ const styles = {
 	},
 	borderRadius: {
 		small: '4px',
-    little: '6px',
+		little: '6px',
 		medium: '8px',
 		large: '12px',
 		xLarge: '16px',

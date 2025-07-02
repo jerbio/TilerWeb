@@ -5,12 +5,19 @@ import { toast } from 'sonner';
 import Section from '../layout/section';
 import Input from '../shared/input';
 import Button from '../shared/button';
+import styles from '../../util/styles';
 
 const Form = styled.form`
 	display: flex;
+	flex-direction: column;
 	gap: 0.5rem;
-  width: 100%;
-  margin: 0 auto;
+	width: 100%;
+	margin: 0 auto;
+
+	@media screen and (min-width: ${styles.screens.sm}) {
+		flex-direction: row;
+		max-width: 600px;
+	}
 `;
 
 const Waitlist: React.FC = () => {
@@ -28,6 +35,7 @@ const Waitlist: React.FC = () => {
 			setEmail('');
 		} catch (error) {
 			setEmail('');
+			console.error('Error signing up for waitlist:', error);
 			toast('Failed to sign up.');
 		}
 	};
@@ -43,12 +51,7 @@ const Waitlist: React.FC = () => {
 					onChange={(e) => setEmail(e.target.value)}
 					required
 				/>
-				<Button
-					type="submit"
-					size="large"
-					height={44}
-					variant="brand"
-				>
+				<Button type="submit" size="large" height={44} variant="brand">
 					Join Waitlist
 				</Button>
 			</Form>
@@ -57,4 +60,3 @@ const Waitlist: React.FC = () => {
 };
 
 export default Waitlist;
-

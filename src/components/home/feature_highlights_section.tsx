@@ -12,22 +12,22 @@ import { useTranslation } from 'react-i18next';
 
 const HighlightCardWrapper = styled.div`
 	display: grid;
-  place-items: center;
-  gap: 1.5rem;
-  width: fit-content;
-  margin: 0 auto;
+	place-items: center;
+	gap: 1.5rem;
+	width: fit-content;
+	margin: 0 auto;
 
-  @media (min-width: ${styles.screens.sm}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+	@media (min-width: ${styles.screens.sm}) {
+		grid-template-columns: repeat(2, 1fr);
+	}
 
-  @media (min-width: ${styles.screens.xl}) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+	@media (min-width: ${styles.screens.xl}) {
+		grid-template-columns: repeat(4, 1fr);
+	}
 `;
 
-const HighlightCard = styled.div<{ backgroundImage: string }>`
-	background-image: url(${(props) => props.backgroundImage});
+const HighlightCard = styled.div<{ backgroundimage: string }>`
+	background-image: url(${(props) => props.backgroundimage});
 	background-size: cover;
 	background-position: center;
 	padding: 1rem;
@@ -43,7 +43,7 @@ const HighlightCard = styled.div<{ backgroundImage: string }>`
 
 const MiniTitle = styled.p`
 	color: ${styles.colors.brand['300']};
-  font-weight: ${styles.typography.fontWeight.medium};
+	font-weight: ${styles.typography.fontWeight.semibold};
 	font-size: ${styles.typography.fontSize.xxs};
 	margin: 0;
 `;
@@ -63,7 +63,7 @@ const Body = styled.p`
 
 const FeatureHighlightsSection: React.FC = () => {
 	const { t } = useTranslation();
-	
+
 	const highlights: Highlight[] = [
 		{
 			subHeader: t('home.features.transit.subtitle'),
@@ -100,10 +100,7 @@ const FeatureHighlightsSection: React.FC = () => {
 			/>
 			<HighlightCardWrapper>
 				{highlights.map((highlight, index) => (
-					<HighlightCard
-						key={index}
-						backgroundImage={highlight.backgroundImage}
-					>
+					<HighlightCard key={index} backgroundimage={highlight.backgroundImage}>
 						<MiniTitle>{highlight.subHeader}</MiniTitle>
 						<div>
 							<Title>{highlight.header}</Title>

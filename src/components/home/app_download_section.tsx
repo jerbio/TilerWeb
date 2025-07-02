@@ -14,66 +14,67 @@ const FlexWrapper = styled.div`
 `;
 
 const DownloadLink = styled.a`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-decoration: none;
+	gap: 0.5rem;
 
-  color: ${styles.colors.gray[500]};
-  &:hover {
-    color: ${styles.colors.gray[300]};
-  }
+	color: ${styles.colors.gray[500]};
+	&:hover {
+		color: ${styles.colors.gray[300]};
+	}
 `;
 
 const DownloadLinkLabel = styled.span`
-  display: flex;
-  gap: 0.25ch;
-  align-items: flex-start;
-  font-size: ${styles.typography.fontSize.sm};
-  font-weight: ${styles.typography.fontWeight.normal};
+	display: flex;
+	gap: 0.25ch;
+	align-items: flex-start;
+	font-size: ${styles.typography.fontSize.sm};
+	font-weight: ${styles.typography.fontWeight.medium};
+	text-align: center;
 
-  transition: color 0.2s ease-in-out;
+	transition: color 0.2s ease-in-out;
 `;
 
 const AppDownloadSection: React.FC = () => {
 	const { t } = useTranslation();
-	
+
 	return (
 		<Section paddingBlock={36}>
 			<FlexWrapper>
 				<DownloadLink
-          href="https://apps.apple.com/us/app/tiler-assistant/id1663594789"
+					href="https://apps.apple.com/us/app/tiler-assistant/id1663594789"
 					title={t('home.appDownload.ios.title')}
-          rel="noopener noreferrer"
-          target="_blank"
+					rel="noopener noreferrer"
+					target="_blank"
 				>
 					<img
 						src={AppStore}
 						alt={t('home.appDownload.ios.alt')}
-            width={56}
-            height={56}
+						width={56}
+						height={56}
 					/>
 					<DownloadLinkLabel>
 						<span>{t('home.appDownload.ios.title')}</span>
-            <ArrowOut />
+						<ArrowOut size={12} />
 					</DownloadLinkLabel>
 				</DownloadLink>
 				<DownloadLink
 					href="https://play.google.com/store/apps/details?id=app.tiler.app"
 					title={t('home.appDownload.android.title')}
-          rel="noopener noreferrer"
-          target="_blank"
+					rel="noopener noreferrer"
+					target="_blank"
 				>
 					<img
 						src={PlayStore}
 						alt={t('home.appDownload.android.alt')}
-            width={56}
-            height={56}
+						width={56}
+						height={56}
 					/>
 					<DownloadLinkLabel>
 						<span>{t('home.appDownload.android.title')}</span>
-            <ArrowOut />
+						<ArrowOut size={12} />
 					</DownloadLinkLabel>
 				</DownloadLink>
 			</FlexWrapper>
@@ -82,4 +83,3 @@ const AppDownloadSection: React.FC = () => {
 };
 
 export default AppDownloadSection;
-
