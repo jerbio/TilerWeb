@@ -6,7 +6,7 @@ import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
-import dummySchedule, { DummyScheduleEventType, DummyScheduleKeys } from '../../../data/dummySchedule';
+import { DummyScheduleEventType } from '../../../data/dummySchedule';
 import { animated, useSpring } from '@react-spring/web';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
@@ -25,7 +25,6 @@ const CalendarHeader = styled.div`
 	width: 100%;
 	height: ${calendarConfig.HEADER_HEIGHT};
 	background-color: ${styles.colors.gray[800]};
-
 	display: flex;
 `;
 
@@ -160,6 +159,7 @@ export type CalendarViewOptions = {
 	startDay: dayjs.Dayjs;
 	daysInView: number;
 };
+
 type CalendarProps = {
 	width: number;
 	events: Array<DummyScheduleEventType>;
@@ -175,7 +175,7 @@ const Calendar = ({ width, events }: CalendarProps) => {
 	}, [width, calendarHeaderDateListRef.current]);
 
 	// State to manage view options
-	const [startDay, setStartDay] = useState(dayjs());
+	const [startDay, setStartDay] = useState(dayjs().startOf('day'));
 	const viewOptions = useMemo<CalendarViewOptions>(() => {
 		const daysInView = Math.floor(headerWidth / parseInt(calendarConfig.HEADER_DATE_MIN_WIDTH));
 		return {
