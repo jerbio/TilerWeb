@@ -1,3 +1,4 @@
+import React from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -5,7 +6,7 @@ import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
-import dummySchedule from '../../../data/dummySchedule';
+import { DummyScheduleEventType } from '../../../data/dummySchedule';
 import { animated, useSpring } from '@react-spring/web';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
@@ -24,7 +25,6 @@ const CalendarHeader = styled.div`
 	width: 100%;
 	height: ${calendarConfig.HEADER_HEIGHT};
 	background-color: ${styles.colors.gray[800]};
-
 	display: flex;
 `;
 
@@ -76,12 +76,13 @@ const CalendarHeaderDateItem = styled.li<{ today: boolean }>`
 	font-weight: ${styles.typography.fontWeight.bold};
 	font-size: ${styles.typography.fontSize.lg};
 	text-transform: uppercase;
-	color: ${styles.colors.gray[400]};
+	color: ${({ today }) => (today ? styles.colors.white : styles.colors.gray[400])};
 
 	&:not(:last-child) {
 		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	}
 
+	background-color: ${({ today }) => (today ? styles.colors.gray[700] : 'transparent')};
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -158,10 +159,12 @@ export type CalendarViewOptions = {
 	startDay: dayjs.Dayjs;
 	daysInView: number;
 };
+
 type CalendarProps = {
 	width: number;
+	events: Array<DummyScheduleEventType>;
 };
-const Calendar = ({ width }: CalendarProps) => {
+const Calendar = ({ width, events }: CalendarProps) => {
 	// State to manage the width of the header
 	const [headerWidth, setHeaderWidth] = useState(0);
 	const calendarHeaderDateListRef = useRef<HTMLUListElement>(null);
@@ -172,7 +175,7 @@ const Calendar = ({ width }: CalendarProps) => {
 	}, [width, calendarHeaderDateListRef.current]);
 
 	// State to manage view options
-	const [startDay, setStartDay] = useState(dayjs());
+	const [startDay, setStartDay] = useState(dayjs().startOf('day'));
 	const viewOptions = useMemo<CalendarViewOptions>(() => {
 		const daysInView = Math.floor(headerWidth / parseInt(calendarConfig.HEADER_DATE_MIN_WIDTH));
 		return {
@@ -192,17 +195,15 @@ const Calendar = ({ width }: CalendarProps) => {
 		config: { tension: 300, friction: 30 },
 	});
 
-	const isMounted = headerWidth > 0;
-	const events = useMemo(() => {
-		// TODO: Fetch events from an API or state management
-		// For now, we will use dummy data
-		const events = dummySchedule.Content.subCalendarEvents;
-		return events;
-	}, []);
+	const contentMounted = headerWidth > 0;
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+	useEffect(() => {
+		// Reset selected event when events change
+		setSelectedEvent(null);
+	}, [events]);
 
 	return (
-		<CalendarContainer mounted={isMounted}>
+		<CalendarContainer mounted={contentMounted}>
 			<CalendarHeader>
 				<CalendarHeaderActions>
 					<ChangeViewButton onClick={() => changeDayView('left')}>
@@ -273,7 +274,6 @@ const Calendar = ({ width }: CalendarProps) => {
 						selectedEvent={selectedEvent}
 						setSelectedEvent={setSelectedEvent}
 						cellHeight={cellHeight}
-						cellHeightAnimated={cellHeightAnimated}
 						setCellHeight={setCellHeight}
 					/>
 				</CalendarContent>

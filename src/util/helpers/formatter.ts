@@ -17,7 +17,7 @@ const formatter = {
 				const value = Math.floor(totalMinutes / divisor);
 				if (value > 0) {
 					totalMinutes -= value * divisor;
-					return `${value} ${unit}`;
+					return `${value}${unit}`;
 				}
 				return '';
 			})

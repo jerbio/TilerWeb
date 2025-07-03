@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
+import { ChevronLeftIcon, Plus, ShuffleIcon } from 'lucide-react';
 import useIsMobile from '../../../hooks/useIsMobile';
 import Calendar from '../../shared/calendar/calendar';
+import dummySchedule, { DummyScheduleKeys } from '../../../data/dummySchedule';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
@@ -99,7 +100,7 @@ const CalendarContainerActionButtons = styled.div`
 	gap: 12px;
 `;
 
-const MobileShowChatButton = styled.button`
+const CalendarActionButton = styled.button`
 	display: grid;
 	place-items: center;
 	height: 36px;
@@ -107,7 +108,14 @@ const MobileShowChatButton = styled.button`
 	border-radius: ${styles.borderRadius.xxLarge};
 	background-color: ${styles.colors.brand[500]};
 	color: ${styles.colors.white};
+	transition: background-color 0.2s ease-in-out;
 
+	&:hover {
+		background-color: ${styles.colors.brand[600]};
+	}
+`;
+
+const MobileShowChatButton = styled(CalendarActionButton)`
 	@media screen and (min-width: ${styles.screens.lg}) {
 		display: none;
 	}
@@ -136,6 +144,19 @@ function PersonaExpandedCard({
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
+	const [currentEventsKey, setCurrentEventsKey] = useState<DummyScheduleKeys>('base');
+	function shuffleEvents() {
+		const keys = Object.keys(dummySchedule) as DummyScheduleKeys[];
+		const nextKey = keys[(keys.indexOf(currentEventsKey) + 1) % keys.length];
+		setCurrentEventsKey(nextKey);
+	}
+
+	const events = useMemo(() => {
+		// TODO: Fetch events from an API or state management
+		// For now, we will use dummy data
+		const events = dummySchedule[currentEventsKey].Content.subCalendarEvents;
+		return events;
+	}, [currentEventsKey]);
 
 	const content = [
 		{
@@ -143,8 +164,11 @@ function PersonaExpandedCard({
 			container: CalendarContainer,
 			content: (
 				<React.Fragment>
-					<Calendar width={expandedWidth} />
+					<Calendar events={events} width={expandedWidth} />
 					<CalendarContainerActionButtons>
+						<CalendarActionButton onClick={shuffleEvents}>
+							<ShuffleIcon size={20} />
+						</CalendarActionButton>
 						<MobileShowChatButton
 							onClick={() => setMobileChatVisible(!mobileChatVisible)}
 						>
