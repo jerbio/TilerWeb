@@ -58,8 +58,9 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
+				const newColor = colorUtil.setLightness(colors, 0.7);
 				return $selected
-					? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
+					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
 					: 'transparent';
 			}};
 			stroke-dasharray: 6, 6;
@@ -83,18 +84,18 @@ const EventContent = styled.div<{
 }>`
 	position: relative;
 	background-color: ${({ colors }) => {
-		const newColor = colorUtil.darken(colors, 0.5);
+		const newColor = colorUtil.setLightness(colors, 0.35);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	color: ${({ colors }) => {
-		const newColor = colorUtil.lighten(colors, 0.25);
+		const newColor = colorUtil.setLightness(colors, 0.85);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			const newColor = colorUtil.darken(colors, 0.3);
-			return variant === 'block'
-				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
+			const newColor = colorUtil.setLightness(colors, 0.6);
+			return variant !== 'block'
+				? `transparent`
 				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
 	height: 100%;
@@ -135,7 +136,7 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-			const newColor = colorUtil.lighten(colors, 0.1);
+			const newColor = colorUtil.setLightness(colors, 0.7);
 			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
 	}
@@ -330,6 +331,7 @@ const CalendarEvents = ({
 
 		return result;
 	}, [currentViewEvents, cellHeight]);
+	// Add Travel Details
 
 	const eventTransition = useTransition(styledEvents, {
 		keys: (event) => event.key,
