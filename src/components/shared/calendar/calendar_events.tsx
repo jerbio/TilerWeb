@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from 'react';
-import styled, { keyframes } from 'styled-components';
 import calendarConfig from './config';
 import { DummyScheduleEventType } from '../../../data/dummySchedule';
 import { CalendarViewOptions } from './calendar';
@@ -10,6 +9,7 @@ import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
 import { Clock, LockKeyhole } from 'lucide-react';
 import calendarEventUtil from '../../../util/helpers/calendar_events';
+import styled, { keyframes } from 'styled-components';
 
 const dashRotate = keyframes`
   0% {
@@ -58,9 +58,8 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.darken(colors, 0.1);
 				return $selected
-					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+					? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
 					: 'transparent';
 			}};
 			stroke-dasharray: 6, 6;
@@ -84,16 +83,16 @@ const EventContent = styled.div<{
 }>`
 	position: relative;
 	background-color: ${({ colors }) => {
-		const newColor = colorUtil.darken(colors, 0.45);
+		const newColor = colorUtil.darken(colors, 0.5);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	color: ${({ colors }) => {
-		const newColor = colorUtil.lighten(colors, 0.4);
+		const newColor = colorUtil.lighten(colors, 0.25);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			const newColor = colorUtil.darken(colors, 0.2);
+			const newColor = colorUtil.darken(colors, 0.3);
 			return variant === 'block'
 				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
 				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
@@ -342,6 +341,7 @@ const CalendarEvents = ({
 		leave: ({ springStyles }) => ({
 			opacity: 0,
 			...springStyles,
+			config: { duration: 100 },
 		}),
 		enter: ({ springStyles }) => ({
 			opacity: 1,
@@ -349,7 +349,7 @@ const CalendarEvents = ({
 			...springStyles,
 		}),
 		update: ({ springStyles }) => ({ ...springStyles }),
-		config: { tension: 300, friction: 30 },
+		config: { tension: 500, friction: 40 },
 	});
 
 	return (

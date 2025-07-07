@@ -1,4 +1,3 @@
-import React from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -192,7 +191,7 @@ const Calendar = ({ width, events }: CalendarProps) => {
 	const [cellHeight, setCellHeight] = useState(parseInt(calendarConfig.MIN_CELL_HEIGHT));
 	const { height: cellHeightAnimated } = useSpring({
 		height: cellHeight,
-		config: { tension: 300, friction: 30 },
+		config: { tension: 300, friction: 30, duration: 0 },
 	});
 
 	const contentMounted = headerWidth > 0;
