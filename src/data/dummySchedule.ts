@@ -14898,3 +14898,4 @@ type DummyScheduleType = typeof dummySchedule;
 export type DummyScheduleKeys = 'base' | 'updated';
 export type DummyScheduleContentType = DummyScheduleType['base']['Content'];
 export type DummyScheduleEventType = DummyScheduleContentType['subCalendarEvents'][number];
+export type DummyScheduleTravelDetailType = DummyScheduleEventType['travelDetail']['before' | 'after'];
