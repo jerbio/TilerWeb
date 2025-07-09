@@ -7,7 +7,7 @@ import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
 import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
-import { Bike, Car, CarFront, Clock, Dot, DotIcon, LockKeyhole, Route } from 'lucide-react';
+import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
 import calendarEventUtil from '../../../util/helpers/calendar_events';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
@@ -37,7 +37,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div)<{
+const EventContainer = styled(animated.div) <{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -59,11 +59,11 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.setLightness(colors, 0.7);
-				return $selected
-					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-					: 'transparent';
-			}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return $selected
+			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+			: 'transparent';
+	}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -94,11 +94,12 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			const newColor = colorUtil.setLightness(colors, 0.6);
-			return variant !== 'block'
-				? `transparent`
-				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const blockColor = colorUtil.setLightness(colors, 0.6);
+		const tileColor = colorUtil.setLightness(colors, 0.1);
+		return variant === 'block'
+			? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
+			: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
+	}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -137,13 +138,13 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-			const newColor = colorUtil.setLightness(colors, 0.7);
-			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 	}
 `;
 
-const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: number; b: number } }>`
+const TravelDetailContent = styled(animated.div) <{ colors: { r: number; g: number; b: number } }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
@@ -181,6 +182,7 @@ type CalendarEventsProps = {
 	setSelectedEvent: (id: string | null) => void;
 	cellHeight: number;
 	setCellHeight: React.Dispatch<React.SetStateAction<number>>;
+	scrollToTime: (time: dayjs.Dayjs, cellHeight: number) => void;
 };
 
 const CalendarEvents = ({
@@ -191,6 +193,7 @@ const CalendarEvents = ({
 	setSelectedEvent,
 	cellHeight,
 	setCellHeight,
+	scrollToTime,
 }: CalendarEventsProps) => {
 	type CurrentViewEvent = DummyScheduleEventType & { key: string };
 	type CurrentViewTravelDetail = DummyScheduleTravelDetailType & {
@@ -265,9 +268,9 @@ const CalendarEvents = ({
 		return { currentViewEvents, currentViewTravelDetails };
 	}, [events, viewOptions]);
 
-	// Set Cell Height based on the event with minimum duration
 	useEffect(() => {
 		if (currentViewEvents.length > 0) {
+			// Set Cell Height based on the event with minimum duration
 			const minDurationEvent = currentViewEvents.reduce(
 				(minEvent, event) => {
 					const duration = dayjs(event.end, 'unix').diff(
@@ -281,8 +284,23 @@ const CalendarEvents = ({
 
 			const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
 			const minDurationInMinutes = minDurationEvent.duration;
+			const newCellHeight = minCellHeight * (60 / minDurationInMinutes)
 
-			setCellHeight(minCellHeight * (60 / minDurationInMinutes));
+			setCellHeight(newCellHeight);
+
+			// Scroll to the earliest event whenever the current events change
+			const earliestEvent = currentViewEvents.reduce((earliest, event) => {
+				const start = dayjs(event.start, 'unix');
+				const startTime = start.hour() + start.minute() / 60;
+				const earliestTime = earliest.hour() + earliest.minute() / 60;
+				return startTime < earliestTime ? start : earliest;
+			}, dayjs('9999-12-31').endOf('day'));
+
+			if (earliestEvent.isValid()) {
+				setTimeout(() => {
+				scrollToTime(earliestEvent, newCellHeight);
+				}, 0);
+			}
 		}
 	}, [currentViewEvents, setCellHeight]);
 
@@ -444,6 +462,9 @@ const CalendarEvents = ({
 		}),
 		update: ({ springStyles }) => ({ ...springStyles }),
 		config: { tension: 500, friction: 40 },
+		onRest: () => {
+			console.log("rested")
+		},
 	});
 
 	const travelTransition = useTransition(styledTravelDetails, {
@@ -455,7 +476,7 @@ const CalendarEvents = ({
 	});
 
 	return (
-		<Container>
+		<Container id="calendar-events-container">
 			<Wrapper>
 				{eventTransition((style, event) => {
 					return (
@@ -516,7 +537,7 @@ const CalendarEvents = ({
 					const travelMediumIconMap: Record<string, React.ReactNode> = {
 						driving: <CarFront size={16} />,
 						biking: <Bike size={16} />,
-						transit: <Route size={16} />, 
+						transit: <Route size={16} />,
 					};
 					return (
 						<TravelDetailContent
