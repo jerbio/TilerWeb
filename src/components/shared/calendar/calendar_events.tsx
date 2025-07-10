@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo } from 'react';
-import styled, { keyframes } from 'styled-components';
 import calendarConfig from './config';
-import { DummyScheduleEventType } from '../../../data/dummySchedule';
+import { DummyScheduleEventType, DummyScheduleTravelDetailType } from '../../../data/dummySchedule';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
 import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
-import { Clock, LockKeyhole } from 'lucide-react';
+import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
 import calendarEventUtil from '../../../util/helpers/calendar_events';
+import styled, { keyframes } from 'styled-components';
+import { v4 } from 'uuid';
 
 const dashRotate = keyframes`
   0% {
@@ -36,7 +37,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div)<{
+const EventContainer = styled(animated.div) <{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -58,11 +59,11 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.darken(colors, 0.1);
-				return $selected
-					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-					: 'transparent';
-			}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return $selected
+			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+			: 'transparent';
+	}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -84,20 +85,21 @@ const EventContent = styled.div<{
 }>`
 	position: relative;
 	background-color: ${({ colors }) => {
-		const newColor = colorUtil.darken(colors, 0.45);
+		const newColor = colorUtil.setLightness(colors, 0.35);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	color: ${({ colors }) => {
-		const newColor = colorUtil.lighten(colors, 0.4);
+		const newColor = colorUtil.setLightness(colors, 0.85);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			const newColor = colorUtil.darken(colors, 0.2);
-			return variant === 'block'
-				? `rgb(${colors.r}, ${colors.g}, ${colors.b})`
-				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const blockColor = colorUtil.setLightness(colors, 0.6);
+		const tileColor = colorUtil.setLightness(colors, 0.1);
+		return variant === 'block'
+			? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
+			: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
+	}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -136,9 +138,39 @@ const EventContent = styled.div<{
 		font-family: ${styles.typography.fontFamily.urban};
 
 		color: ${({ colors }) => {
-			const newColor = colorUtil.lighten(colors, 0.1);
-			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
+	}
+`;
+
+const TravelDetailContent = styled(animated.div) <{ colors: { r: number; g: number; b: number } }>`
+	position: absolute;
+	display: flex;
+	gap: 0.5ch;
+	align-items: center;
+	justify-content: center;
+	background: ${({ colors }) => {
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return `repeating-linear-gradient(
+			45deg,
+			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.1),
+			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.1) 8px,
+			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 8px,
+			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 9px
+)`;
+	}};
+	color: ${({ colors }) => {
+		const newColor = colorUtil.setLightness(colors, 0.5);
+		return `rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.75)`;
+	}};
+	font-size: ${styles.typography.fontSize.xs};
+	font-weight: ${styles.typography.fontWeight.semibold};
+
+	span {
+		display: flex;
+		align-items: center;
+		gap: 0.5ch;
 	}
 `;
 
@@ -150,6 +182,7 @@ type CalendarEventsProps = {
 	setSelectedEvent: (id: string | null) => void;
 	cellHeight: number;
 	setCellHeight: React.Dispatch<React.SetStateAction<number>>;
+	scrollToTime: (time: dayjs.Dayjs, cellHeight: number) => void;
 };
 
 const CalendarEvents = ({
@@ -160,38 +193,44 @@ const CalendarEvents = ({
 	setSelectedEvent,
 	cellHeight,
 	setCellHeight,
+	scrollToTime,
 }: CalendarEventsProps) => {
 	type CurrentViewEvent = DummyScheduleEventType & { key: string };
-	const currentViewEvents = useMemo(() => {
-		const res = events.reduce((acc, event) => {
-			const viewStart = viewOptions.startDay;
-			const viewEnd = dayjs(viewOptions.startDay)
-				.add(viewOptions.daysInView - 1, 'day')
-				.endOf('day');
+	type CurrentViewTravelDetail = DummyScheduleTravelDetailType & {
+		key: string;
+		colorRed: number;
+		colorGreen: number;
+		colorBlue: number;
+	};
 
-			// If the event is not in the current view, skip it
-			function filteredPush(event: CurrentViewEvent) {
-				const start = dayjs(event.start, 'unix');
-				const end = dayjs(event.end, 'unix');
-				if (start.isBefore(viewStart) || end.isAfter(viewEnd)) {
-					return;
-				}
-				acc.push(event);
-			}
+	const { currentViewEvents, currentViewTravelDetails } = useMemo(() => {
+		const currentViewEvents: Array<CurrentViewEvent> = [];
+		const currentViewTravelDetails: Array<CurrentViewTravelDetail> = [];
 
-			// Split events that span multiple days
+		const viewStart = viewOptions.startDay;
+		const viewEnd = dayjs(viewOptions.startDay)
+			.add(viewOptions.daysInView - 1, 'day')
+			.endOf('day');
+
+		// Filter and process events to only include those in the current view
+		for (const event of events) {
 			const start = dayjs(event.start);
 			let end = dayjs(event.end);
+
+			// Skip events that are not in the current view
+			if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
+
 			// 💡 Treat midnight as still part of previous day
 			if (end.hour() === 0 && end.minute() === 0 && end.second() === 0) {
 				end = end.subtract(1, 'millisecond');
 			}
 
+			// Split events that span multiple days
 			if (!start.isSame(end, 'day')) {
 				const days = end.endOf('day').diff(start.startOf('day'), 'day') + 1;
 				for (let i = 0; i < days; i++) {
 					const day = start.add(i, 'day');
-					filteredPush({
+					currentViewEvents.push({
 						...event,
 						key: `${event.id}-${i}`,
 						start: i === 0 ? start.unix() * 1000 : day.startOf('day').unix() * 1000,
@@ -199,20 +238,39 @@ const CalendarEvents = ({
 					});
 				}
 			} else {
-				filteredPush({
+				currentViewEvents.push({
 					...event,
 					key: event.id,
 				});
 			}
+		}
 
-			return acc;
-		}, [] as Array<CurrentViewEvent>);
-		return res;
+		// Process travel details of all events in the current view
+		for (const event of currentViewEvents) {
+			const travelDetails = event.travelDetail;
+			for (const detail of Object.values(travelDetails)) {
+				if (detail.end - detail.start <= 0) continue;
+
+				const start = dayjs(detail.start, 'unix');
+				const end = dayjs(detail.end, 'unix');
+
+				if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
+
+				currentViewTravelDetails.push({
+					...detail,
+					key: v4(),
+					colorRed: event.colorRed,
+					colorGreen: event.colorGreen,
+					colorBlue: event.colorBlue,
+				});
+			}
+		}
+		return { currentViewEvents, currentViewTravelDetails };
 	}, [events, viewOptions]);
 
-	// Set Cell Height based on the event with minimum duration
 	useEffect(() => {
 		if (currentViewEvents.length > 0) {
+			// Set Cell Height based on the event with minimum duration
 			const minDurationEvent = currentViewEvents.reduce(
 				(minEvent, event) => {
 					const duration = dayjs(event.end, 'unix').diff(
@@ -226,8 +284,23 @@ const CalendarEvents = ({
 
 			const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
 			const minDurationInMinutes = minDurationEvent.duration;
+			const newCellHeight = minCellHeight * (60 / minDurationInMinutes)
 
-			setCellHeight(minCellHeight * (60 / minDurationInMinutes));
+			setCellHeight(newCellHeight);
+
+			// Scroll to the earliest event whenever the current events change
+			const earliestEvent = currentViewEvents.reduce((earliest, event) => {
+				const start = dayjs(event.start, 'unix');
+				const startTime = start.hour() + start.minute() / 60;
+				const earliestTime = earliest.hour() + earliest.minute() / 60;
+				return startTime < earliestTime ? start : earliest;
+			}, dayjs('9999-12-31').endOf('day'));
+
+			if (earliestEvent.isValid()) {
+				setTimeout(() => {
+				scrollToTime(earliestEvent, newCellHeight);
+				}, 0);
+			}
 		}
 	}, [currentViewEvents, setCellHeight]);
 
@@ -246,6 +319,33 @@ const CalendarEvents = ({
 			height: number;
 		};
 	};
+
+	type StyledTravelDetail = CurrentViewTravelDetail & {
+		springStyles: {
+			left: number;
+			top: number;
+			width: number;
+			height: number;
+		};
+	};
+
+	function getBoundingBox(
+		s: dayjs.Dayjs,
+		e: dayjs.Dayjs
+	): { x: number; y: number; width: number; height: number } {
+		const startHourFraction = s.hour() + s.minute() / 60;
+		const endHourFraction = e.hour() + e.minute() / 60;
+		const dayIndex = s.diff(viewOptions.startDay.startOf('day'), 'day');
+
+		// Positioning the event based on the day index and width
+		const height = cellHeight * (endHourFraction - startHourFraction);
+		const width = headerWidth / viewOptions.daysInView;
+		const x = dayIndex * width;
+		const y = cellHeight * startHourFraction;
+
+		return { x, y, width, height };
+	}
+
 	const styledEvents = useMemo(() => {
 		const result = [] as Array<StyledEvent>;
 
@@ -255,17 +355,11 @@ const CalendarEvents = ({
 		});
 
 		currentViewEvents.forEach((event) => {
-			const start = dayjs(event.start, 'unix');
-			const end = dayjs(event.end, 'unix');
-			const startHourFraction = start.hour() + start.minute() / 60;
-			const endHourFraction = end.hour() + end.minute() / 60;
-			const dayIndex = start.diff(viewOptions.startDay.startOf('day'), 'day');
-
-			// Positioning the event based on the day index and width
-			const height = cellHeight * (endHourFraction - startHourFraction);
-			const width = headerWidth / viewOptions.daysInView;
-			const x = dayIndex * width;
-			const y = cellHeight * startHourFraction;
+			const s = dayjs(event.start, 'unix');
+			const e = dayjs(event.end, 'unix');
+			const { x, y, width, height } = getBoundingBox(s, e);
+			const startHourFraction = s.hour() + s.minute() / 60;
+			const endHourFraction = e.hour() + e.minute() / 60;
 
 			// Layering intersected events
 			const lastEvent = result[result.length - 1] as StyledEvent | undefined;
@@ -332,6 +426,23 @@ const CalendarEvents = ({
 		return result;
 	}, [currentViewEvents, cellHeight]);
 
+	const styledTravelDetails = useMemo(() => {
+		const result = [] as Array<StyledTravelDetail>;
+
+		currentViewTravelDetails.forEach((detail) => {
+			const s = dayjs(detail.start);
+			const e = dayjs(detail.end);
+			const { x, y, width, height } = getBoundingBox(s, e);
+
+			result.push({
+				...detail,
+				springStyles: { left: x, top: y, width, height },
+			});
+		});
+
+		return result;
+	}, [styledEvents]);
+
 	const eventTransition = useTransition(styledEvents, {
 		keys: (event) => event.key,
 		from: ({ springStyles }) => ({
@@ -342,6 +453,7 @@ const CalendarEvents = ({
 		leave: ({ springStyles }) => ({
 			opacity: 0,
 			...springStyles,
+			config: { duration: 100 },
 		}),
 		enter: ({ springStyles }) => ({
 			opacity: 1,
@@ -349,11 +461,22 @@ const CalendarEvents = ({
 			...springStyles,
 		}),
 		update: ({ springStyles }) => ({ ...springStyles }),
-		config: { tension: 300, friction: 30 },
+		config: { tension: 500, friction: 40 },
+		onRest: () => {
+			console.log("rested")
+		},
+	});
+
+	const travelTransition = useTransition(styledTravelDetails, {
+		keys: (detail) => detail.key,
+		from: () => ({ opacity: 0, scale: 0.9 }),
+		leave: () => ({ opacity: 0, scale: 0.9, config: { duration: 100 } }),
+		enter: () => ({ opacity: 1, scale: 1 }),
+		config: { tension: 500, friction: 40 },
 	});
 
 	return (
-		<Container>
+		<Container id="calendar-events-container">
 			<Wrapper>
 				{eventTransition((style, event) => {
 					return (
@@ -408,6 +531,36 @@ const CalendarEvents = ({
 								/>
 							</svg>
 						</EventContainer>
+					);
+				})}
+				{travelTransition((style, detail) => {
+					const travelMediumIconMap: Record<string, React.ReactNode> = {
+						driving: <CarFront size={16} />,
+						biking: <Bike size={16} />,
+						transit: <Route size={16} />,
+					};
+					return (
+						<TravelDetailContent
+							key={detail.key}
+							style={{
+								...detail.springStyles,
+								...style,
+							}}
+							colors={{
+								r: detail.colorRed,
+								g: detail.colorGreen,
+								b: detail.colorBlue,
+							}}
+						>
+							<span>
+								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}
+								{detail.travelMedium}
+							</span>
+							{formatter.timeDuration(
+								dayjs(detail.start, 'unix'),
+								dayjs(detail.end, 'unix')
+							)}
+						</TravelDetailContent>
 					);
 				})}
 			</Wrapper>

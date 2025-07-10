@@ -1,6 +1,5 @@
-import React from 'react';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
@@ -192,7 +191,7 @@ const Calendar = ({ width, events }: CalendarProps) => {
 	const [cellHeight, setCellHeight] = useState(parseInt(calendarConfig.MIN_CELL_HEIGHT));
 	const { height: cellHeightAnimated } = useSpring({
 		height: cellHeight,
-		config: { tension: 300, friction: 30 },
+		config: { tension: 300, friction: 30, duration: 0 },
 	});
 
 	const contentMounted = headerWidth > 0;
@@ -201,6 +200,26 @@ const Calendar = ({ width, events }: CalendarProps) => {
 		// Reset selected event when events change
 		setSelectedEvent(null);
 	}, [events]);
+
+	// Scroll to a specific time
+	const calendarContentContainerRef = useRef<HTMLDivElement>(null);
+	function scrollToTime(ref: RefObject<any>) {
+		return function (time: dayjs.Dayjs, cellHeight: number) {
+			if (ref.current) {
+				const timeFraction = time.hour() + time.minute() / 60;
+				const scrollTop = timeFraction * cellHeight;
+				console.table({
+					time: scrollTop,
+					actualTime: time.format('HH:mm'),
+					cellHeight: cellHeight,
+				});
+				ref.current.scrollTo({
+					top: scrollTop,
+					behavior: "smooth",
+				});
+			}
+		};
+	}
 
 	return (
 		<CalendarContainer mounted={contentMounted}>
@@ -227,7 +246,10 @@ const Calendar = ({ width, events }: CalendarProps) => {
 					})}
 				</CalendarHeaderDateList>
 			</CalendarHeader>
-			<CalendarContentContainer>
+			<CalendarContentContainer
+				id="calendar-content-container"
+				ref={calendarContentContainerRef}
+			>
 				<CalendarContent style={{ height: cellHeightAnimated.to((h) => `${h * 24}px`) }}>
 					{/* Background */}
 					{(
@@ -275,6 +297,7 @@ const Calendar = ({ width, events }: CalendarProps) => {
 						setSelectedEvent={setSelectedEvent}
 						cellHeight={cellHeight}
 						setCellHeight={setCellHeight}
+						scrollToTime={scrollToTime(calendarContentContainerRef)}
 					/>
 				</CalendarContent>
 			</CalendarContentContainer>
