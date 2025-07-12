@@ -215,7 +215,7 @@ const Calendar = ({ width, events }: CalendarProps) => {
 				});
 				ref.current.scrollTo({
 					top: scrollTop,
-					behavior: "smooth",
+					behavior: 'smooth',
 				});
 			}
 		};

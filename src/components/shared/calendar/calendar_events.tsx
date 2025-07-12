@@ -82,7 +82,6 @@ const EventContent = styled.div<{
 	colors: { r: number; g: number; b: number };
 	height: number;
 	variant: 'block' | 'tile';
-	late: boolean;
 }>`
 	position: relative;
 	background-color: ${({ colors }) => {
@@ -108,6 +107,7 @@ const EventContent = styled.div<{
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	overflow: hidden;
 
 	header {
 		display: flex;
@@ -133,7 +133,6 @@ const EventContent = styled.div<{
 	.duration {
 		display: flex;
 		align-items: center;
-		gap: 0.5ch;
 		font-size: ${styles.typography.fontSize.xs};
 		font-weight: ${styles.typography.fontWeight.semibold};
 
@@ -142,20 +141,26 @@ const EventContent = styled.div<{
 			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
 
-		.late {
-			background-color: ${({ colors }) => {
-				const newColor = colorUtil.setLightness(colors, 0.7);
-				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-			}};
-
+		.clock {
+			height: 18px;
+			display: flex;
+			gap: 0.5ch;
+			align-items: center;
 			border-radius: 6px;
+			font-size: 11px;
+			padding-inline: 4px;
+		}
+
+		.clock.highlight {
+			margin-right: 0.5ch;
 			color: ${({ colors }) => {
 				const newColor = colorUtil.setLightness(colors, 0.2);
 				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 			}};
-			font-size: 11px;
-			padding: 1px 4px;
-			display: ${({ late }) => (late ? 'inline' : 'none')};
+			background-color: ${({ colors }) => {
+				const newColor = colorUtil.setLightness(colors, 0.7);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
 		}
 	}
 `;
@@ -515,21 +520,22 @@ const CalendarEvents = ({
 								}}
 								onClick={() => setSelectedEvent(event.id)}
 								variant={event.isRigid ? 'block' : 'tile'}
-								late={event.isTardy}
 							>
 								<header>
 									<h3>{event.name}</h3>
 									<EventLockIcon className="lock-icon" size={14} />
 								</header>
 								<div className="duration">
+									<div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
+										<Clock size={14} />
+										{event.isTardy && <span>Late</span>}
+									</div>
 									<span>
 										{formatter.timeDuration(
 											dayjs(event.start, 'unix'),
 											dayjs(event.end, 'unix')
 										)}
 									</span>
-									<Clock size={14} />
-									<span className="late">Late</span>
 								</div>
 							</EventContent>
 							{/* Border SVG for styling */}
@@ -551,6 +557,7 @@ const CalendarEvents = ({
 						</EventContainer>
 					);
 				})}
+
 				{travelTransition((style, detail) => {
 					const travelMediumIconMap: Record<string, React.ReactNode> = {
 						driving: <CarFront size={16} />,
