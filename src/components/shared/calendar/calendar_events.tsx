@@ -37,7 +37,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div) <{
+const EventContainer = styled(animated.div)<{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -59,11 +59,11 @@ const EventContainer = styled(animated.div) <{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-		const newColor = colorUtil.setLightness(colors, 0.7);
-		return $selected
-			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-			: 'transparent';
-	}};
+				const newColor = colorUtil.setLightness(colors, 0.7);
+				return $selected
+					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+					: 'transparent';
+			}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -82,10 +82,11 @@ const EventContent = styled.div<{
 	colors: { r: number; g: number; b: number };
 	height: number;
 	variant: 'block' | 'tile';
+	late: boolean;
 }>`
 	position: relative;
 	background-color: ${({ colors }) => {
-		const newColor = colorUtil.setLightness(colors, 0.35);
+		const newColor = colorUtil.setLightness(colors, 0.325);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	color: ${({ colors }) => {
@@ -94,12 +95,12 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-		const blockColor = colorUtil.setLightness(colors, 0.6);
-		const tileColor = colorUtil.setLightness(colors, 0.1);
-		return variant === 'block'
-			? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
-			: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
-	}};
+			const blockColor = colorUtil.setLightness(colors, 0.6);
+			const tileColor = colorUtil.setLightness(colors, 0.1);
+			return variant === 'block'
+				? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
+				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
+		}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -134,17 +135,22 @@ const EventContent = styled.div<{
 		align-items: center;
 		gap: 0.5ch;
 		font-size: ${styles.typography.fontSize.xs};
-		font-weight: ${styles.typography.fontWeight.bold};
-		font-family: ${styles.typography.fontFamily.urban};
+		font-weight: ${styles.typography.fontWeight.semibold};
 
-		color: ${({ colors }) => {
-		const newColor = colorUtil.setLightness(colors, 0.7);
-		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-	}};
+		color: ${({ colors, late }) => {
+			const newColor = colorUtil.setLightness(colors, 0.7);
+			return late
+				? styles.colors.error[400]
+				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+		}};
+
+		.late {
+			display: ${({ late }) => (late ? 'inline' : 'none')};
+		}
 	}
 `;
 
-const TravelDetailContent = styled(animated.div) <{ colors: { r: number; g: number; b: number } }>`
+const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: number; b: number } }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
@@ -284,7 +290,7 @@ const CalendarEvents = ({
 
 			const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
 			const minDurationInMinutes = minDurationEvent.duration;
-			const newCellHeight = minCellHeight * (60 / minDurationInMinutes)
+			const newCellHeight = minCellHeight * (60 / minDurationInMinutes);
 
 			setCellHeight(newCellHeight);
 
@@ -298,7 +304,7 @@ const CalendarEvents = ({
 
 			if (earliestEvent.isValid()) {
 				setTimeout(() => {
-				scrollToTime(earliestEvent, newCellHeight);
+					scrollToTime(earliestEvent, newCellHeight);
 				}, 0);
 			}
 		}
@@ -463,7 +469,7 @@ const CalendarEvents = ({
 		update: ({ springStyles }) => ({ ...springStyles }),
 		config: { tension: 500, friction: 40 },
 		onRest: () => {
-			console.log("rested")
+			console.log('rested');
 		},
 	});
 
@@ -499,6 +505,7 @@ const CalendarEvents = ({
 								}}
 								onClick={() => setSelectedEvent(event.id)}
 								variant={event.isRigid ? 'block' : 'tile'}
+								late={event.isTardy}
 							>
 								<header>
 									<h3>{event.name}</h3>
@@ -512,11 +519,12 @@ const CalendarEvents = ({
 										)}
 									</span>
 									<Clock size={14} />
+									<span className="late">(Late)</span>
 								</div>
 							</EventContent>
 							{/* Border SVG for styling */}
 							<svg
-								viewBox="0 0 1 2"
+								viewBox="0 0 1 4"
 								preserveAspectRatio="none"
 								xmlns="http://www.w3.org/2000/svg"
 							>
@@ -526,7 +534,7 @@ const CalendarEvents = ({
 									rx="0.08"
 									ry="0.08"
 									width="1"
-									height="2"
+									height="4"
 									vectorEffect="non-scaling-stroke"
 								/>
 							</svg>
