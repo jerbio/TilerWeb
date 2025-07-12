@@ -137,14 +137,24 @@ const EventContent = styled.div<{
 		font-size: ${styles.typography.fontSize.xs};
 		font-weight: ${styles.typography.fontWeight.semibold};
 
-		color: ${({ colors, late }) => {
+		color: ${({ colors }) => {
 			const newColor = colorUtil.setLightness(colors, 0.7);
-			return late
-				? styles.colors.error[400]
-				: `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
 
 		.late {
+			background-color: ${({ colors }) => {
+				const newColor = colorUtil.setLightness(colors, 0.7);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
+
+			border-radius: 6px;
+			color: ${({ colors }) => {
+				const newColor = colorUtil.setLightness(colors, 0.2);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
+			font-size: 11px;
+			padding: 1px 4px;
 			display: ${({ late }) => (late ? 'inline' : 'none')};
 		}
 	}
@@ -519,7 +529,7 @@ const CalendarEvents = ({
 										)}
 									</span>
 									<Clock size={14} />
-									<span className="late">(Late)</span>
+									<span className="late">Late</span>
 								</div>
 							</EventContent>
 							{/* Border SVG for styling */}
