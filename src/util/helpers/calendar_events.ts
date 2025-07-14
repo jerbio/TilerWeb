@@ -1,4 +1,4 @@
-import { DummyScheduleEventType } from "../../data/dummySchedule";
+import { DummyScheduleEventType } from '../../data/dummySchedule';
 
 const calendarEventUtil = {
 	isInterseting: (eventA?: DummyScheduleEventType, eventB?: DummyScheduleEventType) => {
@@ -10,7 +10,7 @@ const calendarEventUtil = {
 		const endB = new Date(eventB.end);
 
 		return !(startA >= endB || startB >= endA);
-	}
+	},
 };
 
 export default calendarEventUtil;
