@@ -1,6 +1,35 @@
+import { ScheduleLookupResponse } from '../types/schedule';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
+	public async getScheduleLookupById(scheduleId: string) {
+		const threeDaysInMs = 24 * 3 * 86400000; // 3 days in milliseconds
+		// Three days before and after the current time
+		const start = Date.now() - threeDaysInMs;
+		const end = Date.now() + threeDaysInMs;
+		const myHeaders = new Headers();
+		const requestOptions = {
+			method: 'GET',
+			headers: myHeaders,
+		};
+
+		const urlParams = new URLSearchParams({
+			scheduleId: scheduleId,
+			mobileApp: true.toString(),
+			startRange: start.toString(),
+			endRange: end.toString(),
+		}).toString();
+
+		return fetch(this.getUri(`api/Schedule/Lookup?${urlParams}`), requestOptions)
+			.then((response) => response.json())
+			.then((result: ScheduleLookupResponse) => {
+				return result.Content;
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
 	public async getSchedule() {
 		// : Promise<Schedule>
 		const oneWeekInMs = 24 * 7 * 86400000;
