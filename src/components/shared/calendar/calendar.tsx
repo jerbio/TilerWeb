@@ -5,8 +5,10 @@ import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
-import { DummyScheduleEventType } from '../../../data/dummySchedule';
 import { animated, useSpring } from '@react-spring/web';
+import { ScheduleApi } from '../../../api/scheduleApi';
+import { ScheduleId, ScheduleSubCalendarEvent } from '../../../types/schedule';
+import Spinner from '../loader';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
 	position: relative;
@@ -108,7 +110,7 @@ const CalendarContent = styled(animated.div)`
 	isolation: isolate;
 `;
 
-const CalendarCellBg = styled(animated.div)<{
+const CalendarCellBg = styled(animated.div) <{
 	width: number;
 	dayIndex: number;
 }>`
@@ -154,6 +156,22 @@ const CalendarCellTime = styled(animated.div)`
 	}
 `;
 
+const LoadingContainer = styled.div<{ $loading: boolean }>`
+	position: absolute;
+	top: ${calendarConfig.HEADER_HEIGHT};
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: ${({ $loading }) => ($loading ? 1 : 0)};
+pointer-events: ${({ $loading }) => ($loading ? 'auto' : 'none')};
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	transition: opacity 0.3s ease-in-out;
+`;
+
 export type CalendarViewOptions = {
 	startDay: dayjs.Dayjs;
 	daysInView: number;
@@ -161,11 +179,36 @@ export type CalendarViewOptions = {
 
 type CalendarProps = {
 	width: number;
-	events: Array<DummyScheduleEventType>;
+	scheduleId: ScheduleId;
 };
-const Calendar = ({ width, events }: CalendarProps) => {
+
+const Calendar = ({ width, scheduleId }: CalendarProps) => {
+	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		// Fetch schedule events from the API
+		const scheduleApi = new ScheduleApi();
+		setIsLoading(true);
+		scheduleApi.getScheduleLookupById(scheduleId).then((schedule) => {
+			if (schedule) {
+				setEvents(schedule.subCalendarEvents);
+			} else {
+				console.error('No schedule found for the given ID');
+			}
+			setIsLoading(false);
+		});
+	}, [scheduleId]);
+
+	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+	useEffect(() => {
+		// Reset selected event when events change
+		setSelectedEvent(null);
+	}, [events]);
+
 	// State to manage the width of the header
 	const [headerWidth, setHeaderWidth] = useState(0);
+	const contentMounted = headerWidth > 0;
 	const calendarHeaderDateListRef = useRef<HTMLUListElement>(null);
 	useEffect(() => {
 		if (calendarHeaderDateListRef.current) {
@@ -194,25 +237,13 @@ const Calendar = ({ width, events }: CalendarProps) => {
 		config: { tension: 300, friction: 30, duration: 0 },
 	});
 
-	const contentMounted = headerWidth > 0;
-	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-	useEffect(() => {
-		// Reset selected event when events change
-		setSelectedEvent(null);
-	}, [events]);
-
 	// Scroll to a specific time
 	const calendarContentContainerRef = useRef<HTMLDivElement>(null);
 	function scrollToTime(ref: RefObject<any>) {
-		return function (time: dayjs.Dayjs, cellHeight: number) {
+		return function(time: dayjs.Dayjs, cellHeight: number) {
 			if (ref.current) {
 				const timeFraction = time.hour() + time.minute() / 60;
 				const scrollTop = timeFraction * cellHeight;
-				console.table({
-					time: scrollTop,
-					actualTime: time.format('HH:mm'),
-					cellHeight: cellHeight,
-				});
 				ref.current.scrollTo({
 					top: scrollTop,
 					behavior: 'smooth',
@@ -246,6 +277,10 @@ const Calendar = ({ width, events }: CalendarProps) => {
 					})}
 				</CalendarHeaderDateList>
 			</CalendarHeader>
+
+			<LoadingContainer $loading={isLoading}>
+				<Spinner />
+			</LoadingContainer>
 			<CalendarContentContainer
 				id="calendar-content-container"
 				ref={calendarContentContainerRef}

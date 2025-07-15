@@ -1,7 +1,7 @@
-import { DummyScheduleEventType } from '../../data/dummySchedule';
+import { ScheduleSubCalendarEvent } from "../../types/schedule";
 
 const calendarEventUtil = {
-	isInterseting: (eventA?: DummyScheduleEventType, eventB?: DummyScheduleEventType) => {
+	isInterseting: (eventA?: ScheduleSubCalendarEvent, eventB?: ScheduleSubCalendarEvent) => {
 		if (!eventA || !eventB) return false;
 
 		const startA = new Date(eventA.start);

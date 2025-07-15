@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import calendarConfig from './config';
-import { DummyScheduleEventType, DummyScheduleTravelDetailType } from '../../../data/dummySchedule';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
@@ -11,6 +10,7 @@ import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react
 import calendarEventUtil from '../../../util/helpers/calendar_events';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
+import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
 
 const dashRotate = keyframes`
   0% {
@@ -37,7 +37,7 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventContainer = styled(animated.div)<{
+const EventContainer = styled(animated.div) <{
 	$selected: boolean;
 	colors: { r: number; g: number; b: number };
 }>`
@@ -59,11 +59,11 @@ const EventContainer = styled(animated.div)<{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.setLightness(colors, 0.7);
-				return $selected
-					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-					: 'transparent';
-			}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return $selected
+			? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+			: 'transparent';
+	}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -94,12 +94,12 @@ const EventContent = styled.div<{
 	}};
 	border: 1px solid
 		${({ colors, variant }) => {
-			const blockColor = colorUtil.setLightness(colors, 0.6);
-			const tileColor = colorUtil.setLightness(colors, 0.1);
-			return variant === 'block'
-				? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
-				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
-		}};
+		const blockColor = colorUtil.setLightness(colors, 0.6);
+		const tileColor = colorUtil.setLightness(colors, 0.1);
+		return variant === 'block'
+			? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
+			: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
+	}};
 	height: 100%;
 	padding: 8px;
 	border-radius: 10px;
@@ -137,9 +137,9 @@ const EventContent = styled.div<{
 		font-weight: ${styles.typography.fontWeight.semibold};
 
 		color: ${({ colors }) => {
-			const newColor = colorUtil.setLightness(colors, 0.7);
-			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-		}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 
 		.clock {
 			height: 18px;
@@ -154,18 +154,18 @@ const EventContent = styled.div<{
 		.clock.highlight {
 			margin-right: 0.5ch;
 			color: ${({ colors }) => {
-				const newColor = colorUtil.setLightness(colors, 0.2);
-				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-			}};
+		const newColor = colorUtil.setLightness(colors, 0.2);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 			background-color: ${({ colors }) => {
-				const newColor = colorUtil.setLightness(colors, 0.7);
-				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-			}};
+		const newColor = colorUtil.setLightness(colors, 0.7);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 		}
 	}
 `;
 
-const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: number; b: number } }>`
+const TravelDetailContent = styled(animated.div) <{ colors: { r: number; g: number; b: number } }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
@@ -197,7 +197,7 @@ const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: numbe
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
-	events: Array<DummyScheduleEventType>;
+	events: Array<ScheduleSubCalendarEvent>;
 	headerWidth: number;
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
@@ -216,8 +216,8 @@ const CalendarEvents = ({
 	setCellHeight,
 	scrollToTime,
 }: CalendarEventsProps) => {
-	type CurrentViewEvent = DummyScheduleEventType & { key: string };
-	type CurrentViewTravelDetail = DummyScheduleTravelDetailType & {
+	type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
+	type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
 		key: string;
 		colorRed: number;
 		colorGreen: number;
@@ -483,9 +483,6 @@ const CalendarEvents = ({
 		}),
 		update: ({ springStyles }) => ({ ...springStyles }),
 		config: { tension: 500, friction: 40 },
-		onRest: () => {
-			console.log('rested');
-		},
 	});
 
 	const travelTransition = useTransition(styledTravelDetails, {
