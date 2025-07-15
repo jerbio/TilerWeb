@@ -3,10 +3,11 @@ import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
 	public async getScheduleLookupById(scheduleId: string) {
-		const threeDaysInMs = 24 * 3 * 86400000; // 3 days in milliseconds
+		const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+		const fourDaysInMs = oneDay * 4;
 		// Three days before and after the current time
-		const start = Date.now() - threeDaysInMs;
-		const end = Date.now() + threeDaysInMs;
+		const start = Date.now() - fourDaysInMs;
+		const end = Date.now() + fourDaysInMs;
 		const myHeaders = new Headers();
 		const requestOptions = {
 			method: 'GET',
@@ -32,7 +33,8 @@ export class ScheduleApi extends AppApi {
 
 	public async getSchedule() {
 		// : Promise<Schedule>
-		const oneWeekInMs = 24 * 7 * 86400000;
+		const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+		const oneWeekInMs = oneDay * 7;
 		const start = Date.now();
 		const end = start + oneWeekInMs;
 
