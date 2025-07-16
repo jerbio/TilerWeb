@@ -13,6 +13,8 @@ import {
 	clearStoredSessionId,
 } from './util/chat_service';
 import useAppStore from '../../../global_state'; // Import Zustand Global State
+import { ChatContextType } from '../../../global_state'; // Import ChatContextType
+import { Actions, Status } from '../../../util/enums'; // Import the enums
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -101,6 +103,7 @@ type ChatProps = {
 };
 
 const Chat = ({ onClose }: ChatProps) => {
+	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const [messages, setMessages] = useState<Prompt[]>([]);
 	const [message, setMessage] = useState('');
@@ -108,6 +111,7 @@ const Chat = ({ onClose }: ChatProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
+	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	// Load session ID from local storage on mount
 	useEffect(() => {
@@ -149,7 +153,7 @@ const Chat = ({ onClose }: ChatProps) => {
 		try {
 			setIsSending(true);
 			setError(null);
-			const response = await sendChatMessage(message, sessionId);
+			const response = await sendChatMessage(message, entityId, sessionId);
 
 			const responseMessages: Prompt[] = [];
 			const actions = response?.Content?.vibeResponse?.actions || [];
@@ -171,6 +175,8 @@ const Chat = ({ onClose }: ChatProps) => {
 			responseMessages.sort((a, b) => a.id.localeCompare(b.id));
 			responseMessages.reverse();
 			setMessages((prev) => [...responseMessages, ...prev]);
+
+			console.log('Response Messages:', responseMessages, messages);
 
 			// Update session ID if this was the first message
 			const sessionIdFromResponse = responseMessages[0]?.sessionId;
@@ -195,23 +201,59 @@ const Chat = ({ onClose }: ChatProps) => {
 		setMessages([]);
 	};
 
-	// Zustand store state and actions
-	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
 	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
 
-	const handleRemoveContext = (context: string) => {
+	const handleRemoveContext = (context: ChatContextType) => {
 		removeChatContext(context); // Remove the clicked context
 	};
 
 	return (
 		<ChatContainer>
+			<Button
+				variant="outline"
+				style={{
+					alignSelf: 'flex-end',
+					marginBottom: '0.5rem',
+					color: styles.colors.orange[500],
+					borderColor: styles.colors.orange[500],
+				}}
+				onClick={handleNewChat}
+			>
+				Clear Session
+			</Button>
 			<ChatHeader>
-				<ChatTitle>New Chat</ChatTitle>
 				{onClose && (
 					<Button variant="ghost" height={32} onClick={onClose}>
 						<ChevronLeftIcon size={16} />
 						<span>Back</span>
 					</Button>
+				)}
+				{chatContext.length === 0 ? (
+					<ChatTitle>New Chat</ChatTitle>
+				) : (
+					<>
+						{chatContext.map((context, index) => (
+							<Button
+								key={index}
+								variant="outline"
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'space-between',
+									padding: '0.5rem',
+									border: `1px solid ${styles.colors.gray[300]}`,
+								}}
+							>
+								<span>{context.Name}</span>
+								<span
+									onClick={() => handleRemoveContext(context)}
+									style={{ marginLeft: '0.5rem', color: 'red', cursor: 'pointer' }}
+								>
+									x
+								</span>
+							</Button>
+						))}
+					</>
 				)}
 			</ChatHeader>
 			<ChatContent>
@@ -244,27 +286,6 @@ const Chat = ({ onClose }: ChatProps) => {
 
 			{/* Render chatContext buttons */}
 			<div style={{ marginBottom: '0.25rem' }}>
-				{chatContext.map((context, index) => (
-					<Button
-						key={index}
-						variant="outline"
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-							padding: '0.5rem',
-							border: `1px solid ${styles.colors.gray[300]}`,
-						}}
-					>
-						<span>{context}</span>
-						<span
-							onClick={() => handleRemoveContext(context)}
-							style={{ marginLeft: '0.5rem', color: 'red', cursor: 'pointer' }}
-						>
-							x
-						</span>
-					</Button>
-				))}
 			</div>
 
 			<ChatForm onSubmit={handleSubmit}>

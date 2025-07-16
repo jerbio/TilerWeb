@@ -4,6 +4,7 @@ const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
 const STORAGE_KEY = 'chat_session_id';
 
 interface SendMessageRequest {
+	EntityId: string;
 	SessionId?: string;
 	RequestId?: string;
 	ChatMessage: string;
@@ -46,14 +47,16 @@ export const fetchChatMessages = async (sessionId: string): Promise<ChatPromptRe
 
 export const sendChatMessage = async (
 	message: string,
+	entityId: string,
 	sessionId: string = '',
 	requestId?: string,
-	actionId?: string
+	actionId?: string,
 ): Promise<ChatVibeResponse> => {
 	try {
 		const requestBody: SendMessageRequest = {
 			ChatMessage: message,
 			SessionId: sessionId,
+			EntityId: entityId,
 			RequestId: requestId || '',
 			ActionId: actionId || '',
 			MobileApp: true,
