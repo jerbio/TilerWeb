@@ -1,4 +1,4 @@
-import { ScheduleSubCalendarEvent } from "../../types/schedule";
+import { ScheduleSubCalendarEvent } from '../../types/schedule';
 
 const calendarEventUtil = {
 	isInterseting: (eventA?: ScheduleSubCalendarEvent, eventB?: ScheduleSubCalendarEvent) => {

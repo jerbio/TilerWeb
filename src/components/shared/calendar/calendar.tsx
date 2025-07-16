@@ -110,7 +110,7 @@ const CalendarContent = styled(animated.div)`
 	isolation: isolate;
 `;
 
-const CalendarCellBg = styled(animated.div) <{
+const CalendarCellBg = styled(animated.div)<{
 	width: number;
 	dayIndex: number;
 }>`
@@ -166,7 +166,7 @@ const LoadingContainer = styled.div<{ $loading: boolean }>`
 	justify-content: center;
 	align-items: center;
 	opacity: ${({ $loading }) => ($loading ? 1 : 0)};
-pointer-events: ${({ $loading }) => ($loading ? 'auto' : 'none')};
+	pointer-events: ${({ $loading }) => ($loading ? 'auto' : 'none')};
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 1000;
 	transition: opacity 0.3s ease-in-out;
@@ -240,7 +240,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 	// Scroll to a specific time
 	const calendarContentContainerRef = useRef<HTMLDivElement>(null);
 	function scrollToTime(ref: RefObject<any>) {
-		return function(time: dayjs.Dayjs, cellHeight: number) {
+		return function (time: dayjs.Dayjs, cellHeight: number) {
 			if (ref.current) {
 				const timeFraction = time.hour() + time.minute() / 60;
 				const scrollTop = timeFraction * cellHeight;
