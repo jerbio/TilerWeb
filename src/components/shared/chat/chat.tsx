@@ -4,6 +4,7 @@ import Button from '../button';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
 import Input from '../input';
 import Logo from '../../icons/logo';
+import { useTranslation } from 'react-i18next';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -92,29 +93,31 @@ type ChatProps = {
 };
 
 const Chat = ({ onClose }: ChatProps) => {
+	const { t } = useTranslation();
+
 	return (
 		<ChatContainer>
 			<ChatHeader>
-				<ChatTitle>New Chat</ChatTitle>
+				<ChatTitle>{t('home.expanded.chat.newChat')}</ChatTitle>
 				{onClose && (
 					<Button variant="ghost" height={32} onClick={onClose}>
 						<ChevronLeftIcon size={16} />
-						<span>Back</span>
+						<span>{t('common.buttons.back')}</span>
 					</Button>
 				)}
 			</ChatHeader>
 			<ChatContent>
 				<EmptyChat>
 					<Logo size={48} />
-					<h3>What would you like to do?</h3>
-					<p>Describe a task, We&apos;ll handle the tiling. </p>
+					<h3>{t('home.expanded.chat.title')}</h3>
+					<p>{t('home.expanded.chat.subtitle')}</p>
 				</EmptyChat>
 			</ChatContent>
 			<ChatForm action="">
 				<Input
 					type="text"
 					height={48}
-					placeholder="Tell Tiler what you do..."
+					placeholder={t('home.expanded.chat.inputPlaceholder')}
 					borderGradient={[styles.colors.brand[500]]}
 				/>
 				<ChatButton type="submit">
