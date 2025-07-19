@@ -185,7 +185,6 @@ type CalendarProps = {
 const Calendar = ({ width, scheduleId }: CalendarProps) => {
 	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
 	const [isLoading, setIsLoading] = useState(true);
-
 	useEffect(() => {
 		// Fetch schedule events from the API
 		const scheduleApi = new ScheduleApi();

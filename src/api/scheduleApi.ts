@@ -1,13 +1,14 @@
 import { ScheduleLookupResponse } from '../types/schedule';
+import TimeUtil from '../util/helpers/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
 	public async getScheduleLookupById(scheduleId: string) {
-		const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
-		const fourDaysInMs = oneDay * 4;
-		// Three days before and after the current time
-		const start = Date.now() - fourDaysInMs;
-		const end = Date.now() + fourDaysInMs;
+		const fourDays = TimeUtil.inMilliseconds(4, 'd');
+
+		// (-4 days, current time, +4 days)
+		const start = TimeUtil.now() - fourDays;
+		const end = TimeUtil.now() + fourDays;
 		const myHeaders = new Headers();
 		const requestOptions = {
 			method: 'GET',
@@ -32,11 +33,9 @@ export class ScheduleApi extends AppApi {
 	}
 
 	public async getSchedule() {
-		// : Promise<Schedule>
-		const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
-		const oneWeekInMs = oneDay * 7;
-		const start = Date.now();
-		const end = start + oneWeekInMs;
+		const oneWeek = TimeUtil.inMilliseconds(1, 'w');
+		const start = TimeUtil.now();
+		const end = start + oneWeek;
 
 		const myHeaders = new Headers();
 		const tilerBearerToken = localStorage.getItem('tiler_bearer'); // write

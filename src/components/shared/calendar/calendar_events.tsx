@@ -4,13 +4,13 @@ import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
-import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
 import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
 import calendarEventUtil from '../../../util/helpers/calendar_events';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
+import TimeUtil from '../../../util/helpers/time';
 
 const dashRotate = keyframes`
   0% {
@@ -528,7 +528,7 @@ const CalendarEvents = ({
 										{event.isTardy && <span>Late</span>}
 									</div>
 									<span>
-										{formatter.timeDuration(
+										{TimeUtil.rangeDuration(
 											dayjs(event.start, 'unix'),
 											dayjs(event.end, 'unix')
 										)}
@@ -578,7 +578,7 @@ const CalendarEvents = ({
 								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}
 								{detail.travelMedium}
 							</span>
-							{formatter.timeDuration(
+							{TimeUtil.rangeDuration(
 								dayjs(detail.start, 'unix'),
 								dayjs(detail.end, 'unix')
 							)}
