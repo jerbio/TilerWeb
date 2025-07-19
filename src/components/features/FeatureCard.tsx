@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import styles from '../../util/styles';
 
@@ -93,12 +94,7 @@ interface FeatureCardProps {
 	reversed: boolean;
 }
 
-export default function FeatureCard({
-	title,
-	image,
-	children,
-	reversed,
-}: FeatureCardProps) {
+export default function FeatureCard({ title, image, children, reversed }: FeatureCardProps) {
 	return (
 		<Article $reversed={reversed}>
 			<ContentWrapper>

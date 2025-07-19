@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import styles from '../util/styles';
+import styled from 'styled-components';
 import { SvgWrapper } from './shared_styled_components';
 import { TILER_LOGO } from '../util/constants';
 import InstagramLogo from '../assets/image_assets/instagram_logo.png';
@@ -85,7 +85,7 @@ const FooterLink = styled.a`
 
 const FooterSection: React.FC = () => {
 	const { t } = useTranslation();
-	
+
 	return (
 		<FooterContainer>
 			<FooterSubContainer>
@@ -144,40 +144,28 @@ const FooterSection: React.FC = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo
-								src={FacebookLogo}
-								alt={t('common.social.facebook')}
-							/>
+							<SocialLogo src={FacebookLogo} alt={t('common.social.facebook')} />
 						</FooterLink>
 						<FooterLink
 							href="https://www.linkedin.com/company/tilerapp"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo
-								src={LinkedInLogo}
-								alt={t('common.social.linkedin')}
-							/>
+							<SocialLogo src={LinkedInLogo} alt={t('common.social.linkedin')} />
 						</FooterLink>
 						<FooterLink
 							href="https://www.instagram.com/tiler.app/"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo
-								src={InstagramLogo}
-								alt={t('common.social.instagram')}
-							/>
+							<SocialLogo src={InstagramLogo} alt={t('common.social.instagram')} />
 						</FooterLink>
 						<FooterLink
 							href="https://x.com/Tiler_app"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<SocialLogo 
-								src={XLogo} 
-								alt={t('common.social.x')} 
-							/>
+							<SocialLogo src={XLogo} alt={t('common.social.x')} />
 						</FooterLink>
 					</FooterLinks>
 				</FooterColumn>
@@ -225,4 +213,3 @@ const FooterSection: React.FC = () => {
 };
 
 export default FooterSection;
-

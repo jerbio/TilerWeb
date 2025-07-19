@@ -32,15 +32,15 @@ const FlexWrapper = styled.div`
 	align-items: center;
 	justify-content: center;
 
-  @media (min-width: ${styles.screens.md}) {
-    flex-direction: row;
-    justify-content: space-between;
-  }
+	@media (min-width: ${styles.screens.md}) {
+		flex-direction: row;
+		justify-content: space-between;
+	}
 `;
 
 const CalendarIntegrationSection: React.FC = () => {
 	const { t } = useTranslation();
-	
+
 	return (
 		<Section>
 			<FlexWrapper>
@@ -67,4 +67,3 @@ const CalendarIntegrationSection: React.FC = () => {
 };
 
 export default CalendarIntegrationSection;
-

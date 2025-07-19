@@ -57,4 +57,3 @@ const Section = ({ children, width, paddingBlock }: SectionProps) => {
 };
 
 export default Section;
-

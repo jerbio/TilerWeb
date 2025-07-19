@@ -1,0 +1,119 @@
+import React, { useEffect, useState } from 'react';
+import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import PersonaCard from './persona_card';
+
+// @ts-expect-error Swiper styles are not typed
+import 'swiper/css';
+import Section from '../../layout/section';
+import styled from 'styled-components';
+import useIsMobile from '../../../hooks/useIsMobile';
+import usePersonas from '../../../data/persona';
+
+const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
+	position: relative;
+	width: 100%;
+	height: 100%;
+	isolation: isolate;
+
+	&::before,
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		width: ${({ $visible }) => ($visible ? '1.5rem' : '.5rem')};
+		height: 100%;
+		z-index: 10;
+		transition: width 0.3s ease-in-out;
+	}
+
+	&::before {
+		background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+		left: 0;
+	}
+
+	&::after {
+		background: linear-gradient(to left, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+		right: 0;
+	}
+`;
+
+const PersonaCarousel: React.FC = () => {
+	const { personas } = usePersonas();
+
+	const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
+	const isMobile = useIsMobile();
+	const isTablet = useIsMobile(1100);
+	const [slidesPerView, setSlidesPerView] = useState(1);
+	const swiperRef = React.useRef<SwiperRef | null>(null);
+
+	function handleUpdateSlides() {
+		if (isMobile) {
+			setSlidesPerView(1);
+		} else if (isTablet) {
+			setSlidesPerView(2);
+		} else {
+			setSlidesPerView(3);
+		}
+		setTimeout(() => {
+			if (swiperRef.current) {
+				swiperRef.current.swiper.autoplay.pause();
+				swiperRef.current.swiper.autoplay.resume();
+			}
+		}, 0);
+	}
+	useEffect(() => {
+		handleUpdateSlides();
+	}, [isMobile, isTablet]);
+
+	return (
+		<Section paddingBlock={0}>
+			<EdgeFadeSwiper
+				ref={swiperRef}
+				modules={[Autoplay]}
+				centeredSlides={true}
+				slidesPerView={slidesPerView}
+				loop={true}
+				autoplay={{
+					delay: 3500,
+					disableOnInteraction: false,
+					pauseOnMouseEnter: true,
+				}}
+				$visible={selectedPersona === null}
+			>
+				{personas.map((persona) => (
+					<SwiperSlide
+						key={persona.key}
+						style={{
+							position: 'relative',
+							height: 'calc(100svh - 100px)',
+							maxHeight: '680px',
+							minHeight: '500px',
+						}}
+					>
+						<div
+							style={{
+								position: 'absolute',
+								top: 0,
+								height: '100%',
+								transform: 'translateX(-50%)',
+								left: '50%',
+							}}
+						>
+							<PersonaCard
+								persona={persona.key}
+								occupation={persona.occupation}
+								backgroundImage={persona.image}
+								gradient={persona.highlight}
+								selectedPersona={selectedPersona}
+								setSelectedPersona={setSelectedPersona}
+							/>
+						</div>
+					</SwiperSlide>
+				))}
+			</EdgeFadeSwiper>
+		</Section>
+	);
+};
+
+export default PersonaCarousel;

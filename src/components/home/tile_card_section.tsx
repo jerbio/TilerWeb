@@ -36,14 +36,13 @@ const TileCardWrapper = styled.div<{ direction: 'left' | 'right' }>`
 	position: absolute;
 	${(props) => (props.direction === 'left' ? 'left: 0;' : 'right: 0;')}
 
-	animation: ${(props) =>
-		slideInAnimation(props.direction)} 64s linear infinite;
+	animation: ${(props) => slideInAnimation(props.direction)} 64s linear infinite;
 	transform: translateX(-50%);
 `;
 
 const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
+	display: flex;
+	justify-content: center;
 `;
 
 const TileFadeDivRight = styled.div`
@@ -52,11 +51,7 @@ const TileFadeDivRight = styled.div`
 	right: 0;
 	width: 4rem;
 	height: 100%;
-	background: linear-gradient(
-		90deg,
-		rgba(0, 0, 0, 0) 0%,
-		rgba(0, 0, 0, 1) 100%
-	);
+	background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
 `;
 
 const TileFadeDivLeft = styled.div`
@@ -172,17 +167,9 @@ const TileCardSection: React.FC = () => {
 			<TileCardContainer>
 				{tileGrid.map((tiles, index) => (
 					<TileCardWrapperScroll key={index}>
-						<TileCardWrapper
-							direction={index % 2 === 0 ? 'left' : 'right'}
-						>
+						<TileCardWrapper direction={index % 2 === 0 ? 'left' : 'right'}>
 							{[...tiles, ...tiles].map((tile, index) => {
-								return (
-									<TileCard
-										key={index}
-										{...tile}
-										index={index}
-									/>
-								);
+								return <TileCard key={index} {...tile} index={index} />;
 							})}
 						</TileCardWrapper>
 						<TileFadeDivLeft />
@@ -193,12 +180,10 @@ const TileCardSection: React.FC = () => {
 
 			<ButtonContainer>
 				<Button variant="brand">
-					<span>Create your own tiles</span>{' '}
-					<ArrowRight />
+					<span>Create your own tiles</span> <ArrowRight />
 				</Button>
 			</ButtonContainer>
 		</Section>
 	);
 };
 export default TileCardSection;
-

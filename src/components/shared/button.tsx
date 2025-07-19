@@ -6,10 +6,10 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	children: React.ReactNode;
 	onClick?: () => void;
 	disabled?: boolean;
-	variant?: 'primary' | 'secondary' | 'brand' | string;
+	variant?: 'primary' | 'secondary' | 'brand' | 'ghost' | string;
 	size?: 'small' | 'medium' | 'large';
-  height?: number; // Optional height prop for custom button height
-	borderGradient?: Array<string>; // Array of colors for border gradient
+	height?: number; // Optional height prop for custom button height
+	bordergradient?: Array<string>; // Array of colors for border gradient
 };
 
 const StyledButton = styled.button<ButtonProps>`
@@ -28,16 +28,18 @@ const StyledButton = styled.button<ButtonProps>`
 					? styles.colors.white
 					: props.variant === 'brand'
 						? styles.colors.brand[500]
-						: props.variant};
+						: props.variant === 'ghost'
+							? 'transparent'
+							: props.variant};
 		border-radius: ${(props) =>
-			props.size === 'small'
-				? styles.borderRadius.little
-				: styles.borderRadius.medium};
+			props.size === 'small' ? styles.borderRadius.little : styles.borderRadius.medium};
 		z-index: -1;
+
+		transition: background-color 0.2s ease-in-out;
 	}
 
 	${(props) =>
-		props.borderGradient &&
+		props.bordergradient &&
 		`@property --rotation {
       inherits: false;
       initial-value: 0deg;
@@ -52,8 +54,8 @@ const StyledButton = styled.button<ButtonProps>`
 
 	/* Border color and gradient */
 	background: ${(props) =>
-		props.borderGradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.borderGradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.borderGradient[0]})`
+		props.bordergradient
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
 			: props.variant === 'primary'
 				? styles.colors.gray[700]
 				: 'transparent'};
@@ -65,21 +67,29 @@ const StyledButton = styled.button<ButtonProps>`
 				? styles.colors.black
 				: props.variant === 'brand'
 					? styles.colors.white
-					: styles.colors.white};
+					: props.variant === 'ghost'
+						? styles.colors.gray[300]
+						: styles.colors.white};
 	border-radius: ${styles.borderRadius.little};
-	font-weight: ${styles.typography.fontWeight.normal};
+	font-weight: ${styles.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	line-height: 1;
 	gap: 1ch;
 	height: ${(props) =>
-		props.height ? `${props.height}px` : props.size === 'small'
-			? styles.buttonHeights.small
-			: props.size === 'medium'
-				? styles.buttonHeights.medium
-				: styles.buttonHeights.large};
+		props.height
+			? `${props.height}px`
+			: props.size === 'small'
+				? styles.buttonHeights.small
+				: props.size === 'medium'
+					? styles.buttonHeights.medium
+					: styles.buttonHeights.large};
 	padding-inline: ${(props) =>
-		props.size === 'small' ? styles.space.small : styles.space.medium};
+		props.size === 'small' || props.variant === 'ghost'
+			? styles.space.small
+			: styles.space.medium};
 	font-size: ${(props) =>
 		props.size === 'small'
 			? styles.typography.fontSize.xs
@@ -95,11 +105,11 @@ const StyledButton = styled.button<ButtonProps>`
 						? styles.colors.gray[200]
 						: props.variant === 'brand'
 							? styles.colors.brand[600]
-							: props.variant + '80'};
+							: props.variant === 'ghost'
+								? '#ffffff12'
+								: props.variant + '80'};
 		}
-		${(props) =>
-			props.borderGradient &&
-			`animation: rotate 3s linear infinite paused;`}
+		${(props) => props.bordergradient && `animation: rotate 3s linear infinite paused;`}
 	}
 	&:disabled {
 		opacity: 0.6;
@@ -113,7 +123,7 @@ const Button: React.FC<ButtonProps> = ({
 	disabled = false,
 	variant = 'primary',
 	size = 'medium',
-	borderGradient,
+	bordergradient: bordergradient,
 	...props
 }) => {
 	return (
@@ -123,7 +133,7 @@ const Button: React.FC<ButtonProps> = ({
 			disabled={disabled}
 			variant={variant}
 			size={size}
-			borderGradient={borderGradient}
+			bordergradient={bordergradient}
 		>
 			{children}
 		</StyledButton>
@@ -131,4 +141,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-

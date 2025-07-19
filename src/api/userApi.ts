@@ -18,10 +18,7 @@ export class UserApi extends AppApi {
 		return fetch(`${this.defaultDomain}account/token`, requestOptions)
 			.then((response) => response.json())
 			.then((result) => {
-				localStorage.setItem(
-					'tiler_bearer',
-					`Bearer ${result['access_token']}`
-				); // write
+				localStorage.setItem('tiler_bearer', `Bearer ${result['access_token']}`); // write
 				return result;
 			})
 			.catch((error) => {
