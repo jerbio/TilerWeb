@@ -5,7 +5,8 @@ const calendarConfig = {
 	HEADER_HEIGHT: '34px',
 	TIMELINE_WIDTH: '70px',
 	BORDER_COLOR: styles.colors.gray[700],
-	MIN_CELL_HEIGHT: '72px',
+	CELL_HEIGHT: '96px',
+	MIN_CELL_HEIGHT: '60px',
 };
 
 export default calendarConfig;

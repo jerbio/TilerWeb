@@ -3,12 +3,17 @@ import TimeUtil from '../util/helpers/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
-	public async getScheduleLookupById(scheduleId: string) {
-		const fourDays = TimeUtil.inMilliseconds(4, 'd');
+	public async getScheduleLookupById(
+		scheduleId: string,
+		options?: { startRange: number; endRange: number }
+	) {
+		const fourDays = TimeUtil.inMilliseconds(3, 'd');
+		const defaultStart = TimeUtil.now() - fourDays;
+		const defaultEnd = TimeUtil.now() + fourDays;
 
-		// (-4 days, current time, +4 days)
-		const start = TimeUtil.now() - fourDays;
-		const end = TimeUtil.now() + fourDays;
+
+		const start = options?.startRange ?? defaultStart;
+		const end = options?.endRange ?? defaultEnd;
 		const myHeaders = new Headers();
 		const requestOptions = {
 			method: 'GET',

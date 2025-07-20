@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
-import { animated, useSpring } from '@react-spring/web';
 import { ScheduleApi } from '../../../api/scheduleApi';
 import { ScheduleId, ScheduleSubCalendarEvent } from '../../../types/schedule';
 import Spinner from '../loader';
+import TimeUtil from '../../../util/helpers/time';
 
 const CalendarContainer = styled.div<{ mounted: boolean }>`
 	position: relative;
@@ -17,6 +17,7 @@ const CalendarContainer = styled.div<{ mounted: boolean }>`
 	background-color: ${styles.colors.gray[900]};
 	opacity: ${({ mounted }) => (mounted ? 1 : 0)};
 	transition: opacity 0.3s 0.5s ease-in-out;
+	user-select: none;
 `;
 
 const CalendarHeader = styled.div`
@@ -104,20 +105,24 @@ const CalendarContentContainer = styled.div`
 	width: 100%;
 `;
 
-const CalendarContent = styled(animated.div)`
+const CalendarContent = styled.div`
 	width: 100%;
+	height: ${parseInt(calendarConfig.CELL_HEIGHT) * 24}px; /* 24 hours */
 	position: relative;
 	isolation: isolate;
 `;
 
-const CalendarCellBg = styled(animated.div)<{
+const CalendarCellBg = styled.div<{
 	width: number;
-	dayIndex: number;
+	dayindex: number;
+	hourindex: number;
 }>`
 	position: absolute;
+	height: ${calendarConfig.CELL_HEIGHT};
 	width: ${({ width }) => width}px;
 	top: 0;
-	left: calc(${({ dayIndex, width }) => dayIndex * width}px + ${calendarConfig.TIMELINE_WIDTH});
+	left: calc(${({ dayindex, width }) => dayindex * width}px + ${calendarConfig.TIMELINE_WIDTH});
+	transform: translateY(${({ hourindex }) => hourindex * parseInt(calendarConfig.CELL_HEIGHT)}px);
 	z-index: -1;
 
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
@@ -127,11 +132,13 @@ const CalendarCellBg = styled(animated.div)<{
 	background-repeat: repeat-x;
 `;
 
-const CalendarCellTime = styled(animated.div)`
+const CalendarCellTime = styled.div<{ hourindex: number }>`
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: ${calendarConfig.TIMELINE_WIDTH};
+	height: ${calendarConfig.CELL_HEIGHT};
+	transform: translateY(${({ hourindex }) => hourindex * parseInt(calendarConfig.CELL_HEIGHT)}px);
 
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	background-color: #1f1f1f;
@@ -185,19 +192,6 @@ type CalendarProps = {
 const Calendar = ({ width, scheduleId }: CalendarProps) => {
 	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	useEffect(() => {
-		// Fetch schedule events from the API
-		const scheduleApi = new ScheduleApi();
-		setIsLoading(true);
-		scheduleApi.getScheduleLookupById(scheduleId).then((schedule) => {
-			if (schedule) {
-				setEvents(schedule.subCalendarEvents);
-			} else {
-				console.error('No schedule found for the given ID');
-			}
-			setIsLoading(false);
-		});
-	}, [scheduleId]);
 
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	useEffect(() => {
@@ -224,32 +218,32 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 			daysInView,
 		};
 	}, [headerWidth, startDay]);
+
 	function changeDayView(dir: 'left' | 'right') {
 		setStartDay((prev) => {
 			return prev.add((dir === 'left' ? -1 : 1) * viewOptions.daysInView, 'day');
 		});
 	}
 
-	const [cellHeight, setCellHeight] = useState(parseInt(calendarConfig.MIN_CELL_HEIGHT));
-	const { height: cellHeightAnimated } = useSpring({
-		height: cellHeight,
-		config: { tension: 300, friction: 30, duration: 0 },
-	});
+	// Fetch schedule data
+	useEffect(() => {
+		if (viewOptions.daysInView <= 0) return;
 
-	// Scroll to a specific time
-	const calendarContentContainerRef = useRef<HTMLDivElement>(null);
-	function scrollToTime(ref: RefObject<any>) {
-		return function (time: dayjs.Dayjs, cellHeight: number) {
-			if (ref.current) {
-				const timeFraction = time.hour() + time.minute() / 60;
-				const scrollTop = timeFraction * cellHeight;
-				ref.current.scrollTo({
-					top: scrollTop,
-					behavior: 'smooth',
-				});
+		const scheduleApi = new ScheduleApi();
+		setIsLoading(true);
+
+		const startRange = viewOptions.startDay.valueOf();
+		const endRange = startRange + TimeUtil.inMilliseconds(viewOptions.daysInView, 'd');
+
+		scheduleApi.getScheduleLookupById(scheduleId, { startRange, endRange }).then((schedule) => {
+			if (schedule) {
+				setEvents(schedule.subCalendarEvents);
+			} else {
+				console.error('No schedule found for the given ID');
 			}
-		};
-	}
+			setIsLoading(false);
+		});
+	}, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
 	return (
 		<CalendarContainer mounted={contentMounted}>
@@ -280,11 +274,8 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 			<LoadingContainer $loading={isLoading}>
 				<Spinner />
 			</LoadingContainer>
-			<CalendarContentContainer
-				id="calendar-content-container"
-				ref={calendarContentContainerRef}
-			>
-				<CalendarContent style={{ height: cellHeightAnimated.to((h) => `${h * 24}px`) }}>
+			<CalendarContentContainer id="calendar-content-container">
+				<CalendarContent>
 					{/* Background */}
 					{(
 						Array.from({ length: viewOptions.daysInView }).fill(
@@ -295,12 +286,9 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 							return (
 								<CalendarCellBg
 									key={`${dayIndex}-${hourIndex}`}
-									dayIndex={dayIndex}
+									dayindex={dayIndex}
+									hourindex={hourIndex}
 									width={headerWidth / viewOptions.daysInView}
-									style={{
-										height: cellHeightAnimated,
-										y: cellHeightAnimated.to((h) => `${hourIndex * h}px`),
-									}}
 								/>
 							);
 						});
@@ -308,13 +296,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 					{/* Timeline */}
 					{Array.from({ length: 24 }).map((_, hourIndex) => {
 						return (
-							<CalendarCellTime
-								key={hourIndex}
-								style={{
-									height: cellHeightAnimated,
-									y: cellHeightAnimated.to((h) => `${hourIndex * h}px`),
-								}}
-							>
+							<CalendarCellTime key={hourIndex} hourindex={hourIndex}>
 								<div>
 									{/* eg. "8 AM" */}
 									<span>{dayjs().hour(hourIndex).format('h A')}</span>
@@ -329,9 +311,6 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 						headerWidth={headerWidth}
 						selectedEvent={selectedEvent}
 						setSelectedEvent={setSelectedEvent}
-						cellHeight={cellHeight}
-						setCellHeight={setCellHeight}
-						scrollToTime={scrollToTime(calendarContentContainerRef)}
 					/>
 				</CalendarContent>
 			</CalendarContentContainer>

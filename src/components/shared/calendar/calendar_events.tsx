@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import calendarConfig from './config';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
@@ -6,11 +6,11 @@ import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
 import colorUtil from '../../../util/helpers/colors';
 import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
-import calendarEventUtil from '../../../util/helpers/calendar_events';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
 import TimeUtil from '../../../util/helpers/time';
+import CalendarUtil from '../../../util/helpers/calendar';
 
 const dashRotate = keyframes`
   0% {
@@ -101,7 +101,7 @@ const EventContent = styled.div<{
 				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
 		}};
 	height: 100%;
-	padding: 8px;
+	padding: 7px 8px;
 	border-radius: 10px;
 	cursor: pointer;
 	display: flex;
@@ -111,18 +111,19 @@ const EventContent = styled.div<{
 
 	header {
 		display: flex;
+		align-items: start;
 
 		h3 {
 			flex: 1;
 			display: -webkit-box;
-			line-height: 21px;
+			line-height: 16px;
 			-webkit-box-orient: vertical;
-			-webkit-line-clamp: ${({ height }) => Math.floor((height - 46) / 21)};
+			-webkit-line-clamp: ${({ height }) => Math.floor((height - 46) / 16)};
 			max-height: calc(${({ height }) => height}px - 46px);
 			text-overflow: ellipsis;
 			overflow: hidden;
 			font-weight: ${styles.typography.fontWeight.medium};
-			font-size: ${styles.typography.fontSize.sm};
+			font-size: 13px;
 		}
 
 		${EventLockIcon} {
@@ -187,6 +188,7 @@ const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: numbe
 	}};
 	font-size: ${styles.typography.fontSize.xs};
 	font-weight: ${styles.typography.fontWeight.semibold};
+z-index: -1;
 
 	span {
 		display: flex;
@@ -201,9 +203,37 @@ type CalendarEventsProps = {
 	headerWidth: number;
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
-	cellHeight: number;
-	setCellHeight: React.Dispatch<React.SetStateAction<number>>;
-	scrollToTime: (time: dayjs.Dayjs, cellHeight: number) => void;
+};
+
+type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
+type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
+	key: string;
+	colorRed: number;
+	colorGreen: number;
+	colorBlue: number;
+};
+type StyledEvent = CurrentViewEvent & {
+	properties: {
+		eventLayerKey: string;
+		eventLayerIndex: number;
+		eventLayerSize: number;
+		startHourFraction: number;
+		endHourFraction: number;
+	};
+	springStyles: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	};
+};
+type StyledTravelDetail = CurrentViewTravelDetail & {
+	springStyles: {
+		left: number;
+		top: number;
+		width: number;
+		height: number;
+	};
 };
 
 const CalendarEvents = ({
@@ -212,18 +242,7 @@ const CalendarEvents = ({
 	headerWidth,
 	selectedEvent,
 	setSelectedEvent,
-	cellHeight,
-	setCellHeight,
-	scrollToTime,
 }: CalendarEventsProps) => {
-	type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
-	type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
-		key: string;
-		colorRed: number;
-		colorGreen: number;
-		colorBlue: number;
-	};
-
 	const { currentViewEvents, currentViewTravelDetails } = useMemo(() => {
 		const currentViewEvents: Array<CurrentViewEvent> = [];
 		const currentViewTravelDetails: Array<CurrentViewTravelDetail> = [];
@@ -237,8 +256,6 @@ const CalendarEvents = ({
 		for (const event of events) {
 			const start = dayjs(event.start);
 			let end = dayjs(event.end);
-
-			// Skip events that are not in the current view
 			if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
 
 			// 💡 Treat midnight as still part of previous day
@@ -289,84 +306,6 @@ const CalendarEvents = ({
 		return { currentViewEvents, currentViewTravelDetails };
 	}, [events, viewOptions]);
 
-	useEffect(() => {
-		if (currentViewEvents.length > 0) {
-			// Set Cell Height based on the event with minimum duration
-			const minDurationEvent = currentViewEvents.reduce(
-				(minEvent, event) => {
-					const duration = dayjs(event.end, 'unix').diff(
-						dayjs(event.start, 'unix'),
-						'minute'
-					);
-					return duration < minEvent.duration ? { event, duration } : minEvent;
-				},
-				{ event: currentViewEvents[0], duration: Infinity }
-			);
-
-			const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
-			const minDurationInMinutes = minDurationEvent.duration;
-			const newCellHeight = minCellHeight * (60 / minDurationInMinutes);
-
-			setCellHeight(newCellHeight);
-
-			// Scroll to the earliest event whenever the current events change
-			const earliestEvent = currentViewEvents.reduce((earliest, event) => {
-				const start = dayjs(event.start, 'unix');
-				const startTime = start.hour() + start.minute() / 60;
-				const earliestTime = earliest.hour() + earliest.minute() / 60;
-				return startTime < earliestTime ? start : earliest;
-			}, dayjs('9999-12-31').endOf('day'));
-
-			if (earliestEvent.isValid()) {
-				setTimeout(() => {
-					scrollToTime(earliestEvent, newCellHeight);
-				}, 0);
-			}
-		}
-	}, [currentViewEvents, setCellHeight]);
-
-	type StyledEvent = CurrentViewEvent & {
-		properties: {
-			layerGroupKey: string;
-			layerIndex: number;
-			layerGroupLength: number;
-			startHourFraction: number;
-			endHourFraction: number;
-		};
-		springStyles: {
-			x: number;
-			y: number;
-			width: number;
-			height: number;
-		};
-	};
-
-	type StyledTravelDetail = CurrentViewTravelDetail & {
-		springStyles: {
-			left: number;
-			top: number;
-			width: number;
-			height: number;
-		};
-	};
-
-	function getBoundingBox(
-		s: dayjs.Dayjs,
-		e: dayjs.Dayjs
-	): { x: number; y: number; width: number; height: number } {
-		const startHourFraction = s.hour() + s.minute() / 60;
-		const endHourFraction = e.hour() + e.minute() / 60;
-		const dayIndex = s.diff(viewOptions.startDay.startOf('day'), 'day');
-
-		// Positioning the event based on the day index and width
-		const height = cellHeight * (endHourFraction - startHourFraction);
-		const width = headerWidth / viewOptions.daysInView;
-		const x = dayIndex * width;
-		const y = cellHeight * startHourFraction;
-
-		return { x, y, width, height };
-	}
-
 	const styledEvents = useMemo(() => {
 		const result = [] as Array<StyledEvent>;
 
@@ -378,24 +317,31 @@ const CalendarEvents = ({
 		currentViewEvents.forEach((event) => {
 			const s = dayjs(event.start, 'unix');
 			const e = dayjs(event.end, 'unix');
-			const { x, y, width, height } = getBoundingBox(s, e);
+			const eventBox = CalendarUtil.getBoundingBox(s, e, viewOptions, headerWidth);
+			const { x, y, width, height } = eventBox;
 			const startHourFraction = s.hour() + s.minute() / 60;
 			const endHourFraction = e.hour() + e.minute() / 60;
 
 			// Layering intersected events
 			const lastEvent = result[result.length - 1] as StyledEvent | undefined;
-			const isOverlapping = calendarEventUtil.isInterseting(event, lastEvent);
-			const layerGroupKey =
-				isOverlapping && lastEvent ? lastEvent.properties.layerGroupKey || '' : event.key;
+			const isSameDay = dayjs(event.start, 'unix').isSame(
+				dayjs(lastEvent?.start, 'unix'),
+				'day'
+			);
+			const lastEventIntersecting =
+				!!lastEvent && isSameDay && CalendarUtil.isInterseting(eventBox, lastEvent.springStyles);
+			const eventLayerKey = lastEventIntersecting
+				? lastEvent.properties.eventLayerKey
+				: event.key;
 
 			const styledEvent = {
 				...event,
 				properties: {
 					startHourFraction,
 					endHourFraction,
-					layerGroupKey,
-					layerIndex: 0,
-					layerGroupLength: 1,
+					eventLayerKey,
+					eventLayerIndex: 0,
+					eventLayerSize: 1,
 				},
 				springStyles: { x, y, width, height },
 			};
@@ -405,7 +351,7 @@ const CalendarEvents = ({
 		// Sort by start time ascending
 		// If events have the same layerGroupKey, sort descending by duration
 		result.sort((a, b) => {
-			if (a.properties.layerGroupKey === b.properties.layerGroupKey) {
+			if (a.properties.eventLayerKey === b.properties.eventLayerKey) {
 				return (
 					dayjs(b.end, 'unix').diff(dayjs(b.start, 'unix')) -
 					dayjs(a.end, 'unix').diff(dayjs(a.start, 'unix'))
@@ -417,7 +363,7 @@ const CalendarEvents = ({
 		// Calculating the layerGroupLength and and layerIndex
 		const layerEventMap = new Map<string, Array<string>>();
 		result.forEach((event) => {
-			const layerGroupKey = event.properties.layerGroupKey;
+			const layerGroupKey = event.properties.eventLayerKey;
 			if (!layerEventMap.has(layerGroupKey)) {
 				layerEventMap.set(layerGroupKey, []);
 			}
@@ -426,13 +372,13 @@ const CalendarEvents = ({
 
 		// Assigning layerGroupLength and layerIndex / updating springStyles
 		result.forEach((event) => {
-			const layerGroupKey = event.properties.layerGroupKey;
+			const layerGroupKey = event.properties.eventLayerKey;
 			const layerEvents = layerEventMap.get(layerGroupKey) || [];
 			const layerIndex = layerEvents.indexOf(event.key);
 			const layerGroupLength = layerEvents.length;
 			if (layerGroupLength > 1) {
-				event.properties.layerIndex = layerIndex;
-				event.properties.layerGroupLength = layerGroupLength;
+				event.properties.eventLayerIndex = layerIndex;
+				event.properties.eventLayerSize = layerGroupLength;
 
 				// Update springStyles
 				const fullWidth = event.springStyles.width;
@@ -445,7 +391,7 @@ const CalendarEvents = ({
 		});
 
 		return result;
-	}, [currentViewEvents, cellHeight]);
+	}, [currentViewEvents]);
 
 	const styledTravelDetails = useMemo(() => {
 		const result = [] as Array<StyledTravelDetail>;
@@ -453,7 +399,12 @@ const CalendarEvents = ({
 		currentViewTravelDetails.forEach((detail) => {
 			const s = dayjs(detail.start);
 			const e = dayjs(detail.end);
-			const { x, y, width, height } = getBoundingBox(s, e);
+			const { x, y, width, height } = CalendarUtil.getBoundingBox(
+				s,
+				e,
+				viewOptions,
+				headerWidth
+			);
 
 			result.push({
 				...detail,
@@ -505,11 +456,7 @@ const CalendarEvents = ({
 							colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
 						>
 							<EventContent
-								height={
-									cellHeight *
-									(event.properties.endHourFraction -
-										event.properties.startHourFraction)
-								}
+								height={event.springStyles.height}
 								colors={{
 									r: event.colorRed,
 									g: event.colorGreen,
