@@ -7,11 +7,14 @@ import ArrowRight2 from '../../icons/arrow_right2';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaExpandedCard from './persona_expanded_card';
+import { Persona } from '../../../types/persona';
+import { getPersonaImage } from '../../../data/persona';
 
 const Card = styled(animated.div)<{
 	gradient?: number;
 	$active: boolean;
 	$selected?: boolean;
+	$mounted?: boolean;
 }>`
 	min-width: 315px;
 	height: 100%;
@@ -20,7 +23,7 @@ const Card = styled(animated.div)<{
 	border-radius: ${styles.borderRadius.xxLarge};
 	color: white;
 	position: relative;
-	opacity: ${(props) => (props.$active ? 1 : 0.5)};
+	opacity: ${(props) => (props.$mounted ? (props.$active ? 1 : 0.5) : 0)};
 	transition: opacity 0.3s ease-in-out;
 	cursor: ${(props) => (props.$selected ? 'auto' : 'pointer')};
 
@@ -93,7 +96,7 @@ const OverlayContainer = styled.div<{ $selected: boolean }>`
 const Overlay = styled.div`
 	background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
 	width: 100%;
-	padding: 1.5rem;
+	padding: 1.5rem 1.25rem;
 `;
 
 const OverlayHeader = styled.header`
@@ -105,7 +108,9 @@ const OverlayHeader = styled.header`
 const OverlayTitle = styled.h3`
 	font-size: ${styles.typography.fontSize.displayXs};
 	font-weight: bold;
+	line-height: 1.2;
 	font-family: ${styles.typography.fontFamily.urban};
+	margin-bottom: 0.5rem;
 `;
 
 const OverlayHeaderTag = styled(animated.span)`
@@ -121,15 +126,15 @@ const OverlayHeaderTag = styled(animated.span)`
 const OverlayList = styled(animated.ul)`
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 	gap: 0.5rem;
+	z-index: 1;
 `;
 
 const OverlayListItem = styled(animated.li)`
+	height: fit-content;
 	width: fit-content;
 	display: flex;
 	gap: 0.25rem;
-	justify-content: space-between;
 	align-items: center;
 	font-size: ${styles.typography.fontSize.sm};
 	color: ${styles.colors.white};
@@ -157,11 +162,12 @@ const OverlayListItem = styled(animated.li)`
 `;
 
 const ButtonContainer = styled.div`
-	margin-top: -3rem;
 	display: flex;
+	margin-top: -2.25rem;
 	align-items: center;
 	justify-content: end;
 	border-radius: 0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge};
+	z-index: 2;
 `;
 
 const ButtonStyled = styled(animated.button)`
@@ -171,6 +177,7 @@ const ButtonStyled = styled(animated.button)`
 	place-items: center;
 	border-radius: ${styles.borderRadius.xxLarge};
 	background-color: ${styles.colors.brand[600]};
+	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
 
 	&:hover {
 		background-color: ${styles.colors.brand[700]};
@@ -178,30 +185,30 @@ const ButtonStyled = styled(animated.button)`
 	transition: background-color 0.3s ease-in-out;
 `;
 
-const tileSuggestions = [
-	{ id: 1, name: 'Tile Suggestion 1' },
-	{ id: 2, name: 'Tile Suggestion 2' },
-];
-
-interface PersonaCardProps {
-	persona: number;
-	occupation: string;
-	backgroundImage: string;
+type PersonaCardProps = {
+	persona: Persona & { key: number };
 	gradient?: boolean;
 	selectedPersona: number | null;
 	setSelectedPersona: React.Dispatch<React.SetStateAction<number | null>>;
-}
+};
 
 const PersonaCard: React.FC<PersonaCardProps> = ({
 	persona,
-	occupation,
-	backgroundImage,
 	gradient,
 	selectedPersona,
 	setSelectedPersona,
 }) => {
-	const isSelected = selectedPersona === persona; // Check if this card is selected
-	const isNotCurrentSelected = selectedPersona !== null && selectedPersona !== persona; // Check if another card is selected
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const isSelected = selectedPersona === persona.key; // Check if this card is selected
+	const isNotCurrentSelected = selectedPersona !== null && selectedPersona !== persona.key; // Check if another card is selected
+	const tileSuggestions = persona.tilePreferences.map((pref, index) => ({
+		id: index + 1,
+		name: pref.TileName,
+	}));
 
 	const swiper = useSwiper();
 	const swiperSlide = useSwiperSlide();
@@ -210,7 +217,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const displayUI = mouseHovered || (swiperSlide.isActive && isMobile);
 
 	function onSelect() {
-		setSelectedPersona(persona); // Update the selected state
+		setSelectedPersona(persona.key); // Update the selected state
 	}
 	function onDeselect() {
 		setSelectedPersona(null); // Clear the selected state
@@ -219,7 +226,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
 	useEffect(() => {
 		if (isNotCurrentSelected && swiperSlide.isActive) {
-			let diff = selectedPersona - persona;
+			let diff = selectedPersona - persona.key;
 			// if difference is greater than 1
 			if (Math.abs(diff) > 1) {
 				if (diff > 1) {
@@ -255,7 +262,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const tileListSpring = useSpring({
 		ref: tileListApi,
 		from: { height: 0 },
-		to: { height: displayUI ? 40 * tileSuggestions.length + 16 : 0 },
+		to: { height: displayUI ? 40 * tileSuggestions.length : 0 },
 		config: { tension: 200, friction: 30 },
 	});
 
@@ -311,15 +318,16 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			gradient={gradient && !isSelected ? 1 : 0}
 			$active={swiperSlide.isActive}
 			$selected={isSelected}
+			$mounted={mounted}
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
 			style={cardSpring}
 		>
-			<CardImage $backgroundImage={backgroundImage} $selected={isSelected} />
+			<CardImage $backgroundImage={getPersonaImage(persona.id)} $selected={isSelected} />
 			<OverlayContainer $selected={isSelected}>
 				<Overlay>
 					<OverlayHeader>
-						<OverlayTitle>{occupation}</OverlayTitle>
+						<OverlayTitle>{persona.name}</OverlayTitle>
 						<OverlayHeaderTag style={overlayTagSpring}>Tiles</OverlayHeaderTag>
 					</OverlayHeader>
 					<OverlayList style={tileListSpring}>
@@ -341,7 +349,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			</OverlayContainer>
 			{/* Set expanded width to the final width of animation */}
 			<PersonaExpandedCard
-				occupation={occupation}
+				occupation={persona.occupation}
 				display={isSelected}
 				onCollapse={onDeselect}
 				expandedWidth={expandedWidth}

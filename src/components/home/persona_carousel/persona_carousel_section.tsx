@@ -8,7 +8,9 @@ import 'swiper/css';
 import Section from '../../layout/section';
 import styled from 'styled-components';
 import useIsMobile from '../../../hooks/useIsMobile';
-import usePersonas from '../../../data/persona';
+import { PersonaApi } from '../../../api/personaApi';
+import { Persona } from '../../../types/persona';
+import PersonaCardTemplate from './persona_card_template';
 
 const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 	position: relative;
@@ -39,7 +41,24 @@ const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 `;
 
 const PersonaCarousel: React.FC = () => {
-	const { personas } = usePersonas();
+	// const { personas } = usePersonas();
+	const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
+
+	async function getPersonas() {
+		const personaApi = new PersonaApi();
+		const data = await personaApi.getPersonas();
+		if (data) {
+			const personasWithKeys = data.personas.map((persona, index) => ({
+				...persona,
+				key: index,
+			}));
+			setPersonas(personasWithKeys);
+		}
+	}
+
+	useEffect(() => {
+		getPersonas();
+	}, []);
 
 	const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
 	const isMobile = useIsMobile();
@@ -66,6 +85,21 @@ const PersonaCarousel: React.FC = () => {
 		handleUpdateSlides();
 	}, [isMobile, isTablet]);
 
+	const swiperStyles: React.CSSProperties = {
+		position: 'relative',
+		height: 'calc(100svh - 100px)',
+		maxHeight: '680px',
+		minHeight: '500px',
+	};
+
+	const slideContentStyles: React.CSSProperties = {
+		position: 'absolute',
+		top: 0,
+		height: '100%',
+		transform: 'translateX(-50%)',
+		left: '50%',
+	};
+
 	return (
 		<Section paddingBlock={0}>
 			<EdgeFadeSwiper
@@ -81,36 +115,26 @@ const PersonaCarousel: React.FC = () => {
 				}}
 				$visible={selectedPersona === null}
 			>
-				{personas.map((persona) => (
-					<SwiperSlide
-						key={persona.key}
-						style={{
-							position: 'relative',
-							height: 'calc(100svh - 100px)',
-							maxHeight: '680px',
-							minHeight: '500px',
-						}}
-					>
-						<div
-							style={{
-								position: 'absolute',
-								top: 0,
-								height: '100%',
-								transform: 'translateX(-50%)',
-								left: '50%',
-							}}
-						>
-							<PersonaCard
-								persona={persona.key}
-								occupation={persona.occupation}
-								backgroundImage={persona.image}
-								gradient={persona.highlight}
-								selectedPersona={selectedPersona}
-								setSelectedPersona={setSelectedPersona}
-							/>
-						</div>
-					</SwiperSlide>
-				))}
+				{personas.length
+					? personas.map((persona) => (
+							<SwiperSlide key={persona.key} style={swiperStyles}>
+								<div style={slideContentStyles}>
+									<PersonaCard
+										persona={persona}
+										gradient={['custom-persona'].includes(persona.id)}
+										selectedPersona={selectedPersona}
+										setSelectedPersona={setSelectedPersona}
+									/>
+								</div>
+							</SwiperSlide>
+						))
+					: Array.from({ length: 8 }).map((_, index) => (
+							<SwiperSlide key={index} style={swiperStyles}>
+								<div style={slideContentStyles}>
+									<PersonaCardTemplate />
+								</div>
+							</SwiperSlide>
+						))}
 			</EdgeFadeSwiper>
 		</Section>
 	);
