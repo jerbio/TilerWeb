@@ -9,6 +9,7 @@ import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaExpandedCard from './persona_expanded_card';
 import { Persona } from '../../../types/persona';
 import { getPersonaImage } from '../../../data/persona';
+import { Check } from 'lucide-react';
 
 const Card = styled(animated.div)<{
 	gradient?: number;
@@ -130,7 +131,7 @@ const OverlayList = styled(animated.ul)`
 	z-index: 1;
 `;
 
-const OverlayListItem = styled(animated.li)`
+const OverlayListItem = styled(animated.li)<{ $isSelected: boolean }>`
 	height: fit-content;
 	width: fit-content;
 	display: flex;
@@ -139,12 +140,17 @@ const OverlayListItem = styled(animated.li)`
 	font-size: ${styles.typography.fontSize.sm};
 	color: ${styles.colors.white};
 
-	background: ${styles.colors.gray[800]};
+	background: ${({ $isSelected }) =>
+		$isSelected ? styles.colors.brand[600] : styles.colors.gray[800]};
 	border-radius: ${styles.borderRadius.xLarge};
-	border: 1px solid ${styles.colors.gray[700]};
+	border: 1px solid
+		${({ $isSelected }) => ($isSelected ? 'transparent' : styles.colors.gray[700])};
 	padding-left: 12px;
 	line-height: 1.3;
 	color: ${styles.colors.gray[100]};
+	transition:
+		background-color 0.25s ease-in-out,
+		color 0.25s ease-in-out;
 
 	button {
 		height: 32px;
@@ -152,7 +158,8 @@ const OverlayListItem = styled(animated.li)`
 		display: grid;
 		place-items: center;
 		border-radius: ${styles.borderRadius.xLarge};
-		color: ${styles.colors.gray[500]};
+		color: ${({ $isSelected }) =>
+			$isSelected ? styles.colors.white : styles.colors.gray[400]};
 		transition: color 0.25s ease-in-out;
 
 		&:hover {
@@ -205,10 +212,18 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
 	const isSelected = selectedPersona === persona.key; // Check if this card is selected
 	const isNotCurrentSelected = selectedPersona !== null && selectedPersona !== persona.key; // Check if another card is selected
-	const tileSuggestions = persona.tilePreferences.map((pref, index) => ({
-		id: index + 1,
-		name: pref.TileName,
-	}));
+	const [tileSuggestions, setTileSuggestions] = useState(
+		persona.tilePreferences.map((pref, index) => ({
+			id: index + 1,
+			name: pref.TileName,
+			selected: false,
+		}))
+	);
+	function toggleTileSuggestion(id: number) {
+		setTileSuggestions((prev) =>
+			prev.map((tile) => (tile.id === id ? { ...tile, selected: !tile.selected } : tile))
+		);
+	}
 
 	const swiper = useSwiper();
 	const swiperSlide = useSwiperSlide();
@@ -332,10 +347,14 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 					</OverlayHeader>
 					<OverlayList style={tileListSpring}>
 						{tileListTransition((style, tile) => (
-							<OverlayListItem key={tile.id} style={style}>
+							<OverlayListItem
+								key={tile.id}
+								style={style}
+								$isSelected={tile.selected}
+							>
 								<span>{tile.name}</span>
-								<button>
-									<Add size={12} />
+								<button onClick={() => toggleTileSuggestion(tile.id)}>
+									{tile.selected ? <Check size={14} /> : <Add size={12} />}
 								</button>
 							</OverlayListItem>
 						))}
