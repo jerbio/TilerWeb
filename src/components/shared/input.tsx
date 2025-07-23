@@ -7,7 +7,7 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	variant?: 'default' | 'brand';
 	sized?: 'small' | 'medium' | 'large';
 	height?: number; // Optional height override
-	borderGradient?: Array<string>; // Array of colors for border gradient
+	bordergradient?: Array<string>; // Array of colors for border gradient
 };
 
 const StyledInputWrapper = styled.div<InputProps>`
@@ -26,7 +26,7 @@ const StyledInputWrapper = styled.div<InputProps>`
 					: styles.inputHeights.large};
 
 	${(props) =>
-		props.borderGradient &&
+		props.bordergradient &&
 		`@property --rotation {
       inherits: false;
       initial-value: 0deg;
@@ -40,8 +40,8 @@ const StyledInputWrapper = styled.div<InputProps>`
     animation: rotate 3s linear infinite;`}
 
 	background: ${(props) =>
-		props.borderGradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.borderGradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.borderGradient[0]})`
+		props.bordergradient
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
 			: props.variant === 'brand'
 				? styles.colors.brand[400] + '99'
 				: styles.colors.gray[800]};
@@ -49,8 +49,8 @@ const StyledInputWrapper = styled.div<InputProps>`
 
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
-			props.borderGradient
-				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.borderGradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.borderGradient[0]})`
+			props.bordergradient
+				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
 				: props.variant === 'brand'
 					? styles.colors.brand[400] + 'CC'
 					: styles.colors.gray[700]};
@@ -101,7 +101,7 @@ const Input: React.FC<InputProps> = ({
 	disabled = false,
 	variant = 'default',
 	sized = 'medium',
-	borderGradient,
+	bordergradient: borderGradient,
 	...props
 }) => {
 	return (
@@ -110,14 +110,14 @@ const Input: React.FC<InputProps> = ({
 			disabled={disabled}
 			variant={variant}
 			sized={sized}
-			borderGradient={borderGradient}
+			bordergradient={borderGradient}
 		>
 			<StyledInput
 				{...props}
 				disabled={disabled}
 				variant={variant}
 				sized={sized}
-				borderGradient={borderGradient}
+				bordergradient={borderGradient}
 			/>
 		</StyledInputWrapper>
 	);

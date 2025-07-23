@@ -10,12 +10,12 @@ import { ScheduleId, ScheduleSubCalendarEvent } from '../../../types/schedule';
 import Spinner from '../loader';
 import TimeUtil from '../../../util/helpers/time';
 
-const CalendarContainer = styled.div<{ mounted: boolean }>`
+const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	position: relative;
 	width: 100%;
 	height: 100%;
 	background-color: ${styles.colors.gray[900]};
-	opacity: ${({ mounted }) => (mounted ? 1 : 0)};
+	opacity: ${({ $isMounted }) => ($isMounted ? 1 : 0)};
 	transition: opacity 0.3s 0.5s ease-in-out;
 	user-select: none;
 `;
@@ -72,26 +72,26 @@ const CalendarHeaderDateList = styled.ul`
 	flex: 1;
 `;
 
-const CalendarHeaderDateItem = styled.li<{ today: boolean }>`
+const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	flex: 1;
 	font-family: ${styles.typography.fontFamily.urban};
 	font-weight: ${styles.typography.fontWeight.bold};
 	font-size: ${styles.typography.fontSize.lg};
 	text-transform: uppercase;
-	color: ${({ today }) => (today ? styles.colors.white : styles.colors.gray[400])};
+	color: ${({ $isToday }) => ($isToday ? styles.colors.white : styles.colors.gray[400])};
 
 	&:not(:last-child) {
 		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	}
 
-	background-color: ${({ today }) => (today ? styles.colors.gray[700] : 'transparent')};
+	background-color: ${({ $isToday }) => ($isToday ? styles.colors.gray[700] : 'transparent')};
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 0.5ch;
 
 	span {
-		color: ${({ today }) => (today ? styles.colors.brand[400] : styles.colors.gray[200])};
+		color: ${({ $isToday }) => ($isToday ? styles.colors.brand[400] : styles.colors.gray[200])};
 	}
 `;
 
@@ -246,7 +246,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 	}, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
 	return (
-		<CalendarContainer mounted={contentMounted}>
+		<CalendarContainer $isMounted={contentMounted}>
 			<CalendarHeader>
 				<CalendarHeaderActions>
 					<ChangeViewButton onClick={() => changeDayView('left')}>
@@ -260,7 +260,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 					{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
 						const date = viewOptions.startDay.add(index, 'day');
 						return (
-							<CalendarHeaderDateItem key={index} today={date.isSame(dayjs(), 'day')}>
+							<CalendarHeaderDateItem key={index} $isToday={date.isSame(dayjs(), 'day')}>
 								{/* 3 letter day */}
 								<h3>{date.format('ddd')}</h3>
 								{/* 2 number date */}

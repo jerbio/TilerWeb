@@ -118,7 +118,7 @@ const Chat = ({ onClose }: ChatProps) => {
 					type="text"
 					height={48}
 					placeholder={t('home.expanded.chat.inputPlaceholder')}
-					borderGradient={[styles.colors.brand[500]]}
+					bordergradient={[styles.colors.brand[500]]}
 				/>
 				<ChatButton type="submit">
 					<Plus size={20} />
