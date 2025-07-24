@@ -5,13 +5,26 @@ export interface ChatContextType {
 	Name: string; // Name of the tile we want in context
 	Description?: string; // Description of the tile
 }
+export interface UserInfo {
+	userId?: string;
+	name?: string;
+	email?: string;
+	scheduleId: string;
+}
+
 interface AppState {
 	chatContext: ChatContextType[]; // Represents an array of chat contexts
 	addChatContext: (context: ChatContextType) => void; // Action to add a new chat context
 	removeChatContext: (context: ChatContextType) => void; // Action to remove a specific chat context
 	clearChatContext: () => void; // Action to clear all chat contexts
-	scheduleChange: boolean; // Indicates if a schedule change has occurred
-	setScheduleChange: (value: boolean) => void; // Action to set the schedule change state
+	scheduleId: string | null; // Action to set the schedule change state
+	setScheduleId: (id: string | null) => void; // Action to set the schedule ID
+	scheduleLastUpdatedBy: string | null; // Action to set the last updated by component
+	setScheduleLastUpdatedBy: (component: string | null) => void; // Action to set the last updated by component
+
+	// New user info state
+	userInfo: UserInfo | null;
+	setUserInfo: (info: UserInfo) => void;
 }
 
 const useAppStore = create<AppState>((set) => ({
@@ -22,8 +35,14 @@ const useAppStore = create<AppState>((set) => ({
 			chatContext: state.chatContext.filter((item) => item !== context), // Removes the specified context
 		})),
 	clearChatContext: () => set(() => ({ chatContext: [] })), // Clears all contexts
-	scheduleChange: false, // Initial value for scheduleChange is false
-	setScheduleChange: (value: boolean) => set(() => ({ scheduleChange: value }))
+	scheduleId: null, // Initial value for scheduleId is null
+	setScheduleId: (id) => set(() => ({ scheduleId: id })), //
+	scheduleLastUpdatedBy: null, // Initial value for scheduleLastUpdatedBy is null
+	setScheduleLastUpdatedBy: (component) => set(() => ({ scheduleLastUpdatedBy: component })), // Sets the last updated by component
+
+	// User info state
+	userInfo: null,
+	setUserInfo: (info) => set(() => ({ userInfo: info })),
 }));
 
 // {EntityId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d++01JTVFJDG5B8G5RBJEY4E365GQ_7_01JTVFJDG5QMY0STMNA82AZ18D_01JTVFJDG521S2V82V17J4ZTX7', Name: 'Work Out', Description: ''}

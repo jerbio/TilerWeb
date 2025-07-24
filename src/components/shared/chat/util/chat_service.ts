@@ -1,6 +1,7 @@
 import { ChatVibeResponse, ChatPromptResponse } from './chat';
 
 const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
+const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Actions';
 const STORAGE_KEY = 'chat_session_id';
 
 interface SendMessageRequest {
@@ -45,12 +46,50 @@ export const fetchChatMessages = async (sessionId: string): Promise<ChatPromptRe
 	}
 };
 
+// export const fetchChatActions = async (actionId: string): Promise<ChatVibeResponse> => {
+// 	try {
+// 		const response = await fetch(`${API_ACTIONS_URL}?ActionId=${encodeURIComponent(actionId)}`);
+// 		if (!response.ok) {
+// 			throw new Error(`HTTP error! status: ${response.status}`);
+// 		}
+// 		const data = await response.json();
+// 		return data;
+// 	} catch (error) {
+// 		console.error('Error fetching chat actions:', error);
+// 		throw error;
+// 	}
+// };
+
+export const fetchChatActions = async (
+	actionIds: string[] | string
+): Promise<ChatVibeResponse[] | ChatVibeResponse> => {
+	try {
+		// Handle both single and multiple action IDs
+		const queryParam = Array.isArray(actionIds)
+			? actionIds.map((id) => `ActionIds=${encodeURIComponent(id)}`).join('&')
+			: `ActionId=${encodeURIComponent(actionIds)}`;
+
+		const response = await fetch(`${API_ACTIONS_URL}?${queryParam}`);
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data = await response.json();
+
+		return Array.isArray(actionIds) ? data : data;
+	} catch (error) {
+		console.error('Error fetching chat actions:', error);
+		throw error;
+	}
+};
+
 export const sendChatMessage = async (
 	message: string,
 	entityId: string,
 	sessionId: string = '',
 	requestId?: string,
-	actionId?: string,
+	actionId?: string
 ): Promise<ChatVibeResponse> => {
 	try {
 		const requestBody: SendMessageRequest = {

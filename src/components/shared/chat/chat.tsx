@@ -8,8 +8,10 @@ import Logo from '../../icons/logo';
 import { Prompt } from './util/chat';
 import {
 	fetchChatMessages,
+	fetchChatActions,
 	sendChatMessage,
 	getStoredSessionId,
+	setStoredSessionId,
 	clearStoredSessionId,
 } from './util/chat_service';
 import useAppStore from '../../../global_state'; // Import Zustand Global State
@@ -19,7 +21,7 @@ import { Actions, Status } from '../../../util/enums'; // Import the enums
 const ChatContainer = styled.section`
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	// gap: 1rem;
 	height: 100%;
 	padding: 1.5rem;
 
@@ -48,6 +50,19 @@ const ChatTitle = styled.h2`
 
 const ChatContent = styled.div`
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+	max-height: 400px;
+
+	.messages-list {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		overflow-y: auto;
+	}
 `;
 
 const ChatForm = styled.form`
@@ -98,20 +113,80 @@ const EmptyChat = styled.div`
 	}
 `;
 
+const MessageBubble = styled.div<{ $isUser: boolean }>`
+	display: flex;
+	flex-direction: column;
+	align-items: ${({ $isUser }) => ($isUser ? 'flex-end' : 'flex-start')};
+	text-align: ${({ $isUser }) => ($isUser ? 'right' : 'left')};
+	margin: 0.5rem 0;
+
+	.message-content {
+		background-color: ${({ $isUser }) => ($isUser ? '#2a2a2a' : '#c20f31')};
+		color: #ffffff;
+		padding: 0.75rem 1rem;
+		border-radius: 1rem;
+		max-width: 70%;
+		word-wrap: break-word;
+	}
+`;
+
 type ChatProps = {
 	onClose?: () => void;
 };
 
+type Action = {
+	id: string;
+	descriptions: string;
+	type: string;
+	creationTimeInMs: number;
+	status: string;
+	beforeScheduleId: string;
+	afterScheduleId: string;
+	vibeRequest: {
+		id: string;
+		creationTimeInMs: number;
+		activeAction: string | null;
+		isClosed: boolean;
+		actions: any[];
+	};
+};
+
+type PromptWithActions = {
+	id: string;
+	origin: string;
+	content: string;
+	actionId: string | null;
+	requestId: string;
+	sessionId: string;
+	actions: Action[];
+};
+
 const Chat = ({ onClose }: ChatProps) => {
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
+	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
 	const messagesEndRef = useRef<HTMLDivElement>(null);
-	const [messages, setMessages] = useState<Prompt[]>([]);
 	const [message, setMessage] = useState('');
+	const [messages, setMessages] = useState<PromptWithActions[]>([]);
 	const [isSending, setIsSending] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
+
+	const scheduleId = useAppStore((state) => state.scheduleId);
+	// console.log('Current Schedule ID:', scheduleId);
+	const [count, setCount] = useState(0);
+	const randomStrings = Array.from({ length: 20 }, () =>
+		Math.random().toString(36).substring(2, 10)
+	);
+	const handleSetScheduleIdByIndex = (index: number) => {
+		setScheduleId(randomStrings[index]);
+		setCount((prev) => prev + 1);
+	};
+
+	useEffect(() => {
+		console.log('Updated Messages:', messages);
+	}, [messages]);
 
 	// Load session ID from local storage on mount
 	useEffect(() => {
@@ -133,11 +208,40 @@ const Chat = ({ onClose }: ChatProps) => {
 		try {
 			setIsLoading(true);
 			setError(null);
+
 			const data = await fetchChatMessages(sid);
-			// Convert the fetched messages to our Message format
+
 			if (data.Content?.chats) {
-				const loadedMessages = data.Content.chats;
-				setMessages(loadedMessages);
+				const loadedMessages: PromptWithActions[] = data.Content.chats.map(
+					(entry: any) => ({
+						id: entry.id,
+						origin: entry.origin,
+						content: entry.content,
+						actionId: entry.actionId,
+						requestId: entry.requestId,
+						sessionId: entry.sessionId,
+						actions:
+							entry.actions?.map((action: any) => ({
+								...action,
+								vibeRequest: {
+									...action.vibeRequest,
+									isClosed: action.vibeRequest?.isClosed ?? false,
+								},
+							})) ?? [], // 👈 ensure actions is always an array
+					})
+				);
+
+				// Sort oldest to newest by ID
+				loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
+
+				// Merge with existing messages, avoiding duplicates
+				setMessages((prevMessages) => {
+					const existingIds = new Set(prevMessages.map((m) => m.id));
+					const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+					return [...prevMessages, ...uniqueNewMessages];
+				});
+
+				console.log('Loaded Messages:', loadedMessages);
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to load chat messages');
@@ -146,6 +250,105 @@ const Chat = ({ onClose }: ChatProps) => {
 		}
 	};
 
+	// const loadChatMessages = async (sid: string) => {
+	// 	if (!sid) return;
+	// 	try {
+	// 		setIsLoading(true);
+	// 		setError(null);
+
+	// 		const data = await fetchChatMessages(sid);
+
+	// 		if (data.Content?.chats) {
+	// 			const loadedMessages: PromptWithActions[] = data.Content.chats.map(
+	// 				(entry: any) => ({
+	// 					id: entry.id,
+	// 					origin: entry.origin,
+	// 					content: entry.content,
+	// 					actionId: entry.actionId,
+	// 					requestId: entry.requestId,
+	// 					sessionId: entry.sessionId,
+	// 					actions: entry.actions?.map((action: any) => ({
+	// 						...action,
+	// 						vibeRequest: {
+	// 							...action.vibeRequest,
+	// 							isClosed:
+	// 								action.vibeRequest?.isClosed === null
+	// 									? false
+	// 									: action.vibeRequest.isClosed,
+	// 						},
+	// 					})),
+	// 				})
+	// 			);
+
+	// 			// Sort oldest to newest by prompt ID (assumes timestamp-like IDs)
+	// 			loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
+
+	// 			setMessages(loadedMessages);
+	// 			console.log('loadMessages');
+	// 		}
+	// 	} catch (err) {
+	// 		setError(err instanceof Error ? err.message : 'Failed to load chat messages');
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// };
+
+	// const loadChatMessages = async (sid: string) => {
+	// 	if (!sid) return;
+
+	// 	try {
+	// 		setIsLoading(true);
+	// 		setError(null);
+
+	// 		const data = await fetchChatMessages(sid);
+
+	// 		if (data.Content?.chats) {
+	// 			const loadedPrompts = data.Content.chats;
+
+	// 			// Collect all action IDs
+	// 			const allActionIds = loadedPrompts.flatMap((entry: any) => entry.actionId || []);
+	// 			const uniqueActionIds = Array.from(new Set(allActionIds));
+
+	// 			// Fetch all actions in one go
+	// 			const fetchedActions = await fetchChatActions(uniqueActionIds) as ChatVibeResponse[];
+
+	// 			// Map by action ID for fast lookup
+	// 			const actionMap = new Map<string, VibeAction>();
+	// 			fetchedActions.forEach((action) => {
+	// 				if (action && action.id) {
+	// 					actionMap.set(action.id, {
+	// 						...action,
+	// 						vibeRequest: {
+	// 							...action.vibeRequest,
+	// 							isClosed: action.vibeRequest?.isClosed ?? false,
+	// 						},
+	// 					});
+	// 				}
+	// 			});
+
+	// 			// Assemble final PromptWithActions[]
+	// 			const messages: PromptWithActions[] = loadedPrompts.map((entry: any) => ({
+	// 				id: entry.id,
+	// 				origin: entry.origin,
+	// 				content: entry.content,
+	// 				actionId: entry.actionId,
+	// 				requestId: entry.requestId,
+	// 				sessionId: entry.sessionId,
+	// 				actions: (entry.actionId || [])
+	// 					.map((aid: string) => actionMap.get(aid))
+	// 					.filter(Boolean) as VibeAction[],
+	// 			}));
+
+	// 			messages.sort((a, b) => a.id.localeCompare(b.id));
+	// 			setMessages(messages);
+	// 		}
+	// 	} catch (err) {
+	// 		setError(err instanceof Error ? err.message : 'Failed to load chat messages');
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// };
+
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		if (!message.trim() || isSending) return;
@@ -153,43 +356,56 @@ const Chat = ({ onClose }: ChatProps) => {
 		try {
 			setIsSending(true);
 			setError(null);
+
 			const response = await sendChatMessage(message, entityId, sessionId);
+			const promptMap = response?.Content?.vibeResponse?.prompts || {};
+			console.log('Prompt Map:', promptMap);
 
-			const responseMessages: Prompt[] = [];
-			const actions = response?.Content?.vibeResponse?.actions || [];
-			for (const action of actions) {
-				if (action && action.prompts && action.prompts.length > 0) {
-					for (const prompt of action.prompts) {
-						responseMessages.push(prompt);
-					}
-				}
-			}
-			const pendingActions = response?.Content?.vibeResponse?.pendingActions || [];
-			for (const action of pendingActions) {
-				if (action && action.prompts && action.prompts.length > 0) {
-					for (const prompt of action.prompts) {
-						responseMessages.push(prompt);
-					}
-				}
-			}
-			responseMessages.sort((a, b) => a.id.localeCompare(b.id));
-			responseMessages.reverse();
-			setMessages((prev) => [...responseMessages, ...prev]);
+			// Convert the prompt map to PromptWithActions[]
+			const newMessages: PromptWithActions[] = Object.values(promptMap).map((entry: any) => ({
+				id: entry.id,
+				origin: entry.origin,
+				content: entry.content,
+				actionId: entry.actionId,
+				requestId: entry.requestId,
+				sessionId: entry.sessionId,
+				actions: (entry.actions ?? []).map((action: any) => ({
+					id: action.id,
+					descriptions: action.descriptions,
+					type: action.type,
+					creationTimeInMs: action.creationTimeInMs,
+					status: action.status,
+					beforeScheduleId: action.beforeScheduleId,
+					afterScheduleId: action.afterScheduleId,
+					vibeRequest: {
+						id: action.vibeRequest.id,
+						creationTimeInMs: action.vibeRequest.creationTimeInMs,
+						activeAction: action.vibeRequest.activeAction,
+						isClosed: action.vibeRequest.isClosed ?? false,
+						actions: action.vibeRequest.actions || [],
+					},
+				})),
+			}));
 
-			console.log('Response Messages:', responseMessages, messages);
+			console.log('New Messages:', newMessages);
 
-			// Update session ID if this was the first message
-			const sessionIdFromResponse = responseMessages[0]?.sessionId;
+			// Append new messages to existing state
+			setMessages((prev) => [...prev, ...newMessages]);
+			console.log('Updated Messages');
+
+			// Update session ID from the first prompt
+			const sessionIdFromResponse = newMessages[0]?.sessionId;
 			if (sessionIdFromResponse) {
 				setSessionId(sessionIdFromResponse);
+				setStoredSessionId(sessionIdFromResponse);
 			}
 
-			// Clear input field after successful response
 			setMessage('');
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to send message');
 		} finally {
 			setIsSending(false);
+			setError(null);
 		}
 	};
 
@@ -199,6 +415,7 @@ const Chat = ({ onClose }: ChatProps) => {
 		setError(null);
 		setMessage('');
 		setMessages([]);
+		console.log('New chat started, session cleared');
 	};
 
 	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
@@ -209,18 +426,6 @@ const Chat = ({ onClose }: ChatProps) => {
 
 	return (
 		<ChatContainer>
-			<Button
-				variant="outline"
-				style={{
-					alignSelf: 'flex-end',
-					marginBottom: '0.5rem',
-					color: styles.colors.orange[500],
-					borderColor: styles.colors.orange[500],
-				}}
-				onClick={handleNewChat}
-			>
-				Clear Session
-			</Button>
 			<ChatHeader>
 				{onClose && (
 					<Button variant="ghost" height={32} onClick={onClose}>
@@ -228,6 +433,18 @@ const Chat = ({ onClose }: ChatProps) => {
 						<span>Back</span>
 					</Button>
 				)}
+				<Button
+					variant="outline"
+					style={{
+						alignSelf: 'flex-end',
+						marginBottom: '0.5rem',
+						color: styles.colors.orange[500],
+						borderColor: styles.colors.orange[500],
+					}}
+					onClick={handleNewChat}
+				>
+					Clear Session
+				</Button>
 				{chatContext.length === 0 ? (
 					<ChatTitle>New Chat</ChatTitle>
 				) : (
@@ -247,7 +464,11 @@ const Chat = ({ onClose }: ChatProps) => {
 								<span>{context.Name}</span>
 								<span
 									onClick={() => handleRemoveContext(context)}
-									style={{ marginLeft: '0.5rem', color: 'red', cursor: 'pointer' }}
+									style={{
+										marginLeft: '0.5rem',
+										color: 'red',
+										cursor: 'pointer',
+									}}
 								>
 									x
 								</span>
@@ -258,35 +479,60 @@ const Chat = ({ onClose }: ChatProps) => {
 			</ChatHeader>
 			<ChatContent>
 				{isLoading && <div className="chat-loading">Loading chat messages...</div>}
+
 				{error && <div className="chat-error">Error: {error}</div>}
+
 				{!isLoading && !error && !messages.length && (
 					<EmptyChat>
 						<Logo size={48} />
 						<h3>What would you like to do?</h3>
-						<p>Describe a task, We&apos;ll handle the tiling. </p>
+						<p>Describe a task, We&apos;ll handle the tiling.</p>
 					</EmptyChat>
 				)}
+
 				<div className="messages-list">
-					{[...messages].reverse().map((message) => (
-						<div
-							key={message.id}
-							className={`message ${message.origin === 'user' ? 'user-message' : 'model-message'}`}
-						>
+					{messages.map((message) => (
+						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
 							<div className="message-content">{message.content}</div>
-							<div className="message-timestamp">
-								{new Date(
-									parseInt(message.id.split('_').slice(-2, -1)[0])
-								).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-							</div>
-						</div>
+							{/* <div>{message.actions[0].descriptions}</div> */}
+
+							{message.actions?.map((action) => (
+								<Button
+									key={action.id}
+									variant="outline"
+									style={{
+										marginTop: '0.25rem',
+										marginRight: '0.25rem',
+										color: styles.colors.brand[500],
+										borderColor: styles.colors.brand[500],
+										fontSize: '0.875rem',
+										padding: '0.25rem 0.5rem',
+									}}
+								>
+									{action.descriptions}
+								</Button>
+							))}
+						</MessageBubble>
 					))}
 				</div>
+
 				<div ref={messagesEndRef} />
 			</ChatContent>
 
 			{/* Render chatContext buttons */}
-			<div style={{ marginBottom: '0.25rem' }}>
-			</div>
+			<div style={{ marginBottom: '0.25rem' }}></div>
+
+			<Button
+				variant="outline"
+				style={{
+					marginBottom: '0.5rem',
+					color: styles.colors.brand[500],
+					borderColor: styles.colors.brand[500],
+				}}
+				onClick={() => handleSetScheduleIdByIndex(count)}
+			>
+				Accept Changes
+			</Button>
 
 			<ChatForm onSubmit={handleSubmit}>
 				<Input
