@@ -77,9 +77,7 @@ export const fetchChatMessages = async (sessionId: string): Promise<ChatPromptRe
 // 	}
 // };
 
-export const fetchChatActions = async (
-	actionIds: string[] | string
-): Promise<Action[]> => {
+export const fetchChatActions = async (actionIds: string[] | string): Promise<Action[]> => {
 	try {
 		const queryParam = Array.isArray(actionIds)
 			? actionIds.length > 1
@@ -111,7 +109,6 @@ export const fetchChatActions = async (
 		throw error;
 	}
 };
-
 
 export const sendChatMessage = async (
 	message: string,
