@@ -1,7 +1,7 @@
 import { ChatVibeResponse, ChatPromptResponse } from './chat';
 
 const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
-const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Actions';
+const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Action';
 const STORAGE_KEY = 'chat_session_id';
 
 interface SendMessageRequest {
@@ -19,6 +19,23 @@ interface SendMessageRequest {
 	UserName?: string;
 	UserID?: string;
 }
+
+type Action = {
+	id: string;
+	descriptions: string;
+	type: string;
+	creationTimeInMs: number;
+	status: string;
+	beforeScheduleId: string;
+	afterScheduleId: string;
+	vibeRequest: {
+		id: string;
+		creationTimeInMs: number;
+		activeAction: string | null;
+		isClosed: boolean;
+		actions: any[];
+	};
+};
 
 export const getStoredSessionId = (): string | null => {
 	return localStorage.getItem(STORAGE_KEY);
@@ -62,12 +79,13 @@ export const fetchChatMessages = async (sessionId: string): Promise<ChatPromptRe
 
 export const fetchChatActions = async (
 	actionIds: string[] | string
-): Promise<ChatVibeResponse[] | ChatVibeResponse> => {
+): Promise<Action[]> => {
 	try {
-		// Handle both single and multiple action IDs
 		const queryParam = Array.isArray(actionIds)
-			? actionIds.map((id) => `ActionIds=${encodeURIComponent(id)}`).join('&')
-			: `ActionId=${encodeURIComponent(actionIds)}`;
+			? actionIds.length > 1
+				? actionIds.map((id) => `ActionIds=${encodeURIComponent(id)}`).join('&')
+				: `ActionId=${encodeURIComponent(actionIds[0])}`
+			: `ActionId=${encodeURIComponent(actionIds)}`; // 👈 not actionIds[0], it's already a string
 
 		const response = await fetch(`${API_ACTIONS_URL}?${queryParam}`);
 
@@ -77,12 +95,23 @@ export const fetchChatActions = async (
 
 		const data = await response.json();
 
-		return Array.isArray(actionIds) ? data : data;
+		// 🔁 Normalize everything to Action[]
+		if (Array.isArray(data.Content?.vibeAction)) {
+			// Case: multiple actions
+			return data.Content.vibeAction;
+		} else if (data.Content?.vibeAction) {
+			// Case: single action
+			return [data.Content.vibeAction];
+		}
+
+		// Fallback
+		return [];
 	} catch (error) {
 		console.error('Error fetching chat actions:', error);
 		throw error;
 	}
 };
+
 
 export const sendChatMessage = async (
 	message: string,

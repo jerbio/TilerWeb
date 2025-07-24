@@ -160,6 +160,7 @@ type PromptWithActions = {
 	requestId: string;
 	sessionId: string;
 	actions: Action[];
+	actionIds?: string[]; // Optional array of action IDs
 };
 
 const Chat = ({ onClose }: ChatProps) => {
@@ -206,53 +207,6 @@ const Chat = ({ onClose }: ChatProps) => {
 		}
 	}, [sessionId]);
 
-	const loadChatMessages = async (sid: string) => {
-		if (!sid) return;
-		try {
-			setIsLoading(true);
-			setError(null);
-
-			const data = await fetchChatMessages(sid);
-
-			if (data.Content?.chats) {
-				const loadedMessages: PromptWithActions[] = data.Content.chats.map(
-					(entry: any) => ({
-						id: entry.id,
-						origin: entry.origin,
-						content: entry.content,
-						actionId: entry.actionId,
-						requestId: entry.requestId,
-						sessionId: entry.sessionId,
-						actions:
-							entry.actions?.map((action: any) => ({
-								...action,
-								vibeRequest: {
-									...action.vibeRequest,
-									isClosed: action.vibeRequest?.isClosed ?? false,
-								},
-							})) ?? [], // 👈 ensure actions is always an array
-					})
-				);
-
-				// Sort oldest to newest by ID
-				loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
-
-				// Merge with existing messages, avoiding duplicates
-				setMessages((prevMessages) => {
-					const existingIds = new Set(prevMessages.map((m) => m.id));
-					const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
-					return [...prevMessages, ...uniqueNewMessages];
-				});
-
-				console.log('Loaded Messages:', loadedMessages);
-			}
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to load chat messages');
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
 	// const loadChatMessages = async (sid: string) => {
 	// 	if (!sid) return;
 	// 	try {
@@ -270,80 +224,28 @@ const Chat = ({ onClose }: ChatProps) => {
 	// 					actionId: entry.actionId,
 	// 					requestId: entry.requestId,
 	// 					sessionId: entry.sessionId,
-	// 					actions: entry.actions?.map((action: any) => ({
-	// 						...action,
-	// 						vibeRequest: {
-	// 							...action.vibeRequest,
-	// 							isClosed:
-	// 								action.vibeRequest?.isClosed === null
-	// 									? false
-	// 									: action.vibeRequest.isClosed,
-	// 						},
-	// 					})),
+	// 					actions:
+	// 						entry.actions?.map((action: any) => ({
+	// 							...action,
+	// 							vibeRequest: {
+	// 								...action.vibeRequest,
+	// 								isClosed: action.vibeRequest?.isClosed ?? false,
+	// 							},
+	// 						})) ?? [], // 👈 ensure actions is always an array
 	// 				})
 	// 			);
 
-	// 			// Sort oldest to newest by prompt ID (assumes timestamp-like IDs)
+	// 			// Sort oldest to newest by ID
 	// 			loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
 
-	// 			setMessages(loadedMessages);
-	// 			console.log('loadMessages');
-	// 		}
-	// 	} catch (err) {
-	// 		setError(err instanceof Error ? err.message : 'Failed to load chat messages');
-	// 	} finally {
-	// 		setIsLoading(false);
-	// 	}
-	// };
-
-	// const loadChatMessages = async (sid: string) => {
-	// 	if (!sid) return;
-
-	// 	try {
-	// 		setIsLoading(true);
-	// 		setError(null);
-
-	// 		const data = await fetchChatMessages(sid);
-
-	// 		if (data.Content?.chats) {
-	// 			const loadedPrompts = data.Content.chats;
-
-	// 			// Collect all action IDs
-	// 			const allActionIds = loadedPrompts.flatMap((entry: any) => entry.actionId || []);
-	// 			const uniqueActionIds = Array.from(new Set(allActionIds));
-
-	// 			// Fetch all actions in one go
-	// 			const fetchedActions = await fetchChatActions(uniqueActionIds) as ChatVibeResponse[];
-
-	// 			// Map by action ID for fast lookup
-	// 			const actionMap = new Map<string, VibeAction>();
-	// 			fetchedActions.forEach((action) => {
-	// 				if (action && action.id) {
-	// 					actionMap.set(action.id, {
-	// 						...action,
-	// 						vibeRequest: {
-	// 							...action.vibeRequest,
-	// 							isClosed: action.vibeRequest?.isClosed ?? false,
-	// 						},
-	// 					});
-	// 				}
+	// 			// Merge with existing messages, avoiding duplicates
+	// 			setMessages((prevMessages) => {
+	// 				const existingIds = new Set(prevMessages.map((m) => m.id));
+	// 				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+	// 				return [...prevMessages, ...uniqueNewMessages];
 	// 			});
 
-	// 			// Assemble final PromptWithActions[]
-	// 			const messages: PromptWithActions[] = loadedPrompts.map((entry: any) => ({
-	// 				id: entry.id,
-	// 				origin: entry.origin,
-	// 				content: entry.content,
-	// 				actionId: entry.actionId,
-	// 				requestId: entry.requestId,
-	// 				sessionId: entry.sessionId,
-	// 				actions: (entry.actionId || [])
-	// 					.map((aid: string) => actionMap.get(aid))
-	// 					.filter(Boolean) as VibeAction[],
-	// 			}));
-
-	// 			messages.sort((a, b) => a.id.localeCompare(b.id));
-	// 			setMessages(messages);
+	// 			console.log('Loaded Messages:', loadedMessages);
 	// 		}
 	// 	} catch (err) {
 	// 		setError(err instanceof Error ? err.message : 'Failed to load chat messages');
@@ -351,6 +253,81 @@ const Chat = ({ onClose }: ChatProps) => {
 	// 		setIsLoading(false);
 	// 	}
 	// };
+
+const loadChatMessages = async (sid: string) => {
+	if (!sid) return;
+
+	try {
+		setIsLoading(true);
+		setError(null);
+
+		const data = await fetchChatMessages(sid);
+		const rawMessages = data.Content?.chats as any[];
+		if (!rawMessages) return;
+
+		// Step 1: Collect all unique actionIds
+		const uniqueActionIds = Array.from(
+			new Set(
+				rawMessages
+					.flatMap((entry) => entry.actionIds || [])
+					.filter(Boolean)
+			)
+		);
+
+		// Step 2: Fetch and map actions by ID
+		let allActionsMap: Record<string, Action> = {};
+		if (uniqueActionIds.length > 0) {
+			try {
+				const fetchedActions = await fetchChatActions(uniqueActionIds);
+				allActionsMap = fetchedActions.reduce((acc, action) => {
+					acc[action.id] = {
+						...action,
+						vibeRequest: {
+							...action.vibeRequest,
+							isClosed: action.vibeRequest?.isClosed ?? false,
+						},
+					};
+					return acc;
+				}, {} as Record<string, Action>);
+			} catch (err) {
+				console.error('Error fetching actions:', err);
+			}
+		}
+
+		// Step 3: Map messages with resolved actions
+		const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+			const actionIds: string[] = entry.actionIds ?? [];
+			const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
+
+			return {
+				id: entry.id,
+				origin: entry.origin,
+				content: entry.content,
+				actionId: entry.actionId,
+				requestId: entry.requestId,
+				sessionId: entry.sessionId,
+				actionIds,
+				actions: resolvedActions,
+			};
+		});
+
+		// Step 4: Sort and merge with previous
+		loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
+
+		setMessages((prevMessages) => {
+			const existingIds = new Set(prevMessages.map((m) => m.id));
+			const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+			return [...prevMessages, ...uniqueNewMessages];
+		});
+
+		console.log('Loaded Messages:', loadedMessages);
+	} catch (err) {
+		setError(err instanceof Error ? err.message : 'Failed to load chat messages');
+	} finally {
+		setIsLoading(false);
+	}
+};
+
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
