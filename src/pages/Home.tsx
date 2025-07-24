@@ -1,5 +1,5 @@
 import React from 'react';
-import PersonaCarousel from '../components/home/persona_carousel/persona_carousel_section';
+import PersonaCarousel from '../components/home/persona_carousel/persona_carousel';
 import FeatureHighlightsSection from '../components/home/feature_highlights_section';
 import TileCardSection from '../components/home/tile_card_section';
 import CalendarIntegrationSection from '../components/home/integration_section';

@@ -6,7 +6,7 @@ import Add from '../../icons/add';
 import ArrowRight2 from '../../icons/arrow_right2';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import useIsMobile from '../../../hooks/useIsMobile';
-import PersonaExpandedCard from './persona_expanded_card';
+import PersonaCardExpanded from './persona_card_expanded';
 import { Persona } from '../../../types/persona';
 import { getPersonaImage } from '../../../data/persona';
 import { Check } from 'lucide-react';
@@ -367,7 +367,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 				</Overlay>
 			</OverlayContainer>
 			{/* Set expanded width to the final width of animation */}
-			<PersonaExpandedCard
+			<PersonaCardExpanded
 				occupation={persona.occupation}
 				display={isSelected}
 				onCollapse={onDeselect}

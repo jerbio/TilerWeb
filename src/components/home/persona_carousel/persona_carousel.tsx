@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
+import PersonaCardTemplate from './persona_card_template';
 
 // @ts-expect-error Swiper styles are not typed
 import 'swiper/css';
 import Section from '../../layout/section';
 import styled from 'styled-components';
 import useIsMobile from '../../../hooks/useIsMobile';
-import { PersonaApi } from '../../../api/personaApi';
 import { Persona } from '../../../types/persona';
-import PersonaCardTemplate from './persona_card_template';
+import { PersonaApi } from '../../../api/personaApi';
 
 const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 	position: relative;

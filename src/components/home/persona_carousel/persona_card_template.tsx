@@ -1,7 +1,7 @@
 import styled, { keyframes } from 'styled-components';
 import styles from '../../../util/styles';
 
-// Pulse
+// Pulse Animation
 const pulse = keyframes`
 	0% {
 		background-color: #ffffff0d;

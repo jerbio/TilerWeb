@@ -135,7 +135,7 @@ type PersonaExpandedCardProps = {
 	expandedWidth: number;
 };
 
-function PersonaExpandedCard({
+function PersonaCardExpanded({
 	display,
 	occupation,
 	onCollapse,
@@ -144,6 +144,7 @@ function PersonaExpandedCard({
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
+
 	const [currentScheduleId, setCurrentScheduleId] = useState<ScheduleId>('baseScheduleid');
 	function shuffleEvents() {
 		const ids: Array<ScheduleId> = ['baseScheduleid', 'updateScheduleId'];
@@ -238,4 +239,4 @@ function PersonaExpandedCard({
 	);
 }
 
-export default PersonaExpandedCard;
+export default PersonaCardExpanded;
