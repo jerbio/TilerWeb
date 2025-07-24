@@ -5,7 +5,8 @@
 			"learnMore": "Learn More",
 			"subscribe": "Subscribe",
 			"tryFree": "Try Tiler for free",
-			"signUp": "Sign Up"
+			"signUp": "Sign Up",
+			"back": "Back"
 		},
 		"navigation": {
 			"home": "Home",
@@ -34,6 +35,14 @@
 			"developer": "Developer",
 			"healthcare": "Healthcare",
 			"engineer": "Engineer"
+		},
+		"expanded": {
+			"chat": {
+				"newChat": "New Chat",
+				"title": "What would you like to do?",
+				"subtitle": "Describe a task, We'll handle the tiling.",
+				"inputPlaceholder": "Tell Tiler what you do..."
+			}
 		},
 		"waitlist": {
 			"title": "Join the Waitlist",

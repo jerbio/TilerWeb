@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo } from 'react';
 import calendarConfig from './config';
-import { DummyScheduleEventType, DummyScheduleTravelDetailType } from '../../../data/dummySchedule';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
-import formatter from '../../../util/helpers/formatter';
 import colorUtil from '../../../util/helpers/colors';
 import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
 import calendarEventUtil from '../../../util/helpers/calendar_events';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
+import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
+import TimeUtil from '../../../util/helpers/time';
 
 const dashRotate = keyframes`
   0% {
@@ -197,7 +197,7 @@ const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: numbe
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
-	events: Array<DummyScheduleEventType>;
+	events: Array<ScheduleSubCalendarEvent>;
 	headerWidth: number;
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
@@ -216,8 +216,8 @@ const CalendarEvents = ({
 	setCellHeight,
 	scrollToTime,
 }: CalendarEventsProps) => {
-	type CurrentViewEvent = DummyScheduleEventType & { key: string };
-	type CurrentViewTravelDetail = DummyScheduleTravelDetailType & {
+	type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
+	type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
 		key: string;
 		colorRed: number;
 		colorGreen: number;
@@ -483,9 +483,6 @@ const CalendarEvents = ({
 		}),
 		update: ({ springStyles }) => ({ ...springStyles }),
 		config: { tension: 500, friction: 40 },
-		onRest: () => {
-			console.log('rested');
-		},
 	});
 
 	const travelTransition = useTransition(styledTravelDetails, {
@@ -531,7 +528,7 @@ const CalendarEvents = ({
 										{event.isTardy && <span>Late</span>}
 									</div>
 									<span>
-										{formatter.timeDuration(
+										{TimeUtil.rangeDuration(
 											dayjs(event.start, 'unix'),
 											dayjs(event.end, 'unix')
 										)}
@@ -581,7 +578,7 @@ const CalendarEvents = ({
 								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}
 								{detail.travelMedium}
 							</span>
-							{formatter.timeDuration(
+							{TimeUtil.rangeDuration(
 								dayjs(detail.start, 'unix'),
 								dayjs(detail.end, 'unix')
 							)}

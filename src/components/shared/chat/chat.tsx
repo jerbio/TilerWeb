@@ -5,6 +5,7 @@ import Button from '../button';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
 import Input from '../input';
 import Logo from '../../icons/logo';
+import { useTranslation } from 'react-i18next';
 import { Prompt } from './util/chat';
 import {
 	fetchChatMessages,
@@ -162,6 +163,8 @@ type PromptWithActions = {
 };
 
 const Chat = ({ onClose }: ChatProps) => {
+	const { t } = useTranslation();
+
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
 	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -427,10 +430,11 @@ const Chat = ({ onClose }: ChatProps) => {
 	return (
 		<ChatContainer>
 			<ChatHeader>
+				<ChatTitle>{t('home.expanded.chat.newChat')}</ChatTitle>
 				{onClose && (
 					<Button variant="ghost" height={32} onClick={onClose}>
 						<ChevronLeftIcon size={16} />
-						<span>Back</span>
+						<span>{t('common.buttons.back')}</span>
 					</Button>
 				)}
 				<Button
@@ -540,7 +544,7 @@ const Chat = ({ onClose }: ChatProps) => {
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 					height={48}
-					placeholder="Tell Tiler what you do..."
+					placeholder={t('home.expanded.chat.inputPlaceholder')}
 					disabled={isSending}
 					borderGradient={[styles.colors.brand[500]]}
 				/>
