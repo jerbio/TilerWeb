@@ -1,7 +1,8 @@
-import { ChatVibeResponse, ChatPromptResponse } from './chat';
+import { ChatVibeResponse, ChatPromptResponse, ExecuteActionResponse } from './chat';
 
 const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
 const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Action';
+const API_EXECUTE_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Request/Execute';
 const STORAGE_KEY = 'chat_session_id';
 
 interface SendMessageRequest {
@@ -63,27 +64,13 @@ export const fetchChatMessages = async (sessionId: string): Promise<ChatPromptRe
 	}
 };
 
-// export const fetchChatActions = async (actionId: string): Promise<ChatVibeResponse> => {
-// 	try {
-// 		const response = await fetch(`${API_ACTIONS_URL}?ActionId=${encodeURIComponent(actionId)}`);
-// 		if (!response.ok) {
-// 			throw new Error(`HTTP error! status: ${response.status}`);
-// 		}
-// 		const data = await response.json();
-// 		return data;
-// 	} catch (error) {
-// 		console.error('Error fetching chat actions:', error);
-// 		throw error;
-// 	}
-// };
-
 export const fetchChatActions = async (actionIds: string[] | string): Promise<Action[]> => {
 	try {
 		const queryParam = Array.isArray(actionIds)
 			? actionIds.length > 1
 				? actionIds.map((id) => `ActionIds=${encodeURIComponent(id)}`).join('&')
 				: `ActionId=${encodeURIComponent(actionIds[0])}`
-			: `ActionId=${encodeURIComponent(actionIds)}`; // 👈 not actionIds[0], it's already a string
+			: `ActionId=${encodeURIComponent(actionIds)}`;
 
 		const response = await fetch(`${API_ACTIONS_URL}?${queryParam}`);
 
@@ -93,11 +80,11 @@ export const fetchChatActions = async (actionIds: string[] | string): Promise<Ac
 
 		const data = await response.json();
 
-		// 🔁 Normalize everything to Action[]
-		if (Array.isArray(data.Content?.vibeAction)) {
+		// Normalize everything to Action[]
+		if (Array.isArray(data.Content?.vibeActions)) {
 			// Case: multiple actions
-			return data.Content.vibeAction;
-		} else if (data.Content?.vibeAction) {
+			return data.Content.vibeActions;
+		} else if (data.Content?.vibeActions) {
 			// Case: single action
 			return [data.Content.vibeAction];
 		}
@@ -151,6 +138,35 @@ export const sendChatMessage = async (
 		return data;
 	} catch (error) {
 		console.error('Error sending chat message:', error);
+		throw error;
+	}
+};
+
+export const sendChatAcceptChanges = async (
+	requestId: string | null = null
+): Promise<ExecuteActionResponse> => {
+	try {
+		if (!requestId) {
+			throw new Error('Request ID is required to execute actions');
+		}
+		const requestBody = { requestId };
+
+		const response = await fetch(API_EXECUTE_ACTIONS_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(requestBody),
+		});
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data: ExecuteActionResponse = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Error sending chat accept changes:', error);
 		throw error;
 	}
 };

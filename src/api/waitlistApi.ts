@@ -23,7 +23,6 @@ export class WaitlistApi extends AppApi {
 				return response.json();
 			})
 			.then((result) => {
-				console.log('Successfully joined waitlist:', result);
 				return result;
 			})
 			.catch((error) => {

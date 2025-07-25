@@ -81,6 +81,27 @@ interface ChatVibeResponse extends ServerResponse {
 	ServerStatus: null;
 }
 
+interface vibeRequest {
+	id: string;
+	creationTimeInMs: number;
+	activeAction: any; // You can replace `any` with a more specific type if needed
+	isClosed: boolean;
+	beforeScheduleId: string;
+	afterScheduleId: string;
+	actions: any[]; // Replace with proper action type if known
+}
+
+interface ExecuteActionResponse {
+	Error: {
+		Code: string;
+		Message: string;
+	};
+	Content: {
+		vibeRequest: vibeRequest;
+	};
+	ServerStatus: any | null;
+}
+
 // ChatPromptResponse interface
 interface ChatPromptResponse extends ServerResponse {
 	Content: {
@@ -97,4 +118,5 @@ export type {
 	Prompt,
 	ChatPromptResponse,
 	Prompt as Message,
+	ExecuteActionResponse,
 };

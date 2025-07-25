@@ -2,7 +2,7 @@ import React, { useEffect, useState, FormEvent, useRef } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import Button from '../button';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
+import { ChevronLeftIcon, SendHorizontal, CircleStop } from 'lucide-react';
 import Input from '../input';
 import Logo from '../../icons/logo';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import {
 	getStoredSessionId,
 	setStoredSessionId,
 	clearStoredSessionId,
+	sendChatAcceptChanges,
 } from './util/chat_service';
 import useAppStore from '../../../global_state'; // Import Zustand Global State
 import { ChatContextType } from '../../../global_state'; // Import ChatContextType
@@ -68,6 +69,10 @@ const ChatContent = styled.div`
 
 const ChatForm = styled.form`
 	position: relative;
+	width: 100%; /* Ensure the form stretches fully */
+	display: flex;
+	align-items: center;
+	gap: 0.5rem; /* Optional: Add spacing between elements */
 `;
 
 const ChatButton = styled.button`
@@ -160,7 +165,7 @@ type PromptWithActions = {
 	requestId: string;
 	sessionId: string;
 	actions: Action[];
-	actionIds?: string[]; // Optional array of action IDs
+	actionIds?: string[];
 };
 
 const Chat = ({ onClose }: ChatProps) => {
@@ -175,22 +180,13 @@ const Chat = ({ onClose }: ChatProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [requestId, setRequestId] = useState<string | null>(null);
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
-	// console.log('Current Schedule ID:', scheduleId);
-	const [count, setCount] = useState(0);
-	const randomStrings = Array.from({ length: 20 }, () =>
-		Math.random().toString(36).substring(2, 10)
-	);
-	const handleSetScheduleIdByIndex = (index: number) => {
-		setScheduleId(randomStrings[index]);
-		setCount((prev) => prev + 1);
+	const handleSetScheduleId = (id: string) => {
+		setScheduleId(id);
 	};
-
-	useEffect(() => {
-		console.log('Updated Messages:', messages);
-	}, [messages]);
 
 	// Load session ID from local storage on mount
 	useEffect(() => {
@@ -205,7 +201,7 @@ const Chat = ({ onClose }: ChatProps) => {
 		if (sessionId) {
 			loadChatMessages(sessionId);
 		}
-	}, [sessionId]);
+	}, [sessionId, scheduleId]);
 
 	const loadChatMessages = async (sid: string) => {
 		if (!sid) return;
@@ -218,12 +214,12 @@ const Chat = ({ onClose }: ChatProps) => {
 			const rawMessages = data.Content?.chats as any[];
 			if (!rawMessages) return;
 
-			// Step 1: Collect all unique actionIds
+			// Collect all unique actionIds
 			const uniqueActionIds = Array.from(
 				new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
 			);
 
-			// Step 2: Fetch and map actions by ID
+			// Fetch and map actions by ID
 			let allActionsMap: Record<string, Action> = {};
 			if (uniqueActionIds.length > 0) {
 				try {
@@ -246,7 +242,7 @@ const Chat = ({ onClose }: ChatProps) => {
 				}
 			}
 
-			// Step 3: Map messages with resolved actions
+			// Map messages with resolved actions
 			const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
 				const actionIds: string[] = entry.actionIds ?? [];
 				const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
@@ -263,16 +259,25 @@ const Chat = ({ onClose }: ChatProps) => {
 				};
 			});
 
-			// Step 4: Sort and merge with previous
+			// Sort and merge with previous
 			loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
 
 			setMessages((prevMessages) => {
 				const existingIds = new Set(prevMessages.map((m) => m.id));
 				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
-				return [...prevMessages, ...uniqueNewMessages];
+
+				// Merge actions for existing messages
+				const updatedMessages = prevMessages.map((prevMessage) => {
+					const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
+					return updatedMessage
+						? { ...prevMessage, actions: updatedMessage.actions }
+						: prevMessage;
+				});
+
+				return [...updatedMessages, ...uniqueNewMessages];
 			});
 
-			console.log('Loaded Messages:', loadedMessages);
+			setRequestId(loadedMessages[0]?.requestId || null);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to load chat messages');
 		} finally {
@@ -290,7 +295,6 @@ const Chat = ({ onClose }: ChatProps) => {
 
 			const response = await sendChatMessage(message, entityId, sessionId);
 			const promptMap = response?.Content?.vibeResponse?.prompts || {};
-			console.log('Prompt Map:', promptMap);
 
 			// Convert the prompt map to PromptWithActions[]
 			const newMessages: PromptWithActions[] = Object.values(promptMap).map((entry: any) => ({
@@ -318,11 +322,9 @@ const Chat = ({ onClose }: ChatProps) => {
 				})),
 			}));
 
-			console.log('New Messages:', newMessages);
-
 			// Append new messages to existing state
 			setMessages((prev) => [...prev, ...newMessages]);
-			console.log('Updated Messages');
+			setRequestId(newMessages[0]?.requestId || null);
 
 			// Update session ID from the first prompt
 			const sessionIdFromResponse = newMessages[0]?.sessionId;
@@ -340,13 +342,40 @@ const Chat = ({ onClose }: ChatProps) => {
 		}
 	};
 
+	const acceptAllChanges = async () => {
+		try {
+			setIsSending(true);
+			setError(null);
+
+			const executedChanges = await sendChatAcceptChanges(requestId);
+
+			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
+			if (newScheduleId) {
+				handleSetScheduleId(newScheduleId);
+
+				// Trigger reloading of chat messages
+				if (sessionId) {
+					await loadChatMessages(sessionId);
+				}
+			}
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Failed to accept changes');
+		} finally {
+			setIsSending(false);
+		}
+	};
+
+	const hasUnexecutedActions = () => {
+		return messages.some((msg) => msg.actions?.some((action) => action.status !== 'executed'));
+	};
+
 	const handleNewChat = () => {
 		clearStoredSessionId();
 		setSessionId('');
 		setError(null);
 		setMessage('');
 		setMessages([]);
-		console.log('New chat started, session cleared');
+		handleSetScheduleId('');
 	};
 
 	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
@@ -358,27 +387,28 @@ const Chat = ({ onClose }: ChatProps) => {
 	return (
 		<ChatContainer>
 			<ChatHeader>
-				<ChatTitle>{t('home.expanded.chat.newChat')}</ChatTitle>
 				{onClose && (
 					<Button variant="ghost" height={32} onClick={onClose}>
 						<ChevronLeftIcon size={16} />
 						<span>{t('common.buttons.back')}</span>
 					</Button>
 				)}
-				<Button
-					variant="outline"
-					style={{
-						alignSelf: 'flex-end',
-						marginBottom: '0.5rem',
-						color: styles.colors.orange[500],
-						borderColor: styles.colors.orange[500],
-					}}
-					onClick={handleNewChat}
-				>
-					Clear Session
-				</Button>
+				{import.meta.env.VITE_NODE_ENV === 'development' && (
+					<Button
+						variant="outline"
+						style={{
+							alignSelf: 'flex-end',
+							marginBottom: '0.5rem',
+							color: styles.colors.orange[500],
+							borderColor: styles.colors.orange[500],
+						}}
+						onClick={handleNewChat}
+					>
+						Clear Session
+					</Button>
+				)}
 				{chatContext.length === 0 ? (
-					<ChatTitle>New Chat</ChatTitle>
+					<ChatTitle>{t('home.expanded.chat.newChat')}</ChatTitle>
 				) : (
 					<>
 						{chatContext.map((context, index) => (
@@ -426,20 +456,18 @@ const Chat = ({ onClose }: ChatProps) => {
 					{messages.map((message) => (
 						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
 							<div className="message-content">{message.content}</div>
-							{/* <div>{message.actions[0].descriptions}</div> */}
 
 							{message.actions?.map((action) => (
 								<Button
 									key={action.id}
-									variant="outline"
-									style={{
-										marginTop: '0.25rem',
-										marginRight: '0.25rem',
-										color: styles.colors.brand[500],
-										borderColor: styles.colors.brand[500],
-										fontSize: '0.875rem',
-										padding: '0.25rem 0.5rem',
-									}}
+									variant="pill"
+									dotstatus={
+										action.status as
+											| 'parsed'
+											| 'clarification'
+											| 'executed'
+											| undefined
+									}
 								>
 									{action.descriptions}
 								</Button>
@@ -454,21 +482,57 @@ const Chat = ({ onClose }: ChatProps) => {
 			{/* Render chatContext buttons */}
 			<div style={{ marginBottom: '0.25rem' }}></div>
 
-			<Button
-				variant="outline"
-				style={{
-					marginBottom: '0.5rem',
-					color: styles.colors.brand[500],
-					borderColor: styles.colors.brand[500],
-				}}
-				onClick={() => handleSetScheduleIdByIndex(count)}
-			>
-				Accept Changes
-			</Button>
+			<div>
+				{isSending && (
+					<div
+						style={{
+							marginBottom: '0.5rem',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+					>
+						<span
+							className="spinner"
+							style={{
+								width: '24px',
+								height: '24px',
+								border: '4px solid #f3f3f3',
+								borderTop: `4px solid ${styles.colors.brand[500]}`,
+								borderRadius: '50%',
+								animation: 'spin 1s linear infinite',
+								marginRight: '0.5rem',
+							}}
+						/>
+						<style>
+							{`
+									@keyframes spin {
+										0% { transform: rotate(0deg); }
+										100% { transform: rotate(360deg); }
+									}
+								`}
+						</style>
+						<span>Sending Request...</span>
+					</div>
+				)}
+				{!isSending && hasUnexecutedActions() && (
+					<Button
+						variant="outline"
+						style={{
+							marginBottom: '0.5rem',
+							color: styles.colors.brand[500],
+							borderColor: styles.colors.brand[500],
+						}}
+						onClick={() => acceptAllChanges()}
+					>
+						Accept Changes
+					</Button>
+				)}
+			</div>
 
 			<ChatForm onSubmit={handleSubmit}>
 				<Input
-					type="text"
+					as="textarea"
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 					height={48}
@@ -477,7 +541,7 @@ const Chat = ({ onClose }: ChatProps) => {
 					borderGradient={[styles.colors.brand[500]]}
 				/>
 				<ChatButton type="submit" disabled={isSending || !message.trim()}>
-					<Plus size={20} />
+					{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
 				</ChatButton>
 			</ChatForm>
 		</ChatContainer>
