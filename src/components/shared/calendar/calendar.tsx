@@ -1,14 +1,12 @@
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import calendarConfig from './config';
 import CalendarEvents from './calendar_events';
-import { ScheduleApi } from '../../../api/scheduleApi';
-import { ScheduleId, ScheduleSubCalendarEvent } from '../../../types/schedule';
+import { ScheduleSubCalendarEvent } from '../../../types/schedule';
 import Spinner from '../loader';
-import TimeUtil from '../../../util/helpers/time';
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	position: relative;
@@ -37,8 +35,6 @@ const CalendarHeaderActions = styled.div`
 	align-items: center;
 	overflow: hidden;
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	border-top: 1px solid ${calendarConfig.BORDER_COLOR};
-	border-radius: 0 ${styles.borderRadius.medium} 0 0;
 	background-color: #1f1f1f;
 `;
 
@@ -55,13 +51,15 @@ const ChangeViewButton = styled.button`
 		background-color 0.2s ease,
 		color 0.2s ease;
 
-	&:hover {
-		background-color: ${styles.colors.gray[800]};
-		color: ${styles.colors.gray[200]};
-	}
+	&:not(:disabled) {
+		&:hover {
+			background-color: ${styles.colors.gray[800]};
+			color: ${styles.colors.gray[200]};
+		}
 
-	&:active {
-		background-color: ${styles.colors.gray[700]};
+		&:active {
+			background-color: ${styles.colors.gray[700]};
+		}
 	}
 `;
 
@@ -180,98 +178,81 @@ const LoadingContainer = styled.div<{ $loading: boolean }>`
 `;
 
 export type CalendarViewOptions = {
+	width: number;
 	startDay: dayjs.Dayjs;
 	daysInView: number;
 };
 
 type CalendarProps = {
-	width: number;
-	scheduleId: ScheduleId;
+	events: Array<ScheduleSubCalendarEvent>;
+	eventsLoading: boolean;
+	viewRef: React.RefObject<HTMLUListElement>;
+	viewOptions: CalendarViewOptions;
+	setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
 };
 
-const Calendar = ({ width, scheduleId }: CalendarProps) => {
-	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
-	const [isLoading, setIsLoading] = useState(true);
-
+const Calendar = ({
+	events,
+	eventsLoading,
+	viewRef,
+	viewOptions,
+	setViewOptions,
+}: CalendarProps) => {
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	useEffect(() => {
 		// Reset selected event when events change
 		setSelectedEvent(null);
 	}, [events]);
 
-	// State to manage the width of the header
-	const [headerWidth, setHeaderWidth] = useState(0);
-	const contentMounted = headerWidth > 0;
-	const calendarHeaderDateListRef = useRef<HTMLUListElement>(null);
-	useEffect(() => {
-		if (calendarHeaderDateListRef.current) {
-			setHeaderWidth(calendarHeaderDateListRef.current.offsetWidth);
-		}
-	}, [width, calendarHeaderDateListRef.current]);
-
-	// State to manage view options
-	const [startDay, setStartDay] = useState(dayjs().startOf('day'));
-	const viewOptions = useMemo<CalendarViewOptions>(() => {
-		const daysInView = Math.floor(headerWidth / parseInt(calendarConfig.HEADER_DATE_MIN_WIDTH));
-		return {
-			startDay,
-			daysInView,
-		};
-	}, [headerWidth, startDay]);
+	const contentMounted = viewOptions.width > 0;
 
 	function changeDayView(dir: 'left' | 'right') {
-		setStartDay((prev) => {
-			return prev.add((dir === 'left' ? -1 : 1) * viewOptions.daysInView, 'day');
+		const changeAmount = dir === 'left' ? -1 : 1;
+		setViewOptions((prev) => {
+			const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
+			return {
+				...prev,
+				startDay: newStartDay,
+			};
 		});
 	}
-
-	// Fetch schedule data
-	useEffect(() => {
-		if (viewOptions.daysInView <= 0) return;
-
-		const scheduleApi = new ScheduleApi();
-		setIsLoading(true);
-
-		const startRange = viewOptions.startDay.valueOf();
-		const endRange = startRange + TimeUtil.inMilliseconds(viewOptions.daysInView, 'd');
-
-		scheduleApi.getScheduleLookupById(scheduleId, { startRange, endRange }).then((schedule) => {
-			if (schedule) {
-				setEvents(schedule.subCalendarEvents);
-			} else {
-				console.error('No schedule found for the given ID');
-			}
-			setIsLoading(false);
-		});
-	}, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
 	return (
 		<CalendarContainer $isMounted={contentMounted}>
 			<CalendarHeader>
 				<CalendarHeaderActions>
-					<ChangeViewButton onClick={() => changeDayView('left')}>
+					<ChangeViewButton
+						disabled={eventsLoading}
+						onClick={() => changeDayView('left')}
+					>
 						<ChevronLeftIcon size={16} />
 					</ChangeViewButton>
-					<ChangeViewButton onClick={() => changeDayView('right')}>
+					<ChangeViewButton
+						disabled={eventsLoading}
+						onClick={() => changeDayView('right')}
+					>
 						<ChevronRightIcon size={16} />
 					</ChangeViewButton>
 				</CalendarHeaderActions>
-				<CalendarHeaderDateList ref={calendarHeaderDateListRef}>
+				<CalendarHeaderDateList ref={viewRef}>
 					{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
-						const date = viewOptions.startDay.add(index, 'day');
+						const day = viewOptions.startDay.add(index, 'day');
 						return (
-							<CalendarHeaderDateItem key={index} $isToday={date.isSame(dayjs(), 'day')}>
+							<CalendarHeaderDateItem
+								key={index}
+								$isToday={day.isSame(dayjs(), 'day')}
+							>
 								{/* 3 letter day */}
-								<h3>{date.format('ddd')}</h3>
+								<h3>{day.format('ddd')}</h3>
 								{/* 2 number date */}
-								<span>{date.format('DD')}</span>
+								<span>{day.format('DD')}</span>
 							</CalendarHeaderDateItem>
 						);
 					})}
 				</CalendarHeaderDateList>
 			</CalendarHeader>
 
-			<LoadingContainer $loading={isLoading}>
+			<LoadingContainer $loading={eventsLoading}>
 				<Spinner />
 			</LoadingContainer>
 			<CalendarContentContainer id="calendar-content-container">
@@ -288,7 +269,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 									key={`${dayIndex}-${hourIndex}`}
 									dayindex={dayIndex}
 									hourindex={hourIndex}
-									width={headerWidth / viewOptions.daysInView}
+									width={viewOptions.width / viewOptions.daysInView}
 								/>
 							);
 						});
@@ -308,7 +289,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 					<CalendarEvents
 						events={events}
 						viewOptions={viewOptions}
-						headerWidth={headerWidth}
+						headerWidth={viewOptions.width}
 						selectedEvent={selectedEvent}
 						setSelectedEvent={setSelectedEvent}
 					/>

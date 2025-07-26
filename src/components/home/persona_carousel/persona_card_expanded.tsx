@@ -6,8 +6,8 @@ import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
 import { ChevronLeftIcon, Plus, ShuffleIcon } from 'lucide-react';
 import useIsMobile from '../../../hooks/useIsMobile';
-import Calendar from '../../shared/calendar/calendar';
 import { ScheduleId } from '../../../types/schedule';
+import PersonaCalendar from './persona_calendar';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
@@ -158,7 +158,7 @@ function PersonaCardExpanded({
 			container: CalendarContainer,
 			content: (
 				<React.Fragment>
-					<Calendar width={expandedWidth} scheduleId={currentScheduleId} />
+					<PersonaCalendar expandedWidth={expandedWidth} scheduleId={currentScheduleId} />
 					<CalendarContainerActionButtons>
 						<CalendarActionButton onClick={shuffleEvents}>
 							<ShuffleIcon size={20} />
