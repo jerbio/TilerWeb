@@ -34,7 +34,10 @@ class CalendarUtil {
 		const x = dayIndex * width;
 		const y = cellHeight * startHourFraction;
 		const maxCellHeight = viewBox.height - y;
-		const height = Math.min(maxCellHeight, Math.max(cellHeight * (endHourFraction - startHourFraction), minCellHeight));
+		const height = Math.min(
+			maxCellHeight,
+			Math.max(cellHeight * (endHourFraction - startHourFraction), minCellHeight)
+		);
 
 		return { x, y, width, height };
 	}

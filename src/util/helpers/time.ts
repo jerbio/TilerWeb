@@ -10,15 +10,14 @@ const _quantities: Record<TimeUnit, number> = {
 
 class TimeUtil {
 	static rangeDuration(start: dayjs.Dayjs, end: dayjs.Dayjs): string {
-		const quantitiesInMins = Object.entries(_quantities).map(([unit, quantity]) => [
-			unit,
-			quantity / (60 * 1000),
-		] as [TimeUnit, number]);
+		const quantitiesInMins = Object.entries(_quantities).map(
+			([unit, quantity]) => [unit, quantity / (60 * 1000)] as [TimeUnit, number]
+		);
 
 		const totalSeconds = end.diff(start, 'second');
 		let totalMinutes = Math.ceil(totalSeconds / 60);
 
-		const parts = quantitiesInMins 
+		const parts = quantitiesInMins
 			.map(([unit, divisor]) => {
 				const value = Math.floor(totalMinutes / divisor);
 				if (value > 0) {

@@ -1,5 +1,5 @@
-import { PersonaResponse } from "../types/persona";
-import { AppApi } from "./appApi";
+import { PersonaResponse } from '../types/persona';
+import { AppApi } from './appApi';
 
 export class PersonaApi extends AppApi {
 	public async getPersonas() {
@@ -18,4 +18,4 @@ export class PersonaApi extends AppApi {
 				console.error(error);
 			});
 	}
-};
+}

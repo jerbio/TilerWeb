@@ -120,13 +120,8 @@ const Input: React.FC<InputProps> = ({
 		$bordergradient: bordergradient,
 	};
 	return (
-		<StyledInputWrapper
-			{...styledProps}
-		>
-			<StyledInput
-				disabled={disabled}
-				{...styledProps}
-			/>
+		<StyledInputWrapper {...styledProps}>
+			<StyledInput disabled={disabled} {...styledProps} />
 		</StyledInputWrapper>
 	);
 };

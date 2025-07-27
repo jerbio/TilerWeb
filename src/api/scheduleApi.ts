@@ -11,7 +11,6 @@ export class ScheduleApi extends AppApi {
 		const defaultStart = TimeUtil.now() - fourDays;
 		const defaultEnd = TimeUtil.now() + fourDays;
 
-
 		const start = options?.startRange ?? defaultStart;
 		const end = options?.endRange ?? defaultEnd;
 		const myHeaders = new Headers();

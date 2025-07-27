@@ -4,11 +4,7 @@ import styles from '../../../util/styles';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
-import {
-	ChevronLeftIcon,
-	Plus,
-	ShuffleIcon,
-} from 'lucide-react';
+import { ChevronLeftIcon, Plus, ShuffleIcon } from 'lucide-react';
 import useIsMobile from '../../../hooks/useIsMobile';
 import { ScheduleId } from '../../../types/schedule';
 import PersonaCalendar from './persona_calendar';

@@ -78,6 +78,6 @@ export type PersonaResponse = {
 			totalCount: number;
 			pageIndex: number;
 			pageSize: number;
-		}
+		};
 	};
 };

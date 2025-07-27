@@ -188,7 +188,7 @@ const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: numbe
 	}};
 	font-size: ${styles.typography.fontSize.xs};
 	font-weight: ${styles.typography.fontWeight.semibold};
-z-index: -1;
+	z-index: -1;
 
 	span {
 		display: flex;
@@ -329,7 +329,9 @@ const CalendarEvents = ({
 				'day'
 			);
 			const lastEventIntersecting =
-				!!lastEvent && isSameDay && CalendarUtil.isInterseting(eventBox, lastEvent.springStyles);
+				!!lastEvent &&
+				isSameDay &&
+				CalendarUtil.isInterseting(eventBox, lastEvent.springStyles);
 			const eventLayerKey = lastEventIntersecting
 				? lastEvent.properties.eventLayerKey
 				: event.key;

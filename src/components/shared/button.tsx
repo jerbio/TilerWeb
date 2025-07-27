@@ -18,7 +18,7 @@ type StyledButtonProps = {
 	$size: ButtonProps['size'];
 	$height: ButtonProps['height'];
 	$disabled: ButtonProps['disabled'];
-}
+};
 
 const StyledButton = styled.button<StyledButtonProps>`
 	/* Background color */
