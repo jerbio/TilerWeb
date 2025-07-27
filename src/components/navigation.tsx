@@ -57,12 +57,11 @@ const NavigationItemsWrapper = styled.div`
 
 const NavItems = styled.ul`
 	display: flex;
-	justify-content: space-evenly;
 	align-items: center;
+	gap: 1.5rem;
 	list-style: none;
 	padding: 0;
 	margin: 0;
-	width: 210px;
 
 	@media (max-width: 768px) {
 		display: none;
@@ -72,14 +71,16 @@ const NavItems = styled.ul`
 const NavItem = styled.li``;
 
 const NavLink = styled.a`
-	color: ${styles.colors.text};
+	color: ${styles.colors.gray[500]};
 	text-decoration: none;
 	font-size: ${styles.typography.fontSize.sm};
 	font-family: ${styles.typography.fontFamily.inter};
+	font-weight: ${styles.typography.fontWeight.medium};
 	cursor: pointer;
 	&:hover {
-		color: ${styles.colors.brand[500]};
+		color: ${styles.colors.gray[400]};
 	}
+	transition: color 0.3s ease;
 `;
 
 const ButtonsWrapper = styled.div`

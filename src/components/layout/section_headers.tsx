@@ -12,13 +12,13 @@ interface SectionHeadersProps {
 	size?: 'base' | 'large';
 }
 
-const Container = styled.div<{ align: 'left' | 'center' | 'right' }>`
+const Container = styled.div<{ $align: 'left' | 'center' | 'right' }>`
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	align-items: ${({ align }) =>
+	align-items: ${({ $align: align }) =>
 		align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center'};
-	text-align: ${({ align }) => align};
+	text-align: ${({ $align: align }) => align};
 	max-width: 100%;
 	margin-bottom: 2rem;
 
@@ -81,7 +81,7 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 	size = 'base',
 }) => {
 	return (
-		<Container align={align}>
+		<Container $align={align}>
 			<Header size={size}>
 				{headerText}
 				{spanText && (

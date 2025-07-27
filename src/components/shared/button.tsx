@@ -12,7 +12,15 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	bordergradient?: Array<string>; // Array of colors for border gradient
 };
 
-const StyledButton = styled.button<ButtonProps>`
+type StyledButtonProps = {
+	$bordergradient: ButtonProps['bordergradient'];
+	$variant: ButtonProps['variant'];
+	$size: ButtonProps['size'];
+	$height: ButtonProps['height'];
+	$disabled: ButtonProps['disabled'];
+}
+
+const StyledButton = styled.button<StyledButtonProps>`
 	/* Background color */
 	position: relative;
 	isolation: isolate;
@@ -22,24 +30,24 @@ const StyledButton = styled.button<ButtonProps>`
 		position: absolute;
 		inset: 1px;
 		background: ${(props) =>
-			props.variant === 'primary'
+			props.$variant === 'primary'
 				? styles.colors.black
-				: props.variant === 'secondary'
+				: props.$variant === 'secondary'
 					? styles.colors.white
-					: props.variant === 'brand'
+					: props.$variant === 'brand'
 						? styles.colors.brand[500]
-						: props.variant === 'ghost'
+						: props.$variant === 'ghost'
 							? 'transparent'
-							: props.variant};
+							: props.$variant};
 		border-radius: ${(props) =>
-			props.size === 'small' ? styles.borderRadius.little : styles.borderRadius.medium};
+			props.$size === 'small' ? styles.borderRadius.little : styles.borderRadius.medium};
 		z-index: -1;
 
 		transition: background-color 0.2s ease-in-out;
 	}
 
 	${(props) =>
-		props.bordergradient &&
+		props.$bordergradient &&
 		`@property --rotation {
       inherits: false;
       initial-value: 0deg;
@@ -54,20 +62,20 @@ const StyledButton = styled.button<ButtonProps>`
 
 	/* Border color and gradient */
 	background: ${(props) =>
-		props.bordergradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
-			: props.variant === 'primary'
+		props.$bordergradient
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.$bordergradient[0]})`
+			: props.$variant === 'primary'
 				? styles.colors.gray[700]
 				: 'transparent'};
 
 	color: ${(props) =>
-		props.variant === 'primary'
+		props.$variant === 'primary'
 			? styles.colors.white
-			: props.variant === 'secondary'
+			: props.$variant === 'secondary'
 				? styles.colors.black
-				: props.variant === 'brand'
+				: props.$variant === 'brand'
 					? styles.colors.white
-					: props.variant === 'ghost'
+					: props.$variant === 'ghost'
 						? styles.colors.gray[300]
 						: styles.colors.white};
 	border-radius: ${styles.borderRadius.little};
@@ -79,37 +87,37 @@ const StyledButton = styled.button<ButtonProps>`
 	line-height: 1;
 	gap: 1ch;
 	height: ${(props) =>
-		props.height
-			? `${props.height}px`
-			: props.size === 'small'
+		props.$height
+			? `${props.$height}px`
+			: props.$size === 'small'
 				? styles.buttonHeights.small
-				: props.size === 'medium'
+				: props.$size === 'medium'
 					? styles.buttonHeights.medium
 					: styles.buttonHeights.large};
 	padding-inline: ${(props) =>
-		props.size === 'small' || props.variant === 'ghost'
+		props.$size === 'small' || props.$variant === 'ghost'
 			? styles.space.small
 			: styles.space.medium};
 	font-size: ${(props) =>
-		props.size === 'small'
+		props.$size === 'small'
 			? styles.typography.fontSize.xs
-			: props.size === 'medium'
+			: props.$size === 'medium'
 				? styles.typography.fontSize.sm
 				: styles.typography.fontSize.base};
 	&:hover {
 		&::before {
 			background-color: ${(props) =>
-				props.variant === 'primary'
+				props.$variant === 'primary'
 					? styles.colors.gray[900]
-					: props.variant === 'secondary'
+					: props.$variant === 'secondary'
 						? styles.colors.gray[200]
-						: props.variant === 'brand'
+						: props.$variant === 'brand'
 							? styles.colors.brand[600]
-							: props.variant === 'ghost'
+							: props.$variant === 'ghost'
 								? '#ffffff12'
-								: props.variant + '80'};
+								: props.$variant + '80'};
 		}
-		${(props) => props.bordergradient && `animation: rotate 3s linear infinite paused;`}
+		${(props) => props.$bordergradient && `animation: rotate 3s linear infinite paused;`}
 	}
 	&:disabled {
 		opacity: 0.6;
@@ -124,16 +132,17 @@ const Button: React.FC<ButtonProps> = ({
 	variant = 'primary',
 	size = 'medium',
 	bordergradient: bordergradient,
-	...props
+	height,
 }) => {
 	return (
 		<StyledButton
-			{...props}
 			onClick={onClick}
 			disabled={disabled}
-			variant={variant}
-			size={size}
-			bordergradient={bordergradient}
+			$disabled={disabled}
+			$variant={variant}
+			$size={size}
+			$bordergradient={bordergradient}
+			$height={height}
 		>
 			{children}
 		</StyledButton>

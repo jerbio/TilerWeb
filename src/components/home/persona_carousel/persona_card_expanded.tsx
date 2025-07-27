@@ -4,7 +4,11 @@ import styles from '../../../util/styles';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
-import { ChevronLeftIcon, Plus, ShuffleIcon } from 'lucide-react';
+import {
+	ChevronLeftIcon,
+	Plus,
+	ShuffleIcon,
+} from 'lucide-react';
 import useIsMobile from '../../../hooks/useIsMobile';
 import { ScheduleId } from '../../../types/schedule';
 import PersonaCalendar from './persona_calendar';
@@ -33,7 +37,7 @@ const CardContainer = styled(animated.section)<{ $display: boolean }>`
 `;
 
 const Header = styled.header`
-	padding: 0 1rem;
+	padding-left: 1rem;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -125,6 +129,14 @@ const MobileCloseButtonContainer = styled.div`
 	width: fit-content;
 	@media screen and (min-width: ${styles.screens.lg}) {
 		display: none;
+	}
+`;
+
+const ChatControlButtonContainer = styled.div`
+	display: none;
+
+	@media screen and (min-width: ${styles.screens.lg}) {
+		display: block;
 	}
 `;
 

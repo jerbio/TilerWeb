@@ -14,12 +14,12 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
 	const [eventsLoading, setEventsLoading] = useState(true);
 
-	// Get a reference to the view container 
+	// Get a reference to the view container
 	const viewRef = useRef<HTMLUListElement>(null);
 	const { viewOptions, setViewOptions } = useCalendarView(viewRef, width);
 
 	// Fetch schedule data
-	async function fetchSchedule() {
+	function fetchSchedule() {
 		if (viewOptions.daysInView <= 0) return;
 
 		const scheduleApi = new ScheduleApi();
@@ -28,16 +28,19 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 		const startRange = viewOptions.startDay.valueOf();
 		const endRange = startRange + TimeUtil.inMilliseconds(viewOptions.daysInView, 'd');
 
-		const scheduleLookup = await scheduleApi.getScheduleLookupById(scheduleId, {
-			startRange,
-			endRange,
-		});
-		if (scheduleLookup) {
-			setEvents(scheduleLookup.subCalendarEvents);
-		} else {
-			console.error('No schedule found for the given ID');
-		}
-		setEventsLoading(false);
+		scheduleApi
+			.getScheduleLookupById(scheduleId, {
+				startRange,
+				endRange,
+			})
+			.then((scheduleLookup) => {
+				if (scheduleLookup) {
+					setEvents(scheduleLookup.subCalendarEvents);
+				} else {
+					console.error('No schedule found for the given ID');
+				}
+				setEventsLoading(false);
+			});
 	}
 	useEffect(() => {
 		fetchSchedule();

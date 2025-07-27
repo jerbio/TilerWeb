@@ -26,8 +26,8 @@ const HighlightCardWrapper = styled.div`
 	}
 `;
 
-const HighlightCard = styled.div<{ backgroundimage: string }>`
-	background-image: url(${(props) => props.backgroundimage});
+const HighlightCard = styled.div<{ $backgroundimage: string }>`
+	background-image: url(${(props) => props.$backgroundimage});
 	background-size: cover;
 	background-position: center;
 	padding: 1rem;
@@ -100,7 +100,7 @@ const FeatureHighlightsSection: React.FC = () => {
 			/>
 			<HighlightCardWrapper>
 				{highlights.map((highlight, index) => (
-					<HighlightCard key={index} backgroundimage={highlight.backgroundImage}>
+					<HighlightCard key={index} $backgroundimage={highlight.backgroundImage}>
 						<MiniTitle>{highlight.subHeader}</MiniTitle>
 						<div>
 							<Title>{highlight.header}</Title>

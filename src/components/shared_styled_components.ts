@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 
 interface SvgWrapperProps {
-	align_items?: string;
-	justify_content?: string;
+	$alignitems?: string;
+	$justifycontent?: string;
 }
 
 export const SvgWrapper = styled.div<SvgWrapperProps>`
 	display: flex;
-	align-items: ${(props) => props.align_items || 'center'};
-	justify-content: ${(props) => props.justify_content || 'center'};
+	align-items: ${(props) => props.$alignitems || 'center'};
+	justify-content: ${(props) => props.$justifycontent || 'center'};
 	cursor: pointer;
 `;
 

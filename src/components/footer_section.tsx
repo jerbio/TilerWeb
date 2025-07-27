@@ -91,7 +91,7 @@ const FooterSection: React.FC = () => {
 			<FooterSubContainer>
 				<FooterColumn>
 					<FooterRow>
-						<SvgWrapper align_items="left" justify_content="left">
+						<SvgWrapper $alignitems="left" $justifycontent="left">
 							<svg
 								width="40"
 								height="32"

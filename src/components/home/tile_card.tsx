@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import styles from '../../util/styles';
 import { TileCardProps } from '../../util/interface';
 
-const TileWrapper = styled.div<{ background_color: string; index?: number }>`
+const TileWrapper = styled.div<{ $backgroundcolor: string; $index?: number }>`
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -14,7 +14,7 @@ const TileWrapper = styled.div<{ background_color: string; index?: number }>`
 	border: 1px solid #2a2a2a;
 	color: ${styles.colors.text};
 	background: ${(props) =>
-		`linear-gradient(102.27deg, rgba(26, 26, 26, 0.1) 41.07%, ${props.background_color}80 124.88%)`}; /* Added opacity */
+		`linear-gradient(102.27deg, rgba(26, 26, 26, 0.1) 41.07%, ${props.$backgroundcolor}80 124.88%)`}; /* Added opacity */
 	margin-right: 20px;
 
 	h2 {
@@ -53,7 +53,7 @@ const TileCard: React.FC<TileCardProps> = ({
 	index,
 }) => {
 	return (
-		<TileWrapper background_color={background_color} index={index}>
+		<TileWrapper $backgroundcolor={background_color} $index={index}>
 			<h2>{heading}</h2>
 			<span>
 				<svg

@@ -10,23 +10,31 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	bordergradient?: Array<string>; // Array of colors for border gradient
 };
 
-const StyledInputWrapper = styled.div<InputProps>`
+type StyledInputProps = {
+	$disabled: InputProps['disabled'];
+	$variant: InputProps['variant'];
+	$sized: InputProps['sized'];
+	$height: InputProps['height'];
+	$bordergradient: InputProps['bordergradient'];
+};
+
+const StyledInputWrapper = styled.div<StyledInputProps>`
 	flex: 1;
 	display: flex;
 	position: relative;
 	isolation: isolate;
 	padding: 1px;
 	height: ${(props) =>
-		props.height
-			? `${props.height}px`
-			: props.sized === 'small'
+		props.$height
+			? `${props.$height}px`
+			: props.$sized === 'small'
 				? styles.inputHeights.small
-				: props.sized === 'medium'
+				: props.$sized === 'medium'
 					? styles.inputHeights.medium
 					: styles.inputHeights.large};
 
 	${(props) =>
-		props.bordergradient &&
+		props.$bordergradient &&
 		`@property --rotation {
       inherits: false;
       initial-value: 0deg;
@@ -40,18 +48,18 @@ const StyledInputWrapper = styled.div<InputProps>`
     animation: rotate 3s linear infinite;`}
 
 	background: ${(props) =>
-		props.bordergradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
-			: props.variant === 'brand'
+		props.$bordergradient
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.$bordergradient[0]})`
+			: props.$variant === 'brand'
 				? styles.colors.brand[400] + '99'
 				: styles.colors.gray[800]};
 	border-radius: ${styles.borderRadius.little};
 
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
-			props.bordergradient
-				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.bordergradient[0]})`
-				: props.variant === 'brand'
+			props.$bordergradient
+				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.$bordergradient[0]})`
+				: props.$variant === 'brand'
 					? styles.colors.brand[400] + 'CC'
 					: styles.colors.gray[700]};
 	}
@@ -59,7 +67,7 @@ const StyledInputWrapper = styled.div<InputProps>`
 	&:has(input:focus) {
 		box-shadow: 0 0 0 4px
 			${(props) =>
-				props.variant === 'brand'
+				props.$variant === 'brand'
 					? styles.colors.brand[400] + '33'
 					: styles.colors.gray[900]};
 	}
@@ -69,7 +77,7 @@ const StyledInputWrapper = styled.div<InputProps>`
 		box-shadow 0.2s ease-in-out;
 `;
 
-const StyledInput = styled.input<InputProps>`
+const StyledInput = styled.input<StyledInputProps>`
 	/* Background color */
 	background-color: ${styles.colors.gray[900]};
 	border: none;
@@ -83,12 +91,12 @@ const StyledInput = styled.input<InputProps>`
 	height: 100%;
 
 	padding-inline: calc(
-		${(props) => (props.sized === 'small' ? styles.space.small : styles.space.medium)} - 6px
+		${(props) => (props.$sized === 'small' ? styles.space.small : styles.space.medium)} - 6px
 	);
 	font-size: ${(props) =>
-		props.sized === 'small'
+		props.$sized === 'small'
 			? styles.typography.fontSize.xs
-			: props.sized === 'medium'
+			: props.$sized === 'medium'
 				? styles.typography.fontSize.sm
 				: styles.typography.fontSize.base};
 
@@ -101,23 +109,23 @@ const Input: React.FC<InputProps> = ({
 	disabled = false,
 	variant = 'default',
 	sized = 'medium',
-	bordergradient: borderGradient,
-	...props
+	height,
+	bordergradient,
 }) => {
+	const styledProps = {
+		$disabled: disabled,
+		$variant: variant,
+		$sized: sized,
+		$height: height,
+		$bordergradient: bordergradient,
+	};
 	return (
 		<StyledInputWrapper
-			{...props}
-			disabled={disabled}
-			variant={variant}
-			sized={sized}
-			bordergradient={borderGradient}
+			{...styledProps}
 		>
 			<StyledInput
-				{...props}
 				disabled={disabled}
-				variant={variant}
-				sized={sized}
-				bordergradient={borderGradient}
+				{...styledProps}
 			/>
 		</StyledInputWrapper>
 	);
