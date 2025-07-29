@@ -13,21 +13,21 @@ class EnvGetter {
 	public get(key: EnvKey): string {
 		const value = this.envMap[key];
 		if (!value) {
-			throw new Error(`[Env] ${key} is not defined in ${import.meta.env.MODE}`);
+			throw new Error(`[Env] ${key} is not defined in ${import.meta.env.VITE_NODE_ENV}`);
 		}
 		return value;
 	}
 
 	public getCurrentEnv(): string {
-		return import.meta.env.MODE;
+		return import.meta.env.VITE_NODE_ENV;
 	}
 
 	public isProduction(): boolean {
-		return import.meta.env.MODE === 'production';
+		return import.meta.env.VITE_NODE_ENV === 'production';
 	}
 
 	public isDevelopment(): boolean {
-		return import.meta.env.MODE === 'development';
+		return import.meta.env.VITE_NODE_ENV === 'development';
 	}
 }
 
