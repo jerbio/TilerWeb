@@ -2,12 +2,13 @@ type RGB = { r: number; g: number; b: number };
 type HSL = { h: number; s: number; l: number };
 
 function rgbToHsl({ r, g, b }: RGB): HSL {
+	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 	(r /= 255), (g /= 255), (b /= 255);
 	const vmax = Math.max(r, g, b),
 		vmin = Math.min(r, g, b);
 	let h = (vmax + vmin) / 2;
 	let s = (vmax + vmin) / 2;
-	let l = (vmax + vmin) / 2;
+	const l = (vmax + vmin) / 2;
 
 	if (vmax === vmin) {
 		return { h: 0, s: 0, l }; // achromatic

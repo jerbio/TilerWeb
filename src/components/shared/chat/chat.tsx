@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import Button from '../button';
@@ -92,7 +93,7 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-const Chat = ({ onClose }: ChatProps) => {
+const Chat : React.FC = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
 	return (

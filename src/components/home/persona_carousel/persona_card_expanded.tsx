@@ -128,14 +128,6 @@ const MobileCloseButtonContainer = styled.div`
 	}
 `;
 
-const ChatControlButtonContainer = styled.div`
-	display: none;
-
-	@media screen and (min-width: ${styles.screens.lg}) {
-		display: block;
-	}
-`;
-
 type PersonaExpandedCardProps = {
 	display: boolean;
 	occupation: string;

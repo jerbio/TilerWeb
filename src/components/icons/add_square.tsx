@@ -1,6 +1,7 @@
+import React from 'react';
 import Icon from './_icon';
 
-const AddSquare = ({ size = 25 }: { size?: number }) => {
+const AddSquare: React.FC<{ size?: number }> = ({ size = 25 }) => {
 	return (
 		<Icon size={size} defaultSize={25}>
 			<svg

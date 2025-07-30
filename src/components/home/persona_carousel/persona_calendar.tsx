@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import { useEffect, useState } from 'react';
 import { ScheduleSubCalendarEvent } from '../../../types/schedule';
 import Calendar from '../../shared/calendar/calendar';
 import { ScheduleApi } from '../../../api/scheduleApi';
@@ -15,7 +16,7 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 	const [eventsLoading, setEventsLoading] = useState(true);
 
 	// Get a reference to the view container
-	const viewRef = useRef<HTMLUListElement>(null);
+	const viewRef = React.useRef<HTMLUListElement>(null);
 	const { viewOptions, setViewOptions } = useCalendarView(viewRef, width);
 
 	// Fetch schedule data

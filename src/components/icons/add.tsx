@@ -1,6 +1,7 @@
+import React from 'react';
 import Icon from './_icon';
 
-const Add = ({ size = 24 }: { size?: number }) => {
+const Add: React.FC<{ size?: number }> = ({ size = 24 }) => {
 	return (
 		<Icon size={size} defaultSize={24}>
 			<svg
