@@ -23,6 +23,8 @@ const Template = styled.div`
 	border-radius: ${styles.borderRadius.xxLarge};
 `;
 
-export default function PersonaCardTemplate() {
+const PersonaCardTemplate: React.FC = () => {
 	return <Template />;
 }
+
+export default PersonaCardTemplate;
