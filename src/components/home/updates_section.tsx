@@ -1,3 +1,4 @@
+import React from 'react';
 import Section from '../layout/section';
 import SectionHeaders from '../layout/section_headers';
 import styled from 'styled-components';
@@ -22,7 +23,7 @@ const ButtonText = styled.span`
 	}
 `;
 
-const UpdatesSection = () => {
+const UpdatesSection: React.FC = () => {
 	return (
 		<Section>
 			<SectionHeaders

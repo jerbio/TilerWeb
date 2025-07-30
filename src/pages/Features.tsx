@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import styles from '../util/styles';
 import FeatureCard from '../components/features/FeatureCard';
@@ -79,7 +80,7 @@ const featureList = [
 	},
 ];
 
-export default function Features() {
+const Features: React.FC = () => {
 	return (
 		<>
 			<Section>
@@ -102,3 +103,4 @@ export default function Features() {
 		</>
 	);
 }
+export default Features;

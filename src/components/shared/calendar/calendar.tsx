@@ -1,3 +1,4 @@
+import React from 'react';
 import dayjs from 'dayjs';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -238,6 +239,7 @@ const Calendar = ({ width, scheduleId }: CalendarProps) => {
 
 	// Scroll to a specific time
 	const calendarContentContainerRef = useRef<HTMLDivElement>(null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function scrollToTime(ref: RefObject<any>) {
 		return function (time: dayjs.Dayjs, cellHeight: number) {
 			if (ref.current) {

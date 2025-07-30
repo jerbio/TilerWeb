@@ -1,6 +1,7 @@
+import React from 'react';
 import Icon from './_icon';
 
-const ArrowOut = ({ size = 21 }: { size?: number }) => {
+const ArrowOut: React.FC<{ size?: number }> = ({ size = 21 }) => {
 	return (
 		<Icon size={size} defaultSize={21}>
 			<svg
