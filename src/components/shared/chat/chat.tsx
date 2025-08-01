@@ -93,7 +93,7 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-const Chat : React.FC = ({ onClose }: ChatProps) => {
+const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const { t } = useTranslation();
 
 	return (

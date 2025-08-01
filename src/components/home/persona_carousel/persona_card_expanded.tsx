@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
-import { ChevronLeftIcon, Plus, ShuffleIcon } from 'lucide-react';
+import { ChevronLeftIcon, Plus } from 'lucide-react';
 import useIsMobile from '../../../hooks/useIsMobile';
-import { ScheduleId } from '../../../types/schedule';
 import PersonaCalendar from './persona_calendar';
+import { Persona } from '../../../types/persona';
+import { PersonaApi } from '../../../api/personaApi';
+import ObjectUtil from '../../../util/helpers/object';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
@@ -129,28 +131,46 @@ const MobileCloseButtonContainer = styled.div`
 `;
 
 type PersonaExpandedCardProps = {
-	display: boolean;
-	occupation: string;
+	persona: Persona;
+	expanded: boolean;
 	onCollapse: () => void;
 	expandedWidth: number;
 };
 
-function PersonaCardExpanded({
-	display,
-	occupation,
+const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
+	expanded,
+	persona,
 	onCollapse,
 	expandedWidth,
-}: PersonaExpandedCardProps) {
+}) => {
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
 
-	const [currentScheduleId, setCurrentScheduleId] = useState<ScheduleId>('baseScheduleid');
-	function shuffleEvents() {
-		const ids: Array<ScheduleId> = ['baseScheduleid', 'updateScheduleId'];
-		const nextKey = ids[(ids.indexOf(currentScheduleId) + 1) % ids.length];
-		setCurrentScheduleId(nextKey);
+	const [scheduleId, setScheduleId] = useState<string | null>(null);
+	const [currentPersona, setCurrentPersona] = useState<Persona | null>(null);
+	const changedPersona = !ObjectUtil.compareObjects(currentPersona, persona);
+
+	function onMobileCollapse() {
+		setMobileChatVisible(false);
 	}
+
+	// Set the scheduleId based on the current persona
+	useEffect(() => {
+		if (expanded && changedPersona) {
+			setCurrentPersona(persona);
+			const personaApi = new PersonaApi();
+
+			personaApi.getPersonaSchedule(persona).then((personaSchedule) => {
+				if (personaSchedule) {
+					setScheduleId(personaSchedule.scheduleId);
+				} else {
+					setScheduleId(null);
+					console.error('No schedule found for the persona');
+				}
+			});
+		}
+	}, [expanded, persona]);
 
 	const content = [
 		{
@@ -158,11 +178,12 @@ function PersonaCardExpanded({
 			container: CalendarContainer,
 			content: (
 				<React.Fragment>
-					<PersonaCalendar expandedWidth={expandedWidth} scheduleId={currentScheduleId} />
+					<PersonaCalendar
+						expandedWidth={expandedWidth}
+						scheduleIdLoading={changedPersona}
+						scheduleId={scheduleId}
+					/>
 					<CalendarContainerActionButtons>
-						<CalendarActionButton onClick={shuffleEvents}>
-							<ShuffleIcon size={20} />
-						</CalendarActionButton>
 						<MobileShowChatButton
 							onClick={() => setMobileChatVisible(!mobileChatVisible)}
 						>
@@ -175,17 +196,7 @@ function PersonaCardExpanded({
 		{
 			key: 'chat',
 			container: ChatContainer,
-			content: (
-				<Chat
-					onClose={
-						!isDesktop
-							? () => {
-									setMobileChatVisible(false);
-								}
-							: onCollapse
-					}
-				/>
-			),
+			content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
 		},
 	];
 
@@ -194,33 +205,33 @@ function PersonaCardExpanded({
 	const cardSpring = useSpring({
 		ref: cardSpringRef,
 		from: { opacity: 0 },
-		to: { opacity: display ? 1 : 0 },
+		to: { opacity: expanded ? 1 : 0 },
 	});
 
 	const contentTransRef = useSpringRef();
 	const contentTransition = useTransition(
-		display ? (showChat ? content : content.slice(0, 1)) : [],
+		expanded ? (showChat ? content : content.slice(0, 1)) : [],
 		{
 			keys: (item) => item.key,
 			ref: contentTransRef,
 			from: { opacity: 0, scale: 1.05 },
 			enter: { opacity: 1, scale: 1 },
 			leave: { opacity: 0, scale: 1 },
-			trail: display ? 200 : 0,
-			config: { tension: display ? 200 : 300 },
+			trail: expanded ? 200 : 0,
+			config: { tension: expanded ? 200 : 300 },
 		}
 	);
 
 	useChain(
-		display ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
-		display ? [0, 0.75] : [0, 1],
+		expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
+		expanded ? [0, 0.75] : [0, 1],
 		300
 	);
 
 	return (
-		<CardContainer $display={display} style={cardSpring}>
+		<CardContainer $display={expanded} style={cardSpring}>
 			<Header>
-				<h2>{occupation}</h2>
+				<h2>{persona.occupation}</h2>
 				<MobileCloseButtonContainer>
 					<Button variant="ghost" height={32} onClick={onCollapse}>
 						<ChevronLeftIcon size={16} />

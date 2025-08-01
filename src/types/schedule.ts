@@ -1,4 +1,4 @@
-export type ScheduleId = 'baseScheduleid' | 'updateScheduleId';
+import { ApiResponse } from './api';
 
 export type ScheduleSubCalendarEvent = {
 	id: string;
@@ -100,7 +100,7 @@ export type ScheduleSubCalendarEvent = {
 				occupiedSlots: null;
 			};
 			projectionType: ['TravelSubCalendarEvent'];
-		};
+		} | null;
 		after: {
 			start: number;
 			end: number;
@@ -120,20 +120,14 @@ export type ScheduleSubCalendarEvent = {
 				occupiedSlots: null;
 			};
 			projectionType: ['TravelSubCalendarEvent'];
-		};
-	};
-};
-
-export type ScheduleLookupResponse = {
-	Error: {
-		Code: string;
-		Message: string;
-	};
-	Content: {
-		subCalendarEvents: Array<ScheduleSubCalendarEvent>;
+		} | null;
 	};
 };
 
 export type ScheduleLookupTravelDetail = ScheduleSubCalendarEvent['travelDetail'][
 	| 'before'
 	| 'after'];
+
+export type ScheduleLookupResponse = ApiResponse<{
+	subCalendarEvents: Array<ScheduleSubCalendarEvent>;
+}>;

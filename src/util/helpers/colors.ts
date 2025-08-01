@@ -1,5 +1,5 @@
-type RGB = { r: number; g: number; b: number };
-type HSL = { h: number; s: number; l: number };
+export type RGB = { r: number; g: number; b: number };
+export type HSL = { h: number; s: number; l: number };
 
 function rgbToHsl({ r, g, b }: RGB): HSL {
 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions

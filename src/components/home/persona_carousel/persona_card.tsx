@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { useSwiper, useSwiperSlide } from 'swiper/react';
@@ -225,6 +225,18 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 		);
 	}
 
+	const currentPersona = useMemo<Persona>(() => {
+		const selectedPreferences = new Set(
+			tileSuggestions.filter((tile) => tile.selected).map((tile) => tile.name)
+		);
+		return {
+			...persona,
+			tilePreferences: persona.tilePreferences.filter((pref) =>
+				selectedPreferences.has(pref.TileName)
+			),
+		};
+	}, [persona, tileSuggestions]);
+
 	const swiper = useSwiper();
 	const swiperSlide = useSwiperSlide();
 	const [mouseHovered, setHovered] = useState(false);
@@ -368,8 +380,8 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			</OverlayContainer>
 			{/* Set expanded width to the final width of animation */}
 			<PersonaCardExpanded
-				occupation={persona.occupation}
-				display={isSelected}
+				persona={currentPersona}
+				expanded={isSelected}
 				onCollapse={onDeselect}
 				expandedWidth={expandedWidth}
 			/>

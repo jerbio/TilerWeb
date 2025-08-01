@@ -7,11 +7,16 @@ import TimeUtil from '../../../util/helpers/time';
 import useCalendarView from '../../../hooks/useCalendarView';
 
 type PersonaCalendarProps = {
-	scheduleId: string;
+	scheduleId: string | null;
+	scheduleIdLoading: boolean;
 	expandedWidth: number;
 };
 
-function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarProps) {
+function PersonaCalendar({
+	expandedWidth: width,
+	scheduleId,
+	scheduleIdLoading,
+}: PersonaCalendarProps) {
 	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
 	const [eventsLoading, setEventsLoading] = useState(true);
 
@@ -20,7 +25,7 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 	const { viewOptions, setViewOptions } = useCalendarView(viewRef, width);
 
 	// Fetch schedule data
-	function fetchSchedule() {
+	function fetchSchedule(id: string) {
 		if (viewOptions.daysInView <= 0) return;
 
 		const scheduleApi = new ScheduleApi();
@@ -30,7 +35,7 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 		const endRange = startRange + TimeUtil.inMilliseconds(viewOptions.daysInView, 'd');
 
 		scheduleApi
-			.getScheduleLookupById(scheduleId, {
+			.getScheduleLookupById(id, {
 				startRange,
 				endRange,
 			})
@@ -44,8 +49,10 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 			});
 	}
 	useEffect(() => {
-		fetchSchedule();
-	}, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
+		if (scheduleId && !scheduleIdLoading) {
+			fetchSchedule(scheduleId);
+		}
+	}, [scheduleId, scheduleIdLoading, viewOptions.daysInView, viewOptions.startDay]);
 
 	return (
 		<Calendar

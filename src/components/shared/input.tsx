@@ -111,6 +111,7 @@ const Input: React.FC<InputProps> = ({
 	sized = 'medium',
 	height,
 	bordergradient,
+	...props
 }) => {
 	const styledProps = {
 		$disabled: disabled,
@@ -121,7 +122,7 @@ const Input: React.FC<InputProps> = ({
 	};
 	return (
 		<StyledInputWrapper {...styledProps}>
-			<StyledInput disabled={disabled} {...styledProps} />
+			<StyledInput disabled={disabled} {...styledProps} {...props} />
 		</StyledInputWrapper>
 	);
 };

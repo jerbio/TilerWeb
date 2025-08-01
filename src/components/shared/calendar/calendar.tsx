@@ -112,16 +112,16 @@ const CalendarContent = styled.div`
 `;
 
 const CalendarCellBg = styled.div<{
-	width: number;
-	dayindex: number;
-	hourindex: number;
+	$width: number;
+	$dayindex: number;
+	$hourindex: number;
 }>`
 	position: absolute;
 	height: ${calendarConfig.CELL_HEIGHT};
-	width: ${({ width }) => width}px;
+	width: ${({ $width: w }) => w}px;
 	top: 0;
-	left: calc(${({ dayindex, width }) => dayindex * width}px + ${calendarConfig.TIMELINE_WIDTH});
-	transform: translateY(${({ hourindex }) => hourindex * parseInt(calendarConfig.CELL_HEIGHT)}px);
+	left: calc(${({ $dayindex: d, $width: w }) => d * w}px + ${calendarConfig.TIMELINE_WIDTH});
+	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
 	z-index: -1;
 
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
@@ -131,13 +131,13 @@ const CalendarCellBg = styled.div<{
 	background-repeat: repeat-x;
 `;
 
-const CalendarCellTime = styled.div<{ hourindex: number }>`
+const CalendarCellTime = styled.div<{ $hourindex: number }>`
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: ${calendarConfig.TIMELINE_WIDTH};
 	height: ${calendarConfig.CELL_HEIGHT};
-	transform: translateY(${({ hourindex }) => hourindex * parseInt(calendarConfig.CELL_HEIGHT)}px);
+	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
 
 	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	background-color: #1f1f1f;
@@ -268,9 +268,9 @@ const Calendar = ({
 							return (
 								<CalendarCellBg
 									key={`${dayIndex}-${hourIndex}`}
-									dayindex={dayIndex}
-									hourindex={hourIndex}
-									width={viewOptions.width / viewOptions.daysInView}
+									$dayindex={dayIndex}
+									$hourindex={hourIndex}
+									$width={viewOptions.width / viewOptions.daysInView}
 								/>
 							);
 						});
@@ -278,7 +278,7 @@ const Calendar = ({
 					{/* Timeline */}
 					{Array.from({ length: 24 }).map((_, hourIndex) => {
 						return (
-							<CalendarCellTime key={hourIndex} hourindex={hourIndex}>
+							<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
 								<div>
 									{/* eg. "8 AM" */}
 									<span>{dayjs().hour(hourIndex).format('h A')}</span>
@@ -300,4 +300,4 @@ const Calendar = ({
 	);
 };
 
-export default Calendar;
+export default Calendar ;

@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
-import calendarConfig from './config';
+import React, { useMemo } from 'react'; import calendarConfig from './config';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
-import colorUtil from '../../../util/helpers/colors';
+import colorUtil, { RGB } from '../../../util/helpers/colors';
 import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
@@ -39,7 +38,7 @@ const Wrapper = styled.div`
 
 const EventContainer = styled(animated.div)<{
 	$selected: boolean;
-	colors: { r: number; g: number; b: number };
+	$colors: RGB;
 }>`
 	position: absolute;
 	top: 0;
@@ -58,8 +57,8 @@ const EventContainer = styled(animated.div)<{
 		rect {
 			fill: transparent;
 			stroke-width: 2;
-			stroke: ${({ colors, $selected }) => {
-				const newColor = colorUtil.setLightness(colors, 0.7);
+			stroke: ${({ $colors, $selected }) => {
+				const newColor = colorUtil.setLightness($colors, 0.7);
 				return $selected
 					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
 					: 'transparent';
@@ -79,23 +78,23 @@ const EventLockIcon = styled(LockKeyhole)`
 `;
 
 const EventContent = styled.div<{
-	colors: { r: number; g: number; b: number };
+	$colors: RGB;
 	height: number;
 	variant: 'block' | 'tile';
 }>`
 	position: relative;
-	background-color: ${({ colors }) => {
-		const newColor = colorUtil.setLightness(colors, 0.325);
+	background-color: ${({ $colors }) => {
+		const newColor = colorUtil.setLightness($colors, 0.325);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
-	color: ${({ colors }) => {
-		const newColor = colorUtil.setLightness(colors, 0.85);
+	color: ${({ $colors }) => {
+		const newColor = colorUtil.setLightness($colors, 0.85);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
 	border: 1px solid
-		${({ colors, variant }) => {
-			const blockColor = colorUtil.setLightness(colors, 0.6);
-			const tileColor = colorUtil.setLightness(colors, 0.1);
+		${({ $colors, variant }) => {
+			const blockColor = colorUtil.setLightness($colors, 0.6);
+			const tileColor = colorUtil.setLightness($colors, 0.1);
 			return variant === 'block'
 				? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
 				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
@@ -137,7 +136,7 @@ const EventContent = styled.div<{
 		font-size: ${styles.typography.fontSize.xs};
 		font-weight: ${styles.typography.fontWeight.semibold};
 
-		color: ${({ colors }) => {
+		color: ${({ $colors: colors }) => {
 			const newColor = colorUtil.setLightness(colors, 0.7);
 			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
@@ -154,11 +153,11 @@ const EventContent = styled.div<{
 
 		.clock.highlight {
 			margin-right: 0.5ch;
-			color: ${({ colors }) => {
+			color: ${({ $colors: colors }) => {
 				const newColor = colorUtil.setLightness(colors, 0.2);
 				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 			}};
-			background-color: ${({ colors }) => {
+			background-color: ${({ $colors: colors }) => {
 				const newColor = colorUtil.setLightness(colors, 0.7);
 				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 			}};
@@ -166,14 +165,14 @@ const EventContent = styled.div<{
 	}
 `;
 
-const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: number; b: number } }>`
+const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
 	align-items: center;
 	justify-content: center;
-	background: ${({ colors }) => {
-		const newColor = colorUtil.setLightness(colors, 0.7);
+	background: ${({ $colors }) => {
+		const newColor = colorUtil.setLightness($colors, 0.7);
 		return `repeating-linear-gradient(
 			45deg,
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.1),
@@ -182,8 +181,8 @@ const TravelDetailContent = styled(animated.div)<{ colors: { r: number; g: numbe
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 9px
 )`;
 	}};
-	color: ${({ colors }) => {
-		const newColor = colorUtil.setLightness(colors, 0.5);
+	color: ${({ $colors }) => {
+		const newColor = colorUtil.setLightness($colors, 0.5);
 		return `rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.75)`;
 	}};
 	font-size: ${styles.typography.fontSize.xs};
@@ -287,6 +286,7 @@ const CalendarEvents = ({
 		for (const event of currentViewEvents) {
 			const travelDetails = event.travelDetail;
 			for (const detail of Object.values(travelDetails)) {
+				if (!detail) continue;
 				if (detail.end - detail.start <= 0) continue;
 
 				const start = dayjs(detail.start, 'unix');
@@ -455,11 +455,11 @@ const CalendarEvents = ({
 							style={style}
 							key={event.id}
 							$selected={selectedEvent === event.id}
-							colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
+							$colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
 						>
 							<EventContent
 								height={event.springStyles.height}
-								colors={{
+								$colors={{
 									r: event.colorRed,
 									g: event.colorGreen,
 									b: event.colorBlue,
@@ -517,7 +517,7 @@ const CalendarEvents = ({
 								...detail.springStyles,
 								...style,
 							}}
-							colors={{
+							$colors={{
 								r: detail.colorRed,
 								g: detail.colorGreen,
 								b: detail.colorBlue,
