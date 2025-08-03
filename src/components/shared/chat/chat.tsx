@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FormEvent, useRef } from 'react';
+import { useEffect, useState, FormEvent, useRef } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import Button from '../button';
@@ -6,7 +6,6 @@ import { ChevronLeftIcon, SendHorizontal, CircleStop } from 'lucide-react';
 import Input from '../input';
 import Logo from '../../icons/logo';
 import { useTranslation } from 'react-i18next';
-import { Prompt } from './util/chat';
 import {
 	fetchChatMessages,
 	fetchChatActions,
@@ -15,10 +14,12 @@ import {
 	setStoredSessionId,
 	clearStoredSessionId,
 	sendChatAcceptChanges,
+	getActionIcon
 } from './util/chat_service';
 import useAppStore from '../../../global_state'; // Import Zustand Global State
 import { ChatContextType } from '../../../global_state'; // Import ChatContextType
-import { Actions, Status } from '../../../util/enums'; // Import the enums
+import { PromptWithActions, VibeAction} from './util/chat'; // Import types
+import HORIZONTALPROGRESSBAR from '../../../assets/image_assets/horizontal_progress_bar.gif';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -73,6 +74,7 @@ const ChatForm = styled.form`
 	display: flex;
 	align-items: center;
 	gap: 0.5rem; /* Optional: Add spacing between elements */
+	margin-top: 8px; /* Add some space above the form */
 `;
 
 const ChatButton = styled.button`
@@ -140,34 +142,6 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-type Action = {
-	id: string;
-	descriptions: string;
-	type: string;
-	creationTimeInMs: number;
-	status: string;
-	beforeScheduleId: string;
-	afterScheduleId: string;
-	vibeRequest: {
-		id: string;
-		creationTimeInMs: number;
-		activeAction: string | null;
-		isClosed: boolean;
-		actions: any[];
-	};
-};
-
-type PromptWithActions = {
-	id: string;
-	origin: string;
-	content: string;
-	actionId: string | null;
-	requestId: string;
-	sessionId: string;
-	actions: Action[];
-	actionIds?: string[];
-};
-
 const Chat = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
@@ -184,6 +158,7 @@ const Chat = ({ onClose }: ChatProps) => {
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
+	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
 	const handleSetScheduleId = (id: string) => {
 		setScheduleId(id);
 	};
@@ -220,22 +195,16 @@ const Chat = ({ onClose }: ChatProps) => {
 			);
 
 			// Fetch and map actions by ID
-			let allActionsMap: Record<string, Action> = {};
+			let allActionsMap: Record<string, VibeAction> = {};
 			if (uniqueActionIds.length > 0) {
 				try {
 					const fetchedActions = await fetchChatActions(uniqueActionIds);
 					allActionsMap = fetchedActions.reduce(
 						(acc, action) => {
-							acc[action.id] = {
-								...action,
-								vibeRequest: {
-									...action.vibeRequest,
-									isClosed: action.vibeRequest?.isClosed ?? false,
-								},
-							};
+							acc[action.id] = action;
 							return acc;
 						},
-						{} as Record<string, Action>
+						{} as Record<string, VibeAction>
 					);
 				} catch (err) {
 					console.error('Error fetching actions:', err);
@@ -293,7 +262,13 @@ const Chat = ({ onClose }: ChatProps) => {
 			setIsSending(true);
 			setError(null);
 
-			const response = await sendChatMessage(message, entityId, sessionId);
+			const response = await sendChatMessage(message, entityId, sessionId, anonymousUserId);
+			if (
+				response?.Content?.vibeResponse?.tilerUser &&
+				JSON.stringify(response.Content.vibeResponse.tilerUser) !== JSON.stringify(useAppStore.getState().userInfo)
+			) {
+				useAppStore.getState().setUserInfo?.(response.Content.vibeResponse.tilerUser);
+			}
 			const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
 			// Convert the prompt map to PromptWithActions[]
@@ -317,6 +292,8 @@ const Chat = ({ onClose }: ChatProps) => {
 						creationTimeInMs: action.vibeRequest.creationTimeInMs,
 						activeAction: action.vibeRequest.activeAction,
 						isClosed: action.vibeRequest.isClosed ?? false,
+						beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
+						afterScheduleId: action.vibeRequest.afterScheduleId || null,
 						actions: action.vibeRequest.actions || [],
 					},
 				})),
@@ -469,7 +446,7 @@ const Chat = ({ onClose }: ChatProps) => {
 											| undefined
 									}
 								>
-									{action.descriptions}
+									<img src={getActionIcon(action)} alt="add_new_appointment" style={{ width: '15px', height: '15px', verticalAlign: 'middle' }} /> - {action.descriptions}
 								</Button>
 							))}
 						</MessageBubble>
@@ -512,6 +489,7 @@ const Chat = ({ onClose }: ChatProps) => {
 									}
 								`}
 						</style>
+						{/* <img src={HORIZONTALPROGRESSBAR} alt="Loading..." style={{ width: '24px', height: '24px', marginRight: '0.5rem' }} /> */}
 						<span>Sending Request...</span>
 					</div>
 				)}
@@ -532,13 +510,24 @@ const Chat = ({ onClose }: ChatProps) => {
 
 			<ChatForm onSubmit={handleSubmit}>
 				<Input
-					as="textarea"
+					other='textarea'
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
-					height={48}
+					onKeyDown={(e) => {
+						// Submit form on Enter key press without Shift key
+						if (e.key === 'Enter' && !e.shiftKey) {
+							e.preventDefault(); // Prevent new line
+							
+							// Use form.requestSubmit() instead of handleSubmit directly
+							// This triggers a single form submission through the standard form mechanism
+							const form = e.currentTarget.form;
+							if (form) form.requestSubmit();
+						}
+					}}
 					placeholder={t('home.expanded.chat.inputPlaceholder')}
 					disabled={isSending}
 					borderGradient={[styles.colors.brand[500]]}
+					height={50} // Set a fixed height for consistent alignment
 				/>
 				<ChatButton type="submit" disabled={isSending || !message.trim()}>
 					{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}

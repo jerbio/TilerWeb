@@ -6,10 +6,17 @@ export interface ChatContextType {
 	Description?: string; // Description of the tile
 }
 export interface UserInfo {
-	userId?: string;
-	name?: string;
-	email?: string;
-	scheduleId: string;
+	id: string;               // TilerUser@@00000000000000000000000
+	username: string;         // Armando-ALPHANUMERIC
+	timeZoneDifference: number;  // 0.0
+	timeZone: string;         // UTC
+	email: string | null;     // null
+	endfOfDay: string;        // 0001-01-01T00:00:00+00:00
+	phoneNumber: string | null;  // null
+	fullName: string;         // ""
+	firstName: string;        // ""
+	lastName: string;         // ""
+	countryCode: string;      // "1"
 }
 
 interface AppState {

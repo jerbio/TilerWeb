@@ -1,42 +1,12 @@
 import { ChatVibeResponse, ChatPromptResponse, ExecuteActionResponse } from './chat';
+import { VibeAction, SendMessageRequest } from './chat';
+import ADDBLOCK from '../../../../assets/image_assets/add_block.svg';
+import ADDTASK from '../../../../assets/image_assets/add_new_tile.svg';	
 
 const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
 const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Action';
 const API_EXECUTE_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Request/Execute';
 const STORAGE_KEY = 'chat_session_id';
-
-interface SendMessageRequest {
-	EntityId: string;
-	SessionId?: string;
-	RequestId?: string;
-	ChatMessage: string;
-	ActionId?: string;
-	MobileApp?: boolean;
-	TimeZoneOffset?: number;
-	Version?: string;
-	TimeZone?: string;
-	IsTimeZoneAdjusted?: string;
-	getTimeSpan?: string;
-	UserName?: string;
-	UserID?: string;
-}
-
-type Action = {
-	id: string;
-	descriptions: string;
-	type: string;
-	creationTimeInMs: number;
-	status: string;
-	beforeScheduleId: string;
-	afterScheduleId: string;
-	vibeRequest: {
-		id: string;
-		creationTimeInMs: number;
-		activeAction: string | null;
-		isClosed: boolean;
-		actions: any[];
-	};
-};
 
 export const getStoredSessionId = (): string | null => {
 	return localStorage.getItem(STORAGE_KEY);
@@ -64,7 +34,7 @@ export const fetchChatMessages = async (sessionId: string): Promise<ChatPromptRe
 	}
 };
 
-export const fetchChatActions = async (actionIds: string[] | string): Promise<Action[]> => {
+export const fetchChatActions = async (actionIds: string[] | string): Promise<VibeAction[]> => {
 	try {
 		const queryParam = Array.isArray(actionIds)
 			? actionIds.length > 1
@@ -84,7 +54,7 @@ export const fetchChatActions = async (actionIds: string[] | string): Promise<Ac
 		if (Array.isArray(data.Content?.vibeActions)) {
 			// Case: multiple actions
 			return data.Content.vibeActions;
-		} else if (data.Content?.vibeActions) {
+		} else if (data.Content?.vibeAction) {
 			// Case: single action
 			return [data.Content.vibeAction];
 		}
@@ -101,8 +71,9 @@ export const sendChatMessage = async (
 	message: string,
 	entityId: string,
 	sessionId: string = '',
+	anonymousUserId?: string,
 	requestId?: string,
-	actionId?: string
+	actionId?: string,
 ): Promise<ChatVibeResponse> => {
 	try {
 		const requestBody: SendMessageRequest = {
@@ -111,6 +82,7 @@ export const sendChatMessage = async (
 			EntityId: entityId,
 			RequestId: requestId || '',
 			ActionId: actionId || '',
+			AnonymousUserId: anonymousUserId || '',
 			MobileApp: true,
 		};
 
@@ -129,8 +101,8 @@ export const sendChatMessage = async (
 		const data = await response.json();
 
 		// If we get a valid session ID in the response, store it
-		const sessionIdFromResponse =
-			data.Content?.vibeResponse?.actions?.[0]?.prompts?.[0]?.sessionId;
+		const promptEntries = Object.values(data.Content?.vibeResponse?.prompts || {});
+		const sessionIdFromResponse = promptEntries.length > 0 ? (promptEntries[0] as any).sessionId : undefined;
 		if (sessionIdFromResponse) {
 			setStoredSessionId(sessionIdFromResponse);
 		}
@@ -168,5 +140,54 @@ export const sendChatAcceptChanges = async (
 	} catch (error) {
 		console.error('Error sending chat accept changes:', error);
 		throw error;
+	}
+};
+
+
+export const getActionIcon = (action: VibeAction): string => {
+	switch (action.type) {
+		// Regular actions
+		case 'add_new_appointment':
+			return ADDBLOCK;
+		case 'add_new_task':
+			return ADDTASK;
+		case 'add_new_project':
+			return '📋';
+		case 'decide_if_task_or_project':
+			return '🤔';
+		case 'update_existing_task':
+			return '✏️';
+		case 'remove_existing_task':
+			return '🗑️';
+		case 'mark_task_as_done':
+			return '✓';
+		case 'procrastinate_all_tasks':
+			return '⏱️';
+		case 'exit_prompting':
+			return '🚪';
+			
+		// What-if scenarios
+		case 'whatif_addanewappointment':
+			return '📅❓';
+		case 'whatif_addednewtask':
+			return '✅❓';
+		case 'whatif_editupdatetask':
+			return '✏️❓';
+		case 'whatif_procrastinatetask':
+			return '⏱️❓';
+		case 'whatif_removedtask':
+			return '🗑️❓';
+		case 'whatif_markedtaskasdone':
+			return '✓❓';
+		case 'whatif_procrastinateall':
+			return '⏱️❓';
+			
+		// Other cases
+		case 'conversational_and_not_supported':
+			return '💬';
+		case 'none':
+			return '⚪';
+		default:
+			return '🔹';
 	}
 };

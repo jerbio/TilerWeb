@@ -1,23 +1,5 @@
-enum Actions {
-	Add_New_Appointment = 'add_new_appointment',
-	Add_New_Task = 'add_new_task',
-	Add_New_Project = 'add_new_project',
-	Decide_If_Task_Or_Project = 'decide_if_task_or_project',
-	Update_Existing_Task = 'update_existing_task',
-	Remove_Existing_Task = 'remove_existing_task',
-	Mark_Task_As_Done = 'mark_task_as_done',
-	Procrastinate_All_Tasks = 'procrastinate_all_tasks',
-	Exit_Prompting = 'exit_prompting',
-	WhatIf_AddANewAppointment = 'whatif_addanewappointment',
-	WhatIf_AddedNewTask = 'whatif_addednewtask',
-	WhatIf_EditUpdateTask = 'whatif_editupdatetask',
-	WhatIf_ProcrastinateTask = 'whatif_procrastinatetask',
-	WhatIf_RemovedTask = 'whatif_removedtask',
-	WhatIf_MarkedTaskAsDone = 'whatif_markedtaskasdone',
-	WhatIf_ProcrastinateAll = 'whatif_procrastinateall',
-	Conversational_And_Not_Supported = 'conversational_and_not_supported',
-	None = 'none',
-}
+import {Actions} from '../../../../util/enums';
+import { UserInfo } from '../../../../global_state';
 
 type ActionType = `${Actions}`;
 interface ServerResponse {
@@ -29,48 +11,48 @@ interface ServerResponse {
 	ServerStatus: Record<string, unknown> | null;
 }
 
-// Prompt interface
-interface Prompt {
+// PromptWithActions interface
+interface PromptWithActions {
 	id: string;
 	origin: 'user' | 'model' | 'tiler';
 	content: string;
 	actionId: string;
 	requestId: string;
 	sessionId: string;
+	actions: VibeAction[];
+	actionIds?: string[];
 }
 
-// Action interface
+// VibeAction interface
 interface VibeAction {
 	id: string;
 	descriptions: string;
 	type: ActionType; // ActionType is a string literal type based on Actions enum
 	creationTimeInMs: number;
 	status: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited';
-	prompts: Prompt[];
+	prompts: PromptWithActions[];
+	beforeScheduleId: string;
+	afterScheduleId: string;
+	vibeRequest: {
+		id: string;
+		creationTimeInMs: number;
+		activeAction: string | null;
+		isClosed: boolean;
+		beforeScheduleId: string | null;
+		afterScheduleId: string | null;
+		actions: VibeAction[];
+	};
 }
 
 // VibeResponse interface
 interface VibeResponse {
-	// actions: VibeAction[];
-	// pendingActions: VibeAction[];
 	prompts: Record<
 		string,
-		{
-			prompt: Prompt;
-			actions: Array<
-				VibeAction & {
-					vibeRequest: {
-						id: string;
-						creationTimeInMs: number;
-						isClosed: boolean | null;
-						actions: VibeAction[];
-					};
-					beforeScheduleId?: string;
-					afterScheduleId?: string;
-				}
-			>;
+		PromptWithActions & {
+			actions: Array<VibeAction>;
 		}
 	>;
+	tilerUser?: UserInfo;
 }
 
 // Chat-specific response interface
@@ -84,11 +66,11 @@ interface ChatVibeResponse extends ServerResponse {
 interface vibeRequest {
 	id: string;
 	creationTimeInMs: number;
-	activeAction: any; // You can replace `any` with a more specific type if needed
+	activeAction: string | null; // More specific type
 	isClosed: boolean;
-	beforeScheduleId: string;
-	afterScheduleId: string;
-	actions: any[]; // Replace with proper action type if known
+	beforeScheduleId: string | null;
+	afterScheduleId: string | null;
+	actions: VibeAction[]; // Using VibeAction type
 }
 
 interface ExecuteActionResponse {
@@ -105,9 +87,25 @@ interface ExecuteActionResponse {
 // ChatPromptResponse interface
 interface ChatPromptResponse extends ServerResponse {
 	Content: {
-		chats: Prompt[];
+		chats: PromptWithActions[];
 	};
 	ServerStatus: null;
+}
+
+interface SendMessageRequest {
+	EntityId: string;
+	SessionId?: string;
+	RequestId?: string;
+	ChatMessage: string;
+	ActionId?: string;
+	MobileApp?: boolean;
+	TimeZoneOffset?: number;
+	Version?: string;
+	TimeZone?: string;
+	IsTimeZoneAdjusted?: string;
+	getTimeSpan?: string;
+	UserName?: string;
+	AnonymousUserId?: string;
 }
 
 export type {
@@ -115,8 +113,10 @@ export type {
 	ChatVibeResponse,
 	VibeResponse,
 	VibeAction,
-	Prompt,
+	PromptWithActions,
 	ChatPromptResponse,
-	Prompt as Message,
+	PromptWithActions as Message,
 	ExecuteActionResponse,
+	ActionType,
+	SendMessageRequest,
 };
