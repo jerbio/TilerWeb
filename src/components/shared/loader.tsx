@@ -32,7 +32,7 @@ const SpinnerContainer = styled.div<{ $size: number }>`
 	}
 `;
 
-export const Spinner : React.FC = () => {
+export const Spinner: React.FC = () => {
 	const SIZE = 72;
 	return (
 		<SpinnerContainer $size={SIZE}>

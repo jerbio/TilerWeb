@@ -6,7 +6,7 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	disabled?: boolean;
 	variant?: 'default' | 'brand';
 	sized?: 'small' | 'medium' | 'large';
-	other?: 'textarea'| any;
+	other?: 'textarea' ;
 	height?: number; // Optional height override
 	borderGradient?: Array<string>; // Array of colors for border gradient
 };
@@ -112,16 +112,15 @@ const StyledTextarea = styled.textarea<InputProps>`
 	line-height: 1.5;
 	color: ${styles.colors.white};
 	height: 100%;
-	
+
 	/* Fix vertical alignment for the textarea */
 	padding: 0;
-	padding-top: ${(props) => 
-		props.sized === 'small' 
-			? `calc(${styles.inputHeights.small} / 2 - 0.75rem)` 
-			: props.sized === 'medium' 
-				? `calc(${styles.inputHeights.medium} / 2 - 0.875rem)` 
-				: `calc(${styles.inputHeights.large} / 2 - 1rem)`
-	};
+	padding-top: ${(props) =>
+		props.sized === 'small'
+			? `calc(${styles.inputHeights.small} / 2 - 0.75rem)`
+			: props.sized === 'medium'
+				? `calc(${styles.inputHeights.medium} / 2 - 0.875rem)`
+				: `calc(${styles.inputHeights.large} / 2 - 1rem)`};
 	padding-inline: calc(
 		${(props) => (props.sized === 'small' ? styles.space.small : styles.space.medium)} - 6px
 	);
@@ -168,7 +167,7 @@ const Input: React.FC<InputProps> = ({
 			</StyledInputWrapper>
 		);
 	}
-	
+
 	return (
 		<StyledInputWrapper
 			{...props}

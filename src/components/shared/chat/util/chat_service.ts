@@ -1,7 +1,7 @@
 import { ChatVibeResponse, ChatPromptResponse, ExecuteActionResponse } from './chat';
-import { VibeAction, SendMessageRequest } from './chat';
+import { VibeAction, SendMessageRequest, PromptWithActions } from './chat';
 import ADDBLOCK from '../../../../assets/image_assets/add_block.svg';
-import ADDTASK from '../../../../assets/image_assets/add_new_tile.svg';	
+import ADDTASK from '../../../../assets/image_assets/add_new_tile.svg';
 
 const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
 const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Action';
@@ -73,7 +73,7 @@ export const sendChatMessage = async (
 	sessionId: string = '',
 	anonymousUserId?: string,
 	requestId?: string,
-	actionId?: string,
+	actionId?: string
 ): Promise<ChatVibeResponse> => {
 	try {
 		const requestBody: SendMessageRequest = {
@@ -102,7 +102,8 @@ export const sendChatMessage = async (
 
 		// If we get a valid session ID in the response, store it
 		const promptEntries = Object.values(data.Content?.vibeResponse?.prompts || {});
-		const sessionIdFromResponse = promptEntries.length > 0 ? (promptEntries[0] as any).sessionId : undefined;
+		const sessionIdFromResponse =
+			promptEntries.length > 0 ? (promptEntries[0] as PromptWithActions).sessionId : undefined;
 		if (sessionIdFromResponse) {
 			setStoredSessionId(sessionIdFromResponse);
 		}
@@ -143,7 +144,6 @@ export const sendChatAcceptChanges = async (
 	}
 };
 
-
 export const getActionIcon = (action: VibeAction): string => {
 	switch (action.type) {
 		// Regular actions
@@ -165,7 +165,7 @@ export const getActionIcon = (action: VibeAction): string => {
 			return '⏱️';
 		case 'exit_prompting':
 			return '🚪';
-			
+
 		// What-if scenarios
 		case 'whatif_addanewappointment':
 			return '📅❓';
@@ -181,7 +181,7 @@ export const getActionIcon = (action: VibeAction): string => {
 			return '✓❓';
 		case 'whatif_procrastinateall':
 			return '⏱️❓';
-			
+
 		// Other cases
 		case 'conversational_and_not_supported':
 			return '💬';

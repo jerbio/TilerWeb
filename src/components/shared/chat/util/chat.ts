@@ -1,4 +1,4 @@
-import {Actions} from '../../../../util/enums';
+import { Actions } from '../../../../util/enums';
 import { UserInfo } from '../../../../global_state';
 
 type ActionType = `${Actions}`;
@@ -81,7 +81,7 @@ interface ExecuteActionResponse {
 	Content: {
 		vibeRequest: vibeRequest;
 	};
-	ServerStatus: any | null;
+	ServerStatus: null;
 }
 
 // ChatPromptResponse interface

@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent, useRef } from 'react';
+import React, { useEffect, useState, FormEvent, useRef } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import Button from '../button';
@@ -14,12 +14,12 @@ import {
 	setStoredSessionId,
 	clearStoredSessionId,
 	sendChatAcceptChanges,
-	getActionIcon
+	getActionIcon,
 } from './util/chat_service';
 import useAppStore from '../../../global_state'; // Import Zustand Global State
 import { ChatContextType } from '../../../global_state'; // Import ChatContextType
-import { PromptWithActions, VibeAction} from './util/chat'; // Import types
-import HORIZONTALPROGRESSBAR from '../../../assets/image_assets/horizontal_progress_bar.gif';
+import { PromptWithActions, VibeAction } from './util/chat'; // Import types
+// import HORIZONTALPROGRESSBAR from '../../../assets/image_assets/horizontal_progress_bar.gif';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -142,7 +142,7 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-const Chat : React.FC = ({ onClose }: ChatProps) => {
+const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
@@ -186,7 +186,7 @@ const Chat : React.FC = ({ onClose }: ChatProps) => {
 			setError(null);
 
 			const data = await fetchChatMessages(sid);
-			const rawMessages = data.Content?.chats as any[];
+			const rawMessages = data.Content?.chats as PromptWithActions[];
 			if (!rawMessages) return;
 
 			// Collect all unique actionIds
@@ -265,21 +265,22 @@ const Chat : React.FC = ({ onClose }: ChatProps) => {
 			const response = await sendChatMessage(message, entityId, sessionId, anonymousUserId);
 			if (
 				response?.Content?.vibeResponse?.tilerUser &&
-				JSON.stringify(response.Content.vibeResponse.tilerUser) !== JSON.stringify(useAppStore.getState().userInfo)
+				JSON.stringify(response.Content.vibeResponse.tilerUser) !==
+					JSON.stringify(useAppStore.getState().userInfo)
 			) {
 				useAppStore.getState().setUserInfo?.(response.Content.vibeResponse.tilerUser);
 			}
 			const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
 			// Convert the prompt map to PromptWithActions[]
-			const newMessages: PromptWithActions[] = Object.values(promptMap).map((entry: any) => ({
+			const newMessages: PromptWithActions[] = Object.values(promptMap).map((entry: PromptWithActions) => ({
 				id: entry.id,
 				origin: entry.origin,
 				content: entry.content,
 				actionId: entry.actionId,
 				requestId: entry.requestId,
 				sessionId: entry.sessionId,
-				actions: (entry.actions ?? []).map((action: any) => ({
+				actions: (entry.actions ?? []).map((action: VibeAction) => ({
 					id: action.id,
 					descriptions: action.descriptions,
 					type: action.type,
@@ -287,6 +288,7 @@ const Chat : React.FC = ({ onClose }: ChatProps) => {
 					status: action.status,
 					beforeScheduleId: action.beforeScheduleId,
 					afterScheduleId: action.afterScheduleId,
+					prompts: action.prompts ?? [],
 					vibeRequest: {
 						id: action.vibeRequest.id,
 						creationTimeInMs: action.vibeRequest.creationTimeInMs,
@@ -446,7 +448,16 @@ const Chat : React.FC = ({ onClose }: ChatProps) => {
 											| undefined
 									}
 								>
-									<img src={getActionIcon(action)} alt="add_new_appointment" style={{ width: '15px', height: '15px', verticalAlign: 'middle' }} /> - {action.descriptions}
+									<img
+										src={getActionIcon(action)}
+										alt="add_new_appointment"
+										style={{
+											width: '15px',
+											height: '15px',
+											verticalAlign: 'middle',
+										}}
+									/>{' '}
+									- {action.descriptions}
 								</Button>
 							))}
 						</MessageBubble>
@@ -510,14 +521,14 @@ const Chat : React.FC = ({ onClose }: ChatProps) => {
 
 			<ChatForm onSubmit={handleSubmit}>
 				<Input
-					other='textarea'
+					other="textarea"
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 					onKeyDown={(e) => {
 						// Submit form on Enter key press without Shift key
 						if (e.key === 'Enter' && !e.shiftKey) {
 							e.preventDefault(); // Prevent new line
-							
+
 							// Use form.requestSubmit() instead of handleSubmit directly
 							// This triggers a single form submission through the standard form mechanism
 							const form = e.currentTarget.form;
