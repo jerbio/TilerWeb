@@ -24,7 +24,8 @@
 		"sonner": "^2.0.3",
 		"styled-components": "^6.1.14",
 		"swiper": "^11.2.6",
-		"uuid": "^11.1.0"
+		"uuid": "^11.1.0",
+		"zustand": "^5.0.6"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.18.0",

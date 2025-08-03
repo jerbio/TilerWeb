@@ -102,5 +102,5 @@ const Features: React.FC = () => {
 			<UpdatesSection />
 		</>
 	);
-}
+};
 export default Features;
