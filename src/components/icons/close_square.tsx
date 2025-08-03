@@ -1,6 +1,7 @@
+import React from 'react';
 import Icon from './_icon';
 
-const CloseSquare = ({ size = 25 }: { size?: number }) => {
+const CloseSquare: React.FC<{ size?: number }> = ({ size = 25 }) => {
 	return (
 		<Icon size={size} defaultSize={25}>
 			<svg

@@ -142,7 +142,7 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-const Chat = ({ onClose }: ChatProps) => {
+const Chat : React.FC = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext

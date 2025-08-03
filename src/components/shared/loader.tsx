@@ -1,3 +1,4 @@
+import React from 'react';
 import { LoaderCircle } from 'lucide-react';
 import Logo from '../icons/logo';
 import styles from '../../util/styles';
@@ -31,7 +32,7 @@ const SpinnerContainer = styled.div<{ $size: number }>`
 	}
 `;
 
-export const Spinner = () => {
+export const Spinner : React.FC = () => {
 	const SIZE = 72;
 	return (
 		<SpinnerContainer $size={SIZE}>
