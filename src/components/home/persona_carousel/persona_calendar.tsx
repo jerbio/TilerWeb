@@ -8,14 +8,12 @@ import useCalendarView from '../../../hooks/useCalendarView';
 
 type PersonaCalendarProps = {
 	scheduleId: string | null;
-	scheduleIdLoading: boolean;
 	expandedWidth: number;
 };
 
 function PersonaCalendar({
 	expandedWidth: width,
 	scheduleId,
-	scheduleIdLoading,
 }: PersonaCalendarProps) {
 	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
 	const [eventsLoading, setEventsLoading] = useState(true);
@@ -48,11 +46,12 @@ function PersonaCalendar({
 				setEventsLoading(false);
 			});
 	}
+
 	useEffect(() => {
-		if (scheduleId && !scheduleIdLoading) {
+		if (scheduleId) {
 			fetchSchedule(scheduleId);
 		}
-	}, [scheduleId, scheduleIdLoading, viewOptions.daysInView, viewOptions.startDay]);
+	}, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
 	return (
 		<Calendar

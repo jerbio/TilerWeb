@@ -9,7 +9,7 @@ import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaCalendar from './persona_calendar';
 import { Persona } from '../../../types/persona';
 import { PersonaApi } from '../../../api/personaApi';
-import ObjectUtil from '../../../util/helpers/object';
+import { PersonaSchedule } from '../../../hooks/usePersonaSchedules';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
@@ -135,6 +135,8 @@ type PersonaExpandedCardProps = {
 	expanded: boolean;
 	onCollapse: () => void;
 	expandedWidth: number;
+	personaSchedules: PersonaSchedule;
+	setPersonaSchedule: (personaId: string, scheduleId: string) => void;
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
@@ -142,14 +144,14 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 	persona,
 	onCollapse,
 	expandedWidth,
+	personaSchedules,
+	setPersonaSchedule,
 }) => {
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
 
-	const [scheduleId, setScheduleId] = useState<string | null>(null);
-	const [currentPersona, setCurrentPersona] = useState<Persona | null>(null);
-	const changedPersona = !ObjectUtil.compareObjects(currentPersona, persona);
+	const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
 
 	function onMobileCollapse() {
 		setMobileChatVisible(false);
@@ -157,15 +159,13 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
 	// Set the scheduleId based on the current persona
 	useEffect(() => {
-		if (expanded && changedPersona) {
-			setCurrentPersona(persona);
+		if (expanded && !scheduleId) {
 			const personaApi = new PersonaApi();
 
 			personaApi.getPersonaSchedule(persona).then((personaSchedule) => {
 				if (personaSchedule) {
-					setScheduleId(personaSchedule.scheduleId);
+					setPersonaSchedule(persona.id, personaSchedule.scheduleId);
 				} else {
-					setScheduleId(null);
 					console.error('No schedule found for the persona');
 				}
 			});
@@ -180,7 +180,6 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 				<React.Fragment>
 					<PersonaCalendar
 						expandedWidth={expandedWidth}
-						scheduleIdLoading={changedPersona}
 						scheduleId={scheduleId}
 					/>
 					<CalendarContainerActionButtons>

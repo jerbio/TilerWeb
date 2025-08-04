@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import useIsMobile from '../../../hooks/useIsMobile';
 import { Persona } from '../../../types/persona';
 import { PersonaApi } from '../../../api/personaApi';
+import usePersonaSchedules from '../../../hooks/usePersonaSchedules';
 
 const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 	position: relative;
@@ -42,6 +43,7 @@ const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 
 const PersonaCarousel: React.FC = () => {
 	const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
+	const { personaSchedules, setPersonaSchedule } = usePersonaSchedules();
 
 	async function getPersonas() {
 		const personaApi = new PersonaApi();
@@ -123,6 +125,8 @@ const PersonaCarousel: React.FC = () => {
 										gradient={['custom-persona'].includes(persona.id)}
 										selectedPersona={selectedPersona}
 										setSelectedPersona={setSelectedPersona}
+										personaSchedules={personaSchedules}
+										setPersonaSchedule={setPersonaSchedule}
 									/>
 								</div>
 							</SwiperSlide>
