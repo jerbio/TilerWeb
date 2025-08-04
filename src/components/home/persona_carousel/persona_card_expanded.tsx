@@ -10,6 +10,7 @@ import PersonaCalendar from './persona_calendar';
 import { Persona } from '../../../types/persona';
 import { PersonaApi } from '../../../api/personaApi';
 import ObjectUtil from '../../../util/helpers/object';
+import useAppStore from '../../../global_state';
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
@@ -151,6 +152,9 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 	const [currentPersona, setCurrentPersona] = useState<Persona | null>(null);
 	const changedPersona = !ObjectUtil.compareObjects(currentPersona, persona);
 
+	// Get the global state actions
+	const setAnonymousUser = useAppStore((state) => state.setAnonymousUser);
+
 	function onMobileCollapse() {
 		setMobileChatVisible(false);
 	}
@@ -164,13 +168,16 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 			personaApi.getPersonaSchedule(persona).then((personaSchedule) => {
 				if (personaSchedule) {
 					setScheduleId(personaSchedule.scheduleId);
+					// Store the anonymous user in global state for chat usage
+					setAnonymousUser(personaSchedule.anonymousUser);
 				} else {
 					setScheduleId(null);
+					setAnonymousUser(null);
 					console.error('No schedule found for the persona');
 				}
 			});
 		}
-	}, [expanded, persona]);
+	}, [expanded, persona, changedPersona, setAnonymousUser]);
 
 	const content = [
 		{

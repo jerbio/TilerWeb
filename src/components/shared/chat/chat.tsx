@@ -142,7 +142,7 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-const Chat: React.FC = ({ onClose }: ChatProps) => {
+const Chat: React.FC<ChatProps> = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
@@ -158,7 +158,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
-	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+	const anonymousUser = useAppStore((state) => state.anonymousUser);
+	const anonymousUserId = anonymousUser?.id ?? '';
 	const handleSetScheduleId = (id: string) => {
 		setScheduleId(id);
 	};

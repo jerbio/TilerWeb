@@ -10,6 +10,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	size?: 'small' | 'medium' | 'large';
 	height?: number; // Optional height prop for custom button height
 	bordergradient?: Array<string>; // Array of colors for border gradient
+	dotstatus?: 'parsed' | 'clarification' | 'executed'; //
 };
 
 type StyledButtonProps = {

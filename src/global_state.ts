@@ -32,6 +32,10 @@ interface AppState {
 	// New user info state
 	userInfo: UserInfo | null;
 	setUserInfo: (info: UserInfo) => void;
+
+	// Anonymous user state for persona chat sessions
+	anonymousUser: UserInfo | null;
+	setAnonymousUser: (user: UserInfo | null) => void;
 }
 
 const useAppStore = create<AppState>((set) => ({
@@ -50,6 +54,10 @@ const useAppStore = create<AppState>((set) => ({
 	// User info state
 	userInfo: null,
 	setUserInfo: (info) => set(() => ({ userInfo: info })),
+
+	// Anonymous user state
+	anonymousUser: null,
+	setAnonymousUser: (user) => set(() => ({ anonymousUser: user })),
 }));
 
 // {EntityId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d++01JTVFJDG5B8G5RBJEY4E365GQ_7_01JTVFJDG5QMY0STMNA82AZ18D_01JTVFJDG521S2V82V17J4ZTX7', Name: 'Work Out', Description: ''}
