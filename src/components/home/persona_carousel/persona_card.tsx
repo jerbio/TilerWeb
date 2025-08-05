@@ -13,6 +13,7 @@ import { Check, ClockFading } from 'lucide-react';
 import { PersonaSchedule } from '../../../hooks/usePersonaSchedules';
 import TimeUtil from '../../../util/helpers/time';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 const Card = styled(animated.div)<{
 	gradient?: number;
@@ -205,7 +206,6 @@ const ButtonStyled = styled(animated.button)`
 	border-radius: ${styles.borderRadius.xxLarge};
 	background-color: ${styles.colors.brand[600]};
 	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
-
 	&:hover {
 		background-color: ${styles.colors.brand[700]};
 	}
@@ -229,6 +229,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	personaSchedules,
 	setPersonaSchedule,
 }) => {
+	const { t } = useTranslation();
 	const [mounted, setMounted] = useState(false);
 	useEffect(() => {
 		setMounted(true);
@@ -424,10 +425,14 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 						<OverlayTitle>
 							{isScheduleCreated && (
 								<div>
-									<span style={{ marginRight: '6px' }}>Profile Created</span>
+									<span style={{ marginRight: '6px' }}>
+										{t('home.persona.created')}
+									</span>
 									<ClockFading size={14} color={styles.colors.brand[400]} />
 									<span style={{ color: styles.colors.gray[300] }}>
-										{personaScheduleTimeLeft} left
+										{t('home.persona.expiresIn', {
+											time: personaScheduleTimeLeft,
+										})}
 									</span>
 								</div>
 							)}
