@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react'; import calendarConfig from './config';
+import React, { useMemo } from 'react';
+import calendarConfig from './config';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
 import colorUtil, { RGB } from '../../../util/helpers/colors';
-import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
+import { Bike, CarFront, Clock, DotIcon, LockKeyhole, MapPin, Route } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
@@ -130,17 +131,27 @@ const EventContent = styled.div<{
 		}
 	}
 
-	.duration {
+	footer {
+		display: flex;
+		gap: 0.25ch;
+		overflow: hidden;
+	}
+
+	.duration,
+	.location {
 		display: flex;
 		align-items: center;
 		font-size: ${styles.typography.fontSize.xs};
 		font-weight: ${styles.typography.fontWeight.semibold};
+		white-space: nowrap;
 
 		color: ${({ $colors: colors }) => {
 			const newColor = colorUtil.setLightness(colors, 0.7);
 			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
+	}
 
+	.duration {
 		.clock {
 			height: 18px;
 			display: flex;
@@ -148,10 +159,10 @@ const EventContent = styled.div<{
 			align-items: center;
 			border-radius: 6px;
 			font-size: 11px;
-			padding-inline: 4px;
 		}
 
 		.clock.highlight {
+			padding-inline: 4px;
 			margin-right: 0.5ch;
 			color: ${({ $colors: colors }) => {
 				const newColor = colorUtil.setLightness(colors, 0.2);
@@ -161,6 +172,27 @@ const EventContent = styled.div<{
 				const newColor = colorUtil.setLightness(colors, 0.7);
 				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 			}};
+		}
+	}
+
+	.location {
+		padding-inline: 2px;
+		min-width: 0;
+		&:hover {
+			background-color: ${({ $colors: colors }) => {
+				const newColor = colorUtil.setLightness(colors, 0.2);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
+		}
+
+		border-radius: ${styles.borderRadius.little};
+		transition: background-color 0.2s ease;
+
+		span {
+			flex: 1;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 	}
 `;
@@ -242,6 +274,15 @@ const CalendarEvents = ({
 	selectedEvent,
 	setSelectedEvent,
 }: CalendarEventsProps) => {
+	const getEventLocationLink = (event: ScheduleSubCalendarEvent) => {
+		if (event.location?.address) {
+			return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+				event.location.address
+			)}`;
+		}
+		return '#';
+	};
+
 	const { currentViewEvents, currentViewTravelDetails } = useMemo(() => {
 		const currentViewEvents: Array<CurrentViewEvent> = [];
 		const currentViewTravelDetails: Array<CurrentViewTravelDetail> = [];
@@ -405,7 +446,8 @@ const CalendarEvents = ({
 				s,
 				e,
 				viewOptions,
-				headerWidth
+				headerWidth,
+				{ minCellHeight: 18 }
 			);
 
 			result.push({
@@ -471,18 +513,33 @@ const CalendarEvents = ({
 									<h3>{event.name}</h3>
 									<EventLockIcon className="lock-icon" size={14} />
 								</header>
-								<div className="duration">
-									<div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
-										<Clock size={14} />
-										{event.isTardy && <span>Late</span>}
+								<footer>
+									<div className="duration">
+										<div
+											className={`clock ${event.isTardy ? 'highlight' : ''}`}
+										>
+											<Clock size={14} style={{ minWidth: 18 }} />
+											{event.isTardy && <span>Late</span>}
+										</div>
+										<span>
+											{TimeUtil.rangeDuration(
+												dayjs(event.start, 'unix'),
+												dayjs(event.end, 'unix')
+											)}
+										</span>
 									</div>
-									<span>
-										{TimeUtil.rangeDuration(
-											dayjs(event.start, 'unix'),
-											dayjs(event.end, 'unix')
-										)}
-									</span>
-								</div>
+									{event.location?.address && (
+										<a
+											href={getEventLocationLink(event)}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="location"
+										>
+											<MapPin size={14} style={{ minWidth: 16 }} />
+											<span>{event.location.description}</span>
+										</a>
+									)}
+								</footer>
 							</EventContent>
 							{/* Border SVG for styling */}
 							<svg

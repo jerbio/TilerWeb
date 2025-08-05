@@ -218,7 +218,7 @@ type PersonaCardProps = {
 	selectedPersona: number | null;
 	setSelectedPersona: React.Dispatch<React.SetStateAction<number | null>>;
 	personaSchedules: PersonaSchedule;
-	setPersonaSchedule: (personaId: string, scheduleId: string) => void;
+	setPersonaSchedule: (personaId: string, scheduleId: string | null) => void;
 };
 
 const PersonaCard: React.FC<PersonaCardProps> = ({
@@ -250,9 +250,16 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			);
 			const intervalID = setInterval(
 				() => {
-					setPersonaScheduleTimeLeft(
-						TimeUtil.rangeDuration(dayjs(), dayjs(personaSchedule.scheduleExpiration))
+					const timeLeft = TimeUtil.rangeDuration(
+						dayjs(),
+						dayjs(personaSchedule.scheduleExpiration)
 					);
+					setPersonaScheduleTimeLeft(timeLeft);
+					if (timeLeft === '0m') {
+						clearInterval(personaScheduleTimeLeftInterval);
+						setPersonaSchedule(persona.id, null); // Clear the schedule when it expires
+						if (selectedPersona === persona.key) onDeselect(); // Deselect the card if it's selected
+					}
 				},
 				TimeUtil.inMilliseconds(1, 'm')
 			);
@@ -386,7 +393,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
 	// Expanding animation hooks
 	const CARD_WIDTH = 315;
-	const MAX_CARD_WIDTH = 1128;
+	const MAX_CARD_WIDTH = 1300;
 	const PADDING = 80;
 	const [expandedWidth, setExpandedWidth] = useState(CARD_WIDTH);
 	const cardSpring = useSpring({

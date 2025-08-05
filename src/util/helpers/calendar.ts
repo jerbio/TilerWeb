@@ -14,7 +14,10 @@ class CalendarUtil {
 		s: dayjs.Dayjs,
 		e: dayjs.Dayjs,
 		viewOptions: CalendarViewOptions,
-		headerWidth: number
+		headerWidth: number,
+		options: {
+			minCellHeight?: number;
+		} = {}
 	): CalendarEventBox {
 		const viewBox: CalendarEventBox = {
 			x: 0,
@@ -29,7 +32,7 @@ class CalendarUtil {
 
 		// Positioning the event based on the day index and width
 		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-		const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
+		const minCellHeight = options.minCellHeight || parseInt(calendarConfig.MIN_CELL_HEIGHT);
 		const width = headerWidth / viewOptions.daysInView;
 		const x = dayIndex * width;
 		const y = cellHeight * startHourFraction;

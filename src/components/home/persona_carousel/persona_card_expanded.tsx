@@ -76,6 +76,9 @@ const CalendarContainer = styled(animated.div)`
 		border-left: none;
 		border-radius: 0 ${styles.borderRadius.large} ${styles.borderRadius.large} 0;
 	}
+	@media screen and (min-width: ${styles.screens.xl}) {
+		grid-column: span 9;
+	}
 `;
 
 const ChatContainer = styled(animated.div)`
@@ -91,6 +94,9 @@ const ChatContainer = styled(animated.div)`
 		background: transparent;
 		grid-column: span 4;
 		border: none;
+	}
+	@media screen and (min-width: ${styles.screens.xl}) {
+		grid-column: span 3;
 	}
 `;
 

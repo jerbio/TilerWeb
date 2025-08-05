@@ -6,7 +6,7 @@ const calendarConfig = {
 	BORDER_COLOR: styles.colors.gray[700],
 	CELL_HEIGHT: '96px',
 	MIN_CELL_HEIGHT: '60px',
-	MIN_CELL_WIDTH: '150px',
+	MIN_CELL_WIDTH: '175px',
 };
 
 export default calendarConfig;

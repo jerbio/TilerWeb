@@ -4,10 +4,11 @@ import TimeUtil from '../util/helpers/time';
 
 export type PersonaSchedule = Record<
 	Persona['id'],
-	{
-		scheduleId: string;
-		scheduleExpiration: number;
-	} | undefined
+	| {
+			scheduleId: string;
+			scheduleExpiration: number;
+	  }
+	| undefined
 >;
 
 function usePersonaSchedules() {
@@ -18,7 +19,7 @@ function usePersonaSchedules() {
 		);
 
 		for (const personaId in storedSchedules) {
-			const schedule = storedSchedules[personaId];
+			const schedule = storedSchedules[personaId]!;
 			if (schedule.scheduleExpiration < TimeUtil.now()) {
 				// Remove expired schedules
 				delete storedSchedules[personaId];
@@ -34,17 +35,24 @@ function usePersonaSchedules() {
 		setPersonaSchedules(storedSchedules);
 	}, []);
 
-	function setPersonaSchedule(personaId: Persona['id'], scheduleId: string) {
-		const scheduleExpiration = TimeUtil.now() + TimeUtil.inMilliseconds(1, 'd');
-		const newSchedules = {
-			...personaSchedules,
-			[personaId]: {
-				scheduleId,
-				scheduleExpiration,
-			},
-		};
-		setPersonaSchedules(newSchedules);
-		localStorage.setItem(PERSONA_SCHEDULE_KEY, JSON.stringify(newSchedules));
+	function setPersonaSchedule(personaId: Persona['id'], scheduleId: string | null) {
+		if (scheduleId === null) {
+			const newSchedules = { ...personaSchedules };
+			delete newSchedules[personaId];
+			setPersonaSchedules(newSchedules);
+			localStorage.setItem(PERSONA_SCHEDULE_KEY, JSON.stringify(newSchedules));
+		} else {
+			const scheduleExpiration = TimeUtil.now() + TimeUtil.inMilliseconds(1, 'd');
+			const newSchedules = {
+				...personaSchedules,
+				[personaId]: {
+					scheduleId,
+					scheduleExpiration,
+				},
+			};
+			setPersonaSchedules(newSchedules);
+			localStorage.setItem(PERSONA_SCHEDULE_KEY, JSON.stringify(newSchedules));
+		}
 	}
 
 	return { personaSchedules, setPersonaSchedule };
