@@ -4,22 +4,29 @@ import styles from '../../../util/styles';
 import { useSwiper, useSwiperSlide } from 'swiper/react';
 import Add from '../../icons/add';
 import ArrowRight2 from '../../icons/arrow_right2';
-import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
+import {
+  animated,
+  Partial,
+  useChain,
+  useSpring,
+  useSpringRef,
+  useTransition,
+} from '@react-spring/web';
 import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaCardExpanded from './persona_card_expanded';
 import { Persona } from '../../../types/persona';
 import { getPersonaImage } from '../../../data/persona';
 import { Check, ClockFading } from 'lucide-react';
-import { PersonaSchedule } from '../../../hooks/usePersonaSchedules';
+import { PersonaSchedule, PersonaScheduleSetter } from '../../../hooks/usePersonaSchedules';
 import TimeUtil from '../../../util/helpers/time';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-const Card = styled(animated.div)<{
-	gradient?: number;
-	$active: boolean;
-	$selected?: boolean;
-	$mounted?: boolean;
+const Card = styled(animated.div) <{
+  gradient?: number;
+  $active: boolean;
+  $selected?: boolean;
+  $mounted?: boolean;
 }>`
 	min-width: 315px;
 	height: 100%;
@@ -45,8 +52,8 @@ const Card = styled(animated.div)<{
 	/* Gradient effect */
 	&::after {
 		${(props) =>
-			props.gradient &&
-			`@property --rotation {
+    props.gradient &&
+    `@property --rotation {
         inherits: false;
         initial-value: 0deg;
         syntax: '<angle>';
@@ -64,9 +71,9 @@ const Card = styled(animated.div)<{
 		z-index: -3;
 		border-radius: ${styles.borderRadius.xxLarge};
 		background: ${(props) =>
-			props.gradient
-				? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
-				: styles.colors.gray[800]};
+    props.gradient
+      ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
+      : styles.colors.gray[800]};
 	}
 `;
 
@@ -126,12 +133,35 @@ const OverlayTitle = styled.div`
 		opacity: 0.75;
 	}
 
-	h3 {
+	.persona-title {
 		font-size: ${styles.typography.fontSize.displayXs};
 		font-weight: bold;
-		line-height: 1.2;
 		font-family: ${styles.typography.fontFamily.urban};
-		margin-bottom: 0.5rem;
+	}
+
+	h3 {
+		line-height: 28px;
+		margin-top: 0.25rem;
+		margin-bottom: 0.25rem;
+	}
+
+	input {
+		padding: 0.25rem 0.5rem;
+		background: transparent;
+		height: calc(28px + 0.5rem);
+		width: 100%;
+		outline: 2px solid transparent;
+		border: none;
+		transition: outline 0.25s ease-in-out;
+
+		&::placeholder {
+			color: rgba(255, 255, 255, 0.3);
+		}
+
+		&:focus {
+			outline: 2px solid ${styles.colors.gray[700]};
+			border-radius: ${styles.borderRadius.small};
+		}
 	}
 `;
 
@@ -152,7 +182,7 @@ const OverlayList = styled(animated.ul)`
 	z-index: 1;
 `;
 
-const OverlayListItem = styled(animated.li)<{ $isSelected: boolean }>`
+const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
 	height: fit-content;
 	width: fit-content;
 	display: flex;
@@ -162,7 +192,7 @@ const OverlayListItem = styled(animated.li)<{ $isSelected: boolean }>`
 	color: ${styles.colors.white};
 
 	background: ${({ $isSelected }) =>
-		$isSelected ? styles.colors.brand[600] : styles.colors.gray[800]};
+    $isSelected ? styles.colors.brand[600] : styles.colors.gray[800]};
 	border-radius: ${styles.borderRadius.xLarge};
 	border: 1px solid
 		${({ $isSelected }) => ($isSelected ? 'transparent' : styles.colors.gray[700])};
@@ -180,7 +210,7 @@ const OverlayListItem = styled(animated.li)<{ $isSelected: boolean }>`
 		place-items: center;
 		border-radius: ${styles.borderRadius.xLarge};
 		color: ${({ $isSelected }) =>
-			$isSelected ? styles.colors.white : styles.colors.gray[400]};
+    $isSelected ? styles.colors.white : styles.colors.gray[400]};
 		transition: color 0.25s ease-in-out;
 
 		&:hover {
@@ -213,272 +243,334 @@ const ButtonStyled = styled(animated.button)`
 `;
 
 type PersonaCardProps = {
-	persona: Persona & { key: number };
-	gradient?: boolean;
-	selectedPersona: number | null;
-	setSelectedPersona: React.Dispatch<React.SetStateAction<number | null>>;
-	personaSchedules: PersonaSchedule;
-	setPersonaSchedule: (personaId: string, scheduleId: string | null) => void;
+  persona: Persona & { key: number };
+  isCustom?: boolean;
+  selectedPersona: number | null;
+  setSelectedPersona: (personaKey: number | null, persona?: Partial<Persona>) => void;
+  personaSchedules: PersonaSchedule;
+  setPersonaSchedule: PersonaScheduleSetter;
 };
 
 const PersonaCard: React.FC<PersonaCardProps> = ({
-	persona,
-	gradient,
-	selectedPersona,
-	setSelectedPersona,
-	personaSchedules,
-	setPersonaSchedule,
+  persona,
+  isCustom,
+  selectedPersona,
+  setSelectedPersona,
+  personaSchedules,
+  setPersonaSchedule,
 }) => {
-	const { t } = useTranslation();
-	const [mounted, setMounted] = useState(false);
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-	const personaSchedule = personaSchedules[persona.id];
-	const [personaScheduleTimeLeft, setPersonaScheduleTimeLeft] = useState<string>('');
-	const [personaScheduleTimeLeftInterval, setPersonaScheduleTimeLeftInterval] = useState<
-		number | undefined
-	>(undefined);
+  const { t } = useTranslation();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const personaSchedule = personaSchedules[persona.id];
+  const [personaScheduleTimeLeft, setPersonaScheduleTimeLeft] = useState<string>('');
+  const [personaScheduleTimeLeftInterval, setPersonaScheduleTimeLeftInterval] = useState<
+    number | undefined
+  >(undefined);
 
-	// Update the time left for the persona schedule every minute
-	useEffect(() => {
-		if (personaSchedule) {
-			clearInterval(personaScheduleTimeLeftInterval);
+  // Update the time left for the persona schedule every minute
+  useEffect(() => {
+    if (personaSchedule) {
+      clearInterval(personaScheduleTimeLeftInterval);
 
-			setPersonaScheduleTimeLeft(
-				TimeUtil.rangeDuration(dayjs(), dayjs(personaSchedule.scheduleExpiration))
-			);
-			const intervalID = setInterval(
-				() => {
-					const timeLeft = TimeUtil.rangeDuration(
-						dayjs(),
-						dayjs(personaSchedule.scheduleExpiration)
-					);
-					setPersonaScheduleTimeLeft(timeLeft);
-					if (timeLeft === '0m') {
-						clearInterval(personaScheduleTimeLeftInterval);
-						setPersonaSchedule(persona.id, null); // Clear the schedule when it expires
-						if (selectedPersona === persona.key) onDeselect(); // Deselect the card if it's selected
-					}
-				},
-				TimeUtil.inMilliseconds(1, 'm')
-			);
-			setPersonaScheduleTimeLeftInterval(intervalID);
-		}
+      setPersonaScheduleTimeLeft(
+        TimeUtil.rangeDuration(dayjs(), dayjs(personaSchedule.scheduleExpiration))
+      );
+      const intervalID = setInterval(
+        () => {
+          const timeLeft = TimeUtil.rangeDuration(
+            dayjs(),
+            dayjs(personaSchedule.scheduleExpiration)
+          );
+          setPersonaScheduleTimeLeft(timeLeft);
+          if (timeLeft === '0m') {
+            clearInterval(personaScheduleTimeLeftInterval);
+            setPersonaSchedule(persona.id, null); // Clear the schedule when it expires
+            if (selectedPersona === persona.key) onDeselect(); // Deselect the card if it's selected
+          }
+        },
+        TimeUtil.inMilliseconds(1, 'm')
+      );
+      setPersonaScheduleTimeLeftInterval(intervalID);
+    }
 
-		return () => {
-			clearInterval(personaScheduleTimeLeftInterval);
-		};
-	}, [personaSchedule]);
+    return () => {
+      clearInterval(personaScheduleTimeLeftInterval);
+    };
+  }, [personaSchedule]);
 
-	const isSelected = selectedPersona === persona.key; // Check if this card is selected
-	const isAnotherSelected = selectedPersona !== null && selectedPersona !== persona.key; // Check if another card is selected
-	const isScheduleCreated = !!personaSchedule;
+  const isSelected = selectedPersona === persona.key;
+  const isAnotherSelected = selectedPersona !== null && selectedPersona !== persona.key;
+  const isScheduleCreated = !!personaSchedule;
 
-	const [tileSuggestions, setTileSuggestions] = useState<
-		{ id: number; name: string; selected: boolean }[]
-	>([]);
+  const [tileSuggestions, setTileSuggestions] = useState<
+    { id: number; name: string; selected: boolean }[]
+  >([]);
 
-	useEffect(() => {
-		if (isScheduleCreated) {
-			// If a schedule is created, we don't show tile suggestions
-			setTileSuggestions([]);
-		} else {
-			// Reset tile suggestions based on persona preferences
-			setTileSuggestions(
-				persona.tilePreferences.map((pref, index) => ({
-					id: index + 1,
-					name: pref.TileName,
-					selected: false,
-				}))
-			);
-		}
-	}, [persona.tilePreferences, isScheduleCreated]);
+  useEffect(() => {
+    if (isScheduleCreated || isCustom) {
+      setTileSuggestions([]);
+    } else {
+      setTileSuggestions(
+        persona.tilePreferences.map((pref, index) => ({
+          id: index + 1,
+          name: pref.TileName,
+          selected: false,
+        }))
+      );
+    }
+  }, [persona.tilePreferences, isScheduleCreated]);
 
-	function toggleTileSuggestion(id: number) {
-		setTileSuggestions((prev) =>
-			prev.map((tile) => (tile.id === id ? { ...tile, selected: !tile.selected } : tile))
-		);
-	}
+  function toggleTileSuggestion(id: number) {
+    setTileSuggestions((prev) =>
+      prev.map((tile) => (tile.id === id ? { ...tile, selected: !tile.selected } : tile))
+    );
+  }
 
-	const currentPersona = useMemo<Persona>(() => {
-		const selectedPreferences = new Set(
-			tileSuggestions.filter((tile) => tile.selected).map((tile) => tile.name)
-		);
-		return {
-			...persona,
-			tilePreferences: persona.tilePreferences.filter((pref) =>
-				selectedPreferences.has(pref.TileName)
-			),
-		};
-	}, [persona, tileSuggestions]);
+  const currentPersona = useMemo<Persona>(() => {
+    const selectedPreferences = new Set(
+      tileSuggestions.filter((tile) => tile.selected).map((tile) => tile.name)
+    );
+    return {
+      ...persona,
+      tilePreferences: persona.tilePreferences.filter((pref) =>
+        selectedPreferences.has(pref.TileName)
+      ),
+    };
+  }, [persona, tileSuggestions]);
 
-	const swiper = useSwiper();
-	const swiperSlide = useSwiperSlide();
-	const [mouseHovered, setHovered] = useState(false);
-	const isMobile = useIsMobile();
-	const displayUI = mouseHovered || (swiperSlide.isActive && isMobile);
+  const swiper = useSwiper();
+  const swiperSlide = useSwiperSlide();
+  const [mouseHovered, setHovered] = useState(false);
+  const isMobile = useIsMobile();
+  const displayUI = mouseHovered || (swiperSlide.isActive && isMobile);
 
-	function onSelect() {
-		setSelectedPersona(persona.key); // Update the selected state
-	}
-	function onDeselect() {
-		setSelectedPersona(null); // Clear the selected state
-		swiper.enable(); // Re-enable the swiper
-	}
+  // State to manage the input for custom persona
+  const customInputFormRef = React.useRef<HTMLFormElement>(null);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customInputValue, setCustomInputValue] = useState('');
 
-	useEffect(() => {
-		if (isAnotherSelected && swiperSlide.isActive) {
-			let diff = selectedPersona - persona.key;
-			// if difference is greater than 1
-			if (Math.abs(diff) > 1) {
-				if (diff > 1) {
-					diff = -1;
-				} else {
-					diff = 1;
-				}
-			}
-			if (diff === -1) {
-				swiper.slidePrev();
-			} else {
-				swiper.slideNext();
-			}
-		}
-		if (selectedPersona !== null) {
-			// Enable the swiper when this card is selected
-			setTimeout(() => swiper.disable(), 0);
-		}
-	}, [selectedPersona]);
+  useEffect(() => {
+    if (showCustomInput && customInputFormRef.current) {
+      customInputFormRef.current.querySelector('input')?.focus();
+    }
+  }, [showCustomInput]);
 
-	// isActive animation hooks
-	const tileListTransApi = useSpringRef();
-	const tileListTransition = useTransition(displayUI ? tileSuggestions : [], {
-		ref: tileListTransApi,
-		keys: (tile) => tile.id,
-		trail: 150 / tileSuggestions.length,
-		from: { opacity: 0, scale: 0.8, y: 20 },
-		enter: { opacity: 1, scale: 1, y: 0 },
-		leave: { opacity: 0, scale: 0.8, y: -20 },
-	});
-	const tileListApi = useSpringRef();
-	const tileListSpring = useSpring({
-		ref: tileListApi,
-		from: { height: 0 },
-		to: { height: displayUI ? 40 * tileSuggestions.length : 0 },
-		config: { tension: 200, friction: 30 },
-	});
+  function onCustomSelect() {
+    if (!customInputValue.trim()) {
+			customInputFormRef.current?.querySelector('input')?.focus();
+      return;
+    }
+    setShowCustomInput(false);
+    setCustomInputValue('');
+    setSelectedPersona(persona.key, {
+      id: persona.id,
+      name: customInputValue.trim(),
+    });
+  }
+  function onCustomDeselect() {
+    setSelectedPersona(null, {
+      id: persona.id,
+      name: 'Custom',
+    });
+    setPersonaSchedule(persona.id, null, { store: false });
+    swiper.enable();
+  }
 
-	const buttonApi = useSpringRef();
-	const buttonSpring = useSpring({
-		ref: buttonApi,
-		from: { x: -32, opacity: 0 },
-		to: { x: displayUI ? 0 : -32, opacity: displayUI ? 1 : 0 },
-	});
+  function onSelect() {
+    setSelectedPersona(persona.key);
+  }
+  function onDeselect() {
+    setSelectedPersona(null);
+    swiper.enable();
+  }
 
-	const overlayTagApi = useSpringRef();
-	const overlayTagSpring = useSpring({
-		ref: overlayTagApi,
-		from: { opacity: 0, scale: 0.9 },
-		to: { opacity: displayUI && !isScheduleCreated ? 1 : 0, scale: displayUI ? 1 : 0.9 },
-		config: { tension: 250, friction: 30 },
-	});
+  useEffect(() => {
+    if (isAnotherSelected && swiperSlide.isActive) {
+      let diff = selectedPersona - persona.key;
+      // if difference is greater than 1
+      if (Math.abs(diff) > 1) {
+        if (diff > 1) {
+          diff = -1;
+        } else {
+          diff = 1;
+        }
+      }
+      if (diff === -1) {
+        swiper.slidePrev();
+      } else {
+        swiper.slideNext();
+      }
+    }
+    if (selectedPersona !== null) {
+      // Enable the swiper when this card is selected
+      setTimeout(() => swiper.disable(), 0);
+    }
+  }, [selectedPersona]);
 
-	useChain(
-		displayUI
-			? [tileListApi, buttonApi, tileListTransApi, overlayTagApi]
-			: [overlayTagApi, tileListTransApi, buttonApi, tileListApi],
-		displayUI ? [0, 0.2, 0.4, 0.6] : [0, 0, 0.1, 0.4],
-		500
-	);
+  // isActive animation hooks
+  const tileListTransApi = useSpringRef();
+  const tileListTransition = useTransition(displayUI ? tileSuggestions : [], {
+    ref: tileListTransApi,
+    keys: (tile) => tile.id,
+    trail: 150 / tileSuggestions.length,
+    from: { opacity: 0, scale: 0.8, y: 20 },
+    enter: { opacity: 1, scale: 1, y: 0 },
+    leave: { opacity: 0, scale: 0.8, y: -20 },
+  });
+  const tileListApi = useSpringRef();
+  const tileListSpring = useSpring({
+    ref: tileListApi,
+    from: { height: 0 },
+    to: { height: displayUI ? 40 * tileSuggestions.length : 0 },
+    config: { tension: 200, friction: 30 },
+  });
+  const buttonApi = useSpringRef();
+  const buttonSpring = useSpring({
+    ref: buttonApi,
+    from: { x: -32, opacity: 0 },
+    to: { x: displayUI ? 0 : -32, opacity: displayUI ? 1 : 0 },
+  });
+  const overlayTagApi = useSpringRef();
+  const overlayTagSpring = useSpring({
+    ref: overlayTagApi,
+    from: { opacity: 0, scale: 0.9 },
+    to: {
+      opacity: displayUI ? (isScheduleCreated || isCustom ? 0 : 1) : 0,
+      scale: displayUI ? 1 : 0.9,
+    },
+    config: { tension: 250, friction: 30 },
+  });
+  useChain(
+    displayUI
+      ? [tileListApi, buttonApi, tileListTransApi, overlayTagApi]
+      : [overlayTagApi, tileListTransApi, buttonApi, tileListApi],
+    displayUI ? [0, 0.2, 0.4, 0.6] : [0, 0, 0.1, 0.4],
+    500
+  );
+  // Expanding animation hooks
+  const CARD_WIDTH = 315;
+  const MAX_CARD_WIDTH = 1300;
+  const PADDING = 80;
+  const [expandedWidth, setExpandedWidth] = useState(CARD_WIDTH);
+  const cardSpring = useSpring({
+    from: { width: CARD_WIDTH },
+    to: {
+      width: isSelected ? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) : CARD_WIDTH,
+    },
+    onRest: () => {
+      if (isSelected) {
+        // Set expanded width to the final width of animation
+        // Setting twice for react to re-render
+        setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1);
+        setTimeout(() => {
+          setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH));
+        }, 0);
+      }
+    },
+    delay: isSelected ? 0 : 300,
+    config: { tension: 300, friction: 27.5 },
+  });
 
-	// Expanding animation hooks
-	const CARD_WIDTH = 315;
-	const MAX_CARD_WIDTH = 1300;
-	const PADDING = 80;
-	const [expandedWidth, setExpandedWidth] = useState(CARD_WIDTH);
-	const cardSpring = useSpring({
-		from: { width: CARD_WIDTH },
-		to: {
-			width: isSelected ? Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) : CARD_WIDTH,
-		},
-		onRest: () => {
-			if (isSelected) {
-				// Set expanded width to the final width of animation
-				// Setting twice for react to re-render
-				setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH) + 1);
-				setTimeout(() => {
-					setExpandedWidth(Math.min(window.innerWidth - PADDING, MAX_CARD_WIDTH));
-				}, 0);
-			}
-		},
-		delay: isSelected ? 0 : 300,
-		config: { tension: 300, friction: 27.5 },
-	});
-
-	return (
-		<Card
-			gradient={gradient && !isSelected ? 1 : 0}
-			$active={swiperSlide.isActive}
-			$selected={isSelected}
-			$mounted={mounted}
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
-			style={cardSpring}
-		>
-			<CardImage $backgroundImage={getPersonaImage(persona.id)} $selected={isSelected} />
-			<OverlayContainer $selected={isSelected}>
-				<Overlay>
-					<OverlayHeader>
-						<OverlayTitle>
-							{isScheduleCreated && (
-								<div>
-									<span style={{ marginRight: '6px' }}>
-										{t('home.persona.created')}
-									</span>
-									<ClockFading size={14} color={styles.colors.brand[400]} />
-									<span style={{ color: styles.colors.gray[300] }}>
-										{t('home.persona.expiresIn', {
-											time: personaScheduleTimeLeft,
-										})}
-									</span>
-								</div>
-							)}
-							<h3>{persona.name}</h3>
-						</OverlayTitle>
-						<OverlayHeaderTag style={overlayTagSpring}>Tiles</OverlayHeaderTag>
-					</OverlayHeader>
-					<OverlayList style={tileListSpring}>
-						{tileListTransition((style, tile) => (
-							<OverlayListItem
-								key={tile.id}
-								style={style}
-								$isSelected={tile.selected}
-							>
-								<span>{tile.name}</span>
-								<button onClick={() => toggleTileSuggestion(tile.id)}>
-									{tile.selected ? <Check size={14} /> : <Add size={12} />}
-								</button>
-							</OverlayListItem>
-						))}
-					</OverlayList>
-					<ButtonContainer>
-						<ButtonStyled style={buttonSpring} onClick={onSelect}>
-							<ArrowRight2 />
-						</ButtonStyled>
-					</ButtonContainer>
-				</Overlay>
-			</OverlayContainer>
-			{/* Set expanded width to the final width of animation */}
-			<PersonaCardExpanded
-				persona={currentPersona}
-				expanded={isSelected}
-				onCollapse={onDeselect}
-				expandedWidth={expandedWidth}
-				personaSchedules={personaSchedules}
-				setPersonaSchedule={setPersonaSchedule}
-			/>
-		</Card>
-	);
+  return (
+    <Card
+      gradient={isCustom && !isSelected ? 1 : 0}
+      $active={swiperSlide.isActive}
+      $selected={isSelected}
+      $mounted={mounted}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={cardSpring}
+    >
+      <CardImage $backgroundImage={getPersonaImage(persona.id)} $selected={isSelected} />
+      <OverlayContainer $selected={isSelected}>
+        <Overlay>
+          <OverlayHeader>
+            <OverlayTitle>
+              {isScheduleCreated && (
+                <div>
+                  <span style={{ marginRight: '6px' }}>
+                    {t('home.persona.created')}
+                  </span>
+                  <ClockFading size={14} color={styles.colors.brand[400]} />
+                  <span style={{ color: styles.colors.gray[300] }}>
+                    {t('home.persona.expiresIn', {
+                      time: personaScheduleTimeLeft,
+                    })}
+                  </span>
+                </div>
+              )}
+              {showCustomInput ? (
+                <form
+                  ref={customInputFormRef}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    onCustomSelect();
+                  }}
+                >
+                  <input
+                    value={customInputValue}
+                    onChange={(e) => setCustomInputValue(e.target.value)}
+                    className="persona-title"
+                    placeholder="Profile Name"
+                  />
+                </form>
+              ) : (
+                <h3 className="persona-title">{persona.name}</h3>
+              )}
+            </OverlayTitle>
+            <OverlayHeaderTag style={overlayTagSpring}>Tiles</OverlayHeaderTag>
+          </OverlayHeader>
+          <OverlayList style={tileListSpring}>
+            {tileListTransition((style, tile) => (
+              <OverlayListItem
+                key={tile.id}
+                style={style}
+                $isSelected={tile.selected}
+              >
+                <span>{tile.name}</span>
+                <button onClick={() => toggleTileSuggestion(tile.id)}>
+                  {tile.selected ? <Check size={14} /> : <Add size={12} />}
+                </button>
+              </OverlayListItem>
+            ))}
+          </OverlayList>
+          <ButtonContainer>
+            {isCustom ? (
+              <ButtonStyled
+                style={buttonSpring}
+                onClick={() => {
+                  if (showCustomInput) {
+                    onCustomSelect();
+                  } else {
+                    setShowCustomInput(true);
+                  }
+                }}
+              >
+                {showCustomInput ? <ArrowRight2 /> : <Add size={16} />}
+              </ButtonStyled>
+            ) : (
+              <ButtonStyled style={buttonSpring} onClick={onSelect}>
+                <ArrowRight2 />
+              </ButtonStyled>
+            )}
+          </ButtonContainer>
+        </Overlay>
+      </OverlayContainer>
+      {/* Set expanded width to the final width of animation */}
+      <PersonaCardExpanded
+        isCustom={isCustom}
+        persona={currentPersona}
+        expanded={isSelected}
+        onCollapse={isCustom ? onCustomDeselect : onDeselect}
+        expandedWidth={expandedWidth}
+        personaSchedules={personaSchedules}
+        setPersonaSchedule={setPersonaSchedule}
+      />
+    </Card>
+  );
 };
 
 export default PersonaCard;
