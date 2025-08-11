@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -104,31 +104,20 @@ const CalendarContentContainer = styled.div`
 	width: 100%;
 `;
 
-const CalendarContent = styled.div`
+const CalendarContent = styled.div<{ $cellwidth: number }>`
 	width: 100%;
 	height: ${parseInt(calendarConfig.CELL_HEIGHT) * 24}px; /* 24 hours */
 	position: relative;
 	isolation: isolate;
 `;
 
-const CalendarCellBg = styled.div<{
-	$width: number;
-	$dayindex: number;
-	$hourindex: number;
-}>`
+const CalendarBg = styled.canvas`
 	position: absolute;
-	height: ${calendarConfig.CELL_HEIGHT};
-	width: ${({ $width: w }) => w}px;
 	top: 0;
-	left: calc(${({ $dayindex: d, $width: w }) => d * w}px + ${calendarConfig.TIMELINE_WIDTH});
-	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
+	left: ${calendarConfig.TIMELINE_WIDTH};
+	width: calc(100% - ${calendarConfig.TIMELINE_WIDTH});
+	height: 100%;
 	z-index: -1;
-
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
-	background-position: bottom;
-	background-size: 12px 1px;
-	background-repeat: repeat-x;
 `;
 
 const CalendarCellTime = styled.div<{ $hourindex: number }>`
@@ -179,87 +168,150 @@ const LoadingContainer = styled.div<{ $loading: boolean }>`
 `;
 
 export type CalendarViewOptions = {
-	width: number;
-	startDay: dayjs.Dayjs;
-	daysInView: number;
+  width: number;
+  startDay: dayjs.Dayjs;
+  daysInView: number;
 };
 
 type CalendarProps = {
-	events: Array<ScheduleSubCalendarEvent>;
-	eventsLoading: boolean;
-	viewRef: React.RefObject<HTMLUListElement>;
-	viewOptions: CalendarViewOptions;
-	setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
+  events: Array<ScheduleSubCalendarEvent>;
+  eventsLoading: boolean;
+  viewRef: React.RefObject<HTMLUListElement>;
+  viewOptions: CalendarViewOptions;
+  setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
 };
 
 const Calendar = ({
-	events,
-	eventsLoading,
-	viewRef,
-	viewOptions,
-	setViewOptions,
+  events,
+  eventsLoading,
+  viewRef,
+  viewOptions,
+  setViewOptions,
 }: CalendarProps) => {
-	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-	useEffect(() => {
-		// Reset selected event when events change
-		setSelectedEvent(null);
-	}, [events]);
+  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  useEffect(() => {
+    // Reset selected event when events change
+    setSelectedEvent(null);
+  }, [events]);
 
-	const contentMounted = viewOptions.width > 0;
+  const contentMounted = viewOptions.width > 0;
 
-	function changeDayView(dir: 'left' | 'right') {
-		const changeAmount = dir === 'left' ? -1 : 1;
-		setViewOptions((prev) => {
-			const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
-			return {
-				...prev,
-				startDay: newStartDay,
-			};
-		});
-	}
+  function changeDayView(dir: 'left' | 'right') {
+    const changeAmount = dir === 'left' ? -1 : 1;
+    setViewOptions((prev) => {
+      const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
+      return {
+        ...prev,
+        startDay: newStartDay,
+      };
+    });
+  }
 
-	return (
-		<CalendarContainer $isMounted={contentMounted}>
-			<CalendarHeader>
-				<CalendarHeaderActions>
-					<ChangeViewButton
-						disabled={eventsLoading}
-						onClick={() => changeDayView('left')}
-					>
-						<ChevronLeftIcon size={16} />
-					</ChangeViewButton>
-					<ChangeViewButton
-						disabled={eventsLoading}
-						onClick={() => changeDayView('right')}
-					>
-						<ChevronRightIcon size={16} />
-					</ChangeViewButton>
-				</CalendarHeaderActions>
-				<CalendarHeaderDateList ref={viewRef}>
-					{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
-						const day = viewOptions.startDay.add(index, 'day');
-						return (
-							<CalendarHeaderDateItem
-								key={index}
-								$isToday={day.isSame(dayjs(), 'day')}
-							>
-								{/* 3 letter day */}
-								<h3>{day.format('ddd')}</h3>
-								{/* 2 number date */}
-								<span>{day.format('DD')}</span>
-							</CalendarHeaderDateItem>
-						);
-					})}
-				</CalendarHeaderDateList>
-			</CalendarHeader>
+  const calendarGridCanvasRef = useRef<HTMLCanvasElement>(null);
+  function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
+    canvas.width = width;
+    canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * 24;
+  }
+  function drawCalendarGrid(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    daysInView: number,
+    cellHeight: number
+  ) {
+    // Clear the canvas before redrawing
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-			<LoadingContainer $loading={eventsLoading}>
-				<Spinner />
-			</LoadingContainer>
-			<CalendarContentContainer id="calendar-content-container">
-				<CalendarContent>
-					{/* Background */}
-					{(
+    const cellWidth = width / daysInView;
+    const gridColor = styles.colors.gray[700];
+    const dashLength = 4;
+    const dashGap = 8;
+    const thickness = 0.5;
+
+    // Draw solid vertical lines
+    ctx.beginPath();
+    ctx.strokeStyle = gridColor;
+		ctx.lineWidth = thickness;
+    for (let x = cellWidth; x < canvas.width; x += cellWidth) {
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+    }
+    ctx.stroke();
+
+    // Draw dashed horizontal lines
+    ctx.beginPath();
+    ctx.strokeStyle = gridColor;
+		ctx.lineWidth = thickness;
+    ctx.setLineDash([dashLength, dashGap]);
+    for (let y = cellHeight; y < canvas.height; y += cellHeight) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+    }
+    ctx.stroke();
+    // Reset the line dash to solid for any future drawing
+    ctx.setLineDash([]);
+  }
+
+  useEffect(() => {
+    if (calendarGridCanvasRef.current) {
+      const canvas = calendarGridCanvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        resizeCanvas(canvas, viewOptions.width);
+        drawCalendarGrid(
+          canvas,
+          ctx,
+          viewOptions.width,
+          viewOptions.daysInView,
+          parseInt(calendarConfig.CELL_HEIGHT)
+        );
+      }
+    }
+  }, [viewOptions.width]);
+
+  return (
+    <CalendarContainer $isMounted={contentMounted}>
+      <CalendarHeader>
+        <CalendarHeaderActions>
+          <ChangeViewButton
+            disabled={eventsLoading}
+            onClick={() => changeDayView('left')}
+          >
+            <ChevronLeftIcon size={16} />
+          </ChangeViewButton>
+          <ChangeViewButton
+            disabled={eventsLoading}
+            onClick={() => changeDayView('right')}
+          >
+            <ChevronRightIcon size={16} />
+          </ChangeViewButton>
+        </CalendarHeaderActions>
+        <CalendarHeaderDateList ref={viewRef}>
+          {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
+            const day = viewOptions.startDay.add(index, 'day');
+            return (
+              <CalendarHeaderDateItem
+                key={index}
+                $isToday={day.isSame(dayjs(), 'day')}
+              >
+                {/* 3 letter day */}
+                <h3>{day.format('ddd')}</h3>
+                {/* 2 number date */}
+                <span>{day.format('DD')}</span>
+              </CalendarHeaderDateItem>
+            );
+          })}
+        </CalendarHeaderDateList>
+      </CalendarHeader>
+
+      <LoadingContainer $loading={eventsLoading}>
+        <Spinner />
+      </LoadingContainer>
+      <CalendarContentContainer id="calendar-content-container">
+        <CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
+          {/* Background */}
+          <CalendarBg ref={calendarGridCanvasRef} />
+          {/* (
 						Array.from({ length: viewOptions.daysInView }).fill(
 							Array.from({ length: 24 }).fill(null)
 						) as null[][]
@@ -274,30 +326,30 @@ const Calendar = ({
 								/>
 							);
 						});
-					})}
+					}) /*}
 					{/* Timeline */}
-					{Array.from({ length: 24 }).map((_, hourIndex) => {
-						return (
-							<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
-								<div>
-									{/* eg. "8 AM" */}
-									<span>{dayjs().hour(hourIndex).format('h A')}</span>
-								</div>
-							</CalendarCellTime>
-						);
-					})}
-					{/* Events */}
-					<CalendarEvents
-						events={events}
-						viewOptions={viewOptions}
-						headerWidth={viewOptions.width}
-						selectedEvent={selectedEvent}
-						setSelectedEvent={setSelectedEvent}
-					/>
-				</CalendarContent>
-			</CalendarContentContainer>
-		</CalendarContainer>
-	);
+          {Array.from({ length: 24 }).map((_, hourIndex) => {
+            return (
+              <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
+                <div>
+                  {/* eg. "8 AM" */}
+                  <span>{dayjs().hour(hourIndex).format('h A')}</span>
+                </div>
+              </CalendarCellTime>
+            );
+          })}
+          {/* Events */}
+          <CalendarEvents
+            events={events}
+            viewOptions={viewOptions}
+            headerWidth={viewOptions.width}
+            selectedEvent={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+          />
+        </CalendarContent>
+      </CalendarContentContainer>
+    </CalendarContainer>
+  );
 };
 
-export default Calendar ;
+export default Calendar;
