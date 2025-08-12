@@ -32,7 +32,11 @@
 	"home": {
 		"persona": {
 			"created": "Profile Created",
-			"expiresIn": "{{time}} left"
+			"expiresIn": "{{time}} left",
+			"tileSuggestions": "Tiles",
+			"custom": {
+				"namePlaceholder": "New Profile"
+			}
 		},
 		"expanded": {
 			"chat": {

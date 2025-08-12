@@ -360,7 +360,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
   function onCustomSelect() {
     if (!customInputValue.trim()) {
-			customInputFormRef.current?.querySelector('input')?.focus();
+      customInputFormRef.current?.querySelector('input')?.focus();
       return;
     }
     setShowCustomInput(false);
@@ -514,14 +514,16 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
                     value={customInputValue}
                     onChange={(e) => setCustomInputValue(e.target.value)}
                     className="persona-title"
-                    placeholder="Profile Name"
+                    placeholder={t('home.persona.custom.namePlaceholder')}
                   />
                 </form>
               ) : (
                 <h3 className="persona-title">{persona.name}</h3>
               )}
             </OverlayTitle>
-            <OverlayHeaderTag style={overlayTagSpring}>Tiles</OverlayHeaderTag>
+            <OverlayHeaderTag style={overlayTagSpring}>
+              {t('home.persona.tileSuggestions')}
+            </OverlayHeaderTag>
           </OverlayHeader>
           <OverlayList style={tileListSpring}>
             {tileListTransition((style, tile) => (

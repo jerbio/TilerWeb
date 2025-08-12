@@ -311,22 +311,6 @@ const Calendar = ({
         <CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
           {/* Background */}
           <CalendarBg ref={calendarGridCanvasRef} />
-          {/* (
-						Array.from({ length: viewOptions.daysInView }).fill(
-							Array.from({ length: 24 }).fill(null)
-						) as null[][]
-					).map((day, dayIndex) => {
-						return day.map((_, hourIndex) => {
-							return (
-								<CalendarCellBg
-									key={`${dayIndex}-${hourIndex}`}
-									$dayindex={dayIndex}
-									$hourindex={hourIndex}
-									$width={viewOptions.width / viewOptions.daysInView}
-								/>
-							);
-						});
-					}) /*}
 					{/* Timeline */}
           {Array.from({ length: 24 }).map((_, hourIndex) => {
             return (
