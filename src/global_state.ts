@@ -36,6 +36,10 @@ interface AppState {
 	// Anonymous user state for persona chat sessions
 	anonymousUser: UserInfo | null;
 	setAnonymousUser: (user: UserInfo | null) => void;
+
+	// Calendar refresh trigger for persona card
+	calendarRefreshTrigger: number;
+	triggerCalendarRefresh: () => void;
 }
 
 const useAppStore = create<AppState>((set) => ({
@@ -58,6 +62,10 @@ const useAppStore = create<AppState>((set) => ({
 	// Anonymous user state
 	anonymousUser: null,
 	setAnonymousUser: (user) => set(() => ({ anonymousUser: user })),
+
+	// Calendar refresh trigger
+	calendarRefreshTrigger: 0,
+	triggerCalendarRefresh: () => set((state) => ({ calendarRefreshTrigger: state.calendarRefreshTrigger + 1 })),
 }));
 
 // {EntityId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d++01JTVFJDG5B8G5RBJEY4E365GQ_7_01JTVFJDG5QMY0STMNA82AZ18D_01JTVFJDG521S2V82V17J4ZTX7', Name: 'Work Out', Description: ''}

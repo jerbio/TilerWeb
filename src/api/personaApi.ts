@@ -28,7 +28,10 @@ export class PersonaApi extends AppApi {
 			method: 'POST',
 			headers: myHeaders,
 		};
-		const requestBody = persona;
+		const requestBody = {
+			...persona,
+			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+		};
 		return fetch(this.getUri('api/Anonymous/Persona'), {
 			...requestOptions,
 			body: JSON.stringify(requestBody),

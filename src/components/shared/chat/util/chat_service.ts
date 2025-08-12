@@ -122,7 +122,10 @@ export const sendChatAcceptChanges = async (
 		if (!requestId) {
 			throw new Error('Request ID is required to execute actions');
 		}
-		const requestBody = { requestId };
+		const requestBody = { 
+			requestId,
+			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+		};
 
 		const response = await fetch(API_EXECUTE_ACTIONS_URL, {
 			method: 'POST',

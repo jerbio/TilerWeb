@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
 import colorUtil, { RGB } from '../../../util/helpers/colors';
-import { Bike, CarFront, Clock, DotIcon, LockKeyhole, Route } from 'lucide-react';
+import { Bike, CarFront, Clock, DotIcon, LockKeyhole, MapPin, Route } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
@@ -117,8 +117,8 @@ const EventContent = styled.div<{
 			display: -webkit-box;
 			line-height: 16px;
 			-webkit-box-orient: vertical;
-			-webkit-line-clamp: ${({ height }) => Math.floor((height - 46) / 16)};
-			max-height: calc(${({ height }) => height}px - 46px);
+			-webkit-line-clamp: ${({ height }) => Math.floor((height - 40) / 16)};
+			max-height: calc(${({ height }) => height}px - 40px);
 			text-overflow: ellipsis;
 			overflow: hidden;
 			font-weight: ${styles.typography.fontWeight.medium};
@@ -133,13 +133,23 @@ const EventContent = styled.div<{
 	.duration {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		font-size: ${styles.typography.fontSize.xs};
 		font-weight: ${styles.typography.fontWeight.semibold};
+		gap: 1.5ch;
+		overflow: hidden;
 
 		color: ${({ $colors: colors }) => {
 			const newColor = colorUtil.setLightness(colors, 0.7);
 			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 		}};
+
+		.time-details {
+			display: flex;
+			align-items: center;
+			gap: 0.5ch;
+			white-space: nowrap;
+		}
 
 		.clock {
 			height: 18px;
@@ -165,7 +175,23 @@ const EventContent = styled.div<{
 	}
 `;
 
-const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
+const LocationLink = styled.a`
+	display: flex;
+	align-items: center;
+	gap: 0.5ch;
+	color: inherit;
+	text-decoration: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-width: 0;
+
+	&:hover {
+		text-decoration: underline;
+	}
+`;
+
+const TravelDetailContainer = styled.div<{ $colors: RGB; $isClickable: boolean }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
@@ -179,7 +205,7 @@ const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.1) 8px,
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 8px,
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 9px
-)`;
+		)`;
 	}};
 	color: ${({ $colors }) => {
 		const newColor = colorUtil.setLightness($colors, 0.5);
@@ -188,6 +214,12 @@ const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 	font-size: ${styles.typography.fontSize.xs};
 	font-weight: ${styles.typography.fontWeight.semibold};
 	z-index: -1;
+	text-decoration: none;
+	cursor: ${({ $isClickable }) => ($isClickable ? 'pointer' : 'default')};
+
+	&:hover {
+		${({ $isClickable }) => $isClickable && 'filter: brightness(1.2);'}
+	}
 
 	span {
 		display: flex;
@@ -195,6 +227,8 @@ const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 		gap: 0.5ch;
 	}
 `;
+
+const TravelDetailContent = animated(TravelDetailContainer);
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
@@ -210,6 +244,8 @@ type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
 	colorRed: number;
 	colorGreen: number;
 	colorBlue: number;
+	originAddress: string | null;
+	destinationAddress: string | null;
 };
 type StyledEvent = CurrentViewEvent & {
 	properties: {
@@ -283,24 +319,44 @@ const CalendarEvents = ({
 		}
 
 		// Process travel details of all events in the current view
-		for (const event of currentViewEvents) {
-			const travelDetails = event.travelDetail;
-			for (const detail of Object.values(travelDetails)) {
-				if (!detail) continue;
-				if (detail.end - detail.start <= 0) continue;
+		for (let i = 0; i < currentViewEvents.length; i++) {
+			const event = currentViewEvents[i];
+			const { before, after } = event.travelDetail;
 
-				const start = dayjs(detail.start, 'unix');
-				const end = dayjs(detail.end, 'unix');
+			// Handle travel *before* the event
+			if (before && before.end - before.start > 0) {
+				const start = dayjs(before.start, 'unix');
+				const end = dayjs(before.end, 'unix');
+				if (!start.isAfter(viewEnd) && !end.isBefore(viewStart)) {
+					const previousEvent = i > 0 ? currentViewEvents[i - 1] : null;
+					currentViewTravelDetails.push({
+						...before,
+						key: v4(),
+						colorRed: event.colorRed,
+						colorGreen: event.colorGreen,
+						colorBlue: event.colorBlue,
+						originAddress: previousEvent?.address || null,
+						destinationAddress: event.address || null,
+					});
+				}
+			}
 
-				if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
-
-				currentViewTravelDetails.push({
-					...detail,
-					key: v4(),
-					colorRed: event.colorRed,
-					colorGreen: event.colorGreen,
-					colorBlue: event.colorBlue,
-				});
+			// Handle travel *after* the event
+			if (after && after.end - after.start > 0) {
+				const start = dayjs(after.start, 'unix');
+				const end = dayjs(after.end, 'unix');
+				if (!start.isAfter(viewEnd) && !end.isBefore(viewStart)) {
+					const nextEvent = i < currentViewEvents.length - 1 ? currentViewEvents[i + 1] : null;
+					currentViewTravelDetails.push({
+						...after,
+						key: v4(),
+						colorRed: event.colorRed,
+						colorGreen: event.colorGreen,
+						colorBlue: event.colorBlue,
+						originAddress: event.address || null,
+						destinationAddress: nextEvent?.address || null,
+					});
+				}
 			}
 		}
 		return { currentViewEvents, currentViewTravelDetails };
@@ -472,16 +528,31 @@ const CalendarEvents = ({
 									<EventLockIcon className="lock-icon" size={14} />
 								</header>
 								<div className="duration">
-									<div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
-										<Clock size={14} />
-										{event.isTardy && <span>Late</span>}
+									<div className="time-details">
+										<div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
+											<Clock size={14} />
+											{event.isTardy && <span>Late</span>}
+										</div>
+										<span>
+											{TimeUtil.rangeDuration(
+												dayjs(event.start, 'unix'),
+												dayjs(event.end, 'unix')
+											)}
+										</span>
 									</div>
-									<span>
-										{TimeUtil.rangeDuration(
-											dayjs(event.start, 'unix'),
-											dayjs(event.end, 'unix')
-										)}
-									</span>
+									{event.addressDescription && event.address && (
+										<LocationLink
+											href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+												event.address
+											)}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											title={event.addressDescription}
+										>
+											<MapPin size={14} />
+											<span>{event.addressDescription}</span>
+										</LocationLink>
+									)}
 								</div>
 							</EventContent>
 							{/* Border SVG for styling */}
@@ -510,6 +581,20 @@ const CalendarEvents = ({
 						biking: <Bike size={16} />,
 						transit: <Route size={16} />,
 					};
+
+					const canGenerateLink = detail.originAddress && detail.destinationAddress;
+					const href = canGenerateLink
+						? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+								detail.originAddress!
+						  )}&destination=${encodeURIComponent(detail.destinationAddress!)}`
+						: '';
+
+					const handleClick = () => {
+						if (canGenerateLink) {
+							window.open(href, '_blank', 'noopener,noreferrer');
+						}
+					};
+
 					return (
 						<TravelDetailContent
 							key={detail.key}
@@ -522,6 +607,8 @@ const CalendarEvents = ({
 								g: detail.colorGreen,
 								b: detail.colorBlue,
 							}}
+							$isClickable={canGenerateLink}
+							onClick={handleClick}
 						>
 							<span>
 								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}

@@ -154,6 +154,8 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
 	// Get the global state actions
 	const setAnonymousUser = useAppStore((state) => state.setAnonymousUser);
+	const globalScheduleId = useAppStore((state) => state.scheduleId);
+	const calendarRefreshTrigger = useAppStore((state) => state.calendarRefreshTrigger);
 
 	function onMobileCollapse() {
 		setMobileChatVisible(false);
@@ -178,6 +180,14 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 			});
 		}
 	}, [expanded, persona, changedPersona, setAnonymousUser]);
+
+	// Listen for calendar refresh triggers from chat component
+	useEffect(() => {
+		if (calendarRefreshTrigger > 0 && globalScheduleId && globalScheduleId !== scheduleId) {
+			// Update local schedule ID when global state changes (from chat actions)
+			setScheduleId(globalScheduleId);
+		}
+	}, [calendarRefreshTrigger, globalScheduleId, scheduleId]);
 
 	const content = [
 		{

@@ -160,6 +160,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }: ChatProps) => {
 	const scheduleId = useAppStore((state) => state.scheduleId);
 	const anonymousUser = useAppStore((state) => state.anonymousUser);
 	const anonymousUserId = anonymousUser?.id ?? '';
+	const triggerCalendarRefresh = useAppStore((state) => state.triggerCalendarRefresh);
 	const handleSetScheduleId = (id: string) => {
 		setScheduleId(id);
 	};
@@ -332,6 +333,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }: ChatProps) => {
 			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
 			if (newScheduleId) {
 				handleSetScheduleId(newScheduleId);
+
+				// Trigger calendar refresh in PersonaCardExpanded
+				triggerCalendarRefresh();
 
 				// Trigger reloading of chat messages
 				if (sessionId) {
