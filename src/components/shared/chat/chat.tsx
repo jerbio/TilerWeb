@@ -19,7 +19,7 @@ import {
 import useAppStore from '../../../global_state'; // Import Zustand Global State
 import { ChatContextType } from '../../../global_state'; // Import ChatContextType
 import { PromptWithActions, VibeAction } from './util/chat'; // Import types
-// import HORIZONTALPROGRESSBAR from '../../../assets/image_assets/horizontal_progress_bar.gif';
+import HORIZONTALPROGRESSBAR from '../../../assets/image_assets/horizontal_progress_bar.gif';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -41,14 +41,6 @@ const ChatHeader = styled.header`
 	@media screen and (min-width: ${styles.screens.lg}) {
 		padding: 0.75rem 0;
 	}
-`;
-
-const ChatTitle = styled.h2`
-	font-family: 'Urbanist', sans-serif;
-	font-size: ${styles.typography.fontSize.lg};
-	font-weight: ${styles.typography.fontWeight.bold};
-	line-height: 1;
-	color: ${styles.colors.gray[300]};
 `;
 
 const ChatContent = styled.div`
@@ -245,7 +237,6 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 				return [...updatedMessages, ...uniqueNewMessages];
 			});
-
 			setRequestId(loadedMessages[0]?.requestId || null);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to load chat messages');
@@ -387,7 +378,9 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 					</Button>
 				)}
 				{chatContext.length === 0 ? (
-					<ChatTitle>{t('home.expanded.chat.newChat')}</ChatTitle>
+					<Button variant="ghost" height={32} onClick={handleNewChat}>
+						<span>{t('home.expanded.chat.newChat')}</span>
+					</Button>
 				) : (
 					<>
 						{chatContext.map((context, index) => (
@@ -480,7 +473,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 							justifyContent: 'center',
 						}}
 					>
-						<span
+						{/* <span
 							className="spinner"
 							style={{
 								width: '24px',
@@ -499,8 +492,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 										100% { transform: rotate(360deg); }
 									}
 								`}
-						</style>
-						{/* <img src={HORIZONTALPROGRESSBAR} alt="Loading..." style={{ width: '24px', height: '24px', marginRight: '0.5rem' }} /> */}
+						</style> */}
+						<img src={HORIZONTALPROGRESSBAR} alt="Loading..." style={{ width: '24px', height: '24px', marginRight: '0.5rem' }} />
 						<span>Sending Request...</span>
 					</div>
 				)}
