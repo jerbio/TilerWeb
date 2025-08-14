@@ -25,226 +25,6 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import PersonaUtil from '@/core/util/persona';
 
-const Card = styled(animated.div) <{
-  gradient?: number;
-  $active: boolean;
-  $selected?: boolean;
-  $mounted?: boolean;
-}>`
-	min-width: 315px;
-	height: 100%;
-	background-size: cover;
-	background-position: center;
-	border-radius: ${pallette.borderRadius.xxLarge};
-	color: white;
-	position: relative;
-	opacity: ${(props) => (props.$mounted ? (props.$active ? 1 : 0.5) : 0)};
-	transition: opacity 0.3s ease-in-out;
-	cursor: ${(props) => (props.$selected ? 'auto' : 'pointer')};
-
-	/* Dark fade effect */
-	&::before {
-		content: '';
-		position: absolute;
-		inset: 2px;
-		z-index: -1;
-		border-radius: calc(${pallette.borderRadius.xxLarge} - 2.5px);
-		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.6), 88%, rgba(0, 0, 0, 0.9));
-	}
-
-	/* Gradient effect */
-	&::after {
-		${(props) =>
-    props.gradient &&
-    `@property --rotation {
-        inherits: false;
-        initial-value: 0deg;
-        syntax: '<angle>';
-      }
-      @keyframes rotate {
-        100% {
-          --rotation: 360deg;
-        }
-      }
-      animation: rotate 5s linear infinite;`}
-
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -3;
-		border-radius: ${pallette.borderRadius.xxLarge};
-		background: ${(props) =>
-    props.gradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
-      : pallette.colors.gray[800]};
-	}
-`;
-
-const CardImage = styled.div<{ $backgroundImage: string; $selected: boolean }>`
-	opacity: ${(props) => (props.$selected ? 0 : 1)};
-	background-image: url(${(props) => props.$backgroundImage});
-	background-size: cover;
-	background-position: center;
-	position: absolute;
-	inset: 2px;
-	z-index: -2;
-	border-radius: calc(${pallette.borderRadius.xxLarge} - 2px);
-	transition: opacity 0.3s ease-in-out;
-`;
-
-const OverlayContainer = styled.div<{ $selected: boolean }>`
-	position: absolute;
-	inset: 2px;
-	overflow: hidden;
-
-	border-radius: ${pallette.borderRadius.xxLarge};
-	border: 1px solid ${pallette.colors.gray[700]};
-
-	display: flex;
-	align-items: flex-end;
-
-	opacity: ${(props) => (props.$selected ? 0 : 1)};
-	pointer-events: ${(props) => (props.$selected ? 'none' : 'auto')};
-	transition: opacity 0.3s ease-in-out;
-`;
-
-const Overlay = styled.div`
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-	width: 100%;
-	padding: 1.5rem 1.25rem;
-`;
-
-const OverlayHeader = styled.header`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-`;
-
-const OverlayTitle = styled.div`
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 0.35rem;
-
-	div {
-		display: flex;
-		align-items: center;
-		gap: 0.5ch;
-		font-size: ${pallette.typography.fontSize.xs};
-		font-weight: ${pallette.typography.fontWeight.medium};
-		color: ${pallette.colors.gray[400]};
-		opacity: 0.75;
-	}
-
-	.persona-title {
-		font-size: ${pallette.typography.fontSize.displayXs};
-		font-weight: bold;
-		font-family: ${pallette.typography.fontFamily.urban};
-	}
-
-	h3 {
-		line-height: 28px;
-		margin-top: 0.25rem;
-		margin-bottom: 0.25rem;
-	}
-
-	input {
-		padding: 0.25rem 0.5rem;
-		background: transparent;
-		height: calc(28px + 0.5rem);
-		width: 100%;
-		outline: 2px solid transparent;
-		border: none;
-		transition: outline 0.25s ease-in-out;
-
-		&::placeholder {
-			color: rgba(255, 255, 255, 0.3);
-		}
-
-		&:focus {
-			outline: 2px solid ${pallette.colors.gray[700]};
-			border-radius: ${pallette.borderRadius.small};
-		}
-	}
-`;
-
-const OverlayHeaderTag = styled(animated.span)`
-	font-size: ${pallette.typography.fontSize.sm};
-	font-weight: ${pallette.typography.fontWeight.semibold};
-	background: ${pallette.colors.white};
-	color: ${pallette.colors.gray[800]};
-	padding: 6px 1rem;
-	line-height: 1;
-	border-radius: ${pallette.borderRadius.xLarge};
-`;
-
-const OverlayList = styled(animated.ul)`
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	z-index: 1;
-`;
-
-const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
-	height: fit-content;
-	width: fit-content;
-	display: flex;
-	gap: 0.25rem;
-	align-items: center;
-	font-size: ${pallette.typography.fontSize.sm};
-	color: ${pallette.colors.white};
-
-	background: ${({ $isSelected }) =>
-    $isSelected ? pallette.colors.brand[600] : pallette.colors.gray[800]};
-	border-radius: ${pallette.borderRadius.xLarge};
-	border: 1px solid
-		${({ $isSelected }) => ($isSelected ? 'transparent' : pallette.colors.gray[700])};
-	padding-left: 12px;
-	line-height: 1.3;
-	color: ${pallette.colors.gray[100]};
-	transition:
-		background-color 0.25s ease-in-out,
-		color 0.25s ease-in-out;
-
-	button {
-		height: 32px;
-		width: 32px;
-		display: grid;
-		place-items: center;
-		border-radius: ${pallette.borderRadius.xLarge};
-		color: ${({ $isSelected }) =>
-    $isSelected ? pallette.colors.white : pallette.colors.gray[400]};
-		transition: color 0.25s ease-in-out;
-
-		&:hover {
-			color: ${pallette.colors.gray[300]};
-		}
-	}
-`;
-
-const ButtonContainer = styled.div`
-	display: flex;
-	margin-top: -2.25rem;
-	align-items: center;
-	justify-content: end;
-	border-radius: 0 0 ${pallette.borderRadius.xxLarge} ${pallette.borderRadius.xxLarge};
-	z-index: 2;
-`;
-
-const ButtonStyled = styled(animated.button)`
-	width: 36px;
-	height: 36px;
-	display: grid;
-	place-items: center;
-	border-radius: ${pallette.borderRadius.xxLarge};
-	background-color: ${pallette.colors.brand[600]};
-	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
-	&:hover {
-		background-color: ${pallette.colors.brand[700]};
-	}
-	transition: background-color 0.3s ease-in-out;
-`;
-
 type PersonaCardProps = {
   persona: Persona & { key: number };
   isCustom?: boolean;
@@ -317,11 +97,11 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       setTileSuggestions([]);
     } else {
       setTileSuggestions(
-        persona.tilePreferences.map((pref, index) => ({
+        persona.tilePreferences?.map((pref, index) => ({
           id: index + 1,
           name: pref.TileName,
           selected: false,
-        }))
+        })) || []
       );
     }
   }, [persona.tilePreferences, isScheduleCreated]);
@@ -580,5 +360,225 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     </Card>
   );
 };
+
+const Card = styled(animated.div) <{
+  gradient?: number;
+  $active: boolean;
+  $selected?: boolean;
+  $mounted?: boolean;
+}>`
+	min-width: 315px;
+	height: 100%;
+	background-size: cover;
+	background-position: center;
+	border-radius: ${pallette.borderRadius.xxLarge};
+	color: white;
+	position: relative;
+	opacity: ${(props) => (props.$mounted ? (props.$active ? 1 : 0.5) : 0)};
+	transition: opacity 0.3s ease-in-out;
+	cursor: ${(props) => (props.$selected ? 'auto' : 'pointer')};
+
+	/* Dark fade effect */
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 2px;
+		z-index: -1;
+		border-radius: calc(${pallette.borderRadius.xxLarge} - 2.5px);
+		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.6), 88%, rgba(0, 0, 0, 0.9));
+	}
+
+	/* Gradient effect */
+	&::after {
+		${(props) =>
+    props.gradient &&
+    `@property --rotation {
+        inherits: false;
+        initial-value: 0deg;
+        syntax: '<angle>';
+      }
+      @keyframes rotate {
+        100% {
+          --rotation: 360deg;
+        }
+      }
+      animation: rotate 5s linear infinite;`}
+
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -3;
+		border-radius: ${pallette.borderRadius.xxLarge};
+		background: ${(props) =>
+    props.gradient
+      ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
+      : pallette.colors.gray[800]};
+	}
+`;
+
+const CardImage = styled.div<{ $backgroundImage: string; $selected: boolean }>`
+	opacity: ${(props) => (props.$selected ? 0 : 1)};
+	background-image: url(${(props) => props.$backgroundImage});
+	background-size: cover;
+	background-position: center;
+	position: absolute;
+	inset: 2px;
+	z-index: -2;
+	border-radius: calc(${pallette.borderRadius.xxLarge} - 2px);
+	transition: opacity 0.3s ease-in-out;
+`;
+
+const OverlayContainer = styled.div<{ $selected: boolean }>`
+	position: absolute;
+	inset: 2px;
+	overflow: hidden;
+
+	border-radius: ${pallette.borderRadius.xxLarge};
+	border: 1px solid ${pallette.colors.gray[700]};
+
+	display: flex;
+	align-items: flex-end;
+
+	opacity: ${(props) => (props.$selected ? 0 : 1)};
+	pointer-events: ${(props) => (props.$selected ? 'none' : 'auto')};
+	transition: opacity 0.3s ease-in-out;
+`;
+
+const Overlay = styled.div`
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+	width: 100%;
+	padding: 1.5rem 1.25rem;
+`;
+
+const OverlayHeader = styled.header`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+`;
+
+const OverlayTitle = styled.div`
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+
+	div {
+		display: flex;
+		align-items: center;
+		gap: 0.5ch;
+		font-size: ${pallette.typography.fontSize.xs};
+		font-weight: ${pallette.typography.fontWeight.medium};
+		color: ${pallette.colors.gray[400]};
+		opacity: 0.75;
+	}
+
+	.persona-title {
+		font-size: ${pallette.typography.fontSize.displayXs};
+		font-weight: bold;
+		font-family: ${pallette.typography.fontFamily.urban};
+	}
+
+	h3 {
+		line-height: 28px;
+		margin-top: 0.25rem;
+		margin-bottom: 0.25rem;
+	}
+
+	input {
+		padding: 0.25rem 0.5rem;
+		background: transparent;
+		height: calc(28px + 0.5rem);
+		width: 100%;
+		outline: 2px solid transparent;
+		border: none;
+		transition: outline 0.25s ease-in-out;
+
+		&::placeholder {
+			color: rgba(255, 255, 255, 0.3);
+		}
+
+		&:focus {
+			outline: 2px solid ${pallette.colors.gray[700]};
+			border-radius: ${pallette.borderRadius.small};
+		}
+	}
+`;
+
+const OverlayHeaderTag = styled(animated.span)`
+	font-size: ${pallette.typography.fontSize.sm};
+	font-weight: ${pallette.typography.fontWeight.semibold};
+	background: ${pallette.colors.white};
+	color: ${pallette.colors.gray[800]};
+	padding: 6px 1rem;
+	line-height: 1;
+	border-radius: ${pallette.borderRadius.xLarge};
+`;
+
+const OverlayList = styled(animated.ul)`
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	z-index: 1;
+`;
+
+const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
+	height: fit-content;
+	width: fit-content;
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	font-size: ${pallette.typography.fontSize.sm};
+	color: ${pallette.colors.white};
+
+	background: ${({ $isSelected }) =>
+    $isSelected ? pallette.colors.brand[600] : pallette.colors.gray[800]};
+	border-radius: ${pallette.borderRadius.xLarge};
+	border: 1px solid
+		${({ $isSelected }) => ($isSelected ? 'transparent' : pallette.colors.gray[700])};
+	padding-left: 12px;
+	line-height: 1.3;
+	color: ${pallette.colors.gray[100]};
+	transition:
+		background-color 0.25s ease-in-out,
+		color 0.25s ease-in-out;
+
+	button {
+		height: 32px;
+		width: 32px;
+		display: grid;
+		place-items: center;
+		border-radius: ${pallette.borderRadius.xLarge};
+		color: ${({ $isSelected }) =>
+    $isSelected ? pallette.colors.white : pallette.colors.gray[400]};
+		transition: color 0.25s ease-in-out;
+
+		&:hover {
+			color: ${pallette.colors.gray[300]};
+		}
+	}
+`;
+
+const ButtonContainer = styled.div`
+	display: flex;
+	margin-top: -2.25rem;
+	align-items: center;
+	justify-content: end;
+	border-radius: 0 0 ${pallette.borderRadius.xxLarge} ${pallette.borderRadius.xxLarge};
+	z-index: 2;
+`;
+
+const ButtonStyled = styled(animated.button)`
+	width: 36px;
+	height: 36px;
+	display: grid;
+	place-items: center;
+	border-radius: ${pallette.borderRadius.xxLarge};
+	background-color: ${pallette.colors.brand[600]};
+	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
+	&:hover {
+		background-color: ${pallette.colors.brand[700]};
+	}
+	transition: background-color 0.3s ease-in-out;
+`;
 
 export default PersonaCard;

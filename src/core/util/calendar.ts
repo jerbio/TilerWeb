@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from '@/core/common/components/calendar/calendar';
 import calendarConfig from '@/core/constants/calendar_config';
+import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 
 type CalendarEventBox = {
 	x: number;
@@ -54,6 +55,15 @@ class CalendarUtil {
 			eventA.y >= eventB.y + eventB.height
 		);
 	}
+
+	static getEventLocationLink (event: ScheduleSubCalendarEvent) {
+		if (event.location?.address) {
+			return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+				event.location.address
+			)}`;
+		}
+		return '#';
+	};
 }
 
 export default CalendarUtil;

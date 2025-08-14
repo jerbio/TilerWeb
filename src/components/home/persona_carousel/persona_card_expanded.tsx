@@ -1,17 +1,134 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
-import Chat from '../../../core/common/components/chat/chat';
-import Button from '../../../core/common/components/button';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
-import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import PersonaCalendar from './persona_calendar';
-import { Persona } from '../../../core/common/types/persona';
-import { PersonaApi } from '../../../api/personaApi';
-import { PersonaSchedule, PersonaScheduleSetter } from '../../../core/common/hooks/usePersonaSchedules';
+import { ChevronLeftIcon, Plus } from 'lucide-react';
 import pallette from '@/core/theme/pallete';
+import Button from '@/core/common/components/button';
+import { Persona } from '@/core/common/types/persona';
+import Chat from '@/core/common/components/chat/chat';
+import useIsMobile from '@/core/common/hooks/useIsMobile';
+import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/usePersonaSchedules';
+import { personaService } from '@/services';
 
-const CardContainer = styled(animated.section) <{ $display: boolean }>`
+type PersonaExpandedCardProps = {
+	isCustom?: boolean;
+	persona: Persona;
+	expanded: boolean;
+	onCollapse: () => void;
+	expandedWidth: number;
+	personaSchedules: PersonaSchedule;
+	setPersonaSchedule: PersonaScheduleSetter;
+};
+
+const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
+	isCustom,
+	expanded,
+	persona,
+	onCollapse,
+	expandedWidth,
+	personaSchedules,
+	setPersonaSchedule,
+}) => {
+	const [mobileChatVisible, setMobileChatVisible] = useState(false);
+	const isDesktop = !useIsMobile(parseInt(pallette.screens.lg, 10));
+	const showChat = isDesktop || mobileChatVisible;
+	const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+
+	function onMobileCollapse() {
+		setMobileChatVisible(false);
+	}
+
+	async function getPersonaSchedule() {
+		const personaSchedule = await personaService.getPersonaSchedule(persona);
+		if (personaSchedule) {
+			setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
+				store: !isCustom,
+			});
+		}
+	}
+
+	useEffect(() => {
+		if (expanded && !scheduleId) {
+			getPersonaSchedule();
+		}
+	}, [expanded]);
+
+	const content = [
+		{
+			key: 'calendar',
+			container: CalendarContainer,
+			content: (
+				<React.Fragment>
+					<PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
+					<CalendarContainerActionButtons>
+						<MobileShowChatButton
+							onClick={() => setMobileChatVisible(!mobileChatVisible)}
+						>
+							<Plus size={20} />
+						</MobileShowChatButton>
+					</CalendarContainerActionButtons>
+				</React.Fragment>
+			),
+		},
+		{
+			key: 'chat',
+			container: ChatContainer,
+			content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
+		},
+	];
+
+	// Content revealing animations
+	const cardSpringRef = useSpringRef();
+	const cardSpring = useSpring({
+		ref: cardSpringRef,
+		from: { opacity: 0 },
+		to: { opacity: expanded ? 1 : 0 },
+	});
+
+	const contentTransRef = useSpringRef();
+	const contentTransition = useTransition(
+		expanded ? (showChat ? content : content.slice(0, 1)) : [],
+		{
+			keys: (item) => item.key,
+			ref: contentTransRef,
+			from: { opacity: 0, scale: 1.05 },
+			enter: { opacity: 1, scale: 1 },
+			leave: { opacity: 0, scale: 1 },
+			trail: expanded ? 200 : 0,
+			config: { tension: expanded ? 200 : 300 },
+		}
+	);
+
+	useChain(
+		expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
+		expanded ? [0, 0.75] : [0, 1],
+		300
+	);
+
+	return (
+		<CardContainer $display={expanded} style={cardSpring}>
+			<Header>
+				<h2>{persona.name}</h2>
+				<MobileCloseButtonContainer>
+					<Button variant="ghost" height={32} onClick={onCollapse}>
+						<ChevronLeftIcon size={16} />
+						<span>Back</span>
+					</Button>
+				</MobileCloseButtonContainer>
+			</Header>
+			<CardContent>
+				{contentTransition((style, item) => (
+					<item.container style={style} key={item.key}>
+						{item.content}
+					</item.container>
+				))}
+			</CardContent>
+		</CardContainer>
+	);
+};
+
+const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
 	background: linear-gradient(to right, ${pallette.colors.black}, ${pallette.colors.gray[900]});
 	border-radius: ${pallette.borderRadius.xxLarge};
@@ -135,125 +252,5 @@ const MobileCloseButtonContainer = styled.div`
 		display: none;
 	}
 `;
-
-type PersonaExpandedCardProps = {
-  isCustom?: boolean;
-  persona: Persona;
-  expanded: boolean;
-  onCollapse: () => void;
-  expandedWidth: number;
-  personaSchedules: PersonaSchedule;
-  setPersonaSchedule: PersonaScheduleSetter;
-};
-
-const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-  isCustom,
-  expanded,
-  persona,
-  onCollapse,
-  expandedWidth,
-  personaSchedules,
-  setPersonaSchedule,
-}) => {
-  const [mobileChatVisible, setMobileChatVisible] = useState(false);
-  const isDesktop = !useIsMobile(parseInt(pallette.screens.lg, 10));
-  const showChat = isDesktop || mobileChatVisible;
-
-  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
-
-  function onMobileCollapse() {
-    setMobileChatVisible(false);
-  }
-
-  // Set the scheduleId based on the current persona
-  useEffect(() => {
-    if (expanded && !scheduleId) {
-      const personaApi = new PersonaApi();
-
-      personaApi.getPersonaSchedule(persona).then((personaSchedule) => {
-        if (personaSchedule) {
-          setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
-            store: !isCustom,
-          });
-        } else {
-          console.error('No schedule found for the persona');
-        }
-      });
-    }
-  }, [expanded]);
-
-  const content = [
-    {
-      key: 'calendar',
-      container: CalendarContainer,
-      content: (
-        <React.Fragment>
-          <PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
-          <CalendarContainerActionButtons>
-            <MobileShowChatButton
-              onClick={() => setMobileChatVisible(!mobileChatVisible)}
-            >
-              <Plus size={20} />
-            </MobileShowChatButton>
-          </CalendarContainerActionButtons>
-        </React.Fragment>
-      ),
-    },
-    {
-      key: 'chat',
-      container: ChatContainer,
-      content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
-    },
-  ];
-
-  // Content revealing animations
-  const cardSpringRef = useSpringRef();
-  const cardSpring = useSpring({
-    ref: cardSpringRef,
-    from: { opacity: 0 },
-    to: { opacity: expanded ? 1 : 0 },
-  });
-
-  const contentTransRef = useSpringRef();
-  const contentTransition = useTransition(
-    expanded ? (showChat ? content : content.slice(0, 1)) : [],
-    {
-      keys: (item) => item.key,
-      ref: contentTransRef,
-      from: { opacity: 0, scale: 1.05 },
-      enter: { opacity: 1, scale: 1 },
-      leave: { opacity: 0, scale: 1 },
-      trail: expanded ? 200 : 0,
-      config: { tension: expanded ? 200 : 300 },
-    }
-  );
-
-  useChain(
-    expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
-    expanded ? [0, 0.75] : [0, 1],
-    300
-  );
-
-  return (
-    <CardContainer $display={expanded} style={cardSpring}>
-      <Header>
-        <h2>{persona.name}</h2>
-        <MobileCloseButtonContainer>
-          <Button variant="ghost" height={32} onClick={onCollapse}>
-            <ChevronLeftIcon size={16} />
-            <span>Back</span>
-          </Button>
-        </MobileCloseButtonContainer>
-      </Header>
-      <CardContent>
-        {contentTransition((style, item) => (
-          <item.container style={style} key={item.key}>
-            {item.content}
-          </item.container>
-        ))}
-      </CardContent>
-    </CardContainer>
-  );
-};
 
 export default PersonaCardExpanded;

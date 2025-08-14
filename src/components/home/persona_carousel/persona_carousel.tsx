@@ -10,8 +10,8 @@ import Section from '../../layout/section';
 import styled from 'styled-components';
 import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import { Persona } from '../../../core/common/types/persona';
-import { PersonaApi } from '../../../api/personaApi';
 import usePersonaSchedules from '../../../core/common/hooks/usePersonaSchedules';
+import { personaService } from '@/services';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;
@@ -46,8 +46,7 @@ const PersonaCarousel: React.FC = () => {
   const { personaSchedules, setPersonaSchedule } = usePersonaSchedules();
 
   async function getPersonas() {
-    const personaApi = new PersonaApi();
-    const data = await personaApi.getPersonas();
+    const data = await personaService.getPersonas();
     if (data) {
       const personasWithKeys = data.personas.map((persona, index) => ({
         ...persona,
