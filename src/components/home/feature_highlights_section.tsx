@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import pallette from '../../core/theme/pallete';
+import pallette from '@/core/theme/pallete';
 import { Highlight } from '@/core/common/types/tile';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';

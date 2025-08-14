@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { WaitlistApi } from '../../api/waitlistApi';
 import { toast } from 'sonner';
 import Section from '../layout/section';
-import Input from '../../core/common/components/input';
-import Button from '../../core/common/components/button';
-import pallette from '../../core/theme/pallete';
+import { WaitlistApi } from '@/api/waitlistApi';
+import Input from '@/core/common/components/input';
+import Button from '@/core/common/components/button';
+import pallette from '@/core/theme/pallete';
 
 const Form = styled.form`
 	display: flex;

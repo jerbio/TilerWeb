@@ -2,9 +2,9 @@ import React from 'react';
 import Section from '../layout/section';
 import SectionHeaders from '../layout/section_headers';
 import styled from 'styled-components';
-import Button from '../../core/common/components/button';
-import Input from '../../core/common/components/input';
-import pallette from '../../core/theme/pallete';
+import Button from '@/core/common/components/button';
+import Input from '@/core/common/components/input';
+import pallette from '@/core/theme/pallete';
 import { ArrowRight } from 'lucide-react';
 
 const Form = styled.form`

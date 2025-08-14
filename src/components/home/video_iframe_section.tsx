@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import pallette from '../../core/theme/pallete';
+import pallette from '@/core/theme/pallete';
 import Section from '../layout/section';
 import { useTranslation } from 'react-i18next';
 

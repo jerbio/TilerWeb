@@ -1,12 +1,12 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import TileCard from './tile_card';
-import { TileCardProps } from '../../core/common/types/tile';
-import pallette from '@/core/theme/pallete';
-import Button from '@/core/common/components/button';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';
-import ArrowRight from '../../core/common/components/icons/arrow_right';
+import pallette from '@/core/theme/pallete';
+import Button from '@/core/common/components/button';
+import { TileCardProps } from '@/core/common/types/tile';
+import ArrowRight from '@/core/common/components/icons/arrow_right';
 
 const TileCardContainer = styled.div`
 	display: flex;

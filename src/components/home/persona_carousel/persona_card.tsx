@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import pallette from '../../../core/theme/pallete';
+import pallette from '@/core/theme/pallete';
 import { useSwiper, useSwiperSlide } from 'swiper/react';
-import Add from '../../../core/common/components/icons/add';
-import ArrowRight2 from '../../../core/common/components/icons/arrow_right2';
+import Add from '@/core/common/components/icons/add';
+import ArrowRight2 from '@/core/common/components/icons/arrow_right2';
 import {
   animated,
   Partial,
@@ -12,15 +12,15 @@ import {
   useSpringRef,
   useTransition,
 } from '@react-spring/web';
-import useIsMobile from '../../../core/common/hooks/useIsMobile';
+import useIsMobile from '@/core/common/hooks/useIsMobile';
 import PersonaCardExpanded from './persona_card_expanded';
-import { Persona } from '../../../core/common/types/persona';
+import { Persona } from '@/core/common/types/persona';
 import { Check, ClockFading } from 'lucide-react';
 import {
   PersonaSchedule,
   PersonaScheduleSetter,
-} from '../../../core/common/hooks/usePersonaSchedules';
-import TimeUtil from '../../../core/util/time';
+} from '@/core/common/hooks/usePersonaSchedules';
+import TimeUtil from '@/core/util/time';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import PersonaUtil from '@/core/util/persona';
