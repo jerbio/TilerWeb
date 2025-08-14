@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import styles from '../../../util/styles';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import Chat from '../../shared/chat/chat';
 import Button from '../../shared/button';
@@ -10,6 +9,7 @@ import PersonaCalendar from './persona_calendar';
 import { Persona } from '../../../types/persona';
 import { PersonaApi } from '../../../api/personaApi';
 import { PersonaSchedule, PersonaScheduleSetter } from '../../../hooks/usePersonaSchedules';
+import styles from '@/util/styles';
 
 const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;
