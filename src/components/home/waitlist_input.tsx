@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { WaitlistApi } from '../../api/waitlistApi';
 import { toast } from 'sonner';
 import Section from '../layout/section';
-import Input from '../shared/input';
-import Button from '../shared/button';
-import styles from '../../util/styles';
+import Input from '../../core/common/components/input';
+import Button from '../../core/common/components/button';
+import pallette from '../../core/theme/pallete';
 
 const Form = styled.form`
 	display: flex;
@@ -14,7 +14,7 @@ const Form = styled.form`
 	width: 100%;
 	margin: 0 auto;
 
-	@media screen and (min-width: ${styles.screens.sm}) {
+	@media screen and (min-width: ${pallette.screens.sm}) {
 		flex-direction: row;
 		max-width: 600px;
 	}

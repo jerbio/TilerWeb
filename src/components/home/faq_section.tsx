@@ -1,6 +1,6 @@
 import React from 'react';
 import Section from '../layout/section';
-import Collapse from '../shared/collapse';
+import Collapse from '../../core/common/components/collapse';
 import { useTranslation } from 'react-i18next';
 
 const FAQ: React.FC = () => {

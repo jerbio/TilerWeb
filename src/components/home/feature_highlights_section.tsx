@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
-import { Highlight } from '../../util/interface';
-import MountainBackground from '../../assets/image_assets/highlights/mountain.jpg';
-import FitnessBackground from '../../assets/image_assets/highlights/fitness.jpg';
-import TilesBackground from '../../assets/image_assets/highlights/tiles.jpg';
-import LocationBackground from '../../assets/image_assets/highlights/location.jpg';
+import pallette from '../../core/theme/pallete';
+import { Highlight } from '../../core/common/types/tile';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';
 import { useTranslation } from 'react-i18next';
+import MountainBackground from '@/assets/highlights/mountain.jpg';
+import FitnessBackground from '@/assets/highlights/fitness.jpg';
+import TilesBackground from '@/assets/highlights/tiles.jpg';
+import LocationBackground from '@/assets/highlights/location.jpg';
 
 const HighlightCardWrapper = styled.div`
 	display: grid;
@@ -17,11 +17,11 @@ const HighlightCardWrapper = styled.div`
 	width: fit-content;
 	margin: 0 auto;
 
-	@media (min-width: ${styles.screens.sm}) {
+	@media (min-width: ${pallette.screens.sm}) {
 		grid-template-columns: repeat(2, 1fr);
 	}
 
-	@media (min-width: ${styles.screens.xl}) {
+	@media (min-width: ${pallette.screens.xl}) {
 		grid-template-columns: repeat(4, 1fr);
 	}
 `;
@@ -35,29 +35,29 @@ const HighlightCard = styled.div<{ $backgroundimage: string }>`
 	width: 262px;
 	min-height: 250px;
 	border-radius: 16px;
-	border: 1px solid ${styles.colors.borderRed};
+	border: 1px solid ${pallette.colors.borderRed};
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 `;
 
 const MiniTitle = styled.p`
-	color: ${styles.colors.brand['300']};
-	font-weight: ${styles.typography.fontWeight.semibold};
-	font-size: ${styles.typography.fontSize.xxs};
+	color: ${pallette.colors.brand['300']};
+	font-weight: ${pallette.typography.fontWeight.semibold};
+	font-size: ${pallette.typography.fontSize.xxs};
 	margin: 0;
 `;
 
 const Title = styled.h2`
-	font-size: ${styles.typography.fontSize.displayXs};
-	line-height: ${styles.typography.lineHeight.lg};
-	font-family: ${styles.typography.fontFamily.urban};
+	font-size: ${pallette.typography.fontSize.displayXs};
+	line-height: ${pallette.typography.lineHeight.lg};
+	font-family: ${pallette.typography.fontFamily.urban};
 	font-weight: 700;
 	margin-bottom: 0.75rem;
 `;
 
 const Body = styled.p`
-	font-size: ${styles.typography.fontSize.sm};
+	font-size: ${pallette.typography.fontSize.sm};
 	color: #ffffffbf;
 `;
 

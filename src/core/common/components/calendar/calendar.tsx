@@ -1,19 +1,19 @@
 import React, { useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import calendarConfig from './config';
-import CalendarEvents from './calendar_events';
-import { ScheduleSubCalendarEvent } from '../../../types/schedule';
+import styled from 'styled-components';
+import pallette from '@/core/theme/pallete';
+import calendarConfig from '@/core/constants/calendar_config';
+import CalendarEvents from '@/core/common/components/calendar/calendar_events';
+import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import Spinner from '../loader';
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	position: relative;
 	width: 100%;
 	height: 100%;
-	background-color: ${styles.colors.gray[900]};
+	background-color: ${pallette.colors.gray[900]};
 	opacity: ${({ $isMounted }) => ($isMounted ? 1 : 0)};
 	transition: opacity 0.3s 0.5s ease-in-out;
 	user-select: none;
@@ -25,7 +25,7 @@ const CalendarHeader = styled.div`
 	left: 0;
 	width: 100%;
 	height: ${calendarConfig.HEADER_HEIGHT};
-	background-color: ${styles.colors.gray[800]};
+	background-color: ${pallette.colors.gray[800]};
 	display: flex;
 `;
 
@@ -47,19 +47,19 @@ const ChangeViewButton = styled.button`
 	justify-content: center;
 	cursor: pointer;
 	background-color: transparent;
-	color: ${styles.colors.gray[400]};
+	color: ${pallette.colors.gray[400]};
 	transition:
 		background-color 0.2s ease,
 		color 0.2s ease;
 
 	&:not(:disabled) {
 		&:hover {
-			background-color: ${styles.colors.gray[800]};
-			color: ${styles.colors.gray[200]};
+			background-color: ${pallette.colors.gray[800]};
+			color: ${pallette.colors.gray[200]};
 		}
 
 		&:active {
-			background-color: ${styles.colors.gray[700]};
+			background-color: ${pallette.colors.gray[700]};
 		}
 	}
 `;
@@ -73,24 +73,24 @@ const CalendarHeaderDateList = styled.ul`
 
 const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	flex: 1;
-	font-family: ${styles.typography.fontFamily.urban};
-	font-weight: ${styles.typography.fontWeight.bold};
-	font-size: ${styles.typography.fontSize.lg};
+	font-family: ${pallette.typography.fontFamily.urban};
+	font-weight: ${pallette.typography.fontWeight.bold};
+	font-size: ${pallette.typography.fontSize.lg};
 	text-transform: uppercase;
-	color: ${({ $isToday }) => ($isToday ? styles.colors.white : styles.colors.gray[400])};
+	color: ${({ $isToday }) => ($isToday ? pallette.colors.white : pallette.colors.gray[400])};
 
 	&:not(:last-child) {
 		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	}
 
-	background-color: ${({ $isToday }) => ($isToday ? styles.colors.gray[700] : 'transparent')};
+	background-color: ${({ $isToday }) => ($isToday ? pallette.colors.gray[700] : 'transparent')};
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 0.5ch;
 
 	span {
-		color: ${({ $isToday }) => ($isToday ? styles.colors.brand[400] : styles.colors.gray[200])};
+		color: ${({ $isToday }) => ($isToday ? pallette.colors.brand[400] : pallette.colors.gray[200])};
 	}
 `;
 
@@ -145,8 +145,8 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 			line-height: 1;
 			top: 4px;
 			right: 2px;
-			font-size: ${styles.typography.fontSize.xs};
-			color: ${styles.colors.gray[500]};
+			font-size: ${pallette.typography.fontSize.xs};
+			color: ${pallette.colors.gray[500]};
 		}
 	}
 `;
@@ -223,7 +223,7 @@ const Calendar = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cellWidth = width / daysInView;
-    const gridColor = styles.colors.gray[700];
+    const gridColor = pallette.colors.gray[700];
     const dashLength = 4;
     const dashGap = 8;
     const thickness = 0.5;

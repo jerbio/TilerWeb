@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
+import pallette from '@/core/theme/pallete';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
@@ -55,16 +55,16 @@ const StyledButton = styled.button<StyledButtonProps>`
 		inset: 1px;
 		background: ${(props) =>
     props.$variant === 'primary'
-      ? styles.colors.black
+      ? pallette.colors.black
       : props.$variant === 'secondary'
-        ? styles.colors.white
+        ? pallette.colors.white
         : props.$variant === 'brand'
-          ? styles.colors.brand[500]
+          ? pallette.colors.brand[500]
           : props.$variant === 'ghost'
             ? 'transparent'
             : props.$variant};
 		border-radius: ${(props) =>
-    props.$size === 'small' ? styles.borderRadius.little : styles.borderRadius.medium};
+    props.$size === 'small' ? pallette.borderRadius.little : pallette.borderRadius.medium};
 		z-index: -1;
 
 		transition: background-color 0.2s ease-in-out;
@@ -87,23 +87,23 @@ const StyledButton = styled.button<StyledButtonProps>`
 	/* Border color and gradient */
 	background: ${(props) =>
     props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.$bordergradient[0]})`
+      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${pallette.colors.gray[700]}, ${pallette.colors.gray[700]}, ${props.$bordergradient[0]})`
       : props.$variant === 'primary'
-        ? styles.colors.gray[700]
+        ? pallette.colors.gray[700]
         : 'transparent'};
 
 	color: ${(props) =>
     props.$variant === 'primary'
-      ? styles.colors.white
+      ? pallette.colors.white
       : props.$variant === 'secondary'
-        ? styles.colors.black
+        ? pallette.colors.black
         : props.$variant === 'brand'
-          ? styles.colors.white
+          ? pallette.colors.white
           : props.$variant === 'ghost'
-            ? styles.colors.gray[300]
-            : styles.colors.white};
-	border-radius: ${styles.borderRadius.little};
-	font-weight: ${styles.typography.fontWeight.medium};
+            ? pallette.colors.gray[300]
+            : pallette.colors.white};
+	border-radius: ${pallette.borderRadius.little};
+	font-weight: ${pallette.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
@@ -114,29 +114,29 @@ const StyledButton = styled.button<StyledButtonProps>`
     props.$height
       ? `${props.$height}px`
       : props.$size === 'small'
-        ? styles.buttonHeights.small
+        ? pallette.buttonHeights.small
         : props.$size === 'medium'
-          ? styles.buttonHeights.medium
-          : styles.buttonHeights.large};
+          ? pallette.buttonHeights.medium
+          : pallette.buttonHeights.large};
 	padding-inline: ${(props) =>
     props.$size === 'small' || props.$variant === 'ghost'
-      ? styles.space.small
-      : styles.space.medium};
+      ? pallette.space.small
+      : pallette.space.medium};
 	font-size: ${(props) =>
     props.$size === 'small'
-      ? styles.typography.fontSize.xs
+      ? pallette.typography.fontSize.xs
       : props.$size === 'medium'
-        ? styles.typography.fontSize.sm
-        : styles.typography.fontSize.base};
+        ? pallette.typography.fontSize.sm
+        : pallette.typography.fontSize.base};
 	&:hover {
 		&::before {
 			background-color: ${(props) =>
     props.$variant === 'primary'
-      ? styles.colors.gray[900]
+      ? pallette.colors.gray[900]
       : props.$variant === 'secondary'
-        ? styles.colors.gray[200]
+        ? pallette.colors.gray[200]
         : props.$variant === 'brand'
-          ? styles.colors.brand[600]
+          ? pallette.colors.brand[600]
           : props.$variant === 'ghost'
             ? '#ffffff12'
             : props.$variant + '80'};

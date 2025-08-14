@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
+import pallette from '@/core/theme/pallete';
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	disabled?: boolean;
@@ -28,10 +28,10 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 		props.$height
 			? `${props.$height}px`
 			: props.$sized === 'small'
-				? styles.inputHeights.small
+				? pallette.inputHeights.small
 				: props.$sized === 'medium'
-					? styles.inputHeights.medium
-					: styles.inputHeights.large};
+					? pallette.inputHeights.medium
+					: pallette.inputHeights.large};
 
 	${(props) =>
 		props.$bordergradient &&
@@ -49,27 +49,27 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 
 	background: ${(props) =>
 		props.$bordergradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.$bordergradient[0]})`
+			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${pallette.colors.gray[700]}, ${pallette.colors.gray[700]}, ${props.$bordergradient[0]})`
 			: props.$variant === 'brand'
-				? styles.colors.brand[400] + '99'
-				: styles.colors.gray[800]};
-	border-radius: ${styles.borderRadius.little};
+				? pallette.colors.brand[400] + '99'
+				: pallette.colors.gray[800]};
+	border-radius: ${pallette.borderRadius.little};
 
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
 			props.$bordergradient
-				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${styles.colors.gray[700]}, ${styles.colors.gray[700]}, ${props.$bordergradient[0]})`
+				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${pallette.colors.gray[700]}, ${pallette.colors.gray[700]}, ${props.$bordergradient[0]})`
 				: props.$variant === 'brand'
-					? styles.colors.brand[400] + 'CC'
-					: styles.colors.gray[700]};
+					? pallette.colors.brand[400] + 'CC'
+					: pallette.colors.gray[700]};
 	}
 
 	&:has(input:focus) {
 		box-shadow: 0 0 0 4px
 			${(props) =>
 				props.$variant === 'brand'
-					? styles.colors.brand[400] + '33'
-					: styles.colors.gray[900]};
+					? pallette.colors.brand[400] + '33'
+					: pallette.colors.gray[900]};
 	}
 
 	transition:
@@ -79,29 +79,29 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 
 const StyledInput = styled.input<StyledInputProps>`
 	/* Background color */
-	background-color: ${styles.colors.gray[900]};
+	background-color: ${pallette.colors.gray[900]};
 	border: none;
 	outline: none;
 
 	width: 100%;
 	border-radius: 5px;
-	font-weight: ${styles.typography.fontWeight.normal};
+	font-weight: ${pallette.typography.fontWeight.normal};
 	line-height: 1;
-	color: ${styles.colors.white};
+	color: ${pallette.colors.white};
 	height: 100%;
 
 	padding-inline: calc(
-		${(props) => (props.$sized === 'small' ? styles.space.small : styles.space.medium)} - 6px
+		${(props) => (props.$sized === 'small' ? pallette.space.small : pallette.space.medium)} - 6px
 	);
 	font-size: ${(props) =>
 		props.$sized === 'small'
-			? styles.typography.fontSize.xs
+			? pallette.typography.fontSize.xs
 			: props.$sized === 'medium'
-				? styles.typography.fontSize.sm
-				: styles.typography.fontSize.base};
+				? pallette.typography.fontSize.sm
+				: pallette.typography.fontSize.base};
 
 	&::placeholder {
-		color: ${styles.colors.gray[500]};
+		color: ${pallette.colors.gray[500]};
 	}
 `;
 

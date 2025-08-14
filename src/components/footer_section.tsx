@@ -1,17 +1,17 @@
 import React from 'react';
-import styles from '../util/styles';
+import pallette from '../core/theme/pallete';
 import styled from 'styled-components';
 import { SvgWrapper } from './shared_styled_components';
-import { TILER_LOGO } from '../util/constants';
-import InstagramLogo from '../assets/image_assets/instagram_logo.png';
-import FacebookLogo from '../assets/image_assets/facebook_logo.png';
-import LinkedInLogo from '../assets/image_assets/linkedin_logo.png';
-import XLogo from '../assets/image_assets/x_logo.png';
-import FounderUniversity from '../assets/image_assets/founder_university.png';
 import { useTranslation } from 'react-i18next';
+import { TILER_LOGO } from '@/core/constants/tiler_logo';
+import InstagramLogo from '@/assets/social/instagram_logo.png';
+import FacebookLogo from '@/assets/social/facebook_logo.png';
+import LinkedInLogo from '@/assets/social/linkedin_logo.png';
+import XLogo from '@/assets/social/x_logo.png';
+import FounderUniversity from '../assets/founder_university.png';
 
 const FooterContainer = styled.div`
-	border-top: 1px solid ${styles.colors.gray[800]};
+	border-top: 1px solid ${pallette.colors.gray[800]};
 	background: #111;
 	display: flex;
 	justify-content: center;
@@ -19,20 +19,20 @@ const FooterContainer = styled.div`
 
 const FooterSubContainer = styled.div`
 	width: 100%;
-	max-width: ${styles.container.sizes.xLarge};
+	max-width: ${pallette.container.sizes.xLarge};
 
 	display: flex;
 	justify-content: space-between;
-	padding-block: ${styles.container.paddingInline.lg};
-	margin-inline: ${styles.container.paddingInline.lg};
-	color: ${styles.colors.gray[500]};
+	padding-block: ${pallette.container.paddingInline.lg};
+	margin-inline: ${pallette.container.paddingInline.lg};
+	color: ${pallette.colors.gray[500]};
 
 	@media (max-width: 768px) {
 		flex-direction: column-reverse;
 		align-items: center;
 		text-align: center;
-		padding-block: ${styles.container.paddingInline.default};
-		margin-inline: ${styles.container.paddingInline.default};
+		padding-block: ${pallette.container.paddingInline.default};
+		margin-inline: ${pallette.container.paddingInline.default};
 	}
 `;
 
@@ -41,7 +41,7 @@ const FooterColumn = styled.div`
 	flex-direction: column;
 	gap: 1rem;
 	text-align: left;
-	font-size: ${styles.typography.fontSize.sm};
+	font-size: ${pallette.typography.fontSize.sm};
 
 	@media (max-width: 768px) {
 		margin: 1rem;
@@ -76,7 +76,7 @@ const FooterLinks = styled.div`
 const FooterLink = styled.a`
 	margin-right: 10px;
 	text-decoration: none;
-	color: ${styles.colors.text};
+	color: ${pallette.colors.text};
 
 	&:hover {
 		text-decoration: underline;
@@ -131,7 +131,7 @@ const FooterSection: React.FC = () => {
 
 					<p
 						style={{
-							fontSize: styles.typography.fontSize.sm,
+							fontSize: pallette.typography.fontSize.sm,
 							margin: 'auto 0 0',
 						}}
 					>
@@ -171,7 +171,7 @@ const FooterSection: React.FC = () => {
 				</FooterColumn>
 
 				<FooterColumn>
-					<h3 style={{ color: styles.colors.white }}>{t('common.legal.title')}</h3>
+					<h3 style={{ color: pallette.colors.white }}>{t('common.legal.title')}</h3>
 
 					<ul
 						style={{

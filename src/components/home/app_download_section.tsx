@@ -1,11 +1,11 @@
 import React from 'react';
 import Section from '../layout/section';
 import styled from 'styled-components';
-import styles from '../../util/styles';
-import AppStore from '../../assets/image_assets/icons/app_store.svg';
-import PlayStore from '../../assets/image_assets/icons/play_store.svg';
-import ArrowOut from '../icons/arrow_out';
 import { useTranslation } from 'react-i18next';
+import pallette from '@/core/theme/pallete';
+import AppStore from '@/assets/icons/app_store.svg';
+import PlayStore from '@/assets/icons/play_store.svg';
+import ArrowOut from '@/core/common/components/icons/arrow_out';
 
 const FlexWrapper = styled.div`
 	display: flex;
@@ -20,9 +20,9 @@ const DownloadLink = styled.a`
 	text-decoration: none;
 	gap: 0.5rem;
 
-	color: ${styles.colors.gray[500]};
+	color: ${pallette.colors.gray[500]};
 	&:hover {
-		color: ${styles.colors.gray[300]};
+		color: ${pallette.colors.gray[300]};
 	}
 `;
 
@@ -30,8 +30,8 @@ const DownloadLinkLabel = styled.span`
 	display: flex;
 	gap: 0.25ch;
 	align-items: flex-start;
-	font-size: ${styles.typography.fontSize.sm};
-	font-weight: ${styles.typography.fontWeight.medium};
+	font-size: ${pallette.typography.fontSize.sm};
+	font-weight: ${pallette.typography.fontWeight.medium};
 	text-align: center;
 
 	transition: color 0.2s ease-in-out;

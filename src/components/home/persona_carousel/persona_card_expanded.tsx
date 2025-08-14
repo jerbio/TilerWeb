@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
-import Chat from '../../shared/chat/chat';
-import Button from '../../shared/button';
+import Chat from '../../../core/common/components/chat/chat';
+import Button from '../../../core/common/components/button';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import useIsMobile from '../../../hooks/useIsMobile';
+import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import PersonaCalendar from './persona_calendar';
-import { Persona } from '../../../types/persona';
+import { Persona } from '../../../core/common/types/persona';
 import { PersonaApi } from '../../../api/personaApi';
-import { PersonaSchedule, PersonaScheduleSetter } from '../../../hooks/usePersonaSchedules';
-import styles from '@/util/styles';
+import { PersonaSchedule, PersonaScheduleSetter } from '../../../core/common/hooks/usePersonaSchedules';
+import pallette from '@/core/theme/pallete';
 
 const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;
-	background: linear-gradient(to right, ${styles.colors.black}, ${styles.colors.gray[900]});
-	border-radius: ${styles.borderRadius.xxLarge};
-	border: 2px solid ${styles.colors.gray[800]};
+	background: linear-gradient(to right, ${pallette.colors.black}, ${pallette.colors.gray[900]});
+	border-radius: ${pallette.borderRadius.xxLarge};
+	border: 2px solid ${pallette.colors.gray[800]};
 	pointer-events: ${(props) => (props.$display ? 'auto' : 'none')};
 	width: 100%;
 	height: 100%;
@@ -26,7 +26,7 @@ const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	gap: 1rem;
 	padding-top: 1.5rem;
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		padding-block: 1.5rem;
 		padding-right: 2rem;
 		gap: 1.5rem;
@@ -42,14 +42,14 @@ const Header = styled.header`
 
 	h2 {
 		line-height: 1.2;
-		font-weight: ${styles.typography.fontWeight.bold};
-		font-size: ${styles.typography.fontSize.xl};
-		font-family: ${styles.typography.fontFamily.urban};
+		font-weight: ${pallette.typography.fontWeight.bold};
+		font-size: ${pallette.typography.fontSize.xl};
+		font-family: ${pallette.typography.fontFamily.urban};
 	}
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		h2 {
-			font-size: ${styles.typography.fontSize.displayXs};
+			font-size: ${pallette.typography.fontSize.displayXs};
 		}
 	}
 `;
@@ -67,16 +67,16 @@ const CalendarContainer = styled(animated.div)`
 	grid-column: span 12;
 	overflow: hidden;
 	height: 100%;
-	background: ${styles.colors.gray[900]};
-	border-top: 1px solid ${styles.colors.gray[700]};
+	background: ${pallette.colors.gray[900]};
+	border-top: 1px solid ${pallette.colors.gray[700]};
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		grid-column: span 8;
-		border: 1px solid ${styles.colors.gray[700]};
+		border: 1px solid ${pallette.colors.gray[700]};
 		border-left: none;
-		border-radius: 0 ${styles.borderRadius.large} ${styles.borderRadius.large} 0;
+		border-radius: 0 ${pallette.borderRadius.large} ${pallette.borderRadius.large} 0;
 	}
-	@media screen and (min-width: ${styles.screens.xl}) {
+	@media screen and (min-width: ${pallette.screens.xl}) {
 		grid-column: span 9;
 	}
 `;
@@ -87,15 +87,15 @@ const ChatContainer = styled(animated.div)`
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
-	border-radius: ${styles.borderRadius.xxLarge};
+	border-radius: ${pallette.borderRadius.xxLarge};
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span 4;
 		border: none;
 	}
-	@media screen and (min-width: ${styles.screens.xl}) {
+	@media screen and (min-width: ${pallette.screens.xl}) {
 		grid-column: span 3;
 	}
 `;
@@ -113,25 +113,25 @@ const CalendarActionButton = styled.button`
 	place-items: center;
 	height: 36px;
 	width: 36px;
-	border-radius: ${styles.borderRadius.xxLarge};
-	background-color: ${styles.colors.brand[500]};
-	color: ${styles.colors.white};
+	border-radius: ${pallette.borderRadius.xxLarge};
+	background-color: ${pallette.colors.brand[500]};
+	color: ${pallette.colors.white};
 	transition: background-color 0.2s ease-in-out;
 
 	&:hover {
-		background-color: ${styles.colors.brand[600]};
+		background-color: ${pallette.colors.brand[600]};
 	}
 `;
 
 const MobileShowChatButton = styled(CalendarActionButton)`
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		display: none;
 	}
 `;
 
 const MobileCloseButtonContainer = styled.div`
 	width: fit-content;
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		display: none;
 	}
 `;
@@ -156,7 +156,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   setPersonaSchedule,
 }) => {
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
-  const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
+  const isDesktop = !useIsMobile(parseInt(pallette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
 
   const scheduleId = personaSchedules[persona.id]?.scheduleId || null;

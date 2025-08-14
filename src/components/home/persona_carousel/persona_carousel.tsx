@@ -8,10 +8,10 @@ import PersonaCardTemplate from './persona_card_template';
 import 'swiper/css';
 import Section from '../../layout/section';
 import styled from 'styled-components';
-import useIsMobile from '../../../hooks/useIsMobile';
-import { Persona } from '../../../types/persona';
+import useIsMobile from '../../../core/common/hooks/useIsMobile';
+import { Persona } from '../../../core/common/types/persona';
 import { PersonaApi } from '../../../api/personaApi';
-import usePersonaSchedules from '../../../hooks/usePersonaSchedules';
+import usePersonaSchedules from '../../../core/common/hooks/usePersonaSchedules';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;

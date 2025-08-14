@@ -1,5 +1,5 @@
-import { ScheduleLookupResponse } from '../types/schedule';
-import TimeUtil from '../util/helpers/time';
+import { ScheduleLookupResponse } from '../core/common/types/schedule';
+import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {

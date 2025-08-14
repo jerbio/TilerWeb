@@ -1,39 +1,3 @@
-/*
- * Example
- {
-	id: 'custom-persona';
-	name: 'Custom';
-	description: 'Create your own personalized persona';
-	personaType: 0;
-	occupation: 'Custom';
-	isActive: true;
-	createdAt: '2025-06-21T15:15:22.0074879+00:00';
-	updatedAt: null;
-	tilePreferences: [
-		{
-			Id: 'a4fdb62a-4537-4164-91bc-515fb4225555';
-			TileName: 'Custom Task 1';
-			Description: 'Your first custom task';
-			Category: 'Custom';
-			Priority: 1;
-			EstimatedDurationMinutes: 60;
-			RecurrencePattern: 'daily';
-			Tags: ['custom', 'personal'];
-			Location: 'Anywhere';
-			IsActive: true;
-		},
-	];
-	preferredSchedulePattern: 'flexible';
-	timeZone: 'UTC';
-	preferredStartHour: 9;
-	preferredEndHour: 17;
-	preferredWorkDurationMinutes: 60;
-	preferredBreakDurationMinutes: 15;
-	preferredLocations: ['Work', 'Coffee Shop', 'Library'];
-	preferredTags: ['personal', 'flexible', 'custom'];
-};
-*/
-
 import { ApiResponse } from './api';
 
 export type Persona = {

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { ScheduleSubCalendarEvent } from '../../../types/schedule';
-import Calendar from '../../shared/calendar/calendar';
+import { ScheduleSubCalendarEvent } from '../../../core/common/types/schedule';
+import Calendar from '../../../core/common/components/calendar/calendar';
 import { ScheduleApi } from '../../../api/scheduleApi';
-import TimeUtil from '../../../util/helpers/time';
-import useCalendarView from '../../../hooks/useCalendarView';
+import TimeUtil from '../../../core/util/time';
+import useCalendarView from '../../../core/common/hooks/useCalendarView';
 
 type PersonaCalendarProps = {
 	scheduleId: string | null;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { LoaderCircle } from 'lucide-react';
-import Logo from '../icons/logo';
-import styles from '../../util/styles';
+import Logo from '@/core/common/components/icons/logo';
+import pallette from '@/core/theme/pallete';
 import styled from 'styled-components';
 import { keyframes } from 'styled-components';
 const spin = keyframes`
@@ -26,7 +26,7 @@ const SpinnerContainer = styled.div<{ $size: number }>`
 		transform: translate(-50%, -50%);
 	}
 	> svg {
-		color: ${styles.colors.gray[400]};
+		color: ${pallette.colors.gray[400]};
 		opacity: 0.25;
 		animation: ${spin} 1.5s ease-in-out infinite;
 	}

@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import styles from '../../../util/styles';
+import pallette from '../../../core/theme/pallete';
 import { useSwiper, useSwiperSlide } from 'swiper/react';
-import Add from '../../icons/add';
-import ArrowRight2 from '../../icons/arrow_right2';
+import Add from '../../../core/common/components/icons/add';
+import ArrowRight2 from '../../../core/common/components/icons/arrow_right2';
 import {
   animated,
   Partial,
@@ -12,15 +12,18 @@ import {
   useSpringRef,
   useTransition,
 } from '@react-spring/web';
-import useIsMobile from '../../../hooks/useIsMobile';
+import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import PersonaCardExpanded from './persona_card_expanded';
-import { Persona } from '../../../types/persona';
-import { getPersonaImage } from '../../../data/persona';
+import { Persona } from '../../../core/common/types/persona';
 import { Check, ClockFading } from 'lucide-react';
-import { PersonaSchedule, PersonaScheduleSetter } from '../../../hooks/usePersonaSchedules';
-import TimeUtil from '../../../util/helpers/time';
+import {
+  PersonaSchedule,
+  PersonaScheduleSetter,
+} from '../../../core/common/hooks/usePersonaSchedules';
+import TimeUtil from '../../../core/util/time';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import PersonaUtil from '@/core/util/persona';
 
 const Card = styled(animated.div) <{
   gradient?: number;
@@ -32,7 +35,7 @@ const Card = styled(animated.div) <{
 	height: 100%;
 	background-size: cover;
 	background-position: center;
-	border-radius: ${styles.borderRadius.xxLarge};
+	border-radius: ${pallette.borderRadius.xxLarge};
 	color: white;
 	position: relative;
 	opacity: ${(props) => (props.$mounted ? (props.$active ? 1 : 0.5) : 0)};
@@ -45,7 +48,7 @@ const Card = styled(animated.div) <{
 		position: absolute;
 		inset: 2px;
 		z-index: -1;
-		border-radius: calc(${styles.borderRadius.xxLarge} - 2.5px);
+		border-radius: calc(${pallette.borderRadius.xxLarge} - 2.5px);
 		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.6), 88%, rgba(0, 0, 0, 0.9));
 	}
 
@@ -69,11 +72,11 @@ const Card = styled(animated.div) <{
 		position: absolute;
 		inset: 0;
 		z-index: -3;
-		border-radius: ${styles.borderRadius.xxLarge};
+		border-radius: ${pallette.borderRadius.xxLarge};
 		background: ${(props) =>
     props.gradient
       ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
-      : styles.colors.gray[800]};
+      : pallette.colors.gray[800]};
 	}
 `;
 
@@ -85,7 +88,7 @@ const CardImage = styled.div<{ $backgroundImage: string; $selected: boolean }>`
 	position: absolute;
 	inset: 2px;
 	z-index: -2;
-	border-radius: calc(${styles.borderRadius.xxLarge} - 2px);
+	border-radius: calc(${pallette.borderRadius.xxLarge} - 2px);
 	transition: opacity 0.3s ease-in-out;
 `;
 
@@ -94,8 +97,8 @@ const OverlayContainer = styled.div<{ $selected: boolean }>`
 	inset: 2px;
 	overflow: hidden;
 
-	border-radius: ${styles.borderRadius.xxLarge};
-	border: 1px solid ${styles.colors.gray[700]};
+	border-radius: ${pallette.borderRadius.xxLarge};
+	border: 1px solid ${pallette.colors.gray[700]};
 
 	display: flex;
 	align-items: flex-end;
@@ -127,16 +130,16 @@ const OverlayTitle = styled.div`
 		display: flex;
 		align-items: center;
 		gap: 0.5ch;
-		font-size: ${styles.typography.fontSize.xs};
-		font-weight: ${styles.typography.fontWeight.medium};
-		color: ${styles.colors.gray[400]};
+		font-size: ${pallette.typography.fontSize.xs};
+		font-weight: ${pallette.typography.fontWeight.medium};
+		color: ${pallette.colors.gray[400]};
 		opacity: 0.75;
 	}
 
 	.persona-title {
-		font-size: ${styles.typography.fontSize.displayXs};
+		font-size: ${pallette.typography.fontSize.displayXs};
 		font-weight: bold;
-		font-family: ${styles.typography.fontFamily.urban};
+		font-family: ${pallette.typography.fontFamily.urban};
 	}
 
 	h3 {
@@ -159,20 +162,20 @@ const OverlayTitle = styled.div`
 		}
 
 		&:focus {
-			outline: 2px solid ${styles.colors.gray[700]};
-			border-radius: ${styles.borderRadius.small};
+			outline: 2px solid ${pallette.colors.gray[700]};
+			border-radius: ${pallette.borderRadius.small};
 		}
 	}
 `;
 
 const OverlayHeaderTag = styled(animated.span)`
-	font-size: ${styles.typography.fontSize.sm};
-	font-weight: ${styles.typography.fontWeight.semibold};
-	background: ${styles.colors.white};
-	color: ${styles.colors.gray[800]};
+	font-size: ${pallette.typography.fontSize.sm};
+	font-weight: ${pallette.typography.fontWeight.semibold};
+	background: ${pallette.colors.white};
+	color: ${pallette.colors.gray[800]};
 	padding: 6px 1rem;
 	line-height: 1;
-	border-radius: ${styles.borderRadius.xLarge};
+	border-radius: ${pallette.borderRadius.xLarge};
 `;
 
 const OverlayList = styled(animated.ul)`
@@ -188,17 +191,17 @@ const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
 	display: flex;
 	gap: 0.25rem;
 	align-items: center;
-	font-size: ${styles.typography.fontSize.sm};
-	color: ${styles.colors.white};
+	font-size: ${pallette.typography.fontSize.sm};
+	color: ${pallette.colors.white};
 
 	background: ${({ $isSelected }) =>
-    $isSelected ? styles.colors.brand[600] : styles.colors.gray[800]};
-	border-radius: ${styles.borderRadius.xLarge};
+    $isSelected ? pallette.colors.brand[600] : pallette.colors.gray[800]};
+	border-radius: ${pallette.borderRadius.xLarge};
 	border: 1px solid
-		${({ $isSelected }) => ($isSelected ? 'transparent' : styles.colors.gray[700])};
+		${({ $isSelected }) => ($isSelected ? 'transparent' : pallette.colors.gray[700])};
 	padding-left: 12px;
 	line-height: 1.3;
-	color: ${styles.colors.gray[100]};
+	color: ${pallette.colors.gray[100]};
 	transition:
 		background-color 0.25s ease-in-out,
 		color 0.25s ease-in-out;
@@ -208,13 +211,13 @@ const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
 		width: 32px;
 		display: grid;
 		place-items: center;
-		border-radius: ${styles.borderRadius.xLarge};
+		border-radius: ${pallette.borderRadius.xLarge};
 		color: ${({ $isSelected }) =>
-    $isSelected ? styles.colors.white : styles.colors.gray[400]};
+    $isSelected ? pallette.colors.white : pallette.colors.gray[400]};
 		transition: color 0.25s ease-in-out;
 
 		&:hover {
-			color: ${styles.colors.gray[300]};
+			color: ${pallette.colors.gray[300]};
 		}
 	}
 `;
@@ -224,7 +227,7 @@ const ButtonContainer = styled.div`
 	margin-top: -2.25rem;
 	align-items: center;
 	justify-content: end;
-	border-radius: 0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge};
+	border-radius: 0 0 ${pallette.borderRadius.xxLarge} ${pallette.borderRadius.xxLarge};
 	z-index: 2;
 `;
 
@@ -233,11 +236,11 @@ const ButtonStyled = styled(animated.button)`
 	height: 36px;
 	display: grid;
 	place-items: center;
-	border-radius: ${styles.borderRadius.xxLarge};
-	background-color: ${styles.colors.brand[600]};
+	border-radius: ${pallette.borderRadius.xxLarge};
+	background-color: ${pallette.colors.brand[600]};
 	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
 	&:hover {
-		background-color: ${styles.colors.brand[700]};
+		background-color: ${pallette.colors.brand[700]};
 	}
 	transition: background-color 0.3s ease-in-out;
 `;
@@ -484,7 +487,10 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       onMouseLeave={() => setHovered(false)}
       style={cardSpring}
     >
-      <CardImage $backgroundImage={getPersonaImage(persona.id)} $selected={isSelected} />
+      <CardImage
+        $backgroundImage={PersonaUtil.getPersonaImage(persona.id)}
+        $selected={isSelected}
+      />
       <OverlayContainer $selected={isSelected}>
         <Overlay>
           <OverlayHeader>
@@ -494,8 +500,8 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
                   <span style={{ marginRight: '6px' }}>
                     {t('home.persona.created')}
                   </span>
-                  <ClockFading size={14} color={styles.colors.brand[400]} />
-                  <span style={{ color: styles.colors.gray[300] }}>
+                  <ClockFading size={14} color={pallette.colors.brand[400]} />
+                  <span style={{ color: pallette.colors.gray[300] }}>
                     {t('home.persona.expiresIn', {
                       time: personaScheduleTimeLeft,
                     })}

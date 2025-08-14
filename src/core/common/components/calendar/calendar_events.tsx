@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react';
-import calendarConfig from './config';
 import { CalendarViewOptions } from './calendar';
 import dayjs from 'dayjs';
-import styles from '../../../util/styles';
 import { animated, useTransition } from '@react-spring/web';
-import colorUtil, { RGB } from '../../../util/helpers/colors';
 import { Bike, CarFront, Clock, DotIcon, LockKeyhole, MapPin, Route } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
-import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '../../../types/schedule';
-import TimeUtil from '../../../util/helpers/time';
-import CalendarUtil from '../../../util/helpers/calendar';
+import TimeUtil from '@/core/util/time';
+import pallette from '@/core/theme/pallete';
+import CalendarUtil from '@/core/util/calendar';
+import colorUtil, { RGB } from '@/core/util/colors';
+import calendarConfig from '@/core/constants/calendar_config';
+import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 
 const dashRotate = keyframes`
   0% {
@@ -122,7 +122,7 @@ const EventContent = styled.div<{
 			max-height: calc(${({ height }) => height}px - 46px);
 			text-overflow: ellipsis;
 			overflow: hidden;
-			font-weight: ${styles.typography.fontWeight.medium};
+			font-weight: ${pallette.typography.fontWeight.medium};
 			font-size: 13px;
 		}
 
@@ -141,8 +141,8 @@ const EventContent = styled.div<{
 	.location {
 		display: flex;
 		align-items: center;
-		font-size: ${styles.typography.fontSize.xs};
-		font-weight: ${styles.typography.fontWeight.semibold};
+		font-size: ${pallette.typography.fontSize.xs};
+		font-weight: ${pallette.typography.fontWeight.semibold};
 		white-space: nowrap;
 
 		color: ${({ $colors: colors }) => {
@@ -185,7 +185,7 @@ const EventContent = styled.div<{
 			}};
 		}
 
-		border-radius: ${styles.borderRadius.little};
+		border-radius: ${pallette.borderRadius.little};
 		transition: background-color 0.2s ease;
 
 		span {
@@ -217,8 +217,8 @@ const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 		const newColor = colorUtil.setLightness($colors, 0.5);
 		return `rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.75)`;
 	}};
-	font-size: ${styles.typography.fontSize.xs};
-	font-weight: ${styles.typography.fontWeight.semibold};
+	font-size: ${pallette.typography.fontSize.xs};
+	font-weight: ${pallette.typography.fontWeight.semibold};
 	z-index: -1;
 
 	span {

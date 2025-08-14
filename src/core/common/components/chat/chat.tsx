@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../../util/styles';
+import pallette from '@/core/theme/pallete';
 import Button from '../button';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
 import Input from '../input';
-import Logo from '../../icons/logo';
+import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 
 const ChatContainer = styled.section`
@@ -14,7 +14,7 @@ const ChatContainer = styled.section`
 	height: 100%;
 	padding: 1.5rem;
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		padding: 0;
 	}
 `;
@@ -24,17 +24,17 @@ const ChatHeader = styled.header`
 	justify-content: space-between;
 	align-items: center;
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${pallette.screens.lg}) {
 		padding: 0.75rem 0;
 	}
 `;
 
 const ChatTitle = styled.h2`
 	font-family: 'Urbanist', sans-serif;
-	font-size: ${styles.typography.fontSize.lg};
-	font-weight: ${styles.typography.fontWeight.bold};
+	font-size: ${pallette.typography.fontSize.lg};
+	font-weight: ${pallette.typography.fontWeight.bold};
 	line-height: 1;
-	color: ${styles.colors.gray[300]};
+	color: ${pallette.colors.gray[300]};
 `;
 
 const ChatContent = styled.div`
@@ -54,9 +54,9 @@ const ChatButton = styled.button`
 	width: 1.5rem;
 	display: grid;
 	place-items: center;
-	border-radius: ${styles.borderRadius.xxLarge};
-	background-color: ${styles.colors.white};
-	color: ${styles.colors.brand[500]};
+	border-radius: ${pallette.borderRadius.xxLarge};
+	background-color: ${pallette.colors.white};
+	color: ${pallette.colors.brand[500]};
 `;
 
 const EmptyChat = styled.div`
@@ -68,23 +68,23 @@ const EmptyChat = styled.div`
 	height: 100%;
 
 	h3 {
-		font-size: ${styles.typography.fontSize.xl};
-		font-weight: ${styles.typography.fontWeight.bold};
-		color: ${styles.colors.white};
-		font-family: ${styles.typography.fontFamily.urban};
+		font-size: ${pallette.typography.fontSize.xl};
+		font-weight: ${pallette.typography.fontWeight.bold};
+		color: ${pallette.colors.white};
+		font-family: ${pallette.typography.fontFamily.urban};
 		text-align: center;
 
-		@media screen and (min-width: ${styles.screens.lg}) {
+		@media screen and (min-width: ${pallette.screens.lg}) {
 			h3 {
-				font-size: ${styles.typography.fontSize.displayXs};
+				font-size: ${pallette.typography.fontSize.displayXs};
 			}
 		}
 	}
 
 	p {
-		font-size: ${styles.typography.fontSize.sm};
-		color: ${styles.colors.gray[500]};
-		font-weight: ${styles.typography.fontWeight.medium};
+		font-size: ${pallette.typography.fontSize.sm};
+		color: ${pallette.colors.gray[500]};
+		font-weight: ${pallette.typography.fontWeight.medium};
 		text-align: center;
 	}
 `;
@@ -119,7 +119,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					type="text"
 					height={48}
 					placeholder={t('home.expanded.chat.inputPlaceholder')}
-					bordergradient={[styles.colors.brand[500]]}
+					bordergradient={[pallette.colors.brand[500]]}
 				/>
 				<ChatButton type="submit">
 					<Plus size={20} />

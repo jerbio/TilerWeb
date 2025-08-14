@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
+import pallette from '../../core/theme/pallete';
 
 const StyledSectionWrapper = styled.div`
 	display: flex;
@@ -18,20 +18,20 @@ const StyledSection = styled.section<{
 	width: 100%;
 	overflow: hidden;
 	max-width: ${(props) =>
-		props.maxWidth ? `${props.maxWidth}px` : styles.container.sizes.xLarge};
+		props.maxWidth ? `${props.maxWidth}px` : pallette.container.sizes.xLarge};
 	margin: 0 auto;
 	padding: ${(props) =>
 			props.paddingBlock !== undefined
 				? `${props.paddingBlock}px`
-				: styles.container.paddingBlock.default}
-		${styles.container.paddingInline.default};
+				: pallette.container.paddingBlock.default}
+		${pallette.container.paddingInline.default};
 
-	@media (min-width: ${styles.screens.lg}) {
+	@media (min-width: ${pallette.screens.lg}) {
 		padding: ${(props) =>
 				props.paddingBlock !== undefined
 					? `${props.paddingBlock}px`
-					: styles.container.paddingBlock.lg}
-			${styles.container.paddingInline.lg};
+					: pallette.container.paddingBlock.lg}
+			${pallette.container.paddingInline.lg};
 	}
 `;
 

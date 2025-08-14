@@ -2,7 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { UserApi } from '../api/userApi';
 import { ScheduleApi } from '../api/scheduleApi';
-import { Tile } from '../util/interface';
+import { Tile } from '../core/common/types/tile';
 
 function renderTileNames(tiles: Array<Tile>) {
 	if (tiles != null && tiles.length > 0) {

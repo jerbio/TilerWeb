@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { CalendarViewOptions } from '../../components/shared/calendar/calendar';
-import calendarConfig from '../../components/shared/calendar/config';
+import { CalendarViewOptions } from '@/core/common/components/calendar/calendar';
+import calendarConfig from '@/core/constants/calendar_config';
 
 type CalendarEventBox = {
 	x: number;

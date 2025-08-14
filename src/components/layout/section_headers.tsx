@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
+import pallette from '../../core/theme/pallete';
 
 interface SectionHeadersProps {
 	headerText: string;
@@ -29,13 +29,13 @@ const Container = styled.div<{ $align: 'left' | 'center' | 'right' }>`
 `;
 
 const Header = styled.h2<{ size: 'base' | 'large' }>`
-	font-family: ${styles.typography.fontFamily.urban};
+	font-family: ${pallette.typography.fontFamily.urban};
 	font-size: ${({ size }) =>
 		size === 'large'
-			? styles.typography.fontSize.displayBase
-			: styles.typography.fontSize.displaySm};
+			? pallette.typography.fontSize.displayBase
+			: pallette.typography.fontSize.displaySm};
 	font-weight: bold;
-	background: linear-gradient(to bottom, white, 70%, ${styles.colors.gray[400]});
+	background: linear-gradient(to bottom, white, 70%, ${pallette.colors.gray[400]});
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
@@ -49,19 +49,19 @@ const Header = styled.h2<{ size: 'base' | 'large' }>`
 	@media (max-width: 768px) {
 		font-size: ${({ size }) =>
 			size === 'large'
-				? styles.typography.fontSize.displaySm
-				: styles.typography.fontSize.displayXs};
+				? pallette.typography.fontSize.displaySm
+				: pallette.typography.fontSize.displayXs};
 		text-align: center;
 	}
 `;
 
 const SubHeader = styled.p`
-	color: ${styles.colors.gray[500]};
+	color: ${pallette.colors.gray[500]};
 	max-width: 480px;
 `;
 
 const SpanText = styled.span`
-	color: ${styles.colors.brand[400]};
+	color: ${pallette.colors.brand[400]};
 `;
 
 const Image = styled.img`

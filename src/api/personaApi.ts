@@ -1,4 +1,4 @@
-import { Persona, PersonaResponse, PersonaScheduleResponse } from '../types/persona';
+import { Persona, PersonaResponse, PersonaScheduleResponse } from '../core/common/types/persona';
 import { AppApi } from './appApi';
 
 export class PersonaApi extends AppApi {

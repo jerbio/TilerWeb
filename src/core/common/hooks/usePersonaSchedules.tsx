@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Persona } from '../types/persona';
-import TimeUtil from '../util/helpers/time';
+import TimeUtil from '../../util/time';
 
 export type PersonaSchedule = Record<
   Persona['id'],
