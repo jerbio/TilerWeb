@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import pallette from '../../core/theme/pallete';
+import pallette from '@/core/theme/pallete';
 
 interface SectionHeadersProps {
 	headerText: string;

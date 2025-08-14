@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
-import pallette from '../../core/theme/pallete';
+import pallette from '@/core/theme/pallete';
 import Section from '../layout/section';
 import { useTranslation } from 'react-i18next';
 import MicrosoftLogo from '@/assets/microsoft_logo.png';
