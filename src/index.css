@@ -1,3 +1,15 @@
+:root {
+	&.dark {
+		--scrollbar-bg: #11111100;
+		--scrollbar-border: #26262600;
+		--scrollbar-thumb-bg: #525252;
+		--scrollbar-thumb-border: #525252;
+		--scrollbar-thumb-hover-bg: #737373;
+		--scrollbar-thumb-hover-border: #737373;
+		background-color: black;
+	}
+}
+
 /* Modern CSS Reset */
 *,
 ::before,
@@ -9,13 +21,6 @@
 }
 
 html {
-	--scrollbar-bg: #11111100;
-	--scrollbar-border: #26262600;
-	--scrollbar-thumb-bg: #525252;
-	--scrollbar-thumb-border: #525252;
-	--scrollbar-thumb-hover-bg: #737373;
-	--scrollbar-thumb-hover-border: #737373;
-
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
 	-moz-tab-size: 4;
@@ -38,7 +43,6 @@ body {
 	margin: 0;
 	line-height: inherit;
 	overflow-x: hidden;
-	color: #9ca3af;
 }
 
 hr {
