@@ -1,5 +1,5 @@
 import React from 'react';
-import pallette from '../core/theme/pallete';
+import palette from '../core/theme/palette';
 import styled from 'styled-components';
 import { SvgWrapper } from './shared_styled_components';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import XLogo from '@/assets/social/x_logo.png';
 import FounderUniversity from '../assets/founder_university.png';
 
 const FooterContainer = styled.div`
-	border-top: 1px solid ${pallette.colors.gray[800]};
+	border-top: 1px solid ${palette.colors.gray[800]};
 	background: #111;
 	display: flex;
 	justify-content: center;
@@ -19,20 +19,20 @@ const FooterContainer = styled.div`
 
 const FooterSubContainer = styled.div`
 	width: 100%;
-	max-width: ${pallette.container.sizes.xLarge};
+	max-width: ${palette.container.sizes.xLarge};
 
 	display: flex;
 	justify-content: space-between;
-	padding-block: ${pallette.container.paddingInline.lg};
-	margin-inline: ${pallette.container.paddingInline.lg};
-	color: ${pallette.colors.gray[500]};
+	padding-block: ${palette.container.paddingInline.lg};
+	margin-inline: ${palette.container.paddingInline.lg};
+	color: ${palette.colors.gray[500]};
 
 	@media (max-width: 768px) {
 		flex-direction: column-reverse;
 		align-items: center;
 		text-align: center;
-		padding-block: ${pallette.container.paddingInline.default};
-		margin-inline: ${pallette.container.paddingInline.default};
+		padding-block: ${palette.container.paddingInline.default};
+		margin-inline: ${palette.container.paddingInline.default};
 	}
 `;
 
@@ -41,7 +41,7 @@ const FooterColumn = styled.div`
 	flex-direction: column;
 	gap: 1rem;
 	text-align: left;
-	font-size: ${pallette.typography.fontSize.sm};
+	font-size: ${palette.typography.fontSize.sm};
 
 	@media (max-width: 768px) {
 		margin: 1rem;
@@ -76,7 +76,7 @@ const FooterLinks = styled.div`
 const FooterLink = styled.a`
 	margin-right: 10px;
 	text-decoration: none;
-	color: ${pallette.colors.text};
+	color: ${palette.colors.text};
 
 	&:hover {
 		text-decoration: underline;
@@ -131,7 +131,7 @@ const FooterSection: React.FC = () => {
 
 					<p
 						style={{
-							fontSize: pallette.typography.fontSize.sm,
+							fontSize: palette.typography.fontSize.sm,
 							margin: 'auto 0 0',
 						}}
 					>
@@ -171,7 +171,7 @@ const FooterSection: React.FC = () => {
 				</FooterColumn>
 
 				<FooterColumn>
-					<h3 style={{ color: pallette.colors.white }}>{t('common.legal.title')}</h3>
+					<h3 style={{ color: palette.colors.white }}>{t('common.legal.title')}</h3>
 
 					<ul
 						style={{

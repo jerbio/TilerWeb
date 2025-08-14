@@ -2,7 +2,7 @@ import React from 'react';
 import Section from '../layout/section';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import AppStore from '@/assets/icons/app_store.svg';
 import PlayStore from '@/assets/icons/play_store.svg';
 import ArrowOut from '@/core/common/components/icons/arrow_out';
@@ -20,9 +20,9 @@ const DownloadLink = styled.a`
 	text-decoration: none;
 	gap: 0.5rem;
 
-	color: ${pallette.colors.gray[500]};
+	color: ${palette.colors.gray[500]};
 	&:hover {
-		color: ${pallette.colors.gray[300]};
+		color: ${palette.colors.gray[300]};
 	}
 `;
 
@@ -30,8 +30,8 @@ const DownloadLinkLabel = styled.span`
 	display: flex;
 	gap: 0.25ch;
 	align-items: flex-start;
-	font-size: ${pallette.typography.fontSize.sm};
-	font-weight: ${pallette.typography.fontWeight.medium};
+	font-size: ${palette.typography.fontSize.sm};
+	font-weight: ${palette.typography.fontWeight.medium};
 	text-align: center;
 
 	transition: color 0.2s ease-in-out;

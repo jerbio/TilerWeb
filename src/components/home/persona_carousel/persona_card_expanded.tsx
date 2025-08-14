@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import PersonaCalendar from './persona_calendar';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
 import Chat from '@/core/common/components/chat/chat';
@@ -31,7 +31,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 	setPersonaSchedule,
 }) => {
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
-	const isDesktop = !useIsMobile(parseInt(pallette.screens.lg, 10));
+	const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
 	const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
 
@@ -130,9 +130,9 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
 const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
-	background: linear-gradient(to right, ${pallette.colors.black}, ${pallette.colors.gray[900]});
-	border-radius: ${pallette.borderRadius.xxLarge};
-	border: 2px solid ${pallette.colors.gray[800]};
+	background: linear-gradient(to right, ${palette.colors.black}, ${palette.colors.gray[900]});
+	border-radius: ${palette.borderRadius.xxLarge};
+	border: 2px solid ${palette.colors.gray[800]};
 	pointer-events: ${(props) => (props.$display ? 'auto' : 'none')};
 	width: 100%;
 	height: 100%;
@@ -143,7 +143,7 @@ const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	gap: 1rem;
 	padding-top: 1.5rem;
 
-	@media screen and (min-width: ${pallette.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		padding-block: 1.5rem;
 		padding-right: 2rem;
 		gap: 1.5rem;
@@ -159,14 +159,14 @@ const Header = styled.header`
 
 	h2 {
 		line-height: 1.2;
-		font-weight: ${pallette.typography.fontWeight.bold};
-		font-size: ${pallette.typography.fontSize.xl};
-		font-family: ${pallette.typography.fontFamily.urban};
+		font-weight: ${palette.typography.fontWeight.bold};
+		font-size: ${palette.typography.fontSize.xl};
+		font-family: ${palette.typography.fontFamily.urban};
 	}
 
-	@media screen and (min-width: ${pallette.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		h2 {
-			font-size: ${pallette.typography.fontSize.displayXs};
+			font-size: ${palette.typography.fontSize.displayXs};
 		}
 	}
 `;
@@ -184,16 +184,16 @@ const CalendarContainer = styled(animated.div)`
 	grid-column: span 12;
 	overflow: hidden;
 	height: 100%;
-	background: ${pallette.colors.gray[900]};
-	border-top: 1px solid ${pallette.colors.gray[700]};
+	background: ${palette.colors.gray[900]};
+	border-top: 1px solid ${palette.colors.gray[700]};
 
-	@media screen and (min-width: ${pallette.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		grid-column: span 8;
-		border: 1px solid ${pallette.colors.gray[700]};
+		border: 1px solid ${palette.colors.gray[700]};
 		border-left: none;
-		border-radius: 0 ${pallette.borderRadius.large} ${pallette.borderRadius.large} 0;
+		border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
 	}
-	@media screen and (min-width: ${pallette.screens.xl}) {
+	@media screen and (min-width: ${palette.screens.xl}) {
 		grid-column: span 9;
 	}
 `;
@@ -204,15 +204,15 @@ const ChatContainer = styled(animated.div)`
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
-	border-radius: ${pallette.borderRadius.xxLarge};
+	border-radius: ${palette.borderRadius.xxLarge};
 
-	@media screen and (min-width: ${pallette.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span 4;
 		border: none;
 	}
-	@media screen and (min-width: ${pallette.screens.xl}) {
+	@media screen and (min-width: ${palette.screens.xl}) {
 		grid-column: span 3;
 	}
 `;
@@ -230,25 +230,25 @@ const CalendarActionButton = styled.button`
 	place-items: center;
 	height: 36px;
 	width: 36px;
-	border-radius: ${pallette.borderRadius.xxLarge};
-	background-color: ${pallette.colors.brand[500]};
-	color: ${pallette.colors.white};
+	border-radius: ${palette.borderRadius.xxLarge};
+	background-color: ${palette.colors.brand[500]};
+	color: ${palette.colors.white};
 	transition: background-color 0.2s ease-in-out;
 
 	&:hover {
-		background-color: ${pallette.colors.brand[600]};
+		background-color: ${palette.colors.brand[600]};
 	}
 `;
 
 const MobileShowChatButton = styled(CalendarActionButton)`
-	@media screen and (min-width: ${pallette.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
 	}
 `;
 
 const MobileCloseButtonContainer = styled.div`
 	width: fit-content;
-	@media screen and (min-width: ${pallette.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
 	}
 `;

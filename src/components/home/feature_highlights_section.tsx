@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import { Highlight } from '@/core/common/types/tile';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';
@@ -17,11 +17,11 @@ const HighlightCardWrapper = styled.div`
 	width: fit-content;
 	margin: 0 auto;
 
-	@media (min-width: ${pallette.screens.sm}) {
+	@media (min-width: ${palette.screens.sm}) {
 		grid-template-columns: repeat(2, 1fr);
 	}
 
-	@media (min-width: ${pallette.screens.xl}) {
+	@media (min-width: ${palette.screens.xl}) {
 		grid-template-columns: repeat(4, 1fr);
 	}
 `;
@@ -35,29 +35,29 @@ const HighlightCard = styled.div<{ $backgroundimage: string }>`
 	width: 262px;
 	min-height: 250px;
 	border-radius: 16px;
-	border: 1px solid ${pallette.colors.borderRed};
+	border: 1px solid ${palette.colors.borderRed};
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 `;
 
 const MiniTitle = styled.p`
-	color: ${pallette.colors.brand['300']};
-	font-weight: ${pallette.typography.fontWeight.semibold};
-	font-size: ${pallette.typography.fontSize.xxs};
+	color: ${palette.colors.brand['300']};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	font-size: ${palette.typography.fontSize.xxs};
 	margin: 0;
 `;
 
 const Title = styled.h2`
-	font-size: ${pallette.typography.fontSize.displayXs};
-	line-height: ${pallette.typography.lineHeight.lg};
-	font-family: ${pallette.typography.fontFamily.urban};
+	font-size: ${palette.typography.fontSize.displayXs};
+	line-height: ${palette.typography.lineHeight.lg};
+	font-family: ${palette.typography.fontFamily.urban};
 	font-weight: 700;
 	margin-bottom: 0.75rem;
 `;
 
 const Body = styled.p`
-	font-size: ${pallette.typography.fontSize.sm};
+	font-size: ${palette.typography.fontSize.sm};
 	color: #ffffffbf;
 `;
 

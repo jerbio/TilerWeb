@@ -6,7 +6,7 @@ import { Bike, CarFront, Clock, DotIcon, LockKeyhole, MapPin, Route } from 'luci
 import styled, { keyframes } from 'styled-components';
 import { v4 } from 'uuid';
 import TimeUtil from '@/core/util/time';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import calendarConfig from '@/core/constants/calendar_config';
@@ -480,7 +480,7 @@ const EventContent = styled.div<{
 			max-height: calc(${({ height }) => height}px - 46px);
 			text-overflow: ellipsis;
 			overflow: hidden;
-			font-weight: ${pallette.typography.fontWeight.medium};
+			font-weight: ${palette.typography.fontWeight.medium};
 			font-size: 13px;
 		}
 
@@ -499,8 +499,8 @@ const EventContent = styled.div<{
 	.location {
 		display: flex;
 		align-items: center;
-		font-size: ${pallette.typography.fontSize.xs};
-		font-weight: ${pallette.typography.fontWeight.semibold};
+		font-size: ${palette.typography.fontSize.xs};
+		font-weight: ${palette.typography.fontWeight.semibold};
 		white-space: nowrap;
 
 		color: ${({ $colors: colors }) => {
@@ -543,7 +543,7 @@ const EventContent = styled.div<{
 			}};
 		}
 
-		border-radius: ${pallette.borderRadius.little};
+		border-radius: ${palette.borderRadius.little};
 		transition: background-color 0.2s ease;
 
 		span {
@@ -575,8 +575,8 @@ const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 		const newColor = colorUtil.setLightness($colors, 0.5);
 		return `rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.75)`;
 	}};
-	font-size: ${pallette.typography.fontSize.xs};
-	font-weight: ${pallette.typography.fontWeight.semibold};
+	font-size: ${palette.typography.fontSize.xs};
+	font-weight: ${palette.typography.fontWeight.semibold};
 	z-index: -1;
 
 	span {

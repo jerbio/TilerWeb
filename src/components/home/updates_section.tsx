@@ -4,7 +4,7 @@ import SectionHeaders from '../layout/section_headers';
 import styled from 'styled-components';
 import Button from '@/core/common/components/button';
 import Input from '@/core/common/components/input';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import { ArrowRight } from 'lucide-react';
 
 const Form = styled.form`
@@ -18,7 +18,7 @@ const Form = styled.form`
 const ButtonText = styled.span`
 	display: none;
 
-	@media (min-width: ${pallette.screens.sm}) {
+	@media (min-width: ${palette.screens.sm}) {
 		display: inline;
 	}
 `;

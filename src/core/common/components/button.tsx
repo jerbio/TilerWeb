@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
-import pallette from '@/core/theme/pallete';
+import styled, { css } from 'styled-components';
+import palette from '@/core/theme/palette';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
@@ -10,6 +10,14 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: 'small' | 'medium' | 'large';
   height?: number; // Optional height prop for custom button height
   bordergradient?: Array<string>; // Array of colors for border gradient
+	dotstatus?: 'parsed' | 'clarification' | 'executed'; //
+};
+
+const getDotColor = (status?: string) => {
+	if (status === 'parsed') return palette.colors.teal[500]; // yellow
+	if (status === 'clarification') return palette.colors.error[500]; // red
+	if (status === 'executed') return palette.colors.success[500]; // green
+	return 'transparent';
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -20,6 +28,7 @@ const Button: React.FC<ButtonProps> = ({
   size = 'medium',
   bordergradient: bordergradient,
   height,
+	dotstatus,
 }) => {
   return (
     <StyledButton
@@ -30,6 +39,7 @@ const Button: React.FC<ButtonProps> = ({
       $size={size}
       $bordergradient={bordergradient}
       $height={height}
+			$dotstatus={dotstatus}
     >
       {children}
     </StyledButton>
@@ -42,6 +52,7 @@ type StyledButtonProps = {
   $size: ButtonProps['size'];
   $height: ButtonProps['height'];
   $disabled: ButtonProps['disabled'];
+	$dotstatus: ButtonProps['dotstatus'];
 };
 
 const StyledButton = styled.button<StyledButtonProps>`
@@ -55,16 +66,16 @@ const StyledButton = styled.button<StyledButtonProps>`
 		inset: 1px;
 		background: ${(props) =>
     props.$variant === 'primary'
-      ? pallette.colors.black
+      ? palette.colors.black
       : props.$variant === 'secondary'
-        ? pallette.colors.white
+        ? palette.colors.white
         : props.$variant === 'brand'
-          ? pallette.colors.brand[500]
+          ? palette.colors.brand[500]
           : props.$variant === 'ghost'
             ? 'transparent'
             : props.$variant};
 		border-radius: ${(props) =>
-    props.$size === 'small' ? pallette.borderRadius.little : pallette.borderRadius.medium};
+    props.$size === 'small' ? palette.borderRadius.little : palette.borderRadius.medium};
 		z-index: -1;
 
 		transition: background-color 0.2s ease-in-out;
@@ -87,23 +98,23 @@ const StyledButton = styled.button<StyledButtonProps>`
 	/* Border color and gradient */
 	background: ${(props) =>
     props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${pallette.colors.gray[700]}, ${pallette.colors.gray[700]}, ${props.$bordergradient[0]})`
+      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${palette.colors.gray[700]}, ${palette.colors.gray[700]}, ${props.$bordergradient[0]})`
       : props.$variant === 'primary'
-        ? pallette.colors.gray[700]
+        ? palette.colors.gray[700]
         : 'transparent'};
 
 	color: ${(props) =>
     props.$variant === 'primary'
-      ? pallette.colors.white
+      ? palette.colors.white
       : props.$variant === 'secondary'
-        ? pallette.colors.black
+        ? palette.colors.black
         : props.$variant === 'brand'
-          ? pallette.colors.white
+          ? palette.colors.white
           : props.$variant === 'ghost'
-            ? pallette.colors.gray[300]
-            : pallette.colors.white};
-	border-radius: ${pallette.borderRadius.little};
-	font-weight: ${pallette.typography.fontWeight.medium};
+            ? palette.colors.gray[300]
+            : palette.colors.white};
+	border-radius: ${palette.borderRadius.little};
+	font-weight: ${palette.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
@@ -114,29 +125,29 @@ const StyledButton = styled.button<StyledButtonProps>`
     props.$height
       ? `${props.$height}px`
       : props.$size === 'small'
-        ? pallette.buttonHeights.small
+        ? palette.buttonHeights.small
         : props.$size === 'medium'
-          ? pallette.buttonHeights.medium
-          : pallette.buttonHeights.large};
+          ? palette.buttonHeights.medium
+          : palette.buttonHeights.large};
 	padding-inline: ${(props) =>
     props.$size === 'small' || props.$variant === 'ghost'
-      ? pallette.space.small
-      : pallette.space.medium};
+      ? palette.space.small
+      : palette.space.medium};
 	font-size: ${(props) =>
     props.$size === 'small'
-      ? pallette.typography.fontSize.xs
+      ? palette.typography.fontSize.xs
       : props.$size === 'medium'
-        ? pallette.typography.fontSize.sm
-        : pallette.typography.fontSize.base};
+        ? palette.typography.fontSize.sm
+        : palette.typography.fontSize.base};
 	&:hover {
 		&::before {
 			background-color: ${(props) =>
     props.$variant === 'primary'
-      ? pallette.colors.gray[900]
+      ? palette.colors.gray[900]
       : props.$variant === 'secondary'
-        ? pallette.colors.gray[200]
+        ? palette.colors.gray[200]
         : props.$variant === 'brand'
-          ? pallette.colors.brand[600]
+          ? palette.colors.brand[600]
           : props.$variant === 'ghost'
             ? '#ffffff12'
             : props.$variant + '80'};
@@ -146,6 +157,31 @@ const StyledButton = styled.button<StyledButtonProps>`
 	&:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
+	}
+
+	${(props) =>
+		props.$variant === 'pill' &&
+		css`
+			background-color: #2a2a2a;
+			margin-top: 0.25rem;
+			margin-right: 0.25rem;
+			color: ${palette.colors.text};
+			font-size: 0.875rem;
+			padding: 0.25rem 0.5rem;
+			border-radius: 999px;
+			border: 1px solid ${getDotColor(props.$dotstatus)};
+			height: auto; /* override default button height */
+			padding-inline: 0.5rem;
+		`}
+
+	&::after {
+		content: '';
+		display: ${(props) => (props.$dotstatus ? 'inline-block' : 'none')};
+		width: 0.75rem;
+		height: 0.75rem;
+		background-color: ${(props) => getDotColor(props.$dotstatus)};
+		border-radius: 999px;
+		margin-left: 0.5rem;
 	}
 `;
 

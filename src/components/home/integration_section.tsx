@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import Section from '../layout/section';
 import { useTranslation } from 'react-i18next';
 import MicrosoftLogo from '@/assets/microsoft_logo.png';
@@ -32,7 +32,7 @@ const FlexWrapper = styled.div`
 	align-items: center;
 	justify-content: center;
 
-	@media (min-width: ${pallette.screens.md}) {
+	@media (min-width: ${palette.screens.md}) {
 		flex-direction: row;
 		justify-content: space-between;
 	}

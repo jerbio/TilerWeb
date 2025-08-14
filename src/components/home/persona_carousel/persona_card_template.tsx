@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import pallette from '../../../core/theme/pallete';
+import palette from '../../../core/theme/palette';
 
 // Pulse Animation
 const pulse = keyframes`
@@ -8,7 +8,7 @@ const pulse = keyframes`
 		background-color: #ffffff0d;
 	}
 	50% {
-		background-color: ${pallette.colors.black};
+		background-color: ${palette.colors.black};
 	}
 	100% {
 		background-color: #ffffff0d;
@@ -19,8 +19,8 @@ const Template = styled.div`
 	width: 300px;
 	height: 100%;
 	animation: ${pulse} 2s linear infinite;
-	box-shadow: 0 0 0 0.5px ${pallette.colors.gray[800]} inset;
-	border-radius: ${pallette.borderRadius.xxLarge};
+	box-shadow: 0 0 0 0.5px ${palette.colors.gray[800]} inset;
+	border-radius: ${palette.borderRadius.xxLarge};
 `;
 
 const PersonaCardTemplate: React.FC = () => {

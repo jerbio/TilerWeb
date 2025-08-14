@@ -1,5 +1,5 @@
-import { Actions } from '../../../../util/enums';
-import { UserInfo } from '../../../../global_state';
+import { Actions } from '@/core/constants/enums';
+import { UserInfo } from '@/global_state';
 
 type ActionType = `${Actions}`;
 interface ServerResponse {

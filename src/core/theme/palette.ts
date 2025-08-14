@@ -1,4 +1,4 @@
-const pallette = {
+const palette = {
 	colors: {
 		primary: '#3498db',
 		secondary: '#2ecc71',
@@ -297,4 +297,4 @@ const pallette = {
 	},
 } as const;
 
-export default pallette;
+export default palette;

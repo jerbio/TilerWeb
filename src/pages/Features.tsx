@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import pallette from '@/core/theme/pallete';
 import FeatureCard from '../components/features/FeatureCard';
+import palette from '@/core/theme/palette';
 import DottedLine from '@/assets/dotted-line.svg';
 import FeatureCollab from '@/assets/features/collab.png';
 import FeatureTransit from '@/assets/features/transit.png';
@@ -20,9 +20,9 @@ const BackgroundBlur = styled.div`
 	height: 1200px;
 	background: linear-gradient(
 		135deg,
-		${pallette.colors.brand[500]}20,
-		${pallette.colors.brand[500]}10,
-		${pallette.colors.brand[500]}20
+		${palette.colors.brand[500]}20,
+		${palette.colors.brand[500]}10,
+		${palette.colors.brand[500]}20
 	);
 	border-radius: 50%;
 	filter: blur(120px);
@@ -34,7 +34,7 @@ const GridContainer = styled.div`
 	padding: 2rem 0;
 	place-items: center;
 
-	@media (min-width: ${pallette.screens.lg}) {
+	@media (min-width: ${palette.screens.lg}) {
 		padding: 3rem 0;
 	}
 `;
@@ -46,7 +46,7 @@ const DottedLineImage = styled.img`
 	transform: translate(-50%, -50%);
 	display: none;
 
-	@media (min-width: ${pallette.screens.lg}) {
+	@media (min-width: ${palette.screens.lg}) {
 		display: block;
 	}
 `;

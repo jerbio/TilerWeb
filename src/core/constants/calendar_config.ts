@@ -1,9 +1,9 @@
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 
 const calendarConfig = {
 	HEADER_HEIGHT: '34px',
 	TIMELINE_WIDTH: '70px',
-	BORDER_COLOR: pallette.colors.gray[700],
+	BORDER_COLOR: palette.colors.gray[700],
 	CELL_HEIGHT: '96px',
 	MIN_CELL_HEIGHT: '60px',
 	MIN_CELL_WIDTH: '175px',

@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import styled from 'styled-components';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import calendarConfig from '@/core/constants/calendar_config';
 import CalendarEvents from '@/core/common/components/calendar/calendar_events';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
@@ -13,7 +13,7 @@ const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	position: relative;
 	width: 100%;
 	height: 100%;
-	background-color: ${pallette.colors.gray[900]};
+	background-color: ${palette.colors.gray[900]};
 	opacity: ${({ $isMounted }) => ($isMounted ? 1 : 0)};
 	transition: opacity 0.3s 0.5s ease-in-out;
 	user-select: none;
@@ -25,7 +25,7 @@ const CalendarHeader = styled.div`
 	left: 0;
 	width: 100%;
 	height: ${calendarConfig.HEADER_HEIGHT};
-	background-color: ${pallette.colors.gray[800]};
+	background-color: ${palette.colors.gray[800]};
 	display: flex;
 `;
 
@@ -47,19 +47,19 @@ const ChangeViewButton = styled.button`
 	justify-content: center;
 	cursor: pointer;
 	background-color: transparent;
-	color: ${pallette.colors.gray[400]};
+	color: ${palette.colors.gray[400]};
 	transition:
 		background-color 0.2s ease,
 		color 0.2s ease;
 
 	&:not(:disabled) {
 		&:hover {
-			background-color: ${pallette.colors.gray[800]};
-			color: ${pallette.colors.gray[200]};
+			background-color: ${palette.colors.gray[800]};
+			color: ${palette.colors.gray[200]};
 		}
 
 		&:active {
-			background-color: ${pallette.colors.gray[700]};
+			background-color: ${palette.colors.gray[700]};
 		}
 	}
 `;
@@ -73,24 +73,25 @@ const CalendarHeaderDateList = styled.ul`
 
 const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	flex: 1;
-	font-family: ${pallette.typography.fontFamily.urban};
-	font-weight: ${pallette.typography.fontWeight.bold};
-	font-size: ${pallette.typography.fontSize.lg};
+	font-family: ${palette.typography.fontFamily.urban};
+	font-weight: ${palette.typography.fontWeight.bold};
+	font-size: ${palette.typography.fontSize.lg};
 	text-transform: uppercase;
-	color: ${({ $isToday }) => ($isToday ? pallette.colors.white : pallette.colors.gray[400])};
+	color: ${({ $isToday }) => ($isToday ? palette.colors.white : palette.colors.gray[400])};
 
 	&:not(:last-child) {
 		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
 	}
 
-	background-color: ${({ $isToday }) => ($isToday ? pallette.colors.gray[700] : 'transparent')};
+	background-color: ${({ $isToday }) => ($isToday ? palette.colors.gray[700] : 'transparent')};
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 0.5ch;
 
 	span {
-		color: ${({ $isToday }) => ($isToday ? pallette.colors.brand[400] : pallette.colors.gray[200])};
+		color: ${({ $isToday }) =>
+    $isToday ? palette.colors.brand[400] : palette.colors.gray[200]};
 	}
 `;
 
@@ -145,8 +146,8 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 			line-height: 1;
 			top: 4px;
 			right: 2px;
-			font-size: ${pallette.typography.fontSize.xs};
-			color: ${pallette.colors.gray[500]};
+			font-size: ${palette.typography.fontSize.xs};
+			color: ${palette.colors.gray[500]};
 		}
 	}
 `;
@@ -223,7 +224,7 @@ const Calendar = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cellWidth = width / daysInView;
-    const gridColor = pallette.colors.gray[700];
+    const gridColor = palette.colors.gray[700];
     const dashLength = 4;
     const dashGap = 8;
     const thickness = 0.5;
@@ -231,7 +232,7 @@ const Calendar = ({
     // Draw solid vertical lines
     ctx.beginPath();
     ctx.strokeStyle = gridColor;
-		ctx.lineWidth = thickness;
+    ctx.lineWidth = thickness;
     for (let x = cellWidth; x < canvas.width; x += cellWidth) {
       ctx.moveTo(x, 0);
       ctx.lineTo(x, canvas.height);
@@ -241,7 +242,7 @@ const Calendar = ({
     // Draw dashed horizontal lines
     ctx.beginPath();
     ctx.strokeStyle = gridColor;
-		ctx.lineWidth = thickness;
+    ctx.lineWidth = thickness;
     ctx.setLineDash([dashLength, dashGap]);
     for (let y = cellHeight; y < canvas.height; y += cellHeight) {
       ctx.moveTo(0, y);
@@ -311,7 +312,7 @@ const Calendar = ({
         <CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
           {/* Background */}
           <CalendarBg ref={calendarGridCanvasRef} />
-					{/* Timeline */}
+          {/* Timeline */}
           {Array.from({ length: 24 }).map((_, hourIndex) => {
             return (
               <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>

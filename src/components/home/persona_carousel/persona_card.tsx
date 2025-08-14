@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import pallette from '@/core/theme/pallete';
+import palette from '@/core/theme/palette';
 import { useSwiper, useSwiperSlide } from 'swiper/react';
 import Add from '@/core/common/components/icons/add';
 import ArrowRight2 from '@/core/common/components/icons/arrow_right2';
@@ -280,8 +280,8 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
                   <span style={{ marginRight: '6px' }}>
                     {t('home.persona.created')}
                   </span>
-                  <ClockFading size={14} color={pallette.colors.brand[400]} />
-                  <span style={{ color: pallette.colors.gray[300] }}>
+                  <ClockFading size={14} color={palette.colors.brand[400]} />
+                  <span style={{ color: palette.colors.gray[300] }}>
                     {t('home.persona.expiresIn', {
                       time: personaScheduleTimeLeft,
                     })}
@@ -371,7 +371,7 @@ const Card = styled(animated.div) <{
 	height: 100%;
 	background-size: cover;
 	background-position: center;
-	border-radius: ${pallette.borderRadius.xxLarge};
+	border-radius: ${palette.borderRadius.xxLarge};
 	color: white;
 	position: relative;
 	opacity: ${(props) => (props.$mounted ? (props.$active ? 1 : 0.5) : 0)};
@@ -384,7 +384,7 @@ const Card = styled(animated.div) <{
 		position: absolute;
 		inset: 2px;
 		z-index: -1;
-		border-radius: calc(${pallette.borderRadius.xxLarge} - 2.5px);
+		border-radius: calc(${palette.borderRadius.xxLarge} - 2.5px);
 		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.6), 88%, rgba(0, 0, 0, 0.9));
 	}
 
@@ -408,11 +408,11 @@ const Card = styled(animated.div) <{
 		position: absolute;
 		inset: 0;
 		z-index: -3;
-		border-radius: ${pallette.borderRadius.xxLarge};
+		border-radius: ${palette.borderRadius.xxLarge};
 		background: ${(props) =>
     props.gradient
       ? `conic-gradient(from var(--rotation) at 50% 50%, #B827FC, #2C90FC, #B8FD33, #FEC837, #FD1892,  #B827FC)`
-      : pallette.colors.gray[800]};
+      : palette.colors.gray[800]};
 	}
 `;
 
@@ -424,7 +424,7 @@ const CardImage = styled.div<{ $backgroundImage: string; $selected: boolean }>`
 	position: absolute;
 	inset: 2px;
 	z-index: -2;
-	border-radius: calc(${pallette.borderRadius.xxLarge} - 2px);
+	border-radius: calc(${palette.borderRadius.xxLarge} - 2px);
 	transition: opacity 0.3s ease-in-out;
 `;
 
@@ -433,8 +433,8 @@ const OverlayContainer = styled.div<{ $selected: boolean }>`
 	inset: 2px;
 	overflow: hidden;
 
-	border-radius: ${pallette.borderRadius.xxLarge};
-	border: 1px solid ${pallette.colors.gray[700]};
+	border-radius: ${palette.borderRadius.xxLarge};
+	border: 1px solid ${palette.colors.gray[700]};
 
 	display: flex;
 	align-items: flex-end;
@@ -466,16 +466,16 @@ const OverlayTitle = styled.div`
 		display: flex;
 		align-items: center;
 		gap: 0.5ch;
-		font-size: ${pallette.typography.fontSize.xs};
-		font-weight: ${pallette.typography.fontWeight.medium};
-		color: ${pallette.colors.gray[400]};
+		font-size: ${palette.typography.fontSize.xs};
+		font-weight: ${palette.typography.fontWeight.medium};
+		color: ${palette.colors.gray[400]};
 		opacity: 0.75;
 	}
 
 	.persona-title {
-		font-size: ${pallette.typography.fontSize.displayXs};
+		font-size: ${palette.typography.fontSize.displayXs};
 		font-weight: bold;
-		font-family: ${pallette.typography.fontFamily.urban};
+		font-family: ${palette.typography.fontFamily.urban};
 	}
 
 	h3 {
@@ -498,20 +498,20 @@ const OverlayTitle = styled.div`
 		}
 
 		&:focus {
-			outline: 2px solid ${pallette.colors.gray[700]};
-			border-radius: ${pallette.borderRadius.small};
+			outline: 2px solid ${palette.colors.gray[700]};
+			border-radius: ${palette.borderRadius.small};
 		}
 	}
 `;
 
 const OverlayHeaderTag = styled(animated.span)`
-	font-size: ${pallette.typography.fontSize.sm};
-	font-weight: ${pallette.typography.fontWeight.semibold};
-	background: ${pallette.colors.white};
-	color: ${pallette.colors.gray[800]};
+	font-size: ${palette.typography.fontSize.sm};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	background: ${palette.colors.white};
+	color: ${palette.colors.gray[800]};
 	padding: 6px 1rem;
 	line-height: 1;
-	border-radius: ${pallette.borderRadius.xLarge};
+	border-radius: ${palette.borderRadius.xLarge};
 `;
 
 const OverlayList = styled(animated.ul)`
@@ -527,17 +527,17 @@ const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
 	display: flex;
 	gap: 0.25rem;
 	align-items: center;
-	font-size: ${pallette.typography.fontSize.sm};
-	color: ${pallette.colors.white};
+	font-size: ${palette.typography.fontSize.sm};
+	color: ${palette.colors.white};
 
 	background: ${({ $isSelected }) =>
-    $isSelected ? pallette.colors.brand[600] : pallette.colors.gray[800]};
-	border-radius: ${pallette.borderRadius.xLarge};
+    $isSelected ? palette.colors.brand[600] : palette.colors.gray[800]};
+	border-radius: ${palette.borderRadius.xLarge};
 	border: 1px solid
-		${({ $isSelected }) => ($isSelected ? 'transparent' : pallette.colors.gray[700])};
+		${({ $isSelected }) => ($isSelected ? 'transparent' : palette.colors.gray[700])};
 	padding-left: 12px;
 	line-height: 1.3;
-	color: ${pallette.colors.gray[100]};
+	color: ${palette.colors.gray[100]};
 	transition:
 		background-color 0.25s ease-in-out,
 		color 0.25s ease-in-out;
@@ -547,13 +547,13 @@ const OverlayListItem = styled(animated.li) <{ $isSelected: boolean }>`
 		width: 32px;
 		display: grid;
 		place-items: center;
-		border-radius: ${pallette.borderRadius.xLarge};
+		border-radius: ${palette.borderRadius.xLarge};
 		color: ${({ $isSelected }) =>
-    $isSelected ? pallette.colors.white : pallette.colors.gray[400]};
+    $isSelected ? palette.colors.white : palette.colors.gray[400]};
 		transition: color 0.25s ease-in-out;
 
 		&:hover {
-			color: ${pallette.colors.gray[300]};
+			color: ${palette.colors.gray[300]};
 		}
 	}
 `;
@@ -563,7 +563,7 @@ const ButtonContainer = styled.div`
 	margin-top: -2.25rem;
 	align-items: center;
 	justify-content: end;
-	border-radius: 0 0 ${pallette.borderRadius.xxLarge} ${pallette.borderRadius.xxLarge};
+	border-radius: 0 0 ${palette.borderRadius.xxLarge} ${palette.borderRadius.xxLarge};
 	z-index: 2;
 `;
 
@@ -572,11 +572,11 @@ const ButtonStyled = styled(animated.button)`
 	height: 36px;
 	display: grid;
 	place-items: center;
-	border-radius: ${pallette.borderRadius.xxLarge};
-	background-color: ${pallette.colors.brand[600]};
+	border-radius: ${palette.borderRadius.xxLarge};
+	background-color: ${palette.colors.brand[600]};
 	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
 	&:hover {
-		background-color: ${pallette.colors.brand[700]};
+		background-color: ${palette.colors.brand[700]};
 	}
 	transition: background-color 0.3s ease-in-out;
 `;
