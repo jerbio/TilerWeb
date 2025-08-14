@@ -18,6 +18,7 @@ import {
 } from './util/chat_service';
 import useAppStore from '../../../global_state'; // Import Zustand Global State
 import { ChatContextType } from '../../../global_state'; // Import ChatContextType
+import UserLocation from './user_location'; // Import UserLocation from its own file
 import { PromptWithActions, VibeAction } from './util/chat'; // Import types
 import HORIZONTALPROGRESSBAR from '../../../assets/image_assets/horizontal_progress_bar.gif';
 
@@ -473,27 +474,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 							justifyContent: 'center',
 						}}
 					>
-						{/* <span
-							className="spinner"
-							style={{
-								width: '24px',
-								height: '24px',
-								border: '4px solid #f3f3f3',
-								borderTop: `4px solid ${styles.colors.brand[500]}`,
-								borderRadius: '50%',
-								animation: 'spin 1s linear infinite',
-								marginRight: '0.5rem',
-							}}
-						/>
-						<style>
-							{`
-									@keyframes spin {
-										0% { transform: rotate(0deg); }
-										100% { transform: rotate(360deg); }
-									}
-								`}
-						</style> */}
-						<img src={HORIZONTALPROGRESSBAR} alt="Loading..." style={{ width: '24px', height: '24px', marginRight: '0.5rem' }} />
+						<img src={HORIZONTALPROGRESSBAR} alt="Loading..." style={{ width: '120px', height: '24px', marginRight: '0.5rem' }} />
 						<span>Sending Request...</span>
 					</div>
 				)}
@@ -537,6 +518,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 					{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
 				</ChatButton>
 			</ChatForm>
+
+			<UserLocation />
 		</ChatContainer>
 	);
 };
