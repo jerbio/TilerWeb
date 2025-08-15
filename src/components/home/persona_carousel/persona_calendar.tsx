@@ -7,50 +7,53 @@ import useCalendarView from '../../../core/common/hooks/useCalendarView';
 import { scheduleService } from '@/services';
 
 type PersonaCalendarProps = {
-	scheduleId: string | null;
-	expandedWidth: number;
+  scheduleId: string | null;
+  expandedWidth: number;
 };
 
 function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarProps) {
-	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
-	const [eventsLoading, setEventsLoading] = useState(true);
+  const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
 
-	// Get a reference to the view container
-	const viewRef = React.useRef<HTMLUListElement>(null);
-	const { viewOptions, setViewOptions } = useCalendarView(viewRef, width);
+  // Get a reference to the view container
+  const viewRef = React.useRef<HTMLUListElement>(null);
+  const { viewOptions, setViewOptions } = useCalendarView(viewRef, width);
 
-	// Fetch schedule data
-	async function fetchSchedule(id: string) {
-		if (viewOptions.daysInView <= 0) return;
-		const startRange = viewOptions.startDay.valueOf();
-		const endRange = startRange + TimeUtil.inMilliseconds(viewOptions.daysInView, 'd');
+  // Fetch schedule data
+  async function fetchSchedule(id: string) {
+    if (viewOptions.daysInView <= 0) return;
+    const startRange = viewOptions.startDay.valueOf();
+    const endRange = startRange + TimeUtil.inMilliseconds(viewOptions.daysInView, 'd');
 
-		setEventsLoading(true);
-		const scheduleLookup = await scheduleService.getScheduleLookupById(id, {
-			startRange,
-			endRange,
-		});
-		if (scheduleLookup) {
-			setEvents(scheduleLookup.subCalendarEvents);
-		}
-		setEventsLoading(false);
-	}
+    try {
+      setEventsLoading(true);
+      const scheduleLookup = await scheduleService.getScheduleLookupById(id, {
+        startRange,
+        endRange,
+      });
+      setEvents(scheduleLookup.subCalendarEvents);
+    } catch (error) {
+      console.error('Error fetching persona schedule events: ', error);
+    } finally {
+      setEventsLoading(false);
+    }
+  }
 
-	useEffect(() => {
-		if (scheduleId) {
-			fetchSchedule(scheduleId);
-		}
-	}, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
+  useEffect(() => {
+    if (scheduleId) {
+      fetchSchedule(scheduleId);
+    }
+  }, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
-	return (
-		<Calendar
-			viewOptions={viewOptions}
-			setViewOptions={setViewOptions}
-			events={events}
-			eventsLoading={eventsLoading}
-			viewRef={viewRef}
-		/>
-	);
+  return (
+    <Calendar
+      viewOptions={viewOptions}
+      setViewOptions={setViewOptions}
+      events={events}
+      eventsLoading={eventsLoading}
+      viewRef={viewRef}
+    />
+  );
 }
 
 export default PersonaCalendar;

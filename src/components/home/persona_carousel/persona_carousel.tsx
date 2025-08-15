@@ -46,13 +46,15 @@ const PersonaCarousel: React.FC = () => {
   const { personaSchedules, setPersonaSchedule } = usePersonaSchedules();
 
   async function getPersonas() {
-    const data = await personaService.getPersonas();
-    if (data) {
+    try {
+      const data = await personaService.getPersonas();
       const personasWithKeys = data.personas.map((persona, index) => ({
         ...persona,
         key: index,
       }));
       setPersonas(personasWithKeys);
+    } catch (error) {
+      console.error("Couldn't populate carousel: ", error);
     }
   }
 

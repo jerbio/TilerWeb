@@ -6,19 +6,16 @@ import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 import {
-  fetchChatMessages,
-  fetchChatActions,
-  sendChatMessage,
   getStoredSessionId,
   setStoredSessionId,
   clearStoredSessionId,
-  sendChatAcceptChanges,
-  getActionIcon,
-} from '@/services/chatService';
+} from '@/core/storage/chatSession';
 import useAppStore, { ChatContextType } from '@/global_state';
-import { PromptWithActions, VibeAction } from '@/core/common/types/chat'; // Import types
+import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 import palette from '@/core/theme/palette';
 import HORIZONTALPROGRESSBAR from '@/assets/horizontal_progress_bar.gif';
+import { chatService } from '@/services';
+import ChatUtil from '@/core/util/chat';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -176,9 +173,9 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
       setIsLoading(true);
       setError(null);
 
-      const data = await fetchChatMessages(sid);
-      const rawMessages = data.Content?.chats as PromptWithActions[];
-      if (!rawMessages) return;
+      const data = await chatService.getMessages(sid);
+      const rawMessages = data.Content.chats || [];
+      if (!rawMessages || rawMessages.length === 0) return;
 
       // Collect all unique actionIds
       const uniqueActionIds = Array.from(
@@ -188,18 +185,14 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
       // Fetch and map actions by ID
       let allActionsMap: Record<string, VibeAction> = {};
       if (uniqueActionIds.length > 0) {
-        try {
-          const fetchedActions = await fetchChatActions(uniqueActionIds);
-          allActionsMap = fetchedActions.reduce(
-            (acc, action) => {
-              acc[action.id] = action;
-              return acc;
-            },
-            {} as Record<string, VibeAction>
-          );
-        } catch (err) {
-          console.error('Error fetching actions:', err);
-        }
+        const fetchedActions = await chatService.getActions(uniqueActionIds);
+        allActionsMap = fetchedActions.reduce(
+          (acc, action) => {
+            acc[action.id] = action;
+            return acc;
+          },
+          {} as Record<string, VibeAction>
+        );
       }
 
       // Map messages with resolved actions
@@ -238,7 +231,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
       });
       setRequestId(loadedMessages[0]?.requestId || null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load chat messages');
+      if (err instanceof Error) setError(err.message);
+      else setError('Failed to load chat messages');
     } finally {
       setIsLoading(false);
     }
@@ -252,13 +246,18 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
       setIsSending(true);
       setError(null);
 
-      const response = await sendChatMessage(message, entityId, sessionId, anonymousUserId);
+      const response = await chatService.sendMessage(
+        message,
+        entityId,
+        sessionId,
+        anonymousUserId
+      );
       if (
         response?.Content?.vibeResponse?.tilerUser &&
         JSON.stringify(response.Content.vibeResponse.tilerUser) !==
         JSON.stringify(useAppStore.getState().userInfo)
       ) {
-        useAppStore.getState().setUserInfo?.(response.Content.vibeResponse.tilerUser);
+        useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
       }
       const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
@@ -306,10 +305,10 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
       setMessage('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message');
+			if (err instanceof Error) setError(err.message);
+			else setError('Failed to send message');
     } finally {
       setIsSending(false);
-      setError(null);
     }
   };
 
@@ -318,8 +317,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
       setIsSending(true);
       setError(null);
 
-      const executedChanges = await sendChatAcceptChanges(requestId);
-
+      const executedChanges = await chatService.sendChatAcceptChanges(requestId);
       const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
       if (newScheduleId) {
         handleSetScheduleId(newScheduleId);
@@ -330,7 +328,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to accept changes');
+			if (err instanceof Error) setError(err.message);
+			else setError('Failed to accept changes');
     } finally {
       setIsSending(false);
     }
@@ -443,7 +442,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
                   }
                 >
                   <img
-                    src={getActionIcon(action)}
+                    src={ChatUtil.getActionIcon(action)}
                     alt="add_new_appointment"
                     style={{
                       width: '15px',

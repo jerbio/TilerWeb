@@ -9,4 +9,5 @@ export type ApiResponse<T> = {
 		Message: string;
 	};
 	Content: T;
+	ServerStatus: null;
 };

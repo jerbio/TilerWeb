@@ -1,5 +1,6 @@
 import { PersonaApi } from "@/api/personaApi";
 import { Persona } from "@/core/common/types/persona";
+import { normalizeError } from "@/core/error";
 
 class PersonaService {
 	private personaApi: PersonaApi;
@@ -12,7 +13,8 @@ class PersonaService {
 			const personas = await this.personaApi.getPersonas();
 			return personas.Content.personas;
 		} catch (error) {
-			console.error(error);
+			console.error("Error fetching personas", error);
+			throw normalizeError(error);
 		}
 	}
 
@@ -21,7 +23,8 @@ class PersonaService {
 			const schedule = await this.personaApi.getPersonaSchedule(persona);
 			return schedule.Content.anonymousUserWithPersona;
 		} catch (error) {
-			console.error(error);
+			console.error("Error fetching persona schedule", error);
+			throw normalizeError(error);
 		}
 	}
 }

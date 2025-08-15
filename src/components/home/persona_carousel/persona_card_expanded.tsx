@@ -12,123 +12,125 @@ import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/useP
 import { personaService } from '@/services';
 
 type PersonaExpandedCardProps = {
-	isCustom?: boolean;
-	persona: Persona;
-	expanded: boolean;
-	onCollapse: () => void;
-	expandedWidth: number;
-	personaSchedules: PersonaSchedule;
-	setPersonaSchedule: PersonaScheduleSetter;
+  isCustom?: boolean;
+  persona: Persona;
+  expanded: boolean;
+  onCollapse: () => void;
+  expandedWidth: number;
+  personaSchedules: PersonaSchedule;
+  setPersonaSchedule: PersonaScheduleSetter;
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-	isCustom,
-	expanded,
-	persona,
-	onCollapse,
-	expandedWidth,
-	personaSchedules,
-	setPersonaSchedule,
+  isCustom,
+  expanded,
+  persona,
+  onCollapse,
+  expandedWidth,
+  personaSchedules,
+  setPersonaSchedule,
 }) => {
-	const [mobileChatVisible, setMobileChatVisible] = useState(false);
-	const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
-	const showChat = isDesktop || mobileChatVisible;
-	const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+  const [mobileChatVisible, setMobileChatVisible] = useState(false);
+  const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
+  const showChat = isDesktop || mobileChatVisible;
+  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
 
-	function onMobileCollapse() {
-		setMobileChatVisible(false);
-	}
+  function onMobileCollapse() {
+    setMobileChatVisible(false);
+  }
 
-	async function getPersonaSchedule() {
-		const personaSchedule = await personaService.getPersonaSchedule(persona);
-		if (personaSchedule) {
-			setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
-				store: !isCustom,
-			});
-		}
-	}
+  async function getPersonaSchedule() {
+    try {
+      const personaSchedule = await personaService.getPersonaSchedule(persona);
+      setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
+        store: !isCustom,
+      });
+    } catch (error) {
+      console.error("Couldn't create profile for persona: ", error);
+    }
+  }
 
-	useEffect(() => {
-		if (expanded && !scheduleId) {
-			getPersonaSchedule();
-		}
-	}, [expanded]);
+  useEffect(() => {
+    if (expanded && !scheduleId) {
+      getPersonaSchedule();
+    }
+  }, [expanded]);
 
-	const content = [
-		{
-			key: 'calendar',
-			container: CalendarContainer,
-			content: (
-				<React.Fragment>
-					<PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
-					<CalendarContainerActionButtons>
-						<MobileShowChatButton
-							onClick={() => setMobileChatVisible(!mobileChatVisible)}
-						>
-							<Plus size={20} />
-						</MobileShowChatButton>
-					</CalendarContainerActionButtons>
-				</React.Fragment>
-			),
-		},
-		{
-			key: 'chat',
-			container: ChatContainer,
-			content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
-		},
-	];
+  const content = [
+    {
+      key: 'calendar',
+      container: CalendarContainer,
+      content: (
+        <React.Fragment>
+          <PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
+          <CalendarContainerActionButtons>
+            <MobileShowChatButton
+              onClick={() => setMobileChatVisible(!mobileChatVisible)}
+            >
+              <Plus size={20} />
+            </MobileShowChatButton>
+          </CalendarContainerActionButtons>
+        </React.Fragment>
+      ),
+    },
+    {
+      key: 'chat',
+      container: ChatContainer,
+      content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
+    },
+  ];
 
-	// Content revealing animations
-	const cardSpringRef = useSpringRef();
-	const cardSpring = useSpring({
-		ref: cardSpringRef,
-		from: { opacity: 0 },
-		to: { opacity: expanded ? 1 : 0 },
-	});
+  // Content revealing animations
+  const cardSpringRef = useSpringRef();
+  const cardSpring = useSpring({
+    ref: cardSpringRef,
+    from: { opacity: 0 },
+    to: { opacity: expanded ? 1 : 0 },
+  });
 
-	const contentTransRef = useSpringRef();
-	const contentTransition = useTransition(
-		expanded ? (showChat ? content : content.slice(0, 1)) : [],
-		{
-			keys: (item) => item.key,
-			ref: contentTransRef,
-			from: { opacity: 0, scale: 1.05 },
-			enter: { opacity: 1, scale: 1 },
-			leave: { opacity: 0, scale: 1 },
-			trail: expanded ? 200 : 0,
-			config: { tension: expanded ? 200 : 300 },
-		}
-	);
+  const contentTransRef = useSpringRef();
+  const contentTransition = useTransition(
+    expanded ? (showChat ? content : content.slice(0, 1)) : [],
+    {
+      keys: (item) => item.key,
+      ref: contentTransRef,
+      from: { opacity: 0, scale: 1.05 },
+      enter: { opacity: 1, scale: 1 },
+      leave: { opacity: 0, scale: 1 },
+      trail: expanded ? 200 : 0,
+      config: { tension: expanded ? 200 : 300 },
+    }
+  );
 
-	useChain(
-		expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
-		expanded ? [0, 0.75] : [0, 1],
-		300
-	);
+  useChain(
+    expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
+    expanded ? [0, 0.75] : [0, 1],
+    300
+  );
 
-	return (
-		<CardContainer $display={expanded} style={cardSpring}>
-			<Header>
-				<h2>{persona.name}</h2>
-				<MobileCloseButtonContainer>
-					<Button variant="ghost" height={32} onClick={onCollapse}>
-						<ChevronLeftIcon size={16} />
-						<span>Back</span>
-					</Button>
-				</MobileCloseButtonContainer>
-			</Header>
-			<CardContent>
-				{contentTransition((style, item) => (
-					<item.container style={style} key={item.key}>
-						{item.content}
-					</item.container>
-				))}
-			</CardContent>
-		</CardContainer>
-	);
+  return (
+    <CardContainer $display={expanded} style={cardSpring}>
+      <Header>
+        <h2>{persona.name}</h2>
+        <MobileCloseButtonContainer>
+          <Button variant="ghost" height={32} onClick={onCollapse}>
+            <ChevronLeftIcon size={16} />
+            <span>Back</span>
+          </Button>
+        </MobileCloseButtonContainer>
+      </Header>
+      <CardContent>
+        {contentTransition((style, item) => (
+          <item.container style={style} key={item.key}>
+            {item.content}
+          </item.container>
+        ))}
+      </CardContent>
+    </CardContainer>
+  );
 };
 
-const CardContainer = styled(animated.section)<{ $display: boolean }>`
+const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;
 	background: linear-gradient(to right, ${palette.colors.black}, ${palette.colors.gray[900]});
 	border-radius: ${palette.borderRadius.xxLarge};

@@ -1,122 +1,93 @@
 import { Actions } from '@/core/constants/enums';
 import { UserInfo } from '@/global_state';
+import { ApiResponse } from './api';
 
-type ActionType = `${Actions}`;
-interface ServerResponse {
-	Error: {
-		Code: string;
-		Message: string;
-	};
-	Content: Record<string, unknown>;
-	ServerStatus: Record<string, unknown> | null;
+export type ActionType = `${Actions}`;
+
+export interface PromptWithActions {
+  id: string;
+  origin: 'user' | 'model' | 'tiler';
+  content: string;
+  actionId: string;
+  requestId: string;
+  sessionId: string;
+  actions: VibeAction[];
+  actionIds?: string[];
 }
 
-// PromptWithActions interface
-interface PromptWithActions {
-	id: string;
-	origin: 'user' | 'model' | 'tiler';
-	content: string;
-	actionId: string;
-	requestId: string;
-	sessionId: string;
-	actions: VibeAction[];
-	actionIds?: string[];
+export interface VibeAction {
+  id: string;
+  descriptions: string;
+  type: ActionType;
+  creationTimeInMs: number;
+  status: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited';
+  prompts: PromptWithActions[];
+  beforeScheduleId: string;
+  afterScheduleId: string;
+  vibeRequest: {
+    id: string;
+    creationTimeInMs: number;
+    activeAction: string | null;
+    isClosed: boolean;
+    beforeScheduleId: string | null;
+    afterScheduleId: string | null;
+    actions: VibeAction[];
+  };
 }
 
-// VibeAction interface
-interface VibeAction {
-	id: string;
-	descriptions: string;
-	type: ActionType; // ActionType is a string literal type based on Actions enum
-	creationTimeInMs: number;
-	status: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited';
-	prompts: PromptWithActions[];
-	beforeScheduleId: string;
-	afterScheduleId: string;
-	vibeRequest: {
-		id: string;
-		creationTimeInMs: number;
-		activeAction: string | null;
-		isClosed: boolean;
-		beforeScheduleId: string | null;
-		afterScheduleId: string | null;
-		actions: VibeAction[];
-	};
+export interface VibeResponse {
+  prompts: Record<
+    string,
+    PromptWithActions & {
+      actions: Array<VibeAction>;
+    }
+  >;
+  tilerUser?: UserInfo;
 }
 
-// VibeResponse interface
-interface VibeResponse {
-	prompts: Record<
-		string,
-		PromptWithActions & {
-			actions: Array<VibeAction>;
-		}
-	>;
-	tilerUser?: UserInfo;
+export interface VibeRequest {
+  id: string;
+  creationTimeInMs: number;
+  activeAction: string | null; // More specific type
+  isClosed: boolean;
+  beforeScheduleId: string | null;
+  afterScheduleId: string | null;
+  actions: VibeAction[]; // Using VibeAction type
 }
 
-// Chat-specific response interface
-interface ChatVibeResponse extends ServerResponse {
-	Content: {
-		vibeResponse: VibeResponse;
-	};
-	ServerStatus: null;
-}
+export type ChatSendMessageResponse = ApiResponse<{
+  vibeResponse: VibeResponse;
+}>;
 
-interface vibeRequest {
-	id: string;
-	creationTimeInMs: number;
-	activeAction: string | null; // More specific type
-	isClosed: boolean;
-	beforeScheduleId: string | null;
-	afterScheduleId: string | null;
-	actions: VibeAction[]; // Using VibeAction type
-}
+export type ChatActionsResponse = ApiResponse<{
+	vibeAction?: VibeAction;
+	vibeActions?: VibeAction[];
+}>;
 
-interface ExecuteActionResponse {
-	Error: {
-		Code: string;
-		Message: string;
-	};
-	Content: {
-		vibeRequest: vibeRequest;
-	};
-	ServerStatus: null;
-}
+export type ChatExecuteActionResponse = ApiResponse<{
+  vibeRequest: VibeRequest;
+}>;
 
-// ChatPromptResponse interface
-interface ChatPromptResponse extends ServerResponse {
-	Content: {
-		chats: PromptWithActions[];
-	};
-	ServerStatus: null;
-}
+export type ChatMessagesResponse = ApiResponse<{
+  chats: PromptWithActions[];
+}>;
 
-interface SendMessageRequest {
-	EntityId: string;
-	SessionId?: string;
-	RequestId?: string;
-	ChatMessage: string;
-	ActionId?: string;
-	MobileApp?: boolean;
-	TimeZoneOffset?: number;
-	Version?: string;
-	TimeZone?: string;
-	IsTimeZoneAdjusted?: string;
-	getTimeSpan?: string;
-	UserName?: string;
-	AnonymousUserId?: string;
+export type ChatMessageBody = {
+  EntityId: string;
+  SessionId?: string;
+  RequestId?: string;
+  ChatMessage: string;
+  ActionId?: string;
+  MobileApp?: boolean;
+  TimeZoneOffset?: number;
+  Version?: string;
+  TimeZone?: string;
+  IsTimeZoneAdjusted?: string;
+  getTimeSpan?: string;
+  UserName?: string;
+  AnonymousUserId?: string;
 }
 
 export type {
-	ServerResponse,
-	ChatVibeResponse,
-	VibeResponse,
-	VibeAction,
-	PromptWithActions,
-	ChatPromptResponse,
-	PromptWithActions as Message,
-	ExecuteActionResponse,
-	ActionType,
-	SendMessageRequest,
+  PromptWithActions as Message,
 };
