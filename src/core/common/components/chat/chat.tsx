@@ -6,9 +6,9 @@ import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 import {
-  getStoredSessionId,
-  setStoredSessionId,
-  clearStoredSessionId,
+	getStoredSessionId,
+	setStoredSessionId,
+	clearStoredSessionId,
 } from '@/core/storage/chatSession';
 import useAppStore, { ChatContextType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
@@ -16,6 +16,7 @@ import palette from '@/core/theme/palette';
 import HORIZONTALPROGRESSBAR from '@/assets/horizontal_progress_bar.gif';
 import { chatService } from '@/services';
 import ChatUtil from '@/core/util/chat';
+import UserLocation from '@/core/common/components/chat/user_location';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -127,421 +128,402 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 `;
 
 type ChatProps = {
-  onClose?: () => void;
+	onClose?: () => void;
 };
 
 const Chat: React.FC = ({ onClose }: ChatProps) => {
-  const { t } = useTranslation();
+	const { t } = useTranslation();
 
-  const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
-  const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<PromptWithActions[]>([]);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [requestId, setRequestId] = useState<string | null>(null);
-  const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
+	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
+	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
+	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const [message, setMessage] = useState('');
+	const [messages, setMessages] = useState<PromptWithActions[]>([]);
+	const [isSending, setIsSending] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [sessionId, setSessionId] = useState<string>('');
+	const [isLoading, setIsLoading] = useState(false);
+	const [requestId, setRequestId] = useState<string | null>(null);
+	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
-  const scheduleId = useAppStore((state) => state.scheduleId);
-  const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
-  const handleSetScheduleId = (id: string) => {
-    setScheduleId(id);
-  };
+	const scheduleId = useAppStore((state) => state.scheduleId);
+	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+	const handleSetScheduleId = (id: string) => {
+		setScheduleId(id);
+	};
 
-  // Load session ID from local storage on mount
-  useEffect(() => {
-    const storedSessionId = getStoredSessionId();
-    if (storedSessionId) {
-      setSessionId(storedSessionId);
-    }
-  }, []);
+	// Load session ID from local storage on mount
+	useEffect(() => {
+		const storedSessionId = getStoredSessionId();
+		if (storedSessionId) {
+			setSessionId(storedSessionId);
+		}
+	}, []);
 
-  // Load chat messages when session ID changes
-  useEffect(() => {
-    if (sessionId) {
-      loadChatMessages(sessionId);
-    }
-  }, [sessionId, scheduleId]);
+	// Load chat messages when session ID changes
+	useEffect(() => {
+		if (sessionId) {
+			loadChatMessages(sessionId);
+		}
+	}, [sessionId, scheduleId]);
 
-  const loadChatMessages = async (sid: string) => {
-    if (!sid) return;
+	const loadChatMessages = async (sid: string) => {
+		if (!sid) return;
 
-    try {
-      setIsLoading(true);
-      setError(null);
+		try {
+			setIsLoading(true);
+			setError(null);
 
-      const data = await chatService.getMessages(sid);
-      const rawMessages = data.Content.chats || [];
-      if (!rawMessages || rawMessages.length === 0) return;
+			const data = await chatService.getMessages(sid);
+			const rawMessages = data.Content.chats || [];
+			if (!rawMessages || rawMessages.length === 0) return;
 
-      // Collect all unique actionIds
-      const uniqueActionIds = Array.from(
-        new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
-      );
+			// Collect all unique actionIds
+			const uniqueActionIds = Array.from(
+				new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
+			);
 
-      // Fetch and map actions by ID
-      let allActionsMap: Record<string, VibeAction> = {};
-      if (uniqueActionIds.length > 0) {
-        const fetchedActions = await chatService.getActions(uniqueActionIds);
-        allActionsMap = fetchedActions.reduce(
-          (acc, action) => {
-            acc[action.id] = action;
-            return acc;
-          },
-          {} as Record<string, VibeAction>
-        );
-      }
+			// Fetch and map actions by ID
+			let allActionsMap: Record<string, VibeAction> = {};
+			if (uniqueActionIds.length > 0) {
+				const fetchedActions = await chatService.getActions(uniqueActionIds);
+				allActionsMap = fetchedActions.reduce(
+					(acc, action) => {
+						acc[action.id] = action;
+						return acc;
+					},
+					{} as Record<string, VibeAction>
+				);
+			}
 
-      // Map messages with resolved actions
-      const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-        const actionIds: string[] = entry.actionIds ?? [];
-        const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
+			// Map messages with resolved actions
+			const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+				const actionIds: string[] = entry.actionIds ?? [];
+				const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
 
-        return {
-          id: entry.id,
-          origin: entry.origin,
-          content: entry.content,
-          actionId: entry.actionId,
-          requestId: entry.requestId,
-          sessionId: entry.sessionId,
-          actionIds,
-          actions: resolvedActions,
-        };
-      });
+				return {
+					id: entry.id,
+					origin: entry.origin,
+					content: entry.content,
+					actionId: entry.actionId,
+					requestId: entry.requestId,
+					sessionId: entry.sessionId,
+					actionIds,
+					actions: resolvedActions,
+				};
+			});
 
-      // Sort and merge with previous
-      loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
+			// Sort and merge with previous
+			loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
 
-      setMessages((prevMessages) => {
-        const existingIds = new Set(prevMessages.map((m) => m.id));
-        const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+			setMessages((prevMessages) => {
+				const existingIds = new Set(prevMessages.map((m) => m.id));
+				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
 
-        // Merge actions for existing messages
-        const updatedMessages = prevMessages.map((prevMessage) => {
-          const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
-          return updatedMessage
-            ? { ...prevMessage, actions: updatedMessage.actions }
-            : prevMessage;
-        });
+				// Merge actions for existing messages
+				const updatedMessages = prevMessages.map((prevMessage) => {
+					const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
+					return updatedMessage
+						? { ...prevMessage, actions: updatedMessage.actions }
+						: prevMessage;
+				});
 
-        return [...updatedMessages, ...uniqueNewMessages];
-      });
-      setRequestId(loadedMessages[0]?.requestId || null);
-    } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError('Failed to load chat messages');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+				return [...updatedMessages, ...uniqueNewMessages];
+			});
+			setRequestId(loadedMessages[0]?.requestId || null);
+		} catch (err) {
+			if (err instanceof Error) setError(err.message);
+			else setError('Failed to load chat messages');
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || isSending) return;
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+		if (!message.trim() || isSending) return;
 
-    try {
-      setIsSending(true);
-      setError(null);
+		try {
+			setIsSending(true);
+			setError(null);
 
-      const response = await chatService.sendMessage(
-        message,
-        entityId,
-        sessionId,
-        anonymousUserId
-      );
-      if (
-        response?.Content?.vibeResponse?.tilerUser &&
-        JSON.stringify(response.Content.vibeResponse.tilerUser) !==
-        JSON.stringify(useAppStore.getState().userInfo)
-      ) {
-        useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
-      }
-      const promptMap = response?.Content?.vibeResponse?.prompts || {};
+			const response = await chatService.sendMessage(
+				message,
+				entityId,
+				sessionId,
+				anonymousUserId
+			);
+			if (
+				response?.Content?.vibeResponse?.tilerUser &&
+				JSON.stringify(response.Content.vibeResponse.tilerUser) !==
+					JSON.stringify(useAppStore.getState().userInfo)
+			) {
+				useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
+			}
+			const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
-      // Convert the prompt map to PromptWithActions[]
-      const newMessages: PromptWithActions[] = Object.values(promptMap).map(
-        (entry: PromptWithActions) => ({
-          id: entry.id,
-          origin: entry.origin,
-          content: entry.content,
-          actionId: entry.actionId,
-          requestId: entry.requestId,
-          sessionId: entry.sessionId,
-          actions: (entry.actions ?? []).map((action: VibeAction) => ({
-            id: action.id,
-            descriptions: action.descriptions,
-            type: action.type,
-            creationTimeInMs: action.creationTimeInMs,
-            status: action.status,
-            beforeScheduleId: action.beforeScheduleId,
-            afterScheduleId: action.afterScheduleId,
-            prompts: action.prompts ?? [],
-            vibeRequest: {
-              id: action.vibeRequest.id,
-              creationTimeInMs: action.vibeRequest.creationTimeInMs,
-              activeAction: action.vibeRequest.activeAction,
-              isClosed: action.vibeRequest.isClosed ?? false,
-              beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
-              afterScheduleId: action.vibeRequest.afterScheduleId || null,
-              actions: action.vibeRequest.actions || [],
-            },
-          })),
-        })
-      );
+			// Convert the prompt map to PromptWithActions[]
+			const newMessages: PromptWithActions[] = Object.values(promptMap).map(
+				(entry: PromptWithActions) => ({
+					id: entry.id,
+					origin: entry.origin,
+					content: entry.content,
+					actionId: entry.actionId,
+					requestId: entry.requestId,
+					sessionId: entry.sessionId,
+					actions: (entry.actions ?? []).map((action: VibeAction) => ({
+						id: action.id,
+						descriptions: action.descriptions,
+						type: action.type,
+						creationTimeInMs: action.creationTimeInMs,
+						status: action.status,
+						beforeScheduleId: action.beforeScheduleId,
+						afterScheduleId: action.afterScheduleId,
+						prompts: action.prompts ?? [],
+						vibeRequest: {
+							id: action.vibeRequest.id,
+							creationTimeInMs: action.vibeRequest.creationTimeInMs,
+							activeAction: action.vibeRequest.activeAction,
+							isClosed: action.vibeRequest.isClosed ?? false,
+							beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
+							afterScheduleId: action.vibeRequest.afterScheduleId || null,
+							actions: action.vibeRequest.actions || [],
+						},
+					})),
+				})
+			);
 
-      // Append new messages to existing state
-      setMessages((prev) => [...prev, ...newMessages]);
-      setRequestId(newMessages[0]?.requestId || null);
+			// Append new messages to existing state
+			setMessages((prev) => [...prev, ...newMessages]);
+			setRequestId(newMessages[0]?.requestId || null);
 
-      // Update session ID from the first prompt
-      const sessionIdFromResponse = newMessages[0]?.sessionId;
-      if (sessionIdFromResponse) {
-        setSessionId(sessionIdFromResponse);
-        setStoredSessionId(sessionIdFromResponse);
-      }
+			// Update session ID from the first prompt
+			const sessionIdFromResponse = newMessages[0]?.sessionId;
+			if (sessionIdFromResponse) {
+				setSessionId(sessionIdFromResponse);
+				setStoredSessionId(sessionIdFromResponse);
+			}
 
-      setMessage('');
-    } catch (err) {
+			setMessage('');
+		} catch (err) {
 			if (err instanceof Error) setError(err.message);
 			else setError('Failed to send message');
-    } finally {
-      setIsSending(false);
-    }
-  };
+		} finally {
+			setIsSending(false);
+		}
+	};
 
-  const acceptAllChanges = async () => {
-    try {
-      setIsSending(true);
-      setError(null);
+	const acceptAllChanges = async () => {
+		try {
+			setIsSending(true);
+			setError(null);
 
-      const executedChanges = await chatService.sendChatAcceptChanges(requestId);
-      const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
-      if (newScheduleId) {
-        handleSetScheduleId(newScheduleId);
+			const executedChanges = await chatService.sendChatAcceptChanges(requestId);
+			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
+			if (newScheduleId) {
+				handleSetScheduleId(newScheduleId);
 
-        // Trigger reloading of chat messages
-        if (sessionId) {
-          await loadChatMessages(sessionId);
-        }
-      }
-    } catch (err) {
+				// Trigger reloading of chat messages
+				if (sessionId) {
+					await loadChatMessages(sessionId);
+				}
+			}
+		} catch (err) {
 			if (err instanceof Error) setError(err.message);
 			else setError('Failed to accept changes');
-    } finally {
-      setIsSending(false);
-    }
-  };
+		} finally {
+			setIsSending(false);
+		}
+	};
 
-  const hasUnexecutedActions = () => {
-    return messages.some((msg) => msg.actions?.some((action) => action.status !== 'executed'));
-  };
+	const hasUnexecutedActions = () => {
+		return messages.some((msg) => msg.actions?.some((action) => action.status !== 'executed'));
+	};
 
-  const handleNewChat = () => {
-    clearStoredSessionId();
-    setSessionId('');
-    setError(null);
-    setMessage('');
-    setMessages([]);
-    handleSetScheduleId('');
-  };
+	const handleNewChat = () => {
+		clearStoredSessionId();
+		setSessionId('');
+		setError(null);
+		setMessage('');
+		setMessages([]);
+		handleSetScheduleId('');
+	};
 
-  const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
+	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
 
-  const handleRemoveContext = (context: ChatContextType) => {
-    removeChatContext(context); // Remove the clicked context
-  };
+	const handleRemoveContext = (context: ChatContextType) => {
+		removeChatContext(context); // Remove the clicked context
+	};
 
-  return (
-    <ChatContainer>
-      <ChatHeader>
-        {onClose && (
-          <Button variant="ghost" height={32} onClick={onClose}>
-            <ChevronLeftIcon size={16} />
-            <span>{t('common.buttons.back')}</span>
-          </Button>
-        )}
-        {import.meta.env.VITE_NODE_ENV === 'development' && (
-          <Button
-            variant="outline"
-            style={{
-              alignSelf: 'flex-end',
-              marginBottom: '0.5rem',
-              color: palette.colors.orange[500],
-              borderColor: palette.colors.orange[500],
-            }}
-            onClick={handleNewChat}
-          >
-            Clear Session
-          </Button>
-        )}
-        {chatContext.length === 0 ? (
-          <Button variant="ghost" height={32} onClick={handleNewChat}>
-            <span>{t('home.expanded.chat.newChat')}</span>
-          </Button>
-        ) : (
-          <>
-            {chatContext.map((context, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.5rem',
-                  border: `1px solid ${palette.colors.gray[300]}`,
-                }}
-              >
-                <span>{context.Name}</span>
-                <span
-                  onClick={() => handleRemoveContext(context)}
-                  style={{
-                    marginLeft: '0.5rem',
-                    color: 'red',
-                    cursor: 'pointer',
-                  }}
-                >
-                  x
-                </span>
-              </Button>
-            ))}
-          </>
-        )}
-      </ChatHeader>
-      <ChatContent>
-        {isLoading && <div className="chat-loading">Loading chat messages...</div>}
+	return (
+		<ChatContainer>
+			<ChatHeader>
+				{onClose && (
+					<Button variant="ghost" height={32} onClick={onClose}>
+						<ChevronLeftIcon size={16} />
+						<span>{t('common.buttons.back')}</span>
+					</Button>
+				)}
+				{import.meta.env.VITE_NODE_ENV === 'development' && (
+					<Button
+						variant="outline"
+						style={{
+							alignSelf: 'flex-end',
+							marginBottom: '0.5rem',
+							color: palette.colors.orange[500],
+							borderColor: palette.colors.orange[500],
+						}}
+						onClick={handleNewChat}
+					>
+						Clear Session
+					</Button>
+				)}
+				{chatContext.length === 0 ? (
+					<Button variant="ghost" height={32} onClick={handleNewChat}>
+						<span>{t('home.expanded.chat.newChat')}</span>
+					</Button>
+				) : (
+					<>
+						{chatContext.map((context, index) => (
+							<Button
+								key={index}
+								variant="outline"
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'space-between',
+									padding: '0.5rem',
+									border: `1px solid ${palette.colors.gray[300]}`,
+								}}
+							>
+								<span>{context.Name}</span>
+								<span
+									onClick={() => handleRemoveContext(context)}
+									style={{
+										marginLeft: '0.5rem',
+										color: 'red',
+										cursor: 'pointer',
+									}}
+								>
+									x
+								</span>
+							</Button>
+						))}
+					</>
+				)}
+			</ChatHeader>
+			<ChatContent>
+				{isLoading && <div className="chat-loading">Loading chat messages...</div>}
 
-        {error && <div className="chat-error">Error: {error}</div>}
+				{error && <div className="chat-error">Error: {error}</div>}
 
-        {!isLoading && !error && !messages.length && (
-          <EmptyChat>
-            <Logo size={48} />
-            <h3>What would you like to do?</h3>
-            <p>Describe a task, We&apos;ll handle the tiling.</p>
-          </EmptyChat>
-        )}
+				{!isLoading && !error && !messages.length && (
+					<EmptyChat>
+						<Logo size={48} />
+						<h3>What would you like to do?</h3>
+						<p>Describe a task, We&apos;ll handle the tiling.</p>
+					</EmptyChat>
+				)}
 
-        <div className="messages-list">
-          {messages.map((message) => (
-            <MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-              <div className="message-content">{message.content}</div>
+				<div className="messages-list">
+					{messages.map((message) => (
+						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
+							<div className="message-content">{message.content}</div>
 
-              {message.actions?.map((action) => (
-                <Button
-                  key={action.id}
-                  variant="pill"
-                  dotstatus={
-                    action.status as
-                    | 'parsed'
-                    | 'clarification'
-                    | 'executed'
-                    | undefined
-                  }
-                >
-                  <img
-                    src={ChatUtil.getActionIcon(action)}
-                    alt="add_new_appointment"
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      verticalAlign: 'middle',
-                    }}
-                  />{' '}
-                  - {action.descriptions}
-                </Button>
-              ))}
-            </MessageBubble>
-          ))}
-        </div>
-
-        <div ref={messagesEndRef} />
-      </ChatContent>
-
-      {/* Render chatContext buttons */}
-      <div style={{ marginBottom: '0.25rem' }}></div>
-
-      <div>
-        {isSending && (
-          <div
-            style={{
-              marginBottom: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {/* <span
-							className="spinner"
-							style={{
-								width: '24px',
-								height: '24px',
-								border: '4px solid #f3f3f3',
-								borderTop: `4px solid ${styles.colors.brand[500]}`,
-								borderRadius: '50%',
-								animation: 'spin 1s linear infinite',
-								marginRight: '0.5rem',
-							}}
-						/>
-						<style>
-							{`
-									@keyframes spin {
-										0% { transform: rotate(0deg); }
-										100% { transform: rotate(360deg); }
+							{message.actions?.map((action) => (
+								<Button
+									key={action.id}
+									variant="pill"
+									dotstatus={
+										action.status as
+											| 'parsed'
+											| 'clarification'
+											| 'executed'
+											| undefined
 									}
-								`}
-						</style> */}
-            <img
-              src={HORIZONTALPROGRESSBAR}
-              alt="Loading..."
-              style={{ width: '24px', height: '24px', marginRight: '0.5rem' }}
-            />
-            <span>Sending Request...</span>
-          </div>
-        )}
-        {!isSending && hasUnexecutedActions() && (
-          <Button
-            variant="outline"
-            style={{
-              marginBottom: '0.5rem',
-              color: palette.colors.brand[500],
-              borderColor: palette.colors.brand[500],
-            }}
-            onClick={() => acceptAllChanges()}
-          >
-            Accept Changes
-          </Button>
-        )}
-      </div>
+								>
+									<img
+										src={ChatUtil.getActionIcon(action)}
+										alt="add_new_appointment"
+										style={{
+											width: '15px',
+											height: '15px',
+											verticalAlign: 'middle',
+										}}
+									/>{' '}
+									- {action.descriptions}
+								</Button>
+							))}
+						</MessageBubble>
+					))}
+				</div>
 
-      <ChatForm onSubmit={handleSubmit}>
-        <Input.Textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            // Submit form on Enter key press without Shift key
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault(); // Prevent new line
+				<div ref={messagesEndRef} />
+			</ChatContent>
 
-              // Use form.requestSubmit() instead of handleSubmit directly
-              // This triggers a single form submission through the standard form mechanism
-              const form = e.currentTarget.form;
-              if (form) form.requestSubmit();
-            }
-          }}
-          placeholder={t('home.expanded.chat.inputPlaceholder')}
-          disabled={isSending}
-          bordergradient={[palette.colors.brand[500]]}
-          height={50} // Set a fixed height for consistent alignment
-        />
-        <ChatButton type="submit" disabled={isSending || !message.trim()}>
-          {isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
-        </ChatButton>
-      </ChatForm>
-    </ChatContainer>
-  );
+			{/* Render chatContext buttons */}
+			<div style={{ marginBottom: '0.25rem' }}></div>
+
+			<div>
+				{isSending && (
+					<div
+						style={{
+							marginBottom: '0.5rem',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+					>
+						<img
+							src={HORIZONTALPROGRESSBAR}
+							alt="Loading..."
+							style={{ width: '120px', height: '24px', marginRight: '0.5rem' }}
+						/>
+						<span>Sending Request...</span>
+					</div>
+				)}
+				{!isSending && hasUnexecutedActions() && (
+					<Button
+						variant="outline"
+						style={{
+							marginBottom: '0.5rem',
+							color: palette.colors.brand[500],
+							borderColor: palette.colors.brand[500],
+						}}
+						onClick={() => acceptAllChanges()}
+					>
+						Accept Changes
+					</Button>
+				)}
+			</div>
+
+			<ChatForm onSubmit={handleSubmit}>
+				<Input.Textarea
+					value={message}
+					onChange={(e) => setMessage(e.target.value)}
+					onKeyDown={(e) => {
+						// Submit form on Enter key press without Shift key
+						if (e.key === 'Enter' && !e.shiftKey) {
+							e.preventDefault(); // Prevent new line
+
+							// Use form.requestSubmit() instead of handleSubmit directly
+							// This triggers a single form submission through the standard form mechanism
+							const form = e.currentTarget.form;
+							if (form) form.requestSubmit();
+						}
+					}}
+					placeholder={t('home.expanded.chat.inputPlaceholder')}
+					disabled={isSending}
+					bordergradient={[palette.colors.brand[500]]}
+					height={50} // Set a fixed height for consistent alignment
+				/>
+				<ChatButton type="submit" disabled={isSending || !message.trim()}>
+					{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
+				</ChatButton>
+			</ChatForm>
+			<UserLocation />
+		</ChatContainer>
+	);
 };
 
 export default Chat;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
-import styles from '../../../util/styles';
-import useAppStore from '../../../global_state';
+import palette from '@/core/theme/palette';
+import useAppStore from '@/global_state';
 
 // Define prop types for styled components
 interface StyledProps {
@@ -13,7 +13,7 @@ const PulseIndicator = styled.span`
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background: ${styles.colors.brand[500]};
+	background: ${palette.colors.brand[500]};
 	display: inline-block;
 	animation: pulse 1.5s infinite;
 	
@@ -28,11 +28,11 @@ const PulseIndicator = styled.span`
 const LocationContainer = styled.div<StyledProps>`
 	margin-top: 10px;
 	padding: 8px 12px;
-	background-color: ${styles.colors.gray[900]};
-	border: 1px solid ${styles.colors.gray[700]};
+	background-color: ${palette.colors.gray[900]};
+	border: 1px solid ${palette.colors.gray[700]};
 	border-radius: 6px;
 	font-size: 0.75rem;
-	color: ${styles.colors.gray[400]};
+	color: ${palette.colors.gray[400]};
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -42,8 +42,8 @@ const LocationContainer = styled.div<StyledProps>`
 	overflow: visible; /* Changed from hidden to allow tooltips to show */
 	
 	&:hover {
-		border-color: ${props => props.$isLoading ? styles.colors.gray[700] : styles.colors.brand[500]};
-		color: ${props => props.$isLoading ? styles.colors.gray[400] : styles.colors.gray[300]};
+		border-color: ${props => props.$isLoading ? palette.colors.gray[700] : palette.colors.brand[500]};
+		color: ${props => props.$isLoading ? palette.colors.gray[400] : palette.colors.gray[300]};
 		box-shadow: ${props => props.$isLoading ? 'none' : '0 0 5px rgba(237, 18, 59, 0.3)'};
 	}
 	
@@ -54,7 +54,7 @@ const LocationContainer = styled.div<StyledProps>`
 		bottom: 0;
 		height: 2px;
 		width: 0;
-		background-color: ${styles.colors.brand[500]};
+		background-color: ${palette.colors.brand[500]};
 		transition: width 0.3s ease;
 	}
 	
@@ -71,28 +71,28 @@ const LocationForm = styled.form`
 `;
 
 const LocationInput = styled.input`
-	background-color: ${styles.colors.gray[800]};
-	border: 1px solid ${styles.colors.gray[600]};
+	background-color: ${palette.colors.gray[800]};
+	border: 1px solid ${palette.colors.gray[600]};
 	border-radius: 4px;
 	padding: 6px 10px;
-	color: ${styles.colors.gray[200]};
+	color: ${palette.colors.gray[200]};
 	font-size: 0.75rem;
 	width: 100%;
 	transition: all 0.2s ease;
 	
 	&:focus {
 		outline: none;
-		border-color: ${styles.colors.brand[500]};
-		box-shadow: 0 0 0 1px ${styles.colors.brand[500]};
+		border-color: ${palette.colors.brand[500]};
+		box-shadow: 0 0 0 1px ${palette.colors.brand[500]};
 	}
 	
 	&::placeholder {
-		color: ${styles.colors.gray[500]};
+		color: ${palette.colors.gray[500]};
 	}
 `;
 
 const SubmitButton = styled.button`
-	background-color: ${styles.colors.brand[500]};
+	background-color: ${palette.colors.brand[500]};
 	color: white;
 	border: none;
 	border-radius: 4px;
@@ -103,11 +103,11 @@ const SubmitButton = styled.button`
 	transition: background-color 0.2s ease;
 	
 	&:hover {
-		background-color: ${styles.colors.brand[600]};
+		background-color: ${palette.colors.brand[600]};
 	}
 	
 	&:active {
-		background-color: ${styles.colors.brand[700]};
+		background-color: ${palette.colors.brand[700]};
 	}
 `;
 
@@ -281,7 +281,7 @@ const UserLocation: React.FC = () => {
 				if (arrow) {
 					arrow.style.bottom = "auto";
 					arrow.style.top = "-10px";
-					arrow.style.borderColor = "transparent transparent " + styles.colors.gray[800] + " transparent";
+					arrow.style.borderColor = "transparent transparent " + palette.colors.gray[800] + " transparent";
 				}
 			}
 		}
@@ -363,7 +363,7 @@ const UserLocation: React.FC = () => {
 			onClick={handleEditClick}
 			style={{
 				borderStyle: useDefaultLocation && !isEditing ? 'dashed' : 'solid',
-				borderColor: useDefaultLocation && !isEditing ? `${styles.colors.brand[400]}` : undefined
+				borderColor: useDefaultLocation && !isEditing ? `${palette.colors.brand[400]}` : undefined
 			}}
 		>
 			<LocationIconWrapper>
@@ -374,8 +374,8 @@ const UserLocation: React.FC = () => {
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 					style={{ 
-						color: isEditing ? styles.colors.brand[400] : 
-							useDefaultLocation ? styles.colors.brand[300] : 'currentColor' 
+						color: isEditing ? palette.colors.brand[400] : 
+							useDefaultLocation ? palette.colors.brand[300] : 'currentColor' 
 					}}
 				>
 					<path
@@ -397,8 +397,8 @@ const UserLocation: React.FC = () => {
 							bottom: '100%',  // Position above the location icon
 							left: '-30px',   // More offset from left edge
 							marginBottom: '15px', // More space between tooltip and element
-							backgroundColor: styles.colors.gray[800],
-							color: styles.colors.white,
+							backgroundColor: palette.colors.gray[800],
+							color: palette.colors.white,
 							padding: '12px 16px',
 							borderRadius: '8px',
 							fontSize: '0.875rem',
@@ -431,7 +431,7 @@ const UserLocation: React.FC = () => {
 							position: 'absolute',
 							width: '12px',
 							height: '12px',
-							backgroundColor: styles.colors.gray[800],
+							backgroundColor: palette.colors.gray[800],
 							bottom: '-6px',
 							left: '36px', // Adjusted to match new left offset
 							transform: 'rotate(45deg)',
@@ -474,7 +474,7 @@ const UserLocation: React.FC = () => {
 									setCustomLocation(DEFAULT_LOCATION);
 								}}
 								style={{ 
-									backgroundColor: styles.colors.gray[700],
+									backgroundColor: palette.colors.gray[700],
 									fontSize: '0.7rem',
 									padding: '4px 8px'
 								}}
@@ -496,7 +496,7 @@ const UserLocation: React.FC = () => {
 					alignItems: 'center', 
 					gap: '6px',
 					fontStyle: useDefaultLocation ? 'italic' : 'normal',
-					color: useDefaultLocation ? styles.colors.gray[300] : styles.colors.gray[400]
+					color: useDefaultLocation ? palette.colors.gray[300] : palette.colors.gray[400]
 				}}>
 					{isLoading ? (
 						<>
@@ -516,7 +516,7 @@ const UserLocation: React.FC = () => {
 									<span 
 										style={{ 
 											fontSize: '0.65rem', 
-											color: styles.colors.brand[300],
+											color: palette.colors.brand[300],
 											backgroundColor: 'rgba(237, 18, 59, 0.1)',
 											padding: '2px 4px',
 											borderRadius: '3px',
@@ -539,8 +539,8 @@ const UserLocation: React.FC = () => {
 											position: 'absolute',
 											bottom: 'calc(100% + 10px)', // Position above the badge
 											right: '-50px',            // Offset from the right edge
-											backgroundColor: styles.colors.gray[800],
-											color: styles.colors.white,
+											backgroundColor: palette.colors.gray[800],
+											color: palette.colors.white,
 											padding: '12px 16px',
 											borderRadius: '8px',
 											fontSize: '0.875rem',
@@ -563,7 +563,7 @@ const UserLocation: React.FC = () => {
 											position: 'absolute',
 											width: '12px',
 											height: '12px',
-											backgroundColor: styles.colors.gray[800],
+											backgroundColor: palette.colors.gray[800],
 											bottom: '-6px',
 											right: '70px', // Adjusted to point at the badge
 											transform: 'rotate(45deg)',
@@ -576,7 +576,7 @@ const UserLocation: React.FC = () => {
 								<span 
 									style={{ 
 										fontSize: '0.65rem', 
-										color: styles.colors.gray[500],
+										color: palette.colors.gray[500],
 										cursor: 'pointer',
 										marginLeft: '4px',
 										textDecoration: 'underline',
