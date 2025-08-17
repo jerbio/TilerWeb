@@ -17,6 +17,7 @@ export interface UserInfo {
 	firstName: string; // ""
 	lastName: string; // ""
 	countryCode: string; // "1"
+	location?: string; // User's current location (optional)
 }
 
 interface AppState {

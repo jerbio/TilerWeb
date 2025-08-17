@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
-import { TileCardProps } from '../../util/interface';
+import palette from '../../core/theme/palette';
+import { TileCardProps } from '../../core/common/types/tile';
 
 const TileWrapper = styled.div<{ $backgroundcolor: string; $index?: number }>`
 	display: flex;
@@ -10,20 +10,20 @@ const TileWrapper = styled.div<{ $backgroundcolor: string; $index?: number }>`
 	border-radius: 0.5rem;
 	width: 300px;
 	height: 101px;
-	border-radius: ${styles.borderRadius.xLarge};
+	border-radius: ${palette.borderRadius.xLarge};
 	border: 1px solid #2a2a2a;
-	color: ${styles.colors.text};
+	color: ${palette.colors.text};
 	background: ${(props) =>
 		`linear-gradient(102.27deg, rgba(26, 26, 26, 0.1) 41.07%, ${props.$backgroundcolor}80 124.88%)`}; /* Added opacity */
 	margin-right: 20px;
 
 	h2 {
-		font-size: ${styles.typography.fontSize.base};
+		font-size: ${palette.typography.fontSize.base};
 		font-weight: 600;
 		margin: 0 0.75rem;
 		margin-top: 1rem;
 		padding: 3px 5px 0 5px;
-		line-height: ${styles.typography.lineHeight.sm};
+		line-height: ${palette.typography.lineHeight.sm};
 	}
 
 	span {
@@ -38,7 +38,7 @@ const TileWrapper = styled.div<{ $backgroundcolor: string; $index?: number }>`
 	}
 
 	p {
-		font-size: ${styles.typography.fontSize.sm};
+		font-size: ${palette.typography.fontSize.sm};
 		margin: 0 0.25rem;
 		padding: 0;
 	}

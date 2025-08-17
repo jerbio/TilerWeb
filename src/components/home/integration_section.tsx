@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
-import MicrosoftLogo from '../../assets/image_assets/microsoft_logo.png';
-import GoogleLogo from '../../assets/image_assets/google_logo.png';
-import CalendarIcon from '../../assets/image_assets/calendar_icon.png';
-import styles from '../../util/styles';
+import palette from '@/core/theme/palette';
 import Section from '../layout/section';
 import { useTranslation } from 'react-i18next';
+import MicrosoftLogo from '@/assets/microsoft_logo.png';
+import GoogleLogo from '@/assets/google_logo.png';
+import CalendarIcon from '@/assets/calendar_icon.png';
 
 const LogoContainer = styled.div`
 	display: flex;
@@ -32,7 +32,7 @@ const FlexWrapper = styled.div`
 	align-items: center;
 	justify-content: center;
 
-	@media (min-width: ${styles.screens.md}) {
+	@media (min-width: ${palette.screens.md}) {
 		flex-direction: row;
 		justify-content: space-between;
 	}

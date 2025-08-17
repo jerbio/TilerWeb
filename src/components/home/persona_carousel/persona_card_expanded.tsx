@@ -1,22 +1,154 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import styles from '../../../util/styles';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
-import Chat from '../../shared/chat/chat';
-import Button from '../../shared/button';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
-import useIsMobile from '../../../hooks/useIsMobile';
 import PersonaCalendar from './persona_calendar';
-import { Persona } from '../../../types/persona';
-import { PersonaApi } from '../../../api/personaApi';
-import ObjectUtil from '../../../util/helpers/object';
-import useAppStore from '../../../global_state';
+import { ChevronLeftIcon, Plus } from 'lucide-react';
+import palette from '@/core/theme/palette';
+import Button from '@/core/common/components/button';
+import { Persona } from '@/core/common/types/persona';
+import Chat from '@/core/common/components/chat/chat';
+import useIsMobile from '@/core/common/hooks/useIsMobile';
+import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/usePersonaSchedules';
+import { personaService } from '@/services';
+import useAppStore from 'global_state';
 
-const CardContainer = styled(animated.section)<{ $display: boolean }>`
+type PersonaExpandedCardProps = {
+  isCustom?: boolean;
+  persona: Persona;
+  expanded: boolean;
+  onCollapse: () => void;
+  expandedWidth: number;
+  personaSchedules: PersonaSchedule;
+  setPersonaSchedule: PersonaScheduleSetter;
+};
+
+const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
+  isCustom,
+  expanded,
+  persona,
+  onCollapse,
+  expandedWidth,
+  personaSchedules,
+  setPersonaSchedule,
+}) => {
+  const [mobileChatVisible, setMobileChatVisible] = useState(false);
+  const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
+  const showChat = isDesktop || mobileChatVisible;
+  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+
+	const setAnonymousUser = useAppStore((state) => state.setAnonymousUser);
+	const setScheduleId = useAppStore((state) => state.setScheduleId);
+	const globalScheduleId = useAppStore((state) => state.scheduleId);
+	const calendarRefreshTrigger = useAppStore((state) => state.calendarRefreshTrigger);
+
+  function onMobileCollapse() {
+    setMobileChatVisible(false);
+  }
+
+  async function getPersonaSchedule() {
+    try {
+      const personaSchedule = await personaService.getPersonaSchedule(persona);
+      setPersonaSchedule(persona.id, personaSchedule.scheduleId, personaSchedule.anonymousUser, {
+        store: !isCustom,
+      });
+	  setAnonymousUser(personaSchedule.anonymousUser);
+    } catch (error) {
+      console.error("Couldn't create profile for persona: ", error);
+    }
+  }
+
+  useEffect(() => {
+    if (expanded && !scheduleId) {
+      getPersonaSchedule();
+    }
+  }, [expanded, setAnonymousUser]);
+
+  useEffect(() => {
+		if (calendarRefreshTrigger > 0 && scheduleId && globalScheduleId !== scheduleId) {
+			// Update local schedule ID when global state changes (from chat actions)
+			setScheduleId(globalScheduleId);
+		}
+	}, [calendarRefreshTrigger, globalScheduleId, scheduleId]);
+
+  const content = [
+    {
+      key: 'calendar',
+      container: CalendarContainer,
+      content: (
+        <React.Fragment>
+          <PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
+          <CalendarContainerActionButtons>
+            <MobileShowChatButton
+              onClick={() => setMobileChatVisible(!mobileChatVisible)}
+            >
+              <Plus size={20} />
+            </MobileShowChatButton>
+          </CalendarContainerActionButtons>
+        </React.Fragment>
+      ),
+    },
+    {
+      key: 'chat',
+      container: ChatContainer,
+      content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
+    },
+  ];
+
+  // Content revealing animations
+  const cardSpringRef = useSpringRef();
+  const cardSpring = useSpring({
+    ref: cardSpringRef,
+    from: { opacity: 0 },
+    to: { opacity: expanded ? 1 : 0 },
+  });
+
+  const contentTransRef = useSpringRef();
+  const contentTransition = useTransition(
+    expanded ? (showChat ? content : content.slice(0, 1)) : [],
+    {
+      keys: (item) => item.key,
+      ref: contentTransRef,
+      from: { opacity: 0, scale: 1.05 },
+      enter: { opacity: 1, scale: 1 },
+      leave: { opacity: 0, scale: 1 },
+      trail: expanded ? 200 : 0,
+      config: { tension: expanded ? 200 : 300 },
+    }
+  );
+
+  useChain(
+    expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
+    expanded ? [0, 0.75] : [0, 1],
+    300
+  );
+
+  return (
+    <CardContainer $display={expanded} style={cardSpring}>
+      <Header>
+        <h2>{persona.name}</h2>
+        <MobileCloseButtonContainer>
+          <Button variant="ghost" height={32} onClick={onCollapse}>
+            <ChevronLeftIcon size={16} />
+            <span>Back</span>
+          </Button>
+        </MobileCloseButtonContainer>
+      </Header>
+      <CardContent>
+        {contentTransition((style, item) => (
+          <item.container style={style} key={item.key}>
+            {item.content}
+          </item.container>
+        ))}
+      </CardContent>
+    </CardContainer>
+  );
+};
+
+const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;
-	background: linear-gradient(to right, ${styles.colors.black}, ${styles.colors.gray[900]});
-	border-radius: ${styles.borderRadius.xxLarge};
-	border: 2px solid ${styles.colors.gray[800]};
+	background: linear-gradient(to right, ${palette.colors.black}, ${palette.colors.gray[900]});
+	border-radius: ${palette.borderRadius.xxLarge};
+	border: 2px solid ${palette.colors.gray[800]};
 	pointer-events: ${(props) => (props.$display ? 'auto' : 'none')};
 	width: 100%;
 	height: 100%;
@@ -27,7 +159,7 @@ const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	gap: 1rem;
 	padding-top: 1.5rem;
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		padding-block: 1.5rem;
 		padding-right: 2rem;
 		gap: 1.5rem;
@@ -43,14 +175,14 @@ const Header = styled.header`
 
 	h2 {
 		line-height: 1.2;
-		font-weight: ${styles.typography.fontWeight.bold};
-		font-size: ${styles.typography.fontSize.xl};
-		font-family: ${styles.typography.fontFamily.urban};
+		font-weight: ${palette.typography.fontWeight.bold};
+		font-size: ${palette.typography.fontSize.xl};
+		font-family: ${palette.typography.fontFamily.urban};
 	}
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		h2 {
-			font-size: ${styles.typography.fontSize.displayXs};
+			font-size: ${palette.typography.fontSize.displayXs};
 		}
 	}
 `;
@@ -68,14 +200,17 @@ const CalendarContainer = styled(animated.div)`
 	grid-column: span 12;
 	overflow: hidden;
 	height: 100%;
-	background: ${styles.colors.gray[900]};
-	border-top: 1px solid ${styles.colors.gray[700]};
+	background: ${palette.colors.gray[900]};
+	border-top: 1px solid ${palette.colors.gray[700]};
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		grid-column: span 8;
-		border: 1px solid ${styles.colors.gray[700]};
+		border: 1px solid ${palette.colors.gray[700]};
 		border-left: none;
-		border-radius: 0 ${styles.borderRadius.large} ${styles.borderRadius.large} 0;
+		border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
+	}
+	@media screen and (min-width: ${palette.screens.xl}) {
+		grid-column: span 9;
 	}
 `;
 
@@ -85,13 +220,16 @@ const ChatContainer = styled(animated.div)`
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
-	border-radius: ${styles.borderRadius.xxLarge};
+	border-radius: ${palette.borderRadius.xxLarge};
 
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span 4;
 		border: none;
+	}
+	@media screen and (min-width: ${palette.screens.xl}) {
+		grid-column: span 3;
 	}
 `;
 
@@ -108,163 +246,27 @@ const CalendarActionButton = styled.button`
 	place-items: center;
 	height: 36px;
 	width: 36px;
-	border-radius: ${styles.borderRadius.xxLarge};
-	background-color: ${styles.colors.brand[500]};
-	color: ${styles.colors.white};
+	border-radius: ${palette.borderRadius.xxLarge};
+	background-color: ${palette.colors.brand[500]};
+	color: ${palette.colors.white};
 	transition: background-color 0.2s ease-in-out;
 
 	&:hover {
-		background-color: ${styles.colors.brand[600]};
+		background-color: ${palette.colors.brand[600]};
 	}
 `;
 
 const MobileShowChatButton = styled(CalendarActionButton)`
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
 	}
 `;
 
 const MobileCloseButtonContainer = styled.div`
 	width: fit-content;
-	@media screen and (min-width: ${styles.screens.lg}) {
+	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
 	}
 `;
-
-type PersonaExpandedCardProps = {
-	persona: Persona;
-	expanded: boolean;
-	onCollapse: () => void;
-	expandedWidth: number;
-};
-
-const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-	expanded,
-	persona,
-	onCollapse,
-	expandedWidth,
-}) => {
-	const [mobileChatVisible, setMobileChatVisible] = useState(false);
-	const isDesktop = !useIsMobile(parseInt(styles.screens.lg, 10));
-	const showChat = isDesktop || mobileChatVisible;
-
-	const [scheduleId, setScheduleId] = useState<string | null>(null);
-	const [currentPersona, setCurrentPersona] = useState<Persona | null>(null);
-	const changedPersona = !ObjectUtil.compareObjects(currentPersona, persona);
-
-	// Get the global state actions
-	const setAnonymousUser = useAppStore((state) => state.setAnonymousUser);
-	const globalScheduleId = useAppStore((state) => state.scheduleId);
-	const calendarRefreshTrigger = useAppStore((state) => state.calendarRefreshTrigger);
-
-	function onMobileCollapse() {
-		setMobileChatVisible(false);
-	}
-
-	// Set the scheduleId based on the current persona
-	useEffect(() => {
-		if (expanded && changedPersona) {
-			setCurrentPersona(persona);
-			const personaApi = new PersonaApi();
-
-			personaApi.getPersonaSchedule(persona).then((personaSchedule) => {
-				if (personaSchedule) {
-					setScheduleId(personaSchedule.scheduleId);
-					// Store the anonymous user in global state for chat usage
-					setAnonymousUser(personaSchedule.anonymousUser);
-				} else {
-					setScheduleId(null);
-					setAnonymousUser(null);
-					console.error('No schedule found for the persona');
-				}
-			});
-		}
-	}, [expanded, persona, changedPersona, setAnonymousUser]);
-
-	// Listen for calendar refresh triggers from chat component
-	useEffect(() => {
-		if (calendarRefreshTrigger > 0 && globalScheduleId && globalScheduleId !== scheduleId) {
-			// Update local schedule ID when global state changes (from chat actions)
-			setScheduleId(globalScheduleId);
-		}
-	}, [calendarRefreshTrigger, globalScheduleId, scheduleId]);
-
-	const content = [
-		{
-			key: 'calendar',
-			container: CalendarContainer,
-			content: (
-				<React.Fragment>
-					<PersonaCalendar
-						expandedWidth={expandedWidth}
-						scheduleIdLoading={changedPersona}
-						scheduleId={scheduleId}
-					/>
-					<CalendarContainerActionButtons>
-						<MobileShowChatButton
-							onClick={() => setMobileChatVisible(!mobileChatVisible)}
-						>
-							<Plus size={20} />
-						</MobileShowChatButton>
-					</CalendarContainerActionButtons>
-				</React.Fragment>
-			),
-		},
-		{
-			key: 'chat',
-			container: ChatContainer,
-			content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
-		},
-	];
-
-	// Content revealing animations
-	const cardSpringRef = useSpringRef();
-	const cardSpring = useSpring({
-		ref: cardSpringRef,
-		from: { opacity: 0 },
-		to: { opacity: expanded ? 1 : 0 },
-	});
-
-	const contentTransRef = useSpringRef();
-	const contentTransition = useTransition(
-		expanded ? (showChat ? content : content.slice(0, 1)) : [],
-		{
-			keys: (item) => item.key,
-			ref: contentTransRef,
-			from: { opacity: 0, scale: 1.05 },
-			enter: { opacity: 1, scale: 1 },
-			leave: { opacity: 0, scale: 1 },
-			trail: expanded ? 200 : 0,
-			config: { tension: expanded ? 200 : 300 },
-		}
-	);
-
-	useChain(
-		expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
-		expanded ? [0, 0.75] : [0, 1],
-		300
-	);
-
-	return (
-		<CardContainer $display={expanded} style={cardSpring}>
-			<Header>
-				<h2>{persona.occupation}</h2>
-				<MobileCloseButtonContainer>
-					<Button variant="ghost" height={32} onClick={onCollapse}>
-						<ChevronLeftIcon size={16} />
-						<span>Back</span>
-					</Button>
-				</MobileCloseButtonContainer>
-			</Header>
-			<CardContent>
-				{contentTransition((style, item) => (
-					<item.container style={style} key={item.key}>
-						{item.content}
-					</item.container>
-				))}
-			</CardContent>
-		</CardContainer>
-	);
-}
 
 export default PersonaCardExpanded;

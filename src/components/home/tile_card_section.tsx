@@ -1,12 +1,12 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import TileCard from './tile_card';
-import { TileCardProps } from '../../util/interface';
-import styles from '../../util/styles';
-import Button from '../shared/button';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';
-import ArrowRight from '../icons/arrow_right';
+import palette from '@/core/theme/palette';
+import Button from '@/core/common/components/button';
+import { TileCardProps } from '@/core/common/types/tile';
+import ArrowRight from '@/core/common/components/icons/arrow_right';
 
 const TileCardContainer = styled.div`
 	display: flex;
@@ -70,28 +70,28 @@ const tileGrid: Array<Array<TileCardProps>> = [
 			location: 'Conference Room A',
 			startTime: '09:00 AM',
 			endTime: '10:00 AM',
-			background_color: styles.colors.tileBackgroundPrimary,
+			background_color: palette.colors.tileBackgroundPrimary,
 		},
 		{
 			heading: 'Morning Meeting',
 			location: 'Conference Room A',
 			startTime: '10:00 AM',
 			endTime: '11:00 AM',
-			background_color: styles.colors.tileBackgroundSecondary,
+			background_color: palette.colors.tileBackgroundSecondary,
 		},
 		{
 			heading: 'Client Call',
 			location: 'Conference Room A',
 			startTime: '11:00 AM',
 			endTime: '12:00 PM',
-			background_color: styles.colors.tileBackgroundTertiary,
+			background_color: palette.colors.tileBackgroundTertiary,
 		},
 		{
 			heading: 'Lunch Break',
 			location: 'Conference Room A',
 			startTime: '12:00 PM',
 			endTime: '01:00 PM',
-			background_color: styles.colors.tileBackgroundSecondary,
+			background_color: palette.colors.tileBackgroundSecondary,
 		},
 	],
 	[
@@ -100,28 +100,28 @@ const tileGrid: Array<Array<TileCardProps>> = [
 			location: 'Conference Room A',
 			startTime: '09:00 AM',
 			endTime: '10:00 AM',
-			background_color: styles.colors.tileBackgroundSecondary,
+			background_color: palette.colors.tileBackgroundSecondary,
 		},
 		{
 			heading: 'Team Sync',
 			location: 'Conference Room A',
 			startTime: '10:00 AM',
 			endTime: '11:00 AM',
-			background_color: styles.colors.tileBackgroundTertiary,
+			background_color: palette.colors.tileBackgroundTertiary,
 		},
 		{
 			heading: 'Project Review',
 			location: 'Conference Room A',
 			startTime: '11:00 AM',
 			endTime: '12:00 PM',
-			background_color: styles.colors.tileBackgroundSecondary,
+			background_color: palette.colors.tileBackgroundSecondary,
 		},
 		{
 			heading: 'Happy Hour',
 			location: 'Conference Room A',
 			startTime: '12:00 PM',
 			endTime: '01:00 PM',
-			background_color: styles.colors.tileBackgroundPrimary,
+			background_color: palette.colors.tileBackgroundPrimary,
 		},
 	],
 	[
@@ -130,28 +130,28 @@ const tileGrid: Array<Array<TileCardProps>> = [
 			location: 'Restaurants',
 			startTime: '09:00 AM',
 			endTime: '10:00 AM',
-			background_color: styles.colors.tileBackgroundPrimary,
+			background_color: palette.colors.tileBackgroundPrimary,
 		},
 		{
 			heading: 'Grocery Shopping',
 			location: 'Grocery Store',
 			startTime: '10:00 AM',
 			endTime: '11:00 AM',
-			background_color: styles.colors.tileBackgroundSecondary,
+			background_color: palette.colors.tileBackgroundSecondary,
 		},
 		{
 			heading: 'Gym Workouts',
 			location: 'Gym',
 			startTime: '11:00 AM',
 			endTime: '12:00 PM',
-			background_color: styles.colors.tileBackgroundTertiary,
+			background_color: palette.colors.tileBackgroundTertiary,
 		},
 		{
 			heading: 'Meeting With Charles',
 			location: 'Zoom',
 			startTime: '12:00 PM',
 			endTime: '01:00 PM',
-			background_color: styles.colors.tileBackgroundSecondary,
+			background_color: palette.colors.tileBackgroundSecondary,
 		},
 	],
 ];

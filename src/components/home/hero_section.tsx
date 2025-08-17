@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
-import Button from '../shared/button';
+import Button from '@/core/common/components/button';
 import Section from '../layout/section';
-import ArrowRight from '../icons/arrow_right';
+import ArrowRight from '@/core/common/components/icons/arrow_right';
 import { useTranslation } from 'react-i18next';
 
 const ButtonContainer = styled.div`

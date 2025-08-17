@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import AddSquare from '../icons/add_square';
 import styled from 'styled-components';
-import styles from '../../util/styles';
+import palette from '@/core/theme/palette';
+import AddSquare from '@/core/common/components/icons/add_square';
+import CloseSquare from '@/core/common/components/icons/close_square';
 import { a } from '@react-spring/web';
-import CloseSquare from '../icons/close_square';
 
 type CollapseProps = {
 	items: Array<{
@@ -21,7 +21,7 @@ const StyledCollapse = styled.ul`
 `;
 
 const StyledCollapseItem = styled(a.li)`
-	border-bottom: 1px solid ${styles.colors.gray[800]};
+	border-bottom: 1px solid ${palette.colors.gray[800]};
 `;
 
 const StyledCollapseHeader = styled.button<{ $active: boolean }>`
@@ -30,9 +30,9 @@ const StyledCollapseHeader = styled.button<{ $active: boolean }>`
 	display: flex;
 	padding: 1rem 0;
 	gap: 0.75rem;
-	color: ${(props) => (props.$active ? styles.colors.brand[400] : styles.colors.gray[300])};
-	font-weight: ${styles.typography.fontWeight.semibold};
-	font-size: ${styles.typography.fontSize.lg};
+	color: ${(props) => (props.$active ? palette.colors.brand[400] : palette.colors.gray[300])};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	font-size: ${palette.typography.fontSize.lg};
 	transition: color 0.3s ease;
 
 	h3 {
@@ -44,16 +44,16 @@ const StyledCollapseHeader = styled.button<{ $active: boolean }>`
 		width: 25px;
 		position: relative;
 		padding-block: 1.5px;
-		color: ${(props) => (props.$active ? styles.colors.brand[400] : styles.colors.gray[500])};
+		color: ${(props) => (props.$active ? palette.colors.brand[400] : palette.colors.gray[500])};
 		transition: color 0.3s ease;
 	}
 
 	&:hover div {
-		${(props) => (props.$active ? '' : `color: ${styles.colors.gray[400]};`)}
+		${(props) => (props.$active ? '' : `color: ${palette.colors.gray[400]};`)}
 	}
 
-	@media (min-width: ${styles.screens.md}) {
-		font-size: ${styles.typography.fontSize.xl};
+	@media (min-width: ${palette.screens.md}) {
+		font-size: ${palette.typography.fontSize.xl};
 
 		div {
 			padding-block: 3px;
@@ -63,8 +63,8 @@ const StyledCollapseHeader = styled.button<{ $active: boolean }>`
 
 const StyledCollapseContent = styled.div<{ $active: boolean }>`
 	padding-left: calc(25px + 0.75rem);
-	color: ${styles.colors.gray[500]};
-	font-size: ${styles.typography.fontSize.base};
+	color: ${palette.colors.gray[500]};
+	font-size: ${palette.typography.fontSize.base};
 	line-height: 1.5;
 	padding-bottom: ${(props) => (props.$active ? '1rem' : '0')};
 

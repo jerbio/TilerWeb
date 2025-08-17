@@ -1,33 +1,10 @@
-import { AppApi } from './appApi';
+import { AppApi } from '@/api/appApi';
 
 export class WaitlistApi extends AppApi {
-	public async joinWaitlist(email: string): Promise<unknown> {
-		const myHeaders = new Headers();
-		myHeaders.append('Content-Type', 'application/json');
-
-		const body = JSON.stringify({
-			email: email,
-		});
-
-		const requestOptions = {
-			method: 'POST',
-			headers: myHeaders,
-			body: body,
-		};
-
-		return fetch(this.getUri('api/BetaUser'), requestOptions)
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				return response.json();
-			})
-			.then((result) => {
-				return result;
-			})
-			.catch((error) => {
-				console.error('Error joining waitlist:', error);
-				throw error;
-			});
-	}
+  joinWaitlist(email: string) {
+    return this.apiRequest('api/BetaUser', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
 }

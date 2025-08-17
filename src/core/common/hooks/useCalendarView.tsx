@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { CalendarViewOptions } from '../components/shared/calendar/calendar';
-import calendarConfig from '../components/shared/calendar/config';
+import { CalendarViewOptions } from '../components/calendar/calendar';
+import calendarConfig from '../../constants/calendar_config';
 
 function useCalendarView(viewRef: React.RefObject<HTMLUListElement>, containerWidth: number) {
 	// State to manage view options

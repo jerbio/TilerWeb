@@ -1,10 +1,10 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import styles from '../util/styles';
-import Button from './shared/button';
+import palette from '../core/theme/palette';
+import Button from '../core/common/components/button';
 import { SvgWrapper } from './shared_styled_components';
-import { TILER_LOGO } from '../util/constants';
+import { TILER_LOGO } from '../core/constants/tiler_logo';
 import { Menu, X } from 'lucide-react';
 import { a } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,7 @@ const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 	place-items: center;
 	padding: 14px 1.5rem;
 	backdrop-filter: blur(16px);
-	border-radius: ${styles.borderRadius.xxLarge};
+	border-radius: ${palette.borderRadius.xxLarge};
 
 	position: absolute;
 	top: 50%;
@@ -38,9 +38,9 @@ const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 	width: calc(100% - 64px);
 
 	border: ${(props) =>
-		props.$shrink ? `1px solid ${styles.colors.gray[800]}` : '1px solid transparent'};
-	background-color: ${(props) => (props.$shrink ? styles.colors.glass : 'transparent')};
-	border-radius: ${(props) => (props.$shrink ? styles.borderRadius.xxLarge : 0)};
+		props.$shrink ? `1px solid ${palette.colors.gray[800]}` : '1px solid transparent'};
+	background-color: ${(props) => (props.$shrink ? palette.colors.glass : 'transparent')};
+	border-radius: ${(props) => (props.$shrink ? palette.borderRadius.xxLarge : 0)};
 	height: ${(props) => (props.$shrink ? '60px' : '80px')};
 	max-width: ${(props) => (props.$shrink ? '800px' : '100%')};
 	transition: all 0.5s ease-in-out;
@@ -48,7 +48,7 @@ const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 
 const NavigationItemsWrapper = styled.div`
 	width: 100%;
-	max-width: ${styles.screens.lg};
+	max-width: ${palette.screens.lg};
 
 	display: flex;
 	justify-content: space-between;
@@ -71,14 +71,14 @@ const NavItems = styled.ul`
 const NavItem = styled.li``;
 
 const NavLink = styled.a`
-	color: ${styles.colors.gray[500]};
+	color: ${palette.colors.gray[500]};
 	text-decoration: none;
-	font-size: ${styles.typography.fontSize.sm};
-	font-family: ${styles.typography.fontFamily.inter};
-	font-weight: ${styles.typography.fontWeight.medium};
+	font-size: ${palette.typography.fontSize.sm};
+	font-family: ${palette.typography.fontFamily.inter};
+	font-weight: ${palette.typography.fontWeight.medium};
 	cursor: pointer;
 	&:hover {
-		color: ${styles.colors.gray[400]};
+		color: ${palette.colors.gray[400]};
 	}
 	transition: color 0.3s ease;
 `;
@@ -110,7 +110,7 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	align-items: center;
 	gap: 16px;
 	backdrop-filter: blur(16px);
-	background-color: ${(props) => (props.$shrink ? styles.colors.glass : '#000000')};
+	background-color: ${(props) => (props.$shrink ? palette.colors.glass : '#000000')};
 
 	position: absolute;
 	top: 50%;
@@ -119,7 +119,7 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	z-index: -1;
 	width: ${(props) => (props.$shrink ? 'calc(100% - 64px)' : '100%')};
 	border-radius: ${(props) =>
-		props.$shrink ? `0 0 ${styles.borderRadius.xxLarge} ${styles.borderRadius.xxLarge}` : 0};
+		props.$shrink ? `0 0 ${palette.borderRadius.xxLarge} ${palette.borderRadius.xxLarge}` : 0};
 
 	padding: ${({ $isopen: isOpen }) => (isOpen ? '56px 16px 16px' : '0 16px')};
 	max-height: ${({ $isopen: isOpen }) => (isOpen ? '300px' : '0')};
@@ -128,11 +128,11 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 
 	a {
 		padding: 12px 0;
-		color: ${styles.colors.text};
+		color: ${palette.colors.text};
 		text-decoration: none;
-		font-size: ${styles.typography.fontSize.sm};
+		font-size: ${palette.typography.fontSize.sm};
 		&:hover {
-			color: ${styles.colors.brand[500]};
+			color: ${palette.colors.brand[500]};
 		}
 	}
 `;
@@ -211,7 +211,7 @@ const Navigation: React.FC = () => {
 							<Button
 								size="small"
 								onClick={() => window.open('https://launch.tiler.app/', '_blank')}
-								bordergradient={[styles.colors.brand[400]]}
+								bordergradient={[palette.colors.brand[400]]}
 							>
 								{t('common.buttons.tryFree')}
 							</Button>
@@ -237,7 +237,7 @@ const Navigation: React.FC = () => {
 					<NavLink href="/features">{t('common.navigation.features')}</NavLink>
 					<Button
 						onClick={() => window.open('https://tiler.app/', '_blank')}
-						bordergradient={[styles.colors.brand[500]]}
+						bordergradient={[palette.colors.brand[500]]}
 					>
 						{t('common.buttons.tryFree')}
 					</Button>

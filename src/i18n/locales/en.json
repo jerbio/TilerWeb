@@ -31,10 +31,12 @@
 	},
 	"home": {
 		"persona": {
-			"custom": "Custom Profile",
-			"developer": "Developer",
-			"healthcare": "Healthcare",
-			"engineer": "Engineer"
+			"created": "Profile Created",
+			"expiresIn": "{{time}} left",
+			"tileSuggestions": "Tiles",
+			"custom": {
+				"namePlaceholder": "New Profile"
+			}
 		},
 		"expanded": {
 			"chat": {

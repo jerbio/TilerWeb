@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
-import { CalendarViewOptions } from '../../components/shared/calendar/calendar';
-import calendarConfig from '../../components/shared/calendar/config';
+import { CalendarViewOptions } from '@/core/common/components/calendar/calendar';
+import calendarConfig from '@/core/constants/calendar_config';
+import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 
 type CalendarEventBox = {
 	x: number;
@@ -14,7 +15,10 @@ class CalendarUtil {
 		s: dayjs.Dayjs,
 		e: dayjs.Dayjs,
 		viewOptions: CalendarViewOptions,
-		headerWidth: number
+		headerWidth: number,
+		options: {
+			minCellHeight?: number;
+		} = {}
 	): CalendarEventBox {
 		const viewBox: CalendarEventBox = {
 			x: 0,
@@ -29,7 +33,7 @@ class CalendarUtil {
 
 		// Positioning the event based on the day index and width
 		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-		const minCellHeight = parseInt(calendarConfig.MIN_CELL_HEIGHT);
+		const minCellHeight = options.minCellHeight || parseInt(calendarConfig.MIN_CELL_HEIGHT);
 		const width = headerWidth / viewOptions.daysInView;
 		const x = dayIndex * width;
 		const y = cellHeight * startHourFraction;
@@ -51,6 +55,15 @@ class CalendarUtil {
 			eventA.y >= eventB.y + eventB.height
 		);
 	}
+
+	static getEventLocationLink (event: ScheduleSubCalendarEvent) {
+		if (event.location?.address) {
+			return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+				event.location.address
+			)}`;
+		}
+		return '#';
+	};
 }
 
 export default CalendarUtil;

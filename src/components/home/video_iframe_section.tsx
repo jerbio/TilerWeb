@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import styles from '../../util/styles';
+import palette from '@/core/theme/palette';
 import Section from '../layout/section';
 import { useTranslation } from 'react-i18next';
 
@@ -19,8 +19,8 @@ const Iframe = styled.iframe`
 	aspect-ratio: 16 / 9;
 	height: 100%;
 	margin: 0 auto;
-	border-radius: ${styles.borderRadius.large};
-	border: 0.25rem solid ${styles.colors.gray[900]};
+	border-radius: ${palette.borderRadius.large};
+	border: 0.25rem solid ${palette.colors.gray[900]};
 `;
 
 const VideoIframeSection: React.FC<VideoIframeProps> = ({
