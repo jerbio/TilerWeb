@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import FeatureCard from '../components/features/FeatureCard';
+import FeatureCard from '@/components/features/FeatureCard';
 import palette from '@/core/theme/palette';
 import DottedLine from '@/assets/dotted-line.svg';
 import FeatureCollab from '@/assets/features/collab.png';

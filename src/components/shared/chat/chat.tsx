@@ -146,7 +146,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
-	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
+	const setScheduleId = useAppStore((state) => state.setGlobalScheduleId); // Action to set the schedule ID
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<PromptWithActions[]>([]);

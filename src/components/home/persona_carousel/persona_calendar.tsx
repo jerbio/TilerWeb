@@ -5,9 +5,11 @@ import Calendar from '../../../core/common/components/calendar/calendar';
 import TimeUtil from '../../../core/util/time';
 import useCalendarView from '../../../core/common/hooks/useCalendarView';
 import { scheduleService } from '@/services';
+import { UserInfo } from 'global_state';
 
 type PersonaCalendarProps = {
   scheduleId: string | null;
+  userInfo: UserInfo | null;
   expandedWidth: number;
 };
 

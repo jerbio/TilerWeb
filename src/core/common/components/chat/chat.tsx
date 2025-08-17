@@ -135,7 +135,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const { t } = useTranslation();
 
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
-	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
+	const setGlobalScheduleId = useAppStore((state) => state.setGlobalScheduleId); // Action to set the schedule ID
+	const triggerCalendarRefresh = useAppStore((state) => state.triggerCalendarRefresh); // Action to set the schedule ID
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<PromptWithActions[]>([]);
@@ -147,9 +148,10 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
-	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+	const anonymousUserId = useAppStore((state) => state.anonymousUser?.id ?? '');
 	const handleSetScheduleId = (id: string) => {
-		setScheduleId(id);
+		setGlobalScheduleId(id);
+		triggerCalendarRefresh(); // Trigger calendar refresh after setting schedule ID
 	};
 
 	// Load session ID from local storage on mount

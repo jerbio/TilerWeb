@@ -26,7 +26,7 @@ interface AppState {
 	removeChatContext: (context: ChatContextType) => void; // Action to remove a specific chat context
 	clearChatContext: () => void; // Action to clear all chat contexts
 	scheduleId: string | null; // Action to set the schedule change state
-	setScheduleId: (id: string | null) => void; // Action to set the schedule ID
+	setGlobalScheduleId: (id: string | null) => void; // Action to set the schedule ID
 	scheduleLastUpdatedBy: string | null; // Action to set the last updated by component
 	setScheduleLastUpdatedBy: (component: string | null) => void; // Action to set the last updated by component
 
@@ -52,7 +52,7 @@ const useAppStore = create<AppState>((set) => ({
 		})),
 	clearChatContext: () => set(() => ({ chatContext: [] })), // Clears all contexts
 	scheduleId: null, // Initial value for scheduleId is null
-	setScheduleId: (id) => set(() => ({ scheduleId: id })), //
+	setGlobalScheduleId: (id) => set(() => ({ scheduleId: id })), //
 	scheduleLastUpdatedBy: null, // Initial value for scheduleLastUpdatedBy is null
 	setScheduleLastUpdatedBy: (component) => set(() => ({ scheduleLastUpdatedBy: component })), // Sets the last updated by component
 

@@ -35,9 +35,11 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+  const userInfo = personaSchedules[persona.id]?.userInfo || null;
 
 	const setAnonymousUser = useAppStore((state) => state.setAnonymousUser);
-	const setScheduleId = useAppStore((state) => state.setScheduleId);
+	const setGlobalScheduleId = useAppStore((state) => state.setGlobalScheduleId);
+	const globalAonymousUser = useAppStore((state) => state.anonymousUser);
 	const globalScheduleId = useAppStore((state) => state.scheduleId);
 	const calendarRefreshTrigger = useAppStore((state) => state.calendarRefreshTrigger);
 
@@ -61,14 +63,24 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
     if (expanded && !scheduleId) {
       getPersonaSchedule();
     }
-  }, [expanded, setAnonymousUser]);
+  }, [expanded]);
 
   useEffect(() => {
 		if (calendarRefreshTrigger > 0 && scheduleId && globalScheduleId !== scheduleId) {
 			// Update local schedule ID when global state changes (from chat actions)
-			setScheduleId(globalScheduleId);
+			if (!userInfo || globalScheduleId?.includes(userInfo.id) ) {
+				setGlobalScheduleId(globalScheduleId);
+				setPersonaSchedule(persona.id, globalScheduleId, userInfo, { store: !isCustom });
+			}
+			// const personaCpy = JSON.parse(JSON.stringify(persona));
+			// personaCpy.scheduleId= globalScheduleId;
+			
 		}
-	}, [calendarRefreshTrigger, globalScheduleId, scheduleId]);
+		if(userInfo && userInfo!=globalAonymousUser) {
+			// Update anonymous user info when it changes
+			setAnonymousUser(userInfo);
+		}
+	}, [calendarRefreshTrigger, globalScheduleId, scheduleId, userInfo]);
 
   const content = [
     {
@@ -76,7 +88,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
+          <PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} userInfo={userInfo} />
           <CalendarContainerActionButtons>
             <MobileShowChatButton
               onClick={() => setMobileChatVisible(!mobileChatVisible)}
