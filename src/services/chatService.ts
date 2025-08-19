@@ -38,6 +38,7 @@ class ChatService {
       ActionId: actionId,
       AnonymousUserId: anonymousUserId,
       MobileApp: true,
+      TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
     try {
       const response = await this.chatApi.sendMessage(requestBody);

@@ -34,7 +34,7 @@ export class ChatApi extends AppApi {
   public executeActions(requestId: string) {
     return this.apiRequest<ChatExecuteActionResponse>('api/Vibe/Request/Execute', {
       method: 'POST',
-      body: JSON.stringify({ requestId }),
+      body: JSON.stringify({ requestId, TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
     });
   }
 }
