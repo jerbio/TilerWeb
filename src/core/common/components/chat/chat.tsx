@@ -138,6 +138,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const setGlobalScheduleId = useAppStore((state) => state.setGlobalScheduleId); // Action to set the schedule ID
 	const triggerCalendarRefresh = useAppStore((state) => state.triggerCalendarRefresh); // Action to set the schedule ID
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const messagesListRef = useRef<HTMLDivElement>(null);
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<PromptWithActions[]>([]);
 	const [isSending, setIsSending] = useState(false);
@@ -149,6 +150,10 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
 	const anonymousUserId = useAppStore((state) => state.anonymousUser?.id ?? '');
+	// const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
+	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
+	const userLocationVerified = useAppStore((state) => state.userInfo?.userLocationVerified ?? "false");
 	const handleSetScheduleId = (id: string) => {
 		setGlobalScheduleId(id);
 		triggerCalendarRefresh(); // Trigger calendar refresh after setting schedule ID
@@ -168,6 +173,15 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			loadChatMessages(sessionId);
 		}
 	}, [sessionId, scheduleId]);
+
+	useEffect(() => {
+		if (messages.length > 0 && messagesListRef.current) {
+			messagesListRef.current.scrollTo({
+			top: messagesListRef.current.scrollHeight,
+			behavior: "smooth",
+			});
+		}
+	}, [messages]);
 
 	const loadChatMessages = async (sid: string) => {
 		if (!sid) return;
@@ -253,7 +267,10 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				message,
 				entityId,
 				sessionId,
-				anonymousUserId
+				anonymousUserId,
+				userLongitude,
+				userLatitude,
+				userLocationVerified,
 			);
 			if (
 				response?.Content?.vibeResponse?.tilerUser &&
@@ -339,7 +356,11 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	};
 
 	const hasUnexecutedActions = () => {
-		return messages.some((msg) => msg.actions?.some((action) => action.status !== 'executed'));
+		return messages.some((msg) =>
+			msg.actions?.some(
+				(action) => action.status !== 'executed' && action.status !== 'exited'
+			)
+		);
 	};
 
 	const handleNewChat = () => {
@@ -427,7 +448,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 					</EmptyChat>
 				)}
 
-				<div className="messages-list">
+				<div className="messages-list" ref={messagesListRef}>
 					{messages.map((message) => (
 						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
 							<div className="message-content">{message.content}</div>
@@ -446,7 +467,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 								>
 									<img
 										src={ChatUtil.getActionIcon(action)}
-										alt="add_new_appointment"
+										alt="action_icon"
 										style={{
 											width: '15px',
 											height: '15px',
@@ -474,14 +495,15 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
+							flexDirection: 'column',
 						}}
 					>
+						<span>Sending Request...</span>
 						<img
 							src={HORIZONTALPROGRESSBAR}
 							alt="Loading..."
-							style={{ width: '120px', height: '24px', marginRight: '0.5rem' }}
+							style={{ width: '100%', height: '24px', marginRight: '0.5rem' }}
 						/>
-						<span>Sending Request...</span>
 					</div>
 				)}
 				{!isSending && hasUnexecutedActions() && (

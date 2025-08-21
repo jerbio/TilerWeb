@@ -187,6 +187,9 @@ const UserLocation: React.FC = () => {
 					
 					const position = await Promise.race([positionPromise, timeoutPromise]) as GeolocationPosition;
 					const { latitude, longitude } = position.coords;
+					const latitudeStr = latitude.toString();
+					const longitudeStr = longitude.toString();
+
 
 					try {
 						// Use reverse geocoding to get a human-readable address
@@ -212,7 +215,10 @@ const UserLocation: React.FC = () => {
 						if (userInfo) {
 							setUserInfo({
 								...userInfo,
-								location: address
+								location: address,
+								userLongitude: longitudeStr,
+								userLatitude: latitudeStr,
+								userLocationVerified: "true",
 							});
 						}
 					} catch (err) {

@@ -14,9 +14,11 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const getDotColor = (status?: string) => {
-	if (status === 'parsed') return palette.colors.teal[500]; // yellow
-	if (status === 'clarification') return palette.colors.error[500]; // red
+	if (status === 'parsed') return palette.colors.teal[500]; // teal
+	if (status === 'clarification') return palette.colors.warning[500]; // yellow
 	if (status === 'executed') return palette.colors.success[500]; // green
+  if (status === 'failed') return palette.colors.error[500] //red
+  if (status === 'exited') return palette.colors.gray[500]; // gray
 	return 'transparent';
 };
 
