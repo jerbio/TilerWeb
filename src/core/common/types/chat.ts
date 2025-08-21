@@ -86,6 +86,9 @@ export type ChatMessageBody = {
   getTimeSpan?: string;
   UserName?: string;
   AnonymousUserId?: string;
+  UserLongitude?: string;
+  UserLatitude?: string;
+  UserLocationVerified?: string;
 }
 
 export type {

@@ -18,6 +18,9 @@ export interface UserInfo {
 	lastName: string; // ""
 	countryCode: string; // "1"
 	location?: string; // User's current location (optional)
+	userLongitude?: string; // User's longitude (optional)
+	userLatitude?: string; // User's latitude (optional)
+	userLocationVerified?: string; // Indicates if the user's location is verified (optional)
 }
 
 interface AppState {

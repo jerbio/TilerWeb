@@ -27,6 +27,9 @@ class ChatService {
     entityId: string,
     sessionId: string = '',
     anonymousUserId: string = '',
+    userLongitude: string = '',
+    userLatitude: string = '',
+    userLocationVerified: string = '',
     requestId: string = '',
     actionId: string = ''
   ) {
@@ -38,6 +41,10 @@ class ChatService {
       ActionId: actionId,
       AnonymousUserId: anonymousUserId,
       MobileApp: true,
+      UserLatitude: userLatitude,
+      UserLongitude: userLongitude,
+      UserLocationVerified: userLocationVerified,
+      TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
     };
     try {
       const response = await this.chatApi.sendMessage(requestBody);
