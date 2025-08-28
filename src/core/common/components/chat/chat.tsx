@@ -226,8 +226,18 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				};
 			});
 
-			// Sort and merge with previous
-			loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
+			console.log('Loaded messages before sorting:', loadedMessages);
+
+			// Sort by timestamp extracted from ID (chronological order)
+			loadedMessages.sort((a, b) => {
+				const extractTimestamp = (id: string): number => {
+					const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
+					return match ? parseInt(match[1], 10) : 0;
+				};
+				return extractTimestamp(a.id) - extractTimestamp(b.id);
+			});
+
+			console.log('Loaded messages after sorting:', loadedMessages);
 
 			setMessages((prevMessages) => {
 				const existingIds = new Set(prevMessages.map((m) => m.id));
@@ -236,9 +246,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				// Merge actions for existing messages
 				const updatedMessages = prevMessages.map((prevMessage) => {
 					const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
-					return updatedMessage
-						? { ...prevMessage, actions: updatedMessage.actions }
-						: prevMessage;
+					return updatedMessage || prevMessage;
 				});
 
 				return [...updatedMessages, ...uniqueNewMessages];
@@ -334,15 +342,17 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			setIsSending(true);
 			setError(null);
 
-			const executedChanges = await chatService.sendChatAcceptChanges(requestId);
+			const executedChanges = await chatService.sendChatAcceptChanges(
+				requestId,
+				anonymousUserId,
+				userLongitude,
+				userLatitude,
+				userLocationVerified
+			);
 			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
 			if (newScheduleId) {
 				handleSetScheduleId(newScheduleId);
-
-				// Trigger reloading of chat messages
-				if (sessionId) {
-					await loadChatMessages(sessionId);
-				}
+				// useEffect will automatically reload messages when scheduleId changes
 			}
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
