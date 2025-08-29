@@ -31,10 +31,24 @@ export class ChatApi extends AppApi {
     return this.apiRequest<ChatActionsResponse>('api/Vibe/Action?' + queryParam);
   }
 
-  public executeActions(requestId: string) {
+  public executeActions(
+    requestId: string, 
+    anonymousUserId?: string,
+    userLongitude?: string, 
+    userLatitude?: string, 
+    userLocationVerified?: string
+  ) {
     return this.apiRequest<ChatExecuteActionResponse>('api/Vibe/Request/Execute', {
       method: 'POST',
-      body: JSON.stringify({ requestId, TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+      // body: JSON.stringify({ requestId, TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+      body: JSON.stringify({ 
+        requestId,
+        anonymousUserId,
+        userLongitude,
+        userLatitude,
+        userLocationVerified,
+        TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      }),
     });
   }
 }
