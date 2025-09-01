@@ -186,7 +186,6 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				try {
 					const response = await chatService.getVibeRequest(requestId);
 					const isClosed = response?.Content?.vibeRequest?.isClosed;
-					console.log('Vibe request isClosed status:', isClosed, isClosed !== true);
 					setHasUnexecuted(isClosed !== true);
 				} catch (error) {
 					console.error('Error checking vibe request status:', error);
@@ -358,8 +357,6 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				};
 			});
 
-			console.log('Loaded messages before sorting:', loadedMessages);
-
 			// Sort by timestamp extracted from ID (chronological order)
 			loadedMessages.sort((a, b) => {
 				const extractTimestamp = (id: string): number => {
@@ -368,9 +365,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				};
 				return extractTimestamp(a.id) - extractTimestamp(b.id);
 			});
-
-			console.log('Loaded messages after sorting:', loadedMessages);
-
+			
 			setMessages((prevMessages) => {
 				const existingIds = new Set(prevMessages.map((m) => m.id));
 				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
