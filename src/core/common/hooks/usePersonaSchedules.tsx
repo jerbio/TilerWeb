@@ -26,15 +26,12 @@ function usePersonaSchedules() {
     const storedSchedules: PersonaSchedule = JSON.parse(
       localStorage.getItem(PERSONA_SCHEDULE_KEY) || '{}'
     );
-
     for (const personaId in storedSchedules) {
       const schedule = storedSchedules[personaId]!;
       if (schedule.scheduleExpiration < TimeUtil.now()) {
-        // Remove expired schedules
         delete storedSchedules[personaId];
       }
     }
-
     return storedSchedules;
   }
 
@@ -44,11 +41,11 @@ function usePersonaSchedules() {
     setPersonaSchedules(storedSchedules);
   }, []);
 
-  function setPersonaSchedule(
-    personaId: Persona['id'],
-    scheduleId: string | null,
-    options: SetPersonaScheduleOptions = { store: true }
-  ) {
+  const setPersonaSchedule: PersonaScheduleSetter = (
+    personaId,
+    scheduleId,
+    options = { store: true }
+  ) => {
     if (scheduleId === null) {
       const newSchedules = { ...personaSchedules };
       delete newSchedules[personaId];
@@ -70,7 +67,7 @@ function usePersonaSchedules() {
         localStorage.setItem(PERSONA_SCHEDULE_KEY, JSON.stringify(newSchedules));
       }
     }
-  }
+  };
 
   return { personaSchedules, setPersonaSchedule };
 }

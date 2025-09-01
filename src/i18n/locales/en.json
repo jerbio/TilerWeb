@@ -10,7 +10,8 @@
 		},
 		"navigation": {
 			"home": "Home",
-			"features": "Features"
+			"features": "Features",
+			"waitlist": "Waitlist"
 		},
 		"copyright": "© {{year}} Tiler. All rights reserved.",
 		"social": {

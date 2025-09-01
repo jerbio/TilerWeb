@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Layout from './pages/Layout';
 import Features from './pages/Features';
 import { Toaster } from 'sonner';
+import Waitlist from './pages/Waitlist';
 // import useAppStore from './global_state';
 
 const App: React.FC = () => {
@@ -43,6 +44,7 @@ const App: React.FC = () => {
 				<Route path="/" element={<Layout />}>
 					<Route index element={<Home />} />
 					<Route path="/features" element={<Features />} />
+					<Route path="/waitlist" element={<Waitlist />} />
 				</Route>
 			</Routes>
 			<Toaster position="bottom-left" theme="system" />

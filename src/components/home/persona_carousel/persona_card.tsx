@@ -57,7 +57,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   useEffect(() => {
     if (personaSchedule) {
       clearInterval(personaScheduleTimeLeftInterval);
-
       setPersonaScheduleTimeLeft(
         TimeUtil.rangeDuration(dayjs(), dayjs(personaSchedule.scheduleExpiration))
       );
@@ -78,7 +77,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       );
       setPersonaScheduleTimeLeftInterval(intervalID);
     }
-
     return () => {
       clearInterval(personaScheduleTimeLeftInterval);
     };
@@ -87,7 +85,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   const isSelected = selectedPersona === persona.key;
   const isAnotherSelected = selectedPersona !== null && selectedPersona !== persona.key;
   const isScheduleCreated = !!personaSchedule;
-
   const [tileSuggestions, setTileSuggestions] = useState<
     { id: number; name: string; selected: boolean }[]
   >([]);
@@ -158,7 +155,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       id: persona.id,
       name: 'Custom',
     });
-    setPersonaSchedule(persona.id, null, { store: false });
     swiper.enable();
   }
 
@@ -326,7 +322,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
             ))}
           </OverlayList>
           <ButtonContainer>
-            {isCustom ? (
+            {isCustom && !isScheduleCreated ? (
               <ButtonStyled
                 style={buttonSpring}
                 onClick={() => {
@@ -349,7 +345,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       </OverlayContainer>
       {/* Set expanded width to the final width of animation */}
       <PersonaCardExpanded
-        isCustom={isCustom}
         persona={currentPersona}
         expanded={isSelected}
         onCollapse={isCustom ? onCustomDeselect : onDeselect}
