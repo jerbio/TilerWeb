@@ -8,6 +8,8 @@ import {
 import { AppApi } from './appApi';
 
 export class ChatApi extends AppApi {
+  private longitude: string|null|undefined = "";
+  private latitude: string|null|undefined = "";
   // Messages
   public getMessages(sessionId: string) {
     return this.apiRequest<ChatMessagesResponse>(
@@ -16,6 +18,8 @@ export class ChatApi extends AppApi {
   }
 
   public sendMessage(messageBody: ChatMessageBody) {
+    this.longitude = messageBody.UserLongitude;
+    this.latitude = messageBody.UserLatitude;
     return this.apiRequest<ChatSendMessageResponse>('api/Vibe/Chat', {
       method: 'POST',
       body: JSON.stringify(messageBody),
@@ -34,7 +38,7 @@ export class ChatApi extends AppApi {
   public executeActions(requestId: string) {
     return this.apiRequest<ChatExecuteActionResponse>('api/Vibe/Request/Execute', {
       method: 'POST',
-      body: JSON.stringify({ requestId, TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+      body: JSON.stringify({ requestId, UserLongitude: this.longitude, UserLatitude: this.latitude, TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
     });
   }
 }

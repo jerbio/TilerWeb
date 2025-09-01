@@ -9,6 +9,11 @@ export default [
 	{
 		ignores: ['dist/**'],
 	},
+	{
+  rules: {
+    'unused-vars': 'off', // You can set this to 'off' as well to completely ignore, but not advisable
+  }
+},
 
 	// File matching and config
 	{ files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
