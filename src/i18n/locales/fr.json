@@ -1,5 +1,24 @@
 {
+	"common": {
+		"buttons": {
+			"back": "Retour"
+		}
+	},
 	"home": {
+		"expanded": {
+			"chat": {
+				"newChat": "Nouvelle Discussion",
+				"clearSession": "Effacer la Session",
+				"inputPlaceholder": "Dites à Tiler ce que vous faites...",
+				"loadingMessages": "Chargement des messages...",
+				"loadingActions": "Chargement d'autres actions...",
+				"error": "Erreur",
+				"emptyStateTitle": "Que souhaitez-vous faire ?",
+				"emptyStateDescription": "Décrivez une tâche, nous nous occupons du carrelage.",
+				"sendingRequest": "Envoi de la requête...",
+				"acceptChanges": "Accepter les Modifications"
+			}
+		},
 		"appDownload": {
 			"ios": {
 				"title": "Télécharger sur l'App Store",

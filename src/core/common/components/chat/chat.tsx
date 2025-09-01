@@ -529,7 +529,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 						}}
 						onClick={handleNewChat}
 					>
-						Clear Session
+						{t('home.expanded.chat.clearSession')}
 					</Button>
 				)}
 				{chatContext.length === 0 ? (
@@ -567,16 +567,16 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				)}
 			</ChatHeader>
 			<ChatContent>
-				{isLoading && <LoadingIndicator message="Loading chat messages..." />}
-				{isBatchLoading && <LoadingIndicator message="Loading more actions..." />}
+				{isLoading && <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />}
+				{isBatchLoading && <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />}
 
-				{error && <div className="chat-error">Error: {error}</div>}
+				{error && <div className="chat-error">{t('home.expanded.chat.error')}: {error}</div>}
 
 				{!isLoading && !error && !messages.length && (
 					<EmptyChat>
 						<Logo size={48} />
-						<h3>What would you like to do?</h3>
-						<p>Describe a task, We&apos;ll handle the tiling.</p>
+						<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+						<p>{t('home.expanded.chat.emptyStateDescription')}</p>
 					</EmptyChat>
 				)}
 
@@ -621,7 +621,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 			<div>
 				{isSending && (
-					<LoadingIndicator message="Sending Request..." />
+					<LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
 				)}
 				{!isSending && shouldShowAcceptButton && (
 					<Button
@@ -633,7 +633,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 						}}
 						onClick={() => acceptAllChanges()}
 					>
-						Accept Changes
+						{t('home.expanded.chat.acceptChanges')}
 					</Button>
 				)}
 			</div>
