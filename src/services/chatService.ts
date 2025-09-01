@@ -105,6 +105,16 @@ class ChatService {
 			throw normalizeError(error);
 		}
 	}
+
+	async getVibeRequest(requestId: string) {
+		try {
+			const response = await this.chatApi.getVibeRequest(requestId);
+			return response;
+		} catch (error) {
+			console.error('Error fetching vibe request', error);
+			throw normalizeError(error);
+		}
+	}
 }
 
 export default ChatService;

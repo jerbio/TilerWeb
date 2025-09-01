@@ -13,10 +13,10 @@ import {
 import useAppStore, { ChatContextType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 import palette from '@/core/theme/palette';
-import HORIZONTALPROGRESSBAR from '@/assets/horizontal_progress_bar.gif';
 import { chatService } from '@/services';
 import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
+import LoadingIndicator from '@/core/common/components/loading-indicator';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -144,6 +144,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [isBatchLoading, setIsBatchLoading] = useState(false);
 	const [requestId, setRequestId] = useState<string | null>(null);
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
@@ -171,6 +172,42 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 		}
 	}, [sessionId, scheduleId]);
 
+	// Custom hook to check unexecuted actions
+	const useHasUnexecutedActions = (requestId: string | null) => {
+		const [hasUnexecuted, setHasUnexecuted] = useState(false);
+		
+		useEffect(() => {
+			const checkActions = async () => {
+				if (!requestId) {
+					setHasUnexecuted(false);
+					return;
+				}
+				
+				try {
+					const response = await chatService.getVibeRequest(requestId);
+					const isClosed = response?.Content?.vibeRequest?.isClosed;
+					console.log('Vibe request isClosed status:', isClosed, isClosed !== true);
+					setHasUnexecuted(isClosed !== true);
+				} catch (error) {
+					console.error('Error checking vibe request status:', error);
+					// Fallback to original logic if API fails
+					const fallback = messages.some((msg) =>
+						msg.actions?.some(
+							(action) => action.status !== 'executed' && action.status !== 'exited'
+						)
+					);
+					setHasUnexecuted(fallback);
+				}
+			};
+			
+			checkActions();
+		}, [requestId, messages]); // Re-check when requestId or messages change
+		
+		return hasUnexecuted;
+	};
+
+	const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
+
 	useEffect(() => {
 		if (messages.length > 0 && messagesListRef.current) {
 			messagesListRef.current.scrollTo({
@@ -179,6 +216,48 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			});
 		}
 	}, [messages]);
+
+
+	// Helper function to update messages with actions progressively
+	const updateMessagesWithActions = (rawMessages: PromptWithActions[], actionsMap: Record<string, VibeAction>) => {
+		const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+			const actionIds: string[] = entry.actionIds ?? [];
+			const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
+
+			return {
+				id: entry.id,
+				origin: entry.origin,
+				content: entry.content,
+				actionId: entry.actionId,
+				requestId: entry.requestId,
+				sessionId: entry.sessionId,
+				actionIds,
+				actions: resolvedActions,
+			};
+		});
+
+		// Sort by timestamp
+		updatedMessages.sort((a, b) => {
+			const extractTimestamp = (id: string): number => {
+				const match = id.match(/(\d{18})/);
+				return match ? parseInt(match[1], 10) : 0;
+			};
+			return extractTimestamp(a.id) - extractTimestamp(b.id);
+		});
+
+		// Update state with partial results
+		setMessages((prevMessages) => {
+			const existingIds = new Set(prevMessages.map((m) => m.id));
+			const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
+
+			const mergedMessages = prevMessages.map((prevMessage) => {
+				const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
+				return updatedMessage || prevMessage;
+			});
+
+			return [...mergedMessages, ...uniqueNewMessages];
+		});
+	};
 
 	const loadChatMessages = async (sid: string) => {
 		if (!sid) return;
@@ -191,22 +270,75 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			const rawMessages = data.Content.chats || [];
 			if (!rawMessages || rawMessages.length === 0) return;
 
-			// Collect all unique actionIds
+			// Collect all unique actionIds, ordered by message timestamp (newest first)
+			const messagesByTimestamp = rawMessages
+				.map((entry) => ({
+					...entry,
+					timestamp: (() => {
+						const match = entry.id.match(/(\d{18})/);
+						return match ? parseInt(match[1], 10) : 0;
+					})()
+				}))
+				.sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
+
 			const uniqueActionIds = Array.from(
-				new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
+				new Set(messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean))
 			);
 
-			// Fetch and map actions by ID
+			// Fetch and map actions by ID with batching
 			let allActionsMap: Record<string, VibeAction> = {};
 			if (uniqueActionIds.length > 0) {
-				const fetchedActions = await chatService.getActions(uniqueActionIds);
-				allActionsMap = fetchedActions.reduce(
-					(acc, action) => {
-						acc[action.id] = action;
-						return acc;
-					},
-					{} as Record<string, VibeAction>
-				);
+				const BATCH_SIZE = 10;
+				const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
+
+				if (shouldBatch) {
+					setIsBatchLoading(true);
+					
+					// Create batches (most recent actions first)
+					const batches: string[][] = [];
+					for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
+						batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
+					}
+
+					// Process batches sequentially, updating UI after each batch
+					for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+						const batch = batches[batchIndex];
+						const isLastBatch = batchIndex === batches.length - 1;
+
+						try {
+							const fetchedActions = await chatService.getActions(batch);
+							const batchActionsMap = fetchedActions.reduce(
+								(acc, action) => {
+									acc[action.id] = action;
+									return acc;
+								},
+								{} as Record<string, VibeAction>
+							);
+
+							// Merge with existing actions
+							allActionsMap = { ...allActionsMap, ...batchActionsMap };
+
+							// Update messages with current actions if not the last batch
+							if (!isLastBatch) {
+								updateMessagesWithActions(rawMessages, allActionsMap);
+							}
+						} catch (error) {
+							console.error(`Error fetching batch ${batchIndex + 1}:`, error);
+						}
+					}
+					
+					setIsBatchLoading(false);
+				} else {
+					// Single request for small number of actions
+					const fetchedActions = await chatService.getActions(uniqueActionIds);
+					allActionsMap = fetchedActions.reduce(
+						(acc, action) => {
+							acc[action.id] = action;
+							return acc;
+						},
+						{} as Record<string, VibeAction>
+					);
+				}
 			}
 
 			// Map messages with resolved actions
@@ -251,7 +383,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 				return [...updatedMessages, ...uniqueNewMessages];
 			});
-			setRequestId(loadedMessages[0]?.requestId || null);
+			setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
 			else setError('Failed to load chat messages');
@@ -341,7 +473,6 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 		try {
 			setIsSending(true);
 			setError(null);
-
 			const executedChanges = await chatService.sendChatAcceptChanges(
 				requestId,
 				anonymousUserId,
@@ -362,13 +493,6 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 		}
 	};
 
-	const hasUnexecutedActions = () => {
-		return messages.some((msg) =>
-			msg.actions?.some(
-				(action) => action.status !== 'executed' && action.status !== 'exited'
-			)
-		);
-	};
 
 	const handleNewChat = () => {
 		clearStoredSessionId();
@@ -443,7 +567,8 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				)}
 			</ChatHeader>
 			<ChatContent>
-				{isLoading && <div className="chat-loading">Loading chat messages...</div>}
+				{isLoading && <LoadingIndicator message="Loading chat messages..." />}
+				{isBatchLoading && <LoadingIndicator message="Loading more actions..." />}
 
 				{error && <div className="chat-error">Error: {error}</div>}
 
@@ -496,24 +621,9 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 			<div>
 				{isSending && (
-					<div
-						style={{
-							marginBottom: '0.5rem',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							flexDirection: 'column',
-						}}
-					>
-						<span>Sending Request...</span>
-						<img
-							src={HORIZONTALPROGRESSBAR}
-							alt="Loading..."
-							style={{ width: '100%', height: '24px', marginRight: '0.5rem' }}
-						/>
-					</div>
+					<LoadingIndicator message="Sending Request..." />
 				)}
-				{!isSending && hasUnexecutedActions() && (
+				{!isSending && shouldShowAcceptButton && (
 					<Button
 						variant="outline"
 						style={{

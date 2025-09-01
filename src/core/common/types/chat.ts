@@ -68,6 +68,10 @@ export type ChatExecuteActionResponse = ApiResponse<{
   vibeRequest: VibeRequest;
 }>;
 
+export type ChatVibeRequestResponse = ApiResponse<{
+  vibeRequest: VibeRequest;
+}>;
+
 export type ChatMessagesResponse = ApiResponse<{
   chats: PromptWithActions[];
 }>;

@@ -2,6 +2,7 @@ import {
   ChatActionsResponse,
   ChatSendMessageResponse,
   ChatExecuteActionResponse,
+  ChatVibeRequestResponse,
   ChatMessageBody,
   ChatMessagesResponse,
 } from '@/core/common/types/chat';
@@ -48,5 +49,11 @@ export class ChatApi extends AppApi {
         userLocationVerified
       }),
     });
+  }
+
+  public getVibeRequest(requestId: string) {
+    return this.apiRequest<ChatVibeRequestResponse>(
+      `api/Vibe/VibeRequest?RequestId=${encodeURIComponent(requestId)}`
+    );
   }
 }
