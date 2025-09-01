@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Persona } from '../types/persona';
 import TimeUtil from '../../util/time';
-import { UserInfo } from 'global_state';
+import { UserInfo } from '@/global_state';
 
 export type PersonaSchedule = Record<
   Persona['id'],
   | {
     scheduleId: string;
     scheduleExpiration: number;
+    userInfo: UserInfo | null;
   }
   | undefined
 >;

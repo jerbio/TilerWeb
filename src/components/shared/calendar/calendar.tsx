@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import styles from '../../../util/styles';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import calendarConfig from './config';
-import CalendarEvents from './calendar_events';
-import { ScheduleSubCalendarEvent } from '../../../types/schedule';
-import Spinner from '../loader';
+import calendarConfig from '@/core/constants/calendar_config';
+import CalendarEvents from '@/core/common/components/calendar/calendar_events';
+import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import Spinner from '@/core/common/components/loader';
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	position: relative;

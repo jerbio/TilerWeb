@@ -254,7 +254,14 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 				return [...updatedMessages, ...uniqueNewMessages];
 			});
-			setRequestId(loadedMessages[0]?.requestId || null);
+			let latestRequestId:string = '';
+
+			loadedMessages.forEach((eachMsg) => {
+				if(eachMsg.requestId && (eachMsg.requestId > latestRequestId))
+				{latestRequestId = eachMsg.requestId;}
+			});
+
+			setRequestId(latestRequestId);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
 			else setError('Failed to load chat messages');
@@ -319,10 +326,26 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 					})),
 				})
 			);
+			let updatedRequestId: string = '';
+			const updatedMessageData = await chatService.getMessages(sessionId);
+			// const newPrompts:Array<PromptWithActions> = []
+			const otherPromptDict = new Map<string, PromptWithActions>();
+			updatedMessageData.Content.chats.concat(newMessages).forEach((chatEntry) => {
+				const existingMessage = messages.find((msg) => msg.id === chatEntry.id);
+				if (existingMessage) {
+					// Update existing message with new data
+					Object.assign(existingMessage, chatEntry);
+				} else {
+					otherPromptDict.set(chatEntry.id, chatEntry);
+				}
+				if (chatEntry.requestId && (chatEntry.requestId > updatedRequestId)) {
+					updatedRequestId = chatEntry.requestId;
+				}
+			});
 
 			// Append new messages to existing state
-			setMessages((prev) => [...prev, ...newMessages]);
-			setRequestId(newMessages[0]?.requestId || null);
+			setMessages((prev) => [...prev, ...otherPromptDict.values()]);
+			setRequestId(updatedRequestId);
 
 			// Update session ID from the first prompt
 			const sessionIdFromResponse = newMessages[0]?.sessionId;

@@ -10,7 +10,7 @@ import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/usePersonaSchedules';
 import { personaService } from '@/services';
-import useAppStore from 'global_state';
+import useAppStore from '@/global_state';
 
 type PersonaExpandedCardProps = {
   isCustom?: boolean;
@@ -53,7 +53,20 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       setPersonaSchedule(persona.id, personaSchedule.scheduleId, personaSchedule.anonymousUser, {
         store: !isCustom,
       });
-	  setAnonymousUser(personaSchedule.anonymousUser);
+	  setAnonymousUser({
+		...personaSchedule.anonymousUser,
+		id: personaSchedule.anonymousUser.id ?? '',
+		username: personaSchedule.anonymousUser.username ?? '',
+		timeZoneDifference: personaSchedule.anonymousUser.timeZoneDifference ?? 0,
+		timeZone: personaSchedule.anonymousUser.timeZone ?? '',
+		email: personaSchedule.anonymousUser.email ?? '',
+		endfOfDay: personaSchedule.anonymousUser.endfOfDay ?? '',
+		phoneNumber: personaSchedule.anonymousUser.phoneNumber ?? '',
+		fullName: personaSchedule.anonymousUser.fullName ?? '',
+		firstName: personaSchedule.anonymousUser.firstName ?? '',
+		lastName: personaSchedule.anonymousUser.lastName ?? '',
+		countryCode: personaSchedule.anonymousUser.countryCode ?? '',
+	  });
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
