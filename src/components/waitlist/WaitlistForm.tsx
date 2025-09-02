@@ -8,15 +8,39 @@ import { animated, useTransition } from '@react-spring/web';
 import { betaUserService } from '@/services';
 import { toast } from 'sonner';
 import MultiInput from '@/core/common/components/multi_input';
-
-const steps = [
-  { id: 1, name: 'Email', icon: () => <Mail size={16} />, key: 'email' },
-  { id: 2, name: 'Profession', icon: () => <Wrench size={16} />, key: 'profession' },
-  { id: 3, name: 'Integrations', icon: () => <Link2 size={16} />, key: 'integrations' },
-  { id: 4, name: 'Use Case', icon: () => <ListCheck size={16} />, key: 'useCase' },
-];
+import { useTranslation } from 'react-i18next';
 
 const WaitlistForm: React.FC = () => {
+  const { t } = useTranslation();
+
+  const refSteps = React.useRef([
+    {
+      id: 1,
+      name: t('waitlist.form.steps.email.name'),
+      icon: () => <Mail size={16} />,
+      key: t('waitlist.form.steps.email.key'),
+    },
+    {
+      id: 2,
+      name: t('waitlist.form.steps.profession.name'),
+      icon: () => <Wrench size={16} />,
+      key: t('waitlist.form.steps.profession.key'),
+    },
+    {
+      id: 3,
+      name: t('waitlist.form.steps.integrations.name'),
+      icon: () => <Link2 size={16} />,
+      key: t('waitlist.form.steps.integrations.key'),
+    },
+    {
+      id: 4,
+      name: t('waitlist.form.steps.useCase.name'),
+      icon: () => <ListCheck size={16} />,
+      key: t('waitlist.form.steps.useCase.key'),
+    },
+  ]);
+  const steps = refSteps.current;
+
   // get email from url params
   const urlParams = new URLSearchParams(window.location.search);
   const emailParam = urlParams.get('email');
@@ -24,7 +48,7 @@ const WaitlistForm: React.FC = () => {
   const [formValues, setFormValues] = React.useState<{
     email: string;
     profession: string;
-    integrations: string[];
+    integrations: { label: string; value: string }[];
     useCase: string;
   }>({
     email: emailParam || '',
@@ -44,36 +68,33 @@ const WaitlistForm: React.FC = () => {
   });
 
   function resetForm() {
-		setFormValues({
-			email: '',
-			profession: '',
-			integrations: [],
-			useCase: '',
-		});
+    setFormValues({
+      email: '',
+      profession: '',
+      integrations: [],
+      useCase: '',
+    });
     setCurrentStep(1);
   }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-		if (formValues.integrations.length === 0 && currentStep === 3) {
-			toast.error('Please add at least one integration');
-			return;
-		}
-
-		console.log(formValues);
+    if (formValues.integrations.length === 0 && currentStep === 3) {
+      toast.error(t('waitlist.form.errors.integrations'));
+      return;
+    }
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
       return;
     }
-
 
     try {
       setIsSubmitting(true);
       await betaUserService.signUp({
         email: formValues.email,
         profession: formValues.profession,
-        integrations: formValues.integrations,
+        integrations: formValues.integrations.map((i) => i.value),
         useCases: formValues.useCase,
       });
       toast('Signed up successfully!', {
@@ -89,63 +110,55 @@ const WaitlistForm: React.FC = () => {
     }
   }
 
+  const integrationOptions = t('waitlist.form.steps.integrations.options', {
+    returnObjects: true,
+  }) as { value: string; label: string }[];
+
   const inputs = [
     <Input
-			key="email"
+      key={t('waitlist.form.steps.email.key')}
       type="email"
       prepend={steps[0].icon()}
-      label="Email Address"
+      label={t('waitlist.form.steps.email.name')}
       variant="brand"
-      placeholder="Email Address"
+      placeholder={t('waitlist.form.steps.email.placeholder')}
       value={formValues.email}
-      onChange={(e) => (setFormValues({ ...formValues, email: e.target.value }))}
+      onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
       required
     />,
     <Input
-			key="profession"
+      key={t('waitlist.form.steps.profession.key')}
       type="string"
       prepend={steps[1].icon()}
-      label="What is your profession?"
+      label={t('waitlist.form.steps.profession.name')}
       variant="brand"
-      placeholder="Profession"
+      placeholder={t('waitlist.form.steps.profession.placeholder')}
       value={formValues.profession}
-			onChange={(e) => (setFormValues({ ...formValues, profession: e.target.value }))}
+      onChange={(e) => setFormValues({ ...formValues, profession: e.target.value })}
       required
     />,
     <MultiInput
-			key="integrations"
-      placeholder="e.g. Google Calendar, Slack"
-      searchList={[
-        'Google Calendar',
-        'Microsoft Outlook Calendar',
-        'Apple Calendar',
-        'Slack',
-        'Monday.com',
-        'Reclaim',
-        'Usemotion',
-        'Notion',
-        'TickTick',
-        'Evernote',
-        'OneNote',
-      ]}
+      key={t('waitlist.form.steps.integrations.key')}
+      placeholder={t('waitlist.form.steps.integrations.placeholder')}
+      options={integrationOptions}
       inputProps={{
         type: 'string',
         prepend: steps[2].icon(),
-        label: 'What integrations do you use?',
+        label: t('waitlist.form.steps.integrations.label'),
         variant: 'brand',
       }}
       value={formValues.integrations}
-			onChange={(integrations) => setFormValues({ ...formValues, integrations })}
+      onChange={(integrations) => setFormValues({ ...formValues, integrations })}
     />,
     <Input
-			key="useCase"
+      key={t('waitlist.form.steps.useCase.key')}
       type="string"
       prepend={steps[3].icon()}
-      label="What do you want to use Tiler Chat for?"
+      label={t('waitlist.form.steps.useCase.label')}
       variant="brand"
-      placeholder="Scheduling, Task Management, etc."
-			value={formValues.useCase}
-			onChange={(e) => (setFormValues({ ...formValues, useCase: e.target.value }))}
+      placeholder={t('waitlist.form.steps.useCase.placeholder')}
+      value={formValues.useCase}
+      onChange={(e) => setFormValues({ ...formValues, useCase: e.target.value })}
       required
     />,
   ];
@@ -160,7 +173,9 @@ const WaitlistForm: React.FC = () => {
           </animated.div>
         ))}
         <Button disabled={isSubmitting} type="submit" variant="brand" height={40}>
-          <span>{currentStep === steps.length ? 'Join Waitlist' : 'Next'}</span>
+          <span>
+            {currentStep === steps.length ? t('waitlist.form.joinWaitlist') : t('waitlist.form.nextStep')}
+          </span>
           <ArrowRight size={16} />
         </Button>
       </StyledWaitlistForm>
