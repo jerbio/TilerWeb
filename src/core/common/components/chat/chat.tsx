@@ -115,7 +115,6 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 	display: flex;
 	flex-direction: column;
 	align-items: ${({ $isUser }) => ($isUser ? 'flex-end' : 'flex-start')};
-	text-align: ${({ $isUser }) => ($isUser ? 'right' : 'left')};
 	margin: 0.5rem 0;
 
 	.message-content {
@@ -592,7 +591,11 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 										action.status as
 											| 'parsed'
 											| 'clarification'
+											| 'none'
+											| 'pending'
 											| 'executed'
+											| 'failed'
+											| 'exited'
 											| undefined
 									}
 								>

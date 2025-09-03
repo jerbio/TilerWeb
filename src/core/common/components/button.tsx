@@ -10,15 +10,17 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: 'small' | 'medium' | 'large';
   height?: number; // Optional height prop for custom button height
   bordergradient?: Array<string>; // Array of colors for border gradient
-	dotstatus?: 'parsed' | 'clarification' | 'executed'; //
+	dotstatus?: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited';
 };
 
 const getDotColor = (status?: string) => {
 	if (status === 'parsed') return palette.colors.teal[500]; // teal
 	if (status === 'clarification') return palette.colors.warning[500]; // yellow
+	if (status === 'none') return palette.colors.gray[300]; // light gray
+	if (status === 'pending') return palette.colors.blue[500]; // blue
 	if (status === 'executed') return palette.colors.success[500]; // green
-  if (status === 'failed') return palette.colors.error[500] //red
-  if (status === 'exited') return palette.colors.gray[500]; // gray
+	if (status === 'failed') return palette.colors.error[500]; // red
+	if (status === 'exited') return palette.colors.gray[500]; // gray
 	return 'transparent';
 };
 
