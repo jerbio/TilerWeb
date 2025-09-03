@@ -140,5 +140,58 @@
 				}
 			}
 		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "Join the",
+			"part2": "Tiler Chat",
+			"part3": "Waitlist Today"
+		},
+		"subtitle": "Stop managing your calendar, start talking to it. Get on the waitlist and be the first to vibe with time",
+		"form": {
+			"errors": {
+				"integrations": "Please add at least one calendar integration."
+			},
+			"joinWaitlist": "Join Waitlist",
+			"nextStep": "Next",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "Email",
+					"label": "Email Address",
+					"placeholder": "Email Address"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "Profession",
+					"label": "What do you do?",
+					"placeholder": "Profession"
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "Integrations",
+					"label": "Which integrations do you use?",
+					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
+					"options": [
+						{ "value": "google", "label": "Google Calendar" },
+						{ "value": "outlook", "label": "Microsoft Outlook Calendar" },
+						{ "value": "apple", "label": "Apple Calendar" },
+						{ "value": "slack", "label": "Slack" },
+						{ "value": "monday", "label": "Monday.com" },
+						{ "value": "reclaim", "label": "Reclaim" },
+						{ "value": "notion", "label": "Notion" },
+						{ "value": "ticktick", "label": "TickTick" },
+						{ "value": "evernote", "label": "Evernote" },
+						{ "value": "oneNote", "label": "OneNote" }
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "Use Case",
+					"label": "What do you want to use Tiler Chat for?",
+					"placeholder": "eg. Scheduling, Task Management"
+				}
+			}
+		}
 	}
 }
