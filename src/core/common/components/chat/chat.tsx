@@ -496,6 +496,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 		setError(null);
 		setMessage('');
 		setMessages([]);
+		setRequestId(null);
 		handleSetScheduleId('');
 	};
 
@@ -583,7 +584,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 								<MarkdownRenderer content={message.content} />
 							</div>
 
-							{message.actions?.map((action) => (
+							{message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
 								<Button
 									key={action.id}
 									variant="pill"
