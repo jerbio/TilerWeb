@@ -17,6 +17,7 @@ import { chatService } from '@/services';
 import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
+import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -149,7 +150,6 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
-	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
 	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
 	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
 	const userLocationVerified = useAppStore((state) => state.userInfo?.userLocationVerified ?? "false");
@@ -399,7 +399,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				message,
 				entityId,
 				sessionId,
-				anonymousUserId,
+				'',
 				userLongitude,
 				userLatitude,
 				userLocationVerified,
@@ -470,7 +470,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			setError(null);
 			const executedChanges = await chatService.sendChatAcceptChanges(
 				requestId,
-				anonymousUserId,
+				undefined,
 				userLongitude,
 				userLatitude,
 				userLocationVerified
@@ -578,7 +578,9 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				<div className="messages-list" ref={messagesListRef}>
 					{messages.map((message) => (
 						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-							<div className="message-content">{message.content}</div>
+							<div className="message-content">
+								<MarkdownRenderer content={message.content} />
+							</div>
 
 							{message.actions?.map((action) => (
 								<Button
