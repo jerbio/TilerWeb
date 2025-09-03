@@ -5,8 +5,11 @@ import palette from '@/core/theme/palette';
 import Logo from '@/core/common/components/icons/logo';
 import WaitlistForm from '@/components/waitlist/WaitlistForm';
 import WAITLIST_BG_IMAGE from '@/assets/waitlist/timeline-content.webp';
+import { useTranslation } from 'react-i18next';
 
 const Waitlist: React.FC = () => {
+	const { t } = useTranslation();
+
   return (
     <>
       <Section>
@@ -14,12 +17,11 @@ const Waitlist: React.FC = () => {
           <Logo size={48} />
           <WaitlistContent>
             <WaitlistTitle>
-              Join the <span>Tiler Chat</span>
-              <br /> Waitlist Today.
+							{t('waitlist.title.part1')} <span>{t('waitlist.title.part2')}</span>
+              <br /> {t('waitlist.title.part3')}.
             </WaitlistTitle>
             <WaitlistSubtitle>
-              Stop managing your calendar, start talking to it. Get on the waitlist
-              and be the first to vibe with time
+							{t('waitlist.subtitle')}
             </WaitlistSubtitle>
           </WaitlistContent>
           <WaitlistForm />
@@ -28,7 +30,7 @@ const Waitlist: React.FC = () => {
       <WaitlistBackgroundContainer>
         <WaitlistBackground>
           <WBGraphicContainer>
-            <img src={WAITLIST_BG_IMAGE} alt="Background" width={602} height={548} />
+            <img src={WAITLIST_BG_IMAGE} alt="" width={602} height={548} />
           </WBGraphicContainer>
           <WBRedCircle />
           <WBWhiteCircle />

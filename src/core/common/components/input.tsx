@@ -11,6 +11,7 @@ type InputProps = {
   bordergradient?: Array<string>;
   prepend?: React.ReactNode;
   searchList?: Array<string>;
+  onSearchSelect?: (value: string) => void;
 };
 
 type StyledInputProps = {
@@ -32,7 +33,8 @@ const BaseInput: React.FC<BaseInputProps> = ({
   bordergradient,
   label,
   prepend,
-	searchList,
+  searchList,
+  onSearchSelect,
   ...props
 }) => {
   const styledProps = {
@@ -45,16 +47,34 @@ const BaseInput: React.FC<BaseInputProps> = ({
     $prepend: prepend,
   };
   const id = label ? `input-${Math.random().toString(36).substring(2, 9)}` : undefined;
-	const listId = searchList ? `${id}-list` : undefined;
+  const listId = searchList ? `${id}-list` : undefined;
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (onSearchSelect) {
+      if (searchList && searchList.includes(e.target.value)) {
+        console.log('selected from list', e.target.value);
+        onSearchSelect(e.target.value);
+      }
+    }
+  }
+
   const styledInput = (
     <StyledInputWrapper {...styledProps}>
       {prepend && <StyledInputPrepend>{prepend}</StyledInputPrepend>}
-			{searchList && <datalist id={listId}>
-				{searchList.map((item) => (
-					<option value={item} key={item} />
-				))}
-			</datalist>}
-      <StyledInput id={id} disabled={disabled} {...styledProps} {...props} list={listId} />
+      {searchList && (
+        <datalist id={listId}>
+          {searchList.map((item) => (
+            <option value={item} key={item} />
+          ))}
+        </datalist>
+      )}
+      <StyledInput
+        id={id}
+        list={listId}
+        disabled={disabled}
+        onInput={handleInputChange}
+        {...styledProps}
+        {...props}
+      />
     </StyledInputWrapper>
   );
 
