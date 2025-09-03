@@ -3,7 +3,7 @@ import { AppApi } from './appApi';
 
 export class BetaUserApi extends AppApi {
 	public signUp(betaUserBody: BetaUserBody) {
-		return this.apiRequest<void>('api/BetaUser/Post', {
+		return this.apiRequest<void>('api/EmailList', {
 			method: 'POST',
 			body: JSON.stringify(betaUserBody),
 		});
