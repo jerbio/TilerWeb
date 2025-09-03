@@ -607,8 +607,9 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 											height: '15px',
 											verticalAlign: 'middle',
 										}}
-									/>{' '}
-									- {action.descriptions}
+									/>
+									<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
+									<span className="action-description">{action.descriptions}</span>
 								</Button>
 							))}
 						</MessageBubble>

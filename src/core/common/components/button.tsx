@@ -176,6 +176,43 @@ const StyledButton = styled.button<StyledButtonProps>`
 			border: 1px solid ${getDotColor(props.$dotstatus)};
 			height: auto; /* override default button height */
 			padding-inline: 0.5rem;
+			display: flex;
+			align-items: center;
+			max-width: 200px;
+			position: relative;
+			
+			/* Icon and dash should not shrink */
+			& > img,
+			& > span:not(.action-description) {
+				flex-shrink: 0;
+			}
+			
+			/* Only truncate the action description */
+			& .action-description {
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				min-width: 0; /* Allow flex item to shrink below content size */
+			}
+			
+			&:hover {
+				max-width: none;
+				z-index: 10;
+				
+				& .action-description {
+					overflow: visible;
+					white-space: normal;
+					word-break: break-word;
+				}
+			}
+			
+			/* Ensure status dot maintains proper size and positioning */
+			&::after {
+				flex-shrink: 0;
+				width: 0.75rem !important;
+				height: 0.75rem !important;
+				margin-left: 0.5rem;
+			}
 		`}
 
 	&::after {
