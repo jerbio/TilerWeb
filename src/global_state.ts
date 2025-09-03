@@ -6,21 +6,21 @@ export interface ChatContextType {
 	Description?: string; // Description of the tile
 }
 export interface UserInfo {
-	id: string; // TilerUser@@00000000000000000000000
-	username: string; // Armando-ALPHANUMERIC
-	timeZoneDifference: number; // 0.0
-	timeZone: string; // UTC
+	id: string | null; // TilerUser@@00000000000000000000000
+	username: string | null; // Armando-ALPHANUMERIC
+	timeZoneDifference: number | null; // 0.0
+	timeZone: string | null; // UTC
 	email: string | null; // null
-	endfOfDay: string; // 0001-01-01T00:00:00+00:00
+	endfOfDay: string| null; // 0001-01-01T00:00:00+00:00
 	phoneNumber: string | null; // null
-	fullName: string; // ""
-	firstName: string; // ""
-	lastName: string; // ""
-	countryCode: string; // "1"
-	location?: string; // User's current location (optional)
-	userLongitude?: string; // User's longitude (optional)
-	userLatitude?: string; // User's latitude (optional)
-	userLocationVerified?: string; // Indicates if the user's location is verified (optional)
+	fullName: string | null; // ""
+	firstName: string | null; // ""
+	lastName: string | null; // ""
+	countryCode: string | null; // "1"
+	location?: string | null; // User's current location (optional)
+	userLongitude?: string | null; // User's longitude (optional)
+	userLatitude?: string | null; // User's latitude (optional)
+	userLocationVerified?: string | null; // Indicates if the user's location is verified (optional)
 }
 
 interface AppState {

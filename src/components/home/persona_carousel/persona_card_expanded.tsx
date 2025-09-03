@@ -11,9 +11,9 @@ import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/usePersonaSchedules';
 import { personaService } from '@/services';
 import useAppStore from '@/global_state';
+import PersonaLimitWarning from './persona_card_limit_modal';
 
 type PersonaExpandedCardProps = {
-  isCustom?: boolean;
   persona: Persona;
   expanded: boolean;
   onCollapse: () => void;
@@ -23,7 +23,6 @@ type PersonaExpandedCardProps = {
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-  isCustom,
   expanded,
   persona,
   onCollapse,
@@ -42,6 +41,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 	const globalAonymousUser = useAppStore((state) => state.anonymousUser);
 	const globalScheduleId = useAppStore((state) => state.scheduleId);
 	const calendarRefreshTrigger = useAppStore((state) => state.calendarRefreshTrigger);
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
 
   function onMobileCollapse() {
     setMobileChatVisible(false);
@@ -50,9 +50,11 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   async function getPersonaSchedule() {
     try {
       const personaSchedule = await personaService.getPersonaSchedule(persona);
-      setPersonaSchedule(persona.id, personaSchedule.scheduleId, personaSchedule.anonymousUser, {
-        store: !isCustom,
-      });
+      setPersonaSchedule(persona.id, personaSchedule.scheduleId, personaSchedule.anonymousUser
+	// 	, {
+    //     store: !isCustom,
+    //   }
+	);
 	  setAnonymousUser({
 		...personaSchedule.anonymousUser,
 		id: personaSchedule.anonymousUser.id ?? '',
@@ -67,6 +69,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 		lastName: personaSchedule.anonymousUser.lastName ?? '',
 		countryCode: personaSchedule.anonymousUser.countryCode ?? '',
 	  });
+    //   setPersonaSchedule(persona.id, personaSchedule.scheduleId);
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
@@ -81,9 +84,12 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   useEffect(() => {
 		if (calendarRefreshTrigger > 0 && scheduleId && globalScheduleId !== scheduleId) {
 			// Update local schedule ID when global state changes (from chat actions)
-			if (!userInfo || globalScheduleId?.includes(userInfo.id) ) {
+			if (!userInfo || userInfo.id && globalScheduleId?.includes(userInfo.id) ) {
 				setGlobalScheduleId(globalScheduleId);
-				setPersonaSchedule(persona.id, globalScheduleId, userInfo, { store: !isCustom });
+				setPersonaSchedule(persona.id, globalScheduleId, userInfo, 
+					// { store: !isCustom }
+
+				);
 			}
 			// const personaCpy = JSON.parse(JSON.stringify(persona));
 			// personaCpy.scheduleId= globalScheduleId;
@@ -165,9 +171,33 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           </item.container>
         ))}
       </CardContent>
+      <CardLimitWarningContainer
+        $visible={showLimitWarning}
+        onClick={() => {
+          setShowLimitWarning(false);
+          onCollapse();
+        }}
+      >
+        <PersonaLimitWarning open={showLimitWarning} />
+      </CardLimitWarningContainer>
     </CardContainer>
   );
 };
+
+const CardLimitWarningContainer = styled.div<{ $visible: boolean }>`
+	position: absolute;
+	inset: 0;
+	opacity: ${(props) => (props.$visible ? 1 : 0)};
+	pointer-events: ${(props) => (props.$visible ? 'auto' : 'none')};
+	z-index: 10;
+	background: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(4px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	transition: opacity 0.3s ease-in-out;
+`;
 
 const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { toast } from 'sonner';
 import Section from '../layout/section';
 import Input from '@/core/common/components/input';
 import Button from '@/core/common/components/button';
 import palette from '@/core/theme/palette';
-import { waitlistService } from '@/services';
+import { useNavigate } from 'react-router';
 
 const Form = styled.form`
 	display: flex;
@@ -21,26 +20,14 @@ const Form = styled.form`
 `;
 
 const Waitlist: React.FC = () => {
+	const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+		navigate('/waitlist?email=' + encodeURIComponent(email));
+		return;
 
-    try {
-      setIsSubmitting(true);
-      await waitlistService.joinWaitlist(email);
-      toast('Signed up successfully!', {
-        duration: 2000,
-      });
-      setEmail('');
-    } catch (error) {
-      console.error('Error signing up for waitlist:', error);
-      toast('Failed to sign up.');
-      setEmail('');
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (
@@ -55,7 +42,6 @@ const Waitlist: React.FC = () => {
           required
         />
         <Button
-          disabled={isSubmitting}
           type="submit"
           size="large"
           height={44}
