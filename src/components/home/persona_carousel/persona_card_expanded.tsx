@@ -10,9 +10,9 @@ import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/usePersonaSchedules';
 import { personaService } from '@/services';
+import PersonaLimitWarning from './persona_card_limit_modal';
 
 type PersonaExpandedCardProps = {
-  isCustom?: boolean;
   persona: Persona;
   expanded: boolean;
   onCollapse: () => void;
@@ -22,7 +22,6 @@ type PersonaExpandedCardProps = {
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-  isCustom,
   expanded,
   persona,
   onCollapse,
@@ -34,6 +33,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
 
   function onMobileCollapse() {
     setMobileChatVisible(false);
@@ -42,9 +42,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   async function getPersonaSchedule() {
     try {
       const personaSchedule = await personaService.getPersonaSchedule(persona);
-      setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
-        store: !isCustom,
-      });
+      setPersonaSchedule(persona.id, personaSchedule.scheduleId);
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
@@ -126,9 +124,33 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           </item.container>
         ))}
       </CardContent>
+      <CardLimitWarningContainer
+        $visible={showLimitWarning}
+        onClick={() => {
+          setShowLimitWarning(false);
+          onCollapse();
+        }}
+      >
+        <PersonaLimitWarning open={showLimitWarning} />
+      </CardLimitWarningContainer>
     </CardContainer>
   );
 };
+
+const CardLimitWarningContainer = styled.div<{ $visible: boolean }>`
+	position: absolute;
+	inset: 0;
+	opacity: ${(props) => (props.$visible ? 1 : 0)};
+	pointer-events: ${(props) => (props.$visible ? 'auto' : 'none')};
+	z-index: 10;
+	background: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(4px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	transition: opacity 0.3s ease-in-out;
+`;
 
 const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;
