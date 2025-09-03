@@ -276,6 +276,29 @@ const UserLocation: React.FC = () => {
 	const userInfo = useAppStore((state) => state.userInfo);
 	const setUserInfo = useAppStore((state) => state.setUserInfo);
 
+	// Helper function to extract user ID from local storage
+	const getUserIdFromStorage = (): string => {
+		try {
+			const personaScheduleData = localStorage.getItem('tiler-persona-schedule');
+			if (!personaScheduleData) return `TilerUser@@${Date.now()}`;
+
+			const parsed = JSON.parse(personaScheduleData);
+			// Look for any persona key and extract scheduleId
+			const personaKeys = Object.keys(parsed);
+			if (personaKeys.length === 0) return `TilerUser@@${Date.now()}`;
+
+			const firstPersona = parsed[personaKeys[0]];
+			if (!firstPersona?.scheduleId) return `TilerUser@@${Date.now()}`;
+
+			// Extract user ID (first part before the first colon)
+			const parts = firstPersona.scheduleId.split(':');
+			return parts[0] || `TilerUser@@${Date.now()}`;
+		} catch (error) {
+			console.warn('Failed to extract user ID from local storage:', error);
+			return `TilerUser@@${Date.now()}`;
+		}
+	};
+
 	// Helper function to safely update userInfo with location data
 	const updateUserLocation = (locationData: {
 		location: string;
@@ -292,7 +315,7 @@ const UserLocation: React.FC = () => {
 		} else {
 			// Create new userInfo with minimal required fields and location data
 			setUserInfo({
-				id: `TilerUser@@${Date.now()}`,
+				id: getUserIdFromStorage(), // to remove when we update the user id in the global state
 				username: 'Anonymous',
 				timeZoneDifference: 0,
 				timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,

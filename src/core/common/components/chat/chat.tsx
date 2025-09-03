@@ -150,6 +150,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
+	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
 	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
 	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
 	const userLocationVerified = useAppStore((state) => state.userInfo?.userLocationVerified ?? "false");
@@ -399,7 +400,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				message,
 				entityId,
 				sessionId,
-				'',
+				anonymousUserId,
 				userLongitude,
 				userLatitude,
 				userLocationVerified,
@@ -470,7 +471,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			setError(null);
 			const executedChanges = await chatService.sendChatAcceptChanges(
 				requestId,
-				undefined,
+				anonymousUserId,
 				userLongitude,
 				userLatitude,
 				userLocationVerified
@@ -622,12 +623,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				)}
 				{!isSending && shouldShowAcceptButton && (
 					<Button
-						variant="outline"
-						style={{
-							marginBottom: '0.5rem',
-							color: palette.colors.brand[500],
-							borderColor: palette.colors.brand[500],
-						}}
+						variant="primary"
 						onClick={() => acceptAllChanges()}
 					>
 						{t('home.expanded.chat.acceptChanges')}
