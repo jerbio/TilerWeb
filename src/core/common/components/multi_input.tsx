@@ -2,6 +2,7 @@ import React, { useState, KeyboardEvent, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import Input, { BaseInputProps } from './input';
+import { X } from 'lucide-react';
 
 type MultiInputOption = {
   label: string;
@@ -61,7 +62,7 @@ const MultiInput: React.FC<MultiInputProps> = ({
       setSelectedOptions(newOptions);
       onChange?.(newOptions);
     }
-    setInput('');
+    setTimeout(() => setInput(''), 0);
   };
   const removeOption = (option: MultiInputOption) => {
     const newOptions = selectedOptions.filter((t) => t.value !== option.value);
@@ -89,7 +90,7 @@ const MultiInput: React.FC<MultiInputProps> = ({
                 aria-label={`Remove ${option.label}`}
                 onClick={() => removeOption(option)}
               >
-                ×
+								<X size={12} />
               </Remove>
             </Tag>
           ))
@@ -104,6 +105,7 @@ const MultiInput: React.FC<MultiInputProps> = ({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         searchList={searchList}
+        onSearchSelect={(val) => addOption(val)}
       />
     </MultiInputContainer>
   );
@@ -128,15 +130,16 @@ const EmptyTagWrapper = styled.div`
 const TagWrapper = styled.div`
 	display: flex;
 	flex-wrap: wrap;
-	gap: 6px;
+	gap: 0.75rem;
 `;
 
 const Tag = styled.span`
 	display: inline-flex;
 	align-items: center;
+	overflow: hidden;
 	height: 28px;
-	gap: 4px;
 	padding: 4px 8px;
+	padding-right: 0px;
 	box-shadow: 0 0 0 1px ${palette.colors.gray[800]};
 	background: ${palette.colors.gray[900]};
 	color: ${palette.colors.gray[300]};
@@ -148,6 +151,11 @@ const Remove = styled.button`
 	color: ${palette.colors.gray[400]};
 	font-size: 14px;
 	line-height: 1;
+	height: 28px;
+	width: 28px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	transition: color 0.2s ease-in-out;
 
 	&:hover {
