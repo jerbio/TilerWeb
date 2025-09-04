@@ -32,37 +32,26 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
-  const personaUserId = personaUsers[persona.id]?.userId || null;
-  const userInfo = useAppStore((state) => state.userInfo);
-  const setUserInfo = useAppStore((state) => state.setUserInfo);
+  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
 
   function onMobileCollapse() {
     setMobileChatVisible(false);
   }
 
-  function setUserId(userId: string) {
-		if (userInfo) {
-			setUserInfo({ ...userInfo, id: userId });
-		}
-	}
-
-  async function getPersonaUser() {
+  async function getPersonaSchedule() {
     try {
-      const personaUser = await personaService.createAnonymousUser(persona);
-      setPersonaUser(persona.id, personaUser.anonymousUser.id);
-			setUserId(personaUser.anonymousUser.id!);
+      const personaSchedule = await personaService.getPersonaSchedule(persona);
+      setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
+        store: !isCustom,
+      });
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
   }
 
   useEffect(() => {
-    if (expanded) {
-      if (!personaUserId) {
-        getPersonaUser();
-      } else {
-				setUserId(personaUserId);
-      }
+    if (expanded && !scheduleId) {
+      getPersonaSchedule();
     }
   }, [expanded]);
 
