@@ -7,11 +7,11 @@ import useCalendarView from '../../../core/common/hooks/useCalendarView';
 import { scheduleService } from '@/services';
 
 type PersonaCalendarProps = {
-  scheduleId: string | null;
+  userId: string | null;
   expandedWidth: number;
 };
 
-function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarProps) {
+function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps) {
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
 
@@ -27,7 +27,7 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
 
     try {
       setEventsLoading(true);
-      const scheduleLookup = await scheduleService.getScheduleLookupById(id, {
+      const scheduleLookup = await scheduleService.lookupScheduleByUserId(id, {
         startRange,
         endRange,
       });
@@ -40,10 +40,10 @@ function PersonaCalendar({ expandedWidth: width, scheduleId }: PersonaCalendarPr
   }
 
   useEffect(() => {
-    if (scheduleId) {
-      fetchSchedule(scheduleId);
+    if (userId) {
+      fetchSchedule(userId);
     }
-  }, [scheduleId, viewOptions.daysInView, viewOptions.startDay]);
+  }, [userId, viewOptions.daysInView, viewOptions.startDay]);
 
   return (
     <Calendar
