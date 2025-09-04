@@ -5,17 +5,27 @@ import styled from 'styled-components';
 const WaitlistProgressBar: React.FC<{
   steps: Array<{ id: number; name: string; icon: () => JSX.Element }>;
   currentStep: number;
-}> = ({ steps, currentStep }) => {
+  setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+}> = ({ steps, currentStep, setCurrentStep }) => {
   const STEP_CIRCLE_DIAMETER = 34;
   const STEP_CONNECTOR_WIDTH = 60;
   const progressWidth =
     STEP_CIRCLE_DIAMETER * currentStep + STEP_CONNECTOR_WIDTH * (currentStep - 1) + 22;
 
+  function goToStep(step: number) {
+    if (step > currentStep) return;
+    setCurrentStep(step);
+  }
+
   return (
     <ProgressBarContainer>
       <ProgressBarIcons>
         {steps.map((step, index) => (
-          <ProgressBarIcon $istouched={currentStep > index} key={step.id}>
+          <ProgressBarIcon
+            onClick={() => goToStep(step.id)}
+            $istouched={currentStep > index}
+            key={step.id}
+          >
             <span>{step.icon()}</span>
           </ProgressBarIcon>
         ))}
@@ -93,7 +103,9 @@ const ProgressBarIcon = styled.li<{ $istouched: boolean }>`
 	justify-content: center;
 	align-items: center;
 	color: ${(props) => (props.$istouched ? palette.colors.white : palette.colors.gray[600])};
-transition: color 0.3s ease;
+	cursor: pointer;
+	transition: color 0.3s ease;
+
 
 	span {
 		display: flex;
@@ -105,6 +117,10 @@ transition: color 0.3s ease;
 		border-radius: 50%;
 transition: background-color 0.3s ease;
 	}
+
+&:hover span {
+		background-color: ${(props) => (props.$istouched ? palette.colors.brand[700] : 'transparent')};
+}
 }
 `;
 
