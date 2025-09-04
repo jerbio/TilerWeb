@@ -40,7 +40,7 @@ export type PersonaResponse = ApiResponse<{
 	};
 }>;
 
-export type PersonaScheduleResponse = ApiResponse<{
+export type PersonaAnonymousUserResponse = ApiResponse<{
 	anonymousUserWithPersona: {
 		anonymousUser: {
 			id: string | null;

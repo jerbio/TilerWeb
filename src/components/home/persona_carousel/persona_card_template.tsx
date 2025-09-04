@@ -1,6 +1,6 @@
+import palette from '@/core/theme/palette';
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import palette from '../../../core/theme/palette';
 
 // Pulse Animation
 const pulse = keyframes`

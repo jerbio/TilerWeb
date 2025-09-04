@@ -8,51 +8,47 @@ import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
 import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
-import { PersonaSchedule, PersonaScheduleSetter } from '@/core/common/hooks/usePersonaSchedules';
+import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
 
 type PersonaExpandedCardProps = {
-  isCustom?: boolean;
   persona: Persona;
   expanded: boolean;
   onCollapse: () => void;
   expandedWidth: number;
-  personaSchedules: PersonaSchedule;
-  setPersonaSchedule: PersonaScheduleSetter;
+  personaUsers: PersonaUsers;
+  setPersonaUser: PersonaUserSetter;
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-  isCustom,
   expanded,
   persona,
   onCollapse,
   expandedWidth,
-  personaSchedules,
-  setPersonaSchedule,
+  personaUsers,
+  setPersonaUser,
 }) => {
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
-  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+  const personaUserId = personaUsers[persona.id]?.userId || null;
 
   function onMobileCollapse() {
     setMobileChatVisible(false);
   }
 
-  async function getPersonaSchedule() {
+  async function getPersonaUser() {
     try {
-      const personaSchedule = await personaService.getPersonaSchedule(persona);
-      setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
-        store: !isCustom,
-      });
+      const personaUser = await personaService.createAnonymousUser(persona);
+      setPersonaUser(persona.id, personaUser.anonymousUser.id);
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
   }
 
   useEffect(() => {
-    if (expanded && !scheduleId) {
-      getPersonaSchedule();
+    if (expanded && !personaUserId) {
+      getPersonaUser();
     }
   }, [expanded]);
 
@@ -62,7 +58,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar expandedWidth={expandedWidth} scheduleId={scheduleId} />
+          <PersonaCalendar expandedWidth={expandedWidth} userId={personaUserId} />
           <CalendarContainerActionButtons>
             <MobileShowChatButton
               onClick={() => setMobileChatVisible(!mobileChatVisible)}

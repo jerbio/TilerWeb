@@ -1,20 +1,39 @@
-import { ScheduleLookupResponse } from '../core/common/types/schedule';
+import { ScheduleLookupOptions, ScheduleLookupResponse } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
-	public getScheduleLookupById(
-		scheduleId: string,
-		options: { startRange: number; endRange: number }
+	private lookupSchedule(
+		params: Record<string, string>,
 	) {
 		const urlParams = new URLSearchParams({
-			scheduleId: scheduleId,
 			mobileApp: true.toString(),
-			startRange: options.startRange.toString(),
-			endRange: options.endRange.toString(),
+			...params,
 		}).toString();
 
 		return this.apiRequest<ScheduleLookupResponse>(`api/Schedule/Lookup?${urlParams}`);
+	}
+
+	public lookupScheduleById(
+		scheduleId: string,
+		options: ScheduleLookupOptions,
+	) {
+		return this.lookupSchedule({
+			scheduleId,
+			startRange: options.startRange.toString(),
+			endRange: options.endRange.toString(),
+		});
+	}
+
+	public lookupScheduleByUserId(
+		userId: string,
+		options: ScheduleLookupOptions,
+	) {
+		return this.lookupSchedule({
+			lookupUserId: userId,
+			startRange: options.startRange.toString(),
+			endRange: options.endRange.toString(),
+		});
 	}
 
 	public getSchedule() {
