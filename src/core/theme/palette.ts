@@ -284,7 +284,7 @@ const palette = {
 			small: '640px',
 			medium: '768px',
 			large: '1024px',
-			xLarge: '1280px',
+			xLarge: '1920px',
 		},
 	},
 	screens: {
@@ -292,8 +292,8 @@ const palette = {
 		sm: '640px',
 		md: '768px',
 		lg: '1024px',
-		xl: '1292px',
-		xxl: '1500px',
+		xl: '1920px',
+		xxl: '2560px',
 	},
 } as const;
 

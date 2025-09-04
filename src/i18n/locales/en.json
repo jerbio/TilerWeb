@@ -171,7 +171,7 @@
 					"key": "integrations",
 					"name": "Integrations",
 					"label": "Which integrations do you use?",
-					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
+					"placeholder": "eg. Google Calendar, Outlook (Hit enter/return with your integration)",
 					"options": [
 						{ "value": "google", "label": "Google Calendar" },
 						{ "value": "outlook", "label": "Microsoft Outlook Calendar" },
