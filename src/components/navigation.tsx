@@ -169,7 +169,6 @@ const Navigation: React.FC = () => {
   const navLinks = [
     { name: t('common.navigation.home'), href: '/' },
     { name: t('common.navigation.features'), href: '/features' },
-    { name: t('common.navigation.waitlist'), href: '/waitlist' },
   ];
 
   function handleScroll() {
