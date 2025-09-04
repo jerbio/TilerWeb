@@ -68,6 +68,10 @@ export type ChatExecuteActionResponse = ApiResponse<{
   vibeRequest: VibeRequest;
 }>;
 
+export type ChatVibeRequestResponse = ApiResponse<{
+  vibeRequest: VibeRequest;
+}>;
+
 export type ChatMessagesResponse = ApiResponse<{
   chats: PromptWithActions[];
 }>;
@@ -86,6 +90,9 @@ export type ChatMessageBody = {
   getTimeSpan?: string;
   UserName?: string;
   AnonymousUserId?: string;
+  UserLongitude?: string;
+  UserLatitude?: string;
+  UserLocationVerified?: string;
 }
 
 export type {

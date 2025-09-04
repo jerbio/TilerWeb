@@ -27,6 +27,9 @@ class ChatService {
     entityId: string,
     sessionId: string = '',
     anonymousUserId: string = '',
+    userLongitude: string = '',
+    userLatitude: string = '',
+    userLocationVerified: string = '',
     requestId: string = '',
     actionId: string = ''
   ) {
@@ -38,6 +41,10 @@ class ChatService {
       ActionId: actionId,
       AnonymousUserId: anonymousUserId,
       MobileApp: true,
+      UserLatitude: userLatitude,
+      UserLongitude: userLongitude,
+      UserLocationVerified: userLocationVerified,
+      TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
     };
     try {
       const response = await this.chatApi.sendMessage(requestBody);
@@ -74,15 +81,37 @@ class ChatService {
     }
   }
 
-	async sendChatAcceptChanges(requestId: string | null = null) {
+	async sendChatAcceptChanges(
+		requestId: string | null = null,
+		anonymousUserId?: string,
+		userLongitude?: string,
+		userLatitude?: string,
+		userLocationVerified?: string
+	) {
 		try {
 			if (!requestId) {
 				throw new Error('Request ID is required to execute actions');
 			}
-			const response = await this.chatApi.executeActions(requestId);
+			const response = await this.chatApi.executeActions(
+				requestId,
+				anonymousUserId,
+				userLongitude,
+				userLatitude,
+				userLocationVerified
+			);
 			return response;
 		} catch (error) {
 			console.error('Error accepting chat changes', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getVibeRequest(requestId: string) {
+		try {
+			const response = await this.chatApi.getVibeRequest(requestId);
+			return response;
+		} catch (error) {
+			console.error('Error fetching vibe request', error);
 			throw normalizeError(error);
 		}
 	}

@@ -2,6 +2,7 @@ import {
   ChatActionsResponse,
   ChatSendMessageResponse,
   ChatExecuteActionResponse,
+  ChatVibeRequestResponse,
   ChatMessageBody,
   ChatMessagesResponse,
 } from '@/core/common/types/chat';
@@ -31,10 +32,28 @@ export class ChatApi extends AppApi {
     return this.apiRequest<ChatActionsResponse>('api/Vibe/Action?' + queryParam);
   }
 
-  public executeActions(requestId: string) {
+  public executeActions(
+    requestId: string, 
+    anonymousUserId?: string,
+    userLongitude?: string, 
+    userLatitude?: string, 
+    userLocationVerified?: string
+  ) {
     return this.apiRequest<ChatExecuteActionResponse>('api/Vibe/Request/Execute', {
       method: 'POST',
-      body: JSON.stringify({ requestId }),
+      body: JSON.stringify({ 
+        requestId,
+        anonymousUserId,
+        userLongitude,
+        userLatitude,
+        userLocationVerified
+      }),
     });
+  }
+
+  public getVibeRequest(requestId: string) {
+    return this.apiRequest<ChatVibeRequestResponse>(
+      `api/Vibe/VibeRequest?RequestId=${encodeURIComponent(requestId)}`
+    );
   }
 }

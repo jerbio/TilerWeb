@@ -41,9 +41,17 @@
 		"expanded": {
 			"chat": {
 				"newChat": "New Chat",
+				"clearSession": "Clear Session",
 				"title": "What would you like to do?",
 				"subtitle": "Describe a task, We'll handle the tiling.",
-				"inputPlaceholder": "Tell Tiler what you do..."
+				"inputPlaceholder": "Tell Tiler what you do...",
+				"loadingMessages": "Loading chat messages...",
+				"loadingActions": "Loading more actions...",
+				"error": "Error",
+				"emptyStateTitle": "What would you like to do?",
+				"emptyStateDescription": "Describe a task, We'll handle the tiling.",
+				"sendingRequest": "Sending Request...",
+				"acceptChanges": "Accept Changes"
 			}
 		},
 		"waitlist": {
