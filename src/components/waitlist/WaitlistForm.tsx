@@ -165,7 +165,11 @@ const WaitlistForm: React.FC = () => {
 
   return (
     <WaitlistFormContainer>
-      <WaitlistProgressBar steps={steps} currentStep={currentStep} />
+      <WaitlistProgressBar
+        steps={steps}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+      />
       <StyledWaitlistForm onSubmit={handleSubmit}>
         {inputTransition((style, item) => (
           <animated.div style={style} key={item.id}>
@@ -174,7 +178,9 @@ const WaitlistForm: React.FC = () => {
         ))}
         <Button disabled={isSubmitting} type="submit" variant="brand" height={40}>
           <span>
-            {currentStep === steps.length ? t('waitlist.form.joinWaitlist') : t('waitlist.form.nextStep')}
+            {currentStep === steps.length
+              ? t('waitlist.form.joinWaitlist')
+              : t('waitlist.form.nextStep')}
           </span>
           <ArrowRight size={16} />
         </Button>

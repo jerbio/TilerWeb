@@ -12,7 +12,7 @@ const Waitlist: React.FC = () => {
 
   return (
     <>
-      <Section>
+      <Section paddingBlock={128}>
         <WaitlistContainer>
           <Logo size={48} />
           <WaitlistContent>
@@ -72,7 +72,7 @@ const WaitlistContainer = styled.div`
 	flex-direction: column;
 	align-items: center;
 	gap: 2rem;
-	min-height: calc(100vh - 196px);
+	min-height: calc(100vh - 256px);
 `;
 
 const WBGraphicContainer = styled.div`
