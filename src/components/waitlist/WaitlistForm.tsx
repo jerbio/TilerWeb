@@ -136,6 +136,18 @@ const WaitlistForm: React.FC = () => {
       value={formValues.profession}
       onChange={(e) => setFormValues({ ...formValues, profession: e.target.value })}
       required
+      searchList={[
+        'Medical professional',
+        'Sales professional',
+        'Software developer',
+        'Client Consultant',
+        'Contractor',
+        'Startup founder',
+        'Researche',
+        'Student',
+        'Lecture',
+        'Travel Consultant',
+      ]}
     />,
     <MultiInput
       key={t('waitlist.form.steps.integrations.key')}
