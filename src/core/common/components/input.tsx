@@ -51,7 +51,6 @@ const BaseInput: React.FC<BaseInputProps> = ({
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (onSearchSelect) {
       if (searchList && searchList.includes(e.target.value)) {
-        console.log('selected from list', e.target.value);
         onSearchSelect(e.target.value);
       }
     }

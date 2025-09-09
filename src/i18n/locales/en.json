@@ -165,7 +165,19 @@
 					"key": "profession",
 					"name": "Profession",
 					"label": "What do you do?",
-					"placeholder": "Profession"
+					"placeholder": "Profession",
+					"suggestions": [
+						"Medical professional",
+						"Sales professional",
+						"Software developer",
+						"Client Consultant",
+						"Contractor",
+						"Startup founder",
+						"Researcher",
+						"Student",
+						"Lecturer",
+						"Travel Consultant"
+					]
 				},
 				"integrations": {
 					"key": "integrations",

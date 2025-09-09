@@ -81,7 +81,6 @@ const WaitlistForm: React.FC = () => {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-
     if (formValues.integrations.length === 0 && currentStep === 3) {
       toast.error(t('waitlist.form.errors.integrations'));
       return;
@@ -90,7 +89,6 @@ const WaitlistForm: React.FC = () => {
       setCurrentStep(currentStep + 1);
       return;
     }
-
     try {
       setIsSubmitting(true);
       await betaUserService.signUp({
@@ -139,18 +137,9 @@ const WaitlistForm: React.FC = () => {
       value={formValues.profession}
       onChange={(e) => setFormValues({ ...formValues, profession: e.target.value })}
       required
-      searchList={[
-        'Medical professional',
-        'Sales professional',
-        'Software developer',
-        'Client Consultant',
-        'Contractor',
-        'Startup founder',
-        'Researche',
-        'Student',
-        'Lecture',
-        'Travel Consultant',
-      ]}
+      searchList={
+        t('waitlist.form.steps.profession.suggestions', { returnObjects: true }) as string[]
+      }
     />,
     <MultiInput
       key={t('waitlist.form.steps.integrations.key')}
