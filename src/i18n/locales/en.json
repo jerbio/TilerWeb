@@ -168,15 +168,14 @@
 					"placeholder": "Profession",
 					"suggestions": [
 						"Medical professional",
-						"Sales professional",
-						"Software developer",
-						"Client Consultant",
+						"Sales",
+						"Engineer",
 						"Contractor",
-						"Startup founder",
-						"Researcher",
 						"Student",
-						"Lecturer",
-						"Travel Consultant"
+						"Researcher",
+						"Attorney",
+						"Travel Advisor",
+						"Consultant"
 					]
 				},
 				"integrations": {
