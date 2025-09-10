@@ -3,9 +3,9 @@ import { VibeAction, SendMessageRequest, PromptWithActions } from './chat';
 import ADDBLOCK from '../../../../assets/image_assets/add_block.svg';
 import ADDTASK from '../../../../assets/image_assets/add_new_tile.svg';
 
-const API_URL = 'https://tiler.app/api/Vibe/Chat';
-const API_ACTIONS_URL = 'https://tiler.app/api/Vibe/Action';
-const API_EXECUTE_ACTIONS_URL = 'https://tiler.app/api/Vibe/Request/Execute';
+const API_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Chat';
+const API_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Action';
+const API_EXECUTE_ACTIONS_URL = 'https://tiler-stage.conveyor.cloud/api/Vibe/Request/Execute';
 const STORAGE_KEY = 'chat_session_id';
 
 export const getStoredSessionId = (): string | null => {
