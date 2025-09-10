@@ -3,9 +3,8 @@ import Section from '../layout/section';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
-import AppStore from '@/assets/icons/app_store.svg';
-import PlayStore from '@/assets/icons/play_store.svg';
 import ArrowOut from '@/core/common/components/icons/arrow_out';
+import apps from '@/core/common/data/apps';
 
 const FlexWrapper = styled.div`
 	display: flex;
@@ -38,48 +37,29 @@ const DownloadLinkLabel = styled.span`
 `;
 
 const AppDownloadSection: React.FC = () => {
-	const { t } = useTranslation();
+  const { t } = useTranslation();
 
-	return (
-		<Section paddingBlock={36}>
-			<FlexWrapper>
-				<DownloadLink
-					href="https://apps.apple.com/us/app/tiler-assistant/id1663594789"
-					title={t('home.appDownload.ios.title')}
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					<img
-						src={AppStore}
-						alt={t('home.appDownload.ios.alt')}
-						width={56}
-						height={56}
-					/>
-					<DownloadLinkLabel>
-						<span>{t('home.appDownload.ios.title')}</span>
-						<ArrowOut size={12} />
-					</DownloadLinkLabel>
-				</DownloadLink>
-				<DownloadLink
-					href="https://play.google.com/store/apps/details?id=app.tiler.app"
-					title={t('home.appDownload.android.title')}
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					<img
-						src={PlayStore}
-						alt={t('home.appDownload.android.alt')}
-						width={56}
-						height={56}
-					/>
-					<DownloadLinkLabel>
-						<span>{t('home.appDownload.android.title')}</span>
-						<ArrowOut size={12} />
-					</DownloadLinkLabel>
-				</DownloadLink>
-			</FlexWrapper>
-		</Section>
-	);
+  return (
+    <Section paddingBlock={36}>
+      <FlexWrapper>
+        {apps.map((app) => (
+          <DownloadLink
+            key={app.i18Platform}
+            href={app.link}
+            title={t(app.i18Platform)}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <img src={app.icons.logo} alt={t(app.i18CTA)} width={56} height={56} />
+            <DownloadLinkLabel>
+              <span>{t(app.i18CTA)}</span>
+              <ArrowOut size={12} />
+            </DownloadLinkLabel>
+          </DownloadLink>
+        ))}
+      </FlexWrapper>
+    </Section>
+  );
 };
 
 export default AppDownloadSection;

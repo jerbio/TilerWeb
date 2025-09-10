@@ -1,61 +1,225 @@
 import React from 'react';
-import palette from '../core/theme/palette';
+import palette from '@/core/theme/palette';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import InstagramLogo from '@/assets/social/instagram_logo.png';
-import FacebookLogo from '@/assets/social/facebook_logo.png';
-import LinkedInLogo from '@/assets/social/linkedin_logo.png';
-import XLogo from '@/assets/social/x_logo.png';
-import FounderUniversity from '../assets/founder_university.png';
 import Logo from '@/core/common/components/icons/logo';
+import FounderUniversity from '@/assets/founder_university.png';
 import { NavLink } from 'react-router';
+import apps from '@/core/common/data/apps';
+import socials from '@/core/common/data/socials.ts';
+
+const FooterSection: React.FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <StyledFooterSection>
+      <FooterContainer>
+        <FlexSpace>
+          <NavLink to="/">
+            <Logo size={36} />
+          </NavLink>
+          <CTALinks>
+            {apps.map((app) => (
+              <a
+                key={app.i18Platform}
+                href={app.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={app.icons.cta} alt={app.i18CTA} height={40} />
+              </a>
+            ))}
+          </CTALinks>
+        </FlexSpace>
+        <FooterDivider />
+        <FlexSpace>
+          <FooterLinksBlock
+            title="Legal"
+            links={[
+              {
+                href: '/terms-of-use',
+                label: t('common.legal.terms'),
+              },
+              {
+                href: '/privacy-policy',
+                label: t('common.legal.privacy'),
+              },
+            ]}
+          />
+          <FooterSocialsSection>
+            <SocialsContainer>
+              {socials.map((social, index) => (
+                <React.Fragment key={social.link}>
+                  {index !== 0 && <SocialDivider />}
+                  <a href={social.link} rel="noopener noreferrer" target="_blank">
+                    <SocialLogo src={social.logo} />
+                  </a>
+                </React.Fragment>
+              ))}
+            </SocialsContainer>
+            <PartnerContainer>
+              <span>{t('common.partners.title')}</span>
+              <img
+                src={FounderUniversity}
+                alt={t('common.partners.founderUniversity')}
+                width={80}
+              />
+            </PartnerContainer>
+            <FooterCopyright>
+              {t('common.copyright', { year: new Date().getFullYear() })}
+            </FooterCopyright>
+          </FooterSocialsSection>
+        </FlexSpace>
+      </FooterContainer>
+    </StyledFooterSection>
+  );
+};
+
+type FooterLink = {
+  href: string;
+  label: string;
+};
+const FooterLinksBlock: React.FC<{ title: string; links: FooterLink[] }> = ({ title, links }) => {
+  return (
+    <FooterLinksContainer>
+      <FooterLinksTitle>{title}</FooterLinksTitle>
+      <FooterLinks>
+        {links.map((link) => (
+          <li key={link.href}>
+            <a href={link.href} target="_blank" rel="noopener noreferrer">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </FooterLinks>
+    </FooterLinksContainer>
+  );
+};
+
+const StyledFooterSection = styled.div`
+	border-top: 1px solid ${palette.colors.gray[800]};
+	background-color: #111;
+	display: grid;
+	place-items: center;
+`;
 
 const FooterContainer = styled.div`
-	border-top: 1px solid ${palette.colors.gray[800]};
-	background: #111;
-	display: flex;
-	justify-content: center;
-`;
-
-const FooterSubContainer = styled.div`
 	width: 100%;
-	max-width: ${palette.container.sizes.xLarge};
+	max-width: ${palette.container.sizes.xxLarge};
 
 	display: flex;
-	justify-content: space-between;
-	padding-block: ${palette.container.paddingInline.lg};
-	margin-inline: ${palette.container.paddingInline.lg};
-	color: ${palette.colors.gray[500]};
-
-	@media (max-width: 768px) {
-		flex-direction: column-reverse;
-		align-items: center;
-		text-align: center;
-		padding-block: ${palette.container.paddingInline.default};
-		margin-inline: ${palette.container.paddingInline.default};
-	}
-`;
-
-const FooterColumn = styled.div`
-	display: flex;
-	flex-direction: column;
 	gap: 1rem;
-	text-align: left;
-	font-size: ${palette.typography.fontSize.sm};
+	flex-direction: column;
+	padding-block: 2rem;
+	padding-inline: 1.5rem;
 
-	@media (max-width: 768px) {
-		margin: 1rem;
-		text-align: center;
+	@media (max-width: ${palette.screens.md}) {
+		gap: 2rem;
 	}
 `;
 
-const FooterRow = styled.div`
+const PartnerContainer = styled.div`
 	display: flex;
 	gap: 0.5rem;
 
-	@media (max-width: 768px) {
+	span {
+		color: ${palette.colors.gray[500]};
+		font-size: ${palette.typography.fontSize.sm};
+	}
+`;
+
+const FlexSpace = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	@media (max-width: ${palette.screens.md}) {
+		flex-direction: column;
+		gap: 2rem;
+	}
+`;
+
+const CTALinks = styled.div`
+	display: flex;
+	gap: 1rem;
+
+	img {
+		height: 40px;
+	}
+
+	@media (max-width: ${palette.screens.md}) {
 		justify-content: center;
 	}
+`;
+
+const FooterDivider = styled.hr`
+	border: none;
+	border-top: 1px solid ${palette.colors.border};
+	margin: 0;
+
+	@media (max-width: ${palette.screens.md}) {
+		display: none;
+	}
+`;
+
+const FooterLinksContainer = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+
+	@media (max-width: ${palette.screens.md}) {
+		align-items: center;
+	}
+`;
+
+const FooterLinksTitle = styled.h4`
+	font-size: ${palette.typography.fontSize.sm};
+	color: ${palette.colors.white};
+	font-weight: ${palette.typography.fontWeight.medium};
+	line-height: 1;
+`;
+
+const FooterLinks = styled.ul`
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	li {
+		font-size: ${palette.typography.fontSize.xs};
+		line-height: 1.2;
+		color: ${palette.colors.gray[500]};
+		transition: color 0.35s ease;
+
+		&:has(a:hover) {
+			color: ${palette.colors.gray[400]};
+		}
+	}
+
+	@media (max-width: ${palette.screens.md}) {
+		align-items: center;
+	}
+`;
+
+const FooterSocialsSection = styled.div`
+	align-items: flex-end;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+
+	@media (max-width: ${palette.screens.md}) {
+		align-items: center;
+	}
+`;
+
+const SocialsContainer = styled.div`
+	display: flex;
+	gap: 0.5rem;
+`;
+
+const SocialDivider = styled.div`
+	height: 16px;
+	width: 1px;
+	background-color: ${palette.colors.gray[800]};
 `;
 
 const SocialLogo = styled.img<{ src: string }>`
@@ -63,120 +227,9 @@ const SocialLogo = styled.img<{ src: string }>`
 	height: 16px;
 `;
 
-const FooterLinks = styled.div`
-	display: flex;
-	gap: 0.5rem;
-
-	@media (max-width: 768px) {
-		display: flex;
-		justify-content: center;
-	}
+const FooterCopyright = styled.p`
+	color: ${palette.colors.gray[500]};
+	font-size: ${palette.typography.fontSize.xs};
 `;
-
-const FooterLink = styled.a`
-	margin-right: 10px;
-	text-decoration: none;
-	color: ${palette.colors.text};
-
-	&:hover {
-		text-decoration: underline;
-	}
-`;
-
-const FooterSection: React.FC = () => {
-  const { t } = useTranslation();
-
-  return (
-    <FooterContainer>
-      <FooterSubContainer>
-        <FooterColumn>
-          <FooterRow>
-            <NavLink to="/" aria-label="Tiler Home">
-              <Logo size={32} />
-            </NavLink>
-          </FooterRow>
-
-          <p
-            style={{
-              fontSize: palette.typography.fontSize.sm,
-              margin: 'auto 0 0',
-            }}
-          >
-            {t('common.copyright', { year: new Date().getFullYear() })}
-          </p>
-
-          <FooterLinks>
-            <FooterLink
-              href="https://www.facebook.com/profile.php?id=100094419297775"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SocialLogo src={FacebookLogo} alt={t('common.social.facebook')} />
-            </FooterLink>
-            <FooterLink
-              href="https://www.linkedin.com/company/tilerapp"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SocialLogo src={LinkedInLogo} alt={t('common.social.linkedin')} />
-            </FooterLink>
-            <FooterLink
-              href="https://www.instagram.com/tiler.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SocialLogo src={InstagramLogo} alt={t('common.social.instagram')} />
-            </FooterLink>
-            <FooterLink
-              href="https://x.com/Tiler_app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SocialLogo src={XLogo} alt={t('common.social.x')} />
-            </FooterLink>
-          </FooterLinks>
-        </FooterColumn>
-
-        <FooterColumn>
-          <h3 style={{ color: palette.colors.white }}>{t('common.legal.title')}</h3>
-
-          <ul
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.25rem',
-              margin: '0 0 auto',
-            }}
-          >
-            <FooterLink
-              href="https://tiler.app/tos"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('common.legal.terms')}
-            </FooterLink>
-
-            <FooterLink
-              href="https://tiler.app/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('common.legal.privacy')}
-            </FooterLink>
-          </ul>
-
-          <FooterRow>
-            <img
-              src={FounderUniversity}
-              alt={t('common.partners.founderUniversity')}
-              style={{ width: '80px', height: 'auto' }}
-            />
-            <span>{t('common.partners.title')}</span>
-          </FooterRow>
-        </FooterColumn>
-      </FooterSubContainer>
-    </FooterContainer>
-  );
-};
 
 export default FooterSection;

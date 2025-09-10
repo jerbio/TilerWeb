@@ -25,6 +25,8 @@ export class BetaUserService {
 				Profession: profession,
 				Integrations: integrations,
 				UserCase: useCases,
+				TimeZoneOffset: new Date().getTimezoneOffset(),
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 			};
 			const response = await this.betaUserApi.signUp(betaUser);
 			return response;

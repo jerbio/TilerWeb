@@ -20,6 +20,16 @@
 			"instagram": "Instagram",
 			"x": "X (Twitter)"
 		},
+		"apps": {
+			"ios": {
+				"cta": "Download on App Store",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "Get it on Google Play",
+				"platform": "Android Play Store"
+			}
+		},
 		"legal": {
 			"title": "Legal",
 			"terms": "Terms of Use",
@@ -69,16 +79,6 @@
 		},
 		"video": {
 			"title": "YouTube video player"
-		},
-		"appDownload": {
-			"ios": {
-				"title": "Download on App Store",
-				"alt": "iOS App Store"
-			},
-			"android": {
-				"title": "Get it on Google Play",
-				"alt": "Android Play Store"
-			}
 		},
 		"updates": {
 			"title": "Get the Latest Tiler News & Updates",
@@ -173,7 +173,18 @@
 					"key": "profession",
 					"name": "Profession",
 					"label": "What do you do?",
-					"placeholder": "Profession"
+					"placeholder": "Profession",
+					"suggestions": [
+						"Medical professional",
+						"Sales",
+						"Engineer",
+						"Contractor",
+						"Student",
+						"Researcher",
+						"Attorney",
+						"Travel Advisor",
+						"Consultant"
+					]
 				},
 				"integrations": {
 					"key": "integrations",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import WaitlistProgressBar from './WaitlistProgressBar';
 import { ArrowRight, Link2, ListCheck, Mail, Wrench } from 'lucide-react';
 import Input from '@/core/common/components/input';
@@ -9,9 +9,11 @@ import { betaUserService } from '@/services';
 import { toast } from 'sonner';
 import MultiInput from '@/core/common/components/multi_input';
 import { useTranslation } from 'react-i18next';
+import WaitlistSuccessModal from './waitlist_success_modal';
 
 const WaitlistForm: React.FC = () => {
   const { t } = useTranslation();
+  const [successModal, setSuccessModal] = useState(false);
 
   const refSteps = React.useRef([
     {
@@ -79,7 +81,6 @@ const WaitlistForm: React.FC = () => {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-
     if (formValues.integrations.length === 0 && currentStep === 3) {
       toast.error(t('waitlist.form.errors.integrations'));
       return;
@@ -88,7 +89,6 @@ const WaitlistForm: React.FC = () => {
       setCurrentStep(currentStep + 1);
       return;
     }
-
     try {
       setIsSubmitting(true);
       await betaUserService.signUp({
@@ -101,6 +101,7 @@ const WaitlistForm: React.FC = () => {
         duration: 2000,
       });
       resetForm();
+      setSuccessModal(true);
     } catch (error) {
       console.error('Error signing up for waitlist:', error);
       toast.error('Failed to sign up.');
@@ -136,6 +137,9 @@ const WaitlistForm: React.FC = () => {
       value={formValues.profession}
       onChange={(e) => setFormValues({ ...formValues, profession: e.target.value })}
       required
+      searchList={
+        t('waitlist.form.steps.profession.suggestions', { returnObjects: true }) as string[]
+      }
     />,
     <MultiInput
       key={t('waitlist.form.steps.integrations.key')}
@@ -164,28 +168,38 @@ const WaitlistForm: React.FC = () => {
   ];
 
   return (
-    <WaitlistFormContainer>
-      <WaitlistProgressBar
-        steps={steps}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-      />
-      <StyledWaitlistForm onSubmit={handleSubmit}>
-        {inputTransition((style, item) => (
-          <animated.div style={style} key={item.id}>
-            {inputs[item.id - 1]}
-          </animated.div>
-        ))}
-        <Button disabled={isSubmitting} type="submit" variant="brand" height={40}>
-          <span>
-            {currentStep === steps.length
-              ? t('waitlist.form.joinWaitlist')
-              : t('waitlist.form.nextStep')}
-          </span>
-          <ArrowRight size={16} />
-        </Button>
-      </StyledWaitlistForm>
-    </WaitlistFormContainer>
+    <React.Fragment>
+      <WaitlistFormContainer>
+        <WaitlistProgressBar
+          steps={steps}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+        />
+        <StyledWaitlistForm onSubmit={handleSubmit}>
+          {inputTransition((style, item) => (
+            <animated.div style={style} key={item.id}>
+              {inputs[item.id - 1]}
+            </animated.div>
+          ))}
+          <Button disabled={isSubmitting} type="submit" variant="brand" height={40}>
+            <span>
+              {currentStep === steps.length
+                ? t('waitlist.form.joinWaitlist')
+                : t('waitlist.form.nextStep')}
+            </span>
+            <ArrowRight size={16} />
+          </Button>
+        </StyledWaitlistForm>
+      </WaitlistFormContainer>
+      <WaitlistSuccessContainer
+        $open={successModal}
+        onClick={() => {
+          setSuccessModal(false);
+        }}
+      >
+        <WaitlistSuccessModal open={successModal} />
+      </WaitlistSuccessContainer>
+    </React.Fragment>
   );
 };
 
@@ -201,6 +215,21 @@ const WaitlistFormContainer = styled.div`
 	gap: 24px;
 	width: 100%;
 	max-width: 400px;
+`;
+
+const WaitlistSuccessContainer = styled.div<{ $open: boolean }>`
+	z-index: 999;
+	position: fixed;
+	inset: 0;
+	height: 100vh;
+	width: 100vw;
+	display: grid;
+	place-items: center;
+	padding: 1rem;
+	background-color: #00000080;
+	opacity: ${({ $open }) => ($open ? '1' : '0')};
+	pointer-events: ${({ $open }) => ($open ? 'all' : 'none')};
+	transition: opacity 0.5s ease;
 `;
 
 export default WaitlistForm;
