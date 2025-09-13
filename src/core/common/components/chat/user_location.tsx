@@ -279,23 +279,21 @@ const UserLocation: React.FC = () => {
 	// Helper function to extract user ID from local storage
 	const getUserIdFromStorage = (): string => {
 		try {
-			const personaScheduleData = localStorage.getItem('tiler-persona-schedule');
-			if (!personaScheduleData) return `TilerUser@@${Date.now()}`;
+			const personaScheduleData = localStorage.getItem('tiler-persona-users');
+			if (!personaScheduleData) return '';
 
 			const parsed = JSON.parse(personaScheduleData);
-			// Look for any persona key and extract scheduleId
+			// Look for any persona key and extract userId
 			const personaKeys = Object.keys(parsed);
-			if (personaKeys.length === 0) return `TilerUser@@${Date.now()}`;
+			if (personaKeys.length === 0) return '';
 
 			const firstPersona = parsed[personaKeys[0]];
-			if (!firstPersona?.scheduleId) return `TilerUser@@${Date.now()}`;
+			if (!firstPersona?.userId) return '';
 
-			// Extract user ID (first part before the first colon)
-			const parts = firstPersona.scheduleId.split(':');
-			return parts[0] || `TilerUser@@${Date.now()}`;
+			return firstPersona.userId;
 		} catch (error) {
 			console.warn('Failed to extract user ID from local storage:', error);
-			return `TilerUser@@${Date.now()}`;
+			return '';
 		}
 	};
 

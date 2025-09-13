@@ -5,6 +5,7 @@ import Calendar from '../../../core/common/components/calendar/calendar';
 import TimeUtil from '../../../core/util/time';
 import useCalendarView from '../../../core/common/hooks/useCalendarView';
 import { scheduleService } from '@/services';
+import useAppStore from '../../../global_state';
 
 type PersonaCalendarProps = {
   userId: string | null;
@@ -14,6 +15,9 @@ type PersonaCalendarProps = {
 function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps) {
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
+
+  // Get scheduleId from global state to trigger refresh when it changes
+  const scheduleId = useAppStore((state) => state.scheduleId);
 
   // Get a reference to the view container
   const viewRef = React.useRef<HTMLUListElement>(null);
@@ -43,7 +47,7 @@ function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps)
     if (userId) {
       fetchSchedule(userId);
     }
-  }, [userId, viewOptions.daysInView, viewOptions.startDay]);
+  }, [userId, scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
   return (
     <Calendar
