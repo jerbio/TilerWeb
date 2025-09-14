@@ -135,15 +135,32 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customInputValue, setCustomInputValue] = useState('');
 
+  // Focus the input when it is shown
+  function focusInput() {
+    const input = customInputFormRef.current?.querySelector('input');
+    if (input) {
+      input.focus();
+			swiper.disable();
+			input.addEventListener('blur', (e) => {
+				const input = e.target as HTMLInputElement;
+				if (!input.value.trim()) {
+					setShowCustomInput(false);
+					swiper.enable();
+					swiper.autoplay.resume();
+				}
+			});
+		}
+  }
+
   useEffect(() => {
     if (showCustomInput && customInputFormRef.current) {
-      customInputFormRef.current.querySelector('input')?.focus();
+      focusInput();
     }
   }, [showCustomInput]);
 
   function onCustomSelect() {
     if (!customInputValue.trim()) {
-      customInputFormRef.current?.querySelector('input')?.focus();
+			focusInput();
       return;
     }
     setShowCustomInput(false);
@@ -161,7 +178,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     setPersonaUser(persona.id, null, { store: false });
     swiper.enable();
   }
-
   function onSelect() {
     setSelectedPersona(persona.key);
   }

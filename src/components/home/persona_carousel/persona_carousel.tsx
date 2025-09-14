@@ -62,6 +62,14 @@ const PersonaCarousel: React.FC = () => {
     getPersonas();
   }, []);
 
+	// Restart swiper autoplay when personas change
+	useEffect(() => {
+		if (swiperRef.current && personas.length) {
+			swiperRef.current.swiper.autoplay.pause();
+			swiperRef.current.swiper.autoplay.resume();
+		}
+	}, [personas]);
+
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
   const isMobile = useIsMobile();
   const isTablet = useIsMobile(1100);
