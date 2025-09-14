@@ -95,6 +95,16 @@ export type ChatMessageBody = {
   UserLocationVerified?: string;
 }
 
+export interface VibeSession {
+	id: string;
+	creationTimeInMs: number;
+	requests: (string | null)[];
+}
+
+export type VibeSessionsResponse = ApiResponse<{
+	vibeSessions: VibeSession[];
+}>;
+
 export type {
   PromptWithActions as Message,
 };

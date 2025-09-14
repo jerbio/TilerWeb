@@ -18,6 +18,7 @@ import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
+import { personaService } from '@/services';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -149,6 +150,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
+	const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
 	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
 	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
 	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
@@ -157,20 +159,83 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		setScheduleId(id);
 	};
 
-	// Load session ID from local storage on mount
-	useEffect(() => {
-		const storedSessionId = getStoredSessionId();
-		if (storedSessionId) {
-			setSessionId(storedSessionId);
+	// Helper function to get persona info from localStorage using selectedPersonaId
+	const getSelectedPersonaInfo = async (): Promise<{ userId: string; expiration: number } | null> => {
+		if (selectedPersonaId === null) return null;
+		
+		try {
+			// Get personas array to map index to persona.id
+			const data = await personaService.getPersonas();
+			const personasWithKeys = data.personas.map((persona, index) => ({
+				...persona,
+				key: index,
+			}));
+			
+			// Find the persona at the selected index
+			const selectedPersona = personasWithKeys[selectedPersonaId];
+			if (!selectedPersona) return null;
+			
+			// Get stored persona users from localStorage
+			const personaScheduleData = localStorage.getItem('tiler-persona-users');
+			if (!personaScheduleData) return null;
+			
+			const parsed = JSON.parse(personaScheduleData);
+			const personaInfo = parsed[selectedPersona.id];
+			
+			return personaInfo || null;
+		} catch (error) {
+			console.warn('Failed to get selected persona info:', error);
+			return null;
 		}
-	}, []);
+	};
 
-	// Load chat messages when session ID changes
+	// Fetch sessions and set latest sessionId on component mount or when persona changes
+	useEffect(() => {
+		const fetchAndSetLatestSession = async () => {
+			try {
+				const personaInfo = await getSelectedPersonaInfo();
+				const personaUserId = personaInfo?.userId;
+
+				if (personaUserId) {
+					const sessionsResponse = await chatService.getVibeSessions(undefined, personaUserId);
+					const sessions = sessionsResponse.Content.vibeSessions;
+					
+					if (sessions && sessions.length > 0) {
+						// Sort sessions by creation time (newest first) and get the latest one
+						const latestSession = sessions.sort((a, b) => b.creationTimeInMs - a.creationTimeInMs)[0];
+						setSessionId(latestSession.id);
+					} else {
+						// No sessions found, clear sessionId
+						setSessionId('');
+					}
+				} else {
+					// No persona selected, check for stored sessionId as fallback
+					const storedSessionId = getStoredSessionId();
+					if (storedSessionId) {
+						setSessionId(storedSessionId);
+					} else {
+						setSessionId('');
+					}
+				}
+			} catch (error) {
+				console.warn('Failed to fetch sessions:', error);
+				// Fallback to stored sessionId if available
+				const storedSessionId = getStoredSessionId();
+				if (storedSessionId) {
+					setSessionId(storedSessionId);
+				}
+			}
+		};
+
+		fetchAndSetLatestSession();
+	}, [selectedPersonaId]);
+
+	// Load chat messages when session ID or selected persona changes
 	useEffect(() => {
 		if (sessionId) {
 			loadChatMessages(sessionId);
 		}
-	}, [sessionId, scheduleId]);
+	}, [sessionId, scheduleId, selectedPersonaId]);
 
 	// Custom hook to check unexecuted actions
 	const useHasUnexecutedActions = (requestId: string | null) => {
