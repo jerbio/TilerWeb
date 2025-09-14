@@ -6,9 +6,9 @@ import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 import {
-	getStoredSessionId,
-	setStoredSessionId,
-	clearStoredSessionId,
+  getStoredSessionId,
+  setStoredSessionId,
+  clearStoredSessionId,
 } from '@/core/storage/chatSession';
 import useAppStore, { ChatContextType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
@@ -19,11 +19,17 @@ import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
 
-const ChatContainer = styled.section`
+const ChatWrapper = styled.section`
+	height: 100%;
+	position: relative;
+`;
+
+const ChatContainer = styled.div`
+	position: absolute;
+	inset: 0;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
-	// gap: 1rem;
-	height: 100%;
 	padding: 1.5rem;
 
 	@media screen and (min-width: ${palette.screens.lg}) {
@@ -128,541 +134,562 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 `;
 
 type ChatProps = {
-	onClose?: () => void;
+  onClose?: () => void;
 };
 
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
-	const { t } = useTranslation();
+  const { t } = useTranslation();
 
-	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
-	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
-	const messagesEndRef = useRef<HTMLDivElement>(null);
-	const messagesListRef = useRef<HTMLDivElement>(null);
-	const [message, setMessage] = useState('');
-	const [messages, setMessages] = useState<PromptWithActions[]>([]);
-	const [isSending, setIsSending] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [sessionId, setSessionId] = useState<string>('');
-	const [isLoading, setIsLoading] = useState(false);
-	const [isBatchLoading, setIsBatchLoading] = useState(false);
-	const [requestId, setRequestId] = useState<string | null>(null);
-	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
+  const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
+  const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesListRef = useRef<HTMLDivElement>(null);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<PromptWithActions[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBatchLoading, setIsBatchLoading] = useState(false);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
-	const scheduleId = useAppStore((state) => state.scheduleId);
-	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
-	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
-	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
-	const userLocationVerified = useAppStore((state) => state.userInfo?.userLocationVerified ?? "false");
-	const handleSetScheduleId = (id: string) => {
-		setScheduleId(id);
-	};
+  const scheduleId = useAppStore((state) => state.scheduleId);
+  const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+  const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
+  const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
+  const userLocationVerified = useAppStore(
+    (state) => state.userInfo?.userLocationVerified ?? 'false'
+  );
+  const handleSetScheduleId = (id: string) => {
+    setScheduleId(id);
+  };
 
-	// Load session ID from local storage on mount
-	useEffect(() => {
-		const storedSessionId = getStoredSessionId();
-		if (storedSessionId) {
-			setSessionId(storedSessionId);
-		}
-	}, []);
+  // Load session ID from local storage on mount
+  useEffect(() => {
+    const storedSessionId = getStoredSessionId();
+    if (storedSessionId) {
+      setSessionId(storedSessionId);
+    }
+  }, []);
 
-	// Load chat messages when session ID changes
-	useEffect(() => {
-		if (sessionId) {
-			loadChatMessages(sessionId);
-		}
-	}, [sessionId, scheduleId]);
+  // Load chat messages when session ID changes
+  useEffect(() => {
+    if (sessionId) {
+      loadChatMessages(sessionId);
+    }
+  }, [sessionId, scheduleId]);
 
-	// Custom hook to check unexecuted actions
-	const useHasUnexecutedActions = (requestId: string | null) => {
-		const [hasUnexecuted, setHasUnexecuted] = useState(false);
-		
-		useEffect(() => {
-			const checkActions = async () => {
-				if (!requestId) {
-					setHasUnexecuted(false);
-					return;
-				}
-				
-				try {
-					const response = await chatService.getVibeRequest(requestId);
-					const isClosed = response?.Content?.vibeRequest?.isClosed;
-					setHasUnexecuted(isClosed !== true);
-				} catch (error) {
-					console.error('Error checking vibe request status:', error);
-					// Fallback to original logic if API fails
-					const fallback = messages.some((msg) =>
-						msg.actions?.some(
-							(action) => action.status !== 'executed' && action.status !== 'exited'
-						)
-					);
-					setHasUnexecuted(fallback);
-				}
-			};
-			
-			checkActions();
-		}, [requestId, messages]); // Re-check when requestId or messages change
-		
-		return hasUnexecuted;
-	};
+  // Custom hook to check unexecuted actions
+  const useHasUnexecutedActions = (requestId: string | null) => {
+    const [hasUnexecuted, setHasUnexecuted] = useState(false);
 
-	const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
+    useEffect(() => {
+      const checkActions = async () => {
+        if (!requestId) {
+          setHasUnexecuted(false);
+          return;
+        }
 
-	useEffect(() => {
-		if (messages.length > 0 && messagesListRef.current) {
-			messagesListRef.current.scrollTo({
-			top: messagesListRef.current.scrollHeight,
-			behavior: "smooth",
-			});
-		}
-	}, [messages]);
+        try {
+          const response = await chatService.getVibeRequest(requestId);
+          const isClosed = response?.Content?.vibeRequest?.isClosed;
+          setHasUnexecuted(isClosed !== true);
+        } catch (error) {
+          console.error('Error checking vibe request status:', error);
+          // Fallback to original logic if API fails
+          const fallback = messages.some((msg) =>
+            msg.actions?.some(
+              (action) => action.status !== 'executed' && action.status !== 'exited'
+            )
+          );
+          setHasUnexecuted(fallback);
+        }
+      };
 
+      checkActions();
+    }, [requestId, messages]); // Re-check when requestId or messages change
 
-	// Helper function to update messages with actions progressively
-	const updateMessagesWithActions = (rawMessages: PromptWithActions[], actionsMap: Record<string, VibeAction>) => {
-		const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-			const actionIds: string[] = entry.actionIds ?? [];
-			const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
+    return hasUnexecuted;
+  };
 
-			return {
-				id: entry.id,
-				origin: entry.origin,
-				content: entry.content,
-				actionId: entry.actionId,
-				requestId: entry.requestId,
-				sessionId: entry.sessionId,
-				actionIds,
-				actions: resolvedActions,
-			};
-		});
+  const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
 
-		// Sort by timestamp
-		updatedMessages.sort((a, b) => {
-			const extractTimestamp = (id: string): number => {
-				const match = id.match(/(\d{18})/);
-				return match ? parseInt(match[1], 10) : 0;
-			};
-			return extractTimestamp(a.id) - extractTimestamp(b.id);
-		});
+  useEffect(() => {
+    if (messages.length > 0 && messagesListRef.current) {
+      messagesListRef.current.scrollTo({
+        top: messagesListRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages]);
 
-		// Update state with partial results
-		setMessages((prevMessages) => {
-			const existingIds = new Set(prevMessages.map((m) => m.id));
-			const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
+  // Helper function to update messages with actions progressively
+  const updateMessagesWithActions = (
+    rawMessages: PromptWithActions[],
+    actionsMap: Record<string, VibeAction>
+  ) => {
+    const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+      const actionIds: string[] = entry.actionIds ?? [];
+      const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
 
-			const mergedMessages = prevMessages.map((prevMessage) => {
-				const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
-				return updatedMessage || prevMessage;
-			});
+      return {
+        id: entry.id,
+        origin: entry.origin,
+        content: entry.content,
+        actionId: entry.actionId,
+        requestId: entry.requestId,
+        sessionId: entry.sessionId,
+        actionIds,
+        actions: resolvedActions,
+      };
+    });
 
-			return [...mergedMessages, ...uniqueNewMessages];
-		});
-	};
+    // Sort by timestamp
+    updatedMessages.sort((a, b) => {
+      const extractTimestamp = (id: string): number => {
+        const match = id.match(/(\d{18})/);
+        return match ? parseInt(match[1], 10) : 0;
+      };
+      return extractTimestamp(a.id) - extractTimestamp(b.id);
+    });
 
-	const loadChatMessages = async (sid: string) => {
-		if (!sid) return;
+    // Update state with partial results
+    setMessages((prevMessages) => {
+      const existingIds = new Set(prevMessages.map((m) => m.id));
+      const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
 
-		try {
-			setIsLoading(true);
-			setError(null);
+      const mergedMessages = prevMessages.map((prevMessage) => {
+        const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
+        return updatedMessage || prevMessage;
+      });
 
-			const data = await chatService.getMessages(sid);
-			const rawMessages = data.Content.chats || [];
-			if (!rawMessages || rawMessages.length === 0) return;
+      return [...mergedMessages, ...uniqueNewMessages];
+    });
+  };
 
-			// Collect all unique actionIds, ordered by message timestamp (newest first)
-			const messagesByTimestamp = rawMessages
-				.map((entry) => ({
-					...entry,
-					timestamp: (() => {
-						const match = entry.id.match(/(\d{18})/);
-						return match ? parseInt(match[1], 10) : 0;
-					})()
-				}))
-				.sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
+  const loadChatMessages = async (sid: string) => {
+    if (!sid) return;
 
-			const uniqueActionIds = Array.from(
-				new Set(messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean))
-			);
+    try {
+      setIsLoading(true);
+      setError(null);
 
-			// Fetch and map actions by ID with batching
-			let allActionsMap: Record<string, VibeAction> = {};
-			if (uniqueActionIds.length > 0) {
-				const BATCH_SIZE = 10;
-				const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
+      const data = await chatService.getMessages(sid);
+      const rawMessages = data.Content.chats || [];
+      if (!rawMessages || rawMessages.length === 0) return;
 
-				if (shouldBatch) {
-					setIsBatchLoading(true);
-					
-					// Create batches (most recent actions first)
-					const batches: string[][] = [];
-					for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
-						batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
-					}
+      // Collect all unique actionIds, ordered by message timestamp (newest first)
+      const messagesByTimestamp = rawMessages
+        .map((entry) => ({
+          ...entry,
+          timestamp: (() => {
+            const match = entry.id.match(/(\d{18})/);
+            return match ? parseInt(match[1], 10) : 0;
+          })(),
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
 
-					// Process batches sequentially, updating UI after each batch
-					for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-						const batch = batches[batchIndex];
-						const isLastBatch = batchIndex === batches.length - 1;
+      const uniqueActionIds = Array.from(
+        new Set(
+          messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean)
+        )
+      );
 
-						try {
-							const fetchedActions = await chatService.getActions(batch);
-							const batchActionsMap = fetchedActions.reduce(
-								(acc, action) => {
-									acc[action.id] = action;
-									return acc;
-								},
-								{} as Record<string, VibeAction>
-							);
+      // Fetch and map actions by ID with batching
+      let allActionsMap: Record<string, VibeAction> = {};
+      if (uniqueActionIds.length > 0) {
+        const BATCH_SIZE = 10;
+        const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
 
-							// Merge with existing actions
-							allActionsMap = { ...allActionsMap, ...batchActionsMap };
+        if (shouldBatch) {
+          setIsBatchLoading(true);
 
-							// Update messages with current actions if not the last batch
-							if (!isLastBatch) {
-								updateMessagesWithActions(rawMessages, allActionsMap);
-							}
-						} catch (error) {
-							console.error(`Error fetching batch ${batchIndex + 1}:`, error);
-						}
-					}
-					
-					setIsBatchLoading(false);
-				} else {
-					// Single request for small number of actions
-					const fetchedActions = await chatService.getActions(uniqueActionIds);
-					allActionsMap = fetchedActions.reduce(
-						(acc, action) => {
-							acc[action.id] = action;
-							return acc;
-						},
-						{} as Record<string, VibeAction>
-					);
-				}
-			}
+          // Create batches (most recent actions first)
+          const batches: string[][] = [];
+          for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
+            batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
+          }
 
-			// Map messages with resolved actions
-			const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-				const actionIds: string[] = entry.actionIds ?? [];
-				const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
+          // Process batches sequentially, updating UI after each batch
+          for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+            const batch = batches[batchIndex];
+            const isLastBatch = batchIndex === batches.length - 1;
 
-				return {
-					id: entry.id,
-					origin: entry.origin,
-					content: entry.content,
-					actionId: entry.actionId,
-					requestId: entry.requestId,
-					sessionId: entry.sessionId,
-					actionIds,
-					actions: resolvedActions,
-				};
-			});
+            try {
+              const fetchedActions = await chatService.getActions(batch);
+              const batchActionsMap = fetchedActions.reduce(
+                (acc, action) => {
+                  acc[action.id] = action;
+                  return acc;
+                },
+                {} as Record<string, VibeAction>
+              );
 
-			// Sort by timestamp extracted from ID (chronological order)
-			loadedMessages.sort((a, b) => {
-				const extractTimestamp = (id: string): number => {
-					const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
-					return match ? parseInt(match[1], 10) : 0;
-				};
-				return extractTimestamp(a.id) - extractTimestamp(b.id);
-			});
-			
-			setMessages((prevMessages) => {
-				const existingIds = new Set(prevMessages.map((m) => m.id));
-				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+              // Merge with existing actions
+              allActionsMap = { ...allActionsMap, ...batchActionsMap };
 
-				// Merge actions for existing messages
-				const updatedMessages = prevMessages.map((prevMessage) => {
-					const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
-					return updatedMessage || prevMessage;
-				});
+              // Update messages with current actions if not the last batch
+              if (!isLastBatch) {
+                updateMessagesWithActions(rawMessages, allActionsMap);
+              }
+            } catch (error) {
+              console.error(`Error fetching batch ${batchIndex + 1}:`, error);
+            }
+          }
 
-				return [...updatedMessages, ...uniqueNewMessages];
-			});
-			setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-			else setError('Failed to load chat messages');
-		} finally {
-			setIsLoading(false);
-		}
-	};
+          setIsBatchLoading(false);
+        } else {
+          // Single request for small number of actions
+          const fetchedActions = await chatService.getActions(uniqueActionIds);
+          allActionsMap = fetchedActions.reduce(
+            (acc, action) => {
+              acc[action.id] = action;
+              return acc;
+            },
+            {} as Record<string, VibeAction>
+          );
+        }
+      }
 
-	const handleSubmit = async (e: FormEvent) => {
-		e.preventDefault();
-		if (!message.trim() || isSending) return;
+      // Map messages with resolved actions
+      const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+        const actionIds: string[] = entry.actionIds ?? [];
+        const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
 
-		try {
-			setIsSending(true);
-			setError(null);
+        return {
+          id: entry.id,
+          origin: entry.origin,
+          content: entry.content,
+          actionId: entry.actionId,
+          requestId: entry.requestId,
+          sessionId: entry.sessionId,
+          actionIds,
+          actions: resolvedActions,
+        };
+      });
 
-			const response = await chatService.sendMessage(
-				message,
-				entityId,
-				sessionId,
-				anonymousUserId,
-				userLongitude,
-				userLatitude,
-				userLocationVerified,
-			);
-			if (
-				response?.Content?.vibeResponse?.tilerUser &&
-				JSON.stringify(response.Content.vibeResponse.tilerUser) !==
-					JSON.stringify(useAppStore.getState().userInfo)
-			) {
-				useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
-			}
-			const promptMap = response?.Content?.vibeResponse?.prompts || {};
+      // Sort by timestamp extracted from ID (chronological order)
+      loadedMessages.sort((a, b) => {
+        const extractTimestamp = (id: string): number => {
+          const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
+          return match ? parseInt(match[1], 10) : 0;
+        };
+        return extractTimestamp(a.id) - extractTimestamp(b.id);
+      });
 
-			// Convert the prompt map to PromptWithActions[]
-			const newMessages: PromptWithActions[] = Object.values(promptMap).map(
-				(entry: PromptWithActions) => ({
-					id: entry.id,
-					origin: entry.origin,
-					content: entry.content,
-					actionId: entry.actionId,
-					requestId: entry.requestId,
-					sessionId: entry.sessionId,
-					actions: (entry.actions ?? []).map((action: VibeAction) => ({
-						id: action.id,
-						descriptions: action.descriptions,
-						type: action.type,
-						creationTimeInMs: action.creationTimeInMs,
-						status: action.status,
-						beforeScheduleId: action.beforeScheduleId,
-						afterScheduleId: action.afterScheduleId,
-						prompts: action.prompts ?? [],
-						vibeRequest: {
-							id: action.vibeRequest.id,
-							creationTimeInMs: action.vibeRequest.creationTimeInMs,
-							activeAction: action.vibeRequest.activeAction,
-							isClosed: action.vibeRequest.isClosed ?? false,
-							beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
-							afterScheduleId: action.vibeRequest.afterScheduleId || null,
-							actions: action.vibeRequest.actions || [],
-						},
-					})),
-				})
-			);
+      setMessages((prevMessages) => {
+        const existingIds = new Set(prevMessages.map((m) => m.id));
+        const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
 
-			// Append new messages to existing state
-			setMessages((prev) => [...prev, ...newMessages]);
-			setRequestId(newMessages[0]?.requestId || null);
+        // Merge actions for existing messages
+        const updatedMessages = prevMessages.map((prevMessage) => {
+          const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
+          return updatedMessage || prevMessage;
+        });
 
-			// Update session ID from the first prompt
-			const sessionIdFromResponse = newMessages[0]?.sessionId;
-			if (sessionIdFromResponse) {
-				setSessionId(sessionIdFromResponse);
-				setStoredSessionId(sessionIdFromResponse);
-			}
+        return [...updatedMessages, ...uniqueNewMessages];
+      });
+      setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Failed to load chat messages');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-			setMessage('');
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-			else setError('Failed to send message');
-		} finally {
-			setIsSending(false);
-		}
-	};
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || isSending) return;
 
-	const acceptAllChanges = async () => {
-		try {
-			setIsSending(true);
-			setError(null);
-			const executedChanges = await chatService.sendChatAcceptChanges(
-				requestId,
-				anonymousUserId,
-				userLongitude,
-				userLatitude,
-				userLocationVerified
-			);
-			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
-			if (newScheduleId) {
-				handleSetScheduleId(newScheduleId);
-				// useEffect will automatically reload messages when scheduleId changes
-			}
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-			else setError('Failed to accept changes');
-		} finally {
-			setIsSending(false);
-		}
-	};
+    try {
+      setIsSending(true);
+      setError(null);
 
+      const response = await chatService.sendMessage(
+        message,
+        entityId,
+        sessionId,
+        anonymousUserId,
+        userLongitude,
+        userLatitude,
+        userLocationVerified
+      );
+      if (
+        response?.Content?.vibeResponse?.tilerUser &&
+        JSON.stringify(response.Content.vibeResponse.tilerUser) !==
+        JSON.stringify(useAppStore.getState().userInfo)
+      ) {
+        useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
+      }
+      const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
-	const handleNewChat = () => {
-		clearStoredSessionId();
-		setSessionId('');
-		setError(null);
-		setMessage('');
-		setMessages([]);
-		setRequestId(null);
-		handleSetScheduleId('');
-	};
+      // Convert the prompt map to PromptWithActions[]
+      const newMessages: PromptWithActions[] = Object.values(promptMap).map(
+        (entry: PromptWithActions) => ({
+          id: entry.id,
+          origin: entry.origin,
+          content: entry.content,
+          actionId: entry.actionId,
+          requestId: entry.requestId,
+          sessionId: entry.sessionId,
+          actions: (entry.actions ?? []).map((action: VibeAction) => ({
+            id: action.id,
+            descriptions: action.descriptions,
+            type: action.type,
+            creationTimeInMs: action.creationTimeInMs,
+            status: action.status,
+            beforeScheduleId: action.beforeScheduleId,
+            afterScheduleId: action.afterScheduleId,
+            prompts: action.prompts ?? [],
+            vibeRequest: {
+              id: action.vibeRequest.id,
+              creationTimeInMs: action.vibeRequest.creationTimeInMs,
+              activeAction: action.vibeRequest.activeAction,
+              isClosed: action.vibeRequest.isClosed ?? false,
+              beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
+              afterScheduleId: action.vibeRequest.afterScheduleId || null,
+              actions: action.vibeRequest.actions || [],
+            },
+          })),
+        })
+      );
 
-	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
+      // Append new messages to existing state
+      setMessages((prev) => [...prev, ...newMessages]);
+      setRequestId(newMessages[0]?.requestId || null);
 
-	const handleRemoveContext = (context: ChatContextType) => {
-		removeChatContext(context); // Remove the clicked context
-	};
+      // Update session ID from the first prompt
+      const sessionIdFromResponse = newMessages[0]?.sessionId;
+      if (sessionIdFromResponse) {
+        setSessionId(sessionIdFromResponse);
+        setStoredSessionId(sessionIdFromResponse);
+      }
 
-	return (
-		<ChatContainer>
-			<ChatHeader>
-				{onClose && (
-					<Button variant="ghost" height={32} onClick={onClose}>
-						<ChevronLeftIcon size={16} />
-						<span>{t('common.buttons.back')}</span>
-					</Button>
-				)}
-				{import.meta.env.VITE_NODE_ENV === 'development' && (
-					<Button
-						variant="outline"
-						style={{
-							alignSelf: 'flex-end',
-							marginBottom: '0.5rem',
-							color: palette.colors.orange[500],
-							borderColor: palette.colors.orange[500],
-						}}
-						onClick={handleNewChat}
-					>
-						{t('home.expanded.chat.clearSession')}
-					</Button>
-				)}
-				{chatContext.length === 0 ? (
-					<Button variant="ghost" height={32} onClick={handleNewChat}>
-						<span>{t('home.expanded.chat.newChat')}</span>
-					</Button>
-				) : (
-					<>
-						{chatContext.map((context, index) => (
-							<Button
-								key={index}
-								variant="outline"
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'space-between',
-									padding: '0.5rem',
-									border: `1px solid ${palette.colors.gray[300]}`,
-								}}
-							>
-								<span>{context.Name}</span>
-								<span
-									onClick={() => handleRemoveContext(context)}
-									style={{
-										marginLeft: '0.5rem',
-										color: 'red',
-										cursor: 'pointer',
-									}}
-								>
-									x
-								</span>
-							</Button>
-						))}
-					</>
-				)}
-			</ChatHeader>
-			<ChatContent>
-				{isLoading && <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />}
-				{isBatchLoading && <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />}
+      setMessage('');
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Failed to send message');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
-				{error && <div className="chat-error">{t('home.expanded.chat.error')}: {error}</div>}
+  const acceptAllChanges = async () => {
+    try {
+      setIsSending(true);
+      setError(null);
+      const executedChanges = await chatService.sendChatAcceptChanges(
+        requestId,
+        anonymousUserId,
+        userLongitude,
+        userLatitude,
+        userLocationVerified
+      );
+      const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
+      if (newScheduleId) {
+        handleSetScheduleId(newScheduleId);
+        // useEffect will automatically reload messages when scheduleId changes
+      }
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Failed to accept changes');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
-				{!isLoading && !error && !messages.length && (
-					<EmptyChat>
-						<Logo size={48} />
-						<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
-						<p>{t('home.expanded.chat.emptyStateDescription')}</p>
-					</EmptyChat>
-				)}
+  const handleNewChat = () => {
+    clearStoredSessionId();
+    setSessionId('');
+    setError(null);
+    setMessage('');
+    setMessages([]);
+    setRequestId(null);
+    handleSetScheduleId('');
+  };
 
-				<div className="messages-list" ref={messagesListRef}>
-					{messages.map((message) => (
-						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-							<div className="message-content">
-								<MarkdownRenderer content={message.content} />
-							</div>
+  const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
 
-							{message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
-								<Button
-									key={action.id}
-									variant="pill"
-									dotstatus={
-										action.status as
-											| 'parsed'
-											| 'clarification'
-											| 'none'
-											| 'pending'
-											| 'executed'
-											| 'failed'
-											| 'exited'
-											| undefined
-									}
-								>
-									<img
-										src={ChatUtil.getActionIcon(action)}
-										alt="action_icon"
-										style={{
-											width: '15px',
-											height: '15px',
-											verticalAlign: 'middle',
-										}}
-									/>
-									<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
-									<span className="action-description">{action.descriptions}</span>
-								</Button>
-							))}
-						</MessageBubble>
-					))}
-				</div>
+  const handleRemoveContext = (context: ChatContextType) => {
+    removeChatContext(context); // Remove the clicked context
+  };
 
-				<div ref={messagesEndRef} />
-			</ChatContent>
+  return (
+    <ChatWrapper>
+      <ChatContainer>
+        <ChatHeader>
+          {onClose && (
+            <Button variant="ghost" height={32} onClick={onClose}>
+              <ChevronLeftIcon size={16} />
+              <span>{t('common.buttons.back')}</span>
+            </Button>
+          )}
+          {import.meta.env.VITE_NODE_ENV === 'development' && (
+            <Button
+              variant="outline"
+              style={{
+                alignSelf: 'flex-end',
+                marginBottom: '0.5rem',
+                color: palette.colors.orange[500],
+                borderColor: palette.colors.orange[500],
+              }}
+              onClick={handleNewChat}
+            >
+              {t('home.expanded.chat.clearSession')}
+            </Button>
+          )}
+          {chatContext.length === 0 ? (
+            <Button variant="ghost" height={32} onClick={handleNewChat}>
+              <span>{t('home.expanded.chat.newChat')}</span>
+            </Button>
+          ) : (
+            <>
+              {chatContext.map((context, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.5rem',
+                    border: `1px solid ${palette.colors.gray[300]}`,
+                  }}
+                >
+                  <span>{context.Name}</span>
+                  <span
+                    onClick={() => handleRemoveContext(context)}
+                    style={{
+                      marginLeft: '0.5rem',
+                      color: 'red',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    x
+                  </span>
+                </Button>
+              ))}
+            </>
+          )}
+        </ChatHeader>
+        <ChatContent>
+          {isLoading && (
+            <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
+          )}
+          {isBatchLoading && (
+            <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
+          )}
 
-			{/* Render chatContext buttons */}
-			<div style={{ marginBottom: '0.25rem' }}></div>
+          {error && (
+            <div className="chat-error">
+              {t('home.expanded.chat.error')}: {error}
+            </div>
+          )}
 
-			<div>
-				{isSending && (
-					<LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
-				)}
-				{!isSending && shouldShowAcceptButton && (
-					<Button
-						variant="primary"
-						onClick={() => acceptAllChanges()}
-					>
-						{t('home.expanded.chat.acceptChanges')}
-					</Button>
-				)}
-			</div>
+          {!isLoading && !error && !messages.length && (
+            <EmptyChat>
+              <Logo size={48} />
+              <h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+              <p>{t('home.expanded.chat.emptyStateDescription')}</p>
+            </EmptyChat>
+          )}
 
-			<ChatForm onSubmit={handleSubmit}>
-				<Input.Textarea
-					value={message}
-					onChange={(e) => setMessage(e.target.value)}
-					onKeyDown={(e) => {
-						// Submit form on Enter key press without Shift key
-						if (e.key === 'Enter' && !e.shiftKey) {
-							e.preventDefault(); // Prevent new line
+          <div className="messages-list" ref={messagesListRef}>
+            {messages.map((message) => (
+              <MessageBubble key={message.id} $isUser={message.origin === 'user'}>
+                <div className="message-content">
+                  <MarkdownRenderer content={message.content} />
+                </div>
 
-							// Use form.requestSubmit() instead of handleSubmit directly
-							// This triggers a single form submission through the standard form mechanism
-							const form = e.currentTarget.form;
-							if (form) form.requestSubmit();
-						}
-					}}
-					placeholder={t('home.expanded.chat.inputPlaceholder')}
-					disabled={isSending}
-					bordergradient={[palette.colors.brand[500]]}
-					height={50} // Set a fixed height for consistent alignment
-				/>
-				<ChatButton type="submit" disabled={isSending || !message.trim()}>
-					{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
-				</ChatButton>
-			</ChatForm>
-			<UserLocation />
-		</ChatContainer>
-	);
+                {message.actions
+                  ?.filter(
+                    (action) =>
+                      action.type !== 'conversational_and_not_supported'
+                  )
+                  .map((action) => (
+                    <Button
+                      key={action.id}
+                      variant="pill"
+                      dotstatus={
+                        action.status as
+                        | 'parsed'
+                        | 'clarification'
+                        | 'none'
+                        | 'pending'
+                        | 'executed'
+                        | 'failed'
+                        | 'exited'
+                        | undefined
+                      }
+                    >
+                      <img
+                        src={ChatUtil.getActionIcon(action)}
+                        alt="action_icon"
+                        style={{
+                          width: '15px',
+                          height: '15px',
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                      <span style={{ marginLeft: '4px', marginRight: '4px' }}>
+                        -
+                      </span>
+                      <span className="action-description">
+                        {action.descriptions}
+                      </span>
+                    </Button>
+                  ))}
+              </MessageBubble>
+            ))}
+          </div>
+
+          <div ref={messagesEndRef} />
+        </ChatContent>
+
+        {/* Render chatContext buttons */}
+        <div style={{ marginBottom: '0.25rem' }}></div>
+
+        <div>
+          {isSending && (
+            <LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
+          )}
+          {!isSending && shouldShowAcceptButton && (
+            <Button variant="primary" onClick={() => acceptAllChanges()}>
+              {t('home.expanded.chat.acceptChanges')}
+            </Button>
+          )}
+        </div>
+
+        <ChatForm onSubmit={handleSubmit}>
+          <Input.Textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => {
+              // Submit form on Enter key press without Shift key
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line
+
+                // Use form.requestSubmit() instead of handleSubmit directly
+                // This triggers a single form submission through the standard form mechanism
+                const form = e.currentTarget.form;
+                if (form) form.requestSubmit();
+              }
+            }}
+            placeholder={t('home.expanded.chat.inputPlaceholder')}
+            disabled={isSending}
+            bordergradient={[palette.colors.brand[500]]}
+            height={50} // Set a fixed height for consistent alignment
+          />
+          <ChatButton type="submit" disabled={isSending || !message.trim()}>
+            {isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
+          </ChatButton>
+        </ChatForm>
+        <UserLocation />
+      </ChatContainer>
+    </ChatWrapper>
+  );
 };
 
 export default Chat;

@@ -42,6 +42,7 @@ const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 `;
 
 const PersonaCarousel: React.FC = () => {
+	const [personasLoaded, setPersonasLoaded] = useState(false);
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
   const { personaUsers, setPersonaUser } = usePersonaUsers();
 
@@ -53,10 +54,26 @@ const PersonaCarousel: React.FC = () => {
         key: index,
       }));
       setPersonas(personasWithKeys);
+			setPersonasLoaded(true);
     } catch (error) {
       console.error("Couldn't populate carousel: ", error);
     }
   }
+
+	useEffect(() => {
+		// Update persona names when personaUsers change
+		if (personasLoaded) {
+			setPersonas((prevPersonas) =>
+				prevPersonas.map((persona) => {
+					const userInfo = personaUsers[persona.id]?.personaInfo;
+					if (userInfo?.name && userInfo.name !== persona.name) {
+						return { ...persona, name: userInfo.name };
+					}
+					return persona;
+				})
+			);
+		}
+	}, [personaUsers, personasLoaded]);
 
   useEffect(() => {
     getPersonas();
