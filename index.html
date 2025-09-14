@@ -18,6 +18,13 @@
 	</head>
 	<body>
 		<div id="root"></div>
+		
+		<!-- Required for .NET Framework SignalR -->
+		<script src="Scripts/jquery-2.1.1.js"></script>
+		<script src="Scripts/jquery.signalR-2.4.3.js"></script>
+		<script src="signalr/hubs"></script>
+
+
 		<script type="module" src="/src/main.tsx"></script>
 	</body>
 </html>
