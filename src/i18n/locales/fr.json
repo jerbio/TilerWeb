@@ -16,7 +16,14 @@
 				"emptyStateTitle": "Que souhaitez-vous faire ?",
 				"emptyStateDescription": "Décrivez une tâche, nous nous occupons du carrelage.",
 				"sendingRequest": "Envoi de la requête...",
-				"acceptChanges": "Accepter les Modifications"
+				"acceptChanges": "Accepter les Modifications",
+				"status": {
+					"initializingActions": "Initialisation des actions...",
+					"processingActions": "Traitement des actions...",
+					"generatingSummary": "Génération du résumé...",
+					"completingRequest": "Finalisation de la requête...",
+					"processing": "Traitement..."
+				}
 			}
 		},
 		"appDownload": {

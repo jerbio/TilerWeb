@@ -62,7 +62,14 @@
 				"emptyStateTitle": "What would you like to do?",
 				"emptyStateDescription": "Describe a task, We'll handle the tiling.",
 				"sendingRequest": "Sending Request...",
-				"acceptChanges": "Accept Changes"
+				"acceptChanges": "Accept Changes",
+				"status": {
+					"initializingActions": "Initializing actions...",
+					"processingActions": "Processing actions...",
+					"generatingSummary": "Generating summary...",
+					"completingRequest": "Completing request...",
+					"processing": "Processing..."
+				}
 			}
 		},
 		"waitlist": {
