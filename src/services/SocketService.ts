@@ -1,6 +1,8 @@
 // For .NET Framework SignalR, we need to use the jQuery-based SignalR client
 // Note: You'll need to include the SignalR JavaScript library and jQuery in your project
 
+import { Env } from "@/config/config_getter";
+
 
 // Define types for .NET Framework SignalR
 interface SignalRConnectionState {
@@ -52,7 +54,8 @@ declare global {
 
 export class SignalRService {
     private signalRConnection: SignalRConnection | null = null;
-    // For production, use: private readonly baseUrl = Env.get('BASE_URL');
+    // For production, use: 
+    private readonly baseUrl = Env.get('BASE_URL');
     private callBackFunc: { [key: string]: (data: unknown) => void } = {};
 
     constructor(private userId: string) {}
@@ -105,31 +108,12 @@ export class SignalRService {
             console.error('SignalR JavaScript library is not loaded');
             return;
         }
-
-        // Initialize connection to the SignalR hub
-        // For .NET Framework SignalR, the default hub URL is /signalr
-        // window.$.connection.hub.url = `${this.baseUrl}signalr/hubs`;
-
-
-        
         // Configure connection settings
+        window.$.connection.hub.url = `${this.baseUrl}signalr`; // Adjust as needed
         window.$.connection.hub.logging = true; // Enable logging for debugging
         
         // Create proxy to your hub (replace 'vibeHub' with your actual hub name)
         // const vibeHubProxy = window.$.connection.vibeHub;
-        
-        // Set up client-side methods that the server can call
-        // if (vibeHubProxy) {
-        //     vibeHubProxy.client.scheduleChange = () => {
-        //         console.log("Server called scheduleChange");
-        //     };
-            
-        //     // Add more client methods as needed
-        //     vibeHubProxy.client.userJoined = (...args: unknown[]) => {
-        //         const username = args[0] as string;
-        //         console.log(`User ${username} joined`);
-        //     };
-        // }
 
         const chat = window.$.connection.vibeUpdateHub;
         if (chat) {
@@ -141,9 +125,9 @@ export class SignalRService {
 
         // Start the connection
         window.$.connection.hub.start(
-        //     { 
-        //     transport: ['webSockets', 'serverSentEvents', 'longPolling'],
-        // }
+            { 
+            transport: ['webSockets', 'serverSentEvents', 'longPolling'],
+        }
     ).done(() => {
             console.log('SignalR connection established');
             this.signalRConnection = window.$.connection.hub;
