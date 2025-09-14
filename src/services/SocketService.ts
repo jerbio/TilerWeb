@@ -1,6 +1,8 @@
 // For .NET Framework SignalR, we need to use the jQuery-based SignalR client
 // Note: You'll need to include the SignalR JavaScript library and jQuery in your project
 
+import { Env } from "@/config/config_getter";
+
 
 // Define types for .NET Framework SignalR
 interface SignalRConnectionState {
@@ -52,7 +54,8 @@ declare global {
 
 export class SignalRService {
     private signalRConnection: SignalRConnection | null = null;
-    // For production, use: private readonly baseUrl = Env.get('BASE_URL');
+    // For production, use: 
+    private readonly baseUrl = Env.get('BASE_URL');
     private callBackFunc: { [key: string]: (data: unknown) => void } = {};
 
     constructor(private userId: string) {}
@@ -106,6 +109,7 @@ export class SignalRService {
             return;
         }
         // Configure connection settings
+        window.$.connection.hub.url = `${this.baseUrl}signalr`; // Adjust as needed
         window.$.connection.hub.logging = true; // Enable logging for debugging
         
         // Create proxy to your hub (replace 'vibeHub' with your actual hub name)
