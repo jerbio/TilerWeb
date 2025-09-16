@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import MultiInput from '@/core/common/components/multi_input';
 import { useTranslation } from 'react-i18next';
 import WaitlistSuccessModal from './waitlist_success_modal';
+import VideoIframeSection from '../home/video_iframe_section';
 
 const WaitlistForm: React.FC = () => {
   const { t } = useTranslation();
@@ -86,6 +87,14 @@ const WaitlistForm: React.FC = () => {
       return;
     }
     if (currentStep < steps.length) {
+      if (currentStep === 1 && formValues.email) {
+        betaUserService.signUp({
+        email: formValues.email,
+        profession: "",
+        integrations: [],
+        useCases: "",
+      });
+      }
       setCurrentStep(currentStep + 1);
       return;
     }
@@ -199,6 +208,13 @@ const WaitlistForm: React.FC = () => {
       >
         <WaitlistSuccessModal open={successModal} />
       </WaitlistSuccessContainer>
+      <VideoIframeSection
+				src="https://www.youtube.com/embed/YMufne975Yw?si=BmQ0wHBvThDCh5Zc"
+				title={t('home.video.title')}
+				width={1024}
+				allowFullScreen={true}
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+			/>
     </React.Fragment>
   );
 };

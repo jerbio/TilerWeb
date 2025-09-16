@@ -363,6 +363,30 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					`💫 Putting finishing touches${actionsText}...`,
 					`🎊 Getting ready to show you${actionsText}!`
 				];
+			case 'schedule_load':
+				return [
+					`📅 Loading your schedule${actionsText}...`,
+					`🗓️ Fetching calendar data${actionsText}...`,
+					`📊 Retrieving your timeline${actionsText}...`,
+					`⏰ Gathering schedule information${actionsText}...`,
+					`📋 Loading your agenda${actionsText}...`
+				];
+			case 'schedule_process_start':
+				return [
+					`⚙️ Processing schedule changes${actionsText}...`,
+					`🔄 Updating your calendar${actionsText}...`,
+					`📝 Applying modifications${actionsText}...`,
+					`🎯 Optimizing your schedule${actionsText}...`,
+					`🔧 Making schedule adjustments${actionsText}...`
+				];
+			case 'schedule_process_end':
+				return [
+					`✅ Schedule processing complete${actionsText}!`,
+					`🎉 Your calendar is updated${actionsText}!`,
+					`✨ Schedule changes applied${actionsText}!`,
+					`🏁 Schedule optimization finished${actionsText}!`,
+					`💫 Your timeline is ready${actionsText}!`
+				];
 			default:
 				return [
 					`⏳ Processing${actionsText}...`,
@@ -428,7 +452,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			}
 
 			// Only hide status container after summary_action_end (final step)
-			if (status === 'summary_action_end') {
+			if (status === 'summary_action_end' || status === 'schedule_process_end') {
 				setTimeout(() => {
 					React.startTransition(() => {
 						setIsStatusVisible(false); // Start fade out transition
@@ -977,7 +1001,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					isTyping={typewriterActive}
 					isVisible={isStatusVisible}
 				/>
-				{!isSending && !isProcessingSocket && shouldShowAcceptButton && (
+				{!isSending && shouldShowAcceptButton && (
 					<Button
 						variant="primary"
 						onClick={() => acceptAllChanges()}
