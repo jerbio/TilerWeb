@@ -17,9 +17,9 @@ import PersonaCardExpanded from './persona_card_expanded';
 import { Persona } from '@/core/common/types/persona';
 import { Check, ClockFading } from 'lucide-react';
 import {
-  PersonaSchedule,
-  PersonaScheduleSetter,
-} from '@/core/common/hooks/usePersonaSchedules';
+  PersonaUsers,
+  PersonaUserSetter,
+} from '@/core/common/hooks/usePersonaUsers';
 import TimeUtil from '@/core/util/time';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -30,8 +30,8 @@ type PersonaCardProps = {
   isCustom?: boolean;
   selectedPersona: number | null;
   setSelectedPersona: (personaKey: number | null, persona?: Partial<Persona>) => void;
-  personaSchedules: PersonaSchedule;
-  setPersonaSchedule: PersonaScheduleSetter;
+  personaUsers: PersonaUsers;
+  setPersonaUser: PersonaUserSetter;
 };
 
 const PersonaCard: React.FC<PersonaCardProps> = ({
@@ -39,61 +39,61 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   isCustom,
   selectedPersona,
   setSelectedPersona,
-  personaSchedules,
-  setPersonaSchedule,
+  personaUsers,
+  setPersonaUser,
 }) => {
   const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
-  const personaSchedule = personaSchedules[persona.id];
-  const [personaScheduleTimeLeft, setPersonaScheduleTimeLeft] = useState<string>('');
-  const [personaScheduleTimeLeftInterval, setPersonaScheduleTimeLeftInterval] = useState<
+  const personaUser = personaUsers[persona.id];
+  const [personaUserTimeLeft, setPersonaUserTimeLeft] = useState<string>('');
+  const [personaUserTimeLeftInterval, setPersonaUserTimeLeftInterval] = useState<
     number | undefined
   >(undefined);
 
-  // Update the time left for the persona schedule every minute
+  // Update the time left for the persona user every minute
   useEffect(() => {
-    if (personaSchedule) {
-      clearInterval(personaScheduleTimeLeftInterval);
+    if (personaUser) {
+      clearInterval(personaUserTimeLeftInterval);
 
-      setPersonaScheduleTimeLeft(
-        TimeUtil.rangeDuration(dayjs(), dayjs(personaSchedule.scheduleExpiration))
+      setPersonaUserTimeLeft(
+        TimeUtil.rangeDuration(dayjs(), dayjs(personaUser.expiration))
       );
       const intervalID = setInterval(
         () => {
           const timeLeft = TimeUtil.rangeDuration(
             dayjs(),
-            dayjs(personaSchedule.scheduleExpiration)
+            dayjs(personaUser.expiration)
           );
-          setPersonaScheduleTimeLeft(timeLeft);
+          setPersonaUserTimeLeft(timeLeft);
           if (timeLeft === '0m') {
-            clearInterval(personaScheduleTimeLeftInterval);
-            setPersonaSchedule(persona.id, null); // Clear the schedule when it expires
+            clearInterval(personaUserTimeLeftInterval);
+            setPersonaUser(persona.id, null); // Clear the user when it expires
             if (selectedPersona === persona.key) onDeselect(); // Deselect the card if it's selected
           }
         },
         TimeUtil.inMilliseconds(1, 'm')
       );
-      setPersonaScheduleTimeLeftInterval(intervalID);
+      setPersonaUserTimeLeftInterval(intervalID);
     }
 
     return () => {
-      clearInterval(personaScheduleTimeLeftInterval);
+      clearInterval(personaUserTimeLeftInterval);
     };
-  }, [personaSchedule]);
+  }, [personaUser]);
 
   const isSelected = selectedPersona === persona.key;
   const isAnotherSelected = selectedPersona !== null && selectedPersona !== persona.key;
-  const isScheduleCreated = !!personaSchedule;
+  const personaUserExists = !!personaUser;
 
   const [tileSuggestions, setTileSuggestions] = useState<
     { id: number; name: string; selected: boolean }[]
   >([]);
 
   useEffect(() => {
-    if (isScheduleCreated || isCustom) {
+    if (personaUserExists || isCustom) {
       setTileSuggestions([]);
     } else {
       setTileSuggestions(
@@ -104,7 +104,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
         })) || []
       );
     }
-  }, [persona.tilePreferences, isScheduleCreated]);
+  }, [persona.tilePreferences, personaUserExists]);
 
   function toggleTileSuggestion(id: number) {
     setTileSuggestions((prev) =>
@@ -158,7 +158,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       id: persona.id,
       name: 'Custom',
     });
-    setPersonaSchedule(persona.id, null, { store: false });
+    setPersonaUser(persona.id, null, { store: false });
     swiper.enable();
   }
 
@@ -221,7 +221,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     ref: overlayTagApi,
     from: { opacity: 0, scale: 0.9 },
     to: {
-      opacity: displayUI ? (isScheduleCreated || isCustom ? 0 : 1) : 0,
+      opacity: displayUI ? (personaUserExists || isCustom ? 0 : 1) : 0,
       scale: displayUI ? 1 : 0.9,
     },
     config: { tension: 250, friction: 30 },
@@ -275,7 +275,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
         <Overlay>
           <OverlayHeader>
             <OverlayTitle>
-              {isScheduleCreated && (
+              {personaUserExists && (
                 <div>
                   <span style={{ marginRight: '6px' }}>
                     {t('home.persona.created')}
@@ -283,7 +283,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
                   <ClockFading size={14} color={palette.colors.brand[400]} />
                   <span style={{ color: palette.colors.gray[300] }}>
                     {t('home.persona.expiresIn', {
-                      time: personaScheduleTimeLeft,
+                      time: personaUserTimeLeft,
                     })}
                   </span>
                 </div>
@@ -349,13 +349,12 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       </OverlayContainer>
       {/* Set expanded width to the final width of animation */}
       <PersonaCardExpanded
-        isCustom={isCustom}
         persona={currentPersona}
         expanded={isSelected}
         onCollapse={isCustom ? onCustomDeselect : onDeselect}
         expandedWidth={expandedWidth}
-        personaSchedules={personaSchedules}
-        setPersonaSchedule={setPersonaSchedule}
+        personaUsers={personaUsers}
+        setPersonaUser={setPersonaUser}
       />
     </Card>
   );

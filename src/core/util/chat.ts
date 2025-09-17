@@ -1,29 +1,33 @@
 import { VibeAction } from "@/core/common/types/chat";
-import ADDBLOCK from '@/assets/add_block.svg';
-import ADDTASK from '@/assets/add_new_tile.svg';
+import ADD_BLOCK from '@/assets/add_block.svg';
+import ADD_TASK from '@/assets/add_new_tile.svg';
+import UPDATE_TILE from '@/assets/update_tile.svg';
+import DELETE_TILE from '@/assets/delete_tile.svg';
+import EXITED_ACTION from '@/assets/exited_action.svg';
+import CLEAR_ALL from '@/assets/clear_all.svg';
 
 class ChatUtil {
   static getActionIcon(action: VibeAction) {
     switch (action.type) {
       // Regular actions
       case 'add_new_appointment':
-        return ADDBLOCK;
+        return ADD_BLOCK;
       case 'add_new_task':
-        return ADDTASK;
+        return ADD_TASK;
       case 'add_new_project':
         return '📋';
       case 'decide_if_task_or_project':
         return '🤔';
       case 'update_existing_task':
-        return '✏️';
+        return UPDATE_TILE;
       case 'remove_existing_task':
-        return '🗑️';
+        return DELETE_TILE;
       case 'mark_task_as_done':
         return '✓';
       case 'procrastinate_all_tasks':
-        return '⏱️';
+        return CLEAR_ALL;
       case 'exit_prompting':
-        return '🚪';
+        return EXITED_ACTION;
 
       // What-if scenarios
       case 'whatif_addanewappointment':

@@ -18,12 +18,12 @@ class PersonaService {
 		}
 	}
 
-	async getPersonaSchedule(persona: Persona) {
+	async createAnonymousUser(persona: Persona) {
 		try {
-			const schedule = await this.personaApi.getPersonaSchedule(persona);
+			const schedule = await this.personaApi.createAnonymousUser(persona);
 			return schedule.Content.anonymousUserWithPersona;
 		} catch (error) {
-			console.error("Error fetching persona schedule", error);
+			console.error("Error creating anonymous user", error);
 			throw normalizeError(error);
 		}
 	}

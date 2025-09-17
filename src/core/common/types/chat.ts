@@ -1,4 +1,4 @@
-import { Actions } from '@/core/constants/enums';
+import { Actions, Status } from '@/core/constants/enums';
 import { UserInfo } from '@/global_state';
 import { ApiResponse } from './api';
 
@@ -20,7 +20,7 @@ export interface VibeAction {
   descriptions: string;
   type: ActionType;
   creationTimeInMs: number;
-  status: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited';
+  status: Status;
   prompts: PromptWithActions[];
   beforeScheduleId: string;
   afterScheduleId: string;
@@ -68,6 +68,10 @@ export type ChatExecuteActionResponse = ApiResponse<{
   vibeRequest: VibeRequest;
 }>;
 
+export type ChatVibeRequestResponse = ApiResponse<{
+  vibeRequest: VibeRequest;
+}>;
+
 export type ChatMessagesResponse = ApiResponse<{
   chats: PromptWithActions[];
 }>;
@@ -86,7 +90,20 @@ export type ChatMessageBody = {
   getTimeSpan?: string;
   UserName?: string;
   AnonymousUserId?: string;
+  UserLongitude?: string;
+  UserLatitude?: string;
+  UserLocationVerified?: string;
 }
+
+export interface VibeSession {
+	id: string;
+	creationTimeInMs: number;
+	requests: (string | null)[];
+}
+
+export type VibeSessionsResponse = ApiResponse<{
+	vibeSessions: VibeSession[];
+}>;
 
 export type {
   PromptWithActions as Message,

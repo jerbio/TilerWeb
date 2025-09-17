@@ -1,6 +1,12 @@
 import { ScheduleApi } from '@/api/scheduleApi';
+import { ScheduleLookupOptions } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
+
+const defaultScheduleOptions: ScheduleLookupOptions = {
+	startRange: TimeUtil.now() - TimeUtil.inMilliseconds(3, 'd'),
+	endRange: TimeUtil.now() + TimeUtil.inMilliseconds(3, 'd'),
+}
 
 class ScheduleService {
   private scheduleApi: ScheduleApi;
@@ -8,21 +14,28 @@ class ScheduleService {
     this.scheduleApi = scheduleApi;
   }
 
-  async getScheduleLookupById(
+  async lookupScheduleById(
     scheduleId: string,
-    options?: { startRange: number; endRange: number }
+    options: ScheduleLookupOptions = defaultScheduleOptions
   ) {
-    const startRange = options?.startRange ?? TimeUtil.now() - TimeUtil.inMilliseconds(3, 'd');
-    const endRange = options?.endRange ?? TimeUtil.now() + TimeUtil.inMilliseconds(3, 'd');
-
     try {
-      const schedule = await this.scheduleApi.getScheduleLookupById(scheduleId, {
-        startRange,
-        endRange,
-      });
+      const schedule = await this.scheduleApi.lookupScheduleById(scheduleId, options);
       return schedule.Content;
     } catch (error) {
-      console.error('Error fetching schedule lookup by ID', error);
+      console.error('Error fetching schedule lookup by schedule ID', error);
+      throw normalizeError(error);
+    }
+  }
+
+  async lookupScheduleByUserId(
+    userId: string,
+    options: ScheduleLookupOptions = defaultScheduleOptions
+  ) {
+    try {
+      const schedule = await this.scheduleApi.lookupScheduleByUserId(userId, options);
+      return schedule.Content;
+    } catch (error) {
+      console.error('Error fetching schedule lookup by user ID', error);
       throw normalizeError(error);
     }
   }

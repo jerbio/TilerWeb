@@ -1,4 +1,4 @@
-import { Persona, PersonaResponse, PersonaScheduleResponse } from '../core/common/types/persona';
+import { Persona, PersonaResponse, PersonaAnonymousUserResponse } from '../core/common/types/persona';
 import { AppApi } from './appApi';
 
 export class PersonaApi extends AppApi {
@@ -6,8 +6,8 @@ export class PersonaApi extends AppApi {
 		return this.apiRequest<PersonaResponse>('api/Persona');
 	}
 
-	public getPersonaSchedule(persona: Persona) {
-		return this.apiRequest<PersonaScheduleResponse>('api/Anonymous/Persona', {
+	public createAnonymousUser(persona: Persona) {
+		return this.apiRequest<PersonaAnonymousUserResponse>('api/Anonymous/Persona', {
 			method: 'POST',
 			body: JSON.stringify(persona),
 		});

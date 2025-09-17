@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import palette from '@/core/theme/palette';
+import { Status } from '@/core/constants/enums';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
@@ -10,14 +11,19 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: 'small' | 'medium' | 'large';
   height?: number; // Optional height prop for custom button height
   bordergradient?: Array<string>; // Array of colors for border gradient
-	dotstatus?: 'parsed' | 'clarification' | 'executed'; //
+	dotstatus?: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited' | 'disposed';
 };
 
 const getDotColor = (status?: string) => {
-	if (status === 'parsed') return palette.colors.teal[500]; // yellow
-	if (status === 'clarification') return palette.colors.error[500]; // red
-	if (status === 'executed') return palette.colors.success[500]; // green
-	return 'transparent';
+	if (status === Status.Parsed) return palette.colors.teal[500]; // teal
+	if (status === Status.Clarification) return palette.colors.warning[500]; // yellow
+	if (status === Status.None) return palette.colors.gray[300]; // light gray
+	if (status === Status.Pending) return palette.colors.blue[500]; // blue
+	if (status === Status.Executed) return palette.colors.success[500]; // green
+	if (status === Status.Failed) return palette.colors.error[500]; // red
+	if (status === Status.Exited) return palette.colors.gray[500]; // gray
+	if (status === Status.Disposed) return palette.colors.gray[600]; // deeper gray
+	return palette.colors.gray[300]; // default to light gray
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -172,6 +178,43 @@ const StyledButton = styled.button<StyledButtonProps>`
 			border: 1px solid ${getDotColor(props.$dotstatus)};
 			height: auto; /* override default button height */
 			padding-inline: 0.5rem;
+			display: flex;
+			align-items: center;
+			max-width: 200px;
+			position: relative;
+			
+			/* Icon and dash should not shrink */
+			& > img,
+			& > span:not(.action-description) {
+				flex-shrink: 0;
+			}
+			
+			/* Only truncate the action description */
+			& .action-description {
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				min-width: 0; /* Allow flex item to shrink below content size */
+			}
+			
+			&:hover {
+				max-width: none;
+				z-index: 10;
+				
+				& .action-description {
+					overflow: visible;
+					white-space: normal;
+					word-break: break-word;
+				}
+			}
+			
+			/* Ensure status dot maintains proper size and positioning */
+			&::after {
+				flex-shrink: 0;
+				width: 0.75rem !important;
+				height: 0.75rem !important;
+				margin-left: 0.5rem;
+			}
 		`}
 
 	&::after {

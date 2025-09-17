@@ -5,18 +5,16 @@ import Button from '@/core/common/components/button';
 import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
-import {
-	getStoredSessionId,
-	setStoredSessionId,
-	clearStoredSessionId,
-} from '@/core/storage/chatSession';
 import useAppStore, { ChatContextType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 import palette from '@/core/theme/palette';
-import HORIZONTALPROGRESSBAR from '@/assets/horizontal_progress_bar.gif';
+import { Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
 import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
+import LoadingIndicator from '@/core/common/components/loading-indicator';
+import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
+import { personaService } from '@/services';
 
 const ChatContainer = styled.section`
 	display: flex;
@@ -114,7 +112,6 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 	display: flex;
 	flex-direction: column;
 	align-items: ${({ $isUser }) => ($isUser ? 'flex-end' : 'flex-start')};
-	text-align: ${({ $isUser }) => ($isUser ? 'right' : 'left')};
 	margin: 0.5rem 0;
 
 	.message-content {
@@ -131,41 +128,188 @@ type ChatProps = {
 	onClose?: () => void;
 };
 
-const Chat: React.FC = ({ onClose }: ChatProps) => {
+const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const { t } = useTranslation();
 
 	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
 	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const messagesListRef = useRef<HTMLDivElement>(null);
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<PromptWithActions[]>([]);
 	const [isSending, setIsSending] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [isBatchLoading, setIsBatchLoading] = useState(false);
 	const [requestId, setRequestId] = useState<string | null>(null);
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
 	const scheduleId = useAppStore((state) => state.scheduleId);
+	const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
 	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
+	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
+	const userLocationVerified = useAppStore((state) => state.userInfo?.userLocationVerified ?? "false");
 	const handleSetScheduleId = (id: string) => {
 		setScheduleId(id);
 	};
 
-	// Load session ID from local storage on mount
-	useEffect(() => {
-		const storedSessionId = getStoredSessionId();
-		if (storedSessionId) {
-			setSessionId(storedSessionId);
+	// Helper function to get persona info from localStorage using selectedPersonaId
+	const getSelectedPersonaInfo = async (): Promise<{ userId: string; expiration: number } | null> => {
+		if (selectedPersonaId === null) return null;
+		
+		try {
+			// Get personas array to map index to persona.id
+			const data = await personaService.getPersonas();
+			const personasWithKeys = data.personas.map((persona, index) => ({
+				...persona,
+				key: index,
+			}));
+			
+			// Find the persona at the selected index
+			const selectedPersona = personasWithKeys[selectedPersonaId];
+			if (!selectedPersona) return null;
+			
+			// Get stored persona users from localStorage
+			const personaScheduleData = localStorage.getItem('tiler-persona-users');
+			if (!personaScheduleData) return null;
+			
+			const parsed = JSON.parse(personaScheduleData);
+			const personaInfo = parsed[selectedPersona.id];
+			
+			return personaInfo || null;
+		} catch (error) {
+			console.warn('Failed to get selected persona info:', error);
+			return null;
 		}
-	}, []);
+	};
 
-	// Load chat messages when session ID changes
+	// Fetch sessions and set latest sessionId on component mount or when persona changes
+	useEffect(() => {
+		const fetchAndSetLatestSession = async () => {
+			try {
+				const personaInfo = await getSelectedPersonaInfo();
+				const personaUserId = personaInfo?.userId;
+
+				if (personaUserId) {
+					const sessionsResponse = await chatService.getVibeSessions(undefined, personaUserId);
+					const sessions = sessionsResponse.Content.vibeSessions;
+					
+					if (sessions && sessions.length > 0) {
+						// Sort sessions by creation time (newest first) and get the latest one
+						const latestSession = sessions.sort((a, b) => b.creationTimeInMs - a.creationTimeInMs)[0];
+						setSessionId(latestSession.id);
+					} else {
+						// No sessions found, clear sessionId
+						setSessionId('');
+					}
+				} else {
+					// No persona selected, clear sessionId
+					setSessionId('');
+				}
+			} catch (error) {
+				console.warn('Failed to fetch sessions:', error);
+				// Clear sessionId on error
+				setSessionId('');
+			}
+		};
+
+		fetchAndSetLatestSession();
+	}, [selectedPersonaId]);
+
+	// Load chat messages when session ID or selected persona changes
 	useEffect(() => {
 		if (sessionId) {
 			loadChatMessages(sessionId);
 		}
-	}, [sessionId, scheduleId]);
+	}, [sessionId, scheduleId, selectedPersonaId]);
+
+	// Custom hook to check unexecuted actions
+	const useHasUnexecutedActions = (requestId: string | null) => {
+		const [hasUnexecuted, setHasUnexecuted] = useState(false);
+		
+		useEffect(() => {
+			const checkActions = async () => {
+				if (!requestId) {
+					setHasUnexecuted(false);
+					return;
+				}
+				
+				try {
+					const response = await chatService.getVibeRequest(requestId);
+					const isClosed = response?.Content?.vibeRequest?.isClosed;
+					setHasUnexecuted(isClosed !== true);
+				} catch (error) {
+					console.error('Error checking vibe request status:', error);
+					// Fallback to original logic if API fails
+					const fallback = messages.some((msg) =>
+						msg.actions?.some(
+							(action) => action.status !== Status.Executed && action.status !== Status.Exited
+						)
+					);
+					setHasUnexecuted(fallback);
+				}
+			};
+			
+			checkActions();
+		}, [requestId, messages]); // Re-check when requestId or messages change
+		
+		return hasUnexecuted;
+	};
+
+	const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
+
+	useEffect(() => {
+		if (messages.length > 0 && messagesListRef.current) {
+			messagesListRef.current.scrollTo({
+			top: messagesListRef.current.scrollHeight,
+			behavior: "smooth",
+			});
+		}
+	}, [messages]);
+
+
+	// Helper function to update messages with actions progressively
+	const updateMessagesWithActions = (rawMessages: PromptWithActions[], actionsMap: Record<string, VibeAction>) => {
+		const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+			const actionIds: string[] = entry.actionIds ?? [];
+			const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
+
+			return {
+				id: entry.id,
+				origin: entry.origin,
+				content: entry.content,
+				actionId: entry.actionId,
+				requestId: entry.requestId,
+				sessionId: entry.sessionId,
+				actionIds,
+				actions: resolvedActions,
+			};
+		});
+
+		// Sort by timestamp
+		updatedMessages.sort((a, b) => {
+			const extractTimestamp = (id: string): number => {
+				const match = id.match(/(\d{18})/);
+				return match ? parseInt(match[1], 10) : 0;
+			};
+			return extractTimestamp(a.id) - extractTimestamp(b.id);
+		});
+
+		// Update state with partial results
+		setMessages((prevMessages) => {
+			const existingIds = new Set(prevMessages.map((m) => m.id));
+			const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
+
+			const mergedMessages = prevMessages.map((prevMessage) => {
+				const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
+				return updatedMessage || prevMessage;
+			});
+
+			return [...mergedMessages, ...uniqueNewMessages];
+		});
+	};
 
 	const loadChatMessages = async (sid: string) => {
 		if (!sid) return;
@@ -178,22 +322,75 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			const rawMessages = data.Content.chats || [];
 			if (!rawMessages || rawMessages.length === 0) return;
 
-			// Collect all unique actionIds
+			// Collect all unique actionIds, ordered by message timestamp (newest first)
+			const messagesByTimestamp = rawMessages
+				.map((entry) => ({
+					...entry,
+					timestamp: (() => {
+						const match = entry.id.match(/(\d{18})/);
+						return match ? parseInt(match[1], 10) : 0;
+					})()
+				}))
+				.sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
+
 			const uniqueActionIds = Array.from(
-				new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
+				new Set(messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean))
 			);
 
-			// Fetch and map actions by ID
+			// Fetch and map actions by ID with batching
 			let allActionsMap: Record<string, VibeAction> = {};
 			if (uniqueActionIds.length > 0) {
-				const fetchedActions = await chatService.getActions(uniqueActionIds);
-				allActionsMap = fetchedActions.reduce(
-					(acc, action) => {
-						acc[action.id] = action;
-						return acc;
-					},
-					{} as Record<string, VibeAction>
-				);
+				const BATCH_SIZE = 10;
+				const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
+
+				if (shouldBatch) {
+					setIsBatchLoading(true);
+					
+					// Create batches (most recent actions first)
+					const batches: string[][] = [];
+					for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
+						batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
+					}
+
+					// Process batches sequentially, updating UI after each batch
+					for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+						const batch = batches[batchIndex];
+						const isLastBatch = batchIndex === batches.length - 1;
+
+						try {
+							const fetchedActions = await chatService.getActions(batch);
+							const batchActionsMap = fetchedActions.reduce(
+								(acc, action) => {
+									acc[action.id] = action;
+									return acc;
+								},
+								{} as Record<string, VibeAction>
+							);
+
+							// Merge with existing actions
+							allActionsMap = { ...allActionsMap, ...batchActionsMap };
+
+							// Update messages with current actions if not the last batch
+							if (!isLastBatch) {
+								updateMessagesWithActions(rawMessages, allActionsMap);
+							}
+						} catch (error) {
+							console.error(`Error fetching batch ${batchIndex + 1}:`, error);
+						}
+					}
+					
+					setIsBatchLoading(false);
+				} else {
+					// Single request for small number of actions
+					const fetchedActions = await chatService.getActions(uniqueActionIds);
+					allActionsMap = fetchedActions.reduce(
+						(acc, action) => {
+							acc[action.id] = action;
+							return acc;
+						},
+						{} as Record<string, VibeAction>
+					);
+				}
 			}
 
 			// Map messages with resolved actions
@@ -213,9 +410,15 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				};
 			});
 
-			// Sort and merge with previous
-			loadedMessages.sort((a, b) => a.id.localeCompare(b.id));
-
+			// Sort by timestamp extracted from ID (chronological order)
+			loadedMessages.sort((a, b) => {
+				const extractTimestamp = (id: string): number => {
+					const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
+					return match ? parseInt(match[1], 10) : 0;
+				};
+				return extractTimestamp(a.id) - extractTimestamp(b.id);
+			});
+			
 			setMessages((prevMessages) => {
 				const existingIds = new Set(prevMessages.map((m) => m.id));
 				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
@@ -223,17 +426,15 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				// Merge actions for existing messages
 				const updatedMessages = prevMessages.map((prevMessage) => {
 					const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
-					return updatedMessage
-						? { ...prevMessage, actions: updatedMessage.actions }
-						: prevMessage;
+					return updatedMessage || prevMessage;
 				});
 
 				return [...updatedMessages, ...uniqueNewMessages];
 			});
-			setRequestId(loadedMessages[0]?.requestId || null);
+			setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
-			else setError('Failed to load chat messages');
+			else setError(t('home.expanded.chat.errorLoadMessages'));
 		} finally {
 			setIsLoading(false);
 		}
@@ -251,7 +452,10 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				message,
 				entityId,
 				sessionId,
-				anonymousUserId
+				anonymousUserId,
+				userLongitude,
+				userLatitude,
+				userLocationVerified,
 			);
 			if (
 				response?.Content?.vibeResponse?.tilerUser &&
@@ -301,13 +505,12 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 			const sessionIdFromResponse = newMessages[0]?.sessionId;
 			if (sessionIdFromResponse) {
 				setSessionId(sessionIdFromResponse);
-				setStoredSessionId(sessionIdFromResponse);
 			}
 
 			setMessage('');
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
-			else setError('Failed to send message');
+			else setError(t('home.expanded.chat.errorSendMessage'));
 		} finally {
 			setIsSending(false);
 		}
@@ -317,35 +520,33 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 		try {
 			setIsSending(true);
 			setError(null);
-
-			const executedChanges = await chatService.sendChatAcceptChanges(requestId);
+			const executedChanges = await chatService.sendChatAcceptChanges(
+				requestId,
+				anonymousUserId,
+				userLongitude,
+				userLatitude,
+				userLocationVerified
+			);
 			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
 			if (newScheduleId) {
 				handleSetScheduleId(newScheduleId);
-
-				// Trigger reloading of chat messages
-				if (sessionId) {
-					await loadChatMessages(sessionId);
-				}
+				// useEffect will automatically reload messages when scheduleId changes
 			}
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
-			else setError('Failed to accept changes');
+			else setError(t('home.expanded.chat.errorAcceptChanges'));
 		} finally {
 			setIsSending(false);
 		}
 	};
 
-	const hasUnexecutedActions = () => {
-		return messages.some((msg) => msg.actions?.some((action) => action.status !== 'executed'));
-	};
 
 	const handleNewChat = () => {
-		clearStoredSessionId();
 		setSessionId('');
 		setError(null);
 		setMessage('');
 		setMessages([]);
+		setRequestId(null);
 		handleSetScheduleId('');
 	};
 
@@ -375,7 +576,7 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 						}}
 						onClick={handleNewChat}
 					>
-						Clear Session
+						{t('home.expanded.chat.clearSession')}
 					</Button>
 				)}
 				{chatContext.length === 0 ? (
@@ -413,45 +614,43 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 				)}
 			</ChatHeader>
 			<ChatContent>
-				{isLoading && <div className="chat-loading">Loading chat messages...</div>}
+				{isLoading && <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />}
+				{isBatchLoading && <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />}
 
-				{error && <div className="chat-error">Error: {error}</div>}
+				{error && <div className="chat-error">{t('home.expanded.chat.error')}: {error}</div>}
 
 				{!isLoading && !error && !messages.length && (
 					<EmptyChat>
 						<Logo size={48} />
-						<h3>What would you like to do?</h3>
-						<p>Describe a task, We&apos;ll handle the tiling.</p>
+						<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+						<p>{t('home.expanded.chat.emptyStateDescription')}</p>
 					</EmptyChat>
 				)}
 
-				<div className="messages-list">
+				<div className="messages-list" ref={messagesListRef}>
 					{messages.map((message) => (
 						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-							<div className="message-content">{message.content}</div>
+							<div className="message-content">
+								<MarkdownRenderer content={message.content} />
+							</div>
 
-							{message.actions?.map((action) => (
+							{message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
 								<Button
 									key={action.id}
 									variant="pill"
-									dotstatus={
-										action.status as
-											| 'parsed'
-											| 'clarification'
-											| 'executed'
-											| undefined
-									}
+									dotstatus={action.status}
 								>
 									<img
 										src={ChatUtil.getActionIcon(action)}
-										alt="add_new_appointment"
+										alt="action_icon"
 										style={{
 											width: '15px',
 											height: '15px',
 											verticalAlign: 'middle',
 										}}
-									/>{' '}
-									- {action.descriptions}
+									/>
+									<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
+									<span className="action-description">{action.descriptions}</span>
 								</Button>
 							))}
 						</MessageBubble>
@@ -466,33 +665,14 @@ const Chat: React.FC = ({ onClose }: ChatProps) => {
 
 			<div>
 				{isSending && (
-					<div
-						style={{
-							marginBottom: '0.5rem',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-					>
-						<img
-							src={HORIZONTALPROGRESSBAR}
-							alt="Loading..."
-							style={{ width: '120px', height: '24px', marginRight: '0.5rem' }}
-						/>
-						<span>Sending Request...</span>
-					</div>
+					<LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
 				)}
-				{!isSending && hasUnexecutedActions() && (
+				{!isSending && shouldShowAcceptButton && (
 					<Button
-						variant="outline"
-						style={{
-							marginBottom: '0.5rem',
-							color: palette.colors.brand[500],
-							borderColor: palette.colors.brand[500],
-						}}
+						variant="primary"
 						onClick={() => acceptAllChanges()}
 					>
-						Accept Changes
+						{t('home.expanded.chat.acceptChanges')}
 					</Button>
 				)}
 			</div>
