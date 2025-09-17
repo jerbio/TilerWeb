@@ -51,7 +51,23 @@
 				"emptyStateTitle": "What would you like to do?",
 				"emptyStateDescription": "Describe a task, We'll handle the tiling.",
 				"sendingRequest": "Sending Request...",
-				"acceptChanges": "Accept Changes"
+				"acceptChanges": "Accept Changes",
+				"errorLoadMessages": "Failed to load chat messages",
+				"errorSendMessage": "Failed to send message",
+				"errorAcceptChanges": "Failed to accept changes",
+				"userLocation": {
+					"anonymous": "Anonymous",
+					"enterLocation": "Enter your location",
+					"default": "Default",
+					"saving": "Saving...",
+					"save": "Save",
+					"gettingCurrentLocation": "Getting your current location...",
+					"gettingLocation": "Getting location...",
+					"resetToDefault": "Reset to default",
+					"locationBenefitMessage": "Setting your actual location helps us create more relevant tiles and improve your experience with personalized scheduling suggestions.",
+					"usingDefaultLocation": "Using default location - Click icon to get your current location.",
+					"clickIconToGetLocation": "Click icon to get your current location or edit your location"
+				}
 			}
 		},
 		"waitlist": {

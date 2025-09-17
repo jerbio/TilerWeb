@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import useAppStore from '@/global_state';
+import { useTranslation } from 'react-i18next';
 
 // Define prop types for styled components
 interface StyledProps {
@@ -258,6 +259,8 @@ const ResetLink = styled.span`
 
 // UserLocation component - displays the user's location
 const UserLocation: React.FC = () => {
+	const { t } = useTranslation();
+
 	// Default location: National Museum of African American History and Culture in DC
 	const DEFAULT_LOCATION = "National Museum of African American History and Culture, Washington, DC";
 	
@@ -314,7 +317,7 @@ const UserLocation: React.FC = () => {
 			// Create new userInfo with minimal required fields and location data
 			setUserInfo({
 				id: getUserIdFromStorage(), // to remove when we update the user id in the global state
-				username: 'Anonymous',
+				username: t('home.expanded.chat.userLocation.anonymous'),
 				timeZoneDifference: 0,
 				timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 				email: null,
@@ -685,7 +688,7 @@ const UserLocation: React.FC = () => {
 	}
 
 	// Message explaining the benefits of setting a custom location
-	const locationBenefitMessage = "Setting your actual location helps us create more relevant tiles and improve your experience with personalized scheduling suggestions.";
+	const locationBenefitMessage = t('home.expanded.chat.userLocation.locationBenefitMessage');
 	
 	return (
 		<LocationContainer 
@@ -718,17 +721,17 @@ const UserLocation: React.FC = () => {
 				>
 					{/* Fixed tooltip that appears at the top of the viewport */}
 					<Tooltip id="location-icon-tooltip">
-						{isLocationFetching ? 
-							"Getting your current location..." :
-							isEditing ? 
-								"Enter your location" :
-								(useDefaultLocation ? 
+						{isLocationFetching ?
+							t('home.expanded.chat.userLocation.gettingCurrentLocation') :
+							isEditing ?
+								t('home.expanded.chat.userLocation.enterLocation') :
+								(useDefaultLocation ?
 									<>
-										Using default location - Click icon to get your current location.
+										{t('home.expanded.chat.userLocation.usingDefaultLocation')}
 										<br /><br />
 										{locationBenefitMessage}
 									</> :
-									"Click icon to get your current location or edit your location"
+									t('home.expanded.chat.userLocation.clickIconToGetLocation')
 								)
 						}
 						{/* Arrow pointing to the location icon */}
@@ -753,7 +756,7 @@ const UserLocation: React.FC = () => {
 						}}
 						onClick={(e) => e.stopPropagation()} // Prevent clicks in input from bubbling
 						onMouseDown={(e) => e.stopPropagation()} // Ensure mouse interactions don't trigger unwanted effects
-						placeholder="Enter your location"
+						placeholder={t('home.expanded.chat.userLocation.enterLocation')}
 						autoComplete="off"
 					/>
 					<ButtonContainer onClick={(e) => e.stopPropagation()}>
@@ -774,7 +777,7 @@ const UserLocation: React.FC = () => {
 							onClick={(e) => e.stopPropagation()}
 							disabled={isLocationFetching}
 						>
-							{isLocationFetching ? 'Saving...' : 'Save'}
+							{isLocationFetching ? t('home.expanded.chat.userLocation.saving') : t('home.expanded.chat.userLocation.save')}
 						</SubmitButton>
 					</ButtonContainer>
 				</LocationForm>
@@ -782,7 +785,7 @@ const UserLocation: React.FC = () => {
 				<LocationText $useDefaultLocation={useDefaultLocation}>
 					{isLoading || isLocationFetching ? (
 						<>
-							{isLocationFetching ? 'Getting current location...' : 'Getting location...'}
+							{isLocationFetching ? t('home.expanded.chat.userLocation.gettingCurrentLocation') : t('home.expanded.chat.userLocation.gettingLocation')}
 							<PulseIndicator />
 						</>
 					) : (
@@ -798,7 +801,7 @@ const UserLocation: React.FC = () => {
 										onMouseOver={() => showTooltip('default-badge-tooltip')}
 										onMouseOut={() => hideTooltip('default-badge-tooltip')}
 									>
-										Default
+										{t('home.expanded.chat.userLocation.default')}
 									</DefaultBadge>
 									
 									{/* Fixed tooltip that always appears at the top center of the viewport */}
@@ -815,7 +818,7 @@ const UserLocation: React.FC = () => {
 										resetToDefault();
 									}}
 								>
-									Reset to default
+									{t('home.expanded.chat.userLocation.resetToDefault')}
 								</ResetLink>
 							)}
 						</>

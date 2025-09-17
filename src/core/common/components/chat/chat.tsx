@@ -5,14 +5,10 @@ import Button from '@/core/common/components/button';
 import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
-import {
-	getStoredSessionId,
-	setStoredSessionId,
-	clearStoredSessionId,
-} from '@/core/storage/chatSession';
 import useAppStore, { ChatContextType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 import palette from '@/core/theme/palette';
+import { Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
 import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
@@ -209,21 +205,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 						setSessionId('');
 					}
 				} else {
-					// No persona selected, check for stored sessionId as fallback
-					const storedSessionId = getStoredSessionId();
-					if (storedSessionId) {
-						setSessionId(storedSessionId);
-					} else {
-						setSessionId('');
-					}
+					// No persona selected, clear sessionId
+					setSessionId('');
 				}
 			} catch (error) {
 				console.warn('Failed to fetch sessions:', error);
-				// Fallback to stored sessionId if available
-				const storedSessionId = getStoredSessionId();
-				if (storedSessionId) {
-					setSessionId(storedSessionId);
-				}
+				// Clear sessionId on error
+				setSessionId('');
 			}
 		};
 
@@ -257,7 +245,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					// Fallback to original logic if API fails
 					const fallback = messages.some((msg) =>
 						msg.actions?.some(
-							(action) => action.status !== 'executed' && action.status !== 'exited'
+							(action) => action.status !== Status.Executed && action.status !== Status.Exited
 						)
 					);
 					setHasUnexecuted(fallback);
@@ -446,7 +434,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
-			else setError('Failed to load chat messages');
+			else setError(t('home.expanded.chat.errorLoadMessages'));
 		} finally {
 			setIsLoading(false);
 		}
@@ -517,13 +505,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			const sessionIdFromResponse = newMessages[0]?.sessionId;
 			if (sessionIdFromResponse) {
 				setSessionId(sessionIdFromResponse);
-				setStoredSessionId(sessionIdFromResponse);
 			}
 
 			setMessage('');
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
-			else setError('Failed to send message');
+			else setError(t('home.expanded.chat.errorSendMessage'));
 		} finally {
 			setIsSending(false);
 		}
@@ -547,7 +534,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			}
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
-			else setError('Failed to accept changes');
+			else setError(t('home.expanded.chat.errorAcceptChanges'));
 		} finally {
 			setIsSending(false);
 		}
@@ -555,7 +542,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 
 	const handleNewChat = () => {
-		clearStoredSessionId();
 		setSessionId('');
 		setError(null);
 		setMessage('');
@@ -652,17 +638,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 								<Button
 									key={action.id}
 									variant="pill"
-									dotstatus={
-										action.status as
-											| 'parsed'
-											| 'clarification'
-											| 'none'
-											| 'pending'
-											| 'executed'
-											| 'failed'
-											| 'exited'
-											| undefined
-									}
+									dotstatus={action.status}
 								>
 									<img
 										src={ChatUtil.getActionIcon(action)}

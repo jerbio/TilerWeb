@@ -16,7 +16,23 @@
 				"emptyStateTitle": "Que souhaitez-vous faire ?",
 				"emptyStateDescription": "Décrivez une tâche, nous nous occupons du carrelage.",
 				"sendingRequest": "Envoi de la requête...",
-				"acceptChanges": "Accepter les Modifications"
+				"acceptChanges": "Accepter les Modifications",
+				"errorLoadMessages": "Échec du chargement des messages de chat",
+				"errorSendMessage": "Échec de l'envoi du message",
+				"errorAcceptChanges": "Échec de l'acceptation des modifications",
+				"userLocation": {
+					"anonymous": "Anonyme",
+					"enterLocation": "Entrez votre emplacement",
+					"default": "Par défaut",
+					"saving": "Enregistrement...",
+					"save": "Enregistrer",
+					"gettingCurrentLocation": "Obtention de votre emplacement actuel...",
+					"gettingLocation": "Obtention de l'emplacement...",
+					"resetToDefault": "Réinitialiser par défaut",
+					"locationBenefitMessage": "Définir votre emplacement réel nous aide à créer des tuiles plus pertinentes et à améliorer votre expérience avec des suggestions de planification personnalisées.",
+					"usingDefaultLocation": "Utilisation de l'emplacement par défaut - Cliquez sur l'icône pour obtenir votre emplacement actuel.",
+					"clickIconToGetLocation": "Cliquez sur l'icône pour obtenir votre emplacement actuel ou modifier votre emplacement"
+				}
 			}
 		},
 		"appDownload": {

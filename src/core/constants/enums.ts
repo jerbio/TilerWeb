@@ -27,4 +27,5 @@ export enum Status {
 	Executed = 'executed',
 	Failed = 'failed',
 	Exited = 'exited',
+	Disposed = 'disposed',
 }

@@ -1,4 +1,4 @@
-import { Actions } from '@/core/constants/enums';
+import { Actions, Status } from '@/core/constants/enums';
 import { UserInfo } from '@/global_state';
 import { ApiResponse } from './api';
 
@@ -20,7 +20,7 @@ export interface VibeAction {
   descriptions: string;
   type: ActionType;
   creationTimeInMs: number;
-  status: 'parsed' | 'clarification' | 'none' | 'pending' | 'executed' | 'failed' | 'exited';
+  status: Status;
   prompts: PromptWithActions[];
   beforeScheduleId: string;
   afterScheduleId: string;
