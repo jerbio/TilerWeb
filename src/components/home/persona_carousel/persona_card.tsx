@@ -16,10 +16,7 @@ import useIsMobile from '@/core/common/hooks/useIsMobile';
 import PersonaCardExpanded from './persona_card_expanded';
 import { Persona } from '@/core/common/types/persona';
 import { Check, ClockFading } from 'lucide-react';
-import {
-  PersonaUsers,
-  PersonaUserSetter,
-} from '@/core/common/hooks/usePersonaUsers';
+import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import TimeUtil from '@/core/util/time';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -58,19 +55,14 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     if (personaUser) {
       clearInterval(personaUserTimeLeftInterval);
 
-      setPersonaUserTimeLeft(
-        TimeUtil.rangeDuration(dayjs(), dayjs(personaUser.expiration))
-      );
+      setPersonaUserTimeLeft(TimeUtil.rangeDuration(dayjs(), dayjs(personaUser.expiration)));
       const intervalID = setInterval(
         () => {
-          const timeLeft = TimeUtil.rangeDuration(
-            dayjs(),
-            dayjs(personaUser.expiration)
-          );
+          const timeLeft = TimeUtil.rangeDuration(dayjs(), dayjs(personaUser.expiration));
           setPersonaUserTimeLeft(timeLeft);
           if (timeLeft === '0m') {
             clearInterval(personaUserTimeLeftInterval);
-            setPersonaUser(persona.id, null); // Clear the user when it expires
+            setPersonaUser(persona.id, { userId: null }); // Clear the user when it expires
             if (selectedPersona === persona.key) onDeselect(); // Deselect the card if it's selected
           }
         },
@@ -135,15 +127,32 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customInputValue, setCustomInputValue] = useState('');
 
+  // Focus the input when it is shown
+  function focusInput() {
+    const input = customInputFormRef.current?.querySelector('input');
+    if (input) {
+      input.focus();
+      swiper.disable();
+      input.addEventListener('blur', (e) => {
+        const input = e.target as HTMLInputElement;
+        if (!input.value.trim()) {
+          setShowCustomInput(false);
+          swiper.enable();
+          swiper.autoplay.resume();
+        }
+      });
+    }
+  }
+
   useEffect(() => {
     if (showCustomInput && customInputFormRef.current) {
-      customInputFormRef.current.querySelector('input')?.focus();
+      focusInput();
     }
   }, [showCustomInput]);
 
   function onCustomSelect() {
     if (!customInputValue.trim()) {
-      customInputFormRef.current?.querySelector('input')?.focus();
+      focusInput();
       return;
     }
     setShowCustomInput(false);
@@ -154,14 +163,9 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     });
   }
   function onCustomDeselect() {
-    setSelectedPersona(null, {
-      id: persona.id,
-      name: 'Custom',
-    });
-    setPersonaUser(persona.id, null, { store: false });
+    setSelectedPersona(null);
     swiper.enable();
   }
-
   function onSelect() {
     setSelectedPersona(persona.key);
   }
@@ -278,7 +282,9 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
               {personaUserExists && (
                 <div>
                   <span style={{ marginRight: '6px' }}>
-                    {t('home.persona.created')}
+                    {isCustom
+                      ? t('home.persona.customCreated')
+                      : t('home.persona.created')}
                   </span>
                   <ClockFading size={14} color={palette.colors.brand[400]} />
                   <span style={{ color: palette.colors.gray[300] }}>
@@ -326,7 +332,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
             ))}
           </OverlayList>
           <ButtonContainer>
-            {isCustom ? (
+            {isCustom && !personaUserExists ? (
               <ButtonStyled
                 style={buttonSpring}
                 onClick={() => {

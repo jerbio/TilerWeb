@@ -41,16 +41,19 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   }
 
   function setUserId(userId: string) {
-		if (userInfo) {
-			setUserInfo({ ...userInfo, id: userId });
-		}
-	}
+    if (userInfo) {
+      setUserInfo({ ...userInfo, id: userId });
+    }
+  }
 
   async function getPersonaUser() {
     try {
       const personaUser = await personaService.createAnonymousUser(persona);
-      setPersonaUser(persona.id, personaUser.anonymousUser.id);
-			setUserId(personaUser.anonymousUser.id!);
+      setPersonaUser(persona.id, {
+				userId: personaUser.anonymousUser.id,
+				personaInfo: { name: persona.name },
+			});
+      setUserId(personaUser.anonymousUser.id!);
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
@@ -61,7 +64,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       if (!personaUserId) {
         getPersonaUser();
       } else {
-				setUserId(personaUserId);
+        setUserId(personaUserId);
       }
     }
   }, [expanded]);
@@ -72,7 +75,6 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar expandedWidth={expandedWidth} userId={personaUserId} />
           <PersonaCalendar expandedWidth={expandedWidth} userId={personaUserId} />
           <CalendarContainerActionButtons>
             <MobileShowChatButton
@@ -190,6 +192,7 @@ const CardContent = styled.div`
 	display: grid;
 	gap: 1.5rem;
 	grid-template-columns: repeat(12, 1fr);
+	height: calc(100% - 12rem);
 `;
 
 const CalendarContainer = styled(animated.div)`

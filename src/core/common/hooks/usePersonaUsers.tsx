@@ -2,18 +2,17 @@ import { useState, useEffect } from 'react';
 import { Persona } from '../types/persona';
 import TimeUtil from '../../util/time';
 
-export type PersonaUsers = Record<
-  Persona['id'],
-  { userId: string; expiration: number } | undefined
->;
-
-type PersonaUserSetterOptions = {
-  store: boolean;
+type PersonaUser = {
+  userId: string;
+  expiration: number;
+  personaInfo?: {
+    name?: string;
+  };
 };
+export type PersonaUsers = Record<Persona['id'], PersonaUser | undefined>;
 export type PersonaUserSetter = (
   personaId: Persona['id'],
-  userId: string | null,
-  options?: PersonaUserSetterOptions
+  user: { userId: string | null; personaInfo?: { name?: string } }
 ) => void;
 
 function usePersonaUsers() {
@@ -40,33 +39,27 @@ function usePersonaUsers() {
     setPersonaUsers(users);
   }, []);
 
-  function setPersonaUser(
-    personaId: Persona['id'],
-    userId: string | null,
-    options: PersonaUserSetterOptions = { store: true }
-  ) {
-    if (userId === null) {
+  const setPersonaUser: PersonaUserSetter = (personaId, user) => {
+    if (user.userId === null) {
       const newPersonaUsers = { ...personaUsers };
       delete newPersonaUsers[personaId];
       setPersonaUsers(newPersonaUsers);
-      if (options.store) {
-        localStorage.setItem(PERSONA_STORAGE_KEY, JSON.stringify(newPersonaUsers));
-      }
+      localStorage.setItem(PERSONA_STORAGE_KEY, JSON.stringify(newPersonaUsers));
     } else {
       const expiration = TimeUtil.now() + TimeUtil.inMilliseconds(1, 'd');
+      const updatedUser: PersonaUser = {
+        userId: user.userId,
+        expiration,
+        personaInfo: user.personaInfo,
+      };
       const updatedPersonaUsers: PersonaUsers = {
         ...personaUsers,
-        [personaId]: {
-          userId,
-          expiration,
-        },
+        [personaId]: updatedUser,
       };
       setPersonaUsers(updatedPersonaUsers);
-      if (options.store) {
-        localStorage.setItem(PERSONA_STORAGE_KEY, JSON.stringify(updatedPersonaUsers));
-      }
+      localStorage.setItem(PERSONA_STORAGE_KEY, JSON.stringify(updatedPersonaUsers));
     }
-  }
+  };
 
   return { personaUsers, setPersonaUser };
 }

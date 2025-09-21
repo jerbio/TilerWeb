@@ -31,7 +31,8 @@
 	},
 	"home": {
 		"persona": {
-			"created": "Profile Created",
+			"created": "Profile",
+			"customCreated": "Custom Profile",
 			"expiresIn": "{{time}} left",
 			"tileSuggestions": "Tiles",
 			"custom": {

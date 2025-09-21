@@ -16,11 +16,17 @@ import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
 import { personaService } from '@/services';
 
+const ChatWrapper = styled.section`
+	height: 100%;
+	position: relative;
+`;
+
 const ChatContainer = styled.section`
+	position: absolute;
+	inset: 0;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
-	// gap: 1rem;
-	height: 100%;
 	padding: 1.5rem;
 
 	@media screen and (min-width: ${palette.screens.lg}) {
@@ -125,35 +131,37 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 `;
 
 type ChatProps = {
-	onClose?: () => void;
+  onClose?: () => void;
 };
 
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
-	const { t } = useTranslation();
+  const { t } = useTranslation();
 
-	const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
-	const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
-	const messagesEndRef = useRef<HTMLDivElement>(null);
-	const messagesListRef = useRef<HTMLDivElement>(null);
-	const [message, setMessage] = useState('');
-	const [messages, setMessages] = useState<PromptWithActions[]>([]);
-	const [isSending, setIsSending] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [sessionId, setSessionId] = useState<string>('');
-	const [isLoading, setIsLoading] = useState(false);
-	const [isBatchLoading, setIsBatchLoading] = useState(false);
-	const [requestId, setRequestId] = useState<string | null>(null);
-	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
+  const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
+  const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesListRef = useRef<HTMLDivElement>(null);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<PromptWithActions[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBatchLoading, setIsBatchLoading] = useState(false);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
-	const scheduleId = useAppStore((state) => state.scheduleId);
+  const scheduleId = useAppStore((state) => state.scheduleId);
 	const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
-	const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
-	const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
-	const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
-	const userLocationVerified = useAppStore((state) => state.userInfo?.userLocationVerified ?? "false");
-	const handleSetScheduleId = (id: string) => {
-		setScheduleId(id);
-	};
+  const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+  const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
+  const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
+  const userLocationVerified = useAppStore(
+    (state) => state.userInfo?.userLocationVerified ?? 'false'
+  );
+  const handleSetScheduleId = (id: string) => {
+    setScheduleId(id);
+  };
 
 	// Helper function to get persona info from localStorage using selectedPersonaId
 	const getSelectedPersonaInfo = async (): Promise<{ userId: string; expiration: number } | null> => {
@@ -258,176 +266,180 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		return hasUnexecuted;
 	};
 
-	const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
+  const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
 
-	useEffect(() => {
-		if (messages.length > 0 && messagesListRef.current) {
-			messagesListRef.current.scrollTo({
-			top: messagesListRef.current.scrollHeight,
-			behavior: "smooth",
-			});
-		}
-	}, [messages]);
+  useEffect(() => {
+    if (messages.length > 0 && messagesListRef.current) {
+      messagesListRef.current.scrollTo({
+        top: messagesListRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages]);
 
+  // Helper function to update messages with actions progressively
+  const updateMessagesWithActions = (
+    rawMessages: PromptWithActions[],
+    actionsMap: Record<string, VibeAction>
+  ) => {
+    const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+      const actionIds: string[] = entry.actionIds ?? [];
+      const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
 
-	// Helper function to update messages with actions progressively
-	const updateMessagesWithActions = (rawMessages: PromptWithActions[], actionsMap: Record<string, VibeAction>) => {
-		const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-			const actionIds: string[] = entry.actionIds ?? [];
-			const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
+      return {
+        id: entry.id,
+        origin: entry.origin,
+        content: entry.content,
+        actionId: entry.actionId,
+        requestId: entry.requestId,
+        sessionId: entry.sessionId,
+        actionIds,
+        actions: resolvedActions,
+      };
+    });
 
-			return {
-				id: entry.id,
-				origin: entry.origin,
-				content: entry.content,
-				actionId: entry.actionId,
-				requestId: entry.requestId,
-				sessionId: entry.sessionId,
-				actionIds,
-				actions: resolvedActions,
-			};
-		});
+    // Sort by timestamp
+    updatedMessages.sort((a, b) => {
+      const extractTimestamp = (id: string): number => {
+        const match = id.match(/(\d{18})/);
+        return match ? parseInt(match[1], 10) : 0;
+      };
+      return extractTimestamp(a.id) - extractTimestamp(b.id);
+    });
 
-		// Sort by timestamp
-		updatedMessages.sort((a, b) => {
-			const extractTimestamp = (id: string): number => {
-				const match = id.match(/(\d{18})/);
-				return match ? parseInt(match[1], 10) : 0;
-			};
-			return extractTimestamp(a.id) - extractTimestamp(b.id);
-		});
+    // Update state with partial results
+    setMessages((prevMessages) => {
+      const existingIds = new Set(prevMessages.map((m) => m.id));
+      const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
 
-		// Update state with partial results
-		setMessages((prevMessages) => {
-			const existingIds = new Set(prevMessages.map((m) => m.id));
-			const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
+      const mergedMessages = prevMessages.map((prevMessage) => {
+        const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
+        return updatedMessage || prevMessage;
+      });
 
-			const mergedMessages = prevMessages.map((prevMessage) => {
-				const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
-				return updatedMessage || prevMessage;
-			});
+      return [...mergedMessages, ...uniqueNewMessages];
+    });
+  };
 
-			return [...mergedMessages, ...uniqueNewMessages];
-		});
-	};
+  const loadChatMessages = async (sid: string) => {
+    if (!sid) return;
 
-	const loadChatMessages = async (sid: string) => {
-		if (!sid) return;
+    try {
+      setIsLoading(true);
+      setError(null);
 
-		try {
-			setIsLoading(true);
-			setError(null);
+      const data = await chatService.getMessages(sid);
+      const rawMessages = data.Content.chats || [];
+      if (!rawMessages || rawMessages.length === 0) return;
 
-			const data = await chatService.getMessages(sid);
-			const rawMessages = data.Content.chats || [];
-			if (!rawMessages || rawMessages.length === 0) return;
+      // Collect all unique actionIds, ordered by message timestamp (newest first)
+      const messagesByTimestamp = rawMessages
+        .map((entry) => ({
+          ...entry,
+          timestamp: (() => {
+            const match = entry.id.match(/(\d{18})/);
+            return match ? parseInt(match[1], 10) : 0;
+          })(),
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
 
-			// Collect all unique actionIds, ordered by message timestamp (newest first)
-			const messagesByTimestamp = rawMessages
-				.map((entry) => ({
-					...entry,
-					timestamp: (() => {
-						const match = entry.id.match(/(\d{18})/);
-						return match ? parseInt(match[1], 10) : 0;
-					})()
-				}))
-				.sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
+      const uniqueActionIds = Array.from(
+        new Set(
+          messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean)
+        )
+      );
 
-			const uniqueActionIds = Array.from(
-				new Set(messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean))
-			);
+      // Fetch and map actions by ID with batching
+      let allActionsMap: Record<string, VibeAction> = {};
+      if (uniqueActionIds.length > 0) {
+        const BATCH_SIZE = 10;
+        const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
 
-			// Fetch and map actions by ID with batching
-			let allActionsMap: Record<string, VibeAction> = {};
-			if (uniqueActionIds.length > 0) {
-				const BATCH_SIZE = 10;
-				const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
+        if (shouldBatch) {
+          setIsBatchLoading(true);
 
-				if (shouldBatch) {
-					setIsBatchLoading(true);
-					
-					// Create batches (most recent actions first)
-					const batches: string[][] = [];
-					for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
-						batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
-					}
+          // Create batches (most recent actions first)
+          const batches: string[][] = [];
+          for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
+            batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
+          }
 
-					// Process batches sequentially, updating UI after each batch
-					for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-						const batch = batches[batchIndex];
-						const isLastBatch = batchIndex === batches.length - 1;
+          // Process batches sequentially, updating UI after each batch
+          for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+            const batch = batches[batchIndex];
+            const isLastBatch = batchIndex === batches.length - 1;
 
-						try {
-							const fetchedActions = await chatService.getActions(batch);
-							const batchActionsMap = fetchedActions.reduce(
-								(acc, action) => {
-									acc[action.id] = action;
-									return acc;
-								},
-								{} as Record<string, VibeAction>
-							);
+            try {
+              const fetchedActions = await chatService.getActions(batch);
+              const batchActionsMap = fetchedActions.reduce(
+                (acc, action) => {
+                  acc[action.id] = action;
+                  return acc;
+                },
+                {} as Record<string, VibeAction>
+              );
 
-							// Merge with existing actions
-							allActionsMap = { ...allActionsMap, ...batchActionsMap };
+              // Merge with existing actions
+              allActionsMap = { ...allActionsMap, ...batchActionsMap };
 
-							// Update messages with current actions if not the last batch
-							if (!isLastBatch) {
-								updateMessagesWithActions(rawMessages, allActionsMap);
-							}
-						} catch (error) {
-							console.error(`Error fetching batch ${batchIndex + 1}:`, error);
-						}
-					}
-					
-					setIsBatchLoading(false);
-				} else {
-					// Single request for small number of actions
-					const fetchedActions = await chatService.getActions(uniqueActionIds);
-					allActionsMap = fetchedActions.reduce(
-						(acc, action) => {
-							acc[action.id] = action;
-							return acc;
-						},
-						{} as Record<string, VibeAction>
-					);
-				}
-			}
+              // Update messages with current actions if not the last batch
+              if (!isLastBatch) {
+                updateMessagesWithActions(rawMessages, allActionsMap);
+              }
+            } catch (error) {
+              console.error(`Error fetching batch ${batchIndex + 1}:`, error);
+            }
+          }
 
-			// Map messages with resolved actions
-			const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-				const actionIds: string[] = entry.actionIds ?? [];
-				const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
+          setIsBatchLoading(false);
+        } else {
+          // Single request for small number of actions
+          const fetchedActions = await chatService.getActions(uniqueActionIds);
+          allActionsMap = fetchedActions.reduce(
+            (acc, action) => {
+              acc[action.id] = action;
+              return acc;
+            },
+            {} as Record<string, VibeAction>
+          );
+        }
+      }
 
-				return {
-					id: entry.id,
-					origin: entry.origin,
-					content: entry.content,
-					actionId: entry.actionId,
-					requestId: entry.requestId,
-					sessionId: entry.sessionId,
-					actionIds,
-					actions: resolvedActions,
-				};
-			});
+      // Map messages with resolved actions
+      const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
+        const actionIds: string[] = entry.actionIds ?? [];
+        const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
 
-			// Sort by timestamp extracted from ID (chronological order)
-			loadedMessages.sort((a, b) => {
-				const extractTimestamp = (id: string): number => {
-					const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
-					return match ? parseInt(match[1], 10) : 0;
-				};
-				return extractTimestamp(a.id) - extractTimestamp(b.id);
-			});
-			
-			setMessages((prevMessages) => {
-				const existingIds = new Set(prevMessages.map((m) => m.id));
-				const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+        return {
+          id: entry.id,
+          origin: entry.origin,
+          content: entry.content,
+          actionId: entry.actionId,
+          requestId: entry.requestId,
+          sessionId: entry.sessionId,
+          actionIds,
+          actions: resolvedActions,
+        };
+      });
 
-				// Merge actions for existing messages
-				const updatedMessages = prevMessages.map((prevMessage) => {
-					const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
-					return updatedMessage || prevMessage;
-				});
+      // Sort by timestamp extracted from ID (chronological order)
+      loadedMessages.sort((a, b) => {
+        const extractTimestamp = (id: string): number => {
+          const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
+          return match ? parseInt(match[1], 10) : 0;
+        };
+        return extractTimestamp(a.id) - extractTimestamp(b.id);
+      });
+
+      setMessages((prevMessages) => {
+        const existingIds = new Set(prevMessages.map((m) => m.id));
+        const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+
+        // Merge actions for existing messages
+        const updatedMessages = prevMessages.map((prevMessage) => {
+          const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
+          return updatedMessage || prevMessage;
+        });
 
 				return [...updatedMessages, ...uniqueNewMessages];
 			});
@@ -440,66 +452,66 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		}
 	};
 
-	const handleSubmit = async (e: FormEvent) => {
-		e.preventDefault();
-		if (!message.trim() || isSending) return;
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || isSending) return;
 
-		try {
-			setIsSending(true);
-			setError(null);
+    try {
+      setIsSending(true);
+      setError(null);
 
-			const response = await chatService.sendMessage(
-				message,
-				entityId,
-				sessionId,
-				anonymousUserId,
-				userLongitude,
-				userLatitude,
-				userLocationVerified,
-			);
-			if (
-				response?.Content?.vibeResponse?.tilerUser &&
-				JSON.stringify(response.Content.vibeResponse.tilerUser) !==
-					JSON.stringify(useAppStore.getState().userInfo)
-			) {
-				useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
-			}
-			const promptMap = response?.Content?.vibeResponse?.prompts || {};
+      const response = await chatService.sendMessage(
+        message,
+        entityId,
+        sessionId,
+        anonymousUserId,
+        userLongitude,
+        userLatitude,
+        userLocationVerified
+      );
+      if (
+        response?.Content?.vibeResponse?.tilerUser &&
+        JSON.stringify(response.Content.vibeResponse.tilerUser) !==
+        JSON.stringify(useAppStore.getState().userInfo)
+      ) {
+        useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
+      }
+      const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
-			// Convert the prompt map to PromptWithActions[]
-			const newMessages: PromptWithActions[] = Object.values(promptMap).map(
-				(entry: PromptWithActions) => ({
-					id: entry.id,
-					origin: entry.origin,
-					content: entry.content,
-					actionId: entry.actionId,
-					requestId: entry.requestId,
-					sessionId: entry.sessionId,
-					actions: (entry.actions ?? []).map((action: VibeAction) => ({
-						id: action.id,
-						descriptions: action.descriptions,
-						type: action.type,
-						creationTimeInMs: action.creationTimeInMs,
-						status: action.status,
-						beforeScheduleId: action.beforeScheduleId,
-						afterScheduleId: action.afterScheduleId,
-						prompts: action.prompts ?? [],
-						vibeRequest: {
-							id: action.vibeRequest.id,
-							creationTimeInMs: action.vibeRequest.creationTimeInMs,
-							activeAction: action.vibeRequest.activeAction,
-							isClosed: action.vibeRequest.isClosed ?? false,
-							beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
-							afterScheduleId: action.vibeRequest.afterScheduleId || null,
-							actions: action.vibeRequest.actions || [],
-						},
-					})),
-				})
-			);
+      // Convert the prompt map to PromptWithActions[]
+      const newMessages: PromptWithActions[] = Object.values(promptMap).map(
+        (entry: PromptWithActions) => ({
+          id: entry.id,
+          origin: entry.origin,
+          content: entry.content,
+          actionId: entry.actionId,
+          requestId: entry.requestId,
+          sessionId: entry.sessionId,
+          actions: (entry.actions ?? []).map((action: VibeAction) => ({
+            id: action.id,
+            descriptions: action.descriptions,
+            type: action.type,
+            creationTimeInMs: action.creationTimeInMs,
+            status: action.status,
+            beforeScheduleId: action.beforeScheduleId,
+            afterScheduleId: action.afterScheduleId,
+            prompts: action.prompts ?? [],
+            vibeRequest: {
+              id: action.vibeRequest.id,
+              creationTimeInMs: action.vibeRequest.creationTimeInMs,
+              activeAction: action.vibeRequest.activeAction,
+              isClosed: action.vibeRequest.isClosed ?? false,
+              beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
+              afterScheduleId: action.vibeRequest.afterScheduleId || null,
+              actions: action.vibeRequest.actions || [],
+            },
+          })),
+        })
+      );
 
-			// Append new messages to existing state
-			setMessages((prev) => [...prev, ...newMessages]);
-			setRequestId(newMessages[0]?.requestId || null);
+      // Append new messages to existing state
+      setMessages((prev) => [...prev, ...newMessages]);
+      setRequestId(newMessages[0]?.requestId || null);
 
 			// Update session ID from the first prompt
 			const sessionIdFromResponse = newMessages[0]?.sessionId;
@@ -550,89 +562,98 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		handleSetScheduleId('');
 	};
 
-	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
+  const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
 
-	const handleRemoveContext = (context: ChatContextType) => {
-		removeChatContext(context); // Remove the clicked context
-	};
+  const handleRemoveContext = (context: ChatContextType) => {
+    removeChatContext(context); // Remove the clicked context
+  };
 
-	return (
-		<ChatContainer>
-			<ChatHeader>
-				{onClose && (
-					<Button variant="ghost" height={32} onClick={onClose}>
-						<ChevronLeftIcon size={16} />
-						<span>{t('common.buttons.back')}</span>
-					</Button>
-				)}
-				{import.meta.env.VITE_NODE_ENV === 'development' && (
-					<Button
-						variant="outline"
-						style={{
-							alignSelf: 'flex-end',
-							marginBottom: '0.5rem',
-							color: palette.colors.orange[500],
-							borderColor: palette.colors.orange[500],
-						}}
-						onClick={handleNewChat}
-					>
-						{t('home.expanded.chat.clearSession')}
-					</Button>
-				)}
-				{chatContext.length === 0 ? (
-					<Button variant="ghost" height={32} onClick={handleNewChat}>
-						<span>{t('home.expanded.chat.newChat')}</span>
-					</Button>
-				) : (
-					<>
-						{chatContext.map((context, index) => (
-							<Button
-								key={index}
-								variant="outline"
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'space-between',
-									padding: '0.5rem',
-									border: `1px solid ${palette.colors.gray[300]}`,
-								}}
-							>
-								<span>{context.Name}</span>
-								<span
-									onClick={() => handleRemoveContext(context)}
-									style={{
-										marginLeft: '0.5rem',
-										color: 'red',
-										cursor: 'pointer',
-									}}
-								>
-									x
-								</span>
-							</Button>
-						))}
-					</>
-				)}
-			</ChatHeader>
-			<ChatContent>
-				{isLoading && <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />}
-				{isBatchLoading && <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />}
+  return (
+    <ChatWrapper>
+      <ChatContainer>
+        <ChatHeader>
+          {onClose && (
+            <Button variant="ghost" height={32} onClick={onClose}>
+              <ChevronLeftIcon size={16} />
+              <span>{t('common.buttons.back')}</span>
+            </Button>
+          )}
+          {import.meta.env.VITE_NODE_ENV === 'development' && (
+            <Button
+              variant="outline"
+              style={{
+                alignSelf: 'flex-end',
+                marginBottom: '0.5rem',
+                color: palette.colors.orange[500],
+                borderColor: palette.colors.orange[500],
+              }}
+              onClick={handleNewChat}
+            >
+              {t('home.expanded.chat.clearSession')}
+            </Button>
+          )}
+          {chatContext.length === 0 ? (
+            <Button variant="ghost" height={32} onClick={handleNewChat}>
+              <span>{t('home.expanded.chat.newChat')}</span>
+            </Button>
+          ) : (
+            <>
+              {chatContext.map((context, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.5rem',
+                    border: `1px solid ${palette.colors.gray[300]}`,
+                  }}
+                >
+                  <span>{context.Name}</span>
+                  <span
+                    onClick={() => handleRemoveContext(context)}
+                    style={{
+                      marginLeft: '0.5rem',
+                      color: 'red',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    x
+                  </span>
+                </Button>
+              ))}
+            </>
+          )}
+        </ChatHeader>
+        <ChatContent>
+          {isLoading && (
+            <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
+          )}
+          {isBatchLoading && (
+            <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
+          )}
 
-				{error && <div className="chat-error">{t('home.expanded.chat.error')}: {error}</div>}
+          {error && (
+            <div className="chat-error">
+              {t('home.expanded.chat.error')}: {error}
+            </div>
+          )}
 
-				{!isLoading && !error && !messages.length && (
-					<EmptyChat>
-						<Logo size={48} />
-						<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
-						<p>{t('home.expanded.chat.emptyStateDescription')}</p>
-					</EmptyChat>
-				)}
+          {!isLoading && !error && !messages.length && (
+            <EmptyChat>
+              <Logo size={48} />
+              <h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+              <p>{t('home.expanded.chat.emptyStateDescription')}</p>
+            </EmptyChat>
+          )}
 
-				<div className="messages-list" ref={messagesListRef}>
-					{messages.map((message) => (
-						<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-							<div className="message-content">
-								<MarkdownRenderer content={message.content} />
-							</div>
+          <div className="messages-list" ref={messagesListRef}>
+            {messages.map((message) => (
+              <MessageBubble key={message.id} $isUser={message.origin === 'user'}>
+                <div className="message-content">
+                  <MarkdownRenderer content={message.content} />
+                </div>
 
 							{message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
 								<Button
@@ -657,53 +678,51 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					))}
 				</div>
 
-				<div ref={messagesEndRef} />
-			</ChatContent>
+          <div ref={messagesEndRef} />
+        </ChatContent>
 
-			{/* Render chatContext buttons */}
-			<div style={{ marginBottom: '0.25rem' }}></div>
+        {/* Render chatContext buttons */}
+        <div style={{ marginBottom: '0.25rem' }}></div>
 
-			<div>
-				{isSending && (
-					<LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
-				)}
-				{!isSending && shouldShowAcceptButton && (
-					<Button
-						variant="primary"
-						onClick={() => acceptAllChanges()}
-					>
-						{t('home.expanded.chat.acceptChanges')}
-					</Button>
-				)}
-			</div>
+        <div>
+          {isSending && (
+            <LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
+          )}
+          {!isSending && shouldShowAcceptButton && (
+            <Button variant="primary" onClick={() => acceptAllChanges()}>
+              {t('home.expanded.chat.acceptChanges')}
+            </Button>
+          )}
+        </div>
 
-			<ChatForm onSubmit={handleSubmit}>
-				<Input.Textarea
-					value={message}
-					onChange={(e) => setMessage(e.target.value)}
-					onKeyDown={(e) => {
-						// Submit form on Enter key press without Shift key
-						if (e.key === 'Enter' && !e.shiftKey) {
-							e.preventDefault(); // Prevent new line
+        <ChatForm onSubmit={handleSubmit}>
+          <Input.Textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => {
+              // Submit form on Enter key press without Shift key
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line
 
-							// Use form.requestSubmit() instead of handleSubmit directly
-							// This triggers a single form submission through the standard form mechanism
-							const form = e.currentTarget.form;
-							if (form) form.requestSubmit();
-						}
-					}}
-					placeholder={t('home.expanded.chat.inputPlaceholder')}
-					disabled={isSending}
-					bordergradient={[palette.colors.brand[500]]}
-					height={50} // Set a fixed height for consistent alignment
-				/>
-				<ChatButton type="submit" disabled={isSending || !message.trim()}>
-					{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
-				</ChatButton>
-			</ChatForm>
-			<UserLocation />
-		</ChatContainer>
-	);
+                // Use form.requestSubmit() instead of handleSubmit directly
+                // This triggers a single form submission through the standard form mechanism
+                const form = e.currentTarget.form;
+                if (form) form.requestSubmit();
+              }
+            }}
+            placeholder={t('home.expanded.chat.inputPlaceholder')}
+            disabled={isSending}
+            bordergradient={[palette.colors.brand[500]]}
+            height={50} // Set a fixed height for consistent alignment
+          />
+          <ChatButton type="submit" disabled={isSending || !message.trim()}>
+            {isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
+          </ChatButton>
+        </ChatForm>
+        <UserLocation />
+      </ChatContainer>
+    </ChatWrapper>
+  );
 };
 
 export default Chat;
