@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
-import useAppStore from '@/global_state';
 import { useTranslation } from 'react-i18next';
+import { locationService, LocationData } from '@/services/locationService';
 
 // Define prop types for styled components
 interface StyledProps {
@@ -261,182 +261,41 @@ const ResetLink = styled.span`
 const UserLocation: React.FC = () => {
 	const { t } = useTranslation();
 
-	// Default location: National Museum of African American History and Culture in DC
-	const DEFAULT_LOCATION = "National Museum of African American History and Culture, Washington, DC";
-	
-	const [location, setLocation] = useState<string>(DEFAULT_LOCATION);
+	const [locationData, setLocationData] = useState<LocationData>(locationService.getDefaultLocation());
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [customLocation, setCustomLocation] = useState<string>('');
-	const [useDefaultLocation, setUseDefaultLocation] = useState<boolean>(true);
 	const [isLocationFetching, setIsLocationFetching] = useState<boolean>(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const tooltipRef = useRef<HTMLDivElement>(null);
 	const locationRef = useRef<HTMLDivElement>(null);
 	
-	// Get and update user info from global state
-	const userInfo = useAppStore((state) => state.userInfo);
-	const setUserInfo = useAppStore((state) => state.setUserInfo);
+	// Location data is now managed locally by the service
 
-	// Helper function to extract user ID from local storage
-	const getUserIdFromStorage = (): string => {
-		try {
-			const personaScheduleData = localStorage.getItem('tiler-persona-users');
-			if (!personaScheduleData) return '';
+	// Location service handles all location logic now
 
-			const parsed = JSON.parse(personaScheduleData);
-			// Look for any persona key and extract userId
-			const personaKeys = Object.keys(parsed);
-			if (personaKeys.length === 0) return '';
-
-			const firstPersona = parsed[personaKeys[0]];
-			if (!firstPersona?.userId) return '';
-
-			return firstPersona.userId;
-		} catch (error) {
-			console.warn('Failed to extract user ID from local storage:', error);
-			return '';
-		}
-	};
-
-	// Helper function to safely update userInfo with location data
-	const updateUserLocation = (locationData: {
-		location: string;
-		userLongitude?: string;
-		userLatitude?: string;
-		userLocationVerified?: string;
-	}) => {
-		if (userInfo) {
-			// Update existing userInfo
-			setUserInfo({
-				...userInfo,
-				...locationData,
-			});
-		} else {
-			// Create new userInfo with minimal required fields and location data
-			setUserInfo({
-				id: getUserIdFromStorage(), // to remove when we update the user id in the global state
-				username: t('home.expanded.chat.userLocation.anonymous'),
-				timeZoneDifference: 0,
-				timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-				email: null,
-				endfOfDay: '0001-01-01T00:00:00+00:00',
-				phoneNumber: null,
-				fullName: '',
-				firstName: '',
-				lastName: '',
-				countryCode: '1',
-				...locationData,
-			});
-		}
-	};
+	// Location data is now managed by the service and doesn't need global state
 
 	useEffect(() => {
 		const fetchLocation = async () => {
-			// If we already have a saved location in global state, use that
-			if (userInfo?.location) {
-				setLocation(userInfo.location);
-				setCustomLocation(userInfo.location);
-				setUseDefaultLocation(false);
-				setIsLoading(false);
-				return;
-			}
-			
 			try {
 				setIsLoading(true);
-
-				// Check if geolocation is supported by the browser
-				if (!navigator.geolocation) {
-					console.log('Geolocation not supported, using default location');
-					// Use default location if geolocation is not supported
-					setLocation(DEFAULT_LOCATION);
-					setCustomLocation(DEFAULT_LOCATION);
-					setUseDefaultLocation(true);
-					setIsLoading(false);
-					return;
-				}
-
-				// Get the current position with a timeout
-				const positionPromise = new Promise<GeolocationPosition>((resolve, reject) => {
-					navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-				});
-				
-				// Race between position fetch and timeout
-				try {
-					// Try to get user position with a timeout
-					const timeoutPromise = new Promise<never>((_, reject) => {
-						setTimeout(() => reject(new Error('Geolocation request timed out')), 10000);
-					});
-					
-					const position = await Promise.race([positionPromise, timeoutPromise]) as GeolocationPosition;
-					const { latitude, longitude } = position.coords;
-					const latitudeStr = latitude.toString();
-					const longitudeStr = longitude.toString();
-
-
-					try {
-						// Use reverse geocoding to get a human-readable address
-						const response = await fetch(
-							`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-						);
-
-						if (!response.ok) {
-							throw new Error('Failed to fetch location information');
-						}
-
-						const data = await response.json();
-
-						// Format the address in a user-friendly way
-						const address =
-							data.display_name ||
-							`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-						setLocation(address);
-						setCustomLocation(address); // Initialize custom location with the fetched location
-						setUseDefaultLocation(false);
-						
-						// Save to global state
-						updateUserLocation({
-							location: address,
-							userLongitude: longitudeStr,
-							userLatitude: latitudeStr,
-							userLocationVerified: "true",
-						});
-						console.log('User location set in global state:', address);
-					} catch (err) {
-						// If reverse geocoding fails, just use coordinates
-						const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-						setLocation(coords);
-						setCustomLocation(coords);
-						setUseDefaultLocation(false);
-                        console.log('Reverse geocoding failed, using coordinates', err);
-						
-						// Save to global state
-						updateUserLocation({
-							location: coords
-						});
-					}
-				} catch (err) {
-					console.log('Geolocation failed, using default location', err);
-					// If geolocation fails for any reason, use the default location
-					setLocation(DEFAULT_LOCATION);
-					setCustomLocation(DEFAULT_LOCATION);
-					setUseDefaultLocation(true);
-				}
-
-				setIsLoading(false);
+				const currentLocation = await locationService.getCurrentLocation();
+				setLocationData(currentLocation);
+				setCustomLocation(currentLocation.location);
 			} catch (err) {
 				console.error('Unexpected error in location fetch:', err);
-				// Use default location if there's any error
-				setLocation(DEFAULT_LOCATION);
-				setCustomLocation(DEFAULT_LOCATION);
-				setUseDefaultLocation(true);
+				const defaultLocation = locationService.getDefaultLocation();
+				setLocationData(defaultLocation);
+				setCustomLocation(defaultLocation.location);
+			} finally {
 				setIsLoading(false);
 			}
 		};
 
 		fetchLocation();
-	}, [userInfo, setUserInfo, DEFAULT_LOCATION]);
+	}, []);
 
 	// Focus the input field when editing starts
 	useEffect(() => {
@@ -476,66 +335,9 @@ const UserLocation: React.FC = () => {
 	const getCurrentLocation = async () => {
 		try {
 			setIsLocationFetching(true);
-			
-			// Check if geolocation is supported by the browser
-			if (!navigator.geolocation) {
-				console.log('Geolocation not supported');
-				return;
-			}
-
-			// Get the current position with a timeout
-			const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-				navigator.geolocation.getCurrentPosition(resolve, reject, { 
-					timeout: 10000,
-					enableHighAccuracy: true 
-				});
-			});
-			
-			const { latitude, longitude } = position.coords;
-			const latitudeStr = latitude.toString();
-			const longitudeStr = longitude.toString();
-
-			try {
-				// Use reverse geocoding to get a human-readable address
-				const response = await fetch(
-					`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-				);
-
-				if (!response.ok) {
-					throw new Error('Failed to fetch location information');
-				}
-
-				const data = await response.json();
-
-				// Format the address in a user-friendly way
-				const address = data.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-				setLocation(address);
-				setCustomLocation(address);
-				setUseDefaultLocation(false);
-				
-				// Save to global state
-				updateUserLocation({
-					location: address,
-					userLongitude: longitudeStr,
-					userLatitude: latitudeStr,
-					userLocationVerified: "true",
-				});
-			} catch (err) {
-				// If reverse geocoding fails, just use coordinates
-				const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-				setLocation(coords);
-				setCustomLocation(coords);
-				setUseDefaultLocation(false);
-				console.log('Reverse geocoding failed, using coordinates', err);
-				
-				// Save to global state
-				updateUserLocation({
-					location: coords,
-					userLongitude: longitudeStr,
-					userLatitude: latitudeStr,
-					userLocationVerified: "true",
-				});
-			}
+			const currentLocation = await locationService.getCurrentLocation();
+			setLocationData(currentLocation);
+			setCustomLocation(currentLocation.location);
 		} catch (err) {
 			console.log('Geolocation failed', err);
 		} finally {
@@ -557,97 +359,25 @@ const UserLocation: React.FC = () => {
 		}
 	};
 
-	// Geocode user-entered address to get coordinates
-	const geocodeAddress = async (address: string) => {
-		try {
-			const response = await fetch(
-				`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`
-			);
-
-			if (!response.ok) {
-				throw new Error('Failed to geocode address');
-			}
-
-			const data = await response.json();
-			
-			if (data && data.length > 0) {
-				const result = data[0];
-				return {
-					latitude: parseFloat(result.lat),
-					longitude: parseFloat(result.lon),
-					displayName: result.display_name
-				};
-			}
-			
-			return null;
-		} catch (err) {
-			console.log('Geocoding failed', err);
-			return null;
-		}
-	};
+	// Geocoding is now handled by the location service
 
 	// Handle location submit
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		e.stopPropagation(); // Prevent event bubbling that might trigger blur
-		
+
 		if (customLocation.trim()) {
 			setIsLocationFetching(true);
-			
-			// Check if the entered location is different from the default
-			const isUsingDefault = customLocation.trim() === DEFAULT_LOCATION;
-			console.log("Is or Is not using default location:", isUsingDefault);
 
 			try {
-				if (!isUsingDefault) {
-					// Try to geocode the entered address to get coordinates
-					const geocodedResult = await geocodeAddress(customLocation.trim());
-					
-					if (geocodedResult) {
-						// Use the geocoded address and coordinates
-						setLocation(geocodedResult.displayName);
-						setUseDefaultLocation(false);
-						
-						// Update global state with coordinates
-						updateUserLocation({
-							location: geocodedResult.displayName,
-							userLongitude: geocodedResult.longitude.toString(),
-							userLatitude: geocodedResult.latitude.toString(),
-							userLocationVerified: "true",
-						});
-
-						console.log('UserInfo updated with geocoded location:', userInfo);
-					} else {
-						// If geocoding fails, just use the entered text
-						setLocation(customLocation.trim());
-						setUseDefaultLocation(false);
-						
-						// Update global state without coordinates
-						updateUserLocation({
-							location: customLocation.trim(),
-							userLocationVerified: "false",
-						});
-					}
-				} else {
-					// Using default location
-					setLocation(DEFAULT_LOCATION);
-					setUseDefaultLocation(true);
-					
-					// Update global state
-					updateUserLocation({
-						location: DEFAULT_LOCATION,
-						userLocationVerified: "false",
-					});
-				}
+				const newLocationData = await locationService.getLocationFromAddress(customLocation.trim());
+				setLocationData(newLocationData);
 			} catch (err) {
-				// If anything fails, just use the entered text
 				console.error('Error setting location:', err);
-				setLocation(customLocation.trim());
-				setUseDefaultLocation(isUsingDefault);
-				
-				updateUserLocation({
+				// Fallback to entered text if service fails
+				setLocationData({
 					location: customLocation.trim(),
-					userLocationVerified: "false",
+					verified: false,
 				});
 			} finally {
 				setIsLocationFetching(false);
@@ -658,14 +388,9 @@ const UserLocation: React.FC = () => {
 
 	// Reset location to default
 	const resetToDefault = () => {
-		setLocation(DEFAULT_LOCATION);
-		setCustomLocation(DEFAULT_LOCATION);
-		setUseDefaultLocation(true);
-		
-		// Update global state
-		updateUserLocation({
-			location: DEFAULT_LOCATION
-		});
+		const defaultLocation = locationService.getDefaultLocation();
+		setLocationData(defaultLocation);
+		setCustomLocation(defaultLocation.location);
 	};
 
 	// Handle clicking outside to cancel editing
@@ -691,10 +416,10 @@ const UserLocation: React.FC = () => {
 	const locationBenefitMessage = t('home.expanded.chat.userLocation.locationBenefitMessage');
 	
 	return (
-		<LocationContainer 
+		<LocationContainer
 			$isLoading={isLoading}
 			$isEditing={isEditing}
-			$useDefaultLocation={useDefaultLocation}
+			$useDefaultLocation={!locationData.verified}
 			onClick={handleEditClick}
 		>
 			<LocationIconWrapper>
@@ -705,7 +430,7 @@ const UserLocation: React.FC = () => {
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 					$isEditing={isEditing}
-					$useDefaultLocation={useDefaultLocation}
+					$useDefaultLocation={!locationData.verified}
 					onClick={handleLocationIconClick}
 					style={{ cursor: isLocationFetching ? 'wait' : 'pointer' }}
 				>
@@ -725,7 +450,7 @@ const UserLocation: React.FC = () => {
 							t('home.expanded.chat.userLocation.gettingCurrentLocation') :
 							isEditing ?
 								t('home.expanded.chat.userLocation.enterLocation') :
-								(useDefaultLocation ?
+								(!locationData.verified ?
 									<>
 										{t('home.expanded.chat.userLocation.usingDefaultLocation')}
 										<br /><br />
@@ -760,13 +485,13 @@ const UserLocation: React.FC = () => {
 						autoComplete="off"
 					/>
 					<ButtonContainer onClick={(e) => e.stopPropagation()}>
-						{customLocation !== DEFAULT_LOCATION && (
+						{customLocation !== locationService.getDefaultLocation().location && (
 							<DefaultButton 
 								type="button" 
 								onClick={(e) => {
 									e.stopPropagation();
 									e.preventDefault(); // Prevent form submission
-									setCustomLocation(DEFAULT_LOCATION);
+									setCustomLocation(locationService.getDefaultLocation().location);
 								}}
 							>
 								Default
@@ -782,7 +507,7 @@ const UserLocation: React.FC = () => {
 					</ButtonContainer>
 				</LocationForm>
 			) : (
-				<LocationText $useDefaultLocation={useDefaultLocation}>
+				<LocationText $useDefaultLocation={!locationData.verified}>
 					{isLoading || isLocationFetching ? (
 						<>
 							{isLocationFetching ? t('home.expanded.chat.userLocation.gettingCurrentLocation') : t('home.expanded.chat.userLocation.gettingLocation')}
@@ -790,8 +515,8 @@ const UserLocation: React.FC = () => {
 						</>
 					) : (
 						<>
-							{location}
-							{useDefaultLocation ? (
+							{locationData.location}
+							{!locationData.verified ? (
 								<DefaultBadgeContainer>
 									<DefaultBadge 
 										onClick={(e) => {
@@ -846,6 +571,11 @@ export const hideTooltip = (id: string) => {
 		tooltip.style.opacity = '0';
 		tooltip.style.visibility = 'hidden';
 	}
+};
+
+// Export function to get current location data for other components
+export const getCurrentLocationData = () => {
+	return locationService.getCurrentLocation();
 };
 
 export default UserLocation;

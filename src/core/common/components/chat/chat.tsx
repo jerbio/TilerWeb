@@ -15,6 +15,7 @@ import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
 import { personaService } from '@/services';
+import { locationService } from '@/services/locationService';
 
 const ChatWrapper = styled.section`
 	height: 100%;
@@ -154,11 +155,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const scheduleId = useAppStore((state) => state.scheduleId);
 	const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
   const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
-  const userLongitude = useAppStore((state) => state.userInfo?.userLongitude ?? '');
-  const userLatitude = useAppStore((state) => state.userInfo?.userLatitude ?? '');
-  const userLocationVerified = useAppStore(
-    (state) => state.userInfo?.userLocationVerified ?? 'false'
-  );
   const handleSetScheduleId = (id: string) => {
     setScheduleId(id);
   };
@@ -460,14 +456,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       setIsSending(true);
       setError(null);
 
+      // Get current location data
+      const locationData = await locationService.getCurrentLocation();
+      const locationApiData = locationService.toApiFormat(locationData);
+
       const response = await chatService.sendMessage(
         message,
         entityId,
         sessionId,
         anonymousUserId,
-        userLongitude,
-        userLatitude,
-        userLocationVerified
+        locationApiData.userLongitude,
+        locationApiData.userLatitude,
+        locationApiData.userLocationVerified
       );
       if (
         response?.Content?.vibeResponse?.tilerUser &&
@@ -532,12 +532,16 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		try {
 			setIsSending(true);
 			setError(null);
+			// Get current location data
+			const locationData = await locationService.getCurrentLocation();
+			const locationApiData = locationService.toApiFormat(locationData);
+
 			const executedChanges = await chatService.sendChatAcceptChanges(
 				requestId,
 				anonymousUserId,
-				userLongitude,
-				userLatitude,
-				userLocationVerified
+				locationApiData.userLongitude,
+				locationApiData.userLatitude,
+				locationApiData.userLocationVerified
 			);
 			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
 			if (newScheduleId) {
