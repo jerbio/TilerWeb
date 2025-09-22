@@ -89,16 +89,16 @@ const NavLink = styled.a`
 	}
 `;
 
-const ButtonsWrapper = styled.div`
-	display: flex;
-	justify-content: space-evenly;
-	align-items: center;
-	gap: 1rem;
+// const ButtonsWrapper = styled.div`
+// 	display: flex;
+// 	justify-content: space-evenly;
+// 	align-items: center;
+// 	gap: 1rem;
 
-	@media (max-width: 768px) {
-		display: none;
-	}
-`;
+// 	@media (max-width: 768px) {
+// 		display: none;
+// 	}
+// `;
 
 const MobileMenuToggle = styled.div`
 	display: none;
@@ -198,7 +198,7 @@ const Navigation: React.FC = () => {
                 </NavItem>
               ))}
             </NavItems>
-            <ButtonsWrapper>
+            {/* <ButtonsWrapper>
               <Button
                 size="small"
                 onClick={() => window.open('https://launch.tiler.app/', '_blank')}
@@ -206,7 +206,7 @@ const Navigation: React.FC = () => {
               >
                 {t('common.buttons.tryFree')}
               </Button>
-            </ButtonsWrapper>
+            </ButtonsWrapper> */}
             <MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? (
                 <X size={24} color={palette.colors.gray[300]} />

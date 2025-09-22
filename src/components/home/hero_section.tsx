@@ -1,18 +1,18 @@
 import React from 'react';
-import styled from 'styled-components';
+// import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
-import Button from '@/core/common/components/button';
+// import Button from '@/core/common/components/button';
 import Section from '../layout/section';
-import ArrowRight from '@/core/common/components/icons/arrow_right';
+// import ArrowRight from '@/core/common/components/icons/arrow_right';
 import { useTranslation } from 'react-i18next';
 
-const ButtonContainer = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 10px;
-	margin-top: 20px;
-`;
+// const ButtonContainer = styled.div`
+// 	display: flex;
+// 	flex-wrap: wrap;
+// 	justify-content: center;
+// 	gap: 10px;
+// 	margin-top: 20px;
+// `;
 
 const HeroSection: React.FC = () => {
 	const { t } = useTranslation();
@@ -25,7 +25,7 @@ const HeroSection: React.FC = () => {
 				align="center"
 				size="large"
 			/>
-			<ButtonContainer>
+			{/* <ButtonContainer>
 				<Button
 					onClick={() => window.open('https://tiler.app/account/login', '_blank')}
 					bordergradient={['#FC278780', '#2C90FC80', '#B8FD3380', '#FEC83780']}
@@ -34,7 +34,7 @@ const HeroSection: React.FC = () => {
 					<ArrowRight />
 				</Button>
 				<Button variant="brand">{t('common.buttons.learnMore')}</Button>
-			</ButtonContainer>
+			</ButtonContainer> */}
 		</Section>
 	);
 };
