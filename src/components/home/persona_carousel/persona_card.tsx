@@ -70,7 +70,6 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
       );
       setPersonaUserTimeLeftInterval(intervalID);
     }
-
     return () => {
       clearInterval(personaUserTimeLeftInterval);
     };

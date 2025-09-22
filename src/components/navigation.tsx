@@ -1,13 +1,12 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import palette from '../core/theme/palette';
-import Button from '../core/common/components/button';
-import { SvgWrapper } from './shared_styled_components';
-import { TILER_LOGO } from '../core/constants/tiler_logo';
 import { Menu, X } from 'lucide-react';
 import { a } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
+import palette from '@/core/theme/palette';
+import Button from '@/core/common/components/button';
+import Logo from '@/core/common/components/icons/logo';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -24,11 +23,11 @@ const NavigationContainer = styled.div`
 	isolation: isolate;
 `;
 
-const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
+const NavigationWrapper = styled(a.nav) <{ $isopen: boolean; $shrink: boolean }>`
 	display: grid;
 	place-items: center;
-	padding: 14px 1.5rem;
-	backdrop-filter: blur(16px);
+	padding: 0 1.5rem;
+	backdrop-filter: ${(props) => (!props.$isopen ? 'blur(16px)' : 'none')};
 	border-radius: ${palette.borderRadius.xxLarge};
 
 	position: absolute;
@@ -38,12 +37,22 @@ const NavigationWrapper = styled(a.nav)<{ $shrink: boolean }>`
 	width: calc(100% - 64px);
 
 	border: ${(props) =>
-		props.$shrink ? `1px solid ${palette.colors.gray[800]}` : '1px solid transparent'};
-	background-color: ${(props) => (props.$shrink ? palette.colors.glass : 'transparent')};
+    props.$shrink && !props.$isopen
+      ? `1px solid ${palette.colors.gray[800]}`
+      : '1px solid transparent'};
+	background-color: ${(props) =>
+    props.$shrink && !props.$isopen ? palette.colors.glass : 'transparent'};
 	border-radius: ${(props) => (props.$shrink ? palette.borderRadius.xxLarge : 0)};
 	height: ${(props) => (props.$shrink ? '60px' : '80px')};
 	max-width: ${(props) => (props.$shrink ? '800px' : '100%')};
-	transition: all 0.5s ease-in-out;
+
+	transition: ${(props) =>
+    `
+		background-color ${props.$shrink ? '0.5s' : '0s'} cubic-bezier(0.4, 0, 0.2, 1),
+		border ${props.$shrink ? '0.5s' : '0s'} cubic-bezier(0.4, 0, 0.2, 1),
+		height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+		max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1)
+	`};
 `;
 
 const NavigationItemsWrapper = styled.div`
@@ -57,11 +66,8 @@ const NavigationItemsWrapper = styled.div`
 
 const NavItems = styled.ul`
 	display: flex;
-	align-items: center;
 	gap: 1.5rem;
-	list-style: none;
-	padding: 0;
-	margin: 0;
+	align-items: center;
 
 	@media (max-width: 768px) {
 		display: none;
@@ -73,14 +79,14 @@ const NavItem = styled.li``;
 const NavLink = styled.a`
 	color: ${palette.colors.gray[500]};
 	text-decoration: none;
+	line-height: 1.3;
 	font-size: ${palette.typography.fontSize.sm};
-	font-family: ${palette.typography.fontFamily.inter};
 	font-weight: ${palette.typography.fontWeight.medium};
+	font-family: ${palette.typography.fontFamily.inter};
 	cursor: pointer;
 	&:hover {
 		color: ${palette.colors.gray[400]};
 	}
-	transition: color 0.3s ease;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -106,153 +112,142 @@ const MobileMenuToggle = styled.div`
 const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	gap: 16px;
 	backdrop-filter: blur(16px);
-	background-color: ${(props) => (props.$shrink ? palette.colors.glass : '#000000')};
+	opacity: ${(props) => (props.$isopen ? 1 : 0)};
+	background-color: ${(props) =>
+    props.$shrink && props.$isopen ? palette.colors.glass : '#000000'};
+	border: ${(props) =>
+    props.$shrink && props.$isopen
+      ? `1px solid ${palette.colors.gray[800]}`
+      : '0px solid transparent'};
+	border-radius: ${(props) => (props.$shrink ? `${palette.borderRadius.xxLarge}` : 0)};
 
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translateX(calc(-50%)) translateY(-31px);
 	z-index: -1;
-	width: ${(props) => (props.$shrink ? 'calc(100% - 64px)' : '100%')};
-	border-radius: ${(props) =>
-		props.$shrink ? `0 0 ${palette.borderRadius.xxLarge} ${palette.borderRadius.xxLarge}` : 0};
+	width: calc(100% - 62px);
 
 	padding: ${({ $isopen: isOpen }) => (isOpen ? '56px 16px 16px' : '0 16px')};
-	max-height: ${({ $isopen: isOpen }) => (isOpen ? '300px' : '0')};
+	max-height: ${({ $isopen: isOpen }) => (isOpen ? '500px' : '60px')};
 	overflow: hidden;
-	transition: all 0.5s ease-in-out;
+	transition: all 0.35s linear;
+
+	hr {
+		border-top: 1px solid
+			${(props) => (props.$shrink ? palette.colors.gray[700] : palette.colors.gray[900])};
+		margin: 0.5rem 0 1rem;
+		transition: border-top 0.35s ease-in-out;
+	}
+
+	@media (min-width: 769px) {
+		display: none;
+	}
+`;
+
+const MobileNavLinks = styled.div<{ $shrink: boolean }>`
+	display: flex;
+	flex-direction: column;
 
 	a {
-		padding: 12px 0;
-		color: ${palette.colors.text};
-		text-decoration: none;
-		font-size: ${palette.typography.fontSize.sm};
+		text-align: center;
+		padding: 0.75rem 0;
+		color: ${(props) => (props.$shrink ? palette.colors.gray[400] : palette.colors.gray[500])};
+		font-size: 13px;
+		font-weight: ${palette.typography.fontWeight.medium};
 		&:hover {
-			color: ${palette.colors.brand[500]};
+			color: ${palette.colors.gray[300]};
 		}
 	}
 `;
 
 const Navigation: React.FC = () => {
-	const { t } = useTranslation();
-	const [isOpen, setIsOpen] = useState(false);
-	const [isAtTop, setIsAtTop] = useState(true);
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const navLinks = [
+    { name: t('common.navigation.home'), href: '/' },
+    { name: t('common.navigation.features'), href: '/features' },
+  ];
 
-	function handleScroll() {
-		if (window.scrollY === 0) {
-			setIsAtTop(true);
-		} else {
-			setIsAtTop(false);
-		}
-	}
-	useEffect(() => {
-		window.addEventListener('scroll', handleScroll);
-		return () => {
-			window.removeEventListener('scroll', handleScroll);
-		};
-	}, []);
+  function handleScroll() {
+    if (window.scrollY === 0) {
+      setIsAtTop(true);
+    } else {
+      setIsAtTop(false);
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
-	return (
-		<NavigationContainerSticky>
-			<NavigationContainer>
-				<NavigationWrapper $shrink={!isAtTop}>
-					<NavigationItemsWrapper>
-						<SvgWrapper>
-							<svg
-								width="40"
-								height="32"
-								viewBox="0 0 40 32"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-								xmlnsXlink="http://www.w3.org/1999/xlink"
-							>
-								<rect
-									x="0.100098"
-									width="40"
-									height="32"
-									fill="url(#pattern0_3_11777)"
-								/>
-								<defs>
-									<pattern
-										id="pattern0_3_11777"
-										patternContentUnits="objectBoundingBox"
-										width="1"
-										height="1"
-									>
-										<use
-											xlinkHref="#image0_3_11777"
-											transform="matrix(0.0074864 0 0 0.0100769 -1.41349 -1.81108)"
-										/>
-									</pattern>
-									<image
-										id="image0_3_11777"
-										width="512"
-										height="512"
-										xlinkHref={TILER_LOGO}
-									/>
-								</defs>
-							</svg>
-						</SvgWrapper>
-						<NavItems>
-							<NavItem>
-								<NavLink href="/">{t('common.navigation.home')}</NavLink>
-							</NavItem>
-							<NavItem>
-								<NavLink href="/features">
-									{t('common.navigation.features')}
-								</NavLink>
-							</NavItem>
-						</NavItems>
-						<ButtonsWrapper>
-							<Button
-								size="small"
-								onClick={() => window.open('https://launch.tiler.app/', '_blank')}
-								bordergradient={[palette.colors.brand[400]]}
-							>
-								{t('common.buttons.tryFree')}
-							</Button>
-							{/* <Button
-								size="small"
-								variant="secondary"
-								onClick={() => window.open('https://tiler.app/?waitlistSignUp=true', '_blank')}
-							>
-								{t('common.buttons.signUp')}
-							</Button> */}
-						</ButtonsWrapper>
-						<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
-							{isOpen ? (
-								<X size={24} color="white" />
-							) : (
-								<Menu size={24} color="white" />
-							)}
-						</MobileMenuToggle>
-					</NavigationItemsWrapper>
-				</NavigationWrapper>
-				<MobileNav $isopen={isOpen} $shrink={!isAtTop}>
-					<NavLink href="/">{t('common.navigation.home')}</NavLink>
-					<NavLink href="/features">{t('common.navigation.features')}</NavLink>
-					<Button
-						onClick={() => window.open('https://tiler.app/', '_blank')}
-						bordergradient={[palette.colors.brand[500]]}
-					>
-						{t('common.buttons.tryFree')}
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() =>
-							window.open('https://tiler.app/?waitlistSignUp=true', '_blank')
-						}
-					>
-						{t('common.buttons.signUp')}
-					</Button>
-				</MobileNav>
-			</NavigationContainer>
-		</NavigationContainerSticky>
-	);
+  return (
+    <NavigationContainerSticky>
+      <NavigationContainer>
+        <NavigationWrapper $isopen={isOpen} $shrink={!isAtTop}>
+          <NavigationItemsWrapper>
+            <Logo size={32} />
+            <NavItems>
+              {navLinks.map((link) => (
+                <NavItem key={link.name}>
+                  <NavLink href={link.href}>{link.name}</NavLink>
+                </NavItem>
+              ))}
+            </NavItems>
+            <ButtonsWrapper>
+              <Button
+                size="small"
+                onClick={() => window.open('https://launch.tiler.app/', '_blank')}
+                bordergradient={[palette.colors.brand[400]]}
+              >
+                {t('common.buttons.tryFree')}
+              </Button>
+            </ButtonsWrapper>
+            <MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? (
+                <X size={24} color={palette.colors.gray[300]} />
+              ) : (
+                <Menu size={24} color={palette.colors.gray[300]} />
+              )}
+            </MobileMenuToggle>
+          </NavigationItemsWrapper>
+        </NavigationWrapper>
+        <MobileNav $isopen={isOpen} $shrink={!isAtTop}>
+          <MobileNavLinks $shrink={!isAtTop}>
+            {navLinks.map((link) => (
+              <NavLink key={link.name} href={link.href}>
+                {link.name}
+              </NavLink>
+            ))}
+          </MobileNavLinks>
+          <hr />
+          <Button
+            height={40}
+            onClick={() => window.open('https://tiler.app/', '_blank')}
+            bordergradient={[palette.colors.brand[500]]}
+            size="small"
+          >
+            {t('common.buttons.tryFree')}
+          </Button>
+          <div style={{ height: '12px' }} />
+          <Button
+            height={40}
+            variant="secondary"
+            onClick={() =>
+              window.open('https://tiler.app/?waitlistSignUp=true', '_blank')
+            }
+            size="small"
+          >
+            {t('common.buttons.signUp')}
+          </Button>
+        </MobileNav>
+      </NavigationContainer>
+    </NavigationContainerSticky>
+  );
 };
 
 export default Navigation;

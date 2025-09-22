@@ -10,7 +10,8 @@
 		},
 		"navigation": {
 			"home": "Home",
-			"features": "Features"
+			"features": "Features",
+			"waitlist": "Waitlist"
 		},
 		"copyright": "© {{year}} Tiler. All rights reserved.",
 		"social": {
@@ -18,6 +19,16 @@
 			"linkedin": "LinkedIn",
 			"instagram": "Instagram",
 			"x": "X (Twitter)"
+		},
+		"apps": {
+			"ios": {
+				"cta": "Download on App Store",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "Get it on Google Play",
+				"platform": "Android Play Store"
+			}
 		},
 		"legal": {
 			"title": "Legal",
@@ -86,16 +97,6 @@
 		"video": {
 			"title": "YouTube video player"
 		},
-		"appDownload": {
-			"ios": {
-				"title": "Download on App Store",
-				"alt": "iOS App Store"
-			},
-			"android": {
-				"title": "Get it on Google Play",
-				"alt": "Android Play Store"
-			}
-		},
 		"updates": {
 			"title": "Get the Latest Tiler News & Updates",
 			"subtitle": "Want to get more out of your schedule? Subscribe for tips, tricks, and updates delivered straight to your inbox.",
@@ -161,6 +162,71 @@
 				"transitFeature": {
 					"question": "How can I use the Transit feature?",
 					"answer": "The transit feature goes beyond just calculating travel time — it acts as your navigation assistant. It helps you plan routes, suggests the best modes of transportation, and provides real-time directions for seamless transitions between tasks and locations. Just tap the travel icon to get instant navigation, ensuring you're always on time and on track."
+				}
+			}
+		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "Join the",
+			"part2": "Tiler Chat",
+			"part3": "Waitlist Today"
+		},
+		"subtitle": "Stop managing your calendar, start talking to it. Get on the waitlist and be the first to vibe with time",
+		"form": {
+			"errors": {
+				"integrations": "Please add at least one calendar integration."
+			},
+			"joinWaitlist": "Join Waitlist",
+			"nextStep": "Next",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "Email",
+					"label": "Email Address",
+					"placeholder": "Email Address"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "Profession",
+					"label": "What do you do?",
+					"placeholder": "Profession",
+					"suggestions": [
+						"Medical professional",
+						"Sales professional",
+						"Software developer",
+						"Client Consultant",
+						"Contractor",
+						"Startup founder",
+						"Researcher",
+						"Student",
+						"Lecturer",
+						"Travel Consultant"
+					]
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "Integrations",
+					"label": "Which integrations do you use?",
+					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
+					"options": [
+						{ "value": "google", "label": "Google Calendar" },
+						{ "value": "outlook", "label": "Microsoft Outlook Calendar" },
+						{ "value": "apple", "label": "Apple Calendar" },
+						{ "value": "slack", "label": "Slack" },
+						{ "value": "monday", "label": "Monday.com" },
+						{ "value": "reclaim", "label": "Reclaim" },
+						{ "value": "notion", "label": "Notion" },
+						{ "value": "ticktick", "label": "TickTick" },
+						{ "value": "evernote", "label": "Evernote" },
+						{ "value": "oneNote", "label": "OneNote" }
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "Use Case",
+					"label": "What do you want to use Tiler Chat for?",
+					"placeholder": "eg. Scheduling, Task Management"
 				}
 			}
 		}
