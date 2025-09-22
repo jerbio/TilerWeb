@@ -346,12 +346,16 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 								{showCustomInput ? (
 									<ArrowRight2 size={16} />
 								) : (
-									<span>Create Profile</span>
+									<span>{t('home.persona.cta.create')}</span>
 								)}
 							</ButtonStyled>
 						) : (
 							<ButtonStyled style={buttonSpring} onClick={onSelect}>
-								<span>{personaUserExists ? 'View Profile' : 'Create Profile'}</span>
+								<span>
+									{personaUserExists
+										? t('home.persona.cta.view')
+										: t('home.persona.cta.create')}
+								</span>
 							</ButtonStyled>
 						)}
 					</ButtonContainer>

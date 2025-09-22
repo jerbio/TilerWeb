@@ -33,6 +33,10 @@
 		"persona": {
 			"created": "Profile",
 			"customCreated": "Custom Profile",
+			"cta": {
+				"create": "Create Profile",
+				"view": "View Profile"
+			},
 			"expiresIn": "{{time}} left",
 			"tileSuggestions": "Tiles",
 			"custom": {
