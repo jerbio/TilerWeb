@@ -239,7 +239,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	);
 	// Expanding animation hooks
 	const CARD_WIDTH = 315;
-	const MAX_CARD_WIDTH = 1300;
+	const MAX_CARD_WIDTH = 1800;
 	const PADDING = 80;
 	const [expandedWidth, setExpandedWidth] = useState(CARD_WIDTH);
 	const cardSpring = useSpring({
