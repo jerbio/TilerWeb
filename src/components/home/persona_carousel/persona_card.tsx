@@ -217,8 +217,8 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const buttonApi = useSpringRef();
 	const buttonSpring = useSpring({
 		ref: buttonApi,
-		from: { x: -32, opacity: 0 },
-		to: { x: displayUI ? 0 : -32, opacity: displayUI ? 1 : 0 },
+		from: { y: 32, opacity: 0 },
+		to: { y: displayUI ? 0 : 32, opacity: displayUI ? 1 : 0 },
 	});
 	const overlayTagApi = useSpringRef();
 	const overlayTagSpring = useSpring({
@@ -350,7 +350,11 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 								)}
 							</ButtonStyled>
 						) : (
-							<ButtonStyled style={buttonSpring} onClick={onSelect}>
+							<ButtonStyled
+								$block={!personaUserExists}
+								style={buttonSpring}
+								onClick={onSelect}
+							>
 								<span>
 									{personaUserExists
 										? t('home.persona.cta.view')
@@ -458,7 +462,7 @@ const OverlayContainer = styled.div<{ $selected: boolean }>`
 `;
 
 const Overlay = styled.div`
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
 	width: 100%;
 	padding: 1rem 1rem;
 `;
@@ -614,19 +618,23 @@ const ButtonContainer = styled.div`
 	z-index: 2;
 `;
 
-const ButtonStyled = styled(animated.button)`
+const ButtonStyled = styled(animated.button)<{ $block?: boolean }>`
+	width: ${({ $block }) => ($block ? '100%' : 'auto')};
 	z-index: 1;
 	display: grid;
 	place-items: center;
 	min-width: 36px;
 	height: 36px;
 	border-radius: ${palette.borderRadius.xxLarge};
-	background-color: ${palette.colors.brand[600]};
+	background-color: ${palette.colors.brand[100]};
+	background-color: ${palette.colors.glass};
+	border: 1px solid ${palette.colors.gray[700]};
+	backdrop-filter: blur(16px);
 	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);
 	font-size: ${palette.typography.fontSize.sm};
 	font-weight: ${palette.typography.fontWeight.medium};
 	&:hover {
-		background-color: ${palette.colors.brand[700]};
+		background-color: ${palette.colors.gray[700]};
 	}
 
 	span {
