@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from '@/core/common/components/calendar/calendar';
 import calendarConfig from '@/core/constants/calendar_config';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 
 type CalendarEventBox = {
 	x: number;
@@ -56,14 +56,30 @@ class CalendarUtil {
 		);
 	}
 
-	static getEventLocationLink (event: ScheduleSubCalendarEvent) {
+	static getEventLocationLink(event: ScheduleSubCalendarEvent) {
 		if (event.location?.address) {
 			return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
 				event.location.address
 			)}`;
 		}
 		return '#';
-	};
+	}
+
+	static getTravelDetailDirectionLink(detail: ScheduleLookupTravelDetail) {
+		const startAddress = detail?.startLocation?.address;
+		const endAddress = detail?.endLocation?.address;
+
+		if (startAddress && endAddress) {
+			return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+				startAddress
+			)}&destination=${encodeURIComponent(endAddress)}`;
+		} else if (endAddress) {
+			return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endAddress)}`;
+		} else if (startAddress) {
+			return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(startAddress)}`;
+		}
+		return '#';
+	}
 }
 
 export default CalendarUtil;
