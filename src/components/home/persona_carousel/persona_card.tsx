@@ -120,12 +120,13 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const swiperSlide = useSwiperSlide();
 	const [mouseHovered, setHovered] = useState(false);
 	const isMobile = useIsMobile();
-	const displayUI = mouseHovered || (swiperSlide.isActive && isMobile);
 
 	// State to manage the input for custom persona
 	const customInputFormRef = React.useRef<HTMLFormElement>(null);
 	const [showCustomInput, setShowCustomInput] = useState(false);
 	const [customInputValue, setCustomInputValue] = useState('');
+
+	const displayUI = mouseHovered || showCustomInput || (swiperSlide.isActive && isMobile);
 
 	// Focus the input when it is shown
 	function focusInput() {
@@ -261,8 +262,21 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 		config: { tension: 300, friction: 27.5 },
 	});
 
+	function handleCardClick() {
+		if (isCustom && !personaUserExists) {
+			if (showCustomInput) {
+				onCustomSelect();
+			} else {
+				setShowCustomInput(true);
+			}
+		} else {
+			onSelect();
+		}
+	}
+
 	return (
 		<Card
+			onClick={handleCardClick}
 			gradient={isCustom && !isSelected ? 1 : 0}
 			$active={swiperSlide.isActive}
 			$selected={isSelected}
@@ -278,7 +292,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			<OverlayContainer $selected={isSelected}>
 				<Overlay>
 					<OverlayHeader>
-						<OverlayTitle>
+						<OverlayTitle onClick={(e) => e.stopPropagation()}>
 							{personaUserExists && (
 								<div>
 									<span style={{ marginRight: '6px' }}>
@@ -286,7 +300,14 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 											? t('home.persona.customCreated')
 											: t('home.persona.created')}
 									</span>
-									<ClockFading size={14} color={palette.colors.brand[400]} />
+									<ClockFading
+										size={14}
+										color={palette.colors.brand[400]}
+										style={{
+											// shadow
+											filter: 'drop-shadow(0 0 4px black',
+										}}
+									/>
 									<span style={{ color: palette.colors.gray[300] }}>
 										{t('home.persona.expiresIn', {
 											time: personaUserTimeLeft,
@@ -323,6 +344,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 								key={tile.id}
 								style={style}
 								$isSelected={tile.selected}
+								onClick={(e) => e.stopPropagation()}
 							>
 								<span>{tile.name}</span>
 								<button onClick={() => toggleTileSuggestion(tile.id)}>
@@ -333,16 +355,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 					</OverlayList>
 					<ButtonContainer>
 						{isCustom && !personaUserExists ? (
-							<ButtonStyled
-								style={buttonSpring}
-								onClick={() => {
-									if (showCustomInput) {
-										onCustomSelect();
-									} else {
-										setShowCustomInput(true);
-									}
-								}}
-							>
+							<ButtonStyled style={buttonSpring}>
 								{showCustomInput ? (
 									<ArrowRight2 size={16} />
 								) : (
@@ -350,11 +363,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 								)}
 							</ButtonStyled>
 						) : (
-							<ButtonStyled
-								$block={!personaUserExists}
-								style={buttonSpring}
-								onClick={onSelect}
-							>
+							<ButtonStyled $block={!personaUserExists} style={buttonSpring}>
 								<span>
 									{personaUserExists
 										? t('home.persona.cta.view')
@@ -367,6 +376,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			</OverlayContainer>
 			{/* Set expanded width to the final width of animation */}
 			<PersonaCardExpanded
+				onClick={(e) => e.stopPropagation()}
 				persona={currentPersona}
 				expanded={isSelected}
 				onCollapse={isCustom ? onCustomDeselect : onDeselect}
@@ -402,7 +412,7 @@ const Card = styled(animated.div)<{
 		inset: 2px;
 		z-index: -1;
 		border-radius: calc(${palette.borderRadius.xxLarge} - 2.5px);
-		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.6), 88%, rgba(0, 0, 0, 0.9));
+		background: linear-gradient(transparent, 66%, rgba(0, 0, 0, 0.3), 88%, rgba(0, 0, 0, 0.8));
 	}
 
 	/* Gradient effect */
@@ -486,7 +496,8 @@ const OverlayTitle = styled.div`
 		font-size: ${palette.typography.fontSize.xs};
 		font-weight: ${palette.typography.fontWeight.medium};
 		color: ${palette.colors.gray[400]};
-		opacity: 0.75;
+		// text shadow
+		text-shadow: 0 0 8px black;
 	}
 
 	.persona-title {
@@ -507,11 +518,13 @@ const OverlayTitle = styled.div`
 
 	input {
 		padding: 0.25rem 0.5rem;
-		background: transparent;
+		background: #23232333;
+		border-radius: ${palette.borderRadius.small};
 		height: calc(28px + 0.5rem);
 		width: 100%;
-		outline: 2px solid transparent;
 		border: none;
+		outline: none;
+		box-shadow: 0 0 0 2px ${palette.colors.gray[900]} inset;
 		transition: outline 0.25s ease-in-out;
 
 		&::placeholder {
@@ -519,8 +532,7 @@ const OverlayTitle = styled.div`
 		}
 
 		&:focus {
-			outline: 2px solid ${palette.colors.gray[700]};
-			border-radius: ${palette.borderRadius.small};
+			box-shadow: 0 0 0 2px ${palette.colors.gray[700]} inset;
 		}
 	}
 `;
@@ -626,8 +638,7 @@ const ButtonStyled = styled(animated.button)<{ $block?: boolean }>`
 	min-width: 36px;
 	height: 36px;
 	border-radius: ${palette.borderRadius.xxLarge};
-	background-color: ${palette.colors.brand[100]};
-	background-color: ${palette.colors.glass};
+	background-color: #23232333;
 	border: 1px solid ${palette.colors.gray[700]};
 	backdrop-filter: blur(16px);
 	box-shadow: 0 0 4px 8px rgba(0, 0, 0, 0.1);

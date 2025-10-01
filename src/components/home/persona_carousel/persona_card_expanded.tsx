@@ -19,6 +19,7 @@ type PersonaExpandedCardProps = {
   expandedWidth: number;
   personaUsers: PersonaUsers;
   setPersonaUser: PersonaUserSetter;
+	onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
@@ -28,6 +29,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   expandedWidth,
   personaUsers,
   setPersonaUser,
+	onClick,
 }) => {
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
@@ -122,7 +124,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   );
 
   return (
-    <CardContainer $display={expanded} style={cardSpring}>
+    <CardContainer $display={expanded} style={cardSpring} onClick={onClick}>
       <Header>
         <h2>{persona.name}</h2>
         <MobileCloseButtonContainer>
