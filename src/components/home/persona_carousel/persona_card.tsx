@@ -579,12 +579,15 @@ const OverlayListItem = styled(animated.li)<{ $isSelected: boolean }>`
 			? palette.colors.brand[600]
 			: `
 				linear-gradient(90deg,
-					${palette.colors.gray[800]},
-					42%, ${palette.colors.gray[600]},
-					58%, ${palette.colors.gray[800]}
+					#232323a7,
+					40%, #232323a7,
+					 ${palette.colors.gray[700]}, 
+					#232323a7, 58%,
+					#232323a7
 				) 
 			`};
 	background-size: 1200% 1200%;
+	backdrop-filter: blur(16px);
 	${({ $isSelected }) =>
 		!$isSelected &&
 		css`
@@ -613,7 +616,7 @@ const OverlayListItem = styled(animated.li)<{ $isSelected: boolean }>`
 			css`
 				animation: ${buttonPulse} 3s linear infinite;
 			`}
-		transition: color 0.25s ease-in-out;
+		transition: color 0.5s ease-in-out;
 
 		&:hover {
 			color: ${palette.colors.gray[300]} !important;
