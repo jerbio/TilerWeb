@@ -17,6 +17,8 @@ import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer
 import { personaService, personaUserService } from '@/services';
 import { locationService } from '@/services/locationService';
 import { SignalRService } from '@/services/SocketService';
+import { ChatLimitError } from '@/core/common/types/errors';
+import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -186,6 +188,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [isBatchLoading, setIsBatchLoading] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorPopupMessage, setErrorPopupMessage] = useState('');
   const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
   const scheduleId = useAppStore((state) => state.scheduleId);
@@ -349,7 +353,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         'status' in data.data.vibe &&
         typeof data.data.vibe.status === 'string'
       ) {
-        setWebSocketStatus(formatWebSocketStatus(data.data.vibe.status));
+        const formattedStatus = formatWebSocketStatus(data.data.vibe.status);
+        console.log('Setting WebSocket status:', formattedStatus);
+        setWebSocketStatus(formattedStatus);
+      } else {
+        console.log('WebSocket data failed type guard check');
       }
     });
 
@@ -595,6 +603,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     try {
       setIsSending(true);
       setError(null);
+      setWebSocketStatus(null); // Reset status to prepare for new updates
 
       // Get current location data
       const locationData = await locationService.getCurrentLocation();
@@ -661,8 +670,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
       setMessage('');
     } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError(t('home.expanded.chat.errorSendMessage'));
+      if (err instanceof ChatLimitError) {
+        setErrorPopupMessage(err.message);
+        setShowErrorPopup(true);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(t('home.expanded.chat.errorSendMessage'));
+      }
     } finally {
       setIsSending(false);
     }
@@ -672,6 +687,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     try {
       setIsSending(true);
       setError(null);
+      setWebSocketStatus(null); // Reset status to prepare for new updates
       // Get current location data
       const locationData = await locationService.getCurrentLocation();
       const locationApiData = locationService.toApiFormat(locationData);
@@ -829,7 +845,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
         <div>
           {isSending && (
-            <LoadingIndicator message={webSocketStatus || t('home.expanded.chat.sendingRequest')} />
+            <>
+              {console.log('LoadingIndicator - isSending:', isSending, 'webSocketStatus:', webSocketStatus)}
+              <LoadingIndicator message={webSocketStatus || t('home.expanded.chat.sendingRequest')} />
+            </>
           )}
           {!isSending && shouldShowAcceptButton && (
             <Button variant="primary" onClick={() => acceptAllChanges()}>
@@ -864,6 +883,17 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         </ChatForm>
         <UserLocation />
       </ChatContainer>
+
+      <ErrorPopup
+        isOpen={showErrorPopup}
+        message={errorPopupMessage}
+        title="Chat Limit Reached"
+        onClose={() => setShowErrorPopup(false)}
+        showWaitlistButton={true}
+        onWaitlistClick={() => {
+          window.location.href = '/waitlist';
+        }}
+      />
     </ChatWrapper>
   );
 };
