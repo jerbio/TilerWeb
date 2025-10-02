@@ -14,8 +14,42 @@ import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
-import { personaService } from '@/services';
+import { personaService, personaUserService } from '@/services';
 import { locationService } from '@/services/locationService';
+import { SignalRService } from '@/services/SocketService';
+
+// Custom hook to check unexecuted actions
+const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
+  const [hasUnexecuted, setHasUnexecuted] = useState(false);
+
+  useEffect(() => {
+    const checkActions = async () => {
+      if (!requestId) {
+        setHasUnexecuted(false);
+        return;
+      }
+
+      try {
+        const response = await chatService.getVibeRequest(requestId);
+        const isClosed = response?.Content?.vibeRequest?.isClosed;
+        setHasUnexecuted(isClosed !== true);
+      } catch (error) {
+        console.error('Error checking vibe request status:', error);
+        // Fallback to original logic if API fails
+        const fallback = messages.some((msg) =>
+          msg.actions?.some(
+            (action) => action.status !== Status.Executed && action.status !== Status.Exited
+          )
+        );
+        setHasUnexecuted(fallback);
+      }
+    };
+
+    checkActions();
+  }, [requestId, messages]); // Re-check when requestId or messages change
+
+  return hasUnexecuted;
+};
 
 const ChatWrapper = styled.section`
 	height: 100%;
@@ -142,6 +176,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesListRef = useRef<HTMLDivElement>(null);
+  const webSocketCommunication = useRef<SignalRService | null>(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<PromptWithActions[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -150,119 +185,224 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isBatchLoading, setIsBatchLoading] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
+  const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
   const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
 
   const scheduleId = useAppStore((state) => state.scheduleId);
-	const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
-  const anonymousUserId = useAppStore((state) => state.userInfo?.id ?? '');
+  const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
+  const userInfo = useAppStore((state) => state.userInfo);
+  const setUserInfo = useAppStore((state) => state.setUserInfo);
+  const anonymousUserId = userInfo?.id ?? '';
   const handleSetScheduleId = (id: string) => {
     setScheduleId(id);
   };
 
-	// Helper function to get persona info from localStorage using selectedPersonaId
-	const getSelectedPersonaInfo = async (): Promise<{ userId: string; expiration: number } | null> => {
-		if (selectedPersonaId === null) return null;
-		
-		try {
-			// Get personas array to map index to persona.id
-			const data = await personaService.getPersonas();
-			const personasWithKeys = data.personas.map((persona, index) => ({
-				...persona,
-				key: index,
-			}));
-			
-			// Find the persona at the selected index
-			const selectedPersona = personasWithKeys[selectedPersonaId];
-			if (!selectedPersona) return null;
-			
-			// Get stored persona users from localStorage
-			const personaScheduleData = localStorage.getItem('tiler-persona-users');
-			if (!personaScheduleData) return null;
-			
-			const parsed = JSON.parse(personaScheduleData);
-			const personaInfo = parsed[selectedPersona.id];
-			
-			return personaInfo || null;
-		} catch (error) {
-			console.warn('Failed to get selected persona info:', error);
-			return null;
-		}
-	};
+  // Sync userInfo.id when selectedPersonaId changes
+  useEffect(() => {
+    const syncUserIdFromPersona = async () => {
+      if (selectedPersonaId !== null) {
+        try {
+          let personaInfo = await personaUserService.getSelectedPersonaInfo(selectedPersonaId);
 
-	// Fetch sessions and set latest sessionId on component mount or when persona changes
-	useEffect(() => {
-		const fetchAndSetLatestSession = async () => {
-			try {
-				const personaInfo = await getSelectedPersonaInfo();
-				const personaUserId = personaInfo?.userId;
+          // If no user exists for this persona, create anonymous user immediately
+          if (!personaInfo) {
+            const selectedPersona = await personaUserService.getPersonaByIndex(selectedPersonaId);
+            if (selectedPersona) {
+              console.log('Creating anonymous user for selected persona:', selectedPersona.name);
+              const personaUser = await personaService.createAnonymousUser(selectedPersona);
 
-				if (personaUserId) {
-					const sessionsResponse = await chatService.getVibeSessions(undefined, personaUserId);
-					const sessions = sessionsResponse.Content.vibeSessions;
-					
-					if (sessions && sessions.length > 0) {
-						// Sort sessions by creation time (newest first) and get the latest one
-						const latestSession = sessions.sort((a, b) => b.creationTimeInMs - a.creationTimeInMs)[0];
-						setSessionId(latestSession.id);
-					} else {
-						// No sessions found, clear sessionId
-						setSessionId('');
-					}
-				} else {
-					// No persona selected, clear sessionId
-					setSessionId('');
-				}
-			} catch (error) {
-				console.warn('Failed to fetch sessions:', error);
-				// Clear sessionId on error
-				setSessionId('');
-			}
-		};
+              const userId = personaUser.anonymousUser.id;
+              if (!userId) {
+                console.error('Failed to create anonymous user: userId is null');
+                return;
+              }
 
-		fetchAndSetLatestSession();
-	}, [selectedPersonaId]);
+              // Store the new user in localStorage
+              personaUserService.setPersonaUser(selectedPersona.id, {
+                userId: userId,
+                personaInfo: { name: selectedPersona.name },
+              });
 
-	// Load chat messages when session ID or selected persona changes
-	useEffect(() => {
-		if (sessionId) {
-			loadChatMessages(sessionId);
-		}
-	}, [sessionId, scheduleId, selectedPersonaId]);
+              // Update personaInfo with the new user data
+              personaInfo = {
+                userId: userId,
+                expiration: Date.now() + (24 * 60 * 60 * 1000), // 1 day
+                personaInfo: { name: selectedPersona.name }
+              };
+            }
+          }
 
-	// Custom hook to check unexecuted actions
-	const useHasUnexecutedActions = (requestId: string | null) => {
-		const [hasUnexecuted, setHasUnexecuted] = useState(false);
-		
-		useEffect(() => {
-			const checkActions = async () => {
-				if (!requestId) {
-					setHasUnexecuted(false);
-					return;
-				}
-				
-				try {
-					const response = await chatService.getVibeRequest(requestId);
-					const isClosed = response?.Content?.vibeRequest?.isClosed;
-					setHasUnexecuted(isClosed !== true);
-				} catch (error) {
-					console.error('Error checking vibe request status:', error);
-					// Fallback to original logic if API fails
-					const fallback = messages.some((msg) =>
-						msg.actions?.some(
-							(action) => action.status !== Status.Executed && action.status !== Status.Exited
-						)
-					);
-					setHasUnexecuted(fallback);
-				}
-			};
-			
-			checkActions();
-		}, [requestId, messages]); // Re-check when requestId or messages change
-		
-		return hasUnexecuted;
-	};
+          if (personaInfo?.userId) {
+            const currentUserInfo = useAppStore.getState().userInfo;
+            // Only update if the ID is actually different to prevent loops
+            if (currentUserInfo?.id !== personaInfo.userId) {
+              if (currentUserInfo) {
+                setUserInfo({ ...currentUserInfo, id: personaInfo.userId });
+              } else {
+                // Create minimal userInfo if it doesn't exist
+                setUserInfo({
+                  id: personaInfo.userId,
+                  username: 'Anonymous',
+                  timeZoneDifference: 0,
+                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  email: null,
+                  endfOfDay: '0001-01-01T00:00:00+00:00',
+                  phoneNumber: null,
+                  fullName: '',
+                  firstName: '',
+                  lastName: '',
+                  countryCode: '1',
+                });
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to sync user ID from persona:', error);
+        }
+      }
+    };
 
-  const shouldShowAcceptButton = useHasUnexecutedActions(requestId);
+    syncUserIdFromPersona();
+  }, [selectedPersonaId, setUserInfo]);
+
+  // Format WebSocket status for display
+  const formatWebSocketStatus = (status: string): string => {
+    const statusMap: Record<string, string[]> = {
+      'action_initialization_start': [
+        'Initializing action generation...',
+        'Setting things up...',
+        'Preparing your request...',
+        'Getting ready...',
+      ],
+      'process_action_start': [
+        'Processing action...',
+        'Working on it...',
+        'Analyzing your request...',
+        'Thinking...',
+      ],
+      'process_action_end': [
+        'Action processing complete',
+        'Processing done!',
+        'All set!',
+        'Finished processing',
+      ],
+      'summary_action_start': [
+        'Generating summary...',
+        'Summarizing results...',
+        'Creating overview...',
+        'Preparing summary...',
+      ],
+      'summary_action_end': [
+        'Summary generation complete',
+        'Summary ready!',
+        'Overview complete',
+        'Done summarizing',
+      ],
+      'schedule_load': [
+        'Loading schedule data...',
+        'Fetching your schedule...',
+        'Retrieving calendar...',
+        'Loading timeline...',
+      ],
+      'schedule_process_start': [
+        'Optimizing schedule...',
+        'Reorganizing your day...',
+        'Finding the best fit...',
+        'Adjusting timeline...',
+      ],
+      'schedule_process_end': [
+        'Schedule optimization complete',
+        'Schedule updated!',
+        'Timeline optimized',
+        'All done!',
+      ],
+    };
+
+    const messages = statusMap[status];
+    if (messages && messages.length > 0) {
+      const randomIndex = Math.floor(Math.random() * messages.length);
+      return messages[randomIndex];
+    }
+
+    // Fallback for unmapped statuses
+    return status.replace(/_/g, ' ').toLowerCase();
+  };
+
+  useEffect(() => {
+    if (!anonymousUserId) return;
+
+    webSocketCommunication.current = new SignalRService(anonymousUserId);
+    webSocketCommunication.current.createVibeConnection();
+    webSocketCommunication.current.subscribeToSocketDataReceipt((data: unknown) => {
+      console.log('WebSocket data received in chat component:', data);
+
+      // Type guard and extract vibe data from WebSocket
+      if (
+        data &&
+        typeof data === 'object' &&
+        'data' in data &&
+        data.data &&
+        typeof data.data === 'object' &&
+        'vibe' in data.data &&
+        data.data.vibe &&
+        typeof data.data.vibe === 'object' &&
+        'status' in data.data.vibe &&
+        typeof data.data.vibe.status === 'string'
+      ) {
+        setWebSocketStatus(formatWebSocketStatus(data.data.vibe.status));
+      }
+    });
+
+    return () => {
+      if (webSocketCommunication.current) {
+        webSocketCommunication.current = null;
+      }
+    };
+  }, [anonymousUserId]);
+
+  // Use consolidated persona user service
+
+  // Fetch sessions and set latest sessionId on component mount or when persona changes
+  useEffect(() => {
+    const fetchAndSetLatestSession = async () => {
+      try {
+        const personaInfo = await personaUserService.getSelectedPersonaInfo(selectedPersonaId);
+        const personaUserId = personaInfo?.userId;
+
+        if (personaUserId) {
+          const sessionsResponse = await chatService.getVibeSessions(undefined, personaUserId);
+          const sessions = sessionsResponse.Content.vibeSessions;
+
+          if (sessions && sessions.length > 0) {
+            // Sort sessions by creation time (newest first) and get the latest one
+            const latestSession = sessions.sort((a, b) => b.creationTimeInMs - a.creationTimeInMs)[0];
+            setSessionId(latestSession.id);
+          } else {
+            // No sessions found, clear sessionId
+            setSessionId('');
+          }
+        } else {
+          // No persona selected, clear sessionId
+          setSessionId('');
+        }
+      } catch (error) {
+        console.warn('Failed to fetch sessions:', error);
+        // Clear sessionId on error
+        setSessionId('');
+      }
+    };
+
+    fetchAndSetLatestSession();
+  }, [selectedPersonaId]);
+
+  // Load chat messages when session ID or selected persona changes
+  useEffect(() => {
+    if (sessionId) {
+      loadChatMessages(sessionId);
+    }
+  }, [sessionId, scheduleId, selectedPersonaId]);
+
+  const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
 
   useEffect(() => {
     if (messages.length > 0 && messagesListRef.current) {
@@ -437,16 +577,16 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           return updatedMessage || prevMessage;
         });
 
-				return [...updatedMessages, ...uniqueNewMessages];
-			});
-			setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-			else setError(t('home.expanded.chat.errorLoadMessages'));
-		} finally {
-			setIsLoading(false);
-		}
-	};
+        return [...updatedMessages, ...uniqueNewMessages];
+      });
+      setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError(t('home.expanded.chat.errorLoadMessages'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -513,58 +653,57 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       setMessages((prev) => [...prev, ...newMessages]);
       setRequestId(newMessages[0]?.requestId || null);
 
-			// Update session ID from the first prompt
-			const sessionIdFromResponse = newMessages[0]?.sessionId;
-			if (sessionIdFromResponse) {
-				setSessionId(sessionIdFromResponse);
-			}
+      // Update session ID from the first prompt
+      const sessionIdFromResponse = newMessages[0]?.sessionId;
+      if (sessionIdFromResponse) {
+        setSessionId(sessionIdFromResponse);
+      }
 
-			setMessage('');
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-			else setError(t('home.expanded.chat.errorSendMessage'));
-		} finally {
-			setIsSending(false);
-		}
-	};
+      setMessage('');
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError(t('home.expanded.chat.errorSendMessage'));
+    } finally {
+      setIsSending(false);
+    }
+  };
 
-	const acceptAllChanges = async () => {
-		try {
-			setIsSending(true);
-			setError(null);
-			// Get current location data
-			const locationData = await locationService.getCurrentLocation();
-			const locationApiData = locationService.toApiFormat(locationData);
+  const acceptAllChanges = async () => {
+    try {
+      setIsSending(true);
+      setError(null);
+      // Get current location data
+      const locationData = await locationService.getCurrentLocation();
+      const locationApiData = locationService.toApiFormat(locationData);
 
-			const executedChanges = await chatService.sendChatAcceptChanges(
-				requestId,
-				anonymousUserId,
-				locationApiData.userLongitude,
-				locationApiData.userLatitude,
-				locationApiData.userLocationVerified
-			);
-			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
-			if (newScheduleId) {
-				handleSetScheduleId(newScheduleId);
-				// useEffect will automatically reload messages when scheduleId changes
-			}
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-			else setError(t('home.expanded.chat.errorAcceptChanges'));
-		} finally {
-			setIsSending(false);
-		}
-	};
+      const executedChanges = await chatService.sendChatAcceptChanges(
+        requestId,
+        anonymousUserId,
+        locationApiData.userLongitude,
+        locationApiData.userLatitude,
+        locationApiData.userLocationVerified
+      );
+      const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
+      if (newScheduleId) {
+        handleSetScheduleId(newScheduleId);
+        // useEffect will automatically reload messages when scheduleId changes
+      }
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError(t('home.expanded.chat.errorAcceptChanges'));
+    } finally {
+      setIsSending(false);
+    }
+  };
 
-
-	const handleNewChat = () => {
-		setSessionId('');
-		setError(null);
-		setMessage('');
-		setMessages([]);
-		setRequestId(null);
-		handleSetScheduleId('');
-	};
+  const handleNewChat = () => {
+    setSessionId('');
+    setError(null);
+    setMessage('');
+    setMessages([]);
+    setRequestId(null);
+    handleSetScheduleId('');
+  };
 
   const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
 
@@ -659,28 +798,28 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
                   <MarkdownRenderer content={message.content} />
                 </div>
 
-							{message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
-								<Button
-									key={action.id}
-									variant="pill"
-									dotstatus={action.status}
-								>
-									<img
-										src={ChatUtil.getActionIcon(action)}
-										alt="action_icon"
-										style={{
-											width: '15px',
-											height: '15px',
-											verticalAlign: 'middle',
-										}}
-									/>
-									<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
-									<span className="action-description">{action.descriptions}</span>
-								</Button>
-							))}
-						</MessageBubble>
-					))}
-				</div>
+                {message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
+                  <Button
+                    key={action.id}
+                    variant="pill"
+                    dotstatus={action.status}
+                  >
+                    <img
+                      src={ChatUtil.getActionIcon(action)}
+                      alt="action_icon"
+                      style={{
+                        width: '15px',
+                        height: '15px',
+                        verticalAlign: 'middle',
+                      }}
+                    />
+                    <span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
+                    <span className="action-description">{action.descriptions}</span>
+                  </Button>
+                ))}
+              </MessageBubble>
+            ))}
+          </div>
 
           <div ref={messagesEndRef} />
         </ChatContent>
@@ -690,7 +829,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
         <div>
           {isSending && (
-            <LoadingIndicator message={t('home.expanded.chat.sendingRequest')} />
+            <LoadingIndicator message={webSocketStatus || t('home.expanded.chat.sendingRequest')} />
           )}
           {!isSending && shouldShowAcceptButton && (
             <Button variant="primary" onClick={() => acceptAllChanges()}>

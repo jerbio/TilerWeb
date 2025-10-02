@@ -67,7 +67,6 @@ export class SignalRService {
             console.error('jQuery and SignalR are required for .NET Framework SignalR');
             return;
         } else {
-            console.log('Socket data received:', data);
             // Call all registered callbacks with the received data
             Object.values(this.callBackFunc).forEach((callback) => {
                 callback(data);
@@ -129,7 +128,6 @@ export class SignalRService {
             transport: ['webSockets', 'serverSentEvents', 'longPolling'],
         }
     ).done(() => {
-            console.log('SignalR connection established');
             this.signalRConnection = window.$.connection.hub;
             this.joinUserGroup(this.userId);
         }).fail((error: Error) => {
@@ -143,18 +141,15 @@ export class SignalRService {
 
         // Handle reconnection
         window.$.connection.hub.reconnected(() => {
-            console.log('SignalR reconnected');
             // Rejoin groups or resend any necessary data
             this.joinUserGroup(this.userId);
         });
 
         // Handle disconnection
         window.$.connection.hub.disconnected(() => {
-            console.log('SignalR disconnected');
             // Attempt to restart connection after 5 seconds
             setTimeout(() => {
                 if (window.$.connection.hub.state === window.$.signalR.connectionState.disconnected) {
-                    console.log('Attempting to restart SignalR connection');
                     window.$.connection.hub.start();
                 }
             }, 5000);

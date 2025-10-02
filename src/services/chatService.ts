@@ -6,6 +6,7 @@ import {
 import { ChatApi } from '@/api/chatApi';
 import { normalizeError } from '@/core/error';
 import { setStoredSessionId } from '@/core/storage/chatSession';
+import { parseServerError, ChatLimitError } from '@/core/common/types/errors';
 
 class ChatService {
   private chatApi: ChatApi;
@@ -71,6 +72,13 @@ class ChatService {
       return response;
     } catch (error) {
 			console.error('Error sending chat message', error);
+
+			// Check if it's a server error we can parse
+			const serverErrorInfo = parseServerError(error);
+			if (serverErrorInfo) {
+				throw new ChatLimitError(serverErrorInfo);
+			}
+
 			throw normalizeError(error);
     }
   }
