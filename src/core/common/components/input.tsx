@@ -3,28 +3,38 @@ import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 
 type InputProps = {
+  label?: React.ReactNode;
   disabled?: boolean;
   variant?: 'default' | 'brand';
   sized?: 'small' | 'medium' | 'large';
   height?: number;
   bordergradient?: Array<string>;
+  prepend?: React.ReactNode;
+  searchList?: Array<string>;
+  onSearchSelect?: (value: string) => void;
 };
 
 type StyledInputProps = {
+  $label: InputProps['label'];
   $disabled: InputProps['disabled'];
   $variant: InputProps['variant'];
   $sized: InputProps['sized'];
   $height: InputProps['height'];
   $bordergradient: InputProps['bordergradient'];
+  $prepend?: InputProps['prepend'];
 };
 
-type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
+export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
 const BaseInput: React.FC<BaseInputProps> = ({
   disabled = false,
   variant = 'default',
   sized = 'medium',
   height,
   bordergradient,
+  label,
+  prepend,
+  searchList,
+  onSearchSelect,
   ...props
 }) => {
   const styledProps = {
@@ -33,21 +43,61 @@ const BaseInput: React.FC<BaseInputProps> = ({
     $sized: sized,
     $height: height,
     $bordergradient: bordergradient,
+    $label: label,
+    $prepend: prepend,
   };
-  return (
+  const id = label ? `input-${Math.random().toString(36).substring(2, 9)}` : undefined;
+  const listId = searchList ? `${id}-list` : undefined;
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (onSearchSelect) {
+      if (searchList && searchList.includes(e.target.value)) {
+        onSearchSelect(e.target.value);
+      }
+    }
+  }
+
+  const styledInput = (
     <StyledInputWrapper {...styledProps}>
-      <StyledInput disabled={disabled} {...styledProps} {...props} />
+      {prepend && <StyledInputPrepend>{prepend}</StyledInputPrepend>}
+      {searchList && (
+        <datalist id={listId}>
+          {searchList.map((item) => (
+            <option value={item} key={item} />
+          ))}
+        </datalist>
+      )}
+      <StyledInput
+        id={id}
+        list={listId}
+        disabled={disabled}
+        onInput={handleInputChange}
+        {...styledProps}
+        {...props}
+      />
     </StyledInputWrapper>
+  );
+
+  return label ? (
+    <div>
+      <StyledLabel htmlFor={id} {...styledProps}>
+        {label}
+      </StyledLabel>
+      {styledInput}
+    </div>
+  ) : (
+    styledInput
   );
 };
 
-type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & InputProps;
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
+  Omit<InputProps, 'prepend' | 'searchList'>;
 const Textarea: React.FC<TextareaProps> = ({
   disabled = false,
   variant = 'default',
   sized = 'medium',
   height,
   bordergradient,
+  label,
   ...props
 }) => {
   const styledProps = {
@@ -56,6 +106,7 @@ const Textarea: React.FC<TextareaProps> = ({
     $sized: sized,
     $height: height,
     $bordergradient: bordergradient,
+    $label: label,
   };
   return (
     <StyledInputWrapper {...styledProps}>
@@ -63,6 +114,29 @@ const Textarea: React.FC<TextareaProps> = ({
     </StyledInputWrapper>
   );
 };
+
+const StyledLabel = styled.label<StyledInputProps>`
+	display: block;
+	margin-bottom: 6px;
+	font-size: ${(props) =>
+    props.$sized === 'small'
+      ? palette.typography.fontSize.xs
+      : props.$sized === 'medium'
+        ? palette.typography.fontSize.xs
+        : palette.typography.fontSize.sm};
+	font-weight: ${palette.typography.fontWeight.medium};
+	color: ${palette.colors.gray[400]};
+`;
+
+const StyledInputPrepend = styled.div`
+	position: absolute;
+	height: 100%;
+	width: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	pointer-events: none;
+`;
 
 const StyledInputWrapper = styled.div<StyledInputProps>`
 	flex: 1;
@@ -101,6 +175,11 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
         : palette.colors.gray[800]};
 	border-radius: ${palette.borderRadius.little};
 
+	${StyledInputPrepend} {
+		color: ${palette.colors.gray[500]};
+		transition: color 0.2s ease-in-out;
+	}
+
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
     props.$bordergradient
@@ -116,6 +195,10 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
     props.$variant === 'brand'
       ? palette.colors.brand[400] + '33'
       : palette.colors.gray[900]};
+
+		${StyledInputPrepend} {
+			color: ${palette.colors.brand[400]};
+		}
 	}
 
 	transition:
@@ -136,7 +219,11 @@ const StyledInput = styled.input<StyledInputProps>`
 	color: ${palette.colors.white};
 	height: 100%;
 
-	padding-inline: calc(
+	padding-left: calc(
+		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} -
+			6px + ${(props) => (props.$prepend ? '20px' : '0px')}
+	);
+	padding-right: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px
 	);
 	font-size: ${(props) =>

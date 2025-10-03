@@ -10,7 +10,6 @@ import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
-import useAppStore from '@/global_state';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -34,9 +33,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
-  const personaUserId = personaUsers[persona.id]?.userId || null;
-  const userInfo = useAppStore((state) => state.userInfo);
-  const setUserInfo = useAppStore((state) => state.setUserInfo);
+  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
 
   function onMobileCollapse() {
     setMobileChatVisible(false);
@@ -50,12 +47,10 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
   async function getPersonaUser() {
     try {
-      const personaUser = await personaService.createAnonymousUser(persona);
-      setPersonaUser(persona.id, {
-				userId: personaUser.anonymousUser.id,
-				personaInfo: { name: persona.name },
-			});
-      setUserId(personaUser.anonymousUser.id!);
+      const personaSchedule = await personaService.getPersonaSchedule(persona);
+      setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
+        store: !isCustom,
+      });
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
@@ -141,9 +136,33 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           </item.container>
         ))}
       </CardContent>
+      <CardLimitWarningContainer
+        $visible={showLimitWarning}
+        onClick={() => {
+          setShowLimitWarning(false);
+          onCollapse();
+        }}
+      >
+        <PersonaLimitWarning open={showLimitWarning} />
+      </CardLimitWarningContainer>
     </CardContainer>
   );
 };
+
+const CardLimitWarningContainer = styled.div<{ $visible: boolean }>`
+	position: absolute;
+	inset: 0;
+	opacity: ${(props) => (props.$visible ? 1 : 0)};
+	pointer-events: ${(props) => (props.$visible ? 'auto' : 'none')};
+	z-index: 10;
+	background: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(4px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	transition: opacity 0.3s ease-in-out;
+`;
 
 const CardContainer = styled(animated.section) <{ $display: boolean }>`
 	overflow: hidden;

@@ -44,7 +44,7 @@ const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 const PersonaCarousel: React.FC = () => {
 	const [personasLoaded, setPersonasLoaded] = useState(false);
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
-  const { personaUsers, setPersonaUser } = usePersonaUsers();
+  const { personaSchedules, setPersonaSchedule } = usePersonaSchedules();
 
   async function getPersonas() {
     try {

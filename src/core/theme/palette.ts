@@ -7,7 +7,7 @@ const palette = {
 		text: '#A1A1A1',
 		textGrey: '#808080',
 		textRed: '#F793A6',
-		border: '#bdc3c7',
+		border: '#2A2A2A',
 		buttonPrimary: '#000000',
 		buttonSecondary: '#ffffff',
 		tileBackgroundPrimary: '#37FF00',
@@ -285,6 +285,7 @@ const palette = {
 			medium: '768px',
 			large: '1024px',
 			xLarge: '1280px',
+			xxLarge: '1536px',
 		},
 	},
 	screens: {
