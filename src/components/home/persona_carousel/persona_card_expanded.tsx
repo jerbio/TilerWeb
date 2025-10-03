@@ -10,6 +10,8 @@ import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
+import useAppStore from '@/global_state';
+import PersonaLimitWarning from './persona_card_limit_modal';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -33,7 +35,10 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
-  const scheduleId = personaSchedules[persona.id]?.scheduleId || null;
+  const personaUserId = personaUsers[persona.id]?.userId || null;
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
+  const userInfo = useAppStore((state) => state.userInfo);
+  const setUserInfo = useAppStore((state) => state.setUserInfo);
 
   function onMobileCollapse() {
     setMobileChatVisible(false);
@@ -47,10 +52,12 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
   async function getPersonaUser() {
     try {
-      const personaSchedule = await personaService.getPersonaSchedule(persona);
-      setPersonaSchedule(persona.id, personaSchedule.scheduleId, {
-        store: !isCustom,
-      });
+      const personaUser = await personaService.createAnonymousUser(persona);
+      setPersonaUser(persona.id, {
+				userId: personaUser.anonymousUser.id,
+				personaInfo: { name: persona.name },
+			});
+      setUserId(personaUser.anonymousUser.id!);
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }

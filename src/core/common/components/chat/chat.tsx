@@ -137,8 +137,8 @@ type ChatProps = {
   onClose?: () => void;
 };
 
-const Chat: React.FC = ({ onClose }: ChatProps) => {
-	const { t } = useTranslation();
+const Chat: React.FC<ChatProps> = ({ onClose }) => {
+  const { t } = useTranslation();
 
   const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
   const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
