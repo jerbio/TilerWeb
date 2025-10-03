@@ -343,6 +343,9 @@ const CalendarEvents = ({
 					};
 					return (
 						<TravelDetailContent
+							href={CalendarUtil.getTravelDetailDirectionLink(detail)}
+							target="_blank"
+							rel="noopener noreferrer"
 							key={detail.key}
 							style={{
 								...detail.springStyles,
@@ -555,12 +558,13 @@ const EventContent = styled.div<{
 	}
 `;
 
-const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
+const TravelDetailContent = styled(animated.a)<{ $colors: RGB }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
 	align-items: center;
 	justify-content: center;
+	cursor: pointer;
 	background: ${({ $colors }) => {
 		const newColor = colorUtil.setLightness($colors, 0.7);
 		return `repeating-linear-gradient(
@@ -577,7 +581,6 @@ const TravelDetailContent = styled(animated.div)<{ $colors: RGB }>`
 	}};
 	font-size: ${palette.typography.fontSize.xs};
 	font-weight: ${palette.typography.fontWeight.semibold};
-	z-index: -1;
 
 	span {
 		display: flex;

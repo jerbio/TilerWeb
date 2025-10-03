@@ -50,6 +50,20 @@ const PersonaCarousel: React.FC = () => {
   async function getPersonas() {
     try {
       const data = await personaService.getPersonas();
+			const preceeding = ['healthcare-persona', 'custom-persona'];
+			data.personas.sort((a, b) => {
+				const aIndex = preceeding.indexOf(a.id);
+				const bIndex = preceeding.indexOf(b.id);
+				if (aIndex !== -1 && bIndex !== -1) {
+					return aIndex - bIndex;
+				} else if (aIndex !== -1) {
+					return -1;
+				} else if (bIndex !== -1) {
+					return 1;
+				}
+				return 0;
+			});
+
       const personasWithKeys = data.personas.map((persona, index) => ({
         ...persona,
         key: index,
@@ -147,7 +161,7 @@ const PersonaCarousel: React.FC = () => {
   };
 
   return (
-    <Section paddingBlock={0} width={1400}>
+    <Section paddingBlock={0} width={2000}>
       <EdgeFadeSwiper
         ref={swiperRef}
         modules={[Autoplay]}
@@ -155,7 +169,7 @@ const PersonaCarousel: React.FC = () => {
         slidesPerView={slidesPerView}
         loop={true}
         autoplay={{
-          delay: 3500,
+          delay: 2000,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
