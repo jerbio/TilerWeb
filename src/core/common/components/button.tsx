@@ -182,29 +182,37 @@ const StyledButton = styled.button<StyledButtonProps>`
 			align-items: center;
 			max-width: 200px;
 			position: relative;
-			
+
 			/* Icon and dash should not shrink */
 			& > img,
 			& > span:not(.action-description) {
 				flex-shrink: 0;
 			}
-			
+
+			/* Add smooth transitions for elegant expansion */
+			transition: max-width 3s ease-out, box-shadow 0.5s ease, transform 3s ease-out;
+
 			/* Only truncate the action description */
 			& .action-description {
 				overflow: hidden;
 				white-space: nowrap;
 				text-overflow: ellipsis;
 				min-width: 0; /* Allow flex item to shrink below content size */
+				transition: all 0.5s ease-out;
+				display: inline-block;
 			}
-			
+
 			&:hover {
-				max-width: none;
+				max-width: 400px; /* Set a specific target width instead of none */
 				z-index: 10;
-				
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				transform: scale(1.02); /* Slight scale for visual feedback */
+
 				& .action-description {
 					overflow: visible;
 					white-space: normal;
 					word-break: break-word;
+					max-width: none;
 				}
 			}
 			

@@ -8,6 +8,7 @@ import { WaitlistApi } from "@/api/waitlistApi";
 import { WaitlistService } from "./waitlistService";
 import { BetaUserApi } from "@/api/betaUserApi";
 import { BetaUserService } from "./betaUserService";
+import { personaUserService } from "./personaUserService";
 
 // Init APIs
 const personaApi = new PersonaApi();
@@ -22,3 +23,4 @@ export const scheduleService = new ScheduleService(scheduleApi);
 export const chatService = new ChatService(chatApi);
 export const waitlistService = new WaitlistService(waitlistApi);
 export const betaUserService = new BetaUserService(betaUserApi);
+export { personaUserService };
