@@ -21,6 +21,7 @@ import TimeUtil from '@/core/util/time';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import PersonaUtil from '@/core/util/persona';
+import { Env } from '@/config/config_getter';
 
 type PersonaCardProps = {
 	persona: Persona & { key: number };
@@ -45,6 +46,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 		setMounted(true);
 	}, []);
 	const personaUser = personaUsers[persona.id];
+	const  baseUrl = Env.get('BASE_URL');
 	const [personaUserTimeLeft, setPersonaUserTimeLeft] = useState<string>('');
 	const [personaUserTimeLeftInterval, setPersonaUserTimeLeftInterval] = useState<
 		number | undefined
@@ -286,7 +288,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			style={cardSpring}
 		>
 			<CardImage
-				$backgroundImage={PersonaUtil.getPersonaImage(persona.id)}
+				$backgroundImage={persona.imageUrl && persona.imageUrl !== '' ? `${baseUrl}${persona.imageUrl}` : PersonaUtil.getPersonaImage(persona.id)}
 				$selected={isSelected}
 			/>
 			<OverlayContainer $selected={isSelected}>
