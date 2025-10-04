@@ -35,30 +35,76 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const personaUserId = personaUsers[persona.id]?.userId || null;
-  const userInfo = useAppStore((state) => state.userInfo);
-  const setUserInfo = useAppStore((state) => state.setUserInfo);
+  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
 
-  function onMobileCollapse() {
-    setMobileChatVisible(false);
-  }
-
-  function setUserId(userId: string) {
-    if (userInfo) {
-      setUserInfo({ ...userInfo, id: userId });
+  function handleClose(fullCollapse: boolean = false) {
+    if (fullCollapse) {
+      // Full collapse: clear the active persona session and close the card
+      setActivePersonaSession(null);
+      setMobileChatVisible(false);
+      onCollapse();
+    } else {
+      // Mobile chat close: only hide the chat overlay, keep persona session active
+      setMobileChatVisible(false);
     }
   }
 
   async function getPersonaUser() {
     try {
       const personaUser = await personaService.createAnonymousUser(persona);
+      const newUserId = personaUser.anonymousUser.id;
+      
+      if (!newUserId) {
+        console.error("Failed to create user for persona: userId is null");
+        return;
+      }
+      
       setPersonaUser(persona.id, {
-				userId: personaUser.anonymousUser.id,
+				userId: newUserId,
 				personaInfo: { name: persona.name },
 			});
-      setUserId(personaUser.anonymousUser.id!);
+      
+      // Create a new persona session with all related data grouped together
+      setActivePersonaSession({
+        personaId: persona.id,
+        personaName: persona.name,
+        userId: newUserId,
+        scheduleId: null,
+        chatSessionId: '',
+        chatContext: [],
+        userInfo: {
+          id: newUserId,
+          username: personaUser.anonymousUser.username || '',
+          timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
+          timeZone: personaUser.anonymousUser.timeZone || 'UTC',
+          email: personaUser.anonymousUser.email,
+          endfOfDay: personaUser.anonymousUser.endfOfDay || '',
+          phoneNumber: personaUser.anonymousUser.phoneNumber,
+          fullName: personaUser.anonymousUser.fullName || '',
+          firstName: personaUser.anonymousUser.firstName || '',
+          lastName: personaUser.anonymousUser.lastName || '',
+          countryCode: personaUser.anonymousUser.countryCode || '1',
+        },
+        scheduleLastUpdatedBy: null,
+      });
     } catch (error) {
       console.error("Couldn't create profile for persona: ", error);
     }
+  }
+
+  async function loadExistingPersonaSession(userId: string) {
+    // Load or create persona session for existing user
+    setActivePersonaSession({
+      personaId: persona.id,
+      personaName: persona.name,
+      userId: userId,
+      scheduleId: activePersonaSession?.scheduleId || null,
+      chatSessionId: activePersonaSession?.chatSessionId || '',
+      chatContext: activePersonaSession?.chatContext || [],
+      userInfo: activePersonaSession?.userInfo || null,
+      scheduleLastUpdatedBy: activePersonaSession?.scheduleLastUpdatedBy || null,
+    });
   }
 
   useEffect(() => {
@@ -66,10 +112,13 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       if (!personaUserId) {
         getPersonaUser();
       } else {
-        setUserId(personaUserId);
+        // Check if we need to switch persona sessions
+        if (!activePersonaSession || activePersonaSession.personaId !== persona.id) {
+          loadExistingPersonaSession(personaUserId);
+        }
       }
     }
-  }, [expanded]);
+  }, [expanded, persona.id]);
 
   const content = [
     {
@@ -91,7 +140,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
     {
       key: 'chat',
       container: ChatContainer,
-      content: <Chat onClose={isDesktop ? onCollapse : onMobileCollapse} />,
+      content: <Chat onClose={() => handleClose(isDesktop)} />,
     },
   ];
 
@@ -128,7 +177,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       <Header>
         <h2>{persona.name}</h2>
         <MobileCloseButtonContainer>
-          <Button variant="ghost" height={32} onClick={onCollapse}>
+          <Button variant="ghost" height={32} onClick={() => handleClose(true)}>
             <ChevronLeftIcon size={16} />
             <span>Back</span>
           </Button>

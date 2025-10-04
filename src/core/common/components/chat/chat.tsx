@@ -14,7 +14,6 @@ import ChatUtil from '@/core/util/chat';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
-import { personaService, personaUserService } from '@/services';
 import { locationService } from '@/services/locationService';
 import { SignalRService } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
@@ -174,8 +173,11 @@ type ChatProps = {
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const { t } = useTranslation();
 
-  const chatContext = useAppStore((state) => state.chatContext); // Access chatContext
-  const setScheduleId = useAppStore((state) => state.setScheduleId); // Action to set the schedule ID
+  // Get the active persona session - single source of truth
+  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const updateActivePersonaSession = useAppStore((state) => state.updateActivePersonaSession);
+  const setScheduleId = useAppStore((state) => state.setScheduleId);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesListRef = useRef<HTMLDivElement>(null);
   const webSocketCommunication = useRef<SignalRService | null>(null);
@@ -190,84 +192,28 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
-  const entityId = chatContext.length > 0 ? chatContext[0].EntityId : ''; // Get EntityId from chatContext
-
-  const scheduleId = useAppStore((state) => state.scheduleId);
-  const selectedPersonaId = useAppStore((state) => state.selectedPersonaId);
-  const userInfo = useAppStore((state) => state.userInfo);
-  const setUserInfo = useAppStore((state) => state.setUserInfo);
-  const anonymousUserId = userInfo?.id ?? '';
+  
+  // Extract values from active persona session
+  const chatContext = activePersonaSession?.chatContext || [];
+  const scheduleId = activePersonaSession?.scheduleId;
+  const selectedPersonaId = activePersonaSession?.personaId;
+  const anonymousUserId = activePersonaSession?.userInfo?.id ?? activePersonaSession?.userId ?? '';
+  const entityId = chatContext.length > 0 ? chatContext[0].EntityId : '';
+  
   const handleSetScheduleId = (id: string) => {
     setScheduleId(id);
   };
 
-  // Sync userInfo.id when selectedPersonaId changes
+  // Sync chat session ID with the active persona session
   useEffect(() => {
-    const syncUserIdFromPersona = async () => {
-      if (selectedPersonaId !== null) {
-        try {
-          let personaInfo = await personaUserService.getSelectedPersonaInfo(selectedPersonaId);
+    if (sessionId && activePersonaSession && activePersonaSession.chatSessionId !== sessionId) {
+      updateActivePersonaSession({ chatSessionId: sessionId });
+    }
+  }, [sessionId, activePersonaSession, updateActivePersonaSession]);
 
-          // If no user exists for this persona, create anonymous user immediately
-          if (!personaInfo) {
-            const selectedPersona = await personaUserService.getPersonaByIndex(selectedPersonaId);
-            if (selectedPersona) {
-              console.log('Creating anonymous user for selected persona:', selectedPersona.name);
-              const personaUser = await personaService.createAnonymousUser(selectedPersona);
-
-              const userId = personaUser.anonymousUser.id;
-              if (!userId) {
-                console.error('Failed to create anonymous user: userId is null');
-                return;
-              }
-
-              // Store the new user in localStorage
-              personaUserService.setPersonaUser(selectedPersona.id, {
-                userId: userId,
-                personaInfo: { name: selectedPersona.name },
-              });
-
-              // Update personaInfo with the new user data
-              personaInfo = {
-                userId: userId,
-                expiration: Date.now() + (24 * 60 * 60 * 1000), // 1 day
-                personaInfo: { name: selectedPersona.name }
-              };
-            }
-          }
-
-          if (personaInfo?.userId) {
-            const currentUserInfo = useAppStore.getState().userInfo;
-            // Only update if the ID is actually different to prevent loops
-            if (currentUserInfo?.id !== personaInfo.userId) {
-              if (currentUserInfo) {
-                setUserInfo({ ...currentUserInfo, id: personaInfo.userId });
-              } else {
-                // Create minimal userInfo if it doesn't exist
-                setUserInfo({
-                  id: personaInfo.userId,
-                  username: 'Anonymous',
-                  timeZoneDifference: 0,
-                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                  email: null,
-                  endfOfDay: '0001-01-01T00:00:00+00:00',
-                  phoneNumber: null,
-                  fullName: '',
-                  firstName: '',
-                  lastName: '',
-                  countryCode: '1',
-                });
-              }
-            }
-          }
-        } catch (error) {
-          console.warn('Failed to sync user ID from persona:', error);
-        }
-      }
-    };
-
-    syncUserIdFromPersona();
-  }, [selectedPersonaId, setUserInfo]);
+  // No need to sync userInfo.id when selectedPersonaId changes anymore,
+  // as the persona session is set by PersonaCardExpanded component
+  // This prevents duplicate logic and ensures single source of truth
 
   // Format WebSocket status for display
   const formatWebSocketStatus = (status: string): string => {
@@ -368,14 +314,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     };
   }, [anonymousUserId]);
 
-  // Use consolidated persona user service
-
   // Fetch sessions and set latest sessionId on component mount or when persona changes
   useEffect(() => {
     const fetchAndSetLatestSession = async () => {
       try {
-        const personaInfo = await personaUserService.getSelectedPersonaInfo(selectedPersonaId);
-        const personaUserId = personaInfo?.userId;
+        const personaUserId = activePersonaSession?.userId;
 
         if (personaUserId) {
           const sessionsResponse = await chatService.getVibeSessions(undefined, personaUserId);
@@ -401,7 +344,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     };
 
     fetchAndSetLatestSession();
-  }, [selectedPersonaId]);
+  }, [activePersonaSession?.userId, activePersonaSession?.personaId]);
 
   // Load chat messages when session ID or selected persona changes
   useEffect(() => {
@@ -621,9 +564,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       if (
         response?.Content?.vibeResponse?.tilerUser &&
         JSON.stringify(response.Content.vibeResponse.tilerUser) !==
-        JSON.stringify(useAppStore.getState().userInfo)
+        JSON.stringify(activePersonaSession?.userInfo)
       ) {
-        useAppStore.getState().setUserInfo(response.Content.vibeResponse.tilerUser);
+        updateActivePersonaSession({ userInfo: response.Content.vibeResponse.tilerUser });
       }
       const promptMap = response?.Content?.vibeResponse?.prompts || {};
 
@@ -719,6 +662,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     setMessages([]);
     setRequestId(null);
     handleSetScheduleId('');
+    // Clear chat context when starting a new chat
+    if (activePersonaSession) {
+      updateActivePersonaSession({ 
+        chatContext: [],
+        chatSessionId: '' 
+      });
+    }
   };
 
   const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context

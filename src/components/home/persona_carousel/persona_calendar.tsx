@@ -16,8 +16,9 @@ function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps)
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
 
-  // Get scheduleId from global state to trigger refresh when it changes
-  const scheduleId = useAppStore((state) => state.scheduleId);
+  // Get scheduleId from the active persona session to ensure consistency
+  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const scheduleId = activePersonaSession?.scheduleId;
 
   // Get a reference to the view container
   const viewRef = React.useRef<HTMLUListElement>(null);

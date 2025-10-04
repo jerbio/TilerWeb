@@ -5,6 +5,7 @@ export interface ChatContextType {
 	Name: string; // Name of the tile we want in context
 	Description?: string; // Description of the tile
 }
+
 export interface UserInfo {
 	id: string; // TilerUser@@00000000000000000000000
 	username: string; // Armando-ALPHANUMERIC
@@ -19,46 +20,160 @@ export interface UserInfo {
 	countryCode: string; // "1"
 }
 
-interface AppState {
-	chatContext: ChatContextType[]; // Represents an array of chat contexts
-	addChatContext: (context: ChatContextType) => void; // Action to add a new chat context
-	removeChatContext: (context: ChatContextType) => void; // Action to remove a specific chat context
-	clearChatContext: () => void; // Action to clear all chat contexts
-	scheduleId: string | null; // Action to set the schedule change state
-	setScheduleId: (id: string | null) => void; // Action to set the schedule ID
-	scheduleLastUpdatedBy: string | null; // Action to set the last updated by component
-	setScheduleLastUpdatedBy: (component: string | null) => void; // Action to set the last updated by component
-
-	// New user info state
-	userInfo: UserInfo | null;
-	setUserInfo: (info: UserInfo) => void;
-
-	// Selected persona state
-	selectedPersonaId: number | null;
-	setSelectedPersonaId: (id: number | null) => void;
+// Grouped persona session that includes user, schedule, and chat session
+export interface PersonaSession {
+	personaId: string; // The persona ID (string type to match Persona type)
+	personaName: string; // Name of the persona for display
+	userId: string; // The anonymous user ID created for this persona
+	scheduleId: string | null; // The schedule ID for this persona's calendar
+	chatSessionId: string; // The chat session ID for this persona
+	chatContext: ChatContextType[]; // Chat context specific to this persona session
+	userInfo: UserInfo | null; // User info for this persona
+	scheduleLastUpdatedBy: string | null; // Component that last updated the schedule
 }
 
-const useAppStore = create<AppState>((set) => ({
-	chatContext: [], // Initial value for chatContext is an empty array
-	addChatContext: (context) => set((state) => ({ chatContext: [...state.chatContext, context] })), // Adds a new context
-	removeChatContext: (context) =>
+interface AppState {
+	// Current active persona session
+	activePersonaSession: PersonaSession | null;
+	
+	// Action to set or update the entire persona session
+	setActivePersonaSession: (session: PersonaSession | null) => void;
+	
+	// Action to update specific fields in the active session
+	updateActivePersonaSession: (updates: Partial<PersonaSession>) => void;
+	
+	// Convenience actions for backward compatibility and ease of use
+	addChatContext: (context: ChatContextType) => void;
+	removeChatContext: (context: ChatContextType) => void;
+	clearChatContext: () => void;
+	setScheduleId: (id: string | null) => void;
+	setScheduleLastUpdatedBy: (component: string | null) => void;
+	setUserInfo: (info: UserInfo) => void;
+	setChatSessionId: (id: string) => void;
+	
+	// Getters for backward compatibility
+	get chatContext(): ChatContextType[];
+	get scheduleId(): string | null;
+	get scheduleLastUpdatedBy(): string | null;
+	get userInfo(): UserInfo | null;
+	get selectedPersonaId(): string | null;
+	get chatSessionId(): string;
+}
+
+const useAppStore = create<AppState>((set, get) => ({
+	activePersonaSession: null,
+	
+	setActivePersonaSession: (session) => set(() => ({ activePersonaSession: session })),
+	
+	updateActivePersonaSession: (updates) =>
 		set((state) => ({
-			chatContext: state.chatContext.filter((item) => item !== context), // Removes the specified context
+			activePersonaSession: state.activePersonaSession
+				? { ...state.activePersonaSession, ...updates }
+				: null,
 		})),
-	clearChatContext: () => set(() => ({ chatContext: [] })), // Clears all contexts
-	scheduleId: null, // Initial value for scheduleId is null
-	setScheduleId: (id) => set(() => ({ scheduleId: id })), //
-	scheduleLastUpdatedBy: null, // Initial value for scheduleLastUpdatedBy is null
-	setScheduleLastUpdatedBy: (component) => set(() => ({ scheduleLastUpdatedBy: component })), // Sets the last updated by component
-
-	// User info state
-	userInfo: null,
-	setUserInfo: (info) => set(() => ({ userInfo: info })),
-
-	// Selected persona state
-	selectedPersonaId: null,
-	setSelectedPersonaId: (id) => set(() => ({ selectedPersonaId: id })),
+	
+	// Convenience actions that update the active session
+	addChatContext: (context) =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					chatContext: [...state.activePersonaSession.chatContext, context],
+				},
+			};
+		}),
+	
+	removeChatContext: (context) =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					chatContext: state.activePersonaSession.chatContext.filter((item) => item !== context),
+				},
+			};
+		}),
+	
+	clearChatContext: () =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					chatContext: [],
+				},
+			};
+		}),
+	
+	setScheduleId: (id) =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					scheduleId: id,
+				},
+			};
+		}),
+	
+	setScheduleLastUpdatedBy: (component) =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					scheduleLastUpdatedBy: component,
+				},
+			};
+		}),
+	
+	setUserInfo: (info) =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					userInfo: info,
+				},
+			};
+		}),
+	
+	setChatSessionId: (id) =>
+		set((state) => {
+			if (!state.activePersonaSession) return state;
+			return {
+				activePersonaSession: {
+					...state.activePersonaSession,
+					chatSessionId: id,
+				},
+			};
+		}),
+	
+	// Getters for backward compatibility
+	get chatContext() {
+		return get().activePersonaSession?.chatContext || [];
+	},
+	
+	get scheduleId() {
+		return get().activePersonaSession?.scheduleId || null;
+	},
+	
+	get scheduleLastUpdatedBy() {
+		return get().activePersonaSession?.scheduleLastUpdatedBy || null;
+	},
+	
+	get userInfo() {
+		return get().activePersonaSession?.userInfo || null;
+	},
+	
+	get selectedPersonaId() {
+		return get().activePersonaSession?.personaId || null;
+	},
+	
+	get chatSessionId() {
+		return get().activePersonaSession?.chatSessionId || '';
+	},
 }));
 
-// {EntityId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d++01JTVFJDG5B8G5RBJEY4E365GQ_7_01JTVFJDG5QMY0STMNA82AZ18D_01JTVFJDG521S2V82V17J4ZTX7', Name: 'Work Out', Description: ''}
 export default useAppStore;

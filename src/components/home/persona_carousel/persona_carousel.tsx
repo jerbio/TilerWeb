@@ -12,7 +12,6 @@ import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import { Persona } from '../../../core/common/types/persona';
 import usePersonaUsers from '../../../core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
-import useAppStore from '../../../global_state';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;
@@ -103,7 +102,6 @@ const PersonaCarousel: React.FC = () => {
 	}, [personas]);
 
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
-  const setSelectedPersonaId = useAppStore((state) => state.setSelectedPersonaId);
   const isMobile = useIsMobile();
   const isTablet = useIsMobile(1100);
   const [slidesPerView, setSlidesPerView] = useState(1);
@@ -122,7 +120,7 @@ const PersonaCarousel: React.FC = () => {
     }
     requestAnimationFrame(() => {
       setSelectedPersona(personaKey);
-      setSelectedPersonaId(personaKey); // Sync to global state
+      // Note: Persona session is now set in PersonaCardExpanded when a card is expanded
     });
   }
 
