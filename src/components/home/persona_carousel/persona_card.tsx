@@ -49,7 +49,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 	const  baseUrl = Env.get('BASE_URL');
 	const [personaUserTimeLeft, setPersonaUserTimeLeft] = useState<string>('');
 	const [personaUserTimeLeftInterval, setPersonaUserTimeLeftInterval] = useState<
-		number | undefined
+		NodeJS.Timeout | undefined
 	>(undefined);
 
 	// Update the time left for the persona user every minute
