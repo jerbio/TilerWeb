@@ -288,7 +288,9 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 			style={cardSpring}
 		>
 			<CardImage
-				$backgroundImage={persona.imageUrl && persona.imageUrl !== '' ? `${baseUrl}${persona.imageUrl}` : PersonaUtil.getPersonaImage(persona.id)}
+				$backgroundImage={
+					 persona.id != 'custom-persona' && persona.imageUrl && persona.imageUrl !== '' ? `${baseUrl}${persona.imageUrl}` : PersonaUtil.getPersonaImage(persona.id)
+				}
 				$selected={isSelected}
 			/>
 			<OverlayContainer $selected={isSelected}>
