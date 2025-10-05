@@ -9,7 +9,8 @@ export class PersonaApi extends AppApi {
 	public createAnonymousUser(persona: Persona) {
 		return this.apiRequest<PersonaAnonymousUserResponse>('api/Anonymous/Persona', {
 			method: 'POST',
-			body: JSON.stringify(persona),
+			body: JSON.stringify({...persona,
+      TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString()}),
 		});
 	}
 }
