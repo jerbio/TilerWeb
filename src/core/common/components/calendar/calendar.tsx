@@ -190,6 +190,9 @@ const Calendar = ({
   setViewOptions,
 }: CalendarProps) => {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+  const contentContainerRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     // Reset selected event when events change
     setSelectedEvent(null);
@@ -270,6 +273,59 @@ const Calendar = ({
     }
   }, [viewOptions.width]);
 
+  // Auto-scroll to first event or current time on initial load
+  useEffect(() => {
+    if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
+      return;
+    }
+
+    const scrollToPosition = (scrollTop: number) => {
+      if (contentContainerRef.current) {
+        contentContainerRef.current.scrollTop = scrollTop;
+        setHasAutoScrolled(true);
+      }
+    };
+
+    // Find the earliest event in the current view
+    const viewStart = viewOptions.startDay.startOf('day');
+    const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
+    
+    const eventsInView = events.filter((event) => {
+      const eventStart = dayjs(event.start);
+      const eventEnd = dayjs(event.end);
+      return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
+    });
+
+    if (eventsInView.length > 0) {
+      // Find the earliest event
+      const earliestEvent = eventsInView.reduce((earliest, current) => {
+        return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
+      });
+
+      const eventStart = dayjs(earliestEvent.start);
+      const hourFraction = eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+      const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+      
+      // Scroll to 1 hour before the first event (or to the event if it's in the first hour)
+      const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+      scrollToPosition(scrollTop);
+    } else {
+      // No events in view, scroll to current time
+      const now = dayjs();
+      const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
+      const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+      
+      // Scroll to 1 hour before current time (or to current time if in first hour)
+      const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+      scrollToPosition(scrollTop);
+    }
+  }, [contentMounted, hasAutoScrolled, eventsLoading, events, viewOptions.startDay, viewOptions.daysInView]);
+
+  // Reset auto-scroll flag when view changes (date navigation)
+  useEffect(() => {
+    setHasAutoScrolled(false);
+  }, [viewOptions.startDay]);
+
   return (
     <CalendarContainer $isMounted={contentMounted}>
       <CalendarHeader>
@@ -308,7 +364,7 @@ const Calendar = ({
       <LoadingContainer $loading={eventsLoading}>
         <Spinner />
       </LoadingContainer>
-      <CalendarContentContainer id="calendar-content-container">
+      <CalendarContentContainer id="calendar-content-container" ref={contentContainerRef}>
         <CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
           {/* Background */}
           <CalendarBg ref={calendarGridCanvasRef} />
