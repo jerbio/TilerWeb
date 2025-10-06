@@ -13,7 +13,7 @@ export interface LocationCoordinates {
 
 class LocationService {
   // Default location: National Museum of African American History and Culture in DC
-  private readonly DEFAULT_LOCATION = "National Museum of African American History and Culture, Washington, DC";
+  private readonly DEFAULT_LOCATION = "Empire State Building, New York, NY";
 
   /**
    * Get the default location data
