@@ -509,15 +509,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         };
       });
 
-      // Sort by timestamp extracted from ID (chronological order)
-      loadedMessages.sort((a, b) => {
-        const extractTimestamp = (id: string): number => {
-          const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
-          return match ? parseInt(match[1], 10) : 0;
-        };
-        return extractTimestamp(a.id) - extractTimestamp(b.id);
-      });
-
       setMessages((prevMessages) => {
         const existingIds = new Set(prevMessages.map((m) => m.id));
         const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
@@ -528,7 +519,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           return updatedMessage || prevMessage;
         });
 
-        return [...updatedMessages, ...uniqueNewMessages];
+        const mergedMessages = [...updatedMessages, ...uniqueNewMessages];
+
+        // Sort by timestamp extracted from ID (chronological order) - single sort on final result
+        mergedMessages.sort((a, b) => {
+          const extractTimestamp = (id: string): number => {
+            const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
+            return match ? parseInt(match[1], 10) : 0;
+          };
+          return extractTimestamp(a.id) - extractTimestamp(b.id);
+        });
+
+        return mergedMessages;
       });
       setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
     } catch (err) {
