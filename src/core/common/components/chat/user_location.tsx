@@ -372,13 +372,17 @@ const UserLocation: React.FC = () => {
 			try {
 				const newLocationData = await locationService.getLocationFromAddress(customLocation.trim());
 				setLocationData(newLocationData);
+				// Cache the manual location so it persists between re-renders
+				locationService.setManualLocation(newLocationData);
 			} catch (err) {
 				console.error('Error setting location:', err);
 				// Fallback to entered text if service fails
-				setLocationData({
+				const fallbackLocation = {
 					location: customLocation.trim(),
 					verified: false,
-				});
+				};
+				setLocationData(fallbackLocation);
+				locationService.setManualLocation(fallbackLocation);
 			} finally {
 				setIsLocationFetching(false);
 			}
@@ -391,6 +395,8 @@ const UserLocation: React.FC = () => {
 		const defaultLocation = locationService.getDefaultLocation();
 		setLocationData(defaultLocation);
 		setCustomLocation(defaultLocation.location);
+		// Clear the cached manual location
+		locationService.clearManualLocation();
 	};
 
 	// Handle clicking outside to cancel editing

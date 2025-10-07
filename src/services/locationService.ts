@@ -15,6 +15,9 @@ class LocationService {
   // Default location: National Museum of African American History and Culture in DC
   private readonly DEFAULT_LOCATION = "National Museum of African American History and Culture, Washington, DC";
 
+  // Cache for manually entered location - persists between re-renders
+  private cachedManualLocation: LocationData | null = null;
+
   /**
    * Get the default location data
    */
@@ -26,9 +29,36 @@ class LocationService {
   }
 
   /**
+   * Set a manually entered location (persists until cleared)
+   */
+  setManualLocation(location: LocationData): void {
+    this.cachedManualLocation = location;
+  }
+
+  /**
+   * Clear the manually entered location
+   */
+  clearManualLocation(): void {
+    this.cachedManualLocation = null;
+  }
+
+  /**
+   * Check if a manual location is set
+   */
+  hasManualLocation(): boolean {
+    return this.cachedManualLocation !== null;
+  }
+
+  /**
    * Get the user's current location using browser geolocation API
+   * Returns cached manual location if available
    */
   async getCurrentLocation(): Promise<LocationData> {
+    // Check cache first - return manual location if set
+    if (this.cachedManualLocation) {
+      return this.cachedManualLocation;
+    }
+
     try {
       // Check if geolocation is supported by the browser
       if (!navigator.geolocation) {
