@@ -45,6 +45,7 @@ const PersonaCarousel: React.FC = () => {
 	const [personasLoaded, setPersonasLoaded] = useState(false);
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
   const { personaUsers, setPersonaUser } = usePersonaUsers();
+  const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
 
   async function getPersonas() {
     try {
@@ -93,6 +94,48 @@ const PersonaCarousel: React.FC = () => {
     getPersonas();
   }, []);
 
+  // Listen for custom persona creation event from navigation
+  useEffect(() => {
+    function handleCreateCustomPersona(event: CustomEvent<{ description: string }>) {
+      const { description } = event.detail;
+      const customPersona = personas.find((p) => p.id === 'custom-persona');
+      if (customPersona) {
+        // Update the custom persona with the provided description
+        updateSelectedPersona(customPersona.key, {
+          id: customPersona.id,
+          name: description,
+        });
+      }
+    }
+
+    window.addEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
+    return () => {
+      window.removeEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
+    };
+  }, [personas]);
+
+  // Check URL params for custom persona creation on mount
+  useEffect(() => {
+    if (personasLoaded) {
+      const params = new URLSearchParams(window.location.search);
+      const isCustomPersona = params.get('customPersona') === 'true';
+      const description = params.get('description');
+      
+      if (isCustomPersona && description) {
+        const customPersona = personas.find((p) => p.id === 'custom-persona');
+        if (customPersona) {
+          // Clear the URL params
+          window.history.replaceState({}, '', window.location.pathname);
+          // Update the custom persona with the provided description
+          updateSelectedPersona(customPersona.key, {
+            id: customPersona.id,
+            name: description,
+          });
+        }
+      }
+    }
+  }, [personasLoaded, personas]);
+
 	// Restart swiper autoplay when personas change
 	useEffect(() => {
 		if (swiperRef.current && personas.length) {
@@ -101,7 +144,6 @@ const PersonaCarousel: React.FC = () => {
 		}
 	}, [personas]);
 
-  const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
   const isMobile = useIsMobile();
   const isTablet = useIsMobile(1100);
   const [slidesPerView, setSlidesPerView] = useState(1);

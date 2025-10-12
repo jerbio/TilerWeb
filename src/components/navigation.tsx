@@ -4,9 +4,12 @@ import styled from 'styled-components';
 import { Menu, X } from 'lucide-react';
 import { a } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Logo from '@/core/common/components/icons/logo';
+import CustomPersonaModal from './navigation/CustomPersonaModal';
+import { PersonaApi } from '@/api/personaApi';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -164,8 +167,10 @@ const MobileNavLinks = styled.div<{ $shrink: boolean }>`
 
 const Navigation: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navLinks = [
     { name: t('common.navigation.home'), href: '/' },
     { name: t('common.navigation.features'), href: '/features' },
@@ -185,6 +190,41 @@ const Navigation: React.FC = () => {
     };
   }, []);
 
+  function handleTryFreeClick() {
+    setIsModalOpen(true);
+    setIsOpen(false); // Close mobile menu if open
+  }
+
+  async function handleModalSubmit(description: string, audioFile?: Blob) {
+    setIsModalOpen(false);
+    
+    // If there's an audio file, send it to the backend
+    if (audioFile) {
+      try {
+        const personaApi = new PersonaApi();
+        await personaApi.createPersonaWithAudio(description, audioFile);
+      } catch (error) {
+        console.error('Error uploading audio:', error);
+      }
+    }
+    
+    // Navigate to home page with the custom persona description
+    const params = new URLSearchParams();
+    params.set('customPersona', 'true');
+    params.set('description', description);
+    
+    if (window.location.pathname === '/') {
+      // Already on home page, just scroll to top and pass data via custom event
+      window.dispatchEvent(
+        new CustomEvent('createCustomPersona', { detail: { description } })
+      );
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Navigate to home page with query params
+      navigate(`/?${params.toString()}`);
+    }
+  }
+
   return (
     <NavigationContainerSticky>
       <NavigationContainer>
@@ -201,7 +241,7 @@ const Navigation: React.FC = () => {
             <ButtonsWrapper>
               <Button
                 size="small"
-                onClick={() => window.open('https://launch.tiler.app/', '_blank')}
+                onClick={handleTryFreeClick}
                 bordergradient={[palette.colors.brand[400]]}
               >
                 {t('common.buttons.tryFree')}
@@ -227,7 +267,7 @@ const Navigation: React.FC = () => {
           <hr />
           <Button
             height={40}
-            onClick={() => window.open('https://tiler.app/', '_blank')}
+            onClick={handleTryFreeClick}
             bordergradient={[palette.colors.brand[500]]}
             size="small"
           >
@@ -246,6 +286,11 @@ const Navigation: React.FC = () => {
           </Button>
         </MobileNav>
       </NavigationContainer>
+      <CustomPersonaModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleModalSubmit}
+      />
     </NavigationContainerSticky>
   );
 };

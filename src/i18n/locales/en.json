@@ -6,12 +6,36 @@
 			"subscribe": "Subscribe",
 			"tryFree": "Try Tiler for free",
 			"signUp": "Sign Up",
-			"back": "Back"
+			"back": "Back",
+			"createSchedule": "Create Schedule",
+			"cancel": "Cancel"
 		},
 		"navigation": {
 			"home": "Home",
 			"features": "Features",
 			"waitlist": "Waitlist"
+		},
+		"voiceInput": {
+			"listening": "Listening...",
+			"startRecording": "Start voice input",
+			"stopRecording": "Stop recording",
+			"playRecording": "Play recording",
+			"pauseRecording": "Pause recording",
+			"deleteRecording": "Delete recording"
+		},
+		"customPersonaModal": {
+			"title": "Create Your Custom Schedule",
+			"description": "Tell us about yourself and what kind of schedule you need. We'll help you create a personalized schedule that fits your lifestyle.",
+			"placeholders": {
+				"healthcare": "I'm a healthcare professional working 12-hour shifts...",
+				"student": "I'm a student balancing classes, study time, and extracurriculars...",
+				"engineer": "I'm a software engineer who codes better in the evening...",
+				"parent": "I'm a parent juggling work, school drop-offs, and family time...",
+				"freelancer": "I'm a freelancer managing multiple clients and deadlines...",
+				"fitness": "I'm a fitness enthusiast who needs morning workout time...",
+				"remote": "I'm a remote worker across different time zones...",
+				"business": "I'm a small business owner with irregular working hours..."
+			}
 		},
 		"copyright": "© {{year}} Tiler. All rights reserved.",
 		"social": {
