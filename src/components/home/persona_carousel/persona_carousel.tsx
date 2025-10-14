@@ -137,6 +137,27 @@ const PersonaCarousel: React.FC = () => {
     }
   }, [personasLoaded, personas]);
 
+  // Listen for focus custom persona event (when modal opens)
+  useEffect(() => {
+    function handleFocusCustomPersona() {
+      if (swiperRef.current && personas.length) {
+        const customPersona = personas.find((p) => p.id === 'custom-persona');
+        if (customPersona) {
+          // Slide to the custom persona card
+          // Since loop is true, we need to use slideToLoop
+          swiperRef.current.swiper.slideToLoop(customPersona.key, 500);
+          // Pause autoplay when manually navigating
+          swiperRef.current.swiper.autoplay.pause();
+        }
+      }
+    }
+
+    window.addEventListener('focusCustomPersona', handleFocusCustomPersona);
+    return () => {
+      window.removeEventListener('focusCustomPersona', handleFocusCustomPersona);
+    };
+  }, [personas]);
+
 	// Restart swiper autoplay when personas change
 	useEffect(() => {
 		if (swiperRef.current && personas.length) {

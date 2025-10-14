@@ -191,6 +191,12 @@ const Navigation: React.FC = () => {
   function handleTryFreeClick() {
     setIsModalOpen(true);
     setIsOpen(false); // Close mobile menu if open
+    
+    // If on home page, dispatch event to focus on custom persona in carousel
+    if (window.location.pathname === '/') {
+      window.dispatchEvent(new CustomEvent('focusCustomPersona'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   async function handleModalSubmit(description: string, audioFile?: Blob) {
