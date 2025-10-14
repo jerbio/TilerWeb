@@ -251,7 +251,7 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 	}, [isOpen]);
 
 	const handleSubmit = () => {
-		if (description.trim()) {
+		if (description.trim() || audioBlob) {
 			onSubmit(description, audioBlob);
 			setDescription('');
 			setAudioBlob(undefined);
@@ -299,18 +299,16 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						disabled={isRecording}
 					/>
 					<VoiceInput
-						onTranscript={setDescription}
 						onRecordingStart={() => setIsRecording(true)}
 						onRecordingStop={() => setIsRecording(false)}
 						onAudioRecorded={setAudioBlob}
-						clearOnStart={true}
 					/>
 				</TextAreaWrapper>
 				<ButtonWrapper>
 					<Button
 						variant="brand"
 						onClick={handleSubmit}
-						disabled={!description.trim()}
+						disabled={!description.trim() && !audioBlob}
 						style={{ flex: 1 }}
 					>
 						{t('common.buttons.createSchedule')}

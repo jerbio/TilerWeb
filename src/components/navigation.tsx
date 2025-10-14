@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { Menu, X } from 'lucide-react';
 import { a } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Logo from '@/core/common/components/icons/logo';
@@ -167,7 +166,6 @@ const MobileNavLinks = styled.div<{ $shrink: boolean }>`
 
 const Navigation: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -199,10 +197,12 @@ const Navigation: React.FC = () => {
     setIsModalOpen(false);
     
     // If there's an audio file, send it to the backend
-    if (audioFile) {
+    // if (audioFile) 
+		{
       try {
         const personaApi = new PersonaApi();
-        await personaApi.createPersonaWithAudio(description, audioFile);
+        const response = await personaApi.createPersonaWithAudio(description, audioFile);
+        description = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
       } catch (error) {
         console.error('Error uploading audio:', error);
       }
@@ -213,16 +213,16 @@ const Navigation: React.FC = () => {
     params.set('customPersona', 'true');
     params.set('description', description);
     
-    if (window.location.pathname === '/') {
-      // Already on home page, just scroll to top and pass data via custom event
-      window.dispatchEvent(
-        new CustomEvent('createCustomPersona', { detail: { description } })
-      );
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // Navigate to home page with query params
-      navigate(`/?${params.toString()}`);
-    }
+    // if (window.location.pathname === '/') {
+    //   // Already on home page, just scroll to top and pass data via custom event
+    //   window.dispatchEvent(
+    //     new CustomEvent('createCustomPersona', { detail: { description } })
+    //   );
+    //   window.scrollTo({ top: 0, behavior: 'smooth' });
+    // } else {
+    //   // Navigate to home page with query params
+    //   navigate(`/?${params.toString()}`);
+    // }
   }
 
   return (

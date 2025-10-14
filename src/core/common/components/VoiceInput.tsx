@@ -4,39 +4,6 @@ import { Mic, MicOff, Play, Pause, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 
-// Extend window interface for speech recognition
-declare global {
-	interface Window {
-		SpeechRecognition: typeof SpeechRecognition;
-		webkitSpeechRecognition: typeof SpeechRecognition;
-	}
-}
-
-interface SpeechRecognitionEvent extends Event {
-	results: SpeechRecognitionResultList;
-	resultIndex: number;
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-	error: string;
-}
-
-interface SpeechRecognition extends EventTarget {
-	continuous: boolean;
-	interimResults: boolean;
-	lang: string;
-	onresult: ((event: SpeechRecognitionEvent) => void) | null;
-	onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-	onend: (() => void) | null;
-	start: () => void;
-	stop: () => void;
-}
-
-declare const SpeechRecognition: {
-	prototype: SpeechRecognition;
-	new (): SpeechRecognition;
-};
-
 const MicrophoneButton = styled.button<{ $isRecording: boolean }>`
 	position: absolute;
 	bottom: 1rem;
@@ -228,8 +195,6 @@ const RecordingIndicator = styled.div<{ $isRecording: boolean }>`
 `;
 
 export interface VoiceInputProps {
-	/** Callback when transcription updates */
-	onTranscript: (transcript: string) => void;
 	/** Callback when recording starts */
 	onRecordingStart?: () => void;
 	/** Callback when recording stops */
@@ -238,14 +203,10 @@ export interface VoiceInputProps {
 	onAudioRecorded?: (audioBlob: Blob) => void;
 	/** Callback when error occurs */
 	onError?: (error: string) => void;
-	/** Language code for speech recognition (default: 'en-US') */
-	language?: string;
 	/** Whether to show the recording indicator (default: true) */
 	showIndicator?: boolean;
 	/** Custom indicator text (default: uses i18n 'common.voiceInput.listening') */
 	indicatorText?: string;
-	/** Whether to clear existing text when starting recording (default: true) */
-	clearOnStart?: boolean;
 	/** Whether recording is disabled */
 	disabled?: boolean;
 	/** Custom button size in pixels (default: 40) */
@@ -264,15 +225,12 @@ export interface VoiceInputProps {
 }
 
 const VoiceInput: React.FC<VoiceInputProps> = ({
-	onTranscript,
 	onRecordingStart,
 	onRecordingStop,
 	onAudioRecorded,
 	onError,
-	language = 'en-US',
 	showIndicator = true,
 	indicatorText,
-	clearOnStart = true,
 	disabled = false,
 	buttonSize = 40,
 	buttonPosition = { bottom: '1rem', right: '1rem' },
@@ -281,13 +239,11 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const [isRecording, setIsRecording] = useState(false);
-	const [isSpeechSupported, setIsSpeechSupported] = useState(false);
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
 	
-	const recognitionRef = useRef<SpeechRecognition | null>(null);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const audioChunksRef = useRef<Blob[]>([]);
 	const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -301,47 +257,9 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 	const pauseLabel = t('common.voiceInput.pauseRecording');
 	const deleteLabel = t('common.voiceInput.deleteRecording');
 
-	// Check for speech recognition support
+	// Cleanup on unmount
 	useEffect(() => {
-		const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-		if (SpeechRecognitionAPI) {
-			setIsSpeechSupported(true);
-			recognitionRef.current = new SpeechRecognitionAPI();
-			recognitionRef.current.continuous = true;
-			recognitionRef.current.interimResults = true;
-			recognitionRef.current.lang = language;
-
-			recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-				let transcript = '';
-				for (let i = event.resultIndex; i < event.results.length; i++) {
-					transcript += event.results[i][0].transcript;
-				}
-				onTranscript(transcript);
-			};
-
-			recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-				console.error('Speech recognition error:', event.error);
-				setIsRecording(false);
-				if (onError) {
-					onError(event.error);
-				}
-				if (onRecordingStop) {
-					onRecordingStop();
-				}
-			};
-
-			recognitionRef.current.onend = () => {
-				setIsRecording(false);
-				if (onRecordingStop) {
-					onRecordingStop();
-				}
-			};
-		}
-
 		return () => {
-			if (recognitionRef.current && isRecording) {
-				recognitionRef.current.stop();
-			}
 			if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
 				mediaRecorderRef.current.stop();
 			}
@@ -349,20 +267,13 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 				mediaStreamRef.current.getTracks().forEach(track => track.stop());
 			}
 		};
-	}, [language, onError, onRecordingStop, isRecording]);
+	}, []);
 
 	const toggleRecording = async () => {
 		if (disabled) return;
 
 		if (isRecording) {
 			// Stop recording
-			if (recognitionRef.current) {
-				try {
-					recognitionRef.current.stop();
-				} catch (error) {
-					console.error('Error stopping speech recognition:', error);
-				}
-			}
 			if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
 				try {
 					mediaRecorderRef.current.stop();
@@ -424,14 +335,6 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 				};
 				
 				mediaRecorderRef.current.start();
-
-				// Start speech recognition for transcription
-				if (recognitionRef.current) {
-					if (clearOnStart) {
-						onTranscript(''); // Clear any existing text
-					}
-					recognitionRef.current.start();
-				}
 				
 				setIsRecording(true);
 				if (onRecordingStart) {
@@ -467,11 +370,6 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 		setCurrentTime(0);
 		setDuration(0);
 		audioChunksRef.current = [];
-		
-		// Clear the transcript if needed
-		if (clearOnStart) {
-			onTranscript('');
-		}
 	};
 
 	const formatTime = (seconds: number) => {
@@ -518,11 +416,6 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 			}
 		};
 	}, [audioURL]);
-
-	// Don't render if speech recognition is not supported
-	if (!isSpeechSupported) {
-		return null;
-	}
 
 	return (
 		<>

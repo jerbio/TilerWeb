@@ -14,9 +14,11 @@ export class PersonaApi extends AppApi {
 		});
 	}
 
-	public createPersonaWithAudio(description: string, audioFile: Blob) {
+	public createPersonaWithAudio(description: string, audioFile: Blob | null | undefined) {
 		const formData = new FormData();
-		formData.append('AudioFile', audioFile, 'recording.webm');
+		if(audioFile) {
+			formData.append('AudioFile', audioFile, 'recording.webm');
+		}
 		formData.append('Description', description);
 		formData.append('TimeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
