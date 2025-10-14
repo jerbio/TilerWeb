@@ -12,6 +12,7 @@ import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import { Persona } from '../../../core/common/types/persona';
 import usePersonaUsers from '../../../core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
+import useAppStore from '@/global_state';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;
@@ -46,6 +47,7 @@ const PersonaCarousel: React.FC = () => {
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
   const { personaUsers, setPersonaUser } = usePersonaUsers();
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
+  const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
   
   // Swiper refs and responsive state
   const swiperRef = React.useRef<SwiperRef | null>(null);
@@ -102,10 +104,57 @@ const PersonaCarousel: React.FC = () => {
 
   // Listen for custom persona creation event from navigation
   useEffect(() => {
-    function handleCreateCustomPersona(event: CustomEvent<{ persona: Partial<Persona> }>) {
-      const { persona } = event.detail;
+    function handleCreateCustomPersona(event: CustomEvent<{ 
+      persona: Partial<Persona>; 
+      anonymousUser?: {
+        id: string | null;
+        username: string | null;
+        timeZoneDifference: number | null;
+        timeZone: string | null;
+        email: null | null;
+        endfOfDay: string | null;
+        phoneNumber: null | null;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+        countryCode: string | null;
+      };
+    }>) {
+      const { persona, anonymousUser } = event.detail;
       const customPersona = personas.find((p) => p.id === 'custom-persona');
       if (customPersona) {
+        // If we have anonymous user data from the API, save it to avoid duplicate API call
+        if (anonymousUser?.id) {
+          setPersonaUser('custom-persona', {
+            userId: anonymousUser.id,
+            personaInfo: { name: persona.name || 'Custom' },
+          });
+          
+          // Initialize the persona session immediately with the user data from the API
+          setActivePersonaSession({
+            personaId: 'custom-persona',
+            personaName: persona.name || 'Custom',
+            userId: anonymousUser.id,
+            scheduleId: null,
+            chatSessionId: '',
+            chatContext: [],
+            userInfo: {
+              id: anonymousUser.id,
+              username: anonymousUser.username || '',
+              timeZoneDifference: anonymousUser.timeZoneDifference || 0,
+              timeZone: anonymousUser.timeZone || 'UTC',
+              email: anonymousUser.email,
+              endfOfDay: anonymousUser.endfOfDay || '',
+              phoneNumber: anonymousUser.phoneNumber,
+              fullName: anonymousUser.fullName || '',
+              firstName: anonymousUser.firstName || '',
+              lastName: anonymousUser.lastName || '',
+              countryCode: anonymousUser.countryCode || '1',
+            },
+            scheduleLastUpdatedBy: null,
+          });
+        }
+        
         // Update the custom persona with the provided data
         updateSelectedPersona(customPersona.key, {
           id: customPersona.id,

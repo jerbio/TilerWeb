@@ -110,6 +110,8 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   useEffect(() => {
     if (expanded) {
       if (!personaUserId) {
+        // Only create a new user if one doesn't exist
+        // For custom persona, the user is already created via createPersonaWithAudio
         getPersonaUser();
       } else {
         // Check if we need to switch persona sessions

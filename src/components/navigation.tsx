@@ -217,6 +217,7 @@ const Navigation: React.FC = () => {
       const personaApi = new PersonaApi();
       const response = await personaApi.createPersonaWithAudio(description, audioFile);
       const finalDescription = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
+      const anonymousUser = response?.Content?.anonymousUserWithPersona?.anonymousUser;
       
       // Close modal after API completes successfully
       setIsModalOpen(false);
@@ -229,7 +230,7 @@ const Navigation: React.FC = () => {
       params.set('description', finalDescription);
       
       if (window.location.pathname === '/') {
-        // Already on home page, dispatch event with complete persona data
+        // Already on home page, dispatch event with complete persona data and user info
         window.dispatchEvent(
           new CustomEvent('createCustomPersona', { 
             detail: { 
@@ -237,7 +238,8 @@ const Navigation: React.FC = () => {
                 id: 'custom-persona',
                 name: finalDescription,
                 description: finalDescription,
-              }
+              },
+              anonymousUser: anonymousUser,  // Include user data from API
             } 
           })
         );
