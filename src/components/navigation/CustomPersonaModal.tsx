@@ -299,21 +299,16 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 		// Clean up state
 		setDescription('');
 		setIsRecording(false);
-		
-		// Revoke audio blob URL if it exists to free memory
-		if (audioBlob) {
-			URL.revokeObjectURL(URL.createObjectURL(audioBlob));
-			setAudioBlob(undefined);
-		}
+		setAudioBlob(undefined);
 		
 		onClose();
 	};
 
-	// Clean up audio blob when modal closes (from parent)
+	// Clean up state when modal closes (from parent)
 	useEffect(() => {
-		if (!isOpen && audioBlob) {
-			// When modal closes, clean up any remaining audio blobs
-			URL.revokeObjectURL(URL.createObjectURL(audioBlob));
+		if (!isOpen) {
+			// When modal closes, clean up state
+			// VoiceInput component will handle its own blob URL cleanup on unmount
 			setAudioBlob(undefined);
 			setDescription('');
 			setIsRecording(false);
@@ -357,6 +352,7 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						disabled={isRecording || isSubmitting}
 					/>
 					<VoiceInput
+						key={`voice-input-${isOpen}`}
 						onRecordingStart={() => setIsRecording(true)}
 						onRecordingStop={() => setIsRecording(false)}
 						onAudioRecorded={setAudioBlob}
