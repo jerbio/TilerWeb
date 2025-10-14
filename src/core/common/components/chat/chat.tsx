@@ -18,6 +18,7 @@ import { locationService } from '@/services/locationService';
 import { SignalRService } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
 import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
+import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -192,7 +193,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
-  
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
+
   // Extract values from active persona session
   const chatContext = activePersonaSession?.chatContext || [];
   const scheduleId = activePersonaSession?.scheduleId;
@@ -679,6 +682,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     removeChatContext(context); // Remove the clicked context
   };
 
+  const handleEmailSubmitted = (email: string) => {
+    setSubmittedEmail(email);
+    setShowErrorPopup(false); // Close chat limit modal
+    setShowEmailConfirmation(true); // Show confirmation modal
+  };
+
   return (
     <ChatWrapper>
       <ChatContainer>
@@ -842,9 +851,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         title="Chat Limit Reached"
         onClose={() => setShowErrorPopup(false)}
         showWaitlistButton={true}
-        onWaitlistClick={() => {
-          window.location.href = '/waitlist';
-        }}
+        onEmailSubmitted={handleEmailSubmitted}
+      />
+
+      <EmailConfirmationModal
+        isOpen={showEmailConfirmation}
+        email={submittedEmail}
+        onClose={() => setShowEmailConfirmation(false)}
       />
     </ChatWrapper>
   );
