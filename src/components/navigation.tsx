@@ -199,6 +199,15 @@ const Navigation: React.FC = () => {
     }
   }
 
+  function handleModalClose() {
+    setIsModalOpen(false);
+    
+    // Dispatch event to re-enable carousel
+    if (window.location.pathname === '/') {
+      window.dispatchEvent(new CustomEvent('customPersonaModalDismissed'));
+    }
+  }
+
   async function handleModalSubmit(description: string, audioFile?: Blob) {
     // Keep modal open with spinner while API processes
     // The modal's isSubmitting state will show the spinner
@@ -211,6 +220,8 @@ const Navigation: React.FC = () => {
       
       // Close modal after API completes successfully
       setIsModalOpen(false);
+      
+      // Don't dispatch dismiss event on submit - persona will be selected/expanded
       
       // Navigate to home page with the persona
       const params = new URLSearchParams();
@@ -306,7 +317,7 @@ const Navigation: React.FC = () => {
       </NavigationContainer>
       <CustomPersonaModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleModalClose}
         onSubmit={handleModalSubmit}
       />
     </NavigationContainerSticky>

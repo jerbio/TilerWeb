@@ -46,6 +46,12 @@ const PersonaCarousel: React.FC = () => {
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
   const { personaUsers, setPersonaUser } = usePersonaUsers();
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
+  
+  // Swiper refs and responsive state
+  const swiperRef = React.useRef<SwiperRef | null>(null);
+  const isMobile = useIsMobile();
+  const isTablet = useIsMobile(1100);
+  const [slidesPerView, setSlidesPerView] = useState(1);
 
   async function getPersonas() {
     try {
@@ -145,9 +151,13 @@ const PersonaCarousel: React.FC = () => {
         if (customPersona) {
           // Slide to the custom persona card
           // Since loop is true, we need to use slideToLoop
+          // swiperRef.current.swiper.slideReset();
           swiperRef.current.swiper.slideToLoop(customPersona.key, 500);
-          // Pause autoplay when manually navigating
-          swiperRef.current.swiper.autoplay.pause();
+          // Pause autoplay and disable swiper interaction when modal opens
+          setTimeout(() => {
+            swiperRef?.current?.swiper?.autoplay?.pause();
+            swiperRef?.current?.swiper?.disable();
+            }, 600); // Delay slightly to allow slide animation to finish
         }
       }
     }
@@ -158,6 +168,22 @@ const PersonaCarousel: React.FC = () => {
     };
   }, [personas]);
 
+  // Listen for modal dismissal to re-enable carousel
+  useEffect(() => {
+    function handleModalDismissed() {
+      if (swiperRef.current) {
+        // Re-enable swiper interaction and resume autoplay
+        swiperRef.current.swiper.enable();
+        swiperRef.current.swiper.autoplay.resume();
+      }
+    }
+
+    window.addEventListener('customPersonaModalDismissed', handleModalDismissed);
+    return () => {
+      window.removeEventListener('customPersonaModalDismissed', handleModalDismissed);
+    };
+  }, []);
+
 	// Restart swiper autoplay when personas change
 	useEffect(() => {
 		if (swiperRef.current && personas.length) {
@@ -165,11 +191,6 @@ const PersonaCarousel: React.FC = () => {
 			swiperRef.current.swiper.autoplay.resume();
 		}
 	}, [personas]);
-
-  const isMobile = useIsMobile();
-  const isTablet = useIsMobile(1100);
-  const [slidesPerView, setSlidesPerView] = useState(1);
-  const swiperRef = React.useRef<SwiperRef | null>(null);
 
   function updateSelectedPersona(personaKey: number | null, persona?: Partial<Persona>) {
     if (persona?.id) {
