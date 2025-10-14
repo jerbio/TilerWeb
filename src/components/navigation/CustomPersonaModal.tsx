@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import VoiceInput from '@/core/common/components/VoiceInput';
+import Spinner from '@/core/common/components/loader';
 
 const ModalOverlay = styled.div<{ $isOpen: boolean }>`
 	position: fixed;
@@ -69,8 +70,13 @@ const CloseButton = styled.button`
 	justify-content: center;
 	transition: color 0.2s ease;
 
-	&:hover {
+	&:hover:not(:disabled) {
 		color: ${palette.colors.gray[200]};
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 `;
 
@@ -158,10 +164,25 @@ const ButtonWrapper = styled.div`
 	}
 `;
 
+const LoadingOverlay = styled.div<{ $visible: boolean }>`
+	position: absolute;
+	inset: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(4px);
+	border-radius: ${palette.borderRadius.xxLarge};
+	z-index: 10;
+	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+	pointer-events: ${({ $visible }) => ($visible ? 'all' : 'none')};
+	transition: opacity 0.3s ease-in-out;
+`;
+
 interface CustomPersonaModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onSubmit: (description: string, audioFile?: Blob) => void;
+	onSubmit: (description: string, audioFile?: Blob) => Promise<void>;
 }
 
 const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
@@ -176,6 +197,7 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 	const [isTyping, setIsTyping] = useState(true);
 	const [isRecording, setIsRecording] = useState(false);
 	const [audioBlob, setAudioBlob] = useState<Blob | undefined>(undefined);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// Get localized placeholder suggestions
 	const PLACEHOLDER_SUGGESTIONS = [
@@ -250,23 +272,56 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 		};
 	}, [isOpen]);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (description.trim() || audioBlob) {
-			onSubmit(description, audioBlob);
-			setDescription('');
-			setAudioBlob(undefined);
+			setIsSubmitting(true);
+			try {
+				// Keep modal open with spinner until API completes
+				await onSubmit(description, audioBlob);
+				
+				// Only clear form after successful submission
+				// Modal will be closed by parent component (navigation.tsx)
+				setDescription('');
+				setAudioBlob(undefined);
+			} catch (error) {
+				console.error('Submission error:', error);
+				// On error, keep form data so user can retry
+				// TODO: Show error message to user
+			} finally {
+				setIsSubmitting(false);
+			}
 		}
 	};
 
 	const handleClose = () => {
+		if (isSubmitting) return; // Prevent closing during submission
+		
+		// Clean up state
 		setDescription('');
 		setIsRecording(false);
-		setAudioBlob(undefined);
+		
+		// Revoke audio blob URL if it exists to free memory
+		if (audioBlob) {
+			URL.revokeObjectURL(URL.createObjectURL(audioBlob));
+			setAudioBlob(undefined);
+		}
+		
 		onClose();
 	};
 
+	// Clean up audio blob when modal closes (from parent)
+	useEffect(() => {
+		if (!isOpen && audioBlob) {
+			// When modal closes, clean up any remaining audio blobs
+			URL.revokeObjectURL(URL.createObjectURL(audioBlob));
+			setAudioBlob(undefined);
+			setDescription('');
+			setIsRecording(false);
+		}
+	}, [isOpen]);
+
 	const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (e.target === e.currentTarget) {
+		if (e.target === e.currentTarget && !isSubmitting) {
 			handleClose();
 		}
 	};
@@ -274,9 +329,12 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 	return (
 		<ModalOverlay $isOpen={isOpen} onClick={handleOverlayClick}>
 			<ModalContent $isOpen={isOpen}>
+				<LoadingOverlay $visible={isSubmitting}>
+					<Spinner />
+				</LoadingOverlay>
 				<ModalHeader>
 					<ModalTitle>{t('common.customPersonaModal.title')}</ModalTitle>
-					<CloseButton onClick={handleClose}>
+					<CloseButton onClick={handleClose} disabled={isSubmitting}>
 						<X size={24} />
 					</CloseButton>
 				</ModalHeader>
@@ -284,7 +342,7 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 					{t('common.customPersonaModal.description')}
 				</ModalDescription>
 				<TextAreaWrapper>
-					<PlaceholderOverlay $visible={!description && placeholder.length > 0 && !isRecording}>
+					<PlaceholderOverlay $visible={!description && placeholder.length > 0 && !isRecording && !isSubmitting}>
 						{placeholder}
 					</PlaceholderOverlay>
 					<TextArea
@@ -296,24 +354,30 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 								handleSubmit();
 							}
 						}}
-						disabled={isRecording}
+						disabled={isRecording || isSubmitting}
 					/>
 					<VoiceInput
 						onRecordingStart={() => setIsRecording(true)}
 						onRecordingStop={() => setIsRecording(false)}
 						onAudioRecorded={setAudioBlob}
+						disabled={isSubmitting}
 					/>
 				</TextAreaWrapper>
 				<ButtonWrapper>
 					<Button
 						variant="brand"
 						onClick={handleSubmit}
-						disabled={!description.trim() && !audioBlob}
+						disabled={(!description.trim() && !audioBlob) || isSubmitting}
 						style={{ flex: 1 }}
 					>
-						{t('common.buttons.createSchedule')}
+						{isSubmitting ? t('common.buttons.creating') : t('common.buttons.createSchedule')}
 					</Button>
-					<Button variant="secondary" onClick={handleClose} style={{ flex: 1 }}>
+					<Button 
+						variant="secondary" 
+						onClick={handleClose} 
+						style={{ flex: 1 }}
+						disabled={isSubmitting}
+					>
 						{t('common.buttons.cancel')}
 					</Button>
 				</ButtonWrapper>

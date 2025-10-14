@@ -96,14 +96,14 @@ const PersonaCarousel: React.FC = () => {
 
   // Listen for custom persona creation event from navigation
   useEffect(() => {
-    function handleCreateCustomPersona(event: CustomEvent<{ description: string }>) {
-      const { description } = event.detail;
+    function handleCreateCustomPersona(event: CustomEvent<{ persona: Partial<Persona> }>) {
+      const { persona } = event.detail;
       const customPersona = personas.find((p) => p.id === 'custom-persona');
       if (customPersona) {
-        // Update the custom persona with the provided description
+        // Update the custom persona with the provided data
         updateSelectedPersona(customPersona.key, {
           id: customPersona.id,
-          name: description,
+          ...persona,
         });
       }
     }
@@ -126,10 +126,11 @@ const PersonaCarousel: React.FC = () => {
         if (customPersona) {
           // Clear the URL params
           window.history.replaceState({}, '', window.location.pathname);
-          // Update the custom persona with the provided description
+          // Update the custom persona with the provided data
           updateSelectedPersona(customPersona.key, {
             id: customPersona.id,
             name: description,
+            description: description,
           });
         }
       }

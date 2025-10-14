@@ -194,35 +194,47 @@ const Navigation: React.FC = () => {
   }
 
   async function handleModalSubmit(description: string, audioFile?: Blob) {
-    setIsModalOpen(false);
+    // Keep modal open with spinner while API processes
+    // The modal's isSubmitting state will show the spinner
     
-    // If there's an audio file, send it to the backend
-    // if (audioFile) 
-		{
-      try {
-        const personaApi = new PersonaApi();
-        const response = await personaApi.createPersonaWithAudio(description, audioFile);
-        description = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
-      } catch (error) {
-        console.error('Error uploading audio:', error);
+    // If there's an audio file or description, send it to the backend
+    try {
+      const personaApi = new PersonaApi();
+      const response = await personaApi.createPersonaWithAudio(description, audioFile);
+      const finalDescription = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
+      
+      // Close modal after API completes successfully
+      setIsModalOpen(false);
+      
+      // Navigate to home page with the persona
+      const params = new URLSearchParams();
+      params.set('customPersona', 'true');
+      params.set('description', finalDescription);
+      
+      if (window.location.pathname === '/') {
+        // Already on home page, dispatch event with complete persona data
+        window.dispatchEvent(
+          new CustomEvent('createCustomPersona', { 
+            detail: { 
+              persona: {
+                id: 'custom-persona',
+                name: finalDescription,
+                description: finalDescription,
+              }
+            } 
+          })
+        );
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Navigate to home page
+        window.location.href = `/?${params.toString()}`;
       }
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+      // Close modal on error too
+      setIsModalOpen(false);
+      // TODO: Show error message to user in toast
     }
-    
-    // Navigate to home page with the custom persona description
-    const params = new URLSearchParams();
-    params.set('customPersona', 'true');
-    params.set('description', description);
-    
-    // if (window.location.pathname === '/') {
-    //   // Already on home page, just scroll to top and pass data via custom event
-    //   window.dispatchEvent(
-    //     new CustomEvent('createCustomPersona', { detail: { description } })
-    //   );
-    //   window.scrollTo({ top: 0, behavior: 'smooth' });
-    // } else {
-    //   // Navigate to home page with query params
-    //   navigate(`/?${params.toString()}`);
-    // }
   }
 
   return (

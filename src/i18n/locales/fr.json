@@ -3,6 +3,7 @@
 		"buttons": {
 			"back": "Retour",
 			"createSchedule": "Créer un Horaire",
+			"creating": "Création...",
 			"cancel": "Annuler"
 		},
 		"voiceInput": {
