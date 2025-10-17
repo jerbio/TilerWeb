@@ -54,7 +54,7 @@ function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps)
     <Calendar
       viewOptions={viewOptions}
       setViewOptions={setViewOptions}
-      events={events.map(e => ({...e, isViable: false }))}
+      events={events}
       eventsLoading={eventsLoading}
       viewRef={viewRef}
     />
