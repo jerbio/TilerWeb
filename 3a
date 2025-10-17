@@ -38,7 +38,7 @@ const Calendar = ({
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
-  const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
+  const [showNonViableEvents, setShowNonViableEvents] = React.useState(false);
 
   useEffect(() => {
     // Reset selected event when events change
@@ -201,9 +201,6 @@ const Calendar = ({
         <CalendarHeaderDateList ref={viewRef}>
           {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
             const day = viewOptions.startDay.add(index, 'day');
-            const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
-              dayjs(event.start).isSame(day, 'day')
-            );
             return (
               <CalendarHeaderDateItem
                 key={index}
@@ -213,69 +210,25 @@ const Calendar = ({
                 <h3>{day.format('ddd')}</h3>
                 {/* 2 number date */}
                 <span>{day.format('DD')}</span>
-                <ShowNonViableEventsButtonContainer
-                  $visible={todaysNonViableEvents.length > 0}
-                >
-                  <ShowNonViableEventsButtonWrapper>
-                    <ShowNonViableEventsButton
-                      $active={
-                        showNonViableEvents?.isSame(day, 'day') ?? false
-                      }
-                      title="Show Non-Viable Events"
-                      onClick={() =>
-                        setShowNonViableEvents((prev) =>
-                          prev?.isSame(day, 'day') ? null : day
-                        )
-                      }
-                    >
-                      <TriangleAlert
-                        size={18}
-                        color={palette.colors.brand[400]}
-                      />
-                    </ShowNonViableEventsButton>
-                    <NonViableEventsCount>
-                      {todaysNonViableEvents.length}
-                    </NonViableEventsCount>
-                  </ShowNonViableEventsButtonWrapper>
-                </ShowNonViableEventsButtonContainer>
+                <ShowNonViableEventsButtonWrapper>
+                  <ShowNonViableEventsButton
+                    title="Show Non-Viable Events"
+                    onClick={() => setShowNonViableEvents((prev) => !prev)}
+                  >
+                    <TriangleAlert
+                      size={20}
+                      color={palette.colors.brand[400]}
+                    />
+                  </ShowNonViableEventsButton>
+                  <NonViableEventsCount>
+                    {styledNonViableEvents.length}
+                  </NonViableEventsCount>
+                </ShowNonViableEventsButtonWrapper>
               </CalendarHeaderDateItem>
             );
           })}
         </CalendarHeaderDateList>
       </CalendarHeader>
-
-      {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
-        const day = viewOptions.startDay.add(index, 'day');
-        const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
-          dayjs(event.start).isSame(day, 'day')
-        );
-        return todaysNonViableEvents.length > 0 ? (
-          <NonViableEventsContainer
-            $index={index}
-            $visible={showNonViableEvents?.isSame(day, 'day') ?? false}
-            $cellwidth={viewOptions.width / viewOptions.daysInView}
-          >
-            <header>
-              <h2>Non-Viable Tiles</h2>
-              <Tooltip
-                text="These events could not be scheduled due to timing conflicts or constraints."
-                position="left"
-              >
-                <Info size={18} color={palette.colors.gray[500]} />
-              </Tooltip>
-            </header>
-
-            {todaysNonViableEvents.map((event) => (
-              <CalendarEvent
-                event={event}
-                key={event.id}
-                selectedEvent={selectedEvent}
-                setSelectedEvent={setSelectedEvent}
-              />
-            ))}
-          </NonViableEventsContainer>
-        ) : null;
-      })}
 
       <LoadingContainer $loading={eventsLoading}>
         <Spinner />
@@ -306,6 +259,41 @@ const Calendar = ({
           />
         </CalendarContent>
       </CalendarContentContainer>
+
+      <ShowNonViableEventsButtonContainer $visible={styledNonViableEvents.length > 0}>
+        <ShowNonViableEventsButtonWrapper>
+          <ShowNonViableEventsButton
+            title="Show Non-Viable Events"
+            onClick={() => setShowNonViableEvents((prev) => !prev)}
+          >
+            <TriangleAlert size={20} color={palette.colors.brand[400]} />
+          </ShowNonViableEventsButton>
+          <NonViableEventsCount>{styledNonViableEvents.length}</NonViableEventsCount>
+        </ShowNonViableEventsButtonWrapper>
+      </ShowNonViableEventsButtonContainer>
+
+      <NonViableEventsContainer
+        $visible={styledNonViableEvents.length > 0 && showNonViableEvents}
+      >
+        <header>
+          <h2>Non-Viable Tiles</h2>
+          <Tooltip
+            text="These events could not be scheduled due to timing conflicts or constraints."
+            position="left"
+          >
+            <Info size={18} color={palette.colors.gray[500]} />
+          </Tooltip>
+        </header>
+
+        {styledNonViableEvents.map((event) => (
+          <CalendarEvent
+            event={event}
+            key={event.id}
+            selectedEvent={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+          />
+        ))}
+      </NonViableEventsContainer>
     </CalendarContainer>
   );
 };
@@ -470,13 +458,17 @@ const LoadingContainer = styled.div<{ $loading: boolean }>`
 `;
 
 const ShowNonViableEventsButtonContainer = styled.button<{ $visible?: boolean }>`
-	margin-left: 8px;
+	position: absolute;
+	top: calc(0.5rem + ${calendarConfig.HEADER_HEIGHT});
+	right: 0.5rem;
+	z-index: 10;
 	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
 `;
 
 const ShowNonViableEventsButtonWrapper = styled.div`
 	position: relative;
+	margin-left: 8px;
 `;
 
 const NonViableEventsCount = styled.div`
@@ -484,8 +476,8 @@ const NonViableEventsCount = styled.div`
 	transform: translate(50%, -50%);
 	top: 25%;
 	right: 0;
-	min-width: 14px;
-	height: 14px;
+	min-width: 16px;
+	height: 16px;
 	padding: 0 4px;
 	background-color: ${palette.colors.gray[200]};
 	border-radius: 8px;
@@ -499,42 +491,44 @@ const NonViableEventsCount = styled.div`
 	user-select: none;
 `;
 
-const ShowNonViableEventsButton = styled.button<{ $active: boolean }>`
-	width: 32px;
-	height: 32px;
-	background-color: transparent;
-	box-shadow: 0 0 0 1px ${({ $active }) => ($active ? palette.colors.gray[500] : 'transparent')}
-		inset;
+const ShowNonViableEventsButton = styled.button`
+	width: 36px;
+	height: 36px;
+	background-color: ${palette.colors.glass};
+	border: 1px solid ${palette.colors.gray[800]};
+	backdrop-filter: blur(6px);
 	display: grid;
 	place-items: center;
 	border-radius: ${palette.borderRadius.xxLarge};
 
 	&:hover {
-		box-shadow: 0 0 0 1px ${palette.colors.gray[500]} inset;
+		background-color: ${palette.colors.gray[800]};
+		border-color: ${palette.colors.gray[700]};
 	}
 
-	transition: box-shadow 0.2s ease-in-out;
+	transition:
+		background-color 0.2s ease-in-out,
+		border-color 0.2s ease-in-out;
 `;
 
-const NonViableEventsContainer = styled.div<{
-  $visible: boolean;
-  $index: number;
-  $cellwidth: number;
-}>`
+const NonViableEventsContainer = styled.div<{ $visible: boolean }>`
 	position: absolute;
-	top: calc(${calendarConfig.HEADER_HEIGHT});
-	left: ${({ $cellwidth, $index }) =>
-    `${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
+	top: calc(0.5rem + ${calendarConfig.HEADER_HEIGHT} + 36px + 0.5rem);
+	right: 0.5rem;
 	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
 
-	height: calc(100% - ${calendarConfig.HEADER_HEIGHT});
-	width: ${({ $cellwidth }) => `${$cellwidth}px`};
+	width: 300px;
+	height: fit-content;
+	max-width: 90vw;
+	max-height: calc(100% - (${calendarConfig.HEADER_HEIGHT} + 1.5rem + 36px));
 
 	padding: 0.5rem;
 	overflow-y: auto;
-	background-color: ${palette.colors.glass};
+	background-color: ${palette.colors.gray[900]};
+	border: 1px solid ${palette.colors.gray[700]};
 	backdrop-filter: blur(6px);
+	border-radius: ${palette.borderRadius.large};
 	z-index: 20;
 
 	header {
