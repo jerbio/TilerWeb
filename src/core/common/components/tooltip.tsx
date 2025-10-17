@@ -10,9 +10,10 @@ type TooltipProps = {
   text: string;
   children: React.ReactNode;
   position?: TooltipPosition;
+  maxWidth?: number;
 };
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top' }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', maxWidth }) => {
   const [show, setShow] = useState(false);
 
   const styles = useSpring({
@@ -32,7 +33,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top' }) =
   return (
     <Wrapper onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
       {children}
-      <Bubble style={styles} position={position}>
+      <Bubble style={styles} position={position} $maxwidth={maxWidth || 200}>
         {text}
       </Bubble>
     </Wrapper>
@@ -44,7 +45,7 @@ const Wrapper = styled.div`
 	display: inline-block;
 `;
 
-const Bubble = styled(animated.div) <{ position: TooltipPosition }>`
+const Bubble = styled(animated.div) <{ position: TooltipPosition; $maxwidth: number }>`
 	position: absolute;
 	background: ${palette.colors.gray[800]};
 	color: ${palette.colors.gray[200]};
@@ -53,7 +54,7 @@ const Bubble = styled(animated.div) <{ position: TooltipPosition }>`
 	border-radius: 6px;
 	z-index: 100;
 	pointer-events: none;
-	max-width: 200px;
+	max-width: ${({ $maxwidth }) => $maxwidth + 'px'};
 	width: max-content;
 
 	${({ position }) =>

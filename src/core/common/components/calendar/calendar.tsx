@@ -259,6 +259,7 @@ const Calendar = ({
               <h2>Non-Viable Tiles</h2>
               <Tooltip
                 text="These events could not be scheduled due to timing conflicts or constraints."
+								maxWidth={150}
                 position="left"
               >
                 <Info size={18} color={palette.colors.gray[500]} />
