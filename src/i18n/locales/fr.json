@@ -8,6 +8,7 @@
 		},
 		"voiceInput": {
 			"listening": "À l'écoute...",
+			"transcribing": "Transcription...",
 			"startRecording": "Démarrer la saisie vocale",
 			"stopRecording": "Arrêter l'enregistrement",
 			"playRecording": "Lire l'enregistrement",

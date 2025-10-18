@@ -18,6 +18,7 @@
 		},
 		"voiceInput": {
 			"listening": "Listening...",
+			"transcribing": "Transcribing...",
 			"startRecording": "Start voice input",
 			"stopRecording": "Stop recording",
 			"playRecording": "Play recording",

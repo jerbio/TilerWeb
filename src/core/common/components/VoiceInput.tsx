@@ -195,6 +195,57 @@ const RecordingIndicator = styled.div<{ $isRecording: boolean }>`
 	}
 `;
 
+const TranscribingIndicator = styled.div<{ $isTranscribing: boolean }>`
+	position: absolute;
+	top: -0.5rem;
+	left: 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: ${palette.colors.gray[800]};
+	padding: 0.25rem 0.75rem;
+	border-radius: ${palette.borderRadius.large};
+	opacity: ${({ $isTranscribing }) => ($isTranscribing ? 1 : 0)};
+	transform: ${({ $isTranscribing }) => ($isTranscribing ? 'translateY(0)' : 'translateY(10px)')};
+	transition: all 0.3s ease;
+	pointer-events: none;
+
+	span {
+		font-size: ${palette.typography.fontSize.xs};
+		color: ${palette.colors.gray[300]};
+		font-family: ${palette.typography.fontFamily.inter};
+		font-weight: ${palette.typography.fontWeight.medium};
+	}
+`;
+
+const TranscribingDots = styled.div`
+	display: flex;
+	gap: 4px;
+	align-items: center;
+`;
+
+const TranscribingDot = styled.div<{ $delay: number }>`
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: ${palette.colors.brand[500]};
+	animation: bounce 1.4s infinite ease-in-out both;
+	animation-delay: ${({ $delay }) => $delay}s;
+
+	@keyframes bounce {
+		0%,
+		80%,
+		100% {
+			transform: scale(0.8);
+			opacity: 0.5;
+		}
+		40% {
+			transform: scale(1.2);
+			opacity: 1;
+		}
+	}
+`;
+
 export interface VoiceInputProps {
 	/** Callback when recording starts */
 	onRecordingStart?: () => void;
@@ -451,11 +502,22 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 				</RecordingIndicator>
 			)}
 			
+			{showIndicator && (
+				<TranscribingIndicator $isTranscribing={isTranscribing}>
+					<TranscribingDots>
+						<TranscribingDot $delay={0} />
+						<TranscribingDot $delay={0.2} />
+						<TranscribingDot $delay={0.4} />
+					</TranscribingDots>
+					<span>{t('common.voiceInput.transcribing')}</span>
+				</TranscribingIndicator>
+			)}
+			
 			{/* Audio Playback Controls */}
 			{audioURL && (
 				<>
 					<audio ref={audioRef} src={audioURL} style={{ display: 'none' }} />
-					<AudioPlaybackContainer $visible={!isRecording}>
+					<AudioPlaybackContainer $visible={!isRecording && !isTranscribing}>
 						<PlaybackButton onClick={togglePlayback} $isPlaying={isPlaying} title={isPlaying ? pauseLabel : playLabel}>
 							{isPlaying ? <Pause size={16} /> : <Play size={16} />}
 						</PlaybackButton>
