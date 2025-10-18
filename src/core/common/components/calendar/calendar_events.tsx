@@ -11,6 +11,7 @@ import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import calendarConfig from '@/core/constants/calendar_config';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import analytics from '@/core/util/analytics';
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
@@ -57,6 +58,31 @@ const CalendarEvents = ({
 	selectedEvent,
 	setSelectedEvent,
 }: CalendarEventsProps) => {
+	const handleEventClick = (event: StyledEvent) => {
+		// Track event selection
+		analytics.trackCalendarEvent('Event Selected', {
+			eventId: event.id,
+			eventName: event.name,
+			isRigid: event.isRigid,
+			isTardy: event.isTardy,
+			hasLocation: !!event.location?.address,
+			duration: dayjs(event.end, 'unix').diff(dayjs(event.start, 'unix'), 'minute'),
+			startTime: dayjs(event.start, 'unix').format('HH:mm'),
+		});
+		
+		setSelectedEvent(event.id);
+	};
+
+	const handleTravelDetailClick = (detail: StyledTravelDetail) => {
+		// Track travel detail interaction
+		analytics.trackCalendarEvent('Travel Detail Clicked', {
+			travelMedium: detail.travelMedium,
+			duration: dayjs(detail.end, 'unix').diff(dayjs(detail.start, 'unix'), 'minute'),
+			hasStartLocation: !!detail.startLocation,
+			hasEndLocation: !!detail.endLocation,
+		});
+	};
+
 	const { currentViewEvents, currentViewTravelDetails } = useMemo(() => {
 		const currentViewEvents: Array<CurrentViewEvent> = [];
 		const currentViewTravelDetails: Array<CurrentViewTravelDetail> = [];
@@ -280,7 +306,7 @@ const CalendarEvents = ({
 									g: event.colorGreen,
 									b: event.colorBlue,
 								}}
-								onClick={() => setSelectedEvent(event.id)}
+								onClick={() => handleEventClick(event)}
 								variant={event.isRigid ? 'block' : 'tile'}
 							>
 								<header>
@@ -356,6 +382,7 @@ const CalendarEvents = ({
 								g: detail.colorGreen,
 								b: detail.colorBlue,
 							}}
+							onClick={() => handleTravelDetailClick(detail)}
 						>
 							<span>
 								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}

@@ -41,6 +41,18 @@ class TimeUtil {
 	static now(): number {
 		return Date.now();
 	}
+
+	static nowDayjs(): dayjs.Dayjs {
+		return dayjs();
+	}
+
+	static nowISO(): string {
+		return new Date(TimeUtil.now()).toISOString();
+	}
+
+	static currentYear(): number {
+		return new Date(TimeUtil.now()).getFullYear();
+	}
 }
 
 export default TimeUtil;

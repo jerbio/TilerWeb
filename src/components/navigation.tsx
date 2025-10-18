@@ -9,6 +9,7 @@ import Button from '@/core/common/components/button';
 import Logo from '@/core/common/components/icons/logo';
 import CustomPersonaModal from './navigation/CustomPersonaModal';
 import { PersonaApi } from '@/api/personaApi';
+import analytics from '@/core/util/analytics';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -189,6 +190,11 @@ const Navigation: React.FC = () => {
   }, []);
 
   function handleTryFreeClick() {
+    analytics.trackButtonClick('Try Free', 'Navigation', {
+      isModalOpen: isModalOpen,
+      isOnHomePage: window.location.pathname === '/',
+    });
+
     setIsModalOpen(true);
     setIsOpen(false); // Close mobile menu if open
     
