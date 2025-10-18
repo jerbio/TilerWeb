@@ -356,6 +356,11 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						onRecordingStart={() => setIsRecording(true)}
 						onRecordingStop={() => setIsRecording(false)}
 						onAudioRecorded={setAudioBlob}
+						onTranscriptionComplete={(transcription) => {
+							// Append transcription to existing description
+							setDescription(prev => prev ? `${prev}\n${transcription}` : transcription);
+						}}
+						autoTranscribe={true}
 						disabled={isSubmitting}
 					/>
 				</TextAreaWrapper>

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Mic, MicOff, Play, Pause, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
+import { chatService } from '@/services';
 
 const MicrophoneButton = styled.button<{ $isRecording: boolean }>`
 	position: absolute;
@@ -201,6 +202,8 @@ export interface VoiceInputProps {
 	onRecordingStop?: () => void;
 	/** Callback when audio recording is complete - receives audio blob */
 	onAudioRecorded?: (audioBlob: Blob) => void;
+	/** Callback when transcription is complete - receives transcribed text */
+	onTranscriptionComplete?: (transcription: string) => void;
 	/** Callback when error occurs */
 	onError?: (error: string) => void;
 	/** Whether to show the recording indicator (default: true) */
@@ -222,12 +225,15 @@ export interface VoiceInputProps {
 	ariaLabelStart?: string;
 	/** Custom aria label for stop recording button (default: uses i18n) */
 	ariaLabelStop?: string;
+	/** Whether to automatically transcribe audio after recording (default: false) */
+	autoTranscribe?: boolean;
 }
 
 const VoiceInput: React.FC<VoiceInputProps> = ({
 	onRecordingStart,
 	onRecordingStop,
 	onAudioRecorded,
+	onTranscriptionComplete,
 	onError,
 	showIndicator = true,
 	indicatorText,
@@ -236,6 +242,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 	buttonPosition = { bottom: '1rem', right: '1rem' },
 	ariaLabelStart,
 	ariaLabelStop,
+	autoTranscribe = false,
 }) => {
 	const { t } = useTranslation();
 	const [isRecording, setIsRecording] = useState(false);
@@ -243,6 +250,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
+	const [isTranscribing, setIsTranscribing] = useState(false);
 	
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const audioChunksRef = useRef<Blob[]>([]);
@@ -303,7 +311,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 					}
 				};
 				
-				mediaRecorderRef.current.onstop = () => {
+				mediaRecorderRef.current.onstop = async () => {
 					// Create audio blob from chunks
 					const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
 					
@@ -323,6 +331,24 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 					
 					if (onRecordingStop) {
 						onRecordingStop();
+					}
+
+					// Auto-transcribe if enabled
+					if (autoTranscribe && onTranscriptionComplete) {
+						setIsTranscribing(true);
+						try {
+							const transcription = await chatService.transcribeAudio(audioBlob);
+							if (onTranscriptionComplete) {
+								onTranscriptionComplete(transcription);
+							}
+						} catch (error) {
+							console.error('Error transcribing audio:', error);
+							if (onError) {
+								onError('Failed to transcribe audio');
+							}
+						} finally {
+							setIsTranscribing(false);
+						}
 					}
 				};
 				
@@ -455,7 +481,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 				type="button"
 				$isRecording={isRecording}
 				onClick={toggleRecording}
-				disabled={disabled || isPlaying}
+				disabled={disabled || isPlaying || isTranscribing}
 				title={isRecording ? stopRecordingLabel : startRecordingLabel}
 				aria-label={isRecording ? stopRecordingLabel : startRecordingLabel}
 				style={{
