@@ -7,6 +7,7 @@ import FounderUniversity from '@/assets/founder_university.png';
 import { NavLink } from 'react-router';
 import apps from '@/core/common/data/apps';
 import socials from '@/core/common/data/socials.ts';
+import TimeUtil from '@/core/util/time';
 
 const FooterSection: React.FC = () => {
   const { t } = useTranslation();
@@ -66,7 +67,7 @@ const FooterSection: React.FC = () => {
               />
             </PartnerContainer>
             <FooterCopyright>
-              {t('common.copyright', { year: new Date().getFullYear() })}
+              {t('common.copyright', { year: TimeUtil.currentYear() })}
             </FooterCopyright>
           </FooterSocialsSection>
         </FlexSpace>

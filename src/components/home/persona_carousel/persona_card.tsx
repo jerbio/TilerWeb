@@ -57,10 +57,10 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
     if (personaUser) {
       clearInterval(personaUserTimeLeftInterval);
 
-      setPersonaUserTimeLeft(TimeUtil.rangeDuration(dayjs(), dayjs(personaUser.expiration)));
+      setPersonaUserTimeLeft(TimeUtil.rangeDuration(TimeUtil.nowDayjs(), dayjs(personaUser.expiration)));
       const intervalID = setInterval(
         () => {
-          const timeLeft = TimeUtil.rangeDuration(dayjs(), dayjs(personaUser.expiration));
+          const timeLeft = TimeUtil.rangeDuration(TimeUtil.nowDayjs(), dayjs(personaUser.expiration));
           setPersonaUserTimeLeft(timeLeft);
           if (timeLeft === '0m') {
             clearInterval(personaUserTimeLeftInterval);

@@ -8,6 +8,8 @@ import calendarConfig from '@/core/constants/calendar_config';
 import CalendarEvents from '@/core/common/components/calendar/calendar_events';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import Spinner from '../loader';
+import analytics from '@/core/util/analytics';
+import TimeUtil from '@/core/util/time';
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	position: relative;
@@ -193,6 +195,14 @@ const Calendar = ({
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
   
+  // Track calendar view mount
+  useEffect(() => {
+    analytics.trackCalendarEvent('View Loaded', {
+      daysInView: viewOptions.daysInView,
+      startDate: viewOptions.startDay.format('YYYY-MM-DD'),
+    });
+  }, []); // Only on mount
+  
   useEffect(() => {
     // Reset selected event when events change
     setSelectedEvent(null);
@@ -204,6 +214,14 @@ const Calendar = ({
     const changeAmount = dir === 'left' ? -1 : 1;
     setViewOptions((prev) => {
       const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
+      
+      // Track navigation
+      analytics.trackCalendarEvent('Navigate Days', {
+        direction: dir,
+        daysChanged: changeAmount * prev.daysInView,
+        newStartDate: newStartDay.format('YYYY-MM-DD'),
+      });
+      
       return {
         ...prev,
         startDay: newStartDay,
@@ -311,7 +329,7 @@ const Calendar = ({
       scrollToPosition(scrollTop);
     } else {
       // No events in view, scroll to current time
-      const now = dayjs();
+      const now = TimeUtil.nowDayjs();
       const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
       const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
       
@@ -349,7 +367,7 @@ const Calendar = ({
             return (
               <CalendarHeaderDateItem
                 key={index}
-                $isToday={day.isSame(dayjs(), 'day')}
+                $isToday={day.isSame(TimeUtil.nowDayjs(), 'day')}
               >
                 {/* 3 letter day */}
                 <h3>{day.format('ddd')}</h3>
