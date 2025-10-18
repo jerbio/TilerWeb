@@ -8,9 +8,11 @@ import { NavLink } from 'react-router';
 import apps from '@/core/common/data/apps';
 import socials from '@/core/common/data/socials.ts';
 import TimeUtil from '@/core/util/time';
+import { useConsent } from '@/core/common/components/consent';
 
 const FooterSection: React.FC = () => {
   const { t } = useTranslation();
+  const { openSettings } = useConsent();
 
   return (
     <StyledFooterSection>
@@ -47,6 +49,19 @@ const FooterSection: React.FC = () => {
               },
             ]}
           />
+          <FooterLinksBlock
+            title="Privacy"
+            links={[
+              {
+                href: '#',
+                label: 'Cookie Settings',
+                onClick: (e: React.MouseEvent) => {
+                  e.preventDefault();
+                  openSettings();
+                },
+              },
+            ]}
+          />
           <FooterSocialsSection>
             <SocialsContainer>
               {socials.map((social, index) => (
@@ -79,6 +94,7 @@ const FooterSection: React.FC = () => {
 type FooterLink = {
   href: string;
   label: string;
+  onClick?: (e: React.MouseEvent) => void;
 };
 const FooterLinksBlock: React.FC<{ title: string; links: FooterLink[] }> = ({ title, links }) => {
   return (
@@ -87,7 +103,12 @@ const FooterLinksBlock: React.FC<{ title: string; links: FooterLink[] }> = ({ ti
       <FooterLinks>
         {links.map((link) => (
           <li key={link.href}>
-            <a href={link.href} target="_blank" rel="noopener noreferrer">
+            <a 
+              href={link.href} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={link.onClick}
+            >
               {link.label}
             </a>
           </li>
