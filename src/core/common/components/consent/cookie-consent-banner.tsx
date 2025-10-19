@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Cookie, Settings, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { consentManager } from '@/core/common/components/consent/consent-manager';
@@ -141,6 +142,7 @@ type CookieConsentBannerProps = {
 };
 
 const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onOpenSettings }) => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -180,34 +182,32 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onOpenSetting
   return (
     <BannerContainer $visible={visible}>
       <BannerContent>
-        <CloseButton onClick={handleClose} aria-label="Close">
+        <CloseButton onClick={handleClose} aria-label={t('common.consent.banner.close')}>
           <X size={20} />
         </CloseButton>
         <BannerInner>
           <BannerText>
             <Cookie className="icon" size={24} />
             <TextContent>
-              <h3>We Value Your Privacy</h3>
+              <h3>{t('common.consent.banner.title')}</h3>
               <p>
-                We use cookies and similar technologies to enhance your experience, analyze site
-                usage, and assist in our marketing efforts. By clicking &quot;Accept All&quot;, you consent
-                to our use of analytics and tracking.{' '}
+                {t('common.consent.banner.description')}{' '}
                 <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">
-                  Learn more
+                  {t('common.consent.banner.learnMore')}
                 </a>
               </p>
             </TextContent>
           </BannerText>
           <BannerActions>
             <ActionButton variant="primary" onClick={handleAcceptAll}>
-              Accept All
+              {t('common.consent.banner.buttons.acceptAll')}
             </ActionButton>
             <ActionButton variant="outline" onClick={handleRejectAll}>
-              Reject All
+              {t('common.consent.banner.buttons.rejectAll')}
             </ActionButton>
             <SettingsButton onClick={handleCustomize}>
               <Settings size={16} />
-              Customize
+              {t('common.consent.banner.buttons.customize')}
             </SettingsButton>
           </BannerActions>
         </BannerInner>

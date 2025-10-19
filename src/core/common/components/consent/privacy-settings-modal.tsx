@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { X, Check, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { consentManager, ConsentPreferences } from './consent-manager';
@@ -213,6 +214,7 @@ type PrivacySettingsModalProps = {
 };
 
 const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [preferences, setPreferences] = useState<ConsentPreferences>({
     necessary: true,
     analytics: false,
@@ -260,80 +262,75 @@ const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onC
     <Overlay $visible={isOpen} onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
-          <h2>Privacy Settings</h2>
-          <CloseButton onClick={onClose} aria-label="Close">
+          <h2>{t('common.consent.modal.title')}</h2>
+          <CloseButton onClick={onClose} aria-label={t('common.consent.banner.close')}>
             <X size={24} />
           </CloseButton>
         </ModalHeader>
 
         <ModalBody>
           <Description>
-            We use different types of cookies to optimize your experience on our website. Click on
-            the categories below to learn more and customize your preferences.
+            {t('common.consent.modal.description')}
           </Description>
 
           <ConsentSection>
             <ConsentHeader>
               <ConsentTitle>
-                <h3>Necessary</h3>
+                <h3>{t('common.consent.modal.categories.necessary.title')}</h3>
                 <span>Always Active</span>
               </ConsentTitle>
-              <Toggle $checked={true} $disabled={true} disabled aria-label="Necessary cookies" />
+              <Toggle $checked={true} $disabled={true} disabled aria-label={t('common.consent.modal.categories.necessary.title')} />
             </ConsentHeader>
             <ConsentDescription>
-              These cookies are essential for the website to function properly. They enable basic
-              features like page navigation and access to secure areas.
+              {t('common.consent.modal.categories.necessary.description')}
             </ConsentDescription>
           </ConsentSection>
 
           <ConsentSection>
             <ConsentHeader>
               <ConsentTitle>
-                <h3>Analytics</h3>
+                <h3>{t('common.consent.modal.categories.analytics.title')}</h3>
               </ConsentTitle>
               <Toggle
                 $checked={preferences.analytics}
                 onClick={() => handleToggle('analytics')}
-                aria-label="Analytics cookies"
+                aria-label={t('common.consent.modal.categories.analytics.title')}
               />
             </ConsentHeader>
             <ConsentDescription>
-              Analytics cookies help us understand how visitors interact with our website by
-              collecting and reporting information anonymously. This helps us improve our service.
+              {t('common.consent.modal.categories.analytics.description')}
             </ConsentDescription>
           </ConsentSection>
 
           <ConsentSection>
             <ConsentHeader>
               <ConsentTitle>
-                <h3>Marketing</h3>
+                <h3>{t('common.consent.modal.categories.marketing.title')}</h3>
               </ConsentTitle>
               <Toggle
                 $checked={preferences.marketing}
                 onClick={() => handleToggle('marketing')}
-                aria-label="Marketing cookies"
+                aria-label={t('common.consent.modal.categories.marketing.title')}
               />
             </ConsentHeader>
             <ConsentDescription>
-              Marketing cookies are used to track visitors across websites. The intention is to
-              display ads that are relevant and engaging for individual users.
+              {t('common.consent.modal.categories.marketing.description')}
             </ConsentDescription>
           </ConsentSection>
 
           <ConsentSection>
             <ConsentHeader>
               <ConsentTitle>
-                <h3>Preferences</h3>
+                <h3>{t('common.consent.modal.categories.preferences.title')}</h3>
               </ConsentTitle>
               <Toggle
                 $checked={preferences.preferences}
                 onClick={() => handleToggle('preferences')}
-                aria-label="Preference cookies"
+                aria-label={t('common.consent.modal.categories.preferences.title')}
               />
             </ConsentHeader>
             <ConsentDescription>
-              Preference cookies enable a website to remember information that changes the way the
-              website behaves or looks, like your preferred language or region.
+              {t('common.consent.modal.categories.preferences.description')}
             </ConsentDescription>
           </ConsentSection>
 
@@ -348,14 +345,14 @@ const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({ isOpen, onC
 
         <ModalFooter>
           <FooterButton variant="ghost" onClick={handleRejectAll}>
-            Reject All
+            {t('common.consent.modal.buttons.rejectAll')}
           </FooterButton>
           <FooterButton variant="outline" onClick={handleAcceptAll}>
-            Accept All
+            {t('common.consent.modal.buttons.acceptAll')}
           </FooterButton>
           <FooterButton variant="primary" onClick={handleSave}>
             <Check size={16} />
-            Save Settings
+            {t('common.consent.modal.buttons.save')}
           </FooterButton>
         </ModalFooter>
       </ModalContainer>

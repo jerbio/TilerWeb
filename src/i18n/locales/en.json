@@ -64,6 +64,50 @@
 		"partners": {
 			"title": "Partners",
 			"founderUniversity": "Founder University"
+		},
+		"consent": {
+			"banner": {
+				"title": "We Value Your Privacy",
+				"description": "We use cookies and similar technologies to enhance your experience, analyze site usage, and assist in our marketing efforts. By clicking \"Accept All\", you consent to our use of analytics and tracking.",
+				"learnMore": "Learn more",
+				"buttons": {
+					"acceptAll": "Accept All",
+					"rejectAll": "Reject All",
+					"customize": "Customize"
+				},
+				"close": "Close"
+			},
+			"modal": {
+				"title": "Privacy Settings",
+				"description": "Manage your cookie preferences. You can enable or disable different types of cookies below.",
+				"categories": {
+					"necessary": {
+						"title": "Necessary Cookies",
+						"description": "Essential for the website to function properly. These cannot be disabled."
+					},
+					"analytics": {
+						"title": "Analytics Cookies",
+						"description": "Help us understand how visitors interact with our website by collecting and reporting information."
+					},
+					"marketing": {
+						"title": "Marketing Cookies",
+						"description": "Used to track visitors across websites to display relevant advertisements."
+					},
+					"preferences": {
+						"title": "Preference Cookies",
+						"description": "Allow the website to remember your choices and provide enhanced features."
+					}
+				},
+				"buttons": {
+					"save": "Save Settings",
+					"cancel": "Cancel",
+					"acceptAll": "Accept All",
+					"rejectAll": "Reject All"
+				}
+			},
+			"footer": {
+				"cookieSettings": "Cookie Settings"
+			}
 		}
 	},
 	"home": {

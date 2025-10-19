@@ -50,11 +50,11 @@ const FooterSection: React.FC = () => {
             ]}
           />
           <FooterLinksBlock
-            title="Privacy"
+            title={t('common.legal.privacy')}
             links={[
               {
                 href: '#',
-                label: 'Cookie Settings',
+                label: t('common.consent.footer.cookieSettings'),
                 onClick: (e: React.MouseEvent) => {
                   e.preventDefault();
                   openSettings();
