@@ -10,15 +10,17 @@ import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
 
 type CalendarEventProps = {
-	event: StyledEvent;
-	selectedEvent: string | null;
-	setSelectedEvent: (eventId: string | null) => void;
-}
+  event: StyledEvent;
+  selectedEvent: string | null;
+  setSelectedEvent: (eventId: string | null) => void;
+  onClick: () => void;
+};
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
-	event,
-	selectedEvent,
-	setSelectedEvent,
+  event,
+  selectedEvent,
+  setSelectedEvent,
+  onClick,
 }) => {
   return (
     <EventContainer
@@ -33,7 +35,10 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           g: event.colorGreen,
           b: event.colorBlue,
         }}
-        onClick={() => setSelectedEvent(event.id)}
+        onClick={() => {
+          setSelectedEvent(event.id);
+          onClick();
+        }}
         variant={event.isRigid ? 'block' : 'tile'}
       >
         <header>
