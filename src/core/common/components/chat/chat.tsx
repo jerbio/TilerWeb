@@ -18,6 +18,7 @@ import { locationService } from '@/services/locationService';
 import { SignalRService } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
 import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
+import analytics from '@/core/util/analytics';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -192,6 +193,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
+  
+  // Track chat component mount
+  useEffect(() => {
+    analytics.trackChatEvent('Chat Opened', {
+      personaId: selectedPersonaId,
+      hasExistingSession: !!sessionId,
+    });
+  }, []); // Only on mount
   
   // Extract values from active persona session
   const chatContext = activePersonaSession?.chatContext || [];
@@ -543,6 +552,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     e.preventDefault();
     if (!message.trim() || isSending) return;
 
+    // Track message send
+    analytics.trackChatEvent('Message Sent', {
+      messageLength: message.length,
+      hasContext: chatContext.length > 0,
+      personaId: selectedPersonaId,
+    });
+
     try {
       setIsSending(true);
       setError(null);
@@ -614,9 +630,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       setMessage('');
     } catch (err) {
       if (err instanceof ChatLimitError) {
+        analytics.trackError('Chat Limit Reached', { personaId: selectedPersonaId });
         setErrorPopupMessage(err.message);
         setShowErrorPopup(true);
       } else if (err instanceof Error) {
+        analytics.trackError('Chat Message Send Failed', {
+          errorMessage: err.message,
+          personaId: selectedPersonaId,
+        });
         setError(err.message);
       } else {
         setError(t('home.expanded.chat.errorSendMessage'));
@@ -627,6 +648,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   };
 
   const acceptAllChanges = async () => {
+    // Track accept changes action
+    analytics.trackChatEvent('Accept Changes', {
+      requestId: requestId || undefined,
+      personaId: selectedPersonaId,
+    });
+
     try {
       setIsSending(true);
       setError(null);
@@ -656,6 +683,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   };
 
   const handleNewChat = () => {
+    analytics.trackChatEvent('New Chat Started', {
+      personaId: selectedPersonaId,
+      previousSessionId: sessionId,
+    });
+
     setSessionId('');
     setError(null);
     setMessage('');
@@ -674,6 +706,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
 
   const handleRemoveContext = (context: ChatContextType) => {
+    analytics.trackChatEvent('Context Removed', {
+      contextName: context.Name,
+      contextEntityId: context.EntityId,
+      personaId: selectedPersonaId,
+    });
     removeChatContext(context); // Remove the clicked context
   };
 

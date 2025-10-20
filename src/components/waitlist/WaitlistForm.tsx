@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import MultiInput from '@/core/common/components/multi_input';
 import { useTranslation } from 'react-i18next';
 import WaitlistSuccessModal from './waitlist_success_modal';
+import analytics from '@/core/util/analytics';
 
 const WaitlistForm: React.FC = () => {
   const { t } = useTranslation();
@@ -86,11 +87,24 @@ const WaitlistForm: React.FC = () => {
       return;
     }
     if (currentStep < steps.length) {
+      // Track progression through steps
+      analytics.trackFormSubmit('Waitlist Form Step', {
+        step: currentStep,
+        stepName: steps[currentStep - 1].name,
+      });
       setCurrentStep(currentStep + 1);
       return;
     }
     try {
       setIsSubmitting(true);
+
+      // Track final submission
+      analytics.trackFormSubmit('Waitlist Form', {
+        profession: formValues.profession,
+        integrationsCount: formValues.integrations.length,
+        hasUseCase: !!formValues.useCase,
+      });
+
       await betaUserService.signUp({
         email: formValues.email,
         profession: formValues.profession,
@@ -104,6 +118,9 @@ const WaitlistForm: React.FC = () => {
       setSuccessModal(true);
     } catch (error) {
       console.error('Error signing up for waitlist:', error);
+      analytics.trackError('Waitlist Signup Failed', {
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      });
       toast.error('Failed to sign up.');
       resetForm();
     } finally {

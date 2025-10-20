@@ -134,6 +134,16 @@ class ChatService {
 			throw normalizeError(error);
 		}
 	}
+
+	async transcribeAudio(audioFile: Blob): Promise<string> {
+		try {
+			const response = await this.chatApi.transcribeAudio(audioFile);
+			return response.Content.transcription;
+		} catch (error) {
+			console.error('Error transcribing audio', error);
+			throw normalizeError(error);
+		}
+	}
 }
 
 export default ChatService;

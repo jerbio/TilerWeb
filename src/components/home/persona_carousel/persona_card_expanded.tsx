@@ -11,6 +11,7 @@ import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
 import useAppStore from '@/global_state';
+import analytics from '@/core/util/analytics';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -40,12 +41,21 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
   function handleClose(fullCollapse: boolean = false) {
     if (fullCollapse) {
+      // Track full collapse
+      analytics.trackPersonaEvent('Persona Card Collapsed', {
+        personaId: persona.id,
+        personaName: persona.name,
+      });
+
       // Full collapse: clear the active persona session and close the card
       setActivePersonaSession(null);
       setMobileChatVisible(false);
       onCollapse();
     } else {
       // Mobile chat close: only hide the chat overlay, keep persona session active
+      analytics.trackPersonaEvent('Mobile Chat Closed', {
+        personaId: persona.id,
+      });
       setMobileChatVisible(false);
     }
   }
@@ -109,7 +119,16 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
   useEffect(() => {
     if (expanded) {
+      // Track persona card expansion
+      analytics.trackPersonaEvent('Persona Card Expanded', {
+        personaId: persona.id,
+        personaName: persona.name,
+        hasExistingUser: !!personaUserId,
+      });
+
       if (!personaUserId) {
+        // Only create a new user if one doesn't exist
+        // For custom persona, the user is already created via createPersonaWithAudio
         getPersonaUser();
       } else {
         // Check if we need to switch persona sessions

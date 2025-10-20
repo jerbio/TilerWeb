@@ -76,4 +76,17 @@ export class ChatApi extends AppApi {
       `api/Vibe/VibeRequest?RequestId=${encodeURIComponent(requestId)}`
     );
   }
+
+  public transcribeAudio(audioFile: Blob) {
+    const formData = new FormData();
+    formData.append('AudioFile', audioFile, 'recording.webm');
+    
+    return this.apiRequestFormData<{ Content: { transcription: string } }>(
+      'api/Vibe/Transcribe',
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+  }
 }

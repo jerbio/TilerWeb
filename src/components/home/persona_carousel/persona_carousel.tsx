@@ -12,6 +12,7 @@ import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import { Persona } from '../../../core/common/types/persona';
 import usePersonaUsers from '../../../core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
+import useAppStore from '@/global_state';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;
@@ -45,6 +46,14 @@ const PersonaCarousel: React.FC = () => {
 	const [personasLoaded, setPersonasLoaded] = useState(false);
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
   const { personaUsers, setPersonaUser } = usePersonaUsers();
+  const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
+  const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
+  
+  // Swiper refs and responsive state
+  const swiperRef = React.useRef<SwiperRef | null>(null);
+  const isMobile = useIsMobile();
+  const isTablet = useIsMobile(1100);
+  const [slidesPerView, setSlidesPerView] = useState(1);
 
   async function getPersonas() {
     try {
@@ -93,6 +102,137 @@ const PersonaCarousel: React.FC = () => {
     getPersonas();
   }, []);
 
+  // Listen for custom persona creation event from navigation
+  useEffect(() => {
+    function handleCreateCustomPersona(event: CustomEvent<{ 
+      persona: Partial<Persona>; 
+      anonymousUser?: {
+        id: string | null;
+        username: string | null;
+        timeZoneDifference: number | null;
+        timeZone: string | null;
+        email: null | null;
+        endfOfDay: string | null;
+        phoneNumber: null | null;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+        countryCode: string | null;
+      };
+    }>) {
+      const { persona, anonymousUser } = event.detail;
+      const customPersona = personas.find((p) => p.id === 'custom-persona');
+      if (customPersona) {
+        // If we have anonymous user data from the API, save it to avoid duplicate API call
+        if (anonymousUser?.id) {
+          setPersonaUser('custom-persona', {
+            userId: anonymousUser.id,
+            personaInfo: { name: persona.name || 'Custom' },
+          });
+          
+          // Initialize the persona session immediately with the user data from the API
+          setActivePersonaSession({
+            personaId: 'custom-persona',
+            personaName: persona.name || 'Custom',
+            userId: anonymousUser.id,
+            scheduleId: null,
+            chatSessionId: '',
+            chatContext: [],
+            userInfo: {
+              id: anonymousUser.id,
+              username: anonymousUser.username || '',
+              timeZoneDifference: anonymousUser.timeZoneDifference || 0,
+              timeZone: anonymousUser.timeZone || 'UTC',
+              email: anonymousUser.email,
+              endfOfDay: anonymousUser.endfOfDay || '',
+              phoneNumber: anonymousUser.phoneNumber,
+              fullName: anonymousUser.fullName || '',
+              firstName: anonymousUser.firstName || '',
+              lastName: anonymousUser.lastName || '',
+              countryCode: anonymousUser.countryCode || '1',
+            },
+            scheduleLastUpdatedBy: null,
+          });
+        }
+        
+        // Update the custom persona with the provided data
+        updateSelectedPersona(customPersona.key, {
+          id: customPersona.id,
+          ...persona,
+        });
+      }
+    }
+
+    window.addEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
+    return () => {
+      window.removeEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
+    };
+  }, [personas]);
+
+  // Check URL params for custom persona creation on mount
+  useEffect(() => {
+    if (personasLoaded) {
+      const params = new URLSearchParams(window.location.search);
+      const isCustomPersona = params.get('customPersona') === 'true';
+      const description = params.get('description');
+      
+      if (isCustomPersona && description) {
+        const customPersona = personas.find((p) => p.id === 'custom-persona');
+        if (customPersona) {
+          // Clear the URL params
+          window.history.replaceState({}, '', window.location.pathname);
+          // Update the custom persona with the provided data
+          updateSelectedPersona(customPersona.key, {
+            id: customPersona.id,
+            name: description,
+            description: description,
+          });
+        }
+      }
+    }
+  }, [personasLoaded, personas]);
+
+  // Listen for focus custom persona event (when modal opens)
+  useEffect(() => {
+    function handleFocusCustomPersona() {
+      if (swiperRef.current && personas.length) {
+        const customPersona = personas.find((p) => p.id === 'custom-persona');
+        if (customPersona) {
+          // Slide to the custom persona card
+          // Since loop is true, we need to use slideToLoop
+          // swiperRef.current.swiper.slideReset();
+          swiperRef.current.swiper.slideToLoop(customPersona.key, 500);
+          // Pause autoplay and disable swiper interaction when modal opens
+          setTimeout(() => {
+            swiperRef?.current?.swiper?.autoplay?.pause();
+            swiperRef?.current?.swiper?.disable();
+            }, 600); // Delay slightly to allow slide animation to finish
+        }
+      }
+    }
+
+    window.addEventListener('focusCustomPersona', handleFocusCustomPersona);
+    return () => {
+      window.removeEventListener('focusCustomPersona', handleFocusCustomPersona);
+    };
+  }, [personas]);
+
+  // Listen for modal dismissal to re-enable carousel
+  useEffect(() => {
+    function handleModalDismissed() {
+      if (swiperRef.current) {
+        // Re-enable swiper interaction and resume autoplay
+        swiperRef.current.swiper.enable();
+        swiperRef.current.swiper.autoplay.resume();
+      }
+    }
+
+    window.addEventListener('customPersonaModalDismissed', handleModalDismissed);
+    return () => {
+      window.removeEventListener('customPersonaModalDismissed', handleModalDismissed);
+    };
+  }, []);
+
 	// Restart swiper autoplay when personas change
 	useEffect(() => {
 		if (swiperRef.current && personas.length) {
@@ -100,12 +240,6 @@ const PersonaCarousel: React.FC = () => {
 			swiperRef.current.swiper.autoplay.resume();
 		}
 	}, [personas]);
-
-  const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
-  const isMobile = useIsMobile();
-  const isTablet = useIsMobile(1100);
-  const [slidesPerView, setSlidesPerView] = useState(1);
-  const swiperRef = React.useRef<SwiperRef | null>(null);
 
   function updateSelectedPersona(personaKey: number | null, persona?: Partial<Persona>) {
     if (persona?.id) {
