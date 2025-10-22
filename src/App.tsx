@@ -7,6 +7,7 @@ import Features from './pages/Features';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import FooterSection from './components/footer_section';
+import { ConsentProvider } from './core/common/components/consent';
 // import useAppStore from './global_state';
 
 const App: React.FC = () => {
@@ -40,24 +41,26 @@ const App: React.FC = () => {
   // }, [setUserInfo]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="/features" element={<Features />} />
-        </Route>
-        <Route
-          path="/waitlist"
-          element={
-            <>
-              <Waitlist />
-              <FooterSection />
-            </>
-          }
-        />
-      </Routes>
-      <Toaster position="bottom-left" theme="system" />
-    </BrowserRouter>
+    <ConsentProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="/features" element={<Features />} />
+          </Route>
+          <Route
+            path="/waitlist"
+            element={
+              <>
+                <Waitlist />
+                <FooterSection />
+              </>
+            }
+          />
+        </Routes>
+        <Toaster position="bottom-left" theme="system" />
+      </BrowserRouter>
+    </ConsentProvider>
   );
 };
 

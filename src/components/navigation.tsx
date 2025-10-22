@@ -7,6 +7,9 @@ import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Logo from '@/core/common/components/icons/logo';
+import CustomPersonaModal from './navigation/CustomPersonaModal';
+import { PersonaApi } from '@/api/personaApi';
+import analytics from '@/core/util/analytics';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -166,6 +169,7 @@ const Navigation: React.FC = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navLinks = [
     { name: t('common.navigation.home'), href: '/' },
     { name: t('common.navigation.features'), href: '/features' },
@@ -185,6 +189,79 @@ const Navigation: React.FC = () => {
     };
   }, []);
 
+  function handleTryFreeClick() {
+    analytics.trackButtonClick('Try Free', 'Navigation', {
+      isModalOpen: isModalOpen,
+      isOnHomePage: window.location.pathname === '/',
+    });
+
+    setIsModalOpen(true);
+    setIsOpen(false); // Close mobile menu if open
+    
+    // If on home page, dispatch event to focus on custom persona in carousel
+    if (window.location.pathname === '/') {
+      window.dispatchEvent(new CustomEvent('focusCustomPersona'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function handleModalClose() {
+    setIsModalOpen(false);
+    
+    // Dispatch event to re-enable carousel
+    if (window.location.pathname === '/') {
+      window.dispatchEvent(new CustomEvent('customPersonaModalDismissed'));
+    }
+  }
+
+  async function handleModalSubmit(description: string, audioFile?: Blob) {
+    // Keep modal open with spinner while API processes
+    // The modal's isSubmitting state will show the spinner
+    
+    // If there's an audio file or description, send it to the backend
+    try {
+      const personaApi = new PersonaApi();
+      const response = await personaApi.createPersonaWithAudio(description, audioFile);
+      const finalDescription = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
+      const anonymousUser = response?.Content?.anonymousUserWithPersona?.anonymousUser;
+      
+      // Close modal after API completes successfully
+      setIsModalOpen(false);
+      
+      // Don't dispatch dismiss event on submit - persona will be selected/expanded
+      
+      // Navigate to home page with the persona
+      const params = new URLSearchParams();
+      params.set('customPersona', 'true');
+      params.set('description', finalDescription);
+      
+      if (window.location.pathname === '/') {
+        // Already on home page, dispatch event with complete persona data and user info
+        window.dispatchEvent(
+          new CustomEvent('createCustomPersona', { 
+            detail: { 
+              persona: {
+                id: 'custom-persona',
+                name: finalDescription,
+                description: finalDescription,
+              },
+              anonymousUser: anonymousUser,  // Include user data from API
+            } 
+          })
+        );
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Navigate to home page
+        window.location.href = `/?${params.toString()}`;
+      }
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+      // Close modal on error too
+      setIsModalOpen(false);
+      // TODO: Show error message to user in toast
+    }
+  }
+
   return (
     <NavigationContainerSticky>
       <NavigationContainer>
@@ -201,7 +278,7 @@ const Navigation: React.FC = () => {
             <ButtonsWrapper>
               <Button
                 size="small"
-                onClick={() => window.open('https://launch.tiler.app/', '_blank')}
+                onClick={handleTryFreeClick}
                 bordergradient={[palette.colors.brand[400]]}
               >
                 {t('common.buttons.tryFree')}
@@ -227,7 +304,7 @@ const Navigation: React.FC = () => {
           <hr />
           <Button
             height={40}
-            onClick={() => window.open('https://tiler.app/', '_blank')}
+            onClick={handleTryFreeClick}
             bordergradient={[palette.colors.brand[500]]}
             size="small"
           >
@@ -246,6 +323,11 @@ const Navigation: React.FC = () => {
           </Button>
         </MobileNav>
       </NavigationContainer>
+      <CustomPersonaModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+      />
     </NavigationContainerSticky>
   );
 };

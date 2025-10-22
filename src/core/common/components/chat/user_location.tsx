@@ -335,7 +335,7 @@ const UserLocation: React.FC = () => {
 	const getCurrentLocation = async () => {
 		try {
 			setIsLocationFetching(true);
-			const currentLocation = await locationService.getCurrentLocation();
+			const currentLocation = await locationService.refreshLocationFromBrowser();
 			setLocationData(currentLocation);
 			setCustomLocation(currentLocation.location);
 		} catch (err) {
@@ -393,6 +393,7 @@ const UserLocation: React.FC = () => {
 	// Reset location to default
 	const resetToDefault = () => {
 		const defaultLocation = locationService.getDefaultLocation();
+		locationService.setCurrentLocation(defaultLocation);
 		setLocationData(defaultLocation);
 		setCustomLocation(defaultLocation.location);
 		// Clear the cached manual location

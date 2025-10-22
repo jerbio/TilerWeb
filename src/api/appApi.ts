@@ -48,6 +48,51 @@ export class AppApi {
 		}
 	}
 
+	async apiRequestFormData<T>(
+		endpoint: string,
+		options?: RequestInit & { authRequired?: boolean }
+	): Promise<T> {
+		const requestEndpoint = this.getUri(endpoint);
+		
+		// Destructure to exclude headers from the spread
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { headers: _headers, authRequired, ...restOptions } = options || {};
+		
+		const requestOptions: RequestInit = {
+			method: 'POST',
+			...restOptions,
+		};
+
+		// Don't set Content-Type header for FormData - browser will set it with boundary
+		const headers = new Headers();
+		
+		if (authRequired) {
+			const token = localStorage.getItem('tiler_bearer');
+			if (!token) {
+				throw new AuthError('No bearer token found');
+			} else {
+				headers.append('Authorization', token);
+			}
+		}
+
+		// Only set headers if we added authorization, otherwise leave undefined
+		// to let browser set multipart/form-data with boundary
+		if (authRequired) {
+			requestOptions.headers = headers;
+		}
+
+		try {
+			const res = await fetch(requestEndpoint, requestOptions);
+			if (!res.ok) {
+				throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
+			}
+			return (await res.json()) as T;
+		} catch (error) {
+			if (error instanceof ServerError) throw error;
+			throw new ServerError('Unexpected error occurred', requestEndpoint, error);
+		}
+	}
+
 	get defaultDomain(): string {
 		return this.#baseUrl;
 	}

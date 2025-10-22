@@ -13,10 +13,10 @@ export interface LocationCoordinates {
 
 class LocationService {
   // Default location: National Museum of African American History and Culture in DC
-  private readonly DEFAULT_LOCATION = "National Museum of African American History and Culture, Washington, DC";
-
-  // Cache for manually entered location - persists between re-renders
-  private cachedManualLocation: LocationData | null = null;
+  private readonly DEFAULT_LOCATION = "Empire State Building, New York, NY";
+  
+  // Cache for the current location data
+  private currentLocationData: LocationData | null = null;
 
   /**
    * Get the default location data
@@ -50,19 +50,42 @@ class LocationService {
   }
 
   /**
-   * Get the user's current location using browser geolocation API
-   * Returns cached manual location if available
+   * Set the current location data (used when user manually enters an address)
+   */
+  setCurrentLocation(locationData: LocationData): void {
+    this.currentLocationData = locationData;
+  }
+
+  /**
+   * Get the user's current location
+   * Returns cached location if available, otherwise uses browser geolocation API
    */
   async getCurrentLocation(): Promise<LocationData> {
-    // Check cache first - return manual location if set
-    if (this.cachedManualLocation) {
-      return this.cachedManualLocation;
+    // If we have a cached location (manually set or previously fetched), return it
+    if (this.currentLocationData) {
+      return this.currentLocationData;
     }
 
+    return this.fetchBrowserLocation();
+  }
+
+  /**
+   * Force refresh location from browser geolocation API (ignores cache)
+   */
+  async refreshLocationFromBrowser(): Promise<LocationData> {
+    return this.fetchBrowserLocation();
+  }
+
+  /**
+   * Fetch location from browser geolocation API
+   */
+  private async fetchBrowserLocation(): Promise<LocationData> {
     try {
       // Check if geolocation is supported by the browser
       if (!navigator.geolocation) {
-        return this.getDefaultLocation();
+        const defaultLocation = this.getDefaultLocation();
+        this.currentLocationData = defaultLocation;
+        return defaultLocation;
       }
 
       // Get the current position with a timeout
@@ -79,27 +102,35 @@ class LocationService {
         // Use reverse geocoding to get a human-readable address
         const address = await this.reverseGeocode(latitude, longitude);
 
-        return {
+        const locationData = {
           location: address,
           longitude,
           latitude,
           verified: true,
         };
+        
+        this.currentLocationData = locationData;
+        return locationData;
       } catch (err) {
         // If reverse geocoding fails, just use coordinates
         console.error('Reverse geocoding failed:', err);
         const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
-        return {
+        const locationData = {
           location: coords,
           longitude,
           latitude,
           verified: true,
         };
+        
+        this.currentLocationData = locationData;
+        return locationData;
       }
     } catch (err) {
       console.error('Geolocation error:', err);
-      return this.getDefaultLocation();
+      const defaultLocation = this.getDefaultLocation();
+      this.currentLocationData = defaultLocation;
+      return defaultLocation;
     }
   }
 
@@ -156,7 +187,9 @@ class LocationService {
   async getLocationFromAddress(address: string): Promise<LocationData> {
     // Check if the entered location is the default
     if (address.trim() === this.DEFAULT_LOCATION) {
-      return this.getDefaultLocation();
+      const defaultLocation = this.getDefaultLocation();
+      this.currentLocationData = defaultLocation;
+      return defaultLocation;
     }
 
     try {
@@ -164,25 +197,35 @@ class LocationService {
       const geocodedResult = await this.geocodeAddress(address.trim());
 
       if (geocodedResult) {
-        return {
+        const locationData = {
           location: geocodedResult.displayName,
           longitude: geocodedResult.longitude,
           latitude: geocodedResult.latitude,
           verified: true,
         };
+        
+        // Cache the location data
+        this.currentLocationData = locationData;
+        return locationData;
       } else {
         // If geocoding fails, just use the entered text
-        return {
+        const locationData = {
           location: address.trim(),
           verified: false,
         };
+        
+        this.currentLocationData = locationData;
+        return locationData;
       }
     } catch (err) {
       console.error('Error processing address:', err);
-      return {
+      const locationData = {
         location: address.trim(),
         verified: false,
       };
+      
+      this.currentLocationData = locationData;
+      return locationData;
     }
   }
 

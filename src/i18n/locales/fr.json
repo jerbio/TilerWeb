@@ -1,7 +1,77 @@
 {
 	"common": {
 		"buttons": {
-			"back": "Retour"
+			"back": "Retour",
+			"createSchedule": "Créer un Horaire",
+			"creating": "Création...",
+			"cancel": "Annuler"
+		},
+		"voiceInput": {
+			"listening": "À l'écoute...",
+			"transcribing": "Transcription...",
+			"startRecording": "Démarrer la saisie vocale",
+			"stopRecording": "Arrêter l'enregistrement",
+			"playRecording": "Lire l'enregistrement",
+			"pauseRecording": "Mettre en pause l'enregistrement",
+			"deleteRecording": "Supprimer l'enregistrement"
+		},
+		"customPersonaModal": {
+			"title": "Créez Votre Horaire Personnalisé",
+			"description": "Parlez-nous de vous et du type d'horaire dont vous avez besoin. Nous vous aiderons à créer un horaire personnalisé qui correspond à votre style de vie.",
+			"placeholders": {
+				"healthcare": "Je suis un professionnel de la santé qui travaille des quarts de 12 heures...",
+				"student": "Je suis un étudiant qui équilibre les cours, le temps d'étude et les activités parascolaires...",
+				"engineer": "Je suis un ingénieur logiciel qui code mieux le soir...",
+				"parent": "Je suis un parent qui jongle entre le travail, les dépôts scolaires et le temps en famille...",
+				"freelancer": "Je suis un travailleur autonome qui gère plusieurs clients et délais...",
+				"fitness": "Je suis un passionné de fitness qui a besoin de temps d'entraînement le matin...",
+				"remote": "Je suis un travailleur à distance dans différents fuseaux horaires...",
+				"business": "Je suis un propriétaire de petite entreprise avec des horaires irréguliers..."
+			}
+		},
+		"consent": {
+			"banner": {
+				"title": "Nous Respectons Votre Vie Privée",
+				"description": "Nous utilisons des cookies et des technologies similaires pour améliorer votre expérience, analyser l'utilisation du site et nous aider dans nos efforts de marketing. En cliquant sur \"Tout Accepter\", vous consentez à notre utilisation d'analyses et de suivi.",
+				"learnMore": "En savoir plus",
+				"buttons": {
+					"acceptAll": "Tout Accepter",
+					"rejectAll": "Tout Refuser",
+					"customize": "Personnaliser"
+				},
+				"close": "Fermer"
+			},
+			"modal": {
+				"title": "Paramètres de Confidentialité",
+				"description": "Gérez vos préférences de cookies. Vous pouvez activer ou désactiver différents types de cookies ci-dessous.",
+				"categories": {
+					"necessary": {
+						"title": "Cookies Nécessaires",
+						"description": "Essentiels au bon fonctionnement du site. Ils ne peuvent pas être désactivés."
+					},
+					"analytics": {
+						"title": "Cookies d'Analyse",
+						"description": "Nous aident à comprendre comment les visiteurs interagissent avec notre site en collectant et rapportant des informations."
+					},
+					"marketing": {
+						"title": "Cookies Marketing",
+						"description": "Utilisés pour suivre les visiteurs sur les sites Web afin d'afficher des publicités pertinentes."
+					},
+					"preferences": {
+						"title": "Cookies de Préférence",
+						"description": "Permettent au site de mémoriser vos choix et de fournir des fonctionnalités améliorées."
+					}
+				},
+				"buttons": {
+					"save": "Enregistrer les Paramètres",
+					"cancel": "Annuler",
+					"acceptAll": "Tout Accepter",
+					"rejectAll": "Tout Refuser"
+				}
+			},
+			"footer": {
+				"cookieSettings": "Paramètres des Cookies"
+			}
 		}
 	},
 	"home": {

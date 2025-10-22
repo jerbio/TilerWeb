@@ -56,6 +56,7 @@ export type PersonaAnonymousUserResponse = ApiResponse<{
 			lastName: string | null;
 			countryCode: string | null;
 		};
+		userDescription: string | null | undefined;
 		scheduleId: string;
 	};
 }>;

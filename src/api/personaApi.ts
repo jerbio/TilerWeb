@@ -13,4 +13,21 @@ export class PersonaApi extends AppApi {
       TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString()}),
 		});
 	}
+
+	public createPersonaWithAudio(description: string, audioFile: Blob | null | undefined) {
+		const formData = new FormData();
+		if(audioFile) {
+			formData.append('AudioFile', audioFile, 'recording.webm');
+		}
+		formData.append('Description', description);
+		formData.append('TimeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+		return this.apiRequestFormData<PersonaAnonymousUserResponse>(
+			'api/Persona/CreateWithAudio',
+			{
+				method: 'POST',
+				body: formData,
+			}
+		);
+	}
 }
