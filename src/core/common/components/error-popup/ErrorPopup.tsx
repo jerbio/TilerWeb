@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
@@ -6,6 +6,7 @@ import Button from '@/core/common/components/button';
 import { ArrowRight } from 'lucide-react';
 import Logo from '@/core/common/components/icons/logo';
 import FetchingChatInterface from '@/assets/fetching_chat_interface.svg';
+import { emailListService } from '@/services';
 
 interface ErrorPopupProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ interface ErrorPopupProps {
   onRedirect?: () => void;
   redirectButtonText?: string;
   showWaitlistButton?: boolean;
-  onWaitlistClick?: () => void;
+  onEmailSubmitted?: (email: string) => void;
 }
 
 const ErrorPopup: React.FC<ErrorPopupProps> = ({
@@ -26,8 +27,49 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
   onRedirect,
   redirectButtonText = 'Go Back',
   showWaitlistButton = false,
-  onWaitlistClick
+  onEmailSubmitted
 }) => {
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleWaitlistSubmit = async () => {
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setEmailError('');
+
+    try {
+      const response = await emailListService.submitEmail(email.trim());
+
+      // Check response structure based on API
+      if (response?.Error?.Code === "0") {
+        // Success - call parent callback
+        onEmailSubmitted?.(email);
+      } else {
+        setEmailError(response?.Error?.Message || 'Failed to submit email');
+      }
+    } catch (error) {
+      console.error('Error submitting email:', error);
+      setEmailError('Failed to submit email. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
@@ -53,17 +95,35 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
         </Content>}
 
         <Actions>
-          {showWaitlistButton && onWaitlistClick && (
+          {showWaitlistButton && onEmailSubmitted && (
             <>
               <WaitlistDescription>
                 Get early access to unlimited chats, smart integrations, and the full Tiler experience.
               </WaitlistDescription>
+
+              {/* Email Input */}
+              <EmailInputContainer>
+                <EmailInputField
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError('');
+                  }}
+                  disabled={isSubmitting}
+                  $hasError={!!emailError}
+                />
+                {emailError && <EmailError>{emailError}</EmailError>}
+              </EmailInputContainer>
+
               <Button
                 variant={palette.colors.brand[500]}
-                onClick={onWaitlistClick}
+                onClick={handleWaitlistSubmit}
+                disabled={isSubmitting}
               >
-                Join The Waitlist
-                <ArrowRight size={16} />
+                {isSubmitting ? 'Submitting...' : (email.trim() ? 'Submit Email' : 'Join The Waitlist')}
+                {!isSubmitting && <ArrowRight size={16} />}
               </Button>
               <WaitlistSubtext>Spots are limited – Save yours now.</WaitlistSubtext>
             </>
@@ -227,6 +287,44 @@ const WaitlistSubtext = styled.p`
   font-size: ${palette.typography.fontSize.sm};
   text-align: center;
   margin: 0;
+  margin-top: -0.25rem;
+`;
+
+const EmailInputContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const EmailInputField = styled.input<{ $hasError: boolean }>`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${props => props.$hasError ? palette.colors.error[500] : palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+  color: ${palette.colors.white};
+  font-size: ${palette.typography.fontSize.base};
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.$hasError ? palette.colors.error[500] : palette.colors.brand[500]};
+  }
+
+  &::placeholder {
+    color: ${palette.colors.gray[500]};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const EmailError = styled.span`
+  color: ${palette.colors.error[500]};
+  font-size: ${palette.typography.fontSize.sm};
   margin-top: -0.25rem;
 `;
 
