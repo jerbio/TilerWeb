@@ -20,6 +20,7 @@ type CalendarEventsProps = {
   headerWidth: number;
   selectedEvent: string | null;
   setSelectedEvent: (id: string | null) => void;
+	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
 	onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
 };
 type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
@@ -61,6 +62,7 @@ const CalendarEvents = ({
   selectedEvent,
   setSelectedEvent,
 	onNonViableEventsChange,
+	setSelectedEventInfo,
 }: CalendarEventsProps) => {
 	const handleEventClick = (event: StyledEvent) => {
 		// Track event selection
@@ -320,6 +322,7 @@ const CalendarEvents = ({
               event={event}
               selectedEvent={selectedEvent}
               setSelectedEvent={setSelectedEvent}
+							setSelectedEventInfo={setSelectedEventInfo}
               onClick={() => handleEventClick(event)}
             />
           </EventPositioner>

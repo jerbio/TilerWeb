@@ -13,13 +13,15 @@ type CalendarEventProps = {
   event: StyledEvent;
   selectedEvent: string | null;
   setSelectedEvent: (eventId: string | null) => void;
-  onClick: () => void;
+	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
+  onClick?: () => void;
 };
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
   event,
   selectedEvent,
   setSelectedEvent,
+	setSelectedEventInfo,
   onClick,
 }) => {
   return (
@@ -37,7 +39,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         }}
         onClick={() => {
           setSelectedEvent(event.id);
-          onClick();
+					setSelectedEventInfo(event);
+          onClick?.();
         }}
         variant={event.isRigid ? 'block' : 'tile'}
       >

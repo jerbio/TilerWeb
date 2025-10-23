@@ -12,6 +12,8 @@ import CalendarEvent from './calendar_event';
 import Tooltip from '../tooltip';
 import analytics from '@/core/util/analytics';
 import TimeUtil from '@/core/util/time';
+import CalendarEventInfo from './calendar_event_info';
+import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 
 export type CalendarViewOptions = {
   width: number;
@@ -36,6 +38,8 @@ const Calendar = ({
 }: CalendarProps) => {
   const viableEvents = events.filter((event) => event.isViable);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
+
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +63,7 @@ const Calendar = ({
 
   function changeDayView(dir: 'left' | 'right') {
     const changeAmount = dir === 'left' ? -1 : 1;
-    
+
     setViewOptions((prev) => {
       const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
       // Track navigation
@@ -198,6 +202,100 @@ const Calendar = ({
     setHasAutoScrolled(false);
   }, [viewOptions.startDay]);
 
+  const calendarEventInfo = [
+    {
+      key: 'info',
+      container: CalendarEventInfoModalContainer,
+      content: (
+        <CalendarEventInfo
+          event={selectedEventInfo}
+          onClose={() => {
+            setSelectedEventInfo(null);
+            setSelectedEvent(null);
+          }}
+        />
+      ),
+    },
+  ];
+
+  const calculateEventInfoCoordinates = (event: StyledEvent) => {
+    const INFO_MODAL_HEIGHT = parseInt(calendarConfig.INFO_MODAL_HEIGHT);
+    const INFO_MODAL_WIDTH = parseInt(calendarConfig.INFO_MODAL_WIDTH);
+    const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
+
+    const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
+    const innerAbsoluteX = event.springStyles.x + parseInt(calendarConfig.TIMELINE_WIDTH);
+    const innerAbsoluteY = event.springStyles.y + parseInt(calendarConfig.HEADER_HEIGHT);
+    const innerAbsoluteWidth = event.springStyles.width;
+
+    const containerRect = contentContainerRef.current?.getBoundingClientRect();
+    const containerWidth = containerRect?.width || 0;
+    const containerHeight = containerRect?.height || 0;
+
+    // Position to the right of the event by default
+    // If not enough space, position to the left
+    let calculatedX = innerAbsoluteX + innerAbsoluteWidth + INFO_MODAL_GAP;
+    if (calculatedX + INFO_MODAL_WIDTH > containerWidth) {
+      // Not enough space on the right, position to the left
+      calculatedX = innerAbsoluteX - INFO_MODAL_WIDTH - INFO_MODAL_GAP; // 12px gap
+      if (calculatedX < 0) {
+        // Still not enough space, clamp to left edge
+        calculatedX = 0;
+      }
+    }
+
+    // Position vertically aligned to the top of the event by default
+    // If not enough space at the bottom, adjust upwards
+    let calculatedY = innerAbsoluteY - vScrollOffset;
+    console.log(calculatedY);
+    if (calculatedY + INFO_MODAL_HEIGHT > containerHeight) {
+      // Not enough space at the bottom, adjust upwards
+      calculatedY =
+        containerHeight + parseInt(calendarConfig.HEADER_HEIGHT) - INFO_MODAL_HEIGHT;
+    }
+    if (calculatedY < parseInt(calendarConfig.HEADER_HEIGHT)) {
+      // Still not enough space, clamp to top edge
+      calculatedY = parseInt(calendarConfig.HEADER_HEIGHT) + INFO_MODAL_GAP;
+    }
+
+    setCalendarEventInfoPos({ x: calculatedX, y: calculatedY });
+  };
+
+  const calendarEventInfoModalRef = useRef<HTMLDivElement>(null);
+  const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  useEffect(() => {
+    if (selectedEventInfo) {
+      calculateEventInfoCoordinates(selectedEventInfo!);
+      contentContainerRef.current?.addEventListener(
+        'click',
+        (e) => {
+          // Close the event info modal if clicking outside of it
+          const modal = calendarEventInfoModalRef.current;
+          if (modal && !modal.contains(e.target as Node)) {
+            setSelectedEventInfo(null);
+            setSelectedEvent(null);
+          }
+        },
+        { once: true }
+      );
+    }
+  }, [selectedEventInfo]);
+  const calendarEventInfoTransRef = useSpringRef();
+  const calendarEventInfoTrans = useTransition(selectedEventInfo ? calendarEventInfo : [], {
+    keys: (item) => item.key,
+    ref: calendarEventInfoTransRef,
+    from: { x: calendarEventInfoPos.x - 12, y: calendarEventInfoPos.y, opacity: 1 },
+    enter: { x: calendarEventInfoPos.x, y: calendarEventInfoPos.y, opacity: 1 },
+    update: { x: calendarEventInfoPos.x, y: calendarEventInfoPos.y },
+    leave: { opacity: 0 },
+    config: { tension: 300, friction: 30 },
+  });
+
+  useChain([calendarEventInfoTransRef], [0], 0);
+
   return (
     <CalendarContainer $isMounted={contentMounted}>
       <CalendarHeader>
@@ -261,6 +359,7 @@ const Calendar = ({
         </CalendarHeaderDateList>
       </CalendarHeader>
 
+      {/* Non-Viable Events Overlays */}
       {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
         const day = viewOptions.startDay.add(index, 'day');
         const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
@@ -276,7 +375,7 @@ const Calendar = ({
               <h2>Non-Viable Tiles</h2>
               <Tooltip
                 text="These events could not be scheduled due to timing conflicts or constraints."
-								maxWidth={150}
+                maxWidth={150}
                 position="left"
               >
                 <Info size={18} color={palette.colors.gray[500]} />
@@ -289,15 +388,26 @@ const Calendar = ({
                 key={event.id}
                 selectedEvent={selectedEvent}
                 setSelectedEvent={setSelectedEvent}
+                setSelectedEventInfo={setSelectedEventInfo}
               />
             ))}
           </NonViableEventsContainer>
         ) : null;
       })}
 
+      {/* Loading Overlay */}
       <LoadingContainer $loading={eventsLoading}>
         <Spinner />
       </LoadingContainer>
+
+      {/* Info Modal Overlay */}
+      {calendarEventInfoTrans((style, item) => (
+        <item.container style={style} key={item.key} ref={calendarEventInfoModalRef}>
+          {item.content}
+        </item.container>
+      ))}
+
+      {/* Calendar Content */}
       <CalendarContentContainer id="calendar-content-container" ref={contentContainerRef}>
         <CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
           {/* Background */}
@@ -320,6 +430,7 @@ const Calendar = ({
             headerWidth={viewOptions.width}
             selectedEvent={selectedEvent}
             setSelectedEvent={setSelectedEvent}
+            setSelectedEventInfo={setSelectedEventInfo}
             onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
           />
         </CalendarContent>
@@ -570,6 +681,15 @@ const NonViableEventsContainer = styled.div<{
 	}
 
 	transition: opacity 0.2s ease-in-out;
+`;
+
+const CalendarEventInfoModalContainer = styled(a.div)`
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	width: ${calendarConfig.INFO_MODAL_WIDTH};
+	height: ${calendarConfig.INFO_MODAL_HEIGHT};
 `;
 
 export default Calendar;
