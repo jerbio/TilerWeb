@@ -247,7 +247,6 @@ const Calendar = ({
     // Position vertically aligned to the top of the event by default
     // If not enough space at the bottom, adjust upwards
     let calculatedY = innerAbsoluteY - vScrollOffset;
-    console.log(calculatedY);
     if (calculatedY + INFO_MODAL_HEIGHT > containerHeight) {
       // Not enough space at the bottom, adjust upwards
       calculatedY =
@@ -263,8 +262,8 @@ const Calendar = ({
 
   const calendarEventInfoModalRef = useRef<HTMLDivElement>(null);
   const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
+    x: 100,
+    y: 100,
   });
   useEffect(() => {
     if (selectedEventInfo) {
@@ -285,13 +284,21 @@ const Calendar = ({
   }, [selectedEventInfo]);
   const calendarEventInfoTransRef = useSpringRef();
   const calendarEventInfoTrans = useTransition(selectedEventInfo ? calendarEventInfo : [], {
-    keys: (item) => item.key,
+    keys: (item) => `${item.key}-${calendarEventInfoPos.x}-${calendarEventInfoPos.y}`,
     ref: calendarEventInfoTransRef,
-    from: { x: calendarEventInfoPos.x - 12, y: calendarEventInfoPos.y, opacity: 1 },
-    enter: { x: calendarEventInfoPos.x, y: calendarEventInfoPos.y, opacity: 1 },
-    update: { x: calendarEventInfoPos.x, y: calendarEventInfoPos.y },
-    leave: { opacity: 0 },
-    config: { tension: 300, friction: 30 },
+    from: {
+      x: calendarEventInfoPos.x - 12,
+      y: calendarEventInfoPos.y,
+      opacity: 0,
+    },
+    enter: {
+      x: calendarEventInfoPos.x,
+      y: calendarEventInfoPos.y,
+      opacity: 1,
+      delay: 100,
+    },
+    leave: { opacity: 0, pointerEvents: 'none' },
+    config: { tension: 300, friction: 30, duration: 150 },
   });
 
   useChain([calendarEventInfoTransRef], [0], 0);
@@ -411,7 +418,7 @@ const Calendar = ({
       <CalendarContentContainer id="calendar-content-container" ref={contentContainerRef}>
         <CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
           {/* Background */}
-          <CalendarBg ref={calendarGridCanvasRef} />
+          <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
           {/* Timeline */}
           {Array.from({ length: 24 }).map((_, hourIndex) => {
             return (
@@ -542,11 +549,11 @@ const CalendarContent = styled.div<{ $cellwidth: number }>`
 	isolation: isolate;
 `;
 
-const CalendarBg = styled.canvas`
+const CalendarBg = styled.canvas<{ $width: number }>`
 	position: absolute;
 	top: 0;
 	left: ${calendarConfig.TIMELINE_WIDTH};
-	width: calc(100% - ${calendarConfig.TIMELINE_WIDTH});
+	width: ${({ $width }) => `${$width}px`};
 	height: 100%;
 	z-index: -1;
 `;
@@ -689,7 +696,8 @@ const CalendarEventInfoModalContainer = styled(a.div)`
 	left: 0;
 	z-index: 1000;
 	width: ${calendarConfig.INFO_MODAL_WIDTH};
-	height: ${calendarConfig.INFO_MODAL_HEIGHT};
+	height: fit-content;
+	max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
 `;
 
 export default Calendar;

@@ -42,17 +42,19 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
           <p>{getEventTimeDescription(event)}</p>
         </div>
       </header>
-      <CalendarEventLocation>
-        <a
-          href={CalendarUtil.getEventLocationLink(event)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="location"
-        >
-          <MapPin size={14} style={{ minWidth: 16 }} />
-          <span>{event.location.address}</span>
-        </a>
-      </CalendarEventLocation>
+      {event.location.address && (
+        <CalendarEventLocation>
+          <a
+            href={CalendarUtil.getEventLocationLink(event)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="location"
+          >
+            <MapPin size={14} style={{ minWidth: 16 }} />
+            <span>{event.location.address}</span>
+          </a>
+        </CalendarEventLocation>
+      )}
     </StyledCalendarEventInfo>
   ) : null;
 };
@@ -60,6 +62,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
 const CalendarEventLocation = styled.div`
 	font-size: ${palette.typography.fontSize.xs};
 	color: ${palette.colors.gray[400]};
+
 
 	a {
 		display: flex;
@@ -87,6 +90,7 @@ const StyledCalendarEventInfo = styled.div`
 	background-color: ${palette.colors.gray[800]};
 	border-radius: ${palette.borderRadius.xLarge};
 	width: 100%;
+height: fit-content;
 
 	header {
 		display: flex;

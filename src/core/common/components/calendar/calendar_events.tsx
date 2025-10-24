@@ -271,7 +271,7 @@ const CalendarEvents = ({
 			const nonViableEvents = styledEvents.filter((event) => !event.isViable);
 			onNonViableEventsChange(nonViableEvents);
 		}
-	}, [styledEvents, onNonViableEventsChange]);
+	}, [styledEvents]);
 
 
   const eventTransition = useTransition(
