@@ -39,6 +39,8 @@
 				"business": "I'm a small business owner with irregular working hours..."
 			},
 			"processing": {
+				"title": "Creating Your Schedule",
+				"description": "Please wait while we set everything up for you...",
 				"creatingUser": "Creating User",
 				"creatingUserDesc": "Setting up your personalized profile...",
 				"generatingProfile": "Generating Schedule Profile",

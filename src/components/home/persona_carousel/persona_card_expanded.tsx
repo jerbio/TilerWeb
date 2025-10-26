@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import PersonaCalendar from './persona_calendar';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
+import { ChevronLeftIcon, Plus, Check } from 'lucide-react';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
@@ -12,6 +12,8 @@ import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaU
 import { personaService } from '@/services';
 import useAppStore from '@/global_state';
 import analytics from '@/core/util/analytics';
+import { useTranslation } from 'react-i18next';
+import Spinner from '@/core/common/components/loader';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -32,12 +34,35 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   setPersonaUser,
 	onClick,
 }) => {
+  const { t } = useTranslation();
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const personaUserId = personaUsers[persona.id]?.userId || null;
   const activePersonaSession = useAppStore((state) => state.activePersonaSession);
   const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
+  const [isCreatingPersona, setIsCreatingPersona] = useState(false);
+  const [processingStep, setProcessingStep] = useState(0);
+
+  // Backend processing steps
+  const PROCESSING_STEPS = [
+    {
+      title: t('common.customPersonaModal.processing.creatingUser'),
+      description: t('common.customPersonaModal.processing.creatingUserDesc'),
+    },
+    {
+      title: t('common.customPersonaModal.processing.generatingProfile'),
+      description: t('common.customPersonaModal.processing.generatingProfileDesc'),
+    },
+    {
+      title: t('common.customPersonaModal.processing.generatingTiles'),
+      description: t('common.customPersonaModal.processing.generatingTilesDesc'),
+    },
+    {
+      title: t('common.customPersonaModal.processing.optimizing'),
+      description: t('common.customPersonaModal.processing.optimizingDesc'),
+    },
+  ];
 
   function handleClose(fullCollapse: boolean = false) {
     if (fullCollapse) {
@@ -61,12 +86,28 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   }
 
   async function getPersonaUser() {
+    setIsCreatingPersona(true);
+    setProcessingStep(0);
+    
+    // Simulate progressive steps with intervals
+    const stepInterval = setInterval(() => {
+      setProcessingStep(prev => {
+        if (prev < PROCESSING_STEPS.length - 1) {
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 2000); // Progress every 2 seconds
+    
     try {
       const personaUser = await personaService.createAnonymousUser(persona);
       const newUserId = personaUser.anonymousUser.id;
       
       if (!newUserId) {
         console.error("Failed to create user for persona: userId is null");
+        clearInterval(stepInterval);
+        setIsCreatingPersona(false);
+        setProcessingStep(0);
         return;
       }
       
@@ -98,8 +139,22 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
         },
         scheduleLastUpdatedBy: null,
       });
+      
+      clearInterval(stepInterval);
+      
+      // Show all steps as complete (all checkmarks)
+      setProcessingStep(PROCESSING_STEPS.length);
+      
+      // Wait 1 second to show all checkmarks before hiding
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsCreatingPersona(false);
+      setProcessingStep(0);
     } catch (error) {
+      clearInterval(stepInterval);
       console.error("Couldn't create profile for persona: ", error);
+      setIsCreatingPersona(false);
+      setProcessingStep(0);
     }
   }
 
@@ -209,6 +264,35 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           </item.container>
         ))}
       </CardContent>
+      
+      {/* Loading overlay for persona creation */}
+      <LoadingOverlay $visible={isCreatingPersona}>
+        <LoadingContent>
+          <Spinner />
+          <LoadingMessage>
+            <LoadingTitle>{t('common.customPersonaModal.processing.title')}</LoadingTitle>
+            <LoadingDescription>
+              {t('common.customPersonaModal.processing.description')}
+            </LoadingDescription>
+          </LoadingMessage>
+          <ProgressSteps>
+            {PROCESSING_STEPS.map((step, index) => {
+              const isActive = processingStep === index;
+              const isComplete = processingStep > index;
+              return (
+                <ProgressStep key={index} $isActive={isActive} $isComplete={isComplete}>
+                  <StepIndicator $isActive={isActive} $isComplete={isComplete}>
+                    {isComplete ? <Check size={14} /> : index + 1}
+                  </StepIndicator>
+                  <StepText $isActive={isActive} $isComplete={isComplete}>
+                    {step.title}
+                  </StepText>
+                </ProgressStep>
+              );
+            })}
+          </ProgressSteps>
+        </LoadingContent>
+      </LoadingOverlay>
     </CardContainer>
   );
 };
@@ -337,6 +421,114 @@ const MobileCloseButtonContainer = styled.div`
 	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
 	}
+`;
+
+const LoadingOverlay = styled.div<{ $visible: boolean }>`
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 1.5rem;
+	background-color: rgba(0, 0, 0, 0.85);
+	backdrop-filter: blur(8px);
+	border-radius: ${palette.borderRadius.xxLarge};
+	z-index: 1000;
+	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+	pointer-events: ${({ $visible }) => ($visible ? 'all' : 'none')};
+	transition: opacity 0.3s ease-in-out;
+`;
+
+const LoadingContent = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	max-width: 400px;
+	padding: 0 2rem;
+`;
+
+const LoadingMessage = styled.div`
+	text-align: center;
+	color: ${palette.colors.gray[100]};
+	font-family: ${palette.typography.fontFamily.inter};
+`;
+
+const LoadingTitle = styled.h3`
+	font-size: ${palette.typography.fontSize.lg};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	margin: 0 0 0.5rem 0;
+	color: ${palette.colors.white};
+`;
+
+const LoadingDescription = styled.p`
+	font-size: ${palette.typography.fontSize.sm};
+	color: ${palette.colors.gray[400]};
+	margin: 0;
+	line-height: 1.5;
+`;
+
+const ProgressSteps = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	width: 100%;
+	margin-top: 0.5rem;
+`;
+
+const ProgressStep = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	background: ${({ $isActive, $isComplete }) =>
+		$isComplete
+			? palette.colors.brand[900] + '40'
+			: $isActive
+				? palette.colors.gray[800]
+				: 'transparent'};
+	border-radius: ${palette.borderRadius.medium};
+	transition: all 0.3s ease;
+`;
+
+const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: ${palette.typography.fontSize.xs};
+	font-weight: ${palette.typography.fontWeight.bold};
+	flex-shrink: 0;
+	
+	${({ $isComplete, $isActive }) =>
+		$isComplete
+			? `
+		background: ${palette.colors.brand[500]};
+		color: ${palette.colors.white};
+	`
+			: $isActive
+				? `
+		background: ${palette.colors.gray[700]};
+		color: ${palette.colors.gray[300]};
+		border: 2px solid ${palette.colors.brand[500]};
+	`
+				: `
+		background: ${palette.colors.gray[800]};
+		color: ${palette.colors.gray[600]};
+		border: 2px solid ${palette.colors.gray[700]};
+	`}
+`;
+
+const StepText = styled.span<{ $isActive: boolean; $isComplete: boolean }>`
+	font-size: ${palette.typography.fontSize.sm};
+	color: ${({ $isComplete, $isActive }) =>
+		$isComplete || $isActive ? palette.colors.gray[200] : palette.colors.gray[500]};
+	font-weight: ${({ $isActive }) =>
+		$isActive ? palette.typography.fontWeight.medium : palette.typography.fontWeight.normal};
+	transition: all 0.3s ease;
 `;
 
 export default PersonaCardExpanded;

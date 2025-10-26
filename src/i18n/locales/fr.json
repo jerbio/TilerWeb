@@ -29,6 +29,8 @@
 				"business": "Je suis un propriétaire de petite entreprise avec des horaires irréguliers..."
 			},
 			"processing": {
+				"title": "Création de Votre Horaire",
+				"description": "Veuillez patienter pendant que nous configurons tout pour vous...",
 				"creatingUser": "Création de l'Utilisateur",
 				"creatingUserDesc": "Configuration de votre profil personnalisé...",
 				"generatingProfile": "Génération du Profil d'Horaire",
