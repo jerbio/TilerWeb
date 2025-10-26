@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
@@ -45,6 +45,11 @@ const Calendar = ({
 
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
   const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
+
+  // Memoize the callback to prevent infinite re-renders
+  const handleNonViableEventsChange = useCallback((events: Array<StyledEvent>) => {
+    setStyledNonViableEvents(events);
+  }, []);
 
   // Track calendar view mount
   useEffect(() => {
@@ -374,6 +379,7 @@ const Calendar = ({
         );
         return todaysNonViableEvents.length > 0 ? (
           <NonViableEventsContainer
+            key={index}
             $index={index}
             $visible={showNonViableEvents?.isSame(day, 'day') ?? false}
             $cellwidth={viewOptions.width / viewOptions.daysInView}
@@ -438,7 +444,8 @@ const Calendar = ({
             selectedEvent={selectedEvent}
             setSelectedEvent={setSelectedEvent}
             setSelectedEventInfo={setSelectedEventInfo}
-            onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+            // onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+            onNonViableEventsChange={handleNonViableEventsChange}
           />
         </CalendarContent>
       </CalendarContentContainer>
