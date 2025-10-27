@@ -168,8 +168,10 @@ const LoadingOverlay = styled.div<{ $visible: boolean }>`
 	position: absolute;
 	inset: 0;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	gap: 1.5rem;
 	background-color: rgba(0, 0, 0, 0.7);
 	backdrop-filter: blur(4px);
 	border-radius: ${palette.borderRadius.xxLarge};
@@ -177,6 +179,97 @@ const LoadingOverlay = styled.div<{ $visible: boolean }>`
 	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'all' : 'none')};
 	transition: opacity 0.3s ease-in-out;
+`;
+
+const LoadingContent = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	max-width: 400px;
+	padding: 0 2rem;
+`;
+
+const LoadingMessage = styled.div`
+	text-align: center;
+	color: ${palette.colors.gray[100]};
+	font-family: ${palette.typography.fontFamily.inter};
+`;
+
+const LoadingTitle = styled.h3`
+	font-size: ${palette.typography.fontSize.lg};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	margin: 0 0 0.5rem 0;
+	color: ${palette.colors.white};
+`;
+
+const LoadingDescription = styled.p`
+	font-size: ${palette.typography.fontSize.sm};
+	color: ${palette.colors.gray[400]};
+	margin: 0;
+	line-height: 1.5;
+`;
+
+const ProgressSteps = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	width: 100%;
+	margin-top: 0.5rem;
+`;
+
+const ProgressStep = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	background: ${({ $isActive, $isComplete }) =>
+		$isComplete
+			? palette.colors.brand[900] + '40'
+			: $isActive
+				? palette.colors.gray[800]
+				: 'transparent'};
+	border-radius: ${palette.borderRadius.medium};
+	transition: all 0.3s ease;
+`;
+
+const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: ${palette.typography.fontSize.xs};
+	font-weight: ${palette.typography.fontWeight.bold};
+	flex-shrink: 0;
+	
+	${({ $isComplete, $isActive }) =>
+		$isComplete
+			? `
+		background: ${palette.colors.brand[500]};
+		color: ${palette.colors.white};
+	`
+			: $isActive
+				? `
+		background: ${palette.colors.gray[700]};
+		color: ${palette.colors.gray[300]};
+		border: 2px solid ${palette.colors.brand[500]};
+	`
+				: `
+		background: ${palette.colors.gray[800]};
+		color: ${palette.colors.gray[600]};
+		border: 2px solid ${palette.colors.gray[700]};
+	`}
+`;
+
+const StepText = styled.span<{ $isActive: boolean; $isComplete: boolean }>`
+	font-size: ${palette.typography.fontSize.sm};
+	color: ${({ $isComplete, $isActive }) =>
+		$isComplete || $isActive ? palette.colors.gray[200] : palette.colors.gray[500]};
+	font-weight: ${({ $isActive }) =>
+		$isActive ? palette.typography.fontWeight.medium : palette.typography.fontWeight.normal};
+	transition: all 0.3s ease;
 `;
 
 interface CustomPersonaModalProps {
@@ -198,6 +291,8 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 	const [isRecording, setIsRecording] = useState(false);
 	const [audioBlob, setAudioBlob] = useState<Blob | undefined>(undefined);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isTranscribed, setIsTranscribed] = useState(false); // Track if audio was transcribed
+	const [processingStep, setProcessingStep] = useState(0); // Track backend processing stage (0-4)
 
 	// Get localized placeholder suggestions
 	const PLACEHOLDER_SUGGESTIONS = [
@@ -209,6 +304,26 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 		t('common.customPersonaModal.placeholders.fitness'),
 		t('common.customPersonaModal.placeholders.remote'),
 		t('common.customPersonaModal.placeholders.business'),
+	];
+
+	// Backend processing steps
+	const PROCESSING_STEPS = [
+		{
+			title: t('common.customPersonaModal.processing.creatingUser'),
+			description: t('common.customPersonaModal.processing.creatingUserDesc'),
+		},
+		{
+			title: t('common.customPersonaModal.processing.generatingProfile'),
+			description: t('common.customPersonaModal.processing.generatingProfileDesc'),
+		},
+		{
+			title: t('common.customPersonaModal.processing.generatingTiles'),
+			description: t('common.customPersonaModal.processing.generatingTilesDesc'),
+		},
+		{
+			title: t('common.customPersonaModal.processing.optimizing'),
+			description: t('common.customPersonaModal.processing.optimizingDesc'),
+		},
 	];
 
 	// Typewriter effect for placeholder
@@ -275,16 +390,42 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 	const handleSubmit = async () => {
 		if (description.trim() || audioBlob) {
 			setIsSubmitting(true);
+			setProcessingStep(0);
+			
+			// Simulate progressive steps with intervals
+			const stepInterval = setInterval(() => {
+				setProcessingStep(prev => {
+					if (prev < PROCESSING_STEPS.length - 1) {
+						return prev + 1;
+					}
+					return prev;
+				});
+			}, 2000); // Progress every 2 seconds
+			
 			try {
 				// Keep modal open with spinner until API completes
-				await onSubmit(description, audioBlob);
+				// Only send audio if it wasn't transcribed (i.e., user didn't use auto-transcribe)
+				const audioToSend = isTranscribed ? undefined : audioBlob;
+				await onSubmit(description, audioToSend);
+				
+				clearInterval(stepInterval);
+				
+				// Show all steps as complete (all checkmarks)
+				setProcessingStep(PROCESSING_STEPS.length);
+				
+				// Wait 1 second to show all checkmarks before closing
+				await new Promise(resolve => setTimeout(resolve, 1000));
 				
 				// Only clear form after successful submission
 				// Modal will be closed by parent component (navigation.tsx)
 				setDescription('');
 				setAudioBlob(undefined);
+				setIsTranscribed(false);
+				setProcessingStep(0);
 			} catch (error) {
+				clearInterval(stepInterval);
 				console.error('Submission error:', error);
+				setProcessingStep(0);
 				// On error, keep form data so user can retry
 				// TODO: Show error message to user
 			} finally {
@@ -300,6 +441,8 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 		setDescription('');
 		setIsRecording(false);
 		setAudioBlob(undefined);
+		setIsTranscribed(false);
+		setProcessingStep(0);
 		
 		onClose();
 	};
@@ -312,6 +455,8 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 			setAudioBlob(undefined);
 			setDescription('');
 			setIsRecording(false);
+			setIsTranscribed(false);
+			setProcessingStep(0);
 		}
 	}, [isOpen]);
 
@@ -324,9 +469,6 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 	return (
 		<ModalOverlay $isOpen={isOpen} onClick={handleOverlayClick}>
 			<ModalContent $isOpen={isOpen}>
-				<LoadingOverlay $visible={isSubmitting}>
-					<Spinner />
-				</LoadingOverlay>
 				<ModalHeader>
 					<ModalTitle>{t('common.customPersonaModal.title')}</ModalTitle>
 					<CloseButton onClick={handleClose} disabled={isSubmitting}>
@@ -355,10 +497,16 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						key={`voice-input-${isOpen}`}
 						onRecordingStart={() => setIsRecording(true)}
 						onRecordingStop={() => setIsRecording(false)}
-						onAudioRecorded={setAudioBlob}
+						onAudioRecorded={(blob) => {
+							setAudioBlob(blob);
+							// Reset transcription flag when new recording is made
+							setIsTranscribed(false);
+						}}
 						onTranscriptionComplete={(transcription) => {
 							// Append transcription to existing description
 							setDescription(prev => prev ? `${prev}\n${transcription}` : transcription);
+							// Mark that this audio was transcribed, so we don't send the blob
+							setIsTranscribed(true);
 						}}
 						autoTranscribe={true}
 						disabled={isSubmitting}
@@ -382,6 +530,39 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						{t('common.buttons.cancel')}
 					</Button>
 				</ButtonWrapper>
+				
+				{/* Loading overlay - positioned last to appear on top */}
+				<LoadingOverlay $visible={isSubmitting}>
+					<LoadingContent>
+						<Spinner />
+						<LoadingMessage>
+							<LoadingTitle>{PROCESSING_STEPS[processingStep]?.title}</LoadingTitle>
+							<LoadingDescription>{PROCESSING_STEPS[processingStep]?.description}</LoadingDescription>
+						</LoadingMessage>
+						<ProgressSteps>
+							{PROCESSING_STEPS.map((step, index) => (
+								<ProgressStep
+									key={index}
+									$isActive={index === processingStep}
+									$isComplete={index < processingStep}
+								>
+									<StepIndicator
+										$isActive={index === processingStep}
+										$isComplete={index < processingStep}
+									>
+										{index < processingStep ? '✓' : index + 1}
+									</StepIndicator>
+									<StepText
+										$isActive={index === processingStep}
+										$isComplete={index < processingStep}
+									>
+										{step.title}
+									</StepText>
+								</ProgressStep>
+							))}
+						</ProgressSteps>
+					</LoadingContent>
+				</LoadingOverlay>
 			</ModalContent>
 		</ModalOverlay>
 	);

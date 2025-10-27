@@ -37,6 +37,16 @@
 				"fitness": "I'm a fitness enthusiast who needs morning workout time...",
 				"remote": "I'm a remote worker across different time zones...",
 				"business": "I'm a small business owner with irregular working hours..."
+			},
+			"processing": {
+				"creatingUser": "Creating User",
+				"creatingUserDesc": "Setting up your personalized profile...",
+				"generatingProfile": "Generating Schedule Profile",
+				"generatingProfileDesc": "Analyzing your preferences and requirements...",
+				"generatingTiles": "Generating Tiles",
+				"generatingTilesDesc": "Creating all necessary schedule blocks...",
+				"optimizing": "Optimizing & Saving",
+				"optimizingDesc": "Finding the best arrangement and saving your schedule..."
 			}
 		},
 		"copyright": "© {{year}} Tiler. All rights reserved.",

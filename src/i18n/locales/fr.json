@@ -27,6 +27,16 @@
 				"fitness": "Je suis un passionné de fitness qui a besoin de temps d'entraînement le matin...",
 				"remote": "Je suis un travailleur à distance dans différents fuseaux horaires...",
 				"business": "Je suis un propriétaire de petite entreprise avec des horaires irréguliers..."
+			},
+			"processing": {
+				"creatingUser": "Création de l'Utilisateur",
+				"creatingUserDesc": "Configuration de votre profil personnalisé...",
+				"generatingProfile": "Génération du Profil d'Horaire",
+				"generatingProfileDesc": "Analyse de vos préférences et exigences...",
+				"generatingTiles": "Génération des Tuiles",
+				"generatingTilesDesc": "Création de tous les blocs d'horaire nécessaires...",
+				"optimizing": "Optimisation et Sauvegarde",
+				"optimizingDesc": "Recherche du meilleur arrangement et sauvegarde de votre horaire..."
 			}
 		},
 		"consent": {
