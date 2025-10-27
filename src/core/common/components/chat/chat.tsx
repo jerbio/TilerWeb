@@ -19,6 +19,7 @@ import { SignalRService } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
 import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
 import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
+import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
 
 // Custom hook to check unexecuted actions
@@ -725,6 +726,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     setShowEmailConfirmation(true); // Show confirmation modal
   };
 
+  const handlePromptClick = (prompt: string) => {
+    setMessage(prompt);
+    // Auto-submit by creating a synthetic form event
+    const syntheticEvent = {
+      preventDefault: () => {},
+    } as FormEvent;
+    // Set message first, then trigger submit on next tick
+    setTimeout(() => {
+      handleSubmit(syntheticEvent);
+    }, 0);
+  };
+
   return (
     <ChatWrapper>
       <ChatContainer>
@@ -854,6 +867,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             </Button>
           )}
         </div>
+
+        {/* Show prompt suggestions when input field is empty */}
+        {!message.trim() && (
+          <PromptSuggestions onPromptClick={handlePromptClick} />
+        )}
 
         <ChatForm onSubmit={handleSubmit}>
           <Input.Textarea
