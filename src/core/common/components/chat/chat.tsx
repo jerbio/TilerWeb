@@ -885,7 +885,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       <ErrorPopup
         isOpen={showErrorPopup}
         message={errorPopupMessage}
-        title="Chat Limit Reached"
+        title={t('home.expanded.chat.errorPopup.chatLimitReached')}
         onClose={() => setShowErrorPopup(false)}
         showWaitlistButton={true}
         onEmailSubmitted={handleEmailSubmitted}
