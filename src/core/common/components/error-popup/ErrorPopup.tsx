@@ -8,6 +8,7 @@ import Logo from '@/core/common/components/icons/logo';
 import FetchingChatInterface from '@/assets/fetching_chat_interface.svg';
 import { emailListService } from '@/services';
 import { useTranslation } from 'react-i18next';
+import { validateEmail } from '@/core/util/validation';
 
 interface ErrorPopupProps {
   isOpen: boolean;
@@ -34,11 +35,6 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const handleWaitlistSubmit = async () => {
     if (!email.trim()) {
