@@ -51,7 +51,7 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
     setEmailError('');
 
     try {
-      const response = await emailListService.submitEmail(email.trim());
+      const response = await emailListService.submitEmail(email.trim(), 'chat-limit-reached');
 
       // Check response structure based on API
       if (response?.Error?.Code === "0") {
