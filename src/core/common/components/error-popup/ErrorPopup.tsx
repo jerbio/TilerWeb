@@ -19,6 +19,7 @@ interface ErrorPopupProps {
   redirectButtonText?: string;
   showWaitlistButton?: boolean;
   onEmailSubmitted?: (email: string) => void;
+  tilerUserId: string;
 }
 
 const ErrorPopup: React.FC<ErrorPopupProps> = ({
@@ -29,8 +30,15 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
   onRedirect,
   redirectButtonText = 'Go Back',
   showWaitlistButton = false,
-  onEmailSubmitted
+  onEmailSubmitted,
+  tilerUserId,
 }) => {
+  // Runtime guard: this popup requires a tilerUserId to function correctly
+  if (!tilerUserId) {
+    // Throwing early makes the missing-prop failure obvious during development/runtime
+    throw new Error('ErrorPopup requires a tilerUserId prop');
+  }
+
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -51,7 +59,12 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
     setEmailError('');
 
     try {
-      const response = await emailListService.submitEmail(email.trim(), 'chat-limit-reached');
+      const response = await emailListService.submitEmail(
+        email.trim(),
+        'chatLimitReached',
+        // pass the optional tiler user id through to the API
+        tilerUserId
+      );
 
       // Check response structure based on API
       if (response?.Error?.Code === "0") {

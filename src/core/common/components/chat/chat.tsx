@@ -882,14 +882,15 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         <UserLocation />
       </ChatContainer>
 
-      <ErrorPopup
+      {anonymousUserId && <ErrorPopup
         isOpen={showErrorPopup}
         message={errorPopupMessage}
         title={t('home.expanded.chat.errorPopup.chatLimitReached')}
         onClose={() => setShowErrorPopup(false)}
         showWaitlistButton={true}
         onEmailSubmitted={handleEmailSubmitted}
-      />
+        tilerUserId={anonymousUserId}
+      />}
 
       <EmailConfirmationModal
         isOpen={showEmailConfirmation}
