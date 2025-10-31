@@ -29,6 +29,27 @@ class LocationService {
   }
 
   /**
+   * Set a manually entered location (persists until cleared)
+   */
+  setManualLocation(location: LocationData): void {
+    this.cachedManualLocation = location;
+  }
+
+  /**
+   * Clear the manually entered location
+   */
+  clearManualLocation(): void {
+    this.cachedManualLocation = null;
+  }
+
+  /**
+   * Check if a manual location is set
+   */
+  hasManualLocation(): boolean {
+    return this.cachedManualLocation !== null;
+  }
+
+  /**
    * Set the current location data (used when user manually enters an address)
    */
   setCurrentLocation(locationData: LocationData): void {
