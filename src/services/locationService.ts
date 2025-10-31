@@ -18,6 +18,9 @@ class LocationService {
   // Cache for the current location data
   private currentLocationData: LocationData | null = null;
 
+  // Cache for the locally set manual location
+  private cachedManualLocation: LocationData | null = null;
+
   /**
    * Get the default location data
    */
