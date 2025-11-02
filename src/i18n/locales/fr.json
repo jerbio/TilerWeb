@@ -84,6 +84,47 @@
 			}
 		}
 	},
+	"auth": {
+		"signup": {
+			"title": "Commencez avec Tiler",
+			"subtitle": "Créez votre compte gratuit pour profiter d'une planification transparente",
+			"googleButton": "S'inscrire avec Google",
+			"emailLabel": "Adresse e-mail",
+			"emailPlaceholder": "Ex. votrenom@outlook.com",
+			"submitButton": "Créer mon compte gratuit",
+			"submitting": "Création du compte...",
+			"footer": "Vous avez déjà un compte ?",
+			"footerLink": "Se connecter plutôt",
+			"verificationSent": "Code de vérification envoyé à votre e-mail !",
+			"createAccountError": "Échec de la création du compte. Veuillez réessayer."
+		},
+		"signin": {
+			"title": "Bienvenue à nouveau sur Tiler",
+			"subtitle": "Connectez-vous pour continuer votre parcours de planification",
+			"googleButton": "Se connecter avec Google",
+			"submitButton": "Se connecter à mon compte",
+			"submitting": "Connexion...",
+			"footer": "Vous n'avez pas de compte ?",
+			"footerLink": "S'inscrire plutôt"
+		},
+		"verification": {
+			"title": "Vérification requise",
+			"header": "Entrez votre code de vérification",
+			"description": "Nous avons envoyé un code de vérification à",
+			"label": "Code de vérification",
+			"placeholder": "Entrez le code de vérification",
+			"verifyButton": "Vérifier le code",
+			"verifying": "Vérification...",
+			"resendButton": "Vous n'avez pas reçu de code ? Renvoyer",
+			"resending": "Envoi...",
+			"cancel": "Annuler",
+			"success": "Compte vérifié avec succès !",
+			"error": "Code de vérification invalide. Veuillez réessayer.",
+			"resendSuccess": "Code de vérification renvoyé !",
+			"resendError": "Échec de l'envoi du code. Veuillez réessayer."
+		},
+		"goBack": "Retour"
+	},
 	"home": {
 		"expanded": {
 			"chat": {

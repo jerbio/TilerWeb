@@ -6,6 +6,7 @@ import Layout from './pages/Layout';
 import Features from './pages/Features';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
+import UserAuthentication from './pages/UserAuthentication';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 // import useAppStore from './global_state';
@@ -53,6 +54,24 @@ const App: React.FC = () => {
             element={
               <>
                 <Waitlist />
+                <FooterSection />
+              </>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <>
+                <UserAuthentication />
+                <FooterSection />
+              </>
+            }
+          />
+          <Route
+            path="/signin"
+            element={
+              <>
+                <UserAuthentication />
                 <FooterSection />
               </>
             }
