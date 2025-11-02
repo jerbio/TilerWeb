@@ -6,12 +6,28 @@ import Logo from '@/core/common/components/icons/logo';
 import WaitlistForm from '@/components/waitlist/WaitlistForm';
 import WAITLIST_BG_IMAGE from '@/assets/waitlist/timeline-content.webp';
 import { useTranslation } from 'react-i18next';
+import SEO from '@/core/common/components/SEO';
 
 const Waitlist: React.FC = () => {
 	const { t } = useTranslation();
 
+	const structuredData = {
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		name: 'Join Tiler Waitlist - Early Access to Smart Calendar',
+		description: 'Join the Tiler waitlist and be among the first to experience intelligent calendar and task management.',
+		url: 'https://tiler.app/waitlist',
+	};
+
   return (
     <>
+			<SEO
+				title="Waitlist - Join Tiler Early Access"
+				description="Join the Tiler waitlist and be among the first to experience intelligent calendar and task management. Get early access to smart scheduling features."
+				keywords="tiler waitlist, early access, beta signup, calendar app signup, task management beta"
+				canonicalUrl="/waitlist"
+				structuredData={structuredData}
+			/>
       <Section paddingBlock={128}>
         <WaitlistContainer>
           <Logo size={48} />

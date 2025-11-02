@@ -39,6 +39,8 @@
 				"business": "I'm a small business owner with irregular working hours..."
 			},
 			"processing": {
+				"title": "Creating Your Schedule",
+				"description": "Please wait while we set everything up for you...",
 				"creatingUser": "Creating User",
 				"creatingUserDesc": "Setting up your personalized profile...",
 				"generatingProfile": "Generating Schedule Profile",
@@ -163,6 +165,30 @@
 					"locationBenefitMessage": "Setting your actual location helps us create more relevant tiles and improve your experience with personalized scheduling suggestions.",
 					"usingDefaultLocation": "Using default location - Click icon to get your current location.",
 					"clickIconToGetLocation": "Click icon to get your current location or edit your location"
+				},
+				"errorPopup": {
+					"chatLimitReached": "Chat Limit Reached",
+					"headerText": "Want more than 20 prompts?",
+					"altText": "Chat interface illustration",
+					"description": "Get early access to unlimited chats, smart integrations, and the full Tiler experience.",
+					"emailPlaceholder": "Enter your email",
+					"submitEmail": "Submit Email",
+					"joinWaitlist": "Join The Waitlist",
+					"submitting": "Submitting...",
+					"subtext": "Spots are limited – Save yours now.",
+					"close": "Close",
+					"errors": {
+						"emailRequired": "Email is required",
+						"emailInvalid": "Please enter a valid email address",
+						"submitFailed": "Failed to submit email. Please try again."
+					}
+				},
+				"emailConfirmation": {
+					"header": "Check your email!",
+					"message": "We sent a confirmation link to <strong>{{email}}</strong>.",
+					"messageContinued": "Click the link to unlock unlimited chats with Tiler.",
+					"button": "Got it",
+					"footer": "Didn't receive the email? Check your spam folder or try again."
 				}
 			}
 		},

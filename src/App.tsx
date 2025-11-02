@@ -9,6 +9,7 @@ import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
+import { HelmetProvider } from 'react-helmet-async';
 // import useAppStore from './global_state';
 
 const App: React.FC = () => {
@@ -42,23 +43,24 @@ const App: React.FC = () => {
   // }, [setUserInfo]);
 
   return (
-    <ConsentProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="/features" element={<Features />} />
-          </Route>
-          <Route
-            path="/waitlist"
-            element={
-              <>
-                <Waitlist />
-                <FooterSection />
-              </>
-            }
-          />
-          <Route
+    <HelmetProvider>
+      <ConsentProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="/features" element={<Features />} />
+            </Route>
+            <Route
+              path="/waitlist"
+              element={
+                <>
+                  <Waitlist />
+                  <FooterSection />
+                </>
+              }
+            />
+            <Route
             path="/signup"
             element={
               <>
@@ -77,9 +79,10 @@ const App: React.FC = () => {
             }
           />
         </Routes>
-        <Toaster position="bottom-left" theme="system" />
-      </BrowserRouter>
-    </ConsentProvider>
+          <Toaster position="bottom-left" theme="system" />
+        </BrowserRouter>
+      </ConsentProvider>
+    </HelmetProvider>
   );
 };
 

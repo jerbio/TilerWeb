@@ -18,6 +18,7 @@ import { locationService } from '@/services/locationService';
 import { SignalRService } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
 import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
+import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
 import analytics from '@/core/util/analytics';
 
 // Custom hook to check unexecuted actions
@@ -201,7 +202,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       hasExistingSession: !!sessionId,
     });
   }, []); // Only on mount
-  
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
+
   // Extract values from active persona session
   const chatContext = activePersonaSession?.chatContext || [];
   const scheduleId = activePersonaSession?.scheduleId;
@@ -518,15 +521,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         };
       });
 
-      // Sort by timestamp extracted from ID (chronological order)
-      loadedMessages.sort((a, b) => {
-        const extractTimestamp = (id: string): number => {
-          const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
-          return match ? parseInt(match[1], 10) : 0;
-        };
-        return extractTimestamp(a.id) - extractTimestamp(b.id);
-      });
-
       setMessages((prevMessages) => {
         const existingIds = new Set(prevMessages.map((m) => m.id));
         const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
@@ -537,7 +531,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           return updatedMessage || prevMessage;
         });
 
-        return [...updatedMessages, ...uniqueNewMessages];
+        const mergedMessages = [...updatedMessages, ...uniqueNewMessages];
+
+        // Sort by timestamp extracted from ID (chronological order) - single sort on final result
+        mergedMessages.sort((a, b) => {
+          const extractTimestamp = (id: string): number => {
+            const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
+            return match ? parseInt(match[1], 10) : 0;
+          };
+          return extractTimestamp(a.id) - extractTimestamp(b.id);
+        });
+
+        return mergedMessages;
       });
       setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
     } catch (err) {
@@ -714,6 +719,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     removeChatContext(context); // Remove the clicked context
   };
 
+  const handleEmailSubmitted = (email: string) => {
+    setSubmittedEmail(email);
+    setShowErrorPopup(false); // Close chat limit modal
+    setShowEmailConfirmation(true); // Show confirmation modal
+  };
+
   return (
     <ChatWrapper>
       <ChatContainer>
@@ -871,15 +882,20 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         <UserLocation />
       </ChatContainer>
 
-      <ErrorPopup
+      {anonymousUserId && <ErrorPopup
         isOpen={showErrorPopup}
         message={errorPopupMessage}
-        title="Chat Limit Reached"
+        title={t('home.expanded.chat.errorPopup.chatLimitReached')}
         onClose={() => setShowErrorPopup(false)}
         showWaitlistButton={true}
-        onWaitlistClick={() => {
-          window.location.href = '/waitlist';
-        }}
+        onEmailSubmitted={handleEmailSubmitted}
+        tilerUserId={anonymousUserId}
+      />}
+
+      <EmailConfirmationModal
+        isOpen={showEmailConfirmation}
+        email={submittedEmail}
+        onClose={() => setShowEmailConfirmation(false)}
       />
     </ChatWrapper>
   );

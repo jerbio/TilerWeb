@@ -49,7 +49,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   const baseUrl = Env.get('BASE_URL');
   const [personaUserTimeLeft, setPersonaUserTimeLeft] = useState<string>('');
   const [personaUserTimeLeftInterval, setPersonaUserTimeLeftInterval] = useState<
-    NodeJS.Timeout | undefined
+    number | NodeJS.Timeout | undefined
   >(undefined);
 
   // Update the time left for the persona user every minute
@@ -134,18 +134,8 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   function focusInput() {
     const input = customInputFormRef.current?.querySelector('input');
     if (input) {
-      // Swipe to card if not active
-      if (!swiperSlide.isActive) {
-        if (swiper.activeIndex - persona.key === 1) {
-          swiper.slideNext();
-        } else {
-					swiper.slidePrev();
-				}
-      }
       input.focus();
       swiper.disable();
-
-      // Resume autoplay when input is blurred and empty
       input.addEventListener('blur', (e) => {
         const input = e.target as HTMLInputElement;
         if (!input.value.trim()) {
