@@ -384,6 +384,7 @@ const Calendar = ({
 				);
 				return todaysNonViableEvents.length > 0 ? (
 					<NonViableEventsContainer
+						key={index}
 						$index={index}
 						$visible={showNonViableEvents?.isSame(day, 'day') ?? false}
 						$cellwidth={viewOptions.width / viewOptions.daysInView}
@@ -615,7 +616,7 @@ const LoadingContainer = styled.div<{ $loading: boolean }>`
 	transition: opacity 0.3s ease-in-out;
 `;
 
-const ShowNonViableEventsButtonContainer = styled.button<{ $visible?: boolean }>`
+const ShowNonViableEventsButtonContainer = styled.div<{ $visible?: boolean }>`
 	margin-left: 8px;
 	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
