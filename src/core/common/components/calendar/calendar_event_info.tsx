@@ -54,11 +54,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
         </div>
         <div className="title">
           <h2>{event.name}</h2>
-					{
-						dayjs().isBefore(dayjs(event.start)) ? (
-							<span>Due in {getEventDueIn(event)}</span>
-						) : null
-					}
+          <span>Due in {getEventDueIn(event)}</span>
         </div>
         <button onClick={onClose}>
           <X size={16} color={eventColor.setLightness(0.5).toHex()} />
