@@ -9,6 +9,9 @@ import Waitlist from './pages/Waitlist';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 import { HelmetProvider } from 'react-helmet-async';
+import DevUserIdOverlay from './core/common/components/dev/DevUserIdOverlay';
+import DevModeBadge from './core/common/components/dev/DevModeBadge';
+import useDevTools from './core/common/hooks/useDevTools';
 // import useAppStore from './global_state';
 
 const App: React.FC = () => {
@@ -41,6 +44,9 @@ const App: React.FC = () => {
   // 	fetchUserInfo();
   // }, [setUserInfo]);
 
+  // Dev tools for testing
+  const { isOverlayVisible, closeOverlay } = useDevTools();
+
   return (
     <HelmetProvider>
       <ConsentProvider>
@@ -62,6 +68,10 @@ const App: React.FC = () => {
           </Routes>
           <Toaster position="bottom-left" theme="system" />
         </BrowserRouter>
+        
+        {/* Dev tools - only rendered in development mode */}
+        <DevUserIdOverlay isVisible={isOverlayVisible} onClose={closeOverlay} />
+        <DevModeBadge />
       </ConsentProvider>
     </HelmetProvider>
   );

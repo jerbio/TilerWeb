@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { personaSessionManager } from '@/services/personaSessionManager';
 
 export interface ChatContextType {
 	EntityId: string;
@@ -51,6 +52,10 @@ interface AppState {
 	setUserInfo: (info: UserInfo) => void;
 	setChatSessionId: (id: string) => void;
 	
+	// Development tools (only active in dev mode)
+	devUserIdOverride: string | null;
+	setDevUserIdOverride: (userId: string | null) => void;
+	
 	// Getters for backward compatibility
 	get chatContext(): ChatContextType[];
 	get scheduleId(): string | null;
@@ -58,6 +63,9 @@ interface AppState {
 	get userInfo(): UserInfo | null;
 	get selectedPersonaId(): string | null;
 	get chatSessionId(): string;
+	
+	// Persona session manager (centralized session management)
+	getPersonaSessionManager: () => typeof personaSessionManager;
 }
 
 const useAppStore = create<AppState>((set, get) => ({
@@ -150,6 +158,10 @@ const useAppStore = create<AppState>((set, get) => ({
 			};
 		}),
 	
+	// Development tools
+	devUserIdOverride: null,
+	setDevUserIdOverride: (userId) => set(() => ({ devUserIdOverride: userId })),
+	
 	// Getters for backward compatibility
 	get chatContext() {
 		return get().activePersonaSession?.chatContext || [];
@@ -174,6 +186,25 @@ const useAppStore = create<AppState>((set, get) => ({
 	get chatSessionId() {
 		return get().activePersonaSession?.chatSessionId || '';
 	},
+	
+	// Persona session manager getter
+	getPersonaSessionManager: () => personaSessionManager,
 }));
+
+// Initialize the PersonaSessionManager with Zustand store methods
+personaSessionManager.initialize({
+	setActivePersonaSession: (session) => useAppStore.setState({ activePersonaSession: session }),
+	updateActivePersonaSession: (updates) => {
+		const currentSession = useAppStore.getState().activePersonaSession;
+		if (currentSession) {
+			useAppStore.setState({
+				activePersonaSession: { ...currentSession, ...updates },
+			});
+		}
+	},
+	getActivePersonaSession: () => useAppStore.getState().activePersonaSession,
+	getDevUserIdOverride: () => useAppStore.getState().devUserIdOverride,
+	setDevUserIdOverride: (userId) => useAppStore.setState({ devUserIdOverride: userId }),
+});
 
 export default useAppStore;

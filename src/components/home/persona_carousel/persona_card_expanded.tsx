@@ -11,6 +11,7 @@ import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
 import useAppStore from '@/global_state';
+import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
 import analytics from '@/core/util/analytics';
 import { useTranslation } from 'react-i18next';
 import Spinner from '@/core/common/components/loader';
@@ -41,6 +42,11 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const personaUserId = personaUsers[persona.id]?.userId || null;
   const activePersonaSession = useAppStore((state) => state.activePersonaSession);
   const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
+  const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
+  
+  // Use PersonaSessionManager for centralized session management
+  const { createSession } = usePersonaSessionManager();
+  
   const [isCreatingPersona, setIsCreatingPersona] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
 
@@ -100,6 +106,39 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
     }, 2000); // Progress every 2 seconds
     
     try {
+      // Check if dev mode override is active
+      if (devUserIdOverride) {
+        // DEV MODE: Use the custom user ID instead of creating a new one
+        console.log('[DEV MODE] Using custom user ID:', devUserIdOverride);
+        
+        // Set the persona user with the override ID
+        setPersonaUser(persona.id, {
+          userId: devUserIdOverride,
+          personaInfo: { name: persona.name },
+        });
+        
+        // Create a persona session using PersonaSessionManager
+        // This automatically handles dev override and syncs to localStorage + global state
+        createSession({
+          personaId: persona.id,
+          personaName: persona.name,
+          userId: devUserIdOverride, // Manager will automatically apply dev override
+          scheduleId: null,
+          chatSessionId: '',
+          chatContext: [],
+          userInfo: null, // Will be populated on first API call
+          scheduleLastUpdatedBy: null,
+        });
+        
+        clearInterval(stepInterval);
+        setProcessingStep(PROCESSING_STEPS.length);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setIsCreatingPersona(false);
+        setProcessingStep(0);
+        return;
+      }
+      
+      // NORMAL MODE: Create a new anonymous user
       const personaUser = await personaService.createAnonymousUser(persona);
       const newUserId = personaUser.anonymousUser.id;
       
@@ -116,8 +155,9 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 				personaInfo: { name: persona.name },
 			});
       
-      // Create a new persona session with all related data grouped together
-      setActivePersonaSession({
+      // Create a new persona session using PersonaSessionManager
+      // This automatically syncs to both localStorage and global state
+      createSession({
         personaId: persona.id,
         personaName: persona.name,
         userId: newUserId,
