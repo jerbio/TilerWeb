@@ -12,7 +12,7 @@ import useIsMobile from '../../../core/common/hooks/useIsMobile';
 import { Persona } from '../../../core/common/types/persona';
 import usePersonaUsers from '../../../core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
-import useAppStore from '@/global_state';
+import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;
@@ -47,7 +47,9 @@ const PersonaCarousel: React.FC = () => {
   const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
   const { personaUsers, setPersonaUser } = usePersonaUsers();
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
-  const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
+  
+  // Use PersonaSessionManager for centralized session management
+  const { createSession } = usePersonaSessionManager();
   
   // Swiper refs and responsive state
   const swiperRef = React.useRef<SwiperRef | null>(null);
@@ -130,8 +132,9 @@ const PersonaCarousel: React.FC = () => {
             personaInfo: { name: persona.name || 'Custom' },
           });
           
-          // Initialize the persona session immediately with the user data from the API
-          setActivePersonaSession({
+          // Initialize the persona session using PersonaSessionManager
+          // This automatically syncs to both localStorage and global state
+          createSession({
             personaId: 'custom-persona',
             personaName: persona.name || 'Custom',
             userId: anonymousUser.id,
