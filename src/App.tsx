@@ -7,6 +7,7 @@ import Features from './pages/Features';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
+import Timeline from './pages/Timeline';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 import { HelmetProvider } from 'react-helmet-async';
@@ -78,6 +79,7 @@ const App: React.FC = () => {
               </>
             }
           />
+          <Route path="/timeline" element={<Timeline />} />
         </Routes>
           <Toaster position="bottom-left" theme="system" />
         </BrowserRouter>

@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Input from '@/core/common/components/input';
 import Logo from '@/core/common/components/icons/logo';
-import { Env } from '@/config/config_getter';
+import { authService } from '@/services';
 
 interface VerificationCodePopupProps {
   isOpen: boolean;
@@ -22,11 +24,36 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
   onResendCode,
 }) => {
   const { t } = useTranslation();
-  const baseUrl = Env.get('BASE_URL');
+  const navigate = useNavigate();
   const [code, setCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!code.trim()) return;
+
+    setIsLoading(true);
+    try {
+      await authService.verifyCode(email, code);
+
+      // Success: Close popup, show success message, and redirect
+      toast.success(t('auth.verification.success'));
+      onClose();
+      navigate('/timeline');
+    } catch (error) {
+      // Failure: Keep popup open and show error message
+      toast.error(t('auth.verification.error'));
+      console.error('Verification error:', error);
+      // Clear the code input so user can try again
+      setCode('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleResendCode = async () => {
     if (!onResendCode) return;
@@ -56,11 +83,9 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
           {t('auth.verification.description')} <EmailText>{email}</EmailText>
         </Description>
 
-        <Form action={`${baseUrl}/Account/emailcodeauthentication`} method="post">
-          <input type="hidden" name="email" value={email} />
+        <Form onSubmit={handleSubmit}>
           <Input
             type="text"
-            name="code"
             placeholder={t('auth.verification.placeholder')}
             label={t('auth.verification.label')}
             sized="large"
@@ -74,9 +99,9 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
               variant="brand"
               size="large"
               type="submit"
-              disabled={!code.trim()}
+              disabled={isLoading || !code.trim()}
             >
-              {t('auth.verification.verifyButton')}
+              {isLoading ? t('auth.verification.verifying') : t('auth.verification.verifyButton')}
             </Button>
 
             {onResendCode && (
