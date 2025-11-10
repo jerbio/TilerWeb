@@ -14,6 +14,7 @@ import analytics from '@/core/util/analytics';
 import TimeUtil from '@/core/util/time';
 import CalendarEventInfo from './calendar_event_info';
 import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
+import { useTranslation } from 'react-i18next';
 
 export type CalendarViewOptions = {
 	width: number;
@@ -313,6 +314,8 @@ const Calendar = ({
 
 	useChain([calendarEventInfoTransRef], [0], 0);
 
+	const { t } = useTranslation();
+
 	return (
 		<CalendarContainer $isMounted={contentMounted}>
 			<CalendarHeader>
@@ -390,9 +393,9 @@ const Calendar = ({
 						$cellwidth={viewOptions.width / viewOptions.daysInView}
 					>
 						<header>
-							<h2>Non-Viable Tiles</h2>
+							<h2>{t('calendar.nonViable.title')}</h2>
 							<Tooltip
-								text="These events could not be scheduled due to timing conflicts or constraints."
+								text={t('calendar.nonViable.infoTooltip')}
 								maxWidth={150}
 								position="left"
 							>

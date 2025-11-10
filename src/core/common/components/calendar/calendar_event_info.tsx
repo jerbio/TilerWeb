@@ -18,6 +18,7 @@ import dayjs from 'dayjs';
 import CalendarUtil from '@/core/util/calendar';
 import TimeUtil from '@/core/util/time';
 import calendarConfig from '@/core/constants/calendar_config';
+import { useTranslation } from 'react-i18next';
 
 type CalendarEventInfoProps = {
   event: ScheduleSubCalendarEvent | null;
@@ -46,6 +47,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
     b: event ? event.colorBlue : 128,
   });
 
+  const { t } = useTranslation();
+
   return event ? (
     <StyledCalendarEventInfo $color={eventColor}>
       <header>
@@ -54,11 +57,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
         </div>
         <div className="title">
           <h2>{event.name}</h2>
-					{
-						dayjs().isBefore(dayjs(event.start)) ? (
-							<span>Due in {getEventDueIn(event)}</span>
-						) : null
-					}
+          {dayjs().isBefore(dayjs(event.start)) ? (
+            <span>{t('calendar.event.dueIn', { time: getEventDueIn(event) })}</span>
+          ) : null}
         </div>
         <button onClick={onClose}>
           <X size={16} color={eventColor.setLightness(0.5).toHex()} />
@@ -73,7 +74,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
               style={{ minWidth: 16, marginTop: '0.25rem' }}
             />
             <div>
-              <h3>Date:</h3>
+              <h3>{t('calendar.event.dateLabel')}</h3>
               <p>{dayjs(event.start).format('ddd, D MMMM, YYYY')}</p>
             </div>
           </CalendarEventInfoArticle>
@@ -84,7 +85,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
               style={{ minWidth: 16, marginTop: '0.25rem' }}
             />
             <div>
-              <h3>Starts:</h3>
+              <h3>{t('calendar.event.startLabel')}</h3>
               <p>{dayjs(event.start).format('hh:mm A')}</p>
             </div>
           </CalendarEventInfoArticle>
@@ -95,7 +96,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
               style={{ minWidth: 16, marginTop: '0.25rem' }}
             />
             <div>
-              <h3>Ends:</h3>
+              <h3>{t('calendar.event.endLabel')}</h3>
               <p>{dayjs(event.end).format('hh:mm A')}</p>
             </div>
           </CalendarEventInfoArticle>
@@ -106,7 +107,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
               style={{ minWidth: 16, marginTop: '0.25rem' }}
             />
             <div>
-              <h3>Duration:</h3>
+              <h3>{t('calendar.event.durationLabel')}</h3>
               <p>
                 {TimeUtil.rangeDuration(
                   dayjs(event.start, 'unix'),
@@ -122,7 +123,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
               style={{ minWidth: 16, marginTop: '0.25rem' }}
             />
             <div>
-              <h3>Repeats:</h3>
+              <h3>{t('calendar.event.repetitionLabel')}</h3>
               <p>{event.isRecurring ? 'Yes' : 'No'}</p>
             </div>
           </CalendarEventInfoArticle>
@@ -139,7 +140,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
                 style={{ minWidth: 16, marginTop: '0.25rem' }}
               />
               <div>
-                <h3>Location:</h3>
+                <h3>{t('calendar.event.locationLabel')}</h3>
                 <p>
                   <a
                     href={CalendarUtil.getEventLocationLink(event)}
