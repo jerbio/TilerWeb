@@ -24,6 +24,7 @@ export class AppApi {
 				'Content-Type': 'application/json',
 				Accept: 'application/json',
 			}),
+			credentials: 'include', // Allow cookies to be sent and received
 			...options,
 		};
 
@@ -79,6 +80,7 @@ export class AppApi {
 
 		const requestOptions: RequestInit = {
 			method: 'POST',
+			credentials: 'include', // Allow cookies to be sent and received
 			...restOptions,
 		};
 

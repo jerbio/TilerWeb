@@ -1,6 +1,36 @@
 import { AppApi } from './appApi';
 
+export interface UserResponse {
+	Error: {
+		Code: string;
+		Message: string;
+	};
+	Content: {
+		user: {
+			id: string;
+			username: string;
+			timeZoneDifference: number;
+			timeZone: string;
+			email: string;
+			endfOfDay: string;
+			phoneNumber: string;
+			fullName: string;
+			firstName: string;
+			lastName: string;
+			countryCode: string | null;
+			dateOfBirth: string;
+		};
+	};
+	ServerStatus: null;
+}
+
 export class UserApi extends AppApi {
+	public getCurrentUser() {
+		return this.apiRequest<UserResponse>('api/User', {
+			method: 'GET',
+		});
+	}
+
 	public async signIn(userName: string, password: string) {
 		// : Promise<Schedule>
 		const myHeaders = new Headers();
