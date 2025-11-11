@@ -7,7 +7,6 @@ export interface SignUpRequest {
 export interface SignUpResponse {
 	userId: string;
 	email: string;
-	token?: string;
 }
 
 export interface VerifyCodeRequest {
@@ -18,7 +17,6 @@ export interface VerifyCodeRequest {
 export interface VerifyCodeResponse {
 	userId: string;
 	email: string;
-	token: string;
 	verified: boolean;
 }
 
