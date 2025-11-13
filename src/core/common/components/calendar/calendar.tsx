@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
+import useIsMobile from '../../hooks/useIsMobile';
 
 export type CalendarViewOptions = {
 	width: number;
@@ -328,6 +329,17 @@ const Calendar = ({
 	// Swiping logic
 	const swiperRef = useRef<SwiperRef | null>(null);
 	const isSwiperResetting = useRef(false);
+	const isMobile = useIsMobile();
+
+	useEffect(() => {
+		if (swiperRef.current) {
+			if (!isMobile) {
+				swiperRef.current.swiper.disable();
+			} else {
+				swiperRef.current.swiper.enable();
+			}
+		}
+	}, [isMobile]);
 
 	return (
 		<CalendarContainer $isMounted={contentMounted}>
