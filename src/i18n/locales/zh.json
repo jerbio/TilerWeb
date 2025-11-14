@@ -152,6 +152,21 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "不可行的活动",
+			"infoTooltip": "由于时间冲突或限制，这些活动无法安排。"
+		},
+		"event": {
+			"dueIn": "还剩 {{time}}",
+			"dateLabel": "日期：",
+			"startLabel": "开始：",
+			"endLabel": "结束：",
+			"durationLabel": "持续时间：",
+			"repetitionLabel": "重复：",
+			"locationLabel": "地点："
+		}
+	},
 	"home": {
 		"demoExplainer": {
 			"title": "观看Tiler的实际操作",

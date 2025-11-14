@@ -152,6 +152,21 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "Nicht lebensfähige Ereignisse",
+			"infoTooltip": "Diese Ereignisse konnten aufgrund von Zeitkonflikten oder Einschränkungen nicht geplant werden."
+		},
+		"event": {
+			"dueIn": "Fällig in {{time}}",
+			"dateLabel": "Datum:",
+			"startLabel": "Beginnt:",
+			"endLabel": "Endet:",
+			"durationLabel": "Dauer:",
+			"repetitionLabel": "Wiederholungen:",
+			"locationLabel": "Ort:"
+		}
+	},
 	"home": {
 		"demoExplainer": {
 			"title": "Sehen Sie Tiler in Aktion",

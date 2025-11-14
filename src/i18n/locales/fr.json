@@ -86,6 +86,21 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "Événements non viables",
+			"infoTooltip": "Ces événements n'ont pas pu être planifiés en raison de conflits d'horaire ou de contraintes."
+		},
+		"event": {
+			"dueIn": "Doit être fait dans {{time}}",
+			"dateLabel": "Date :",
+			"startLabel": "Commence :",
+			"endLabel": "Se termine :",
+			"durationLabel": "Durée :",
+			"repetitionLabel": "Répétitions :",
+			"locationLabel": "Lieu :"
+		}
+	},
 	"home": {
 		"featureHighlights": {
 			"title": "Points Forts des Fonctionnalités",

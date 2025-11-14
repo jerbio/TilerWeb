@@ -152,10 +152,25 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "Niewykonalne zdarzenia",
+			"infoTooltip": "Te zdarzenia nie mogły zostać zaplanowane z powodu konfliktów czasowych lub ograniczeń."
+		},
+		"event": {
+			"dueIn": "Termin za {{time}}",
+			"dateLabel": "Data:",
+			"startLabel": "Zaczyna się:",
+			"endLabel": "Kończy się:",
+			"durationLabel": "Czas trwania:",
+			"repetitionLabel": "Powtarza się:",
+			"locationLabel": "Lokalizacja:"
+		}
+	},
 	"home": {
 		"demoExplainer": {
 			"title": "Zobacz Tiler w akcji",
-			"subtitle": "Wypróbuj teraz — bez konieczności rejestracji. Wybierz poniżej postać, aby doświadczyć, jak Tiler zamienia naturalną rozmowę w inteligentny, adaptacyjny harmonogram.",
+			"subtitle": "Wypróbuj teraz — nie wymaga rejestracji. Wybierz poniżej postać, aby zobaczyć, jak Tiler zamienia naturalną rozmowę w inteligentny, adaptacyjny harmonogram.",
 			"badge": "Interaktywne demo"
 		},
 		"persona": {

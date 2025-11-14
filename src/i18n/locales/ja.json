@@ -152,6 +152,21 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "実行不可能なイベント",
+			"infoTooltip": "これらのイベントは、タイミングの競合や制約のためにスケジュールできませんでした。"
+		},
+		"event": {
+			"dueIn": "{{time}}で期限切れ",
+			"dateLabel": "日付：",
+			"startLabel": "開始：",
+			"endLabel": "終了：",
+			"durationLabel": "期間：",
+			"repetitionLabel": "繰り返し：",
+			"locationLabel": "場所："
+		}
+	},
 	"home": {
 		"demoExplainer": {
 			"title": "Tilerの動作を見る",

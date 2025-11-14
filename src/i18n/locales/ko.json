@@ -152,10 +152,25 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "실행 불가능한 이벤트",
+			"infoTooltip": "시간 충돌이나 제약으로 인해 이 이벤트를 예약할 수 없습니다."
+		},
+		"event": {
+			"dueIn": "{{time}} 내에 완료",
+			"dateLabel": "날짜:",
+			"startLabel": "시작:",
+			"endLabel": "종료:",
+			"durationLabel": "기간:",
+			"repetitionLabel": "반복:",
+			"locationLabel": "위치:"
+		}
+	},
 	"home": {
 		"demoExplainer": {
 			"title": "Tiler 작동 모습 보기",
-			"subtitle": "지금 바로 사용해 보세요 — 가입이 필요 없습니다. 아래에서 페르소나를 선택하여 Tiler가 자연스러운 대화를 스마트하고 적응력 있는 일정으로 바꾸는 방법을 경험해 보세요.",
+			"subtitle": "지금 바로 사용해보세요 — 가입이 필요 없습니다. 아래에서 페르소나를 선택하여 Tiler가 자연스러운 대화를 어떻게 스마트하고 적응력 있는 스케줄로 바꾸는지 경험해보세요.",
 			"badge": "인터랙티브 데모"
 		},
 		"persona": {

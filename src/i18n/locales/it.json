@@ -148,14 +148,29 @@
 				}
 			},
 			"footer": {
-				"cookieSettings": "Impostazioni Cookie"
+				"cookieSettings": "Impostazioni cookie"
 			}
+		}
+	},
+	"calendar": {
+		"nonViable": {
+			"title": "Eventi non realizzabili",
+			"infoTooltip": "Questi eventi non hanno potuto essere programmati a causa di conflitti di orario o vincoli."
+		},
+		"event": {
+			"dueIn": "Scadenza tra {{time}}",
+			"dateLabel": "Data:",
+			"startLabel": "Inizia:",
+			"endLabel": "Finisce:",
+			"durationLabel": "Durata:",
+			"repetitionLabel": "Ripetizioni:",
+			"locationLabel": "Luogo:"
 		}
 	},
 	"home": {
 		"demoExplainer": {
-			"title": "Guarda Tiler in Azione",
-			"subtitle": "Provalo ora — non è richiesta alcuna iscrizione. Scegli una persona qui sotto per sperimentare come Tiler trasforma una conversazione naturale in un programma intelligente e adattivo.",
+			"title": "Guarda Tiler in azione",
+			"subtitle": "Provalo ora — non è richiesta alcuna iscrizione. Scegli un personaggio qui sotto per sperimentare come Tiler trasforma una conversazione naturale in un programma intelligente e adattivo.",
 			"badge": "Demo Interattiva"
 		},
 		"persona": {
