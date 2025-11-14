@@ -6,6 +6,7 @@ import TimeUtil from '../../../core/util/time';
 import useCalendarView from '../../../core/common/hooks/useCalendarView';
 import { scheduleService } from '@/services';
 import useAppStore from '../../../global_state';
+import { usePersonaSession } from '@/core/common/hooks/usePersonaSessionManager';
 
 type PersonaCalendarProps = {
   userId: string | null;
@@ -19,6 +20,16 @@ function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps)
   // Get scheduleId from the active persona session to ensure consistency
   const activePersonaSession = useAppStore((state) => state.activePersonaSession);
   const scheduleId = activePersonaSession?.scheduleId;
+  
+  // Use PersonaSessionManager hook for reactive session updates
+  // This automatically re-renders when session changes (userId, dev override, etc.)
+  const session = usePersonaSession(undefined, (updatedSession) => {
+    console.log('[PersonaCalendar] Session updated, will re-fetch schedule:', updatedSession);
+  });
+  
+  // Use the session's userId if available (includes dev override updates)
+  // Fall back to the prop userId for backwards compatibility
+  const effectiveUserId = session?.userId || userId;
 
   // Get a reference to the view container
   const viewRef = React.useRef<HTMLUListElement>(null);
@@ -45,10 +56,10 @@ function PersonaCalendar({ expandedWidth: width, userId }: PersonaCalendarProps)
   }
 
   useEffect(() => {
-    if (userId) {
-      fetchSchedule(userId);
+    if (effectiveUserId) {
+      fetchSchedule(effectiveUserId);
     }
-  }, [userId, scheduleId, viewOptions.daysInView, viewOptions.startDay]);
+  }, [effectiveUserId, scheduleId, viewOptions.daysInView, viewOptions.startDay]);
 
   return (
     <Calendar

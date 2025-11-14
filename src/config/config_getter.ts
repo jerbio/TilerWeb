@@ -35,6 +35,14 @@ class EnvGetter {
 	public isDevelopment(): boolean {
 		return import.meta.env.VITE_NODE_ENV === 'development';
 	}
+
+	/**
+	 * Check if dev tools should be enabled
+	 * Dev tools are only available in development mode
+	 */
+	public isDevToolsEnabled(): boolean {
+		return this.isDevelopment();
+	}
 }
 
 export const Env = new EnvGetter();

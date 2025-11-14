@@ -137,6 +137,7 @@
 			}
 		},
 		"expanded": {
+			"mobileChatPlaceholder": "Chat with your calendar to update...",
 			"chat": {
 				"newChat": "New Chat",
 				"clearSession": "Clear Session",

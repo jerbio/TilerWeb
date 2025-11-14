@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import PersonaCalendar from './persona_calendar';
-import { ChevronLeftIcon, Plus, Check } from 'lucide-react';
+import { ChevronLeftIcon, Check, MessageCircle } from 'lucide-react';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
@@ -11,6 +11,7 @@ import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
 import useAppStore from '@/global_state';
+import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
 import analytics from '@/core/util/analytics';
 import { useTranslation } from 'react-i18next';
 import Spinner from '@/core/common/components/loader';
@@ -41,6 +42,11 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const personaUserId = personaUsers[persona.id]?.userId || null;
   const activePersonaSession = useAppStore((state) => state.activePersonaSession);
   const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
+  const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
+  
+  // Use PersonaSessionManager for centralized session management
+  const { createSession } = usePersonaSessionManager();
+  
   const [isCreatingPersona, setIsCreatingPersona] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
 
@@ -100,6 +106,39 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
     }, 2000); // Progress every 2 seconds
     
     try {
+      // Check if dev mode override is active
+      if (devUserIdOverride) {
+        // DEV MODE: Use the custom user ID instead of creating a new one
+        console.log('[DEV MODE] Using custom user ID:', devUserIdOverride);
+        
+        // Set the persona user with the override ID
+        setPersonaUser(persona.id, {
+          userId: devUserIdOverride,
+          personaInfo: { name: persona.name },
+        });
+        
+        // Create a persona session using PersonaSessionManager
+        // This automatically handles dev override and syncs to localStorage + global state
+        createSession({
+          personaId: persona.id,
+          personaName: persona.name,
+          userId: devUserIdOverride, // Manager will automatically apply dev override
+          scheduleId: null,
+          chatSessionId: '',
+          chatContext: [],
+          userInfo: null, // Will be populated on first API call
+          scheduleLastUpdatedBy: null,
+        });
+        
+        clearInterval(stepInterval);
+        setProcessingStep(PROCESSING_STEPS.length);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setIsCreatingPersona(false);
+        setProcessingStep(0);
+        return;
+      }
+      
+      // NORMAL MODE: Create a new anonymous user
       const personaUser = await personaService.createAnonymousUser(persona);
       const newUserId = personaUser.anonymousUser.id;
       
@@ -116,8 +155,9 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 				personaInfo: { name: persona.name },
 			});
       
-      // Create a new persona session with all related data grouped together
-      setActivePersonaSession({
+      // Create a new persona session using PersonaSessionManager
+      // This automatically syncs to both localStorage and global state
+      createSession({
         personaId: persona.id,
         personaName: persona.name,
         userId: newUserId,
@@ -201,13 +241,20 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       content: (
         <React.Fragment>
           <PersonaCalendar expandedWidth={expandedWidth} userId={personaUserId} />
-          <CalendarContainerActionButtons>
-            <MobileShowChatButton
-              onClick={() => setMobileChatVisible(!mobileChatVisible)}
-            >
-              <Plus size={20} />
-            </MobileShowChatButton>
-          </CalendarContainerActionButtons>
+          {!mobileChatVisible && (
+            <CalendarContainerActionButtons>
+              <MobileChatInputWrapper>
+                <MessageCircleIcon>
+                  <MessageCircle size={18} />
+                </MessageCircleIcon>
+                <MobileChatInput
+                  onClick={() => setMobileChatVisible(!mobileChatVisible)}
+                  placeholder={t('home.expanded.mobileChatPlaceholder')}
+                  readOnly
+                />
+              </MobileChatInputWrapper>
+            </CalendarContainerActionButtons>
+          )}
         </React.Fragment>
       ),
     },
@@ -390,29 +437,62 @@ const ChatContainer = styled(animated.div)`
 const CalendarContainerActionButtons = styled.div`
 	position: absolute;
 	bottom: 1rem;
+	left: 1rem;
 	right: 1rem;
 	display: flex;
 	gap: 12px;
-`;
 
-const CalendarActionButton = styled.button`
-	display: grid;
-	place-items: center;
-	height: 36px;
-	width: 36px;
-	border-radius: ${palette.borderRadius.xxLarge};
-	background-color: ${palette.colors.brand[500]};
-	color: ${palette.colors.white};
-	transition: background-color 0.2s ease-in-out;
-
-	&:hover {
-		background-color: ${palette.colors.brand[600]};
+	@media screen and (min-width: ${palette.screens.lg}) {
+		display: none;
 	}
 `;
 
-const MobileShowChatButton = styled(CalendarActionButton)`
-	@media screen and (min-width: ${palette.screens.lg}) {
-		display: none;
+const MobileChatInputWrapper = styled.div`
+	position: relative;
+	width: 100%;
+	display: flex;
+	align-items: center;
+`;
+
+const MessageCircleIcon = styled.div`
+	position: absolute;
+	left: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: ${palette.colors.brand[500]};
+	pointer-events: none;
+	z-index: 1;
+`;
+
+const MobileChatInput = styled.input`
+	padding: 0.75rem 1rem 0.75rem 3rem;
+	border-radius: ${palette.borderRadius.xxLarge};
+	background-color: rgba(31, 31, 31, 0.6);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(55, 55, 55, 0.5);
+	color: ${palette.colors.gray[300]};
+	font-size: ${palette.typography.fontSize.sm};
+	font-family: ${palette.typography.fontFamily.inter};
+	cursor: pointer;
+	width: 100%;
+	transition: all 0.2s ease-in-out;
+
+	&::placeholder {
+		color: ${palette.colors.gray[500]};
+	}
+
+	&:hover {
+		background-color: rgba(55, 55, 55, 0.7);
+		border-color: ${palette.colors.brand[500]};
+		backdrop-filter: blur(10px);
+	}
+
+	&:focus {
+		outline: none;
+		border-color: ${palette.colors.brand[500]};
+		background-color: rgba(55, 55, 55, 0.7);
+		backdrop-filter: blur(10px);
 	}
 `;
 
