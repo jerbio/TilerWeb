@@ -11,6 +11,8 @@ import Timeline from './pages/Timeline';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from './core/auth/AuthProvider';
+import { ProtectedRoute } from './core/auth/ProtectedRoute';
 // import useAppStore from './global_state';
 
 const App: React.FC = () => {
@@ -46,43 +48,49 @@ const App: React.FC = () => {
   return (
     <HelmetProvider>
       <ConsentProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="/features" element={<Features />} />
-            </Route>
-            <Route
-              path="/waitlist"
-              element={
-                <>
-                  <Waitlist />
-                  <FooterSection />
-                </>
-              }
-            />
-            <Route
-            path="/signup"
-            element={
-              <>
-                <UserAuthentication />
-                <FooterSection />
-              </>
-            }
-          />
-          <Route
-            path="/signin"
-            element={
-              <>
-                <UserAuthentication />
-                <FooterSection />
-              </>
-            }
-          />
-          <Route path="/timeline" element={<Timeline />} />
-        </Routes>
-          <Toaster position="bottom-left" theme="system" />
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="/features" element={<Features />} />
+              </Route>
+              <Route
+                path="/waitlist"
+                element={
+                  <>
+                    <Waitlist />
+                    <FooterSection />
+                  </>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <>
+                    <UserAuthentication />
+                    <FooterSection />
+                  </>
+                }
+              />
+              <Route
+                path="/signin"
+                element={
+                  <>
+                    <UserAuthentication />
+                    <FooterSection />
+                  </>
+                }
+              />
+
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/timeline" element={<Timeline />} />
+              </Route>
+            </Routes>
+            <Toaster position="bottom-left" theme="system" />
+          </BrowserRouter>
+        </AuthProvider>
       </ConsentProvider>
     </HelmetProvider>
   );

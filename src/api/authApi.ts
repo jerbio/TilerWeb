@@ -20,6 +20,12 @@ export interface VerifyCodeResponse {
 	verified: boolean;
 }
 
+export interface AuthStatusResponse {
+	isAuthenticated: boolean;
+	userId?: string;
+	email?: string;
+}
+
 export class AuthApi extends AppApi {
 	public signUp(email: string) {
 		return this.apiRequest<SignUpResponse>('account/emailauthentication', {
@@ -32,6 +38,18 @@ export class AuthApi extends AppApi {
 		return this.apiRequest<VerifyCodeResponse>('account/emailcodeauthentication', {
 			method: 'POST',
 			body: JSON.stringify({ email, code }),
+		});
+	}
+
+	public checkAuth() {
+		return this.apiRequest<AuthStatusResponse>('account/auth', {
+			method: 'GET',
+		});
+	}
+
+	public logout() {
+		return this.apiRequest<void>('account/signout', {
+			method: 'POST',
 		});
 	}
 }

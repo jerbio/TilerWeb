@@ -8,7 +8,8 @@ import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Input from '@/core/common/components/input';
 import Logo from '@/core/common/components/icons/logo';
-import { authService } from '@/services';
+import { authService, userService } from '@/services';
+import useAppStore from '@/global_state';
 
 interface VerificationCodePopupProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const setAuthenticated = useAppStore((state) => state.setAuthenticated);
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -39,6 +41,10 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
     setIsLoading(true);
     try {
       await authService.verifyCode(email, code);
+
+      // Fetch user info and update global auth state
+      const user = await userService.getCurrentUser();
+      setAuthenticated(user);
 
       // Success: Close popup, show success message, and redirect
       toast.success(t('auth.verification.success'));
