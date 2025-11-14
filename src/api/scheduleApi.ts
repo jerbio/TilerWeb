@@ -46,8 +46,6 @@ export class ScheduleApi extends AppApi {
 			MobileApp: true.toString(),
 		}).toString();
 
-		return this.apiRequest<ScheduleLookupResponse>(`api/Schedule?${urlParams}`, {
-			authRequired: true,
-		});
+		return this.apiRequest<ScheduleLookupResponse>(`api/Schedule?${urlParams}`);
 	}
 }
