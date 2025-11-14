@@ -179,7 +179,7 @@ class LocationService {
 
       return null;
     } catch (err) {
-      console.log('Geocoding failed', err);
+      console.error('Geocoding failed', err);
       return null;
     }
   }

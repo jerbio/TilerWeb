@@ -87,6 +87,10 @@
 		}
 	},
 	"home": {
+		"featureHighlights": {
+			"title": "Points Forts des Fonctionnalités",
+			"subtitle": "Simplifiez votre vie avec Tiler, voici ce que nous pouvons faire pour vous aider."
+		},
 		"expanded": {
 			"chat": {
 				"newChat": "Nouvelle Discussion",

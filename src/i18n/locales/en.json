@@ -1,8 +1,38 @@
 {
-	"common": {
+		"common": {
+		"onboarding": {
+			"guide": {
+				"skip": "Skip",
+				"next": "Next",
+				"prev": "Back",
+				"done": "Got it!",
+				"steps": {
+					"mobile-open-chat": {
+						"title": "Open the Chat",
+						"description": "Tap this button to open the chat interface where you can talk to Tiler about your schedule."
+					},
+					"chat": {
+						"title": "Start with a Conversation",
+						"description": "Type what you need to do in plain English. Try: \"Lunch with Sarah tomorrow at noon in downtown.\""
+					},
+					"ai": {
+						"title": "AI Proposes a Schedule",
+						"description": "Tiler asks clarifying questions if needed, calculates travel time, and suggests when to schedule your task."
+					},
+					"confirm": {
+						"title": "Review and Confirm",
+						"description": "Check the proposed schedule. Click \"Accept Changes\" to add it to your calendar, or adjust as needed."
+					},
+					"calendar": {
+						"title": "See Your Smart Schedule",
+						"description": "Your task appears on the calendar with travel time included. Tiler adapts automatically when things change."
+					}
+				}
+			}
+		},
 		"buttons": {
 			"getStarted": "Get Started with Tiler",
-			"learnMore": "Learn More",
+			"explore": "Explore",
 			"subscribe": "Subscribe",
 			"tryFree": "Try Tiler for free",
 			"signUp": "Sign Up",
@@ -123,6 +153,11 @@
 		}
 	},
 	"home": {
+		"demoExplainer": {
+			"title": "See Tiler in Action",
+			"subtitle": "Try it now — no signup required. Choose a persona below to experience how Tiler turns natural conversation into a smart, adaptive schedule.",
+			"badge": "Interactive Demo"
+		},
 		"persona": {
 			"created": "Profile",
 			"customCreated": "Custom Profile",
@@ -202,8 +237,73 @@
 			"error": "Something went wrong. Please try again."
 		},
 		"hero": {
-			"title": "Visualize Your Schedule, Simplify Your Life.",
-			"subtitle": "The ultimate tool for creating personalized and interactive timelines."
+			"title": "Your AI-Powered Day Architect",
+			"subtitle": "Just describe what you need to do, and Tiler automatically builds a smart, location-aware schedule that adapts as life changes.",
+			"features": {
+				"natural": "Natural-language scheduling",
+				"adaptive": "Adapts to changes automatically",
+				"travel": "Smart travel-time calculation"
+			},
+			"scenarios": {
+				"lunch": {
+					"calendarTitle": "Wednesday, Nov 13",
+					"messages": {
+						"userRequest": "Lunch with Sarah tomorrow at noon in downtown",
+						"aiResponse1": "I'll schedule lunch with Sarah for tomorrow (Wednesday) at 12:00 PM downtown. You're currently at home. Should I add 25 minutes travel time?",
+						"userConfirm": "Yes, add travel time",
+						"aiConfirm": "Perfect! I've added the event with travel buffer included. ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Downtown",
+						"travelTime": "25 min drive",
+						"lunch": "Lunch with Sarah"
+					}
+				},
+				"errands": {
+					"calendarTitle": "Friday, Nov 15",
+					"messages": {
+						"userRequest": "I need to pick up groceries and go to the gym today",
+						"aiResponse1": "I can schedule those for you. What time works best? Your calendar is open from 4-7 PM.",
+						"userConfirm": "After 5 PM works",
+						"aiConfirm": "Great! I'll schedule groceries at 5:00 PM (30 min), then gym at 6:00 PM (1 hour). Added! ✓"
+					},
+					"tiles": {
+						"groceries": "Grocery Shopping",
+						"travel": "Travel to Gym",
+						"travelTime": "12 min drive",
+						"gym": "Gym Workout"
+					}
+				},
+				"client": {
+					"calendarTitle": "Monday, Nov 18",
+					"messages": {
+						"userRequest": "Schedule client meeting with John next Monday at 2 PM at his office",
+						"aiResponse1": "I'll add the client meeting with John for Monday at 2:00 PM at his office. That's a 35-minute drive from your current location. Should I block time before?",
+						"userConfirm": "Yes please",
+						"aiConfirm": "Done! Travel time and meeting added to your calendar. ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Client Office",
+						"travelTime": "35 min drive",
+						"meeting": "Client Meeting - John"
+					}
+				},
+				"dentist": {
+					"calendarTitle": "Thursday, Nov 14",
+					"messages": {
+						"userRequest": "I have a dentist appointment at 9 AM tomorrow, then need to work from home",
+						"aiResponse1": "Got it! I'll add your dentist appointment at 9:00 AM (assuming 1 hour). Return travel home is 15 minutes. Should I schedule deep work after?",
+						"userConfirm": "Yes, block 3 hours for focused work",
+						"aiConfirm": "Perfect! Your morning is planned with travel time included. ✓"
+					},
+					"tiles": {
+						"dentist": "Dentist Appointment",
+						"travel": "Travel Home",
+						"travelTime": "15 min drive",
+						"deepWork": "Deep Work Session"
+					}
+				}
+			}
 		},
 		"video": {
 			"title": "YouTube video player"
@@ -218,26 +318,30 @@
 			"spanText": "calendars",
 			"subtitle": "These apps are available to integrate seamlessly with Tiler."
 		},
+		"featureHighlights": {
+			"title": "Feature Highlights",
+			"subtitle": "Simplify your life with Tiler, Here's what we can do to help you."
+		},
 		"features": {
+			"conversation": {
+				"subtitle": "JUST TALK TO IT",
+				"title": "Natural-Language Scheduling",
+				"description": "Tell Tiler what you need to do in plain English. The AI asks follow-up questions, proposes smart schedules, and waits for your confirmation—no drag-and-drop required."
+			},
 			"transit": {
 				"subtitle": "OPTIMIZE YOUR DAY",
-				"title": "Transit",
-				"description": "Plan your day efficiently with detailed transit routes on a map, showing tiles and stops to make between activities."
+				"title": "Smart Travel Time",
+				"description": "Tiler automatically inserts realistic travel durations between locations and adjusts your timeline when things change—so you're never late."
 			},
-			"forecast": {
-				"subtitle": "ANTICIPATE THE FUTURE",
-				"title": "Forecast & Predictions",
-				"description": "Make strategic choices based on data-driven insights."
-			},
-			"suggestions": {
-				"subtitle": "PERSONALIZED RECOMMENDATIONS",
-				"title": "Tile Suggestions",
-				"description": "Let Tiler handle the complex scheduling tasks, Prioritize tasks and allocate time effectively."
+			"adaptive": {
+				"subtitle": "STAYS IN SYNC",
+				"title": "Adaptive Intelligence",
+				"description": "When life throws a curveball, Tiler reschedules conflicting tasks and finds the next best time—automatically."
 			},
 			"location": {
-				"subtitle": "SMART LOCATION",
-				"title": "Auto Location",
-				"description": "Tiler intelligently detects and automatically adds relevant locations to your tiles."
+				"subtitle": "PRIVACY-FIRST",
+				"title": "Location Awareness",
+				"description": "Use generic labels like 'home' or 'work' instead of specific addresses. Tiler calculates travel time without oversharing your personal data."
 			}
 		},
 		"faq": {
@@ -245,6 +349,18 @@
 				"whatIsTiler": {
 					"question": "What is Tiler, and how does it work?",
 					"answer": "Tiler is not a calendar, it is an AI-powered scheduling app that not only manages your tasks but also optimizes your time. It creates smart, flexible schedules using AutoTiles that adjust as your day shifts, while also letting you lock in non-negotiable tasks using Blocks."
+				},
+				"differentFromCalendar": {
+					"question": "How is Tiler different from Google Calendar or other calendar apps?",
+					"answer": "Unlike static calendars, Tiler is your AI scheduling assistant. Just tell it what you need to do in plain English—it asks clarifying questions, calculates travel time between locations, and proposes a complete schedule. When life changes, Tiler adapts your timeline automatically. You confirm changes before they're made, so you stay in control."
+				},
+				"aiAccuracy": {
+					"question": "Can I trust the AI to schedule my tasks correctly?",
+					"answer": "Tiler uses a confirmation-first approach—it proposes schedules and waits for your approval before making changes. The AI learns your patterns over time and gets smarter about durations, locations, and preferences. You can always undo or adjust any suggestion."
+				},
+				"locationPrivacy": {
+					"question": "Is my location data private? How does Tiler use it?",
+					"answer": "Tiler respects your privacy. You can use generic labels like 'home,' 'work,' or 'local cafe' instead of specific addresses. Location data is only used to calculate realistic travel times between tasks, ensuring your schedule accounts for real-world constraints. Your data is never shared or sold."
 				},
 				"calendarIntegration": {
 					"question": "Why do I need to integrate my calendar?",

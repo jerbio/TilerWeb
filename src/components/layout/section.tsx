@@ -39,11 +39,12 @@ type SectionProps = {
 	children: React.ReactNode;
 	width?: number;
 	paddingBlock?: number;
+	id?: string;
 };
 
-const Section = ({ children, width, paddingBlock }: SectionProps) => {
+const Section = ({ children, width, paddingBlock, id }: SectionProps) => {
 	return (
-		<StyledSectionWrapper>
+		<StyledSectionWrapper id={id}>
 			<StyledSection
 				style={{
 					maxWidth: width,
