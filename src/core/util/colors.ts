@@ -1,33 +1,6 @@
 export type RGB = { r: number; g: number; b: number };
 export type HSL = { h: number; s: number; l: number };
 
-export class RGBColor {
-	r: number;
-	g: number;
-	b: number;
-
-	constructor(rgb: RGB) {
-		this.r = rgb.r;
-		this.g = rgb.g;
-		this.b = rgb.b;
-	}
-
-	toHex(): string {
-		return rgbToHex(this);
-	}
-
-	setLightness(lightness: number): RGBColor {
-		const hsl = rgbToHsl(this);
-		hsl.l = lightness;
-		const rgb = hslToRgb(hsl);
-		return new RGBColor(rgb);
-	}
-}
-
-function rgbToHex({ r, g, b }: RGB): string {
-	return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('');
-}
-
 function rgbToHsl({ r, g, b }: RGB): HSL {
 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 	((r /= 255), (g /= 255), (b /= 255));
@@ -77,10 +50,10 @@ function hslToRgb({ h, s, l }: HSL): RGB {
 }
 
 const colorUtil = {
-	setLightness: (rgb: RGB, lightness: number): RGBColor => {
+	setLightness: (rgb: RGB, lightness: number): RGB => {
 		const hsl = rgbToHsl(rgb);
 		hsl.l = lightness;
-		return new RGBColor(hslToRgb(hsl));
+		return hslToRgb(hsl);
 	},
 	lighten: (rgb: RGB, amount: number): RGB => {
 		const hsl = rgbToHsl(rgb);
