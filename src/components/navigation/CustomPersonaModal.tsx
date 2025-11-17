@@ -412,6 +412,11 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 				
 				// Show all steps as complete (all checkmarks)
 				setProcessingStep(PROCESSING_STEPS.length);
+
+				const personaCarousel = document.getElementById('persona-carousel');
+				if (personaCarousel) {
+					personaCarousel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}
 				
 				// Wait 1 second to show all checkmarks before closing
 				await new Promise(resolve => setTimeout(resolve, 1000));

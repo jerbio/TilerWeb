@@ -152,6 +152,7 @@
 			}
 		},
 		"expanded": {
+			"mobileChatPlaceholder": "Chat with your calendar to update...",
 			"chat": {
 				"newChat": "New Chat",
 				"clearSession": "Clear Session",
@@ -290,6 +291,47 @@
 				}
 			}
 		}
+	},
+	"auth": {
+		"signup": {
+			"title": "Get started with Tiler",
+			"subtitle": "Create your free account to enjoy seamless scheduling",
+			"googleButton": "Sign up with Google",
+			"emailLabel": "Email Address",
+			"emailPlaceholder": "E.g yourname@outlook.com",
+			"submitButton": "Create my free account",
+			"submitting": "Creating account...",
+			"footer": "Already have an account?",
+			"footerLink": "Sign in instead",
+			"verificationSent": "Verification code sent to your email!",
+			"createAccountError": "Failed to create account. Please try again."
+		},
+		"signin": {
+			"title": "Welcome back to Tiler",
+			"subtitle": "Sign in to continue your scheduling journey",
+			"googleButton": "Sign in with Google",
+			"submitButton": "Sign in to my account",
+			"submitting": "Signing in...",
+			"footer": "Don't have an account?",
+			"footerLink": "Sign up instead"
+		},
+		"verification": {
+			"title": "Verification Required",
+			"header": "Enter your verification code",
+			"description": "We've sent a verification code to",
+			"label": "Verification Code",
+			"placeholder": "Enter verification code",
+			"verifyButton": "Verify Code",
+			"verifying": "Verifying...",
+			"resendButton": "Didn't receive a code? Resend",
+			"resending": "Sending...",
+			"cancel": "Cancel",
+			"success": "Account verified successfully!",
+			"error": "Invalid verification code. Please try again.",
+			"resendSuccess": "Verification code resent!",
+			"resendError": "Failed to resend code. Please try again."
+		},
+		"goBack": "Go back"
 	},
 	"waitlist": {
 		"title": {

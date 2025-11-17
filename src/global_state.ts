@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { personaSessionManager } from '@/services/personaSessionManager';
 
 export interface ChatContextType {
 	EntityId: string;
@@ -17,7 +18,7 @@ export interface UserInfo {
 	fullName: string; // ""
 	firstName: string; // ""
 	lastName: string; // ""
-	countryCode: string; // "1"
+	countryCode: string | null; // "1"
 }
 
 // Grouped persona session that includes user, schedule, and chat session
@@ -35,13 +36,13 @@ export interface PersonaSession {
 interface AppState {
 	// Current active persona session
 	activePersonaSession: PersonaSession | null;
-	
+
 	// Action to set or update the entire persona session
 	setActivePersonaSession: (session: PersonaSession | null) => void;
-	
+
 	// Action to update specific fields in the active session
 	updateActivePersonaSession: (updates: Partial<PersonaSession>) => void;
-	
+
 	// Convenience actions for backward compatibility and ease of use
 	addChatContext: (context: ChatContextType) => void;
 	removeChatContext: (context: ChatContextType) => void;
@@ -51,6 +52,10 @@ interface AppState {
 	setUserInfo: (info: UserInfo) => void;
 	setChatSessionId: (id: string) => void;
 	
+	// Development tools (only active in dev mode)
+	devUserIdOverride: string | null;
+	setDevUserIdOverride: (userId: string | null) => void;
+
 	// Getters for backward compatibility
 	get chatContext(): ChatContextType[];
 	get scheduleId(): string | null;
@@ -58,20 +63,33 @@ interface AppState {
 	get userInfo(): UserInfo | null;
 	get selectedPersonaId(): string | null;
 	get chatSessionId(): string;
+	
+	// Persona session manager (centralized session management)
+	getPersonaSessionManager: () => typeof personaSessionManager;
+
+	// Authentication state
+	isAuthenticated: boolean;
+	isAuthLoading: boolean;
+	authenticatedUser: UserInfo | null;
+
+	// Authentication actions
+	checkAuth: () => Promise<void>;
+	logout: () => Promise<void>;
+	setAuthenticated: (user: UserInfo | null) => void;
 }
 
 const useAppStore = create<AppState>((set, get) => ({
 	activePersonaSession: null,
-	
+
 	setActivePersonaSession: (session) => set(() => ({ activePersonaSession: session })),
-	
+
 	updateActivePersonaSession: (updates) =>
 		set((state) => ({
 			activePersonaSession: state.activePersonaSession
 				? { ...state.activePersonaSession, ...updates }
 				: null,
 		})),
-	
+
 	// Convenience actions that update the active session
 	addChatContext: (context) =>
 		set((state) => {
@@ -83,7 +101,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
-	
+
 	removeChatContext: (context) =>
 		set((state) => {
 			if (!state.activePersonaSession) return state;
@@ -94,7 +112,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
-	
+
 	clearChatContext: () =>
 		set((state) => {
 			if (!state.activePersonaSession) return state;
@@ -105,7 +123,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
-	
+
 	setScheduleId: (id) =>
 		set((state) => {
 			if (!state.activePersonaSession) return state;
@@ -116,7 +134,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
-	
+
 	setScheduleLastUpdatedBy: (component) =>
 		set((state) => {
 			if (!state.activePersonaSession) return state;
@@ -127,7 +145,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
-	
+
 	setUserInfo: (info) =>
 		set((state) => {
 			if (!state.activePersonaSession) return state;
@@ -138,7 +156,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
-	
+
 	setChatSessionId: (id) =>
 		set((state) => {
 			if (!state.activePersonaSession) return state;
@@ -149,31 +167,98 @@ const useAppStore = create<AppState>((set, get) => ({
 				},
 			};
 		}),
+
+	// Development tools
+	devUserIdOverride: null,
+	setDevUserIdOverride: (userId) => set(() => ({ devUserIdOverride: userId })),
 	
 	// Getters for backward compatibility
 	get chatContext() {
 		return get().activePersonaSession?.chatContext || [];
 	},
-	
+
 	get scheduleId() {
 		return get().activePersonaSession?.scheduleId || null;
 	},
-	
+
 	get scheduleLastUpdatedBy() {
 		return get().activePersonaSession?.scheduleLastUpdatedBy || null;
 	},
-	
+
 	get userInfo() {
 		return get().activePersonaSession?.userInfo || null;
 	},
-	
+
 	get selectedPersonaId() {
 		return get().activePersonaSession?.personaId || null;
 	},
-	
+
 	get chatSessionId() {
 		return get().activePersonaSession?.chatSessionId || '';
 	},
+
+	// Authentication state
+	isAuthenticated: false,
+	isAuthLoading: true,
+	authenticatedUser: null,
+
+	// Authentication actions
+	checkAuth: async () => {
+		set({ isAuthLoading: true });
+		try {
+			const { authService } = await import('./services');
+			const response = await authService.checkAuth();
+
+			if (response.isAuthenticated) {
+				// Fetch full user info
+				const { userService } = await import('./services');
+				const user = await userService.getCurrentUser();
+				set({ isAuthenticated: true, authenticatedUser: user, isAuthLoading: false });
+			} else {
+				set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
+			}
+		} catch (error) {
+			console.error('Auth check failed:', error);
+			set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
+		}
+	},
+
+	logout: async () => {
+		try {
+			const { authService } = await import('./services');
+			await authService.logout();
+			set({ isAuthenticated: false, authenticatedUser: null });
+		} catch (error) {
+			console.error('Logout failed:', error);
+			throw error;
+		}
+	},
+
+	setAuthenticated: (user) => {
+		set({
+			isAuthenticated: user !== null,
+			authenticatedUser: user,
+		});
+	},
+	
+	// Persona session manager getter
+	getPersonaSessionManager: () => personaSessionManager,
 }));
+
+// Initialize the PersonaSessionManager with Zustand store methods
+personaSessionManager.initialize({
+	setActivePersonaSession: (session) => useAppStore.setState({ activePersonaSession: session }),
+	updateActivePersonaSession: (updates) => {
+		const currentSession = useAppStore.getState().activePersonaSession;
+		if (currentSession) {
+			useAppStore.setState({
+				activePersonaSession: { ...currentSession, ...updates },
+			});
+		}
+	},
+	getActivePersonaSession: () => useAppStore.getState().activePersonaSession,
+	getDevUserIdOverride: () => useAppStore.getState().devUserIdOverride,
+	setDevUserIdOverride: (userId) => useAppStore.setState({ devUserIdOverride: userId }),
+});
 
 export default useAppStore;

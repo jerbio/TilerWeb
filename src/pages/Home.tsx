@@ -47,7 +47,7 @@ const Home: React.FC = () => {
 			/>
 			<PersonaCarousel />
 			<VideoIframeSection
-				src="https://www.youtube.com/embed/N3L49xMBZ60?si=BmQ0wHBvThDCh5Zc"
+				src="https://www.youtube.com/embed/87RGNntLBRY"
 				title={t('home.video.title')}
 				width={1024}
 				allowFullScreen={true}
