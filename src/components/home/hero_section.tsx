@@ -28,6 +28,19 @@ const HeroWrapper = styled.div`
 	}
 `;
 
+const fadeInAnimation = `
+	@keyframes fadeInContent {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+`;
+
 const ContentWrapper = styled.div`
 	position: relative;
 	z-index: 10;
@@ -38,6 +51,9 @@ const ContentWrapper = styled.div`
 	padding: 3rem 2rem;
 	border-radius: ${palette.borderRadius.xLarge};
 	border: 1px solid ${palette.colors.gray[700]}50;
+	opacity: 0;
+	animation: fadeInContent 0.8s ease-out 2s forwards;
+	${fadeInAnimation}
 
 	@media (max-width: ${palette.screens.lg}) {
 		padding: 2.5rem 1.5rem;
@@ -94,14 +110,18 @@ const HeroSection: React.FC = () => {
 		}
 	};
 
-	return (
+		return (
 		<Section>
-			<HeroWrapper>
-				{/* Left side: Lunch meeting scenario */}
-				<HeroAnimatedBackground position="left" scenarioIndex={0} />
-				{/* Right side: Client meeting scenario */}
-				<HeroAnimatedBackground position="right" scenarioIndex={2} />
-				<ContentWrapper>
+		<HeroWrapper>
+			{/* Top-left corner - Lunch scenario */}
+			<HeroAnimatedBackground position="top-left" scenarioIndex={0} />
+			{/* Top-right corner - Errands scenario */}
+			<HeroAnimatedBackground position="top-right" scenarioIndex={1} />
+			{/* Bottom-left corner - Client meeting scenario */}
+			<HeroAnimatedBackground position="bottom-left" scenarioIndex={2} />
+			{/* Bottom-right corner - Dentist scenario */}
+			<HeroAnimatedBackground position="bottom-right" scenarioIndex={3} />
+			<ContentWrapper>
 					<SectionHeaders
 						headerText={t('home.hero.title')}
 						subHeaderText={t('home.hero.subtitle')}
