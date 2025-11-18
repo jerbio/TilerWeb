@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Logo from '@/core/common/components/icons/logo';
 import Spinner from '@/core/common/components/loader';
 import useAppStore from '@/global_state';
+import { authService } from '@/services';
 
 const Timeline: React.FC = () => {
+  const navigate = useNavigate();
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+  const setAuthenticated = useAppStore((state) => state.setAuthenticated);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     // User is already authenticated and available from global state
@@ -15,6 +21,20 @@ const Timeline: React.FC = () => {
       setIsLoading(false);
     }
   }, [authenticatedUser]);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await authService.logout();
+      setAuthenticated(null);
+      toast.success('Signed out successfully');
+      navigate('/signin');
+    } catch (error) {
+      toast.error('Failed to sign out');
+      console.error('Sign out error:', error);
+      setIsSigningOut(false);
+    }
+  };
 
   if (isLoading || !authenticatedUser) {
     return (
@@ -31,6 +51,9 @@ const Timeline: React.FC = () => {
       <Header>
         <Logo size={48} />
         <Title>Timeline</Title>
+        <SignOutButton onClick={handleSignOut} disabled={isSigningOut}>
+          {isSigningOut ? 'Signing out...' : 'Sign Out'}
+        </SignOutButton>
       </Header>
 
       <Content>
@@ -101,6 +124,29 @@ const Title = styled.h1`
   font-family: ${palette.typography.fontFamily.urban};
   font-weight: ${palette.typography.fontWeight.bold};
   margin: 0;
+  flex: 1;
+`;
+
+const SignOutButton = styled.button`
+  background-color: ${palette.colors.gray[800]};
+  color: ${palette.colors.white};
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+  padding: 0.75rem 1.5rem;
+  font-size: ${palette.typography.fontSize.sm};
+  font-weight: ${palette.typography.fontWeight.medium};
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: ${palette.colors.gray[700]};
+    border-color: ${palette.colors.gray[600]};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const Content = styled.div`
