@@ -16,6 +16,7 @@ import DevModeBadge from './core/common/components/dev/DevModeBadge';
 import useDevTools from './core/common/hooks/useDevTools';
 import { AuthProvider } from './core/auth/AuthProvider';
 import { ProtectedRoute } from './core/auth/ProtectedRoute';
+import { PublicRoute } from './components/auth/PublicRoute';
 // import useAppStore from './global_state';
 
 const App: React.FC = () => {
@@ -70,26 +71,30 @@ const App: React.FC = () => {
                   </>
                 }
               />
-              <Route
-                path="/signup"
-                element={
-                  <>
-                    <UserAuthentication />
-                    <FooterSection />
-                  </>
-                }
-              />
-              <Route
-                path="/signin"
-                element={
-                  <>
-                    <UserAuthentication />
-                    <FooterSection />
-                  </>
-                }
-              />
 
-              {/* Protected Routes */}
+              {/* Public Routes - redirect to /timeline if already authenticated */}
+              <Route element={<PublicRoute />}>
+                <Route
+                  path="/signup"
+                  element={
+                    <>
+                      <UserAuthentication />
+                      <FooterSection />
+                    </>
+                  }
+                />
+                <Route
+                  path="/signin"
+                  element={
+                    <>
+                      <UserAuthentication />
+                      <FooterSection />
+                    </>
+                  }
+                />
+              </Route>
+
+              {/* Protected Routes - redirect to /signin if not authenticated */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/timeline" element={<Timeline />} />
               </Route>

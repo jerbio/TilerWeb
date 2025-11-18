@@ -1,48 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router';
-import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Logo from '@/core/common/components/icons/logo';
 import Spinner from '@/core/common/components/loader';
-import { userService } from '@/services';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  fullName: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  timeZone: string;
-  dateOfBirth: string;
-}
+import useAppStore from '@/global_state';
 
 const Timeline: React.FC = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await userService.getCurrentUser();
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-        toast.error('Failed to load user information');
-        // Redirect to signin if unauthorized
-        navigate('/signin');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // User is already authenticated and available from global state
+    if (authenticatedUser) {
+      setIsLoading(false);
+    }
+  }, [authenticatedUser]);
 
-    fetchUser();
-  }, [navigate]);
-
-  if (isLoading) {
+  if (isLoading || !authenticatedUser) {
     return (
       <Container>
         <LoadingContainer>
@@ -50,10 +24,6 @@ const Timeline: React.FC = () => {
         </LoadingContainer>
       </Container>
     );
-  }
-
-  if (!user) {
-    return null; // Will redirect to signin
   }
 
   return (
@@ -70,32 +40,32 @@ const Timeline: React.FC = () => {
           <UserInfo>
             <InfoRow>
               <Label>Full Name:</Label>
-              <Value>{user.fullName || 'N/A'}</Value>
+              <Value>{authenticatedUser.fullName || 'N/A'}</Value>
             </InfoRow>
 
             <InfoRow>
               <Label>Username:</Label>
-              <Value>{user.username}</Value>
+              <Value>{authenticatedUser.username}</Value>
             </InfoRow>
 
             <InfoRow>
               <Label>Email:</Label>
-              <Value>{user.email}</Value>
+              <Value>{authenticatedUser.email || 'N/A'}</Value>
             </InfoRow>
 
             <InfoRow>
               <Label>Phone:</Label>
-              <Value>{user.phoneNumber || 'N/A'}</Value>
+              <Value>{authenticatedUser.phoneNumber || 'N/A'}</Value>
             </InfoRow>
 
             <InfoRow>
               <Label>Time Zone:</Label>
-              <Value>{user.timeZone}</Value>
+              <Value>{authenticatedUser.timeZone}</Value>
             </InfoRow>
 
             <InfoRow>
               <Label>User ID:</Label>
-              <Value>{user.id}</Value>
+              <Value>{authenticatedUser.id}</Value>
             </InfoRow>
           </UserInfo>
         </UserCard>
