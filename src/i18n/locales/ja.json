@@ -1,0 +1,461 @@
+{
+		"common": {
+		"onboarding": {
+			"guide": {
+				"skip": "スキップ",
+				"next": "次へ",
+				"prev": "戻る",
+				"done": "了解しました！",
+				"steps": {
+					"mobile-open-chat": {
+						"title": "チャットを開く",
+						"description": "このボタンをタップしてチャットインターフェースを開き、Tilerとスケジュールについて話すことができます。"
+					},
+					"chat": {
+						"title": "会話から始める",
+						"description": "簡単な英語で何をする必要があるかを入力してください。試してみてください：「明日の正午にダウンタウンでサラとランチ」"
+					},
+					"ai": {
+						"title": "AIがスケジュールを提案",
+						"description": "Tilerは必要に応じて明確化の質問をし、移動時間を計算し、タスクをいつスケジュールするかを提案します。"
+					},
+					"confirm": {
+						"title": "確認して確定",
+						"description": "提案されたスケジュールを確認してください。「変更を承認」をクリックしてカレンダーに追加するか、必要に応じて調整してください。"
+					},
+					"calendar": {
+						"title": "スマートなスケジュールを見る",
+						"description": "タスクは移動時間を含めてカレンダーに表示されます。状況が変わるとTilerは自動的に適応します。"
+					}
+				}
+			}
+		},
+		"buttons": {
+			"getStarted": "Tilerを始める",
+			"explore": "探検する",
+			"subscribe": "購読する",
+			"tryFree": "Tilerを無料で試す",
+			"signUp": "サインアップ",
+			"back": "戻る",
+			"createSchedule": "スケジュールを作成",
+			"creating": "作成中...",
+			"cancel": "キャンセル"
+		},
+		"navigation": {
+			"home": "ホーム",
+			"features": "機能",
+			"waitlist": "ウェイティングリスト"
+		},
+		"voiceInput": {
+			"listening": "聞いています...",
+			"transcribing": "文字起こし中...",
+			"startRecording": "音声入力を開始",
+			"stopRecording": "録音を停止",
+			"playRecording": "録音を再生",
+			"pauseRecording": "録音を一時停止",
+			"deleteRecording": "録音を削除"
+		},
+		"customPersonaModal": {
+			"title": "カスタムスケジュールを作成",
+			"description": "あなた自身と必要なスケジュールの種類について教えてください。あなたのライフスタイルに合ったパーソナライズされたスケジュールを作成するお手伝いをします。",
+			"placeholders": {
+				"healthcare": "私は12時間シフトで働く医療専門家です...",
+				"student": "私は授業、勉強時間、課外活動を両立させている学生です...",
+				"engineer": "私は夜にコーディングがはかどるソフトウェアエンジニアです...",
+				"parent": "私は仕事、学校の送り迎え、家族の時間を両立させている親です...",
+				"freelancer": "私は複数のクライアントと締め切りを管理しているフリーランサーです...",
+				"fitness": "私は朝のトレーニング時間が必要なフィットネス愛好家です...",
+				"remote": "私は異なるタイムゾーンで働くリモートワーカーです...",
+				"business": "私は不規則な労働時間を持つ小規模事業主です..."
+			},
+			"processing": {
+				"title": "スケジュールを作成中",
+				"description": "すべてを準備している間、しばらくお待ちください...",
+				"creatingUser": "ユーザーを作成中",
+				"creatingUserDesc": "パーソナライズされたプロファイルを設定中...",
+				"generatingProfile": "スケジュールプロファイルを生成中",
+				"generatingProfileDesc": "あなたの好みと要件を分析中...",
+				"generatingTiles": "タイルを生成中",
+				"generatingTilesDesc": "必要なすべてのスケジュールブロックを作成中...",
+				"optimizing": "最適化と保存",
+				"optimizingDesc": "最適な配置を見つけてスケジュールを保存中..."
+			}
+		},
+		"copyright": "© {{year}} Tiler. 全著作権所有。",
+		"social": {
+			"facebook": "Facebook",
+			"linkedin": "LinkedIn",
+			"instagram": "Instagram",
+			"x": "X (Twitter)"
+		},
+		"apps": {
+			"ios": {
+				"cta": "App Storeでダウンロード",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "Google Playで入手",
+				"platform": "Android Play Store"
+			}
+		},
+		"legal": {
+			"title": "法的情報",
+			"terms": "利用規約",
+			"privacy": "プライバシー"
+		},
+		"partners": {
+			"title": "パートナー",
+			"founderUniversity": "Founder University"
+		},
+		"consent": {
+			"banner": {
+				"title": "私たちはあなたのプライバシーを尊重します",
+				"description": "私たちはあなたの体験を向上させ、サイトの利用状況を分析し、マーケティング活動を支援するためにCookieおよび類似の技術を使用します。「すべて同意」をクリックすると、分析および追跡の使用に同意したことになります。",
+				"learnMore": "詳細はこちら",
+				"buttons": {
+					"acceptAll": "すべて同意",
+					"rejectAll": "すべて拒否",
+					"customize": "カスタマイズ"
+				},
+				"close": "閉じる"
+			},
+			"modal": {
+				"title": "プライバシー設定",
+				"description": "Cookieの設定を管理します。以下でさまざまな種類のCookieを有効または無効にできます。",
+				"categories": {
+					"necessary": {
+						"title": "必要なCookie",
+						"description": "ウェブサイトが正しく機能するために不可欠です。これらは無効にできません。"
+					},
+					"analytics": {
+						"title": "分析Cookie",
+						"description": "訪問者が当社のウェブサイトとどのようにやり取りするかを理解するのに役立ちます。"
+					},
+					"marketing": {
+						"title": "マーケティングCookie",
+						"description": "関連する広告を表示するためにウェブサイト間で訪問者を追跡するために使用されます。"
+					},
+					"preferences": {
+						"title": "設定Cookie",
+						"description": "ウェブサイトがあなたの選択を記憶し、強化された機能を提供できるようにします。"
+					}
+				},
+				"buttons": {
+					"save": "設定を保存",
+					"cancel": "キャンセル",
+					"acceptAll": "すべて同意",
+					"rejectAll": "すべて拒否"
+				}
+			},
+			"footer": {
+				"cookieSettings": "Cookie設定"
+			}
+		}
+	},
+	"home": {
+		"demoExplainer": {
+			"title": "Tilerの動作を見る",
+			"subtitle": "今すぐお試しください — サインアップは不要です。以下のペルソナを選択して、Tilerが自然な会話をスマートで適応性のあるスケジュールに変える方法を体験してください。",
+			"badge": "インタラクティブデモ"
+		},
+		"persona": {
+			"created": "プロフィール",
+			"customCreated": "カスタムプロフィール",
+			"cta": {
+				"create": "プロフィールを作成",
+				"view": "プロフィールを表示"
+			},
+			"expiresIn": "残り{{time}}",
+			"tileSuggestions": "タイル",
+			"custom": {
+				"namePlaceholder": "新しいプロフィール"
+			}
+		},
+		"expanded": {
+			"mobileChatPlaceholder": "カレンダーとチャットして更新...",
+			"chat": {
+				"newChat": "新しいチャット",
+				"clearSession": "セッションをクリア",
+				"title": "何をしたいですか？",
+				"subtitle": "タスクを説明してください、タイリングは私たちが担当します。",
+				"inputPlaceholder": "Tilerにあなたがすること...",
+				"loadingMessages": "チャットメッセージを読み込み中...",
+				"loadingActions": "その他のアクションを読み込み中...",
+				"error": "エラー",
+				"emptyStateTitle": "何をしたいですか？",
+				"emptyStateDescription": "タスクを説明してください、タイリングは私たちが担当します。",
+				"sendingRequest": "リクエストを送信中...",
+				"acceptChanges": "変更を承認",
+				"errorLoadMessages": "チャットメッセージの読み込みに失敗しました",
+				"errorSendMessage": "メッセージの送信に失敗しました",
+				"errorAcceptChanges": "変更の承認に失敗しました",
+				"userLocation": {
+					"anonymous": "匿名",
+					"enterLocation": "あなたの場所を入力してください",
+					"default": "デフォルト",
+					"saving": "保存中...",
+					"save": "保存",
+					"gettingCurrentLocation": "現在地を取得中...",
+					"gettingLocation": "場所を取得中...",
+					"resetToDefault": "デフォルトにリセット",
+					"locationBenefitMessage": "実際の場所を設定すると、より関連性の高いタイルを作成し、パーソナライズされたスケジュール提案であなたの体験を向上させるのに役立ちます。",
+					"usingDefaultLocation": "デフォルトの場所を使用しています - アイコンをクリックして現在地を取得してください。",
+					"clickIconToGetLocation": "アイコンをクリックして現在地を取得するか、場所を編集してください"
+				},
+				"errorPopup": {
+					"chatLimitReached": "チャット制限に達しました",
+					"headerText": "20以上のプロンプトが必要ですか？",
+					"altText": "チャットインターフェースのイラスト",
+					"description": "無制限のチャット、スマートな統合、そして完全なTiler体験への早期アクセスを手に入れましょう。",
+					"emailPlaceholder": "メールアドレスを入力してください",
+					"submitEmail": "メールを送信",
+					"joinWaitlist": "ウェイティングリストに参加",
+					"submitting": "送信中...",
+					"subtext": "スポットは限られています – 今すぐあなたの場所を確保してください。",
+					"close": "閉じる",
+					"errors": {
+						"emailRequired": "メールアドレスは必須です",
+						"emailInvalid": "有効なメールアドレスを入力してください",
+						"submitFailed": "メールの送信に失敗しました。もう一度お試しください。"
+					}
+				},
+				"emailConfirmation": {
+					"header": "メールを確認してください！",
+					"message": "確認リンクを<strong>{{email}}</strong>に送信しました。",
+					"messageContinued": "リンクをクリックして、Tilerとの無制限のチャットをアンロックしてください。",
+					"button": "了解しました",
+					"footer": "メールが届かない場合は、迷惑メールフォルダを確認するか、もう一度お試しください。"
+				}
+			}
+		},
+		"waitlist": {
+			"title": "ウェイティングリストに参加",
+			"subtitle": "Tilerの強力なスケジューリング機能をいち早く体験してください。",
+			"emailPlaceholder": "メールアドレスを入力してください",
+			"submit": "ウェイティングリストに参加",
+			"success": "ご参加ありがとうございます！Tilerの準備が整い次第、お知らせします。",
+			"error": "問題が発生しました。もう一度お試しください。"
+		},
+		"hero": {
+			"title": "あなたのAI搭載デイアーキテクト",
+			"subtitle": "何をする必要があるかを説明するだけで、Tilerは自動的にスマートで場所を意識したスケジュールを構築し、生活の変化に適応します。",
+			"features": {
+				"natural": "自然言語スケジューリング",
+				"adaptive": "変化に自動的に適応",
+				"travel": "スマートな移動時間計算"
+			},
+			"scenarios": {
+				"lunch": {
+					"calendarTitle": "11月13日水曜日",
+					"messages": {
+						"userRequest": "明日の正午にダウンタウンでサラとランチ",
+						"aiResponse1": "明日（水曜日）の12:00 PMにダウンタウンでサラとのランチをスケジュールします。現在、あなたは自宅にいます。25分の移動時間を追加しますか？",
+						"userConfirm": "はい、移動時間を追加してください",
+						"aiConfirm": "完璧です！移動バッファを含めてイベントを追加しました。✓"
+					},
+					"tiles": {
+						"travel": "ダウンタウンへの移動",
+						"travelTime": "車で25分",
+						"lunch": "サラとランチ"
+					}
+				},
+				"errands": {
+					"calendarTitle": "11月15日金曜日",
+					"messages": {
+						"userRequest": "今日、食料品を買いに行き、ジムに行く必要があります",
+						"aiResponse1": "それらをスケジュールできます。何時が一番いいですか？あなたのカレンダーは午後4時から7時まで空いています。",
+						"userConfirm": "午後5時以降でお願いします",
+						"aiConfirm": "素晴らしい！午後5:00に食料品の買い物（30分）、その後午後6:00にジム（1時間）をスケジュールします。追加しました！✓"
+					},
+					"tiles": {
+						"groceries": "食料品の買い物",
+						"travel": "ジムへの移動",
+						"travelTime": "車で12分",
+						"gym": "ジムでのワークアウト"
+					}
+				},
+				"client": {
+					"calendarTitle": "11月18日月曜日",
+					"messages": {
+						"userRequest": "来週の月曜日午後2時に彼のオフィスでジョンとのクライアント会議をスケジュール",
+						"aiResponse1": "月曜日の午後2:00に彼のオフィスでジョンとのクライアント会議を追加します。現在の場所から車で35分です。前に時間をブロックしますか？",
+						"userConfirm": "はい、お願いします",
+						"aiConfirm": "完了！移動時間と会議がカレンダーに追加されました。✓"
+					},
+					"tiles": {
+						"travel": "クライアントオフィスへの移動",
+						"travelTime": "車で35分",
+						"meeting": "クライアント会議 - ジョン"
+					}
+				},
+				"dentist": {
+					"calendarTitle": "11月14日木曜日",
+					"messages": {
+						"userRequest": "明日の午前9時に歯医者の予約があり、その後自宅で仕事をする必要があります",
+						"aiResponse1": "了解しました！午前9:00に歯医者の予約を追加します（1時間と仮定）。自宅への帰宅時間は15分です。その後、集中作業をスケジュールしますか？",
+						"userConfirm": "はい、集中作業のために3時間ブロックしてください",
+						"aiConfirm": "完璧です！あなたの朝は移動時間を含めて計画されています。✓"
+					},
+					"tiles": {
+						"dentist": "歯医者の予約",
+						"travel": "自宅への移動",
+						"travelTime": "車で15分",
+						"deepWork": "集中作業セッション"
+					}
+				}
+			}
+		},
+		"video": {
+			"title": "YouTubeビデオプレーヤー"
+		},
+		"updates": {
+			"title": "最新のTilerニュースとアップデートを入手",
+			"subtitle": "スケジュールをもっと活用したいですか？ヒント、コツ、アップデートをあなたの受信箱に直接お届けします。",
+			"emailPlaceholder": "あなたのメールアドレス..."
+		},
+		"integration": {
+			"title": "お気に入りの",
+			"spanText": "カレンダー",
+			"subtitle": "と統合します。これらのアプリはTilerとシームレスに統合できます。"
+		},
+		"featureHighlights": {
+			"title": "機能のハイライト",
+			"subtitle": "Tilerであなたの生活を簡素化します。私たちがあなたを助けるためにできることは次のとおりです。"
+		},
+		"features": {
+			"conversation": {
+				"subtitle": "話しかけるだけ",
+				"title": "自然言語スケジューリング",
+				"description": "簡単な英語で何をする必要があるかをTilerに伝えます。AIはフォローアップの質問をし、スマートなスケジュールを提案し、あなたの確認を待ちます—ドラッグアンドドロップは不要です。"
+			},
+			"transit": {
+				"subtitle": "あなたの一日を最適化",
+				"title": "スマートな移動時間",
+				"description": "Tilerは場所間の現実的な移動時間を自動的に挿入し、状況が変わるとタイムラインを調整します—だからあなたは決して遅れません。"
+			},
+			"adaptive": {
+				"subtitle": "同期を保つ",
+				"title": "適応知能",
+				"description": "人生が予期せぬ事態に見舞われたとき、Tilerは競合するタスクを再スケジュールし、次に最適な時間を見つけます—自動的に。"
+			},
+			"location": {
+				"subtitle": "プライバシー第一",
+				"title": "場所の認識",
+				"description": "特定の住所の代わりに「自宅」や「職場」などの一般的なラベルを使用します。Tilerは個人データを過度に共有することなく移動時間を計算します。"
+			}
+		},
+		"faq": {
+			"items": {
+				"whatIsTiler": {
+					"question": "Tilerとは何ですか、どのように機能しますか？",
+					"answer": "Tilerはカレンダーではなく、タスクを管理するだけでなく時間も最適化するAI搭載のスケジューリングアプリです。AutoTilesを使用してスマートで柔軟なスケジュールを作成し、一日の変化に応じて調整しながら、Blocksを使用して交渉不可能なタスクを固定することもできます。"
+				},
+				"differentFromCalendar": {
+					"question": "TilerはGoogleカレンダーや他のカレンダーアプリとどう違いますか？",
+					"answer": "静的なカレンダーとは異なり、TilerはあなたのAIスケジューリングアシスタントです。簡単な英語で何をする必要があるかを伝えるだけです—明確化の質問をし、場所間の移動時間を計算し、完全なスケジュールを提案します。生活が変わると、Tilerは自動的にタイムラインを調整します。変更が加えられる前にあなたが確認するので、あなたは常にコントロールできます。"
+				},
+				"aiAccuracy": {
+					"question": "AIが私のタスクを正しくスケジュールすると信頼できますか？",
+					"answer": "Tilerは確認第一のアプローチを使用します—スケジュールを提案し、変更を加える前にあなたの承認を待ちます。AIは時間とともにあなたのパターンを学習し、期間、場所、好みについてより賢くなります。いつでも提案を元に戻したり調整したりできます。"
+				},
+				"locationPrivacy": {
+					"question": "私の位置データはプライベートですか？Tilerはそれをどのように使用しますか？",
+					"answer": "Tilerはあなたのプライバシーを尊重します。特定の住所の代わりに「自宅」、「職場」、「地元のカフェ」などの一般的なラベルを使用できます。位置データは、タスク間の現実的な移動時間を計算するためにのみ使用され、スケジュールが現実世界の制約を考慮していることを保証します。あなたのデータは決して共有または販売されません。"
+				},
+				"calendarIntegration": {
+					"question": "なぜカレンダーを統合する必要があるのですか？",
+					"answer": "カレンダーをTilerと統合すると、すべてのタスク、イベント、スケジュールを1か所で見ることができます。複数のアプリをやりくりしたり、二重予約のリスクを冒したりする必要はもうありません—Tilerはすべてを自動的に同期し、一日を最大限に生産的に最適化します。"
+				},
+				"multipleCalendars": {
+					"question": "複数のカレンダーをTilerアカウントに統合できますか？",
+					"answer": "はい！複数のカレンダーをTilerアカウントに統合できます。これにより、すべてのイベントとタスクが1か所にまとまります。"
+				},
+				"tileVsBlock": {
+					"question": "タイルとブロックの違いは何ですか？",
+					"answer": "タイルは、Tilerがあなたの空き状況に基づいて自動的にスケジュールおよび調整する柔軟なタスクです。ブロックは、設定した場所に正確に留まる固定タスクです—移動できない会議やタスクに最適です。"
+				},
+				"tileShare": {
+					"question": "TileShareはどのように機能しますか？",
+					"answer": "TileShareを使用すると、友人、家族、チームメイトとタスクを共有できるため、誰が何をする必要があり、誰が担当しているかを全員が知ることができます。タスクを割り当て、進捗を追跡し、スケジュールを簡単に同期します。"
+				},
+				"missedTask": {
+					"question": "タスクを逃したり、再スケジュールする必要がある場合はどうなりますか？",
+					"answer": "心配ありません！Tilerの延期機能は、逃したタスクを完了するための次に最適な時間を自動的に見つけます。簡単なドラッグアンドドロップで手動で再スケジュールすることもできます。"
+				},
+				"habitTracking": {
+					"question": "Tilerは習慣の追跡に役立ちますか？",
+					"answer": "はい！Tilerを使用して、毎日の習慣をスケジュールおよび追跡できます。Tilerはそれらを自動的にスケジュールに合わせるので、一貫性を保つことができます。"
+				},
+				"transitFeature": {
+					"question": "トランジット機能はどのように使用できますか？",
+					"answer": "トランジット機能は、単に移動時間を計算するだけではありません—ナビゲーションアシスタントとして機能します。ルートの計画、最適な交通手段の提案、タスクと場所の間のシームレスな移行のためのリアルタイムの道順を提供します。移動アイコンをタップするだけで、常に時間通りに正しい道を進むことができます。"
+				}
+			}
+		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "今日、",
+			"part2": "Tilerチャット",
+			"part3": "のウェイティングリストに参加"
+		},
+		"subtitle": "カレンダーの管理をやめて、それと話し始めましょう。ウェイティングリストに登録して、時間と共鳴する最初の人になりましょう",
+		"form": {
+			"errors": {
+				"integrations": "少なくとも1つのカレンダー統合を追加してください。"
+			},
+			"joinWaitlist": "ウェイティングリストに参加",
+			"nextStep": "次へ",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "メール",
+					"label": "メールアドレス",
+					"placeholder": "メールアドレス"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "職業",
+					"label": "あなたの職業は何ですか？",
+					"placeholder": "職業",
+					"suggestions": [
+						"医療専門家",
+						"営業専門家",
+						"ソフトウェア開発者",
+						"クライアントコンサルタント",
+						"請負業者",
+						"スタートアップ創業者",
+						"研究者",
+						"学生",
+						"講師",
+						"旅行コンサルタント"
+					]
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "統合",
+					"label": "どの統合を使用しますか？",
+					"placeholder": "例：Googleカレンダー、Outlook、Appleカレンダー",
+					"options": [
+						{ "value": "google", "label": "Googleカレンダー" },
+						{ "value": "outlook", "label": "Microsoft Outlookカレンダー" },
+						{ "value": "apple", "label": "Appleカレンダー" },
+						{ "value": "slack", "label": "Slack" },
+						{ "value": "monday", "label": "Monday.com" },
+						{ "value": "reclaim", "label": "Reclaim" },
+						{ "value": "notion", "label": "Notion" },
+						{ "value": "ticktick", "label": "TickTick" },
+						{ "value": "evernote", "label": "Evernote" },
+						{ "value": "oneNote", "label": "OneNote" }
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "使用例",
+					"label": "Tilerチャットを何に使用しますか？",
+					"placeholder": "例：スケジューリング、タスク管理"
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,461 @@
+{
+		"common": {
+		"onboarding": {
+			"guide": {
+				"skip": "跳过",
+				"next": "下一步",
+				"prev": "上一步",
+				"done": "知道了！",
+				"steps": {
+					"mobile-open-chat": {
+						"title": "打开聊天",
+						"description": "点击此按钮打开聊天界面，您可以与Tiler讨论您的日程安排。"
+					},
+					"chat": {
+						"title": "从对话开始",
+						"description": "用简单的英语输入您需要做的事情。试试：“明天中午在市中心和莎拉共进午餐。”"
+					},
+					"ai": {
+						"title": "AI提出日程安排",
+						"description": "如果需要，Tiler会提出澄清问题，计算旅行时间，并建议何时安排您的任务。"
+					},
+					"confirm": {
+						"title": "审查并确认",
+						"description": "检查建议的日程安排。点击“接受更改”将其添加到您的日历中，或根据需要进行调整。"
+					},
+					"calendar": {
+						"title": "查看您的智能日程",
+						"description": "您的任务会出现在日历上，并包含旅行时间。当情况发生变化时，Tiler会自动调整。"
+					}
+				}
+			}
+		},
+		"buttons": {
+			"getStarted": "开始使用Tiler",
+			"explore": "探索",
+			"subscribe": "订阅",
+			"tryFree": "免费试用Tiler",
+			"signUp": "注册",
+			"back": "返回",
+			"createSchedule": "创建日程",
+			"creating": "创建中...",
+			"cancel": "取消"
+		},
+		"navigation": {
+			"home": "主页",
+			"features": "功能",
+			"waitlist": "等候名单"
+		},
+		"voiceInput": {
+			"listening": "正在聆听...",
+			"transcribing": "正在转录...",
+			"startRecording": "开始语音输入",
+			"stopRecording": "停止录音",
+			"playRecording": "播放录音",
+			"pauseRecording": "暂停录音",
+			"deleteRecording": "删除录音"
+		},
+		"customPersonaModal": {
+			"title": "创建您的自定义日程",
+			"description": "告诉我们关于您自己以及您需要什么样的日程安排。我们将帮助您创建一个适合您生活方式的个性化日程。",
+			"placeholders": {
+				"healthcare": "我是一名工作12小时轮班的医疗专业人员...",
+				"student": "我是一名平衡课程、学习时间和课外活动的学生...",
+				"engineer": "我是一名晚上编码效率更高的软件工程师...",
+				"parent": "我是一名兼顾工作、接送孩子和家庭时间的家长...",
+				"freelancer": "我是一名管理多个客户和截止日期的自由职业者...",
+				"fitness": "我是一名需要早上锻炼时间的健身爱好者...",
+				"remote": "我是一名跨不同时区的远程工作者...",
+				"business": "我是一名工作时间不规律的小企业主..."
+			},
+			"processing": {
+				"title": "正在创建您的日程",
+				"description": "请稍候，我们正在为您设置一切...",
+				"creatingUser": "创建用户",
+				"creatingUserDesc": "设置您的个性化个人资料...",
+				"generatingProfile": "生成日程资料",
+				"generatingProfileDesc": "分析您的偏好和要求...",
+				"generatingTiles": "生成图块",
+				"generatingTilesDesc": "创建所有必要的日程块...",
+				"optimizing": "优化和保存",
+				"optimizingDesc": "寻找最佳安排并保存您的日程..."
+			}
+		},
+		"copyright": "© {{year}} Tiler. 版权所有。",
+		"social": {
+			"facebook": "Facebook",
+			"linkedin": "LinkedIn",
+			"instagram": "Instagram",
+			"x": "X (Twitter)"
+		},
+		"apps": {
+			"ios": {
+				"cta": "在App Store上下载",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "在Google Play上获取",
+				"platform": "Android Play Store"
+			}
+		},
+		"legal": {
+			"title": "法律",
+			"terms": "使用条款",
+			"privacy": "隐私"
+		},
+		"partners": {
+			"title": "合作伙伴",
+			"founderUniversity": "Founder University"
+		},
+		"consent": {
+			"banner": {
+				"title": "我们重视您的隐私",
+				"description": "我们使用Cookie和类似技术来增强您的体验、分析网站使用情况并协助我们的营销工作。点击“全部接受”，即表示您同意我们使用分析和跟踪。",
+				"learnMore": "了解更多",
+				"buttons": {
+					"acceptAll": "全部接受",
+					"rejectAll": "全部拒绝",
+					"customize": "自定义"
+				},
+				"close": "关闭"
+			},
+			"modal": {
+				"title": "隐私设置",
+				"description": "管理您的Cookie偏好。您可以在下面启用或禁用不同类型的Cookie。",
+				"categories": {
+					"necessary": {
+						"title": "必要的Cookie",
+						"description": "网站正常运行所必需的。这些无法禁用。"
+					},
+					"analytics": {
+						"title": "分析Cookie",
+						"description": "通过收集和报告信息，帮助我们了解访问者如何与我们的网站互动。"
+					},
+					"marketing": {
+						"title": "营销Cookie",
+						"description": "用于跟踪访问者在网站上的行为，以显示相关广告。"
+					},
+					"preferences": {
+						"title": "偏好Cookie",
+						"description": "允许网站记住您的选择并提供增强功能。"
+					}
+				},
+				"buttons": {
+					"save": "保存设置",
+					"cancel": "取消",
+					"acceptAll": "全部接受",
+					"rejectAll": "全部拒绝"
+				}
+			},
+			"footer": {
+				"cookieSettings": "Cookie设置"
+			}
+		}
+	},
+	"home": {
+		"demoExplainer": {
+			"title": "观看Tiler的实际操作",
+			"subtitle": "立即尝试——无需注册。在下方选择一个角色，体验Tiler如何将自然对话转化为智能、自适应的日程安排。",
+			"badge": "互动演示"
+		},
+		"persona": {
+			"created": "个人资料",
+			"customCreated": "自定义个人资料",
+			"cta": {
+				"create": "创建个人资料",
+				"view": "查看个人资料"
+			},
+			"expiresIn": "剩余{{time}}",
+			"tileSuggestions": "图块",
+			"custom": {
+				"namePlaceholder": "新个人资料"
+			}
+		},
+		"expanded": {
+			"mobileChatPlaceholder": "与您的日历聊天以更新...",
+			"chat": {
+				"newChat": "新聊天",
+				"clearSession": "清除会话",
+				"title": "您想做什么？",
+				"subtitle": "描述一个任务，我们将处理平铺。",
+				"inputPlaceholder": "告诉Tiler您做什么...",
+				"loadingMessages": "正在加载聊天消息...",
+				"loadingActions": "正在加载更多操作...",
+				"error": "错误",
+				"emptyStateTitle": "您想做什么？",
+				"emptyStateDescription": "描述一个任务，我们将处理平铺。",
+				"sendingRequest": "正在发送请求...",
+				"acceptChanges": "接受更改",
+				"errorLoadMessages": "加载聊天消息失败",
+				"errorSendMessage": "发送消息失败",
+				"errorAcceptChanges": "接受更改失败",
+				"userLocation": {
+					"anonymous": "匿名",
+					"enterLocation": "输入您的位置",
+					"default": "默认",
+					"saving": "正在保存...",
+					"save": "保存",
+					"gettingCurrentLocation": "正在获取您当前的位置...",
+					"gettingLocation": "正在获取位置...",
+					"resetToDefault": "重置为默认",
+					"locationBenefitMessage": "设置您的实际位置有助于我们创建更相关的图块，并通过个性化的日程安排建议改善您的体验。",
+					"usingDefaultLocation": "正在使用默认位置 - 点击图标获取您当前的位置。",
+					"clickIconToGetLocation": "点击图标获取您当前的位置或编辑您的位置"
+				},
+				"errorPopup": {
+					"chatLimitReached": "聊天次数已达上限",
+					"headerText": "想要超过20个提示吗？",
+					"altText": "聊天界面插图",
+					"description": "抢先体验无限聊天、智能集成和完整的Tiler体验。",
+					"emailPlaceholder": "输入您的电子邮件",
+					"submitEmail": "提交电子邮件",
+					"joinWaitlist": "加入等候名单",
+					"submitting": "提交中...",
+					"subtext": "名额有限 – 立即预订。",
+					"close": "关闭",
+					"errors": {
+						"emailRequired": "需要电子邮件",
+						"emailInvalid": "请输入有效的电子邮件地址",
+						"submitFailed": "提交电子邮件失败。请重试。"
+					}
+				},
+				"emailConfirmation": {
+					"header": "请检查您的电子邮件！",
+					"message": "我们已向<strong>{{email}}</strong>发送了确认链接。",
+					"messageContinued": "点击链接即可解锁与Tiler的无限聊天。",
+					"button": "知道了",
+					"footer": "没有收到电子邮件？请检查您的垃圾邮件文件夹或重试。"
+				}
+			}
+		},
+		"waitlist": {
+			"title": "加入等候名单",
+			"subtitle": "成为第一批体验Tiler强大日程安排功能的人。",
+			"emailPlaceholder": "输入您的电子邮件",
+			"submit": "加入等候名单",
+			"success": "感谢您的加入！Tiler准备就绪后我们会通知您。",
+			"error": "出了点问题。请重试。"
+		},
+		"hero": {
+			"title": "您的人工智能日间建筑师",
+			"subtitle": "只需描述您需要做什么，Tiler就会自动构建一个智能的、具有位置感知功能的日程安排，并随着生活的变化而调整。",
+			"features": {
+				"natural": "自然语言日程安排",
+				"adaptive": "自动适应变化",
+				"travel": "智能旅行时间计算"
+			},
+			"scenarios": {
+				"lunch": {
+					"calendarTitle": "11月13日，星期三",
+					"messages": {
+						"userRequest": "明天中午在市中心和莎拉共进午餐",
+						"aiResponse1": "我将安排明天（星期三）中午12:00在市中心与莎拉共进午餐。您目前在家。我应该增加25分钟的旅行时间吗？",
+						"userConfirm": "是的，增加旅行时间",
+						"aiConfirm": "太好了！我已经添加了包含旅行缓冲时间的活动。✓"
+					},
+					"tiles": {
+						"travel": "前往市中心",
+						"travelTime": "25分钟车程",
+						"lunch": "与莎拉共进午餐"
+					}
+				},
+				"errands": {
+					"calendarTitle": "11月15日，星期五",
+					"messages": {
+						"userRequest": "我今天需要去买菜和去健身房",
+						"aiResponse1": "我可以为您安排。什么时间最合适？您的日历从下午4点到7点有空。",
+						"userConfirm": "下午5点以后可以",
+						"aiConfirm": "太好了！我将安排下午5:00买菜（30分钟），然后下午6:00去健身房（1小时）。已添加！✓"
+					},
+					"tiles": {
+						"groceries": "买菜",
+						"travel": "前往健身房",
+						"travelTime": "12分钟车程",
+						"gym": "健身房锻炼"
+					}
+				},
+				"client": {
+					"calendarTitle": "11月18日，星期一",
+					"messages": {
+						"userRequest": "下周一下午2点在约翰的办公室安排与他的客户会议",
+						"aiResponse1": "我将为下周一下午2:00在约翰的办公室添加与他的客户会议。从您当前的位置开车需要35分钟。我应该在之前预留时间吗？",
+						"userConfirm": "是的，请",
+						"aiConfirm": "完成！旅行时间和会议已添加到您的日历中。✓"
+					},
+					"tiles": {
+						"travel": "前往客户办公室",
+						"travelTime": "35分钟车程",
+						"meeting": "客户会议 - 约翰"
+					}
+				},
+				"dentist": {
+					"calendarTitle": "11月14日，星期四",
+					"messages": {
+						"userRequest": "我明天上午9点有牙医预约，然后需要在家工作",
+						"aiResponse1": "好的！我将添加您上午9:00的牙医预约（假设1小时）。回家需要15分钟。我应该在之后安排深度工作吗？",
+						"userConfirm": "是的，预留3小时进行专注工作",
+						"aiConfirm": "太好了！您的早晨已计划好，并包含旅行时间。✓"
+					},
+					"tiles": {
+						"dentist": "牙医预约",
+						"travel": "回家",
+						"travelTime": "15分钟车程",
+						"deepWork": "深度工作时段"
+					}
+				}
+			}
+		},
+		"video": {
+			"title": "YouTube视频播放器"
+		},
+		"updates": {
+			"title": "获取最新的Tiler新闻和更新",
+			"subtitle": "想从您的日程安排中获得更多？订阅即可直接在您的收件箱中收到提示、技巧和更新。",
+			"emailPlaceholder": "您的电子邮件地址..."
+		},
+		"integration": {
+			"title": "与您最喜欢的",
+			"spanText": "日历",
+			"subtitle": "集成。这些应用程序可与Tiler无缝集成。"
+		},
+		"featureHighlights": {
+			"title": "功能亮点",
+			"subtitle": "使用Tiler简化您的生活，这是我们可以帮助您做的事情。"
+		},
+		"features": {
+			"conversation": {
+				"subtitle": "只需与之交谈",
+				"title": "自然语言日程安排",
+				"description": "用简单的英语告诉Tiler您需要做什么。AI会提出后续问题，提出智能日程安排，并等待您的确认——无需拖放。"
+			},
+			"transit": {
+				"subtitle": "优化您的一天",
+				"title": "智能旅行时间",
+				"description": "Tiler会自动在地点之间插入实际的旅行时间，并在情况发生变化时调整您的时间表——所以您永远不会迟到。"
+			},
+			"adaptive": {
+				"subtitle": "保持同步",
+				"title": "自适应智能",
+				"description": "当生活出现意外时，Tiler会自动重新安排冲突的任务并找到下一个最佳时间——自动进行。"
+			},
+			"location": {
+				"subtitle": "隐私至上",
+				"title": "位置感知",
+				"description": "使用“家”或“工作”等通用标签，而不是具体地址。Tiler计算旅行时间，而不会过度分享您的个人数据。"
+			}
+		},
+		"faq": {
+			"items": {
+				"whatIsTiler": {
+					"question": "什么是Tiler，它如何工作？",
+					"answer": "Tiler不是一个日历，它是一个由AI驱动的日程安排应用程序，不仅管理您的任务，还优化您的时间。它使用AutoTiles创建智能、灵活的日程安排，随着您一天的变化而调整，同时还允许您使用Blocks锁定不可协商的任务。"
+				},
+				"differentFromCalendar": {
+					"question": "Tiler与Google日历或其他日历应用程序有何不同？",
+					"answer": "与静态日历不同，Tiler是您的AI日程安排助手。只需用简单的英语告诉它您需要做什么——它会提出澄清问题，计算地点之间的旅行时间，并提出完整的日程安排。当生活发生变化时，Tiler会自动调整您的时间表。您在更改生效前确认，因此您始终掌控一切。"
+				},
+				"aiAccuracy": {
+					"question": "我可以相信AI能正确安排我的任务吗？",
+					"answer": "Tiler采用先确认后操作的方法——它提出日程安排并等待您的批准，然后再进行更改。AI会随着时间的推移学习您的模式，并在持续时间、地点和偏好方面变得更智能。您随时可以撤销或调整任何建议。"
+				},
+				"locationPrivacy": {
+					"question": "我的位置数据是私密的吗？Tiler如何使用它？",
+					"answer": "Tiler尊重您的隐私。您可以使用“家”、“工作”或“当地咖啡馆”等通用标签，而不是具体地址。位置数据仅用于计算任务之间的实际旅行时间，确保您的日程安排考虑到现实世界的限制。您的数据绝不会被共享或出售。"
+				},
+				"calendarIntegration": {
+					"question": "为什么我需要集成我的日历？",
+					"answer": "将您的日历与Tiler集成，您可以在一个地方查看所有任务、事件和日程安排。不再需要在多个应用程序之间切换或冒着重复预订的风险——Tiler会自动同步所有内容并优化您的一天，以实现最高效率。"
+				},
+				"multipleCalendars": {
+					"question": "我可以将多个日历集成到我的Tiler帐户吗？",
+					"answer": "是的！您可以将多个日历集成到您的Tiler帐户中。这样，您所有的事件和任务都在一个地方。"
+				},
+				"tileVsBlock": {
+					"question": "图块和块有什么区别？",
+					"answer": "图块是Tiler根据您的空闲时间自动安排和调整的灵活任务。块是固定任务，完全按照您设置的位置保留——非常适合不能移动的会议或任务。"
+				},
+				"tileShare": {
+					"question": "TileShare如何工作？",
+					"answer": "TileShare让您可以与他人——朋友、家人、队友——共享任务，这样每个人都知道需要做什么以及由谁负责。分配任务、跟踪进度并轻松同步日程安排。"
+				},
+				"missedTask": {
+					"question": "如果我错过了任务或需要重新安排怎么办？",
+					"answer": "不用担心！Tiler的延迟功能会自动找到下一个完成错过任务的最佳时间。您也可以通过简单的拖放手动重新安排。"
+				},
+				"habitTracking": {
+					"question": "Tiler可以帮助跟踪习惯吗？",
+					"answer": "是的！您可以使用Tiler来安排和跟踪日常习惯。Tiler会自动将它们安排到您的日程中，因此您能保持一致。"
+				},
+				"transitFeature": {
+					"question": "如何使用公交功能？",
+					"answer": "公交功能不仅仅是计算旅行时间——它还充当您的导航助手。它帮助您规划路线，建议最佳交通方式，并提供实时方向，实现任务和地点之间的无缝过渡。只需点击旅行图标即可获得即时导航，确保您始终准时并走在正确的轨道上。"
+				}
+			}
+		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "立即加入",
+			"part2": "Tiler聊天",
+			"part3": "等候名单"
+		},
+		"subtitle": "停止管理您的日历，开始与它交谈。加入等候名单，成为第一个与时间共鸣的人",
+		"form": {
+			"errors": {
+				"integrations": "请至少添加一个日历集成。"
+			},
+			"joinWaitlist": "加入等候名单",
+			"nextStep": "下一步",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "电子邮件",
+					"label": "电子邮件地址",
+					"placeholder": "电子邮件地址"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "职业",
+					"label": "您是做什么的？",
+					"placeholder": "职业",
+					"suggestions": [
+						"医疗专业人员",
+						"销售专业人员",
+						"软件开发人员",
+						"客户顾问",
+						"承包商",
+						"初创公司创始人",
+						"研究员",
+						"学生",
+						"讲师",
+						"旅行顾问"
+					]
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "集成",
+					"label": "您使用哪些集成？",
+					"placeholder": "例如 Google日历、Outlook、Apple日历",
+					"options": [
+						{ "value": "google", "label": "Google日历" },
+						{ "value": "outlook", "label": "Microsoft Outlook日历" },
+						{ "value": "apple", "label": "Apple日历" },
+						{ "value": "slack", "label": "Slack" },
+						{ "value": "monday", "label": "Monday.com" },
+						{ "value": "reclaim", "label": "Reclaim" },
+						{ "value": "notion", "label": "Notion" },
+						{ "value": "ticktick", "label": "TickTick" },
+						{ "value": "evernote", "label": "Evernote" },
+						{ "value": "oneNote", "label": "OneNote" }
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "用例",
+					"label": "您想用Tiler聊天做什么？",
+					"placeholder": "例如 日程安排、任务管理"
+				}
+			}
+		}
+	}
+}

@@ -296,7 +296,7 @@ const PersonaCarousel: React.FC = () => {
   };
 
   return (
-    <Section paddingBlock={0} width={2000}>
+    <Section id="persona-carousel" paddingBlock={0} width={2000}>
       <EdgeFadeSwiper
         ref={swiperRef}
         modules={[Autoplay]}

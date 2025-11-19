@@ -1,0 +1,461 @@
+{
+		"common": {
+		"onboarding": {
+			"guide": {
+				"skip": "Pomiń",
+				"next": "Dalej",
+				"prev": "Wstecz",
+				"done": "Rozumiem!",
+				"steps": {
+					"mobile-open-chat": {
+						"title": "Otwórz Czat",
+						"description": "Dotknij tego przycisku, aby otworzyć interfejs czatu, gdzie możesz rozmawiać z Tilerem o swoim harmonogramie."
+					},
+					"chat": {
+						"title": "Zacznij od rozmowy",
+						"description": "Wpisz, co musisz zrobić, w prostym języku. Spróbuj: \"Lunch z Sarą jutro w południe w centrum.\""
+					},
+					"ai": {
+						"title": "AI proponuje harmonogram",
+						"description": "Tiler zadaje pytania wyjaśniające, jeśli to konieczne, oblicza czas podróży i sugeruje, kiedy zaplanować zadanie."
+					},
+					"confirm": {
+						"title": "Przejrzyj i potwierdź",
+						"description": "Sprawdź proponowany harmonogram. Kliknij \"Zaakceptuj zmiany\", aby dodać go do swojego kalendarza, lub dostosuj w razie potrzeby."
+					},
+					"calendar": {
+						"title": "Zobacz swój inteligentny harmonogram",
+						"description": "Twoje zadanie pojawia się w kalendarzu z uwzględnionym czasem podróży. Tiler automatycznie dostosowuje się do zmian."
+					}
+				}
+			}
+		},
+		"buttons": {
+			"getStarted": "Zacznij z Tiler",
+			"explore": "Odkrywaj",
+			"subscribe": "Subskrybuj",
+			"tryFree": "Wypróbuj Tiler za darmo",
+			"signUp": "Zarejestruj się",
+			"back": "Wstecz",
+			"createSchedule": "Utwórz harmonogram",
+			"creating": "Tworzenie...",
+			"cancel": "Anuluj"
+		},
+		"navigation": {
+			"home": "Strona główna",
+			"features": "Funkcje",
+			"waitlist": "Lista oczekujących"
+		},
+		"voiceInput": {
+			"listening": "Słucham...",
+			"transcribing": "Transkrypcja...",
+			"startRecording": "Rozpocznij wprowadzanie głosowe",
+			"stopRecording": "Zatrzymaj nagrywanie",
+			"playRecording": "Odtwórz nagranie",
+			"pauseRecording": "Wstrzymaj nagrywanie",
+			"deleteRecording": "Usuń nagranie"
+		},
+		"customPersonaModal": {
+			"title": "Stwórz swój niestandardowy harmonogram",
+			"description": "Opowiedz nam o sobie i jakiego harmonogramu potrzebujesz. Pomożemy Ci stworzyć spersonalizowany harmonogram, który pasuje do Twojego stylu życia.",
+			"placeholders": {
+				"healthcare": "Jestem pracownikiem służby zdrowia pracującym na 12-godzinnych zmianach...",
+				"student": "Jestem studentem łączącym zajęcia, naukę i zajęcia dodatkowe...",
+				"engineer": "Jestem inżynierem oprogramowania, który lepiej koduje wieczorami...",
+				"parent": "Jestem rodzicem godzącym pracę, odwożenie dzieci do szkoły i czas z rodziną...",
+				"freelancer": "Jestem freelancerem zarządzającym wieloma klientami i terminami...",
+				"fitness": "Jestem entuzjastą fitnessu, który potrzebuje czasu na poranny trening...",
+				"remote": "Jestem pracownikiem zdalnym pracującym w różnych strefach czasowych...",
+				"business": "Jestem właścicielem małej firmy o nieregularnych godzinach pracy..."
+			},
+			"processing": {
+				"title": "Tworzenie Twojego harmonogramu",
+				"description": "Proszę czekać, podczas gdy wszystko dla Ciebie ustawiamy...",
+				"creatingUser": "Tworzenie użytkownika",
+				"creatingUserDesc": "Konfigurowanie Twojego spersonalizowanego profilu...",
+				"generatingProfile": "Generowanie profilu harmonogramu",
+				"generatingProfileDesc": "Analizowanie Twoich preferencji i wymagań...",
+				"generatingTiles": "Generowanie kafelków",
+				"generatingTilesDesc": "Tworzenie wszystkich niezbędnych bloków harmonogramu...",
+				"optimizing": "Optymalizacja i zapisywanie",
+				"optimizingDesc": "Znajdowanie najlepszego układu i zapisywanie Twojego harmonogramu..."
+			}
+		},
+		"copyright": "© {{year}} Tiler. Wszelkie prawa zastrzeżone.",
+		"social": {
+			"facebook": "Facebook",
+			"linkedin": "LinkedIn",
+			"instagram": "Instagram",
+			"x": "X (Twitter)"
+		},
+		"apps": {
+			"ios": {
+				"cta": "Pobierz z App Store",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "Pobierz z Google Play",
+				"platform": "Android Play Store"
+			}
+		},
+		"legal": {
+			"title": "Prawne",
+			"terms": "Warunki użytkowania",
+			"privacy": "Prywatność"
+		},
+		"partners": {
+			"title": "Partnerzy",
+			"founderUniversity": "Founder University"
+		},
+		"consent": {
+			"banner": {
+				"title": "Cenimy Twoją prywatność",
+				"description": "Używamy plików cookie i podobnych technologii, aby poprawić Twoje doświadczenie, analizować korzystanie z witryny i wspierać nasze działania marketingowe. Klikając \"Zaakceptuj wszystko\", wyrażasz zgodę na nasze wykorzystanie analityki i śledzenia.",
+				"learnMore": "Dowiedz się więcej",
+				"buttons": {
+					"acceptAll": "Zaakceptuj wszystko",
+					"rejectAll": "Odrzuć wszystko",
+					"customize": "Dostosuj"
+				},
+				"close": "Zamknij"
+			},
+			"modal": {
+				"title": "Ustawienia prywatności",
+				"description": "Zarządzaj swoimi preferencjami dotyczącymi plików cookie. Poniżej możesz włączyć lub wyłączyć różne rodzaje plików cookie.",
+				"categories": {
+					"necessary": {
+						"title": "Niezbędne pliki cookie",
+						"description": "Niezbędne do prawidłowego funkcjonowania witryny. Nie można ich wyłączyć."
+					},
+					"analytics": {
+						"title": "Analityczne pliki cookie",
+						"description": "Pomagają nam zrozumieć, w jaki sposób odwiedzający wchodzą w interakcję z naszą witryną, zbierając i raportując informacje."
+					},
+					"marketing": {
+						"title": "Marketingowe pliki cookie",
+						"description": "Służą do śledzenia odwiedzających na stronach internetowych w celu wyświetlania odpowiednich reklam."
+					},
+					"preferences": {
+						"title": "Preferencyjne pliki cookie",
+						"description": "Pozwalają witrynie zapamiętać Twoje wybory i zapewnić ulepszone funkcje."
+					}
+				},
+				"buttons": {
+					"save": "Zapisz ustawienia",
+					"cancel": "Anuluj",
+					"acceptAll": "Zaakceptuj wszystko",
+					"rejectAll": "Odrzuć wszystko"
+				}
+			},
+			"footer": {
+				"cookieSettings": "Ustawienia plików cookie"
+			}
+		}
+	},
+	"home": {
+		"demoExplainer": {
+			"title": "Zobacz Tiler w akcji",
+			"subtitle": "Wypróbuj teraz — bez konieczności rejestracji. Wybierz poniżej postać, aby doświadczyć, jak Tiler zamienia naturalną rozmowę w inteligentny, adaptacyjny harmonogram.",
+			"badge": "Interaktywne demo"
+		},
+		"persona": {
+			"created": "Profil",
+			"customCreated": "Profil niestandardowy",
+			"cta": {
+				"create": "Utwórz profil",
+				"view": "Zobacz profil"
+			},
+			"expiresIn": "Pozostało {{time}}",
+			"tileSuggestions": "Kafelki",
+			"custom": {
+				"namePlaceholder": "Nowy profil"
+			}
+		},
+		"expanded": {
+			"mobileChatPlaceholder": "Czatuj ze swoim kalendarzem, aby zaktualizować...",
+			"chat": {
+				"newChat": "Nowy czat",
+				"clearSession": "Wyczyść sesję",
+				"title": "Co chciałbyś zrobić?",
+				"subtitle": "Opisz zadanie, a my zajmiemy się jego kafelkowaniem.",
+				"inputPlaceholder": "Powiedz Tilerowi, co robisz...",
+				"loadingMessages": "Ładowanie wiadomości czatu...",
+				"loadingActions": "Ładowanie kolejnych akcji...",
+				"error": "Błąd",
+				"emptyStateTitle": "Co chciałbyś zrobić?",
+				"emptyStateDescription": "Opisz zadanie, a my zajmiemy się jego kafelkowaniem.",
+				"sendingRequest": "Wysyłanie żądania...",
+				"acceptChanges": "Zaakceptuj zmiany",
+				"errorLoadMessages": "Nie udało się załadować wiadomości czatu",
+				"errorSendMessage": "Nie udało się wysłać wiadomości",
+				"errorAcceptChanges": "Nie udało się zaakceptować zmian",
+				"userLocation": {
+					"anonymous": "Anonimowy",
+					"enterLocation": "Wprowadź swoją lokalizację",
+					"default": "Domyślna",
+					"saving": "Zapisywanie...",
+					"save": "Zapisz",
+					"gettingCurrentLocation": "Pobieranie Twojej bieżącej lokalizacji...",
+					"gettingLocation": "Pobieranie lokalizacji...",
+					"resetToDefault": "Przywróć domyślną",
+					"locationBenefitMessage": "Ustawienie Twojej rzeczywistej lokalizacji pomaga nam tworzyć bardziej trafne kafelki i poprawiać Twoje doświadczenie dzięki spersonalizowanym sugestiom harmonogramu.",
+					"usingDefaultLocation": "Używanie domyślnej lokalizacji - Kliknij ikonę, aby pobrać swoją bieżącą lokalizację.",
+					"clickIconToGetLocation": "Kliknij ikonę, aby pobrać swoją bieżącą lokalizację lub edytować swoją lokalizację"
+				},
+				"errorPopup": {
+					"chatLimitReached": "Osiągnięto limit czatu",
+					"headerText": "Chcesz więcej niż 20 podpowiedzi?",
+					"altText": "Ilustracja interfejsu czatu",
+					"description": "Uzyskaj wczesny dostęp do nieograniczonych czatów, inteligentnych integracji i pełnego doświadczenia Tiler.",
+					"emailPlaceholder": "Wpisz swój adres e-mail",
+					"submitEmail": "Prześlij e-mail",
+					"joinWaitlist": "Dołącz do listy oczekujących",
+					"submitting": "Przesyłanie...",
+					"subtext": "Liczba miejsc jest ograniczona – Zarezerwuj swoje już teraz.",
+					"close": "Zamknij",
+					"errors": {
+						"emailRequired": "E-mail jest wymagany",
+						"emailInvalid": "Proszę podać prawidłowy adres e-mail",
+						"submitFailed": "Nie udało się przesłać e-maila. Proszę spróbować ponownie."
+					}
+				},
+				"emailConfirmation": {
+					"header": "Sprawdź swoją pocztę!",
+					"message": "Wysłaliśmy link potwierdzający na adres <strong>{{email}}</strong>.",
+					"messageContinued": "Kliknij link, aby odblokować nieograniczone czaty z Tilerem.",
+					"button": "Rozumiem",
+					"footer": "Nie otrzymałeś e-maila? Sprawdź folder ze spamem lub spróbuj ponownie."
+				}
+			}
+		},
+		"waitlist": {
+			"title": "Dołącz do listy oczekujących",
+			"subtitle": "Bądź jednym z pierwszych, którzy doświadczą potężnych funkcji harmonogramowania Tilera.",
+			"emailPlaceholder": "Wpisz swój adres e-mail",
+			"submit": "Dołącz do listy oczekujących",
+			"success": "Dziękujemy za dołączenie! Powiadomimy Cię, gdy Tiler będzie gotowy.",
+			"error": "Coś poszło nie tak. Proszę spróbować ponownie."
+		},
+		"hero": {
+			"title": "Twój Architekt Dnia Wspierany przez AI",
+			"subtitle": "Po prostu opisz, co musisz zrobić, a Tiler automatycznie zbuduje inteligentny, świadomy lokalizacji harmonogram, który dostosowuje się do zmian w życiu.",
+			"features": {
+				"natural": "Planowanie w języku naturalnym",
+				"adaptive": "Automatycznie dostosowuje się do zmian",
+				"travel": "Inteligentne obliczanie czasu podróży"
+			},
+			"scenarios": {
+				"lunch": {
+					"calendarTitle": "Środa, 13 listopada",
+					"messages": {
+						"userRequest": "Lunch z Sarą jutro w południe w centrum",
+						"aiResponse1": "Zaplanuję lunch z Sarą na jutro (środa) o 12:00 w centrum. Obecnie jesteś w domu. Czy mam dodać 25 minut czasu podróży?",
+						"userConfirm": "Tak, dodaj czas podróży",
+						"aiConfirm": "Idealnie! Dodałem wydarzenie z uwzględnionym buforem na podróż. ✓"
+					},
+					"tiles": {
+						"travel": "Podróż do centrum",
+						"travelTime": "25 min jazdy",
+						"lunch": "Lunch z Sarą"
+					}
+				},
+				"errands": {
+					"calendarTitle": "Piątek, 15 listopada",
+					"messages": {
+						"userRequest": "Muszę dzisiaj zrobić zakupy i iść na siłownię",
+						"aiResponse1": "Mogę to dla Ciebie zaplanować. Jaka godzina pasuje najlepiej? Twój kalendarz jest wolny od 16:00 do 19:00.",
+						"userConfirm": "Po 17:00 pasuje",
+						"aiConfirm": "Świetnie! Zaplanuję zakupy na 17:00 (30 min), a potem siłownię na 18:00 (1 godzina). Dodano! ✓"
+					},
+					"tiles": {
+						"groceries": "Zakupy spożywcze",
+						"travel": "Podróż na siłownię",
+						"travelTime": "12 min jazdy",
+						"gym": "Trening na siłowni"
+					}
+				},
+				"client": {
+					"calendarTitle": "Poniedziałek, 18 listopada",
+					"messages": {
+						"userRequest": "Zaplanuj spotkanie z klientem Johnem w następny poniedziałek o 14:00 w jego biurze",
+						"aiResponse1": "Dodam spotkanie z klientem Johnem na poniedziałek o 14:00 w jego biurze. To 35 minut jazdy od Twojej obecnej lokalizacji. Czy mam zablokować czas wcześniej?",
+						"userConfirm": "Tak, proszę",
+						"aiConfirm": "Gotowe! Czas podróży i spotkanie dodane do Twojego kalendarza. ✓"
+					},
+					"tiles": {
+						"travel": "Podróż do biura klienta",
+						"travelTime": "35 min jazdy",
+						"meeting": "Spotkanie z klientem - John"
+					}
+				},
+				"dentist": {
+					"calendarTitle": "Czwartek, 14 listopada",
+					"messages": {
+						"userRequest": "Mam wizytę u dentysty jutro o 9:00, a potem muszę pracować z domu",
+						"aiResponse1": "Rozumiem! Dodam Twoją wizytę u dentysty na 9:00 (zakładając 1 godzinę). Powrót do domu zajmie 15 minut. Czy mam zaplanować głęboką pracę po tym?",
+						"userConfirm": "Tak, zablokuj 3 godziny na skupioną pracę",
+						"aiConfirm": "Idealnie! Twój poranek jest zaplanowany z uwzględnionym czasem podróży. ✓"
+					},
+					"tiles": {
+						"dentist": "Wizyta u dentysty",
+						"travel": "Podróż do domu",
+						"travelTime": "15 min jazdy",
+						"deepWork": "Sesja głębokiej pracy"
+					}
+				}
+			}
+		},
+		"video": {
+			"title": "Odtwarzacz wideo YouTube"
+		},
+		"updates": {
+			"title": "Otrzymuj najnowsze wiadomości i aktualizacje Tiler",
+			"subtitle": "Chcesz lepiej wykorzystać swój harmonogram? Subskrybuj, aby otrzymywać wskazówki, triki i aktualizacje prosto do swojej skrzynki odbiorczej.",
+			"emailPlaceholder": "Twój adres e-mail..."
+		},
+		"integration": {
+			"title": "Zintegruj ze swoimi ulubionymi",
+			"spanText": "kalendarzami",
+			"subtitle": "Te aplikacje są dostępne do bezproblemowej integracji z Tilerem."
+		},
+		"featureHighlights": {
+			"title": "Najważniejsze funkcje",
+			"subtitle": "Uprość swoje życie z Tilerem, Oto co możemy zrobić, aby Ci pomóc."
+		},
+		"features": {
+			"conversation": {
+				"subtitle": "PO PROSTU MÓW DO NIEGO",
+				"title": "Planowanie w języku naturalnym",
+				"description": "Powiedz Tilerowi, co musisz zrobić, w prostym języku. AI zadaje pytania uzupełniające, proponuje inteligentne harmonogramy i czeka na Twoje potwierdzenie — bez przeciągania i upuszczania."
+			},
+			"transit": {
+				"subtitle": "ZOPTYMALIZUJ SWÓJ DZIEŃ",
+				"title": "Inteligentny czas podróży",
+				"description": "Tiler automatycznie wstawia realistyczne czasy podróży między lokalizacjami i dostosowuje Twój harmonogram, gdy coś się zmienia — więc nigdy się nie spóźniasz."
+			},
+			"adaptive": {
+				"subtitle": "POZOSTAJE W SYNCHRONIZACJI",
+				"title": "Adaptacyjna inteligencja",
+				"description": "Gdy życie rzuca kłody pod nogi, Tiler automatycznie przekłada kolidujące zadania i znajduje następny najlepszy czas — automatycznie."
+			},
+			"location": {
+				"subtitle": "PRYWATNOŚĆ PRZEDE WSZYSTKIM",
+				"title": "Świadomość lokalizacji",
+				"description": "Używaj ogólnych etykiet, takich jak 'dom' lub 'praca', zamiast konkretnych adresów. Tiler oblicza czas podróży bez nadmiernego udostępniania Twoich danych osobowych."
+			}
+		},
+		"faq": {
+			"items": {
+				"whatIsTiler": {
+					"question": "Czym jest Tiler i jak działa?",
+					"answer": "Tiler to nie kalendarz, to aplikacja do planowania wspierana przez AI, która nie tylko zarządza Twoimi zadaniami, ale także optymalizuje Twój czas. Tworzy inteligentne, elastyczne harmonogramy za pomocą AutoTiles, które dostosowują się do zmian w ciągu dnia, jednocześnie pozwalając na blokowanie niezmiennych zadań za pomocą Bloków."
+				},
+				"differentFromCalendar": {
+					"question": "Czym Tiler różni się od Kalendarza Google lub innych aplikacji kalendarzowych?",
+					"answer": "W przeciwieństwie do statycznych kalendarzy, Tiler jest Twoim asystentem planowania AI. Po prostu powiedz mu, co musisz zrobić, w prostym języku — zadaje pytania wyjaśniające, oblicza czas podróży między lokalizacjami i proponuje kompletny harmonogram. Gdy życie się zmienia, Tiler automatycznie dostosowuje Twój harmonogram. Potwierdzasz zmiany, zanim zostaną wprowadzone, więc zachowujesz kontrolę."
+				},
+				"aiAccuracy": {
+					"question": "Czy mogę ufać AI w prawidłowym planowaniu moich zadań?",
+					"answer": "Tiler stosuje podejście oparte na potwierdzeniu — proponuje harmonogramy i czeka na Twoją zgodę przed wprowadzeniem zmian. AI uczy się Twoich wzorców z czasem i staje się mądrzejsza w kwestii czasów trwania, lokalizacji i preferencji. Zawsze możesz cofnąć lub dostosować każdą sugestię."
+				},
+				"locationPrivacy": {
+					"question": "Czy moje dane o lokalizacji są prywatne? Jak Tiler ich używa?",
+					"answer": "Tiler szanuje Twoją prywatność. Możesz używać ogólnych etykiet, takich jak 'dom', 'praca' lub 'lokalna kawiarnia', zamiast konkretnych adresów. Dane o lokalizacji są używane tylko do obliczania realistycznych czasów podróży między zadaniami, zapewniając, że Twój harmonogram uwzględnia rzeczywiste ograniczenia. Twoje dane nigdy nie są udostępniane ani sprzedawane."
+				},
+				"calendarIntegration": {
+					"question": "Dlaczego muszę zintegrować mój kalendarz?",
+					"answer": "Integracja kalendarza z Tilerem pozwala zobaczyć wszystkie Twoje zadania, wydarzenia i harmonogramy w jednym miejscu. Koniec z żonglowaniem wieloma aplikacjami lub ryzykiem podwójnych rezerwacji — Tiler automatycznie synchronizuje wszystko i optymalizuje Twój dzień dla maksymalnej produktywności."
+				},
+				"multipleCalendars": {
+					"question": "Czy mogę zintegrować wiele kalendarzy z moim kontem Tiler?",
+					"answer": "Tak! Możesz zintegrować wiele kalendarzy ze swoim kontem Tiler. W ten sposób wszystkie Twoje wydarzenia i zadania są w jednym miejscu."
+				},
+				"tileVsBlock": {
+					"question": "Jaka jest różnica między Kafelkiem a Blokiem?",
+					"answer": "Kafelki to elastyczne zadania, które Tiler automatycznie planuje i dostosowuje w oparciu o Twoją dostępność. Bloki to stałe zadania, które pozostają dokładnie tam, gdzie je ustawisz — idealne na spotkania lub zadania, których nie można przenieść."
+				},
+				"tileShare": {
+					"question": "Jak działa TileShare?",
+					"answer": "TileShare pozwala udostępniać zadania innym — przyjaciołom, rodzinie, członkom zespołu — dzięki czemu wszyscy wiedzą, co trzeba zrobić i kto się tym zajmuje. Przypisuj zadania, śledź postępy i bez wysiłku synchronizuj harmonogramy."
+				},
+				"missedTask": {
+					"question": "Co jeśli przegapię zadanie lub będę musiał je przełożyć?",
+					"answer": "Bez obaw! Funkcja Defer Tilera automatycznie znajduje następny najlepszy czas na wykonanie przegapionego zadania. Możesz również ręcznie przełożyć zadanie za pomocą prostego przeciągania i upuszczania."
+				},
+				"habitTracking": {
+					"question": "Czy Tiler może pomóc w śledzeniu nawyków?",
+					"answer": "Tak! Możesz używać Tilera do planowania i śledzenia codziennych nawyków. Tiler automatycznie dopasowuje je do Twojego harmonogramu, dzięki czemu zachowujesz spójność."
+				},
+				"transitFeature": {
+					"question": "Jak mogę używać funkcji Transit?",
+					"answer": "Funkcja tranzytu wykracza poza samo obliczanie czasu podróży — działa jako Twój asystent nawigacji. Pomaga planować trasy, sugeruje najlepsze środki transportu i dostarcza wskazówek w czasie rzeczywistym, zapewniając płynne przejścia między zadaniami i lokalizacjami. Wystarczy dotknąć ikony podróży, aby uzyskać natychmiastową nawigację, dzięki czemu zawsze jesteś na czas i na dobrej drodze."
+				}
+			}
+		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "Dołącz do",
+			"part2": "Tiler Chat",
+			"part3": "Listy oczekujących już dziś"
+		},
+		"subtitle": "Przestań zarządzać swoim kalendarzem, zacznij z nim rozmawiać. Zapisz się na listę oczekujących i bądź pierwszym, który poczuje rytm czasu",
+		"form": {
+			"errors": {
+				"integrations": "Proszę dodać co najmniej jedną integrację kalendarza."
+			},
+			"joinWaitlist": "Dołącz do listy oczekujących",
+			"nextStep": "Dalej",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "E-mail",
+					"label": "Adres e-mail",
+					"placeholder": "Adres e-mail"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "Zawód",
+					"label": "Czym się zajmujesz?",
+					"placeholder": "Zawód",
+					"suggestions": [
+						"Pracownik medyczny",
+						"Przedstawiciel handlowy",
+						"Programista",
+						"Konsultant klienta",
+						"Wykonawca",
+						"Założyciel startupu",
+						"Naukowiec",
+						"Student",
+						"Wykładowca",
+						"Konsultant podróży"
+					]
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "Integracje",
+					"label": "Z jakich integracji korzystasz?",
+					"placeholder": "np. Kalendarz Google, Outlook, Kalendarz Apple",
+					"options": [
+						{ "value": "google", "label": "Kalendarz Google" },
+						{ "value": "outlook", "label": "Kalendarz Microsoft Outlook" },
+						{ "value": "apple", "label": "Kalendarz Apple" },
+						{ "value": "slack", "label": "Slack" },
+						{ "value": "monday", "label": "Monday.com" },
+						{ "value": "reclaim", "label": "Reclaim" },
+						{ "value": "notion", "label": "Notion" },
+						{ "value": "ticktick", "label": "TickTick" },
+						{ "value": "evernote", "label": "Evernote" },
+						{ "value": "oneNote", "label": "OneNote" }
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "Przypadek użycia",
+					"label": "Do czego chcesz używać Tiler Chat?",
+					"placeholder": "np. Planowanie, Zarządzanie zadaniami"
+				}
+			}
+		}
+	}
+}
