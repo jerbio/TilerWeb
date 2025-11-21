@@ -42,19 +42,23 @@ type SectionProps = {
 	id?: string;
 };
 
-const Section = ({ children, width, paddingBlock, id }: SectionProps) => {
-	return (
-		<StyledSectionWrapper id={id}>
-			<StyledSection
-				style={{
-					maxWidth: width,
-					paddingBlock: paddingBlock,
-				}}
-			>
-				{children}
-			</StyledSection>
-		</StyledSectionWrapper>
-	);
-};
+const Section = React.forwardRef<HTMLElement, SectionProps>(
+	({ children, width, paddingBlock, id }, ref) => {
+		return (
+			<StyledSectionWrapper id={id} ref={ref as React.RefObject<HTMLDivElement>}>
+				<StyledSection
+					style={{
+						maxWidth: width,
+						paddingBlock: paddingBlock,
+					}}
+				>
+					{children}
+				</StyledSection>
+			</StyledSectionWrapper>
+		);
+	}
+);
+
+Section.displayName = 'Section';
 
 export default Section;
