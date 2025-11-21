@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
 import Button from '@/core/common/components/button';
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import { Check } from 'lucide-react';
 import HeroAnimatedBackground from './hero_animated_background';
+import analytics from '@/core/util/analytics';
 
 const HeroWrapper = styled.div`
 	position: relative;
@@ -103,7 +104,19 @@ const CheckIcon = styled(Check)`
 const HeroSection: React.FC = () => {
 	const { t } = useTranslation();
 
+	// Track hero section view
+	useEffect(() => {
+		analytics.trackEvent('Hero', 'View', 'Hero Section Loaded', undefined, {
+			timestamp: new Date().toISOString(),
+		});
+	}, []);
+
 	const handleExploreClick = () => {
+		analytics.trackButtonClick('Explore', 'Hero Section', {
+			target: 'persona-carousel',
+			action: 'scroll',
+		});
+		
 		const personaCarousel = document.getElementById('persona-carousel');
 		if (personaCarousel) {
 			personaCarousel.scrollIntoView({ behavior: 'smooth', block: 'center' });
