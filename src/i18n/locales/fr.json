@@ -127,6 +127,23 @@
 		},
 		"goBack": "Retour"
 	},
+	"timeline": {
+		"title": "Chronologie",
+		"signedInUser": "Utilisateur Connecté",
+		"signOut": "Se Déconnecter",
+		"signingOut": "Déconnexion...",
+		"signOutSuccess": "Déconnexion réussie",
+		"signOutError": "Échec de la déconnexion",
+		"userInfo": {
+			"fullName": "Nom Complet",
+			"username": "Nom d'Utilisateur",
+			"email": "E-mail",
+			"phone": "Téléphone",
+			"timeZone": "Fuseau Horaire",
+			"userId": "ID Utilisateur",
+			"notAvailable": "N/D"
+		}
+	},
 	"home": {
 		"expanded": {
 			"chat": {

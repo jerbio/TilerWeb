@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Logo from '@/core/common/components/icons/logo';
@@ -9,6 +10,7 @@ import useAppStore from '@/global_state';
 import { authService } from '@/services';
 
 const Timeline: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const setAuthenticated = useAppStore((state) => state.setAuthenticated);
@@ -27,10 +29,10 @@ const Timeline: React.FC = () => {
     try {
       await authService.logout();
       setAuthenticated(null);
-      toast.success('Signed out successfully');
+      toast.success(t('timeline.signOutSuccess'));
       navigate('/signin');
     } catch (error) {
-      toast.error('Failed to sign out');
+      toast.error(t('timeline.signOutError'));
       console.error('Sign out error:', error);
       setIsSigningOut(false);
     }
@@ -50,44 +52,44 @@ const Timeline: React.FC = () => {
     <Container>
       <Header>
         <Logo size={48} />
-        <Title>Timeline</Title>
+        <Title>{t('timeline.title')}</Title>
         <SignOutButton onClick={handleSignOut} disabled={isSigningOut}>
-          {isSigningOut ? 'Signing out...' : 'Sign Out'}
+          {isSigningOut ? t('timeline.signingOut') : t('timeline.signOut')}
         </SignOutButton>
       </Header>
 
       <Content>
         <UserCard>
-          <CardHeader>Signed In User</CardHeader>
+          <CardHeader>{t('timeline.signedInUser')}</CardHeader>
 
           <UserInfo>
             <InfoRow>
-              <Label>Full Name:</Label>
-              <Value>{authenticatedUser.fullName || 'N/A'}</Value>
+              <Label>{t('timeline.userInfo.fullName')}:</Label>
+              <Value>{authenticatedUser.fullName || t('timeline.userInfo.notAvailable')}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Username:</Label>
+              <Label>{t('timeline.userInfo.username')}:</Label>
               <Value>{authenticatedUser.username}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Email:</Label>
-              <Value>{authenticatedUser.email || 'N/A'}</Value>
+              <Label>{t('timeline.userInfo.email')}:</Label>
+              <Value>{authenticatedUser.email || t('timeline.userInfo.notAvailable')}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Phone:</Label>
-              <Value>{authenticatedUser.phoneNumber || 'N/A'}</Value>
+              <Label>{t('timeline.userInfo.phone')}:</Label>
+              <Value>{authenticatedUser.phoneNumber || t('timeline.userInfo.notAvailable')}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Time Zone:</Label>
+              <Label>{t('timeline.userInfo.timeZone')}:</Label>
               <Value>{authenticatedUser.timeZone}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>User ID:</Label>
+              <Label>{t('timeline.userInfo.userId')}:</Label>
               <Value>{authenticatedUser.id}</Value>
             </InfoRow>
           </UserInfo>
