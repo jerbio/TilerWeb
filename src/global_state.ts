@@ -209,7 +209,7 @@ const useAppStore = create<AppState>((set, get) => ({
 			const { authService } = await import('./services');
 			const response = await authService.checkAuth();
 
-			if (response.isAuthenticated) {
+			if (response && response.isAuthenticated) {
 				// Fetch full user info
 				const { userService } = await import('./services');
 				const user = await userService.getCurrentUser();
@@ -218,7 +218,7 @@ const useAppStore = create<AppState>((set, get) => ({
 				set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
 			}
 		} catch (error) {
-			console.error('Auth check failed:', error);
+			console.error('Check auth failed:', error);
 			set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
 		}
 	},
@@ -235,6 +235,7 @@ const useAppStore = create<AppState>((set, get) => ({
 	},
 
 	setAuthenticated: (user) => {
+    console.log('setAuthenticated', user);
 		set({
 			isAuthenticated: user !== null,
 			authenticatedUser: user,
