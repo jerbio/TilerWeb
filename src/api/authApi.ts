@@ -44,7 +44,7 @@ export class AuthApi extends AppApi {
 	public checkAuth() {
 		return this.apiRequest<string>('account/auth', {
 			method: 'GET',
-			responseType: 'text', // Backend returns "1 OK" as plain text, not JSON
+			responseType: 'text', // Backend returns "OK" as plain text, not JSON
 		});
 	}
 

@@ -8,6 +8,8 @@ import { useSpring, animated } from '@react-spring/web';
 import useAppStore from '@/global_state';
 import { useNavigate } from 'react-router';
 import Button from '@/core/common/components/button';
+import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const TimelineHeader: React.FC = () => {
   const [profileOpen, setProfileOpen] = React.useState(false);
@@ -16,7 +18,7 @@ const TimelineHeader: React.FC = () => {
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-
+  const { t } = useTranslation();
   const spring = useSpring({
     opacity: profileOpen ? 1 : 0,
     scale: profileOpen ? 1 : 0.9,
@@ -48,8 +50,10 @@ const TimelineHeader: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
+      toast.success(t('timeline.userMenu.signOutSuccess'));
       navigate('/signin');
     } catch (error) {
+      toast.error(t('timeline.userMenu.signOutError'));
       console.error('Logout failed:', error);
     }
   };
@@ -58,7 +62,11 @@ const TimelineHeader: React.FC = () => {
     <Header>
       <HeaderLeft>
         <Logo size={30} />
-        <Input height={36} placeholder="Search for a tile/block..." append={<Search size={18} />} />
+        <Input 
+          height={36} 
+          placeholder={t('timeline.searchPlaceholder')} 
+          append={<Search size={18} />} 
+        />
       </HeaderLeft>
       <HeaderRight>
         <ProfileTrigger ref={triggerRef} onClick={() => setProfileOpen(!profileOpen)}>
@@ -79,7 +87,7 @@ const TimelineHeader: React.FC = () => {
                 </ProfileAvatar>
                 <ProfileInfo>
                   <ProfileName>
-                    {authenticatedUser?.fullName || authenticatedUser?.firstName || authenticatedUser?.username || 'User'}
+                    {authenticatedUser?.fullName || authenticatedUser?.firstName || authenticatedUser?.username || t('timeline.userMenu.defaultUsername')}
                   </ProfileName>
                   {authenticatedUser?.email && (
                     <ProfileEmail>{authenticatedUser.email}</ProfileEmail>
@@ -91,7 +99,7 @@ const TimelineHeader: React.FC = () => {
 
               <LogoutButton variant="ghost" onClick={handleLogout}>
                 <LogOut size={16} color={palette.colors.error[400]} />
-                Logout
+                {t('timeline.userMenu.logout')}
               </LogoutButton>
             </AnimatedProfileMenu>
         </ProfileTrigger>
