@@ -333,6 +333,23 @@
 		},
 		"goBack": "Go back"
 	},
+	"timeline": {
+		"title": "Timeline",
+		"signedInUser": "Signed In User",
+		"signOut": "Sign Out",
+		"signingOut": "Signing out...",
+		"signOutSuccess": "Signed out successfully",
+		"signOutError": "Failed to sign out",
+		"userInfo": {
+			"fullName": "Full Name",
+			"username": "Username",
+			"email": "Email",
+			"phone": "Phone",
+			"timeZone": "Time Zone",
+			"userId": "User ID",
+			"notAvailable": "N/A"
+		}
+	},
 	"waitlist": {
 		"title": {
 			"part1": "Join the",

@@ -12,6 +12,7 @@ import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 
 const Timeline: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const isAuthLoading = useAppStore((state) => state.isAuthLoading);
