@@ -41,27 +41,11 @@ export class AuthApi extends AppApi {
 		});
 	}
 
-	public async checkAuth(): Promise<AuthStatusResponse> {
-		const endpoint = this.getUri('account/auth');
-
-		try {
-			const res = await fetch(endpoint, {
-				method: 'GET',
-				credentials: 'include', // Include authentication cookies
-			});
-
-			// If response is OK (200), user is authenticated
-			if (res.ok) {
-				return { isAuthenticated: true };
-			}
-
-			// Any other status means not authenticated
-			return { isAuthenticated: false };
-		} catch (error) {
-			console.error('Error checking auth:', error);
-			// If request fails, assume not authenticated
-			return { isAuthenticated: false };
-		}
+	public checkAuth() {
+		return this.apiRequest<string>('account/auth', {
+			method: 'GET',
+			responseType: 'text', // Backend returns "OK" as plain text, not JSON
+		});
 	}
 
 	public logout() {

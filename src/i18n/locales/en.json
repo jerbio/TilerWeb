@@ -122,6 +122,21 @@
 			}
 		}
 	},
+	"calendar": {
+		"nonViable": {
+			"title": "Non-Viable Events",
+			"infoTooltip": "These events could not be scheduled due to timing conflicts or constraints."
+		},
+		"event": {
+			"dueIn": "Due in {{time}}",
+			"dateLabel": "Date:",
+			"startLabel": "Starts:",
+			"endLabel": "Ends:",
+			"durationLabel": "Duration:",
+			"repetitionLabel": "Repeats:",
+			"locationLabel": "Location:"
+		}
+	},
 	"home": {
 		"persona": {
 			"created": "Profile",
@@ -318,23 +333,6 @@
 		},
 		"goBack": "Go back"
 	},
-	"timeline": {
-		"title": "Timeline",
-		"signedInUser": "Signed In User",
-		"signOut": "Sign Out",
-		"signingOut": "Signing out...",
-		"signOutSuccess": "Signed out successfully",
-		"signOutError": "Failed to sign out",
-		"userInfo": {
-			"fullName": "Full Name",
-			"username": "Username",
-			"email": "Email",
-			"phone": "Phone",
-			"timeZone": "Time Zone",
-			"userId": "User ID",
-			"notAvailable": "N/A"
-		}
-	},
 	"waitlist": {
 		"title": {
 			"part1": "Join the",
@@ -398,6 +396,15 @@
 					"placeholder": "eg. Scheduling, Task Management"
 				}
 			}
+		}
+	},
+	"timeline": {
+		"searchPlaceholder": "Search for a tile/block...",
+		"userMenu": {
+			"logout": "Logout",
+			"signOutSuccess": "You have been successfully signed out",
+			"signOutError": "Failed to sign out. Please try again.",
+			"defaultUsername": "User"
 		}
 	}
 }

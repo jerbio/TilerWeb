@@ -30,8 +30,11 @@ export class AuthService {
 
 	async checkAuth() {
 		try {
-			const response = await this.authApi.checkAuth();
-			return response;
+			const text = await this.authApi.checkAuth();
+      console.log('checkAuth text', text);
+			return {
+				isAuthenticated: text.trim() === 'OK',
+			};
 		} catch (error) {
 			console.error('Error checking auth status', error);
 			throw normalizeError(error);

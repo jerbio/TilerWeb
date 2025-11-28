@@ -88,7 +88,6 @@ const ChatContent = styled.div`
 	flex-direction: column;
 	height: 100%;
 	overflow: hidden;
-	max-height: 400px;
 
 	.messages-list {
 		flex: 1;
