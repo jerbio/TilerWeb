@@ -1,48 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Logo from '@/core/common/components/icons/logo';
 import Spinner from '@/core/common/components/loader';
-import { userService } from '@/services';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  fullName: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  timeZone: string;
-  dateOfBirth: string;
-}
+import useAppStore from '@/global_state';
+import { authService } from '@/services';
 
 const Timeline: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+  const setAuthenticated = useAppStore((state) => state.setAuthenticated);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await userService.getCurrentUser();
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-        toast.error('Failed to load user information');
-        // Redirect to signin if unauthorized
-        navigate('/signin');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // User is already authenticated and available from global state
+    if (authenticatedUser) {
+      setIsLoading(false);
+    }
+  }, [authenticatedUser]);
 
-    fetchUser();
-  }, [navigate]);
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await authService.logout();
+      setAuthenticated(null);
+      toast.success(t('timeline.signOutSuccess'));
+      navigate('/signin');
+    } catch (error) {
+      toast.error(t('timeline.signOutError'));
+      console.error('Sign out error:', error);
+      setIsSigningOut(false);
+    }
+  };
 
-  if (isLoading) {
+  if (isLoading || !authenticatedUser) {
     return (
       <Container>
         <LoadingContainer>
@@ -52,50 +48,49 @@ const Timeline: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return null; // Will redirect to signin
-  }
-
   return (
     <Container>
       <Header>
         <Logo size={48} />
-        <Title>Timeline</Title>
+        <Title>{t('timeline.title')}</Title>
+        <SignOutButton onClick={handleSignOut} disabled={isSigningOut}>
+          {isSigningOut ? t('timeline.signingOut') : t('timeline.signOut')}
+        </SignOutButton>
       </Header>
 
       <Content>
         <UserCard>
-          <CardHeader>Signed In User</CardHeader>
+          <CardHeader>{t('timeline.signedInUser')}</CardHeader>
 
           <UserInfo>
             <InfoRow>
-              <Label>Full Name:</Label>
-              <Value>{user.fullName || 'N/A'}</Value>
+              <Label>{t('timeline.userInfo.fullName')}:</Label>
+              <Value>{authenticatedUser.fullName || t('timeline.userInfo.notAvailable')}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Username:</Label>
-              <Value>{user.username}</Value>
+              <Label>{t('timeline.userInfo.username')}:</Label>
+              <Value>{authenticatedUser.username}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Email:</Label>
-              <Value>{user.email}</Value>
+              <Label>{t('timeline.userInfo.email')}:</Label>
+              <Value>{authenticatedUser.email || t('timeline.userInfo.notAvailable')}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Phone:</Label>
-              <Value>{user.phoneNumber || 'N/A'}</Value>
+              <Label>{t('timeline.userInfo.phone')}:</Label>
+              <Value>{authenticatedUser.phoneNumber || t('timeline.userInfo.notAvailable')}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>Time Zone:</Label>
-              <Value>{user.timeZone}</Value>
+              <Label>{t('timeline.userInfo.timeZone')}:</Label>
+              <Value>{authenticatedUser.timeZone}</Value>
             </InfoRow>
 
             <InfoRow>
-              <Label>User ID:</Label>
-              <Value>{user.id}</Value>
+              <Label>{t('timeline.userInfo.userId')}:</Label>
+              <Value>{authenticatedUser.id}</Value>
             </InfoRow>
           </UserInfo>
         </UserCard>
@@ -131,6 +126,29 @@ const Title = styled.h1`
   font-family: ${palette.typography.fontFamily.urban};
   font-weight: ${palette.typography.fontWeight.bold};
   margin: 0;
+  flex: 1;
+`;
+
+const SignOutButton = styled.button`
+  background-color: ${palette.colors.gray[800]};
+  color: ${palette.colors.white};
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+  padding: 0.75rem 1.5rem;
+  font-size: ${palette.typography.fontSize.sm};
+  font-weight: ${palette.typography.fontWeight.medium};
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: ${palette.colors.gray[700]};
+    border-color: ${palette.colors.gray[600]};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const Content = styled.div`
