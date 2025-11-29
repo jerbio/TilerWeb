@@ -35,6 +35,7 @@ const Button: React.FC<ButtonProps> = ({
   bordergradient: bordergradient,
   height,
 	dotstatus,
+  ...rest
 }) => {
   return (
     <StyledButton
@@ -46,6 +47,7 @@ const Button: React.FC<ButtonProps> = ({
       $bordergradient={bordergradient}
       $height={height}
 			$dotstatus={dotstatus}
+      {...rest}
     >
       {children}
     </StyledButton>
