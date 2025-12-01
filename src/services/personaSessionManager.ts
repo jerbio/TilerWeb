@@ -143,12 +143,6 @@ class PersonaSessionManager {
     const devOverride = this.getDevUserIdOverride?.();
     const effectiveUserId = devOverride || userId;
 
-    console.log(
-      devOverride
-        ? `[PersonaSessionManager] Creating session with dev override: ${effectiveUserId}`
-        : `[PersonaSessionManager] Creating session for persona: ${personaId}`
-    );
-
     const session: PersonaSession = {
       personaId,
       personaName,
@@ -187,8 +181,6 @@ class PersonaSessionManager {
    * Automatically syncs to both localStorage and global state
    */
   updateSession(personaId: Persona['id'], updates: Partial<PersonaSession>): void {
-    console.log(`[PersonaSessionManager] Updating session for persona: ${personaId}`);
-
     const activeSession = this.getActivePersonaSession?.();
     
     // Only update if this is the active session
@@ -233,8 +225,6 @@ class PersonaSessionManager {
    * Removes from both localStorage and global state
    */
   deleteSession(personaId: Persona['id']): void {
-    console.log(`[PersonaSessionManager] Deleting session for persona: ${personaId}`);
-
     // Remove from localStorage
     this.setStoredPersonaUser(personaId, null);
 
@@ -260,10 +250,6 @@ class PersonaSessionManager {
    */
   setUserId(personaId: Persona['id'], userId: string): void {
     const previousUserId = this.getUserId(personaId);
-    
-    console.log(
-      `[PersonaSessionManager] Setting userId for ${personaId}: ${userId}`
-    );
 
     // Update localStorage
     const storedUser = this.getStoredPersonaUser(personaId);
@@ -316,8 +302,6 @@ class PersonaSessionManager {
    * Automatically updates the active session if one exists
    */
   applyDevOverride(userId: string): void {
-    console.log(`[PersonaSessionManager] Applying dev override: ${userId}`);
-
     // Set the dev override in global state
     this.setDevUserIdOverride?.(userId);
 
@@ -346,8 +330,6 @@ class PersonaSessionManager {
    * Reverts to the original userId from localStorage
    */
   clearDevOverride(): void {
-    console.log(`[PersonaSessionManager] Clearing dev override`);
-
     // Clear the dev override
     this.setDevUserIdOverride?.(null);
 
