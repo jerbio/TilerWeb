@@ -1,7 +1,6 @@
 import React from 'react';
 import { usePersonaSession } from '@/core/common/hooks/usePersonaSessionManager';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
-import { isDemoMode, getDemoData } from '@/config/demo_config';
 
 type PersonaCalendarProps = {
   userId: string | null;

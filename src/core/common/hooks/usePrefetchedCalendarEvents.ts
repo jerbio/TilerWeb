@@ -4,6 +4,7 @@ import { scheduleService } from '@/services';
 import { ScheduleSubCalendarEvent } from '../types/schedule';
 import useAppStore from '../../../global_state';
 import dayjs from 'dayjs';
+import { getDemoData, isDemoMode } from '@/config/demo_config';
 
 export default function usePrefetchedCalendarData({
   userId,
@@ -19,7 +20,7 @@ export default function usePrefetchedCalendarData({
   const latestLookupRequestRef = useRef<string | null>(null);
   const scheduleCacheRef = useRef<Map<string, Array<ScheduleSubCalendarEvent>>>(new Map());
   const scheduleCache = scheduleCacheRef.current;
-
+  
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +46,11 @@ export default function usePrefetchedCalendarData({
     useCache = true
   ) {
     const cacheKey = makeCacheKey(id, startRange, endRange);
+    
+    if (isDemoMode()) {
+      const { calendarEvents } = getDemoData();
+      return calendarEvents;
+    }
 
     if (useCache && scheduleCache.has(cacheKey)) {
       return scheduleCache.get(cacheKey) || [];
