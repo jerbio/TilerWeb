@@ -301,6 +301,15 @@ const Calendar = ({
 				},
 				{ once: true }
 			);
+      contentContainerRef.current?.addEventListener('scroll', () => {
+        setSelectedEventInfo((prev) => {
+          if (prev) {
+            // Return a new object to trigger re-render
+            return { ...prev };
+          }
+          return null;
+        });
+      });
 		}
 	}, [selectedEventInfo]);
 	const calendarEventInfoTransRef = useSpringRef();
@@ -515,6 +524,8 @@ const Calendar = ({
 };
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
+  overflow: hidden;
+  border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
 	position: relative;
 	width: 100%;
 	height: 100%;

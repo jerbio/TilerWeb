@@ -1,7 +1,6 @@
 import Logo from '@/core/common/components/icons/logo';
-import Input from '@/core/common/components/input';
 import palette from '@/core/theme/palette';
-import { LogOut, Search, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from '@react-spring/web';
@@ -62,11 +61,11 @@ const TimelineHeader: React.FC = () => {
     <Header>
       <HeaderLeft>
         <Logo size={30} />
-        <Input 
+        {/* <Input 
           height={36} 
           placeholder={t('timeline.searchPlaceholder')} 
           append={<Search size={18} />} 
-        />
+        /> */}
       </HeaderLeft>
       <HeaderRight>
         <ProfileTrigger ref={triggerRef} onClick={() => setProfileOpen(!profileOpen)}>

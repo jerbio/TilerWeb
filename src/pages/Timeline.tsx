@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
-import { MessageCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
 import palette from '@/core/theme/palette';
 import Spinner from '@/core/common/components/loader';
@@ -21,6 +21,7 @@ const Timeline: React.FC = () => {
   const showChat = isDesktop || mobileChatVisible;
   const contentRef = useRef<HTMLDivElement>(null);
   const [expandedWidth, setExpandedWidth] = useState(0);
+  const [chatExpanded, setChatExpanded] = useState(false);
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -60,7 +61,7 @@ const Timeline: React.FC = () => {
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <CalendarWrapper userId={authenticatedUser.id} width={expandedWidth} />
+          <CalendarWrapper chatExpanded={chatExpanded} userId={authenticatedUser.id} width={expandedWidth} />
           <CalendarContainerActionButtons>
             <MobileChatInputWrapper>
               <MessageCircleIcon>
@@ -73,6 +74,11 @@ const Timeline: React.FC = () => {
               />
             </MobileChatInputWrapper>
           </CalendarContainerActionButtons>
+          {isDesktop && (
+            <ChatExpandToggle title={chatExpanded ? 'Collapse chat' : 'Expand chat'} onClick={() => setChatExpanded(!chatExpanded)}>
+              {chatExpanded ? <ChevronLeft /> : <ChevronRight />}
+            </ChatExpandToggle>
+          )}
         </React.Fragment>
       ),
     },
@@ -103,7 +109,7 @@ const Timeline: React.FC = () => {
         <TimelineContent ref={contentRef}>
           <CardContent>
             {contentTransition((style, item) => (
-              <item.container style={style} key={item.key}>
+              <item.container style={style} key={item.key} $chatexpanded={chatExpanded}>
                 {item.content}
               </item.container>
             ))}
@@ -149,26 +155,25 @@ const CardContent = styled.div`
 	height: calc(100% - 3rem);
 `;
 
-const CalendarContainer = styled(animated.div)`
+const CalendarContainer = styled(animated.div)<{ $chatexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
-	overflow: hidden;
 	height: 100%;
 	background: ${palette.colors.gray[900]};
 	border-top: 1px solid ${palette.colors.gray[700]};
 
 	@media screen and (min-width: ${palette.screens.lg}) {
-		grid-column: span 8;
+	grid-column: span ${props => (props.$chatexpanded ? 12 : 8)};
 		border: 1px solid ${palette.colors.gray[700]};
 		border-left: none;
 		border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
 	}
 	@media screen and (min-width: ${palette.screens.xl}) {
-		grid-column: span 9;
+	grid-column: span ${props => (props.$chatexpanded ? 12 : 9)};
 	}
 `;
 
-const ChatContainer = styled(animated.div)`
+const ChatContainer = styled(animated.div)<{ $chatexpanded: boolean }>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;
@@ -176,15 +181,41 @@ const ChatContainer = styled(animated.div)`
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
 	border-radius: ${palette.borderRadius.xxLarge};
+  display: ${props => (props.$chatexpanded ? 'none' : 'block')};
 
 	@media screen and (min-width: ${palette.screens.lg}) {
 		position: static;
 		background: transparent;
-		grid-column: span 4;
+    grid-column: span ${props => (props.$chatexpanded ? 0 : 4)};
 		border: none;
 	}
 	@media screen and (min-width: ${palette.screens.xl}) {
-		grid-column: span 3;
+    grid-column: span ${props => (props.$chatexpanded ? 0 : 3)};
+	}
+`;
+
+const ChatExpandToggle = styled.button`
+	position: absolute;
+	top: 75%;
+	right: 0;
+	transform: translateY(-50%) translateX(50%);
+	width: 40px;
+	height: 40px;
+	background: ${palette.colors.gray[900]};
+	border: 1px solid ${palette.colors.gray[800]};
+  border-radius: ${palette.borderRadius.large};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	color: ${palette.colors.gray[300]};
+	transition: all 0.2s ease;
+	z-index: 1000;
+	outline: none;
+
+	&:hover {
+		background: ${palette.colors.gray[800]};
+		color: white;
 	}
 `;
 
