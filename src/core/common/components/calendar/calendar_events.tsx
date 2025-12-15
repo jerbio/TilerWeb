@@ -270,7 +270,6 @@ const CalendarEvents = ({
 						result[o].properties.eventChainLength -= newChainLength;
 						o--;
 					}
-					console.log('chain broken, new start event:', event.name);
 				}
 			}
 		}
