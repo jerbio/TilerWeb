@@ -33,9 +33,9 @@ type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
 };
 export type StyledEvent = CurrentViewEvent & {
   properties: {
-    eventLayerKey: string;
-    eventLayerIndex: number;
-    eventLayerSize: number;
+    eventChainKey: string;
+    eventChainIndex: number;
+    eventChainLength: number;
     startHourFraction: number;
     endHourFraction: number;
   };
@@ -162,83 +162,133 @@ const CalendarEvents = ({
       return dayjs(a.start, 'unix').diff(dayjs(b.start, 'unix'));
     });
 
-    currentViewEvents.forEach((event) => {
+		// Calculate chains of intersected events
+		for (let i = 0; i < currentViewEvents.length; i++) {
+			const event = currentViewEvents[i];
+
       const s = dayjs(event.start, 'unix');
       const e = dayjs(event.end, 'unix');
       const eventBox = CalendarUtil.getBoundingBox(s, e, viewOptions, headerWidth);
       const { x, y, width, height } = eventBox;
-      const startHourFraction = s.hour() + s.minute() / 60;
-      const endHourFraction = e.hour() + e.minute() / 60;
+      const eventStartInHours = s.hour() + s.minute() / 60; // 11:30PM -> 23.5
+      const eventEndInHours = e.hour() + e.minute() / 60; // 11:45AM -> 11.75
 
-      // Layering intersected events
-      const lastEvent = result[result.length - 1] as StyledEvent | undefined;
-      const isSameDay = dayjs(event.start, 'unix').isSame(
-        dayjs(lastEvent?.start, 'unix'),
+      const prevEvent = result[result.length - 1] as StyledEvent | undefined;
+      const isEventSameDayAsPrev = dayjs(event.start, 'unix').isSame(
+        dayjs(prevEvent?.start, 'unix'),
         'day'
       );
-      const lastEventIntersecting =
-        !!lastEvent &&
-        isSameDay &&
-        CalendarUtil.isInterseting(eventBox, lastEvent.springStyles);
-      const eventLayerKey = lastEventIntersecting
-        ? lastEvent.properties.eventLayerKey
-        : event.key;
 
-      const styledEvent = {
-        ...event,
-        properties: {
-          startHourFraction,
-          endHourFraction,
-          eventLayerKey,
-          eventLayerIndex: 0,
-          eventLayerSize: 1,
-        },
-        springStyles: { x, y, width, height },
-      };
+      const isIntersectingWithPrev =
+        prevEvent &&
+				prevEvent.isViable &&
+        isEventSameDayAsPrev &&
+        CalendarUtil.isInterseting(eventBox, prevEvent.springStyles);
+
+			let styledEvent: StyledEvent;
+			if (prevEvent && isIntersectingWithPrev && event.isViable) {
+				const eventChainKey = prevEvent.properties.eventChainKey;
+				const eventChainIndex = prevEvent.properties.eventChainIndex + 1;
+
+				// Update event chain length of previously chained events
+				for (let eci = 0; eci < eventChainIndex; eci++) {
+					const chainedEvent = result[result.length - 1 - eci];
+					chainedEvent.properties.eventChainLength++;
+				}
+
+				styledEvent = {
+					...event,
+					properties: {
+						startHourFraction: eventStartInHours,
+						endHourFraction: eventEndInHours,
+						eventChainKey,
+						eventChainIndex,
+						eventChainLength: eventChainIndex + 1,
+					},
+					springStyles: { x, y, width, height },
+				};
+			} else {
+				styledEvent = {
+					...event,
+					properties: {
+						startHourFraction: eventStartInHours,
+						endHourFraction: eventEndInHours,
+						eventChainKey: event.key,
+						eventChainIndex: 0,
+						eventChainLength: 1,
+					},
+					springStyles: { x, y, width, height },
+				};
+			}
+
       result.push(styledEvent);
-    });
+    };
 
-    // Sort by start time ascending
-    // If events have the same layerGroupKey, sort descending by duration
-    result.sort((a, b) => {
-      if (a.properties.eventLayerKey === b.properties.eventLayerKey) {
-        return (
-          dayjs(b.end, 'unix').diff(dayjs(b.start, 'unix')) -
-          dayjs(a.end, 'unix').diff(dayjs(a.start, 'unix'))
-        );
+		let currentChainKey = '';
+		let currentChainFirstEnd = 0;
+
+		// Break chains if they are too long
+    for (let i = 0; i < result.length; i++) {
+      const event = result[i];
+			const chainKey = event.properties.eventChainKey;
+      const chainLength = event.properties.eventChainLength;
+			const chainIndex = event.properties.eventChainIndex;
+
+			// Check new chain
+			if (chainKey !== currentChainKey) {
+        currentChainKey = chainKey;
+        currentChainFirstEnd = event.end;
+				continue;
       }
-      return dayjs(a.start, 'unix').diff(dayjs(b.start, 'unix'));
-    });
 
-    // Calculating the layerGroupLength and and layerIndex
-    const layerEventMap = new Map<string, Array<string>>();
-    result.forEach((event) => {
-      const layerGroupKey = event.properties.eventLayerKey;
-      if (!layerEventMap.has(layerGroupKey)) {
-        layerEventMap.set(layerGroupKey, []);
-      }
-      layerEventMap.get(layerGroupKey)?.push(event.key);
-    });
+      if (chainLength > 2) {
+				// Skip if last event of chain
+				if (chainIndex === chainLength - 1) continue;
+				const breakingCondition = event.start > currentChainFirstEnd;
+				if (breakingCondition) {
+					const oldChainKey = currentChainKey;
+					currentChainKey = event.key;
+					currentChainFirstEnd = event.end;
+					let n = i;
+					let newChainLength = 0;
+					// Assign new chain keys
+					while (result[n].properties.eventChainKey === oldChainKey) {
+						result[n].properties.eventChainKey = event.key;
+						result[n].properties.eventChainIndex = n - i;
+						n++;
+						newChainLength++;
+					}
+					let l = i;
+					// Assign new chain lengths
+					while (result[l].properties.eventChainKey === event.key) {
+						result[l].properties.eventChainLength = newChainLength;
+						l++;
+					}
+					// Update old chain lengths
+					let o = i - 1;
+					while (result[o].properties.eventChainKey === oldChainKey) {
+						result[o].properties.eventChainLength -= newChainLength;
+						o--;
+					}
+					console.log('chain broken, new start event:', event.name);
+				}
+			}
+		}
 
-    // Assigning layerGroupLength and layerIndex / updating springStyles
-    result.forEach((event) => {
-      const layerGroupKey = event.properties.eventLayerKey;
-      const layerEvents = layerEventMap.get(layerGroupKey) || [];
-      const layerIndex = layerEvents.indexOf(event.key);
-      const layerGroupLength = layerEvents.length;
-      if (layerGroupLength > 1) {
-        event.properties.eventLayerIndex = layerIndex;
-        event.properties.eventLayerSize = layerGroupLength;
-
-        // Update springStyles
+		// Divide width of chained events
+		for (let i = 0; i < result.length; i++) {
+			const event = result[i];
+			const chainIndex = event.properties.eventChainIndex;
+			const chainLength = event.properties.eventChainLength;
+      if (event.properties.eventChainLength > 1) {
         const fullWidth = event.springStyles.width;
-        event.springStyles.x += layerIndex * (fullWidth / layerGroupLength);
-        const lastGroupItemWidth = fullWidth / layerGroupLength;
-        const groupItemWidth = (lastGroupItemWidth * 3) / 2;
+        event.springStyles.x += chainIndex * (fullWidth / chainLength);
+        const lastChainEventWidth = fullWidth / chainLength;
+        const chainEventWidth = (lastChainEventWidth * 7) / 6;
         event.springStyles.width =
-          layerIndex === layerGroupLength - 1 ? lastGroupItemWidth : groupItemWidth;
+          chainIndex === chainLength - 1 ? lastChainEventWidth : chainEventWidth;
       }
-    });
+    }
 
     return result;
   }, [currentViewEvents]);
