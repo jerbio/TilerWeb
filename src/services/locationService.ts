@@ -18,6 +18,9 @@ class LocationService {
   // Cache for the current location data
   private currentLocationData: LocationData | null = null;
 
+  // Cache for the locally set manual location
+  private cachedManualLocation: LocationData | null = null;
+
   /**
    * Get the default location data
    */
@@ -176,7 +179,7 @@ class LocationService {
 
       return null;
     } catch (err) {
-      console.log('Geocoding failed', err);
+      console.error('Geocoding failed', err);
       return null;
     }
   }

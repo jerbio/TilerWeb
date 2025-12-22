@@ -21,6 +21,7 @@ import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
 import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
 import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
+import { isDemoMode, getDemoData } from '@/config/demo_config';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -297,8 +298,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     webSocketCommunication.current = new SignalRService(anonymousUserId);
     webSocketCommunication.current.createVibeConnection();
     webSocketCommunication.current.subscribeToSocketDataReceipt((data: unknown) => {
-      console.log('WebSocket data received in chat component:', data);
-
       // Type guard and extract vibe data from WebSocket
       if (
         data &&
@@ -313,10 +312,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         typeof data.data.vibe.status === 'string'
       ) {
         const formattedStatus = formatWebSocketStatus(data.data.vibe.status);
-        console.log('Setting WebSocket status:', formattedStatus);
         setWebSocketStatus(formattedStatus);
-      } else {
-        console.log('WebSocket data failed type guard check');
       }
     });
 
@@ -359,11 +355,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     fetchAndSetLatestSession();
   }, [activePersonaSession?.userId, activePersonaSession?.personaId]);
 
-  // Load chat messages when session ID or selected persona changes
+  // Load chat messages when relevant dependencies change
   useEffect(() => {
-    if (sessionId) {
-      loadChatMessages(sessionId);
-    }
+    loadChatMessages(sessionId);
   }, [sessionId, scheduleId, selectedPersonaId]);
 
   const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
@@ -421,13 +415,30 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     });
   };
 
-  const loadChatMessages = async (sid: string) => {
-    if (!sid) return;
+  const loadChatMessages = async (sid?: string) => {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      setIsLoading(true);
-      setError(null);
+      // Dev mode takes priority - always fetch from API with dev userId (skip demo)
+      const devUserIdOverride = useAppStore.getState().devUserIdOverride;
+      const isDevMode = !!devUserIdOverride;
 
+      // Priority 1: Demo mode (only if NOT in dev mode) - inject demo data
+      if (!isDevMode && isDemoMode()) {
+        const { chatMessages } = getDemoData();
+        setMessages(chatMessages);
+        setRequestId(chatMessages[chatMessages.length - 1]?.requestId || 'request-demo-001');
+        setIsLoading(false);
+        return;
+      }
+
+      // Exit early if we still don't have a session ID
+      if (!sid) {
+        setIsLoading(false);
+        return;
+      }
+      
       const data = await chatService.getMessages(sid);
       const rawMessages = data.Content.chats || [];
       if (!rawMessages || rawMessages.length === 0) return;
@@ -818,7 +829,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             </EmptyChat>
           )}
 
-          <div className="messages-list" ref={messagesListRef}>
+          <div className="messages-list" ref={messagesListRef} data-onboarding-chat-messages>
             {messages.map((message) => (
               <MessageBubble key={message.id} $isUser={message.origin === 'user'}>
                 <div className="message-content">
@@ -856,13 +867,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
         <div>
           {isSending && (
-            <>
-              {console.log('LoadingIndicator - isSending:', isSending, 'webSocketStatus:', webSocketStatus)}
-              <LoadingIndicator message={webSocketStatus || t('home.expanded.chat.sendingRequest')} />
-            </>
+            <LoadingIndicator message={webSocketStatus || t('home.expanded.chat.sendingRequest')} />
           )}
-          {!isSending && shouldShowAcceptButton && (
-            <Button variant="primary" onClick={() => acceptAllChanges()}>
+          {((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
+            <Button variant="primary" onClick={() => acceptAllChanges()} data-onboarding-accept-button>
               {t('home.expanded.chat.acceptChanges')}
             </Button>
           )}
@@ -893,21 +901,22 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             bordergradient={[palette.colors.brand[500]]}
             height={50} // Set a fixed height for consistent alignment
           />
-          <ChatButton type="submit" disabled={isSending || !message.trim()}>
+          <ChatButton type="submit" disabled={isSending || !message.trim()} data-onboarding-chat-button>
             {isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
           </ChatButton>
         </ChatForm>
         <UserLocation />
       </ChatContainer>
 
-      <ErrorPopup
+      {anonymousUserId && <ErrorPopup
         isOpen={showErrorPopup}
         message={errorPopupMessage}
-        title="Chat Limit Reached"
+        title={t('home.expanded.chat.errorPopup.chatLimitReached')}
         onClose={() => setShowErrorPopup(false)}
         showWaitlistButton={true}
         onEmailSubmitted={handleEmailSubmitted}
-      />
+        tilerUserId={anonymousUserId}
+      />}
 
       <EmailConfirmationModal
         isOpen={showEmailConfirmation}

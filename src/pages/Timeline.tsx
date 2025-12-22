@@ -1,0 +1,205 @@
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import palette from '@/core/theme/palette';
+import Logo from '@/core/common/components/icons/logo';
+import Spinner from '@/core/common/components/loader';
+import useAppStore from '@/global_state';
+import { authService } from '@/services';
+
+const Timeline: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+  const setAuthenticated = useAppStore((state) => state.setAuthenticated);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  useEffect(() => {
+    // User is already authenticated and available from global state
+    if (authenticatedUser) {
+      setIsLoading(false);
+    }
+  }, [authenticatedUser]);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await authService.logout();
+      setAuthenticated(null);
+      toast.success(t('timeline.signOutSuccess'));
+      navigate('/signin');
+    } catch (error) {
+      toast.error(t('timeline.signOutError'));
+      console.error('Sign out error:', error);
+      setIsSigningOut(false);
+    }
+  };
+
+  if (isLoading || !authenticatedUser) {
+    return (
+      <Container>
+        <LoadingContainer>
+          <Spinner />
+        </LoadingContainer>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <Header>
+        <Logo size={48} />
+        <Title>{t('timeline.title')}</Title>
+        <SignOutButton onClick={handleSignOut} disabled={isSigningOut}>
+          {isSigningOut ? t('timeline.signingOut') : t('timeline.signOut')}
+        </SignOutButton>
+      </Header>
+
+      <Content>
+        <UserCard>
+          <CardHeader>{t('timeline.signedInUser')}</CardHeader>
+
+          <UserInfo>
+            <InfoRow>
+              <Label>{t('timeline.userInfo.fullName')}:</Label>
+              <Value>{authenticatedUser.fullName || t('timeline.userInfo.notAvailable')}</Value>
+            </InfoRow>
+
+            <InfoRow>
+              <Label>{t('timeline.userInfo.username')}:</Label>
+              <Value>{authenticatedUser.username}</Value>
+            </InfoRow>
+
+            <InfoRow>
+              <Label>{t('timeline.userInfo.email')}:</Label>
+              <Value>{authenticatedUser.email || t('timeline.userInfo.notAvailable')}</Value>
+            </InfoRow>
+
+            <InfoRow>
+              <Label>{t('timeline.userInfo.phone')}:</Label>
+              <Value>{authenticatedUser.phoneNumber || t('timeline.userInfo.notAvailable')}</Value>
+            </InfoRow>
+
+            <InfoRow>
+              <Label>{t('timeline.userInfo.timeZone')}:</Label>
+              <Value>{authenticatedUser.timeZone}</Value>
+            </InfoRow>
+
+            <InfoRow>
+              <Label>{t('timeline.userInfo.userId')}:</Label>
+              <Value>{authenticatedUser.id}</Value>
+            </InfoRow>
+          </UserInfo>
+        </UserCard>
+      </Content>
+    </Container>
+  );
+};
+
+const Container = styled.div`
+  min-height: 100vh;
+  background-color: ${palette.colors.black};
+  padding: 2rem;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+`;
+
+const Header = styled.header`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h1`
+  font-size: ${palette.typography.fontSize.displaySm};
+  color: ${palette.colors.white};
+  font-family: ${palette.typography.fontFamily.urban};
+  font-weight: ${palette.typography.fontWeight.bold};
+  margin: 0;
+  flex: 1;
+`;
+
+const SignOutButton = styled.button`
+  background-color: ${palette.colors.gray[800]};
+  color: ${palette.colors.white};
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+  padding: 0.75rem 1.5rem;
+  font-size: ${palette.typography.fontSize.sm};
+  font-weight: ${palette.typography.fontWeight.medium};
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: ${palette.colors.gray[700]};
+    border-color: ${palette.colors.gray[600]};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const Content = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const UserCard = styled.div`
+  background-color: ${palette.colors.gray[900]};
+  border: 1px solid ${palette.colors.gray[800]};
+  border-radius: ${palette.borderRadius.large};
+  padding: 2rem;
+`;
+
+const CardHeader = styled.h2`
+  font-size: ${palette.typography.fontSize.xl};
+  color: ${palette.colors.white};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid ${palette.colors.gray[800]};
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const InfoRow = styled.div`
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+`;
+
+const Label = styled.span`
+  color: ${palette.colors.gray[400]};
+  font-size: ${palette.typography.fontSize.sm};
+  font-weight: ${palette.typography.fontWeight.medium};
+`;
+
+const Value = styled.span`
+  color: ${palette.colors.white};
+  font-size: ${palette.typography.fontSize.base};
+  word-break: break-all;
+`;
+
+export default Timeline;

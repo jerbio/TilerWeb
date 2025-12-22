@@ -5,6 +5,7 @@ import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Logo from '@/core/common/components/icons/logo';
 import { Mail } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 
 interface EmailConfirmationModalProps {
   isOpen: boolean;
@@ -17,6 +18,8 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({
   email,
   onClose,
 }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
@@ -30,12 +33,16 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({
           <Mail size={64} color={palette.colors.brand[500]} />
         </IconContainer>
 
-        <Header>Check your email!</Header>
+        <Header>{t('home.expanded.chat.emailConfirmation.header')}</Header>
 
         <Message>
-          We sent a confirmation link to <strong>{email}</strong>.
+          <Trans
+            i18nKey="home.expanded.chat.emailConfirmation.message"
+            values={{ email }}
+            components={{ strong: <strong /> }}
+          />
           <br /><br />
-          Click the link to unlock unlimited chats with Tiler.
+          {t('home.expanded.chat.emailConfirmation.messageContinued')}
         </Message>
 
         <Actions>
@@ -43,12 +50,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({
             variant="primary"
             onClick={onClose}
           >
-            Got it
+            {t('home.expanded.chat.emailConfirmation.button')}
           </Button>
         </Actions>
 
         <FooterNote>
-          Didn&apos;t receive the email? Check your spam folder or try again.
+          {t('home.expanded.chat.emailConfirmation.footer')}
         </FooterNote>
       </ModalContainer>
     </Overlay>,

@@ -9,6 +9,7 @@ import FeatureTimely from '@/assets/features/timely.png';
 import FeatureAutoLoc from '@/assets/features/auto-loc.png';
 import Section from '../components/layout/section';
 import UpdatesSection from '../components/home/updates_section';
+import SEO from '@/core/common/components/SEO';
 
 const BackgroundBlur = styled.div`
 	position: absolute;
@@ -79,8 +80,24 @@ const featureList = [
 ];
 
 const Features: React.FC = () => {
+	const structuredData = {
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		name: 'Tiler Features - Smart Scheduling & Task Collaboration',
+		description:
+			'Discover Tiler features: TileShare for task collaboration, Transit for navigation, Forecast for time management, and Auto Location.',
+		url: 'https://tiler.app/features',
+	};
+
 	return (
 		<>
+			<SEO
+				title="Features - Tiler Smart Calendar & Task Management"
+				description="Discover Tiler features: TileShare for task collaboration, Transit for navigation, Forecast for time management, and Auto Location. Boost your productivity with intelligent scheduling."
+				keywords="tiler features, task sharing, tileshare, transit navigation, time forecasting, auto location, task collaboration, smart scheduling features"
+				canonicalUrl="/features"
+				structuredData={structuredData}
+			/>
 			<Section>
 				<BackgroundBlur />
 				<DottedLineImage src={DottedLine} alt="null" />

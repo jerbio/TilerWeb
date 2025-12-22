@@ -7,6 +7,8 @@ import { ArrowRight } from 'lucide-react';
 import Logo from '@/core/common/components/icons/logo';
 import FetchingChatInterface from '@/assets/fetching_chat_interface.svg';
 import { emailListService } from '@/services';
+import { useTranslation } from 'react-i18next';
+import { validateEmail } from '@/core/util/validation';
 
 interface ErrorPopupProps {
   isOpen: boolean;
@@ -17,6 +19,7 @@ interface ErrorPopupProps {
   redirectButtonText?: string;
   showWaitlistButton?: boolean;
   onEmailSubmitted?: (email: string) => void;
+  tilerUserId: string;
 }
 
 const ErrorPopup: React.FC<ErrorPopupProps> = ({
@@ -27,25 +30,28 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
   onRedirect,
   redirectButtonText = 'Go Back',
   showWaitlistButton = false,
-  onEmailSubmitted
+  onEmailSubmitted,
+  tilerUserId,
 }) => {
+  // Runtime guard: this popup requires a tilerUserId to function correctly
+  if (!tilerUserId) {
+    // Throwing early makes the missing-prop failure obvious during development/runtime
+    throw new Error('ErrorPopup requires a tilerUserId prop');
+  }
+
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleWaitlistSubmit = async () => {
     if (!email.trim()) {
-      setEmailError('Email is required');
+      setEmailError(t('home.expanded.chat.errorPopup.errors.emailRequired'));
       return;
     }
 
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('home.expanded.chat.errorPopup.errors.emailInvalid'));
       return;
     }
 
@@ -53,18 +59,23 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
     setEmailError('');
 
     try {
-      const response = await emailListService.submitEmail(email.trim());
+      const response = await emailListService.submitEmail(
+        email.trim(),
+        'chatLimitReached',
+        // pass the optional tiler user id through to the API
+        tilerUserId
+      );
 
       // Check response structure based on API
       if (response?.Error?.Code === "0") {
         // Success - call parent callback
         onEmailSubmitted?.(email);
       } else {
-        setEmailError(response?.Error?.Message || 'Failed to submit email');
+        setEmailError(response?.Error?.Message || t('home.expanded.chat.errorPopup.errors.submitFailed'));
       }
     } catch (error) {
       console.error('Error submitting email:', error);
-      setEmailError('Failed to submit email. Please try again.');
+      setEmailError(t('home.expanded.chat.errorPopup.errors.submitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -83,10 +94,10 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
           <TitlePill>{title}</TitlePill>
         </Header>
 
-        <HeaderText>Want more than 20 prompts?</HeaderText>
+        <HeaderText>{t('home.expanded.chat.errorPopup.headerText')}</HeaderText>
 
         <IllustrationContainer>
-          <img src={FetchingChatInterface} alt="Chat interface illustration" />
+          <img src={FetchingChatInterface} alt={t('home.expanded.chat.errorPopup.altText')} />
         </IllustrationContainer>
 
         {/* OLAMIDE TODO: Remove this conditional when pop up fleshed out to use the message response from the backend */}
@@ -98,14 +109,14 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
           {showWaitlistButton && onEmailSubmitted && (
             <>
               <WaitlistDescription>
-                Get early access to unlimited chats, smart integrations, and the full Tiler experience.
+                {t('home.expanded.chat.errorPopup.description')}
               </WaitlistDescription>
 
               {/* Email Input */}
               <EmailInputContainer>
                 <EmailInputField
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('home.expanded.chat.errorPopup.emailPlaceholder')}
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -122,10 +133,10 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
                 onClick={handleWaitlistSubmit}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : (email.trim() ? 'Submit Email' : 'Join The Waitlist')}
+                {isSubmitting ? t('home.expanded.chat.errorPopup.submitting') : (email.trim() ? t('home.expanded.chat.errorPopup.submitEmail') : t('home.expanded.chat.errorPopup.joinWaitlist'))}
                 {!isSubmitting && <ArrowRight size={16} />}
               </Button>
-              <WaitlistSubtext>Spots are limited – Save yours now.</WaitlistSubtext>
+              <WaitlistSubtext>{t('home.expanded.chat.errorPopup.subtext')}</WaitlistSubtext>
             </>
           )}
           {onRedirect && (
@@ -144,7 +155,7 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
               variant="outline"
               onClick={onClose}
             >
-              Close
+              {t('home.expanded.chat.errorPopup.close')}
             </Button>
           )}
         </Actions>

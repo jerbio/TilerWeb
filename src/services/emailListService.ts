@@ -9,9 +9,9 @@ export class EmailListService {
     this.emailListApi = emailListApi;
   }
 
-  async submitEmail(email: string): Promise<ServerError> {
+  async submitEmail(email: string, uiFlow?: string, tilerUserId?: string): Promise<ServerError> {
     try {
-      const response = await this.emailListApi.submitEmail(email);
+      const response = await this.emailListApi.submitEmail(email, uiFlow, tilerUserId);
       return response;
     } catch (error) {
       console.error('Error submitting email to list', error);
