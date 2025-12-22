@@ -10,7 +10,7 @@ interface PromptSuggestionsProps {
 const Container = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
   padding: 16px 0;
   width: 100%;
 
@@ -26,9 +26,9 @@ const Container = styled.div`
 const PromptPill = styled.button`
   background: ${palette.colors.gray[50]};
   border: 1px solid ${palette.colors.gray[200]};
-  border-radius: 20px;
-  padding: 10px 16px;
-  font-size: 14px;
+  border-radius: 16px;
+  padding: 8px 12px;
+  font-size: 13px;
   font-weight: 500;
   color: ${palette.colors.gray[800]};
   cursor: pointer;
@@ -52,54 +52,54 @@ const PromptPill = styled.button`
 
 const allPrompts = [
   // ⚙️ Core / Structural
-  'Morning setup',
-  'Daily planning',
-  'Travel buffer',
-  'Task review',
-  'Day wrap-up',
+  'Set up my morning routine',
+  'Plan my day',
+  'Add travel buffer time',
+  'Review my tasks',
+  'Wrap up my day',
 
   // 🧑‍💼 Professional
-  'Sales call',
-  'Client presentation',
-  'Proposal drafting',
-  'Contract review',
-  'Budget review',
-  'Team sync',
-  'Board prep',
-  'Performance check-in',
+  'Schedule a sales call',
+  'Prepare client presentation',
+  'Draft a proposal',
+  'Review contract',
+  'Analyze budget',
+  'Sync with team',
+  'Prepare for board meeting',
+  'Conduct performance check-in',
 
   // 📊 Operations / Execution
-  'Dispatch schedule',
-  'Shift changeover',
-  'Inventory check',
-  'Quality audit',
-  'Field visit',
-  'Vendor coordination',
-  'Report submission',
+  'Create dispatch schedule',
+  'Plan shift changeover',
+  'Check inventory',
+  'Conduct quality audit',
+  'Schedule field visit',
+  'Coordinate with vendor',
+  'Submit report',
 
   // 📍 Location-Linked
-  'Site visit',
-  'Office block',
-  'On-site inspection',
-  'Customer appointment',
-  'Pickup / delivery',
-  'Route planning',
+  'Schedule site visit',
+  'Block office time',
+  'Plan on-site inspection',
+  'Book customer appointment',
+  'Arrange pickup and delivery',
+  'Plan my route',
 
   // 🚀 Strategic
-  'Market research',
-  'Competitive scan',
-  'Weekly forecast',
-  'Hiring interview',
-  'Investor call',
-  'Product roadmap review',
+  'Conduct market research',
+  'Analyze competitors',
+  'Create weekly forecast',
+  'Schedule hiring interview',
+  'Prepare investor call',
+  'Review product roadmap',
 
   // 🧠 Deep Work
-  'Writing session',
-  'Analysis block',
-  'Design sprint',
-  'Coding block',
-  'Financial modeling',
-  'Research study',
+  'Block time for writing',
+  'Schedule analysis time',
+  'Plan design sprint',
+  'Block coding time',
+  'Build financial model',
+  'Conduct research study',
 ];
 
 // Utility function to get random prompts
@@ -114,7 +114,7 @@ const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) 
   return (
     <Container>
       {displayedPrompts.map((prompt, index) => (
-        <PromptPill key={index} onClick={() => onPromptClick(prompt)}>
+        <PromptPill key={index} onClick={() => onPromptClick(prompt)} title={prompt}>
           {prompt}
         </PromptPill>
       ))}
