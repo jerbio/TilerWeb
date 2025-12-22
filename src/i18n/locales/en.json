@@ -225,6 +225,58 @@
 					"messageContinued": "Click the link to unlock unlimited chats with Tiler.",
 					"button": "Got it",
 					"footer": "Didn't receive the email? Check your spam folder or try again."
+				},
+				"promptSuggestions": {
+					"coreStructural": {
+						"morningSetup": "Set up my morning routine",
+						"dailyPlanning": "Plan my day",
+						"travelBuffer": "Add travel buffer time",
+						"taskReview": "Review my tasks",
+						"dayWrapUp": "Wrap up my day"
+					},
+					"professional": {
+						"salesCall": "Schedule a sales call",
+						"clientPresentation": "Prepare client presentation",
+						"proposalDrafting": "Draft a proposal",
+						"contractReview": "Review contract",
+						"budgetReview": "Analyze budget",
+						"teamSync": "Sync with team",
+						"boardPrep": "Prepare for board meeting",
+						"performanceCheckIn": "Conduct performance check-in"
+					},
+					"operations": {
+						"dispatchSchedule": "Create dispatch schedule",
+						"shiftChangeover": "Plan shift changeover",
+						"inventoryCheck": "Check inventory",
+						"qualityAudit": "Conduct quality audit",
+						"fieldVisit": "Schedule field visit",
+						"vendorCoordination": "Coordinate with vendor",
+						"reportSubmission": "Submit report"
+					},
+					"locationLinked": {
+						"siteVisit": "Schedule site visit",
+						"officeBlock": "Block office time",
+						"onSiteInspection": "Plan on-site inspection",
+						"customerAppointment": "Book customer appointment",
+						"pickupDelivery": "Arrange pickup and delivery",
+						"routePlanning": "Plan my route"
+					},
+					"strategic": {
+						"marketResearch": "Conduct market research",
+						"competitiveScan": "Analyze competitors",
+						"weeklyForecast": "Create weekly forecast",
+						"hiringInterview": "Schedule hiring interview",
+						"investorCall": "Prepare investor call",
+						"productRoadmapReview": "Review product roadmap"
+					},
+					"deepWork": {
+						"writingSession": "Block time for writing",
+						"analysisBlock": "Schedule analysis time",
+						"designSprint": "Plan design sprint",
+						"codingBlock": "Block coding time",
+						"financialModeling": "Build financial model",
+						"researchStudy": "Conduct research study"
+					}
 				}
 			}
 		},

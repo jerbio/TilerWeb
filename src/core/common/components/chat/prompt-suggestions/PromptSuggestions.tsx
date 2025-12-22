@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
+import { useTranslation } from 'react-i18next';
 
 interface PromptSuggestionsProps {
   onPromptClick: (prompt: string) => void;
@@ -50,66 +51,69 @@ const PromptPill = styled.button`
   }
 `;
 
-const allPrompts = [
-  // ⚙️ Core / Structural
-  'Set up my morning routine',
-  'Plan my day',
-  'Add travel buffer time',
-  'Review my tasks',
-  'Wrap up my day',
-
-  // 🧑‍💼 Professional
-  'Schedule a sales call',
-  'Prepare client presentation',
-  'Draft a proposal',
-  'Review contract',
-  'Analyze budget',
-  'Sync with team',
-  'Prepare for board meeting',
-  'Conduct performance check-in',
-
-  // 📊 Operations / Execution
-  'Create dispatch schedule',
-  'Plan shift changeover',
-  'Check inventory',
-  'Conduct quality audit',
-  'Schedule field visit',
-  'Coordinate with vendor',
-  'Submit report',
-
-  // 📍 Location-Linked
-  'Schedule site visit',
-  'Block office time',
-  'Plan on-site inspection',
-  'Book customer appointment',
-  'Arrange pickup and delivery',
-  'Plan my route',
-
-  // 🚀 Strategic
-  'Conduct market research',
-  'Analyze competitors',
-  'Create weekly forecast',
-  'Schedule hiring interview',
-  'Prepare investor call',
-  'Review product roadmap',
-
-  // 🧠 Deep Work
-  'Block time for writing',
-  'Schedule analysis time',
-  'Plan design sprint',
-  'Block coding time',
-  'Build financial model',
-  'Conduct research study',
-];
-
 // Utility function to get random prompts
-const getRandomPrompts = (count: number = 5): string[] => {
+const getRandomPrompts = (count: number = 5, allPrompts: string[]): string[] => {
   const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 
 const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) => {
-  const [displayedPrompts] = React.useState(() => getRandomPrompts(5));
+  const { t } = useTranslation();
+
+  // Build the prompts array using translations
+  const allPrompts = [
+    // ⚙️ Core / Structural
+    t('home.expanded.chat.promptSuggestions.coreStructural.morningSetup'),
+    t('home.expanded.chat.promptSuggestions.coreStructural.dailyPlanning'),
+    t('home.expanded.chat.promptSuggestions.coreStructural.travelBuffer'),
+    t('home.expanded.chat.promptSuggestions.coreStructural.taskReview'),
+    t('home.expanded.chat.promptSuggestions.coreStructural.dayWrapUp'),
+
+    // 🧑‍💼 Professional
+    t('home.expanded.chat.promptSuggestions.professional.salesCall'),
+    t('home.expanded.chat.promptSuggestions.professional.clientPresentation'),
+    t('home.expanded.chat.promptSuggestions.professional.proposalDrafting'),
+    t('home.expanded.chat.promptSuggestions.professional.contractReview'),
+    t('home.expanded.chat.promptSuggestions.professional.budgetReview'),
+    t('home.expanded.chat.promptSuggestions.professional.teamSync'),
+    t('home.expanded.chat.promptSuggestions.professional.boardPrep'),
+    t('home.expanded.chat.promptSuggestions.professional.performanceCheckIn'),
+
+    // 📊 Operations / Execution
+    t('home.expanded.chat.promptSuggestions.operations.dispatchSchedule'),
+    t('home.expanded.chat.promptSuggestions.operations.shiftChangeover'),
+    t('home.expanded.chat.promptSuggestions.operations.inventoryCheck'),
+    t('home.expanded.chat.promptSuggestions.operations.qualityAudit'),
+    t('home.expanded.chat.promptSuggestions.operations.fieldVisit'),
+    t('home.expanded.chat.promptSuggestions.operations.vendorCoordination'),
+    t('home.expanded.chat.promptSuggestions.operations.reportSubmission'),
+
+    // 📍 Location-Linked
+    t('home.expanded.chat.promptSuggestions.locationLinked.siteVisit'),
+    t('home.expanded.chat.promptSuggestions.locationLinked.officeBlock'),
+    t('home.expanded.chat.promptSuggestions.locationLinked.onSiteInspection'),
+    t('home.expanded.chat.promptSuggestions.locationLinked.customerAppointment'),
+    t('home.expanded.chat.promptSuggestions.locationLinked.pickupDelivery'),
+    t('home.expanded.chat.promptSuggestions.locationLinked.routePlanning'),
+
+    // 🚀 Strategic
+    t('home.expanded.chat.promptSuggestions.strategic.marketResearch'),
+    t('home.expanded.chat.promptSuggestions.strategic.competitiveScan'),
+    t('home.expanded.chat.promptSuggestions.strategic.weeklyForecast'),
+    t('home.expanded.chat.promptSuggestions.strategic.hiringInterview'),
+    t('home.expanded.chat.promptSuggestions.strategic.investorCall'),
+    t('home.expanded.chat.promptSuggestions.strategic.productRoadmapReview'),
+
+    // 🧠 Deep Work
+    t('home.expanded.chat.promptSuggestions.deepWork.writingSession'),
+    t('home.expanded.chat.promptSuggestions.deepWork.analysisBlock'),
+    t('home.expanded.chat.promptSuggestions.deepWork.designSprint'),
+    t('home.expanded.chat.promptSuggestions.deepWork.codingBlock'),
+    t('home.expanded.chat.promptSuggestions.deepWork.financialModeling'),
+    t('home.expanded.chat.promptSuggestions.deepWork.researchStudy'),
+  ];
+
+  const [displayedPrompts] = React.useState(() => getRandomPrompts(5, allPrompts));
 
   return (
     <Container>
