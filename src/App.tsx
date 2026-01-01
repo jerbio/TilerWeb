@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router';
+import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
 import Layout from './pages/Layout';
 import Features from './pages/Features';
@@ -18,6 +18,12 @@ import { AuthProvider } from './core/auth/AuthProvider';
 import { ProtectedRoute } from './core/auth/ProtectedRoute';
 import analytics from './core/util/analytics';
 import { PublicRoute } from './components/auth/PublicRoute';
+import SettingsLayout from './pages/settings/SettingsLayout';
+import AccountSettings from './pages/settings/AccountSettings';
+import PreferencesSettings from './pages/settings/PreferencesSettings';
+import ContactsSettings from './pages/settings/ContactsSettings';
+import NotificationsSettings from './pages/settings/NotificationsSettings';
+import ConnectionsSettings from './pages/settings/ConnectionsSettings';
 // import useAppStore from './global_state';
 
 // Component to track page views on route changes
@@ -125,6 +131,14 @@ const App: React.FC = () => {
               {/* Protected Routes - redirect to /signin if not authenticated */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/timeline" element={<Timeline />} />
+                <Route path="/settings" element={<SettingsLayout />}>
+                  <Route index element={<Navigate to="/settings" replace />} />
+                  <Route path="account" element={<AccountSettings />} />
+                  <Route path="preferences" element={<PreferencesSettings />} />
+                  <Route path="contacts" element={<ContactsSettings />} />
+                  <Route path="notifications" element={<NotificationsSettings />} />
+                  <Route path="connections" element={<ConnectionsSettings />} />
+                </Route>
               </Route>
             </Routes>
             <Toaster position="bottom-left" theme="system" />
