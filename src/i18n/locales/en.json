@@ -623,7 +623,11 @@
 			"tilerContacts": {
 				"title": "Tiler Contacts",
 				"description": "Add your colleagues as contacts in tiler so you can easily share tiles with them.",
-				"placeholder": "Contacts management coming soon..."
+				"placeholder": "Contacts management coming soon...",
+				"youHave": "You have",
+				"tilerContacts": "Tiler Contacts",
+				"enterFullName": "enter full name",
+				"emailOrPhone": "email or phone number"
 			},
 			"notificationPreferences": {
 				"title": "Notification Preferences",
