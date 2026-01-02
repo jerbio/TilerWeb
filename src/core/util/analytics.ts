@@ -92,7 +92,7 @@ class Analytics {
    * Track button clicks
    */
   public trackButtonClick(buttonName: string, location: string, properties?: AnalyticsProperties) {
-    this.trackEvent('Button', 'Click', buttonName, undefined, {
+    this.trackEvent('Button', buttonName ?? 'Click', buttonName, undefined, {
       location,
       ...properties,
     });
@@ -102,14 +102,14 @@ class Analytics {
    * Track form submissions
    */
   public trackFormSubmit(formName: string, properties?: AnalyticsProperties) {
-    this.trackEvent('Form', 'Submit', formName, undefined, properties);
+    this.trackEvent('Form', formName ??'Submit', formName, undefined, properties);
   }
 
   /**
    * Track navigation events
    */
   public trackNavigation(destination: string, source: string, properties?: AnalyticsProperties) {
-    this.trackEvent('Navigation', 'Navigate', destination, undefined, {
+    this.trackEvent('Navigation', destination ?? 'Navigate', destination, undefined, {
       source,
       ...properties,
     });

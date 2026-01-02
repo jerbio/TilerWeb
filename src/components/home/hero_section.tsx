@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import SectionHeaders from '../layout/section_headers';
 import Button from '@/core/common/components/button';
@@ -7,6 +7,9 @@ import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import { Check } from 'lucide-react';
 import HeroAnimatedBackground from './hero_animated_background';
+import CustomPersonaModal from '../navigation/CustomPersonaModal';
+import { PersonaApi } from '@/api/personaApi';
+import analytics from '@/core/util/analytics';
 
 const HeroWrapper = styled.div`
 	position: relative;
@@ -102,13 +105,80 @@ const CheckIcon = styled(Check)`
 
 const HeroSection: React.FC = () => {
 	const { t } = useTranslation();
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const handleExploreClick = () => {
-		const personaCarousel = document.getElementById('persona-carousel');
-		if (personaCarousel) {
-			personaCarousel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		analytics.trackButtonClick('Explore', 'Hero Section', {
+			isModalOpen: isModalOpen,
+			isOnHomePage: window.location.pathname === '/',
+		});
+
+		setIsModalOpen(true);
+		
+		// Dispatch event to focus on custom persona in carousel
+		if (window.location.pathname === '/') {
+			window.dispatchEvent(new CustomEvent('focusCustomPersona'));
 		}
 	};
+
+	const handleGetStartedClick = () => {
+		window.location.href = '/signin';
+	};
+
+	const handleModalClose = () => {
+		analytics.trackEvent('Modal', 'Close', 'Custom Persona Modal', undefined, {
+			location: 'Hero Section',
+		});
+		
+		setIsModalOpen(false);
+		
+		// Dispatch event to re-enable carousel
+		if (window.location.pathname === '/') {
+			window.dispatchEvent(new CustomEvent('customPersonaModalDismissed'));
+		}
+	};
+
+	async function handleModalSubmit(description: string, audioFile?: Blob) {
+		analytics.trackEvent('Modal', 'Submit', 'Custom Persona Modal', undefined, {
+			hasAudio: !!audioFile,
+			descriptionLength: description.length,
+			location: 'Hero Section',
+		});
+		
+		try {
+			const personaApi = new PersonaApi();
+			const response = await personaApi.createPersonaWithAudio(description, audioFile);
+			const finalDescription = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
+			const anonymousUser = response?.Content?.anonymousUserWithPersona?.anonymousUser;
+			
+			setIsModalOpen(false);
+			
+			const params = new URLSearchParams();
+			params.set('customPersona', 'true');
+			params.set('description', finalDescription);
+			
+			if (window.location.pathname === '/') {
+				window.dispatchEvent(
+					new CustomEvent('createCustomPersona', { 
+						detail: { 
+							persona: {
+								id: 'custom-persona',
+								name: finalDescription,
+								description: finalDescription,
+							},
+							anonymousUser: anonymousUser,
+						} 
+					})
+				);
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+			} else {
+				window.location.href = `/?${params.toString()}`;
+			}
+		} catch (error) {
+			console.error('Error creating custom persona:', error);
+			setIsModalOpen(false);
+		}
+	}
 
 		return (
 		<Section>
@@ -143,10 +213,16 @@ const HeroSection: React.FC = () => {
 						</FeatureItem>
 					</FeaturesList>
 					<ButtonContainer>
-						<Button variant="brand" onClick={handleExploreClick}>{t('common.buttons.explore')}</Button>
+						<Button variant="brand" onClick={handleGetStartedClick}>{t('common.buttons.tryFree')}</Button>
+						<Button variant="secondary" onClick={handleExploreClick}>{t('common.buttons.explore')}</Button>
 					</ButtonContainer>
 				</ContentWrapper>
 			</HeroWrapper>
+			<CustomPersonaModal 
+				isOpen={isModalOpen} 
+				onClose={handleModalClose}
+				onSubmit={handleModalSubmit}
+			/>
 		</Section>
 	);
 };
