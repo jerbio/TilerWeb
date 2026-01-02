@@ -114,7 +114,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       // Check if dev mode override is active
       if (devUserIdOverride) {
         // DEV MODE: Use the custom user ID instead of creating a new one
-        console.log('[DEV MODE] Using custom user ID:', devUserIdOverride);
+        
         // Set the persona user with the override ID
         setPersonaUser(persona.id, {
           userId: devUserIdOverride,
@@ -294,7 +294,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar expandedWidth={expandedWidth} userId={personaUserId} />
+          <PersonaCalendar key={`calendar-${demoModeKey}`} expandedWidth={expandedWidth} userId={personaUserId} />
           <CalendarContainerActionButtons>
             <MobileChatInputWrapper>
               <MessageCircleIcon>
