@@ -25,7 +25,7 @@ type PersonaExpandedCardProps = {
   expandedWidth: number;
   personaUsers: PersonaUsers;
   setPersonaUser: PersonaUserSetter;
-	onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
@@ -35,7 +35,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   expandedWidth,
   personaUsers,
   setPersonaUser,
-	onClick,
+  onClick,
 }) => {
   const { t } = useTranslation();
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
@@ -47,10 +47,10 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const activePersonaSession = useAppStore((state) => state.activePersonaSession);
   const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
   const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
-  
+
   // Use PersonaSessionManager for centralized session management
   const { createSession } = usePersonaSessionManager();
-  
+
   const [isCreatingPersona, setIsCreatingPersona] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
 
@@ -98,17 +98,17 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   async function getPersonaUser() {
     setIsCreatingPersona(true);
     setProcessingStep(0);
-    
+
     // Simulate progressive steps with intervals
     const stepInterval = setInterval(() => {
-      setProcessingStep(prev => {
+      setProcessingStep((prev) => {
         if (prev < PROCESSING_STEPS.length - 1) {
           return prev + 1;
         }
         return prev;
       });
     }, 2000); // Progress every 2 seconds
-    
+
     try {
       // Check if dev mode override is active
       if (devUserIdOverride) {
@@ -119,7 +119,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           userId: devUserIdOverride,
           personaInfo: { name: persona.name },
         });
-        
+
         // Create a persona session using PersonaSessionManager
         // This automatically handles dev override and syncs to localStorage + global state
         createSession({
@@ -132,32 +132,32 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           userInfo: null, // Will be populated on first API call
           scheduleLastUpdatedBy: null,
         });
-        
+
         clearInterval(stepInterval);
         setProcessingStep(PROCESSING_STEPS.length);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setIsCreatingPersona(false);
         setProcessingStep(0);
         return;
       }
-      
+
       // NORMAL MODE: Create a new anonymous user
       const personaUser = await personaService.createAnonymousUser(persona);
       const newUserId = personaUser.anonymousUser.id;
-      
+
       if (!newUserId) {
-        console.error("Failed to create user for persona: userId is null");
+        console.error('Failed to create user for persona: userId is null');
         clearInterval(stepInterval);
         setIsCreatingPersona(false);
         setProcessingStep(0);
         return;
       }
-      
+
       setPersonaUser(persona.id, {
-				userId: newUserId,
-				personaInfo: { name: persona.name },
-			});
-      
+        userId: newUserId,
+        personaInfo: { name: persona.name },
+      });
+
       // Create a new persona session using PersonaSessionManager
       // This automatically syncs to both localStorage and global state
       createSession({
@@ -182,15 +182,15 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
         },
         scheduleLastUpdatedBy: null,
       });
-      
+
       clearInterval(stepInterval);
-      
+
       // Show all steps as complete (all checkmarks)
       setProcessingStep(PROCESSING_STEPS.length);
-      
+
       // Wait 1 second to show all checkmarks before hiding
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setIsCreatingPersona(false);
       setProcessingStep(0);
     } catch (error) {
@@ -518,6 +518,7 @@ const CalendarContainer = styled(animated.div)`
 
 const ChatContainer = styled(animated.div)`
 	position: absolute;
+	z-index: 3;
 	inset: -2px;
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
@@ -537,11 +538,13 @@ const ChatContainer = styled(animated.div)`
 
 const CalendarContainerActionButtons = styled.div`
 	position: absolute;
+	z-index: 2;
 	bottom: 1rem;
 	left: 1rem;
 	right: 1rem;
 	display: flex;
 	gap: 12px;
+	padding-left: 69px;
 
 	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
@@ -567,6 +570,7 @@ const MessageCircleIcon = styled.div`
 `;
 
 const MobileChatInput = styled.input`
+	border: 1px sold red;
 	padding: 0.75rem 1rem 0.75rem 3rem;
 	border-radius: ${palette.borderRadius.xxLarge};
 	background-color: rgba(31, 31, 31, 0.6);
@@ -664,11 +668,11 @@ const ProgressStep = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 	gap: 0.75rem;
 	padding: 0.5rem 0.75rem;
 	background: ${({ $isActive, $isComplete }) =>
-		$isComplete
-			? palette.colors.brand[900] + '40'
-			: $isActive
-				? palette.colors.gray[800]
-				: 'transparent'};
+    $isComplete
+      ? palette.colors.brand[900] + '40'
+      : $isActive
+        ? palette.colors.gray[800]
+        : 'transparent'};
 	border-radius: ${palette.borderRadius.medium};
 	transition: all 0.3s ease;
 `;
@@ -683,20 +687,20 @@ const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 	font-size: ${palette.typography.fontSize.xs};
 	font-weight: ${palette.typography.fontWeight.bold};
 	flex-shrink: 0;
-	
+
 	${({ $isComplete, $isActive }) =>
-		$isComplete
-			? `
+    $isComplete
+      ? `
 		background: ${palette.colors.brand[500]};
 		color: ${palette.colors.white};
 	`
-			: $isActive
-				? `
+      : $isActive
+        ? `
 		background: ${palette.colors.gray[700]};
 		color: ${palette.colors.gray[300]};
 		border: 2px solid ${palette.colors.brand[500]};
 	`
-				: `
+        : `
 		background: ${palette.colors.gray[800]};
 		color: ${palette.colors.gray[600]};
 		border: 2px solid ${palette.colors.gray[700]};
@@ -706,9 +710,9 @@ const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 const StepText = styled.span<{ $isActive: boolean; $isComplete: boolean }>`
 	font-size: ${palette.typography.fontSize.sm};
 	color: ${({ $isComplete, $isActive }) =>
-		$isComplete || $isActive ? palette.colors.gray[200] : palette.colors.gray[500]};
+    $isComplete || $isActive ? palette.colors.gray[200] : palette.colors.gray[500]};
 	font-weight: ${({ $isActive }) =>
-		$isActive ? palette.typography.fontWeight.medium : palette.typography.fontWeight.normal};
+    $isActive ? palette.typography.fontWeight.medium : palette.typography.fontWeight.normal};
 	transition: all 0.3s ease;
 `;
 

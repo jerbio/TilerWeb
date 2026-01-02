@@ -467,7 +467,7 @@ const Calendar = ({
 						setTimeout(() => {
 							swiperRef.current?.swiper.slideTo(1, 0, false);
 							setTimeout(() => (isSwiperResetting.current = false), 0);
-						}, 100);
+						}, 300);
 					}}
 					onSlidePrevTransitionStart={() => {
 						if (isSwiperResetting.current || !swiperRef.current) return;
@@ -477,7 +477,7 @@ const Calendar = ({
 						setTimeout(() => {
 							swiperRef.current?.swiper.slideTo(1, 0, false);
 							setTimeout(() => (isSwiperResetting.current = false), 0);
-						}, 100);
+						}, 300);
 					}}
 					allowTouchMove={true}
 					slidesPerView={1}
