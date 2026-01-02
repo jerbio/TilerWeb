@@ -339,7 +339,7 @@ const UserLocation: React.FC = () => {
 			setLocationData(currentLocation);
 			setCustomLocation(currentLocation.location);
 		} catch (err) {
-			console.log('Geolocation failed', err);
+			console.error('Error getting current location:', err);
 		} finally {
 			setIsLocationFetching(false);
 		}

@@ -8,6 +8,8 @@ import VideoIframeSection from '../components/home/video_iframe_section';
 import Waitlist from '../components/home/waitlist_input';
 import AppDownloadSection from '../components/home/app_download_section';
 import FAQ from '../components/home/faq_section';
+import DemoExplainerSection from '../components/home/demo_explainer_section';
+import TestimonialsSection from '../components/home/testimonials_section';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/core/common/components/SEO';
 
@@ -45,7 +47,7 @@ const Home: React.FC = () => {
 				canonicalUrl="/"
 				structuredData={structuredData}
 			/>
-			<PersonaCarousel />
+			<HeroSection />
 			<VideoIframeSection
 				src="https://www.youtube.com/embed/87RGNntLBRY"
 				title={t('home.video.title')}
@@ -54,13 +56,15 @@ const Home: React.FC = () => {
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 				waitlistSignUp={waitlistSignUp}
 			/>
-			<Waitlist />
-			<AppDownloadSection />
+			<DemoExplainerSection />
+			<PersonaCarousel />
 			<FeatureHighlightsSection />
+			<TestimonialsSection />
 			<TileCardSection />
 			<CalendarIntegrationSection />
-			<HeroSection />
 			<FAQ />
+			<Waitlist />
+			<AppDownloadSection />
 		</>
 	);
 };

@@ -15,6 +15,8 @@ import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionM
 import analytics from '@/core/util/analytics';
 import { useTranslation } from 'react-i18next';
 import Spinner from '@/core/common/components/loader';
+import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
+import { createPortal } from 'react-dom';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -37,6 +39,8 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [demoModeKey, setDemoModeKey] = useState(0); // Force re-render when demo mode changes
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const personaUserId = personaUsers[persona.id]?.userId || null;
@@ -109,8 +113,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       // Check if dev mode override is active
       if (devUserIdOverride) {
         // DEV MODE: Use the custom user ID instead of creating a new one
-        console.log('[DEV MODE] Using custom user ID:', devUserIdOverride);
-
+        
         // Set the persona user with the override ID
         setPersonaUser(persona.id, {
           userId: devUserIdOverride,
@@ -234,32 +237,89 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
     }
   }, [expanded, persona.id]);
 
+  // Listen for onboarding mobile chat open/close events
+  useEffect(() => {
+    const handleOpenMobileChat = () => {
+      setMobileChatVisible(true);
+    };
+
+    const handleCloseMobileChat = () => {
+      setMobileChatVisible(false);
+    };
+
+    window.addEventListener('onboarding-open-mobile-chat', handleOpenMobileChat);
+    window.addEventListener('onboarding-close-mobile-chat', handleCloseMobileChat);
+    return () => {
+      window.removeEventListener('onboarding-open-mobile-chat', handleOpenMobileChat);
+      window.removeEventListener('onboarding-close-mobile-chat', handleCloseMobileChat);
+    };
+  }, []);
+
+  // Trigger onboarding guide after persona creation completes
+  useEffect(() => {
+    // When persona creation finishes, check if we should show onboarding
+    if (!isCreatingPersona && expanded && personaUserId) {
+      // Check for skip parameter: add ?skipOnboarding=true to URL to force show onboarding
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceShowOnboarding = urlParams.get('skipOnboarding') === 'false' || urlParams.get('showOnboarding') === 'true';
+      
+      const hasSeenOnboarding = forceShowOnboarding ? null : localStorage.getItem('tiler_onboarding_completed');
+      
+      if (!hasSeenOnboarding && !showOnboarding) {
+        // Show onboarding guide after animation completes (give extra time for layout to fully settle)
+        const timer = setTimeout(async () => {
+          
+          // Activate demo mode before showing onboarding
+          const { activateOnboardingDemo } = await import('@/config/demo_config');
+          activateOnboardingDemo(persona.id);
+          
+          // Force re-render of PersonaCalendar and Chat to pick up demo data
+          setDemoModeKey(prev => prev + 1);
+          
+          // Wait a tick for demo mode to propagate
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Trigger onboarding guide
+          setShowOnboarding(true);
+        }, 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isCreatingPersona, expanded, personaUserId, showOnboarding, persona.id]);
+
   const content = [
     {
       key: 'calendar',
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar expandedWidth={expandedWidth} userId={personaUserId} />
-          <CalendarContainerActionButtons>
-            <MobileChatInputWrapper>
-              <MessageCircleIcon>
-                <MessageCircle size={18} />
-              </MessageCircleIcon>
-              <MobileChatInput
-                onClick={() => setMobileChatVisible(!mobileChatVisible)}
-                placeholder={t('home.expanded.mobileChatPlaceholder')}
-                readOnly
-              />
-            </MobileChatInputWrapper>
-          </CalendarContainerActionButtons>
+          <PersonaCalendar 
+            key={`calendar-${demoModeKey}`} 
+            expandedWidth={expandedWidth} 
+            userId={personaUserId} 
+          />
+          {!mobileChatVisible && (
+            <CalendarContainerActionButtons>
+              <MobileChatInputWrapper>
+                <MessageCircleIcon>
+                  <MessageCircle size={18} />
+                </MessageCircleIcon>
+                <MobileChatInput
+                  onClick={() => setMobileChatVisible(!mobileChatVisible)}
+                  placeholder={t('home.expanded.mobileChatPlaceholder')}
+                  readOnly
+                  data-onboarding-mobile-chat-input
+                />
+              </MobileChatInputWrapper>
+            </CalendarContainerActionButtons>
+          )}
         </React.Fragment>
       ),
     },
     {
       key: 'chat',
       container: ChatContainer,
-      content: <Chat onClose={() => handleClose(isDesktop)} />,
+      content: <Chat key={`chat-${demoModeKey}`} onClose={() => handleClose(isDesktop)} />,
     },
   ];
 
@@ -292,59 +352,96 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   );
 
   return (
-    <CardContainer $display={expanded} style={cardSpring} onClick={onClick}>
-      <Header>
-        <h2>{persona.name}</h2>
-        <MobileCloseButtonContainer>
-          <Button variant="ghost" height={32} onClick={() => handleClose(true)}>
-            <ChevronLeftIcon size={16} />
-            <span>Back</span>
-          </Button>
-        </MobileCloseButtonContainer>
-      </Header>
-      <CardContent>
-        {contentTransition((style, item) => (
-          <item.container style={style} key={item.key}>
-            {item.content}
-          </item.container>
-        ))}
-      </CardContent>
-
-      {/* Loading overlay for persona creation */}
-      <LoadingOverlay $visible={isCreatingPersona}>
-        <LoadingContent>
-          <Spinner />
-          <LoadingMessage>
-            <LoadingTitle>
-              {t('common.customPersonaModal.processing.title')}
-            </LoadingTitle>
-            <LoadingDescription>
-              {t('common.customPersonaModal.processing.description')}
-            </LoadingDescription>
-          </LoadingMessage>
-          <ProgressSteps>
-            {PROCESSING_STEPS.map((step, index) => {
-              const isActive = processingStep === index;
-              const isComplete = processingStep > index;
-              return (
-                <ProgressStep
-                  key={index}
-                  $isActive={isActive}
-                  $isComplete={isComplete}
-                >
-                  <StepIndicator $isActive={isActive} $isComplete={isComplete}>
-                    {isComplete ? <Check size={14} /> : index + 1}
-                  </StepIndicator>
-                  <StepText $isActive={isActive} $isComplete={isComplete}>
-                    {step.title}
-                  </StepText>
-                </ProgressStep>
-              );
-            })}
-          </ProgressSteps>
-        </LoadingContent>
-      </LoadingOverlay>
-    </CardContainer>
+    <>
+      <CardContainer 
+        $display={expanded} 
+        style={cardSpring} 
+        onClick={onClick}
+        data-persona-card-container
+      >
+        <Header>
+          <h2>{persona.name}</h2>
+          <MobileCloseButtonContainer>
+            <Button variant="ghost" height={32} onClick={() => handleClose(true)}>
+              <ChevronLeftIcon size={16} />
+              <span>Back</span>
+            </Button>
+          </MobileCloseButtonContainer>
+        </Header>
+        <CardContent>
+          {contentTransition((style, item) => (
+            <item.container style={style} key={item.key}>
+              {item.content}
+            </item.container>
+          ))}
+        </CardContent>
+        
+        {/* Loading overlay for persona creation */}
+        <LoadingOverlay $visible={isCreatingPersona}>
+          <LoadingContent>
+            <Spinner />
+            <LoadingMessage>
+              <LoadingTitle>{t('common.customPersonaModal.processing.title')}</LoadingTitle>
+              <LoadingDescription>
+                {t('common.customPersonaModal.processing.description')}
+              </LoadingDescription>
+            </LoadingMessage>
+            <ProgressSteps>
+              {PROCESSING_STEPS.map((step, index) => {
+                const isActive = processingStep === index;
+                const isComplete = processingStep > index;
+                return (
+                  <ProgressStep key={index} $isActive={isActive} $isComplete={isComplete}>
+                    <StepIndicator $isActive={isActive} $isComplete={isComplete}>
+                      {isComplete ? <Check size={14} /> : index + 1}
+                    </StepIndicator>
+                    <StepText $isActive={isActive} $isComplete={isComplete}>
+                      {step.title}
+                    </StepText>
+                  </ProgressStep>
+                );
+              })}
+            </ProgressSteps>
+          </LoadingContent>
+        </LoadingOverlay>
+      </CardContainer>
+      
+      {/* Onboarding guide - rendered as portal to document.body to avoid z-index issues */}
+      {createPortal(
+        <OnboardingGuide
+          isVisible={showOnboarding}
+          onComplete={async () => {
+            // Deactivate demo mode
+            const { deactivateOnboardingDemo } = await import('@/config/demo_config');
+            deactivateOnboardingDemo();
+            
+            // Force re-render to switch back to real data
+            setDemoModeKey(prev => prev + 1);
+            
+            localStorage.setItem('tiler_onboarding_completed', 'true');
+            setShowOnboarding(false);
+            analytics.trackPersonaEvent('Onboarding Completed', {
+              personaId: persona.id,
+            });
+          }}
+          onSkip={async () => {
+            // Deactivate demo mode
+            const { deactivateOnboardingDemo } = await import('@/config/demo_config');
+            deactivateOnboardingDemo();
+            
+            // Force re-render to switch back to real data
+            setDemoModeKey(prev => prev + 1);
+            
+            localStorage.setItem('tiler_onboarding_completed', 'true');
+            setShowOnboarding(false);
+            analytics.trackPersonaEvent('Onboarding Skipped', {
+              personaId: persona.id,
+            });
+          }}
+        />,
+        document.body
+      )}
+    </>
   );
 };
 

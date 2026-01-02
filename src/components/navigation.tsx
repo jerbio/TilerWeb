@@ -195,17 +195,17 @@ const Navigation: React.FC = () => {
       isOnHomePage: window.location.pathname === '/',
     });
 
-    setIsModalOpen(true);
     setIsOpen(false); // Close mobile menu if open
     
-    // If on home page, dispatch event to focus on custom persona in carousel
-    if (window.location.pathname === '/') {
-      window.dispatchEvent(new CustomEvent('focusCustomPersona'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Redirect to sign in page
+    window.location.href = '/signin';
   }
 
   function handleModalClose() {
+    analytics.trackEvent('Modal', 'Close', 'Custom Persona Modal', undefined, {
+      location: 'Navigation',
+    });
+    
     setIsModalOpen(false);
     
     // Dispatch event to re-enable carousel
@@ -217,6 +217,12 @@ const Navigation: React.FC = () => {
   async function handleModalSubmit(description: string, audioFile?: Blob) {
     // Keep modal open with spinner while API processes
     // The modal's isSubmitting state will show the spinner
+    
+    analytics.trackEvent('Modal', 'Submit', 'Custom Persona Modal', undefined, {
+      hasAudio: !!audioFile,
+      descriptionLength: description.length,
+      location: 'Navigation',
+    });
     
     // If there's an audio file or description, send it to the backend
     try {
@@ -271,7 +277,16 @@ const Navigation: React.FC = () => {
             <NavItems>
               {navLinks.map((link) => (
                 <NavItem key={link.name}>
-                  <NavLink href={link.href}>{link.name}</NavLink>
+                  <NavLink 
+                    href={link.href}
+                    onClick={() => {
+                      analytics.trackNavigation(link.href, 'Desktop Navigation', {
+                        linkName: link.name,
+                      });
+                    }}
+                  >
+                    {link.name}
+                  </NavLink>
                 </NavItem>
               ))}
             </NavItems>
@@ -296,7 +311,16 @@ const Navigation: React.FC = () => {
         <MobileNav $isopen={isOpen} $shrink={!isAtTop}>
           <MobileNavLinks $shrink={!isAtTop}>
             {navLinks.map((link) => (
-              <NavLink key={link.name} href={link.href}>
+              <NavLink 
+                key={link.name} 
+                href={link.href}
+                onClick={() => {
+                  analytics.trackNavigation(link.href, 'Mobile Navigation', {
+                    linkName: link.name,
+                  });
+                  setIsOpen(false);
+                }}
+              >
                 {link.name}
               </NavLink>
             ))}
@@ -314,9 +338,12 @@ const Navigation: React.FC = () => {
           <Button
             height={40}
             variant="secondary"
-            onClick={() =>
-              window.open('https://tiler.app/?waitlistSignUp=true', '_blank')
-            }
+            onClick={() => {
+              analytics.trackButtonClick('Sign Up', 'Mobile Navigation', {
+                destination: 'https://tiler.app/?waitlistSignUp=true',
+              });
+              window.open('https://tiler.app/?waitlistSignUp=true', '_blank');
+            }}
             size="small"
           >
             {t('common.buttons.signUp')}
