@@ -454,7 +454,7 @@ const Calendar = ({
 			))}
 
 			{/* Calendar Content */}
-			<CalendarContentContainer id="calendar-content-container" ref={contentContainerRef}>
+			<CalendarContentContainer id="calendar-content-container" ref={contentContainerRef} data-onboarding-calendar-view>
 				<Swiper
 					loop={false}
 					ref={swiperRef}
