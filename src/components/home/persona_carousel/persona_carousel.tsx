@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
@@ -13,6 +13,7 @@ import { Persona } from '../../../core/common/types/persona';
 import usePersonaUsers from '../../../core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
 import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
+import analytics from '@/core/util/analytics';
 
 const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 	position: relative;
@@ -53,6 +54,8 @@ const PersonaCarousel: React.FC = () => {
   
   // Swiper refs and responsive state
   const swiperRef = React.useRef<SwiperRef | null>(null);
+  const carouselSectionRef = useRef<HTMLElement>(null);
+  const hasTrackedView = useRef(false);
   const isMobile = useIsMobile();
   const isTablet = useIsMobile(1100);
   const [slidesPerView, setSlidesPerView] = useState(1);
@@ -84,6 +87,35 @@ const PersonaCarousel: React.FC = () => {
       console.error("Couldn't populate carousel: ", error);
     }
   }
+
+	// Track when carousel scrolls into view
+  useEffect(() => {
+    if (!carouselSectionRef.current || hasTrackedView.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasTrackedView.current) {
+            analytics.trackEvent('Carousel', 'Scrolled Into View', 'Persona Carousel', undefined, {
+              personasCount: personas.length,
+              personasLoaded,
+            });
+            hasTrackedView.current = true;
+          }
+        });
+      },
+      {
+        threshold: 0.3, // Trigger when 30% of the carousel is visible
+        rootMargin: '0px',
+      }
+    );
+
+    observer.observe(carouselSectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [personas.length, personasLoaded]);
 
 	useEffect(() => {
 		// Update persona names when personaUsers change
@@ -296,7 +328,7 @@ const PersonaCarousel: React.FC = () => {
   };
 
   return (
-    <Section paddingBlock={0} width={2000}>
+    <Section id="persona-carousel" paddingBlock={0} width={2000} ref={carouselSectionRef}>
       <EdgeFadeSwiper
         ref={swiperRef}
         modules={[Autoplay]}

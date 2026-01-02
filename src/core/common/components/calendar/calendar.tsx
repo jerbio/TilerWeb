@@ -358,7 +358,7 @@ const Calendar = ({
 						<ChevronRightIcon size={16} />
 					</ChangeViewButton>
 				</CalendarHeaderActions>
-				<CalendarHeaderDateList ref={viewRef}>
+				<CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
 					{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
 						const day = viewOptions.startDay.add(index, 'day');
 						const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
@@ -454,7 +454,7 @@ const Calendar = ({
 			))}
 
 			{/* Calendar Content */}
-			<CalendarContentContainer id="calendar-content-container" ref={contentContainerRef}>
+			<CalendarContentContainer id="calendar-content-container" ref={contentContainerRef} data-onboarding-calendar-view>
 				<Swiper
 					loop={false}
 					ref={swiperRef}
