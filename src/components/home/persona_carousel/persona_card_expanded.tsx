@@ -518,7 +518,7 @@ const CalendarContainer = styled(animated.div)`
 
 const ChatContainer = styled(animated.div)`
 	position: absolute;
-z-index: 3;
+	z-index: 3;
 	inset: -2px;
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
