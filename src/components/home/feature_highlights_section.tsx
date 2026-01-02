@@ -66,22 +66,22 @@ const FeatureHighlightsSection: React.FC = () => {
 
 	const highlights: Highlight[] = [
 		{
+			subHeader: t('home.features.conversation.subtitle'),
+			header: t('home.features.conversation.title'),
+			body: t('home.features.conversation.description'),
+			backgroundImage: TilesBackground,
+		},
+		{
 			subHeader: t('home.features.transit.subtitle'),
 			header: t('home.features.transit.title'),
 			body: t('home.features.transit.description'),
 			backgroundImage: MountainBackground,
 		},
 		{
-			subHeader: t('home.features.forecast.subtitle'),
-			header: t('home.features.forecast.title'),
-			body: t('home.features.forecast.description'),
+			subHeader: t('home.features.adaptive.subtitle'),
+			header: t('home.features.adaptive.title'),
+			body: t('home.features.adaptive.description'),
 			backgroundImage: FitnessBackground,
-		},
-		{
-			subHeader: t('home.features.suggestions.subtitle'),
-			header: t('home.features.suggestions.title'),
-			body: t('home.features.suggestions.description'),
-			backgroundImage: TilesBackground,
 		},
 		{
 			subHeader: t('home.features.location.subtitle'),
@@ -94,8 +94,8 @@ const FeatureHighlightsSection: React.FC = () => {
 	return (
 		<Section>
 			<SectionHeaders
-				headerText="Feature Highlights"
-				subHeaderText="Simplify your life with Tiler, Here's what we can do to help you."
+				headerText={t('home.featureHighlights.title')}
+				subHeaderText={t('home.featureHighlights.subtitle')}
 				align="center"
 			/>
 			<HighlightCardWrapper>

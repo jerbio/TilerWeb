@@ -1,0 +1,461 @@
+{
+		"common": {
+		"onboarding": {
+			"guide": {
+				"skip": "Überspringen",
+				"next": "Weiter",
+				"prev": "Zurück",
+				"done": "Verstanden!",
+				"steps": {
+					"mobile-open-chat": {
+						"title": "Chat öffnen",
+						"description": "Tippen Sie auf diese Schaltfläche, um die Chat-Oberfläche zu öffnen, in der Sie mit Tiler über Ihren Zeitplan sprechen können."
+					},
+					"chat": {
+						"title": "Beginnen Sie mit einem Gespräch",
+						"description": "Geben Sie auf einfache Weise ein, was Sie tun müssen. Versuchen Sie: \"Mittagessen mit Sarah morgen um 12 Uhr in der Innenstadt.\""
+					},
+					"ai": {
+						"title": "KI schlägt einen Zeitplan vor",
+						"description": "Tiler stellt bei Bedarf klärende Fragen, berechnet die Reisezeit und schlägt vor, wann Sie Ihre Aufgabe planen sollten."
+					},
+					"confirm": {
+						"title": "Überprüfen und Bestätigen",
+						"description": "Überprüfen Sie den vorgeschlagenen Zeitplan. Klicken Sie auf \"Änderungen übernehmen\", um ihn Ihrem Kalender hinzuzufügen, oder passen Sie ihn nach Bedarf an."
+					},
+					"calendar": {
+						"title": "Sehen Sie Ihren intelligenten Zeitplan",
+						"description": "Ihre Aufgabe wird im Kalender mit der Reisezeit angezeigt. Tiler passt sich automatisch an, wenn sich etwas ändert."
+					}
+				}
+			}
+		},
+		"buttons": {
+			"getStarted": "Starten Sie mit Tiler",
+			"explore": "Erkunden",
+			"subscribe": "Abonnieren",
+			"tryFree": "Tiler kostenlos testen",
+			"signUp": "Anmelden",
+			"back": "Zurück",
+			"createSchedule": "Zeitplan erstellen",
+			"creating": "Erstellt...",
+			"cancel": "Abbrechen"
+		},
+		"navigation": {
+			"home": "Startseite",
+			"features": "Funktionen",
+			"waitlist": "Warteliste"
+		},
+		"voiceInput": {
+			"listening": "Hören...",
+			"transcribing": "Transkribieren...",
+			"startRecording": "Spracheingabe starten",
+			"stopRecording": "Aufnahme stoppen",
+			"playRecording": "Aufnahme abspielen",
+			"pauseRecording": "Aufnahme anhalten",
+			"deleteRecording": "Aufnahme löschen"
+		},
+		"customPersonaModal": {
+			"title": "Erstellen Sie Ihren individuellen Zeitplan",
+			"description": "Erzählen Sie uns von sich und welche Art von Zeitplan Sie benötigen. Wir helfen Ihnen, einen personalisierten Zeitplan zu erstellen, der zu Ihrem Lebensstil passt.",
+			"placeholders": {
+				"healthcare": "Ich bin ein Angehöriger der Gesundheitsberufe und arbeite 12-Stunden-Schichten...",
+				"student": "Ich bin ein Student, der Kurse, Lernzeit und außerschulische Aktivitäten unter einen Hut bringt...",
+				"engineer": "Ich bin ein Software-Ingenieur, der abends besser programmieren kann...",
+				"parent": "Ich bin ein Elternteil, das Arbeit, das Abholen der Kinder von der Schule und die Familienzeit unter einen Hut bringt...",
+				"freelancer": "Ich bin ein Freiberufler, der mehrere Kunden und Fristen verwaltet...",
+				"fitness": "Ich bin ein Fitness-Enthusiast, der morgens Trainingszeit benötigt...",
+				"remote": "Ich bin ein Remote-Mitarbeiter in verschiedenen Zeitzonen...",
+				"business": "Ich bin ein Kleinunternehmer mit unregelmäßigen Arbeitszeiten..."
+			},
+			"processing": {
+				"title": "Ihren Zeitplan erstellen",
+				"description": "Bitte warten Sie, während wir alles für Sie einrichten...",
+				"creatingUser": "Benutzer erstellen",
+				"creatingUserDesc": "Einrichten Ihres personalisierten Profils...",
+				"generatingProfile": "Zeitplanprofil generieren",
+				"generatingProfileDesc": "Analyse Ihrer Vorlieben und Anforderungen...",
+				"generatingTiles": "Kacheln generieren",
+				"generatingTilesDesc": "Erstellen aller notwendigen Zeitplanblöcke...",
+				"optimizing": "Optimieren & Speichern",
+				"optimizingDesc": "Finden der besten Anordnung und Speichern Ihres Zeitplans..."
+			}
+		},
+		"copyright": "© {{year}} Tiler. Alle Rechte vorbehalten.",
+		"social": {
+			"facebook": "Facebook",
+			"linkedin": "LinkedIn",
+			"instagram": "Instagram",
+			"x": "X (Twitter)"
+		},
+		"apps": {
+			"ios": {
+				"cta": "Im App Store herunterladen",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "Bei Google Play holen",
+				"platform": "Android Play Store"
+			}
+		},
+		"legal": {
+			"title": "Rechtliches",
+			"terms": "Nutzungsbedingungen",
+			"privacy": "Datenschutz"
+		},
+		"partners": {
+			"title": "Partner",
+			"founderUniversity": "Founder University"
+		},
+		"consent": {
+			"banner": {
+				"title": "Wir schätzen Ihre Privatsphäre",
+				"description": "Wir verwenden Cookies und ähnliche Technologien, um Ihre Erfahrung zu verbessern, die Nutzung der Website zu analysieren und unsere Marketingbemühungen zu unterstützen. Indem Sie auf \"Alle akzeptieren\" klicken, stimmen Sie unserer Verwendung von Analysen und Tracking zu.",
+				"learnMore": "Erfahren Sie mehr",
+				"buttons": {
+					"acceptAll": "Alle akzeptieren",
+					"rejectAll": "Alle ablehnen",
+					"customize": "Anpassen"
+				},
+				"close": "Schließen"
+			},
+			"modal": {
+				"title": "Datenschutzeinstellungen",
+				"description": "Verwalten Sie Ihre Cookie-Einstellungen. Sie können unten verschiedene Arten von Cookies aktivieren oder deaktivieren.",
+				"categories": {
+					"necessary": {
+						"title": "Notwendige Cookies",
+						"description": "Unerlässlich für die ordnungsgemäße Funktion der Website. Diese können nicht deaktiviert werden."
+					},
+					"analytics": {
+						"title": "Analyse-Cookies",
+						"description": "Helfen uns zu verstehen, wie Besucher mit unserer Website interagieren, indem sie Informationen sammeln und melden."
+					},
+					"marketing": {
+						"title": "Marketing-Cookies",
+						"description": "Werden verwendet, um Besucher über Websites hinweg zu verfolgen, um relevante Werbung anzuzeigen."
+					},
+					"preferences": {
+						"title": "Präferenz-Cookies",
+						"description": "Ermöglichen es der Website, Ihre Auswahl zu speichern und erweiterte Funktionen bereitzustellen."
+					}
+				},
+				"buttons": {
+					"save": "Einstellungen speichern",
+					"cancel": "Abbrechen",
+					"acceptAll": "Alle akzeptieren",
+					"rejectAll": "Alle ablehnen"
+				}
+			},
+			"footer": {
+				"cookieSettings": "Cookie-Einstellungen"
+			}
+		}
+	},
+	"home": {
+		"demoExplainer": {
+			"title": "Sehen Sie Tiler in Aktion",
+			"subtitle": "Probieren Sie es jetzt aus — keine Anmeldung erforderlich. Wählen Sie unten eine Persona aus, um zu erleben, wie Tiler natürliche Gespräche in einen intelligenten, anpassungsfähigen Zeitplan umwandelt.",
+			"badge": "Interaktive Demo"
+		},
+		"persona": {
+			"created": "Profil",
+			"customCreated": "Benutzerdefiniertes Profil",
+			"cta": {
+				"create": "Profil erstellen",
+				"view": "Profil anzeigen"
+			},
+			"expiresIn": "{{time}} verbleibend",
+			"tileSuggestions": "Kacheln",
+			"custom": {
+				"namePlaceholder": "Neues Profil"
+			}
+		},
+		"expanded": {
+			"mobileChatPlaceholder": "Chatten Sie mit Ihrem Kalender, um zu aktualisieren...",
+			"chat": {
+				"newChat": "Neuer Chat",
+				"clearSession": "Sitzung löschen",
+				"title": "Was möchten Sie tun?",
+				"subtitle": "Beschreiben Sie eine Aufgabe, wir kümmern uns um die Kachelung.",
+				"inputPlaceholder": "Sagen Sie Tiler, was Sie tun...",
+				"loadingMessages": "Chat-Nachrichten werden geladen...",
+				"loadingActions": "Weitere Aktionen werden geladen...",
+				"error": "Fehler",
+				"emptyStateTitle": "Was möchten Sie tun?",
+				"emptyStateDescription": "Beschreiben Sie eine Aufgabe, wir kümmern uns um die Kachelung.",
+				"sendingRequest": "Anfrage wird gesendet...",
+				"acceptChanges": "Änderungen übernehmen",
+				"errorLoadMessages": "Fehler beim Laden der Chat-Nachrichten",
+				"errorSendMessage": "Fehler beim Senden der Nachricht",
+				"errorAcceptChanges": "Fehler beim Übernehmen der Änderungen",
+				"userLocation": {
+					"anonymous": "Anonym",
+					"enterLocation": "Geben Sie Ihren Standort ein",
+					"default": "Standard",
+					"saving": "Speichern...",
+					"save": "Speichern",
+					"gettingCurrentLocation": "Ihren aktuellen Standort abrufen...",
+					"gettingLocation": "Standort abrufen...",
+					"resetToDefault": "Auf Standard zurücksetzen",
+					"locationBenefitMessage": "Die Angabe Ihres tatsächlichen Standorts hilft uns, relevantere Kacheln zu erstellen und Ihre Erfahrung mit personalisierten Zeitplanvorschlägen zu verbessern.",
+					"usingDefaultLocation": "Standardstandort wird verwendet - Klicken Sie auf das Symbol, um Ihren aktuellen Standort abzurufen.",
+					"clickIconToGetLocation": "Klicken Sie auf das Symbol, um Ihren aktuellen Standort abzurufen oder Ihren Standort zu bearbeiten"
+				},
+				"errorPopup": {
+					"chatLimitReached": "Chat-Limit erreicht",
+					"headerText": "Möchten Sie mehr als 20 Eingabeaufforderungen?",
+					"altText": "Chat-Oberflächen-Illustration",
+					"description": "Erhalten Sie frühzeitigen Zugriff auf unbegrenzte Chats, intelligente Integrationen und das volle Tiler-Erlebnis.",
+					"emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+					"submitEmail": "E-Mail senden",
+					"joinWaitlist": "Der Warteliste beitreten",
+					"submitting": "Wird gesendet...",
+					"subtext": "Die Plätze sind begrenzt – Sichern Sie sich jetzt Ihren.",
+					"close": "Schließen",
+					"errors": {
+						"emailRequired": "E-Mail ist erforderlich",
+						"emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+						"submitFailed": "Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut."
+					}
+				},
+				"emailConfirmation": {
+					"header": "Überprüfen Sie Ihre E-Mails!",
+					"message": "Wir haben einen Bestätigungslink an <strong>{{email}}</strong> gesendet.",
+					"messageContinued": "Klicken Sie auf den Link, um unbegrenzte Chats mit Tiler freizuschalten.",
+					"button": "Verstanden",
+					"footer": "Haben Sie die E-Mail nicht erhalten? Überprüfen Sie Ihren Spam-Ordner oder versuchen Sie es erneut."
+				}
+			}
+		},
+		"waitlist": {
+			"title": "Der Warteliste beitreten",
+			"subtitle": "Seien Sie unter den Ersten, die die leistungsstarken Planungsfunktionen von Tiler erleben.",
+			"emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+			"submit": "Warteliste beitreten",
+			"success": "Danke für Ihre Teilnahme! Wir benachrichtigen Sie, wenn Tiler fertig ist.",
+			"error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+		},
+		"hero": {
+			"title": "Ihr KI-gestützter Tagesarchitekt",
+			"subtitle": "Beschreiben Sie einfach, was Sie tun müssen, und Tiler erstellt automatisch einen intelligenten, standortbezogenen Zeitplan, der sich anpasst, wenn sich das Leben ändert.",
+			"features": {
+				"natural": "Planung in natürlicher Sprache",
+				"adaptive": "Passt sich automatisch an Änderungen an",
+				"travel": "Intelligente Reisezeitberechnung"
+			},
+			"scenarios": {
+				"lunch": {
+					"calendarTitle": "Mittwoch, 13. November",
+					"messages": {
+						"userRequest": "Mittagessen mit Sarah morgen um 12 Uhr in der Innenstadt",
+						"aiResponse1": "Ich plane das Mittagessen mit Sarah für morgen (Mittwoch) um 12:00 Uhr in der Innenstadt. Sie sind derzeit zu Hause. Soll ich 25 Minuten Reisezeit hinzufügen?",
+						"userConfirm": "Ja, Reisezeit hinzufügen",
+						"aiConfirm": "Perfekt! Ich habe das Ereignis mit Reisezeitpuffer hinzugefügt. ✓"
+					},
+					"tiles": {
+						"travel": "Reise in die Innenstadt",
+						"travelTime": "25 Min. Fahrt",
+						"lunch": "Mittagessen mit Sarah"
+					}
+				},
+				"errands": {
+					"calendarTitle": "Freitag, 15. November",
+					"messages": {
+						"userRequest": "Ich muss heute Lebensmittel einkaufen und ins Fitnessstudio gehen",
+						"aiResponse1": "Ich kann das für Sie planen. Welche Zeit passt am besten? Ihr Kalender ist von 16-19 Uhr frei.",
+						"userConfirm": "Nach 17 Uhr passt",
+						"aiConfirm": "Großartig! Ich plane den Einkauf um 17:00 Uhr (30 Min.), dann das Fitnessstudio um 18:00 Uhr (1 Stunde). Hinzugefügt! ✓"
+					},
+					"tiles": {
+						"groceries": "Lebensmitteleinkauf",
+						"travel": "Reise zum Fitnessstudio",
+						"travelTime": "12 Min. Fahrt",
+						"gym": "Fitnessstudio-Training"
+					}
+				},
+				"client": {
+					"calendarTitle": "Montag, 18. November",
+					"messages": {
+						"userRequest": "Kundentermin mit John nächsten Montag um 14 Uhr in seinem Büro vereinbaren",
+						"aiResponse1": "Ich füge den Kundentermin mit John für Montag um 14:00 Uhr in seinem Büro hinzu. Das ist eine 35-minütige Fahrt von Ihrem aktuellen Standort. Soll ich vorher Zeit blockieren?",
+						"userConfirm": "Ja, bitte",
+						"aiConfirm": "Erledigt! Reisezeit und Termin wurden Ihrem Kalender hinzugefügt. ✓"
+					},
+					"tiles": {
+						"travel": "Reise zum Kundenbüro",
+						"travelTime": "35 Min. Fahrt",
+						"meeting": "Kundentermin - John"
+					}
+				},
+				"dentist": {
+					"calendarTitle": "Donnerstag, 14. November",
+					"messages": {
+						"userRequest": "Ich habe morgen um 9 Uhr einen Zahnarzttermin und muss dann von zu Hause aus arbeiten",
+						"aiResponse1": "Verstanden! Ich füge Ihren Zahnarzttermin um 9:00 Uhr hinzu (angenommen 1 Stunde). Die Rückfahrt nach Hause dauert 15 Minuten. Soll ich danach eine Tiefenarbeitssitzung planen?",
+						"userConfirm": "Ja, blockieren Sie 3 Stunden für konzentrierte Arbeit",
+						"aiConfirm": "Perfekt! Ihr Morgen ist mit Reisezeit geplant. ✓"
+					},
+					"tiles": {
+						"dentist": "Zahnarzttermin",
+						"travel": "Reise nach Hause",
+						"travelTime": "15 Min. Fahrt",
+						"deepWork": "Tiefenarbeitssitzung"
+					}
+				}
+			}
+		},
+		"video": {
+			"title": "YouTube-Videoplayer"
+		},
+		"updates": {
+			"title": "Erhalten Sie die neuesten Tiler-Nachrichten und -Updates",
+			"subtitle": "Möchten Sie mehr aus Ihrem Zeitplan herausholen? Abonnieren Sie Tipps, Tricks und Updates direkt in Ihrem Posteingang.",
+			"emailPlaceholder": "Ihre E-Mail-Adresse..."
+		},
+		"integration": {
+			"title": "Integrieren Sie mit Ihren Favoriten",
+			"spanText": "Kalendern",
+			"subtitle": "Diese Apps sind verfügbar, um sich nahtlos in Tiler zu integrieren."
+		},
+		"featureHighlights": {
+			"title": "Funktionshighlights",
+			"subtitle": "Vereinfachen Sie Ihr Leben mit Tiler. Hier ist, was wir tun können, um Ihnen zu helfen."
+		},
+		"features": {
+			"conversation": {
+				"subtitle": "SPRECHEN SIE EINFACH DAMIT",
+				"title": "Planung in natürlicher Sprache",
+				"description": "Sagen Sie Tiler auf einfache Weise, was Sie tun müssen. Die KI stellt Folgefragen, schlägt intelligente Zeitpläne vor und wartet auf Ihre Bestätigung – kein Drag-and-Drop erforderlich."
+			},
+			"transit": {
+				"subtitle": "OPTIMIEREN SIE IHREN TAG",
+				"title": "Intelligente Reisezeit",
+				"description": "Tiler fügt automatisch realistische Reisedauern zwischen Standorten ein und passt Ihre Zeitleiste an, wenn sich etwas ändert – damit Sie nie zu spät kommen."
+			},
+			"adaptive": {
+				"subtitle": "BLEIBT SYNCHRON",
+				"title": "Adaptive Intelligenz",
+				"description": "Wenn das Leben einen Strich durch die Rechnung macht, plant Tiler widersprüchliche Aufgaben neu und findet die nächstbeste Zeit – automatisch."
+			},
+			"location": {
+				"subtitle": "DATENSCHUTZ AN ERSTER STELLE",
+				"title": "Standortbewusstsein",
+				"description": "Verwenden Sie allgemeine Bezeichnungen wie 'Zuhause' oder 'Arbeit' anstelle von spezifischen Adressen. Tiler berechnet die Reisezeit, ohne Ihre persönlichen Daten übermäßig preiszugeben."
+			}
+		},
+		"faq": {
+			"items": {
+				"whatIsTiler": {
+					"question": "Was ist Tiler und wie funktioniert es?",
+					"answer": "Tiler ist kein Kalender, sondern eine KI-gestützte Planungs-App, die nicht nur Ihre Aufgaben verwaltet, sondern auch Ihre Zeit optimiert. Sie erstellt intelligente, flexible Zeitpläne mit AutoTiles, die sich anpassen, wenn sich Ihr Tag ändert, und ermöglicht es Ihnen gleichzeitig, nicht verhandelbare Aufgaben mit Blöcken zu fixieren."
+				},
+				"differentFromCalendar": {
+					"question": "Wie unterscheidet sich Tiler von Google Kalender oder anderen Kalender-Apps?",
+					"answer": "Im Gegensatz zu statischen Kalendern ist Tiler Ihr KI-Planungsassistent. Sagen Sie ihm einfach auf einfache Weise, was Sie tun müssen – er stellt klärende Fragen, berechnet die Reisezeit zwischen Standorten und schlägt einen vollständigen Zeitplan vor. Wenn sich das Leben ändert, passt Tiler Ihre Zeitleiste automatisch an. Sie bestätigen Änderungen, bevor sie vorgenommen werden, sodass Sie die Kontrolle behalten."
+				},
+				"aiAccuracy": {
+					"question": "Kann ich der KI vertrauen, meine Aufgaben korrekt zu planen?",
+					"answer": "Tiler verwendet einen Bestätigungs-Ansatz – er schlägt Zeitpläne vor und wartet auf Ihre Genehmigung, bevor Änderungen vorgenommen werden. Die KI lernt Ihre Muster im Laufe der Zeit und wird bei Dauern, Standorten und Vorlieben immer intelligenter. Sie können jede Anregung jederzeit rückgängig machen oder anpassen."
+				},
+				"locationPrivacy": {
+					"question": "Sind meine Standortdaten privat? Wie verwendet Tiler sie?",
+					"answer": "Tiler respektiert Ihre Privatsphäre. Sie können allgemeine Bezeichnungen wie 'Zuhause', 'Arbeit' oder 'lokales Café' anstelle von spezifischen Adressen verwenden. Standortdaten werden nur zur Berechnung realistischer Reisezeiten zwischen Aufgaben verwendet, um sicherzustellen, dass Ihr Zeitplan die realen Gegebenheiten berücksichtigt. Ihre Daten werden niemals weitergegeben oder verkauft."
+				},
+				"calendarIntegration": {
+					"question": "Warum muss ich meinen Kalender integrieren?",
+					"answer": "Die Integration Ihres Kalenders mit Tiler ermöglicht es Ihnen, alle Ihre Aufgaben, Ereignisse und Zeitpläne an einem Ort zu sehen. Kein Jonglieren mehr mit mehreren Apps oder das Risiko von Doppelbuchungen – Tiler synchronisiert alles automatisch und optimiert Ihren Tag für maximale Produktivität."
+				},
+				"multipleCalendars": {
+					"question": "Kann ich mehrere Kalender in mein Tiler-Konto integrieren?",
+					"answer": "Ja! Sie können mehrere Kalender in Ihr Tiler-Konto integrieren. Auf diese Weise sind alle Ihre Ereignisse und Aufgaben an einem Ort."
+				},
+				"tileVsBlock": {
+					"question": "Was ist der Unterschied zwischen einer Kachel und einem Block?",
+					"answer": "Kacheln sind flexible Aufgaben, die Tiler automatisch plant und an Ihre Verfügbarkeit anpasst. Blöcke sind feste Aufgaben, die genau dort bleiben, wo Sie sie festlegen – perfekt für Besprechungen oder Aufgaben, die nicht verschoben werden können."
+				},
+				"tileShare": {
+					"question": "Wie funktioniert TileShare?",
+					"answer": "Mit TileShare können Sie Aufgaben mit anderen teilen – Freunden, Familie, Teamkollegen –, damit jeder weiß, was zu tun ist und wer dafür verantwortlich ist. Weisen Sie Aufgaben zu, verfolgen Sie den Fortschritt und synchronisieren Sie Zeitpläne mühelos."
+				},
+				"missedTask": {
+					"question": "Was ist, wenn ich eine Aufgabe verpasse oder neu planen muss?",
+					"answer": "Keine Sorge! Die Defer-Funktion von Tiler findet automatisch die nächstbeste Zeit, um eine verpasste Aufgabe zu erledigen. Sie können auch manuell mit einem einfachen Drag-and-Drop neu planen."
+				},
+				"habitTracking": {
+					"question": "Kann Tiler beim Gewohnheitstracking helfen?",
+					"answer": "Ja! Sie können Tiler verwenden, um tägliche Gewohnheiten zu planen und zu verfolgen. Tiler passt sie automatisch in Ihren Zeitplan ein, damit Sie konsequent bleiben."
+				},
+				"transitFeature": {
+					"question": "Wie kann ich die Transit-Funktion nutzen?",
+					"answer": "Die Transit-Funktion geht über die reine Berechnung der Reisezeit hinaus – sie fungiert als Ihr Navigationsassistent. Sie hilft Ihnen bei der Routenplanung, schlägt die besten Verkehrsmittel vor und liefert Echtzeit-Wegbeschreibungen für nahtlose Übergänge zwischen Aufgaben und Standorten. Tippen Sie einfach auf das Reisesymbol, um sofortige Navigation zu erhalten und sicherzustellen, dass Sie immer pünktlich und auf dem richtigen Weg sind."
+				}
+			}
+		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "Treten Sie der",
+			"part2": "Tiler Chat",
+			"part3": "Warteliste noch heute bei"
+		},
+		"subtitle": "Hören Sie auf, Ihren Kalender zu verwalten, fangen Sie an, mit ihm zu sprechen. Melden Sie sich für die Warteliste an und seien Sie der Erste, der mit der Zeit im Einklang ist",
+		"form": {
+			"errors": {
+				"integrations": "Bitte fügen Sie mindestens eine Kalenderintegration hinzu."
+			},
+			"joinWaitlist": "Warteliste beitreten",
+			"nextStep": "Weiter",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "E-Mail",
+					"label": "E-Mail-Adresse",
+					"placeholder": "E-Mail-Adresse"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "Beruf",
+					"label": "Was machen Sie beruflich?",
+					"placeholder": "Beruf",
+					"suggestions": [
+						"Medizinischer Fachangestellter",
+						"Vertriebsprofi",
+						"Softwareentwickler",
+						"Kundenberater",
+						"Auftragnehmer",
+						"Startup-Gründer",
+						"Forscher",
+						"Student",
+						"Dozent",
+						"Reiseberater"
+					]
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "Integrationen",
+					"label": "Welche Integrationen verwenden Sie?",
+					"placeholder": "z.B. Google Kalender, Outlook, Apple Kalender",
+					"options": [
+						{ "value": "google", "label": "Google Kalender" },
+						{ "value": "outlook", "label": "Microsoft Outlook Kalender" },
+						{ "value": "apple", "label": "Apple Kalender" },
+						{ "value": "slack", "label": "Slack" },
+						{ "value": "monday", "label": "Monday.com" },
+						{ "value": "reclaim", "label": "Reclaim" },
+						{ "value": "notion", "label": "Notion" },
+						{ "value": "ticktick", "label": "TickTick" },
+						{ "value": "evernote", "label": "Evernote" },
+						{ "value": "oneNote", "label": "OneNote" }
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "Anwendungsfall",
+					"label": "Wofür möchten Sie Tiler Chat verwenden?",
+					"placeholder": "z.B. Terminplanung, Aufgabenverwaltung"
+				}
+			}
+		}
+	}
+}
