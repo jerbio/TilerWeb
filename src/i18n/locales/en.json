@@ -618,7 +618,24 @@
 			"tilePreferences": {
 				"title": "Tile Preferences",
 				"description": "Define how you move around and help Tiler understand your daily time patterns",
-				"placeholder": "Tile preferences settings coming soon..."
+				"placeholder": "Tile preferences settings coming soon...",
+				"howMoveAround": "How do you move around?",
+				"byBike": "By bike",
+				"iDrive": "I drive",
+				"byBus": "By Bus",
+				"defineTimeRestrictions": "Define your time restrictions",
+				"myWorkHours": "My Work Hours",
+				"myPersonalHours": "My Personal Hours",
+				"setBlockOutHours": "Set your block out hours",
+				"bedTime": "Bed Time",
+				"useCustom": "Use custom",
+				"customTimeRestrictions": "Custom time restrictions",
+				"reset": "Reset",
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"saveSuccess": "Tile preferences updated successfully",
+				"saveError": "Failed to save changes. Please try again.",
+				"customSaved": "Custom time restrictions saved"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",
@@ -632,7 +649,13 @@
 			"notificationPreferences": {
 				"title": "Notification Preferences",
 				"description": "Manage reminders and email updates",
-				"placeholder": "Notification settings coming soon..."
+				"placeholder": "Notification settings coming soon...",
+				"tileReminders": "Tile Reminders",
+				"emailNotifications": "Email Notifications",
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"saveSuccess": "Notification preferences updated successfully",
+				"saveError": "Failed to save changes. Please try again."
 			},
 			"connections": {
 				"title": "Connections",
