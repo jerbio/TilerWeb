@@ -34,7 +34,7 @@
 			"getStarted": "Get Started with Tiler",
 			"explore": "Explore",
 			"subscribe": "Subscribe",
-			"tryFree": "Try Tiler for free",
+			"tryFree": "Start Free Today",
 			"signUp": "Sign Up",
 			"back": "Back",
 			"createSchedule": "Create Schedule",
@@ -150,6 +150,21 @@
 			"footer": {
 				"cookieSettings": "Cookie Settings"
 			}
+		}
+	},
+	"calendar": {
+		"nonViable": {
+			"title": "Non-Viable Events",
+			"infoTooltip": "These events could not be scheduled due to timing conflicts or constraints."
+		},
+		"event": {
+			"dueIn": "Due in {{time}}",
+			"dateLabel": "Date:",
+			"startLabel": "Starts:",
+			"endLabel": "Ends:",
+			"durationLabel": "Duration:",
+			"repetitionLabel": "Repeats:",
+			"locationLabel": "Location:"
 		}
 	},
 	"home": {
