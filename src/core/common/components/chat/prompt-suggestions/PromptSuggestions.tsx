@@ -52,13 +52,14 @@ const PromptPill = styled.button`
 `;
 
 // Utility function to get random prompts
-const getRandomPrompts = (count: number = 5, allPrompts: string[]): string[] => {
+const getRandomPrompts = async (count: number = 5, allPrompts: string[]): Promise<string[]> => {
   const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 
 const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) => {
   const { t } = useTranslation();
+  const [displayedPrompts, setDisplayedPrompts] = React.useState<string[]>([]);
 
   // Build the prompts array using translations
   const allPrompts = [
@@ -113,7 +114,13 @@ const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) 
     t('home.expanded.chat.promptSuggestions.deepWork.researchStudy'),
   ];
 
-  const [displayedPrompts] = React.useState(() => getRandomPrompts(5, allPrompts));
+  React.useEffect(() => {
+    const loadPrompts = async () => {
+      const prompts = await getRandomPrompts(5, allPrompts);
+      setDisplayedPrompts(prompts);
+    };
+    loadPrompts();
+  }, []);
 
   return (
     <Container>
