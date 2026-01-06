@@ -165,6 +165,9 @@
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
 			"locationLabel": "Location:"
+		},
+		"mobileChatInput": {
+      "placeholder": "Ask tiler anything..."
 		}
 	},
 	"home": {
