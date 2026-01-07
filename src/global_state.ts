@@ -2,263 +2,278 @@ import { create } from 'zustand';
 import { personaSessionManager } from '@/services/personaSessionManager';
 
 export interface ChatContextType {
-	EntityId: string;
-	Name: string; // Name of the tile we want in context
-	Description?: string; // Description of the tile
+  EntityId: string;
+  Name: string; // Name of the tile we want in context
+  Description?: string; // Description of the tile
 }
 
 export interface UserInfo {
-	id: string; // TilerUser@@00000000000000000000000
-	username: string; // Armando-ALPHANUMERIC
-	timeZoneDifference: number; // 0.0
-	timeZone: string; // UTC
-	email: string | null; // null
-	endfOfDay: string; // 0001-01-01T00:00:00+00:00
-	phoneNumber: string | null; // null
-	fullName: string; // ""
-	firstName: string; // ""
-	lastName: string; // ""
-	countryCode: string | null; // "1"
+  id: string; // TilerUser@@00000000000000000000000
+  username: string; // Armando-ALPHANUMERIC
+  timeZoneDifference: number; // 0.0
+  timeZone: string; // UTC
+  email: string | null; // null
+  endfOfDay: string; // 0001-01-01T00:00:00+00:00
+  phoneNumber: string | null; // null
+  fullName: string; // ""
+  firstName: string; // ""
+  lastName: string; // ""
+  countryCode: string | null; // "1"
 }
 
 // Grouped persona session that includes user, schedule, and chat session
 export interface PersonaSession {
-	personaId: string; // The persona ID (string type to match Persona type)
-	personaName: string; // Name of the persona for display
-	userId: string; // The anonymous user ID created for this persona
-	scheduleId: string | null; // The schedule ID for this persona's calendar
-	chatSessionId: string; // The chat session ID for this persona
-	chatContext: ChatContextType[]; // Chat context specific to this persona session
-	userInfo: UserInfo | null; // User info for this persona
-	scheduleLastUpdatedBy: string | null; // Component that last updated the schedule
+  personaId: string; // The persona ID (string type to match Persona type)
+  personaName: string; // Name of the persona for display
+  userId: string; // The anonymous user ID created for this persona
+  scheduleId: string | null; // The schedule ID for this persona's calendar
+  chatSessionId: string; // The chat session ID for this persona
+  chatContext: ChatContextType[]; // Chat context specific to this persona session
+  userInfo: UserInfo | null; // User info for this persona
+  scheduleLastUpdatedBy: string | null; // Component that last updated the schedule
 }
 
 interface AppState {
-	// Current active persona session
-	activePersonaSession: PersonaSession | null;
+  // Current active persona session
+  activePersonaSession: PersonaSession | null;
 
-	// Action to set or update the entire persona session
-	setActivePersonaSession: (session: PersonaSession | null) => void;
+  // Action to set or update the entire persona session
+  setActivePersonaSession: (session: PersonaSession | null) => void;
 
-	// Action to update specific fields in the active session
-	updateActivePersonaSession: (updates: Partial<PersonaSession>) => void;
+  // Action to update specific fields in the active session
+  updateActivePersonaSession: (updates: Partial<PersonaSession>) => void;
 
-	// Convenience actions for backward compatibility and ease of use
-	addChatContext: (context: ChatContextType) => void;
-	removeChatContext: (context: ChatContextType) => void;
-	clearChatContext: () => void;
-	setScheduleId: (id: string | null) => void;
-	setScheduleLastUpdatedBy: (component: string | null) => void;
-	setUserInfo: (info: UserInfo) => void;
-	setChatSessionId: (id: string) => void;
-	
-	// Development tools (only active in dev mode)
-	devUserIdOverride: string | null;
-	setDevUserIdOverride: (userId: string | null) => void;
+  // Convenience actions for backward compatibility and ease of use
+  addChatContext: (context: ChatContextType) => void;
+  removeChatContext: (context: ChatContextType) => void;
+  clearChatContext: () => void;
+  setScheduleId: (id: string | null) => void;
+  setScheduleLastUpdatedBy: (component: string | null) => void;
+  setUserInfo: (info: UserInfo) => void;
+  setChatSessionId: (id: string) => void;
 
-	// Getters for backward compatibility
-	get chatContext(): ChatContextType[];
-	get scheduleId(): string | null;
-	get scheduleLastUpdatedBy(): string | null;
-	get userInfo(): UserInfo | null;
-	get selectedPersonaId(): string | null;
-	get chatSessionId(): string;
-	
-	// Persona session manager (centralized session management)
-	getPersonaSessionManager: () => typeof personaSessionManager;
+  // Development tools (only active in dev mode)
+  devUserIdOverride: string | null;
+  setDevUserIdOverride: (userId: string | null) => void;
 
-	// Authentication state
-	isAuthenticated: boolean;
-	isAuthLoading: boolean;
-	authenticatedUser: UserInfo | null;
+  // Getters for backward compatibility
+  get chatContext(): ChatContextType[];
+  get scheduleId(): string | null;
+  get scheduleLastUpdatedBy(): string | null;
+  get userInfo(): UserInfo | null;
+  get selectedPersonaId(): string | null;
+  get chatSessionId(): string;
 
-	// Authentication actions
-	checkAuth: () => Promise<void>;
-	logout: () => Promise<void>;
-	setAuthenticated: (user: UserInfo | null) => void;
+  // Persona session manager (centralized session management)
+  getPersonaSessionManager: () => typeof personaSessionManager;
+
+  // Authentication state
+  isAuthenticated: boolean;
+  isAuthLoading: boolean;
+  authenticatedUser: UserInfo | null;
+
+  // Authentication actions
+  checkAuth: () => Promise<void>;
+  logout: () => Promise<void>;
+  setAuthenticated: (user: UserInfo | null) => void;
 }
 
 const useAppStore = create<AppState>((set, get) => ({
-	activePersonaSession: null,
+  activePersonaSession: null,
 
-	setActivePersonaSession: (session) => set(() => ({ activePersonaSession: session })),
+  setActivePersonaSession: (session) => set(() => ({ activePersonaSession: session })),
 
-	updateActivePersonaSession: (updates) =>
-		set((state) => ({
-			activePersonaSession: state.activePersonaSession
-				? { ...state.activePersonaSession, ...updates }
-				: null,
-		})),
+  updateActivePersonaSession: (updates) =>
+    set((state) => ({
+      activePersonaSession: state.activePersonaSession
+        ? { ...state.activePersonaSession, ...updates }
+        : null,
+    })),
 
-	// Convenience actions that update the active session
-	addChatContext: (context) =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					chatContext: [...state.activePersonaSession.chatContext, context],
-				},
-			};
-		}),
+  // Convenience actions that update the active session
+  addChatContext: (context) =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          chatContext: [...state.activePersonaSession.chatContext, context],
+        },
+      };
+    }),
 
-	removeChatContext: (context) =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					chatContext: state.activePersonaSession.chatContext.filter((item) => item !== context),
-				},
-			};
-		}),
+  removeChatContext: (context) =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          chatContext: state.activePersonaSession.chatContext.filter((item) => item !== context),
+        },
+      };
+    }),
 
-	clearChatContext: () =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					chatContext: [],
-				},
-			};
-		}),
+  clearChatContext: () =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          chatContext: [],
+        },
+      };
+    }),
 
-	setScheduleId: (id) =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					scheduleId: id,
-				},
-			};
-		}),
+  setScheduleId: (id) =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          scheduleId: id,
+        },
+      };
+    }),
 
-	setScheduleLastUpdatedBy: (component) =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					scheduleLastUpdatedBy: component,
-				},
-			};
-		}),
+  setScheduleLastUpdatedBy: (component) =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          scheduleLastUpdatedBy: component,
+        },
+      };
+    }),
 
-	setUserInfo: (info) =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					userInfo: info,
-				},
-			};
-		}),
+  setUserInfo: (info) =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          userInfo: info,
+        },
+      };
+    }),
 
-	setChatSessionId: (id) =>
-		set((state) => {
-			if (!state.activePersonaSession) return state;
-			return {
-				activePersonaSession: {
-					...state.activePersonaSession,
-					chatSessionId: id,
-				},
-			};
-		}),
+  setChatSessionId: (id) =>
+    set((state) => {
+      if (!state.activePersonaSession) return state;
+      return {
+        activePersonaSession: {
+          ...state.activePersonaSession,
+          chatSessionId: id,
+        },
+      };
+    }),
 
-	// Development tools
-	devUserIdOverride: null,
-	setDevUserIdOverride: (userId) => set(() => ({ devUserIdOverride: userId })),
-	
-	// Getters for backward compatibility
-	get chatContext() {
-		return get().activePersonaSession?.chatContext || [];
-	},
+  // Development tools
+  devUserIdOverride: null,
+  setDevUserIdOverride: (userId) => set(() => ({ devUserIdOverride: userId })),
 
-	get scheduleId() {
-		return get().activePersonaSession?.scheduleId || null;
-	},
+  // Getters for backward compatibility
+  get chatContext() {
+    return get().activePersonaSession?.chatContext || [];
+  },
 
-	get scheduleLastUpdatedBy() {
-		return get().activePersonaSession?.scheduleLastUpdatedBy || null;
-	},
+  get scheduleId() {
+    return get().activePersonaSession?.scheduleId || null;
+  },
 
-	get userInfo() {
-		return get().activePersonaSession?.userInfo || null;
-	},
+  get scheduleLastUpdatedBy() {
+    return get().activePersonaSession?.scheduleLastUpdatedBy || null;
+  },
 
-	get selectedPersonaId() {
-		return get().activePersonaSession?.personaId || null;
-	},
+  get userInfo() {
+    return get().activePersonaSession?.userInfo || null;
+  },
 
-	get chatSessionId() {
-		return get().activePersonaSession?.chatSessionId || '';
-	},
+  get selectedPersonaId() {
+    return get().activePersonaSession?.personaId || null;
+  },
 
-	// Authentication state
-	isAuthenticated: false,
-	isAuthLoading: true,
-	authenticatedUser: null,
+  get chatSessionId() {
+    return get().activePersonaSession?.chatSessionId || '';
+  },
 
-	// Authentication actions
-	checkAuth: async () => {
-		set({ isAuthLoading: true });
-		try {
-			const { authService } = await import('./services');
-			const response = await authService.checkAuth();
+  // Authentication state
+  isAuthenticated: false,
+  isAuthLoading: true,
+  authenticatedUser: null,
 
-			if (response.isAuthenticated) {
-				// Fetch full user info
-				const { userService } = await import('./services');
-				const user = await userService.getCurrentUser();
-				set({ isAuthenticated: true, authenticatedUser: user, isAuthLoading: false });
-			} else {
-				set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
-			}
-		} catch (error) {
-			console.error('Auth check failed:', error);
-			set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
-		}
-	},
+  // Authentication actions
+  checkAuth: async () => {
+    set({ isAuthLoading: true });
+    try {
+      const { authService } = await import('./services');
+      const response = await authService.checkAuth();
 
-	logout: async () => {
-		try {
-			const { authService } = await import('./services');
-			await authService.logout();
-			set({ isAuthenticated: false, authenticatedUser: null });
-		} catch (error) {
-			console.error('Logout failed:', error);
-			throw error;
-		}
-	},
+      if (response && response.isAuthenticated) {
+        // Fetch full user info
+        const { userService } = await import('./services');
+        const user = await userService.getCurrentUser();
+        set({ isAuthenticated: true, authenticatedUser: user, isAuthLoading: false });
+      } else {
+        set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
+      }
+    } catch (error) {
+      console.error('Check auth failed:', error);
+      set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
+    }
+  },
 
-	setAuthenticated: (user) => {
-		set({
-			isAuthenticated: user !== null,
-			authenticatedUser: user,
-		});
-	},
-	
-	// Persona session manager getter
-	getPersonaSessionManager: () => personaSessionManager,
+  logout: async () => {
+    try {
+      const { authService } = await import('./services');
+      await authService.logout();
+      set({ isAuthenticated: false, authenticatedUser: null });
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw error;
+    }
+  },
+
+  setAuthenticated: (user) => {
+    set({
+      isAuthenticated: user !== null,
+      authenticatedUser: user,
+    });
+
+    // Initialize persona session when user logs in
+    if (user) {
+      const personaSessionManager = get().getPersonaSessionManager();
+      personaSessionManager.createSession({
+        personaId: 'default',
+        personaName: user.username || 'Default Persona',
+        userId: user.id,
+        userInfo: user,
+        scheduleId: null,
+        chatSessionId: '',
+        chatContext: [],
+        scheduleLastUpdatedBy: null,
+      });
+    }
+  },
+
+  // Persona session manager getter
+  getPersonaSessionManager: () => personaSessionManager,
 }));
 
 // Initialize the PersonaSessionManager with Zustand store methods
 personaSessionManager.initialize({
-	setActivePersonaSession: (session) => useAppStore.setState({ activePersonaSession: session }),
-	updateActivePersonaSession: (updates) => {
-		const currentSession = useAppStore.getState().activePersonaSession;
-		if (currentSession) {
-			useAppStore.setState({
-				activePersonaSession: { ...currentSession, ...updates },
-			});
-		}
-	},
-	getActivePersonaSession: () => useAppStore.getState().activePersonaSession,
-	getDevUserIdOverride: () => useAppStore.getState().devUserIdOverride,
-	setDevUserIdOverride: (userId) => useAppStore.setState({ devUserIdOverride: userId }),
+  setActivePersonaSession: (session) => useAppStore.setState({ activePersonaSession: session }),
+  updateActivePersonaSession: (updates) => {
+    const currentSession = useAppStore.getState().activePersonaSession;
+    if (currentSession) {
+      useAppStore.setState({
+        activePersonaSession: { ...currentSession, ...updates },
+      });
+    }
+  },
+  getActivePersonaSession: () => useAppStore.getState().activePersonaSession,
+  getDevUserIdOverride: () => useAppStore.getState().devUserIdOverride,
+  setDevUserIdOverride: (userId) => useAppStore.setState({ devUserIdOverride: userId }),
 });
 
 export default useAppStore;

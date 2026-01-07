@@ -3,6 +3,7 @@ import { Env } from '../config/config_getter';
 
 type RequestOptions = RequestInit & {
 	headers?: Headers;
+	responseType?: 'json' | 'text'; // Optional: specify response type, defaults to 'json'
 };
 
 export class AppApi {
@@ -16,14 +17,15 @@ export class AppApi {
 		options?: RequestOptions
 	): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
-		const requestOptions: RequestOptions = {
+		const { responseType, ...fetchOptions } = options || {};
+		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: new Headers({
 				'Content-Type': 'application/json',
 				Accept: 'application/json',
 			}),
 			credentials: 'include', // Send ASP.NET authentication cookies with every request
-			...options,
+			...fetchOptions,
 		};
 
 		try {
@@ -46,8 +48,17 @@ export class AppApi {
 					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
 				}
 			}
+			
+			// Handle text responses if specified
+			const responseTypeToUse = responseType || 'json';
+			if (responseTypeToUse === 'text') {
+				const text = await res.text();
+				return text as T;
+			}
+			
 			return (await res.json()) as T;
 		} catch (error) {
+			console.log(error, 'from api req');
 			if (error instanceof ServerError) throw error;
 			// Check if it's a structured error response (not ServerError)
 			if (error && typeof error === 'object' && 'Error' in error) {

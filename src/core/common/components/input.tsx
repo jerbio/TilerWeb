@@ -10,6 +10,7 @@ type InputProps = {
   height?: number;
   bordergradient?: Array<string>;
   prepend?: React.ReactNode;
+  append?: React.ReactNode;
   searchList?: Array<string>;
   onSearchSelect?: (value: string) => void;
 };
@@ -22,6 +23,7 @@ type StyledInputProps = {
   $height: InputProps['height'];
   $bordergradient: InputProps['bordergradient'];
   $prepend?: InputProps['prepend'];
+  $append?: InputProps['append'];
 };
 
 export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
@@ -33,6 +35,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
   bordergradient,
   label,
   prepend,
+  append,
   searchList,
   onSearchSelect,
   ...props
@@ -45,6 +48,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
     $bordergradient: bordergradient,
     $label: label,
     $prepend: prepend,
+    $append: append,
   };
   const id = label ? `input-${Math.random().toString(36).substring(2, 9)}` : undefined;
   const listId = searchList ? `${id}-list` : undefined;
@@ -74,6 +78,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
         {...styledProps}
         {...props}
       />
+      {append && <StyledInputAppend {...styledProps}>{append}</StyledInputAppend>}
     </StyledInputWrapper>
   );
 
@@ -130,12 +135,24 @@ const StyledLabel = styled.label<StyledInputProps>`
 
 const StyledInputPrepend = styled.div`
 	position: absolute;
+	left: 0;
 	height: 100%;
 	width: 40px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	pointer-events: none;
+`;
+
+const StyledInputAppend = styled.div<StyledInputProps>`
+	position: absolute;
+	right: 0;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	pointer-events: none;
+	padding-right: ${(props) => (props.$sized === 'small' ? '8px' : '12px')};
 `;
 
 const StyledInputWrapper = styled.div<StyledInputProps>`
@@ -175,7 +192,7 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
         : palette.colors.gray[800]};
 	border-radius: ${palette.borderRadius.little};
 
-	${StyledInputPrepend} {
+	${StyledInputPrepend}, ${StyledInputAppend} {
 		color: ${palette.colors.gray[500]};
 		transition: color 0.2s ease-in-out;
 	}
@@ -196,7 +213,7 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
       ? palette.colors.brand[400] + '33'
       : palette.colors.gray[900]};
 
-		${StyledInputPrepend} {
+		${StyledInputPrepend}, ${StyledInputAppend} {
 			color: ${palette.colors.brand[400]};
 		}
 	}
@@ -224,7 +241,8 @@ const StyledInput = styled.input<StyledInputProps>`
 			6px + ${(props) => (props.$prepend ? '20px' : '0px')}
 	);
 	padding-right: calc(
-		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px
+		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px +
+			${(props) => (props.$append ? '32px' : '0px')}
 	);
 	font-size: ${(props) =>
     props.$sized === 'small'

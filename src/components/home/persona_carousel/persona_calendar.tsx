@@ -13,7 +13,6 @@ const PersonaCalendar: React.FC<PersonaCalendarProps> = ({ expandedWidth: width,
   const session = usePersonaSession(undefined, (updatedSession) => {
     console.log('[PersonaCalendar] Session updated, will re-fetch schedule:', updatedSession);
   });
-
   // Use the session's userId if available (includes dev override updates)
   // Fall back to the prop userId for backwards compatibility
   const effectiveUserId = session?.userId || userId;

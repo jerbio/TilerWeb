@@ -4,15 +4,17 @@ import usePrefetchedCalendarData from "@/core/common/hooks/usePrefetchedCalendar
 import useCalendarView from "@/core/common/hooks/useCalendarView";
 
 export function CalendarWrapper({
+  chatExpanded,
   userId,
   width,
 }: {
+  chatExpanded?: boolean;
   userId: string | null;
   width: number;
 }) {
   const viewRef = React.useRef<HTMLUListElement>(null);
 
-  const { viewOptions, setViewOptions } = useCalendarView(viewRef, width);
+  const { viewOptions, setViewOptions } = useCalendarView(viewRef, width, chatExpanded);
 
   const { events, loading } = usePrefetchedCalendarData({
     userId,
