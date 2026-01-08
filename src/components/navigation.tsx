@@ -195,14 +195,10 @@ const Navigation: React.FC = () => {
       isOnHomePage: window.location.pathname === '/',
     });
 
-    setIsModalOpen(true);
     setIsOpen(false); // Close mobile menu if open
     
-    // If on home page, dispatch event to focus on custom persona in carousel
-    if (window.location.pathname === '/') {
-      window.dispatchEvent(new CustomEvent('focusCustomPersona'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Redirect to sign in page
+    window.location.href = '/signin';
   }
 
   function handleModalClose() {

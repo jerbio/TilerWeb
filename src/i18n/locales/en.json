@@ -34,7 +34,7 @@
 			"getStarted": "Get Started with Tiler",
 			"explore": "Explore",
 			"subscribe": "Subscribe",
-			"tryFree": "Try Tiler for free",
+			"tryFree": "Start Free Today",
 			"signUp": "Sign Up",
 			"back": "Back",
 			"createSchedule": "Create Schedule",
@@ -150,6 +150,24 @@
 			"footer": {
 				"cookieSettings": "Cookie Settings"
 			}
+		}
+	},
+	"calendar": {
+		"nonViable": {
+			"title": "Non-Viable Events",
+			"infoTooltip": "These events could not be scheduled due to timing conflicts or constraints."
+		},
+		"event": {
+			"dueIn": "Due in {{time}}",
+			"dateLabel": "Date:",
+			"startLabel": "Starts:",
+			"endLabel": "Ends:",
+			"durationLabel": "Duration:",
+			"repetitionLabel": "Repeats:",
+			"locationLabel": "Location:"
+		},
+		"mobileChatInput": {
+      "placeholder": "Ask tiler anything..."
 		}
 	},
 	"home": {
@@ -571,23 +589,6 @@
 		},
 		"goBack": "Go back"
 	},
-	"timeline": {
-		"title": "Timeline",
-		"signedInUser": "Signed In User",
-		"signOut": "Sign Out",
-		"signingOut": "Signing out...",
-		"signOutSuccess": "Signed out successfully",
-		"signOutError": "Failed to sign out",
-		"userInfo": {
-			"fullName": "Full Name",
-			"username": "Username",
-			"email": "Email",
-			"phone": "Phone",
-			"timeZone": "Time Zone",
-			"userId": "User ID",
-			"notAvailable": "N/A"
-		}
-	},
 	"settings": {
 		"title": "Settings",
 		"back": "Back",
@@ -727,6 +728,15 @@
 					"placeholder": "eg. Scheduling, Task Management"
 				}
 			}
+		}
+	},
+	"timeline": {
+		"searchPlaceholder": "Search for a tile/block...",
+		"userMenu": {
+			"logout": "Logout",
+			"signOutSuccess": "You have been successfully signed out",
+			"signOutError": "Failed to sign out. Please try again.",
+			"defaultUsername": "User"
 		}
 	}
 }

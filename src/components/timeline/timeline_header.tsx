@@ -1,0 +1,101 @@
+import Logo from '@/core/common/components/icons/logo';
+import palette from '@/core/theme/palette';
+import { User } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import useAppStore from '@/global_state';
+import ProfileSheet from '@/core/common/components/profile_sheet';
+
+const TimelineHeader: React.FC = () => {
+  const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
+  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        triggerRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !triggerRef.current.contains(event.target as Node)
+      ) {
+        setProfileSheetOpen(false);
+      }
+    };
+
+    if (profileSheetOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [profileSheetOpen]);
+
+
+  return (
+    <Header>
+      <HeaderLeft>
+        <Logo size={30} />
+      </HeaderLeft>
+      <HeaderRight>
+        <ProfileTrigger
+          ref={triggerRef}
+          onClick={() => setProfileSheetOpen(!profileSheetOpen)}
+        >
+          <ProfileContainer>
+            <User size={18} />
+          </ProfileContainer>
+          <ProfileSheet open={profileSheetOpen} ref={menuRef} user={authenticatedUser} />
+        </ProfileTrigger>
+      </HeaderRight>
+    </Header>
+  );
+};
+
+const ProfileTrigger = styled.button`
+	position: relative;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+`;
+
+const ProfileContainer = styled.div`
+	height: 36px;
+	width: 36px;
+	overflow: hidden;
+	background-color: ${palette.colors.gray[800]};
+	border-radius: ${palette.borderRadius.large};
+	border: 1px solid ${palette.colors.gray[700]};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
+const Header = styled.header`
+	height: 64px;
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+	align-items: center;
+	background-color: ${palette.colors.gray[900]};
+	border-bottom: 1px solid ${palette.colors.gray[800]};
+	padding-inline: 2rem;
+`;
+
+const HeaderLeft = styled.div`
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+`;
+
+const HeaderRight = styled.div`
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+`;
+
+export default TimelineHeader;

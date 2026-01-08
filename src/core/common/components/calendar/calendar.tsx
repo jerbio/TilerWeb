@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-r
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import calendarConfig from '@/core/constants/calendar_config';
-import CalendarEvents, { StyledEvent } from '@/core/common/components/calendar/calendar_events';
+import { StyledEvent } from '@/core/common/components/calendar/calendar_events';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import Spinner from '../loader';
 import CalendarEvent from './calendar_event';
@@ -14,6 +14,11 @@ import analytics from '@/core/util/analytics';
 import TimeUtil from '@/core/util/time';
 import CalendarEventInfo from './calendar_event_info';
 import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
+import { useTranslation } from 'react-i18next';
+import CalendarContent from './calendar_content';
+import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
+import CalendarContentDummy from './calendar_content_dummy';
+import useIsMobile from '../../hooks/useIsMobile';
 
 export type CalendarViewOptions = {
 	width: number;
@@ -80,6 +85,8 @@ const Calendar = ({
 	}
 
 	const calendarGridCanvasRef = useRef<HTMLCanvasElement>(null);
+	const calendarGridPrevCanvasRef = useRef<HTMLCanvasElement>(null);
+	const calendarGridNextCanvasRef = useRef<HTMLCanvasElement>(null);
 	function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
 		canvas.width = width;
 		canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * 24;
@@ -125,20 +132,24 @@ const Calendar = ({
 	}
 
 	useEffect(() => {
-		if (calendarGridCanvasRef.current) {
-			const canvas = calendarGridCanvasRef.current;
-			const ctx = canvas.getContext('2d');
-			if (ctx) {
-				resizeCanvas(canvas, viewOptions.width);
-				drawCalendarGrid(
-					canvas,
-					ctx,
-					viewOptions.width,
-					viewOptions.daysInView,
-					parseInt(calendarConfig.CELL_HEIGHT)
-				);
+		[calendarGridCanvasRef, calendarGridPrevCanvasRef, calendarGridNextCanvasRef].forEach(
+			(ref) => {
+				if (ref.current) {
+					const canvas = ref.current;
+					const ctx = canvas.getContext('2d');
+					if (ctx) {
+						resizeCanvas(canvas, viewOptions.width);
+						drawCalendarGrid(
+							canvas,
+							ctx,
+							viewOptions.width,
+							viewOptions.daysInView,
+							parseInt(calendarConfig.CELL_HEIGHT)
+						);
+					}
+				}
 			}
-		}
+		);
 	}, [viewOptions.width]);
 
 	// Auto-scroll to first event or current time on initial load
@@ -290,6 +301,15 @@ const Calendar = ({
 				},
 				{ once: true }
 			);
+      contentContainerRef.current?.addEventListener('scroll', () => {
+        setSelectedEventInfo((prev) => {
+          if (prev) {
+            // Return a new object to trigger re-render
+            return { ...prev };
+          }
+          return null;
+        });
+      });
 		}
 	}, [selectedEventInfo]);
 	const calendarEventInfoTransRef = useSpringRef();
@@ -312,6 +332,23 @@ const Calendar = ({
 	});
 
 	useChain([calendarEventInfoTransRef], [0], 0);
+
+	const { t } = useTranslation();
+
+	// Swiping logic
+	const swiperRef = useRef<SwiperRef | null>(null);
+	const isSwiperResetting = useRef(false);
+	const isMobile = useIsMobile();
+
+	useEffect(() => {
+		if (swiperRef.current) {
+			if (!isMobile) {
+				swiperRef.current.swiper.disable();
+			} else {
+				swiperRef.current.swiper.enable();
+			}
+		}
+	}, [isMobile]);
 
 	return (
 		<CalendarContainer $isMounted={contentMounted}>
@@ -390,9 +427,9 @@ const Calendar = ({
 						$cellwidth={viewOptions.width / viewOptions.daysInView}
 					>
 						<header>
-							<h2>Non-Viable Tiles</h2>
+							<h2>{t('calendar.nonViable.title')}</h2>
 							<Tooltip
-								text="These events could not be scheduled due to timing conflicts or constraints."
+								text={t('calendar.nonViable.infoTooltip')}
 								maxWidth={150}
 								position="left"
 							>
@@ -427,37 +464,68 @@ const Calendar = ({
 
 			{/* Calendar Content */}
 			<CalendarContentContainer id="calendar-content-container" ref={contentContainerRef} data-onboarding-calendar-view>
-				<CalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
-					{/* Background */}
-					<CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
-					{/* Timeline */}
-					{Array.from({ length: 24 }).map((_, hourIndex) => {
-						return (
-							<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
-								<div>
-									{/* eg. "8 AM" */}
-									<span>{dayjs().hour(hourIndex).format('h A')}</span>
-								</div>
-							</CalendarCellTime>
-						);
-					})}
-					{/* Events */}
-					<CalendarEvents
-						events={events}
-						viewOptions={viewOptions}
-						headerWidth={viewOptions.width}
-						selectedEvent={selectedEvent}
-						setSelectedEvent={setSelectedEvent}
-						setSelectedEventInfo={setSelectedEventInfo}
-						onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
-					/>
-				</CalendarContent>
+				<Swiper
+					loop={false}
+					ref={swiperRef}
+					initialSlide={1}
+					onSlideNextTransitionStart={() => {
+						if (isSwiperResetting.current || !swiperRef.current) return;
+						changeDayView('right');
+
+						isSwiperResetting.current = true;
+						setTimeout(() => {
+							swiperRef.current?.swiper.slideTo(1, 0, false);
+							setTimeout(() => (isSwiperResetting.current = false), 0);
+						}, 300);
+					}}
+					onSlidePrevTransitionStart={() => {
+						if (isSwiperResetting.current || !swiperRef.current) return;
+						changeDayView('left');
+
+						isSwiperResetting.current = true;
+						setTimeout(() => {
+							swiperRef.current?.swiper.slideTo(1, 0, false);
+							setTimeout(() => (isSwiperResetting.current = false), 0);
+						}, 300);
+					}}
+					allowTouchMove={true}
+					slidesPerView={1}
+					speed={300}
+					resistanceRatio={0.1}
+					threshold={10}
+				>
+					<SwiperSlide>
+						<CalendarContentDummy
+							viewOptions={viewOptions}
+							calendarGridCanvasRef={calendarGridPrevCanvasRef}
+						/>
+					</SwiperSlide>
+					<SwiperSlide>
+						<CalendarContent
+							events={events}
+							viewOptions={viewOptions}
+							selectedEvent={selectedEvent}
+							setSelectedEvent={setSelectedEvent}
+							setSelectedEventInfo={setSelectedEventInfo}
+							calendarGridCanvasRef={calendarGridCanvasRef}
+							setStyledNonViableEvents={setStyledNonViableEvents}
+						/>
+					</SwiperSlide>
+					<SwiperSlide>
+						<CalendarContentDummy
+							viewOptions={viewOptions}
+							calendarGridCanvasRef={calendarGridNextCanvasRef}
+						/>
+					</SwiperSlide>
+				</Swiper>
 			</CalendarContentContainer>
 		</CalendarContainer>
 	);
 };
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
+  overflow: hidden;
+  border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
 	position: relative;
 	width: 100%;
 	height: 100%;
@@ -551,53 +619,6 @@ const CalendarContentContainer = styled.div`
 	bottom: 0;
 	left: 0;
 	width: 100%;
-`;
-
-const CalendarContent = styled.div<{ $cellwidth: number }>`
-	width: 100%;
-	height: ${parseInt(calendarConfig.CELL_HEIGHT) * 24}px; /* 24 hours */
-	position: relative;
-	isolation: isolate;
-`;
-
-const CalendarBg = styled.canvas<{ $width: number }>`
-	position: absolute;
-	top: 0;
-	left: ${calendarConfig.TIMELINE_WIDTH};
-	width: ${({ $width }) => `${$width}px`};
-	height: 100%;
-	z-index: -1;
-`;
-
-const CalendarCellTime = styled.div<{ $hourindex: number }>`
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: ${calendarConfig.TIMELINE_WIDTH};
-	height: ${calendarConfig.CELL_HEIGHT};
-	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
-
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-color: #1f1f1f;
-	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
-	background-position: bottom;
-	background-size: 12px 1px;
-	background-repeat: repeat-x;
-
-	div {
-		height: 100%;
-		width: 100%;
-		position: relative;
-
-		span {
-			position: absolute;
-			line-height: 1;
-			top: 4px;
-			right: 2px;
-			font-size: ${palette.typography.fontSize.xs};
-			color: ${palette.colors.gray[500]};
-		}
-	}
 `;
 
 const LoadingContainer = styled.div<{ $loading: boolean }>`
