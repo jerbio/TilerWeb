@@ -8,6 +8,7 @@ import palette from '@/core/theme/palette';
 import Input from '@/core/common/components/input';
 import Button from '@/core/common/components/button';
 import useAppStore from '@/global_state';
+import { userService } from '@/services';
 
 const AccountSettings: React.FC = () => {
 	const { t } = useTranslation();
@@ -32,8 +33,37 @@ const AccountSettings: React.FC = () => {
 	const handleSaveChanges = async () => {
 		setIsSaving(true);
 		try {
-			// TODO: Implement save functionality with backend
-			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+			// Parse full name into first and last name
+			const nameParts = fullName.trim().split(' ');
+			const firstName = nameParts[0] || '';
+			const lastName = nameParts.slice(1).join(' ') || '';
+
+			// Parse date of birth to UTC epoch (assuming format MM/DD/YYYY)
+			let dateOfBirthUtcEpoch = 0;
+			if (dateOfBirth) {
+				const [month, day, year] = dateOfBirth.split('/');
+				if (month && day && year) {
+					const date = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+					dateOfBirthUtcEpoch = Math.floor(date.getTime() / 1000);
+				}
+			}
+
+			// Extract country code and phone number
+			// Assuming phone number might include country code or just the number
+			const phoneNumberClean = phoneNumber.replace(/\D/g, ''); // Remove non-digits
+			const countryCode = phoneNumberClean.length > 10 ? parseInt(phoneNumberClean.substring(0, phoneNumberClean.length - 10)) : 0;
+			const phoneNumberOnly = phoneNumberClean.length > 10 ? phoneNumberClean.substring(phoneNumberClean.length - 10) : phoneNumberClean;
+
+			await userService.updateUser({
+				FirstName: firstName,
+				LastName: lastName,
+				UpdatedUserName: authenticatedUser?.username || '',
+				CountryCode: countryCode,
+				PhoneNumber: phoneNumberOnly,
+				DateOfBirthUtcEpoch: dateOfBirthUtcEpoch,
+				EndOfDay: authenticatedUser?.endfOfDay || '',
+			});
+
 			toast.success(t('settings.sections.accountInfo.saveSuccess'));
 		} catch (error) {
 			toast.error(t('settings.sections.accountInfo.saveError'));

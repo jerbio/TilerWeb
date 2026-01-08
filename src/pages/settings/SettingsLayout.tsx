@@ -17,26 +17,27 @@ const SettingsLayout: React.FC = () => {
 			description: t('settings.sections.accountInfo.description'),
 			path: '/settings/account',
 		},
-		{
-			title: t('settings.sections.tilePreferences.title'),
-			description: t('settings.sections.tilePreferences.description'),
-			path: '/settings/preferences',
-		},
-		{
-			title: t('settings.sections.tilerContacts.title'),
-			description: t('settings.sections.tilerContacts.description'),
-			path: '/settings/contacts',
-		},
-		{
-			title: t('settings.sections.notificationPreferences.title'),
-			description: t('settings.sections.notificationPreferences.description'),
-			path: '/settings/notifications',
-		},
-		{
-			title: t('settings.sections.connections.title'),
-			description: t('settings.sections.connections.description'),
-			path: '/settings/connections',
-		},
+		// TODO: Uncomment when ready
+		// {
+		// 	title: t('settings.sections.tilePreferences.title'),
+		// 	description: t('settings.sections.tilePreferences.description'),
+		// 	path: '/settings/preferences',
+		// },
+		// {
+		// 	title: t('settings.sections.tilerContacts.title'),
+		// 	description: t('settings.sections.tilerContacts.description'),
+		// 	path: '/settings/contacts',
+		// },
+		// {
+		// 	title: t('settings.sections.notificationPreferences.title'),
+		// 	description: t('settings.sections.notificationPreferences.description'),
+		// 	path: '/settings/notifications',
+		// },
+		// {
+		// 	title: t('settings.sections.connections.title'),
+		// 	description: t('settings.sections.connections.description'),
+		// 	path: '/settings/connections',
+		// },
 	];
 
 	const handleLogout = () => {
