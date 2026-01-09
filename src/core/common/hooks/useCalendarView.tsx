@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { CalendarViewOptions } from '../components/calendar/calendar';
 import calendarConfig from '../../constants/calendar_config';
 
-function useCalendarView(viewRef: React.RefObject<HTMLUListElement>, containerWidth: number) {
+function useCalendarView(viewRef: React.RefObject<HTMLUListElement>, containerWidth: number, chatExpanded?: boolean) {
 	// State to manage view options
 	const [viewOptions, setViewOptions] = useState<CalendarViewOptions>({
 		width: 0,
@@ -19,7 +19,7 @@ function useCalendarView(viewRef: React.RefObject<HTMLUListElement>, containerWi
 			width: viewWidth,
 			daysInView,
 		}));
-	}, [containerWidth, viewRef.current]);
+	}, [containerWidth, viewRef.current, chatExpanded]);
 
 	return {
 		viewOptions,

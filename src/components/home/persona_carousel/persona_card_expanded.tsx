@@ -293,26 +293,20 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar 
-            key={`calendar-${demoModeKey}`} 
-            expandedWidth={expandedWidth} 
-            userId={personaUserId} 
-          />
-          {!mobileChatVisible && (
-            <CalendarContainerActionButtons>
-              <MobileChatInputWrapper>
-                <MessageCircleIcon>
-                  <MessageCircle size={18} />
-                </MessageCircleIcon>
-                <MobileChatInput
-                  onClick={() => setMobileChatVisible(!mobileChatVisible)}
-                  placeholder={t('home.expanded.mobileChatPlaceholder')}
-                  readOnly
-                  data-onboarding-mobile-chat-input
-                />
-              </MobileChatInputWrapper>
-            </CalendarContainerActionButtons>
-          )}
+          <PersonaCalendar key={`calendar-${demoModeKey}`} expandedWidth={expandedWidth} userId={personaUserId} />
+          <CalendarContainerActionButtons>
+            <MobileChatInputWrapper>
+              <MessageCircleIcon>
+                <MessageCircle size={18} />
+              </MessageCircleIcon>
+              <MobileChatInput
+                onClick={() => setMobileChatVisible(!mobileChatVisible)}
+                placeholder={t('home.expanded.mobileChatPlaceholder')}
+                readOnly
+                data-onboarding-mobile-chat-input
+              />
+            </MobileChatInputWrapper>
+          </CalendarContainerActionButtons>
         </React.Fragment>
       ),
     },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
-import { MessageCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
 import palette from '@/core/theme/palette';
 import Spinner from '@/core/common/components/loader';
@@ -10,8 +10,10 @@ import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
 import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
+import { useTranslation } from 'react-i18next';
 
 const Timeline: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const isAuthLoading = useAppStore((state) => state.isAuthLoading);
@@ -21,6 +23,7 @@ const Timeline: React.FC = () => {
   const showChat = isDesktop || mobileChatVisible;
   const contentRef = useRef<HTMLDivElement>(null);
   const [expandedWidth, setExpandedWidth] = useState(0);
+  const [chatExpanded, setChatExpanded] = useState(false);
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -29,15 +32,15 @@ const Timeline: React.FC = () => {
   }, [isAuthLoading, isAuthenticated, navigate]);
 
   useEffect(() => {
-    const updateWidth = () => {
+    const resizeTimelineWidth = () => {
       if (contentRef.current) {
         setExpandedWidth(contentRef.current.offsetWidth);
       }
     };
 
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
+    resizeTimelineWidth();
+    window.addEventListener('resize', resizeTimelineWidth);
+    return () => window.removeEventListener('resize', resizeTimelineWidth);
   }, []);
 
   if (isAuthLoading) {
@@ -60,7 +63,11 @@ const Timeline: React.FC = () => {
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <CalendarWrapper userId={authenticatedUser.id} width={expandedWidth} />
+          <CalendarWrapper
+            chatExpanded={chatExpanded}
+            userId={authenticatedUser.id}
+            width={expandedWidth}
+          />
           <CalendarContainerActionButtons>
             <MobileChatInputWrapper>
               <MessageCircleIcon>
@@ -68,11 +75,19 @@ const Timeline: React.FC = () => {
               </MessageCircleIcon>
               <MobileChatInput
                 onClick={() => setMobileChatVisible(!mobileChatVisible)}
-                placeholder="Ask Tiler anything..."
+                placeholder={t('calendar.mobileChatInput.placeholder')}
                 readOnly
               />
             </MobileChatInputWrapper>
           </CalendarContainerActionButtons>
+          {isDesktop && (
+            <ChatExpandToggle
+              title={chatExpanded ? 'Collapse chat' : 'Expand chat'}
+              onClick={() => setChatExpanded(!chatExpanded)}
+            >
+              {chatExpanded ? <ChevronLeft /> : <ChevronRight />}
+            </ChatExpandToggle>
+          )}
         </React.Fragment>
       ),
     },
@@ -83,17 +98,14 @@ const Timeline: React.FC = () => {
     },
   ];
 
-  const contentTransition = useTransition(
-    showChat ? content : content.slice(0, 1),
-    {
-      keys: (item) => item.key,
-      from: { opacity: 0, scale: 1.05 },
-      enter: { opacity: 1, scale: 1 },
-      leave: { opacity: 0, scale: 1 },
-      trail: 200,
-      config: { tension: 200 },
-    }
-  );
+  const contentTransition = useTransition(showChat ? content : content.slice(0, 1), {
+    keys: (item) => item.key,
+    from: { opacity: 0, scale: 1.05 },
+    enter: { opacity: 1, scale: 1 },
+    leave: { opacity: 0, scale: 1 },
+    trail: 200,
+    config: { tension: 200 },
+  });
 
   return (
     <Container>
@@ -103,7 +115,11 @@ const Timeline: React.FC = () => {
         <TimelineContent ref={contentRef}>
           <CardContent>
             {contentTransition((style, item) => (
-              <item.container style={style} key={item.key}>
+              <item.container
+                style={style}
+                key={item.key}
+                $chatexpanded={chatExpanded}
+              >
                 {item.content}
               </item.container>
             ))}
@@ -149,26 +165,25 @@ const CardContent = styled.div`
 	height: calc(100% - 3rem);
 `;
 
-const CalendarContainer = styled(animated.div)`
+const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
-	overflow: hidden;
 	height: 100%;
 	background: ${palette.colors.gray[900]};
 	border-top: 1px solid ${palette.colors.gray[700]};
 
 	@media screen and (min-width: ${palette.screens.lg}) {
-		grid-column: span 8;
+		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 8)};
 		border: 1px solid ${palette.colors.gray[700]};
 		border-left: none;
 		border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
 	}
 	@media screen and (min-width: ${palette.screens.xl}) {
-		grid-column: span 9;
+		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 9)};
 	}
 `;
 
-const ChatContainer = styled(animated.div)`
+const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;
@@ -176,15 +191,41 @@ const ChatContainer = styled(animated.div)`
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
 	border-radius: ${palette.borderRadius.xxLarge};
+	display: ${(props) => (props.$chatexpanded ? 'none' : 'block')};
 
 	@media screen and (min-width: ${palette.screens.lg}) {
 		position: static;
 		background: transparent;
-		grid-column: span 4;
+		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 4)};
 		border: none;
 	}
 	@media screen and (min-width: ${palette.screens.xl}) {
-		grid-column: span 3;
+		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 3)};
+	}
+`;
+
+const ChatExpandToggle = styled.button`
+	position: absolute;
+	top: 75%;
+	right: 0;
+	transform: translateY(-50%) translateX(50%);
+	width: 40px;
+	height: 40px;
+	background: ${palette.colors.gray[900]};
+	border: 1px solid ${palette.colors.gray[800]};
+	border-radius: ${palette.borderRadius.large};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	color: ${palette.colors.gray[300]};
+	transition: all 0.2s ease;
+	z-index: 1000;
+	outline: none;
+
+	&:hover {
+		background: ${palette.colors.gray[800]};
+		color: white;
 	}
 `;
 
@@ -253,44 +294,43 @@ const MobileChatInput = styled.input`
 	}
 `;
 
-
 const Container = styled.div`
-  min-height: 100vh;
-  position: relative;
-  background: linear-gradient(
-    to bottom,
-    ${palette.colors.black} 0%,
-    ${palette.colors.black} 60%,
-    ${palette.colors.brand[400]}80 100%
-  );
-  overflow: hidden;
+	min-height: 100vh;
+	position: relative;
+	background: linear-gradient(
+		to bottom,
+		${palette.colors.black} 0%,
+		${palette.colors.black} 60%,
+		${palette.colors.brand[400]}80 100%
+	);
+	overflow: hidden;
 
-  &::after {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: radial-gradient(
-      ellipse at center bottom,
-      ${palette.colors.brand[400]}80 0%,
-      ${palette.colors.brand[500]}80 50%,
-      transparent 100%
-    );
-    filter: blur(80px);
-    opacity: 0.6;
-    pointer-events: none;
-    z-index: 0;
-  }
+	&::after {
+		content: '';
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 40%;
+		background: radial-gradient(
+			ellipse at center bottom,
+			${palette.colors.brand[400]}80 0%,
+			${palette.colors.brand[500]}80 50%,
+			transparent 100%
+		);
+		filter: blur(80px);
+		opacity: 0.6;
+		pointer-events: none;
+		z-index: 0;
+	}
 `;
 
 const LoadingContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 60vh;
 `;
 
 export default Timeline;

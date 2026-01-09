@@ -51,7 +51,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
 
   return event ? (
     <StyledCalendarEventInfo $color={eventColor}>
-      <header>
+      <CalendarEventInfoHeader>
         <div className="icon">
           <Star size={16} color={eventColor.setLightness(0.6).toHex()} />
         </div>
@@ -64,7 +64,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
         <button onClick={onClose}>
           <X size={16} color={eventColor.setLightness(0.5).toHex()} />
         </button>
-      </header>
+      </CalendarEventInfoHeader>
       <CalendarEventInfoSection>
         <CalendarEventInfoArticleContainer>
           <CalendarEventInfoArticle>
@@ -185,6 +185,11 @@ padding: 0 16px 16px 16px;
 		}
 	}
 }
+`;
+
+const CalendarEventInfoHeader = styled.header`
+position: sticky;
+top: 0;
 `;
 
 const CalendarEventInfoSection = styled.div`
