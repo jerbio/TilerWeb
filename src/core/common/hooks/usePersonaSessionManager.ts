@@ -112,7 +112,8 @@ export function usePersonaSession(
   personaId?: Persona['id'],
   onSessionChange?: SessionChangeCallback
 ) {
-  const activeSession = useAppStore((state) => state.activePersonaSession);
+  const activeSessionType = useAppStore((state) => state.activeSessionType);
+  const activeSession = useAppStore((state) => activeSessionType === 'anonymous' ? state.anonymousPersonaSession : state.authenticatedPersonaSession);
   const manager = useAppStore((state) => state.getPersonaSessionManager());
 
   // Subscribe to session changes
@@ -147,7 +148,8 @@ export function usePersonaSession(
  * // Returns dev override if active, otherwise returns stored userId
  */
 export function useEffectiveUserId(personaId?: Persona['id']) {
-  const activeSession = useAppStore((state) => state.activePersonaSession);
+  const activeSessionType = useAppStore((state) => state.activeSessionType);
+  const activeSession = useAppStore((state) => activeSessionType === 'anonymous' ? state.anonymousPersonaSession : state.authenticatedPersonaSession);
   const devOverride = useAppStore((state) => state.devUserIdOverride);
   const manager = useAppStore((state) => state.getPersonaSessionManager());
 
