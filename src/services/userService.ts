@@ -1,4 +1,4 @@
-import { UserApi } from '@/api/userApi';
+import { UserApi, UpdateUserRequest } from '@/api/userApi';
 import { normalizeError } from '@/core/error';
 
 export class UserService {
@@ -20,6 +20,22 @@ export class UserService {
 			return response.Content.user;
 		} catch (error) {
 			console.error('Error fetching current user', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async updateUser(userData: UpdateUserRequest) {
+		try {
+			const response = await this.userApi.updateUser(userData);
+
+			// Check if the API returned an error
+			if (response.Error.Code !== '0') {
+				throw new Error(response.Error.Message);
+			}
+
+			return response;
+		} catch (error) {
+			console.error('Error updating user', error);
 			throw normalizeError(error);
 		}
 	}
