@@ -25,13 +25,13 @@ const Container = styled.div`
 `;
 
 const PromptPill = styled.button`
-  background: ${palette.colors.gray[50]};
-  border: 1px solid ${palette.colors.gray[200]};
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
   border-radius: 16px;
   padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${palette.colors.gray[800]};
+  font-size: 12px;
+  font-weight: 400;
+  color: ${palette.colors.gray[300]};
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
@@ -40,9 +40,9 @@ const PromptPill = styled.button`
   text-overflow: ellipsis;
 
   &:hover {
-    background: ${palette.colors.brand[50]};
-    border-color: ${palette.colors.brand[300]};
-    color: ${palette.colors.brand[700]};
+    background: ${palette.colors.gray[700]};
+    border-color: ${palette.colors.gray[600]};
+    color: ${palette.colors.white};
     transform: translateY(-1px);
   }
 
@@ -52,13 +52,14 @@ const PromptPill = styled.button`
 `;
 
 // Utility function to get random prompts
-const getRandomPrompts = (count: number = 5, allPrompts: string[]): string[] => {
+const getRandomPrompts = async (count: number = 5, allPrompts: string[]): Promise<string[]> => {
   const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 
 const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) => {
   const { t } = useTranslation();
+  const [displayedPrompts, setDisplayedPrompts] = React.useState<string[]>([]);
 
   // Build the prompts array using translations
   const allPrompts = [
@@ -113,7 +114,13 @@ const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) 
     t('home.expanded.chat.promptSuggestions.deepWork.researchStudy'),
   ];
 
-  const [displayedPrompts] = React.useState(() => getRandomPrompts(5, allPrompts));
+  React.useEffect(() => {
+    const loadPrompts = async () => {
+      const prompts = await getRandomPrompts(5, allPrompts);
+      setDisplayedPrompts(prompts);
+    };
+    loadPrompts();
+  }, []);
 
   return (
     <Container>
