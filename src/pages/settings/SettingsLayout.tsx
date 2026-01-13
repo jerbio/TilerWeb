@@ -5,11 +5,14 @@ import { ChevronRight, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import Logo from '@/core/common/components/icons/logo';
+import useAppStore from '@/global_state';
+import { toast } from 'sonner'
 
 const SettingsLayout: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const location = useLocation();
+	const logout = useAppStore((state) => state.logout);
 
 	const settingsSections = [
 		{
@@ -40,9 +43,15 @@ const SettingsLayout: React.FC = () => {
 		// },
 	];
 
-	const handleLogout = () => {
-		// TODO: Implement logout logic
-		console.log('Logout clicked');
+	const handleLogout = async () => {
+	try {
+      await logout();
+      toast.success(t('timeline.userMenu.signOutSuccess'));
+      navigate('/signin');
+    } catch (error) {
+      toast.error(t('timeline.userMenu.signOutError'));
+      console.error('Logout failed:', error);
+    }
 	};
 
 	// Check if we're on a settings detail page

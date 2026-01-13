@@ -21,9 +21,6 @@ import { PublicRoute } from './components/auth/PublicRoute';
 import SettingsLayout from './pages/settings/SettingsLayout';
 import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
-import ContactsSettings from './pages/settings/ContactsSettings';
-import NotificationsSettings from './pages/settings/NotificationsSettings';
-import ConnectionsSettings from './pages/settings/ConnectionsSettings';
 // import useAppStore from './global_state';
 
 // Component to track page views on route changes
@@ -135,9 +132,6 @@ const App: React.FC = () => {
                   <Route index element={<Navigate to="/settings" replace />} />
                   <Route path="account" element={<AccountSettings />} />
                   <Route path="preferences" element={<PreferencesSettings />} />
-                  <Route path="contacts" element={<ContactsSettings />} />
-                  <Route path="notifications" element={<NotificationsSettings />} />
-                  <Route path="connections" element={<ConnectionsSettings />} />
                 </Route>
               </Route>
             </Routes>
