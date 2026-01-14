@@ -20,7 +20,7 @@ export default function usePrefetchedCalendarData({
   const latestLookupRequestRef = useRef<string | null>(null);
   const scheduleCacheRef = useRef<Map<string, Array<ScheduleSubCalendarEvent>>>(new Map());
   const scheduleCache = scheduleCacheRef.current;
-  
+
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,8 +28,9 @@ export default function usePrefetchedCalendarData({
   const activePersonaSession = useAppStore((state) => state.activePersonaSession);
   const scheduleId = activePersonaSession?.scheduleId;
 
-  function makeCacheKey(uid: string, start: number, end: number) {
-    return `${uid}-${start}-${end}`;
+  function makeCacheKey(uid: string, sid: string | null | undefined, start: number, end: number) {
+    const key = `${uid}-${sid || 'noschedule'}-${start}-${end}`;
+    return key;
   }
 
   function enforceMaxCacheSize() {
@@ -45,8 +46,8 @@ export default function usePrefetchedCalendarData({
     endRange: number,
     useCache = true
   ) {
-    const cacheKey = makeCacheKey(id, startRange, endRange);
-    
+    const cacheKey = makeCacheKey(id, scheduleId, startRange, endRange);
+
     if (isDemoMode()) {
       const { calendarEvents } = getDemoData();
       return calendarEvents;
@@ -72,7 +73,7 @@ export default function usePrefetchedCalendarData({
     const start = viewOptions.startDay.valueOf();
     const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
 
-    const requestKey = makeCacheKey(userId, start, end);
+    const requestKey = makeCacheKey(userId, scheduleId, start, end);
     latestLookupRequestRef.current = requestKey;
 
     setLoading(true);

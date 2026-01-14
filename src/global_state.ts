@@ -108,7 +108,9 @@ const useAppStore = create<AppState>((set, get) => ({
       return {
         activePersonaSession: {
           ...state.activePersonaSession,
-          chatContext: state.activePersonaSession.chatContext.filter((item) => item !== context),
+          chatContext: state.activePersonaSession.chatContext.filter(
+            (item) => item !== context
+          ),
         },
       };
     }),
@@ -124,7 +126,7 @@ const useAppStore = create<AppState>((set, get) => ({
       };
     }),
 
-  setScheduleId: (id) =>
+  setScheduleId: (id) => {
     set((state) => {
       if (!state.activePersonaSession) return state;
       return {
@@ -133,7 +135,8 @@ const useAppStore = create<AppState>((set, get) => ({
           scheduleId: id,
         },
       };
-    }),
+    });
+  },
 
   setScheduleLastUpdatedBy: (component) =>
     set((state) => {
