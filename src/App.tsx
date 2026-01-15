@@ -41,34 +41,6 @@ const AnalyticsTracker: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  // TO USE WHEN WE ARE READY TO FETCH USER INFO
-  // const setUserInfo = useAppStore((state) => state.setUserInfo);
-
-  // useEffect(() => {
-  // 	const fetchUserInfo = async () => {
-  // 		try {
-  // 			// Get sessionId or userId from localStorage or login flow
-  // 			const sessionId = localStorage.getItem('sessionId') || 'default-session-id';
-
-  // 			// Call the endpoint to fetch user info
-  // 			const response = await fetch(`/api/user-info?sessionId=${sessionId}`);
-  // 			if (!response.ok) throw new Error('Failed to fetch user info');
-  // 			const data = await response.json();
-
-  // 			// Update global state with user info
-  // 			setUserInfo({
-  // 				userId: data.userId,
-  // 				name: data.name,
-  // 				email: data.email,
-  // 				scheduleId: data.scheduleId,
-  // 			});
-  // 		} catch (error) {
-  // 			console.error('Error fetching user info:', error);
-  // 		}
-  // 	};
-
-  // 	fetchUserInfo();
-  // }, [setUserInfo]);
 
   // Dev tools for testing
   const { isOverlayVisible, closeOverlay } = useDevTools();
