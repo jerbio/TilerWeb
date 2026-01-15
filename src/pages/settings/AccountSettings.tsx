@@ -18,7 +18,7 @@ const AccountSettings: React.FC = () => {
 	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
 	const [phoneNumber, setPhoneNumber] = useState('');
-	const [dateOfBirth, setDateOfBirth] = useState('');
+	const [dateOfBirth, setDateOfBirth] = useState(''); // YYYY-MM-DD format for native date picker
 	const [isSaving, setIsSaving] = useState(false);
 
 	useEffect(() => {
@@ -26,7 +26,17 @@ const AccountSettings: React.FC = () => {
 			setFullName(authenticatedUser.fullName || '');
 			setEmail(authenticatedUser.email || '');
 			setPhoneNumber(authenticatedUser.phoneNumber || '');
-			// Date of birth is not in UserInfo type, so we'll leave it empty for now
+
+			// Format date of birth to YYYY-MM-DD for native date picker
+			if (authenticatedUser.dateOfBirth) {
+				const date = new Date(authenticatedUser.dateOfBirth);
+				if (!isNaN(date.getTime())) {
+					const year = date.getFullYear();
+					const month = String(date.getMonth() + 1).padStart(2, '0');
+					const day = String(date.getDate()).padStart(2, '0');
+					setDateOfBirth(`${year}-${month}-${day}`);
+				}
+			}
 		}
 	}, [authenticatedUser]);
 
@@ -38,11 +48,11 @@ const AccountSettings: React.FC = () => {
 			const firstName = nameParts[0] || '';
 			const lastName = nameParts.slice(1).join(' ') || '';
 
-			// Parse date of birth to UTC epoch (assuming format MM/DD/YYYY)
+			// Parse date of birth to UTC epoch (YYYY-MM-DD format from native picker)
 			let dateOfBirthUtcEpoch = 0;
 			if (dateOfBirth) {
-				const [month, day, year] = dateOfBirth.split('/');
-				if (month && day && year) {
+				const [year, month, day] = dateOfBirth.split('-');
+				if (year && month && day) {
 					const date = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
 					dateOfBirthUtcEpoch = Math.floor(date.getTime() / 1000);
 				}
@@ -144,10 +154,9 @@ const AccountSettings: React.FC = () => {
 					<FormGroup>
 						<Input
 							label={t('settings.sections.accountInfo.fields.dateOfBirth')}
-							placeholder="01/06/1997"
 							value={dateOfBirth}
 							onChange={(e) => setDateOfBirth(e.target.value)}
-							type="text"
+							type="date"
 						/>
 					</FormGroup>
 					<FormGroup $alignEnd>
