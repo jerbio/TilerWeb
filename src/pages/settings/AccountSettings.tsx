@@ -152,7 +152,13 @@ const AccountSettings: React.FC = () => {
 				</FormRow>
 
 				<FormRow>
-					<FormGroup>
+					<FormGroup onClick={() => {
+						const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+						if (dateInput) {
+							dateInput.focus();
+							dateInput.showPicker?.();
+						}
+					}}>
 						<Input
 							label={t('settings.sections.accountInfo.fields.dateOfBirth')}
 							value={dateOfBirth}
@@ -248,6 +254,10 @@ const FormGroup = styled.div<{ $alignEnd?: boolean }>`
 	display: flex;
 	flex-direction: column;
 	${(props) => props.$alignEnd && 'justify-content: flex-end;'}
+
+	&:has(input[type="date"]) {
+		cursor: pointer;
+	}
 `;
 
 const DeleteButton = styled.button`
