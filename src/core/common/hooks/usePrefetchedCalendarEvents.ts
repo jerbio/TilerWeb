@@ -20,7 +20,7 @@ export default function usePrefetchedCalendarData({
   const latestLookupRequestRef = useRef<string | null>(null);
   const scheduleCacheRef = useRef<Map<string, Array<ScheduleSubCalendarEvent>>>(new Map());
   const scheduleCache = scheduleCacheRef.current;
-  
+
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [loading, setLoading] = useState(true);
 
