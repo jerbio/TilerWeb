@@ -24,10 +24,51 @@ export interface UserResponse {
 	ServerStatus: null;
 }
 
+export interface UpdateUserRequest {
+	FirstName: string;
+	LastName: string;
+	UpdatedUserName: string;
+	CountryCode: number;
+	PhoneNumber: string;
+	DateOfBirthUtcEpoch: number;
+	EndOfDay: string;
+}
+
+export interface UpdateUserResponse {
+	Error: {
+		Code: string;
+		Message: string;
+	};
+	Content: {
+		user: {
+			id: string;
+			username: string;
+			timeZoneDifference: number;
+			timeZone: string;
+			email: string;
+			endfOfDay: string;
+			phoneNumber: string;
+			fullName: string;
+			firstName: string;
+			lastName: string;
+			countryCode: string;
+			dateOfBirth: string;
+		};
+	};
+	ServerStatus: null;
+}
+
 export class UserApi extends AppApi {
 	public getCurrentUser() {
 		return this.apiRequest<UserResponse>('api/User', {
 			method: 'GET',
+		});
+	}
+
+	public updateUser(userData: UpdateUserRequest) {
+		return this.apiRequest<UpdateUserResponse>('api/User', {
+			method: 'PUT',
+			body: JSON.stringify(userData),
 		});
 	}
 
