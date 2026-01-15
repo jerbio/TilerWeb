@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { PersonaId } from '@/core/constants/persona';
 import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import PersonaCalendar from './persona_calendar';
@@ -44,7 +45,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const personaUserId = personaUsers[persona.id]?.userId || null;
-  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const activePersonaSession = useAppStore((state) => state.anonymousPersonaSession);
   const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
   const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
 
@@ -123,7 +124,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
         // Create a persona session using PersonaSessionManager
         // This automatically handles dev override and syncs to localStorage + global state
         createSession({
-          personaId: persona.id,
+          personaId: PersonaId.AnonymousPersonaId,
           personaName: persona.name,
           userId: devUserIdOverride, // Manager will automatically apply dev override
           scheduleId: null,
@@ -161,7 +162,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       // Create a new persona session using PersonaSessionManager
       // This automatically syncs to both localStorage and global state
       createSession({
-        personaId: persona.id,
+        personaId: PersonaId.AnonymousPersonaId,
         personaName: persona.name,
         userId: newUserId,
         scheduleId: null,

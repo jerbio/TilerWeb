@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { PersonaId } from '@/core/constants/persona';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import PersonaCard from './persona_card';
@@ -167,7 +168,7 @@ const PersonaCarousel: React.FC = () => {
           // Initialize the persona session using PersonaSessionManager
           // This automatically syncs to both localStorage and global state
           createSession({
-            personaId: 'custom-persona',
+            personaId: PersonaId.AnonymousPersonaId,
             personaName: persona.name || 'Custom',
             userId: anonymousUser.id,
             scheduleId: null,

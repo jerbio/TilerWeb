@@ -47,13 +47,15 @@ class CalendarUtil {
 	}
 
 	static isInterseting(eventA: CalendarEventBox, eventB: CalendarEventBox): boolean {
+    const verticalOverlapTolerance = 15;
 		// Check if the bounding boxes of two events intersect
-		return !(
+		const res = !(
 			eventA.x + eventA.width <= eventB.x ||
 			eventA.x >= eventB.x + eventB.width ||
-			eventA.y + eventA.height <= eventB.y ||
-			eventA.y >= eventB.y + eventB.height
+			eventA.y + eventA.height <= eventB.y + verticalOverlapTolerance ||
+			eventA.y >= eventB.y + eventB.height - verticalOverlapTolerance
 		);
+    return res;
 	}
 
 	static getEventLocationLink(event: ScheduleSubCalendarEvent) {

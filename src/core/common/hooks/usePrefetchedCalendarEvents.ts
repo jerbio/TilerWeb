@@ -25,12 +25,18 @@ export default function usePrefetchedCalendarData({
   const [loading, setLoading] = useState(true);
 
   // Get scheduleId from the active persona session to ensure consistency
-  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const activeSessionType = useAppStore((state) => state.activeSessionType);
+  const activePersonaSession = useAppStore((state) => activeSessionType === 'anonymous' ? state.anonymousPersonaSession : state.authenticatedPersonaSession);
   const scheduleId = activePersonaSession?.scheduleId;
 
-  function makeCacheKey(uid: string, sid: string | null | undefined, start: number, end: number) {
-    const key = `${uid}-${sid || 'noschedule'}-${start}-${end}`;
-    return key;
+  function makeCacheKey(
+    uid: string,
+    start: number,
+    end: number,
+    schedId: string | null | undefined,
+    personaId: string
+  ) {
+    return `${personaId}-${uid}-${start}-${end}-${schedId || 'no-schedule'}`;
   }
 
   function enforceMaxCacheSize() {
@@ -46,15 +52,25 @@ export default function usePrefetchedCalendarData({
     endRange: number,
     useCache = true
   ) {
-    const cacheKey = makeCacheKey(id, scheduleId, startRange, endRange);
-
+    const personaId = activePersonaSession?.personaId || 'unknown-persona';
+    const cacheKey = makeCacheKey(
+      id,
+      startRange,
+      endRange,
+      scheduleId || null,
+      personaId
+    );
+    
     if (isDemoMode()) {
       const { calendarEvents } = getDemoData();
       return calendarEvents;
     }
 
-    if (useCache && scheduleCache.has(cacheKey)) {
-      return scheduleCache.get(cacheKey) || [];
+    if (useCache) {
+      const cached = scheduleCache.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
     }
 
     const lookup = await scheduleService.lookupScheduleByUserId(id, {
@@ -73,7 +89,13 @@ export default function usePrefetchedCalendarData({
     const start = viewOptions.startDay.valueOf();
     const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
 
-    const requestKey = makeCacheKey(userId, scheduleId, start, end);
+    const requestKey = makeCacheKey(
+      userId,
+      start,
+      end,
+      scheduleId,
+      activePersonaSession?.personaId || 'unknown-persona'
+    );
     latestLookupRequestRef.current = requestKey;
 
     setLoading(true);
