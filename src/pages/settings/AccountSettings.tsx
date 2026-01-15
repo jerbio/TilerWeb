@@ -17,6 +17,7 @@ const AccountSettings: React.FC = () => {
 
 	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
+	const [username, setUsername] = useState('');
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const [dateOfBirth, setDateOfBirth] = useState(''); // YYYY-MM-DD format for native date picker
 	const [isSaving, setIsSaving] = useState(false);
@@ -25,6 +26,7 @@ const AccountSettings: React.FC = () => {
 		if (authenticatedUser) {
 			setFullName(authenticatedUser.fullName || '');
 			setEmail(authenticatedUser.email || '');
+			setUsername(authenticatedUser.username || '');
 			setPhoneNumber(authenticatedUser.phoneNumber || '');
 
 			// Format date of birth to YYYY-MM-DD for native date picker
@@ -67,7 +69,7 @@ const AccountSettings: React.FC = () => {
 			await userService.updateUser({
 				FirstName: firstName,
 				LastName: lastName,
-				UpdatedUserName: authenticatedUser?.username || '',
+				UpdatedUserName: username || '',
 				CountryCode: countryCode,
 				PhoneNumber: phoneNumberOnly,
 				DateOfBirthUtcEpoch: dateOfBirthUtcEpoch,
@@ -119,12 +121,11 @@ const AccountSettings: React.FC = () => {
 					</FormGroup>
 					<FormGroup>
 						<Input
-							label={t('settings.sections.accountInfo.fields.email')}
-							placeholder="jamesmichael@gmail.com"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							type="email"
-							disabled
+							label={t('settings.sections.accountInfo.fields.username')}
+							placeholder="james-michael"
+							value={username}
+							onChange={(e) => setUsername(e.target.value)}
+							type="text"
 						/>
 					</FormGroup>
 				</FormRow>

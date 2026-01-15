@@ -604,6 +604,7 @@
 				"placeholder": "Account information settings coming soon...",
 				"fields": {
 					"fullName": "Full Name",
+					"username": "Username",
 					"email": "Email Address",
 					"phoneNumber": "Phone Number",
 					"phoneNumberPlaceholder": "Add phone number",
