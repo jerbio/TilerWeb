@@ -50,13 +50,13 @@ const AccountSettings: React.FC = () => {
 			const firstName = nameParts[0] || '';
 			const lastName = nameParts.slice(1).join(' ') || '';
 
-			// Parse date of birth to UTC epoch (YYYY-MM-DD format from native picker)
+			// Parse date of birth to UTC epoch in milliseconds (YYYY-MM-DD format from native picker)
 			let dateOfBirthUtcEpoch = 0;
 			if (dateOfBirth) {
 				const [year, month, day] = dateOfBirth.split('-');
 				if (year && month && day) {
 					const date = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
-					dateOfBirthUtcEpoch = Math.floor(date.getTime() / 1000);
+					dateOfBirthUtcEpoch = date.getTime();
 				}
 			}
 
