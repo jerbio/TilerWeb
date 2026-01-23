@@ -608,7 +608,8 @@
 					"email": "Email Address",
 					"phoneNumber": "Phone Number",
 					"phoneNumberPlaceholder": "Add phone number",
-					"dateOfBirth": "Date of Birth"
+					"dateOfBirth": "Date of Birth",
+					"dateOfBirthPlaceholder": "MM/DD/YYYY"
 				},
 				"saveChanges": "Save changes",
 				"saving": "Saving...",

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Input from '@/core/common/components/input';
 import Button from '@/core/common/components/button';
+import DatePicker from '@/core/common/components/date_picker';
 import useAppStore from '@/global_state';
 import { userService } from '@/services';
 
@@ -85,11 +85,6 @@ const AccountSettings: React.FC = () => {
 		}
 	};
 
-	const handleDeleteAccount = () => {
-		// TODO: Implement delete account functionality
-		toast.error(t('settings.sections.accountInfo.deleteNotImplemented'));
-	};
-
 	return (
 		<Container>
 			<Breadcrumb>
@@ -138,6 +133,7 @@ const AccountSettings: React.FC = () => {
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							type="email"
+							readOnly
 						/>
 					</FormGroup>
 					<FormGroup>
@@ -152,18 +148,12 @@ const AccountSettings: React.FC = () => {
 				</FormRow>
 
 				<FormRow>
-					<FormGroup onClick={() => {
-						const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
-						if (dateInput) {
-							dateInput.focus();
-							dateInput.showPicker?.();
-						}
-					}}>
-						<Input
+					<FormGroup>
+						<DatePicker
 							label={t('settings.sections.accountInfo.fields.dateOfBirth')}
 							value={dateOfBirth}
-							onChange={(e) => setDateOfBirth(e.target.value)}
-							type="date"
+							onChange={setDateOfBirth}
+							placeholder={t('settings.sections.accountInfo.fields.dateOfBirthPlaceholder')}
 						/>
 					</FormGroup>
 					<FormGroup $alignEnd>
@@ -175,11 +165,6 @@ const AccountSettings: React.FC = () => {
 					</FormGroup>
 				</FormRow>
 			</Form>
-
-			<DeleteButton onClick={handleDeleteAccount}>
-				{t('settings.sections.accountInfo.deleteAccount')}
-				<Trash2 size={16} />
-			</DeleteButton>
 		</Container>
 	);
 };
@@ -254,28 +239,6 @@ const FormGroup = styled.div<{ $alignEnd?: boolean }>`
 	display: flex;
 	flex-direction: column;
 	${(props) => props.$alignEnd && 'justify-content: flex-end;'}
-
-	&:has(input[type="date"]) {
-		cursor: pointer;
-	}
-`;
-
-const DeleteButton = styled.button`
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	background: transparent;
-	border: none;
-	color: ${palette.colors.brand[400]};
-	font-size: ${palette.typography.fontSize.base};
-	font-weight: ${palette.typography.fontWeight.medium};
-	cursor: pointer;
-	padding: 0;
-	transition: color 0.2s ease;
-
-	&:hover {
-		color: ${palette.colors.brand[300]};
-	}
 `;
 
 export default AccountSettings;

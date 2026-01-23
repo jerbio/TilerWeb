@@ -254,6 +254,11 @@ const StyledInput = styled.input<StyledInputProps>`
 	&::placeholder {
 		color: ${palette.colors.gray[500]};
 	}
+
+	&:read-only {
+		color: ${palette.colors.gray[500]};
+		cursor: not-allowed;
+	}
 `;
 
 const StyledTextarea = styled.textarea<StyledInputProps>`

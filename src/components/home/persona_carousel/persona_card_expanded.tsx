@@ -179,6 +179,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           firstName: personaUser.anonymousUser.firstName || '',
           lastName: personaUser.anonymousUser.lastName || '',
           countryCode: personaUser.anonymousUser.countryCode || '1',
+          dateOfBirth: '',
         },
         scheduleLastUpdatedBy: null,
       });
