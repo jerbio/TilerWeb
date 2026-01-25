@@ -740,5 +740,9 @@
 			"signOutError": "Failed to sign out. Please try again.",
 			"defaultUsername": "User"
 		}
+	},
+	"errors": {
+		"chatLimitReached": "Chat limit reached. Please try again later.",
+		"usernameAlreadyExists": "Username already exists"
 	}
 }

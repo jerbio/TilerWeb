@@ -1,3 +1,4 @@
+import { ApiCodeResponse } from '@/core/common/types/api';
 import { AppApi } from './appApi';
 
 export interface UserResponse {
@@ -35,10 +36,7 @@ export interface UpdateUserRequest {
 }
 
 export interface UpdateUserResponse {
-	Error: {
-		Code: string;
-		Message: string;
-	};
+	Error: ApiCodeResponse;
 	Content: {
 		user: {
 			id: string;

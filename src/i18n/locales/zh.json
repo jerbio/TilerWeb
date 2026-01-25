@@ -457,5 +457,9 @@
 				}
 			}
 		}
+	},
+	"errors": {
+		"chatLimitReached": "聊天限制已达到。请稍后再试。",
+		"usernameAlreadyExists": "用户名已存在"
 	}
 }

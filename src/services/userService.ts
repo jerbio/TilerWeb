@@ -1,5 +1,8 @@
 import { UserApi, UpdateUserRequest } from '@/api/userApi';
 import { normalizeError } from '@/core/error';
+import { TilerResponseError } from '@/core/common/types/errors';
+// import { ApiCodeResponse } from '@/core/';
+
 
 export class UserService {
 	private userApi: UserApi;
@@ -14,7 +17,7 @@ export class UserService {
 
 			// Check if the API returned an error
 			if (response.Error.Code !== '0') {
-				throw new Error(response.Error.Message);
+				throw TilerResponseError.fromApiCodeResponse(response.Error);
 			}
 
 			return response.Content.user;
@@ -30,13 +33,13 @@ export class UserService {
 
 			// Check if the API returned an error
 			if (response.Error.Code !== '0') {
-				throw new Error(response.Error.Message);
+				throw TilerResponseError.fromApiCodeResponse(response.Error);
 			}
 
 			return response;
-		} catch (error) {
-			console.error('Error updating user', error);
-			throw normalizeError(error);
+		} catch (errorResponse) {			
+			console.error('Error updating user', errorResponse);
+			throw normalizeError(errorResponse);
 		}
 	}
 }

@@ -457,5 +457,9 @@
 				}
 			}
 		}
+	},
+	"errors": {
+		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",
+		"usernameAlreadyExists": "ユーザー名は既に存在します"
 	}
 }

@@ -78,7 +78,11 @@ const AccountSettings: React.FC = () => {
 
 			toast.success(t('settings.sections.accountInfo.saveSuccess'));
 		} catch (error) {
-			toast.error(t('settings.sections.accountInfo.saveError'));
+			let toastMessage = t('settings.sections.accountInfo.saveError');
+			if (error instanceof Error && error.message) {
+				toastMessage = error.message;
+			}
+			toast.error(toastMessage);
 			console.error('Failed to save changes:', error);
 		} finally {
 			setIsSaving(false);
