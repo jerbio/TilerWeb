@@ -1,15 +1,8 @@
-export interface ServerError {
-  Error: {
-    Code: string;
-    Message: string;
-  };
-  Content: string;
-  ServerStatus: null;
-}
+import { ApiResponse } from "./api";
 
 export interface ErrorInfo {
   code: string;
-  message: string;
+  message: string | unknown;
   shouldRedirect: boolean;
   redirectPath?: string;
 }
@@ -20,7 +13,7 @@ export class ChatLimitError extends Error {
   public readonly redirectPath?: string;
 
   constructor(errorInfo: ErrorInfo) {
-    super(errorInfo.message);
+    super(typeof errorInfo.message === 'string' ? errorInfo.message : '');
     this.name = 'ChatLimitError';
     this.code = errorInfo.code;
     this.shouldRedirect = errorInfo.shouldRedirect;
@@ -43,15 +36,15 @@ export const parseServerError = (error: unknown): ErrorInfo | null => {
     'Code' in error.Error &&
     'Message' in error.Error &&
     typeof error.Error.Code === 'string' &&
-    typeof error.Error.Message === 'string'
+    (typeof error.Error.Message === 'string' || error.Error.Message === null)
   ) {
-    const serverError = error as ServerError;
+    const serverError = error as ApiResponse<string>;
 
     switch (serverError.Error.Code) {
       case ERROR_CODES.CHAT_LIMIT_REACHED:
         return {
           code: serverError.Error.Code,
-          message: serverError.Error.Message,
+          message: serverError.Error.Message ?? undefined,
           shouldRedirect: true,
           redirectPath: '/' // or wherever you want to redirect
         };
@@ -59,7 +52,7 @@ export const parseServerError = (error: unknown): ErrorInfo | null => {
       default:
         return {
           code: serverError.Error.Code,
-          message: serverError.Error.Message,
+          message: serverError.Error.Message ?? undefined,
           shouldRedirect: false
         };
     }
