@@ -92,7 +92,7 @@ const AccountSettings: React.FC = () => {
 	return (
 		<Container>
 			<Breadcrumb>
-				<BreadcrumbLink onClick={() => navigate('/')}>
+				<BreadcrumbLink onClick={() => navigate('/signin')}>
 					{t('settings.breadcrumb.home')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>

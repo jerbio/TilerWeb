@@ -1,8 +1,6 @@
 import { UserApi, UpdateUserRequest } from '@/api/userApi';
 import { normalizeError } from '@/core/error';
 import { TilerResponseError } from '@/core/common/types/errors';
-// import { ApiCodeResponse } from '@/core/';
-
 
 export class UserService {
 	private userApi: UserApi;
