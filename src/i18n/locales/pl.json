@@ -457,5 +457,9 @@
 				}
 			}
 		}
+	},
+	"errors": {
+		"chatLimitReached": "Osiągnięto limit czatu. Spróbuj ponownie później.",
+		"usernameAlreadyExists": "Nazwa użytkownika już istnieje"
 	}
 }

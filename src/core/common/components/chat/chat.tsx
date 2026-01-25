@@ -880,7 +880,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           <PromptSuggestions onPromptClick={handlePromptClick} />
         )}
 
-        <ChatForm onSubmit={handleSubmit}>
+        <ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
           <Input.Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}

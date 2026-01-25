@@ -20,6 +20,7 @@ export interface UserInfo {
   firstName: string; // ""
   lastName: string; // ""
   countryCode: string | null; // "1"
+  dateOfBirth: string; // ""
 }
 
 // Grouped persona session that includes user, schedule, and chat session

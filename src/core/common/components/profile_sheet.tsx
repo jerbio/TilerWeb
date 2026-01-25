@@ -47,7 +47,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
         pointerEvents: open ? 'all' : 'none',
       }}
     >
-      <ProfileHeader>
+      <ProfileHeader onClick={() => navigate('/settings')}>
         <ProfileAvatar>
           <User size={24} />
         </ProfileAvatar>
@@ -91,6 +91,12 @@ const ProfileHeader = styled.div`
 	align-items: center;
 	gap: 1rem;
 	padding: 1.25rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background-color: ${palette.colors.gray[800]};
+	}
 `;
 
 const ProfileAvatar = styled.div`

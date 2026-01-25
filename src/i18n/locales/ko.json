@@ -457,5 +457,9 @@
 				}
 			}
 		}
+	},
+	"errors": {
+		"chatLimitReached": "채팅 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
+		"usernameAlreadyExists": "사용자 이름이 이미 존재합니다"
 	}
 }
