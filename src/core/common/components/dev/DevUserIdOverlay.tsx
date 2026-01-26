@@ -11,7 +11,7 @@ type DevUserIdOverlayProps = {
 };
 
 const DevUserIdOverlay: React.FC<DevUserIdOverlayProps> = ({ isVisible, onClose }) => {
-  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const activePersonaSession = useAppStore((state) => state.getActivePersonaSession);
   const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
   
   // Use PersonaSessionManager for centralized session management

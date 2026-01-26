@@ -6,52 +6,58 @@ import DELETE_TILE from '@/assets/delete_tile.svg';
 import EXITED_ACTION from '@/assets/exited_action.svg';
 import CLEAR_ALL from '@/assets/clear_all.svg';
 
+export interface ActionIcon {
+  type: 'emoji' | 'image';
+  value: string;
+}
+
 class ChatUtil {
-  static getActionIcon(action: VibeAction) {
+  static getActionIcon(action: VibeAction): ActionIcon {
     switch (action.type) {
       // Regular actions
       case 'add_new_appointment':
-        return ADD_BLOCK;
+        return { type: 'image', value: ADD_BLOCK };
       case 'add_new_task':
-        return ADD_TASK;
+        return { type: 'image', value: ADD_TASK };
       case 'add_new_project':
-        return '📋';
+        return { type: 'emoji', value: '📋' };
       case 'decide_if_task_or_project':
-        return '🤔';
+        return { type: 'emoji', value: '🤔' };
       case 'update_existing_task':
-        return UPDATE_TILE;
+        return { type: 'image', value: UPDATE_TILE };
       case 'remove_existing_task':
-        return DELETE_TILE;
+        return { type: 'image', value: DELETE_TILE };
       case 'mark_task_as_done':
-        return '✓';
+        return { type: 'emoji', value: '✓' };
       case 'procrastinate_all_tasks':
-        return CLEAR_ALL;
+      case 'procrastinate_all_by_timeline':
+        return { type: 'image', value: CLEAR_ALL };
       case 'exit_prompting':
-        return EXITED_ACTION;
+        return { type: 'image', value: EXITED_ACTION };
 
       // What-if scenarios
       case 'whatif_addanewappointment':
-        return '📅❓';
+        return { type: 'emoji', value: '📅❓' };
       case 'whatif_addednewtask':
-        return '✅❓';
+        return { type: 'emoji', value: '✅❓' };
       case 'whatif_editupdatetask':
-        return '✏️❓';
+        return { type: 'emoji', value: '✏️❓' };
       case 'whatif_procrastinatetask':
-        return '⏱️❓';
+        return { type: 'emoji', value: '⏱️❓' };
       case 'whatif_removedtask':
-        return '🗑️❓';
+        return { type: 'emoji', value: '🗑️❓' };
       case 'whatif_markedtaskasdone':
-        return '✓❓';
+        return { type: 'emoji', value: '✓❓' };
       case 'whatif_procrastinateall':
-        return '⏱️❓';
+        return { type: 'emoji', value: '⏱️❓' };
 
       // Other cases
       case 'conversational_and_not_supported':
-        return '💬';
+        return { type: 'emoji', value: '💬' };
       case 'none':
-        return '⚪';
+        return { type: 'emoji', value: '⚪' };
       default:
-        return '🔹';
+        return { type: 'emoji', value: '🔹' };
     }
   }
 }
