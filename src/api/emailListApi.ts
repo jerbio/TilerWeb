@@ -1,9 +1,10 @@
+import { ApiResponse } from '@/core/common/types/api';
 import { AppApi } from './appApi';
-import { ServerError } from '@/core/common/types/errors';
+// import { ServerError } from '@/core/common/types/errors';
 
 export class EmailListApi extends AppApi {
   submitEmail(email: string, uiFlow?: string, tilerUserId?: string) {
-    return this.apiRequest<ServerError>('api/emailList', {
+    return this.apiRequest<ApiResponse<unknown>>('api/emailList', {
       method: 'POST',
       body: JSON.stringify({
         email,

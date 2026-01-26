@@ -1,6 +1,6 @@
 import { EmailListApi } from '@/api/emailListApi';
+import { ApiResponse } from '@/core/common/types/api';
 import { normalizeError } from '@/core/error';
-import { ServerError } from '@/core/common/types/errors';
 
 export class EmailListService {
   private emailListApi: EmailListApi;
@@ -9,7 +9,7 @@ export class EmailListService {
     this.emailListApi = emailListApi;
   }
 
-  async submitEmail(email: string, uiFlow?: string, tilerUserId?: string): Promise<ServerError> {
+  async submitEmail(email: string, uiFlow?: string, tilerUserId?: string): Promise<ApiResponse<unknown>> {
     try {
       const response = await this.emailListApi.submitEmail(email, uiFlow, tilerUserId);
       return response;

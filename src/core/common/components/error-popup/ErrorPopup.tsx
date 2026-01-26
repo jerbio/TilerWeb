@@ -71,7 +71,7 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({
         // Success - call parent callback
         onEmailSubmitted?.(email);
       } else {
-        setEmailError(response?.Error?.Message || t('home.expanded.chat.errorPopup.errors.submitFailed'));
+        setEmailError((response?.Error?.Message as string) || t('home.expanded.chat.errorPopup.errors.submitFailed'));
       }
     } catch (error) {
       console.error('Error submitting email:', error);
