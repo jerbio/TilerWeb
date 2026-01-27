@@ -1,0 +1,65 @@
+import { AppTheme } from "./types";
+import palette from "./palette";
+
+export const darkTheme: AppTheme = {
+  colors: {
+    // Text colors
+    text: {
+      primary: palette.colors.gray[100],
+      secondary: palette.colors.gray[300],
+      muted: palette.colors.gray[500],
+      inverse: palette.colors.white,
+      error: palette.colors.error[400]
+    },
+    // Background colors
+    background: {
+      page: palette.colors.gray[900],
+      surface: palette.colors.gray[800],
+      card: palette.colors.gray[800]
+    },
+    // Border colors
+    border: {
+      default: palette.colors.gray[700],
+      subtle: palette.colors.gray[800],
+      error: palette.colors.error[500]
+    },
+    // Button colors
+    button: {
+      primary: {
+        bg: palette.colors.brand[500],
+        text: palette.colors.white
+      },
+      secondary: {
+        bg: 'transparent',
+        text: palette.colors.white,
+        border: palette.colors.gray[400]
+      }
+    },
+    // hues
+		brand: palette.colors.brand,
+    gray: palette.colors.gray,
+    error: palette.colors.error,
+    warning: palette.colors.warning,
+    success: palette.colors.success,
+    blue: palette.colors.blue,
+    teal: palette.colors.teal,
+    indigo: palette.colors.indigo,
+    purple: palette.colors.purple,
+    pink: palette.colors.pink,
+    orange: palette.colors.orange,
+		bluelight: palette.colors.bluelight,
+		bluegray: palette.colors.bluegray,
+		rose: palette.colors.rose,
+    // Utility
+    white: palette.colors.white,
+    black: palette.colors.black,
+  },
+	typography: palette.typography,
+	buttonHeights: palette.buttonHeights,
+	inputHeights: palette.inputHeights,
+	space: palette.space,
+	inputs: palette.inputs,
+	borderRadius: palette.borderRadius,
+  container: palette.container,
+  screens: palette.screens,
+};
