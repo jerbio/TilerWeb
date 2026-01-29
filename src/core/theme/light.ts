@@ -3,19 +3,21 @@ import palette from "./palette";
 
 export const lightTheme: AppTheme = {
   colors: {
+		plain: palette.colors.white,
     // Text colors
     text: {
       primary: palette.colors.gray[900],
-      secondary: palette.colors.gray[700],
+      secondary: palette.colors.gray[600],
       muted: palette.colors.gray[500],
       inverse: palette.colors.white,
       error: palette.colors.error[600]
     },
     // Background colors
     background: {
-      page: palette.colors.gray[50],
-      surface: palette.colors.white,
-      card: palette.colors.white
+      page: palette.colors.gray[100],
+			header: palette.colors.white,
+      card: palette.colors.white,
+			card2: palette.colors.gray[100]
     },
     // Border colors
     border: {

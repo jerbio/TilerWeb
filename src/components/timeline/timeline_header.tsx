@@ -1,5 +1,4 @@
 import Logo from '@/core/common/components/icons/logo';
-import palette from '@/core/theme/palette';
 import { Moon, Sun, User } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
@@ -65,8 +64,8 @@ const ThemeToggle = styled.button`
 	width: 36px;
 	overflow: hidden;
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${palette.borderRadius.large};
-	border: 1px solid ${palette.colors.gray[700]};
+	border-radius: ${props => props.theme.borderRadius.large};
+	border: 1px solid ${props => props.theme.colors.border.default};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -84,9 +83,10 @@ const ProfileContainer = styled.div`
 	height: 36px;
 	width: 36px;
 	overflow: hidden;
-	background-color: ${palette.colors.gray[800]};
-	border-radius: ${palette.borderRadius.large};
-	border: 1px solid ${palette.colors.gray[700]};
+	background-color: ${(props) => props.theme.colors.background.header};
+	border-radius: ${(props) => props.theme.borderRadius.large};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
+	color: ${(props) => props.theme.colors.text.primary};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -98,8 +98,8 @@ const Header = styled.header`
 	gap: 1rem;
 	justify-content: space-between;
 	align-items: center;
-	background-color: ${palette.colors.gray[900]};
-	border-bottom: 1px solid ${palette.colors.gray[800]};
+	background-color: ${(props) => props.theme.colors.background.header};
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
 	padding-inline: 2rem;
 `;
 

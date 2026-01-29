@@ -32,6 +32,7 @@ export type ColorScaleHue =
 
 export type AppTheme = {
   colors: {
+		plain: string;
     // Text colors
     text: {
       primary: string;
@@ -43,8 +44,9 @@ export type AppTheme = {
     // Background colors
     background: {
       page: string;
-      surface: string;
+			header: string;
       card: string;
+			card2: string;
     };
     // Border colors
     border: {

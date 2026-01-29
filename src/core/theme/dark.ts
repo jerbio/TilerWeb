@@ -3,10 +3,11 @@ import palette from "./palette";
 
 export const darkTheme: AppTheme = {
   colors: {
+		plain: palette.colors.black,
     // Text colors
     text: {
       primary: palette.colors.gray[100],
-      secondary: palette.colors.gray[300],
+      secondary: palette.colors.gray[400],
       muted: palette.colors.gray[500],
       inverse: palette.colors.white,
       error: palette.colors.error[400]
@@ -14,12 +15,13 @@ export const darkTheme: AppTheme = {
     // Background colors
     background: {
       page: palette.colors.gray[900],
-      surface: palette.colors.gray[800],
-      card: palette.colors.gray[800]
+			header: palette.colors.gray[900],
+      card: palette.colors.gray[900],
+			card2: palette.colors.gray[800]
     },
     // Border colors
     border: {
-      default: palette.colors.gray[700],
+      default: 'hsla(0, 4%, 14%, 1)',
       subtle: palette.colors.gray[800],
       error: palette.colors.error[500]
     },
