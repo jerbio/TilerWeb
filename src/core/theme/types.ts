@@ -58,13 +58,25 @@ export type AppTheme = {
     button: {
       primary: {
         bg: string;
+				bgHover: string;
+				border: string;
         text: string;
       };
       secondary: {
         bg: string;
+				bgHover: string;
         text: string;
-        border: string;
       };
+			brand: {
+				bg: string; 
+				bgHover: string;
+				text: string;
+			};
+			ghost: {
+				bg: string; 
+				bgHover: string;
+				text: string;
+			};
     };
     // Utility colors
     white: string;

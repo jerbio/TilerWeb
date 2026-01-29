@@ -28,14 +28,26 @@ export const lightTheme: AppTheme = {
     // Button colors
     button: {
       primary: {
-        bg: palette.colors.brand[500],
-        text: palette.colors.white
+        bg: palette.colors.white,
+				bgHover: palette.colors.gray[100],
+				border: palette.colors.gray[200],
+        text: palette.colors.black
       },
       secondary: {
-        bg: 'transparent',
-        text: palette.colors.gray[900],
-        border: palette.colors.gray[300]
-      }
+        bg: palette.colors.black,
+				bgHover: palette.colors.gray[900],
+        text: palette.colors.white,
+      },
+			brand: {
+				bg: palette.colors.brand[500],
+        bgHover: palette.colors.brand[600],
+        text: palette.colors.white,
+			},
+			ghost: {
+				bg: 'transparent',
+				bgHover: '#00000012',
+				text: palette.colors.gray[700],
+			}
     },
     // hues
 		brand: palette.colors.brand,

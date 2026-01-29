@@ -57,7 +57,7 @@ const Container = styled.div`
 const Label = styled.label`
 	display: block;
 	margin-bottom: 6px;
-	font-size: ${palette.typography.fontSize.xs};
+	font-size: ${props => props.theme.typography.fontSize.xs};
 	font-weight: ${palette.typography.fontWeight.medium};
 	color: ${palette.colors.gray[400]};
 `;

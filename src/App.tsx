@@ -55,7 +55,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme='dark'>
       <HelmetProvider>
         <ConsentProvider>
           <AuthProvider>

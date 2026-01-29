@@ -63,9 +63,10 @@ const ThemeToggle = styled.button`
 	height: 36px;
 	width: 36px;
 	overflow: hidden;
+	color: ${(props) => props.theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${props => props.theme.borderRadius.large};
-	border: 1px solid ${props => props.theme.colors.border.default};
+	border-radius: ${(props) => props.theme.borderRadius.large};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -83,10 +84,10 @@ const ProfileContainer = styled.div`
 	height: 36px;
 	width: 36px;
 	overflow: hidden;
-	background-color: ${(props) => props.theme.colors.background.header};
+	background-color: ${(props) => props.theme.colors.button.primary.bg};
 	border-radius: ${(props) => props.theme.borderRadius.large};
 	border: 1px solid ${(props) => props.theme.colors.border.default};
-	color: ${(props) => props.theme.colors.text.primary};
+	color: ${(props) => props.theme.colors.button.primary.text};
 	display: flex;
 	align-items: center;
 	justify-content: center;

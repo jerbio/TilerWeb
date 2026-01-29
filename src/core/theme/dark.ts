@@ -28,14 +28,26 @@ export const darkTheme: AppTheme = {
     // Button colors
     button: {
       primary: {
-        bg: palette.colors.brand[500],
+        bg: palette.colors.black,
+				bgHover: palette.colors.gray[900],
+				border: palette.colors.gray[700],
         text: palette.colors.white
       },
       secondary: {
-        bg: 'transparent',
+        bg: palette.colors.white,
+				bgHover: palette.colors.gray[200],
+        text: palette.colors.black,
+      },
+			brand: {
+				bg: palette.colors.brand[500],
+        bgHover: palette.colors.brand[600],
         text: palette.colors.white,
-        border: palette.colors.gray[400]
-      }
+			},
+			ghost: {
+				bg: 'transparent',
+				bgHover: '#ffffff12',
+				text: palette.colors.gray[300],
+			}
     },
     // hues
 		brand: palette.colors.brand,
