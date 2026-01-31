@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import { Env } from '@/config/config_getter';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -42,9 +43,11 @@ const TimelineHeader: React.FC = () => {
         <Logo size={30} />
       </HeaderLeft>
       <HeaderRight>
-        <ThemeToggle onClick={toggleTheme}>
-          {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-        </ThemeToggle>
+        {Env.isDevelopment() && (
+          <ThemeToggle onClick={toggleTheme}>
+            {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
+          </ThemeToggle>
+        )}
         <ProfileTrigger
           ref={triggerRef}
           onClick={() => setProfileSheetOpen(!profileSheetOpen)}
