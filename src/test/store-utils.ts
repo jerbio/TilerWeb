@@ -217,7 +217,7 @@ export const createMockUserInfo = (overrides: Partial<UserInfo> = {}): UserInfo 
 	timeZoneDifference: 0,
 	timeZone: 'UTC',
 	email: 'test@example.com',
-	endfOfDay: null,
+	endOfDay: null,
 	phoneNumber: null,
 	fullName: 'Test User',
 	firstName: 'Test',

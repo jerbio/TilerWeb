@@ -49,7 +49,7 @@ export type PersonaAnonymousUserResponse = ApiResponse<{
 			timeZoneDifference: number | null;
 			timeZone: string | null;
 			email: null | null;
-			endfOfDay: string | null;
+			endOfDay: string | null;
 			phoneNumber: null | null;
 			fullName: string | null;
 			firstName: string | null;

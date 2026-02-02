@@ -13,7 +13,7 @@ export interface UserResponse {
 			timeZoneDifference: number;
 			timeZone: string;
 			email: string;
-			endfOfDay: string;
+			endOfDay: string;
 			phoneNumber: string;
 			fullName: string;
 			firstName: string;
@@ -44,7 +44,7 @@ export interface UpdateUserResponse {
 			timeZoneDifference: number;
 			timeZone: string;
 			email: string;
-			endfOfDay: string;
+			endOfDay: string;
 			phoneNumber: string;
 			fullName: string;
 			firstName: string;

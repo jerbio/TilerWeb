@@ -174,7 +174,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
           timeZone: personaUser.anonymousUser.timeZone || 'UTC',
           email: personaUser.anonymousUser.email,
-          endfOfDay: personaUser.anonymousUser.endfOfDay || '',
+          endOfDay: personaUser.anonymousUser.endOfDay || '',
           phoneNumber: personaUser.anonymousUser.phoneNumber,
           fullName: personaUser.anonymousUser.fullName || '',
           firstName: personaUser.anonymousUser.firstName || '',

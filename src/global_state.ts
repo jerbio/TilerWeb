@@ -24,7 +24,7 @@ export interface UserInfo {
   timeZoneDifference: number; // 0.0
   timeZone: string; // UTC
   email: string | null; // null
-  endfOfDay: string | null; // 0001-01-01T00:00:00+00:00
+  endOfDay: string | null; // 0001-01-01T00:00:00+00:00
   phoneNumber: string | null; // null
   fullName: string; // ""
   firstName: string; // ""
