@@ -1,12 +1,11 @@
 import React from 'react';
-import palette from '@/core/theme/palette';
 import { UserInfo } from '@/global_state';
 import { animated, useSpring } from '@react-spring/web';
 import { LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import useAppStore from '@/global_state';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Button from './button';
 
@@ -20,6 +19,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
   const logout = useAppStore((state) => state.logout);
   const navigate = useNavigate();
   const { t } = useTranslation();
+	const theme = useTheme();
 
   const openSheetSpring = useSpring({
     opacity: open ? 1 : 0,
@@ -47,7 +47,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
         pointerEvents: open ? 'all' : 'none',
       }}
     >
-      <ProfileHeader>
+      <ProfileHeader onClick={() => navigate('/settings')}>
         <ProfileAvatar>
           <User size={24} />
         </ProfileAvatar>
@@ -65,7 +65,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
       <ProfileDivider />
 
       <LogoutButton variant="ghost" onClick={handleLogout}>
-        <LogOut size={16} color={palette.colors.error[400]} />
+        <LogOut size={16} color={theme.colors.error[400]} />
         {t('timeline.userMenu.logout')}
       </LogoutButton>
     </AnimatedProfileMenu>
@@ -73,13 +73,13 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 };
 
 const AnimatedProfileMenu = styled(animated.div)`
-	padding: ${palette.space.small} 0;
+	padding: ${props => props.theme.space.small} 0;
 	position: absolute;
 	right: 0;
 	top: calc(100% + 1rem);
-	background-color: ${palette.colors.gray[900]};
-	border-radius: ${palette.borderRadius.large};
-	border: 1px solid ${palette.colors.gray[800]};
+	background-color: ${props => props.theme.colors.background.card};
+	border-radius: ${props => props.theme.borderRadius.large};
+	border: 1px solid ${props => props.theme.colors.border.default};
 	min-width: 280px;
 	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 	transform-origin: top right;
@@ -91,18 +91,24 @@ const ProfileHeader = styled.div`
 	align-items: center;
 	gap: 1rem;
 	padding: 1.25rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background-color: ${props => props.theme.colors.background.card2};
+	}
 `;
 
 const ProfileAvatar = styled.div`
 	height: 48px;
 	width: 48px;
-	border-radius: ${palette.borderRadius.large};
-	background-color: ${palette.colors.gray[800]};
-	border: 1px solid ${palette.colors.gray[700]};
+	border-radius: ${props => props.theme.borderRadius.large};
+	background-color: ${props => props.theme.colors.background.card};
+	border: 1px solid ${props => props.theme.colors.border.default};
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: ${palette.colors.gray[400]};
+	color: ${props => props.theme.colors.text.secondary};
 	flex-shrink: 0;
 `;
 
@@ -112,9 +118,9 @@ const ProfileInfo = styled.div`
 `;
 
 const ProfileName = styled.div`
-	font-size: ${palette.typography.fontSize.base};
-	font-weight: ${palette.typography.fontWeight.semibold};
-	color: ${palette.colors.white};
+	font-size: ${props => props.theme.typography.fontSize.base};
+	font-weight: ${props => props.theme.typography.fontWeight.semibold};
+	color: ${props => props.theme.colors.text.primary};
 	margin-bottom: 0.25rem;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -122,8 +128,8 @@ const ProfileName = styled.div`
 `;
 
 const ProfileEmail = styled.div`
-	font-size: ${palette.typography.fontSize.sm};
-	color: ${palette.colors.gray[400]};
+	font-size: ${props => props.theme.typography.fontSize.sm};
+	color: ${props => props.theme.colors.text.secondary};
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -131,8 +137,8 @@ const ProfileEmail = styled.div`
 
 const ProfileDivider = styled.div`
 	height: 1px;
-	background-color: ${palette.colors.gray[800]};
-	margin: ${palette.space.small} 0;
+	background-color: ${props => props.theme.colors.border.default};
+	margin: ${props => props.theme.space.small} 0;
 `;
 
 const LogoutButton = styled(Button)``;

@@ -3,11 +3,13 @@ export type ApiRequest<T> = {
 	Content: T;
 };
 
+export type ApiCodeResponse = {
+	Code: string;
+	Message: string | unknown;
+};
+
 export type ApiResponse<T> = {
-	Error: {
-		Code: string;
-		Message: string;
-	};
+	Error: ApiCodeResponse;
 	Content: T;
 	ServerStatus: null;
 };

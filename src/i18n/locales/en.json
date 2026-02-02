@@ -594,6 +594,84 @@
 		},
 		"goBack": "Go back"
 	},
+	"settings": {
+		"title": "Settings",
+		"back": "Back",
+		"logout": "Log out",
+		"breadcrumb": {
+			"home": "Home",
+			"settings": "Settings"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "Account Info",
+				"description": "Review your account and make changes to your personal information",
+				"placeholder": "Account information settings coming soon...",
+				"fields": {
+					"fullName": "Full Name",
+					"username": "Username",
+					"email": "Email Address",
+					"phoneNumber": "Phone Number",
+					"phoneNumberPlaceholder": "Add phone number",
+					"dateOfBirth": "Date of Birth",
+					"dateOfBirthPlaceholder": "MM/DD/YYYY"
+				},
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"deleteAccount": "Delete my account",
+				"saveSuccess": "Account information updated successfully",
+				"saveError": "Failed to save changes. Please try again.",
+				"deleteNotImplemented": "Delete account feature coming soon"
+			},
+			"tilePreferences": {
+				"title": "Tile Preferences",
+				"description": "Define how you move around and help Tiler understand your daily time patterns",
+				"placeholder": "Tile preferences settings coming soon...",
+				"howMoveAround": "How do you move around?",
+				"byBike": "By bike",
+				"iDrive": "I drive",
+				"byBus": "By Bus",
+				"defineTimeRestrictions": "Define your time restrictions",
+				"myWorkHours": "My Work Hours",
+				"myPersonalHours": "My Personal Hours",
+				"setBlockOutHours": "Set your block out hours",
+				"bedTime": "Bed Time",
+				"useCustom": "Use custom",
+				"customTimeRestrictions": "Custom time restrictions",
+				"reset": "Reset",
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"saveSuccess": "Tile preferences updated successfully",
+				"saveError": "Failed to save changes. Please try again.",
+				"customSaved": "Custom time restrictions saved"
+			},
+			"tilerContacts": {
+				"title": "Tiler Contacts",
+				"description": "Add your colleagues as contacts in tiler so you can easily share tiles with them.",
+				"placeholder": "Contacts management coming soon...",
+				"youHave": "You have",
+				"tilerContacts": "Tiler Contacts",
+				"enterFullName": "enter full name",
+				"emailOrPhone": "email or phone number"
+			},
+			"notificationPreferences": {
+				"title": "Notification Preferences",
+				"description": "Manage reminders and email updates",
+				"placeholder": "Notification settings coming soon...",
+				"tileReminders": "Tile Reminders",
+				"emailNotifications": "Email Notifications",
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"saveSuccess": "Notification preferences updated successfully",
+				"saveError": "Failed to save changes. Please try again."
+			},
+			"connections": {
+				"title": "Connections",
+				"description": "Manage apps connected to your Tiler account",
+				"placeholder": "Connection settings coming soon..."
+			}
+		}
+	},
 	"waitlist": {
 		"title": {
 			"part1": "Join the",
@@ -667,5 +745,9 @@
 			"signOutError": "Failed to sign out. Please try again.",
 			"defaultUsername": "User"
 		}
+	},
+	"errors": {
+		"chatLimitReached": "Chat limit reached. Please try again later.",
+		"usernameAlreadyExists": "Username already exists"
 	}
 }

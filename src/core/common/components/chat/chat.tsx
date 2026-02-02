@@ -10,7 +10,7 @@ import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 import palette from '@/core/theme/palette';
 import { Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
-import ChatUtil from '@/core/util/chat';
+import ActionIcon from '@/core/common/components/chat/ActionIcon';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
@@ -177,10 +177,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const { t } = useTranslation();
 
   // Get the active persona session - single source of truth
-  const activePersonaSession = useAppStore((state) => state.activePersonaSession);
+  const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
   const updateActivePersonaSession = useAppStore((state) => state.updateActivePersonaSession);
   const setScheduleId = useAppStore((state) => state.setScheduleId);
-  
+  const activePersonaSession = getActivePersonaSession();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesListRef = useRef<HTMLDivElement>(null);
   const webSocketCommunication = useRef<SignalRService | null>(null);
@@ -595,8 +595,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       );
       if (
         response?.Content?.vibeResponse?.tilerUser &&
-        JSON.stringify(response.Content.vibeResponse.tilerUser) !==
-        JSON.stringify(activePersonaSession?.userInfo)
+        response.Content.vibeResponse.tilerUser?.id !==
+        activePersonaSession?.userInfo?.id
       ) {
         updateActivePersonaSession({ userInfo: response.Content.vibeResponse.tilerUser });
       }
@@ -634,7 +634,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       );
 
       // Append new messages to existing state
-      setMessages((prev) => [...prev, ...newMessages]);
+      const sortedMessages = sortMessageById([...messages, ...newMessages]);
+      setMessages(() => sortedMessages);
       setRequestId(newMessages[0]?.requestId || null);
 
       // Update session ID from the first prompt
@@ -663,6 +664,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     }
   };
 
+  const sortMessageById = (messages: PromptWithActions[]) => {
+    return messages.sort((a, b) => {
+      if (a.id < b.id) return -1;
+      if (a.id > b.id) return 1;
+      return 0;
+    });
+  }
   const acceptAllChanges = async () => {
     // Track accept changes action
     analytics.trackChatEvent('Accept Changes', {
@@ -841,15 +849,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
                     variant="pill"
                     dotstatus={action.status}
                   >
-                    <img
-                      src={ChatUtil.getActionIcon(action)}
-                      alt="action_icon"
-                      style={{
-                        width: '15px',
-                        height: '15px',
-                        verticalAlign: 'middle',
-                      }}
-                    />
+                    <ActionIcon action={action} />
                     <span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
                     <span className="action-description">{action.descriptions}</span>
                   </Button>
@@ -880,7 +880,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           <PromptSuggestions onPromptClick={handlePromptClick} />
         )}
 
-        <ChatForm onSubmit={handleSubmit}>
+        <ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
           <Input.Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}

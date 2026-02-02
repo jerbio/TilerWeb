@@ -74,16 +74,16 @@ const StyledButton = styled.button<StyledButtonProps>`
 		inset: 1px;
 		background: ${(props) =>
     props.$variant === 'primary'
-      ? palette.colors.black
+      ? props.theme.colors.button.primary.bg
       : props.$variant === 'secondary'
-        ? palette.colors.white
+        ? props.theme.colors.button.secondary.bg
         : props.$variant === 'brand'
-          ? palette.colors.brand[500]
+          ? props.theme.colors.button.brand.bg
           : props.$variant === 'ghost'
             ? 'transparent'
             : props.$variant};
 		border-radius: ${(props) =>
-    props.$size === 'small' ? palette.borderRadius.little : palette.borderRadius.medium};
+    props.$size === 'small' ? props.theme.borderRadius.little : props.theme.borderRadius.medium};
 		z-index: -1;
 
 		transition: background-color 0.2s ease-in-out;
@@ -106,23 +106,23 @@ const StyledButton = styled.button<StyledButtonProps>`
 	/* Border color and gradient */
 	background: ${(props) =>
     props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${palette.colors.gray[700]}, ${palette.colors.gray[700]}, ${props.$bordergradient[0]})`
+      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.button.primary.border}, ${props.theme.colors.button.primary.border}, ${props.$bordergradient[0]})`
       : props.$variant === 'primary'
-        ? palette.colors.gray[700]
+        ? props.theme.colors.button.primary.border
         : 'transparent'};
 
 	color: ${(props) =>
     props.$variant === 'primary'
-      ? palette.colors.white
+      ? props.theme.colors.button.primary.text
       : props.$variant === 'secondary'
-        ? palette.colors.black
+        ? props.theme.colors.button.secondary.text
         : props.$variant === 'brand'
-          ? palette.colors.white
+          ? props.theme.colors.button.brand.text
           : props.$variant === 'ghost'
-            ? palette.colors.gray[300]
-            : palette.colors.white};
-	border-radius: ${palette.borderRadius.little};
-	font-weight: ${palette.typography.fontWeight.medium};
+            ? props.theme.colors.button.ghost.text
+            : props.theme.colors.white};
+	border-radius: ${props => props.theme.borderRadius.little};
+	font-weight: ${props => props.theme.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
@@ -133,31 +133,31 @@ const StyledButton = styled.button<StyledButtonProps>`
     props.$height
       ? `${props.$height}px`
       : props.$size === 'small'
-        ? palette.buttonHeights.small
+        ? props.theme.buttonHeights.small
         : props.$size === 'medium'
-          ? palette.buttonHeights.medium
-          : palette.buttonHeights.large};
+          ? props.theme.buttonHeights.medium
+          : props.theme.buttonHeights.large};
 	padding-inline: ${(props) =>
     props.$size === 'small' || props.$variant === 'ghost'
-      ? palette.space.small
-      : palette.space.medium};
+      ? props.theme.space.small
+      : props.theme.space.medium};
 	font-size: ${(props) =>
     props.$size === 'small'
-      ? palette.typography.fontSize.xs
+      ? props.theme.typography.fontSize.xs
       : props.$size === 'medium'
-        ? palette.typography.fontSize.sm
-        : palette.typography.fontSize.base};
+        ? props.theme.typography.fontSize.sm
+        : props.theme.typography.fontSize.base};
 	&:hover {
 		&::before {
 			background-color: ${(props) =>
     props.$variant === 'primary'
-      ? palette.colors.gray[900]
+      ? props.theme.colors.button.primary.bgHover
       : props.$variant === 'secondary'
-        ? palette.colors.gray[200]
+        ? props.theme.colors.button.secondary.bgHover
         : props.$variant === 'brand'
-          ? palette.colors.brand[600]
+          ? props.theme.colors.button.brand.bgHover
           : props.$variant === 'ghost'
-            ? '#ffffff12'
+            ? props.theme.colors.button.ghost.bgHover
             : props.$variant + '80'};
 		}
 		${(props) => props.$bordergradient && `animation: rotate 3s linear infinite paused;`}
@@ -173,7 +173,7 @@ const StyledButton = styled.button<StyledButtonProps>`
 			background-color: #2a2a2a;
 			margin-top: 0.25rem;
 			margin-right: 0.25rem;
-			color: ${palette.colors.text};
+			color: ${props => props.theme.colors.text};
 			font-size: 0.875rem;
 			padding: 0.25rem 0.5rem;
 			border-radius: 999px;

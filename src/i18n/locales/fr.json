@@ -189,5 +189,9 @@
 				"alt": "Google Play"
 			}
 		}
+	},
+	"errors": {
+		"chatLimitReached": "Limite de chat atteinte. Veuillez réessayer plus tard.",
+		"usernameAlreadyExists": "Le nom d'utilisateur existe déjà"
 	}
 }

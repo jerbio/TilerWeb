@@ -31,6 +31,7 @@ const palette = {
 			900: '#171717',
 		},
 		brand: {
+			25: '#FDE9ED',
 			50: '#FDE9ED',
 			100: '#FABECA',
 			200: '#F793A6',

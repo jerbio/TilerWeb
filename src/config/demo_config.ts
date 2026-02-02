@@ -69,6 +69,7 @@ export const DEMO_USER_INFO: UserInfo = {
 	firstName: 'Demo',
 	lastName: 'User',
 	countryCode: '1',
+	dateOfBirth: null,
 };
 
 // Demo Chat Context

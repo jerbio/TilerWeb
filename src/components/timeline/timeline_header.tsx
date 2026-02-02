@@ -1,10 +1,11 @@
 import Logo from '@/core/common/components/icons/logo';
-import palette from '@/core/theme/palette';
-import { User } from 'lucide-react';
+import { Moon, Sun, User } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
+import { useTheme } from '@/core/theme/ThemeProvider';
+import { Env } from '@/config/config_getter';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -34,6 +35,7 @@ const TimelineHeader: React.FC = () => {
     };
   }, [profileSheetOpen]);
 
+  const { isDarkMode, toggleTheme } = useTheme();
 
   return (
     <Header>
@@ -41,6 +43,11 @@ const TimelineHeader: React.FC = () => {
         <Logo size={30} />
       </HeaderLeft>
       <HeaderRight>
+        {Env.isDevelopment() && (
+          <ThemeToggle onClick={toggleTheme}>
+            {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
+          </ThemeToggle>
+        )}
         <ProfileTrigger
           ref={triggerRef}
           onClick={() => setProfileSheetOpen(!profileSheetOpen)}
@@ -55,6 +62,19 @@ const TimelineHeader: React.FC = () => {
   );
 };
 
+const ThemeToggle = styled.button`
+	height: 36px;
+	width: 36px;
+	overflow: hidden;
+	color: ${(props) => props.theme.colors.button.primary.text};
+	background-color: ${({ theme }) => theme.colors.button.primary.bg};
+	border-radius: ${(props) => props.theme.borderRadius.large};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
 const ProfileTrigger = styled.button`
 	position: relative;
 	background: none;
@@ -67,9 +87,10 @@ const ProfileContainer = styled.div`
 	height: 36px;
 	width: 36px;
 	overflow: hidden;
-	background-color: ${palette.colors.gray[800]};
-	border-radius: ${palette.borderRadius.large};
-	border: 1px solid ${palette.colors.gray[700]};
+	background-color: ${(props) => props.theme.colors.button.primary.bg};
+	border-radius: ${(props) => props.theme.borderRadius.large};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
+	color: ${(props) => props.theme.colors.button.primary.text};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -81,8 +102,8 @@ const Header = styled.header`
 	gap: 1rem;
 	justify-content: space-between;
 	align-items: center;
-	background-color: ${palette.colors.gray[900]};
-	border-bottom: 1px solid ${palette.colors.gray[800]};
+	background-color: ${(props) => props.theme.colors.background.header};
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
 	padding-inline: 2rem;
 `;
 

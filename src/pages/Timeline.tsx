@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useNavigate } from 'react-router';
 import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
-import palette from '@/core/theme/palette';
 import Spinner from '@/core/common/components/loader';
 import TimelineHeader from '@/components/timeline/timeline_header';
 import useAppStore from '@/global_state';
@@ -15,11 +14,12 @@ import { useTranslation } from 'react-i18next';
 const Timeline: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+	const theme = useTheme();
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const isAuthLoading = useAppStore((state) => state.isAuthLoading);
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const [mobileChatVisible, setMobileChatVisible] = useState(false);
-  const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
+  const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
   const showChat = isDesktop || mobileChatVisible;
   const contentRef = useRef<HTMLDivElement>(null);
   const [expandedWidth, setExpandedWidth] = useState(0);
@@ -133,16 +133,17 @@ const Timeline: React.FC = () => {
 const TimelineContent = styled.main`
 	position: absolute;
 	inset: 1.5rem;
-	border-radius: ${palette.borderRadius.xLarge};
-	background: linear-gradient(to right, ${palette.colors.black}, ${palette.colors.gray[900]});
-	border: 2px solid ${palette.colors.gray[800]};
+	border-radius: ${props => props.theme.borderRadius.xLarge};
+	background: ${props => `linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`}
+;
+	border: 2px solid ${props => props.theme.colors.border.default};
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
 	padding-top: 1.5rem;
 	overflow: hidden;
 
-	@media screen and (min-width: ${palette.screens.lg}) {
+	@media screen and (min-width: ${props => props.theme.screens.lg}) {
 		padding-block: 1.5rem;
 		padding-right: 2rem;
 		gap: 1.5rem;
@@ -169,16 +170,16 @@ const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
 	height: 100%;
-	background: ${palette.colors.gray[900]};
-	border-top: 1px solid ${palette.colors.gray[700]};
+	background: ${props => props.theme.colors.gray[900]};
+	border-top: 1px solid ${props => props.theme.colors.gray[700]};
 
-	@media screen and (min-width: ${palette.screens.lg}) {
+	@media screen and (min-width: ${props => props.theme.screens.lg}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 8)};
-		border: 1px solid ${palette.colors.gray[700]};
+		border: 1px solid ${props => props.theme.colors.gray[700]};
 		border-left: none;
-		border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
+		border-radius: 0 ${props => props.theme.borderRadius.large} ${props => props.theme.borderRadius.large} 0;
 	}
-	@media screen and (min-width: ${palette.screens.xl}) {
+	@media screen and (min-width: ${props => props.theme.screens.xl}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 9)};
 	}
 `;
@@ -190,16 +191,16 @@ const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
-	border-radius: ${palette.borderRadius.xxLarge};
+	border-radius: ${props => props.theme.borderRadius.xxLarge};
 	display: ${(props) => (props.$chatexpanded ? 'none' : 'block')};
 
-	@media screen and (min-width: ${palette.screens.lg}) {
+	@media screen and (min-width: ${props => props.theme.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 4)};
 		border: none;
 	}
-	@media screen and (min-width: ${palette.screens.xl}) {
+	@media screen and (min-width: ${props => props.theme.screens.xl}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 3)};
 	}
 `;
@@ -211,20 +212,20 @@ const ChatExpandToggle = styled.button`
 	transform: translateY(-50%) translateX(50%);
 	width: 40px;
 	height: 40px;
-	background: ${palette.colors.gray[900]};
-	border: 1px solid ${palette.colors.gray[800]};
-	border-radius: ${palette.borderRadius.large};
+	background: ${props => props.theme.colors.gray[900]};
+	border: 1px solid ${props => props.theme.colors.gray[800]};
+	border-radius: ${props => props.theme.borderRadius.large};
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	color: ${palette.colors.gray[300]};
+	color: ${props => props.theme.colors.gray[300]};
 	transition: all 0.2s ease;
 	z-index: 1000;
 	outline: none;
 
 	&:hover {
-		background: ${palette.colors.gray[800]};
+		background: ${props => props.theme.colors.gray[800]};
 		color: white;
 	}
 `;
@@ -239,7 +240,7 @@ const CalendarContainerActionButtons = styled.div`
 	gap: 12px;
 	padding-left: 69px;
 
-	@media screen and (min-width: ${palette.screens.lg}) {
+	@media screen and (min-width: ${props => props.theme.screens.lg}) {
 		display: none;
 	}
 `;
@@ -257,7 +258,7 @@ const MessageCircleIcon = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: ${palette.colors.brand[500]};
+	color: ${props => props.theme.colors.brand[500]};
 	pointer-events: none;
 	z-index: 1;
 `;
@@ -265,30 +266,30 @@ const MessageCircleIcon = styled.div`
 const MobileChatInput = styled.input`
 	border: 1px sold red;
 	padding: 0.75rem 1rem 0.75rem 3rem;
-	border-radius: ${palette.borderRadius.xxLarge};
+	border-radius: ${props => props.theme.borderRadius.xxLarge};
 	background-color: rgba(31, 31, 31, 0.6);
 	backdrop-filter: blur(8px);
 	border: 1px solid rgba(55, 55, 55, 0.5);
-	color: ${palette.colors.gray[300]};
-	font-size: ${palette.typography.fontSize.sm};
-	font-family: ${palette.typography.fontFamily.inter};
+	color: ${props => props.theme.colors.gray[300]};
+	font-size: ${props => props.theme.typography.fontSize.sm};
+	font-family: ${props => props.theme.typography.fontFamily.inter};
 	cursor: pointer;
 	width: 100%;
 	transition: all 0.2s ease-in-out;
 
 	&::placeholder {
-		color: ${palette.colors.gray[500]};
+		color: ${props => props.theme.colors.gray[500]};
 	}
 
 	&:hover {
 		background-color: rgba(55, 55, 55, 0.7);
-		border-color: ${palette.colors.brand[500]};
+		border-color: ${props => props.theme.colors.brand[500]};
 		backdrop-filter: blur(10px);
 	}
 
 	&:focus {
 		outline: none;
-		border-color: ${palette.colors.brand[500]};
+		border-color: ${props => props.theme.colors.brand[500]};
 		background-color: rgba(55, 55, 55, 0.7);
 		backdrop-filter: blur(10px);
 	}
@@ -297,12 +298,12 @@ const MobileChatInput = styled.input`
 const Container = styled.div`
 	min-height: 100vh;
 	position: relative;
-	background: linear-gradient(
+	background: ${props => `linear-gradient(
 		to bottom,
-		${palette.colors.black} 0%,
-		${palette.colors.black} 60%,
-		${palette.colors.brand[400]}80 100%
-	);
+		${props.theme.colors.background.page} 0%,
+		${props.theme.colors.background.page} 60%,
+		${props.theme.colors.brand[400]}80 100%
+	)`};
 	overflow: hidden;
 
 	&::after {
@@ -312,12 +313,12 @@ const Container = styled.div`
 		left: 0;
 		right: 0;
 		height: 40%;
-		background: radial-gradient(
+		background: ${props => `radial-gradient(
 			ellipse at center bottom,
-			${palette.colors.brand[400]}80 0%,
-			${palette.colors.brand[500]}80 50%,
+			${props.theme.colors.brand[400]}80 0%,
+			${props.theme.colors.brand[500]}80 50%,
 			transparent 100%
-		);
+		)`};
 		filter: blur(80px);
 		opacity: 0.6;
 		pointer-events: none;

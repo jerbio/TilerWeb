@@ -7,6 +7,7 @@ export enum Actions {
 	Remove_Existing_Task = 'remove_existing_task',
 	Mark_Task_As_Done = 'mark_task_as_done',
 	Procrastinate_All_Tasks = 'procrastinate_all_tasks',
+	Procrastinate_All_By_Timeline = 'procrastinate_all_by_timeline',
 	Exit_Prompting = 'exit_prompting',
 	WhatIf_AddANewAppointment = 'whatif_addanewappointment',
 	WhatIf_AddedNewTask = 'whatif_addednewtask',

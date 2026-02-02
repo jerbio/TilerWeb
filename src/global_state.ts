@@ -2,6 +2,16 @@ import { create } from 'zustand';
 import { personaSessionManager } from '@/services/personaSessionManager';
 import { PersonaId } from '@/core/constants/persona';
 
+export enum SessionType {
+  AUTHENTICATED = 'authenticated',
+  ANONYMOUS = 'anonymous'
+}
+
+export enum SessionPropertyName {
+  AUTHENTICATED_PERSONA_SESSION = 'authenticatedPersonaSession',
+  ANONYMOUS_PERSONA_SESSION = 'anonymousPersonaSession'
+}
+
 export interface ChatContextType {
   EntityId: string;
   Name: string; // Name of the tile we want in context
@@ -14,12 +24,13 @@ export interface UserInfo {
   timeZoneDifference: number; // 0.0
   timeZone: string; // UTC
   email: string | null; // null
-  endfOfDay: string; // 0001-01-01T00:00:00+00:00
+  endfOfDay: string | null; // 0001-01-01T00:00:00+00:00
   phoneNumber: string | null; // null
   fullName: string; // ""
   firstName: string; // ""
   lastName: string; // ""
   countryCode: string | null; // "1"
+  dateOfBirth: string | null; // ""
 }
 
 // Grouped persona session that includes user, schedule, and chat session
@@ -35,10 +46,11 @@ export interface PersonaSession {
 }
 
 interface AppState {
+  getActivePersonaSession: () => PersonaSession | null;
   // Current active persona session
   authenticatedPersonaSession: PersonaSession | null;
   anonymousPersonaSession: PersonaSession | null;
-  activeSessionType: 'authenticated' | 'anonymous';
+  activeSessionType: SessionType;
 
   // Action to set or update the entire persona session
   setActivePersonaSession: (session: PersonaSession | null) => void;
@@ -72,7 +84,7 @@ interface AppState {
   initializePersonaSessionManager: () => void;
 
   // Session management
-  switchSessionType: (type: 'authenticated' | 'anonymous') => void;
+  switchSessionType: (type: SessionType) => void;
 
   // Authentication state
   isAuthenticated: boolean;
@@ -85,18 +97,26 @@ interface AppState {
   setAuthenticated: (user: UserInfo | null) => void;
 }
 
-const useAppStore = create<AppState>()((set, get) => ({
+const useAppStore = create<AppState>()((set, get) => {
+  // Helper function to determine the session property name based on active session type
+  const getSessionPropertyName = (state: AppState): SessionPropertyName => {
+    return state.activeSessionType === SessionType.AUTHENTICATED 
+      ? SessionPropertyName.AUTHENTICATED_PERSONA_SESSION 
+      : SessionPropertyName.ANONYMOUS_PERSONA_SESSION;
+  };
+
+  return {
   authenticatedPersonaSession: null,
   anonymousPersonaSession: null,
-  activeSessionType: 'anonymous',
+  activeSessionType: SessionType.ANONYMOUS,
 
   setActivePersonaSession: (session: PersonaSession | null) => set((state) => ({
-    [state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession']: session
+    [getSessionPropertyName(state)]: session
   })),
 
   updateActivePersonaSession: (updates: Partial<PersonaSession>) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -109,10 +129,17 @@ const useAppStore = create<AppState>()((set, get) => ({
       } as Partial<AppState>;
     }),
 
+  getActivePersonaSession: (): PersonaSession | null => {
+    const state = get();
+    return state.activeSessionType === SessionType.ANONYMOUS
+      ? state.anonymousPersonaSession
+      : state.authenticatedPersonaSession;
+  },
+
   // Convenience actions that update the active session
   addChatContext: (context: ChatContextType) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -127,7 +154,7 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   removeChatContext: (context: ChatContextType) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -144,7 +171,7 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   clearChatContext: () =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -159,7 +186,7 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   setScheduleId: (id: string | null) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -174,7 +201,7 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   setScheduleLastUpdatedBy: (component: string | null) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -189,7 +216,7 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   setUserInfo: (info: UserInfo) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -204,7 +231,7 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   setChatSessionId: (id: string) =>
     set((state) => {
-      const sessionType = state.activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+      const sessionType = getSessionPropertyName(state);
       const currentSession = state[sessionType];
 
       if (!currentSession) return state;
@@ -223,32 +250,32 @@ const useAppStore = create<AppState>()((set, get) => ({
 
   // Getters for backward compatibility
   get chatContext() {
-    const sessionType = get().activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+    const sessionType = getSessionPropertyName(get());
     return get()[sessionType]?.chatContext || [];
   },
 
   get scheduleId() {
-    const sessionType = get().activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+    const sessionType = getSessionPropertyName(get());
     return get()[sessionType]?.scheduleId || null;
   },
 
   get scheduleLastUpdatedBy() {
-    const sessionType = get().activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+    const sessionType = getSessionPropertyName(get());
     return get()[sessionType]?.scheduleLastUpdatedBy || null;
   },
 
   get userInfo() {
-    const sessionType = get().activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+    const sessionType = getSessionPropertyName(get());
     return get()[sessionType]?.userInfo || null;
   },
 
   get selectedPersonaId() {
-    const sessionType = get().activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+    const sessionType = getSessionPropertyName(get());
     return get()[sessionType]?.personaId || null;
   },
 
   get chatSessionId() {
-    const sessionType = get().activeSessionType === 'authenticated' ? 'authenticatedPersonaSession' : 'anonymousPersonaSession';
+    const sessionType = getSessionPropertyName(get());
     return get()[sessionType]?.chatSessionId || '';
   },
 
@@ -258,7 +285,7 @@ const useAppStore = create<AppState>()((set, get) => ({
   authenticatedUser: null,
 
   // Method to switch between authenticated and anonymous sessions
-  switchSessionType: (type: 'authenticated' | 'anonymous') =>
+  switchSessionType: (type: SessionType) =>
     set({ activeSessionType: type }),
 
   // Authentication actions
@@ -332,9 +359,9 @@ const useAppStore = create<AppState>()((set, get) => ({
 
         // Set active session type based on personaId
         if (personaId === PersonaId.AuthenticatedPersonaId) {
-          store.switchSessionType('authenticated');
+          store.switchSessionType(SessionType.AUTHENTICATED);
         } else if (personaId === PersonaId.AnonymousPersonaId) {
-          store.switchSessionType('anonymous');
+          store.switchSessionType(SessionType.ANONYMOUS);
         }
 
         console.log('initialize session ', store);
@@ -343,7 +370,7 @@ const useAppStore = create<AppState>()((set, get) => ({
       },
       updateActivePersonaSession: (updates: Partial<PersonaSession>) => {
         const store = useAppStore.getState();
-        const currentSession = store.activeSessionType === 'authenticated'
+        const currentSession = store.activeSessionType === SessionType.AUTHENTICATED
           ? store.authenticatedPersonaSession
           : store.anonymousPersonaSession;
 
@@ -352,9 +379,9 @@ const useAppStore = create<AppState>()((set, get) => ({
         // If updating personaId, handle session type switching
         if (updates.personaId) {
           if (updates.personaId === PersonaId.AuthenticatedPersonaId) {
-            store.switchSessionType('authenticated');
+            store.switchSessionType(SessionType.AUTHENTICATED);
           } else if (updates.personaId === PersonaId.AnonymousPersonaId) {
-            store.switchSessionType('anonymous');
+            store.switchSessionType(SessionType.ANONYMOUS);
           }
         }
 
@@ -362,7 +389,7 @@ const useAppStore = create<AppState>()((set, get) => ({
       },
       getActivePersonaSession: () => {
         const state = useAppStore.getState();
-        return state.activeSessionType === 'anonymous'
+        return state.activeSessionType === SessionType.ANONYMOUS
           ? state.anonymousPersonaSession
           : state.authenticatedPersonaSession;
       },
@@ -370,7 +397,7 @@ const useAppStore = create<AppState>()((set, get) => ({
       setDevUserIdOverride: (userId: string | null) => useAppStore.getState().setDevUserIdOverride(userId),
     });
   }
-}));
+}});
 
 // Initialize the persona session manager after the store is created
 useAppStore.getState().initializePersonaSessionManager();

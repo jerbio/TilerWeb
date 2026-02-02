@@ -186,6 +186,7 @@ const PersonaCarousel: React.FC = () => {
               firstName: anonymousUser.firstName || '',
               lastName: anonymousUser.lastName || '',
               countryCode: anonymousUser.countryCode || '1',
+              dateOfBirth: null,
             },
             scheduleLastUpdatedBy: null,
           });
