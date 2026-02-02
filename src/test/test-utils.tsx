@@ -1,11 +1,11 @@
 import { render, RenderOptions } from '@testing-library/react';
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import userEvent from '@testing-library/user-event';
 
 // Wrap components with providers for testing
-function AllTheProviders({ children }: { children: React.ReactNode }) {
+function AllTheProviders({ children }: { children: ReactNode }) {
 	return (
 		<BrowserRouter>
 			{children}

@@ -132,26 +132,26 @@ describe('CalendarUtil', () => {
 		});
 	});
 
-	describe('isInterseting', () => {
+	describe('isIntersecting', () => {
 		it('returns true for overlapping boxes', () => {
 			const eventA = { x: 0, y: 0, width: 100, height: 100 };
 			const eventB = { x: 50, y: 50, width: 100, height: 100 };
 
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(true);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(true);
 		});
 
 		it('returns false for horizontally separated boxes', () => {
 			const eventA = { x: 0, y: 0, width: 100, height: 100 };
 			const eventB = { x: 150, y: 0, width: 100, height: 100 };
 
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(false);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(false);
 		});
 
 		it('returns false for vertically separated boxes beyond tolerance', () => {
 			const eventA = { x: 0, y: 0, width: 100, height: 100 };
 			const eventB = { x: 0, y: 200, width: 100, height: 100 };
 
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(false);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(false);
 		});
 
 		it('applies 15px vertical overlap tolerance - adjacent events do not intersect', () => {
@@ -160,28 +160,28 @@ describe('CalendarUtil', () => {
 			const eventB = { x: 0, y: 100, width: 100, height: 100 };
 
 			// With 15px tolerance, adjacent events should not intersect
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(false);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(false);
 		});
 
 		it('returns true when vertical overlap exceeds tolerance', () => {
 			const eventA = { x: 0, y: 0, width: 100, height: 100 };
 			const eventB = { x: 0, y: 70, width: 100, height: 100 }; // 30px overlap
 
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(true);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(true);
 		});
 
 		it('returns false for boxes touching exactly at horizontal edge', () => {
 			const eventA = { x: 0, y: 0, width: 100, height: 100 };
 			const eventB = { x: 100, y: 0, width: 100, height: 100 }; // Right edge touch
 
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(false);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(false);
 		});
 
 		it('returns true for completely contained box', () => {
 			const eventA = { x: 0, y: 0, width: 200, height: 200 };
 			const eventB = { x: 50, y: 50, width: 50, height: 50 }; // Inside eventA
 
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(true);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(true);
 		});
 
 		it('handles zero-sized events', () => {
@@ -189,7 +189,7 @@ describe('CalendarUtil', () => {
 			const eventB = { x: 50, y: 50, width: 100, height: 100 };
 
 			// Zero-sized event at corner should not intersect
-			expect(CalendarUtil.isInterseting(eventA, eventB)).toBe(false);
+			expect(CalendarUtil.isIntersecting(eventA, eventB)).toBe(false);
 		});
 	});
 

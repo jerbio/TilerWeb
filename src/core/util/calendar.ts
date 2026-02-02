@@ -46,8 +46,20 @@ class CalendarUtil {
 		return { x, y, width, height };
 	}
 
+	/**
+	 * Check if two calendar event bounding boxes intersect.
+	 * @deprecated Use `isIntersecting` instead (correct spelling)
+	 */
 	static isInterseting(eventA: CalendarEventBox, eventB: CalendarEventBox): boolean {
-    const verticalOverlapTolerance = 15;
+		return CalendarUtil.isIntersecting(eventA, eventB);
+	}
+
+	/**
+	 * Check if two calendar event bounding boxes intersect.
+	 * Uses a 15px vertical overlap tolerance to avoid false positives for adjacent events.
+	 */
+	static isIntersecting(eventA: CalendarEventBox, eventB: CalendarEventBox): boolean {
+		const verticalOverlapTolerance = 15;
 		// Check if the bounding boxes of two events intersect
 		const res = !(
 			eventA.x + eventA.width <= eventB.x ||
@@ -55,7 +67,7 @@ class CalendarUtil {
 			eventA.y + eventA.height <= eventB.y + verticalOverlapTolerance ||
 			eventA.y >= eventB.y + eventB.height - verticalOverlapTolerance
 		);
-    return res;
+		return res;
 	}
 
 	static getEventLocationLink(event: ScheduleSubCalendarEvent) {
