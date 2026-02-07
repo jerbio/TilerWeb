@@ -1,4 +1,18 @@
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/fr';
+import 'dayjs/locale/pl';
+import 'dayjs/locale/es';
+import 'dayjs/locale/de';
+import 'dayjs/locale/ru';
+import 'dayjs/locale/it';
+import 'dayjs/locale/el';
+import 'dayjs/locale/zh';
+import 'dayjs/locale/ja';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/hi';
+
+dayjs.extend(relativeTime);
 
 type TimeUnit = 'w' | 'd' | 'h' | 'm';
 const _quantities: Record<TimeUnit, number> = {
@@ -52,6 +66,23 @@ class TimeUtil {
 
 	static currentYear(): number {
 		return new Date(TimeUtil.now()).getFullYear();
+	}
+
+	/**
+	 * Sets the dayjs locale to match the app's current language.
+	 * Call this when the user changes language.
+	 */
+	static setLocale(locale: string): void {
+		dayjs.locale(locale);
+	}
+
+	/**
+	 * Formats a timestamp (in ms) as a localized relative time string.
+	 * Uses dayjs relativeTime plugin — automatically handles i18n.
+	 * e.g. "a few seconds ago", "5 minutes ago", "3 hours ago", "2 days ago"
+	 */
+	static relativeTime(timestampMs: number): string {
+		return dayjs(timestampMs).fromNow();
 	}
 }
 

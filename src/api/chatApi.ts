@@ -6,6 +6,7 @@ import {
   ChatMessageBody,
   ChatMessagesResponse,
   VibeSessionsResponse,
+  VibeSessionParams,
 } from '@/core/common/types/chat';
 import { AppApi } from './appApi';
 
@@ -18,9 +19,9 @@ export class ChatApi extends AppApi {
   }
 
   // Sessions
-  public getVibeSessions(userId?: string, anonymousUserId?: string) {
+  public getVibeSessions(userId?: string, anonymousUserId?: string, pagination?: VibeSessionParams) {
     let url = 'api/Vibe/Session';
-    const params = [];
+    const params = ['getVibeByIdModel.mobileApp=true'];
     
     if (userId) {
       params.push(`UserId=${encodeURIComponent(userId)}`);
@@ -28,10 +29,17 @@ export class ChatApi extends AppApi {
     if (anonymousUserId) {
       params.push(`AnonymousUserId=${encodeURIComponent(anonymousUserId)}`);
     }
-    
-    if (params.length > 0) {
-      url += `?${params.join('&')}`;
+    if (pagination?.batchSize !== undefined) {
+      params.push(`BatchSize=${pagination.batchSize}`);
     }
+    if (pagination?.index !== undefined) {
+      params.push(`Index=${pagination.index}`);
+    }
+    if (pagination?.order) {
+      params.push(`Order=${pagination.order}`);
+    }
+    
+    url += `?${params.join('&')}`;
     
     return this.apiRequest<VibeSessionsResponse>(url);
   }
