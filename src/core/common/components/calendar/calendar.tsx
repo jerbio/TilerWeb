@@ -378,15 +378,15 @@ const Calendar = ({
   }
 
   // Create Tile State
-  const tileColorOptions: Array<{ color: RGB; name: string }> = [
-    { color: { r: 255, g: 159, b: 28 }, name: 'Orange' },
-    { color: { r: 0, g: 188, b: 212 }, name: 'Cyan' },
-    { color: { r: 204, g: 51, b: 0 }, name: 'Dark Orange' },
-    { color: { r: 102, g: 122, b: 62 }, name: 'Green' },
-    { color: { r: 33, g: 150, b: 243 }, name: 'Blue' },
-    { color: { r: 126, g: 87, b: 194 }, name: 'Purple' },
-    { color: { r: 152, g: 255, b: 197 }, name: 'Mint' },
-    { color: { r: 219, g: 58, b: 94 }, name: 'Red' },
+  const tileColorOptions: Array<RGB> = [
+    { r: 255, g: 159, b: 28 },
+    { r: 0, g: 188, b: 212 },
+    { r: 204, g: 51, b: 0 },
+    { r: 102, g: 122, b: 62 },
+    { r: 33, g: 150, b: 243 },
+    { r: 126, g: 87, b: 194 },
+    { r: 152, g: 255, b: 197 },
+    { r: 219, g: 58, b: 94 },
   ];
   const initialCreateTileFormState: InitialCreateTileFormState = {
     action: '',
@@ -394,7 +394,7 @@ const Calendar = ({
     durationHours: 0,
     durationMins: 0,
     deadline: dayjs(),
-    color: new RGBColor(tileColorOptions[0].color),
+    color: new RGBColor(tileColorOptions[0]),
     isRecurring: false,
     recurrenceCount: 1,
     recurrenceType: 'daily',
@@ -406,11 +406,11 @@ const Calendar = ({
     locationNickname: '',
   };
   const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-	function closeCreateTile() {
+  function closeCreateTile() {
     createTileFormHandler.resetForm();
     setCreateTileOpen(false);
-		setCreateTileExpanded(false);
-	}
+    setCreateTileExpanded(false);
+  }
 
   return (
     <CalendarContainer $isMounted={contentMounted}>

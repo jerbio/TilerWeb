@@ -7,9 +7,9 @@ import Collapse from '../collapse';
 import { RGB, RGBColor } from '@/core/util/colors';
 import Toggle from '../toggle';
 import React from 'react';
-import Radio from '../radio';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import { Trans, useTranslation } from 'react-i18next';
 
 dayjs.extend(advancedFormat);
 
@@ -36,7 +36,7 @@ type CalendarCreateTileProps = {
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-  tileColorOptions: { name: string; color: RGB }[];
+  tileColorOptions: RGB[];
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
@@ -47,21 +47,22 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 }) => {
   const { formData, handleFormInputChange, resetForm } = formHandler;
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const collapseItems = [
     {
-      title: 'Select Tile Color',
+      title: t('calendar.createTile.sections.tileColor'),
       content: (
         <TileColorOptions>
-          {tileColorOptions.map((option) => {
-            const optionRGBColor = new RGBColor(option.color);
+          {tileColorOptions.map((color) => {
+            const optionRGBColor = new RGBColor(color);
             return (
               <TileColorOption
-                key={option.name}
+                key={optionRGBColor.toHex()}
                 $color={optionRGBColor}
                 $selected={optionRGBColor.equals(formData.color)}
                 onClick={() =>
-                  handleFormInputChange('color', { mode: 'static' })(option.color)
+                  handleFormInputChange('color', { mode: 'static' })(color)
                 }
               ></TileColorOption>
             );
@@ -70,12 +71,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       ),
     },
     {
-      title: 'Tile Actions',
+      title: t('calendar.createTile.sections.tileActions'),
       content: (
         <>
           <TileActionToggleContainer>
             <div>
-              <h3>Repeat the Tile</h3>
+              <h3>{t('calendar.createTile.actions.repeatTile')}</h3>
               <Toggle
                 checked={formData.isRecurring}
                 onChange={handleFormInputChange('isRecurring', { mode: 'static' })}
@@ -84,32 +85,60 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             {formData.isRecurring && (
               <TileActionContainer>
                 <DescriptionContainer>
-                  <p>I need to do this</p>
-                  <DescriptionInput
-                    value={formData.recurrenceCount}
-                    onChange={handleFormInputChange('recurrenceCount', {
-                      restriction: 'integer',
-                    })}
-                    minWidth={50}
-                    maxWidth={50}
-                    type="number"
+                  <Trans
+                    i18nKey="calendar.createTile.recurrence.description"
+                    components={{
+                      repetition: (
+                        <DescriptionInput
+                          value={formData.recurrenceCount}
+                          onChange={handleFormInputChange(
+                            'recurrenceCount',
+                            {
+                              restriction: 'integer',
+                            }
+                          )}
+                          minWidth={50}
+                          maxWidth={50}
+                          type="number"
+                        />
+                      ),
+                      period: (
+                        <DescriptionSelect
+                          value={formData.recurrenceType}
+                          onChange={handleFormInputChange(
+                            'recurrenceType'
+                          )}
+                        >
+                          <option value="daily">
+                            {t(
+                              'calendar.createTile.recurrence.periods.daily'
+                            )}
+                          </option>
+                          <option value="weekly">
+                            {t(
+                              'calendar.createTile.recurrence.periods.weekly'
+                            )}
+                          </option>
+                          <option value="monthly">
+                            {t(
+                              'calendar.createTile.recurrence.periods.monthly'
+                            )}
+                          </option>
+                          <option value="yearly">
+                            {t(
+                              'calendar.createTile.recurrence.periods.yearly'
+                            )}
+                          </option>
+                        </DescriptionSelect>
+                      ),
+                    }}
                   />
-                  <p>per</p>
-                  <DescriptionSelect
-                    value={formData.recurrenceType}
-                    onChange={handleFormInputChange('recurrenceType')}
-                  >
-                    <option value="daily">Day</option>
-                    <option value="weekly">Week</option>
-                    <option value="monthly">Month</option>
-                    <option value="yearly">Year</option>
-                  </DescriptionSelect>
                 </DescriptionContainer>
                 <Seperator />
               </TileActionContainer>
             )}
             <div>
-              <h3>Add time restrictions</h3>
+              <h3>{t('calendar.createTile.actions.addTimeRestriction')}</h3>
               <Toggle
                 checked={formData.isTimeRestricted}
                 onChange={handleFormInputChange('isTimeRestricted', {
@@ -119,75 +148,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             </div>
             {formData.isTimeRestricted && (
               <TileActionContainer>
-                <TimeRestrictionList>
-                  <div>
-                    <Radio
-                      checked={formData.timeRestrictionType === 'daily'}
-                      onChange={() =>
-                        handleFormInputChange('timeRestrictionType', {
-                          mode: 'static',
-                        })('Daily')
-                      }
-                    />
-                    <h3>Everyday</h3>
-                  </div>
-                  <div>
-                    <Radio
-                      checked={formData.timeRestrictionType === 'personal'}
-                      onChange={() =>
-                        handleFormInputChange('timeRestrictionType', {
-                          mode: 'static',
-                        })('Personal')
-                      }
-                    />
-                    <h3>Personal Hours</h3>
-                  </div>
-                  <div>
-                    <Radio
-                      checked={formData.timeRestrictionType === 'work'}
-                      onChange={() =>
-                        handleFormInputChange('timeRestrictionType', {
-                          mode: 'static',
-                        })('Work')
-                      }
-                    />
-                    <h3>Work Hours</h3>
-                  </div>
-                  <div>
-                    <Radio
-                      checked={formData.timeRestrictionType === 'custom'}
-                      onChange={() =>
-                        handleFormInputChange('timeRestrictionType', {
-                          mode: 'static',
-                        })('Custom')
-                      }
-                    />
-                    <h3>Selected Days</h3>
-                  </div>
-                </TimeRestrictionList>
-                <DescriptionContainer>
-                  <p>Start time</p>
-                  <DescriptionInput
-                    type="time"
-                    value={formData.timeRestrictionStart}
-                    onChange={handleFormInputChange('timeRestrictionStart')}
-                    minWidth={64}
-                    maxWidth={64}
-                  />
-                  <p>End Time</p>
-                  <DescriptionInput
-                    type="time"
-                    value={formData.timeRestrictionEnd}
-                    onChange={handleFormInputChange('timeRestrictionEnd')}
-                    minWidth={64}
-                    maxWidth={64}
-                  />
-                </DescriptionContainer>
                 <Seperator />
               </TileActionContainer>
             )}
             <div>
-              <h3>Add location nickname</h3>
+              <h3>{t('calendar.createTile.actions.addLocationNickname')}</h3>
               <Toggle
                 checked={formData.hasLocationNickname}
                 onChange={handleFormInputChange('hasLocationNickname', {
@@ -218,7 +183,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     <StyledCalendarCreateEvent $isexpanded={expanded}>
       <header>
         <div className="title">
-          <h2>Add a New Tile</h2>
+          <h2>{t('calendar.createTile.title')}</h2>
         </div>
         <button onClick={onClose}>
           <X size={16} color={theme.colors.text.primary} />
@@ -228,47 +193,59 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       {/* Tile Description */}
       <Section>
         <DescriptionContainer>
-          <p>I need to</p>
-          <DescriptionInput
-            value={formData.action}
-            onChange={handleFormInputChange('action')}
-            minWidth={50}
-            maxWidth={250}
-          />
-          <p>at</p>
-          <DescriptionInput
-            value={formData.location}
-            onChange={handleFormInputChange('location')}
-            minWidth={50}
-            maxWidth={250}
-          />
-          <p>it will take me</p>
-          <DescriptionInput
-            value={formData.durationHours}
-            onChange={handleFormInputChange('durationHours', {
-              restriction: 'integer',
-            })}
-            minWidth={50}
-            maxWidth={50}
-            type="number"
-          />
-          <p>Hr</p>
-          <DescriptionInput
-            value={formData.durationMins}
-            onChange={handleFormInputChange('durationMins', { restriction: 'integer' })}
-            minWidth={50}
-            maxWidth={50}
-            type="number"
-          />
-          <p>Min, and I need to get it done by</p>
-          <DescripitonDate
-            type="date"
-            value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-            onChange={(e) =>
-              handleFormInputChange('deadline', { mode: 'static' })(
-                dayjs(e.target.value)
-              )
-            }
+          <Trans
+            i18nKey="calendar.createTile.description"
+            components={{
+              action: (
+                <DescriptionInput
+                  value={formData.action}
+                  onChange={handleFormInputChange('action')}
+                  minWidth={50}
+                  maxWidth={250}
+                />
+              ),
+              location: (
+                <DescriptionInput
+                  value={formData.location}
+                  onChange={handleFormInputChange('location')}
+                  minWidth={50}
+                  maxWidth={250}
+                />
+              ),
+              hours: (
+                <DescriptionInput
+                  value={formData.durationHours}
+                  onChange={handleFormInputChange('durationHours', {
+                    restriction: 'integer',
+                  })}
+                  minWidth={50}
+                  maxWidth={50}
+                  type="number"
+                />
+              ),
+              minutes: (
+                <DescriptionInput
+                  value={formData.durationMins}
+                  onChange={handleFormInputChange('durationMins', {
+                    restriction: 'integer',
+                  })}
+                  minWidth={50}
+                  maxWidth={50}
+                  type="number"
+                />
+              ),
+              date: (
+                <DescripitonDate
+                  type="date"
+                  value={dayjs(formData.deadline).format('YYYY-MM-DD')}
+                  onChange={(e) =>
+                    handleFormInputChange('deadline', { mode: 'static' })(
+                      dayjs(e.target.value)
+                    )
+                  }
+                />
+              ),
+            }}
           />
         </DescriptionContainer>
       </Section>
@@ -277,7 +254,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       <TipContainer>
         <Keyboard size={20} />
         <p>
-          Press <b>[Enter]</b> when done.
+          <Trans
+            i18nKey="calendar.createTile.tip.description"
+            components={{
+              b: <b />,
+              key: <>{t('calendar.createTile.tip.keys.enter')}</>,
+            }}
+          />
         </p>
       </TipContainer>
 
@@ -297,34 +280,39 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
           </Section>
           <Spacer />
           <SummaryContainer>
-            <header>Summary</header>
+            <header>{t('calendar.createTile.summary.title')}</header>
             <p>
-              I need to <b>{formData.action}</b> at <b>{formData.location}</b> it will
-              take me{' '}
-              <b>
-                {formData.durationHours} Hr {formData.durationMins} Min
-              </b>
-              , and I need to get it done by{' '}
-              <b>{dayjs(formData.deadline).format('Do MMMM, YYYY')}</b>
+              <Trans
+                i18nKey="calendar.createTile.summary.description"
+                components={{
+                  b: <b />,
+                }}
+                values={{
+                  action: formData.action,
+                  location: formData.location,
+                  hours: formData.durationHours,
+                  minutes: formData.durationMins,
+                }}
+              />
             </p>
           </SummaryContainer>
         </>
       )}
       <ButtonContainer>
-				{/*
+        {/*
 					<Button
 						variant={'ghost'}
 						onClick={() => {
 							setExpanded(!expanded);
 						}}
 					>
-						{expanded ? 'Less Options' : 'More Options'}
+						{expanded ? t('calendar.createTile.buttons.collapse') : t('calendar.createTile.buttons.expand')}
 					</Button>
 				*/}
         <Button variant={'ghost'} onClick={resetForm}>
-          Reset
+					{t('calendar.createTile.buttons.reset')}
         </Button>
-        <Button variant="brand">Create Tile</Button>
+        <Button variant="brand">{t('calendar.createTile.buttons.submit')}</Button>
       </ButtonContainer>
     </StyledCalendarCreateEvent>
   );
@@ -379,27 +367,6 @@ const Section = styled.section`
 	width: 100%;
 	max-width: ${(props) => props.theme.screens.md};
 	margin-inline: auto;
-`;
-
-const TimeRestrictionList = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	margin-bottom: 1rem;
-
-	> div {
-		display: flex;
-		gap: 0.75rem;
-		min-width: 0;
-	}
-
-	h3 {
-		font-size: ${(props) => props.theme.typography.fontSize.sm};
-		font-family: ${(props) => props.theme.typography.fontFamily.urban};
-		font-weight: ${(props) => props.theme.typography.fontWeight.bold};
-		color: ${(props) => props.theme.colors.gray[200]};
-		leading: 1;
-	}
 `;
 
 const TileActionContainer = styled.div`
@@ -538,7 +505,7 @@ const StyledCalendarCreateEvent = styled.div<{ $isexpanded: boolean }>`
 			z-index: 1001;
 			width: 100%;
 		`
-			: `
+      : `
 			border-radius: ${props.theme.borderRadius.xLarge};
 			width: 100%;
 		`};
