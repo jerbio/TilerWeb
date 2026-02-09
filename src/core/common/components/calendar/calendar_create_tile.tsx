@@ -42,7 +42,6 @@ type CalendarCreateTileProps = {
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   onClose,
   expanded,
-  setExpanded,
   tileColorOptions,
   formHandler,
 }) => {
@@ -312,14 +311,16 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         </>
       )}
       <ButtonContainer>
-        <Button
-          variant={'ghost'}
-          onClick={() => {
-            setExpanded(!expanded);
-          }}
-        >
-          {expanded ? 'Less Options' : 'More Options'}
-        </Button>
+				{/*
+					<Button
+						variant={'ghost'}
+						onClick={() => {
+							setExpanded(!expanded);
+						}}
+					>
+						{expanded ? 'Less Options' : 'More Options'}
+					</Button>
+				*/}
         <Button variant={'ghost'} onClick={resetForm}>
           Reset
         </Button>

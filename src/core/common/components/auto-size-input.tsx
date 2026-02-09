@@ -5,7 +5,7 @@ import styled from 'styled-components';
 type AutosizeInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   minWidth?: number;
   maxWidth?: number;
-	value?: string;
+	value?: unknown;
   style?: React.CSSProperties;
 };
 
