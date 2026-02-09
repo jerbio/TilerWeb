@@ -19,6 +19,10 @@ import CalendarContent from './calendar_content';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
+import CalendarCreateTile, { InitialCreateTileFormState } from './calendar_create_tile';
+import { RGB, RGBColor } from '@/core/util/colors';
+import useFormHandler from '@/hooks/useFormHandler';
+import { createPortal } from 'react-dom';
 
 export type CalendarViewOptions = {
   width: number;
@@ -45,7 +49,8 @@ const Calendar = ({
   const viableEvents = events.filter((event) => event.isViable);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
-  const [createEventModalOpen, setCreateEventModalOpen] = useState<boolean>(true);
+  const [createTileOpen, setCreateTileOpen] = useState<boolean>(true);
+  const [createTileExpanded, setCreateTileExpanded] = useState<boolean>(false);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -342,9 +347,9 @@ const Calendar = ({
       y: 0,
     },
     to: {
-      opacity: createEventModalOpen ? 1 : 0,
-      scale: createEventModalOpen ? 1 : 0.9,
-      y: createEventModalOpen ? 0 : 100,
+      opacity: createTileOpen ? 1 : 0,
+      scale: createTileOpen ? 1 : 0.9,
+      y: createTileOpen ? 0 : 100,
     },
     config: {
       duration: 200,
@@ -369,8 +374,43 @@ const Calendar = ({
   function onBackgroundClick() {
     setSelectedEvent(null);
     setSelectedEventInfo(null);
-    setCreateEventModalOpen(true);
+    setCreateTileOpen(true);
   }
+
+  // Create Tile State
+  const tileColorOptions: Array<{ color: RGB; name: string }> = [
+    { color: { r: 255, g: 159, b: 28 }, name: 'Orange' },
+    { color: { r: 0, g: 188, b: 212 }, name: 'Cyan' },
+    { color: { r: 204, g: 51, b: 0 }, name: 'Dark Orange' },
+    { color: { r: 102, g: 122, b: 62 }, name: 'Green' },
+    { color: { r: 33, g: 150, b: 243 }, name: 'Blue' },
+    { color: { r: 126, g: 87, b: 194 }, name: 'Purple' },
+    { color: { r: 152, g: 255, b: 197 }, name: 'Mint' },
+    { color: { r: 219, g: 58, b: 94 }, name: 'Red' },
+  ];
+  const initialCreateTileFormState: InitialCreateTileFormState = {
+    action: '',
+    location: '',
+    durationHours: 0,
+    durationMins: 0,
+    deadline: dayjs(),
+    color: new RGBColor(tileColorOptions[0].color),
+    isRecurring: false,
+    recurrenceCount: 1,
+    recurrenceType: 'daily',
+    isTimeRestricted: false,
+    timeRestrictionType: 'daily',
+    timeRestrictionStart: '00:00',
+    timeRestrictionEnd: '23:59',
+    hasLocationNickname: false,
+    locationNickname: '',
+  };
+  const createTileFormHandler = useFormHandler(initialCreateTileFormState);
+	function closeCreateTile() {
+    createTileFormHandler.resetForm();
+    setCreateTileOpen(false);
+		setCreateTileExpanded(false);
+	}
 
   return (
     <CalendarContainer $isMounted={contentMounted}>
@@ -459,7 +499,6 @@ const Calendar = ({
                 <Info size={18} color={palette.colors.gray[500]} />
               </Tooltip>
             </header>
-
             {todaysNonViableEvents.map((event) => (
               <CalendarEvent
                 event={event}
@@ -486,24 +525,45 @@ const Calendar = ({
       ))}
 
       {/* Create Modal Overlay */}
-      <CalendarCreateEventModalBackdrop
-        $visible={createEventModalOpen}
-        onClick={() => setCreateEventModalOpen(false)}
-      >
-        <CalendarCreateEventModalWrapper>
-          <CalendarCreateEventModalContainer
-            style={{
-              scale: calendarCreateEventSpring.scale,
-              opacity: calendarCreateEventSpring.opacity,
-              transform: calendarCreateEventSpring.y.to(
-                (y) => `translate(-50%, calc(${y}px - 50%))`
-              ),
-            }}
-          >
-            {createEventModalOpen ? 'Open' : 'Closed'}
-          </CalendarCreateEventModalContainer>
-        </CalendarCreateEventModalWrapper>
-      </CalendarCreateEventModalBackdrop>
+      {!createTileExpanded ? (
+        <CalendarCreateEventModalBackdrop
+          $visible={createTileOpen}
+          onClick={() => setCreateTileOpen(false)}
+        >
+          <CalendarCreateEventModalWrapper>
+            <CalendarCreateEventModalContainer
+              $expanded={createTileExpanded}
+              style={{
+                scale: calendarCreateEventSpring.scale,
+                opacity: calendarCreateEventSpring.opacity,
+                transform: calendarCreateEventSpring.y.to(
+                  (y) => `translate(-50%, calc(${y}px - 50%))`
+                ),
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CalendarCreateTile
+                formHandler={createTileFormHandler}
+                tileColorOptions={tileColorOptions}
+                expanded={createTileExpanded}
+                setExpanded={setCreateTileExpanded}
+                onClose={closeCreateTile}
+              />
+            </CalendarCreateEventModalContainer>
+          </CalendarCreateEventModalWrapper>
+        </CalendarCreateEventModalBackdrop>
+      ) : (
+        createPortal(
+          <CalendarCreateTile
+            formHandler={createTileFormHandler}
+            tileColorOptions={tileColorOptions}
+            expanded={createTileExpanded}
+            setExpanded={setCreateTileExpanded}
+            onClose={closeCreateTile}
+          />,
+          document.body
+        )
+      )}
 
       {/* Calendar Content */}
       <CalendarContentContainer
@@ -799,11 +859,21 @@ const CalendarCreateEventModalWrapper = styled.div`
 	height: 100%;
 `;
 
-const CalendarCreateEventModalContainer = styled(a.div)`
+const CalendarCreateEventModalContainer = styled(a.div) <{ $expanded: boolean }>`
+	${(props) =>
+    props.$expanded
+      ? `
+position: fixed;
+		top: -5rem;
+		`
+      : `
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	z-index: 1001;
+	width: calc(100% - 32px);
+	max-width: ${calendarConfig.CREATE_EVENT_MODAL_WIDTH};
+`}
 `;
 
 export default Calendar;

@@ -23,7 +23,30 @@ export const lightTheme: AppTheme = {
     border: {
       default: palette.colors.gray[200],
       subtle: palette.colors.gray[100],
-      error: palette.colors.error[500]
+      error: palette.colors.error[500],
+			strong: palette.colors.gray[200],
+    },
+		// Highlight colors
+		highlight: {
+			text: 'hsla(224, 31%, 54%, 1)',
+		},
+		// Calendar colors
+		calendar: {
+			summary: {
+			bg: 'hsla(36, 60%, 95%, 1)',
+			border: 'hsla(34, 32%, 91%, 1)',
+			text: 'hsla(34, 32%, 50%, 1)',
+			boldText: 'hsla(34, 32%, 40%, 1)',
+			headerBg: palette.colors.white,
+			header: 'hsla(234, 10%, 39%, 1)',
+			}
+		},
+		// Toggle colors
+    toggle: {
+			bg: palette.colors.gray[200],
+			bgChecked: palette.colors.brand[400],
+			circle: palette.colors.white,
+			circleChecked: palette.colors.white,
     },
     // Button colors
     button: {
@@ -46,7 +69,7 @@ export const lightTheme: AppTheme = {
 			ghost: {
 				bg: 'transparent',
 				bgHover: '#00000012',
-				text: palette.colors.gray[700],
+				text: palette.colors.gray[500],
 			}
     },
     // hues

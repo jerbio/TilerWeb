@@ -6,7 +6,7 @@ export const darkTheme: AppTheme = {
 		plain: palette.colors.black,
     // Text colors
     text: {
-      primary: palette.colors.gray[100],
+      primary: palette.colors.gray[200],
       secondary: palette.colors.gray[400],
       muted: palette.colors.gray[500],
       inverse: palette.colors.white,
@@ -19,11 +19,34 @@ export const darkTheme: AppTheme = {
       card: palette.colors.gray[900],
 			card2: palette.colors.gray[800]
     },
+		// Highlight colors
+		highlight: {
+			text: 'hsla(23, 100%, 86%, 1)',
+		},
+		// Calendar colors
+		calendar: {
+			summary: {
+			bg: 'hsla(36, 70%, 16%, 1)',
+			border: 'hsla(36, 71%, 19%, 1)',
+			text: 'hsla(36, 30%, 65%, 1)',
+			boldText: palette.colors.white,
+			headerBg: 'hsla(36, 70%, 21%, 1)',
+			header: 'hsla(36, 21%, 73%, 1)',
+			}
+		},
     // Border colors
     border: {
       default: 'hsla(0, 4%, 14%, 1)',
       subtle: palette.colors.gray[800],
-      error: palette.colors.error[500]
+      error: palette.colors.error[500],
+			strong: palette.colors.gray[800],
+    },
+		// Toggle colors
+    toggle: {
+			bg: palette.colors.gray[700],
+			bgChecked: palette.colors.brand[400],
+			circle: palette.colors.gray[400],
+			circleChecked: palette.colors.white,
     },
     // Button colors
     button: {

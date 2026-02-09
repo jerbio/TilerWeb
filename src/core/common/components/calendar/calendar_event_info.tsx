@@ -337,6 +337,21 @@ gap: .5rem;
 border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
 			border-radius: ${palette.borderRadius.medium};
 		}
+
+		> button {
+			height: 28px;
+			width: 28px;
+border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
+			border-radius: ${palette.borderRadius.medium};
+			display: flex;
+			justify-content: center;
+			align-items: center;
+transition: background-color 0.2s;
+
+			&:hover {
+background-color: ${(props) => props.$color.setLightness(0.3).toHex()};
+			}
+		}
 }
 
 .title {
@@ -359,20 +374,6 @@ color: ${(props) => props.$color.setLightness(0.6).toHex()};
 			}
 }
 
-		> button {
-			height: 28px;
-			width: 28px;
-border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
-			border-radius: ${palette.borderRadius.medium};
-			display: flex;
-			justify-content: center;
-			align-items: center;
-transition: background-color 0.2s;
-
-			&:hover {
-background-color: ${(props) => props.$color.setLightness(0.3).toHex()};
-			}
-		}
 	}
 
 	.event-header {
