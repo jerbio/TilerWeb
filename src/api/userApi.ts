@@ -56,6 +56,70 @@ export interface UpdateUserResponse {
 	ServerStatus: null;
 }
 
+export interface UserPreference {
+	id: string;
+	notifcationEnabled: boolean;
+	notifcationEnabledMs: number;
+	emailNotificationEnabled: boolean;
+	textNotificationEnabled: boolean;
+	pushNotificationEnabled: boolean;
+	tileNotificationEnabled: boolean;
+}
+
+export interface MarketingPreference {
+	id: string;
+	disableAll: boolean;
+	disableEmail: boolean;
+	disableTextMsg: boolean;
+}
+
+export interface ScheduleProfile {
+	travelMedium: string;
+	pinPreference: string;
+	sleepDuration: number;
+}
+
+export interface UiScheme {
+	id: string;
+	scheduleProfileId: string;
+	name: string;
+	mainColor: string;
+	accentColor: string;
+	fontFamily: string;
+	fontSize: number;
+	fontWeight: string;
+	isDefault: boolean;
+	themeMode: string;
+}
+
+export interface UserSettings {
+	userPreference: UserPreference;
+	marketingPreference: MarketingPreference;
+	scheduleProfile: ScheduleProfile;
+	mobileUiScheme: UiScheme;
+	desktopUiScheme: UiScheme;
+}
+
+export interface UserSettingsResponse {
+	Error: ApiCodeResponse;
+	Content: {
+		settings: UserSettings;
+	};
+	ServerStatus: null;
+}
+
+export interface UpdateSettingsRequest {
+	[key: string]: boolean | number | string;
+}
+
+export interface UpdateSettingsResponse {
+	Error: ApiCodeResponse;
+	Content: {
+		settings: UserSettings;
+	};
+	ServerStatus: null;
+}
+
 export class UserApi extends AppApi {
 	public getCurrentUser() {
 		return this.apiRequest<UserResponse>('api/User', {
@@ -67,6 +131,19 @@ export class UserApi extends AppApi {
 		return this.apiRequest<UpdateUserResponse>('api/User', {
 			method: 'PUT',
 			body: JSON.stringify(userData),
+		});
+	}
+
+	public getSettings() {
+		return this.apiRequest<UserSettingsResponse>('api/User/Settings?mobileApi=true', {
+			method: 'GET',
+		});
+	}
+
+	public updateSettings(settings: UpdateSettingsRequest) {
+		return this.apiRequest<UpdateSettingsResponse>('api/User/Settings', {
+			method: 'POST',
+			body: JSON.stringify(settings),
 		});
 	}
 
