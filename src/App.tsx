@@ -21,6 +21,7 @@ import { PublicRoute } from './components/auth/PublicRoute';
 import SettingsLayout from './pages/settings/SettingsLayout';
 import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
+import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
 // import useAppStore from './global_state';
 
@@ -110,6 +111,10 @@ const App: React.FC = () => {
                     <Route
                       path="preferences"
                       element={<PreferencesSettings />}
+                    />
+                    <Route
+                      path="notifications"
+                      element={<NotificationPreferencesSettings />}
                     />
                   </Route>
                 </Route>

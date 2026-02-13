@@ -20,6 +20,11 @@ const SettingsLayout: React.FC = () => {
 			description: t('settings.sections.accountInfo.description'),
 			path: '/settings/account',
 		},
+		{
+			title: t('settings.sections.notificationPreferences.title'),
+			description: t('settings.sections.notificationPreferences.description'),
+			path: '/settings/notifications',
+		},
 	];
 
 	const handleLogout = async () => {
