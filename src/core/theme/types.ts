@@ -52,8 +52,31 @@ export type AppTheme = {
     border: {
       default: string;
       subtle: string;
+			strong: string;
       error: string;
     };
+		// Highlight colors
+		highlight: {
+			text: string;
+		}
+		// Toggle colors
+    toggle: {
+			bg: string;
+			bgChecked: string;
+			circle: string;
+			circleChecked: string;
+    },
+		// Calendar Colors
+		calendar: {
+			summary: {
+			bg: string;
+			border: string;
+			text: string;
+			boldText: string;
+			headerBg: string;
+			header: string;
+			}
+		},
     // Button colors
     button: {
       primary: {

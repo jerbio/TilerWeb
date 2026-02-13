@@ -1,5 +1,5 @@
 import { ScheduleApi } from '@/api/scheduleApi';
-import { ScheduleLookupOptions } from '@/core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleLookupOptions } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
 
@@ -13,6 +13,16 @@ class ScheduleService {
   constructor(scheduleApi: ScheduleApi) {
     this.scheduleApi = scheduleApi;
   }
+
+	async createEvent(params: ScheduleCreateEventParams) {
+		try {
+			const res = await this.scheduleApi.createEvent(params);
+			return res.Content;
+		} catch (error) {
+			console.error("Error creating sub-calendar event", error);
+			throw normalizeError(error);
+		}
+	}
 
   async lookupScheduleById(
     scheduleId: string,

@@ -1,8 +1,15 @@
-import { ScheduleLookupOptions, ScheduleLookupResponse } from '../core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
+	public createEvent(params: ScheduleCreateEventParams) {
+		return this.apiRequest<ScheduleCreateEventResponse>('api/Schedule/Event', {
+			method: 'POST',
+			body: JSON.stringify({...params }),
+		});
+	}
+
 	private lookupSchedule(
 		params: Record<string, string>,
 	) {

@@ -8,34 +8,39 @@ import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import palette from '@/core/theme/palette';
 
 type CalendarContentProps = {
-	// Events to display in the calendar
-	events: ScheduleSubCalendarEvent[];
-	// View options for the calendar
-	viewOptions: CalendarViewOptions;
-	// Selected event state
-	selectedEvent: string | null;
-	setSelectedEvent: React.Dispatch<React.SetStateAction<string | null>>;
-	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
-	// Ref for the calendar grid canvas
-	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
-	// Function to set styled non-viable events
-	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+  // Events to display in the calendar
+  events: ScheduleSubCalendarEvent[];
+  // View options for the calendar
+  viewOptions: CalendarViewOptions;
+  // Selected event state
+  selectedEvent: string | null;
+  setSelectedEvent: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
+  // Ref for the calendar grid canvas
+  calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
+  // Function to set styled non-viable events
+  setStyledNonViableEvents: (events: StyledEvent[]) => void;
+  onBackgroundClick?: () => void;
 };
 
 const CalendarContent: React.FC<CalendarContentProps> = ({
-	events,
-	viewOptions,
-	selectedEvent,
-	setSelectedEvent,
-	setSelectedEventInfo,
-	calendarGridCanvasRef,
-	setStyledNonViableEvents,
+  events,
+  viewOptions,
+  selectedEvent,
+  setSelectedEvent,
+  setSelectedEventInfo,
+  calendarGridCanvasRef,
+  setStyledNonViableEvents,
+  onBackgroundClick,
 }) => {
   return (
     <Container>
       <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
         {/* Background */}
-        <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+        <CalendarBg
+          ref={calendarGridCanvasRef}
+          $width={viewOptions.width}
+        />
         {/* Timeline */}
         {Array.from({ length: 24 }).map((_, hourIndex) => {
           return (
@@ -56,6 +61,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
           setSelectedEvent={setSelectedEvent}
           setSelectedEventInfo={setSelectedEventInfo}
           onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+          onBackgroundClick={onBackgroundClick}
         />
       </StyledCalendarContent>
     </Container>
