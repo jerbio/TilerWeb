@@ -185,6 +185,10 @@
 					"return": "Return"
 				}
 			},
+			"message": {
+				"success": "<b>\"<action/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{action}}\" to your schedule"
+			},
 			"actions": {
 				"repeatTile": "Repeat the Tile",
 				"addTimeRestriction": "Add time restrictions",
@@ -517,54 +521,6 @@
 			"title": "Get the Latest Tiler News & Updates",
 			"subtitle": "Want to get more out of your schedule? Subscribe for tips, tricks, and updates delivered straight to your inbox.",
 			"emailPlaceholder": "Your Email Address..."
-		},
-		"calendar": {
-			"createTile": {
-				"title": "Create New Tile",
-				"description": "I need to <0>action</0> at <1>location</1> it will take me <2>hours</2> Hr <3>minutes</3> Min, and I need to get it done by <4>date</4>",
-				"sections": {
-					"tileColor": "Select Tile Color",
-					"tileActions": "Tile Actions"
-				},
-				"actions": {
-					"repeatTile": "Repeat the Tile",
-					"addTimeRestrictions": "Add time restrictions",
-					"addLocationNickname": "Add location nickname"
-				},
-				"recurrence": {
-					"iNeedToDoThis": "I need to do this",
-					"per": "per",
-					"day": "Day",
-					"week": "Week",
-					"month": "Month",
-					"year": "Year"
-				},
-				"timeRestrictions": {
-					"everyday": "Everyday",
-					"personalHours": "Personal Hours",
-					"workHours": "Work Hours",
-					"selectedDays": "Selected Days",
-					"startTime": "Start time",
-					"endTime": "End Time"
-				},
-				"buttons": {
-					"reset": "Reset",
-					"createTile": "Create Tile",
-					"lessOptions": "Less Options",
-					"moreOptions": "More Options"
-				},
-				"summary": {
-					"title": "Summary",
-					"content": "I need to {{action}} at {{location}} it will take me {{hours}} Hr {{minutes}} Min, and I need to get it done by {{date}}",
-					"iNeedTo": "I need to",
-					"at": "at",
-					"itWillTakeMe": "it will take me",
-					"andINeedToGetItDoneBy": "and I need to get it done by"
-				},
-				"tooltips": {
-					"pressEnter": "Press <0>Enter</0> when done."
-				}
-			}
 		},
 		"integration": {
 			"title": "Integrate with your favorite",

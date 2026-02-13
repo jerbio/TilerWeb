@@ -36,6 +36,7 @@ type CalendarProps = {
   viewRef: React.RefObject<HTMLUListElement>;
   viewOptions: CalendarViewOptions;
   setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
+	refetchEvents?: () => void;
 };
 
 const Calendar = ({
@@ -44,12 +45,13 @@ const Calendar = ({
   viewRef,
   viewOptions,
   setViewOptions,
+	refetchEvents,
 }: CalendarProps) => {
   const { t } = useTranslation();
   const viableEvents = events.filter((event) => event.isViable);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
-  const [createTileOpen, setCreateTileOpen] = useState<boolean>(true);
+  const [createTileOpen, setCreateTileOpen] = useState<boolean>(false);
   const [createTileExpanded, setCreateTileExpanded] = useState<boolean>(false);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
@@ -410,6 +412,7 @@ const Calendar = ({
     createTileFormHandler.resetForm();
     setCreateTileOpen(false);
     setCreateTileExpanded(false);
+		refetchEvents?.();
   }
 
   return (

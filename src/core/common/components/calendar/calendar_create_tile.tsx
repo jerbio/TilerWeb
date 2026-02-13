@@ -6,10 +6,15 @@ import Button from '../button';
 import Collapse from '../collapse';
 import { RGB, RGBColor } from '@/core/util/colors';
 import Toggle from '../toggle';
-import React from 'react';
+import React, { useState } from 'react';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
+import LoadingModal from '../modals/loading-modal';
+import SuccessModal from '../modals/success-modal';
+import { scheduleService } from '@/services';
+import { ScheduleCreateEventParams } from '../../types/schedule';
+import { toast } from 'sonner';
 
 dayjs.extend(advancedFormat);
 
@@ -48,6 +53,9 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   const { formData, handleFormInputChange, resetForm } = formHandler;
   const theme = useTheme();
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [successEventName, setSuccessEventName] = useState('');
 
   const collapseItems = [
     {
@@ -179,8 +187,54 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     },
   ];
 
+  async function submitForm() {
+    setLoading(true);
+    try {
+      const event: ScheduleCreateEventParams = {
+        Name: formData.action,
+        RColor: formData.color.r.toString(),
+        GColor: formData.color.g.toString(),
+        BColor: formData.color.b.toString(),
+        LocationAddress: formData.location,
+        DurationDays: '0',
+        DurationHours: formData.durationHours.toString(),
+        DurationMinute: formData.durationMins.toString(),
+        EndYear: dayjs(formData.deadline).format('YYYY'),
+        EndMonth: dayjs(formData.deadline).format('MM'),
+        EndDay: dayjs(formData.deadline).format('DD'),
+        EndHour: '23',
+        EndMinute: '59',
+        isRestricted: 'false',
+        MobileApp: true,
+      };
+      const newEvent = await scheduleService.createEvent(event);
+      onClose();
+      setSuccessEventName(newEvent.name);
+      setSuccess(true);
+    } catch (error) {
+      console.error(error);
+      toast.error(String(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <StyledCalendarCreateEvent $isexpanded={expanded}>
+      <LoadingModal show={loading} setShow={setLoading}>
+        <p>{t('calendar.createTile.message.pending', { action: formData.action })}</p>
+      </LoadingModal>
+      <SuccessModal show={success} setShow={setSuccess}>
+        <p>
+          <Trans
+            i18nKey="calendar.createTile.message.success"
+            components={{
+              b: <b />,
+              action: <>{successEventName}</>,
+            }}
+          />
+        </p>
+      </SuccessModal>
       <header>
         <div className="title">
           <h2>{t('calendar.createTile.title')}</h2>
@@ -310,9 +364,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 					</Button>
 				*/}
         <Button variant={'ghost'} onClick={resetForm}>
-					{t('calendar.createTile.buttons.reset')}
+          {t('calendar.createTile.buttons.reset')}
         </Button>
-        <Button variant="brand">{t('calendar.createTile.buttons.submit')}</Button>
+        <Button variant="brand" onClick={submitForm}>
+          {t('calendar.createTile.buttons.submit')}
+        </Button>
       </ButtonContainer>
     </StyledCalendarCreateEvent>
   );
@@ -494,7 +550,7 @@ const StyledCalendarCreateEvent = styled.div<{ $isexpanded: boolean }>`
 	display: flex;
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};
-			overflow-y: scroll;
+			overflow-y: ${(props) => (props.$isexpanded ? 'scroll' : 'hidden')};
 			overflow-x: hidden;
 	
   ${(props) =>
