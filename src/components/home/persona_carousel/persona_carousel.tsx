@@ -147,7 +147,7 @@ const PersonaCarousel: React.FC = () => {
         timeZoneDifference: number | null;
         timeZone: string | null;
         email: null | null;
-        endfOfDay: string | null;
+        endOfDay: string | null;
         phoneNumber: null | null;
         fullName: string | null;
         firstName: string | null;
@@ -180,7 +180,7 @@ const PersonaCarousel: React.FC = () => {
               timeZoneDifference: anonymousUser.timeZoneDifference || 0,
               timeZone: anonymousUser.timeZone || 'UTC',
               email: anonymousUser.email,
-              endfOfDay: anonymousUser.endfOfDay || '',
+              endOfDay: anonymousUser.endOfDay || '',
               phoneNumber: anonymousUser.phoneNumber,
               fullName: anonymousUser.fullName || '',
               firstName: anonymousUser.firstName || '',
