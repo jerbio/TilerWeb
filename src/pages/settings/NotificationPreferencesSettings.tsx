@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { userService } from '@/services';
 
@@ -49,27 +48,29 @@ const NotificationPreferencesSettings: React.FC = () => {
 
 	const handleSaveChanges = async () => {
 		// Build object with only changed fields
-		const changedSettings: Record<string, boolean> = {};
+		const changedUserPreference: Record<string, boolean> = {};
 
 		if (tileReminders !== originalValues.tileReminders) {
-			changedSettings.tileNotificationEnabled = tileReminders;
+			changedUserPreference.TileNotificationEnabled = tileReminders;
 		}
 		if (emailNotifications !== originalValues.emailNotifications) {
-			changedSettings.emailNotificationEnabled = emailNotifications;
+			changedUserPreference.EmailNotificationEnabled = emailNotifications;
 		}
 		if (pushNotifications !== originalValues.pushNotifications) {
-			changedSettings.pushNotificationEnabled = pushNotifications;
+			changedUserPreference.PushNotificationEnabled = pushNotifications;
 		}
 
 		// If nothing changed, don't make API call
-		if (Object.keys(changedSettings).length === 0) {
+		if (Object.keys(changedUserPreference).length === 0) {
 			toast.success(t('settings.sections.notificationPreferences.saveSuccess'));
 			return;
 		}
 
 		setIsSaving(true);
 		try {
-			const settings = await userService.updateSettings(changedSettings);
+			const settings = await userService.updateSettings({
+				UserPreference: changedUserPreference,
+			});
 			// Update state with server response
 			const { userPreference } = settings;
 			const serverValues = {
@@ -165,25 +166,25 @@ const Breadcrumb = styled.div`
 	align-items: center;
 	gap: 0.5rem;
 	margin-bottom: 2rem;
-	font-size: ${palette.typography.fontSize.sm};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 `;
 
 const BreadcrumbLink = styled.span`
-	color: ${palette.colors.gray[500]};
+	color: ${({ theme }) => theme.colors.text.secondary};
 	cursor: pointer;
 	transition: color 0.2s ease;
 
 	&:hover {
-		color: ${palette.colors.gray[400]};
+		color: ${({ theme }) => theme.colors.gray[400]};
 	}
 `;
 
 const BreadcrumbSeparator = styled.span`
-	color: ${palette.colors.gray[600]};
+	color: ${({ theme }) => theme.colors.gray[600]};
 `;
 
 const BreadcrumbCurrent = styled.span`
-	color: ${palette.colors.white};
+	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const Header = styled.div`
@@ -191,16 +192,16 @@ const Header = styled.div`
 `;
 
 const Title = styled.h1`
-	font-size: ${palette.typography.fontSize.displaySm};
-	color: ${palette.colors.white};
-	font-family: ${palette.typography.fontFamily.urban};
-	font-weight: ${palette.typography.fontWeight.bold};
+	font-size: ${({ theme }) => theme.typography.fontSize.displaySm};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
 	margin: 0 0 0.5rem 0;
 `;
 
 const Description = styled.p`
-	font-size: ${palette.typography.fontSize.sm};
-	color: ${palette.colors.gray[500]};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
 	margin: 0;
 `;
 
@@ -213,7 +214,7 @@ const ToggleRow = styled.div`
 	justify-content: space-between;
 	align-items: center;
 	padding: 1.5rem 0;
-	border-bottom: 1px solid ${palette.colors.gray[900]};
+	border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
 
 	&:last-child {
 		border-bottom: none;
@@ -221,45 +222,48 @@ const ToggleRow = styled.div`
 `;
 
 const ToggleLabel = styled.label`
-	font-size: ${palette.typography.fontSize.base};
-	color: ${palette.colors.white};
-	font-weight: ${palette.typography.fontWeight.medium};
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 `;
 
 const ToggleSwitch = styled.button<{ $isOn: boolean; $disabled?: boolean }>`
 	position: relative;
 	width: 48px;
 	height: 28px;
-	background-color: ${(props) =>
-		props.$isOn ? palette.colors.brand[500] : palette.colors.gray[700]};
+	background-color: ${({ $isOn, theme }) =>
+		$isOn ? theme.colors.brand[500] : theme.colors.gray[700]};
 	border: none;
 	border-radius: 14px;
-	cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
+	cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
 	transition: background-color 0.2s ease;
-	padding: 2px;
-	opacity: ${(props) => (props.$disabled ? 0.5 : 1)};
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
+	display: flex;
+	align-items: center;
 
 	&:hover {
-		background-color: ${(props) =>
-			props.$disabled
-				? props.$isOn
-					? palette.colors.brand[500]
-					: palette.colors.gray[700]
-				: props.$isOn
-					? palette.colors.brand[400]
-					: palette.colors.gray[600]};
+		background-color: ${({ $disabled, $isOn, theme }) =>
+			$disabled
+				? $isOn
+					? theme.colors.brand[500]
+					: theme.colors.gray[700]
+				: $isOn
+					? theme.colors.brand[400]
+					: theme.colors.gray[600]};
 	}
 `;
 
 const ToggleKnob = styled.div<{ $isOn: boolean }>`
-	position: absolute;
-	top: 2px;
-	left: ${(props) => (props.$isOn ? '22px' : '2px')};
-	width: 24px;
-	height: 24px;
-	background-color: ${palette.colors.white};
+	width: 22px;
+	height: 22px;
+	background-color: ${({ theme }) => theme.colors.background.card};
 	border-radius: 50%;
-	transition: left 0.2s ease;
+	transition: margin-left 0.2s ease;
+	margin-left: ${({ $isOn }) => ($isOn ? '23px' : '3px')};
+	flex-shrink: 0;
 `;
 
 const SaveButtonContainer = styled.div`

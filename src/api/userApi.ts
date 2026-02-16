@@ -109,7 +109,24 @@ export interface UserSettingsResponse {
 }
 
 export interface UpdateSettingsRequest {
-	[key: string]: boolean | number | string;
+	UserPreference?: Partial<{
+		TileNotificationEnabled: boolean;
+		EmailNotificationEnabled: boolean;
+		PushNotificationEnabled: boolean;
+		TextNotificationEnabled: boolean;
+		NotifcationEnabled: boolean;
+		NotifcationEnabledMs: number;
+	}>;
+	MarketingPreference?: Partial<{
+		DisableAll: boolean;
+		DisableEmail: boolean;
+		DisableTextMsg: boolean;
+	}>;
+	ScheduleProfile?: Partial<{
+		TravelMedium: string;
+		PinPreference: string;
+		SleepDuration: number;
+	}>;
 }
 
 export interface UpdateSettingsResponse {
