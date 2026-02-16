@@ -7,7 +7,7 @@ import palette from '@/core/theme/palette';
 import calendarConfig from '@/core/constants/calendar_config';
 import { StyledEvent } from '@/core/common/components/calendar/calendar_events';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
-import Spinner from '../loader';
+import Loader from '../loader';
 import CalendarEvent from './calendar_event';
 import Tooltip from '../tooltip';
 import analytics from '@/core/util/analytics';
@@ -517,7 +517,7 @@ const Calendar = ({
 
       {/* Loading Overlay */}
       <LoadingContainer $loading={eventsLoading}>
-        <Spinner />
+        <Loader />
       </LoadingContainer>
 
       {/* Info Modal Overlay */}
