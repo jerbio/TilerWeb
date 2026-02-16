@@ -360,7 +360,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
           </SummaryContainer>
         </>
       )}
-      <ButtonContainer>
+      <ButtonContainer $isexpanded={expanded}>
         <Button variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
@@ -482,9 +482,8 @@ const TileColorOption = styled.button<{ $color: RGBColor; $selected: boolean }>`
 	transition: outline 0.2s ease-in-out;
 `;
 
-const ButtonContainer = styled.div`
-	position: sticky;
-	bottom: 0;
+const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
+	${props => props.$isexpanded ? 'position: sticky; bottom: 0;' : ''}
 	border-top: 1px solid ${(props) => props.theme.colors.border.strong};
 	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
 		${(props) => props.theme.borderRadius.xLarge};

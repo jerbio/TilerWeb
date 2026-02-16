@@ -185,7 +185,7 @@
 		},
 		"createTile": {
 			"title": "Add a New Tile",
-			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>.",
+			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
 			"sections": {
 				"tileColor": "Select Tile Color",
 				"tileActions": "Tile Actions"
