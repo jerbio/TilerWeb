@@ -152,6 +152,13 @@
 			}
 		}
 	},
+	"modals": {
+		"loading": {
+			"image": {
+        "alt": "Loading Indicator"
+			}
+		}
+	},
 	"calendar": {
 		"nonViable": {
 			"title": "Non-Viable Events",

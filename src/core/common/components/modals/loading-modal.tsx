@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import LoadingEllipse from '@/assets/loading-ellipse.svg';
 import Logo from '../icons/logo';
+import { useTranslation } from 'react-i18next';
 
 type LoadingModalProps = {
   show: boolean;
@@ -11,11 +12,13 @@ type LoadingModalProps = {
 };
 
 const LoadingModal: React.FC<LoadingModalProps> = ({ show, children }) => {
+  const { t } = useTranslation();
+
   return createPortal(
     <Overlay $show={show}>
       <Content>
         <LoadingIcon>
-          <img src={LoadingEllipse} alt="Loading Ellipse" />
+          <img src={LoadingEllipse} alt={t('modals.loading.image.alt')} />
           <Logo size={30} />
         </LoadingIcon>
         {children}
