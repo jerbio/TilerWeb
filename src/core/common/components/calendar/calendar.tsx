@@ -23,6 +23,7 @@ import CalendarCreateTile, { InitialCreateTileFormState } from './calendar_creat
 import { RGB, RGBColor } from '@/core/util/colors';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
+import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 
 export type CalendarViewOptions = {
   width: number;
@@ -399,9 +400,9 @@ const Calendar = ({
     color: new RGBColor(tileColorOptions[0]),
     isRecurring: false,
     recurrenceCount: 1,
-    recurrenceType: 'daily',
+    recurrenceType: TILE_RECURRENCE_TYPE.DAILY,
     isTimeRestricted: false,
-    timeRestrictionType: 'daily',
+    timeRestrictionType: TILE_TIME_RESTRICTION_TYPE.DAILY,
     timeRestrictionStart: '00:00',
     timeRestrictionEnd: '23:59',
     hasLocationNickname: false,

@@ -1,5 +1,20 @@
 import { ApiResponse } from './api';
 
+export type ScheduleSubCalendarEventLocation = {
+  id: string;
+  description: string;
+  address: string;
+  longitude: number;
+  latitude: number;
+  isVerified: boolean;
+  isDefault: boolean;
+  isNull: boolean;
+  thirdPartyId: string;
+  userId: string;
+  source: string;
+  nickname: string;
+};
+
 export type ScheduleSubCalendarEvent = {
   id: string;
   start: number;
@@ -32,20 +47,7 @@ export type ScheduleSubCalendarEvent = {
   name: string;
   address: string;
   addressDescription: string;
-  location: {
-    id: string;
-    description: string;
-    address: string;
-    longitude: number;
-    latitude: number;
-    isVerified: boolean;
-    isDefault: boolean;
-    isNull: boolean;
-    thirdPartyId: string;
-    userId: string;
-    source: string;
-    nickname: string;
-  };
+  location: ScheduleSubCalendarEventLocation;
   description: string;
   searchdDescription: string;
   rangeStart: number;
@@ -84,34 +86,8 @@ export type ScheduleSubCalendarEvent = {
     before: {
       start: number;
       end: number;
-      startLocation?: {
-        id: string;
-        description: string;
-        address: string;
-        longitude: number;
-        latitude: number;
-        isVerified: boolean;
-        isDefault: boolean;
-        isNull: boolean;
-        thirdPartyId: string;
-        userId: string;
-        source: string;
-        nickname: string;
-      };
-      endLocation?: {
-        id: string;
-        description: string;
-        address: string;
-        longitude: number;
-        latitude: number;
-        isVerified: boolean;
-        isDefault: boolean;
-        isNull: boolean;
-        thirdPartyId: string;
-        userId: string;
-        source: string;
-        nickname: string;
-      };
+      startLocation?: ScheduleSubCalendarEventLocation;
+      endLocation?: ScheduleSubCalendarEventLocation;
       isRigid: boolean;
       travelLegs: [];
       travelMedium: string;
@@ -235,8 +211,6 @@ export type ScheduleCreateEventParams = {
   TimeZone?: string;
   IsTimeZoneAdjusted?: string;
   getTimeSpan?: string;
-  UserName?: string;
-  UserID?: string;
 };
 
 export type ScheduleCreateEventResponse = ApiResponse<ScheduleSubCalendarEvent>;

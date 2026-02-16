@@ -1,5 +1,5 @@
 import useFormHandler from '@/hooks/useFormHandler';
-import { ChevronDown, ChevronUp, Keyboard, X } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, Keyboard, X } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../button';
@@ -15,6 +15,8 @@ import SuccessModal from '../modals/success-modal';
 import { scheduleService } from '@/services';
 import { ScheduleCreateEventParams } from '../../types/schedule';
 import { toast } from 'sonner';
+import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
+import DatePicker from '../date_picker';
 
 dayjs.extend(advancedFormat);
 
@@ -27,9 +29,9 @@ export type InitialCreateTileFormState = {
   color: RGBColor;
   isRecurring: boolean;
   recurrenceCount: number;
-  recurrenceType: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurrenceType: TILE_RECURRENCE_TYPE;
   isTimeRestricted: boolean;
-  timeRestrictionType: 'daily' | 'personal' | 'work' | 'custom';
+  timeRestrictionType: TILE_TIME_RESTRICTION_TYPE;
   timeRestrictionStart: string;
   timeRestrictionEnd: string;
   hasLocationNickname: boolean;
@@ -117,22 +119,22 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                             'recurrenceType'
                           )}
                         >
-                          <option value="daily">
+                          <option value={TILE_RECURRENCE_TYPE.DAILY}>
                             {t(
                               'calendar.createTile.recurrence.periods.daily'
                             )}
                           </option>
-                          <option value="weekly">
+                          <option value={TILE_RECURRENCE_TYPE.WEEKLY}>
                             {t(
                               'calendar.createTile.recurrence.periods.weekly'
                             )}
                           </option>
-                          <option value="monthly">
+                          <option value={TILE_RECURRENCE_TYPE.MONTHLY}>
                             {t(
                               'calendar.createTile.recurrence.periods.monthly'
                             )}
                           </option>
-                          <option value="yearly">
+                          <option value={TILE_RECURRENCE_TYPE.YEARLY}>
                             {t(
                               'calendar.createTile.recurrence.periods.yearly'
                             )}
@@ -289,15 +291,21 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                 />
               ),
               date: (
-                <DescripitonDate
-                  type="date"
-                  value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-                  onChange={(e) =>
-                    handleFormInputChange('deadline', { mode: 'static' })(
-                      dayjs(e.target.value)
-                    )
-                  }
-                />
+                <DescriptionDatePickerContainer>
+                  <DescriptionDatePickerDisplay>
+                    {dayjs(formData.deadline).format('DD/MM/YYYY')}
+                    <Calendar color={theme.colors.text.secondary} size={20} />
+                  </DescriptionDatePickerDisplay>
+                  <DatePicker
+                    ghostInput
+                    value={dayjs(formData.deadline).format('YYYY-MM-DD')}
+                    onChange={(date) =>
+                      handleFormInputChange('deadline', {
+                        mode: 'static',
+                      })(dayjs(date))
+                    }
+                  />
+                </DescriptionDatePickerContainer>
               ),
             }}
           />
@@ -353,16 +361,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         </>
       )}
       <ButtonContainer>
-        {/*
-					<Button
-						variant={'ghost'}
-						onClick={() => {
-							setExpanded(!expanded);
-						}}
-					>
-						{expanded ? t('calendar.createTile.buttons.collapse') : t('calendar.createTile.buttons.expand')}
-					</Button>
-				*/}
         <Button variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
@@ -488,6 +486,8 @@ const ButtonContainer = styled.div`
 	position: sticky;
 	bottom: 0;
 	border-top: 1px solid ${(props) => props.theme.colors.border.strong};
+	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
+		${(props) => props.theme.borderRadius.xLarge};
 	display: flex;
 	justify-content: flex-end;
 	gap: 0.25rem;
@@ -502,11 +502,21 @@ const DescriptionSelect = styled.select`
 	border-bottom: 1.5px dashed ${(props) => props.theme.colors.highlight.text} !important;
 `;
 
-const DescripitonDate = styled.input`
+const DescriptionDatePickerContainer = styled.div`
+	width: 150px;
+	position: relative;
+`;
+const DescriptionDatePickerDisplay = styled.div`
+	position: absolute;
+	inset: 0;
 	background: none;
 	outline: none;
 	color: ${(props) => props.theme.colors.highlight.text};
 	border-bottom: 1.5px dashed ${(props) => props.theme.colors.highlight.text} !important;
+	text-align: center;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
 `;
 
 const DescriptionInput = styled(AutosizeInput)`
@@ -550,8 +560,7 @@ const StyledCalendarCreateEvent = styled.div<{ $isexpanded: boolean }>`
 	display: flex;
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};
-			overflow-y: ${(props) => (props.$isexpanded ? 'scroll' : 'hidden')};
-			overflow-x: hidden;
+	width: 100%;
 	
   ${(props) =>
     props.$isexpanded
@@ -559,39 +568,39 @@ const StyledCalendarCreateEvent = styled.div<{ $isexpanded: boolean }>`
 			position: fixed;
 			inset: 0;
 			z-index: 1001;
-			width: 100%;
+			overflow-y: scroll;
+			overflow-x: hidden;
 		`
       : `
 			border-radius: ${props.theme.borderRadius.xLarge};
-			width: 100%;
 		`};
 
 	& > header {
-width: 100%;
-position: sticky;
-top: 0;
-border-bottom: 1px solid ${(props) => props.theme.colors.border.strong};
-background-color: ${(props) => props.theme.colors.background.card};
+		width: 100%;
+		position: sticky;
+		top: 0;
+		border-bottom: 1px solid ${(props) => props.theme.colors.border.strong};
+		background-color: ${(props) => props.theme.colors.background.card};
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-gap: .5rem;
+		gap: .5rem;
 		padding: 8px 16px;
-	border-radius: ${(props) => `${props.theme.borderRadius.xLarge} ${props.theme.borderRadius.xLarge} 0 0`};
+		border-radius: ${(props) => `${props.theme.borderRadius.xLarge} ${props.theme.borderRadius.xLarge} 0 0`};
 
 		> button {
 			height: 28px;
 			width: 28px;
-border: 1px solid ${(props) => props.theme.colors.border.default};
-color: ${(props) => props.theme.colors.text.primary};
+			border: 1px solid ${(props) => props.theme.colors.border.default};
+			color: ${(props) => props.theme.colors.text.primary};
 			border-radius: ${(props) => props.theme.borderRadius.medium};
 			display: flex;
 			justify-content: center;
 			align-items: center;
-transition: background-color 0.2s;
+			transition: background-color 0.2s;
 
 			&:hover {
-background-color: ${(props) => props.theme.colors.background.card2};
+				background-color: ${(props) => props.theme.colors.background.card2};
 			}
 		}
 }
