@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import LoadingEllipse from '@/assets/loading-ellipse.svg';
 import Logo from '../icons/logo';
 import { useTranslation } from 'react-i18next';
+import Modal from '.';
 
 type LoadingModalProps = {
   show: boolean;
@@ -15,7 +16,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ show, children }) => {
   const { t } = useTranslation();
 
   return createPortal(
-    <Overlay $show={show}>
+    <Modal show={show} headerStyle={{ display: 'none' }}>
       <Content>
         <LoadingIcon>
           <img src={LoadingEllipse} alt={t('modals.loading.image.alt')} />
@@ -23,7 +24,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ show, children }) => {
         </LoadingIcon>
         {children}
       </Content>
-    </Overlay>,
+    </Modal>,
     document.body
   );
 };
@@ -55,36 +56,18 @@ const LoadingIcon = styled.div`
 	}
 `;
 
-const Overlay = styled.div<{ $show: boolean }>`
-	opacity: ${(props) => (props.$show ? 1 : 0)};
-	pointer-events: ${(props) => (props.$show ? 'auto' : 'none')};
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 10000;
-	transition: opacity 0.2s ease;
-`;
-
 const Content = styled.div`
 	width: 100%;
-	max-width: 400px;
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 	color: ${(props) => props.theme.colors.text.secondary};
-	background: ${(props) => props.theme.colors.background.card};
-	border-radius: ${(props) => props.theme.borderRadius.large};
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 1.5rem;
-	padding: 2rem;
+	padding-block: 1.5rem;
 	text-align: center;
+
 	p {
 		max-width: 250px;
 	}
