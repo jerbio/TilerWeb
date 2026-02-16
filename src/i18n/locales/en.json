@@ -157,6 +157,11 @@
 			"image": {
         "alt": "Loading Indicator"
 			}
+		},
+		"success": {
+			"image": {
+        "alt": "Success Icon"
+			}
 		}
 	},
 	"calendar": {

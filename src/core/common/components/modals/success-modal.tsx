@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styled, { useTheme } from 'styled-components';
 import LoadingEllipse from '@/assets/success-circle.svg';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type SuccessModalProps = {
   show: boolean;
@@ -11,14 +12,15 @@ type SuccessModalProps = {
 };
 
 const SuccessModal: React.FC<SuccessModalProps> = ({ show, setShow, children }) => {
-	const theme = useTheme();
+  const { t } = useTranslation();
+  const theme = useTheme();
   return createPortal(
     <Overlay onClick={() => setShow(false)} $show={show}>
       <Content onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={() => setShow(false)}>
           <X color={theme.colors.text.secondary} size={24} />
         </CloseButton>
-				<img src={LoadingEllipse} alt="Loading Ellipse" />
+        <img src={LoadingEllipse} alt={t('modals.success.image.alt')} />
         {children}
       </Content>
     </Overlay>,
@@ -68,21 +70,21 @@ const Content = styled.div`
 `;
 
 const CloseButton = styled.button`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
 	height: 36px;
-  width: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: transparent;
-  border: ${props => `1px solid ${props.theme.colors.border.default}`};
-	border-radius: ${props => props.theme.borderRadius.medium};
+	width: 36px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: transparent;
+	border: ${(props) => `1px solid ${props.theme.colors.border.default}`};
+	border-radius: ${(props) => props.theme.borderRadius.medium};
 
-  &:hover {
-    background-color: ${props => props.theme.colors.background.card2};
-  }
+	&:hover {
+		background-color: ${(props) => props.theme.colors.background.card2};
+	}
 `;
 
 export default SuccessModal;
