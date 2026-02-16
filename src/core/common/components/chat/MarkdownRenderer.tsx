@@ -41,7 +41,7 @@ const MarkdownContainer = styled.div`
 
   // Code
   code {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: ${({ theme }) => theme.colors.background.card2};
     border-radius: 3px;
     padding: 0.1em 0.3em;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -49,7 +49,7 @@ const MarkdownContainer = styled.div`
   }
 
   pre {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: ${({ theme }) => theme.colors.background.card2};
     border-radius: 5px;
     padding: 1em;
     margin: 0.5em 0;
@@ -63,7 +63,7 @@ const MarkdownContainer = styled.div`
 
   // Blockquotes
   blockquote {
-    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    border-left: 3px solid ${({ theme }) => theme.colors.border.default};
     margin: 0.5em 0;
     padding-left: 1em;
     font-style: italic;
@@ -72,7 +72,7 @@ const MarkdownContainer = styled.div`
 
   // Links
   a {
-    color: #4a9eff;
+    color: ${({ theme }) => theme.colors.blue[500]};
     text-decoration: none;
     
     &:hover {
@@ -83,7 +83,7 @@ const MarkdownContainer = styled.div`
   // Horizontal rules
   hr {
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid ${({ theme }) => theme.colors.border.default};
     margin: 1em 0;
   }
 
@@ -95,13 +95,13 @@ const MarkdownContainer = styled.div`
   }
 
   th, td {
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid ${({ theme }) => theme.colors.border.default};
     padding: 0.5em;
     text-align: left;
   }
 
   th {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: ${({ theme }) => theme.colors.background.card2};
     font-weight: 600;
   }
 

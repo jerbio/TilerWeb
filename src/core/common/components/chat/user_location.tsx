@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import styled from 'styled-components';
-import palette from '@/core/theme/palette';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { locationService, LocationData } from '@/services/locationService';
 
@@ -16,7 +15,7 @@ const PulseIndicator = styled.span`
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background: ${palette.colors.brand[500]};
+	background: ${({ theme }) => theme.colors.brand[500]};
 	display: inline-block;
 	animation: pulse 1.5s infinite;
 	
@@ -31,24 +30,24 @@ const PulseIndicator = styled.span`
 const LocationContainer = styled.div<StyledProps>`
 	margin-top: 10px;
 	padding: 8px 12px;
-	background-color: ${palette.colors.gray[900]};
-	border: 1px solid ${palette.colors.gray[700]};
+	background-color: ${({ theme }) => theme.colors.background.card2};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-style: ${props => props.$useDefaultLocation && !props.$isEditing ? 'dashed' : 'solid'};
-	border-color: ${props => props.$useDefaultLocation && !props.$isEditing ? palette.colors.brand[400] : palette.colors.gray[700]};
+	border-color: ${({ $useDefaultLocation, $isEditing, theme }) => $useDefaultLocation && !$isEditing ? theme.colors.brand[400] : theme.colors.border.default};
 	border-radius: 6px;
 	font-size: 0.75rem;
-	color: ${palette.colors.gray[400]};
+	color: ${({ theme }) => theme.colors.text.secondary};
 	display: flex;
 	align-items: center;
 	gap: 6px;
 	cursor: ${props => props.$isLoading ? 'default' : 'pointer'};
 	transition: all 0.2s ease-in-out;
 	position: relative;
-	overflow: visible; /* Changed from hidden to allow tooltips to show */
+	overflow: visible;
 	
 	&:hover {
-		border-color: ${props => props.$isLoading ? palette.colors.gray[700] : palette.colors.brand[500]};
-		color: ${props => props.$isLoading ? palette.colors.gray[400] : palette.colors.gray[300]};
+		border-color: ${({ $isLoading, theme }) => $isLoading ? theme.colors.border.default : theme.colors.brand[500]};
+		color: ${({ $isLoading, theme }) => $isLoading ? theme.colors.text.secondary : theme.colors.text.primary};
 		box-shadow: ${props => props.$isLoading ? 'none' : '0 0 5px rgba(237, 18, 59, 0.3)'};
 	}
 	
@@ -59,7 +58,7 @@ const LocationContainer = styled.div<StyledProps>`
 		bottom: 0;
 		height: 2px;
 		width: 0;
-		background-color: ${palette.colors.brand[500]};
+		background-color: ${({ theme }) => theme.colors.brand[500]};
 		transition: width 0.3s ease;
 	}
 	
@@ -76,29 +75,29 @@ const LocationForm = styled.form`
 `;
 
 const LocationInput = styled.input`
-	background-color: ${palette.colors.gray[800]};
-	border: 1px solid ${palette.colors.gray[600]};
+	background-color: ${({ theme }) => theme.colors.background.card2};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: 4px;
 	padding: 6px 10px;
-	color: ${palette.colors.gray[200]};
+	color: ${({ theme }) => theme.colors.text.primary};
 	font-size: 0.75rem;
 	width: 100%;
 	transition: all 0.2s ease;
 	
 	&:focus {
 		outline: none;
-		border-color: ${palette.colors.brand[500]};
-		box-shadow: 0 0 0 1px ${palette.colors.brand[500]};
+		border-color: ${({ theme }) => theme.colors.brand[500]};
+		box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.brand[500]};
 	}
 	
 	&::placeholder {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.text.muted};
 	}
 `;
 
 const SubmitButton = styled.button`
-	background-color: ${palette.colors.brand[500]};
-	color: white;
+	background-color: ${({ theme }) => theme.colors.brand[500]};
+	color: ${({ theme }) => theme.colors.white};
 	border: none;
 	border-radius: 4px;
 	padding: 6px 12px;
@@ -108,11 +107,11 @@ const SubmitButton = styled.button`
 	transition: background-color 0.2s ease;
 	
 	&:hover {
-		background-color: ${palette.colors.brand[600]};
+		background-color: ${({ theme }) => theme.colors.brand[600]};
 	}
 	
 	&:active {
-		background-color: ${palette.colors.brand[700]};
+		background-color: ${({ theme }) => theme.colors.brand[700]};
 	}
 `;
 
@@ -136,8 +135,8 @@ const LocationIconWrapper = styled.div`
 
 const LocationIcon = styled.svg<StyledProps>`
 	color: ${props => 
-		props.$isEditing ? palette.colors.brand[400] : 
-		props.$useDefaultLocation ? palette.colors.brand[300] : 'currentColor'
+		props.$isEditing ? props.theme.colors.brand[400] : 
+		props.$useDefaultLocation ? props.theme.colors.brand[300] : 'currentColor'
 	};
 `;
 
@@ -150,8 +149,8 @@ const Tooltip = styled.div`
 	bottom: 100%;
 	left: -30px;
 	margin-bottom: 15px;
-	background-color: ${palette.colors.gray[800]};
-	color: ${palette.colors.white};
+	background-color: ${({ theme }) => theme.colors.background.card2};
+	color: ${({ theme }) => theme.colors.text.primary};
 	padding: 12px 16px;
 	border-radius: 8px;
 	font-size: 0.875rem;
@@ -172,7 +171,7 @@ const TooltipArrow = styled.div`
 	position: absolute;
 	width: 12px;
 	height: 12px;
-	background-color: ${palette.colors.gray[800]};
+	background-color: ${({ theme }) => theme.colors.background.card2};
 	bottom: -6px;
 	left: 36px;
 	transform: rotate(45deg);
@@ -186,7 +185,7 @@ const ButtonContainer = styled.div`
 `;
 
 const DefaultButton = styled(SubmitButton)`
-	background-color: ${palette.colors.gray[700]};
+	background-color: ${({ theme }) => theme.colors.button.ghost.bgHover};
 	font-size: 0.7rem;
 	padding: 4px 8px;
 `;
@@ -196,7 +195,7 @@ const LocationText = styled.span<StyledProps>`
 	align-items: center;
 	gap: 6px;
 	font-style: ${props => props.$useDefaultLocation ? 'italic' : 'normal'};
-	color: ${props => props.$useDefaultLocation ? palette.colors.gray[300] : palette.colors.gray[400]};
+	color: ${({ $useDefaultLocation, theme }) => $useDefaultLocation ? theme.colors.text.secondary : theme.colors.text.muted};
 `;
 
 const DefaultBadgeContainer = styled.div`
@@ -207,7 +206,7 @@ const DefaultBadgeContainer = styled.div`
 
 const DefaultBadge = styled.span`
 	font-size: 0.65rem;
-	color: ${palette.colors.brand[300]};
+	color: ${({ theme }) => theme.colors.brand[300]};
 	background-color: rgba(237, 18, 59, 0.1);
 	padding: 2px 4px;
 	border-radius: 3px;
@@ -218,8 +217,8 @@ const DefaultBadgeTooltip = styled.div`
 	position: absolute;
 	bottom: calc(100% + 10px);
 	right: -50px;
-	background-color: ${palette.colors.gray[800]};
-	color: ${palette.colors.white};
+	background-color: ${({ theme }) => theme.colors.background.card2};
+	color: ${({ theme }) => theme.colors.text.primary};
 	padding: 12px 16px;
 	border-radius: 8px;
 	font-size: 0.875rem;
@@ -240,7 +239,7 @@ const DefaultBadgeTooltipArrow = styled.div`
 	position: absolute;
 	width: 12px;
 	height: 12px;
-	background-color: ${palette.colors.gray[800]};
+	background-color: ${({ theme }) => theme.colors.background.card2};
 	bottom: -6px;
 	right: 70px;
 	transform: rotate(45deg);
@@ -250,7 +249,7 @@ const DefaultBadgeTooltipArrow = styled.div`
 
 const ResetLink = styled.span`
 	font-size: 0.65rem;
-	color: ${palette.colors.gray[500]};
+	color: ${({ theme }) => theme.colors.text.muted};
 	cursor: pointer;
 	margin-left: 4px;
 	text-decoration: underline;
@@ -260,6 +259,7 @@ const ResetLink = styled.span`
 // UserLocation component - displays the user's location
 const UserLocation: React.FC = () => {
 	const { t } = useTranslation();
+	const theme = useTheme();
 
 	const [locationData, setLocationData] = useState<LocationData>(locationService.getDefaultLocation());
 	const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -325,7 +325,7 @@ const UserLocation: React.FC = () => {
 				if (arrow) {
 					arrow.style.bottom = "auto";
 					arrow.style.top = "-10px";
-					arrow.style.borderColor = "transparent transparent " + palette.colors.gray[800] + " transparent";
+					arrow.style.borderColor = "transparent transparent " + theme.colors.background.card2 + " transparent";
 				}
 			}
 		}

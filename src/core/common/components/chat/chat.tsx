@@ -1,13 +1,15 @@
 import React, { useEffect, useState, FormEvent, useRef } from 'react';
-import styled from 'styled-components';
-import { ChevronLeftIcon, SendHorizontal, CircleStop } from 'lucide-react';
+import styled, { useTheme } from 'styled-components';
+import { ChevronLeftIcon, SendHorizontal, CircleStop, History, SquarePen } from 'lucide-react';
+import SessionHistory from '@/core/common/components/chat/session-history/SessionHistory';
+import { VibeSession } from '@/core/common/types/chat';
 import Button from '@/core/common/components/button';
 import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 import useAppStore, { ChatContextType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
-import palette from '@/core/theme/palette';
+// VibeSession imported above with SessionHistory
 import { Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
 import ActionIcon from '@/core/common/components/chat/ActionIcon';
@@ -69,7 +71,7 @@ const ChatContainer = styled.section`
 	flex-direction: column;
 	padding: 1.5rem;
 
-	@media screen and (min-width: ${palette.screens.lg}) {
+	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
 		padding: 0;
 	}
 `;
@@ -78,9 +80,87 @@ const ChatHeader = styled.header`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	gap: 0.5rem;
 
-	@media screen and (min-width: ${palette.screens.lg}) {
+	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
 		padding: 0.75rem 0;
+	}
+`;
+
+const ChatHeaderLeft = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-shrink: 0;
+`;
+
+const ChatHeaderCenter = styled.div`
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	justify-content: center;
+`;
+
+const ChatHeaderRight = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
+`;
+
+const ChatContextChips = styled.div`
+	display: flex;
+	gap: 0.25rem;
+	overflow-x: auto;
+	max-width: 150px;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+`;
+
+const SessionTitleDisplay = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-family: ${({ theme }) => theme.typography.fontFamily.inter};
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 200px;
+`;
+
+const HistoryButton = styled.button`
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	cursor: pointer;
+	transition: all 0.15s ease;
+
+	&:hover {
+		background-color: ${({ theme }) => theme.colors.button.ghost.bgHover};
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+`;
+
+const NewChatHeaderButton = styled.button`
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	cursor: pointer;
+	transition: all 0.15s ease;
+
+	&:hover {
+		background-color: ${({ theme }) => theme.colors.button.ghost.bgHover};
+		color: ${({ theme }) => theme.colors.text.primary};
 	}
 `;
 
@@ -118,9 +198,9 @@ const ChatButton = styled.button`
 	width: 1.5rem;
 	display: grid;
 	place-items: center;
-	border-radius: ${palette.borderRadius.xxLarge};
-	background-color: ${palette.colors.white};
-	color: ${palette.colors.brand[500]};
+	border-radius: ${({ theme }) => theme.borderRadius.xxLarge};
+	background-color: ${({ theme }) => theme.colors.button.brand.bg};
+	color: ${({ theme }) => theme.colors.button.brand.text};
 `;
 
 const EmptyChat = styled.div`
@@ -132,23 +212,23 @@ const EmptyChat = styled.div`
 	height: 100%;
 
 	h3 {
-		font-size: ${palette.typography.fontSize.xl};
-		font-weight: ${palette.typography.fontWeight.bold};
-		color: ${palette.colors.white};
-		font-family: ${palette.typography.fontFamily.urban};
+		font-size: ${({ theme }) => theme.typography.fontSize.xl};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+		color: ${({ theme }) => theme.colors.text.primary};
+		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 		text-align: center;
 
-		@media screen and (min-width: ${palette.screens.lg}) {
+		@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
 			h3 {
-				font-size: ${palette.typography.fontSize.displayXs};
+				font-size: ${({ theme }) => theme.typography.fontSize.displayXs};
 			}
 		}
 	}
 
 	p {
-		font-size: ${palette.typography.fontSize.sm};
-		color: ${palette.colors.gray[500]};
-		font-weight: ${palette.typography.fontWeight.medium};
+		font-size: ${({ theme }) => theme.typography.fontSize.sm};
+		color: ${({ theme }) => theme.colors.text.muted};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 		text-align: center;
 	}
 `;
@@ -160,8 +240,8 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 	margin: 0.5rem 0;
 
 	.message-content {
-		background-color: ${({ $isUser }) => ($isUser ? '#2a2a2a' : '#c20f31')};
-		color: #ffffff;
+		background-color: ${({ $isUser, theme }) => ($isUser ? theme.colors.background.card2 : theme.colors.brand[500])};
+		color: ${({ $isUser, theme }) => ($isUser ? theme.colors.text.primary : theme.colors.white)};
 		padding: 0.75rem 1rem;
 		border-radius: 1rem;
 		max-width: 70%;
@@ -175,6 +255,7 @@ type ChatProps = {
 
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   // Get the active persona session - single source of truth
   const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
@@ -193,8 +274,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [isBatchLoading, setIsBatchLoading] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
+  const [wsStatusKey, setWsStatusKey] = useState<string | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
+  const [showSessionHistory, setShowSessionHistory] = useState(false);
+  const [currentSessionTitle, setCurrentSessionTitle] = useState<string | null>(null);
   
   // Track chat component mount
   useEffect(() => {
@@ -228,56 +312,56 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   // as the persona session is set by PersonaCardExpanded component
   // This prevents duplicate logic and ensures single source of truth
 
-  // Format WebSocket status for display
+  // Format WebSocket status for display (internationalized)
   const formatWebSocketStatus = (status: string): string => {
     const statusMap: Record<string, string[]> = {
       'action_initialization_start': [
-        'Initializing action generation...',
-        'Setting things up...',
-        'Preparing your request...',
-        'Getting ready...',
+        t('home.expanded.chat.wsStatus.actionInitStart1'),
+        t('home.expanded.chat.wsStatus.actionInitStart2'),
+        t('home.expanded.chat.wsStatus.actionInitStart3'),
+        t('home.expanded.chat.wsStatus.actionInitStart4'),
       ],
       'process_action_start': [
-        'Processing action...',
-        'Working on it...',
-        'Analyzing your request...',
-        'Thinking...',
+        t('home.expanded.chat.wsStatus.processActionStart1'),
+        t('home.expanded.chat.wsStatus.processActionStart2'),
+        t('home.expanded.chat.wsStatus.processActionStart3'),
+        t('home.expanded.chat.wsStatus.processActionStart4'),
       ],
       'process_action_end': [
-        'Action processing complete',
-        'Processing done!',
-        'All set!',
-        'Finished processing',
+        t('home.expanded.chat.wsStatus.processActionEnd1'),
+        t('home.expanded.chat.wsStatus.processActionEnd2'),
+        t('home.expanded.chat.wsStatus.processActionEnd3'),
+        t('home.expanded.chat.wsStatus.processActionEnd4'),
       ],
       'summary_action_start': [
-        'Generating summary...',
-        'Summarizing results...',
-        'Creating overview...',
-        'Preparing summary...',
+        t('home.expanded.chat.wsStatus.summaryStart1'),
+        t('home.expanded.chat.wsStatus.summaryStart2'),
+        t('home.expanded.chat.wsStatus.summaryStart3'),
+        t('home.expanded.chat.wsStatus.summaryStart4'),
       ],
       'summary_action_end': [
-        'Summary generation complete',
-        'Summary ready!',
-        'Overview complete',
-        'Done summarizing',
+        t('home.expanded.chat.wsStatus.summaryEnd1'),
+        t('home.expanded.chat.wsStatus.summaryEnd2'),
+        t('home.expanded.chat.wsStatus.summaryEnd3'),
+        t('home.expanded.chat.wsStatus.summaryEnd4'),
       ],
       'schedule_load': [
-        'Loading schedule data...',
-        'Fetching your schedule...',
-        'Retrieving calendar...',
-        'Loading timeline...',
+        t('home.expanded.chat.wsStatus.scheduleLoad1'),
+        t('home.expanded.chat.wsStatus.scheduleLoad2'),
+        t('home.expanded.chat.wsStatus.scheduleLoad3'),
+        t('home.expanded.chat.wsStatus.scheduleLoad4'),
       ],
       'schedule_process_start': [
-        'Optimizing schedule...',
-        'Reorganizing your day...',
-        'Finding the best fit...',
-        'Adjusting timeline...',
+        t('home.expanded.chat.wsStatus.scheduleProcessStart1'),
+        t('home.expanded.chat.wsStatus.scheduleProcessStart2'),
+        t('home.expanded.chat.wsStatus.scheduleProcessStart3'),
+        t('home.expanded.chat.wsStatus.scheduleProcessStart4'),
       ],
       'schedule_process_end': [
-        'Schedule optimization complete',
-        'Schedule updated!',
-        'Timeline optimized',
-        'All done!',
+        t('home.expanded.chat.wsStatus.scheduleProcessEnd1'),
+        t('home.expanded.chat.wsStatus.scheduleProcessEnd2'),
+        t('home.expanded.chat.wsStatus.scheduleProcessEnd3'),
+        t('home.expanded.chat.wsStatus.scheduleProcessEnd4'),
       ],
     };
 
@@ -310,7 +394,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         'status' in data.data.vibe &&
         typeof data.data.vibe.status === 'string'
       ) {
-        const formattedStatus = formatWebSocketStatus(data.data.vibe.status);
+        const rawStatus = data.data.vibe.status;
+        const formattedStatus = formatWebSocketStatus(rawStatus);
+        setWsStatusKey(rawStatus);
         setWebSocketStatus(formattedStatus);
       }
     });
@@ -336,9 +422,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             // Sort sessions by creation time (newest first) and get the latest one
             const latestSession = sessions.sort((a, b) => b.creationTimeInMs - a.creationTimeInMs)[0];
             setSessionId(latestSession.id);
+            setCurrentSessionTitle(latestSession.title || null);
           } else {
             // No sessions found, clear sessionId
             setSessionId('');
+            setCurrentSessionTitle(null);
           }
         } else {
           // No persona selected, clear sessionId
@@ -579,6 +667,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       setIsSending(true);
       setError(null);
       setWebSocketStatus(null); // Reset status to prepare for new updates
+      setWsStatusKey(null);
 
       // Get current location data
       const locationData = await locationService.getCurrentLocation();
@@ -682,6 +771,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
       setIsSending(true);
       setError(null);
       setWebSocketStatus(null); // Reset status to prepare for new updates
+      setWsStatusKey(null);
       // Get current location data
       const locationData = await locationService.getCurrentLocation();
       const locationApiData = locationService.toApiFormat(locationData);
@@ -717,6 +807,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     setMessage('');
     setMessages([]);
     setRequestId(null);
+    setCurrentSessionTitle(null);
     handleSetScheduleId('');
     // Clear chat context when starting a new chat
     if (activePersonaSession) {
@@ -756,63 +847,85 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     }, 0);
   };
 
+  const handleSessionSelect = (session: VibeSession) => {
+    // Skip if selecting the already-active session
+    if (session.id === sessionId) return;
+
+    // Clear current state before loading new session
+    setMessages([]);
+    setError(null);
+    setMessage('');
+    setRequestId(null);
+    setCurrentSessionTitle(session.title || null);
+    setSessionId(session.id);
+    // loadChatMessages will be triggered by the sessionId useEffect
+  };
+
   return (
     <ChatWrapper>
       <ChatContainer>
         <ChatHeader>
-          {onClose && (
-            <Button variant="ghost" height={32} onClick={onClose}>
-              <ChevronLeftIcon size={16} />
-              <span>{t('common.buttons.back')}</span>
-            </Button>
-          )}
-          {import.meta.env.VITE_NODE_ENV === 'development' && (
-            <Button
-              variant="outline"
-              style={{
-                alignSelf: 'flex-end',
-                marginBottom: '0.5rem',
-                color: palette.colors.orange[500],
-                borderColor: palette.colors.orange[500],
-              }}
-              onClick={handleNewChat}
+          <ChatHeaderLeft>
+            {onClose && (
+              <Button variant="ghost" height={32} onClick={onClose}>
+                <ChevronLeftIcon size={16} />
+                <span>{t('common.buttons.back')}</span>
+              </Button>
+            )}
+            <HistoryButton
+              onClick={() => setShowSessionHistory(true)}
+              title={t('home.expanded.chat.sessionHistory.title')}
             >
-              {t('home.expanded.chat.clearSession')}
-            </Button>
-          )}
-          {chatContext.length === 0 ? (
-            <Button variant="ghost" height={32} onClick={handleNewChat}>
-              <span>{t('home.expanded.chat.newChat')}</span>
-            </Button>
-          ) : (
-            <>
-              {chatContext.map((context, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.5rem',
-                    border: `1px solid ${palette.colors.gray[300]}`,
-                  }}
-                >
-                  <span>{context.Name}</span>
-                  <span
-                    onClick={() => handleRemoveContext(context)}
+              <History size={18} />
+            </HistoryButton>
+          </ChatHeaderLeft>
+
+          <ChatHeaderCenter>
+            {currentSessionTitle && (
+              <SessionTitleDisplay title={currentSessionTitle}>
+                {currentSessionTitle}
+              </SessionTitleDisplay>
+            )}
+          </ChatHeaderCenter>
+
+          <ChatHeaderRight>
+            {chatContext.length > 0 && (
+              <ChatContextChips>
+                {chatContext.map((context, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
                     style={{
-                      marginLeft: '0.5rem',
-                      color: 'red',
-                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.25rem 0.5rem',
+                      border: '1px solid currentColor',
+                      fontSize: theme.typography.fontSize.xs,
                     }}
                   >
-                    x
-                  </span>
-                </Button>
-              ))}
-            </>
-          )}
+                    <span>{context.Name}</span>
+                    <span
+                      onClick={() => handleRemoveContext(context)}
+                      style={{
+                        marginLeft: '0.5rem',
+                        color: 'red',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      x
+                    </span>
+                  </Button>
+                ))}
+              </ChatContextChips>
+            )}
+            <NewChatHeaderButton
+              onClick={handleNewChat}
+              title={t('home.expanded.chat.newChat')}
+            >
+              <SquarePen size={18} />
+            </NewChatHeaderButton>
+          </ChatHeaderRight>
         </ChatHeader>
         <ChatContent>
           {isLoading && (
@@ -866,7 +979,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
         <div>
           {isSending && (
-            <LoadingIndicator message={webSocketStatus || t('home.expanded.chat.sendingRequest')} />
+            <LoadingIndicator
+              message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
+              wsStatus={wsStatusKey}
+            />
           )}
           {((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
             <Button variant="primary" onClick={() => acceptAllChanges()} data-onboarding-accept-button>
@@ -897,7 +1013,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             }}
             placeholder={t('home.expanded.chat.inputPlaceholder')}
             disabled={isSending}
-            bordergradient={[palette.colors.brand[500]]}
+            bordergradient={[theme.colors.brand[500]]}
             height={50} // Set a fixed height for consistent alignment
           />
           <ChatButton type="submit" disabled={isSending || !message.trim()} data-onboarding-chat-button>
@@ -921,6 +1037,15 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         isOpen={showEmailConfirmation}
         email={submittedEmail}
         onClose={() => setShowEmailConfirmation(false)}
+      />
+
+      <SessionHistory
+        isOpen={showSessionHistory}
+        onClose={() => setShowSessionHistory(false)}
+        currentSessionId={sessionId}
+        onSessionSelect={handleSessionSelect}
+        onNewChat={handleNewChat}
+        userId={activePersonaSession?.userId}
       />
     </ChatWrapper>
   );

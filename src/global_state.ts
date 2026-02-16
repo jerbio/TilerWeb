@@ -299,7 +299,9 @@ const useAppStore = create<AppState>()((set, get) => {
         // Fetch full user info
         const { userService } = await import('./services');
         const user = await userService.getCurrentUser();
-        set({ isAuthenticated: true, authenticatedUser: user, isAuthLoading: false });
+        // Re-create the authenticated persona session so Chat/Calendar work after reload
+        get().setAuthenticated(user);
+        set({ isAuthLoading: false });
       } else {
         set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
       }

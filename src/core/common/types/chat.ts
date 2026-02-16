@@ -98,7 +98,14 @@ export type ChatMessageBody = {
 export interface VibeSession {
 	id: string;
 	creationTimeInMs: number;
+	title: string | null;
 	requests: (string | null)[];
+}
+
+export interface VibeSessionParams {
+	batchSize?: number;
+	index?: number;
+	order?: 'desc' | 'asc';
 }
 
 export type VibeSessionsResponse = ApiResponse<{

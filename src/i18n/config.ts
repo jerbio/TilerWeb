@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import TimeUtil from '@/core/util/time';
 
 // Import translations
 import translationEN from './locales/en.json';
@@ -69,5 +70,11 @@ i18n.use(LanguageDetector)
 			escapeValue: false, // React already escapes values
 		},
 	});
+
+// Sync dayjs locale with i18n language on init and on change
+TimeUtil.setLocale(i18n.language);
+i18n.on('languageChanged', (lng: string) => {
+	TimeUtil.setLocale(lng);
+});
 
 export default i18n;
