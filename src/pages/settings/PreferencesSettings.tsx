@@ -2,20 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-// import { X } from 'lucide-react'; // Used in commented-out modal
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
 import { userService } from '@/services';
 
-// Interface for custom time restrictions (commented out for now)
-// interface CustomTimeRestriction {
-// 	day: string;
-// 	startTime: string;
-// 	endTime: string;
-// }
-
-// const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // Map API values to UI values
 type TransportModeUI = 'bike' | 'drive' | 'bus';
@@ -44,20 +35,6 @@ const PreferencesSettings: React.FC = () => {
 	// Bed time
 	const [bedTimeStart, setBedTimeStart] = useState('');
 	const [bedTimeEnd, setBedTimeEnd] = useState('');
-
-	// Time restrictions state (commented out for now)
-	// const [workHoursStart, setWorkHoursStart] = useState('8:00 AM');
-	// const [workHoursEnd, setWorkHoursEnd] = useState('5:00 PM');
-	// const [personalHoursStart, setPersonalHoursStart] = useState('');
-	// const [personalHoursEnd, setPersonalHoursEnd] = useState('');
-	// const [showCustomModal, setShowCustomModal] = useState(false);
-	// const [customRestrictions, setCustomRestrictions] = useState<CustomTimeRestriction[]>(
-	// 	DAYS_OF_WEEK.map(day => ({
-	// 		day,
-	// 		startTime: '',
-	// 		endTime: '',
-	// 	}))
-	// );
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
@@ -116,21 +93,6 @@ const PreferencesSettings: React.FC = () => {
 		}
 	};
 
-	// Modal handlers (commented out for now)
-	// const handleCustomModalSave = () => {
-	// 	setShowCustomModal(false);
-	// 	toast.success(t('settings.sections.tilePreferences.customSaved'));
-	// };
-	// const handleCustomModalReset = () => {
-	// 	setCustomRestrictions(
-	// 		DAYS_OF_WEEK.map(day => ({
-	// 			day,
-	// 			startTime: '',
-	// 			endTime: '',
-	// 		}))
-	// 	);
-	// };
-
 	return (
 		<Container>
 			<Breadcrumb>
@@ -186,52 +148,6 @@ const PreferencesSettings: React.FC = () => {
 				</RadioGroup>
 			</Section>
 
-			{/* Define your time restrictions section (commented out for now)
-			<Section>
-				<SectionTitle>{t('settings.sections.tilePreferences.defineTimeRestrictions')}</SectionTitle>
-
-				<TimeRestrictionRow>
-					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.myWorkHours')}:</TimeRestrictionLabel>
-					<TimeSelectorsGroup>
-						<TimeDropdown
-							value={workHoursStart}
-							onChange={setWorkHoursStart}
-							placeholder="Starts at"
-						/>
-						<TimeSeparator>-</TimeSeparator>
-						<TimeDropdown
-							value={workHoursEnd}
-							onChange={setWorkHoursEnd}
-							placeholder="Ends at"
-						/>
-					</TimeSelectorsGroup>
-					<CustomLink onClick={() => setShowCustomModal(true)}>
-						{t('settings.sections.tilePreferences.useCustom')}
-					</CustomLink>
-				</TimeRestrictionRow>
-
-				<TimeRestrictionRow>
-					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.myPersonalHours')}:</TimeRestrictionLabel>
-					<TimeSelectorsGroup>
-						<TimeDropdown
-							value={personalHoursStart}
-							onChange={setPersonalHoursStart}
-							placeholder="Starts at"
-						/>
-						<TimeSeparator>-</TimeSeparator>
-						<TimeDropdown
-							value={personalHoursEnd}
-							onChange={setPersonalHoursEnd}
-							placeholder="Ends at"
-						/>
-					</TimeSelectorsGroup>
-					<CustomLink onClick={() => setShowCustomModal(true)}>
-						{t('settings.sections.tilePreferences.useCustom')}
-					</CustomLink>
-				</TimeRestrictionRow>
-			</Section>
-			*/}
-
 			<Section>
 				<SectionTitle>{t('settings.sections.tilePreferences.setBlockOutHours')}</SectionTitle>
 
@@ -261,58 +177,6 @@ const PreferencesSettings: React.FC = () => {
 				</Button>
 			</SaveButtonContainer>
 
-			{/* Custom Time Restrictions Modal (commented out for now)
-			{showCustomModal && (
-				<ModalOverlay onClick={() => setShowCustomModal(false)}>
-					<ModalContent onClick={(e) => e.stopPropagation()}>
-						<ModalHeader>
-							<ModalTitle>{t('settings.sections.tilePreferences.customTimeRestrictions')}</ModalTitle>
-							<CloseButton onClick={() => setShowCustomModal(false)}>
-								<X size={20} />
-							</CloseButton>
-						</ModalHeader>
-
-						<ModalBody>
-							{customRestrictions.map((restriction, index) => (
-								<DayRow key={restriction.day}>
-									<DayLabel>{restriction.day}</DayLabel>
-									<TimeSelectorsGroup>
-										<TimeDropdown
-											value={restriction.startTime}
-											onChange={(value) => {
-												const newRestrictions = [...customRestrictions];
-												newRestrictions[index].startTime = value;
-												setCustomRestrictions(newRestrictions);
-											}}
-											placeholder="Starts at"
-										/>
-										<TimeSeparator>-</TimeSeparator>
-										<TimeDropdown
-											value={restriction.endTime}
-											onChange={(value) => {
-												const newRestrictions = [...customRestrictions];
-												newRestrictions[index].endTime = value;
-												setCustomRestrictions(newRestrictions);
-											}}
-											placeholder="Ends at"
-										/>
-									</TimeSelectorsGroup>
-								</DayRow>
-							))}
-						</ModalBody>
-
-						<ModalFooter>
-							<ResetButton onClick={handleCustomModalReset}>
-								{t('settings.sections.tilePreferences.reset')}
-							</ResetButton>
-							<Button variant="brand" onClick={handleCustomModalSave}>
-								{t('settings.sections.tilePreferences.saveChanges')}
-							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</ModalOverlay>
-			)}
-			*/}
 		</Container>
 	);
 };
@@ -467,131 +331,5 @@ const SaveButtonContainer = styled.div`
 	display: flex;
 	justify-content: flex-end;
 `;
-
-// Commented out styled components for time restrictions modal (uncomment when needed)
-/*
-const CustomLink = styled.button`
-	background: transparent;
-	border: none;
-	color: ${({ theme }) => theme.colors.gray[400]};
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-	cursor: pointer;
-	text-decoration: underline;
-	padding: 0;
-	transition: color 0.2s ease;
-
-	&:hover {
-		color: ${({ theme }) => theme.colors.gray[300]};
-	}
-`;
-
-const ModalOverlay = styled.div`
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 1000;
-	padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-	background-color: ${({ theme }) => theme.colors.background.card};
-	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
-	border-radius: ${({ theme }) => theme.borderRadius.large};
-	max-width: 600px;
-	width: 100%;
-	max-height: 90vh;
-	display: flex;
-	flex-direction: column;
-`;
-
-const ModalHeader = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.5rem;
-	border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
-`;
-
-const ModalTitle = styled.h2`
-	font-size: ${({ theme }) => theme.typography.fontSize.xl};
-	color: ${({ theme }) => theme.colors.text.primary};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-	margin: 0;
-`;
-
-const CloseButton = styled.button`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 32px;
-	height: 32px;
-	background-color: transparent;
-	border: none;
-	color: ${({ theme }) => theme.colors.gray[400]};
-	cursor: pointer;
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	transition: all 0.2s ease;
-
-	&:hover {
-		background-color: ${({ theme }) => theme.colors.gray[800]};
-		color: ${({ theme }) => theme.colors.text.primary};
-	}
-`;
-
-const ModalBody = styled.div`
-	padding: 1.5rem;
-	overflow-y: auto;
-	flex: 1;
-`;
-
-const DayRow = styled.div`
-	display: grid;
-	grid-template-columns: 120px 1fr;
-	gap: 1.5rem;
-	align-items: center;
-	padding: 0.75rem 0;
-
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-		gap: 0.75rem;
-	}
-`;
-
-const DayLabel = styled.div`
-	font-size: ${({ theme }) => theme.typography.fontSize.base};
-	color: ${({ theme }) => theme.colors.text.primary};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-`;
-
-const ModalFooter = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.5rem;
-	border-top: 1px solid ${({ theme }) => theme.colors.border.subtle};
-`;
-
-const ResetButton = styled.button`
-	background: transparent;
-	border: none;
-	color: ${({ theme }) => theme.colors.gray[400]};
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-	cursor: pointer;
-	padding: 0;
-	transition: color 0.2s ease;
-
-	&:hover {
-		color: ${({ theme }) => theme.colors.gray[300]};
-	}
-`;
-*/
 
 export default PreferencesSettings;
