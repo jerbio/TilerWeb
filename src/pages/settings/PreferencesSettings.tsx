@@ -9,19 +9,28 @@ import { userService } from '@/services';
 
 
 // Map API values to UI values
-type TransportModeUI = 'bike' | 'drive' | 'bus';
-type TransportModeAPI = 'bicycling' | 'driving' | 'transit';
+enum TransportModeUI {
+	Bike = 'bike',
+	Drive = 'drive',
+	Bus = 'bus',
+}
+
+enum TransportModeAPI {
+	Bicycling = 'bicycling',
+	Driving = 'driving',
+	Transit = 'transit',
+}
 
 const apiToUiTransportMap: Record<TransportModeAPI, TransportModeUI> = {
-	bicycling: 'bike',
-	driving: 'drive',
-	transit: 'bus',
+	[TransportModeAPI.Bicycling]: TransportModeUI.Bike,
+	[TransportModeAPI.Driving]: TransportModeUI.Drive,
+	[TransportModeAPI.Transit]: TransportModeUI.Bus,
 };
 
 const uiToApiTransportMap: Record<TransportModeUI, TransportModeAPI> = {
-	bike: 'bicycling',
-	drive: 'driving',
-	bus: 'transit',
+	[TransportModeUI.Bike]: TransportModeAPI.Bicycling,
+	[TransportModeUI.Drive]: TransportModeAPI.Driving,
+	[TransportModeUI.Bus]: TransportModeAPI.Transit,
 };
 
 const PreferencesSettings: React.FC = () => {
@@ -29,8 +38,8 @@ const PreferencesSettings: React.FC = () => {
 	const navigate = useNavigate();
 
 	// Transportation mode
-	const [transportMode, setTransportMode] = useState<TransportModeUI>('bus');
-	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>('bus');
+	const [transportMode, setTransportMode] = useState<TransportModeUI>(TransportModeUI.Bus);
+	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>(TransportModeUI.Bus);
 
 	// Bed time
 	const [bedTimeStart, setBedTimeStart] = useState('');
@@ -45,7 +54,7 @@ const PreferencesSettings: React.FC = () => {
 				const settings = await userService.getSettings();
 				const { scheduleProfile } = settings;
 				const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
-				const uiValue = apiToUiTransportMap[apiValue] || 'bus';
+				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Bus;
 				setTransportMode(uiValue);
 				setOriginalTransportMode(uiValue);
 			} catch (error) {
@@ -81,7 +90,7 @@ const PreferencesSettings: React.FC = () => {
 			// Update state with server response
 			const { scheduleProfile } = settings;
 			const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
-			const uiValue = apiToUiTransportMap[apiValue] || 'bus';
+			const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Bus;
 			setTransportMode(uiValue);
 			setOriginalTransportMode(uiValue);
 			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
@@ -119,8 +128,8 @@ const PreferencesSettings: React.FC = () => {
 						<RadioInput
 							type="radio"
 							name="transport"
-							checked={transportMode === 'bike'}
-							onChange={() => setTransportMode('bike')}
+							checked={transportMode === TransportModeUI.Bike}
+							onChange={() => setTransportMode(TransportModeUI.Bike)}
 							disabled={isLoading}
 						/>
 						<RadioLabel>{t('settings.sections.tilePreferences.byBike')}</RadioLabel>
@@ -129,8 +138,8 @@ const PreferencesSettings: React.FC = () => {
 						<RadioInput
 							type="radio"
 							name="transport"
-							checked={transportMode === 'drive'}
-							onChange={() => setTransportMode('drive')}
+							checked={transportMode === TransportModeUI.Drive}
+							onChange={() => setTransportMode(TransportModeUI.Drive)}
 							disabled={isLoading}
 						/>
 						<RadioLabel>{t('settings.sections.tilePreferences.iDrive')}</RadioLabel>
@@ -139,8 +148,8 @@ const PreferencesSettings: React.FC = () => {
 						<RadioInput
 							type="radio"
 							name="transport"
-							checked={transportMode === 'bus'}
-							onChange={() => setTransportMode('bus')}
+							checked={transportMode === TransportModeUI.Bus}
+							onChange={() => setTransportMode(TransportModeUI.Bus)}
 							disabled={isLoading}
 						/>
 						<RadioLabel>{t('settings.sections.tilePreferences.byBus')}</RadioLabel>
