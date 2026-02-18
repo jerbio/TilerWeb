@@ -698,6 +698,7 @@
 				"placeholder": "Notification settings coming soon...",
 				"tileReminders": "Tile Reminders",
 				"emailNotifications": "Email Notifications",
+				"pushNotifications": "Push Notifications",
 				"saveChanges": "Save changes",
 				"saving": "Saving...",
 				"saveSuccess": "Notification preferences updated successfully",
