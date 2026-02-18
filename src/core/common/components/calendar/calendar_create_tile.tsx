@@ -6,7 +6,7 @@ import Button from '../button';
 import Collapse from '../collapse';
 import { RGB, RGBColor } from '@/core/util/colors';
 import Toggle from '../toggle';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
@@ -58,6 +58,14 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successEventName, setSuccessEventName] = useState('');
+  const isValidSubmission = useMemo(() => {
+    if (formData.action.trim().length === 0) return false;
+    if (formData.location.trim().length === 0) return false;
+    const duration = formData.durationHours * 60 + formData.durationMins;
+    if (duration === 0) return false;
+    if (formData.deadline.isBefore(dayjs(), 'day')) return false;
+    return true;
+  }, [formData]);
 
   const collapseItems = [
     {
@@ -364,7 +372,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <Button variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
-        <Button variant="brand" onClick={submitForm}>
+        <Button variant="brand" onClick={submitForm} disabled={!isValidSubmission}>
           {t('calendar.createTile.buttons.submit')}
         </Button>
       </ButtonContainer>
@@ -483,7 +491,7 @@ const TileColorOption = styled.button<{ $color: RGBColor; $selected: boolean }>`
 `;
 
 const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
-	${props => props.$isexpanded ? 'position: sticky; bottom: 0;' : ''}
+	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
 	border-top: 1px solid ${(props) => props.theme.colors.border.strong};
 	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
 		${(props) => props.theme.borderRadius.xLarge};

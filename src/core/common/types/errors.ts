@@ -1,4 +1,4 @@
-import { ApiResponse, ApiCodeResponse } from "./api";
+import { ApiResponse, ApiCodeResponse } from './api';
 import i18n from '@/i18n/config';
 
 export interface ErrorInfo {
@@ -40,9 +40,10 @@ export class TilerResponseError extends Error {
    * @returns TilerResponseError instance with server message
    */
   static fromApiCodeResponse(apiCodeResponse: ApiCodeResponse): TilerResponseError {
-    const message = typeof apiCodeResponse.Message === 'string' 
-      ? apiCodeResponse.Message 
-      : `Error code: ${apiCodeResponse.Code}`;
+    const message =
+      typeof apiCodeResponse.Message === 'string'
+        ? apiCodeResponse.Message
+        : `Error code: ${apiCodeResponse.Code}`;
     return new TilerResponseError(apiCodeResponse.Code, message);
   }
 }
@@ -50,7 +51,6 @@ export class TilerResponseError extends Error {
 export const ERROR_CODES = {
   CHAT_LIMIT_REACHED: '60000001',
   USERNAME_ALREADY_EXISTS: '1004',
-
 } as const;
 
 // Error message map for internationalization
@@ -88,26 +88,26 @@ export const getErrorMessage = (code: string): string => {
  */
 export const getErrorInfo = (code: string): ErrorInfo => {
   const message = getErrorMessage(code);
-  
+
   switch (code) {
     case ERROR_CODES.CHAT_LIMIT_REACHED:
       return {
         code,
         message,
         shouldRedirect: true,
-        redirectPath: '/'
+        redirectPath: '/',
       };
     case ERROR_CODES.USERNAME_ALREADY_EXISTS:
       return {
         code,
         message,
-        shouldRedirect: false
+        shouldRedirect: false,
       };
     default:
       return {
         code,
-        message,
-        shouldRedirect: false
+        message: '',
+        shouldRedirect: false,
       };
   }
 };
@@ -137,7 +137,7 @@ export const parseServerError = (error: unknown): ErrorInfo | null => {
     const errorInfo = getErrorInfo(errorCode);
 
     // Use server message as fallback if i18n is not initialized and server provides a message
-    if (!i18n.isInitialized && serverError.Error.Message) {
+    if ((!i18n.isInitialized || !errorInfo.message) && serverError.Error.Message) {
       errorInfo.message = serverError.Error.Message;
     }
 
