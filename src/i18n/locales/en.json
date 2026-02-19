@@ -674,6 +674,8 @@
 				"myPersonalHours": "My Personal Hours",
 				"setBlockOutHours": "Set your block out hours",
 				"bedTime": "Bed Time",
+			"startsAt": "Starts at",
+			"endsAt": "Ends at",
 				"useCustom": "Use custom",
 				"customTimeRestrictions": "Custom time restrictions",
 				"reset": "Reset",

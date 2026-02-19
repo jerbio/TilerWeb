@@ -38,8 +38,8 @@ const PreferencesSettings: React.FC = () => {
 	const navigate = useNavigate();
 
 	// Transportation mode
-	const [transportMode, setTransportMode] = useState<TransportModeUI>(TransportModeUI.Bus);
-	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>(TransportModeUI.Bus);
+	const [transportMode, setTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
+	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
 
 	// Bed time
 	const [bedTimeStart, setBedTimeStart] = useState('');
@@ -54,7 +54,7 @@ const PreferencesSettings: React.FC = () => {
 				const settings = await userService.getSettings();
 				const { scheduleProfile } = settings;
 				const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
-				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Bus;
+				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
 				setTransportMode(uiValue);
 				setOriginalTransportMode(uiValue);
 			} catch (error) {
@@ -90,7 +90,7 @@ const PreferencesSettings: React.FC = () => {
 			// Update state with server response
 			const { scheduleProfile } = settings;
 			const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
-			const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Bus;
+			const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
 			setTransportMode(uiValue);
 			setOriginalTransportMode(uiValue);
 			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
@@ -166,13 +166,13 @@ const PreferencesSettings: React.FC = () => {
 						<TimeDropdown
 							value={bedTimeStart}
 							onChange={setBedTimeStart}
-							placeholder="Starts at"
+							placeholder={t('settings.sections.tilePreferences.startsAt')}
 						/>
 						<TimeSeparator>-</TimeSeparator>
 						<TimeDropdown
 							value={bedTimeEnd}
 							onChange={setBedTimeEnd}
-							placeholder="Ends at"
+							placeholder={t('settings.sections.tilePreferences.endsAt')}
 						/>
 					</TimeSelectorsGroup>
 				</TimeRestrictionRow>
