@@ -4,6 +4,40 @@ import Logo from '@/core/common/components/icons/logo';
 import palette from '@/core/theme/palette';
 import styled from 'styled-components';
 import { keyframes } from 'styled-components';
+
+type LoaderProps = {
+	message?: string;
+}
+
+export const Loader: React.FC<LoaderProps> = ({ message = "" }) => {
+  const SIZE = 72;
+  return (
+		<Container>
+    <LoaderContainer $size={SIZE}>
+      <LoaderCircle size={SIZE} />
+      <div>
+        <Logo size={SIZE / 3} />
+      </div>
+    </LoaderContainer>
+			<LoaderMessage>{message}</LoaderMessage>
+    </Container>
+  );
+};
+
+const Container = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+	align-items: center;
+`;
+
+const LoaderMessage = styled.div`
+	color: ${props => props.theme.colors.text.primary};
+  font-family: ${props => props.theme.typography.fontFamily.urban};
+  font-weight: ${props => props.theme.typography.fontWeight.bold};
+  font-size: ${props => props.theme.typography.fontSize.base};
+`;
+
 const spin = keyframes`
 	0% {
 		transform: translate(-50%, -50%) rotate(0deg);
@@ -13,7 +47,7 @@ const spin = keyframes`
 	}
 `;
 
-const SpinnerContainer = styled.div<{ $size: number }>`
+const LoaderContainer = styled.div<{ $size: number }>`
 	width: ${({ $size }) => $size}px;
 	height: ${({ $size }) => $size}px;
 	position: relative;
@@ -32,16 +66,4 @@ const SpinnerContainer = styled.div<{ $size: number }>`
 	}
 `;
 
-export const Spinner: React.FC = () => {
-	const SIZE = 72;
-	return (
-		<SpinnerContainer $size={SIZE}>
-			<LoaderCircle size={SIZE} />
-			<div>
-				<Logo size={SIZE / 3} />
-			</div>
-		</SpinnerContainer>
-	);
-};
-
-export default Spinner;
+export default Loader;

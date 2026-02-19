@@ -16,7 +16,7 @@ export function CalendarWrapper({
 
   const { viewOptions, setViewOptions } = useCalendarView(viewRef, width, chatExpanded);
 
-  const { events, loading } = usePrefetchedCalendarData({
+  const { events, loading, refetchEvents } = usePrefetchedCalendarData({
     userId,
     viewOptions,
     daysInView: viewOptions.daysInView,
@@ -29,6 +29,7 @@ export function CalendarWrapper({
       events={events}
       eventsLoading={loading}
       viewRef={viewRef}
+			refetchEvents={refetchEvents}
     />
   );
 }

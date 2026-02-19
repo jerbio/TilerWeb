@@ -15,7 +15,7 @@ import useAppStore from '@/global_state';
 import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
 import analytics from '@/core/util/analytics';
 import { useTranslation } from 'react-i18next';
-import Spinner from '@/core/common/components/loader';
+import Loader from '@/core/common/components/loader';
 import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 import { createPortal } from 'react-dom';
 
@@ -375,7 +375,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
         {/* Loading overlay for persona creation */}
         <LoadingOverlay $visible={isCreatingPersona}>
           <LoadingContent>
-            <Spinner />
+            <Loader />
             <LoadingMessage>
               <LoadingTitle>{t('common.customPersonaModal.processing.title')}</LoadingTitle>
               <LoadingDescription>

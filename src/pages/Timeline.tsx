@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import { useNavigate } from 'react-router';
 import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
-import Spinner from '@/core/common/components/loader';
+import Loader from '@/core/common/components/loader';
 import TimelineHeader from '@/components/timeline/timeline_header';
 import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
@@ -47,7 +47,7 @@ const Timeline: React.FC = () => {
     return (
       <Container>
         <LoadingContainer>
-          <Spinner />
+          <Loader />
         </LoadingContainer>
       </Container>
     );

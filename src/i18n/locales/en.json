@@ -1,5 +1,5 @@
 {
-		"common": {
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "Skip",
@@ -152,6 +152,18 @@
 			}
 		}
 	},
+	"modals": {
+		"loading": {
+			"image": {
+        "alt": "Loading Indicator"
+			}
+		},
+		"success": {
+			"image": {
+        "alt": "Success Icon"
+			}
+		}
+	},
 	"calendar": {
 		"nonViable": {
 			"title": "Non-Viable Events",
@@ -164,10 +176,64 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
-			"locationLabel": "Location:"
+			"locationLabel": "View directions on map",
+			"secondaryActionsLabel": "Secondary Tile Actions:",
+			"secondaryActions": {
+				"editLabel": "Edit",
+				"deleteLabel": "Delete"
+			}
+		},
+		"createTile": {
+			"title": "Add a New Tile",
+			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+			"sections": {
+				"tileColor": "Select Tile Color",
+				"tileActions": "Tile Actions"
+			},
+			"tip": {
+				"description": "Press <b><key/></b> to create a new tile",
+				"keys": {
+					"enter": "Enter",
+					"return": "Return"
+				}
+			},
+			"message": {
+				"success": "<b>\"<action/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{action}}\" to your schedule"
+			},
+			"actions": {
+				"repeatTile": "Repeat the Tile",
+				"addTimeRestriction": "Add time restrictions",
+				"addLocationNickname": "Add location nickname"
+			},
+			"recurrence": {
+				"description": "I need to do this <repetition/> per <period/>",
+				"periods": {
+					"daily": "Day",
+					"weekly": "Week",
+					"monthly": "Month",
+					"yearly": "Year"
+				}
+			},
+			"timeRestrictions": {
+				"anytime": "Anytime",
+				"personalHours": "Personal Hours",
+				"workHours": "Work Hours",
+				"custom": "Custom"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Tile",
+				"collapse": "Less Options",
+				"expand": "More Options"
+			},
+			"summary": {
+				"title": "Summary",
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by"
+			}
 		},
 		"mobileChatInput": {
-      "placeholder": "Ask tiler anything..."
+			"placeholder": "Ask tiler anything..."
 		}
 	},
 	"home": {
