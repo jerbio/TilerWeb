@@ -60,13 +60,10 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   const [successEventName, setSuccessEventName] = useState('');
   const isValidSubmission = useMemo(() => {
     if (formData.action.trim().length === 0) return false;
-    if (formData.location.trim().length === 0) return false;
     const duration = formData.durationHours * 60 + formData.durationMins;
     if (duration === 0) return false;
-    if (formData.deadline.isBefore(dayjs(), 'day')) return false;
     return true;
   }, [formData]);
-
   const collapseItems = [
     {
       title: t('calendar.createTile.sections.tileColor'),
@@ -197,7 +194,9 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     },
   ];
 
-  async function submitForm() {
+  async function submitForm(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!isValidSubmission) return;
     setLoading(true);
     try {
       const event: ScheduleCreateEventParams = {
@@ -230,7 +229,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   }
 
   return (
-    <StyledCalendarCreateEvent $isexpanded={expanded}>
+    <StyledCalendarCreateEvent onSubmit={submitForm} $isexpanded={expanded}>
       <LoadingModal show={loading} setShow={setLoading}>
         <p>{t('calendar.createTile.message.pending', { action: formData.action })}</p>
       </LoadingModal>
@@ -262,6 +261,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             components={{
               action: (
                 <DescriptionInput
+									markRequired
                   value={formData.action}
                   onChange={handleFormInputChange('action')}
                   minWidth={50}
@@ -278,6 +278,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               ),
               hours: (
                 <DescriptionInput
+									markRequired
                   value={formData.durationHours}
                   onChange={handleFormInputChange('durationHours', {
                     restriction: 'integer',
@@ -289,6 +290,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               ),
               minutes: (
                 <DescriptionInput
+									markRequired
                   value={formData.durationMins}
                   onChange={handleFormInputChange('durationMins', {
                     restriction: 'integer',
@@ -372,7 +374,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <Button variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
-        <Button variant="brand" onClick={submitForm} disabled={!isValidSubmission}>
+        <Button variant="brand" type="submit" disabled={!isValidSubmission}>
           {t('calendar.createTile.buttons.submit')}
         </Button>
       </ButtonContainer>
@@ -563,7 +565,7 @@ const DescriptionContainer = styled.div`
 	color: ${(props) => props.theme.colors.text.secondary};
 `;
 
-const StyledCalendarCreateEvent = styled.div<{ $isexpanded: boolean }>`
+const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 	display: flex;
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};

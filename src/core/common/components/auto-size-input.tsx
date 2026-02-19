@@ -5,7 +5,8 @@ import styled from 'styled-components';
 type AutosizeInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   minWidth?: number;
   maxWidth?: number;
-	value?: unknown;
+  markRequired?: boolean;
+  value?: unknown;
   style?: React.CSSProperties;
 };
 
@@ -16,6 +17,17 @@ const Input = styled.input`
 	color: inherit;
 	outline: none;
 	width: 100%;
+`;
+
+const InputContainer = styled.div<{ $markrequired: boolean }>`
+	position: relative;
+	&::before {
+		content: ${(props) => (props.$markrequired ? '"*"' : '""')};
+		color: ${(props) => props.theme.colors.brand[400]};
+		position: absolute;
+		top: -.65rem;
+		right: -.3rem;
+	}
 `;
 
 const Mirror = styled.span`
@@ -31,6 +43,7 @@ const Mirror = styled.span`
 const AutosizeInput: React.FC<AutosizeInputProps> = ({
   minWidth = 40,
   maxWidth = 400,
+  markRequired,
   value = '',
   style,
   ...props
@@ -52,17 +65,19 @@ const AutosizeInput: React.FC<AutosizeInputProps> = ({
 
   return (
     <>
-      <Input
-        {...props}
-        value={value}
-        style={{
-          width,
-          ...style,
-        }}
-      />
+      <InputContainer $markrequired={!!markRequired}>
+        <Input
+          {...props}
+          value={value}
+          style={{
+            width,
+            ...style,
+          }}
+        />
+      </InputContainer>
       <Mirror ref={mirrorRef}>{value || ' '}</Mirror>
     </>
   );
-}
+};
 
 export default AutosizeInput;
