@@ -2,13 +2,13 @@
 <html class="dark" lang="en">
 	<head>
 		<!-- Google tag (gtag.js) -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=G-FRMKMX02CG"></script>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA_MEASUREMENT_ID%"></script>
 		<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
 
-		gtag('config', 'G-FRMKMX02CG');
+		gtag('config', '%VITE_GA_MEASUREMENT_ID%');
 		</script>
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/png" href="TilerLogo.png" />
@@ -81,9 +81,9 @@
 		<div id="root"></div>
 		
 		<!-- Required for .NET Framework SignalR -->
-		<script src="https://tiler-stage.conveyor.cloud/Scripts/jquery-2.1.1.js"></script>
-		<script src="https://tiler-stage.conveyor.cloud/Scripts/jquery.signalR-2.4.3.js"></script>
-		<script src="https://tiler-stage.conveyor.cloud/signalr/hubs"></script>
+		<script src="%VITE_BASE_URL%Scripts/jquery-2.1.1.js"></script>
+		<script src="%VITE_BASE_URL%Scripts/jquery.signalR-2.4.3.js"></script>
+		<script src="%VITE_BASE_URL%signalr/hubs"></script>
 
 
 		<script type="module" src="/src/main.tsx"></script>
