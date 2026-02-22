@@ -21,18 +21,12 @@ export interface VibeAction {
   type: ActionType;
   creationTimeInMs: number;
   status: Status;
-  prompts: PromptWithActions[];
-  beforeScheduleId: string;
-  afterScheduleId: string;
-  vibeRequest: {
-    id: string;
-    creationTimeInMs: number;
-    activeAction: string | null;
-    isClosed: boolean;
-    beforeScheduleId: string | null;
-    afterScheduleId: string | null;
-    actions: VibeAction[];
-  };
+  prompts?: PromptWithActions[];
+  entityId?: string;
+  entityType?: string;
+  beforeScheduleId: string | null;
+  afterScheduleId: string | null;
+  vibeRequest: VibeRequest | null;
 }
 
 export interface VibeResponse {
@@ -48,11 +42,12 @@ export interface VibeResponse {
 export interface VibeRequest {
   id: string;
   creationTimeInMs: number;
-  activeAction: string | null; // More specific type
+  activeAction: string | null;
   isClosed: boolean;
   beforeScheduleId: string | null;
   afterScheduleId: string | null;
-  actions: VibeAction[]; // Using VibeAction type
+  actions: VibeAction[];
+  previews?: unknown[];
 }
 
 export type ChatSendMessageResponse = ApiResponse<{

@@ -1,6 +1,8 @@
 import { PersonaApi } from "@/api/personaApi";
 import PersonaService from "./personaService";
 import { ScheduleApi } from "@/api/scheduleApi";
+import { SubCalendarEventApi } from "@/api/subCalendarEventApi";
+import { CalendarEventApi } from "@/api/calendarEventApi";
 import ScheduleService from "./scheduleService";
 import { ChatApi } from "@/api/chatApi";
 import ChatService from "./chatService";
@@ -19,6 +21,8 @@ import { personaUserService } from "./personaUserService";
 // Init APIs
 const personaApi = new PersonaApi();
 const scheduleApi = new ScheduleApi();
+const subCalendarEventApi = new SubCalendarEventApi();
+const calendarEventApi = new CalendarEventApi();
 const chatApi = new ChatApi();
 const waitlistApi = new WaitlistApi();
 const betaUserApi = new BetaUserApi();
@@ -28,7 +32,7 @@ const userApi = new UserApi();
 
 // Init Services
 export const personaService = new PersonaService(personaApi);
-export const scheduleService = new ScheduleService(scheduleApi);
+export const scheduleService = new ScheduleService(scheduleApi, subCalendarEventApi, calendarEventApi);
 export const chatService = new ChatService(chatApi);
 export const waitlistService = new WaitlistService(waitlistApi);
 export const betaUserService = new BetaUserService(betaUserApi);
