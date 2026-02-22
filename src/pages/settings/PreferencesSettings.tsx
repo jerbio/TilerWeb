@@ -1,56 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
 import { toast } from 'sonner';
-import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
+import TimeDropdown from '@/core/common/components/TimeDropdown';
+import { userService } from '@/services';
 
-interface CustomTimeRestriction {
-	day: string;
-	startTime: string;
-	endTime: string;
+
+// Map API values to UI values
+enum TransportModeUI {
+	Bike = 'bike',
+	Drive = 'drive',
+	Bus = 'bus',
 }
 
-const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+enum TransportModeAPI {
+	Bicycling = 'bicycling',
+	Driving = 'driving',
+	Transit = 'transit',
+}
+
+const apiToUiTransportMap: Record<TransportModeAPI, TransportModeUI> = {
+	[TransportModeAPI.Bicycling]: TransportModeUI.Bike,
+	[TransportModeAPI.Driving]: TransportModeUI.Drive,
+	[TransportModeAPI.Transit]: TransportModeUI.Bus,
+};
+
+const uiToApiTransportMap: Record<TransportModeUI, TransportModeAPI> = {
+	[TransportModeUI.Bike]: TransportModeAPI.Bicycling,
+	[TransportModeUI.Drive]: TransportModeAPI.Driving,
+	[TransportModeUI.Bus]: TransportModeAPI.Transit,
+};
 
 const PreferencesSettings: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
 	// Transportation mode
-	const [transportMode, setTransportMode] = useState<'bike' | 'drive' | 'bus'>('bus');
-
-	// Work hours
-	const [workHoursStart, setWorkHoursStart] = useState('8:00AM');
-	const [workHoursEnd, setWorkHoursEnd] = useState('4:45PM');
-
-	// Personal hours
-	const [personalHoursStart, setPersonalHoursStart] = useState('Starts at');
-	const [personalHoursEnd, setPersonalHoursEnd] = useState('Ends at');
+	const [transportMode, setTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
+	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
 
 	// Bed time
-	const [bedTimeStart, setBedTimeStart] = useState('Starts at');
-	const [bedTimeEnd, setBedTimeEnd] = useState('Ends at');
+	const [bedTimeStart, setBedTimeStart] = useState('');
+	const [bedTimeEnd, setBedTimeEnd] = useState('');
 
-	// Modal state
-	const [showCustomModal, setShowCustomModal] = useState(false);
-	const [customRestrictions, setCustomRestrictions] = useState<CustomTimeRestriction[]>(
-		DAYS_OF_WEEK.map(day => ({
-			day,
-			startTime: 'Starts at',
-			endTime: 'Ends at',
-		}))
-	);
-
+	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 
+	useEffect(() => {
+		const fetchSettings = async () => {
+			try {
+				const settings = await userService.getSettings();
+				const { scheduleProfile } = settings;
+				const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
+				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
+				setTransportMode(uiValue);
+				setOriginalTransportMode(uiValue);
+			} catch (error) {
+				console.error('Failed to fetch settings:', error);
+				toast.error(t('settings.sections.tilePreferences.saveError'));
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchSettings();
+	}, [t]);
+
 	const handleSaveChanges = async () => {
+		// Build object with only changed fields
+		const changedScheduleProfile: Record<string, string> = {};
+
+		if (transportMode !== originalTransportMode) {
+			changedScheduleProfile.TravelMedium = uiToApiTransportMap[transportMode];
+		}
+
+		// If nothing changed, don't make API call
+		if (Object.keys(changedScheduleProfile).length === 0) {
+			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
+			return;
+		}
+
 		setIsSaving(true);
 		try {
-			// TODO: Implement save functionality with backend
-			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+			const settings = await userService.updateSettings({
+				ScheduleProfile: changedScheduleProfile,
+			});
+			// Update state with server response
+			const { scheduleProfile } = settings;
+			const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
+			const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
+			setTransportMode(uiValue);
+			setOriginalTransportMode(uiValue);
 			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
 		} catch (error) {
 			toast.error(t('settings.sections.tilePreferences.saveError'));
@@ -58,21 +100,6 @@ const PreferencesSettings: React.FC = () => {
 		} finally {
 			setIsSaving(false);
 		}
-	};
-
-	const handleCustomModalSave = () => {
-		setShowCustomModal(false);
-		toast.success(t('settings.sections.tilePreferences.customSaved'));
-	};
-
-	const handleCustomModalReset = () => {
-		setCustomRestrictions(
-			DAYS_OF_WEEK.map(day => ({
-				day,
-				startTime: 'Starts at',
-				endTime: 'Ends at',
-			}))
-		);
 	};
 
 	return (
@@ -101,8 +128,9 @@ const PreferencesSettings: React.FC = () => {
 						<RadioInput
 							type="radio"
 							name="transport"
-							checked={transportMode === 'bike'}
-							onChange={() => setTransportMode('bike')}
+							checked={transportMode === TransportModeUI.Bike}
+							onChange={() => setTransportMode(TransportModeUI.Bike)}
+							disabled={isLoading}
 						/>
 						<RadioLabel>{t('settings.sections.tilePreferences.byBike')}</RadioLabel>
 					</RadioOption>
@@ -110,8 +138,9 @@ const PreferencesSettings: React.FC = () => {
 						<RadioInput
 							type="radio"
 							name="transport"
-							checked={transportMode === 'drive'}
-							onChange={() => setTransportMode('drive')}
+							checked={transportMode === TransportModeUI.Drive}
+							onChange={() => setTransportMode(TransportModeUI.Drive)}
+							disabled={isLoading}
 						/>
 						<RadioLabel>{t('settings.sections.tilePreferences.iDrive')}</RadioLabel>
 					</RadioOption>
@@ -119,56 +148,13 @@ const PreferencesSettings: React.FC = () => {
 						<RadioInput
 							type="radio"
 							name="transport"
-							checked={transportMode === 'bus'}
-							onChange={() => setTransportMode('bus')}
+							checked={transportMode === TransportModeUI.Bus}
+							onChange={() => setTransportMode(TransportModeUI.Bus)}
+							disabled={isLoading}
 						/>
 						<RadioLabel>{t('settings.sections.tilePreferences.byBus')}</RadioLabel>
 					</RadioOption>
 				</RadioGroup>
-			</Section>
-
-			<Section>
-				<SectionTitle>{t('settings.sections.tilePreferences.defineTimeRestrictions')}</SectionTitle>
-
-				<TimeRestrictionRow>
-					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.myWorkHours')}:</TimeRestrictionLabel>
-					<TimeSelectorsGroup>
-						<TimeSelect value={workHoursStart} onChange={(e) => setWorkHoursStart(e.target.value)}>
-							<option>8:00AM</option>
-							<option>9:00AM</option>
-							<option>10:00AM</option>
-						</TimeSelect>
-						<TimeSeparator>-</TimeSeparator>
-						<TimeSelect value={workHoursEnd} onChange={(e) => setWorkHoursEnd(e.target.value)}>
-							<option>4:45PM</option>
-							<option>5:00PM</option>
-							<option>6:00PM</option>
-						</TimeSelect>
-					</TimeSelectorsGroup>
-					<CustomLink onClick={() => setShowCustomModal(true)}>
-						{t('settings.sections.tilePreferences.useCustom')}
-					</CustomLink>
-				</TimeRestrictionRow>
-
-				<TimeRestrictionRow>
-					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.myPersonalHours')}:</TimeRestrictionLabel>
-					<TimeSelectorsGroup>
-						<TimeSelect value={personalHoursStart} onChange={(e) => setPersonalHoursStart(e.target.value)}>
-							<option>Starts at</option>
-							<option>6:00AM</option>
-							<option>7:00AM</option>
-						</TimeSelect>
-						<TimeSeparator>-</TimeSeparator>
-						<TimeSelect value={personalHoursEnd} onChange={(e) => setPersonalHoursEnd(e.target.value)}>
-							<option>Ends at</option>
-							<option>10:00PM</option>
-							<option>11:00PM</option>
-						</TimeSelect>
-					</TimeSelectorsGroup>
-					<CustomLink onClick={() => setShowCustomModal(true)}>
-						{t('settings.sections.tilePreferences.useCustom')}
-					</CustomLink>
-				</TimeRestrictionRow>
 			</Section>
 
 			<Section>
@@ -177,92 +163,29 @@ const PreferencesSettings: React.FC = () => {
 				<TimeRestrictionRow>
 					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.bedTime')}:</TimeRestrictionLabel>
 					<TimeSelectorsGroup>
-						<TimeSelect value={bedTimeStart} onChange={(e) => setBedTimeStart(e.target.value)}>
-							<option>Starts at</option>
-							<option>9:00PM</option>
-							<option>10:00PM</option>
-							<option>11:00PM</option>
-						</TimeSelect>
+						<TimeDropdown
+							value={bedTimeStart}
+							onChange={setBedTimeStart}
+							placeholder={t('settings.sections.tilePreferences.startsAt')}
+						/>
 						<TimeSeparator>-</TimeSeparator>
-						<TimeSelect value={bedTimeEnd} onChange={(e) => setBedTimeEnd(e.target.value)}>
-							<option>Ends at</option>
-							<option>6:00AM</option>
-							<option>7:00AM</option>
-							<option>8:00AM</option>
-						</TimeSelect>
+						<TimeDropdown
+							value={bedTimeEnd}
+							onChange={setBedTimeEnd}
+							placeholder={t('settings.sections.tilePreferences.endsAt')}
+						/>
 					</TimeSelectorsGroup>
 				</TimeRestrictionRow>
 			</Section>
 
 			<SaveButtonContainer>
-				<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving}>
+				<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving || isLoading}>
 					{isSaving
 						? t('settings.sections.tilePreferences.saving')
 						: t('settings.sections.tilePreferences.saveChanges')}
 				</Button>
 			</SaveButtonContainer>
 
-			{/* Custom Time Restrictions Modal */}
-			{showCustomModal && (
-				<ModalOverlay onClick={() => setShowCustomModal(false)}>
-					<ModalContent onClick={(e) => e.stopPropagation()}>
-						<ModalHeader>
-							<ModalTitle>{t('settings.sections.tilePreferences.customTimeRestrictions')}</ModalTitle>
-							<CloseButton onClick={() => setShowCustomModal(false)}>
-								<X size={20} />
-							</CloseButton>
-						</ModalHeader>
-
-						<ModalBody>
-							{customRestrictions.map((restriction, index) => (
-								<DayRow key={restriction.day}>
-									<DayLabel>{restriction.day}</DayLabel>
-									<TimeSelectorsGroup>
-										<TimeSelect
-											value={restriction.startTime}
-											onChange={(e) => {
-												const newRestrictions = [...customRestrictions];
-												newRestrictions[index].startTime = e.target.value;
-												setCustomRestrictions(newRestrictions);
-											}}
-										>
-											<option>Starts at</option>
-											<option>6:00AM</option>
-											<option>7:00AM</option>
-											<option>8:00AM</option>
-											<option>9:00AM</option>
-										</TimeSelect>
-										<TimeSeparator>-</TimeSeparator>
-										<TimeSelect
-											value={restriction.endTime}
-											onChange={(e) => {
-												const newRestrictions = [...customRestrictions];
-												newRestrictions[index].endTime = e.target.value;
-												setCustomRestrictions(newRestrictions);
-											}}
-										>
-											<option>Ends at</option>
-											<option>4:00PM</option>
-											<option>5:00PM</option>
-											<option>6:00PM</option>
-											<option>7:00PM</option>
-										</TimeSelect>
-									</TimeSelectorsGroup>
-								</DayRow>
-							))}
-						</ModalBody>
-
-						<ModalFooter>
-							<ResetButton onClick={handleCustomModalReset}>
-								{t('settings.sections.tilePreferences.reset')}
-							</ResetButton>
-							<Button variant="brand" onClick={handleCustomModalSave}>
-								{t('settings.sections.tilePreferences.saveChanges')}
-							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</ModalOverlay>
-			)}
 		</Container>
 	);
 };
@@ -277,25 +200,25 @@ const Breadcrumb = styled.div`
 	align-items: center;
 	gap: 0.5rem;
 	margin-bottom: 2rem;
-	font-size: ${palette.typography.fontSize.sm};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 `;
 
 const BreadcrumbLink = styled.span`
-	color: ${palette.colors.gray[500]};
+	color: ${({ theme }) => theme.colors.text.secondary};
 	cursor: pointer;
 	transition: color 0.2s ease;
 
 	&:hover {
-		color: ${palette.colors.gray[400]};
+		color: ${({ theme }) => theme.colors.gray[400]};
 	}
 `;
 
 const BreadcrumbSeparator = styled.span`
-	color: ${palette.colors.gray[600]};
+	color: ${({ theme }) => theme.colors.gray[600]};
 `;
 
 const BreadcrumbCurrent = styled.span`
-	color: ${palette.colors.white};
+	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const Header = styled.div`
@@ -303,16 +226,16 @@ const Header = styled.div`
 `;
 
 const Title = styled.h1`
-	font-size: ${palette.typography.fontSize.displaySm};
-	color: ${palette.colors.white};
-	font-family: ${palette.typography.fontFamily.urban};
-	font-weight: ${palette.typography.fontWeight.bold};
+	font-size: ${({ theme }) => theme.typography.fontSize.displaySm};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
 	margin: 0 0 0.5rem 0;
 `;
 
 const Description = styled.p`
-	font-size: ${palette.typography.fontSize.sm};
-	color: ${palette.colors.gray[500]};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
 	margin: 0;
 `;
 
@@ -321,9 +244,9 @@ const Section = styled.div`
 `;
 
 const SectionTitle = styled.h3`
-	font-size: ${palette.typography.fontSize.lg};
-	color: ${palette.colors.white};
-	font-weight: ${palette.typography.fontWeight.semibold};
+	font-size: ${({ theme }) => theme.typography.fontSize.lg};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 	margin: 0 0 1.5rem 0;
 `;
 
@@ -341,16 +264,46 @@ const RadioOption = styled.label`
 `;
 
 const RadioInput = styled.input`
+	appearance: none;
 	width: 20px;
 	height: 20px;
-	accent-color: ${palette.colors.brand[500]};
+	border: 2px solid ${({ theme }) => theme.colors.gray[400]};
+	border-radius: 50%;
+	background-color: transparent;
 	cursor: pointer;
+	transition: all 0.2s ease;
+	position: relative;
+
+	&:checked {
+		border-color: ${({ theme }) => theme.colors.brand[500]};
+	}
+
+	&:checked::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background-color: ${({ theme }) => theme.colors.brand[500]};
+	}
+
+	&:hover:not(:disabled) {
+		border-color: ${({ theme }) => theme.colors.brand[400]};
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 `;
 
 const RadioLabel = styled.span`
-	font-size: ${palette.typography.fontSize.base};
-	color: ${palette.colors.white};
-	font-weight: ${palette.typography.fontWeight.normal};
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.normal};
 `;
 
 const TimeRestrictionRow = styled.div`
@@ -367,9 +320,9 @@ const TimeRestrictionRow = styled.div`
 `;
 
 const TimeRestrictionLabel = styled.label`
-	font-size: ${palette.typography.fontSize.base};
-	color: ${palette.colors.white};
-	font-weight: ${palette.typography.fontWeight.medium};
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 `;
 
 const TimeSelectorsGroup = styled.div`
@@ -378,164 +331,14 @@ const TimeSelectorsGroup = styled.div`
 	gap: 0.75rem;
 `;
 
-const TimeSelect = styled.select`
-	appearance: none;
-	background-color: ${palette.colors.gray[900]};
-	border: 1px solid ${palette.colors.gray[800]};
-	border-radius: ${palette.borderRadius.medium};
-	color: ${palette.colors.white};
-	padding: 0.75rem 2.5rem 0.75rem 1rem;
-	font-size: ${palette.typography.fontSize.sm};
-	font-weight: ${palette.typography.fontWeight.medium};
-	cursor: pointer;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A3A3A3' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-position: right 0.75rem center;
-	transition: border-color 0.2s ease;
-
-	&:hover {
-		border-color: ${palette.colors.gray[700]};
-	}
-
-	&:focus {
-		outline: none;
-		border-color: ${palette.colors.brand[500]};
-		box-shadow: 0 0 0 2px ${palette.colors.brand[500]}33;
-	}
-`;
-
 const TimeSeparator = styled.span`
-	color: ${palette.colors.gray[500]};
-	font-size: ${palette.typography.fontSize.base};
-`;
-
-const CustomLink = styled.button`
-	background: transparent;
-	border: none;
-	color: ${palette.colors.gray[400]};
-	font-size: ${palette.typography.fontSize.sm};
-	font-weight: ${palette.typography.fontWeight.medium};
-	cursor: pointer;
-	text-decoration: underline;
-	padding: 0;
-	transition: color 0.2s ease;
-
-	&:hover {
-		color: ${palette.colors.gray[300]};
-	}
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
 `;
 
 const SaveButtonContainer = styled.div`
 	display: flex;
 	justify-content: flex-end;
-`;
-
-// Modal styles
-const ModalOverlay = styled.div`
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 1000;
-	padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-	background-color: ${palette.colors.gray[900]};
-	border: 1px solid ${palette.colors.gray[800]};
-	border-radius: ${palette.borderRadius.large};
-	max-width: 600px;
-	width: 100%;
-	max-height: 90vh;
-	display: flex;
-	flex-direction: column;
-`;
-
-const ModalHeader = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.5rem;
-	border-bottom: 1px solid ${palette.colors.gray[800]};
-`;
-
-const ModalTitle = styled.h2`
-	font-size: ${palette.typography.fontSize.xl};
-	color: ${palette.colors.white};
-	font-weight: ${palette.typography.fontWeight.semibold};
-	margin: 0;
-`;
-
-const CloseButton = styled.button`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 32px;
-	height: 32px;
-	background-color: transparent;
-	border: none;
-	color: ${palette.colors.gray[400]};
-	cursor: pointer;
-	border-radius: ${palette.borderRadius.medium};
-	transition: all 0.2s ease;
-
-	&:hover {
-		background-color: ${palette.colors.gray[800]};
-		color: ${palette.colors.white};
-	}
-`;
-
-const ModalBody = styled.div`
-	padding: 1.5rem;
-	overflow-y: auto;
-	flex: 1;
-`;
-
-const DayRow = styled.div`
-	display: grid;
-	grid-template-columns: 120px 1fr;
-	gap: 1.5rem;
-	align-items: center;
-	padding: 0.75rem 0;
-
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-		gap: 0.75rem;
-	}
-`;
-
-const DayLabel = styled.div`
-	font-size: ${palette.typography.fontSize.base};
-	color: ${palette.colors.white};
-	font-weight: ${palette.typography.fontWeight.medium};
-`;
-
-const ModalFooter = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.5rem;
-	border-top: 1px solid ${palette.colors.gray[800]};
-`;
-
-const ResetButton = styled.button`
-	background: transparent;
-	border: none;
-	color: ${palette.colors.gray[400]};
-	font-size: ${palette.typography.fontSize.sm};
-	font-weight: ${palette.typography.fontWeight.medium};
-	cursor: pointer;
-	padding: 0;
-	transition: color 0.2s ease;
-
-	&:hover {
-		color: ${palette.colors.gray[300]};
-	}
 `;
 
 export default PreferencesSettings;
