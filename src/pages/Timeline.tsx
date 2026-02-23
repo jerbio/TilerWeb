@@ -7,6 +7,7 @@ import Spinner from '@/core/common/components/loader';
 import TimelineHeader from '@/components/timeline/timeline_header';
 import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
+import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
@@ -113,17 +114,19 @@ const Timeline: React.FC = () => {
 
       <TimelineContentContainer>
         <TimelineContent ref={contentRef}>
-          <CardContent>
-            {contentTransition((style, item) => (
-              <item.container
-                style={style}
-                key={item.key}
-                $chatexpanded={chatExpanded}
-              >
-                {item.content}
-              </item.container>
-            ))}
-          </CardContent>
+          <CalendarRequestProvider>
+            <CardContent>
+              {contentTransition((style, item) => (
+                <item.container
+                  style={style}
+                  key={item.key}
+                  $chatexpanded={chatExpanded}
+                >
+                  {item.content}
+                </item.container>
+              ))}
+            </CardContent>
+          </CalendarRequestProvider>
         </TimelineContent>
       </TimelineContentContainer>
     </Container>

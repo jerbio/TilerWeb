@@ -22,6 +22,10 @@ type CalendarEventsProps = {
   setSelectedEvent: (id: string | null) => void;
 	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
 	onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
+	/** Ref populated with all styled events so Calendar can look up by ID */
+	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
+	/** Currently focused event ID (from chat action pill click) */
+	focusedEventId?: string | null;
 };
 type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
@@ -63,6 +67,8 @@ const CalendarEvents = ({
   setSelectedEvent,
 	onNonViableEventsChange,
 	setSelectedEventInfo,
+	styledEventsRef,
+	focusedEventId,
 }: CalendarEventsProps) => {
 	const handleEventClick = (event: StyledEvent) => {
 		// Track event selection
@@ -322,6 +328,13 @@ const CalendarEvents = ({
 		}
 	}, [styledEvents]);
 
+	// Expose all styled events via ref for Calendar request handling
+	useEffect(() => {
+		if (styledEventsRef) {
+			styledEventsRef.current = styledEvents;
+		}
+	}, [styledEvents, styledEventsRef]);
+
 
   const eventTransition = useTransition(
     styledEvents.filter((event) => event.isViable),
@@ -366,6 +379,7 @@ const CalendarEvents = ({
             key={event.key}
             style={style}
             $selected={selectedEvent === event.id}
+            $focused={focusedEventId === event.id}
           >
             <CalendarEvent
               event={event}
@@ -373,6 +387,7 @@ const CalendarEvents = ({
               setSelectedEvent={setSelectedEvent}
 							setSelectedEventInfo={setSelectedEventInfo}
               onClick={() => handleEventClick(event)}
+              focused={focusedEventId === event.id}
             />
           </EventPositioner>
         ))}
@@ -432,11 +447,11 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventPositioner = styled(animated.div) <{ $selected: boolean }>`
+const EventPositioner = styled(animated.div) <{ $selected: boolean; $focused: boolean }>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: ${({ $selected }) => ($selected ? 999 : 'auto')};
+	z-index: ${({ $selected, $focused }) => ($selected || $focused ? 999 : 'auto')};
 	display: flex;
 
 	&:hover {

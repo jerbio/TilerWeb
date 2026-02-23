@@ -1,4 +1,7 @@
-import { ScheduleLookupOptions, ScheduleLookupResponse } from '../core/common/types/schedule';
+import {
+	ScheduleLookupOptions,
+	ScheduleLookupResponse,
+} from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 

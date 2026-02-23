@@ -12,7 +12,6 @@ import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 // VibeSession imported above with SessionHistory
 import { Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
-import ActionIcon from '@/core/common/components/chat/ActionIcon';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
@@ -24,6 +23,7 @@ import EmailConfirmationModal from '@/core/common/components/email-confirmation/
 import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
+import ActionPill from '@/core/common/components/chat/ActionPill';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -706,18 +706,23 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             type: action.type,
             creationTimeInMs: action.creationTimeInMs,
             status: action.status,
+            entityId: action.entityId,
+            entityType: action.entityType,
             beforeScheduleId: action.beforeScheduleId,
             afterScheduleId: action.afterScheduleId,
             prompts: action.prompts ?? [],
-            vibeRequest: {
-              id: action.vibeRequest.id,
-              creationTimeInMs: action.vibeRequest.creationTimeInMs,
-              activeAction: action.vibeRequest.activeAction,
-              isClosed: action.vibeRequest.isClosed ?? false,
-              beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
-              afterScheduleId: action.vibeRequest.afterScheduleId || null,
-              actions: action.vibeRequest.actions || [],
-            },
+            vibeRequest: action.vibeRequest
+              ? {
+                id: action.vibeRequest.id,
+                creationTimeInMs: action.vibeRequest.creationTimeInMs,
+                activeAction: action.vibeRequest.activeAction,
+                isClosed: action.vibeRequest.isClosed ?? false,
+                beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
+                afterScheduleId: action.vibeRequest.afterScheduleId || null,
+                actions: action.vibeRequest.actions || [],
+                previews: action.vibeRequest.previews || [],
+              }
+              : null,
           })),
         })
       );
@@ -957,15 +962,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
                 </div>
 
                 {message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
-                  <Button
-                    key={action.id}
-                    variant="pill"
-                    dotstatus={action.status}
-                  >
-                    <ActionIcon action={action} />
-                    <span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
-                    <span className="action-description">{action.descriptions}</span>
-                  </Button>
+                  <ActionPill key={action.id} action={action} />
                 ))}
               </MessageBubble>
             ))}

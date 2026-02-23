@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
@@ -16,6 +16,11 @@ import CalendarEventInfo from './calendar_event_info';
 import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
+import { useCalendarRequestListener } from './CalendarRequestProvider';
+import { CalendarRequestEnvelope, CalendarEntityType } from './calendarRequestContext';
+import { resolveEntityToTileId } from '@/core/util/entityResolution';
+import { findEventDate } from '@/core/util/eventDateLookup';
+import { scheduleService } from '@/services';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
@@ -50,6 +55,186 @@ const Calendar = ({
 
 	const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
 	const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
+
+	// Ref holding all styled events (populated by CalendarEvents)
+	const styledEventsRef = useRef<StyledEvent[]>([]);
+
+	// Focused event state — drives the pulse animation, auto-clears after timeout
+	const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
+	const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// ── Phase 4: Pending focus after navigation ───────────────────
+	// Stores the request to retry once events finish reloading after a date navigation
+	const pendingFocusRef = useRef<{
+		entityId: string;
+		entityType: CalendarEntityType;
+		onResult?: (result: import('./calendarRequestContext').CalendarRequestResult) => void;
+	} | null>(null);
+
+	// ── Calendar Request Listener ──────────────────────────────────
+	const handleCalendarRequest = useCallback(
+		(envelope: CalendarRequestEnvelope) => {
+			const { request, onResult } = envelope;
+
+			if (request.type === 'focus_event') {
+				const { entityId, entityType } = request;
+
+				// Resolve the entity to a concrete tile ID on the calendar grid
+				const resolvedTileId = resolveEntityToTileId(
+					entityId,
+					entityType,
+					styledEventsRef.current,
+				);
+
+				const styledEvent = resolvedTileId
+					? styledEventsRef.current.find((e) => e.id === resolvedTileId)
+					: undefined;
+
+				if (!styledEvent) {
+					// ── Phase 4: Tile not in view — look up date & navigate ──
+					onResult?.({ status: 'navigating', entityId });
+
+					findEventDate({
+						entityId,
+						entityType,
+						lookupSubCalEvent: async (id) => {
+							try {
+								return await scheduleService.lookupSubCalendarEventById(id);
+							} catch {
+								return null;
+							}
+						},
+						lookupCalEvent: async (id) => {
+							try {
+								const result = await scheduleService.lookupCalendarEventById(id);
+								if (!result || result.start == null) return null;
+								return {
+									start: result.start,
+									subEvents: (result.subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
+								};
+							} catch {
+								return null;
+							}
+						},
+					}).then((startMs) => {
+						if (startMs == null) {
+							onResult?.({ status: 'not_found', entityId });
+							return;
+						}
+
+						// Store the pending focus so it retries after events reload
+						pendingFocusRef.current = { entityId, entityType, onResult };
+
+						// Navigate the calendar view to the event's date
+						setViewOptions((prev) => ({
+							...prev,
+							startDay: dayjs(startMs).startOf('day'),
+						}));
+					});
+
+					return;
+				}
+
+				if (styledEvent.isViable) {
+					// ── Viable event: select, scroll, highlight ────────────
+					setSelectedEvent(styledEvent.id);
+					setSelectedEventInfo(styledEvent);
+
+					// Scroll to the event's vertical position
+					if (contentContainerRef.current) {
+						const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+						const eventStart = dayjs(styledEvent.start);
+						const hourFraction =
+							eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+						const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
+
+						contentContainerRef.current.scrollTo({
+							top: targetScroll,
+							behavior: 'smooth',
+						});
+					}
+				} else {
+					// ── Non-viable event: open overlay for that day ────────
+					const eventDay = dayjs(styledEvent.start);
+					setShowNonViableEvents(eventDay);
+					setSelectedEvent(styledEvent.id);
+					setSelectedEventInfo(styledEvent);
+				}
+
+				// Trigger pulse animation
+				if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+				setFocusedEventId(styledEvent.id);
+				focusTimeoutRef.current = setTimeout(() => {
+					setFocusedEventId(null);
+				}, 2500);
+
+				onResult?.({ status: 'found', entityId });
+			}
+		},
+		[]
+	);
+
+	useCalendarRequestListener(handleCalendarRequest);
+
+	// ── Phase 4: Retry pending focus after events reload ──────────
+	useEffect(() => {
+		if (eventsLoading || !pendingFocusRef.current) return;
+
+		const { entityId, entityType, onResult } = pendingFocusRef.current;
+		pendingFocusRef.current = null;
+
+		// Give styled events a tick to render after new data arrives
+		const retryTimer = setTimeout(() => {
+			const resolvedTileId = resolveEntityToTileId(
+				entityId,
+				entityType,
+				styledEventsRef.current,
+			);
+
+			const styledEvent = resolvedTileId
+				? styledEventsRef.current.find((e) => e.id === resolvedTileId)
+				: undefined;
+
+			if (!styledEvent) {
+				onResult?.({ status: 'not_found', entityId });
+				return;
+			}
+
+			if (styledEvent.isViable) {
+				setSelectedEvent(styledEvent.id);
+				setSelectedEventInfo(styledEvent);
+
+				if (contentContainerRef.current) {
+					const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+					const eventStart = dayjs(styledEvent.start);
+					const hourFraction =
+						eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+					const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
+
+					contentContainerRef.current.scrollTo({
+						top: targetScroll,
+						behavior: 'smooth',
+					});
+				}
+			} else {
+				const eventDay = dayjs(styledEvent.start);
+				setShowNonViableEvents(eventDay);
+				setSelectedEvent(styledEvent.id);
+				setSelectedEventInfo(styledEvent);
+			}
+
+			// Trigger pulse animation
+			if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+			setFocusedEventId(styledEvent.id);
+			focusTimeoutRef.current = setTimeout(() => {
+				setFocusedEventId(null);
+			}, 2500);
+
+			onResult?.({ status: 'found', entityId });
+		}, 150);
+
+		return () => clearTimeout(retryTimer);
+	}, [eventsLoading, events]);
 
 	// Track calendar view mount
 	useEffect(() => {
@@ -444,6 +629,7 @@ const Calendar = ({
 								selectedEvent={selectedEvent}
 								setSelectedEvent={setSelectedEvent}
 								setSelectedEventInfo={setSelectedEventInfo}
+								focused={focusedEventId === event.id}
 							/>
 						))}
 					</NonViableEventsContainer>
@@ -509,6 +695,8 @@ const Calendar = ({
 							setSelectedEventInfo={setSelectedEventInfo}
 							calendarGridCanvasRef={calendarGridCanvasRef}
 							setStyledNonViableEvents={setStyledNonViableEvents}
+							styledEventsRef={styledEventsRef}
+							focusedEventId={focusedEventId}
 						/>
 					</SwiperSlide>
 					<SwiperSlide>

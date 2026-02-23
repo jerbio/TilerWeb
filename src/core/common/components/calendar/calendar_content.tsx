@@ -20,6 +20,10 @@ type CalendarContentProps = {
 	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 	// Function to set styled non-viable events
 	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+	/** Ref populated with all styled events for Calendar request handling */
+	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
+	/** Currently focused event ID (chat → calendar highlight) */
+	focusedEventId?: string | null;
 };
 
 const CalendarContent: React.FC<CalendarContentProps> = ({
@@ -30,6 +34,8 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setSelectedEventInfo,
 	calendarGridCanvasRef,
 	setStyledNonViableEvents,
+	styledEventsRef,
+	focusedEventId,
 }) => {
   return (
     <Container>
@@ -56,6 +62,8 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
           setSelectedEvent={setSelectedEvent}
           setSelectedEventInfo={setSelectedEventInfo}
           onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+          styledEventsRef={styledEventsRef}
+          focusedEventId={focusedEventId}
         />
       </StyledCalendarContent>
     </Container>
