@@ -683,7 +683,9 @@
 				"saving": "Saving...",
 				"saveSuccess": "Tile preferences updated successfully",
 				"saveError": "Failed to save changes. Please try again.",
-				"customSaved": "Custom time restrictions saved"
+				"customSaved": "Custom time restrictions saved",
+				"bedTimeStartRequired": "Please select a bed time start",
+				"bedTimeEndRequired": "Please select a bed time end"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",

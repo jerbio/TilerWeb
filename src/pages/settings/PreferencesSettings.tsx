@@ -6,6 +6,11 @@ import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
 import { userService } from '@/services';
+import {
+	calculateSleepDurationMs,
+	calculateBedTimeEnd,
+	normalizeTimeString,
+} from '@/core/common/utils/timeUtils';
 
 
 // Map API values to UI values
@@ -44,6 +49,8 @@ const PreferencesSettings: React.FC = () => {
 	// Bed time
 	const [bedTimeStart, setBedTimeStart] = useState('');
 	const [bedTimeEnd, setBedTimeEnd] = useState('');
+	const [originalBedTimeStart, setOriginalBedTimeStart] = useState('');
+	const [originalBedTimeEnd, setOriginalBedTimeEnd] = useState('');
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
@@ -53,10 +60,25 @@ const PreferencesSettings: React.FC = () => {
 			try {
 				const settings = await userService.getSettings();
 				const { scheduleProfile } = settings;
+
+				// Transport mode
 				const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
 				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
 				setTransportMode(uiValue);
 				setOriginalTransportMode(uiValue);
+
+				// Bed time - endTimeOfDay is when the day ends (bed time start), sleepDuration is in milliseconds
+				const rawStartTime = scheduleProfile.endTimeOfDay || '';
+				const startTime = normalizeTimeString(rawStartTime);
+				const sleepDuration = scheduleProfile.sleepDuration || 0;
+				const endTime = startTime && sleepDuration > 0
+					? calculateBedTimeEnd(startTime, sleepDuration)
+					: '';
+
+				setBedTimeStart(startTime);
+				setBedTimeEnd(endTime);
+				setOriginalBedTimeStart(startTime);
+				setOriginalBedTimeEnd(endTime);
 			} catch (error) {
 				console.error('Failed to fetch settings:', error);
 				toast.error(t('settings.sections.tilePreferences.saveError'));
@@ -69,11 +91,35 @@ const PreferencesSettings: React.FC = () => {
 	}, [t]);
 
 	const handleSaveChanges = async () => {
+		// Validate bed time: both must be set or both must be empty
+		const hasBedTimeStart = bedTimeStart !== '';
+		const hasBedTimeEnd = bedTimeEnd !== '';
+
+		if (hasBedTimeStart && !hasBedTimeEnd) {
+			toast.error(t('settings.sections.tilePreferences.bedTimeEndRequired'));
+			return;
+		}
+
+		if (!hasBedTimeStart && hasBedTimeEnd) {
+			toast.error(t('settings.sections.tilePreferences.bedTimeStartRequired'));
+			return;
+		}
+
 		// Build object with only changed fields
-		const changedScheduleProfile: Record<string, string> = {};
+		const changedScheduleProfile: Record<string, string | number> = {};
 
 		if (transportMode !== originalTransportMode) {
 			changedScheduleProfile.TravelMedium = uiToApiTransportMap[transportMode];
+		}
+
+		// Check if bed time changed
+		const bedTimeChanged =
+			bedTimeStart !== originalBedTimeStart || bedTimeEnd !== originalBedTimeEnd;
+
+		if (bedTimeChanged && bedTimeStart && bedTimeEnd) {
+			const newSleepDuration = calculateSleepDurationMs(bedTimeStart, bedTimeEnd);
+			changedScheduleProfile.SleepDuration = newSleepDuration;
+			changedScheduleProfile.EndTimeOfDay = bedTimeStart;
 		}
 
 		// If nothing changed, don't make API call
@@ -89,10 +135,26 @@ const PreferencesSettings: React.FC = () => {
 			});
 			// Update state with server response
 			const { scheduleProfile } = settings;
+
+			// Transport mode
 			const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
 			const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
 			setTransportMode(uiValue);
 			setOriginalTransportMode(uiValue);
+
+			// Bed time - endTimeOfDay is bed time start
+			const rawStartTime = scheduleProfile.endTimeOfDay || '';
+			const startTime = normalizeTimeString(rawStartTime);
+			const sleepDuration = scheduleProfile.sleepDuration || 0;
+			const endTime = startTime && sleepDuration > 0
+				? calculateBedTimeEnd(startTime, sleepDuration)
+				: '';
+
+			setBedTimeStart(startTime);
+			setBedTimeEnd(endTime);
+			setOriginalBedTimeStart(startTime);
+			setOriginalBedTimeEnd(endTime);
+
 			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
 		} catch (error) {
 			toast.error(t('settings.sections.tilePreferences.saveError'));
