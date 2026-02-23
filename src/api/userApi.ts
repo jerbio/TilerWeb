@@ -76,6 +76,7 @@ export interface MarketingPreference {
 export interface ScheduleProfile {
 	travelMedium: string;
 	pinPreference: string;
+	endTimeOfDay: string;
 	sleepDuration: number;
 }
 
@@ -126,6 +127,7 @@ export interface UpdateSettingsRequest {
 		TravelMedium: string;
 		PinPreference: string;
 		SleepDuration: number;
+		EndTimeOfDay: string;
 	}>;
 }
 

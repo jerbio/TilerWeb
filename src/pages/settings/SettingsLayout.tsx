@@ -21,6 +21,11 @@ const SettingsLayout: React.FC = () => {
 			path: '/settings/account',
 		},
 		{
+			title: t('settings.sections.tilePreferences.title'),
+			description: t('settings.sections.tilePreferences.description'),
+			path: '/settings/preferences',
+		},
+		{
 			title: t('settings.sections.notificationPreferences.title'),
 			description: t('settings.sections.notificationPreferences.description'),
 			path: '/settings/notifications',

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
+import Toggle from '@/core/common/components/Toggle';
 import { userService } from '@/services';
 
 const NotificationPreferencesSettings: React.FC = () => {
@@ -111,38 +112,24 @@ const NotificationPreferencesSettings: React.FC = () => {
 			</Header>
 
 			<Section>
-				<ToggleRow>
-					<ToggleLabel>{t('settings.sections.notificationPreferences.tileReminders')}</ToggleLabel>
-					<ToggleSwitch
-						$isOn={tileReminders}
-						$disabled={isLoading}
-						onClick={() => !isLoading && setTileReminders(!tileReminders)}
-					>
-						<ToggleKnob $isOn={tileReminders} />
-					</ToggleSwitch>
-				</ToggleRow>
-
-				<ToggleRow>
-					<ToggleLabel>{t('settings.sections.notificationPreferences.emailNotifications')}</ToggleLabel>
-					<ToggleSwitch
-						$isOn={emailNotifications}
-						$disabled={isLoading}
-						onClick={() => !isLoading && setEmailNotifications(!emailNotifications)}
-					>
-						<ToggleKnob $isOn={emailNotifications} />
-					</ToggleSwitch>
-				</ToggleRow>
-
-				<ToggleRow>
-					<ToggleLabel>{t('settings.sections.notificationPreferences.pushNotifications')}</ToggleLabel>
-					<ToggleSwitch
-						$isOn={pushNotifications}
-						$disabled={isLoading}
-						onClick={() => !isLoading && setPushNotifications(!pushNotifications)}
-					>
-						<ToggleKnob $isOn={pushNotifications} />
-					</ToggleSwitch>
-				</ToggleRow>
+				<Toggle
+					label={t('settings.sections.notificationPreferences.tileReminders')}
+					isOn={tileReminders}
+					onChange={setTileReminders}
+					disabled={isLoading}
+				/>
+				<Toggle
+					label={t('settings.sections.notificationPreferences.emailNotifications')}
+					isOn={emailNotifications}
+					onChange={setEmailNotifications}
+					disabled={isLoading}
+				/>
+				<Toggle
+					label={t('settings.sections.notificationPreferences.pushNotifications')}
+					isOn={pushNotifications}
+					onChange={setPushNotifications}
+					disabled={isLoading}
+				/>
 			</Section>
 
 			<SaveButtonContainer>
@@ -207,63 +194,6 @@ const Description = styled.p`
 
 const Section = styled.div`
 	margin-bottom: 3rem;
-`;
-
-const ToggleRow = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.5rem 0;
-	border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
-
-	&:last-child {
-		border-bottom: none;
-	}
-`;
-
-const ToggleLabel = styled.label`
-	font-size: ${({ theme }) => theme.typography.fontSize.base};
-	color: ${({ theme }) => theme.colors.text.primary};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-`;
-
-const ToggleSwitch = styled.button<{ $isOn: boolean; $disabled?: boolean }>`
-	position: relative;
-	width: 48px;
-	height: 28px;
-	background-color: ${({ $isOn, theme }) =>
-		$isOn ? theme.colors.brand[500] : theme.colors.gray[700]};
-	border: none;
-	border-radius: 14px;
-	cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
-	transition: background-color 0.2s ease;
-	padding: 0;
-	margin: 0;
-	box-sizing: border-box;
-	opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
-	display: flex;
-	align-items: center;
-
-	&:hover {
-		background-color: ${({ $disabled, $isOn, theme }) =>
-			$disabled
-				? $isOn
-					? theme.colors.brand[500]
-					: theme.colors.gray[700]
-				: $isOn
-					? theme.colors.brand[400]
-					: theme.colors.gray[600]};
-	}
-`;
-
-const ToggleKnob = styled.div<{ $isOn: boolean }>`
-	width: 22px;
-	height: 22px;
-	background-color: ${({ theme }) => theme.colors.background.card};
-	border-radius: 50%;
-	transition: margin-left 0.2s ease;
-	margin-left: ${({ $isOn }) => ($isOn ? '23px' : '3px')};
-	flex-shrink: 0;
 `;
 
 const SaveButtonContainer = styled.div`
