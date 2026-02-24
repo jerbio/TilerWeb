@@ -368,7 +368,6 @@ const CalendarEvents = ({
   const backgroundClickHandler = (
     event: React.MouseEvent<HTMLDivElement>
   ): CalendarBackgroundClickInfo => {
-    console.log('background clicked');
     const background = event.target as HTMLDivElement;
     const dimensions = background.getBoundingClientRect();
     const timelineHeight = dimensions.height;
@@ -395,7 +394,6 @@ const CalendarEvents = ({
       minute: minuteClicked,
       second: secondClicked,
     };
-    console.log(info);
     return info;
   };
 
@@ -467,7 +465,6 @@ const CalendarEvents = ({
 };
 
 const Container = styled.div`
-	box-shadow: 0 0 0 4px ${(props) => props.theme.colors.brand[500]} inset;
 	position: absolute;
 	top: 0;
 	left: ${calendarConfig.TIMELINE_WIDTH};

@@ -6,7 +6,7 @@ import Button from '../button';
 import Collapse from '../collapse';
 import { RGB, RGBColor } from '@/core/util/colors';
 import Toggle from '../toggle';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
@@ -39,6 +39,7 @@ export type InitialCreateTileFormState = {
 };
 
 type CalendarCreateTileProps = {
+  isOpen: boolean;
   onClose: (shouldRefetch?: boolean) => void;
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
@@ -47,6 +48,7 @@ type CalendarCreateTileProps = {
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
+  isOpen,
   onClose,
   expanded,
   tileColorOptions,
@@ -64,6 +66,24 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     if (duration === 0) return false;
     return true;
   }, [formData]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        submitForm();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', onKeyDown);
+    } else {
+      document.removeEventListener('keydown', onKeyDown);
+    }
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isOpen, submitForm]);
+
   const collapseItems = [
     {
       title: t('calendar.createTile.sections.tileColor'),
@@ -194,8 +214,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     },
   ];
 
-  async function submitForm(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function submitForm() {
     if (!isValidSubmission) return;
     setLoading(true);
     try {
@@ -229,7 +248,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   }
 
   return (
-    <StyledCalendarCreateEvent onSubmit={submitForm} $isexpanded={expanded}>
+    <StyledCalendarCreateEvent
+      onSubmit={(e) => {
+        e.preventDefault();
+        submitForm();
+      }}
+      $isexpanded={expanded}
+    >
       <LoadingModal show={loading} setShow={setLoading}>
         <p>{t('calendar.createTile.message.pending', { action: formData.action })}</p>
       </LoadingModal>
@@ -307,11 +332,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               date: (
                 <DescriptionDatePickerContainer>
                   <DescriptionDatePickerDisplay>
-                    {dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                    })}
+                    {dayjs(formData.deadline)
+                      .toDate()
+                      .toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                      })}
                     <Calendar color={theme.colors.text.secondary} size={20} />
                   </DescriptionDatePickerDisplay>
                   <DatePicker

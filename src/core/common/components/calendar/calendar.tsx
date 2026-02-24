@@ -5,7 +5,10 @@ import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-r
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import calendarConfig from '@/core/constants/calendar_config';
-import { CalendarBackgroundClickInfo, StyledEvent } from '@/core/common/components/calendar/calendar_events';
+import {
+  CalendarBackgroundClickInfo,
+  StyledEvent,
+} from '@/core/common/components/calendar/calendar_events';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import Loader from '../loader';
 import CalendarEvent from './calendar_event';
@@ -57,8 +60,8 @@ const Calendar = ({
     isCreateTileModalOpen,
     setCreateTileModalOpen,
     isCreateTileModalExpanded,
-    setCreateTileModalExpanded
-  } = useAppStore(state => state);
+    setCreateTileModalExpanded,
+  } = useAppStore((state) => state);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -379,7 +382,6 @@ const Calendar = ({
     }
   }, [isMobile]);
 
-
   // Create Tile State
   const tileColorOptions: Array<RGB> = [
     { r: 255, g: 159, b: 28 },
@@ -416,14 +418,14 @@ const Calendar = ({
     if (shouldRefetch) refetchEvents?.();
   }
 
-	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
+  function onBackgroundClick(info: CalendarBackgroundClickInfo) {
     setSelectedEvent(null);
     setSelectedEventInfo(null);
-		const { formData, setFormData } = createTileFormHandler;
-		setFormData({
-			...formData,
-			deadline: dayjs(info.day),
-		})
+    const { formData, setFormData } = createTileFormHandler;
+    setFormData({
+      ...formData,
+      deadline: dayjs(info.day),
+    });
     setCreateTileModalOpen(true);
   }
 
@@ -558,6 +560,7 @@ const Calendar = ({
               onClick={(e) => e.stopPropagation()}
             >
               <CalendarCreateTile
+                isOpen={isCreateTileModalOpen}
                 formHandler={createTileFormHandler}
                 tileColorOptions={tileColorOptions}
                 expanded={isCreateTileModalExpanded}
@@ -570,6 +573,7 @@ const Calendar = ({
       ) : (
         createPortal(
           <CalendarCreateTile
+            isOpen={isCreateTileModalOpen}
             formHandler={createTileFormHandler}
             tileColorOptions={tileColorOptions}
             expanded={isCreateTileModalExpanded}
