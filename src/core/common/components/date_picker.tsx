@@ -112,19 +112,23 @@ const DatePickerWrapper = styled.div<{ $ghostInput?: boolean }>`
 	}
 
 	.react-datepicker {
-		background-color: ${(props) => props.theme.colors.gray[900]};
-		border: 1px solid ${(props) => props.theme.colors.gray[700]};
+		background-color: ${(props) => props.theme.colors.datepicker.bg};
+		border: 1px solid ${(props) => props.theme.colors.border.default};
 		border-radius: ${(props) => props.theme.borderRadius.medium};
 		font-family: ${(props) => props.theme.typography.fontFamily.inter};
 		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 	}
 
 	.react-datepicker__header {
-		background-color: ${(props) => props.theme.colors.gray[800]};
-		border-bottom: 1px solid ${(props) => props.theme.colors.gray[700]};
+		background-color: ${(props) => props.theme.colors.datepicker.headerBg};
+		border-bottom: 1px solid ${(props) => props.theme.colors.border.strong};
 		border-radius: ${(props) => props.theme.borderRadius.medium}
 			${(props) => props.theme.borderRadius.medium} 0 0;
 		padding-top: 12px;
+
+		& > h2 {
+			color: ${(props) => props.theme.colors.datepicker.headerText};
+		}
 	}
 
 	.react-datepicker__current-month {
@@ -135,34 +139,36 @@ const DatePickerWrapper = styled.div<{ $ghostInput?: boolean }>`
 	}
 
 	.react-datepicker__day-name {
-		color: ${(props) => props.theme.colors.gray[500]};
+		color: ${(props) => props.theme.colors.datepicker.dayText};
 		font-size: ${(props) => props.theme.typography.fontSize.xs};
 		font-weight: ${(props) => props.theme.typography.fontWeight.medium};
 	}
 
 	.react-datepicker__day {
-		color: ${(props) => props.theme.colors.white};
+		color: ${(props) => props.theme.colors.datepicker.dateText};
 		border-radius: ${(props) => props.theme.borderRadius.small};
 		transition: all 0.2s ease;
 
 		&:hover {
-			background-color: ${(props) => props.theme.colors.gray[700]};
+			background-color: ${(props) => props.theme.colors.datepicker.dateHoverBg};
+			color: ${(props) => props.theme.colors.datepicker.dateHoverText};
 		}
 	}
 
 	.react-datepicker__day--selected {
-		background-color: ${(props) => props.theme.colors.brand[500]};
-		color: ${(props) => props.theme.colors.white};
+		background-color: ${(props) => props.theme.colors.datepicker.dateSelectedBg};
+		color: ${(props) => props.theme.colors.datepicker.dateSelectedText} !important;
 		font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 
 		&:hover {
-			background-color: ${(props) => props.theme.colors.brand[600]};
+			background-color: ${(props) => props.theme.colors.datepicker.dateSelectedBg};
+			color: ${(props) => props.theme.colors.datepicker.dateSelectedText};
 		}
 	}
 
 	.react-datepicker__day--keyboard-selected {
-		background-color: ${(props) => props.theme.colors.gray[700]};
-		color: ${(props) => props.theme.colors.white};
+		background-color: ${(props) => props.theme.colors.datepicker.dateHoverBg};
+		color: ${(props) => props.theme.colors.datepicker.dateHoverText};
 	}
 
 	.react-datepicker__day--today {
@@ -171,7 +177,7 @@ const DatePickerWrapper = styled.div<{ $ghostInput?: boolean }>`
 	}
 
 	.react-datepicker__day--disabled {
-		color: ${(props) => props.theme.colors.gray[600]};
+		color: ${(props) => props.theme.colors.datepicker.dateDisabledText};
 		cursor: not-allowed;
 
 		&:hover {
@@ -180,7 +186,7 @@ const DatePickerWrapper = styled.div<{ $ghostInput?: boolean }>`
 	}
 
 	.react-datepicker__day--outside-month {
-		color: ${(props) => props.theme.colors.gray[600]};
+		color: ${(props) => props.theme.colors.datepicker.dateOutsideMonthText};
 	}
 
 	.react-datepicker__navigation {
@@ -188,11 +194,11 @@ const DatePickerWrapper = styled.div<{ $ghostInput?: boolean }>`
 	}
 
 	.react-datepicker__navigation-icon::before {
-		border-color: ${(props) => props.theme.colors.gray[400]};
+		border-color: ${(props) => props.theme.colors.datepicker.headerButton};
 	}
 
 	.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
-		border-color: ${(props) => props.theme.colors.white};
+		border-color: ${(props) => props.theme.colors.datepicker.headerButtonHover};
 	}
 `;
 
