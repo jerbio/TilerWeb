@@ -1,5 +1,5 @@
 import Logo from '@/core/common/components/icons/logo';
-import { Moon, Sun, User } from 'lucide-react';
+import { Moon, Plus, Sun, User } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import useAppStore from '@/global_state';
@@ -10,6 +10,7 @@ import { Env } from '@/config/config_getter';
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const setCreateTileModalOpen = useAppStore((state) => state.setCreateTileModalOpen);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -43,6 +44,9 @@ const TimelineHeader: React.FC = () => {
         <Logo size={30} />
       </HeaderLeft>
       <HeaderRight>
+				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
+					<Plus size={16} />
+				</CreateEventButton>
         {Env.isDevelopment() && (
           <ThemeToggle onClick={toggleTheme}>
             {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
@@ -61,6 +65,18 @@ const TimelineHeader: React.FC = () => {
     </Header>
   );
 };
+
+const CreateEventButton = styled.button`
+	height: 36px;
+	width: 36px;
+	overflow: hidden;
+	color: ${(props) => props.theme.colors.button.brand.text};
+	background-color: ${({ theme }) => theme.colors.button.brand.bg};
+	border-radius: ${(props) => props.theme.borderRadius.large};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
 
 const ThemeToggle = styled.button`
 	height: 36px;

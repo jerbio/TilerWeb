@@ -1,7 +1,7 @@
 import calendarConfig from '@/core/constants/calendar_config';
 import React from 'react';
 import styled from 'styled-components';
-import CalendarEvents, { StyledEvent } from './calendar_events';
+import CalendarEvents, { CalendarBackgroundClickInfo, StyledEvent } from './calendar_events';
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
@@ -20,7 +20,7 @@ type CalendarContentProps = {
   calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
   // Function to set styled non-viable events
   setStyledNonViableEvents: (events: StyledEvent[]) => void;
-  onBackgroundClick?: () => void;
+	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 };
 
 const CalendarContent: React.FC<CalendarContentProps> = ({

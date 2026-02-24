@@ -22,7 +22,7 @@ type CalendarEventsProps = {
   setSelectedEvent: (id: string | null) => void;
   setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
   onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
-  onBackgroundClick?: () => void;
+	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 };
 type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
@@ -54,6 +54,12 @@ export type StyledTravelDetail = CurrentViewTravelDetail & {
     width: number;
     height: number;
   };
+};
+export type CalendarBackgroundClickInfo = {
+  day: Date;
+  hour: number;
+  minute: number;
+  second: number;
 };
 
 const CalendarEvents = ({
@@ -359,8 +365,48 @@ const CalendarEvents = ({
     }
   );
 
+  const backgroundClickHandler = (
+    event: React.MouseEvent<HTMLDivElement>
+  ): CalendarBackgroundClickInfo => {
+    console.log('background clicked');
+    const background = event.target as HTMLDivElement;
+    const dimensions = background.getBoundingClientRect();
+    const timelineHeight = dimensions.height;
+    const timelineWidth = dimensions.width;
+
+    // click position relative to timeline
+    const clickX = event.clientX - dimensions.left;
+    const clickY = event.clientY - dimensions.top;
+
+    const dayClicked = viewOptions.startDay
+      .startOf('day')
+      .add(Math.floor((clickX / timelineWidth) * viewOptions.daysInView), 'day')
+      .toDate();
+    const ratio = clickY / timelineHeight;
+    const totalSeconds = Math.min(Math.floor(ratio * 86400), 86399);
+
+    const hourClicked = Math.floor(totalSeconds / 3600);
+    const minuteClicked = Math.floor((totalSeconds % 3600) / 60);
+    const secondClicked = totalSeconds % 60;
+
+    const info: CalendarBackgroundClickInfo = {
+      day: dayClicked,
+      hour: hourClicked,
+      minute: minuteClicked,
+      second: secondClicked,
+    };
+    console.log(info);
+    return info;
+  };
+
   return (
-    <Container id="calendar-events-container" onClick={onBackgroundClick}>
+    <Container
+      id="calendar-events-container"
+      onClick={(e) => {
+        const info = backgroundClickHandler(e);
+        onBackgroundClick?.(info);
+      }}
+    >
       <Wrapper>
         {eventTransition((style, event) => (
           <EventPositioner
@@ -421,6 +467,7 @@ const CalendarEvents = ({
 };
 
 const Container = styled.div`
+	box-shadow: 0 0 0 4px ${(props) => props.theme.colors.brand[500]} inset;
 	position: absolute;
 	top: 0;
 	left: ${calendarConfig.TIMELINE_WIDTH};

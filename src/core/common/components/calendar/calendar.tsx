@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-r
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import calendarConfig from '@/core/constants/calendar_config';
-import { StyledEvent } from '@/core/common/components/calendar/calendar_events';
+import { CalendarBackgroundClickInfo, StyledEvent } from '@/core/common/components/calendar/calendar_events';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import Loader from '../loader';
 import CalendarEvent from './calendar_event';
@@ -24,6 +24,7 @@ import { RGB, RGBColor } from '@/core/util/colors';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
+import useAppStore from '@/global_state';
 
 export type CalendarViewOptions = {
   width: number;
@@ -37,7 +38,7 @@ type CalendarProps = {
   viewRef: React.RefObject<HTMLUListElement>;
   viewOptions: CalendarViewOptions;
   setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
-	refetchEvents?: () => void;
+  refetchEvents?: () => void;
 };
 
 const Calendar = ({
@@ -46,14 +47,18 @@ const Calendar = ({
   viewRef,
   viewOptions,
   setViewOptions,
-	refetchEvents,
+  refetchEvents,
 }: CalendarProps) => {
   const { t } = useTranslation();
   const viableEvents = events.filter((event) => event.isViable);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
-  const [createTileOpen, setCreateTileOpen] = useState<boolean>(false);
-  const [createTileExpanded, setCreateTileExpanded] = useState<boolean>(false);
+  const {
+    isCreateTileModalOpen,
+    setCreateTileModalOpen,
+    isCreateTileModalExpanded,
+    setCreateTileModalExpanded
+  } = useAppStore(state => state);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -350,9 +355,9 @@ const Calendar = ({
       y: 0,
     },
     to: {
-      opacity: createTileOpen ? 1 : 0,
-      scale: createTileOpen ? 1 : 0.9,
-      y: createTileOpen ? 0 : 100,
+      opacity: isCreateTileModalOpen ? 1 : 0,
+      scale: isCreateTileModalOpen ? 1 : 0.9,
+      y: isCreateTileModalOpen ? 0 : 100,
     },
     config: {
       duration: 200,
@@ -374,11 +379,6 @@ const Calendar = ({
     }
   }, [isMobile]);
 
-  function onBackgroundClick() {
-    setSelectedEvent(null);
-    setSelectedEventInfo(null);
-    setCreateTileOpen(true);
-  }
 
   // Create Tile State
   const tileColorOptions: Array<RGB> = [
@@ -409,11 +409,22 @@ const Calendar = ({
     locationNickname: '',
   };
   const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-  function closeCreateTile() {
+  function closeCreateTile(shouldRefetch: boolean = false) {
     createTileFormHandler.resetForm();
-    setCreateTileOpen(false);
-    setCreateTileExpanded(false);
-		refetchEvents?.();
+    setCreateTileModalOpen(false);
+    setCreateTileModalExpanded(false);
+    if (shouldRefetch) refetchEvents?.();
+  }
+
+	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
+    setSelectedEvent(null);
+    setSelectedEventInfo(null);
+		const { formData, setFormData } = createTileFormHandler;
+		setFormData({
+			...formData,
+			deadline: dayjs(info.day),
+		})
+    setCreateTileModalOpen(true);
   }
 
   return (
@@ -529,14 +540,14 @@ const Calendar = ({
       ))}
 
       {/* Create Modal Overlay */}
-      {!createTileExpanded ? (
+      {!isCreateTileModalExpanded ? (
         <CalendarCreateEventModalBackdrop
-          $visible={createTileOpen}
-          onClick={() => setCreateTileOpen(false)}
+          $visible={isCreateTileModalOpen}
+          onClick={() => setCreateTileModalOpen(false)}
         >
           <CalendarCreateEventModalWrapper>
             <CalendarCreateEventModalContainer
-              $expanded={createTileExpanded}
+              $expanded={isCreateTileModalExpanded}
               style={{
                 scale: calendarCreateEventSpring.scale,
                 opacity: calendarCreateEventSpring.opacity,
@@ -549,8 +560,8 @@ const Calendar = ({
               <CalendarCreateTile
                 formHandler={createTileFormHandler}
                 tileColorOptions={tileColorOptions}
-                expanded={createTileExpanded}
-                setExpanded={setCreateTileExpanded}
+                expanded={isCreateTileModalExpanded}
+                setExpanded={setCreateTileModalExpanded}
                 onClose={closeCreateTile}
               />
             </CalendarCreateEventModalContainer>
@@ -561,8 +572,8 @@ const Calendar = ({
           <CalendarCreateTile
             formHandler={createTileFormHandler}
             tileColorOptions={tileColorOptions}
-            expanded={createTileExpanded}
-            setExpanded={setCreateTileExpanded}
+            expanded={isCreateTileModalExpanded}
+            setExpanded={setCreateTileModalExpanded}
             onClose={closeCreateTile}
           />,
           document.body
@@ -619,7 +630,9 @@ const Calendar = ({
               setSelectedEventInfo={setSelectedEventInfo}
               calendarGridCanvasRef={calendarGridCanvasRef}
               setStyledNonViableEvents={setStyledNonViableEvents}
-              onBackgroundClick={onBackgroundClick}
+              onBackgroundClick={(info) => {
+                onBackgroundClick(info);
+              }}
             />
           </SwiperSlide>
           <SwiperSlide>

@@ -39,7 +39,7 @@ export type InitialCreateTileFormState = {
 };
 
 type CalendarCreateTileProps = {
-  onClose: () => void;
+  onClose: (shouldRefetch?: boolean) => void;
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
@@ -248,7 +248,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <div className="title">
           <h2>{t('calendar.createTile.title')}</h2>
         </div>
-        <button onClick={onClose}>
+        <button
+          onClick={() => {
+            onClose(false);
+          }}
+        >
           <X size={16} color={theme.colors.text.primary} />
         </button>
       </header>
@@ -261,7 +265,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             components={{
               action: (
                 <DescriptionInput
-									markRequired
+                  markRequired
                   value={formData.action}
                   onChange={handleFormInputChange('action')}
                   minWidth={50}
@@ -278,7 +282,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               ),
               hours: (
                 <DescriptionInput
-									markRequired
+                  markRequired
                   value={formData.durationHours}
                   onChange={handleFormInputChange('durationHours', {
                     restriction: 'integer',
@@ -290,7 +294,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               ),
               minutes: (
                 <DescriptionInput
-									markRequired
+                  markRequired
                   value={formData.durationMins}
                   onChange={handleFormInputChange('durationMins', {
                     restriction: 'integer',
@@ -303,7 +307,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               date: (
                 <DescriptionDatePickerContainer>
                   <DescriptionDatePickerDisplay>
-                    {dayjs(formData.deadline).format('DD/MM/YYYY')}
+                    {dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })}
                     <Calendar color={theme.colors.text.secondary} size={20} />
                   </DescriptionDatePickerDisplay>
                   <DatePicker

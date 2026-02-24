@@ -4,12 +4,12 @@ import { PersonaId } from '@/core/constants/persona';
 
 export enum SessionType {
   AUTHENTICATED = 'authenticated',
-  ANONYMOUS = 'anonymous'
+  ANONYMOUS = 'anonymous',
 }
 
 export enum SessionPropertyName {
   AUTHENTICATED_PERSONA_SESSION = 'authenticatedPersonaSession',
-  ANONYMOUS_PERSONA_SESSION = 'anonymousPersonaSession'
+  ANONYMOUS_PERSONA_SESSION = 'anonymousPersonaSession',
 }
 
 export interface ChatContextType {
@@ -95,309 +95,322 @@ interface AppState {
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
   setAuthenticated: (user: UserInfo | null) => void;
+
+  // Modal States
+  isCreateTileModalOpen: boolean;
+  setCreateTileModalOpen: (isOpen: boolean) => void;
+	isCreateTileModalExpanded: boolean;
+  setCreateTileModalExpanded: (isExpanded: boolean) => void;
 }
 
 const useAppStore = create<AppState>()((set, get) => {
   // Helper function to determine the session property name based on active session type
   const getSessionPropertyName = (state: AppState): SessionPropertyName => {
-    return state.activeSessionType === SessionType.AUTHENTICATED 
-      ? SessionPropertyName.AUTHENTICATED_PERSONA_SESSION 
+    return state.activeSessionType === SessionType.AUTHENTICATED
+      ? SessionPropertyName.AUTHENTICATED_PERSONA_SESSION
       : SessionPropertyName.ANONYMOUS_PERSONA_SESSION;
   };
 
   return {
-  authenticatedPersonaSession: null,
-  anonymousPersonaSession: null,
-  activeSessionType: SessionType.ANONYMOUS,
+    // Modal States
+    isCreateTileModalOpen: false,
+    setCreateTileModalOpen: (isOpen: boolean) => set({ isCreateTileModalOpen: isOpen }),
+    isCreateTileModalExpanded: false,
+    setCreateTileModalExpanded: (isExpanded: boolean) => set({ isCreateTileModalExpanded: isExpanded }),
 
-  setActivePersonaSession: (session: PersonaSession | null) => set((state) => ({
-    [getSessionPropertyName(state)]: session
-  })),
+    authenticatedPersonaSession: null,
+    anonymousPersonaSession: null,
+    activeSessionType: SessionType.ANONYMOUS,
 
-  updateActivePersonaSession: (updates: Partial<PersonaSession>) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
+    setActivePersonaSession: (session: PersonaSession | null) =>
+      set((state) => ({
+        [getSessionPropertyName(state)]: session,
+      })),
 
-      if (!currentSession) return state;
+    updateActivePersonaSession: (updates: Partial<PersonaSession>) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
 
-      return {
-        [sessionType]: {
-          ...currentSession,
-          ...updates
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            ...updates,
+          },
+        } as Partial<AppState>;
+      }),
+
+    getActivePersonaSession: (): PersonaSession | null => {
+      const state = get();
+      return state.activeSessionType === SessionType.ANONYMOUS
+        ? state.anonymousPersonaSession
+        : state.authenticatedPersonaSession;
+    },
+
+    // Convenience actions that update the active session
+    addChatContext: (context: ChatContextType) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            chatContext: [...currentSession.chatContext, context],
+          },
+        } as Partial<AppState>;
+      }),
+
+    removeChatContext: (context: ChatContextType) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            chatContext: currentSession.chatContext.filter((item) => item !== context),
+          },
+        } as Partial<AppState>;
+      }),
+
+    clearChatContext: () =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            chatContext: [],
+          },
+        } as Partial<AppState>;
+      }),
+
+    setScheduleId: (id: string | null) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            scheduleId: id,
+          },
+        } as Partial<AppState>;
+      }),
+
+    setScheduleLastUpdatedBy: (component: string | null) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            scheduleLastUpdatedBy: component,
+          },
+        } as Partial<AppState>;
+      }),
+
+    setUserInfo: (info: UserInfo) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            userInfo: info,
+          },
+        } as Partial<AppState>;
+      }),
+
+    setChatSessionId: (id: string) =>
+      set((state) => {
+        const sessionType = getSessionPropertyName(state);
+        const currentSession = state[sessionType];
+
+        if (!currentSession) return state;
+
+        return {
+          [sessionType]: {
+            ...currentSession,
+            chatSessionId: id,
+          },
+        } as Partial<AppState>;
+      }),
+
+    // Development tools
+    devUserIdOverride: null,
+    setDevUserIdOverride: (userId: string | null) => set(() => ({ devUserIdOverride: userId })),
+
+    // Getters for backward compatibility
+    get chatContext() {
+      const sessionType = getSessionPropertyName(get());
+      return get()[sessionType]?.chatContext || [];
+    },
+
+    get scheduleId() {
+      const sessionType = getSessionPropertyName(get());
+      return get()[sessionType]?.scheduleId || null;
+    },
+
+    get scheduleLastUpdatedBy() {
+      const sessionType = getSessionPropertyName(get());
+      return get()[sessionType]?.scheduleLastUpdatedBy || null;
+    },
+
+    get userInfo() {
+      const sessionType = getSessionPropertyName(get());
+      return get()[sessionType]?.userInfo || null;
+    },
+
+    get selectedPersonaId() {
+      const sessionType = getSessionPropertyName(get());
+      return get()[sessionType]?.personaId || null;
+    },
+
+    get chatSessionId() {
+      const sessionType = getSessionPropertyName(get());
+      return get()[sessionType]?.chatSessionId || '';
+    },
+
+    // Authentication state
+    isAuthenticated: false,
+    isAuthLoading: true,
+    authenticatedUser: null,
+
+    // Method to switch between authenticated and anonymous sessions
+    switchSessionType: (type: SessionType) => set({ activeSessionType: type }),
+
+    // Authentication actions
+    checkAuth: async () => {
+      set({ isAuthLoading: true });
+      try {
+        const { authService } = await import('./services');
+        const response = await authService.checkAuth();
+
+        if (response && response.isAuthenticated) {
+          // Fetch full user info
+          const { userService } = await import('./services');
+          const user = await userService.getCurrentUser();
+          set({ isAuthenticated: true, authenticatedUser: user, isAuthLoading: false });
+        } else {
+          set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
         }
-      } as Partial<AppState>;
-    }),
-
-  getActivePersonaSession: (): PersonaSession | null => {
-    const state = get();
-    return state.activeSessionType === SessionType.ANONYMOUS
-      ? state.anonymousPersonaSession
-      : state.authenticatedPersonaSession;
-  },
-
-  // Convenience actions that update the active session
-  addChatContext: (context: ChatContextType) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          chatContext: [...currentSession.chatContext, context],
-        },
-      } as Partial<AppState>;
-    }),
-
-  removeChatContext: (context: ChatContextType) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          chatContext: currentSession.chatContext.filter(
-            (item) => item !== context
-          ),
-        },
-      } as Partial<AppState>;
-    }),
-
-  clearChatContext: () =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          chatContext: [],
-        },
-      } as Partial<AppState>;
-    }),
-
-  setScheduleId: (id: string | null) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          scheduleId: id,
-        },
-      } as Partial<AppState>;
-    }),
-
-  setScheduleLastUpdatedBy: (component: string | null) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          scheduleLastUpdatedBy: component,
-        },
-      } as Partial<AppState>;
-    }),
-
-  setUserInfo: (info: UserInfo) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          userInfo: info,
-        },
-      } as Partial<AppState>;
-    }),
-
-  setChatSessionId: (id: string) =>
-    set((state) => {
-      const sessionType = getSessionPropertyName(state);
-      const currentSession = state[sessionType];
-
-      if (!currentSession) return state;
-
-      return {
-        [sessionType]: {
-          ...currentSession,
-          chatSessionId: id,
-        },
-      } as Partial<AppState>;
-    }),
-
-  // Development tools
-  devUserIdOverride: null,
-  setDevUserIdOverride: (userId: string | null) => set(() => ({ devUserIdOverride: userId })),
-
-  // Getters for backward compatibility
-  get chatContext() {
-    const sessionType = getSessionPropertyName(get());
-    return get()[sessionType]?.chatContext || [];
-  },
-
-  get scheduleId() {
-    const sessionType = getSessionPropertyName(get());
-    return get()[sessionType]?.scheduleId || null;
-  },
-
-  get scheduleLastUpdatedBy() {
-    const sessionType = getSessionPropertyName(get());
-    return get()[sessionType]?.scheduleLastUpdatedBy || null;
-  },
-
-  get userInfo() {
-    const sessionType = getSessionPropertyName(get());
-    return get()[sessionType]?.userInfo || null;
-  },
-
-  get selectedPersonaId() {
-    const sessionType = getSessionPropertyName(get());
-    return get()[sessionType]?.personaId || null;
-  },
-
-  get chatSessionId() {
-    const sessionType = getSessionPropertyName(get());
-    return get()[sessionType]?.chatSessionId || '';
-  },
-
-  // Authentication state
-  isAuthenticated: false,
-  isAuthLoading: true,
-  authenticatedUser: null,
-
-  // Method to switch between authenticated and anonymous sessions
-  switchSessionType: (type: SessionType) =>
-    set({ activeSessionType: type }),
-
-  // Authentication actions
-  checkAuth: async () => {
-    set({ isAuthLoading: true });
-    try {
-      const { authService } = await import('./services');
-      const response = await authService.checkAuth();
-
-      if (response && response.isAuthenticated) {
-        // Fetch full user info
-        const { userService } = await import('./services');
-        const user = await userService.getCurrentUser();
-        set({ isAuthenticated: true, authenticatedUser: user, isAuthLoading: false });
-      } else {
+      } catch (error) {
+        console.error('Check auth failed:', error);
         set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
       }
-    } catch (error) {
-      console.error('Check auth failed:', error);
-      set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
-    }
-  },
+    },
 
-  logout: async () => {
-    try {
-      const { authService } = await import('./services');
-      await authService.logout();
-      set({ isAuthenticated: false, authenticatedUser: null });
-    } catch (error) {
-      console.error('Logout failed:', error);
-      throw error;
-    }
-  },
+    logout: async () => {
+      try {
+        const { authService } = await import('./services');
+        await authService.logout();
+        set({ isAuthenticated: false, authenticatedUser: null });
+      } catch (error) {
+        console.error('Logout failed:', error);
+        throw error;
+      }
+    },
 
-  setAuthenticated: (user) => {
-    set({
-      isAuthenticated: user !== null,
-      authenticatedUser: user,
-    });
-
-    // Initialize persona session when user logs in
-    if (user) {
-      const personaSessionManager = get().getPersonaSessionManager();
-      personaSessionManager.createSession({
-        personaId: PersonaId.AuthenticatedPersonaId,
-        personaName: user.username || 'Default Persona',
-        userId: user.id,
-        userInfo: user,
-        scheduleId: null,
-        chatSessionId: '',
-        chatContext: [],
-        scheduleLastUpdatedBy: null,
+    setAuthenticated: (user) => {
+      set({
+        isAuthenticated: user !== null,
+        authenticatedUser: user,
       });
-    }
-  },
 
-  // Persona session manager getter
-  getPersonaSessionManager: () => personaSessionManager,
+      // Initialize persona session when user logs in
+      if (user) {
+        const personaSessionManager = get().getPersonaSessionManager();
+        personaSessionManager.createSession({
+          personaId: PersonaId.AuthenticatedPersonaId,
+          personaName: user.username || 'Default Persona',
+          userId: user.id,
+          userInfo: user,
+          scheduleId: null,
+          chatSessionId: '',
+          chatContext: [],
+          scheduleLastUpdatedBy: null,
+        });
+      }
+    },
 
-  // Initialize the PersonaSessionManager with Zustand store methods
-  initializePersonaSessionManager: () => {
-    personaSessionManager.initialize({
-      setActivePersonaSession: (session: PersonaSession | null) => {
-        if (!session) {
-          useAppStore.getState().setActivePersonaSession(null);
-          return;
-        }
+    // Persona session manager getter
+    getPersonaSessionManager: () => personaSessionManager,
 
-        const { personaId } = session;
-        const store = useAppStore.getState();
+    // Initialize the PersonaSessionManager with Zustand store methods
+    initializePersonaSessionManager: () => {
+      personaSessionManager.initialize({
+        setActivePersonaSession: (session: PersonaSession | null) => {
+          if (!session) {
+            useAppStore.getState().setActivePersonaSession(null);
+            return;
+          }
 
-        // Set active session type based on personaId
-        if (personaId === PersonaId.AuthenticatedPersonaId) {
-          store.switchSessionType(SessionType.AUTHENTICATED);
-        } else if (personaId === PersonaId.AnonymousPersonaId) {
-          store.switchSessionType(SessionType.ANONYMOUS);
-        }
+          const { personaId } = session;
+          const store = useAppStore.getState();
 
-        console.log('initialize session ', store);
-
-        store.setActivePersonaSession(session);
-      },
-      updateActivePersonaSession: (updates: Partial<PersonaSession>) => {
-        const store = useAppStore.getState();
-        const currentSession = store.activeSessionType === SessionType.AUTHENTICATED
-          ? store.authenticatedPersonaSession
-          : store.anonymousPersonaSession;
-
-        if (!currentSession) return;
-
-        // If updating personaId, handle session type switching
-        if (updates.personaId) {
-          if (updates.personaId === PersonaId.AuthenticatedPersonaId) {
+          // Set active session type based on personaId
+          if (personaId === PersonaId.AuthenticatedPersonaId) {
             store.switchSessionType(SessionType.AUTHENTICATED);
-          } else if (updates.personaId === PersonaId.AnonymousPersonaId) {
+          } else if (personaId === PersonaId.AnonymousPersonaId) {
             store.switchSessionType(SessionType.ANONYMOUS);
           }
-        }
 
-        store.updateActivePersonaSession(updates);
-      },
-      getActivePersonaSession: () => {
-        const state = useAppStore.getState();
-        return state.activeSessionType === SessionType.ANONYMOUS
-          ? state.anonymousPersonaSession
-          : state.authenticatedPersonaSession;
-      },
-      getDevUserIdOverride: () => useAppStore.getState().devUserIdOverride,
-      setDevUserIdOverride: (userId: string | null) => useAppStore.getState().setDevUserIdOverride(userId),
-    });
-  }
-}});
+          console.log('initialize session ', store);
+
+          store.setActivePersonaSession(session);
+        },
+        updateActivePersonaSession: (updates: Partial<PersonaSession>) => {
+          const store = useAppStore.getState();
+          const currentSession =
+            store.activeSessionType === SessionType.AUTHENTICATED
+              ? store.authenticatedPersonaSession
+              : store.anonymousPersonaSession;
+
+          if (!currentSession) return;
+
+          // If updating personaId, handle session type switching
+          if (updates.personaId) {
+            if (updates.personaId === PersonaId.AuthenticatedPersonaId) {
+              store.switchSessionType(SessionType.AUTHENTICATED);
+            } else if (updates.personaId === PersonaId.AnonymousPersonaId) {
+              store.switchSessionType(SessionType.ANONYMOUS);
+            }
+          }
+
+          store.updateActivePersonaSession(updates);
+        },
+        getActivePersonaSession: () => {
+          const state = useAppStore.getState();
+          return state.activeSessionType === SessionType.ANONYMOUS
+            ? state.anonymousPersonaSession
+            : state.authenticatedPersonaSession;
+        },
+        getDevUserIdOverride: () => useAppStore.getState().devUserIdOverride,
+        setDevUserIdOverride: (userId: string | null) =>
+          useAppStore.getState().setDevUserIdOverride(userId),
+      });
+    },
+  };
+});
 
 // Initialize the persona session manager after the store is created
 useAppStore.getState().initializePersonaSessionManager();
