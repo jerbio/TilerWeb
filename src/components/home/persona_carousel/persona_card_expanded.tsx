@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import Spinner from '@/core/common/components/loader';
 import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 import { createPortal } from 'react-dom';
+import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -348,7 +349,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   );
 
   return (
-    <>
+    <CalendarRequestProvider>
       <CardContainer 
         $display={expanded} 
         style={cardSpring} 
@@ -437,7 +438,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
         />,
         document.body
       )}
-    </>
+    </CalendarRequestProvider>
   );
 };
 

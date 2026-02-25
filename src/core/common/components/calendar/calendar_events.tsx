@@ -26,6 +26,8 @@ type CalendarEventsProps = {
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (from chat action pill click) */
 	focusedEventId?: string | null;
+	/** Called when a viable event tile on the grid is clicked */
+	onViableEventClicked?: () => void;
 };
 type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
@@ -69,6 +71,7 @@ const CalendarEvents = ({
 	setSelectedEventInfo,
 	styledEventsRef,
 	focusedEventId,
+	onViableEventClicked,
 }: CalendarEventsProps) => {
 	const handleEventClick = (event: StyledEvent) => {
 		// Track event selection
@@ -83,6 +86,8 @@ const CalendarEvents = ({
 		});
 		
 		setSelectedEvent(event.id);
+		// VIABLE_EVENT_CLICKED — dismiss non-viable overlay
+		onViableEventClicked?.();
 	};
 
 	const handleTravelDetailClick = (detail: StyledTravelDetail) => {

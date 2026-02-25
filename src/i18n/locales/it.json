@@ -356,6 +356,30 @@
 			"title": "Punti Salienti delle Funzionalità",
 			"subtitle": "Semplifica la tua vita con Tiler, Ecco cosa possiamo fare per aiutarti."
 		},
+		"tileCardSection": {
+			"header": "Visualizza le tue attività e appuntamenti",
+			"subHeader": "Visualizza il tuo programma con le nostre tessere intuitive. Vedi i tuoi appuntamenti, scadenze e attività a colpo d'occhio.",
+			"cta": "Crea le tue tessere",
+			"tiles": {
+				"meetingWithCharles": "Incontro con Charles",
+				"morningMeeting": "Riunione mattutina",
+				"clientCall": "Chiamata cliente",
+				"lunchBreak": "Pausa pranzo",
+				"teamSync": "Sincronizzazione team",
+				"projectReview": "Revisione progetto",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Colazione con amici",
+				"groceryShopping": "Spesa alimentare",
+				"gymWorkouts": "Allenamenti in palestra"
+			},
+			"locations": {
+				"conferenceRoomA": "Sala conferenze A",
+				"restaurants": "Ristoranti",
+				"groceryStore": "Supermercato",
+				"gym": "Palestra",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "PARLAGLI E BASTA",

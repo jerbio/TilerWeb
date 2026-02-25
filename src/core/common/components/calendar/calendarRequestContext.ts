@@ -18,6 +18,7 @@ export type CalendarRequestResult =
   | { status: 'not_found'; entityId: string }
   | { status: 'navigating'; entityId: string }
   | { status: 'stale'; entityId: string }
+  | { status: 'demo_mode'; entityId: string }
   | { status: 'error'; message: string };
 
 /**

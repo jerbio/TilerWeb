@@ -356,6 +356,30 @@
 			"title": "Características Destacadas",
 			"subtitle": "Simplifica tu vida con Tiler, Esto es lo que podemos hacer para ayudarte."
 		},
+		"tileCardSection": {
+			"header": "Visualiza tus tareas y citas",
+			"subHeader": "Visualiza tu horario con nuestras fichas intuitivas. Ve tus citas, plazos y tareas de un vistazo.",
+			"cta": "Crea tus propias fichas",
+			"tiles": {
+				"meetingWithCharles": "Reunión con Charles",
+				"morningMeeting": "Reunión matutina",
+				"clientCall": "Llamada con cliente",
+				"lunchBreak": "Pausa para almorzar",
+				"teamSync": "Sincronización de equipo",
+				"projectReview": "Revisión del proyecto",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Desayuno con amigos",
+				"groceryShopping": "Compras de supermercado",
+				"gymWorkouts": "Entrenamientos en el gimnasio"
+			},
+			"locations": {
+				"conferenceRoomA": "Sala de conferencias A",
+				"restaurants": "Restaurantes",
+				"groceryStore": "Supermercado",
+				"gym": "Gimnasio",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "SOLO HÁBLALE",

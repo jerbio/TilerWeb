@@ -356,6 +356,30 @@
 			"title": "Основные моменты функций",
 			"subtitle": "Упростите свою жизнь с Tiler, вот что мы можем сделать, чтобы помочь вам."
 		},
+		"tileCardSection": {
+			"header": "Визуализируйте свои задачи и встречи",
+			"subHeader": "Визуализируйте своё расписание с помощью наших интуитивных плиток. Смотрите встречи, сроки и задачи с первого взгляда.",
+			"cta": "Создайте свои плитки",
+			"tiles": {
+				"meetingWithCharles": "Встреча с Charles",
+				"morningMeeting": "Утренняя встреча",
+				"clientCall": "Звонок клиенту",
+				"lunchBreak": "Обеденный перерыв",
+				"teamSync": "Синхронизация команды",
+				"projectReview": "Обзор проекта",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Завтрак с друзьями",
+				"groceryShopping": "Покупка продуктов",
+				"gymWorkouts": "Тренировка в спортзале"
+			},
+			"locations": {
+				"conferenceRoomA": "Конференц-зал A",
+				"restaurants": "Рестораны",
+				"groceryStore": "Продуктовый магазин",
+				"gym": "Спортзал",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "ПРОСТО ГОВОРИТЕ С НИМ",

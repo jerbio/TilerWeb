@@ -24,6 +24,8 @@ type CalendarContentProps = {
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (chat → calendar highlight) */
 	focusedEventId?: string | null;
+	/** Called when a viable event tile on the grid is clicked */
+	onViableEventClicked?: () => void;
 };
 
 const CalendarContent: React.FC<CalendarContentProps> = ({
@@ -36,6 +38,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setStyledNonViableEvents,
 	styledEventsRef,
 	focusedEventId,
+	onViableEventClicked,
 }) => {
   return (
     <Container>
@@ -64,6 +67,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
           onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
           styledEventsRef={styledEventsRef}
           focusedEventId={focusedEventId}
+          onViableEventClicked={onViableEventClicked}
         />
       </StyledCalendarContent>
     </Container>

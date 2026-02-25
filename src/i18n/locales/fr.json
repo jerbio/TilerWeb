@@ -149,6 +149,30 @@
 			"title": "Points Forts des Fonctionnalités",
 			"subtitle": "Simplifiez votre vie avec Tiler, voici ce que nous pouvons faire pour vous aider."
 		},
+		"tileCardSection": {
+			"header": "Visualisez vos tâches et rendez-vous",
+			"subHeader": "Visualisez votre emploi du temps avec nos tuiles intuitives. Voyez vos rendez-vous, échéances et tâches en un coup d'œil.",
+			"cta": "Créez vos propres tuiles",
+			"tiles": {
+				"meetingWithCharles": "Réunion avec Charles",
+				"morningMeeting": "Réunion du matin",
+				"clientCall": "Appel client",
+				"lunchBreak": "Pause déjeuner",
+				"teamSync": "Synchronisation d'équipe",
+				"projectReview": "Revue de projet",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Petit-déjeuner entre amis",
+				"groceryShopping": "Courses alimentaires",
+				"gymWorkouts": "Entraînements à la salle"
+			},
+			"locations": {
+				"conferenceRoomA": "Salle de conférence A",
+				"restaurants": "Restaurants",
+				"groceryStore": "Épicerie",
+				"gym": "Salle de sport",
+				"zoom": "Zoom"
+			}
+		},
 		"expanded": {
 			"chat": {
 				"newChat": "Nouvelle Discussion",

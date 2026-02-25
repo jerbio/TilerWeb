@@ -356,6 +356,30 @@
 			"title": "Funktionshighlights",
 			"subtitle": "Vereinfachen Sie Ihr Leben mit Tiler. Hier ist, was wir tun können, um Ihnen zu helfen."
 		},
+		"tileCardSection": {
+			"header": "Visualisieren Sie Ihre Aufgaben und Termine",
+			"subHeader": "Visualisieren Sie Ihren Zeitplan mit unseren intuitiven Kacheln. Sehen Sie Ihre Termine, Fristen und Aufgaben auf einen Blick.",
+			"cta": "Erstellen Sie Ihre eigenen Kacheln",
+			"tiles": {
+				"meetingWithCharles": "Treffen mit Charles",
+				"morningMeeting": "Morgenbesprechung",
+				"clientCall": "Kundenanruf",
+				"lunchBreak": "Mittagspause",
+				"teamSync": "Team-Sync",
+				"projectReview": "Projektüberprüfung",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Frühstück mit Freunden",
+				"groceryShopping": "Lebensmitteleinkauf",
+				"gymWorkouts": "Fitnessstudio-Training"
+			},
+			"locations": {
+				"conferenceRoomA": "Konferenzraum A",
+				"restaurants": "Restaurants",
+				"groceryStore": "Lebensmittelladen",
+				"gym": "Fitnessstudio",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "SPRECHEN SIE EINFACH DAMIT",

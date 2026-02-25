@@ -356,6 +356,30 @@
 			"title": "功能亮点",
 			"subtitle": "使用Tiler简化您的生活，这是我们可以帮助您做的事情。"
 		},
+		"tileCardSection": {
+			"header": "可视化您的任务和预约",
+			"subHeader": "使用我们直观的瓦片可视化您的日程。一目了然地查看您的预约、截止日期和任务。",
+			"cta": "创建您自己的瓦片",
+			"tiles": {
+				"meetingWithCharles": "与Charles的会议",
+				"morningMeeting": "晚上会议",
+				"clientCall": "客户电话",
+				"lunchBreak": "午餐休息",
+				"teamSync": "团队同步",
+				"projectReview": "项目审查",
+				"happyHour": "欢乐时光",
+				"breakfastWithFriends": "与朋友共进早餐",
+				"groceryShopping": "食品购物",
+				"gymWorkouts": "健身房训练"
+			},
+			"locations": {
+				"conferenceRoomA": "会议室A",
+				"restaurants": "餐厅",
+				"groceryStore": "超市",
+				"gym": "健身房",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "只需与之交谈",

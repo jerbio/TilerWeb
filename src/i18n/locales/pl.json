@@ -356,6 +356,30 @@
 			"title": "Najważniejsze funkcje",
 			"subtitle": "Uprość swoje życie z Tilerem, Oto co możemy zrobić, aby Ci pomóc."
 		},
+		"tileCardSection": {
+			"header": "Wizualizuj swoje zadania i spotkania",
+			"subHeader": "Wizualizuj swój harmonogram za pomocą naszych intuicyjnych kafelków. Przeglądaj spotkania, terminy i zadania na pierwszy rzut oka.",
+			"cta": "Stwórz własne kafelki",
+			"tiles": {
+				"meetingWithCharles": "Spotkanie z Charlesem",
+				"morningMeeting": "Poranne spotkanie",
+				"clientCall": "Rozmowa z klientem",
+				"lunchBreak": "Przerwa na lunch",
+				"teamSync": "Synchronizacja zespołu",
+				"projectReview": "Przegląd projektu",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Śniadanie z przyjaciółmi",
+				"groceryShopping": "Zakupy spożywcze",
+				"gymWorkouts": "Trening na siłowni"
+			},
+			"locations": {
+				"conferenceRoomA": "Sala konferencyjna A",
+				"restaurants": "Restauracje",
+				"groceryStore": "Sklep spożywczy",
+				"gym": "Siłownia",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "PO PROSTU MÓW DO NIEGO",

@@ -356,6 +356,30 @@
 			"title": "機能のハイライト",
 			"subtitle": "Tilerであなたの生活を簡素化します。私たちがあなたを助けるためにできることは次のとおりです。"
 		},
+		"tileCardSection": {
+			"header": "タスクと予定を視覚化",
+			"subHeader": "直感的なタイルでスケジュールを視覚化します。予定、締め切り、タスクを一目で確認できます。",
+			"cta": "自分のタイルを作成",
+			"tiles": {
+				"meetingWithCharles": "Charlesとのミーティング",
+				"morningMeeting": "朝のミーティング",
+				"clientCall": "クライアント通話",
+				"lunchBreak": "昇食休憩",
+				"teamSync": "チームシンク",
+				"projectReview": "プロジェクトレビュー",
+				"happyHour": "ハッピーアワー",
+				"breakfastWithFriends": "友人との朝食",
+				"groceryShopping": "食料品の買い物",
+				"gymWorkouts": "ジムトレーニング"
+			},
+			"locations": {
+				"conferenceRoomA": "会議室A",
+				"restaurants": "レストラン",
+				"groceryStore": "スーパーマーケット",
+				"gym": "ジム",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "話しかけるだけ",

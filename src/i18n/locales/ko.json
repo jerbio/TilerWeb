@@ -356,6 +356,30 @@
 			"title": "주요 기능",
 			"subtitle": "Tiler로 삶을 단순화하세요. 저희가 도와드릴 수 있는 것은 다음과 같습니다."
 		},
+		"tileCardSection": {
+			"header": "작업과 일정을 시각화하세요",
+			"subHeader": "직관적인 타일로 일정을 시각화하세요. 예약, 마감일 및 작업을 한눈에 확인하세요.",
+			"cta": "자신만의 타일 만들기",
+			"tiles": {
+				"meetingWithCharles": "Charles와의 회의",
+				"morningMeeting": "아침 회의",
+				"clientCall": "고객 통화",
+				"lunchBreak": "점심 시간",
+				"teamSync": "팀 동기화",
+				"projectReview": "프로젝트 검토",
+				"happyHour": "해피 아워",
+				"breakfastWithFriends": "친구들과 아침 식사",
+				"groceryShopping": "식료품 쇼핑",
+				"gymWorkouts": "헬스장 운동"
+			},
+			"locations": {
+				"conferenceRoomA": "회의실 A",
+				"restaurants": "레스토랑",
+				"groceryStore": "식료품점",
+				"gym": "헬스장",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "그냥 말하세요",

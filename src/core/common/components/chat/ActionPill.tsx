@@ -21,6 +21,7 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
   );
 
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isDemoLimited, setIsDemoLimited] = useState(false);
 
   const scheduleState = getActionScheduleState(action, currentScheduleId);
 
@@ -60,9 +61,14 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
       (result: CalendarRequestResult) => {
         if (result.status === 'navigating') {
           setIsNavigating(true);
+          setIsDemoLimited(false);
+        } else if (result.status === 'demo_mode') {
+          setIsDemoLimited(true);
+          setIsNavigating(false);
         } else {
           // Any terminal result (found, not_found, error) clears navigating state
           setIsNavigating(false);
+          setIsDemoLimited(false);
           if (result.status === 'not_found') {
             console.warn('[ActionPill] Calendar could not find entity:', action.entityId);
           }
@@ -72,6 +78,9 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
   };
 
   const getTitle = (): string | undefined => {
+    if (isDemoLimited) {
+      return t('home.expanded.chat.demoMode', 'You are in demo mode with limited features. Sign up to unlock the full experience!');
+    }
     if (isNavigating) {
       return t('home.expanded.chat.navigating', 'Navigating to tile...');
     }
@@ -97,7 +106,7 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
       onClick={handleClick}
       style={{
         cursor: isClickable ? 'pointer' : 'default',
-        opacity: isRemoved || isStale ? 0.6 : isNavigating ? 0.75 : 1,
+        opacity: isRemoved || isStale ? 0.6 : isDemoLimited ? 0.8 : isNavigating ? 0.75 : 1,
       }}
       title={getTitle()}
     >

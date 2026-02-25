@@ -356,6 +356,30 @@
 			"title": "फ़ीचर हाइलाइट्स",
 			"subtitle": "Tiler के साथ अपने जीवन को सरल बनाएं, यहाँ हम आपकी मदद के लिए क्या कर सकते हैं।"
 		},
+		"tileCardSection": {
+			"header": "अपने कार्यों और अपॉइंटमेंट्स को विज़ुअलाइज़ करें",
+			"subHeader": "हमारी सहज टाइल्स के साथ अपने शेड्यूल को विज़ुअलाइज़ करें। अपने अपॉइंटमेंट्स, डेडलाइन्स और कार्यों को एक नज़र में देखें।",
+			"cta": "अपनी खुद की टाइल्स बनाएं",
+			"tiles": {
+				"meetingWithCharles": "Charles के साथ मीटिंग",
+				"morningMeeting": "सुबह की मीटिंग",
+				"clientCall": "क्लाइंट कॉल",
+				"lunchBreak": "लंच ब्रेक",
+				"teamSync": "टीम सिंक",
+				"projectReview": "प्रोजेक्ट रिव्यू",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "दोस्तों के साथ नाश्ता",
+				"groceryShopping": "किराने की खरीदारी",
+				"gymWorkouts": "जिम वर्कआउट"
+			},
+			"locations": {
+				"conferenceRoomA": "कॉन्फ्रेंस रूम A",
+				"restaurants": "रेस्टोरेंट्स",
+				"groceryStore": "किराना स्टोर",
+				"gym": "जिम",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "बस इससे बात करें",

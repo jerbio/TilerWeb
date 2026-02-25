@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import TileCard from './tile_card';
 import SectionHeaders from '../layout/section_headers';
 import Section from '../layout/section';
@@ -63,113 +64,115 @@ const TileFadeDivLeft = styled.div`
 	background: linear-gradient(270deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
 `;
 
-const tileGrid: Array<Array<TileCardProps>> = [
-	[
-		{
-			heading: 'Meeting With Charles',
-			location: 'Conference Room A',
-			startTime: '09:00 AM',
-			endTime: '10:00 AM',
-			background_color: palette.colors.tileBackgroundPrimary,
-		},
-		{
-			heading: 'Morning Meeting',
-			location: 'Conference Room A',
-			startTime: '10:00 AM',
-			endTime: '11:00 AM',
-			background_color: palette.colors.tileBackgroundSecondary,
-		},
-		{
-			heading: 'Client Call',
-			location: 'Conference Room A',
-			startTime: '11:00 AM',
-			endTime: '12:00 PM',
-			background_color: palette.colors.tileBackgroundTertiary,
-		},
-		{
-			heading: 'Lunch Break',
-			location: 'Conference Room A',
-			startTime: '12:00 PM',
-			endTime: '01:00 PM',
-			background_color: palette.colors.tileBackgroundSecondary,
-		},
-	],
-	[
-		{
-			heading: 'Meeting With Charles',
-			location: 'Conference Room A',
-			startTime: '09:00 AM',
-			endTime: '10:00 AM',
-			background_color: palette.colors.tileBackgroundSecondary,
-		},
-		{
-			heading: 'Team Sync',
-			location: 'Conference Room A',
-			startTime: '10:00 AM',
-			endTime: '11:00 AM',
-			background_color: palette.colors.tileBackgroundTertiary,
-		},
-		{
-			heading: 'Project Review',
-			location: 'Conference Room A',
-			startTime: '11:00 AM',
-			endTime: '12:00 PM',
-			background_color: palette.colors.tileBackgroundSecondary,
-		},
-		{
-			heading: 'Happy Hour',
-			location: 'Conference Room A',
-			startTime: '12:00 PM',
-			endTime: '01:00 PM',
-			background_color: palette.colors.tileBackgroundPrimary,
-		},
-	],
-	[
-		{
-			heading: 'Breakfast with Friends',
-			location: 'Restaurants',
-			startTime: '09:00 AM',
-			endTime: '10:00 AM',
-			background_color: palette.colors.tileBackgroundPrimary,
-		},
-		{
-			heading: 'Grocery Shopping',
-			location: 'Grocery Store',
-			startTime: '10:00 AM',
-			endTime: '11:00 AM',
-			background_color: palette.colors.tileBackgroundSecondary,
-		},
-		{
-			heading: 'Gym Workouts',
-			location: 'Gym',
-			startTime: '11:00 AM',
-			endTime: '12:00 PM',
-			background_color: palette.colors.tileBackgroundTertiary,
-		},
-		{
-			heading: 'Meeting With Charles',
-			location: 'Zoom',
-			startTime: '12:00 PM',
-			endTime: '01:00 PM',
-			background_color: palette.colors.tileBackgroundSecondary,
-		},
-	],
-];
-
 const TileCardSection: React.FC = () => {
+	const { t } = useTranslation();
+
+	const tileGrid: Array<Array<TileCardProps>> = useMemo(() => [
+		[
+			{
+				heading: t('home.tileCardSection.tiles.meetingWithCharles'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '09:00 AM',
+				endTime: '10:00 AM',
+				background_color: palette.colors.tileBackgroundPrimary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.morningMeeting'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '10:00 AM',
+				endTime: '11:00 AM',
+				background_color: palette.colors.tileBackgroundSecondary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.clientCall'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '11:00 AM',
+				endTime: '12:00 PM',
+				background_color: palette.colors.tileBackgroundTertiary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.lunchBreak'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '12:00 PM',
+				endTime: '01:00 PM',
+				background_color: palette.colors.tileBackgroundSecondary,
+			},
+		],
+		[
+			{
+				heading: t('home.tileCardSection.tiles.meetingWithCharles'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '09:00 AM',
+				endTime: '10:00 AM',
+				background_color: palette.colors.tileBackgroundSecondary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.teamSync'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '10:00 AM',
+				endTime: '11:00 AM',
+				background_color: palette.colors.tileBackgroundTertiary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.projectReview'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '11:00 AM',
+				endTime: '12:00 PM',
+				background_color: palette.colors.tileBackgroundSecondary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.happyHour'),
+				location: t('home.tileCardSection.locations.conferenceRoomA'),
+				startTime: '12:00 PM',
+				endTime: '01:00 PM',
+				background_color: palette.colors.tileBackgroundPrimary,
+			},
+		],
+		[
+			{
+				heading: t('home.tileCardSection.tiles.breakfastWithFriends'),
+				location: t('home.tileCardSection.locations.restaurants'),
+				startTime: '09:00 AM',
+				endTime: '10:00 AM',
+				background_color: palette.colors.tileBackgroundPrimary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.groceryShopping'),
+				location: t('home.tileCardSection.locations.groceryStore'),
+				startTime: '10:00 AM',
+				endTime: '11:00 AM',
+				background_color: palette.colors.tileBackgroundSecondary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.gymWorkouts'),
+				location: t('home.tileCardSection.locations.gym'),
+				startTime: '11:00 AM',
+				endTime: '12:00 PM',
+				background_color: palette.colors.tileBackgroundTertiary,
+			},
+			{
+				heading: t('home.tileCardSection.tiles.meetingWithCharles'),
+				location: t('home.tileCardSection.locations.zoom'),
+				startTime: '12:00 PM',
+				endTime: '01:00 PM',
+				background_color: palette.colors.tileBackgroundSecondary,
+			},
+		],
+	], [t]);
+
 	return (
 		<Section>
 			<SectionHeaders
-				headerText="Visualize your tasks and appointments"
-				subHeaderText="Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance."
+				headerText={t('home.tileCardSection.header')}
+				subHeaderText={t('home.tileCardSection.subHeader')}
 				align="center"
 			/>
 			<TileCardContainer>
 				{tileGrid.map((tiles, index) => (
 					<TileCardWrapperScroll key={index}>
 						<TileCardWrapper direction={index % 2 === 0 ? 'left' : 'right'}>
-							{[...tiles, ...tiles].map((tile, index) => {
-								return <TileCard key={index} {...tile} index={index} />;
+							{[...tiles, ...tiles].map((tile, tileIndex) => {
+								return <TileCard key={tileIndex} {...tile} index={tileIndex} />;
 							})}
 						</TileCardWrapper>
 						<TileFadeDivLeft />
@@ -180,7 +183,7 @@ const TileCardSection: React.FC = () => {
 
 			<ButtonContainer>
 				<Button variant="brand">
-					<span>Create your own tiles</span> <ArrowRight />
+					<span>{t('home.tileCardSection.cta')}</span> <ArrowRight />
 				</Button>
 			</ButtonContainer>
 		</Section>

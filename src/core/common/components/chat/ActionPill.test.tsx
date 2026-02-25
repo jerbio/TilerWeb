@@ -4,10 +4,11 @@ import { setupUser } from '@/test/test-utils';
 import ActionPill from './ActionPill';
 import { VibeAction } from '@/core/common/types/chat';
 import { Actions, Status } from '@/core/constants/enums';
-import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
-import { CalendarEntityType } from '@/core/common/components/calendar/calendarRequestContext';
+import { CalendarRequestProvider, useCalendarRequestListener } from '@/core/common/components/calendar/CalendarRequestProvider';
+import { CalendarEntityType, CalendarRequestResult } from '@/core/common/components/calendar/calendarRequestContext';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import React from 'react';
+import { act } from '@testing-library/react';
 
 // ── Mock Zustand store ────────────────────────────────────────
 
@@ -84,6 +85,34 @@ function renderActionPill(action: VibeAction) {
   );
 
   return { ...result, dispatchSpy };
+}
+
+/**
+ * A mock listener component that auto-responds to calendar requests
+ * with a configurable CalendarRequestResult.
+ */
+const MockCalendarListener: React.FC<{ autoResponse: CalendarRequestResult }> = ({ autoResponse }) => {
+  useCalendarRequestListener((envelope) => {
+    envelope.onResult?.(autoResponse);
+  });
+  return null;
+};
+
+/**
+ * Render ActionPill with a mock listener that responds with the given result.
+ * Use this to test result-driven UI states (navigating, demo_mode, etc).
+ */
+function renderActionPillWithAutoResponse(action: VibeAction, autoResponse: CalendarRequestResult) {
+  const result = render(
+    <ThemeProvider>
+      <CalendarRequestProvider>
+        <MockCalendarListener autoResponse={autoResponse} />
+        <ActionPill action={action} />
+      </CalendarRequestProvider>
+    </ThemeProvider>
+  );
+
+  return result;
 }
 
 /** Set the mock scheduleId that the ActionPill will read from the store */
@@ -358,6 +387,105 @@ describe('ActionPill schedule consistency', () => {
       // Should not trigger any dispatch — no console warnings about entity lookup
       expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('demo mode (anonymous persona)', () => {
+    it('shows demo mode title after receiving demo_mode result', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+
+      expect(button.getAttribute('title')).toContain('demo mode');
+      expect(button.getAttribute('title')).toContain('Sign up');
+    });
+
+    it('sets opacity to 0.8 when demo limited', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+
+      expect(button.style.opacity).toBe('0.8');
+    });
+
+    it('navigating result clears demo limited state', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      // First render with demo_mode response
+      const { unmount } = renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      // Verify demo mode
+      expect(button.style.opacity).toBe('0.8');
+
+      // Cleanup and re-render with navigating response
+      unmount();
+      renderActionPillWithAutoResponse(action, { status: 'navigating', entityId: 'entity-abc' });
+
+      const button2 = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button2);
+      });
+
+      // Should be in navigating state, not demo mode
+      expect(button2.getAttribute('title')).toContain('Navigating');
+      expect(button2.style.opacity).toBe('0.75');
+    });
+
+    it('found result clears demo limited state', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      // First click triggers demo_mode
+      const { unmount } = renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(button.style.opacity).toBe('0.8');
+
+      // Re-render with found response
+      unmount();
+      renderActionPillWithAutoResponse(action, { status: 'found', entityId: 'entity-abc' });
+
+      const button2 = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button2);
+      });
+
+      // Should be back to normal
+      expect(button2.style.opacity).toBe('1');
+      expect(button2.getAttribute('title')).not.toContain('demo mode');
+    });
+
+    it('demo mode does not prevent subsequent clicks', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+
+      // First click
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(button.getAttribute('title')).toContain('demo mode');
+
+      // Second click — should still be clickable (cursor is pointer)
+      expect(button.style.cursor).toBe('pointer');
     });
   });
 });

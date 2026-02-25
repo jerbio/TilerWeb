@@ -37,6 +37,8 @@ type CalendarProps = {
 	viewRef: React.RefObject<HTMLUListElement>;
 	viewOptions: CalendarViewOptions;
 	setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
+	/** When false, skip REST-based event lookup (Phase 4) and fall back to cached-event search only. Defaults to true. */
+	allowEventLookup?: boolean;
 };
 
 const Calendar = ({
@@ -45,6 +47,7 @@ const Calendar = ({
 	viewRef,
 	viewOptions,
 	setViewOptions,
+	allowEventLookup = true,
 }: CalendarProps) => {
 	const viableEvents = events.filter((event) => event.isViable);
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
@@ -91,7 +94,40 @@ const Calendar = ({
 					: undefined;
 
 				if (!styledEvent) {
-					// ── Phase 4: Tile not in view — look up date & navigate ──
+					// ── Phase 4: Tile not in view ──────────────────────────
+
+					// First, try to find the event in the already-loaded events array
+					// (covers the full fetched date range, not just what's rendered)
+					const cachedTileId = resolveEntityToTileId(entityId, entityType, events);
+					const cachedEvent = cachedTileId
+						? events.find((e) => e.id === cachedTileId)
+						: undefined;
+
+					if (cachedEvent) {
+						// Found in cache — navigate without an API call (NAVIGATE_TO_DATE)
+						setShowNonViableEvents(null);
+						setSelectedEventInfo(null);
+						setSelectedEvent(null);
+						onResult?.({ status: 'navigating', entityId });
+						pendingFocusRef.current = { entityId, entityType, onResult };
+						setViewOptions((prev) => ({
+							...prev,
+							startDay: dayjs(cachedEvent.start).startOf('day'),
+						}));
+						return;
+					}
+
+					// Not in cache — if event lookup is disabled (anonymous / demo),
+					// surface a friendly demo_mode result instead of calling the API
+					if (!allowEventLookup) {
+						onResult?.({ status: 'demo_mode', entityId });
+						return;
+					}
+
+					// Authenticated path — look up date via REST & navigate (NAVIGATE_TO_DATE)
+					setShowNonViableEvents(null);
+					setSelectedEventInfo(null);
+					setSelectedEvent(null);
 					onResult?.({ status: 'navigating', entityId });
 
 					findEventDate({
@@ -137,6 +173,7 @@ const Calendar = ({
 
 				if (styledEvent.isViable) {
 					// ── Viable event: select, scroll, highlight ────────────
+					setShowNonViableEvents(null);
 					setSelectedEvent(styledEvent.id);
 					setSelectedEventInfo(styledEvent);
 
@@ -201,6 +238,7 @@ const Calendar = ({
 			}
 
 			if (styledEvent.isViable) {
+				setShowNonViableEvents(null);
 				setSelectedEvent(styledEvent.id);
 				setSelectedEventInfo(styledEvent);
 
@@ -245,14 +283,19 @@ const Calendar = ({
 	}, []); // Only on mount
 
 	useEffect(() => {
-		// Reset selected event when events change
+		// EVENTS_RELOADED — reset selection & event info (data may be stale)
 		setSelectedEvent(null);
+		setSelectedEventInfo(null);
 	}, [events]);
 
 	const contentMounted = viewOptions.width > 0;
 
 	function changeDayView(dir: 'left' | 'right') {
 		const changeAmount = dir === 'left' ? -1 : 1;
+		// DAY_NAVIGATED — dismiss all overlays
+		setShowNonViableEvents(null);
+		setSelectedEventInfo(null);
+		setSelectedEvent(null);
 
 		setViewOptions((prev) => {
 			const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
@@ -477,11 +520,12 @@ const Calendar = ({
 			contentContainerRef.current?.addEventListener(
 				'click',
 				(e) => {
-					// Close the event info modal if clicking outside of it
+					// CONTENT_CLICK_OUTSIDE — dismiss event info and non-viable overlay
 					const modal = calendarEventInfoModalRef.current;
 					if (modal && !modal.contains(e.target as Node)) {
 						setSelectedEventInfo(null);
 						setSelectedEvent(null);
+						setShowNonViableEvents(null);
 					}
 				},
 				{ once: true }
@@ -576,11 +620,15 @@ const Calendar = ({
 												showNonViableEvents?.isSame(day, 'day') ?? false
 											}
 											title="Show Non-Viable Events"
-											onClick={() =>
-												setShowNonViableEvents((prev) =>
-													prev?.isSame(day, 'day') ? null : day
-												)
-											}
+											onClick={() => {
+												const isClosing = showNonViableEvents?.isSame(day, 'day') ?? false;
+												setShowNonViableEvents(isClosing ? null : day);
+												// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
+												if (!isClosing) {
+													setSelectedEventInfo(null);
+													setSelectedEvent(null);
+												}
+											}}
 										>
 											<TriangleAlert
 												size={18}
@@ -696,8 +744,7 @@ const Calendar = ({
 							calendarGridCanvasRef={calendarGridCanvasRef}
 							setStyledNonViableEvents={setStyledNonViableEvents}
 							styledEventsRef={styledEventsRef}
-							focusedEventId={focusedEventId}
-						/>
+							focusedEventId={focusedEventId}						onViableEventClicked={() => setShowNonViableEvents(null)}						/>
 					</SwiperSlide>
 					<SwiperSlide>
 						<CalendarContentDummy

@@ -520,6 +520,30 @@
 			"title": "Feature Highlights",
 			"subtitle": "Simplify your life with Tiler, Here's what we can do to help you."
 		},
+		"tileCardSection": {
+			"header": "Visualize your tasks and appointments",
+			"subHeader": "Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance.",
+			"cta": "Create your own tiles",
+			"tiles": {
+				"meetingWithCharles": "Meeting With Charles",
+				"morningMeeting": "Morning Meeting",
+				"clientCall": "Client Call",
+				"lunchBreak": "Lunch Break",
+				"teamSync": "Team Sync",
+				"projectReview": "Project Review",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Breakfast with Friends",
+				"groceryShopping": "Grocery Shopping",
+				"gymWorkouts": "Gym Workouts"
+			},
+			"locations": {
+				"conferenceRoomA": "Conference Room A",
+				"restaurants": "Restaurants",
+				"groceryStore": "Grocery Store",
+				"gym": "Gym",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "JUST TALK TO IT",

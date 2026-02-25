@@ -21,7 +21,7 @@ export class ChatApi extends AppApi {
   // Sessions
   public getVibeSessions(userId?: string, anonymousUserId?: string, pagination?: VibeSessionParams) {
     let url = 'api/Vibe/Session';
-    const params = ['getVibeByIdModel.mobileApp=true'];
+    const params = ['mobileApp=true'];
     
     if (userId) {
       params.push(`UserId=${encodeURIComponent(userId)}`);

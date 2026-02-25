@@ -7,10 +7,12 @@ export function CalendarWrapper({
   chatExpanded,
   userId,
   width,
+  allowEventLookup = true,
 }: {
   chatExpanded?: boolean;
   userId: string | null;
   width: number;
+  allowEventLookup?: boolean;
 }) {
   const viewRef = React.useRef<HTMLUListElement>(null);
 
@@ -29,6 +31,7 @@ export function CalendarWrapper({
       events={events}
       eventsLoading={loading}
       viewRef={viewRef}
+      allowEventLookup={allowEventLookup}
     />
   );
 }
