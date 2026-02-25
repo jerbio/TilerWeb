@@ -9,6 +9,7 @@ import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import React from 'react';
 import { act } from '@testing-library/react';
+import { CALENDAR_OVERLAY_CONTAINER_ID } from './StatusOverlay';
 
 // â”€â”€ Mock Zustand store â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -134,6 +135,15 @@ function setCurrentScheduleId(scheduleId: string | null) {
 beforeEach(() => {
   vi.clearAllMocks();
   setCurrentScheduleId('schedule-v2'); // default: calendar shows v2
+
+  // Create the portal target for StatusOverlay
+  let container = document.getElementById(CALENDAR_OVERLAY_CONTAINER_ID);
+  if (!container) {
+    container = document.createElement('div');
+    container.id = CALENDAR_OVERLAY_CONTAINER_ID;
+    container.style.position = 'relative';
+    document.body.appendChild(container);
+  }
 });
 
 describe('ActionPill schedule consistency', () => {
@@ -144,24 +154,29 @@ describe('ActionPill schedule consistency', () => {
       expect(screen.getByText('Add morning standup')).toBeInTheDocument();
     });
 
-    it('shows "Click to find on calendar" when action is on current schedule', () => {
+    it('is clickable when action is on current schedule', () => {
       const action = createAction({ afterScheduleId: 'schedule-v2' });
       renderActionPill(action);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('title', 'Click to find on calendar');
+      expect(button.style.cursor).toBe('pointer');
     });
 
-    it('shows stale tooltip when action afterScheduleId does not match current schedule', () => {
+    it('shows stale overlay when stale action is clicked', async () => {
+      const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v1' });
       renderActionPill(action);
 
       const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
       // Should communicate that this action may no longer reflect the calendar
-      expect(button.getAttribute('title')).toContain('may have changed');
+      expect(screen.getByText(/may have changed/)).toBeInTheDocument();
     });
 
-    it('shows pending tooltip when action has no afterScheduleId', () => {
+    it('shows pending overlay when pending action is clicked', async () => {
+      const user = setupUser();
       const action = createAction({
         status: Status.Pending,
         afterScheduleId: null,
@@ -170,15 +185,22 @@ describe('ActionPill schedule consistency', () => {
       renderActionPill(action);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('title', 'Accept changes to see this tile');
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(screen.getByText('Accept changes to see this tile')).toBeInTheDocument();
     });
 
-    it('shows removed tooltip for remove actions', () => {
+    it('shows removed overlay when removed action is clicked', async () => {
+      const user = setupUser();
       const action = createAction({ type: Actions.Remove_Existing_Task });
       renderActionPill(action);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('title', 'Tile removed');
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(screen.getByText('Tile removed')).toBeInTheDocument();
     });
   });
 
@@ -255,7 +277,7 @@ describe('ActionPill schedule consistency', () => {
       const button = screen.getByRole('button');
       // Should not be clickable â€” stale
       expect(button.style.cursor).toBe('default');
-      expect(button.getAttribute('title')).toContain('may have changed');
+
     });
 
     it('action from session 2 is clickable when schedule matches', () => {
@@ -391,7 +413,7 @@ describe('ActionPill schedule consistency', () => {
   });
 
   describe('demo mode (anonymous persona)', () => {
-    it('shows demo mode title after receiving demo_mode result', async () => {
+    it('shows demo mode overlay after receiving demo_mode result', async () => {
       const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v2' });
       renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
@@ -401,8 +423,8 @@ describe('ActionPill schedule consistency', () => {
         await user.click(button);
       });
 
-      expect(button.getAttribute('title')).toContain('demo mode');
-      expect(button.getAttribute('title')).toContain('Sign up');
+      expect(screen.getByText(/demo mode/i)).toBeInTheDocument();
+      expect(screen.getByText(/Sign up/)).toBeInTheDocument();
     });
 
     it('sets opacity to 0.8 when demo limited', async () => {
@@ -441,7 +463,7 @@ describe('ActionPill schedule consistency', () => {
       });
 
       // Should be in navigating state, not demo mode
-      expect(button2.getAttribute('title')).toContain('Navigating');
+      expect(screen.getByText(/Navigating/)).toBeInTheDocument();
       expect(button2.style.opacity).toBe('0.75');
     });
 
@@ -468,7 +490,7 @@ describe('ActionPill schedule consistency', () => {
 
       // Should be back to normal
       expect(button2.style.opacity).toBe('1');
-      expect(button2.getAttribute('title')).not.toContain('demo mode');
+      expect(screen.queryByText(/demo mode/i)).not.toBeInTheDocument();
     });
 
     it('demo mode does not prevent subsequent clicks', async () => {
@@ -482,7 +504,7 @@ describe('ActionPill schedule consistency', () => {
       await act(async () => {
         await user.click(button);
       });
-      expect(button.getAttribute('title')).toContain('demo mode');
+      expect(screen.getByText(/demo mode/i)).toBeInTheDocument();
 
       // Second click â€” should still be clickable (cursor is pointer)
       expect(button.style.cursor).toBe('pointer');

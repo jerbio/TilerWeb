@@ -583,7 +583,7 @@ const Calendar = ({
 	}, [isMobile]);
 
 	return (
-		<CalendarContainer $isMounted={contentMounted}>
+		<CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>
 			<CalendarHeader>
 				<CalendarHeaderActions>
 					<ChangeViewButton
