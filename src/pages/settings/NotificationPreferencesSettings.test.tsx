@@ -47,7 +47,8 @@ const createMockSettings = (overrides: Partial<UserSettings['userPreference']> =
 	scheduleProfile: {
 		travelMedium: 'driving',
 		pinPreference: 'start',
-		sleepDuration: 0.0,
+		sleepDuration: 8.0,
+		endTimeOfDay: ''
 	},
 	mobileUiScheme: {
 		id: 'test-mobile-ui-id',
