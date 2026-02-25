@@ -5,7 +5,7 @@ import ActionIcon from '@/core/common/components/chat/ActionIcon';
 import { VibeAction } from '@/core/common/types/chat';
 import { Status } from '@/core/constants/enums';
 import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
-import { CalendarEntityType, CalendarRequestResult } from '@/core/common/components/calendar/calendarRequestContext';
+import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from '@/core/common/components/calendar/calendarRequestContext';
 import useAppStore from '@/global_state';
 import { getActionScheduleState, ScheduleState } from '@/core/util/scheduleConsistency';
 
@@ -59,17 +59,17 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
         },
       },
       (result: CalendarRequestResult) => {
-        if (result.status === 'navigating') {
+        if (result.status === CalendarRequestStatus.Navigating) {
           setIsNavigating(true);
           setIsDemoLimited(false);
-        } else if (result.status === 'demo_mode') {
+        } else if (result.status === CalendarRequestStatus.DemoMode) {
           setIsDemoLimited(true);
           setIsNavigating(false);
         } else {
           // Any terminal result (found, not_found, error) clears navigating state
           setIsNavigating(false);
           setIsDemoLimited(false);
-          if (result.status === 'not_found') {
+          if (result.status === CalendarRequestStatus.NotFound) {
             console.warn('[ActionPill] Calendar could not find entity:', action.entityId);
           }
         }

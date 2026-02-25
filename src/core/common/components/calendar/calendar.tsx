@@ -17,7 +17,7 @@ import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
-import { CalendarRequestEnvelope, CalendarEntityType } from './calendarRequestContext';
+import { CalendarRequestEnvelope, CalendarEntityType, CalendarRequestStatus } from './calendarRequestContext';
 import { resolveEntityToTileId } from '@/core/util/entityResolution';
 import { findEventDate } from '@/core/util/eventDateLookup';
 import { scheduleService } from '@/services';
@@ -108,7 +108,7 @@ const Calendar = ({
 						setShowNonViableEvents(null);
 						setSelectedEventInfo(null);
 						setSelectedEvent(null);
-						onResult?.({ status: 'navigating', entityId });
+						onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
 						pendingFocusRef.current = { entityId, entityType, onResult };
 						setViewOptions((prev) => ({
 							...prev,
@@ -120,7 +120,7 @@ const Calendar = ({
 					// Not in cache — if event lookup is disabled (anonymous / demo),
 					// surface a friendly demo_mode result instead of calling the API
 					if (!allowEventLookup) {
-						onResult?.({ status: 'demo_mode', entityId });
+						onResult?.({ status: CalendarRequestStatus.DemoMode, entityId });
 						return;
 					}
 
@@ -128,7 +128,7 @@ const Calendar = ({
 					setShowNonViableEvents(null);
 					setSelectedEventInfo(null);
 					setSelectedEvent(null);
-					onResult?.({ status: 'navigating', entityId });
+					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
 
 					findEventDate({
 						entityId,
@@ -142,11 +142,14 @@ const Calendar = ({
 						},
 						lookupCalEvent: async (id) => {
 							try {
-								const result = await scheduleService.lookupCalendarEventById(id);
-								if (!result || result.start == null) return null;
+								const [calEvent, subEvents] = await Promise.all([
+									scheduleService.lookupCalendarEventById(id),
+									scheduleService.getSubEventsOfCalendar(id),
+								]);
+								if (!calEvent || calEvent.start == null) return null;
 								return {
-									start: result.start,
-									subEvents: (result.subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
+									start: calEvent.start,
+									subEvents: (subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
 								};
 							} catch {
 								return null;
@@ -154,7 +157,7 @@ const Calendar = ({
 						},
 					}).then((startMs) => {
 						if (startMs == null) {
-							onResult?.({ status: 'not_found', entityId });
+							onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
 							return;
 						}
 
@@ -205,7 +208,7 @@ const Calendar = ({
 					setFocusedEventId(null);
 				}, 2500);
 
-				onResult?.({ status: 'found', entityId });
+				onResult?.({ status: CalendarRequestStatus.Found, entityId });
 			}
 		},
 		[]
@@ -233,7 +236,7 @@ const Calendar = ({
 				: undefined;
 
 			if (!styledEvent) {
-				onResult?.({ status: 'not_found', entityId });
+				onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
 				return;
 			}
 
@@ -268,7 +271,7 @@ const Calendar = ({
 				setFocusedEventId(null);
 			}, 2500);
 
-			onResult?.({ status: 'found', entityId });
+			onResult?.({ status: CalendarRequestStatus.Found, entityId });
 		}, 150);
 
 		return () => clearTimeout(retryTimer);

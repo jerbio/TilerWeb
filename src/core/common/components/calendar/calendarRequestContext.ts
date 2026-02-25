@@ -12,14 +12,24 @@ export enum CalendarEntityType {
   None = 'None',
 }
 
+/** Status codes reported back after the calendar processes a request */
+export enum CalendarRequestStatus {
+  Found = 'found',
+  NotFound = 'not_found',
+  Navigating = 'navigating',
+  Stale = 'stale',
+  DemoMode = 'demo_mode',
+  Error = 'error',
+}
+
 /** Result reported back to the dispatcher after the calendar processes a request */
 export type CalendarRequestResult =
-  | { status: 'found'; entityId: string }
-  | { status: 'not_found'; entityId: string }
-  | { status: 'navigating'; entityId: string }
-  | { status: 'stale'; entityId: string }
-  | { status: 'demo_mode'; entityId: string }
-  | { status: 'error'; message: string };
+  | { status: CalendarRequestStatus.Found; entityId: string }
+  | { status: CalendarRequestStatus.NotFound; entityId: string }
+  | { status: CalendarRequestStatus.Navigating; entityId: string }
+  | { status: CalendarRequestStatus.Stale; entityId: string }
+  | { status: CalendarRequestStatus.DemoMode; entityId: string }
+  | { status: CalendarRequestStatus.Error; message: string };
 
 /**
  * Schedule context attached to a request so the calendar listener

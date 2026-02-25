@@ -10,12 +10,13 @@ import {
   CalendarRequest,
   CalendarRequestEnvelope,
   CalendarRequestResult,
+  CalendarRequestStatus,
   CalendarEntityType,
   FocusEventRequest,
 } from './calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
 
-// ── Helpers ────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function createFocusRequest(overrides: Partial<FocusEventRequest> = {}): FocusEventRequest {
   return {
@@ -101,7 +102,7 @@ function renderBusMultiListener(
   };
 }
 
-// ── CalendarRequestProvider dispatch/subscribe ────────────────
+// â”€â”€ CalendarRequestProvider dispatch/subscribe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe('CalendarRequestProvider', () => {
   describe('basic pub/sub', () => {
@@ -129,8 +130,8 @@ describe('CalendarRequestProvider', () => {
       expect(envelope.onResult).toBe(onResult);
 
       // Calendar calls onResult
-      envelope.onResult!({ status: 'found', entityId: 'entity-1' });
-      expect(onResult).toHaveBeenCalledWith({ status: 'found', entityId: 'entity-1' });
+      envelope.onResult!({ status: CalendarRequestStatus.Found, entityId: 'entity-1' });
+      expect(onResult).toHaveBeenCalledWith({ status: CalendarRequestStatus.Found, entityId: 'entity-1' });
     });
 
     it('multiple listeners all receive the dispatch', () => {
@@ -205,16 +206,16 @@ describe('CalendarRequestProvider', () => {
             req.scheduleContext &&
             req.scheduleContext.afterScheduleId !== req.scheduleContext.currentScheduleId
           ) {
-            envelope.onResult?.({ status: 'stale', entityId: req.entityId });
+            envelope.onResult?.({ status: CalendarRequestStatus.Stale, entityId: req.entityId });
             return;
           }
         }
-        envelope.onResult?.({ status: 'found', entityId: 'entity-1' });
+        envelope.onResult?.({ status: CalendarRequestStatus.Found, entityId: 'entity-1' });
       };
 
       const { dispatch } = renderBus(smartHandler);
 
-      // Dispatch a stale request (afterScheduleId ≠ currentScheduleId)
+      // Dispatch a stale request (afterScheduleId & currentScheduleId)
       const staleRequest = createFocusRequest({
         scheduleContext: {
           afterScheduleId: 'schedule-v1',
@@ -225,7 +226,7 @@ describe('CalendarRequestProvider', () => {
       dispatch(staleRequest, onResult);
 
       expect(onResult).toHaveBeenCalledWith({
-        status: 'stale',
+        status: CalendarRequestStatus.Stale,
         entityId: 'entity-1',
       });
     });
@@ -240,11 +241,11 @@ describe('CalendarRequestProvider', () => {
             req.scheduleContext &&
             req.scheduleContext.afterScheduleId !== req.scheduleContext.currentScheduleId
           ) {
-            envelope.onResult?.({ status: 'stale', entityId: req.entityId });
+            envelope.onResult?.({ status: CalendarRequestStatus.Stale, entityId: req.entityId });
             return;
           }
         }
-        envelope.onResult?.({ status: 'found', entityId: 'entity-1' });
+        envelope.onResult?.({ status: CalendarRequestStatus.Found, entityId: 'entity-1' });
       };
 
       const { dispatch } = renderBus(smartHandler);
@@ -259,7 +260,7 @@ describe('CalendarRequestProvider', () => {
       dispatch(validRequest, onResult);
 
       expect(onResult).toHaveBeenCalledWith({
-        status: 'found',
+        status: CalendarRequestStatus.Found,
         entityId: 'entity-1',
       });
     });
@@ -268,7 +269,7 @@ describe('CalendarRequestProvider', () => {
       const onResult = vi.fn();
 
       const handler = (envelope: CalendarRequestEnvelope) => {
-        envelope.onResult?.({ status: 'found', entityId: 'entity-1' });
+        envelope.onResult?.({ status: CalendarRequestStatus.Found, entityId: 'entity-1' });
       };
 
       const { dispatch } = renderBus(handler);
@@ -276,7 +277,7 @@ describe('CalendarRequestProvider', () => {
       dispatch(createFocusRequest(), onResult);
 
       expect(onResult).toHaveBeenCalledWith({
-        status: 'found',
+        status: CalendarRequestStatus.Found,
         entityId: 'entity-1',
       });
     });
@@ -311,16 +312,16 @@ describe('CalendarRequestProvider', () => {
   });
 });
 
-// ── CalendarRequestResult type tests ─────────────────────────
+// â”€â”€ CalendarRequestResult type tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe('CalendarRequestResult types', () => {
   it('supports stale status', () => {
     const result: CalendarRequestResult = {
-      status: 'stale',
+      status: CalendarRequestStatus.Stale,
       entityId: 'entity-1',
     };
 
-    // Now a proper member of the union — no cast needed
+    // Now a proper member of the union â€” no cast needed
     expect(result.status).toBe('stale');
   });
 });

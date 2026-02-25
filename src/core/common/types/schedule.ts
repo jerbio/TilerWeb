@@ -189,3 +189,5 @@ export type CalendarEvent = {
 };
 
 export type CalendarEventResponse = ApiResponse<CalendarEvent>;
+
+export type SubEventsOfCalendarResponse = ApiResponse<ScheduleSubCalendarEvent[]>;

@@ -5,19 +5,19 @@ import ActionPill from './ActionPill';
 import { VibeAction } from '@/core/common/types/chat';
 import { Actions, Status } from '@/core/constants/enums';
 import { CalendarRequestProvider, useCalendarRequestListener } from '@/core/common/components/calendar/CalendarRequestProvider';
-import { CalendarEntityType, CalendarRequestResult } from '@/core/common/components/calendar/calendarRequestContext';
+import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from '@/core/common/components/calendar/calendarRequestContext';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import React from 'react';
 import { act } from '@testing-library/react';
 
-// ── Mock Zustand store ────────────────────────────────────────
+// â”€â”€ Mock Zustand store â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const mockGetActivePersonaSession = vi.fn();
 
 vi.mock('@/global_state', () => ({
   __esModule: true,
   default: Object.assign(
-    // The Zustand hook itself — when called with a selector, invoke it
+    // The Zustand hook itself â€” when called with a selector, invoke it
     (selector?: (state: unknown) => unknown) => {
       const state = {
         getActivePersonaSession: mockGetActivePersonaSession,
@@ -32,7 +32,7 @@ vi.mock('@/global_state', () => ({
   ),
 }));
 
-// ── Mock i18n ────────────────────────────────────────────────
+// â”€â”€ Mock i18n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -41,7 +41,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-// ── Helpers ──────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function createAction(overrides: Partial<VibeAction> = {}): VibeAction {
   return {
@@ -129,7 +129,7 @@ function setCurrentScheduleId(scheduleId: string | null) {
   });
 }
 
-// ── Tests ────────────────────────────────────────────────────
+// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -253,7 +253,7 @@ describe('ActionPill schedule consistency', () => {
       renderActionPill(session1Action);
 
       const button = screen.getByRole('button');
-      // Should not be clickable — stale
+      // Should not be clickable â€” stale
       expect(button.style.cursor).toBe('default');
       expect(button.getAttribute('title')).toContain('may have changed');
     });
@@ -280,7 +280,7 @@ describe('ActionPill schedule consistency', () => {
 
       const button = screen.getByRole('button');
       // When scheduleId is null, we still allow click for backwards compat
-      // (unknown state → clickable if entity info is present)
+      // (unknown state â†’ clickable if entity info is present)
       // This tests that the component handles null gracefully
       expect(button).toBeInTheDocument();
     });
@@ -293,7 +293,7 @@ describe('ActionPill schedule consistency', () => {
       renderActionPill(action);
 
       const button = screen.getByRole('button');
-      // Unknown state — allow click since we can't determine staleness
+      // Unknown state â€” allow click since we can't determine staleness
       expect(button.style.cursor).toBe('pointer');
     });
   });
@@ -384,7 +384,7 @@ describe('ActionPill schedule consistency', () => {
       const button = screen.getByRole('button');
       await user.click(button);
 
-      // Should not trigger any dispatch — no console warnings about entity lookup
+      // Should not trigger any dispatch â€” no console warnings about entity lookup
       expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -394,7 +394,7 @@ describe('ActionPill schedule consistency', () => {
     it('shows demo mode title after receiving demo_mode result', async () => {
       const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v2' });
-      renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
 
       const button = screen.getByRole('button');
       await act(async () => {
@@ -408,7 +408,7 @@ describe('ActionPill schedule consistency', () => {
     it('sets opacity to 0.8 when demo limited', async () => {
       const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v2' });
-      renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
 
       const button = screen.getByRole('button');
       await act(async () => {
@@ -422,7 +422,7 @@ describe('ActionPill schedule consistency', () => {
       const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v2' });
       // First render with demo_mode response
-      const { unmount } = renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+      const { unmount } = renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
 
       const button = screen.getByRole('button');
       await act(async () => {
@@ -433,7 +433,7 @@ describe('ActionPill schedule consistency', () => {
 
       // Cleanup and re-render with navigating response
       unmount();
-      renderActionPillWithAutoResponse(action, { status: 'navigating', entityId: 'entity-abc' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.Navigating, entityId: 'entity-abc' });
 
       const button2 = screen.getByRole('button');
       await act(async () => {
@@ -449,7 +449,7 @@ describe('ActionPill schedule consistency', () => {
       const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v2' });
       // First click triggers demo_mode
-      const { unmount } = renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+      const { unmount } = renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
 
       const button = screen.getByRole('button');
       await act(async () => {
@@ -459,7 +459,7 @@ describe('ActionPill schedule consistency', () => {
 
       // Re-render with found response
       unmount();
-      renderActionPillWithAutoResponse(action, { status: 'found', entityId: 'entity-abc' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.Found, entityId: 'entity-abc' });
 
       const button2 = screen.getByRole('button');
       await act(async () => {
@@ -474,7 +474,7 @@ describe('ActionPill schedule consistency', () => {
     it('demo mode does not prevent subsequent clicks', async () => {
       const user = setupUser();
       const action = createAction({ afterScheduleId: 'schedule-v2' });
-      renderActionPillWithAutoResponse(action, { status: 'demo_mode', entityId: 'entity-abc' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
 
       const button = screen.getByRole('button');
 
@@ -484,7 +484,7 @@ describe('ActionPill schedule consistency', () => {
       });
       expect(button.getAttribute('title')).toContain('demo mode');
 
-      // Second click — should still be clickable (cursor is pointer)
+      // Second click â€” should still be clickable (cursor is pointer)
       expect(button.style.cursor).toBe('pointer');
     });
   });

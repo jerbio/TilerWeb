@@ -1,6 +1,6 @@
 import { Actions, Status } from '@/core/constants/enums';
 import { UserInfo } from '@/global_state';
-import { ApiResponse } from './api';
+import { ApiResponse, PaginationParams } from './api';
 
 export type ActionType = `${Actions}`;
 
@@ -97,10 +97,9 @@ export interface VibeSession {
 	requests: (string | null)[];
 }
 
-export interface VibeSessionParams {
-	batchSize?: number;
-	index?: number;
-	order?: 'desc' | 'asc';
+export interface VibeSessionParams extends PaginationParams {
+  sessionId?: string;
+  anonymousUserId?: string;
 }
 
 export type VibeSessionsResponse = ApiResponse<{
