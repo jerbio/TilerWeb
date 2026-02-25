@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ToggleProps {
-	label: string;
+	label?: string;
 	isOn: boolean;
 	onChange: (value: boolean) => void;
 	disabled?: boolean;
@@ -17,7 +17,7 @@ const Toggle: React.FC<ToggleProps> = ({ label, isOn, onChange, disabled = false
 
 	return (
 		<ToggleRow>
-			<ToggleLabel>{label}</ToggleLabel>
+			{label && <ToggleLabel>{label}</ToggleLabel>}
 			<ToggleSwitch $isOn={isOn} $disabled={disabled} onClick={handleClick}>
 				<ToggleKnob $isOn={isOn} />
 			</ToggleSwitch>

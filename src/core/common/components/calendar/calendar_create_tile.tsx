@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import Button from '../button';
 import Collapse from '../collapse';
 import { RGB, RGBColor } from '@/core/util/colors';
-import Toggle from '../toggle';
 import React, { useEffect, useMemo, useState } from 'react';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -17,6 +16,7 @@ import { ScheduleCreateEventParams } from '../../types/schedule';
 import { toast } from 'sonner';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 import DatePicker from '../date_picker';
+import Toggle from '../Toggle';
 
 dayjs.extend(advancedFormat);
 
@@ -113,7 +113,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             <div>
               <h3>{t('calendar.createTile.actions.repeatTile')}</h3>
               <Toggle
-                checked={formData.isRecurring}
+                isOn={formData.isRecurring}
                 onChange={handleFormInputChange('isRecurring', { mode: 'static' })}
               />
             </div>
@@ -175,7 +175,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             <div>
               <h3>{t('calendar.createTile.actions.addTimeRestriction')}</h3>
               <Toggle
-                checked={formData.isTimeRestricted}
+                isOn={formData.isTimeRestricted}
                 onChange={handleFormInputChange('isTimeRestricted', {
                   mode: 'static',
                 })}
@@ -189,7 +189,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             <div>
               <h3>{t('calendar.createTile.actions.addLocationNickname')}</h3>
               <Toggle
-                checked={formData.hasLocationNickname}
+                isOn={formData.hasLocationNickname}
                 onChange={handleFormInputChange('hasLocationNickname', {
                   mode: 'static',
                 })}
