@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import Loader from '@/core/common/components/loader';
 import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 import { createPortal } from 'react-dom';
+import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -174,7 +175,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
           timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
           timeZone: personaUser.anonymousUser.timeZone || 'UTC',
           email: personaUser.anonymousUser.email,
-          endfOfDay: personaUser.anonymousUser.endfOfDay || '',
+          endOfDay: personaUser.anonymousUser.endOfDay || '',
           phoneNumber: personaUser.anonymousUser.phoneNumber,
           fullName: personaUser.anonymousUser.fullName || '',
           firstName: personaUser.anonymousUser.firstName || '',
@@ -348,7 +349,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   );
 
   return (
-    <>
+    <CalendarRequestProvider>
       <CardContainer 
         $display={expanded} 
         style={cardSpring} 
@@ -437,7 +438,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
         />,
         document.body
       )}
-    </>
+    </CalendarRequestProvider>
   );
 };
 

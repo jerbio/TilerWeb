@@ -273,6 +273,40 @@
 				"errorLoadMessages": "Failed to load chat messages",
 				"errorSendMessage": "Failed to send message",
 				"errorAcceptChanges": "Failed to accept changes",
+				"wsStatus": {
+					"actionInitStart1": "Initializing action generation...",
+					"actionInitStart2": "Setting things up...",
+					"actionInitStart3": "Preparing your request...",
+					"actionInitStart4": "Getting ready...",
+					"processActionStart1": "Processing action...",
+					"processActionStart2": "Working on it...",
+					"processActionStart3": "Analyzing your request...",
+					"processActionStart4": "Thinking...",
+					"processActionEnd1": "Action processing complete",
+					"processActionEnd2": "Processing done!",
+					"processActionEnd3": "All set!",
+					"processActionEnd4": "Finished processing",
+					"summaryStart1": "Generating summary...",
+					"summaryStart2": "Summarizing results...",
+					"summaryStart3": "Creating overview...",
+					"summaryStart4": "Preparing summary...",
+					"summaryEnd1": "Summary generation complete",
+					"summaryEnd2": "Summary ready!",
+					"summaryEnd3": "Overview complete",
+					"summaryEnd4": "Done summarizing",
+					"scheduleLoad1": "Loading schedule data...",
+					"scheduleLoad2": "Fetching your schedule...",
+					"scheduleLoad3": "Retrieving calendar...",
+					"scheduleLoad4": "Loading timeline...",
+					"scheduleProcessStart1": "Optimizing schedule...",
+					"scheduleProcessStart2": "Reorganizing your day...",
+					"scheduleProcessStart3": "Finding the best fit...",
+					"scheduleProcessStart4": "Adjusting timeline...",
+					"scheduleProcessEnd1": "Schedule optimization complete",
+					"scheduleProcessEnd2": "Schedule updated!",
+					"scheduleProcessEnd3": "Timeline optimized",
+					"scheduleProcessEnd4": "All done!"
+				},
 				"userLocation": {
 					"anonymous": "Anonymous",
 					"enterLocation": "Enter your location",
@@ -285,6 +319,15 @@
 					"locationBenefitMessage": "Setting your actual location helps us create more relevant tiles and improve your experience with personalized scheduling suggestions.",
 					"usingDefaultLocation": "Using default location - Click icon to get your current location.",
 					"clickIconToGetLocation": "Click icon to get your current location or edit your location"
+				},
+				"sessionHistory": {
+					"title": "Chat History",
+					"loading": "Loading sessions...",
+					"loadingMore": "Loading more...",
+					"loadMore": "Load older sessions",
+					"empty": "No conversations yet",
+					"untitled": "Untitled Session",
+					"newConversation": "New Conversation"
 				},
 				"errorPopup": {
 					"chatLimitReached": "Chat Limit Reached",
@@ -543,6 +586,30 @@
 			"title": "Feature Highlights",
 			"subtitle": "Simplify your life with Tiler, Here's what we can do to help you."
 		},
+		"tileCardSection": {
+			"header": "Visualize your tasks and appointments",
+			"subHeader": "Visualize your schedule with our intuitive tiles. Easily see your appointments, deadlines, and tasks at a glance.",
+			"cta": "Create your own tiles",
+			"tiles": {
+				"meetingWithCharles": "Meeting With Charles",
+				"morningMeeting": "Morning Meeting",
+				"clientCall": "Client Call",
+				"lunchBreak": "Lunch Break",
+				"teamSync": "Team Sync",
+				"projectReview": "Project Review",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Breakfast with Friends",
+				"groceryShopping": "Grocery Shopping",
+				"gymWorkouts": "Gym Workouts"
+			},
+			"locations": {
+				"conferenceRoomA": "Conference Room A",
+				"restaurants": "Restaurants",
+				"groceryStore": "Grocery Store",
+				"gym": "Gym",
+				"zoom": "Zoom"
+			}
+		},
 		"features": {
 			"conversation": {
 				"subtitle": "JUST TALK TO IT",
@@ -697,6 +764,8 @@
 				"myPersonalHours": "My Personal Hours",
 				"setBlockOutHours": "Set your block out hours",
 				"bedTime": "Bed Time",
+			"startsAt": "Starts at",
+			"endsAt": "Ends at",
 				"useCustom": "Use custom",
 				"customTimeRestrictions": "Custom time restrictions",
 				"reset": "Reset",
@@ -704,7 +773,9 @@
 				"saving": "Saving...",
 				"saveSuccess": "Tile preferences updated successfully",
 				"saveError": "Failed to save changes. Please try again.",
-				"customSaved": "Custom time restrictions saved"
+				"customSaved": "Custom time restrictions saved",
+				"bedTimeStartRequired": "Please select a bed time start",
+				"bedTimeEndRequired": "Please select a bed time end"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",
@@ -721,6 +792,7 @@
 				"placeholder": "Notification settings coming soon...",
 				"tileReminders": "Tile Reminders",
 				"emailNotifications": "Email Notifications",
+				"pushNotifications": "Push Notifications",
 				"saveChanges": "Save changes",
 				"saving": "Saving...",
 				"saveSuccess": "Notification preferences updated successfully",

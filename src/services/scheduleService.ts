@@ -1,4 +1,7 @@
 import { ScheduleApi } from '@/api/scheduleApi';
+import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
+import { CalendarEventApi } from '@/api/calendarEventApi';
+import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
 import { ScheduleCreateEventParams, ScheduleLookupOptions } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
@@ -10,8 +13,17 @@ const defaultScheduleOptions: ScheduleLookupOptions = {
 
 class ScheduleService {
   private scheduleApi: ScheduleApi;
-  constructor(scheduleApi: ScheduleApi) {
+  private subCalendarEventApi: SubCalendarEventApi;
+  private calendarEventApi: CalendarEventApi;
+
+  constructor(
+    scheduleApi: ScheduleApi,
+    subCalendarEventApi: SubCalendarEventApi,
+    calendarEventApi: CalendarEventApi,
+  ) {
     this.scheduleApi = scheduleApi;
+    this.subCalendarEventApi = subCalendarEventApi;
+    this.calendarEventApi = calendarEventApi;
   }
 
 	async createEvent(params: ScheduleCreateEventParams) {
@@ -56,6 +68,49 @@ class ScheduleService {
       return schedule.Content;
     } catch (error) {
       console.error('Error fetching schedule', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Lookup a single SubCalendarEvent by its ID.
+   * Returns the raw SubCalendarEvent payload (unwrapped from ApiResponse).
+   */
+  async lookupSubCalendarEventById(eventId: string) {
+    try {
+      const response = await this.subCalendarEventApi.getSubCalendarEvent(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error fetching SubCalendarEvent by ID', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Lookup a single CalendarEvent by ID (without sub-events).
+   * Supports standard pagination via `batchSize`, `index`, and `order`.
+   */
+  async lookupCalendarEventById(eventId: string, options?: CalendarEventQueryOptions) {
+    try {
+      const response = await this.calendarEventApi.getCalendarEvent(eventId, options);
+      return response.Content;
+    } catch (error) {
+      console.error('Error fetching CalendarEvent by ID', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Lookup the sub-events of a CalendarEvent by its parent ID.
+   * `GET /api/CalendarEvent/SubEvents?EventID=...`
+   * Returns an array of ScheduleSubCalendarEvent.
+   */
+  async getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
+    try {
+      const response = await this.calendarEventApi.getSubEventsOfCalendar(eventId, options);
+      return response.Content;
+    } catch (error) {
+      console.error('Error fetching sub-events of CalendarEvent by ID', error);
       throw normalizeError(error);
     }
   }

@@ -8,30 +8,40 @@ import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import palette from '@/core/theme/palette';
 
 type CalendarContentProps = {
-  // Events to display in the calendar
-  events: ScheduleSubCalendarEvent[];
-  // View options for the calendar
-  viewOptions: CalendarViewOptions;
-  // Selected event state
-  selectedEvent: string | null;
-  setSelectedEvent: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
-  // Ref for the calendar grid canvas
-  calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
-  // Function to set styled non-viable events
-  setStyledNonViableEvents: (events: StyledEvent[]) => void;
-	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
+	// Events to display in the calendar
+	events: ScheduleSubCalendarEvent[];
+	// View options for the calendar
+	viewOptions: CalendarViewOptions;
+	// Selected event state
+	selectedEvent: string | null;
+	setSelectedEvent: React.Dispatch<React.SetStateAction<string | null>>;
+	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
+	// Ref for the calendar grid canvas
+	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
+	// Function to set styled non-viable events
+	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+  // Function to provide background click info
+  onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
+	/** Ref populated with all styled events for Calendar request handling */
+	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
+	/** Currently focused event ID (chat → calendar highlight) */
+	focusedEventId?: string | null;
+	/** Called when a viable event tile on the grid is clicked */
+	onViableEventClicked?: () => void;
 };
 
 const CalendarContent: React.FC<CalendarContentProps> = ({
-  events,
-  viewOptions,
-  selectedEvent,
-  setSelectedEvent,
-  setSelectedEventInfo,
-  calendarGridCanvasRef,
-  setStyledNonViableEvents,
+	events,
+	viewOptions,
+	selectedEvent,
+	setSelectedEvent,
+	setSelectedEventInfo,
+	calendarGridCanvasRef,
+	setStyledNonViableEvents,
   onBackgroundClick,
+	styledEventsRef,
+	focusedEventId,
+	onViableEventClicked,
 }) => {
   return (
     <Container>
@@ -62,6 +72,9 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
           setSelectedEventInfo={setSelectedEventInfo}
           onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
           onBackgroundClick={onBackgroundClick}
+          styledEventsRef={styledEventsRef}
+          focusedEventId={focusedEventId}
+          onViableEventClicked={onViableEventClicked}
         />
       </StyledCalendarContent>
     </Container>

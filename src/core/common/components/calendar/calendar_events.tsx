@@ -20,9 +20,15 @@ type CalendarEventsProps = {
   headerWidth: number;
   selectedEvent: string | null;
   setSelectedEvent: (id: string | null) => void;
-  setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
-  onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
-	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
+	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
+	onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
+  onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
+	/** Ref populated with all styled events so Calendar can look up by ID */
+	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
+	/** Currently focused event ID (from chat action pill click) */
+	focusedEventId?: string | null;
+	/** Called when a viable event tile on the grid is clicked */
+	onViableEventClicked?: () => void;
 };
 type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
@@ -68,23 +74,28 @@ const CalendarEvents = ({
   headerWidth,
   selectedEvent,
   setSelectedEvent,
-  onNonViableEventsChange,
-  setSelectedEventInfo,
+	onNonViableEventsChange,
+	setSelectedEventInfo,
+	styledEventsRef,
+	focusedEventId,
+	onViableEventClicked,
   onBackgroundClick,
 }: CalendarEventsProps) => {
-  const handleEventClick = (event: StyledEvent) => {
-    // Track event selection
-    analytics.trackCalendarEvent('Event Selected', {
-      eventId: event.id,
-      eventName: event.name,
-      isRigid: event.isRigid,
-      isTardy: event.isTardy,
-      hasLocation: !!event.location?.address,
-      duration: dayjs(event.end, 'unix').diff(dayjs(event.start, 'unix'), 'minute'),
-      startTime: dayjs(event.start, 'unix').format('HH:mm'),
-    });
-
-    setSelectedEvent(event.id);
+	const handleEventClick = (event: StyledEvent) => {
+		// Track event selection
+		analytics.trackCalendarEvent('Event Selected', {
+			eventId: event.id,
+			eventName: event.name,
+			isRigid: event.isRigid,
+			isTardy: event.isTardy,
+			hasLocation: !!event.location?.address,
+			duration: dayjs(event.end, 'unix').diff(dayjs(event.start, 'unix'), 'minute'),
+			startTime: dayjs(event.start, 'unix').format('HH:mm'),
+		});
+		
+		setSelectedEvent(event.id);
+		// VIABLE_EVENT_CLICKED — dismiss non-viable overlay
+		onViableEventClicked?.();
   };
 
   const handleTravelDetailClick = (detail: StyledTravelDetail) => {
@@ -323,12 +334,20 @@ const CalendarEvents = ({
     return result;
   }, [styledEvents]);
 
-  useEffect(() => {
-    if (onNonViableEventsChange) {
-      const nonViableEvents = styledEvents.filter((event) => !event.isViable);
-      onNonViableEventsChange(nonViableEvents);
-    }
-  }, [styledEvents]);
+	useEffect(() => {
+		if (onNonViableEventsChange) {
+			const nonViableEvents = styledEvents.filter((event) => !event.isViable);
+			onNonViableEventsChange(nonViableEvents);
+		}
+	}, [styledEvents]);
+
+	// Expose all styled events via ref for Calendar request handling
+	useEffect(() => {
+		if (styledEventsRef) {
+			styledEventsRef.current = styledEvents;
+		}
+	}, [styledEvents, styledEventsRef]);
+
 
   const eventTransition = useTransition(
     styledEvents.filter((event) => event.isViable),
@@ -411,10 +430,7 @@ const CalendarEvents = ({
             key={event.key}
             style={style}
             $selected={selectedEvent === event.id}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
+            $focused={focusedEventId === event.id}
           >
             <CalendarEvent
               event={event}
@@ -422,6 +438,7 @@ const CalendarEvents = ({
               setSelectedEvent={setSelectedEvent}
               setSelectedEventInfo={setSelectedEventInfo}
               onClick={() => handleEventClick(event)}
+              focused={focusedEventId === event.id}
             />
           </EventPositioner>
         ))}
@@ -480,11 +497,11 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventPositioner = styled(animated.div) <{ $selected: boolean }>`
+const EventPositioner = styled(animated.div) <{ $selected: boolean; $focused: boolean }>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: ${({ $selected }) => ($selected ? 999 : 'auto')};
+	z-index: ${({ $selected, $focused }) => ($selected || $focused ? 999 : 'auto')};
 	display: flex;
 
 	&:hover {

@@ -40,11 +40,11 @@ const FooterSection: React.FC = () => {
             title="Legal"
             links={[
               {
-                href: '/terms-of-use',
+                href: '/TOS',
                 label: t('common.legal.terms'),
               },
               {
-                href: '/privacy-policy',
+                href: '/privacy',
                 label: t('common.legal.privacy'),
               },
             ]}

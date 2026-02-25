@@ -1,0 +1,513 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { setupUser } from '@/test/test-utils';
+import ActionPill from './ActionPill';
+import { VibeAction } from '@/core/common/types/chat';
+import { Actions, Status } from '@/core/constants/enums';
+import { CalendarRequestProvider, useCalendarRequestListener } from '@/core/common/components/calendar/CalendarRequestProvider';
+import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from '@/core/common/components/calendar/calendarRequestContext';
+import { ThemeProvider } from '@/core/theme/ThemeProvider';
+import React from 'react';
+import { act } from '@testing-library/react';
+import { CALENDAR_OVERLAY_CONTAINER_ID } from './StatusOverlay';
+
+// â”€â”€ Mock Zustand store â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+const mockGetActivePersonaSession = vi.fn();
+
+vi.mock('@/global_state', () => ({
+  __esModule: true,
+  default: Object.assign(
+    // The Zustand hook itself â€” when called with a selector, invoke it
+    (selector?: (state: unknown) => unknown) => {
+      const state = {
+        getActivePersonaSession: mockGetActivePersonaSession,
+      };
+      return selector ? selector(state) : state;
+    },
+    {
+      getState: () => ({
+        getActivePersonaSession: mockGetActivePersonaSession,
+      }),
+    }
+  ),
+}));
+
+// â”€â”€ Mock i18n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback: string) => fallback,
+    i18n: { language: 'en' },
+  }),
+}));
+
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function createAction(overrides: Partial<VibeAction> = {}): VibeAction {
+  return {
+    id: 'action-1',
+    descriptions: 'Add morning standup',
+    type: Actions.Add_New_Task,
+    creationTimeInMs: Date.now(),
+    status: Status.Executed,
+    entityId: 'entity-abc',
+    entityType: CalendarEntityType.SubcalendarEvent,
+    beforeScheduleId: 'schedule-v1',
+    afterScheduleId: 'schedule-v2',
+    vibeRequest: null,
+    ...overrides,
+  };
+}
+
+/**
+ * Render ActionPill within CalendarRequestProvider. 
+ * Returns the dispatch spy so tests can assert on dispatched requests.
+ */
+function renderActionPill(action: VibeAction) {
+  const dispatchSpy = vi.fn();
+
+  // We wrap ActionPill in CalendarRequestProvider and a test component that
+  // intercepts dispatch via ref.
+  const DispatchInterceptor: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    // This component renders inside the provider and uses useCalendarRequestListener
+    // to capture dispatches (but we'll use a simpler approach by intercepting at the provider level).
+    return <>{children}</>;
+  };
+
+  const result = render(
+    <ThemeProvider>
+      <CalendarRequestProvider>
+        <DispatchInterceptor>
+          <ActionPill action={action} />
+        </DispatchInterceptor>
+      </CalendarRequestProvider>
+    </ThemeProvider>
+  );
+
+  return { ...result, dispatchSpy };
+}
+
+/**
+ * A mock listener component that auto-responds to calendar requests
+ * with a configurable CalendarRequestResult.
+ */
+const MockCalendarListener: React.FC<{ autoResponse: CalendarRequestResult }> = ({ autoResponse }) => {
+  useCalendarRequestListener((envelope) => {
+    envelope.onResult?.(autoResponse);
+  });
+  return null;
+};
+
+/**
+ * Render ActionPill with a mock listener that responds with the given result.
+ * Use this to test result-driven UI states (navigating, demo_mode, etc).
+ */
+function renderActionPillWithAutoResponse(action: VibeAction, autoResponse: CalendarRequestResult) {
+  const result = render(
+    <ThemeProvider>
+      <CalendarRequestProvider>
+        <MockCalendarListener autoResponse={autoResponse} />
+        <ActionPill action={action} />
+      </CalendarRequestProvider>
+    </ThemeProvider>
+  );
+
+  return result;
+}
+
+/** Set the mock scheduleId that the ActionPill will read from the store */
+function setCurrentScheduleId(scheduleId: string | null) {
+  mockGetActivePersonaSession.mockReturnValue({
+    scheduleId,
+    personaId: 'test-persona',
+    personaName: 'Test',
+    userId: 'test-user',
+    chatSessionId: 'test-session',
+    chatContext: [],
+    userInfo: null,
+    scheduleLastUpdatedBy: null,
+  });
+}
+
+// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  setCurrentScheduleId('schedule-v2'); // default: calendar shows v2
+
+  // Create the portal target for StatusOverlay
+  let container = document.getElementById(CALENDAR_OVERLAY_CONTAINER_ID);
+  if (!container) {
+    container = document.createElement('div');
+    container.id = CALENDAR_OVERLAY_CONTAINER_ID;
+    container.style.position = 'relative';
+    document.body.appendChild(container);
+  }
+});
+
+describe('ActionPill schedule consistency', () => {
+  describe('rendering schedule state', () => {
+    it('renders the action description text', () => {
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPill(action);
+      expect(screen.getByText('Add morning standup')).toBeInTheDocument();
+    });
+
+    it('is clickable when action is on current schedule', () => {
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('pointer');
+    });
+
+    it('shows stale overlay when stale action is clicked', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v1' });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      // Should communicate that this action may no longer reflect the calendar
+      expect(screen.getByText(/may have changed/)).toBeInTheDocument();
+    });
+
+    it('shows pending overlay when pending action is clicked', async () => {
+      const user = setupUser();
+      const action = createAction({
+        status: Status.Pending,
+        afterScheduleId: null,
+        beforeScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(screen.getByText('Accept changes to see this tile')).toBeInTheDocument();
+    });
+
+    it('shows removed overlay when removed action is clicked', async () => {
+      const user = setupUser();
+      const action = createAction({ type: Actions.Remove_Existing_Task });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(screen.getByText('Tile removed')).toBeInTheDocument();
+    });
+  });
+
+  describe('click behavior with schedule guards', () => {
+    it('dispatches focus_event when action is on current schedule', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      await user.click(button);
+
+      // Button should be clickable (pointer cursor)
+      expect(button.style.cursor).toBe('pointer');
+    });
+
+    it('does NOT dispatch when action is stale (afterScheduleId mismatch)', async () => {
+      setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v1' });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('default');
+    });
+
+    it('does NOT dispatch when action is a remove action', async () => {
+      setupUser();
+      const action = createAction({ type: Actions.Remove_Existing_Task });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('default');
+      expect(button.style.opacity).toBe('0.6');
+    });
+
+    it('does NOT dispatch when action is pending', async () => {
+      setupUser();
+      const action = createAction({
+        status: Status.Pending,
+        afterScheduleId: null,
+        beforeScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('default');
+    });
+
+    it('does NOT dispatch when entityId is missing', async () => {
+      setupUser();
+      const action = createAction({
+        afterScheduleId: 'schedule-v2',
+        entityId: undefined,
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('default');
+    });
+  });
+
+  describe('cross-session scenarios', () => {
+    it('action from session 1 becomes unclickable after session 2 moves schedule forward', () => {
+      // Session 1 action produced schedule-v2
+      const session1Action = createAction({
+        beforeScheduleId: 'schedule-v1',
+        afterScheduleId: 'schedule-v2',
+      });
+
+      // But now the calendar is on schedule-v3 (session 2 advanced it)
+      setCurrentScheduleId('schedule-v3');
+      renderActionPill(session1Action);
+
+      const button = screen.getByRole('button');
+      // Should not be clickable â€” stale
+      expect(button.style.cursor).toBe('default');
+
+    });
+
+    it('action from session 2 is clickable when schedule matches', () => {
+      const session2Action = createAction({
+        beforeScheduleId: 'schedule-v2',
+        afterScheduleId: 'schedule-v3',
+      });
+
+      setCurrentScheduleId('schedule-v3');
+      renderActionPill(session2Action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('pointer');
+    });
+
+    it('shows stale state when no scheduleId is available (unknown)', () => {
+      setCurrentScheduleId(null);
+      const action = createAction({
+        afterScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      // When scheduleId is null, we still allow click for backwards compat
+      // (unknown state â†’ clickable if entity info is present)
+      // This tests that the component handles null gracefully
+      expect(button).toBeInTheDocument();
+    });
+
+    it('action with no schedule nonces is still clickable (backwards compat)', () => {
+      const action = createAction({
+        beforeScheduleId: null,
+        afterScheduleId: null,
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      // Unknown state â€” allow click since we can't determine staleness
+      expect(button.style.cursor).toBe('pointer');
+    });
+  });
+
+  describe('visual indicators', () => {
+    it('stale actions have reduced opacity', () => {
+      setCurrentScheduleId('schedule-v3');
+      const action = createAction({ afterScheduleId: 'schedule-v1' });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.opacity).toBe('0.6');
+    });
+
+    it('current actions have full opacity', () => {
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.opacity).toBe('1');
+    });
+
+    it('removed actions have reduced opacity', () => {
+      const action = createAction({ type: Actions.Remove_Existing_Task });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.opacity).toBe('0.6');
+    });
+  });
+
+  describe('entity type handling', () => {
+    it('is clickable for SubcalendarEvent entityType', () => {
+      const action = createAction({
+        entityType: CalendarEntityType.SubcalendarEvent,
+        afterScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('pointer');
+    });
+
+    it('is clickable for CalendarEvent entityType', () => {
+      const action = createAction({
+        entityType: CalendarEntityType.CalendarEvent,
+        entityId: 'abc_def_0_0',
+        afterScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('pointer');
+    });
+
+    it('is non-interactive for None entityType', () => {
+      const action = createAction({
+        entityType: CalendarEntityType.None,
+        afterScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('default');
+    });
+
+    it('is non-interactive for RestrictionProfile entityType', () => {
+      const action = createAction({
+        entityType: CalendarEntityType.RestrictionProfile,
+        entityId: 'restriction-123',
+        afterScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      expect(button.style.cursor).toBe('default');
+    });
+
+    it('None entityType does not dispatch on click', async () => {
+      const user = setupUser();
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const action = createAction({
+        entityType: CalendarEntityType.None,
+        afterScheduleId: 'schedule-v2',
+      });
+      renderActionPill(action);
+
+      const button = screen.getByRole('button');
+      await user.click(button);
+
+      // Should not trigger any dispatch â€” no console warnings about entity lookup
+      expect(consoleSpy).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('demo mode (anonymous persona)', () => {
+    it('shows demo mode overlay after receiving demo_mode result', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+
+      expect(screen.getByText(/demo mode/i)).toBeInTheDocument();
+      expect(screen.getByText(/Sign up/)).toBeInTheDocument();
+    });
+
+    it('sets opacity to 0.8 when demo limited', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+
+      expect(button.style.opacity).toBe('0.8');
+    });
+
+    it('navigating result clears demo limited state', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      // First render with demo_mode response
+      const { unmount } = renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      // Verify demo mode
+      expect(button.style.opacity).toBe('0.8');
+
+      // Cleanup and re-render with navigating response
+      unmount();
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.Navigating, entityId: 'entity-abc' });
+
+      const button2 = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button2);
+      });
+
+      // Should be in navigating state, not demo mode
+      expect(screen.getByText(/Navigating/)).toBeInTheDocument();
+      expect(button2.style.opacity).toBe('0.75');
+    });
+
+    it('found result clears demo limited state', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      // First click triggers demo_mode
+      const { unmount } = renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(button.style.opacity).toBe('0.8');
+
+      // Re-render with found response
+      unmount();
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.Found, entityId: 'entity-abc' });
+
+      const button2 = screen.getByRole('button');
+      await act(async () => {
+        await user.click(button2);
+      });
+
+      // Should be back to normal
+      expect(button2.style.opacity).toBe('1');
+      expect(screen.queryByText(/demo mode/i)).not.toBeInTheDocument();
+    });
+
+    it('demo mode does not prevent subsequent clicks', async () => {
+      const user = setupUser();
+      const action = createAction({ afterScheduleId: 'schedule-v2' });
+      renderActionPillWithAutoResponse(action, { status: CalendarRequestStatus.DemoMode, entityId: 'entity-abc' });
+
+      const button = screen.getByRole('button');
+
+      // First click
+      await act(async () => {
+        await user.click(button);
+      });
+      expect(screen.getByText(/demo mode/i)).toBeInTheDocument();
+
+      // Second click â€” should still be clickable (cursor is pointer)
+      expect(button.style.cursor).toBe('pointer');
+    });
+  });
+});

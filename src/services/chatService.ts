@@ -2,6 +2,7 @@ import {
   ChatMessageBody,
   PromptWithActions,
   VibeSessionsResponse,
+  VibeSessionParams,
 } from '@/core/common/types/chat';
 import { ChatApi } from '@/api/chatApi';
 import { normalizeError } from '@/core/error';
@@ -24,9 +25,9 @@ class ChatService {
     }
   }
 
-  async getVibeSessions(userId?: string, anonymousUserId?: string): Promise<VibeSessionsResponse> {
+  async getVibeSessions(userId?: string, anonymousUserId?: string, pagination?: VibeSessionParams): Promise<VibeSessionsResponse> {
     try {
-      const sessions = await this.chatApi.getVibeSessions(userId, anonymousUserId);
+      const sessions = await this.chatApi.getVibeSessions(userId, anonymousUserId, pagination);
       return sessions;
     } catch (error) {
       console.error('Error fetching vibe sessions', error);

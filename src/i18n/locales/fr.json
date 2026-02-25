@@ -149,6 +149,30 @@
 			"title": "Points Forts des Fonctionnalités",
 			"subtitle": "Simplifiez votre vie avec Tiler, voici ce que nous pouvons faire pour vous aider."
 		},
+		"tileCardSection": {
+			"header": "Visualisez vos tâches et rendez-vous",
+			"subHeader": "Visualisez votre emploi du temps avec nos tuiles intuitives. Voyez vos rendez-vous, échéances et tâches en un coup d'œil.",
+			"cta": "Créez vos propres tuiles",
+			"tiles": {
+				"meetingWithCharles": "Réunion avec Charles",
+				"morningMeeting": "Réunion du matin",
+				"clientCall": "Appel client",
+				"lunchBreak": "Pause déjeuner",
+				"teamSync": "Synchronisation d'équipe",
+				"projectReview": "Revue de projet",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Petit-déjeuner entre amis",
+				"groceryShopping": "Courses alimentaires",
+				"gymWorkouts": "Entraînements à la salle"
+			},
+			"locations": {
+				"conferenceRoomA": "Salle de conférence A",
+				"restaurants": "Restaurants",
+				"groceryStore": "Épicerie",
+				"gym": "Salle de sport",
+				"zoom": "Zoom"
+			}
+		},
 		"expanded": {
 			"chat": {
 				"newChat": "Nouvelle Discussion",
@@ -164,6 +188,40 @@
 				"errorLoadMessages": "Échec du chargement des messages de chat",
 				"errorSendMessage": "Échec de l'envoi du message",
 				"errorAcceptChanges": "Échec de l'acceptation des modifications",
+				"wsStatus": {
+					"actionInitStart1": "Initialisation de la génération d'actions...",
+					"actionInitStart2": "Mise en place...",
+					"actionInitStart3": "Préparation de votre requête...",
+					"actionInitStart4": "Préparation en cours...",
+					"processActionStart1": "Traitement de l'action...",
+					"processActionStart2": "En cours de traitement...",
+					"processActionStart3": "Analyse de votre requête...",
+					"processActionStart4": "Réflexion...",
+					"processActionEnd1": "Traitement terminé",
+					"processActionEnd2": "Traitement terminé !",
+					"processActionEnd3": "Tout est prêt !",
+					"processActionEnd4": "Traitement achevé",
+					"summaryStart1": "Génération du résumé...",
+					"summaryStart2": "Résumé des résultats...",
+					"summaryStart3": "Création de l'aperçu...",
+					"summaryStart4": "Préparation du résumé...",
+					"summaryEnd1": "Génération du résumé terminée",
+					"summaryEnd2": "Résumé prêt !",
+					"summaryEnd3": "Aperçu terminé",
+					"summaryEnd4": "Résumé terminé",
+					"scheduleLoad1": "Chargement des données du calendrier...",
+					"scheduleLoad2": "Récupération de votre emploi du temps...",
+					"scheduleLoad3": "Récupération du calendrier...",
+					"scheduleLoad4": "Chargement de la chronologie...",
+					"scheduleProcessStart1": "Optimisation du calendrier...",
+					"scheduleProcessStart2": "Réorganisation de votre journée...",
+					"scheduleProcessStart3": "Recherche du meilleur créneau...",
+					"scheduleProcessStart4": "Ajustement de la chronologie...",
+					"scheduleProcessEnd1": "Optimisation du calendrier terminée",
+					"scheduleProcessEnd2": "Calendrier mis à jour !",
+					"scheduleProcessEnd3": "Chronologie optimisée",
+					"scheduleProcessEnd4": "Terminé !"
+				},
 				"userLocation": {
 					"anonymous": "Anonyme",
 					"enterLocation": "Entrez votre emplacement",

@@ -189,6 +189,40 @@
 				"errorLoadMessages": "加载聊天消息失败",
 				"errorSendMessage": "发送消息失败",
 				"errorAcceptChanges": "接受更改失败",
+				"wsStatus": {
+					"actionInitStart1": "正在初始化操作生成...",
+					"actionInitStart2": "正在设置...",
+					"actionInitStart3": "正在准备您的请求...",
+					"actionInitStart4": "准备就绪...",
+					"processActionStart1": "正在处理操作...",
+					"processActionStart2": "正在处理中...",
+					"processActionStart3": "正在分析您的请求...",
+					"processActionStart4": "思考中...",
+					"processActionEnd1": "操作处理完成",
+					"processActionEnd2": "处理完毕！",
+					"processActionEnd3": "一切就绪！",
+					"processActionEnd4": "处理结束",
+					"summaryStart1": "正在生成摘要...",
+					"summaryStart2": "正在汇总结果...",
+					"summaryStart3": "正在创建概览...",
+					"summaryStart4": "正在准备摘要...",
+					"summaryEnd1": "摘要生成完成",
+					"summaryEnd2": "摘要已准备好！",
+					"summaryEnd3": "概览完成",
+					"summaryEnd4": "汇总完成",
+					"scheduleLoad1": "正在加载日程数据...",
+					"scheduleLoad2": "正在获取您的日程...",
+					"scheduleLoad3": "正在检索日历...",
+					"scheduleLoad4": "正在加载时间线...",
+					"scheduleProcessStart1": "正在优化日程...",
+					"scheduleProcessStart2": "正在重新安排您的一天...",
+					"scheduleProcessStart3": "正在寻找最佳安排...",
+					"scheduleProcessStart4": "正在调整时间线...",
+					"scheduleProcessEnd1": "日程优化完成",
+					"scheduleProcessEnd2": "日程已更新！",
+					"scheduleProcessEnd3": "时间线已优化",
+					"scheduleProcessEnd4": "全部完成！"
+				},
 				"userLocation": {
 					"anonymous": "匿名",
 					"enterLocation": "输入您的位置",
@@ -321,6 +355,30 @@
 		"featureHighlights": {
 			"title": "功能亮点",
 			"subtitle": "使用Tiler简化您的生活，这是我们可以帮助您做的事情。"
+		},
+		"tileCardSection": {
+			"header": "可视化您的任务和预约",
+			"subHeader": "使用我们直观的瓦片可视化您的日程。一目了然地查看您的预约、截止日期和任务。",
+			"cta": "创建您自己的瓦片",
+			"tiles": {
+				"meetingWithCharles": "与Charles的会议",
+				"morningMeeting": "晚上会议",
+				"clientCall": "客户电话",
+				"lunchBreak": "午餐休息",
+				"teamSync": "团队同步",
+				"projectReview": "项目审查",
+				"happyHour": "欢乐时光",
+				"breakfastWithFriends": "与朋友共进早餐",
+				"groceryShopping": "食品购物",
+				"gymWorkouts": "健身房训练"
+			},
+			"locations": {
+				"conferenceRoomA": "会议室A",
+				"restaurants": "餐厅",
+				"groceryStore": "超市",
+				"gym": "健身房",
+				"zoom": "Zoom"
+			}
 		},
 		"features": {
 			"conversation": {

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
@@ -19,6 +19,11 @@ import CalendarEventInfo from './calendar_event_info';
 import { a, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
+import { useCalendarRequestListener } from './CalendarRequestProvider';
+import { CalendarRequestEnvelope, CalendarEntityType, CalendarRequestStatus } from './calendarRequestContext';
+import { resolveEntityToTileId } from '@/core/util/entityResolution';
+import { findEventDate } from '@/core/util/eventDateLookup';
+import { scheduleService } from '@/services';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
@@ -36,21 +41,24 @@ export type CalendarViewOptions = {
 };
 
 type CalendarProps = {
-  events: Array<ScheduleSubCalendarEvent>;
-  eventsLoading: boolean;
-  viewRef: React.RefObject<HTMLUListElement>;
-  viewOptions: CalendarViewOptions;
-  setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
+	events: Array<ScheduleSubCalendarEvent>;
+	eventsLoading: boolean;
+	viewRef: React.RefObject<HTMLUListElement>;
+	viewOptions: CalendarViewOptions;
+	setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
   refetchEvents?: () => void;
+	/** When false, skip REST-based event lookup (Phase 4) and fall back to cached-event search only. Defaults to true. */
+	allowEventLookup?: boolean;
 };
 
 const Calendar = ({
-  events,
-  eventsLoading,
-  viewRef,
-  viewOptions,
-  setViewOptions,
+	events,
+	eventsLoading,
+	viewRef,
+	viewOptions,
+	setViewOptions,
   refetchEvents,
+	allowEventLookup = true,
 }: CalendarProps) => {
   const { t } = useTranslation();
   const viableEvents = events.filter((event) => event.isViable);
@@ -69,23 +77,246 @@ const Calendar = ({
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
   const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
 
-  // Track calendar view mount
-  useEffect(() => {
-    analytics.trackCalendarEvent('View Loaded', {
-      daysInView: viewOptions.daysInView,
-      startDate: viewOptions.startDay.format('YYYY-MM-DD'),
-    });
-  }, []); // Only on mount
+	// Ref holding all styled events (populated by CalendarEvents)
+	const styledEventsRef = useRef<StyledEvent[]>([]);
 
-  useEffect(() => {
-    // Reset selected event when events change
-    setSelectedEvent(null);
-  }, [events]);
+	// Focused event state — drives the pulse animation, auto-clears after timeout
+	const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
+	const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// ── Phase 4: Pending focus after navigation ───────────────────
+	// Stores the request to retry once events finish reloading after a date navigation
+	const pendingFocusRef = useRef<{
+		entityId: string;
+		entityType: CalendarEntityType;
+		onResult?: (result: import('./calendarRequestContext').CalendarRequestResult) => void;
+	} | null>(null);
+
+	// ── Calendar Request Listener ──────────────────────────────────
+	const handleCalendarRequest = useCallback(
+		(envelope: CalendarRequestEnvelope) => {
+			const { request, onResult } = envelope;
+
+			if (request.type === 'focus_event') {
+				const { entityId, entityType } = request;
+
+				// Resolve the entity to a concrete tile ID on the calendar grid
+				const resolvedTileId = resolveEntityToTileId(
+					entityId,
+					entityType,
+					styledEventsRef.current,
+				);
+
+				const styledEvent = resolvedTileId
+					? styledEventsRef.current.find((e) => e.id === resolvedTileId)
+					: undefined;
+
+				if (!styledEvent) {
+					// ── Phase 4: Tile not in view ──────────────────────────
+
+					// First, try to find the event in the already-loaded events array
+					// (covers the full fetched date range, not just what's rendered)
+					const cachedTileId = resolveEntityToTileId(entityId, entityType, events);
+					const cachedEvent = cachedTileId
+						? events.find((e) => e.id === cachedTileId)
+						: undefined;
+
+					if (cachedEvent) {
+						// Found in cache — navigate without an API call (NAVIGATE_TO_DATE)
+						setShowNonViableEvents(null);
+						setSelectedEventInfo(null);
+						setSelectedEvent(null);
+						onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
+						pendingFocusRef.current = { entityId, entityType, onResult };
+						setViewOptions((prev) => ({
+							...prev,
+							startDay: dayjs(cachedEvent.start).startOf('day'),
+						}));
+						return;
+					}
+
+					// Not in cache — if event lookup is disabled (anonymous / demo),
+					// surface a friendly demo_mode result instead of calling the API
+					if (!allowEventLookup) {
+						onResult?.({ status: CalendarRequestStatus.DemoMode, entityId });
+						return;
+					}
+
+					// Authenticated path — look up date via REST & navigate (NAVIGATE_TO_DATE)
+					setShowNonViableEvents(null);
+					setSelectedEventInfo(null);
+					setSelectedEvent(null);
+					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
+
+					findEventDate({
+						entityId,
+						entityType,
+						lookupSubCalEvent: async (id) => {
+							try {
+								return await scheduleService.lookupSubCalendarEventById(id);
+							} catch {
+								return null;
+							}
+						},
+						lookupCalEvent: async (id) => {
+							try {
+								const [calEvent, subEvents] = await Promise.all([
+									scheduleService.lookupCalendarEventById(id),
+									scheduleService.getSubEventsOfCalendar(id),
+								]);
+								if (!calEvent || calEvent.start == null) return null;
+								return {
+									start: calEvent.start,
+									subEvents: (subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
+								};
+							} catch {
+								return null;
+							}
+						},
+					}).then((startMs) => {
+						if (startMs == null) {
+							onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
+							return;
+						}
+
+						// Store the pending focus so it retries after events reload
+						pendingFocusRef.current = { entityId, entityType, onResult };
+
+						// Navigate the calendar view to the event's date
+						setViewOptions((prev) => ({
+							...prev,
+							startDay: dayjs(startMs).startOf('day'),
+						}));
+					});
+
+					return;
+				}
+
+				if (styledEvent.isViable) {
+					// ── Viable event: select, scroll, highlight ────────────
+					setShowNonViableEvents(null);
+					setSelectedEvent(styledEvent.id);
+					setSelectedEventInfo(styledEvent);
+
+					// Scroll to the event's vertical position
+					if (contentContainerRef.current) {
+						const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+						const eventStart = dayjs(styledEvent.start);
+						const hourFraction =
+							eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+						const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
+
+						contentContainerRef.current.scrollTo({
+							top: targetScroll,
+							behavior: 'smooth',
+						});
+					}
+				} else {
+					// ── Non-viable event: open overlay for that day ────────
+					const eventDay = dayjs(styledEvent.start);
+					setShowNonViableEvents(eventDay);
+					setSelectedEvent(styledEvent.id);
+					setSelectedEventInfo(styledEvent);
+				}
+
+				// Trigger pulse animation
+				if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+				setFocusedEventId(styledEvent.id);
+				focusTimeoutRef.current = setTimeout(() => {
+					setFocusedEventId(null);
+				}, 2500);
+
+				onResult?.({ status: CalendarRequestStatus.Found, entityId });
+			}
+		},
+		[]
+	);
+
+	useCalendarRequestListener(handleCalendarRequest);
+
+	// ── Phase 4: Retry pending focus after events reload ──────────
+	useEffect(() => {
+		if (eventsLoading || !pendingFocusRef.current) return;
+
+		const { entityId, entityType, onResult } = pendingFocusRef.current;
+		pendingFocusRef.current = null;
+
+		// Give styled events a tick to render after new data arrives
+		const retryTimer = setTimeout(() => {
+			const resolvedTileId = resolveEntityToTileId(
+				entityId,
+				entityType,
+				styledEventsRef.current,
+			);
+
+			const styledEvent = resolvedTileId
+				? styledEventsRef.current.find((e) => e.id === resolvedTileId)
+				: undefined;
+
+			if (!styledEvent) {
+				onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
+				return;
+			}
+
+			if (styledEvent.isViable) {
+				setShowNonViableEvents(null);
+				setSelectedEvent(styledEvent.id);
+				setSelectedEventInfo(styledEvent);
+
+				if (contentContainerRef.current) {
+					const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+					const eventStart = dayjs(styledEvent.start);
+					const hourFraction =
+						eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+					const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
+
+					contentContainerRef.current.scrollTo({
+						top: targetScroll,
+						behavior: 'smooth',
+					});
+				}
+			} else {
+				const eventDay = dayjs(styledEvent.start);
+				setShowNonViableEvents(eventDay);
+				setSelectedEvent(styledEvent.id);
+				setSelectedEventInfo(styledEvent);
+			}
+
+			// Trigger pulse animation
+			if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+			setFocusedEventId(styledEvent.id);
+			focusTimeoutRef.current = setTimeout(() => {
+				setFocusedEventId(null);
+			}, 2500);
+
+			onResult?.({ status: CalendarRequestStatus.Found, entityId });
+		}, 150);
+
+		return () => clearTimeout(retryTimer);
+	}, [eventsLoading, events]);
+
+	// Track calendar view mount
+	useEffect(() => {
+		analytics.trackCalendarEvent('View Loaded', {
+			daysInView: viewOptions.daysInView,
+			startDate: viewOptions.startDay.format('YYYY-MM-DD'),
+		});
+	}, []); // Only on mount
+
+	useEffect(() => {
+		// EVENTS_RELOADED — reset selection & event info (data may be stale)
+		setSelectedEvent(null);
+		setSelectedEventInfo(null);
+	}, [events]);
 
   const contentMounted = viewOptions.width > 0;
 
-  function changeDayView(dir: 'left' | 'right') {
-    const changeAmount = dir === 'left' ? -1 : 1;
+	function changeDayView(dir: 'left' | 'right') {
+		const changeAmount = dir === 'left' ? -1 : 1;
+		// DAY_NAVIGATED — dismiss all overlays
+		setShowNonViableEvents(null);
+		setSelectedEventInfo(null);
+		setSelectedEvent(null);
 
     setViewOptions((prev) => {
       const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
@@ -299,26 +530,27 @@ const Calendar = ({
     setCalendarEventInfoPos({ x: calculatedX, y: calculatedY });
   };
 
-  const calendarEventInfoModalRef = useRef<HTMLDivElement>(null);
-  const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number }>({
-    x: 100,
-    y: 100,
-  });
-  useEffect(() => {
-    if (selectedEventInfo) {
-      calculateEventInfoCoordinates(selectedEventInfo!);
-      contentContainerRef.current?.addEventListener(
-        'click',
-        (e) => {
-          // Close the event info modal if clicking outside of it
-          const modal = calendarEventInfoModalRef.current;
-          if (modal && !modal.contains(e.target as Node)) {
-            setSelectedEventInfo(null);
-            setSelectedEvent(null);
-          }
-        },
-        { once: true }
-      );
+	const calendarEventInfoModalRef = useRef<HTMLDivElement>(null);
+	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number }>({
+		x: 100,
+		y: 100,
+	});
+	useEffect(() => {
+		if (selectedEventInfo) {
+			calculateEventInfoCoordinates(selectedEventInfo!);
+			contentContainerRef.current?.addEventListener(
+				'click',
+				(e) => {
+					// CONTENT_CLICK_OUTSIDE — dismiss event info and non-viable overlay
+					const modal = calendarEventInfoModalRef.current;
+					if (modal && !modal.contains(e.target as Node)) {
+						setSelectedEventInfo(null);
+						setSelectedEvent(null);
+						setShowNonViableEvents(null);
+					}
+				},
+				{ once: true }
+			);
       contentContainerRef.current?.addEventListener('scroll', () => {
         setSelectedEventInfo((prev) => {
           if (prev) {
@@ -417,7 +649,6 @@ const Calendar = ({
     setCreateTileModalExpanded(false);
     if (shouldRefetch) refetchEvents?.();
   }
-
   function onBackgroundClick(info: CalendarBackgroundClickInfo) {
     setSelectedEvent(null);
     setSelectedEventInfo(null);
@@ -429,69 +660,72 @@ const Calendar = ({
     setCreateTileModalOpen(true);
   }
 
-  return (
-    <CalendarContainer $isMounted={contentMounted}>
-      <CalendarHeader>
-        <CalendarHeaderActions>
-          <ChangeViewButton
-            disabled={eventsLoading}
-            onClick={() => changeDayView('left')}
-          >
-            <ChevronLeftIcon size={16} />
-          </ChangeViewButton>
-          <ChangeViewButton
-            disabled={eventsLoading}
-            onClick={() => changeDayView('right')}
-          >
-            <ChevronRightIcon size={16} />
-          </ChangeViewButton>
-        </CalendarHeaderActions>
-        <CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
-          {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
-            const day = viewOptions.startDay.add(index, 'day');
-            const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
-              dayjs(event.start).isSame(day, 'day')
-            );
-            return (
-              <CalendarHeaderDateItem
-                key={index}
-                $isToday={day.isSame(dayjs(), 'day')}
-              >
-                {/* 3 letter day */}
-                <h3>{day.format('ddd')}</h3>
-                {/* 2 number date */}
-                <span>{day.format('DD')}</span>
-                <ShowNonViableEventsButtonContainer
-                  $visible={todaysNonViableEvents.length > 0}
-                >
-                  <ShowNonViableEventsButtonWrapper>
-                    <ShowNonViableEventsButton
-                      $active={
-                        showNonViableEvents?.isSame(day, 'day') ?? false
-                      }
-                      title="Show Non-Viable Events"
-                      onClick={() => {
-                        setShowNonViableEvents((prev) =>
-                          prev?.isSame(day, 'day') ? null : day
-                        );
-                      }}
-                    >
-                      <TriangleAlert
-                        size={18}
-                        color={palette.colors.brand[400]}
-                      />
-                    </ShowNonViableEventsButton>
-                    <NonViableEventsCount>
-                      {todaysNonViableEvents.length}
-                    </NonViableEventsCount>
-                  </ShowNonViableEventsButtonWrapper>
-                </ShowNonViableEventsButtonContainer>
-              </CalendarHeaderDateItem>
-            );
-          })}
-        </CalendarHeaderDateList>
-      </CalendarHeader>
-
+	return (
+		<CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>
+			<CalendarHeader>
+				<CalendarHeaderActions>
+					<ChangeViewButton
+						disabled={eventsLoading}
+						onClick={() => changeDayView('left')}
+					>
+						<ChevronLeftIcon size={16} />
+					</ChangeViewButton>
+					<ChangeViewButton
+						disabled={eventsLoading}
+						onClick={() => changeDayView('right')}
+					>
+						<ChevronRightIcon size={16} />
+					</ChangeViewButton>
+				</CalendarHeaderActions>
+				<CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
+					{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
+						const day = viewOptions.startDay.add(index, 'day');
+						const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
+							dayjs(event.start).isSame(day, 'day')
+						);
+						return (
+							<CalendarHeaderDateItem
+								key={index}
+								$isToday={day.isSame(dayjs(), 'day')}
+							>
+								{/* 3 letter day */}
+								<h3>{day.format('ddd')}</h3>
+								{/* 2 number date */}
+								<span>{day.format('DD')}</span>
+								<ShowNonViableEventsButtonContainer
+									$visible={todaysNonViableEvents.length > 0}
+								>
+									<ShowNonViableEventsButtonWrapper>
+										<ShowNonViableEventsButton
+											$active={
+												showNonViableEvents?.isSame(day, 'day') ?? false
+											}
+											title="Show Non-Viable Events"
+											onClick={() => {
+												const isClosing = showNonViableEvents?.isSame(day, 'day') ?? false;
+												setShowNonViableEvents(isClosing ? null : day);
+												// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
+												if (!isClosing) {
+													setSelectedEventInfo(null);
+													setSelectedEvent(null);
+												}
+											}}
+										>
+											<TriangleAlert
+												size={18}
+												color={palette.colors.brand[400]}
+											/>
+										</ShowNonViableEventsButton>
+										<NonViableEventsCount>
+											{todaysNonViableEvents.length}
+										</NonViableEventsCount>
+									</ShowNonViableEventsButtonWrapper>
+								</ShowNonViableEventsButtonContainer>
+							</CalendarHeaderDateItem>
+						);
+					})}
+				</CalendarHeaderDateList>
+			</CalendarHeader>
       {/* Non-Viable Events Overlays */}
       {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
         const day = viewOptions.startDay.add(index, 'day');
@@ -523,6 +757,7 @@ const Calendar = ({
                 selectedEvent={selectedEvent}
                 setSelectedEvent={setSelectedEvent}
                 setSelectedEventInfo={setSelectedEventInfo}
+                focused={focusedEventId === event.id}
               />
             ))}
           </NonViableEventsContainer>
@@ -583,7 +818,6 @@ const Calendar = ({
           document.body
         )
       )}
-
       {/* Calendar Content */}
       <CalendarContentContainer
         id="calendar-content-container"
@@ -637,6 +871,8 @@ const Calendar = ({
               onBackgroundClick={(info) => {
                 onBackgroundClick(info);
               }}
+              focusedEventId={focusedEventId}
+              onViableEventClicked={() => setShowNonViableEvents(null)}
             />
           </SwiperSlide>
           <SwiperSlide>
@@ -735,7 +971,7 @@ const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 
 	span {
 		color: ${({ $isToday }) => ($isToday ? palette.colors.brand[400] : palette.colors.gray[200])};
-    
+  }
 `;
 
 const CalendarContentContainer = styled.div`

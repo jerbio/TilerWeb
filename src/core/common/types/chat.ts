@@ -1,6 +1,6 @@
 import { Actions, Status } from '@/core/constants/enums';
 import { UserInfo } from '@/global_state';
-import { ApiResponse } from './api';
+import { ApiResponse, PaginationParams } from './api';
 
 export type ActionType = `${Actions}`;
 
@@ -21,18 +21,12 @@ export interface VibeAction {
   type: ActionType;
   creationTimeInMs: number;
   status: Status;
-  prompts: PromptWithActions[];
-  beforeScheduleId: string;
-  afterScheduleId: string;
-  vibeRequest: {
-    id: string;
-    creationTimeInMs: number;
-    activeAction: string | null;
-    isClosed: boolean;
-    beforeScheduleId: string | null;
-    afterScheduleId: string | null;
-    actions: VibeAction[];
-  };
+  prompts?: PromptWithActions[];
+  entityId?: string;
+  entityType?: string;
+  beforeScheduleId: string | null;
+  afterScheduleId: string | null;
+  vibeRequest: VibeRequest | null;
 }
 
 export interface VibeResponse {
@@ -48,11 +42,12 @@ export interface VibeResponse {
 export interface VibeRequest {
   id: string;
   creationTimeInMs: number;
-  activeAction: string | null; // More specific type
+  activeAction: string | null;
   isClosed: boolean;
   beforeScheduleId: string | null;
   afterScheduleId: string | null;
-  actions: VibeAction[]; // Using VibeAction type
+  actions: VibeAction[];
+  previews?: unknown[];
 }
 
 export type ChatSendMessageResponse = ApiResponse<{
@@ -98,7 +93,13 @@ export type ChatMessageBody = {
 export interface VibeSession {
 	id: string;
 	creationTimeInMs: number;
+	title: string | null;
 	requests: (string | null)[];
+}
+
+export interface VibeSessionParams extends PaginationParams {
+  sessionId?: string;
+  anonymousUserId?: string;
 }
 
 export type VibeSessionsResponse = ApiResponse<{

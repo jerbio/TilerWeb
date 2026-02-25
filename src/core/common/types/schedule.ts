@@ -1,134 +1,138 @@
 import { ApiResponse } from './api';
 
-export type ScheduleSubCalendarEventLocation = {
-  id: string;
-  description: string;
-  address: string;
-  longitude: number;
-  latitude: number;
-  isVerified: boolean;
-  isDefault: boolean;
-  isNull: boolean;
-  thirdPartyId: string;
-  userId: string;
-  source: string;
-  nickname: string;
+// ── Shared extracted types ──────────────────────────────────────
+export type ScheduleSubCalendarEventColor = {
+	colorSelection: number;
+	r: number;
+	g: number;
+	b: number;
+	o: number;
 };
+
+export type ScheduleSubCalendarEventStyleProperties = {
+	id: string;
+	color: ScheduleSubCalendarEventColor;
+};
+
+export type ScheduleSubCalendarEventLocation = {
+	id: string;
+	description: string;
+	address: string;
+	longitude: number;
+	latitude: number;
+	isVerified: boolean;
+	isDefault: boolean;
+	isNull: boolean;
+	thirdPartyId: string;
+	userId: string;
+	source: string;
+	nickname: string;
+};
+
+export type ScheduleSubCalendarEventBlob = {
+	type: number;
+	note: string;
+	id: string;
+};
+
+export type ScheduleSubCalendarEventTimeline = {
+	start: number;
+	end: number;
+	duration: number;
+	occupiedSlots: null;
+};
+
+export type ScheduleSubCalendarEventRepetition = {
+	id: string;
+	isEnabled: boolean;
+	frequency: string;
+	weekDays: string;
+	isForever: boolean;
+	tileTimeline: ScheduleSubCalendarEventTimeline;
+	repetitionTimeline: ScheduleSubCalendarEventTimeline;
+};
+
+export type ScheduleSubCalendarEventTravelPath = {
+	start: number;
+	end: number;
+	startLocation?: ScheduleSubCalendarEventLocation | null;
+	endLocation?: ScheduleSubCalendarEventLocation | null;
+	isRigid: boolean;
+	travelLegs: [];
+	travelMedium: string;
+	isFailed: boolean;
+	isDisabled: boolean;
+	isDefault: boolean;
+	duration: number;
+	calTimeLine: ScheduleSubCalendarEventTimeline;
+	projectionType: ['TravelSubCalendarEvent'];
+};
+
+export type ScheduleSubCalendarEventTravelDetail = {
+	before: ScheduleSubCalendarEventTravelPath | null;
+	after: ScheduleSubCalendarEventTravelPath | null;
+};
+
+// ── ScheduleSubCalendarEvent ───────────────────────────────────
 
 export type ScheduleSubCalendarEvent = {
-  id: string;
-  start: number;
-  end: number;
-  isSleep: boolean;
-  sleepDay: number;
-  isWake: boolean;
-  wakeDay: number;
-  isPaused: boolean;
-  isRigid: boolean;
-  isComplete: boolean;
-  isEnabled: boolean;
-  isTardy: boolean;
-  isViable: boolean;
-  isScheduleAble: boolean;
-  isProcrastinateEvent: boolean;
-  travelTimeBefore: number;
-  travelTimeAfter: number;
-  travelTimeBeforeDetail: string;
-  travelTimeAfterDetail: string;
-  locationId: null;
-  locationValidationId: string;
-  isCompleteAfterElapsedEnabled: boolean;
-  thirdPartyType: string;
-  thirdPartyUserId: null;
-  thirdPartyId: string;
-  priority: number;
-  tileShareDesignatedId: null;
-  projectionType: ['SimpleObject'];
-  name: string;
-  address: string;
-  addressDescription: string;
-  location: ScheduleSubCalendarEventLocation;
-  description: string;
-  searchdDescription: string;
-  rangeStart: number;
-  rangeEnd: number;
-  colorOpacity: number;
-  colorRed: number;
-  colorGreen: number;
-  colorBlue: number;
-  isRecurring: boolean;
-  emojis: null;
-  isReadOnly: boolean;
-  restrictionProfile: null;
-  isWhatIf: boolean;
-  jsonProjectionType: string;
-  blob: {
-    type: number;
-    note: string;
-    id: string;
-  };
-  styleProperties: {
-    id: string;
-    color: {
-      colorSelection: number;
-      r: number;
-      g: number;
-      b: number;
-      o: number;
-    };
-  };
-  split: number;
-  calendarEventStart: number;
-  calendarEventEnd: number;
-  SubCalCalEventStart: number;
-  SubCalCalEventEnd: number;
-  travelDetail: {
-    before: {
-      start: number;
-      end: number;
-      startLocation?: ScheduleSubCalendarEventLocation;
-      endLocation?: ScheduleSubCalendarEventLocation;
-      isRigid: boolean;
-      travelLegs: [];
-      travelMedium: string;
-      isFailed: boolean;
-      isDisabled: boolean;
-      isDefault: boolean;
-      duration: number;
-      calTimeLine: {
-        start: number;
-        end: number;
-        duration: number;
-        occupiedSlots: null;
-      };
-      projectionType: ['TravelSubCalendarEvent'];
-    } | null;
-    after: {
-      start: number;
-      end: number;
-      startLocation: null;
-      endLocation: null;
-      isRigid: boolean;
-      travelLegs: [];
-      travelMedium: string;
-      isFailed: boolean;
-      isDisabled: boolean;
-      isDefault: boolean;
-      duration: number;
-      calTimeLine: {
-        start: number;
-        end: number;
-        duration: number;
-        occupiedSlots: null;
-      };
-      projectionType: ['TravelSubCalendarEvent'];
-    } | null;
-  };
+	id: string;
+	start: number;
+	end: number;
+	isSleep: boolean;
+	sleepDay: number;
+	isWake: boolean;
+	wakeDay: number;
+	isPaused: boolean;
+	isRigid: boolean;
+	isComplete: boolean;
+	isEnabled: boolean;
+	isTardy: boolean;
+	isViable: boolean;
+	isScheduleAble: boolean;
+	isProcrastinateEvent: boolean;
+	travelTimeBefore: number;
+	travelTimeAfter: number;
+	travelTimeBeforeDetail: string;
+	travelTimeAfterDetail: string;
+	locationId: null;
+	locationValidationId: string;
+	isCompleteAfterElapsedEnabled: boolean;
+	thirdPartyType: string;
+	thirdPartyUserId: null;
+	thirdPartyId: string;
+	priority: number;
+	tileShareDesignatedId: null;
+	projectionType: ['SimpleObject'];
+	name: string;
+	address: string;
+	addressDescription: string;
+	location: ScheduleSubCalendarEventLocation;
+	description: string;
+	searchdDescription: string;
+	rangeStart: number;
+	rangeEnd: number;
+	colorOpacity: number;
+	colorRed: number;
+	colorGreen: number;
+	colorBlue: number;
+	isRecurring: boolean;
+	emojis: null;
+	isReadOnly: boolean;
+	restrictionProfile: null;
+	isWhatIf: boolean;
+	jsonProjectionType: string;
+	blob: ScheduleSubCalendarEventBlob;
+	styleProperties: ScheduleSubCalendarEventStyleProperties;
+	split: number;
+	calendarEventStart: number;
+	calendarEventEnd: number;
+	SubCalCalEventStart: number;
+	SubCalCalEventEnd: number;
+	travelDetail: ScheduleSubCalendarEventTravelDetail;
 };
 
-export type ScheduleLookupTravelDetail = ScheduleSubCalendarEvent['travelDetail'][
-  | 'before'
-  | 'after'];
+export type ScheduleLookupTravelDetail = ScheduleSubCalendarEventTravelPath | null;
 
 export type ScheduleLookupResponse = ApiResponse<{
   subCalendarEvents: Array<ScheduleSubCalendarEvent>;
@@ -214,3 +218,50 @@ export type ScheduleCreateEventParams = {
 };
 
 export type ScheduleCreateEventResponse = ApiResponse<ScheduleSubCalendarEvent>;
+// ── Single-event lookup response types ─────────────────────────
+
+/** Response shape for `GET /api/SubCalendarEvent?EventID=...` */
+export type SubCalendarEventLookupResponse = ApiResponse<ScheduleSubCalendarEvent>;
+
+// ── CalendarEvent (parent event with child subEvents) ──────────
+
+/** Response shape for `GET /api/CalendarEvent?EventID=...` */
+export type CalendarEvent = {
+	id: string | null;
+	start: number | null;
+	end: number | null;
+	name: string | null;
+	address: string | null;
+	addressDescription: string | null;
+	searchdDescription: string | null;
+	splitCount: number | null;
+	completeCount: number | null;
+	deletionCount: number | null;
+	thirdpartyType: string | null;
+	thirdPartyId: string | null;
+	thirdPartyUserId: string | null;
+	colorOpacity: number | null;
+	colorRed: number | null;
+	colorGreen: number | null;
+	colorBlue: number | null;
+	isComplete: boolean | null;
+	isEnabled: boolean | null;
+	isRecurring: boolean | null;
+	locationId: string | null;
+	isReadOnly: boolean | null;
+	isProcrastinateEvent: boolean | null;
+	isRigid: boolean | null;
+	uiConfig: ScheduleSubCalendarEventStyleProperties | null;
+	repetition: ScheduleSubCalendarEventRepetition | null;
+	eachTileDuration: number | null;
+	restrictionProfile: null;
+	emojis: string | null;
+	isWhatIf: boolean | null;
+	entityName: string | null;
+	blob: ScheduleSubCalendarEventBlob | null;
+	subEvents: Array<ScheduleSubCalendarEvent> | null;
+};
+
+export type CalendarEventResponse = ApiResponse<CalendarEvent>;
+
+export type SubEventsOfCalendarResponse = ApiResponse<ScheduleSubCalendarEvent[]>;

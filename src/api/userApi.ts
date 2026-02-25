@@ -13,7 +13,7 @@ export interface UserResponse {
 			timeZoneDifference: number;
 			timeZone: string;
 			email: string;
-			endfOfDay: string;
+			endOfDay: string;
 			phoneNumber: string;
 			fullName: string;
 			firstName: string;
@@ -44,7 +44,7 @@ export interface UpdateUserResponse {
 			timeZoneDifference: number;
 			timeZone: string;
 			email: string;
-			endfOfDay: string;
+			endOfDay: string;
 			phoneNumber: string;
 			fullName: string;
 			firstName: string;
@@ -52,6 +52,89 @@ export interface UpdateUserResponse {
 			countryCode: string;
 			dateOfBirth: string;
 		};
+	};
+	ServerStatus: null;
+}
+
+export interface UserPreference {
+	id: string;
+	notifcationEnabled: boolean;
+	notifcationEnabledMs: number;
+	emailNotificationEnabled: boolean;
+	textNotificationEnabled: boolean;
+	pushNotificationEnabled: boolean;
+	tileNotificationEnabled: boolean;
+}
+
+export interface MarketingPreference {
+	id: string;
+	disableAll: boolean;
+	disableEmail: boolean;
+	disableTextMsg: boolean;
+}
+
+export interface ScheduleProfile {
+	travelMedium: string;
+	pinPreference: string;
+	endTimeOfDay: string;
+	sleepDuration: number;
+}
+
+export interface UiScheme {
+	id: string;
+	scheduleProfileId: string;
+	name: string;
+	mainColor: string;
+	accentColor: string;
+	fontFamily: string;
+	fontSize: number;
+	fontWeight: string;
+	isDefault: boolean;
+	themeMode: string;
+}
+
+export interface UserSettings {
+	userPreference: UserPreference;
+	marketingPreference: MarketingPreference;
+	scheduleProfile: ScheduleProfile;
+	mobileUiScheme: UiScheme;
+	desktopUiScheme: UiScheme;
+}
+
+export interface UserSettingsResponse {
+	Error: ApiCodeResponse;
+	Content: {
+		settings: UserSettings;
+	};
+	ServerStatus: null;
+}
+
+export interface UpdateSettingsRequest {
+	UserPreference?: Partial<{
+		TileNotificationEnabled: boolean;
+		EmailNotificationEnabled: boolean;
+		PushNotificationEnabled: boolean;
+		TextNotificationEnabled: boolean;
+		NotifcationEnabled: boolean;
+		NotifcationEnabledMs: number;
+	}>;
+	MarketingPreference?: Partial<{
+		DisableAll: boolean;
+		DisableEmail: boolean;
+		DisableTextMsg: boolean;
+	}>;
+	ScheduleProfile?: Partial<{
+		TravelMedium: string;
+		PinPreference: string;
+		SleepDuration: number;
+		EndTimeOfDay: string;
+	}>;
+}
+
+export interface UpdateSettingsResponse {
+	Error: ApiCodeResponse;
+	Content: {
+		settings: UserSettings;
 	};
 	ServerStatus: null;
 }
@@ -67,6 +150,19 @@ export class UserApi extends AppApi {
 		return this.apiRequest<UpdateUserResponse>('api/User', {
 			method: 'PUT',
 			body: JSON.stringify(userData),
+		});
+	}
+
+	public getSettings() {
+		return this.apiRequest<UserSettingsResponse>('api/User/Settings?mobileApi=true', {
+			method: 'GET',
+		});
+	}
+
+	public updateSettings(settings: UpdateSettingsRequest) {
+		return this.apiRequest<UpdateSettingsResponse>('api/User/Settings', {
+			method: 'POST',
+			body: JSON.stringify(settings),
 		});
 	}
 

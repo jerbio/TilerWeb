@@ -15,6 +15,8 @@ type CalendarEventProps = {
   setSelectedEvent: (eventId: string | null) => void;
 	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
   onClick?: () => void;
+	/** When true, shows a pulse-glow ring to draw attention */
+	focused?: boolean;
 };
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
@@ -23,11 +25,13 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   setSelectedEvent,
 	setSelectedEventInfo,
   onClick,
+	focused = false,
 }) => {
   return (
     <EventContainer
       key={event.id}
       $selected={selectedEvent === event.id}
+      $focused={focused}
       $colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
     >
       <EventContent
@@ -99,13 +103,28 @@ const dashRotate = keyframes`
   }
 `;
 
+const focusPulse = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+`;
+
 const EventContainer = styled(animated.div) <{
   $selected: boolean;
+  $focused: boolean;
   $colors: RGB;
 }>`
 	padding: 4px;
 	position: relative;
 	width: 100%;
+	border-radius: 12px;
+	animation: ${({ $focused }) => ($focused ? focusPulse : 'none')} 1s ease-in-out 3;
 
 	> svg {
 		position: absolute;

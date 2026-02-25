@@ -17,7 +17,7 @@ const PersonaCalendar: React.FC<PersonaCalendarProps> = ({ expandedWidth: width,
   // Fall back to the prop userId for backwards compatibility
   const effectiveUserId = session?.userId || userId;
 
-  return <CalendarWrapper userId={effectiveUserId} width={width} />;
+  return <CalendarWrapper userId={effectiveUserId} width={width} allowEventLookup={false} />;
 };
 
 export default PersonaCalendar;

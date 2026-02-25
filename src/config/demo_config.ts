@@ -63,7 +63,7 @@ export const DEMO_USER_INFO: UserInfo = {
 	timeZoneDifference: 0,
 	timeZone: 'UTC',
 	email: 'demo@tiler.app',
-	endfOfDay: '2024-01-01T23:59:59+00:00',
+	endOfDay: '2024-01-01T23:59:59+00:00',
 	phoneNumber: null,
 	fullName: 'Demo User',
 	firstName: 'Demo',

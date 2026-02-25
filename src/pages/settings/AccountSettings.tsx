@@ -73,7 +73,7 @@ const AccountSettings: React.FC = () => {
 				CountryCode: countryCode,
 				PhoneNumber: phoneNumberOnly,
 				DateOfBirthUtcEpoch: dateOfBirthUtcEpoch,
-				EndOfDay: authenticatedUser?.endfOfDay || '',
+				EndOfDay: authenticatedUser?.endOfDay || '',
 			});
 
 			toast.success(t('settings.sections.accountInfo.saveSuccess'));

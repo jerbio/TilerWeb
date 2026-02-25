@@ -26,3 +26,9 @@ dist-ssr
 obj/*
 *.env
 *.env*
+
+# Test coverage
+coverage
+
+# Claude Code
+.claude

@@ -6,6 +6,9 @@
 			"@/*": ["src/*"],
 		},
 
+		/* Vitest globals */
+		"types": ["vitest/globals"],
+
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 		"target": "ES2020",
 		"useDefineForClassFields": true,

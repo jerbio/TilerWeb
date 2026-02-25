@@ -13,3 +13,16 @@ export type ApiResponse<T> = {
 	Content: T;
 	ServerStatus: null;
 };
+
+/**
+ * Standardized pagination parameters used across API endpoints.
+ *
+ * - `batchSize` — number of items per page
+ * - `index`     — page offset / cursor position
+ * - `order`     — sort direction
+ */
+export interface PaginationParams {
+	batchSize?: number;
+	index?: number;
+	order?: 'desc' | 'asc';
+}

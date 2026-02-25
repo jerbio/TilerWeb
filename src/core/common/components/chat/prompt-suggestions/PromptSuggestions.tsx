@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import palette from '@/core/theme/palette';
 import { useTranslation } from 'react-i18next';
 
 interface PromptSuggestionsProps {
@@ -25,13 +24,13 @@ const Container = styled.div`
 `;
 
 const PromptPill = styled.button`
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
+  background: ${({ theme }) => theme.colors.background.card2};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
   border-radius: 16px;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 400;
-  color: ${palette.colors.gray[300]};
+  color: ${({ theme }) => theme.colors.text.secondary};
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
@@ -40,9 +39,9 @@ const PromptPill = styled.button`
   text-overflow: ellipsis;
 
   &:hover {
-    background: ${palette.colors.gray[700]};
-    border-color: ${palette.colors.gray[600]};
-    color: ${palette.colors.white};
+    background: ${({ theme }) => theme.colors.button.ghost.bgHover};
+    border-color: ${({ theme }) => theme.colors.border.default};
+    color: ${({ theme }) => theme.colors.text.primary};
     transform: translateY(-1px);
   }
 

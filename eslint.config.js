@@ -7,7 +7,7 @@ import pluginReact from 'eslint-plugin-react';
 export default [
 	// Ignore files and folders
 	{
-		ignores: ['dist/**'],
+		ignores: ['dist/**', 'coverage/**'],
 	},
 
 	// File matching and config
@@ -16,4 +16,16 @@ export default [
 	pluginJs.configs.recommended,
 	...tseslint.configs.recommended,
 	pluginReact.configs.flat.recommended,
+
+	// React settings
+	{
+		settings: {
+			react: {
+				version: 'detect',
+			},
+		},
+		rules: {
+			'react/react-in-jsx-scope': 'off', // Not needed with React 17+ JSX transform
+		},
+	},
 ];
