@@ -1,50 +1,155 @@
-# React + TypeScript + Vite
+# Tiler Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A smart calendar and task management web application that helps users schedule tasks, manage time, and boost productivity with an AI-powered assistant.
 
-Currently, two official plugins are available:
+**Website:** [https://tiler.app/](https://tiler.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **Google Calendar Integration** — Sync and manage your calendar events
+- **AI Chat Assistant** — Persona-based intelligent scheduling assistant with voice input support
+- **Location & Transit** — Real-time travel estimates and route planning between events
+- **TileShare** — Task sharing and collaboration
+- **Forecast** — Find free time slots intelligently
+- **Multi-language Support** — 12 languages including English, Spanish, French, German, Chinese, Japanese, and more
+- **Cross-platform** — Works alongside iOS and Android native apps
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Tech Stack
 
-- Configure the top-level `parserOptions` property like this:
+| Category | Technology |
+|----------|------------|
+| Framework | React 18 + TypeScript |
+| Build Tool | Vite 6 |
+| Styling | styled-components |
+| State Management | Zustand |
+| Routing | React Router 7 |
+| Real-time | SignalR |
+| i18n | i18next |
+| Testing | Vitest + React Testing Library + MSW |
 
-```js
-export default tseslint.config({
-	languageOptions: {
-		// other options...
-		parserOptions: {
-			project: ['./tsconfig.node.json', './tsconfig.app.json'],
-			tsconfigRootDir: import.meta.dirname,
-		},
-	},
-});
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd TilerWeb
+
+# Install dependencies
+npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Environment Setup
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react';
+Create a `.env` file in the project root:
 
-export default tseslint.config({
-	// Set the react version
-	settings: { react: { version: '18.3' } },
-	plugins: {
-		// Add the react plugin
-		react,
-	},
-	rules: {
-		// other rules...
-		// Enable its recommended rules
-		...react.configs.recommended.rules,
-		...react.configs['jsx-runtime'].rules,
-	},
-});
+```env
+VITE_BASE_URL=https://tiler.app/
+VITE_NODE_ENV=development
+VITE_ANALYTICS_PROVIDER=console
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_BASE_URL` | Backend API base URL | Yes |
+| `VITE_NODE_ENV` | `development` or `production` | Yes |
+| `VITE_ANALYTICS_PROVIDER` | `google`, `mixpanel`, `custom`, or `console` | No |
+| `VITE_GA_MEASUREMENT_ID` | Google Analytics measurement ID | No |
+
+### Running the App
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server with HMR |
+| `npm run build` | TypeScript compile + production build |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format code with Prettier |
+| `npm run test` | Run tests in watch mode |
+| `npm run test:run` | Run tests once |
+| `npm run test:coverage` | Run tests with coverage report |
+
+## Project Structure
+
+```
+src/
+├── api/            # REST API layer
+├── assets/         # Images, icons, persona assets
+├── components/     # React components
+│   ├── auth/       # Authentication UI
+│   ├── features/   # Feature showcase cards
+│   ├── home/       # Landing page sections
+│   ├── layout/     # Layout components
+│   ├── navigation/ # Navigation components
+│   ├── onboarding/ # Onboarding flows
+│   ├── timeline/   # Timeline/calendar UI
+│   └── waitlist/   # Waitlist signup
+├── config/         # Environment configuration
+├── core/           # Core utilities
+│   ├── auth/       # Auth provider, protected routes
+│   ├── common/     # Shared components (calendar, chat, consent)
+│   ├── constants/  # App constants
+│   ├── error/      # Error handling
+│   ├── storage/    # LocalStorage helpers
+│   ├── theme/      # Theme provider (dark/light)
+│   └── util/       # Analytics, time utilities
+├── hooks/          # Custom React hooks
+├── i18n/           # Internationalization
+│   ├── config.ts   # i18next setup
+│   └── locales/    # Translation files (12 languages)
+├── pages/          # Page components
+│   └── settings/   # Settings pages
+├── services/       # Business logic services
+└── test/           # Test setup and mocks
+```
+
+## Testing
+
+```bash
+# Run tests in watch mode
+npm run test
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+Tests use **Vitest** with **jsdom** environment and **MSW** for API mocking.
+
+## Documentation
+
+Additional documentation is available in the project root:
+
+- [ANALYTICS_SETUP.md](ANALYTICS_SETUP.md) — Analytics implementation guide
+- [ANALYTICS_QUICK_START.md](ANALYTICS_QUICK_START.md) — Quick analytics setup
+- [CONSENT_INTEGRATION_GUIDE.md](CONSENT_INTEGRATION_GUIDE.md) — Cookie consent system (GDPR)
+
+## Contributing
+
+1. Create a feature branch from `main`
+2. Make your changes
+3. Run `npm run lint` and `npm run test` to ensure quality
+4. Submit a pull request
+
+## License
+
+Proprietary - All rights reserved.
