@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import CalendarEvents, { StyledEvent } from './calendar_events';
 import dayjs from 'dayjs';
-import { CalendarViewOptions } from './calendar';
+import { CalendarViewOptions } from './calendar.types';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import palette from '@/core/theme/palette';
 

@@ -17,19 +17,13 @@ import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
-import { CalendarRequestEnvelope, CalendarEntityType, CalendarRequestStatus, CalendarRequestType } from './calendarRequestContext';
-import { resolveEntityToTileId } from '@/core/util/entityResolution';
-import { findEventDate } from '@/core/util/eventDateLookup';
-import { scheduleService } from '@/services';
+import { createCalendarRequestHandler, retryPendingFocus, PendingFocus } from './calendarRequestHandler';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
 
-export type CalendarViewOptions = {
-	width: number;
-	startDay: dayjs.Dayjs;
-	daysInView: number;
-};
+import { CalendarViewOptions } from './calendar.types';
+export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
 	events: Array<ScheduleSubCalendarEvent>;
@@ -68,150 +62,24 @@ const Calendar = ({
 
 	// ── Phase 4: Pending focus after navigation ───────────────────
 	// Stores the request to retry once events finish reloading after a date navigation
-	const pendingFocusRef = useRef<{
-		entityId: string;
-		entityType: CalendarEntityType;
-		onResult?: (result: import('./calendarRequestContext').CalendarRequestResult) => void;
-	} | null>(null);
+	const pendingFocusRef = useRef<PendingFocus | null>(null);
 
 	// ── Calendar Request Listener ──────────────────────────────────
 	const handleCalendarRequest = useCallback(
-		(envelope: CalendarRequestEnvelope) => {
-			const { request, onResult } = envelope;
-
-			if (request.type === CalendarRequestType.FocusEvent) {
-				const { entityId, entityType } = request;
-
-				// Resolve the entity to a concrete tile ID on the calendar grid
-				const resolvedTileId = resolveEntityToTileId(
-					entityId,
-					entityType,
-					styledEventsRef.current,
-				);
-
-				const styledEvent = resolvedTileId
-					? styledEventsRef.current.find((e) => e.id === resolvedTileId)
-					: undefined;
-
-				if (!styledEvent) {
-					// ── Phase 4: Tile not in view ──────────────────────────
-
-					// First, try to find the event in the already-loaded events array
-					// (covers the full fetched date range, not just what's rendered)
-					const cachedTileId = resolveEntityToTileId(entityId, entityType, events);
-					const cachedEvent = cachedTileId
-						? events.find((e) => e.id === cachedTileId)
-						: undefined;
-
-					if (cachedEvent) {
-						// Found in cache — navigate without an API call (NAVIGATE_TO_DATE)
-						setShowNonViableEvents(null);
-						setSelectedEventInfo(null);
-						setSelectedEvent(null);
-						onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
-						pendingFocusRef.current = { entityId, entityType, onResult };
-						setViewOptions((prev) => ({
-							...prev,
-							startDay: dayjs(cachedEvent.start).startOf('day'),
-						}));
-						return;
-					}
-
-					// Not in cache — if event lookup is disabled (anonymous / demo),
-					// surface a friendly demo_mode result instead of calling the API
-					if (!allowEventLookup) {
-						onResult?.({ status: CalendarRequestStatus.DemoMode, entityId });
-						return;
-					}
-
-					// Authenticated path — look up date via REST & navigate (NAVIGATE_TO_DATE)
-					setShowNonViableEvents(null);
-					setSelectedEventInfo(null);
-					setSelectedEvent(null);
-					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
-
-					findEventDate({
-						entityId,
-						entityType,
-						lookupSubCalEvent: async (id) => {
-							try {
-								return await scheduleService.lookupSubCalendarEventById(id);
-							} catch {
-								return null;
-							}
-						},
-						lookupCalEvent: async (id) => {
-							try {
-								const [calEvent, subEvents] = await Promise.all([
-									scheduleService.lookupCalendarEventById(id),
-									scheduleService.getSubEventsOfCalendar(id),
-								]);
-								if (!calEvent || calEvent.start == null) return null;
-								return {
-									start: calEvent.start,
-									subEvents: (subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
-								};
-							} catch {
-								return null;
-							}
-						},
-					}).then((startMs) => {
-						if (startMs == null) {
-							onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
-							return;
-						}
-
-						// Store the pending focus so it retries after events reload
-						pendingFocusRef.current = { entityId, entityType, onResult };
-
-						// Navigate the calendar view to the event's date
-						setViewOptions((prev) => ({
-							...prev,
-							startDay: dayjs(startMs).startOf('day'),
-						}));
-					});
-
-					return;
-				}
-
-				if (styledEvent.isViable) {
-					// ── Viable event: select, scroll, highlight ────────────
-					setShowNonViableEvents(null);
-					setSelectedEvent(styledEvent.id);
-					setSelectedEventInfo(styledEvent);
-
-					// Scroll to the event's vertical position
-					if (contentContainerRef.current) {
-						const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-						const eventStart = dayjs(styledEvent.start);
-						const hourFraction =
-							eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-						const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
-
-						contentContainerRef.current.scrollTo({
-							top: targetScroll,
-							behavior: 'smooth',
-						});
-					}
-				} else {
-					// ── Non-viable event: open overlay for that day ────────
-					const eventDay = dayjs(styledEvent.start);
-					setShowNonViableEvents(eventDay);
-					setSelectedEvent(styledEvent.id);
-					setSelectedEventInfo(styledEvent);
-				}
-
-				// Trigger pulse animation
-				if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
-				setFocusedEventId(styledEvent.id);
-				focusTimeoutRef.current = setTimeout(() => {
-					setFocusedEventId(null);
-				}, 2500);
-
-				onResult?.({ status: CalendarRequestStatus.Found, entityId });
-			}
-		},
-		[]
+		createCalendarRequestHandler({
+			styledEventsRef,
+			pendingFocusRef,
+			contentContainerRef,
+			focusTimeoutRef,
+			events,
+			allowEventLookup,
+			setShowNonViableEvents,
+			setSelectedEventInfo,
+			setSelectedEvent,
+			setViewOptions,
+			setFocusedEventId,
+		}),
+		[],
 	);
 
 	useCalendarRequestListener(handleCalendarRequest);
@@ -220,58 +88,18 @@ const Calendar = ({
 	useEffect(() => {
 		if (eventsLoading || !pendingFocusRef.current) return;
 
-		const { entityId, entityType, onResult } = pendingFocusRef.current;
-		pendingFocusRef.current = null;
-
 		// Give styled events a tick to render after new data arrives
 		const retryTimer = setTimeout(() => {
-			const resolvedTileId = resolveEntityToTileId(
-				entityId,
-				entityType,
-				styledEventsRef.current,
-			);
-
-			const styledEvent = resolvedTileId
-				? styledEventsRef.current.find((e) => e.id === resolvedTileId)
-				: undefined;
-
-			if (!styledEvent) {
-				onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
-				return;
-			}
-
-			if (styledEvent.isViable) {
-				setShowNonViableEvents(null);
-				setSelectedEvent(styledEvent.id);
-				setSelectedEventInfo(styledEvent);
-
-				if (contentContainerRef.current) {
-					const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-					const eventStart = dayjs(styledEvent.start);
-					const hourFraction =
-						eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-					const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
-
-					contentContainerRef.current.scrollTo({
-						top: targetScroll,
-						behavior: 'smooth',
-					});
-				}
-			} else {
-				const eventDay = dayjs(styledEvent.start);
-				setShowNonViableEvents(eventDay);
-				setSelectedEvent(styledEvent.id);
-				setSelectedEventInfo(styledEvent);
-			}
-
-			// Trigger pulse animation
-			if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
-			setFocusedEventId(styledEvent.id);
-			focusTimeoutRef.current = setTimeout(() => {
-				setFocusedEventId(null);
-			}, 2500);
-
-			onResult?.({ status: CalendarRequestStatus.Found, entityId });
+			retryPendingFocus({
+				styledEventsRef,
+				pendingFocusRef,
+				contentContainerRef,
+				focusTimeoutRef,
+				setShowNonViableEvents,
+				setSelectedEventInfo,
+				setSelectedEvent,
+				setFocusedEventId,
+			});
 		}, 150);
 
 		return () => clearTimeout(retryTimer);

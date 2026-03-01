@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import palette from '@/core/theme/palette';
-import { CalendarViewOptions } from './calendar';
+import { CalendarViewOptions } from './calendar.types';
 
 type CalendarContentProps = {
 	viewOptions: CalendarViewOptions;
