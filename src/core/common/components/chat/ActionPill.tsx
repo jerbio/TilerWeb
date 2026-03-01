@@ -6,7 +6,7 @@ import StatusOverlay, { StatusOverlayVariant } from '@/core/common/components/ch
 import { VibeAction } from '@/core/common/types/chat';
 import { Status } from '@/core/constants/enums';
 import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
-import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from '@/core/common/components/calendar/calendarRequestContext';
+import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus, CalendarRequestType } from '@/core/common/components/calendar/calendarRequestContext';
 import useAppStore from '@/global_state';
 import { getActionScheduleState, ScheduleState } from '@/core/util/scheduleConsistency';
 
@@ -75,7 +75,7 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
 
     calendarDispatch(
       {
-        type: 'focus_event',
+        type: CalendarRequestType.FocusEvent,
         entityId: action.entityId,
         entityType: action.entityType as CalendarEntityType,
         actionType: action.type,

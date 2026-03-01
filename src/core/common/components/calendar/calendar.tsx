@@ -17,7 +17,7 @@ import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
-import { CalendarRequestEnvelope, CalendarEntityType, CalendarRequestStatus } from './calendarRequestContext';
+import { CalendarRequestEnvelope, CalendarEntityType, CalendarRequestStatus, CalendarRequestType } from './calendarRequestContext';
 import { resolveEntityToTileId } from '@/core/util/entityResolution';
 import { findEventDate } from '@/core/util/eventDateLookup';
 import { scheduleService } from '@/services';
@@ -79,7 +79,7 @@ const Calendar = ({
 		(envelope: CalendarRequestEnvelope) => {
 			const { request, onResult } = envelope;
 
-			if (request.type === 'focus_event') {
+			if (request.type === CalendarRequestType.FocusEvent) {
 				const { entityId, entityType } = request;
 
 				// Resolve the entity to a concrete tile ID on the calendar grid
