@@ -30,11 +30,12 @@ const Modal: React.FC<ModalProps> = ({
   function closeModal() {
     setShow?.(false);
     clearInterval(intervalId);
-    setTimeLeft(closeTimeout ?? 0);
+    setTimeLeft(0);
   }
 
   useEffect(() => {
     if (timerExists) {
+			setTimeLeft(closeTimeout);
       const id = window.setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);

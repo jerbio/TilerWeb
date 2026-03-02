@@ -13,7 +13,7 @@ type SuccessModalProps = {
   setShow: (show: boolean) => void;
   children?: React.ReactNode;
   closeTimeout?: number;
-  actions?: Array<{ text: string; onClick: () => void }>;
+  actions?: Array<{ text: string; onClick: () => void, disabled?: boolean }>;
 };
 
 const SuccessModal: React.FC<SuccessModalProps> = ({
@@ -41,6 +41,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
               variant="ghost"
               key={index}
               onClick={action.onClick}
+              disabled={action.disabled}
             >
               {action.text}
             </SuccessAction>

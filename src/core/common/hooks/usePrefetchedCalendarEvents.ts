@@ -26,21 +26,37 @@ export default function usePrefetchedCalendarData({
 
   // Get scheduleId from the active persona session to ensure consistency
   const activeSessionType = useAppStore((state) => state.activeSessionType);
-  const activePersonaSession = useAppStore((state) => activeSessionType === 'anonymous' ? state.anonymousPersonaSession : state.authenticatedPersonaSession);
+  const activePersonaSession = useAppStore((state) =>
+    activeSessionType === 'anonymous'
+      ? state.anonymousPersonaSession
+      : state.authenticatedPersonaSession
+  );
   const scheduleId = activePersonaSession?.scheduleId;
 
-	const [refetchKey, setRefetchKey] = useState(0);
-	const refetchEvents = () => setRefetchKey(refetchKey + 1);
+  async function refetchEvents() {
+    if (!userId) return;
+
+    setLoading(true);
+
+    // Clear the cache
+    scheduleCacheRef.current = new Map();
+
+    const start = viewOptions.startDay.valueOf();
+    const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
+    const refreshedEvents = await fetchSchedule(userId, start, end, false);
+
+		setEvents(refreshedEvents);
+    setLoading(false);
+  }
 
   function makeCacheKey(
     uid: string,
     start: number,
     end: number,
     schedId: string | null | undefined,
-		personaId: string,
-		refetchKey: number,
+    personaId: string
   ) {
-    return `${personaId}-${uid}-${start}-${end}-${schedId || 'no-schedule'}-${refetchKey}`;
+    return `${personaId}-${uid}-${start}-${end}-${schedId || 'no-schedule'}`;
   }
 
   function enforceMaxCacheSize() {
@@ -57,15 +73,8 @@ export default function usePrefetchedCalendarData({
     useCache = true
   ) {
     const personaId = activePersonaSession?.personaId || 'unknown-persona';
-    const cacheKey = makeCacheKey(
-      id,
-      startRange,
-      endRange,
-      scheduleId || null,
-			personaId,
-			refetchKey,
-    );
-    
+    const cacheKey = makeCacheKey(id, startRange, endRange, scheduleId || null, personaId);
+
     if (isDemoMode()) {
       const { calendarEvents } = getDemoData();
       return calendarEvents;
@@ -88,7 +97,6 @@ export default function usePrefetchedCalendarData({
     return lookup.subCalendarEvents;
   }
 
-
   useEffect(() => {
     if (!userId || daysInView <= 0) return;
 
@@ -100,8 +108,7 @@ export default function usePrefetchedCalendarData({
       start,
       end,
       scheduleId,
-			activePersonaSession?.personaId || 'unknown-persona',
-			refetchKey,
+      activePersonaSession?.personaId || 'unknown-persona'
     );
     latestLookupRequestRef.current = requestKey;
 
@@ -123,7 +130,7 @@ export default function usePrefetchedCalendarData({
     const prevEnd = start;
     const prevStart = prevEnd - TimeUtil.inMilliseconds(daysInView, 'd');
     fetchSchedule(userId, prevStart, prevEnd, false);
-  }, [userId, viewOptions.startDay, daysInView, scheduleId, refetchKey]);
+  }, [userId, viewOptions.startDay, daysInView, scheduleId]);
 
   return { events, loading, refetchEvents };
 }

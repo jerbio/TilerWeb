@@ -12,11 +12,16 @@ import { Trans, useTranslation } from 'react-i18next';
 import LoadingModal from '../modals/loading-modal';
 import SuccessModal from '../modals/success-modal';
 import { scheduleService } from '@/services';
-import { ScheduleCreateEventParams } from '../../types/schedule';
+import {
+  ScheduleCreateEventParams,
+  ScheduleCreateEventResponse,
+} from '../../types/schedule';
 import { toast } from 'sonner';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 import DatePicker from '../date_picker';
 import Toggle from '../Toggle';
+import { useCalendarDispatch } from './CalendarRequestProvider';
+import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from './calendarRequestContext';
 
 dayjs.extend(advancedFormat);
 
@@ -40,11 +45,12 @@ export type InitialCreateTileFormState = {
 
 type CalendarCreateTileProps = {
   isOpen: boolean;
-  onClose: (shouldRefetch?: boolean) => void;
+  onClose: () => void;
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
   tileColorOptions: RGB[];
+  refetchEvents: () => Promise<void>;
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
@@ -53,21 +59,26 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   expanded,
   tileColorOptions,
   formHandler,
+  refetchEvents,
 }) => {
   const { formData, handleFormInputChange, resetForm } = formHandler;
   const theme = useTheme();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [successEventName, setSuccessEventName] = useState('');
+  const [successEvent, setSuccessEvent] = useState<ScheduleCreateEventResponse['Content'] | null>(
+    null
+  );
+	const [isNavigatingToEvent, setIsNavigatingToEvent] = useState(false);
   const isValidSubmission = useMemo(() => {
     if (formData.action.trim().length === 0) return false;
     const duration = formData.durationHours * 60 + formData.durationMins;
     if (duration === 0) return false;
     return true;
   }, [formData]);
+  const calendarDispatch = useCalendarDispatch();
 
- useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -236,8 +247,10 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         MobileApp: true,
       };
       const newEvent = await scheduleService.createEvent(event);
+      await refetchEvents();
       onClose();
-      setSuccessEventName(newEvent.name);
+			setIsNavigatingToEvent(false);
+      setSuccessEvent(newEvent);
       setSuccess(true);
     } catch (error) {
       console.error(error);
@@ -248,7 +261,26 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   }
 
   function viewCreatedEvent() {
-	}
+    if (successEvent === null) return;
+    calendarDispatch({
+      type: 'focus_event',
+      entityId: successEvent.calendarEvent.id!,
+      entityType: CalendarEntityType.CalendarEvent,
+      actionType: 'add_new_task',
+		},
+      (result: CalendarRequestResult) => {
+        if (result.status === CalendarRequestStatus.Navigating) {
+          setIsNavigatingToEvent(true);
+        } else {
+          setIsNavigatingToEvent(false);
+					setSuccess(false);
+          if (result.status === CalendarRequestStatus.NotFound) {
+            console.warn('[CreateTile] Calendar could not find entity:', successEvent.calendarEvent.id);
+          }
+        }
+      }
+		);
+  }
 
   return (
     <StyledCalendarCreateEvent
@@ -264,11 +296,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       <SuccessModal
         show={success}
         setShow={setSuccess}
-				closeTimeout={15}
+        closeTimeout={!isNavigatingToEvent ? 15 : undefined}
         actions={[
           {
             text: 'View Event',
-						onClick: viewCreatedEvent,
+            onClick: viewCreatedEvent,
+						disabled: isNavigatingToEvent
           },
         ]}
       >
@@ -277,7 +310,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             i18nKey="calendar.createTile.message.success"
             components={{
               b: <b />,
-              action: <>{successEventName}</>,
+              action: <>{successEvent?.name}</>,
             }}
           />
         </p>
@@ -288,7 +321,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         </div>
         <button
           onClick={() => {
-            onClose(false);
+            onClose();
           }}
         >
           <X size={16} color={theme.colors.text.primary} />
@@ -492,7 +525,7 @@ const TileActionContainer = styled.div`
 		font-family: ${(props) => props.theme.typography.fontFamily.urban};
 		font-weight: ${(props) => props.theme.typography.fontWeight.bold};
 		color: ${(props) => props.theme.colors.text.primary};
-		leading: 1;
+		line-height: 1;
 	}
 `;
 
@@ -618,8 +651,8 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};
 	width: 100%;
-	
-  ${(props) =>
+
+	${(props) =>
     props.$isexpanded
       ? `
 			position: fixed;
@@ -641,9 +674,10 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-		gap: .5rem;
+		gap: 0.5rem;
 		padding: 8px 16px;
-		border-radius: ${(props) => `${props.theme.borderRadius.xLarge} ${props.theme.borderRadius.xLarge} 0 0`};
+		border-radius: ${(props) =>
+    `${props.theme.borderRadius.xLarge} ${props.theme.borderRadius.xLarge} 0 0`};
 
 		> button {
 			height: 28px;
@@ -660,7 +694,7 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 				background-color: ${(props) => props.theme.colors.background.card2};
 			}
 		}
-}
+	}
 
 	.title {
 		flex: 1;
@@ -677,7 +711,6 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 			line-height: 1.1;
 		}
 	}
-}
 `;
 
 export default CalendarCreateTile;
