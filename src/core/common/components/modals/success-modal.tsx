@@ -12,10 +12,17 @@ type SuccessModalProps = {
   show: boolean;
   setShow: (show: boolean) => void;
   children?: React.ReactNode;
+  closeTimeout?: number;
   actions?: Array<{ text: string; onClick: () => void }>;
 };
 
-const SuccessModal: React.FC<SuccessModalProps> = ({ show, setShow, children, actions }) => {
+const SuccessModal: React.FC<SuccessModalProps> = ({
+  show,
+  setShow,
+  children,
+  actions,
+  closeTimeout,
+}) => {
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
   const loadingEllipse = isDarkMode ? DarkLoadingEllipse : LightLoadingEllipse;
@@ -25,10 +32,16 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ show, setShow, children, ac
       show={show}
       setShow={setShow}
       headerStyle={{ border: 'none' }}
+      closeTimeout={closeTimeout}
       footer={
         actions
           ? actions.map((action, index) => (
-            <SuccessAction size='large' variant="ghost" key={index} onClick={action.onClick}>
+            <SuccessAction
+              size="large"
+              variant="ghost"
+              key={index}
+              onClick={action.onClick}
+            >
               {action.text}
             </SuccessAction>
           ))
@@ -50,7 +63,7 @@ const SuccessAction = styled(Button)`
 	outline: 1.5px solid ${(props) => props.theme.colors.border.strong};
 	outline-offset: -1.5px;
 	color: ${(props) => props.theme.colors.text.secondary};
-font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
+	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 `;
 

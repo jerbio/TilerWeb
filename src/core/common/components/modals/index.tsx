@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled, { useTheme } from 'styled-components';
 import { X } from 'lucide-react';
@@ -10,6 +10,7 @@ type ModalProps = {
   setShow?: (show: boolean) => void;
   children?: React.ReactNode;
   footer?: React.ReactNode;
+  closeTimeout?: number;
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -19,18 +20,53 @@ const Modal: React.FC<ModalProps> = ({
   headerText = '',
   headerStyle,
   footer,
+  closeTimeout,
 }) => {
   const theme = useTheme();
+  const [intervalId, setIntervalId] = React.useState<number>();
+  const [timeLeft, setTimeLeft] = React.useState<number>(closeTimeout ?? 0);
+  const timerExists = show && !!setShow && closeTimeout !== undefined;
+
+  function closeModal() {
+    setShow?.(false);
+    clearInterval(intervalId);
+    setTimeLeft(closeTimeout ?? 0);
+  }
+
+  useEffect(() => {
+    if (timerExists) {
+      const id = window.setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+      setIntervalId(id);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [show, setShow, closeTimeout]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      closeModal();
+    }
+  }, [timeLeft, setShow]);
 
   return createPortal(
-    <Overlay onClick={() => setShow?.(false)} $show={show}>
+    <Overlay onClick={closeModal} $show={show}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <Header style={headerStyle}>
           <h3>{headerText}</h3>
           {setShow && (
-            <CloseButton onClick={() => setShow(false)}>
-              <X color={theme.colors.text.secondary} size={16} />
-            </CloseButton>
+            <CloseButtonTimerWrapper
+              $isclosing={timerExists}
+              closeTimeLeftRatio={timerExists ? timeLeft / closeTimeout : 0}
+            >
+              <CloseButton onClick={closeModal}>
+                <X color={theme.colors.text.secondary} size={16} />
+              </CloseButton>
+              {timerExists && (
+                <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>
+              )}
+            </CloseButtonTimerWrapper>
           )}
         </Header>
         <ModalBody>{children}</ModalBody>
@@ -40,6 +76,41 @@ const Modal: React.FC<ModalProps> = ({
     document.body
   );
 };
+
+const CloseButtonTimer = styled.div`
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	transform: translate(-50%, calc(100% + 0.25rem));
+	font-size: ${(props) => props.theme.typography.fontSize.xs};
+	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
+	color: ${(props) => props.theme.colors.text.muted};
+`;
+
+const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; closeTimeLeftRatio: number }>`
+	height: 36px;
+	width: 36px;
+	margin-left: auto;
+	position: relative;
+	padding: 0.25rem;
+	border-radius: calc(${(props) => props.theme.borderRadius.medium} + 0.125rem);
+	background-color: ${(props) =>
+    props.$isclosing ? props.theme.colors.border.default : props.theme.colors.background.card};
+	isolate: isolate;
+
+	&::after {
+		z-index: 0;
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: calc(${(props) => props.theme.borderRadius.medium} + 0.125rem);
+		background: conic-gradient(
+			${(props) => props.theme.colors.text.secondary} 0deg
+				${(props) => props.closeTimeLeftRatio * 360}deg,
+			/* sector angle */ transparent ${(props) => props.closeTimeLeftRatio * 360}deg 360deg
+		);
+	}
+`;
 
 const Header = styled.header`
 	height: 48px;
@@ -63,13 +134,17 @@ const Header = styled.header`
 `;
 
 const CloseButton = styled.button`
-	margin-left: auto;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1;
 	height: 32px;
 	width: 32px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-color: transparent;
+	background-color: ${(props) => props.theme.colors.background.card};
 	border: ${(props) => `1px solid ${props.theme.colors.border.default}`};
 	border-radius: ${(props) => props.theme.borderRadius.medium};
 

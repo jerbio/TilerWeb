@@ -264,6 +264,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       <SuccessModal
         show={success}
         setShow={setSuccess}
+				closeTimeout={15}
         actions={[
           {
             text: 'View Event',
