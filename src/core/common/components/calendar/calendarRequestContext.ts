@@ -22,6 +22,12 @@ export enum CalendarRequestStatus {
   Error = 'error',
 }
 
+/** Discriminant values for each calendar request kind */
+export enum CalendarRequestType {
+  FocusEvent = 'focus_event',
+  NavigateToDate = 'navigate_to_date',
+}
+
 /** Result reported back to the dispatcher after the calendar processes a request */
 export type CalendarRequestResult =
   | { status: CalendarRequestStatus.Found; entityId: string }
@@ -52,7 +58,7 @@ export interface ScheduleContext {
  * Handled by Calendar internally.
  */
 export interface FocusEventRequest {
-  type: 'focus_event';
+  type: CalendarRequestType.FocusEvent;
   entityId: string;
   entityType: CalendarEntityType;
   actionType: ActionType;
@@ -67,7 +73,7 @@ export interface FocusEventRequest {
  * currently loaded date range.
  */
 export interface NavigateToDateRequest {
-  type: 'navigate_to_date';
+  type: CalendarRequestType.NavigateToDate;
   /** ISO-8601 date string or unix ms timestamp */
   date: string | number;
   /** Optional: after navigating, re-attempt this pending focus */

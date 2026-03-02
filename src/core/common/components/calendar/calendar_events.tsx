@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { CalendarViewOptions } from './calendar';
+import { CalendarViewOptions } from './calendar.types';
 import dayjs from 'dayjs';
 import { animated, useTransition } from '@react-spring/web';
 import { Bike, CarFront, DotIcon, Route } from 'lucide-react';

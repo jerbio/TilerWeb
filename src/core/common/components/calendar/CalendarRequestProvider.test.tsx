@@ -11,6 +11,7 @@ import {
   CalendarRequestEnvelope,
   CalendarRequestResult,
   CalendarRequestStatus,
+  CalendarRequestType,
   CalendarEntityType,
   FocusEventRequest,
 } from './calendarRequestContext';
@@ -20,7 +21,7 @@ import { Actions } from '@/core/constants/enums';
 
 function createFocusRequest(overrides: Partial<FocusEventRequest> = {}): FocusEventRequest {
   return {
-    type: 'focus_event',
+    type: CalendarRequestType.FocusEvent,
     entityId: 'entity-1',
     entityType: CalendarEntityType.SubcalendarEvent,
     actionType: Actions.Add_New_Task,
@@ -114,7 +115,7 @@ describe('CalendarRequestProvider', () => {
 
       expect(handler).toHaveBeenCalledTimes(1);
       const envelope: CalendarRequestEnvelope = handler.mock.calls[0][0];
-      expect(envelope.request.type).toBe('focus_event');
+      expect(envelope.request.type).toBe(CalendarRequestType.FocusEvent);
       expect((envelope.request as FocusEventRequest).entityId).toBe('entity-1');
     });
 
@@ -200,7 +201,7 @@ describe('CalendarRequestProvider', () => {
 
       // Smart handler that checks schedule consistency
       const smartHandler = (envelope: CalendarRequestEnvelope) => {
-        if (envelope.request.type === 'focus_event') {
+        if (envelope.request.type === CalendarRequestType.FocusEvent) {
           const req = envelope.request as FocusEventRequest;
           if (
             req.scheduleContext &&
@@ -235,7 +236,7 @@ describe('CalendarRequestProvider', () => {
       const onResult = vi.fn();
 
       const smartHandler = (envelope: CalendarRequestEnvelope) => {
-        if (envelope.request.type === 'focus_event') {
+        if (envelope.request.type === CalendarRequestType.FocusEvent) {
           const req = envelope.request as FocusEventRequest;
           if (
             req.scheduleContext &&

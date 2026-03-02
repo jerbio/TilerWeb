@@ -135,14 +135,6 @@ npm run test:coverage
 
 Tests use **Vitest** with **jsdom** environment and **MSW** for API mocking.
 
-## Documentation
-
-Additional documentation is available in the project root:
-
-- [ANALYTICS_SETUP.md](ANALYTICS_SETUP.md) — Analytics implementation guide
-- [ANALYTICS_QUICK_START.md](ANALYTICS_QUICK_START.md) — Quick analytics setup
-- [CONSENT_INTEGRATION_GUIDE.md](CONSENT_INTEGRATION_GUIDE.md) — Cookie consent system (GDPR)
-
 ## Contributing
 
 1. Create a feature branch from `main`
@@ -153,3 +145,4 @@ Additional documentation is available in the project root:
 ## License
 
 Proprietary - All rights reserved.
+
