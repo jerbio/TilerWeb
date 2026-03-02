@@ -67,7 +67,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     return true;
   }, [formData]);
 
-  useEffect(() => {
+ useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -247,6 +247,9 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     }
   }
 
+  function viewCreatedEvent() {
+	}
+
   return (
     <StyledCalendarCreateEvent
       onSubmit={(e) => {
@@ -258,7 +261,16 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       <LoadingModal show={loading} setShow={setLoading}>
         <p>{t('calendar.createTile.message.pending', { action: formData.action })}</p>
       </LoadingModal>
-      <SuccessModal show={success} setShow={setSuccess}>
+      <SuccessModal
+        show={success}
+        setShow={setSuccess}
+        actions={[
+          {
+            text: 'View Event',
+						onClick: viewCreatedEvent,
+          },
+        ]}
+      >
         <p>
           <Trans
             i18nKey="calendar.createTile.message.success"

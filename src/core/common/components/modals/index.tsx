@@ -9,9 +9,17 @@ type ModalProps = {
   show: boolean;
   setShow?: (show: boolean) => void;
   children?: React.ReactNode;
+  footer?: React.ReactNode;
 };
 
-const Modal: React.FC<ModalProps> = ({ show, setShow, children, headerText = '', headerStyle }) => {
+const Modal: React.FC<ModalProps> = ({
+  show,
+  setShow,
+  children,
+  headerText = '',
+  headerStyle,
+  footer,
+}) => {
   const theme = useTheme();
 
   return createPortal(
@@ -26,6 +34,7 @@ const Modal: React.FC<ModalProps> = ({ show, setShow, children, headerText = '',
           )}
         </Header>
         <ModalBody>{children}</ModalBody>
+        {footer && <ModalFooter>{footer}</ModalFooter>}
       </ModalContainer>
     </Overlay>,
     document.body
@@ -94,6 +103,11 @@ const ModalContainer = styled.div`
 `;
 
 const ModalBody = styled.div`
+	padding: 1rem;
+`;
+
+const ModalFooter = styled.div`
+	border-top: 1px solid ${(props) => props.theme.colors.border.default};
 	padding: 1rem;
 `;
 export default Modal;
