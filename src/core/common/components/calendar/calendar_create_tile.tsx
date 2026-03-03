@@ -21,7 +21,7 @@ import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/ca
 import DatePicker from '../date_picker';
 import Toggle from '../Toggle';
 import { useCalendarDispatch } from './CalendarRequestProvider';
-import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus } from './calendarRequestContext';
+import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus, CalendarRequestType } from './calendarRequestContext';
 
 dayjs.extend(advancedFormat);
 
@@ -263,7 +263,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   function viewCreatedEvent() {
     if (successEvent === null) return;
     calendarDispatch({
-      type: 'focus_event',
+      type: CalendarRequestType.FocusEvent,
       entityId: successEvent.calendarEvent.id!,
       entityType: CalendarEntityType.CalendarEvent,
       actionType: 'add_new_task',
