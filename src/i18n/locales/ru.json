@@ -44,7 +44,8 @@
 		"navigation": {
 			"home": "Главная",
 			"features": "Функции",
-			"waitlist": "Список ожидания"
+			"waitlist": "Список ожидания",
+			"newsletter": "Рассылка"
 		},
 		"voiceInput": {
 			"listening": "Слушаю...",

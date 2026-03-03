@@ -6,6 +6,12 @@
 			"creating": "Création...",
 			"cancel": "Annuler"
 		},
+		"navigation": {
+			"home": "Accueil",
+			"features": "Fonctionnalités",
+			"waitlist": "Liste d'attente",
+			"newsletter": "Newsletter"
+		},
 		"voiceInput": {
 			"listening": "À l'écoute...",
 			"transcribing": "Transcription...",

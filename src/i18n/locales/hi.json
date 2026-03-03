@@ -44,7 +44,8 @@
 		"navigation": {
 			"home": "होम",
 			"features": "विशेषताएँ",
-			"waitlist": "प्रतीक्षा सूची"
+			"waitlist": "प्रतीक्षा सूची",
+			"newsletter": "न्यूज़लेटर"
 		},
 		"voiceInput": {
 			"listening": "सुन रहा है...",

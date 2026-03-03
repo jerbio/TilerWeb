@@ -44,7 +44,8 @@
 		"navigation": {
 			"home": "Home",
 			"features": "Funzionalità",
-			"waitlist": "Lista d'attesa"
+			"waitlist": "Lista d'attesa",
+			"newsletter": "Newsletter"
 		},
 		"voiceInput": {
 			"listening": "In ascolto...",

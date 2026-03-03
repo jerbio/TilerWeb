@@ -44,7 +44,8 @@
 		"navigation": {
 			"home": "ホーム",
 			"features": "機能",
-			"waitlist": "ウェイティングリスト"
+			"waitlist": "ウェイティングリスト",
+			"newsletter": "ニュースレター"
 		},
 		"voiceInput": {
 			"listening": "聞いています...",

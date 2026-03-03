@@ -44,7 +44,8 @@
 		"navigation": {
 			"home": "Αρχική",
 			"features": "Χαρακτηριστικά",
-			"waitlist": "Λίστα αναμονής"
+			"waitlist": "Λίστα αναμονής",
+			"newsletter": "Ενημερωτικό δελτίο"
 		},
 		"voiceInput": {
 			"listening": "Ακούγοντας...",
