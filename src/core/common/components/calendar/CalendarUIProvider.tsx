@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 
-type CalendarUIContextType = {
+export type CalendarUIContextType = {
   isCreateTileModalOpen: boolean;
   setCreateTileModalOpen: (isOpen: boolean) => void;
   isCreateTileModalExpanded: boolean;
