@@ -95,12 +95,6 @@ interface AppState {
 	checkAuth: () => Promise<void>;
 	logout: () => Promise<void>;
 	setAuthenticated: (user: UserInfo | null) => void;
-
-	// Modal States
-	isCreateTileModalOpen: boolean;
-	setCreateTileModalOpen: (isOpen: boolean) => void;
-	isCreateTileModalExpanded: boolean;
-	setCreateTileModalExpanded: (isExpanded: boolean) => void;
 }
 
 const useAppStore = create<AppState>()((set, get) => {
@@ -112,11 +106,6 @@ const useAppStore = create<AppState>()((set, get) => {
 	};
 
 	return {
-		isCreateTileModalOpen: false,
-		setCreateTileModalOpen: (isOpen: boolean) => set({ isCreateTileModalOpen: isOpen }),
-		isCreateTileModalExpanded: false,
-		setCreateTileModalExpanded: (isExpanded: boolean) =>
-			set({ isCreateTileModalExpanded: isExpanded }),
 		authenticatedPersonaSession: null,
 		anonymousPersonaSession: null,
 		activeSessionType: SessionType.ANONYMOUS,

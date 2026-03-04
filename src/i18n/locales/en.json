@@ -225,7 +225,8 @@
 				"reset": "Reset",
 				"submit": "Create Tile",
 				"collapse": "Less Options",
-				"expand": "More Options"
+				"expand": "More Options",
+				"viewInTimeline": "View Tile"
 			},
 			"summary": {
 				"title": "Summary",

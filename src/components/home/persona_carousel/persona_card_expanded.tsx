@@ -19,6 +19,7 @@ import Loader from '@/core/common/components/loader';
 import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 import { createPortal } from 'react-dom';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
+import { CalendarUIProvider } from '@/core/common/components/calendar/CalendarUIProvider';
 
 type PersonaExpandedCardProps = {
   persona: Persona;
@@ -115,7 +116,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       // Check if dev mode override is active
       if (devUserIdOverride) {
         // DEV MODE: Use the custom user ID instead of creating a new one
-        
+
         // Set the persona user with the override ID
         setPersonaUser(persona.id, {
           userId: devUserIdOverride,
@@ -264,24 +265,27 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
     if (!isCreatingPersona && expanded && personaUserId) {
       // Check for skip parameter: add ?skipOnboarding=true to URL to force show onboarding
       const urlParams = new URLSearchParams(window.location.search);
-      const forceShowOnboarding = urlParams.get('skipOnboarding') === 'false' || urlParams.get('showOnboarding') === 'true';
-      
-      const hasSeenOnboarding = forceShowOnboarding ? null : localStorage.getItem('tiler_onboarding_completed');
-      
+      const forceShowOnboarding =
+        urlParams.get('skipOnboarding') === 'false' ||
+        urlParams.get('showOnboarding') === 'true';
+
+      const hasSeenOnboarding = forceShowOnboarding
+        ? null
+        : localStorage.getItem('tiler_onboarding_completed');
+
       if (!hasSeenOnboarding && !showOnboarding) {
         // Show onboarding guide after animation completes (give extra time for layout to fully settle)
         const timer = setTimeout(async () => {
-          
           // Activate demo mode before showing onboarding
           const { activateOnboardingDemo } = await import('@/config/demo_config');
           activateOnboardingDemo(persona.id);
-          
+
           // Force re-render of PersonaCalendar and Chat to pick up demo data
-          setDemoModeKey(prev => prev + 1);
-          
+          setDemoModeKey((prev) => prev + 1);
+
           // Wait a tick for demo mode to propagate
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
           // Trigger onboarding guide
           setShowOnboarding(true);
         }, 800);
@@ -296,7 +300,11 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
       container: CalendarContainer,
       content: (
         <React.Fragment>
-          <PersonaCalendar key={`calendar-${demoModeKey}`} expandedWidth={expandedWidth} userId={personaUserId} />
+          <PersonaCalendar
+            key={`calendar-${demoModeKey}`}
+            expandedWidth={expandedWidth}
+            userId={personaUserId}
+          />
           <CalendarContainerActionButtons>
             <MobileChatInputWrapper>
               <MessageCircleIcon>
@@ -349,96 +357,111 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
   );
 
   return (
-    <CalendarRequestProvider>
-      <CardContainer 
-        $display={expanded} 
-        style={cardSpring} 
-        onClick={onClick}
-        data-persona-card-container
-      >
-        <Header>
-          <h2>{persona.name}</h2>
-          <MobileCloseButtonContainer>
-            <Button variant="ghost" height={32} onClick={() => handleClose(true)}>
-              <ChevronLeftIcon size={16} />
-              <span>Back</span>
-            </Button>
-          </MobileCloseButtonContainer>
-        </Header>
-        <CardContent>
-          {contentTransition((style, item) => (
-            <item.container style={style} key={item.key}>
-              {item.content}
-            </item.container>
-          ))}
-        </CardContent>
-        
-        {/* Loading overlay for persona creation */}
-        <LoadingOverlay $visible={isCreatingPersona}>
-          <LoadingContent>
-            <Loader />
-            <LoadingMessage>
-              <LoadingTitle>{t('common.customPersonaModal.processing.title')}</LoadingTitle>
-              <LoadingDescription>
-                {t('common.customPersonaModal.processing.description')}
-              </LoadingDescription>
-            </LoadingMessage>
-            <ProgressSteps>
-              {PROCESSING_STEPS.map((step, index) => {
-                const isActive = processingStep === index;
-                const isComplete = processingStep > index;
-                return (
-                  <ProgressStep key={index} $isActive={isActive} $isComplete={isComplete}>
-                    <StepIndicator $isActive={isActive} $isComplete={isComplete}>
-                      {isComplete ? <Check size={14} /> : index + 1}
-                    </StepIndicator>
-                    <StepText $isActive={isActive} $isComplete={isComplete}>
-                      {step.title}
-                    </StepText>
-                  </ProgressStep>
-                );
-              })}
-            </ProgressSteps>
-          </LoadingContent>
-        </LoadingOverlay>
-      </CardContainer>
-      
-      {/* Onboarding guide - rendered as portal to document.body to avoid z-index issues */}
-      {createPortal(
-        <OnboardingGuide
-          isVisible={showOnboarding}
-          onComplete={async () => {
-            // Deactivate demo mode
-            const { deactivateOnboardingDemo } = await import('@/config/demo_config');
-            deactivateOnboardingDemo();
-            
-            // Force re-render to switch back to real data
-            setDemoModeKey(prev => prev + 1);
-            
-            localStorage.setItem('tiler_onboarding_completed', 'true');
-            setShowOnboarding(false);
-            analytics.trackPersonaEvent('Onboarding Completed', {
-              personaId: persona.id,
-            });
-          }}
-          onSkip={async () => {
-            // Deactivate demo mode
-            const { deactivateOnboardingDemo } = await import('@/config/demo_config');
-            deactivateOnboardingDemo();
-            
-            // Force re-render to switch back to real data
-            setDemoModeKey(prev => prev + 1);
-            
-            localStorage.setItem('tiler_onboarding_completed', 'true');
-            setShowOnboarding(false);
-            analytics.trackPersonaEvent('Onboarding Skipped', {
-              personaId: persona.id,
-            });
-          }}
-        />,
-        document.body
-      )}
-    </CalendarRequestProvider>
+    <CalendarUIProvider demoMode>
+      <CalendarRequestProvider>
+        <CardContainer
+          $display={expanded}
+          style={cardSpring}
+          onClick={onClick}
+          data-persona-card-container
+        >
+          <Header>
+            <h2>{persona.name}</h2>
+            <MobileCloseButtonContainer>
+              <Button variant="ghost" height={32} onClick={() => handleClose(true)}>
+                <ChevronLeftIcon size={16} />
+                <span>Back</span>
+              </Button>
+            </MobileCloseButtonContainer>
+          </Header>
+          <CardContent>
+            {contentTransition((style, item) => (
+              <item.container style={style} key={item.key}>
+                {item.content}
+              </item.container>
+            ))}
+          </CardContent>
+
+          {/* Loading overlay for persona creation */}
+          <LoadingOverlay $visible={isCreatingPersona}>
+            <LoadingContent>
+              <Loader />
+              <LoadingMessage>
+                <LoadingTitle>
+                  {t('common.customPersonaModal.processing.title')}
+                </LoadingTitle>
+                <LoadingDescription>
+                  {t('common.customPersonaModal.processing.description')}
+                </LoadingDescription>
+              </LoadingMessage>
+              <ProgressSteps>
+                {PROCESSING_STEPS.map((step, index) => {
+                  const isActive = processingStep === index;
+                  const isComplete = processingStep > index;
+                  return (
+                    <ProgressStep
+                      key={index}
+                      $isActive={isActive}
+                      $isComplete={isComplete}
+                    >
+                      <StepIndicator
+                        $isActive={isActive}
+                        $isComplete={isComplete}
+                      >
+                        {isComplete ? <Check size={14} /> : index + 1}
+                      </StepIndicator>
+                      <StepText $isActive={isActive} $isComplete={isComplete}>
+                        {step.title}
+                      </StepText>
+                    </ProgressStep>
+                  );
+                })}
+              </ProgressSteps>
+            </LoadingContent>
+          </LoadingOverlay>
+        </CardContainer>
+
+        {/* Onboarding guide - rendered as portal to document.body to avoid z-index issues */}
+        {createPortal(
+          <OnboardingGuide
+            isVisible={showOnboarding}
+            onComplete={async () => {
+              // Deactivate demo mode
+              const { deactivateOnboardingDemo } = await import(
+                '@/config/demo_config'
+              );
+              deactivateOnboardingDemo();
+
+              // Force re-render to switch back to real data
+              setDemoModeKey((prev) => prev + 1);
+
+              localStorage.setItem('tiler_onboarding_completed', 'true');
+              setShowOnboarding(false);
+              analytics.trackPersonaEvent('Onboarding Completed', {
+                personaId: persona.id,
+              });
+            }}
+            onSkip={async () => {
+              // Deactivate demo mode
+              const { deactivateOnboardingDemo } = await import(
+                '@/config/demo_config'
+              );
+              deactivateOnboardingDemo();
+
+              // Force re-render to switch back to real data
+              setDemoModeKey((prev) => prev + 1);
+
+              localStorage.setItem('tiler_onboarding_completed', 'true');
+              setShowOnboarding(false);
+              analytics.trackPersonaEvent('Onboarding Skipped', {
+                personaId: persona.id,
+              });
+            }}
+          />,
+          document.body
+        )}
+      </CalendarRequestProvider>
+    </CalendarUIProvider>
   );
 };
 

@@ -6,13 +6,14 @@ import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Env } from '@/config/config_getter';
+import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-	const setCreateTileModalOpen = useAppStore((state) => state.setCreateTileModalOpen);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+	const { setCreateTileModalOpen } = useCalendarUI();
 
   // Close menu when clicking outside
   useEffect(() => {

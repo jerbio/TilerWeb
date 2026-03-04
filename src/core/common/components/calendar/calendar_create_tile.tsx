@@ -22,6 +22,7 @@ import DatePicker from '../date_picker';
 import Toggle from '../Toggle';
 import { useCalendarDispatch } from './CalendarRequestProvider';
 import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus, CalendarRequestType } from './calendarRequestContext';
+import { Actions } from '@/core/constants/enums';
 
 dayjs.extend(advancedFormat);
 
@@ -261,12 +262,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   }
 
   function viewCreatedEvent() {
-    if (successEvent === null) return;
+    if (successEvent === null || successEvent.calendarEvent.id === null) return;
     calendarDispatch({
       type: CalendarRequestType.FocusEvent,
-      entityId: successEvent.calendarEvent.id!,
+      entityId: successEvent.calendarEvent.id,
       entityType: CalendarEntityType.CalendarEvent,
-      actionType: 'add_new_task',
+      actionType: Actions.Add_New_Task,
 		},
       (result: CalendarRequestResult) => {
         if (result.status === CalendarRequestStatus.Navigating) {
@@ -299,7 +300,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         closeTimeout={!isNavigatingToEvent ? 15 : undefined}
         actions={[
           {
-            text: 'View Event',
+            text: t('calendar.createTile.buttons.viewInTimeline'),
             onClick: viewCreatedEvent,
 						disabled: isNavigatingToEvent
           },

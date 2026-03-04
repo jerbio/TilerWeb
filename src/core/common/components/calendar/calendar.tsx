@@ -20,7 +20,11 @@ import { a, useChain, useSpring, useSpringRef, useTransition } from '@react-spri
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
-import { createCalendarRequestHandler, retryPendingFocus, PendingFocus } from './calendarRequestHandler';
+import {
+  createCalendarRequestHandler,
+  retryPendingFocus,
+  PendingFocus,
+} from './calendarRequestHandler';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
@@ -29,10 +33,10 @@ import { RGB, RGBColor } from '@/core/util/colors';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
-import useAppStore from '@/global_state';
 
 import { CalendarViewOptions } from './calendar.types';
 export type { CalendarViewOptions } from './calendar.types';
+import { useCalendarUI } from './CalendarUIProvider.tsx';
 
 type CalendarProps = {
   events: Array<ScheduleSubCalendarEvent>;
@@ -63,7 +67,7 @@ const Calendar = ({
     setCreateTileModalOpen,
     isCreateTileModalExpanded,
     setCreateTileModalExpanded,
-  } = useAppStore((state) => state);
+  } = useCalendarUI();
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -78,27 +82,27 @@ const Calendar = ({
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
   const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	// ── Phase 4: Pending focus after navigation ───────────────────
-	// Stores the request to retry once events finish reloading after a date navigation
-	const pendingFocusRef = useRef<PendingFocus | null>(null);
+  // ── Phase 4: Pending focus after navigation ───────────────────
+  // Stores the request to retry once events finish reloading after a date navigation
+  const pendingFocusRef = useRef<PendingFocus | null>(null);
 
-	// ── Calendar Request Listener ──────────────────────────────────
-	const handleCalendarRequest = useCallback(
-		createCalendarRequestHandler({
-			styledEventsRef,
-			pendingFocusRef,
-			contentContainerRef,
-			focusTimeoutRef,
-			events,
-			allowEventLookup,
-			setShowNonViableEvents,
-			setSelectedEventInfo,
-			setSelectedEvent,
-			setViewOptions,
-			setFocusedEventId,
-		}),
-		[],
-	);
+  // ── Calendar Request Listener ──────────────────────────────────
+  const handleCalendarRequest = useCallback(
+    createCalendarRequestHandler({
+      styledEventsRef,
+      pendingFocusRef,
+      contentContainerRef,
+      focusTimeoutRef,
+      events,
+      allowEventLookup,
+      setShowNonViableEvents,
+      setSelectedEventInfo,
+      setSelectedEvent,
+      setViewOptions,
+      setFocusedEventId,
+    }),
+    []
+  );
 
   useCalendarRequestListener(handleCalendarRequest);
 
@@ -106,19 +110,19 @@ const Calendar = ({
   useEffect(() => {
     if (eventsLoading || !pendingFocusRef.current) return;
 
-		// Give styled events a tick to render after new data arrives
-		const retryTimer = setTimeout(() => {
-			retryPendingFocus({
-				styledEventsRef,
-				pendingFocusRef,
-				contentContainerRef,
-				focusTimeoutRef,
-				setShowNonViableEvents,
-				setSelectedEventInfo,
-				setSelectedEvent,
-				setFocusedEventId,
-			});
-		}, 150);
+    // Give styled events a tick to render after new data arrives
+    const retryTimer = setTimeout(() => {
+      retryPendingFocus({
+        styledEventsRef,
+        pendingFocusRef,
+        contentContainerRef,
+        focusTimeoutRef,
+        setShowNonViableEvents,
+        setSelectedEventInfo,
+        setSelectedEvent,
+        setFocusedEventId,
+      });
+    }, 150);
 
     return () => clearTimeout(retryTimer);
   }, [eventsLoading, events]);
