@@ -101,15 +101,31 @@ const CollapseWrapper = styled.div`
   max-width: 860px;
 `;
 
+const ContentRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  padding-bottom: 0.5rem;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+`;
+
 const MediaPlaceholder = styled.div`
-  width: 100%;
+  flex: 0 0 55%;
   aspect-ratio: 16 / 9;
   background: ${palette.colors.gray[800]};
   border-radius: ${palette.borderRadius.medium};
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+
+  @media (max-width: 640px) {
+    flex: unset;
+    width: 100%;
+  }
 `;
 
 const MediaPlaceholderText = styled.span`
@@ -118,6 +134,14 @@ const MediaPlaceholderText = styled.span`
   color: ${palette.colors.gray[600]};
   letter-spacing: 0.05em;
   text-transform: uppercase;
+`;
+
+const BodyText = styled.span`
+  flex: 1;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.base};
+  color: ${palette.colors.gray[500]};
+  line-height: 1.6;
 `;
 
 const Divider = styled.hr`
@@ -148,12 +172,12 @@ const Newsletter: React.FC = () => {
   const collapseItems = items.map((item) => ({
     title: item.title,
     content: (
-      <>
+      <ContentRow>
         <MediaPlaceholder>
           <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
         </MediaPlaceholder>
-        {item.body}
-      </>
+        <BodyText>{item.body}</BodyText>
+      </ContentRow>
     ),
   }));
 
