@@ -70,6 +70,20 @@ const Hero = styled.div`
   max-width: 680px;
 `;
 
+const Badge = styled.span`
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  background: linear-gradient(135deg, ${palette.colors.brand[500]}20, ${palette.colors.brand[600]}30);
+  border: 1px solid ${palette.colors.brand[500]}40;
+  border-radius: 9999px;
+  color: ${palette.colors.brand[300]};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
 const HeroTitle = styled.h1`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: clamp(2rem, 5vw, 3rem);
@@ -85,15 +99,6 @@ const HeroSubtitle = styled.p`
   color: ${palette.colors.gray[400]};
   margin: 0;
   line-height: 1.7;
-`;
-
-const SectionHeading = styled.h2`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[200]};
-  margin: 0;
-  text-align: center;
 `;
 
 const CollapseWrapper = styled.div`
@@ -144,14 +149,6 @@ const BodyText = styled.span`
   line-height: 1.6;
 `;
 
-const Divider = styled.hr`
-  width: 100%;
-  max-width: 860px;
-  border: none;
-  border-top: 1px solid ${palette.colors.gray[800]};
-  margin: 0;
-`;
-
 const BackgroundBlur = styled.div`
   position: absolute;
   top: 30%;
@@ -192,16 +189,13 @@ const Newsletter: React.FC = () => {
         <BackgroundBlur />
         <PageWrapper>
           <Hero>
-            <HeroTitle>Newsletter</HeroTitle>
+            <Badge>Navigate Tiler</Badge>
+            <HeroTitle>Here&rsquo;s Where Everything Lives</HeroTitle>
             <HeroSubtitle>
               Explore the moments where your day finally makes sense. Find your way around the app.
               Find things to try in-app.
             </HeroSubtitle>
           </Hero>
-
-          <Divider />
-
-          <SectionHeading>See how Tiler works differently for YOU</SectionHeading>
 
           <CollapseWrapper>
             <Collapse items={collapseItems} />
