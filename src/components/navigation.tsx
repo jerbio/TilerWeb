@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import styled from 'styled-components';
 import { Menu, X } from 'lucide-react';
 import { a } from '@react-spring/web';
@@ -79,16 +80,23 @@ const NavItems = styled.ul`
 
 const NavItem = styled.li``;
 
-const NavLink = styled.a`
-	color: ${palette.colors.gray[500]};
+const NavLink = styled.a<{ $active?: boolean }>`
+	color: ${(props) => (props.$active ? palette.colors.gray[100] : palette.colors.gray[500])};
 	text-decoration: none;
 	line-height: 1.3;
 	font-size: ${palette.typography.fontSize.sm};
-	font-weight: ${palette.typography.fontWeight.medium};
+	font-weight: ${(props) =>
+    props.$active
+      ? palette.typography.fontWeight.semibold
+      : palette.typography.fontWeight.medium};
 	font-family: ${palette.typography.fontFamily.inter};
 	cursor: pointer;
+	padding: 0.375rem 0.75rem;
+	border-radius: 9999px;
+	background-color: ${(props) => (props.$active ? palette.colors.gray[800] : 'transparent')};
+	transition: color 0.2s ease, background-color 0.2s ease;
 	&:hover {
-		color: ${palette.colors.gray[400]};
+		color: ${(props) => (props.$active ? palette.colors.gray[100] : palette.colors.gray[400])};
 	}
 `;
 
@@ -167,6 +175,7 @@ const MobileNavLinks = styled.div<{ $shrink: boolean }>`
 
 const Navigation: React.FC = () => {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -278,8 +287,9 @@ const Navigation: React.FC = () => {
             <NavItems>
               {navLinks.map((link) => (
                 <NavItem key={link.name}>
-                  <NavLink 
+                  <NavLink
                     href={link.href}
+                    $active={pathname === link.href}
                     onClick={() => {
                       analytics.trackNavigation(link.href, 'Desktop Navigation', {
                         linkName: link.name,
@@ -312,9 +322,10 @@ const Navigation: React.FC = () => {
         <MobileNav $isopen={isOpen} $shrink={!isAtTop}>
           <MobileNavLinks $shrink={!isAtTop}>
             {navLinks.map((link) => (
-              <NavLink 
-                key={link.name} 
+              <NavLink
+                key={link.name}
                 href={link.href}
+                $active={pathname === link.href}
                 onClick={() => {
                   analytics.trackNavigation(link.href, 'Mobile Navigation', {
                     linkName: link.name,
