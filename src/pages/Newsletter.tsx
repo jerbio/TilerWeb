@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { ChevronDown } from 'lucide-react';
 import palette from '@/core/theme/palette';
 import SEO from '@/core/common/components/SEO';
 import Section from '../components/layout/section';
+import Collapse from '@/core/common/components/collapse';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -96,74 +96,9 @@ const SectionHeading = styled.h2`
   text-align: center;
 `;
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+const CollapseWrapper = styled.div`
   width: 100%;
-  max-width: 960px;
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Card = styled.div<{ $expanded: boolean }>`
-  border: 1px solid
-    ${({ $expanded }) =>
-      $expanded ? palette.colors.brand[500] : palette.colors.gray[800]};
-  border-radius: ${palette.borderRadius.large};
-  background-color: ${({ $expanded }) =>
-    $expanded ? `${palette.colors.brand[500]}0d` : palette.colors.gray[900]};
-  overflow: hidden;
-  transition: border-color 0.25s ease, background-color 0.25s ease;
-  cursor: pointer;
-
-  &:hover {
-    border-color: ${({ $expanded }) =>
-      $expanded ? palette.colors.brand[400] : palette.colors.gray[600]};
-  }
-`;
-
-const CardHeader = styled.button`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.1rem 1.25rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-`;
-
-const CardTitle = styled.span`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[100]};
-  line-height: 1.4;
-`;
-
-const ChevronIcon = styled(ChevronDown)<{ $expanded: boolean }>`
-  flex-shrink: 0;
-  color: ${palette.colors.gray[500]};
-  transition: transform 0.25s ease;
-  transform: ${({ $expanded }) => ($expanded ? 'rotate(180deg)' : 'rotate(0deg)')};
-`;
-
-const CardBody = styled.div<{ $expanded: boolean }>`
-  max-height: ${({ $expanded }) => ($expanded ? '600px' : '0')};
-  overflow: hidden;
-  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-`;
-
-const CardBodyInner = styled.div`
-  padding: 0 1.25rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  max-width: 860px;
 `;
 
 const MediaPlaceholder = styled.div`
@@ -174,6 +109,7 @@ const MediaPlaceholder = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 1rem;
 `;
 
 const MediaPlaceholderText = styled.span`
@@ -184,17 +120,9 @@ const MediaPlaceholderText = styled.span`
   text-transform: uppercase;
 `;
 
-const BodyText = styled.p`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  color: ${palette.colors.gray[400]};
-  line-height: 1.7;
-  margin: 0;
-`;
-
 const Divider = styled.hr`
   width: 100%;
-  max-width: 960px;
+  max-width: 860px;
   border: none;
   border-top: 1px solid ${palette.colors.gray[800]};
   margin: 0;
@@ -217,11 +145,17 @@ const BackgroundBlur = styled.div`
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const Newsletter: React.FC = () => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  function toggle(index: number) {
-    setExpandedIndex((prev) => (prev === index ? null : index));
-  }
+  const collapseItems = items.map((item) => ({
+    title: item.title,
+    content: (
+      <>
+        <MediaPlaceholder>
+          <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
+        </MediaPlaceholder>
+        {item.body}
+      </>
+    ),
+  }));
 
   return (
     <>
@@ -233,7 +167,6 @@ const Newsletter: React.FC = () => {
       <Section>
         <BackgroundBlur />
         <PageWrapper>
-          {/* Hero */}
           <Hero>
             <HeroTitle>Newsletter</HeroTitle>
             <HeroSubtitle>
@@ -244,38 +177,11 @@ const Newsletter: React.FC = () => {
 
           <Divider />
 
-          {/* Section heading */}
           <SectionHeading>See how Tiler works differently for YOU</SectionHeading>
 
-          {/* Expandable card grid */}
-          <Grid>
-            {items.map((item, index) => {
-              const isExpanded = expandedIndex === index;
-              return (
-                <Card
-                  key={item.title + index}
-                  $expanded={isExpanded}
-                  onClick={() => toggle(index)}
-                >
-                  <CardHeader
-                    aria-expanded={isExpanded}
-                    aria-controls={`card-body-${index}`}
-                  >
-                    <CardTitle>{item.title}</CardTitle>
-                    <ChevronIcon size={16} $expanded={isExpanded} />
-                  </CardHeader>
-                  <CardBody $expanded={isExpanded} id={`card-body-${index}`}>
-                    <CardBodyInner>
-                      <MediaPlaceholder>
-                        <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
-                      </MediaPlaceholder>
-                      <BodyText>{item.body}</BodyText>
-                    </CardBodyInner>
-                  </CardBody>
-                </Card>
-              );
-            })}
-          </Grid>
+          <CollapseWrapper>
+            <Collapse items={collapseItems} />
+          </CollapseWrapper>
         </PageWrapper>
       </Section>
     </>
