@@ -31,7 +31,6 @@ export class AuthService {
 	async checkAuth() {
 		try {
 			const text = await this.authApi.checkAuth();
-      console.log('checkAuth text', text);
 			return {
 				isAuthenticated: text.trim() === 'OK',
 			};

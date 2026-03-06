@@ -29,6 +29,10 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 }) => {
   return (
     <EventContainer
+			onClick={(e) => {
+				e.stopPropagation();
+        e.preventDefault();
+			}}
       key={event.id}
       $selected={selectedEvent === event.id}
       $focused={focused}

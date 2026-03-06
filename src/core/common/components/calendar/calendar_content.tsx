@@ -1,7 +1,7 @@
 import calendarConfig from '@/core/constants/calendar_config';
 import React from 'react';
 import styled from 'styled-components';
-import CalendarEvents, { StyledEvent } from './calendar_events';
+import CalendarEvents, { CalendarBackgroundClickInfo, StyledEvent } from './calendar_events';
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar.types';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
@@ -20,6 +20,8 @@ type CalendarContentProps = {
 	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 	// Function to set styled non-viable events
 	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+  // Function to provide background click info
+  onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events for Calendar request handling */
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (chat → calendar highlight) */
@@ -36,6 +38,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setSelectedEventInfo,
 	calendarGridCanvasRef,
 	setStyledNonViableEvents,
+  onBackgroundClick,
 	styledEventsRef,
 	focusedEventId,
 	onViableEventClicked,
@@ -44,7 +47,10 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
     <Container>
       <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
         {/* Background */}
-        <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+        <CalendarBg
+          ref={calendarGridCanvasRef}
+          $width={viewOptions.width}
+        />
         {/* Timeline */}
         {Array.from({ length: 24 }).map((_, hourIndex) => {
           return (
@@ -65,6 +71,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
           setSelectedEvent={setSelectedEvent}
           setSelectedEventInfo={setSelectedEventInfo}
           onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+          onBackgroundClick={onBackgroundClick}
           styledEventsRef={styledEventsRef}
           focusedEventId={focusedEventId}
           onViableEventClicked={onViableEventClicked}

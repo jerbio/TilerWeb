@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import VoiceInput from '@/core/common/components/VoiceInput';
-import Spinner from '@/core/common/components/loader';
+import Loader from '@/core/common/components/loader';
 
 const ModalOverlay = styled.div<{ $isOpen: boolean }>`
 	position: fixed;
@@ -539,7 +539,7 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 				{/* Loading overlay - positioned last to appear on top */}
 				<LoadingOverlay $visible={isSubmitting}>
 					<LoadingContent>
-						<Spinner />
+						<Loader />
 						<LoadingMessage>
 							<LoadingTitle>{PROCESSING_STEPS[processingStep]?.title}</LoadingTitle>
 							<LoadingDescription>{PROCESSING_STEPS[processingStep]?.description}</LoadingDescription>
