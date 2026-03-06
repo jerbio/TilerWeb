@@ -4,6 +4,10 @@ import palette from './palette';
 export const darkTheme: AppTheme = {
   colors: {
     plain: palette.colors.black,
+		backdrop: {
+			default: 'rgba(0, 0, 0, 0.5)',
+			glass: '#232323a7',
+		},
     // Text colors
     text: {
       primary: palette.colors.gray[200],
@@ -25,6 +29,21 @@ export const darkTheme: AppTheme = {
     },
     // Calendar colors
     calendar: {
+			bg: palette.colors.gray[900],
+			grid: palette.colors.gray[700],
+			headerBg: palette.colors.gray[800],
+			headerTodayBg: palette.colors.gray[700],
+			headerDayText: palette.colors.gray[400],
+			headerDayTodayText: palette.colors.white,
+			headerDateText: palette.colors.gray[200],
+			headerDateTodayText: palette.colors.brand[400],
+			headerNonViableDateText: palette.colors.gray[900],	
+			headerNonViableDateBg: palette.colors.gray[200],
+			border: palette.colors.gray[700], 
+			sidebarBg: '#1f1f1f',
+			sidebarButtonHover: palette.colors.gray[800],
+			sidebarButtonActive: palette.colors.gray[700],
+			eventInfoModalBg: palette.colors.gray[800],
       summary: {
         bg: 'hsla(36, 70%, 16%, 1)',
         border: 'hsla(36, 71%, 19%, 1)',
