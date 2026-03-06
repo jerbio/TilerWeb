@@ -21,6 +21,7 @@ import calendarConfig from '@/core/constants/calendar_config';
 import { useTranslation } from 'react-i18next';
 import Button from '../button';
 import LocationBG from '@/assets/event/location-bg.png';
+import { useTheme } from '@/core/theme/ThemeProvider';
 
 type CalendarEventInfoProps = {
   event: ScheduleSubCalendarEvent | null;
@@ -28,6 +29,8 @@ type CalendarEventInfoProps = {
 };
 
 const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose }) => {
+  const { isDarkMode } = useTheme();
+
   function getEventDueIn(event: ScheduleSubCalendarEvent) {
     const now = dayjs();
     const eventStart = dayjs(event.start);
@@ -52,7 +55,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({ event, onClose })
   const { t } = useTranslation();
 
   return event ? (
-    <StyledCalendarEventInfo $color={eventColor}>
+    <StyledCalendarEventInfo $color={eventColor} $darkmode={isDarkMode}>
       <CalendarEventInfoHeader>
         <div className="icon">
           <Star size={16} color={eventColor.setLightness(0.6).toHex()} />
@@ -177,10 +180,10 @@ const CalendarEventInfoActions = styled.div`
 	gap: 0.5rem;
 
 	h3 {
-		font-size: ${palette.typography.fontSize.sm};
-		font-family: ${palette.typography.fontFamily.urban};
-		font-weight: ${palette.typography.fontWeight.bold};
-		color: ${palette.colors.gray[400]};
+		font-size: ${({ theme }) => theme.typography.fontSize.sm};
+		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+		color: ${({ theme }) => theme.colors.text.secondary};
 		leading: 1;
 	}
 `;
@@ -192,14 +195,14 @@ const CalendarEventInfoActionItems = styled.div`
 
 const CalendarEventInfoActionButton = styled(Button)`
 	flex: 1;
-	border: 1px solid ${palette.colors.gray[700]};
+	border: 1px solid ${({ theme }) => theme.colors.calendar.border};
 `;
 
 const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
 	position: relative;
 	height: 100px;
-	border: 1px solid ${palette.colors.gray[700]};
-	border-radius: ${palette.borderRadius.large};
+	border: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	border-radius: ${({ theme }) => theme.borderRadius.large};
 	isolation: isolate;
 	overflow: hidden;
 	cursor: pointer;
@@ -218,7 +221,7 @@ const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
 		transform: translate(-50%, -60%);
 
 		h3 {
-			color: ${(props) => props.$color.setLightness(0.5).toHex()};
+			color: ${(props) => props.$color.setLightness(0.8).toHex()};
 		}
 	}
 
@@ -232,16 +235,16 @@ const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-		border-radius: ${palette.borderRadius.large};
+		border-radius: ${({ theme }) => theme.borderRadius.large};
 		padding: 0.5rem;
 		transition: transform 0.3s ease;
 
 		h3 {
 			white-space: nowrap;
-			font-size: ${palette.typography.fontSize.sm};
-			font-family: ${palette.typography.fontFamily.urban};
-			font-weight: ${palette.typography.fontWeight.bold};
-			color: ${palette.colors.white};
+			font-size: ${({ theme }) => theme.typography.fontSize.sm};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+			color: ${({ theme }) => theme.colors.white};
 			leading: 1;
 		}
 	}
@@ -256,8 +259,8 @@ const CalendarEventInfoArticleContainer = styled.div`
 	display: grid;
 	gap: 0.5rem;
 	grid-template-columns: 1fr 1fr;
-	border-radius: ${palette.borderRadius.large};
-	border: 1px solid ${palette.colors.gray[700]};
+	border-radius: ${({ theme }) => theme.borderRadius.large};
+	border: 1px solid ${({ theme }) => theme.colors.calendar.border};
 
 	& > :first-child {
 		grid-column: 1 / 3;
@@ -275,21 +278,21 @@ const CalendarEventInfoArticle = styled.article`
 		flex-direction: column;
 
 		h3 {
-			font-size: ${palette.typography.fontSize.sm};
-			font-family: ${palette.typography.fontFamily.urban};
-			font-weight: ${palette.typography.fontWeight.bold};
-			color: ${palette.colors.gray[400]};
+			font-size: ${({ theme }) => theme.typography.fontSize.sm};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+			color: ${({ theme }) => theme.colors.text.muted};
 			leading: 1;
 		}
 
 		p {
-			font-size: ${palette.typography.fontSize.sm};
-			font-family: ${palette.typography.fontFamily.urban};
-			font-weight: ${palette.typography.fontWeight.bold};
-			color: ${palette.colors.gray[300]};
+			font-size: ${({ theme }) => theme.typography.fontSize.sm};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+			color: ${({ theme }) => theme.colors.text.secondary};
 
 			a {
-				color: ${palette.colors.gray[300]};
+				color: ${({ theme }) => theme.colors.text.secondary};
 				text-decoration: none;
 				span {
 					display: flex;
@@ -305,28 +308,29 @@ const CalendarEventInfoArticle = styled.article`
 	}
 `;
 
-const StyledCalendarEventInfo = styled.div<{ $color: RGBColor }>`
-	background-color: ${palette.colors.gray[800]};
-	border-radius: ${palette.borderRadius.xLarge};
+const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolean }>`
+	background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
+	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	width: 100%;
-max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
-overflow-y: auto;
+	max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
+	overflow-y: auto;
+	border: 1px solid ${({ theme, $darkmode }) => (!$darkmode ? theme.colors.gray[300] : 'transparent')};
 
-hr {
-	border: none;
-	height: 1px;
-	background-color: ${palette.colors.gray[700]};
-}
+	hr {
+		border: none;
+		height: 1px;
+		background-color: ${({ theme }) => theme.colors.calendar.border};
+	}
 
 
 	header {
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-gap: .5rem;
-		background-color: ${(props) => props.$color.setLightness(0.2).toHex()};
+		gap: .5rem;
+		background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 0.9).toHex()};
 		padding: 8px 16px;
-	border-radius: ${palette.borderRadius.xLarge} ${palette.borderRadius.xLarge} 0 0;
+		border-radius: ${({ theme }) => theme.borderRadius.xLarge} ${palette.borderRadius.xLarge} 0 0;
 
 		.icon {
 			display: flex;
@@ -334,46 +338,47 @@ gap: .5rem;
 			align-items: center;
 			width: 32px;
 			height: 32px;
-border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
-			border-radius: ${palette.borderRadius.medium};
+			background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 1).toHex()};
+			border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
+			border-radius: ${({ theme }) => theme.borderRadius.medium};
 		}
 
 		> button {
 			height: 28px;
 			width: 28px;
-border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
-			border-radius: ${palette.borderRadius.medium};
+			border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
+			border-radius: ${({ theme }) => theme.borderRadius.medium};
 			display: flex;
 			justify-content: center;
 			align-items: center;
 transition: background-color 0.2s;
 
 			&:hover {
-background-color: ${(props) => props.$color.setLightness(0.3).toHex()};
+			background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
 			}
 		}
 }
 
-.title {
+	.title {
 		flex: 1;
-			overflow: hidden;
-h2 {
-white-space: nowrap;
+		overflow: hidden;
+display: flex;
+flex-direction: column;
+
+		h2 {
+			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-size: ${palette.typography.fontSize.lg};
-			font-family: ${palette.typography.fontFamily.urban};
-			font-weight: ${palette.typography.fontWeight.bold};
-color: ${(props) => props.$color.setLightness(0.8).toHex()};
-line-height: 1.1;
-}
-			span {
-				font-size: ${palette.typography.fontSize.xs};
-font-weight: ${palette.typography.fontWeight.medium};
-color: ${(props) => props.$color.setLightness(0.6).toHex()};
-			}
-}
-
+			font-size: ${({ theme }) => theme.typography.fontSize.lg};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+			color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.8 : 0.2).toHex()};
+		}
+		span {
+			font-size: ${({ theme }) => theme.typography.fontSize.xs};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+			color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.6 : 0.4).toHex()};
+		}
 	}
 
 	.event-header {
@@ -384,15 +389,15 @@ color: ${(props) => props.$color.setLightness(0.6).toHex()};
 
 		h3 {
 			margin-top: -.5rem;
-			font-size: ${palette.typography.fontSize.base};
-			font-family: ${palette.typography.fontFamily.urban};
-			font-weight: ${palette.typography.fontWeight.semibold};
-			color: ${palette.colors.gray[100]};
+			font-size: ${({ theme }) => theme.typography.fontSize.base};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+			color: ${({ theme }) => theme.colors.gray[100]};
 		}
 
 		p {
-			font-size: ${palette.typography.fontSize.xs};
-			color: ${palette.colors.gray[300]};
+			font-size: ${({ theme }) => theme.typography.fontSize.xs};
+			color: ${({ theme }) => theme.colors.gray[300]};
 }
 	}
 }

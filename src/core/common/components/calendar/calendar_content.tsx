@@ -5,7 +5,6 @@ import CalendarEvents, { CalendarBackgroundClickInfo, StyledEvent } from './cale
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar.types';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
-import palette from '@/core/theme/palette';
 
 type CalendarContentProps = {
 	// Events to display in the calendar
@@ -112,9 +111,9 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 	height: ${calendarConfig.CELL_HEIGHT};
 	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
 
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-color: #1f1f1f;
-	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
+	border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	background-color: ${({ theme }) => theme.colors.calendar.sidebarBg};
+	background-image: linear-gradient(to right, ${({ theme }) => theme.colors.calendar.grid} 33%, rgba(255, 255, 255, 0) 0%);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;
@@ -129,8 +128,8 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 			line-height: 1;
 			top: 4px;
 			right: 2px;
-			font-size: ${palette.typography.fontSize.xs};
-			color: ${palette.colors.gray[500]};
+			font-size: ${({ theme }) => theme.typography.fontSize.xs};
+			color: ${({ theme }) => theme.colors.gray[500]};
 		}
 	}
 `;

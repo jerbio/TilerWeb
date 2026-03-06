@@ -513,6 +513,7 @@ const Section = styled.section`
 	width: 100%;
 	max-width: ${(props) => props.theme.screens.md};
 	margin-inline: auto;
+  border-inline: 1px solid ${(props) => props.theme.colors.border.strong};
 `;
 
 const TileActionContainer = styled.div`
@@ -576,7 +577,7 @@ const TileColorOption = styled.button<{ $color: RGBColor; $selected: boolean }>`
 
 const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
-	border-top: 1px solid ${(props) => props.theme.colors.border.strong};
+	border: 1px solid ${(props) => props.theme.colors.border.strong};
 	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
 		${(props) => props.theme.borderRadius.xLarge};
 	display: flex;
@@ -670,7 +671,7 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 		width: 100%;
 		position: sticky;
 		top: 0;
-		border-bottom: 1px solid ${(props) => props.theme.colors.border.strong};
+		border: 1px solid ${(props) => props.theme.colors.border.strong};
 		background-color: ${(props) => props.theme.colors.background.card};
 		display: flex;
 		align-items: center;

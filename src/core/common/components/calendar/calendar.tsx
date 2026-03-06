@@ -2,8 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
-import styled from 'styled-components';
-import palette from '@/core/theme/palette';
+import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
 import {
   CalendarBackgroundClickInfo,
@@ -68,6 +67,7 @@ const Calendar = ({
     isCreateTileModalExpanded,
     setCreateTileModalExpanded,
   } = useCalendarUI();
+  const theme = useTheme();
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -183,7 +183,7 @@ const Calendar = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cellWidth = width / daysInView;
-    const gridColor = palette.colors.gray[700];
+    const gridColor = theme.colors.calendar.grid;
     const dashLength = 4;
     const dashGap = 8;
     const thickness = 0.5;
@@ -231,7 +231,7 @@ const Calendar = ({
         }
       }
     );
-  }, [viewOptions.width]);
+  }, [viewOptions.width, theme]);
 
   // Auto-scroll to first event or current time on initial load
   useEffect(() => {
@@ -537,7 +537,7 @@ const Calendar = ({
                     >
                       <TriangleAlert
                         size={18}
-                        color={palette.colors.brand[400]}
+                        color={theme.colors.brand[400]}
                       />
                     </ShowNonViableEventsButton>
                     <NonViableEventsCount>
@@ -571,7 +571,7 @@ const Calendar = ({
                 maxWidth={150}
                 position="left"
               >
-                <Info size={18} color={palette.colors.gray[500]} />
+                <Info size={18} color={theme.colors.text.secondary} />
               </Tooltip>
             </header>
             {todaysNonViableEvents.map((event) => (
@@ -716,11 +716,12 @@ const Calendar = ({
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	overflow: hidden;
-	border-radius: 0 ${palette.borderRadius.large} ${palette.borderRadius.large} 0;
+	border-radius: 0 ${({ theme }) => theme.borderRadius.large}
+		${({ theme }) => theme.borderRadius.large} 0;
 	position: relative;
 	width: 100%;
 	height: 100%;
-	background-color: ${palette.colors.gray[900]};
+	background-color: ${({ theme }) => theme.colors.calendar.bg};
 	opacity: ${({ $isMounted }) => ($isMounted ? 1 : 0)};
 	transition: opacity 0.3s 0.5s ease-in-out;
 	user-select: none;
@@ -732,7 +733,7 @@ const CalendarHeader = styled.div`
 	left: 0;
 	width: 100%;
 	height: ${calendarConfig.HEADER_HEIGHT};
-	background-color: ${palette.colors.gray[800]};
+	background-color: ${({ theme }) => theme.colors.calendar.headerBg};
 	display: flex;
 `;
 
@@ -742,8 +743,8 @@ const CalendarHeaderActions = styled.div`
 	display: flex;
 	align-items: center;
 	overflow: hidden;
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-color: #1f1f1f;
+	border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	background-color: ${({ theme }) => theme.colors.calendar.sidebarBg};
 `;
 
 const ChangeViewButton = styled.button`
@@ -754,19 +755,19 @@ const ChangeViewButton = styled.button`
 	justify-content: center;
 	cursor: pointer;
 	background-color: transparent;
-	color: ${palette.colors.gray[400]};
+	color: ${({ theme }) => theme.colors.text.secondary};
 	transition:
 		background-color 0.2s ease,
 		color 0.2s ease;
 
 	&:not(:disabled) {
 		&:hover {
-			background-color: ${palette.colors.gray[800]};
-			color: ${palette.colors.gray[200]};
+			background-color: ${({ theme }) => theme.colors.calendar.sidebarButtonHover};
+			color: ${({ theme }) => theme.colors.text.primary};
 		}
 
 		&:active {
-			background-color: ${palette.colors.gray[700]};
+			background-color: ${({ theme }) => theme.colors.calendar.sidebarButtonActive};
 		}
 	}
 `;
@@ -780,25 +781,31 @@ const CalendarHeaderDateList = styled.ul`
 
 const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	flex: 1;
-	font-family: ${palette.typography.fontFamily.urban};
-	font-weight: ${palette.typography.fontWeight.bold};
-	font-size: ${palette.typography.fontSize.lg};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+	font-size: ${({ theme }) => theme.typography.fontSize.lg};
 	text-transform: uppercase;
-	color: ${({ $isToday }) => ($isToday ? palette.colors.white : palette.colors.gray[400])};
+	color: ${({ $isToday, theme }) =>
+    $isToday ? theme.colors.calendar.headerDayTodayText : theme.colors.calendar.headerDayText};
+
+	border-bottom: 1px solid ${({ theme }) => theme.colors.calendar.border};
 
 	&:not(:last-child) {
-		border-right: 1px solid ${calendarConfig.BORDER_COLOR};
+		border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
 	}
 
-	background-color: ${({ $isToday }) => ($isToday ? palette.colors.gray[700] : 'transparent')};
+	background-color: ${({ $isToday, theme }) =>
+    $isToday ? theme.colors.calendar.headerTodayBg : theme.colors.calendar.headerBg};
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 0.5ch;
 
 	span {
-		color: ${({ $isToday }) =>
-    $isToday ? palette.colors.brand[400] : palette.colors.gray[200]};
+		color: ${({ $isToday, theme }) =>
+    $isToday
+      ? theme.colors.calendar.headerDateTodayText
+      : theme.colors.calendar.headerDateText};
 	}
 `;
 
@@ -823,7 +830,7 @@ const LoadingContainer = styled.div<{ $loading: boolean }>`
 	align-items: center;
 	opacity: ${({ $loading }) => ($loading ? 1 : 0)};
 	pointer-events: ${({ $loading }) => ($loading ? 'auto' : 'none')};
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: ${({ theme }) => theme.colors.backdrop.default};
 	z-index: 1000;
 	transition: opacity 0.3s ease-in-out;
 `;
@@ -846,14 +853,14 @@ const NonViableEventsCount = styled.div`
 	min-width: 14px;
 	height: 14px;
 	padding: 0 4px;
-	background-color: ${palette.colors.gray[200]};
+	background-color: ${({ theme }) => theme.colors.calendar.headerNonViableDateBg};
+	color: ${({ theme }) => theme.colors.calendar.headerNonViableDateText};
 	border-radius: 8px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	font-size: 10px;
-	font-weight: ${palette.typography.fontWeight.bold};
-	color: ${palette.colors.black};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
 	pointer-events: none;
 	user-select: none;
 `;
@@ -862,14 +869,14 @@ const ShowNonViableEventsButton = styled.button<{ $active: boolean }>`
 	width: 32px;
 	height: 32px;
 	background-color: transparent;
-	box-shadow: 0 0 0 1px ${({ $active }) => ($active ? palette.colors.gray[500] : 'transparent')}
-		inset;
+	box-shadow: 0 0 0 1px
+		${({ $active, theme }) => ($active ? theme.colors.calendar.headerDayText : 'transparent')} inset;
 	display: grid;
 	place-items: center;
-	border-radius: ${palette.borderRadius.xxLarge};
+	border-radius: ${({ theme }) => theme.borderRadius.xxLarge};
 
 	&:hover {
-		box-shadow: 0 0 0 1px ${palette.colors.gray[500]} inset;
+		box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.calendar.headerDayText} inset;
 	}
 
 	transition: box-shadow 0.2s ease-in-out;
@@ -892,7 +899,7 @@ const NonViableEventsContainer = styled.div<{
 
 	padding: 0.5rem;
 	overflow-y: auto;
-	background-color: ${palette.colors.glass};
+	background-color: ${({ theme }) => theme.colors.backdrop.glass};
 	backdrop-filter: blur(6px);
 	z-index: 20;
 
@@ -906,8 +913,8 @@ const NonViableEventsContainer = styled.div<{
 
 	h2 {
 		font-size: 14px;
-		font-weight: ${palette.typography.fontWeight.bold};
-		color: ${palette.colors.gray[300]};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+		color: ${({ theme }) => theme.colors.text.primary};
 	}
 
 	transition: opacity 0.2s ease-in-out;
@@ -927,11 +934,11 @@ const CalendarCreateEventModalBackdrop = styled.div<{ $visible: boolean }>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: 1001;
+	z-index: 2;
 	isolation: isolate;
 	width: 100%;
 	height: 100%;
-	background-color: ${palette.colors.glass};
+	background-color: ${({ theme }) => theme.colors.backdrop.glass};
 	backdrop-filter: blur(4px);
 	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};

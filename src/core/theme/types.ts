@@ -33,6 +33,10 @@ export type ColorScaleHue =
 export type AppTheme = {
   colors: {
     plain: string;
+    backdrop: {
+      default: string;
+      glass: string;
+    };
     // Text colors
     text: {
       primary: string;
@@ -66,24 +70,39 @@ export type AppTheme = {
       circle: string;
       circleChecked: string;
     };
-		// Date picker colors
-		datepicker: {
+    // Date picker colors
+    datepicker: {
       bg: string;
-			headerBg: string;
-			headerText: string;
-			headerButton: string;
-			headerButtonHover: string;
-			dayText: string;
-			dateText: string;
-			dateDisabledText: string;
-			dateOutsideMonthText: string;
-			dateHoverBg: string;
-			dateHoverText: string;
-			dateSelectedBg: string;
+      headerBg: string;
+      headerText: string;
+      headerButton: string;
+      headerButtonHover: string;
+      dayText: string;
+      dateText: string;
+      dateDisabledText: string;
+      dateOutsideMonthText: string;
+      dateHoverBg: string;
+      dateHoverText: string;
+      dateSelectedBg: string;
       dateSelectedText: string;
-		}
+    };
     // Calendar Colors
     calendar: {
+      bg: string;
+			grid: string;
+      headerBg: string;
+      headerTodayBg: string;
+      headerDayText: string;
+      headerDayTodayText: string;
+      headerDateText: string;
+      headerDateTodayText: string;
+      headerNonViableDateText: string;
+      headerNonViableDateBg: string;
+      sidebarBg: string;
+      border: string;
+      sidebarButtonHover: string;
+      sidebarButtonActive: string;
+			eventInfoModalBg: string;
       summary: {
         bg: string;
         border: string;

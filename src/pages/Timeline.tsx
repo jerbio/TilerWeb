@@ -146,7 +146,6 @@ const TimelineContent = styled.main`
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	padding-top: 1.5rem;
 	overflow: hidden;
 
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
@@ -176,12 +175,11 @@ const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
 	height: 100%;
-	background: ${(props) => props.theme.colors.gray[900]};
-	border-top: 1px solid ${(props) => props.theme.colors.gray[700]};
+	background: ${(props) => props.theme.colors.calendar.bg};
 
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 8)};
-		border: 1px solid ${(props) => props.theme.colors.gray[700]};
+		border: 1px solid ${(props) => props.theme.colors.calendar.border};
 		border-left: none;
 		border-radius: 0 ${(props) => props.theme.borderRadius.large}
 			${(props) => props.theme.borderRadius.large} 0;
@@ -219,21 +217,21 @@ const ChatExpandToggle = styled.button`
 	transform: translateY(-50%) translateX(50%);
 	width: 40px;
 	height: 40px;
-	background: ${(props) => props.theme.colors.gray[900]};
-	border: 1px solid ${(props) => props.theme.colors.gray[800]};
+	background: ${(props) => props.theme.colors.background.card};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
 	border-radius: ${(props) => props.theme.borderRadius.large};
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	color: ${(props) => props.theme.colors.gray[300]};
+	color: ${(props) => props.theme.colors.text.secondary};
 	transition: all 0.2s ease;
 	z-index: 1000;
 	outline: none;
 
 	&:hover {
-		background: ${(props) => props.theme.colors.gray[800]};
-		color: white;
+		background: ${(props) => props.theme.colors.background.card2};
+		color: ${(props) => props.theme.colors.text.primary};
 	}
 `;
 
