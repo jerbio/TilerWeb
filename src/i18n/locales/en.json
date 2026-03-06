@@ -873,6 +873,13 @@
 	},
 	"timeline": {
 		"searchPlaceholder": "Search for a tile/block...",
+		"searchAriaLabel": "Search for a tile or block",
+		"clearSearch": "Clear search",
+		"loadMore": "Load more",
+		"loading": "Loading…",
+		"notFoundMessage": "Oops, we couldn't find '{{query}}'. Would you like to create a Tile from this title?",
+		"notFoundDismiss": "No thanks",
+		"notFoundCreate": "Create",
 		"userMenu": {
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",

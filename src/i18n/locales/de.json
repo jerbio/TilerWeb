@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Nach einer Kachel/Block suchen...",
+		"searchAriaLabel": "Nach einer Kachel oder einem Block suchen",
+		"clearSearch": "Suche löschen",
+		"loadMore": "Mehr laden",
+		"loading": "Laden…",
+		"notFoundMessage": "Hoppla, wir konnten '{{query}}' nicht finden. Möchten Sie eine Kachel mit diesem Titel erstellen?",
+		"notFoundDismiss": "Nein danke",
+		"notFoundCreate": "Erstellen"
+	},
 	"errors": {
 		"chatLimitReached": "Chat-Limit erreicht. Bitte versuchen Sie es später erneut.",
 		"usernameAlreadyExists": "Benutzername existiert bereits"

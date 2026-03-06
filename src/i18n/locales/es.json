@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Buscar un mosaico/bloque...",
+		"searchAriaLabel": "Buscar un mosaico o bloque",
+		"clearSearch": "Borrar búsqueda",
+		"loadMore": "Cargar más",
+		"loading": "Cargando…",
+		"notFoundMessage": "Ups, no pudimos encontrar '{{query}}'. ¿Te gustaría crear un mosaico con este título?",
+		"notFoundDismiss": "No, gracias",
+		"notFoundCreate": "Crear"
+	},
 	"errors": {
 		"chatLimitReached": "Límite de chat alcanzado. Por favor, inténtelo más tarde.",
 		"usernameAlreadyExists": "El nombre de usuario ya existe"

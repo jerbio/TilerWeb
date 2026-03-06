@@ -264,8 +264,22 @@ export type CalendarEvent = {
   entityName: string | null;
   blob: ScheduleSubCalendarEventBlob | null;
   subEvents: Array<ScheduleSubCalendarEvent> | null;
+  isAutoReviseDeadline?: boolean;
+  isAutoDeadline?: boolean;
 };
 
 export type CalendarEventResponse = ApiResponse<CalendarEvent>;
 
 export type SubEventsOfCalendarResponse = ApiResponse<ScheduleSubCalendarEvent[]>;
+
+/** Params for `GET /api/CalendarEvent/Name` — search tiles by name */
+export type CalendarEventSearchParams = {
+	data: string;
+	userName: string;
+	userId: string;
+	batchSize?: number;
+	index?: number;
+};
+
+/** Response shape for `GET /api/CalendarEvent/Name` */
+export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;

@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Cerca un riquadro/blocco...",
+		"searchAriaLabel": "Cerca un riquadro o blocco",
+		"clearSearch": "Cancella ricerca",
+		"loadMore": "Carica altro",
+		"loading": "Caricamento…",
+		"notFoundMessage": "Ops, non abbiamo trovato '{{query}}'. Vuoi creare un riquadro con questo titolo?",
+		"notFoundDismiss": "No grazie",
+		"notFoundCreate": "Crea"
+	},
 	"errors": {
 		"chatLimitReached": "Limite di chat raggiunto. Riprova più tardi.",
 		"usernameAlreadyExists": "Nome utente già esistente"

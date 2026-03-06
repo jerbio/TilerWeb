@@ -7,6 +7,7 @@ import ProfileSheet from '@/core/common/components/profile_sheet';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Env } from '@/config/config_getter';
 import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
+import SearchBar from './search_bar';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -44,6 +45,7 @@ const TimelineHeader: React.FC = () => {
       <HeaderLeft>
         <Logo size={30} />
       </HeaderLeft>
+      <SearchBar />
       <HeaderRight>
 				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
 					<Plus size={16} />

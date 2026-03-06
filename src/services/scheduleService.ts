@@ -114,6 +114,32 @@ class ScheduleService {
       throw normalizeError(error);
     }
   }
+
+  /**
+   * Search calendar events by name.
+   * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
+   * Returns an array of CalendarEvent matching the search query.
+   */
+  async searchCalendarEventsByName(
+    query: string,
+    userName: string,
+    userId: string,
+    pagination?: { batchSize?: number; index?: number },
+  ) {
+    try {
+      const response = await this.calendarEventApi.searchByName({
+        data: query,
+        userName,
+        userId,
+        ...pagination,
+      });
+
+      return response.Content;
+    } catch (error) {
+      console.error('Error searching calendar events by name', error);
+      throw normalizeError(error);
+    }
+  }
 }
 
 export default ScheduleService;

@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "搜索磁贴/块...",
+		"searchAriaLabel": "搜索磁贴或块",
+		"clearSearch": "清除搜索",
+		"loadMore": "加载更多",
+		"loading": "加载中…",
+		"notFoundMessage": "哎呀，我们找不到'{{query}}'。您想用这个标题创建一个磁贴吗？",
+		"notFoundDismiss": "不用了",
+		"notFoundCreate": "创建"
+	},
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",
 		"usernameAlreadyExists": "用户名已存在"

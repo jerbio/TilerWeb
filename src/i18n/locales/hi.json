@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "टाइल/ब्लॉक खोजें...",
+		"searchAriaLabel": "टाइल या ब्लॉक खोजें",
+		"clearSearch": "खोज साफ़ करें",
+		"loadMore": "और लोड करें",
+		"loading": "लोड हो रहा है…",
+		"notFoundMessage": "उफ़, हमें '{{query}}' नहीं मिला। क्या आप इस शीर्षक से एक टाइल बनाना चाहेंगे?",
+		"notFoundDismiss": "नहीं धन्यवाद",
+		"notFoundCreate": "बनाएँ"
+	},
 	"errors": {
 		"chatLimitReached": "चैट सीमा पूरी हो गई। कृपया बाद में पुनः प्रयास करें।",
 		"usernameAlreadyExists": "उपयोगकर्ता नाम पहले से मौजूद है"

@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Szukaj kafelka/bloku...",
+		"searchAriaLabel": "Szukaj kafelka lub bloku",
+		"clearSearch": "Wyczyść wyszukiwanie",
+		"loadMore": "Załaduj więcej",
+		"loading": "Ładowanie…",
+		"notFoundMessage": "Ups, nie znaleźliśmy '{{query}}'. Czy chcesz utworzyć kafelek z tego tytułu?",
+		"notFoundDismiss": "Nie, dziękuję",
+		"notFoundCreate": "Utwórz"
+	},
 	"errors": {
 		"chatLimitReached": "Osiągnięto limit czatu. Spróbuj ponownie później.",
 		"usernameAlreadyExists": "Nazwa użytkownika już istnieje"

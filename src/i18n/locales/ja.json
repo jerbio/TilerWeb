@@ -516,6 +516,16 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "タイル/ブロックを検索...",
+		"searchAriaLabel": "タイルまたはブロックを検索",
+		"clearSearch": "検索をクリア",
+		"loadMore": "もっと読み込む",
+		"loading": "読み込み中…",
+		"notFoundMessage": "おっと、'{{query}}'が見つかりませんでした。このタイトルでタイルを作成しますか？",
+		"notFoundDismiss": "いいえ",
+		"notFoundCreate": "作成"
+	},
 	"errors": {
 		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",
 		"usernameAlreadyExists": "ユーザー名は既に存在します"
