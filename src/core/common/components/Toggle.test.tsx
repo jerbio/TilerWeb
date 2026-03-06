@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
-import Toggle from './Toggle';
+import Toggle from '@/core/common/components/toggle';
 
 // Helper to render component with ThemeProvider
 const renderWithTheme = (ui: React.ReactElement) => {

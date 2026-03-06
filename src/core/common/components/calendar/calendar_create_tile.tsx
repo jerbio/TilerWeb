@@ -19,7 +19,7 @@ import {
 import { toast } from 'sonner';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 import DatePicker from '../date_picker';
-import Toggle from '../Toggle';
+import Toggle from '../toggle';
 import { useCalendarDispatch } from './CalendarRequestProvider';
 import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus, CalendarRequestType } from './calendarRequestContext';
 import { Actions } from '@/core/constants/enums';

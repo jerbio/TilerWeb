@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
-import Toggle from '@/core/common/components/Toggle';
+import Toggle from '@/core/common/components/toggle';
 import { userService } from '@/services';
 
 const NotificationPreferencesSettings: React.FC = () => {
