@@ -19,7 +19,6 @@ export default function usePrefetchedCalendarData({
 
   const latestLookupRequestRef = useRef<string | null>(null);
   const scheduleCacheRef = useRef<Map<string, Array<ScheduleSubCalendarEvent>>>(new Map());
-  const scheduleCache = scheduleCacheRef.current;
 
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [loading, setLoading] = useState(true);
@@ -38,15 +37,26 @@ export default function usePrefetchedCalendarData({
 
     setLoading(true);
 
-    // Clear the cache
+    // Clear the entire cache so stale prefetched ranges are discarded
     scheduleCacheRef.current = new Map();
 
     const start = viewOptions.startDay.valueOf();
     const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
+
+    // Re-fetch the current visible range
     const refreshedEvents = await fetchSchedule(userId, start, end, false);
 
 		setEvents(refreshedEvents);
     setLoading(false);
+
+    // Re-prefetch adjacent ranges so swiping is still instant
+    const nextStart = end;
+    const nextEnd = nextStart + TimeUtil.inMilliseconds(daysInView, 'd');
+    fetchSchedule(userId, nextStart, nextEnd, false);
+
+    const prevEnd = start;
+    const prevStart = prevEnd - TimeUtil.inMilliseconds(daysInView, 'd');
+    fetchSchedule(userId, prevStart, prevEnd, false);
   }
 
   function makeCacheKey(
@@ -60,9 +70,10 @@ export default function usePrefetchedCalendarData({
   }
 
   function enforceMaxCacheSize() {
-    if (scheduleCache.size > MAX_CACHE_ENTRIES) {
-      const firstKey = scheduleCache.keys().next().value || '';
-      scheduleCache.delete(firstKey);
+    const cache = scheduleCacheRef.current;
+    if (cache.size > MAX_CACHE_ENTRIES) {
+      const firstKey = cache.keys().next().value || '';
+      cache.delete(firstKey);
     }
   }
 
@@ -81,7 +92,7 @@ export default function usePrefetchedCalendarData({
     }
 
     if (useCache) {
-      const cached = scheduleCache.get(cacheKey);
+      const cached = scheduleCacheRef.current.get(cacheKey);
       if (cached) {
         return cached;
       }
@@ -92,7 +103,7 @@ export default function usePrefetchedCalendarData({
       endRange,
     });
 
-    scheduleCache.set(cacheKey, lookup.subCalendarEvents);
+    scheduleCacheRef.current.set(cacheKey, lookup.subCalendarEvents);
     enforceMaxCacheSize();
     return lookup.subCalendarEvents;
   }
