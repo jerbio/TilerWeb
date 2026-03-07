@@ -15,6 +15,7 @@ const items = [
   },
   {
     title: "How to Create a Block",
+    gif: "/gifs/how-to-create-a-block.gif",
     body: "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don\u2019t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable.",
   },
   {
