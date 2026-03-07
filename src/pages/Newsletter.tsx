@@ -19,6 +19,7 @@ const items = [
   },
   {
     title: "Creating Flexible Tiles",
+    gif: "/gifs/creating-flexible-tiles.gif",
     body: "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline \u2014 Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions.",
   },
   {
