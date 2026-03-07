@@ -23,6 +23,7 @@ import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
+import NotificationToast from './core/ui/NotificationToast';
 // import useAppStore from './global_state';
 
 // Component to track page views on route changes
@@ -120,6 +121,7 @@ const App: React.FC = () => {
                 </Route>
               </Routes>
               <Toaster position="bottom-left" theme="system" />
+              <NotificationToast />
             </BrowserRouter>
           </AuthProvider>
 

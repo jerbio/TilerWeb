@@ -536,5 +536,16 @@
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",
 		"usernameAlreadyExists": "用户名已存在"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "正在设置为当前...",
+			"setAsNowSuccess": "事件已设为当前！",
+			"completing": "正在完成事件...",
+			"completeSuccess": "事件已完成！",
+			"deleting": "正在删除事件...",
+			"deleteSuccess": "事件已删除！",
+			"actionFailed": "操作失败，请重试。"
+		}
 	}
 }

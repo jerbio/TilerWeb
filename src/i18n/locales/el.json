@@ -536,5 +536,16 @@
 	"errors": {
 		"chatLimitReached": "Έχει φτάσει το όριο συνομιλιών. Παρακαλώ δοκιμάστε ξανά αργότερα.",
 		"usernameAlreadyExists": "Το όνομα χρήστη υπάρχει ήδη"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Ορισμός ως τρέχον...",
+			"setAsNowSuccess": "Το συμβάν ορίστηκε ως τρέχον!",
+			"completing": "Ολοκλήρωση συμβάντος...",
+			"completeSuccess": "Το συμβάν ολοκληρώθηκε!",
+			"deleting": "Διαγραφή συμβάντος...",
+			"deleteSuccess": "Το συμβάν διαγράφηκε!",
+			"actionFailed": "Η ενέργεια απέτυχε. Δοκιμάστε ξανά."
+		}
 	}
 }

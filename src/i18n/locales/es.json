@@ -536,5 +536,16 @@
 	"errors": {
 		"chatLimitReached": "Límite de chat alcanzado. Por favor, inténtelo más tarde.",
 		"usernameAlreadyExists": "El nombre de usuario ya existe"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Configurando como actual...",
+			"setAsNowSuccess": "¡Evento configurado como actual!",
+			"completing": "Completando evento...",
+			"completeSuccess": "¡Evento completado!",
+			"deleting": "Eliminando evento...",
+			"deleteSuccess": "¡Evento eliminado!",
+			"actionFailed": "La acción falló. Inténtalo de nuevo."
+		}
 	}
 }

@@ -536,5 +536,16 @@
 	"errors": {
 		"chatLimitReached": "चैट सीमा पूरी हो गई। कृपया बाद में पुनः प्रयास करें।",
 		"usernameAlreadyExists": "उपयोगकर्ता नाम पहले से मौजूद है"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "वर्तमान के रूप में सेट हो रहा है...",
+			"setAsNowSuccess": "इवेंट वर्तमान के रूप में सेट किया गया!",
+			"completing": "इवेंट पूरा हो रहा है...",
+			"completeSuccess": "इवेंट पूरा हुआ!",
+			"deleting": "इवेंट हटाया जा रहा है...",
+			"deleteSuccess": "इवेंट हटाया गया!",
+			"actionFailed": "कार्रवाई विफल हुई। कृपया पुनः प्रयास करें।"
+		}
 	}
 }

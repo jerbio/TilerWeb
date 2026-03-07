@@ -536,5 +536,16 @@
 	"errors": {
 		"chatLimitReached": "Osiągnięto limit czatu. Spróbuj ponownie później.",
 		"usernameAlreadyExists": "Nazwa użytkownika już istnieje"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Ustawianie jako bieżące...",
+			"setAsNowSuccess": "Wydarzenie ustawione jako bieżące!",
+			"completing": "Kończenie wydarzenia...",
+			"completeSuccess": "Wydarzenie ukończone!",
+			"deleting": "Usuwanie wydarzenia...",
+			"deleteSuccess": "Wydarzenie usunięte!",
+			"actionFailed": "Akcja nie powiodła się. Spróbuj ponownie."
+		}
 	}
 }

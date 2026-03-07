@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Search, X, ChevronRight, HelpCircle, Play, Check, Trash2 } from 'lucide-react';
+import { Search, X, HelpCircle, Play, Check, Trash2 } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { scheduleService } from '@/services';
@@ -7,6 +7,7 @@ import useAppStore from '@/global_state';
 import { CalendarEvent } from '@/core/common/types/schedule';
 import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import colorUtil from '@/core/util/colors';
 import TimeUtil from '@/core/util/time';
 
@@ -42,6 +43,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const { setCreateTileModalOpen } = useCalendarUI();
+	const showNotification = useUiStore((s) => s.notification.show);
+	const updateNotification = useUiStore((s) => s.notification.update);
 
 	const performSearch = useCallback(
 		async (searchQuery: string) => {
@@ -149,11 +152,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
 	const handleSetAsNow = useCallback(async (eventId: string) => {
 		setActionLoading((prev) => ({ ...prev, [eventId]: 'now' }));
+		const notifId = notificationId(NotificationAction.SetAsNow, eventId);
+		showNotification(notifId, t('calendarEvent.notifications.settingAsNow'), 'loading');
+		// Dismiss search bar immediately — don't wait for the request
+		setQuery('');
+		setResults([]);
+		setHasSearched(false);
+		setShowDropdown(false);
+		setCurrentPage(0);
+		setHasMore(false);
+		onSearch?.('');
+		onResults?.([]);
 		try {
 			await scheduleService.setCalendarEventAsNow(eventId);
-			setResults((prev) => prev.filter((e) => e.id !== eventId));
+			updateNotification(notifId, t('calendarEvent.notifications.setAsNowSuccess'), 'success');
 		} catch (error) {
 			console.error('Set as now failed:', error);
+			updateNotification(notifId, t('calendarEvent.notifications.actionFailed'), 'error');
 		} finally {
 			setActionLoading((prev) => {
 				const next = { ...prev };
@@ -161,7 +176,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				return next;
 			});
 		}
-	}, []);
+	}, [showNotification, updateNotification, t, onSearch, onResults]);
 
 	const handleMarkComplete = useCallback((eventId: string) => {
 		setConfirmingAction({ eventId, action: 'complete' });
@@ -176,15 +191,34 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		const { eventId, action } = confirmingAction;
 		setConfirmingAction(null);
 		setActionLoading((prev) => ({ ...prev, [eventId]: action }));
+		const notifAction = action === 'complete' ? NotificationAction.Complete : NotificationAction.Delete;
+		const notifId = notificationId(notifAction, eventId);
+		const loadingMsg = action === 'complete'
+			? t('calendarEvent.notifications.completing')
+			: t('calendarEvent.notifications.deleting');
+		const successMsg = action === 'complete'
+			? t('calendarEvent.notifications.completeSuccess')
+			: t('calendarEvent.notifications.deleteSuccess');
+		showNotification(notifId, loadingMsg, 'loading');
+		// Dismiss search bar immediately — don't wait for the request
+		setQuery('');
+		setResults([]);
+		setHasSearched(false);
+		setShowDropdown(false);
+		setCurrentPage(0);
+		setHasMore(false);
+		onSearch?.('');
+		onResults?.([]);
 		try {
 			if (action === 'complete') {
 				await scheduleService.markCalendarEventComplete(eventId);
 			} else {
 				await scheduleService.deleteCalendarEvent(eventId);
 			}
-			setResults((prev) => prev.filter((e) => e.id !== eventId));
+			updateNotification(notifId, successMsg, 'success');
 		} catch (error) {
 			console.error(`${action} failed:`, error);
+			updateNotification(notifId, t('calendarEvent.notifications.actionFailed'), 'error');
 		} finally {
 			setActionLoading((prev) => {
 				const next = { ...prev };
@@ -192,7 +226,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				return next;
 			});
 		}
-	}, [confirmingAction]);
+	}, [confirmingAction, showNotification, updateNotification, t, onSearch, onResults]);
 
 	const handleCancelConfirm = useCallback(() => {
 		setConfirmingAction(null);
@@ -271,6 +305,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 											data-testid="confirm-yes"
 											onClick={(e) => { e.stopPropagation(); handleConfirmAction(); }}
 											$danger={confirmingAction.action === 'delete'}
+											$success={confirmingAction.action === 'complete'}
 										>
 											{t('timeline.confirmAction')}
 										</ConfirmButton>
@@ -310,7 +345,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
 										</ActionButton>
 									</ResultActions>
 								)}
-								<ChevronRight size={14} />
 							</ResultItem>
 						);
 					})}
@@ -537,23 +571,31 @@ const ConfirmText = styled.span`
 	white-space: nowrap;
 `;
 
-const ConfirmButton = styled.button<{ $danger?: boolean }>`
+const ConfirmButton = styled.button<{ $danger?: boolean; $success?: boolean }>`
 	padding: 2px 8px;
-	border: 1px solid ${({ theme, $danger }) =>
-		$danger ? 'rgba(220, 38, 38, 0.4)' : theme.colors.border.default};
+	border: 1px solid ${({ theme, $danger, $success }) =>
+		$danger ? 'rgba(220, 38, 38, 0.4)'
+		: $success ? 'rgba(18, 183, 106, 0.4)'
+		: theme.colors.border.default};
 	border-radius: 4px;
-	background: ${({ $danger }) =>
-		$danger ? 'rgba(220, 38, 38, 0.1)' : 'transparent'};
-	color: ${({ theme, $danger }) =>
-		$danger ? '#dc2626' : theme.colors.text.secondary};
+	background: ${({ $danger, $success }) =>
+		$danger ? 'rgba(220, 38, 38, 0.1)'
+		: $success ? 'rgba(18, 183, 106, 0.1)'
+		: 'transparent'};
+	color: ${({ theme, $danger, $success }) =>
+		$danger ? '#dc2626'
+		: $success ? '#12b76a'
+		: theme.colors.text.secondary};
 	font-size: 11px;
 	cursor: pointer;
 	white-space: nowrap;
 	transition: background 0.1s ease;
 
 	&:hover {
-		background: ${({ theme, $danger }) =>
-			$danger ? 'rgba(220, 38, 38, 0.2)' : theme.colors.background.card2};
+		background: ${({ theme, $danger, $success }) =>
+			$danger ? 'rgba(220, 38, 38, 0.2)'
+			: $success ? 'rgba(18, 183, 106, 0.2)'
+			: theme.colors.background.card2};
 	}
 `;
 

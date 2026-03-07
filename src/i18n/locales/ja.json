@@ -536,5 +536,16 @@
 	"errors": {
 		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",
 		"usernameAlreadyExists": "ユーザー名は既に存在します"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "現在のイベントに設定中...",
+			"setAsNowSuccess": "イベントを現在に設定しました！",
+			"completing": "イベントを完了中...",
+			"completeSuccess": "イベントが完了しました！",
+			"deleting": "イベントを削除中...",
+			"deleteSuccess": "イベントが削除されました！",
+			"actionFailed": "アクションに失敗しました。もう一度お試しください。"
+		}
 	}
 }

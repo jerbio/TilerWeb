@@ -67,6 +67,30 @@ vi.mock('@/core/util/time', () => ({
 	},
 }));
 
+// Mock notification store
+const mockShowNotification = vi.fn();
+const mockUpdateNotification = vi.fn();
+vi.mock('@/core/ui', () => ({
+	useUiStore: (selector?: (state: unknown) => unknown) => {
+		const state = {
+			notification: {
+				items: [],
+				show: mockShowNotification,
+				update: mockUpdateNotification,
+				dismiss: vi.fn(),
+				clear: vi.fn(),
+			},
+		};
+		return selector ? selector(state) : state;
+	},
+	notificationId: (action: string, entityId: string) => `${action}-${entityId}`,
+	NotificationAction: {
+		SetAsNow: 'set-now',
+		Complete: 'complete',
+		Delete: 'delete',
+	},
+}));
+
 // Mock i18n
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
@@ -87,6 +111,13 @@ vi.mock('react-i18next', () => ({
 				'timeline.confirmDeleteTitle': 'Delete this event?',
 				'timeline.confirmAction': 'Confirm',
 				'timeline.cancelAction': 'Cancel',
+				'timeline.notifications.settingAsNow': 'Setting as current...',
+				'timeline.notifications.setAsNowSuccess': 'Event set as current!',
+				'timeline.notifications.completing': 'Completing event...',
+				'timeline.notifications.completeSuccess': 'Event completed!',
+				'timeline.notifications.deleting': 'Deleting event...',
+				'timeline.notifications.deleteSuccess': 'Event deleted!',
+				'timeline.notifications.actionFailed': 'Action failed. Please try again.',
 			};
 			return translations[key] ?? key;
 		},
@@ -568,7 +599,7 @@ describe('SearchBar', () => {
 			expect(deleteButtons[0]).toHaveAttribute('title', 'Delete');
 		});
 
-		it('calls setCalendarEventAsNow and removes result on success', async () => {
+		it('calls setCalendarEventAsNow and dismisses search bar on success', async () => {
 			mockSetCalendarEventAsNow.mockResolvedValue(mockResults[0]);
 			const user = await searchAndGetResults();
 
@@ -578,11 +609,12 @@ describe('SearchBar', () => {
 			expect(mockSetCalendarEventAsNow).toHaveBeenCalledWith('cal-1');
 
 			await waitFor(() => {
-				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+				expect(screen.queryByTestId('search-results-dropdown')).not.toBeInTheDocument();
+				expect(screen.getByRole('textbox')).toHaveValue('');
 			});
 		});
 
-		it('calls markCalendarEventComplete and removes result on success', async () => {
+		it('calls markCalendarEventComplete and dismisses search bar on success', async () => {
 			mockMarkCalendarEventComplete.mockResolvedValue(mockResults[0]);
 			const user = await searchAndGetResults();
 
@@ -599,11 +631,12 @@ describe('SearchBar', () => {
 			expect(mockMarkCalendarEventComplete).toHaveBeenCalledWith('cal-1');
 
 			await waitFor(() => {
-				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+				expect(screen.queryByTestId('search-results-dropdown')).not.toBeInTheDocument();
+				expect(screen.getByRole('textbox')).toHaveValue('');
 			});
 		});
 
-		it('calls deleteCalendarEvent and removes result on success', async () => {
+		it('calls deleteCalendarEvent and dismisses search bar on success', async () => {
 			mockDeleteCalendarEvent.mockResolvedValue(mockResults[0]);
 			const user = await searchAndGetResults();
 
@@ -620,11 +653,12 @@ describe('SearchBar', () => {
 			expect(mockDeleteCalendarEvent).toHaveBeenCalledWith('cal-1');
 
 			await waitFor(() => {
-				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+				expect(screen.queryByTestId('search-results-dropdown')).not.toBeInTheDocument();
+				expect(screen.getByRole('textbox')).toHaveValue('');
 			});
 		});
 
-		it('keeps result in list when action fails', async () => {
+		it('dismisses search bar even when action fails', async () => {
 			mockSetCalendarEventAsNow.mockRejectedValue(new Error('Network error'));
 			const user = await searchAndGetResults();
 
@@ -632,8 +666,9 @@ describe('SearchBar', () => {
 			await user.click(setAsNowButtons[0]);
 
 			await waitFor(() => {
-				// Both results should still be present after failure
-				expect(screen.getAllByTestId('search-result-item')).toHaveLength(2);
+				// Search bar dismisses immediately, even before the request resolves
+				expect(screen.queryByTestId('search-results-dropdown')).not.toBeInTheDocument();
+				expect(screen.getByRole('textbox')).toHaveValue('');
 			});
 		});
 
@@ -710,7 +745,7 @@ describe('SearchBar', () => {
 			});
 		});
 
-		it('disables all action buttons globally while an action is in progress', async () => {
+		it('dismisses search bar immediately when an action is triggered', async () => {
 			let resolveAction: (value: unknown) => void;
 			mockSetCalendarEventAsNow.mockReturnValue(
 				new Promise((resolve) => { resolveAction = resolve; }),
@@ -720,23 +755,14 @@ describe('SearchBar', () => {
 			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
 			await user.click(setAsNowButtons[0]);
 
-			// ALL action buttons across ALL items should be disabled
+			// Search bar should be dismissed immediately, before the request resolves
 			await waitFor(() => {
-				const allResults = screen.getAllByTestId('search-result-item');
-				allResults.forEach((result) => {
-					const buttons = result.querySelectorAll('button');
-					buttons.forEach((btn) => {
-						expect(btn).toBeDisabled();
-					});
-				});
+				expect(screen.queryByTestId('search-results-dropdown')).not.toBeInTheDocument();
+				expect(screen.getByRole('textbox')).toHaveValue('');
 			});
 
-			// Resolve the action
+			// Resolve the action to avoid unhandled promise
 			resolveAction!(mockResults[0]);
-
-			await waitFor(() => {
-				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
-			});
 		});
 	});
 });
