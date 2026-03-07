@@ -524,7 +524,14 @@
 		"loading": "Caricamento…",
 		"notFoundMessage": "Ops, non abbiamo trovato '{{query}}'. Vuoi creare un riquadro con questo titolo?",
 		"notFoundDismiss": "No grazie",
-		"notFoundCreate": "Crea"
+		"notFoundCreate": "Crea",
+		"setAsNow": "Imposta come adesso",
+		"markComplete": "Completa",
+		"markDeleted": "Elimina",
+		"confirmCompleteTitle": "Completare questo evento?",
+		"confirmDeleteTitle": "Eliminare questo evento?",
+		"confirmAction": "Conferma",
+		"cancelAction": "Annulla"
 	},
 	"errors": {
 		"chatLimitReached": "Limite di chat raggiunto. Riprova più tardi.",

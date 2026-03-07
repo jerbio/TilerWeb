@@ -524,7 +524,14 @@
 		"loading": "लोड हो रहा है…",
 		"notFoundMessage": "उफ़, हमें '{{query}}' नहीं मिला। क्या आप इस शीर्षक से एक टाइल बनाना चाहेंगे?",
 		"notFoundDismiss": "नहीं धन्यवाद",
-		"notFoundCreate": "बनाएँ"
+		"notFoundCreate": "बनाएँ",
+		"setAsNow": "अभी के रूप में सेट करें",
+		"markComplete": "पूर्ण करें",
+		"markDeleted": "हटाएँ",
+		"confirmCompleteTitle": "इस इवेंट को पूर्ण करें?",
+		"confirmDeleteTitle": "इस इवेंट को हटाएँ?",
+		"confirmAction": "पुष्टि करें",
+		"cancelAction": "रद्द करें"
 	},
 	"errors": {
 		"chatLimitReached": "चैट सीमा पूरी हो गई। कृपया बाद में पुनः प्रयास करें।",

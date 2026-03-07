@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Search, X, ChevronRight, HelpCircle } from 'lucide-react';
+import { Search, X, ChevronRight, HelpCircle, Play, Check, Trash2 } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { scheduleService } from '@/services';
 import useAppStore from '@/global_state';
 import { CalendarEvent } from '@/core/common/types/schedule';
 import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
+import { useTheme } from '@/core/theme/ThemeProvider';
+import colorUtil from '@/core/util/colors';
 import TimeUtil from '@/core/util/time';
 
 export type SearchBarProps = {
@@ -26,6 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	pageSize = 10,
 }) => {
 	const { t } = useTranslation();
+	const { isDarkMode } = useTheme();
 	const [query, setQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [results, setResults] = useState<CalendarEvent[]>([]);
@@ -34,6 +37,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const [currentPage, setCurrentPage] = useState(0);
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
+	const [actionLoading, setActionLoading] = useState<Record<string, string>>({});
+	const [confirmingAction, setConfirmingAction] = useState<{ eventId: string; action: 'complete' | 'delete' } | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const { setCreateTileModalOpen } = useCalendarUI();
@@ -123,6 +128,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		setShowDropdown(false);
 		setCurrentPage(0);
 		setHasMore(false);
+		setActionLoading({});
+		setConfirmingAction(null);
 		onSearch?.('');
 		onResults?.([]);
 		if (debounceRef.current) {
@@ -139,6 +146,57 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		setCreateTileModalOpen(true);
 		setShowDropdown(false);
 	};
+
+	const handleSetAsNow = useCallback(async (eventId: string) => {
+		setActionLoading((prev) => ({ ...prev, [eventId]: 'now' }));
+		try {
+			await scheduleService.setCalendarEventAsNow(eventId);
+			setResults((prev) => prev.filter((e) => e.id !== eventId));
+		} catch (error) {
+			console.error('Set as now failed:', error);
+		} finally {
+			setActionLoading((prev) => {
+				const next = { ...prev };
+				delete next[eventId];
+				return next;
+			});
+		}
+	}, []);
+
+	const handleMarkComplete = useCallback((eventId: string) => {
+		setConfirmingAction({ eventId, action: 'complete' });
+	}, []);
+
+	const handleDelete = useCallback((eventId: string) => {
+		setConfirmingAction({ eventId, action: 'delete' });
+	}, []);
+
+	const handleConfirmAction = useCallback(async () => {
+		if (!confirmingAction) return;
+		const { eventId, action } = confirmingAction;
+		setConfirmingAction(null);
+		setActionLoading((prev) => ({ ...prev, [eventId]: action }));
+		try {
+			if (action === 'complete') {
+				await scheduleService.markCalendarEventComplete(eventId);
+			} else {
+				await scheduleService.deleteCalendarEvent(eventId);
+			}
+			setResults((prev) => prev.filter((e) => e.id !== eventId));
+		} catch (error) {
+			console.error(`${action} failed:`, error);
+		} finally {
+			setActionLoading((prev) => {
+				const next = { ...prev };
+				delete next[eventId];
+				return next;
+			});
+		}
+	}, [confirmingAction]);
+
+	const handleCancelConfirm = useCallback(() => {
+		setConfirmingAction(null);
+	}, []);
 
 	// Click-outside handler to dismiss dropdown
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -157,6 +215,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
 	const showResults = showDropdown && hasSearched && results.length > 0;
 	const showNotFound = showDropdown && hasSearched && results.length === 0;
+	const isAnyActionInProgress = Object.keys(actionLoading).length > 0;
+	const isInteractionBlocked = isAnyActionInProgress || !!confirmingAction;
 
 	return (
 		<SearchContainer ref={containerRef}>
@@ -183,24 +243,82 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
 			{showResults && (
 				<ResultsDropdown data-testid="search-results-dropdown">
-					{results.map((event) => (
-						<ResultItem key={event.id} data-testid="search-result-item">
-							<ColorDot
-								data-testid="result-color-dot"
-								$r={event.colorRed ?? 0}
-								$g={event.colorGreen ?? 0}
-								$b={event.colorBlue ?? 0}
-							/>
-							<ResultName>{event.name}</ResultName>
-							<ResultTime>{TimeUtil.relativeTime(event.start ?? 0)}</ResultTime>
-							<ChevronRight size={14} />
-						</ResultItem>
-					))}
+					{results.map((event) => {
+						const rgb = { r: event.colorRed ?? 0, g: event.colorGreen ?? 0, b: event.colorBlue ?? 0 };
+						const adjusted = isDarkMode ? colorUtil.setLightness(rgb, 0.6) : rgb;
+						const eventId = event.id ?? '';
+						const itemAction = actionLoading[eventId];
+						const isConfirming = confirmingAction?.eventId === eventId;
+						return (
+							<ResultItem key={event.id} data-testid="search-result-item">
+								<ColorDot
+									data-testid="result-color-dot"
+									$r={adjusted.r}
+									$g={adjusted.g}
+									$b={adjusted.b}
+									$isBlock={!!event.isRigid}
+								/>
+								<ResultName>{event.name}</ResultName>
+								<ResultTime>{TimeUtil.relativeTime(event.start ?? 0)}</ResultTime>
+								{isConfirming ? (
+									<ConfirmInline data-testid="confirm-inline">
+										<ConfirmText>
+											{confirmingAction.action === 'complete'
+												? t('timeline.confirmCompleteTitle')
+												: t('timeline.confirmDeleteTitle')}
+										</ConfirmText>
+										<ConfirmButton
+											data-testid="confirm-yes"
+											onClick={(e) => { e.stopPropagation(); handleConfirmAction(); }}
+											$danger={confirmingAction.action === 'delete'}
+										>
+											{t('timeline.confirmAction')}
+										</ConfirmButton>
+										<ConfirmButton
+											data-testid="confirm-cancel"
+											onClick={(e) => { e.stopPropagation(); handleCancelConfirm(); }}
+										>
+											{t('timeline.cancelAction')}
+										</ConfirmButton>
+									</ConfirmInline>
+								) : (
+									<ResultActions data-testid="result-actions">
+										<ActionButton
+											data-testid="action-set-as-now"
+											title={t('timeline.setAsNow')}
+											onClick={(e) => { e.stopPropagation(); handleSetAsNow(eventId); }}
+											disabled={isInteractionBlocked}
+										>
+											{itemAction === 'now' ? <ActionSpinner /> : <Play size={12} />}
+										</ActionButton>
+										<ActionButton
+											data-testid="action-mark-complete"
+											title={t('timeline.markComplete')}
+											onClick={(e) => { e.stopPropagation(); handleMarkComplete(eventId); }}
+											disabled={isInteractionBlocked}
+										>
+											{itemAction === 'complete' ? <ActionSpinner /> : <Check size={12} />}
+										</ActionButton>
+										<ActionButton
+											data-testid="action-delete"
+											title={t('timeline.markDeleted')}
+											onClick={(e) => { e.stopPropagation(); handleDelete(eventId); }}
+											disabled={isInteractionBlocked}
+											$danger
+										>
+											{itemAction === 'delete' ? <ActionSpinner /> : <Trash2 size={12} />}
+										</ActionButton>
+									</ResultActions>
+								)}
+								<ChevronRight size={14} />
+							</ResultItem>
+						);
+					})}
 					{hasMore && (
 						<LoadMoreButton
 							data-testid="load-more-button"
 							onClick={loadMore}
-							disabled={isLoadingMore}
+							disabled={isLoadingMore || isInteractionBlocked}
 						>
 							{isLoadingMore ? t('timeline.loading') : t('timeline.loadMore')}
 						</LoadMoreButton>
@@ -334,12 +452,13 @@ const ResultItem = styled.div`
 	}
 `;
 
-const ColorDot = styled.span<{ $r: number; $g: number; $b: number }>`
+const ColorDot = styled.span<{ $r: number; $g: number; $b: number; $isBlock: boolean }>`
 	width: 10px;
 	height: 10px;
-	border-radius: 50%;
+	border-radius: ${({ $isBlock }) => ($isBlock ? '3px' : '50%')};
 	flex-shrink: 0;
 	background-color: ${({ $r, $g, $b }) => `rgb(${$r}, ${$g}, ${$b})`};
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 `;
 
 const ResultName = styled.span`
@@ -354,6 +473,88 @@ const ResultTime = styled.span`
 	font-size: 12px;
 	color: ${({ theme }) => theme.colors.text.muted};
 	white-space: nowrap;
+`;
+
+const ResultActions = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	flex-shrink: 0;
+`;
+
+const ActionButton = styled.button<{ $danger?: boolean }>`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border: none;
+	border-radius: 4px;
+	background: transparent;
+	color: ${({ theme, $danger }) => ($danger ? theme.colors.text.muted : theme.colors.text.muted)};
+	cursor: pointer;
+	padding: 0;
+	transition: background 0.1s ease, color 0.1s ease;
+
+	&:hover:not(:disabled) {
+		background: ${({ theme, $danger }) =>
+			$danger ? 'rgba(220, 38, 38, 0.1)' : theme.colors.background.card2};
+		color: ${({ $danger, theme }) =>
+			$danger ? '#dc2626' : theme.colors.text.primary};
+	}
+
+	&:disabled {
+		cursor: default;
+		opacity: 0.5;
+	}
+`;
+
+const ActionSpinner = styled.div`
+	width: 10px;
+	height: 10px;
+	border: 1.5px solid ${({ theme }) => theme.colors.border.default};
+	border-top-color: ${({ theme }) => theme.colors.text.secondary};
+	border-radius: 50%;
+	animation: action-spin 0.6s linear infinite;
+
+	@keyframes action-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+`;
+
+const ConfirmInline = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-shrink: 0;
+`;
+
+const ConfirmText = styled.span`
+	font-size: 11px;
+	color: ${({ theme }) => theme.colors.text.muted};
+	white-space: nowrap;
+`;
+
+const ConfirmButton = styled.button<{ $danger?: boolean }>`
+	padding: 2px 8px;
+	border: 1px solid ${({ theme, $danger }) =>
+		$danger ? 'rgba(220, 38, 38, 0.4)' : theme.colors.border.default};
+	border-radius: 4px;
+	background: ${({ $danger }) =>
+		$danger ? 'rgba(220, 38, 38, 0.1)' : 'transparent'};
+	color: ${({ theme, $danger }) =>
+		$danger ? '#dc2626' : theme.colors.text.secondary};
+	font-size: 11px;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.1s ease;
+
+	&:hover {
+		background: ${({ theme, $danger }) =>
+			$danger ? 'rgba(220, 38, 38, 0.2)' : theme.colors.background.card2};
+	}
 `;
 
 const LoadMoreButton = styled.button`

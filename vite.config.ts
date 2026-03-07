@@ -13,7 +13,7 @@ const developmentConfig = (baseUrl: string): UserConfig => ({
 	...baseConfig,
 	server: {
 		host: true,
-		https: false,
+		// https: false,
 		// Proxy API requests to backend in development
 		// This enables same-origin cookie handling
 		proxy: {

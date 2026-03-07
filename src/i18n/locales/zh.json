@@ -524,7 +524,14 @@
 		"loading": "加载中…",
 		"notFoundMessage": "哎呀，我们找不到'{{query}}'。您想用这个标题创建一个磁贴吗？",
 		"notFoundDismiss": "不用了",
-		"notFoundCreate": "创建"
+		"notFoundCreate": "创建",
+		"setAsNow": "设为当前",
+		"markComplete": "完成",
+		"markDeleted": "删除",
+		"confirmCompleteTitle": "完成此事件？",
+		"confirmDeleteTitle": "删除此事件？",
+		"confirmAction": "确认",
+		"cancelAction": "取消"
 	},
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",

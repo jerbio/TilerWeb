@@ -524,7 +524,14 @@
 		"loading": "読み込み中…",
 		"notFoundMessage": "おっと、'{{query}}'が見つかりませんでした。このタイトルでタイルを作成しますか？",
 		"notFoundDismiss": "いいえ",
-		"notFoundCreate": "作成"
+		"notFoundCreate": "作成",
+		"setAsNow": "現在に設定",
+		"markComplete": "完了",
+		"markDeleted": "削除",
+		"confirmCompleteTitle": "このイベントを完了しますか？",
+		"confirmDeleteTitle": "このイベントを削除しますか？",
+		"confirmAction": "確認",
+		"cancelAction": "キャンセル"
 	},
 	"errors": {
 		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",

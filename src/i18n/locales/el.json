@@ -524,7 +524,14 @@
 		"loading": "Φόρτωση…",
 		"notFoundMessage": "Ωχ, δεν μπορέσαμε να βρούμε '{{query}}'. Θα θέλατε να δημιουργήσετε ένα πλακίδιο με αυτόν τον τίτλο;",
 		"notFoundDismiss": "Όχι, ευχαριστώ",
-		"notFoundCreate": "Δημιουργία"
+		"notFoundCreate": "Δημιουργία",
+		"setAsNow": "Ορισμός ως τώρα",
+		"markComplete": "Ολοκλήρωση",
+		"markDeleted": "Διαγραφή",
+		"confirmCompleteTitle": "Ολοκλήρωση αυτού του συμβάντος;",
+		"confirmDeleteTitle": "Διαγραφή αυτού του συμβάντος;",
+		"confirmAction": "Επιβεβαίωση",
+		"cancelAction": "Ακύρωση"
 	},
 	"errors": {
 		"chatLimitReached": "Έχει φτάσει το όριο συνομιλιών. Παρακαλώ δοκιμάστε ξανά αργότερα.",

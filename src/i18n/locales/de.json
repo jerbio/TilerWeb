@@ -524,7 +524,14 @@
 		"loading": "Laden…",
 		"notFoundMessage": "Hoppla, wir konnten '{{query}}' nicht finden. Möchten Sie eine Kachel mit diesem Titel erstellen?",
 		"notFoundDismiss": "Nein danke",
-		"notFoundCreate": "Erstellen"
+		"notFoundCreate": "Erstellen",
+		"setAsNow": "Jetzt setzen",
+		"markComplete": "Abschließen",
+		"markDeleted": "Löschen",
+		"confirmCompleteTitle": "Dieses Ereignis abschließen?",
+		"confirmDeleteTitle": "Dieses Ereignis löschen?",
+		"confirmAction": "Bestätigen",
+		"cancelAction": "Abbrechen"
 	},
 	"errors": {
 		"chatLimitReached": "Chat-Limit erreicht. Bitte versuchen Sie es später erneut.",

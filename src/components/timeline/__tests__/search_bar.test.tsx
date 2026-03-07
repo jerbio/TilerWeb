@@ -6,11 +6,17 @@ import SearchBar from '../search_bar';
 import { CalendarEvent } from '@/core/common/types/schedule';
 
 const mockSearchCalendarEventsByName = vi.fn();
+const mockSetCalendarEventAsNow = vi.fn();
+const mockMarkCalendarEventComplete = vi.fn();
+const mockDeleteCalendarEvent = vi.fn();
 
 // Mock the services module
 vi.mock('@/services', () => ({
 	scheduleService: {
 		searchCalendarEventsByName: (...args: unknown[]) => mockSearchCalendarEventsByName(...args),
+		setCalendarEventAsNow: (...args: unknown[]) => mockSetCalendarEventAsNow(...args),
+		markCalendarEventComplete: (...args: unknown[]) => mockMarkCalendarEventComplete(...args),
+		deleteCalendarEvent: (...args: unknown[]) => mockDeleteCalendarEvent(...args),
 	},
 }));
 
@@ -42,6 +48,18 @@ vi.mock('@/core/common/components/calendar/CalendarUIProvider', () => ({
 	}),
 }));
 
+// Mock ThemeProvider
+vi.mock('@/core/theme/ThemeProvider', () => ({
+	useTheme: () => ({ isDarkMode: false, toggleTheme: vi.fn() }),
+}));
+
+// Mock colorUtil
+vi.mock('@/core/util/colors', () => ({
+	default: {
+		setLightness: (rgb: { r: number; g: number; b: number }) => rgb,
+	},
+}));
+
 // Mock TimeUtil
 vi.mock('@/core/util/time', () => ({
 	default: {
@@ -62,6 +80,13 @@ vi.mock('react-i18next', () => ({
 				'timeline.notFoundMessage': `Oops, we couldn't find '${opts?.query ?? ''}'. Would you like to create a Tile from this title?`,
 				'timeline.notFoundDismiss': 'No thanks',
 				'timeline.notFoundCreate': 'Create',
+				'timeline.setAsNow': 'Set as now',
+				'timeline.markComplete': 'Complete',
+				'timeline.markDeleted': 'Delete',
+				'timeline.confirmCompleteTitle': 'Complete this event?',
+				'timeline.confirmDeleteTitle': 'Delete this event?',
+				'timeline.confirmAction': 'Confirm',
+				'timeline.cancelAction': 'Cancel',
 			};
 			return translations[key] ?? key;
 		},
@@ -129,7 +154,7 @@ const mockResults: CalendarEvent[] = [
 		locationId: null,
 		isReadOnly: false,
 		isProcrastinateEvent: false,
-		isRigid: false,
+		isRigid: true,
 		uiConfig: null,
 		repetition: null,
 		eachTileDuration: 3600000,
@@ -239,6 +264,25 @@ describe('SearchBar', () => {
 
 		const colorDots = screen.getAllByTestId('result-color-dot');
 		expect(colorDots.length).toBe(2);
+	});
+
+	it('renders circle dot for tiles and rounded-square dot for blocks', async () => {
+		const user = setupUser();
+		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+
+		renderWithTheme(<SearchBar />);
+		const input = screen.getByPlaceholderText('Search for a tile/block...');
+		await user.type(input, 'Buy Coffee');
+
+		await waitFor(() => {
+			expect(screen.getByTestId('search-results-dropdown')).toBeInTheDocument();
+		});
+
+		const colorDots = screen.getAllByTestId('result-color-dot');
+		// cal-1 is a tile (isRigid: false) → circle
+		expect(colorDots[0]).toHaveStyle('border-radius: 50%');
+		// cal-2 is a block (isRigid: true) → rounded square
+		expect(colorDots[1]).toHaveStyle('border-radius: 3px');
 	});
 
 	it('shows not-found prompt when search returns empty', async () => {
@@ -481,5 +525,218 @@ describe('SearchBar', () => {
 		await user.click(screen.getByTestId('outside-element'));
 
 		expect(screen.queryByTestId('search-not-found')).not.toBeInTheDocument();
+	});
+
+	describe('result actions', () => {
+		const searchAndGetResults = async () => {
+			const user = setupUser();
+			mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+			renderWithTheme(<SearchBar />);
+
+			const input = screen.getByPlaceholderText('Search for a tile/block...');
+			await user.type(input, 'coffee');
+
+			await waitFor(() => {
+				expect(screen.getAllByTestId('search-result-item')).toHaveLength(2);
+			});
+
+			return user;
+		};
+
+		it('renders action buttons for each result item', async () => {
+			await searchAndGetResults();
+
+			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
+			const completeButtons = screen.getAllByTestId('action-mark-complete');
+			const deleteButtons = screen.getAllByTestId('action-delete');
+
+			expect(setAsNowButtons).toHaveLength(2);
+			expect(completeButtons).toHaveLength(2);
+			expect(deleteButtons).toHaveLength(2);
+		});
+
+		it('action buttons have correct titles', async () => {
+			await searchAndGetResults();
+
+			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
+			expect(setAsNowButtons[0]).toHaveAttribute('title', 'Set as now');
+
+			const completeButtons = screen.getAllByTestId('action-mark-complete');
+			expect(completeButtons[0]).toHaveAttribute('title', 'Complete');
+
+			const deleteButtons = screen.getAllByTestId('action-delete');
+			expect(deleteButtons[0]).toHaveAttribute('title', 'Delete');
+		});
+
+		it('calls setCalendarEventAsNow and removes result on success', async () => {
+			mockSetCalendarEventAsNow.mockResolvedValue(mockResults[0]);
+			const user = await searchAndGetResults();
+
+			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
+			await user.click(setAsNowButtons[0]);
+
+			expect(mockSetCalendarEventAsNow).toHaveBeenCalledWith('cal-1');
+
+			await waitFor(() => {
+				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+			});
+		});
+
+		it('calls markCalendarEventComplete and removes result on success', async () => {
+			mockMarkCalendarEventComplete.mockResolvedValue(mockResults[0]);
+			const user = await searchAndGetResults();
+
+			const completeButtons = screen.getAllByTestId('action-mark-complete');
+			await user.click(completeButtons[0]);
+
+			// Confirmation UI should appear
+			expect(screen.getByTestId('confirm-inline')).toBeInTheDocument();
+			expect(screen.getByText('Complete this event?')).toBeInTheDocument();
+
+			// Click confirm
+			await user.click(screen.getByTestId('confirm-yes'));
+
+			expect(mockMarkCalendarEventComplete).toHaveBeenCalledWith('cal-1');
+
+			await waitFor(() => {
+				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+			});
+		});
+
+		it('calls deleteCalendarEvent and removes result on success', async () => {
+			mockDeleteCalendarEvent.mockResolvedValue(mockResults[0]);
+			const user = await searchAndGetResults();
+
+			const deleteButtons = screen.getAllByTestId('action-delete');
+			await user.click(deleteButtons[0]);
+
+			// Confirmation UI should appear
+			expect(screen.getByTestId('confirm-inline')).toBeInTheDocument();
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+
+			// Click confirm
+			await user.click(screen.getByTestId('confirm-yes'));
+
+			expect(mockDeleteCalendarEvent).toHaveBeenCalledWith('cal-1');
+
+			await waitFor(() => {
+				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+			});
+		});
+
+		it('keeps result in list when action fails', async () => {
+			mockSetCalendarEventAsNow.mockRejectedValue(new Error('Network error'));
+			const user = await searchAndGetResults();
+
+			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
+			await user.click(setAsNowButtons[0]);
+
+			await waitFor(() => {
+				// Both results should still be present after failure
+				expect(screen.getAllByTestId('search-result-item')).toHaveLength(2);
+			});
+		});
+
+		it('shows confirmation UI when clicking Complete', async () => {
+			const user = await searchAndGetResults();
+
+			const completeButtons = screen.getAllByTestId('action-mark-complete');
+			await user.click(completeButtons[0]);
+
+			expect(screen.getByTestId('confirm-inline')).toBeInTheDocument();
+			expect(screen.getByText('Complete this event?')).toBeInTheDocument();
+			expect(screen.getByTestId('confirm-yes')).toBeInTheDocument();
+			expect(screen.getByTestId('confirm-cancel')).toBeInTheDocument();
+			// Service should NOT have been called yet
+			expect(mockMarkCalendarEventComplete).not.toHaveBeenCalled();
+		});
+
+		it('shows confirmation UI when clicking Delete', async () => {
+			const user = await searchAndGetResults();
+
+			const deleteButtons = screen.getAllByTestId('action-delete');
+			await user.click(deleteButtons[0]);
+
+			expect(screen.getByTestId('confirm-inline')).toBeInTheDocument();
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+			// Service should NOT have been called yet
+			expect(mockDeleteCalendarEvent).not.toHaveBeenCalled();
+		});
+
+		it('cancels confirmation and restores action buttons', async () => {
+			const user = await searchAndGetResults();
+
+			const completeButtons = screen.getAllByTestId('action-mark-complete');
+			await user.click(completeButtons[0]);
+
+			expect(screen.getByTestId('confirm-inline')).toBeInTheDocument();
+
+			// Click cancel
+			await user.click(screen.getByTestId('confirm-cancel'));
+
+			// Confirmation should be gone, action buttons restored
+			expect(screen.queryByTestId('confirm-inline')).not.toBeInTheDocument();
+			expect(screen.getAllByTestId('action-mark-complete')).toHaveLength(2);
+			expect(mockMarkCalendarEventComplete).not.toHaveBeenCalled();
+		});
+
+		it('Set As Now does not require confirmation', async () => {
+			mockSetCalendarEventAsNow.mockResolvedValue(mockResults[0]);
+			const user = await searchAndGetResults();
+
+			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
+			await user.click(setAsNowButtons[0]);
+
+			// No confirmation UI
+			expect(screen.queryByTestId('confirm-inline')).not.toBeInTheDocument();
+			// Service should be called immediately
+			expect(mockSetCalendarEventAsNow).toHaveBeenCalledWith('cal-1');
+		});
+
+		it('blocks all action buttons on other items while confirmation is showing', async () => {
+			const user = await searchAndGetResults();
+
+			const completeButtons = screen.getAllByTestId('action-mark-complete');
+			await user.click(completeButtons[0]);
+
+			// Confirmation showing for first item
+			expect(screen.getByTestId('confirm-inline')).toBeInTheDocument();
+
+			// Second item's action buttons should be disabled
+			const secondResult = screen.getAllByTestId('search-result-item')[1];
+			const buttons = secondResult.querySelectorAll('button');
+			buttons.forEach((btn) => {
+				expect(btn).toBeDisabled();
+			});
+		});
+
+		it('disables all action buttons globally while an action is in progress', async () => {
+			let resolveAction: (value: unknown) => void;
+			mockSetCalendarEventAsNow.mockReturnValue(
+				new Promise((resolve) => { resolveAction = resolve; }),
+			);
+			const user = await searchAndGetResults();
+
+			const setAsNowButtons = screen.getAllByTestId('action-set-as-now');
+			await user.click(setAsNowButtons[0]);
+
+			// ALL action buttons across ALL items should be disabled
+			await waitFor(() => {
+				const allResults = screen.getAllByTestId('search-result-item');
+				allResults.forEach((result) => {
+					const buttons = result.querySelectorAll('button');
+					buttons.forEach((btn) => {
+						expect(btn).toBeDisabled();
+					});
+				});
+			});
+
+			// Resolve the action
+			resolveAction!(mockResults[0]);
+
+			await waitFor(() => {
+				expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+			});
+		});
 	});
 });

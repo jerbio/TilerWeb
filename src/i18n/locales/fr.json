@@ -142,6 +142,13 @@
 		"notFoundMessage": "Oups, nous n'avons pas trouvé '{{query}}'. Souhaitez-vous créer une tuile à partir de ce titre ?",
 		"notFoundDismiss": "Non merci",
 		"notFoundCreate": "Créer",
+		"setAsNow": "Définir comme maintenant",
+		"markComplete": "Terminer",
+		"markDeleted": "Supprimer",
+		"confirmCompleteTitle": "Terminer cet événement ?",
+		"confirmDeleteTitle": "Supprimer cet événement ?",
+		"confirmAction": "Confirmer",
+		"cancelAction": "Annuler",
 		"userInfo": {
 			"fullName": "Nom Complet",
 			"username": "Nom d'Utilisateur",

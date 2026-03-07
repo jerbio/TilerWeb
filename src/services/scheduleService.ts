@@ -140,6 +140,48 @@ class ScheduleService {
       throw normalizeError(error);
     }
   }
+
+  /**
+   * Set a calendar event as the current ("now") event.
+   * `POST /api/CalendarEvent/Now`
+   */
+  async setCalendarEventAsNow(eventId: string) {
+    try {
+      const response = await this.calendarEventApi.setAsNow(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error setting calendar event as now', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Mark a calendar event as complete.
+   * `POST /api/CalendarEvent/Complete`
+   */
+  async markCalendarEventComplete(eventId: string) {
+    try {
+      const response = await this.calendarEventApi.markAsComplete(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error marking calendar event as complete', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Delete a calendar event.
+   * `DELETE /api/CalendarEvent`
+   */
+  async deleteCalendarEvent(eventId: string) {
+    try {
+      const response = await this.calendarEventApi.deleteCalendarEvent(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error deleting calendar event', error);
+      throw normalizeError(error);
+    }
+  }
 }
 
 export default ScheduleService;

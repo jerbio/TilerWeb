@@ -68,4 +68,37 @@ export class CalendarEventApi extends AppApi {
 
 		return this.apiRequest<CalendarEventSearchResponse>(`api/CalendarEvent/Name?${urlParams}`);
 	}
+
+	/**
+	 * Set a calendar event as the current ("now") event.
+	 * `POST /api/CalendarEvent/Now`  body: `{ ID: eventId }`
+	 */
+	public setAsNow(eventId: string) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Now', {
+			method: 'POST',
+			body: JSON.stringify({ ID: eventId }),
+		});
+	}
+
+	/**
+	 * Mark a calendar event as complete.
+	 * `POST /api/CalendarEvent/Complete`  body: `{ EventID: eventId }`
+	 */
+	public markAsComplete(eventId: string) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Complete', {
+			method: 'POST',
+			body: JSON.stringify({ EventID: eventId }),
+		});
+	}
+
+	/**
+	 * Delete a calendar event.
+	 * `DELETE /api/CalendarEvent`  body: `{ EventID: eventId }`
+	 */
+	public deleteCalendarEvent(eventId: string) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent', {
+			method: 'DELETE',
+			body: JSON.stringify({ EventID: eventId }),
+		});
+	}
 }

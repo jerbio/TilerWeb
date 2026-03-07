@@ -123,4 +123,82 @@ describe('ScheduleService', () => {
 			).rejects.toThrow();
 		});
 	});
+
+	describe('setCalendarEventAsNow', () => {
+		it('calls setAsNow on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.setAsNow).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.setCalendarEventAsNow('event-id-123');
+
+			expect(calendarEventApi.setAsNow).toHaveBeenCalledWith('event-id-123');
+			expect(result.id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(result.name).toBe('work out');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.setAsNow).mockRejectedValueOnce(
+				new Error('Network error'),
+			);
+
+			await expect(
+				service.setCalendarEventAsNow('bad-id'),
+			).rejects.toThrow();
+		});
+	});
+
+	describe('markCalendarEventComplete', () => {
+		it('calls markAsComplete on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.markAsComplete).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.markCalendarEventComplete('event-id-456');
+
+			expect(calendarEventApi.markAsComplete).toHaveBeenCalledWith('event-id-456');
+			expect(result.id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(result.name).toBe('work out');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.markAsComplete).mockRejectedValueOnce(
+				new Error('Network error'),
+			);
+
+			await expect(
+				service.markCalendarEventComplete('bad-id'),
+			).rejects.toThrow();
+		});
+	});
+
+	describe('deleteCalendarEvent', () => {
+		it('calls deleteCalendarEvent on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.deleteCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.deleteCalendarEvent('event-id-789');
+
+			expect(calendarEventApi.deleteCalendarEvent).toHaveBeenCalledWith('event-id-789');
+			expect(result.id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(result.name).toBe('work out');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.deleteCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error'),
+			);
+
+			await expect(
+				service.deleteCalendarEvent('bad-id'),
+			).rejects.toThrow();
+		});
+	});
 });

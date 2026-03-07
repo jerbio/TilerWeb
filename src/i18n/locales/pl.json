@@ -524,7 +524,14 @@
 		"loading": "Ładowanie…",
 		"notFoundMessage": "Ups, nie znaleźliśmy '{{query}}'. Czy chcesz utworzyć kafelek z tego tytułu?",
 		"notFoundDismiss": "Nie, dziękuję",
-		"notFoundCreate": "Utwórz"
+		"notFoundCreate": "Utwórz",
+		"setAsNow": "Ustaw jako teraz",
+		"markComplete": "Ukończ",
+		"markDeleted": "Usuń",
+		"confirmCompleteTitle": "Ukończyć to wydarzenie?",
+		"confirmDeleteTitle": "Usunąć to wydarzenie?",
+		"confirmAction": "Potwierdź",
+		"cancelAction": "Anuluj"
 	},
 	"errors": {
 		"chatLimitReached": "Osiągnięto limit czatu. Spróbuj ponownie później.",

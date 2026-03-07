@@ -524,7 +524,14 @@
 		"loading": "Загрузка…",
 		"notFoundMessage": "Упс, мы не смогли найти '{{query}}'. Хотите создать плитку с этим названием?",
 		"notFoundDismiss": "Нет, спасибо",
-		"notFoundCreate": "Создать"
+		"notFoundCreate": "Создать",
+		"setAsNow": "Установить как текущее",
+		"markComplete": "Завершить",
+		"markDeleted": "Удалить",
+		"confirmCompleteTitle": "Завершить это событие?",
+		"confirmDeleteTitle": "Удалить это событие?",
+		"confirmAction": "Подтвердить",
+		"cancelAction": "Отмена"
 	},
 	"errors": {
 		"chatLimitReached": "Достигнут лимит чата. Пожалуйста, повторите попытку позже.",

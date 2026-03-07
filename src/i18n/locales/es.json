@@ -524,7 +524,14 @@
 		"loading": "Cargando…",
 		"notFoundMessage": "Ups, no pudimos encontrar '{{query}}'. ¿Te gustaría crear un mosaico con este título?",
 		"notFoundDismiss": "No, gracias",
-		"notFoundCreate": "Crear"
+		"notFoundCreate": "Crear",
+		"setAsNow": "Establecer como ahora",
+		"markComplete": "Completar",
+		"markDeleted": "Eliminar",
+		"confirmCompleteTitle": "¿Completar este evento?",
+		"confirmDeleteTitle": "¿Eliminar este evento?",
+		"confirmAction": "Confirmar",
+		"cancelAction": "Cancelar"
 	},
 	"errors": {
 		"chatLimitReached": "Límite de chat alcanzado. Por favor, inténtelo más tarde.",
