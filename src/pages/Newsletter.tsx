@@ -10,6 +10,7 @@ import Collapse from '@/core/common/components/collapse';
 const items = [
   {
     title: "Set Up Tiler",
+    gif: "/gifs/set-up-tiler.gif",
     body: "Tiler works best when it\u2019s running in the background. Autopilot means you don\u2019t manually place tasks on your timeline; you simply tell Tiler what needs to get done, and it schedules everything around your day automatically. Once enabled, Tiler continuously adjusts your timeline as tasks are added, deferred, or as calendar events come in.",
   },
   {
@@ -133,6 +134,13 @@ const MediaPlaceholder = styled.div`
   }
 `;
 
+const GifImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: ${palette.borderRadius.medium};
+`;
+
 const MediaPlaceholderText = styled.span`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.xs};
@@ -171,7 +179,10 @@ const Newsletter: React.FC = () => {
     content: (
       <ContentRow>
         <MediaPlaceholder>
-          <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
+          {item.gif
+            ? <GifImage src={item.gif} alt={item.title} />
+            : <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
+          }
         </MediaPlaceholder>
         <BodyText>{item.body}</BodyText>
       </ContentRow>
