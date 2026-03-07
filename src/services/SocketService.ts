@@ -38,6 +38,7 @@ interface JQueryConnection {
     hub: SignalRConnection;
     vibeHub?: SignalRHubProxy;
     vibeUpdateHub?: SignalRHubProxy;
+    scheduleChange?: SignalRHubProxy;
 }
 
 interface JQueryWithSignalR {
@@ -57,6 +58,7 @@ export class SignalRService {
     // For production, use: 
     private readonly baseUrl = Env.get('BASE_URL');
     private callBackFunc: { [key: string]: (data: unknown) => void } = {};
+    private scheduleChangeCallbacks: { [key: string]: (data: unknown) => void } = {};
 
     constructor(private userId: string) {}
 
@@ -88,8 +90,25 @@ export class SignalRService {
     public unsubscribeFromSocketDataReceipt(callbackId: string): void {
         delete this.callBackFunc[callbackId];
     }
+    public subscribeToScheduleChange(callback: (data: unknown) => void): string {
+        const callbackId = this.generateCallbackId();
+        this.scheduleChangeCallbacks[callbackId] = callback;
+        return callbackId;
+    }
+
+    public unsubscribeFromScheduleChange(callbackId: string): void {
+        delete this.scheduleChangeCallbacks[callbackId];
+    }
+
+    private onScheduleChangeReceipt(data: unknown): void {
+        Object.values(this.scheduleChangeCallbacks).forEach((callback) => {
+            callback(data);
+        });
+    }
+
     public unsubscribeAll(): void {
         this.callBackFunc = {};
+        this.scheduleChangeCallbacks = {};
     }
     public dispose(): void {
         this.unsubscribeAll();
@@ -119,6 +138,14 @@ export class SignalRService {
             chat.client.refreshDataFromSockets = this.onSocketDataReceipt.bind(this);
         } else {
             console.error('vibeUpdateHub proxy is not available');
+        }
+
+        // Register scheduleChange hub for detecting schedule updates
+        const scheduleChangeHub = window.$.connection.scheduleChange;
+        if (scheduleChangeHub) {
+            scheduleChangeHub.client.refereshDataFromSockets = this.onScheduleChangeReceipt.bind(this);
+        } else {
+            console.error('scheduleChange proxy is not available');
         }
 
 

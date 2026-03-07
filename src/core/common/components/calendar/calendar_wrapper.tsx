@@ -2,6 +2,7 @@ import React from "react";
 import Calendar from "@/core/common/components/calendar/calendar";
 import usePrefetchedCalendarData from "@/core/common/hooks/usePrefetchedCalendarEvents";
 import useCalendarView from "@/core/common/hooks/useCalendarView";
+import { useScheduleSocket } from "@/hooks/useScheduleSocket";
 
 export function CalendarWrapper({
   chatExpanded,
@@ -23,6 +24,9 @@ export function CalendarWrapper({
     viewOptions,
     daysInView: viewOptions.daysInView,
   });
+
+  // Auto-refetch calendar events when a schedule change is detected via WebSocket
+  useScheduleSocket(refetchEvents);
 
   return (
     <Calendar

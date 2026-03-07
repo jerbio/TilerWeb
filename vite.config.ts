@@ -35,6 +35,13 @@ const developmentConfig = (baseUrl: string): UserConfig => ({
 				secure: false,
 				cookieDomainRewrite: 'localhost',
 			},
+			'/signalr': {
+				target: baseUrl,
+				changeOrigin: true,
+				secure: false,
+				cookieDomainRewrite: 'localhost',
+				ws: true,
+			},
 		},
 	},
 });
