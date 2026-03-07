@@ -6,7 +6,7 @@ import {
   initialOverlayState,
 } from './calendarOverlayManager';
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Helpers --------------------------------------------------
 
 function stateWith(overrides: Partial<OverlayState> = {}): OverlayState {
   return { ...initialOverlayState, ...overrides };
@@ -15,10 +15,10 @@ function stateWith(overrides: Partial<OverlayState> = {}): OverlayState {
 const MONDAY = '2026-02-23';
 const TUESDAY = '2026-02-24';
 
-// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Tests ----------------------------------------------------
 
 describe('calendarOverlayManager', () => {
-  // â”€â”€ Viable event clicked on grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Viable event clicked on grid ------------------------
 
   describe('VIABLE_EVENT_CLICKED', () => {
     it('dismisses the non-viable overlay', () => {
@@ -60,7 +60,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Non-viable event clicked on grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Non-viable event clicked on grid ---------------------
 
   describe('NON_VIABLE_EVENT_CLICKED', () => {
     it('keeps the non-viable overlay open for the same day', () => {
@@ -92,7 +92,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Day navigation (chevron arrows) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Day navigation (chevron arrows) ----------------------
 
   describe('DAY_NAVIGATED', () => {
     it('dismisses the non-viable overlay', () => {
@@ -119,7 +119,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ ActionPill focus â†’ viable event â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- ActionPill focus -> viable event ----------------------
 
   describe('FOCUS_VIABLE_EVENT', () => {
     it('dismisses the non-viable overlay', () => {
@@ -160,7 +160,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ ActionPill focus â†’ non-viable event â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- ActionPill focus -> non-viable event ------------------
 
   describe('FOCUS_NON_VIABLE_EVENT', () => {
     it('opens the non-viable overlay for the event day', () => {
@@ -201,7 +201,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Toggle non-viable overlay button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Toggle non-viable overlay button ---------------------
 
   describe('TOGGLE_NON_VIABLE_OVERLAY', () => {
     it('opens the overlay when closed', () => {
@@ -253,13 +253,13 @@ describe('calendarOverlayManager', () => {
         type: OverlayActionType.TOGGLE_NON_VIABLE_OVERLAY,
         day: MONDAY,
       });
-      // Closing the overlay â€” event info stays for now (user can close it separately)
+      // Closing the overlay -- event info stays for now (user can close it separately)
       expect(next.nonViableDay).toBeNull();
       expect(next.eventInfoEventId).toBe('nv-1');
     });
   });
 
-  // â”€â”€ Date navigation (Phase 4) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Date navigation (Phase 4) ---------------------------
 
   describe('NAVIGATE_TO_DATE', () => {
     it('dismisses non-viable overlay', () => {
@@ -279,7 +279,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Content area click outside â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Content area click outside ---------------------------
 
   describe('CONTENT_CLICK_OUTSIDE', () => {
     it('dismisses event info panel', () => {
@@ -311,7 +311,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Events reloaded â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Events reloaded --------------------------------------
 
   describe('EVENTS_RELOADED', () => {
     it('dismisses event info panel (data may be stale)', () => {
@@ -331,7 +331,7 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Close event info (explicit) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Close event info (explicit) --------------------------
 
   describe('CLOSE_EVENT_INFO', () => {
     it('clears event info and selection', () => {
@@ -355,10 +355,10 @@ describe('calendarOverlayManager', () => {
     });
   });
 
-  // â”€â”€ Compound scenarios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Compound scenarios -----------------------------------
 
   describe('compound scenarios', () => {
-    it('toggling non-viable overlay â†’ clicking viable event â†’ both dismissed', () => {
+    it('toggling non-viable overlay -> clicking viable event -> both dismissed', () => {
       let state = initialOverlayState;
       // Open non-viable overlay
       state = overlayReducer(state, { type: OverlayActionType.TOGGLE_NON_VIABLE_OVERLAY, day: MONDAY });
@@ -382,7 +382,7 @@ describe('calendarOverlayManager', () => {
       expect(state.selectedEventId).toBe('evt-2');
     });
 
-    it('ActionPill viable focus while non-viable overlay is open â†’ overlay dismissed, event focused', () => {
+    it('ActionPill viable focus while non-viable overlay is open -> overlay dismissed, event focused', () => {
       let state = stateWith({
         nonViableDay: MONDAY,
         eventInfoEventId: 'nv-1',
@@ -396,7 +396,7 @@ describe('calendarOverlayManager', () => {
       expect(state.eventInfoEventId).toBe('evt-1');
     });
 
-    it('navigate to date â†’ events reload â†’ clean slate', () => {
+    it('navigate to date -> events reload -> clean slate', () => {
       let state = stateWith({
         nonViableDay: MONDAY,
         eventInfoEventId: 'evt-1',
@@ -412,7 +412,7 @@ describe('calendarOverlayManager', () => {
       expect(state).toEqual(initialOverlayState);
     });
 
-    it('day navigation â†’ clean slate', () => {
+    it('day navigation -> clean slate', () => {
       const state = stateWith({
         nonViableDay: MONDAY,
         eventInfoEventId: 'evt-1',

@@ -440,6 +440,78 @@ describe('SearchBar', () => {
 		});
 	});
 
+	it('sends correct item-based index (not page index) when loading more', async () => {
+		const user = setupUser();
+		const firstPage = Array.from({ length: 10 }, (_, i) => ({
+			...mockResults[0],
+			id: `cal-${i}`,
+			name: `Tile ${i}`,
+		}));
+		const secondPage = Array.from({ length: 10 }, (_, i) => ({
+			...mockResults[0],
+			id: `cal-${10 + i}`,
+			name: `Tile ${10 + i}`,
+		}));
+		const thirdPage = Array.from({ length: 3 }, (_, i) => ({
+			...mockResults[0],
+			id: `cal-${20 + i}`,
+			name: `Tile ${20 + i}`,
+		}));
+
+		// Use mockImplementation so debounce timing doesn't exhaust mock values
+		mockSearchCalendarEventsByName.mockImplementation(
+			(_query: string, _userName: string, _userId: string, pagination?: { batchSize?: number; index?: number }) => {
+				const idx = pagination?.index ?? 0;
+				if (idx === 0) return Promise.resolve(firstPage);
+				if (idx === 10) return Promise.resolve(secondPage);
+				if (idx === 20) return Promise.resolve(thirdPage);
+				return Promise.resolve([]);
+			},
+		);
+
+		renderWithTheme(<SearchBar />);
+		const input = screen.getByPlaceholderText('Search for a tile/block...');
+		await user.type(input, 'tile');
+
+		await waitFor(() => {
+			expect(screen.getByTestId('search-results-dropdown')).toBeInTheDocument();
+		});
+
+		// Initial search: index 0
+		expect(mockSearchCalendarEventsByName).toHaveBeenLastCalledWith(
+			'tile',
+			'testuser',
+			'user-id-123',
+			{ batchSize: 10, index: 0 },
+		);
+
+		// First load more: index should be 10 (1 * 10), not 1
+		await user.click(screen.getByTestId('load-more-button'));
+		await waitFor(() => {
+			expect(screen.getAllByTestId('search-result-item')).toHaveLength(20);
+		});
+
+		expect(mockSearchCalendarEventsByName).toHaveBeenLastCalledWith(
+			'tile',
+			'testuser',
+			'user-id-123',
+			{ batchSize: 10, index: 10 },
+		);
+
+		// Second load more: index should be 20 (2 * 10), not 2
+		await user.click(screen.getByTestId('load-more-button'));
+		await waitFor(() => {
+			expect(screen.getAllByTestId('search-result-item')).toHaveLength(23);
+		});
+
+		expect(mockSearchCalendarEventsByName).toHaveBeenLastCalledWith(
+			'tile',
+			'testuser',
+			'user-id-123',
+			{ batchSize: 10, index: 20 },
+		);
+	});
+
 	it('hides "Load more" after loading a partial page', async () => {
 		const user = setupUser();
 		const firstPage = Array.from({ length: 10 }, (_, i) => ({

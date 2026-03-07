@@ -17,7 +17,7 @@ import {
 } from './calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Helpers ----------------------------------------------------
 
 function createFocusRequest(overrides: Partial<FocusEventRequest> = {}): FocusEventRequest {
   return {
@@ -103,7 +103,7 @@ function renderBusMultiListener(
   };
 }
 
-// â”€â”€ CalendarRequestProvider dispatch/subscribe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- CalendarRequestProvider dispatch/subscribe ----------------
 
 describe('CalendarRequestProvider', () => {
   describe('basic pub/sub', () => {
@@ -313,7 +313,7 @@ describe('CalendarRequestProvider', () => {
   });
 });
 
-// â”€â”€ CalendarRequestResult type tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- CalendarRequestResult type tests -------------------------
 
 describe('CalendarRequestResult types', () => {
   it('supports stale status', () => {
@@ -322,7 +322,7 @@ describe('CalendarRequestResult types', () => {
       entityId: 'entity-1',
     };
 
-    // Now a proper member of the union â€” no cast needed
+    // Now a proper member of the union -- no cast needed
     expect(result.status).toBe('stale');
   });
 });

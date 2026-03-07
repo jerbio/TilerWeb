@@ -97,7 +97,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				query,
 				authenticatedUser.username,
 				authenticatedUser.id,
-				{ batchSize: pageSize, index: nextPage },
+				{ batchSize: pageSize, index: nextPage * pageSize },
 			);
 			setResults((prev) => [...prev, ...moreResults]);
 			setCurrentPage(nextPage);
