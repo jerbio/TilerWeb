@@ -115,7 +115,7 @@ export class SignalRService {
         this.stopConnection();
     }
 
-    public createVibeConnection(): void {
+    public createConnection(): void {
         // Ensure jQuery and SignalR are loaded
         if (typeof window.$ === 'undefined') {
             console.error('jQuery is required for .NET Framework SignalR');

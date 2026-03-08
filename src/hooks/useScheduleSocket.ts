@@ -34,7 +34,7 @@ export function useScheduleSocket(onScheduleChange: () => void) {
 
     // Create the SignalR service and start the connection
     const service = new SignalRService(userId);
-    service.createVibeConnection();
+    service.createConnection();
 
     // Subscribe to schedule change events
     const cbId = service.subscribeToScheduleChange(handleScheduleChange);
