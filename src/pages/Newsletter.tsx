@@ -545,8 +545,8 @@ const SetupRowLabel = styled.span<{ $done?: boolean }>`
 const SetupGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  padding: 1.5rem 0 0.5rem;
+  gap: 1rem;
+  padding: 1.25rem 0 0.5rem;
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
@@ -570,7 +570,7 @@ const SetupCard = styled.div`
 
 // ── Animation area (220px, dark bg, clipped) ─────────────────────────────────
 const SetupAnim = styled.div`
-  height: 220px;
+  height: 170px;
   background: ${palette.colors.gray[900]};
   border-bottom: 1px solid ${palette.colors.gray[700]};
   position: relative;
@@ -582,10 +582,10 @@ const SetupAnim = styled.div`
 
 // ── Minimal body: step badge + title only ─────────────────────────────────────
 const SetupBody = styled.div`
-  padding: 20px 24px 24px;
+  padding: 14px 18px 18px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 `;
 
 const SetupCardStepBadge = styled.div`
