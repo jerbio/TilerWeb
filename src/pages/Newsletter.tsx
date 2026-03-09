@@ -508,19 +508,17 @@ const Newsletter: React.FC = () => {
 
   const whatIsSubItems = [
     {
-      title: "1. Not a Calendar. Autopilot AI",
+      title: "Tiler is an AI that runs your day.",
       content: (
         <SubBodyText>
-          Tiler works best on Autopilot. Instead of manually placing tasks on your timeline, you
-          simply tell Tiler what needs to get done — it schedules everything around your day
-          automatically. When a meeting runs long, when you defer a task, when life shifts —
-          Tiler detects the ripple and adjusts your whole day in seconds. You set the intent. Tiler
-          handles the placement.
+          When a meeting runs long, or a task gets deferred, Tiler doesn&rsquo;t wait for you to
+          fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the
+          intent. Tiler handles the rest.
         </SubBodyText>
       ),
     },
     {
-      title: "2. The Four Core Blocks of Tiler",
+      title: "The Four Core Blocks of Tiler",
       content: (
         <BlocksGrid>
           {coreBlocks.map((block) => (
@@ -537,7 +535,7 @@ const Newsletter: React.FC = () => {
       ),
     },
     {
-      title: "3. How Tiler is Different",
+      title: "How Tiler is Different",
       content: (
         <ComparisonTable>
           <ComparisonHeader>
@@ -598,12 +596,10 @@ const Newsletter: React.FC = () => {
               >
                 <WhatIsTilerTextSide>
                   <SectionBadge>What Is Tiler</SectionBadge>
-                  <SectionTitle>Not a calendar. An AI that runs your day.</SectionTitle>
+                  <SectionTitle>Not a calendar. An AI that runs your day</SectionTitle>
                   <SectionSummary>
-                    Most calendar apps are passive — they display what you&rsquo;ve already
-                    planned and stop there. Tiler actively builds and manages your schedule. Describe
-                    what you need to do. Tiler finds the time, adds travel, resolves conflicts, and
-                    adapts when your day changes.
+                    Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts
+                    when your day doesn&rsquo;t go to plan.
                   </SectionSummary>
                 </WhatIsTilerTextSide>
 
