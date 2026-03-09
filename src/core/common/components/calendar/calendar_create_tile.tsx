@@ -1,18 +1,18 @@
 import useFormHandler from '@/hooks/useFormHandler';
 import { Calendar, ChevronDown, ChevronUp, Keyboard, X } from 'lucide-react';
-import styled, { useTheme } from 'styled-components';
+import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../button';
 import Collapse from '../collapse';
 import { RGB, RGBColor } from '@/core/util/colors';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
 import LoadingModal from '../modals/loading-modal';
 import SuccessModal from '../modals/success-modal';
 import { scheduleService } from '@/services';
-import { ScheduleCreateEventParams, ScheduleCreateEventResponse } from '../../types/schedule';
+import { ScheduleCreateEventParams } from '../../types/schedule';
 import { toast } from 'sonner';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 import DatePicker from '../date_picker';
@@ -24,6 +24,8 @@ import {
   CalendarRequestType,
 } from './calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
+import { useTheme } from '@/core/theme/ThemeProvider';
+import { useCalendarUI } from './calendar-ui.provider';
 
 dayjs.extend(advancedFormat);
 
@@ -46,33 +48,24 @@ export type InitialCreateTileFormState = {
 };
 
 type CalendarCreateTileProps = {
-  isOpen: boolean;
   onClose: () => void;
-  expanded: boolean;
-  setExpanded: (expanded: boolean) => void;
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
   tileColorOptions: RGB[];
   refetchEvents: () => Promise<void>;
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
-  isOpen,
   onClose,
-  expanded,
-  setExpanded,
   tileColorOptions,
   formHandler,
   refetchEvents,
 }) => {
+  const ui = useCalendarUI((state) => state.createTile);
   const { formData, handleFormInputChange, resetForm } = formHandler;
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
+  const theme = useStyledTheme();
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [successEvent, setSuccessEvent] = useState<ScheduleCreateEventResponse['Content'] | null>(
-    null
-  );
-  const [isNavigatingToEvent, setIsNavigatingToEvent] = useState(false);
+
   const isValidSubmission = useMemo(() => {
     if (formData.action.trim().length === 0) return false;
     const duration = formData.durationHours * 60 + formData.durationMins;
@@ -84,12 +77,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
-				console.log('Submitting Form');
+        console.log('Submitting Form from Keyboard Enter');
         event.preventDefault();
         submitForm();
       }
     };
-    if (isOpen) {
+    if (ui.state.isOpen) {
       document.addEventListener('keydown', onKeyDown);
     } else {
       document.removeEventListener('keydown', onKeyDown);
@@ -97,7 +90,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     return () => {
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [isOpen, submitForm]);
+  }, [ui.state.isOpen, submitForm]);
 
   const tileActions = [
     {
@@ -111,9 +104,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                 key={optionRGBColor.toHex()}
                 $color={optionRGBColor}
                 $selected={optionRGBColor.equals(formData.color)}
-                onClick={() =>
-                  handleFormInputChange('color', { mode: 'static' })(color)
-                }
+                onClick={() => {
+                  handleFormInputChange('color', { mode: 'static' })(
+                    optionRGBColor
+                  );
+                }}
               ></TileColorOption>
             );
           })}
@@ -122,9 +117,15 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     },
   ];
 
+  function closeModal() {
+    ui.actions.close();
+    ui.actions.collapse();
+    onClose();
+  }
+
   async function submitForm() {
     if (!isValidSubmission) return;
-    setLoading(true);
+    ui.actions.startLoading(formData.action);
     try {
       const event: ScheduleCreateEventParams = {
         Name: formData.action,
@@ -145,37 +146,37 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       };
       const newEvent = await scheduleService.createEvent(event);
       await refetchEvents();
-      onClose();
-      setIsNavigatingToEvent(false);
-      setSuccessEvent(newEvent);
-      setSuccess(true);
+      closeModal();
+      ui.actions.navigateToTileComplete();
+      ui.actions.showSuccess(newEvent);
     } catch (error) {
       console.error(error);
       toast.error(String(error));
     } finally {
-      setLoading(false);
+      ui.actions.endLoading();
     }
   }
 
   function viewCreatedEvent() {
-    if (successEvent === null || successEvent.calendarEvent.id === null) return;
+    const successTile = ui.state.success.tile;
+    if (!successTile || successTile.calendarEvent.id === null) return;
     calendarDispatch(
       {
         type: CalendarRequestType.FocusEvent,
-        entityId: successEvent.calendarEvent.id,
+        entityId: successTile.calendarEvent.id,
         entityType: CalendarEntityType.CalendarEvent,
         actionType: Actions.Add_New_Task,
       },
       (result: CalendarRequestResult) => {
         if (result.status === CalendarRequestStatus.Navigating) {
-          setIsNavigatingToEvent(true);
+          ui.actions.navigateToTile();
         } else {
-          setIsNavigatingToEvent(false);
-          setSuccess(false);
+          ui.actions.navigateToTileComplete();
+          ui.actions.hideSuccess();
           if (result.status === CalendarRequestStatus.NotFound) {
             console.warn(
               '[CreateTile] Calendar could not find entity:',
-              successEvent.calendarEvent.id
+              successTile.calendarEvent.id
             );
           }
         }
@@ -185,24 +186,25 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 
   return (
     <StyledCalendarCreateEvent
-      onSubmit={(e) => {
-        e.preventDefault();
-        submitForm();
-      }}
-      $isexpanded={expanded}
+      onSubmit={(e) => e.preventDefault()}
+      $isexpanded={ui.state.isExpanded}
     >
-      <LoadingModal show={loading} setShow={setLoading}>
-        <p>{t('calendar.createTile.message.pending', { action: formData.action })}</p>
+      <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
+        <p>
+          {t('calendar.createTile.message.pending', {
+            action: ui.state.loading.tileName,
+          })}
+        </p>
       </LoadingModal>
       <SuccessModal
-        show={success}
-        setShow={setSuccess}
-        closeTimeout={!isNavigatingToEvent ? 15 : undefined}
+        show={ui.state.success.isOpen}
+        setShow={ui.actions.hideSuccess}
+        closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
         actions={[
           {
             text: t('calendar.createTile.buttons.viewInTimeline'),
             onClick: viewCreatedEvent,
-            disabled: isNavigatingToEvent,
+            disabled: ui.state.success.isNavigatingToTile,
           },
         ]}
       >
@@ -211,7 +213,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             i18nKey="calendar.createTile.message.success"
             components={{
               b: <b />,
-              action: <>{successEvent?.name}</>,
+              action: <>{ui.state.success.tile?.calendarEvent.name}</>,
             }}
           />
         </p>
@@ -220,17 +222,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <div className="title">
           <h2>{t('calendar.createTile.title')}</h2>
         </div>
-        <button
-          onClick={() => {
-            onClose();
-          }}
-        >
+        <button onClick={closeModal}>
           <X size={16} color={theme.colors.text.primary} />
         </button>
       </header>
 
       {/* Tile Description */}
-      <Section $isexpanded={expanded}>
+      <Section $isexpanded={ui.state.isExpanded}>
         <DescriptionContainer>
           <Trans
             i18nKey="calendar.createTile.description"
@@ -319,9 +317,9 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       </TipContainer>
 
       {/* Tile Actions */}
-      {expanded && (
+      {ui.state.isExpanded && (
         <>
-          <Section $isexpanded={expanded}>
+          <Section $isexpanded={ui.state.isExpanded}>
             <Collapse
               openIcon={<ChevronUp />}
               closeIcon={<ChevronDown />}
@@ -329,11 +327,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               size="small"
               iconPosition="right"
               seperatorColor={theme.colors.border.strong}
-              openAll={expanded}
+              openAll={ui.state.isExpanded}
             />
           </Section>
           <Spacer />
-          <SummaryContainer>
+          <SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
             <header>{t('calendar.createTile.summary.title')}</header>
             <p>
               <Trans
@@ -346,27 +344,37 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                   location: formData.location,
                   hours: formData.durationHours,
                   minutes: formData.durationMins,
+                  deadline: dayjs(formData.deadline)
+                    .toDate()
+                    .toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    }),
                 }}
               />
             </p>
           </SummaryContainer>
         </>
       )}
-      <ButtonContainer $isexpanded={expanded}>
+      <ButtonContainer $isexpanded={ui.state.isExpanded}>
         <Button
           variant={'ghost'}
-          onClick={() => {
-            setExpanded(!expanded);
-          }}
+          onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
         >
-          {expanded
+          {ui.state.isExpanded
             ? t('calendar.createTile.buttons.collapse')
             : t('calendar.createTile.buttons.expand')}
         </Button>
         <Button variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
-        <Button variant="brand" type="submit" disabled={!isValidSubmission}>
+        <Button
+          variant="brand"
+          type="submit"
+          onClick={submitForm}
+          disabled={!isValidSubmission}
+        >
           {t('calendar.createTile.buttons.submit')}
         </Button>
       </ButtonContainer>
@@ -374,38 +382,47 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   );
 };
 
-const SummaryContainer = styled.div`
-	position: sticky;
-	bottom: calc(52px + 1rem);
-	font-family: ${(props) => props.theme.typography.fontFamily.urban};
-	font-size: ${(props) => props.theme.typography.fontSize.base};
-	margin-bottom: 1rem;
-	margin-right: 1rem;
-	margin-left: auto;
-	width: 100%;
-	max-width: ${(props) => props.theme.screens.md};
-	border-radius: ${(props) => props.theme.borderRadius.xLarge};
-	padding: 1rem;
-	background-color: ${(props) => props.theme.colors.calendar.summary.bg};
-	color: ${(props) => props.theme.colors.calendar.summary.text};
-	border: 1px solid ${(props) => props.theme.colors.calendar.summary.border};
+const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
+	${({ theme, $darkmode, $color }) => {
+    const summaryColor = new RGBColor($color);
+    return `
+			position: sticky;
+			bottom: calc(52px + 1rem);
+			font-family: ${theme.typography.fontFamily.urban};
+			font-size: ${theme.typography.fontSize.base};
+			margin-bottom: 1rem;
+			margin-right: 1rem;
+			margin-left: auto;
+			width: 100%;
+			max-width: ${theme.screens.md};
+			border-radius: ${theme.borderRadius.xLarge};
+			padding: 1rem;
+			color: ${summaryColor.setLightness($darkmode ? 0.85 : 0.3).toHex()};
+			border: 1px solid ${summaryColor.setLightness($darkmode ? 0.3 : 0.8).toHex()};
+			background-color: ${summaryColor.setLightness($darkmode ? 0.2 : 0.9).toHex()};
+			font-weight: ${theme.typography.fontWeight.semibold};
 
-	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
-	b {
-		color: ${(props) => props.theme.colors.calendar.summary.boldText};
-		border-bottom: 1px solid ${(props) => props.theme.colors.calendar.summary.boldText};
-		min-width: 20px;
-		display: inline-block;
-	}
+			transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
 
-	header {
-		background-color: ${(props) => props.theme.colors.calendar.summary.headerBg};
-		color: ${(props) => props.theme.colors.calendar.summary.header};
-		width: fit-content;
-		padding: 0.25rem 0.75rem !important;
-		border-radius: ${(props) => props.theme.borderRadius.large} !important;
-		margin-bottom: 0.5rem;
-	}
+			b {
+				color: ${summaryColor.setLightness($darkmode ? 0.95 : 0.2).toHex()};
+				border-bottom: 1px solid ${summaryColor.setLightness($darkmode ? 0.95 : 0.2).toHex()};
+				min-width: 20px;
+				display: inline-block;
+				transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+			}
+
+			header {
+				background-color: ${summaryColor.setLightness($darkmode ? 0.3 : 1).toHex()};
+				color: ${summaryColor.setLightness($darkmode ? 0.95 : 0.2).toHex()};
+				width: fit-content;
+				padding: 0.25rem 0.75rem !important;
+				border-radius: ${theme.borderRadius.large} !important;
+				margin-bottom: 0.5rem;
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+			}
+		`;
+  }}
 `;
 
 const Spacer = styled.div`

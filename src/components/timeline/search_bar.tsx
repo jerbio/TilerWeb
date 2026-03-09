@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { scheduleService } from '@/services';
 import useAppStore from '@/global_state';
 import { CalendarEvent } from '@/core/common/types/schedule';
-import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
+import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import colorUtil from '@/core/util/colors';
@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const [confirmingAction, setConfirmingAction] = useState<{ eventId: string; action: 'complete' | 'delete' } | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-	const { setCreateTileModalOpen } = useCalendarUI();
+	const openCreateTile = useCalendarUI(state => state.createTile.actions.open);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 
@@ -146,7 +146,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	};
 
 	const handleCreate = () => {
-		setCreateTileModalOpen(true);
+		openCreateTile();
 		setShowDropdown(false);
 	};
 

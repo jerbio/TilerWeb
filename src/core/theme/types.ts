@@ -103,14 +103,6 @@ export type AppTheme = {
       sidebarButtonHover: string;
       sidebarButtonActive: string;
 			eventInfoModalBg: string;
-      summary: {
-        bg: string;
-        border: string;
-        text: string;
-        boldText: string;
-        headerBg: string;
-        header: string;
-      };
     };
     // Button colors
     button: {

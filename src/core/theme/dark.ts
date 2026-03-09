@@ -44,14 +44,6 @@ export const darkTheme: AppTheme = {
 			sidebarButtonHover: palette.colors.gray[800],
 			sidebarButtonActive: palette.colors.gray[700],
 			eventInfoModalBg: palette.colors.gray[800],
-      summary: {
-        bg: 'hsla(36, 70%, 16%, 1)',
-        border: 'hsla(36, 71%, 19%, 1)',
-        text: 'hsla(36, 30%, 65%, 1)',
-        boldText: palette.colors.white,
-        headerBg: 'hsla(36, 70%, 21%, 1)',
-        header: 'hsla(36, 21%, 73%, 1)',
-      },
     },
     // Border colors
     border: {

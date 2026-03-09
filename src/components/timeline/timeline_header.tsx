@@ -6,11 +6,11 @@ import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Env } from '@/config/config_getter';
-import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
 import SearchBar from './search_bar';
 import ShuffleButton from './shuffle_button';
 import ReviseButton from './revise_button';
 import ProcrastinateAllButton from './procrastinate_all_button';
+import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -18,7 +18,7 @@ const TimelineHeader: React.FC = () => {
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-	const { setCreateTileModalOpen } = useCalendarUI();
+	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -54,7 +54,7 @@ const TimelineHeader: React.FC = () => {
 				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<ProcrastinateAllButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
-				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
+				<CreateEventButton onClick={openCreateTile}>
 					<Plus size={16} />
 				</CreateEventButton>
         {Env.isDevelopment() && (
