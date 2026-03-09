@@ -9,6 +9,7 @@ import AppDownloadSection from '../components/home/app_download_section';
 import FAQ from '../components/home/faq_section';
 import DemoExplainerSection from '../components/home/demo_explainer_section';
 import TestimonialsSection from '../components/home/testimonials_section';
+import DiscoverTeaserSection from '../components/home/discover_teaser_section';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/core/common/components/SEO';
 
@@ -58,6 +59,7 @@ const Home: React.FC = () => {
 			<DemoExplainerSection />
 			<PersonaCarousel />
 			<FeatureHighlightsSection />
+			<DiscoverTeaserSection />
 			<TestimonialsSection />
 			<TileCardSection />
 			<CalendarIntegrationSection />
