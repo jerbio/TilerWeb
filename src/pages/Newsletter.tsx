@@ -612,7 +612,15 @@ const SetupCardTitle = styled.h3`
   line-height: 1.25;
 `;
 
-// ── Card 1: Calendar connect (JS-animated) ────────────────────────────────────
+const SetupCardSubtext = styled.p`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[500]};
+  line-height: 1.5;
+  margin: 0;
+`;
+
+// ── Card 1: Sign up (JS-animated) ─────────────────────────────────────────────
 const SaCalRow = styled.div`
   display: flex;
   align-items: center;
@@ -688,129 +696,89 @@ const SaCalCheck = styled.div<{ $show: boolean }>`
   transition: opacity 0.4s;
 `;
 
-// ── Card 2: Autopilot toggle (CSS-only animation) ─────────────────────────────
-const toggleKnobAnim = css`
-  @keyframes saToggleKnob {
-    0%, 30%   { left: 3px; }
-    50%, 70%  { left: calc(100% - 21px); }
-    90%, 100% { left: 3px; }
-  }
-`;
-
-const toggleBgAnim = css`
-  @keyframes saToggleBg {
-    0%, 30%   { background: ${palette.colors.gray[700]}; }
-    50%, 70%  { background: ${palette.colors.brand[500]}; }
-    90%, 100% { background: ${palette.colors.gray[700]}; }
-  }
-`;
-
-const toggleStateAnim = css`
-  @keyframes saToggleState {
-    0%, 30%   { opacity: 0; }
-    50%, 70%  { opacity: 1; }
-    90%, 100% { opacity: 0; }
-  }
-`;
-
-const SaToggleScene = styled.div`
+// ── Card 1: Sign-up form (JS-animated) ────────────────────────────────────────
+const SaSignupScene = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  gap: 10px;
+  width: 78%;
 `;
 
-const SaToggleLabel = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[400]};
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-`;
-
-const SaToggleTrack = styled.div`
-  ${toggleBgAnim}
-  position: relative;
-  width: 62px;
-  height: 34px;
-  border-radius: 9999px;
-  animation: saToggleBg 5s ease-in-out infinite;
-`;
-
-const SaToggleKnob = styled.div`
-  ${toggleKnobAnim}
-  position: absolute;
-  top: 3px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-  animation: saToggleKnob 5s ease-in-out infinite;
-`;
-
-const SaToggleState = styled.div`
-  ${toggleStateAnim}
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.brand[400]};
-  animation: saToggleState 5s ease-in-out infinite;
-`;
-
-// ── Card 3: Tile appearing (CSS-only animation) ───────────────────────────────
-const tileSlideInAnim = css`
-  @keyframes saTileSlideIn {
-    0%, 10%   { opacity: 0; transform: translateY(10px); }
-    30%, 75%  { opacity: 1; transform: translateY(0); }
-    90%, 100% { opacity: 0; transform: translateY(10px); }
-  }
-`;
-
-const SaTileScene = styled.div`
-  width: 82%;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-`;
-
-const SaTileItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
+const SaSignupInput = styled.div`
   padding: 9px 12px;
   background: ${palette.colors.gray[800]};
   border: 1px solid ${palette.colors.gray[700]};
   border-radius: ${palette.borderRadius.medium};
-`;
-
-const SaTileItemNew = styled(SaTileItem)`
-  ${tileSlideInAnim}
-  border-color: ${palette.colors.brand[500]}50;
-  background: ${palette.colors.brand[500]}12;
-  animation: saTileSlideIn 4.5s ease-in-out infinite;
-`;
-
-const SaTileDot = styled.div<{ $color?: string }>`
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: ${({ $color }) => $color || palette.colors.brand[500]};
-  flex-shrink: 0;
-`;
-
-const SaTileLabel = styled.div`
   font-family: ${palette.typography.fontFamily.inter};
-  font-size: 11px;
-  color: ${palette.colors.gray[300]};
-  flex: 1;
+  font-size: ${palette.typography.fontSize.xs};
+  color: ${palette.colors.gray[400]};
 `;
 
-const SaTileTime = styled.div`
+const SaSignupBtn = styled.div<{ $phase: 'idle' | 'creating' | 'done' }>`
+  padding: 9px 12px;
+  border-radius: ${palette.borderRadius.medium};
+  text-align: center;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: #fff;
+  background: ${({ $phase }) =>
+    $phase === 'done' ? '#12B76A' :
+    $phase === 'creating' ? palette.colors.gray[600] :
+    palette.colors.brand[500]};
+  transition: background 0.35s;
+`;
+
+// ── Card 3: Preferences (JS-animated) ────────────────────────────────────────
+const SaPrefsScene = styled.div`
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const SaPrefRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const SaPrefLabel = styled.div`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: 10px;
   color: ${palette.colors.gray[600]};
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+`;
+
+const SaTransitRow = styled.div`
+  display: flex;
+  gap: 6px;
+`;
+
+const SaTransitOption = styled.div<{ $active: boolean }>`
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: ${palette.borderRadius.medium};
+  border: 1px solid ${({ $active }) => $active ? `${palette.colors.brand[500]}40` : palette.colors.gray[700]};
+  background: ${({ $active }) => $active ? `${palette.colors.brand[500]}15` : palette.colors.gray[800]};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 10px;
+  text-align: center;
+  color: ${({ $active }) => $active ? palette.colors.brand[400] : palette.colors.gray[500]};
+  transition: all 0.4s;
+`;
+
+const SaTimeRange = styled.div`
+  padding: 7px 10px;
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 10px;
+  color: ${palette.colors.gray[400]};
+  display: flex;
+  justify-content: space-between;
 `;
 
 // ── Card 4: Adaptive scheduling (JS-animated) ────────────────────────────────
@@ -1006,14 +974,25 @@ const Newsletter: React.FC = () => {
   const [howToOpen, setHowToOpen] = useState(false);
 
   // ── Set Up Tiler animation state ──────────────────────────────────────────
+  const [signupPhase, setSignupPhase] = useState<'idle' | 'creating' | 'done'>('idle');
   const [calStatus, setCalStatus] = useState<'idle' | 'connecting' | 'connected'>('idle');
+  const [transitMode, setTransitMode] = useState<'drive' | 'transit' | 'walk'>('drive');
   const [schedPhase, setSchedPhase] = useState<'normal' | 'disrupted' | 'settled'>('normal');
 
   useEffect(() => {
     if (!setUpOpen) return;
     const t: ReturnType<typeof setTimeout>[] = [];
 
-    // Card 1: calendar connect sequence (6.5s loop)
+    // Card 1: account creation button states (6s loop)
+    const signupCycle = () => {
+      setSignupPhase('idle');
+      t.push(setTimeout(() => setSignupPhase('creating'), 2000));
+      t.push(setTimeout(() => setSignupPhase('done'), 3200));
+      t.push(setTimeout(signupCycle, 6000));
+    };
+    signupCycle();
+
+    // Card 2: calendar connect sequence (6.5s loop)
     const calCycle = () => {
       setCalStatus('idle');
       t.push(setTimeout(() => setCalStatus('connecting'), 2000));
@@ -1021,6 +1000,15 @@ const Newsletter: React.FC = () => {
       t.push(setTimeout(calCycle, 6500));
     };
     calCycle();
+
+    // Card 3: transit mode cycling (6s loop)
+    const transitCycle = () => {
+      setTransitMode('drive');
+      t.push(setTimeout(() => setTransitMode('transit'), 2000));
+      t.push(setTimeout(() => setTransitMode('walk'), 3800));
+      t.push(setTimeout(transitCycle, 6000));
+    };
+    transitCycle();
 
     // Card 4: adaptive schedule rearrange (7s loop)
     const schedCycle = () => {
@@ -1243,7 +1231,30 @@ const Newsletter: React.FC = () => {
                 <ExpandableBodyInner>
                   <SetupGrid>
 
-                    {/* ── Card 1: Connect your calendar (JS animation) ── */}
+                    {/* ── Card 1: Create your account (JS animation) ── */}
+                    <SetupCard>
+                      <SetupAnim>
+                        <SaSignupScene>
+                          <SaSignupInput>gloria@example.com</SaSignupInput>
+                          <SaSignupBtn $phase={signupPhase}>
+                            {signupPhase === 'idle'
+                              ? 'Create free account'
+                              : signupPhase === 'creating'
+                              ? 'Creating account…'
+                              : '✓ Account created!'}
+                          </SaSignupBtn>
+                        </SaSignupScene>
+                      </SetupAnim>
+                      <SetupBody>
+                        <SetupCardStepBadge>1</SetupCardStepBadge>
+                        <SetupCardTitle>Create your account</SetupCardTitle>
+                        <SetupCardSubtext>
+                          Sign up with your email — free to start, no credit card needed.
+                        </SetupCardSubtext>
+                      </SetupBody>
+                    </SetupCard>
+
+                    {/* ── Card 2: Connect your calendar (JS animation) ── */}
                     <SetupCard>
                       <SetupAnim>
                         <SaCalRow>
@@ -1265,56 +1276,52 @@ const Newsletter: React.FC = () => {
                         </SaCalRow>
                       </SetupAnim>
                       <SetupBody>
-                        <SetupCardStepBadge>1</SetupCardStepBadge>
-                        <SetupCardTitle>Connect your calendar</SetupCardTitle>
-                      </SetupBody>
-                    </SetupCard>
-
-                    {/* ── Card 2: Turn on Autopilot (CSS-only animation) ── */}
-                    <SetupCard>
-                      <SetupAnim>
-                        <SaToggleScene>
-                          <SaToggleLabel>Autopilot</SaToggleLabel>
-                          <SaToggleTrack>
-                            <SaToggleKnob />
-                          </SaToggleTrack>
-                          <SaToggleState>Scheduling enabled</SaToggleState>
-                        </SaToggleScene>
-                      </SetupAnim>
-                      <SetupBody>
                         <SetupCardStepBadge>2</SetupCardStepBadge>
-                        <SetupCardTitle>Turn on Autopilot</SetupCardTitle>
+                        <SetupCardTitle>Connect your calendar</SetupCardTitle>
+                        <SetupCardSubtext>
+                          Link Google or Outlook — Tiler reads your events and builds around them.
+                        </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
 
-                    {/* ── Card 3: Add your first tile (CSS-only animation) ── */}
+                    {/* ── Card 3: Set up your preferences (JS animation) ── */}
                     <SetupCard>
                       <SetupAnim>
-                        <SaTileScene>
-                          <SaTileItem>
-                            <SaTileDot $color={palette.colors.gray[600]} />
-                            <SaTileLabel>9:00 — Team standup</SaTileLabel>
-                            <SaTileTime>1h</SaTileTime>
-                          </SaTileItem>
-                          <SaTileItemNew>
-                            <SaTileDot />
-                            <SaTileLabel>Read for 30 min</SaTileLabel>
-                            <SaTileTime>30m</SaTileTime>
-                          </SaTileItemNew>
-                          <SaTileItem>
-                            <SaTileDot $color={palette.colors.gray[600]} />
-                            <SaTileLabel>12:00 — Lunch</SaTileLabel>
-                            <SaTileTime>1h</SaTileTime>
-                          </SaTileItem>
-                        </SaTileScene>
+                        <SaPrefsScene>
+                          <SaPrefRow>
+                            <SaPrefLabel>Transit mode</SaPrefLabel>
+                            <SaTransitRow>
+                              <SaTransitOption $active={transitMode === 'drive'}>
+                                🚗 Drive
+                              </SaTransitOption>
+                              <SaTransitOption $active={transitMode === 'transit'}>
+                                🚌 Transit
+                              </SaTransitOption>
+                              <SaTransitOption $active={transitMode === 'walk'}>
+                                🚶 Walk
+                              </SaTransitOption>
+                            </SaTransitRow>
+                          </SaPrefRow>
+                          <SaPrefRow>
+                            <SaPrefLabel>Work hours</SaPrefLabel>
+                            <SaTimeRange>
+                              <span>9:00 am</span>
+                              <span>→</span>
+                              <span>6:00 pm</span>
+                            </SaTimeRange>
+                          </SaPrefRow>
+                        </SaPrefsScene>
                       </SetupAnim>
                       <SetupBody>
                         <SetupCardStepBadge>3</SetupCardStepBadge>
-                        <SetupCardTitle>Add your first tile</SetupCardTitle>
+                        <SetupCardTitle>Set up your preferences</SetupCardTitle>
+                        <SetupCardSubtext>
+                          Choose your transit mode and set time limits in your profile.
+                        </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
 
-                    {/* ── Card 4: Adaptive scheduling (JS animation) ── */}
+                    {/* ── Card 4: Ready for Adaptive Scheduling (JS animation) ── */}
                     <SetupCard>
                       <SetupAnim>
                         <SaSchedScene>
@@ -1359,7 +1366,10 @@ const Newsletter: React.FC = () => {
                       </SetupAnim>
                       <SetupBody>
                         <SetupCardStepBadge>4</SetupCardStepBadge>
-                        <SetupCardTitle>Let Adaptive Scheduling run</SetupCardTitle>
+                        <SetupCardTitle>Ready for Adaptive Scheduling</SetupCardTitle>
+                        <SetupCardSubtext>
+                          Your schedule is live — Tiler adapts automatically as your day changes.
+                        </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
 
