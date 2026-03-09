@@ -136,6 +136,16 @@ export type AppTheme = {
         text: string;
       };
     };
+    // Input colors
+    input: {
+      bg: string;
+      text: string;
+      placeholder: string;
+      border: string;
+      borderHover: string;
+      focusRing: string;
+      gradientNeutral: string;
+    };
     // Utility colors
     white: string;
     black: string;

@@ -193,8 +193,8 @@ const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;
-	border: 2px solid #2a2a2a;
-	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
+	border: 2px solid ${(props) => props.theme.colors.border.default};
+	background: ${(props) => props.theme.colors.backdrop.glass};
 	backdrop-filter: blur(6px);
 	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
 	display: ${(props) => (props.$chatexpanded ? 'none' : 'block')};
@@ -272,10 +272,10 @@ const MobileChatInput = styled.input`
 	border: 1px sold red;
 	padding: 0.75rem 1rem 0.75rem 3rem;
 	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
-	background-color: rgba(31, 31, 31, 0.6);
+	background-color: ${(props) => props.theme.colors.backdrop.glass};
 	backdrop-filter: blur(8px);
-	border: 1px solid rgba(55, 55, 55, 0.5);
-	color: ${(props) => props.theme.colors.gray[300]};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
+	color: ${(props) => props.theme.colors.text.primary};
 	font-size: ${(props) => props.theme.typography.fontSize.sm};
 	font-family: ${(props) => props.theme.typography.fontFamily.inter};
 	cursor: pointer;
@@ -287,7 +287,7 @@ const MobileChatInput = styled.input`
 	}
 
 	&:hover {
-		background-color: rgba(55, 55, 55, 0.7);
+		background-color: ${(props) => props.theme.colors.backdrop.glass};
 		border-color: ${(props) => props.theme.colors.brand[500]};
 		backdrop-filter: blur(10px);
 	}
@@ -295,7 +295,7 @@ const MobileChatInput = styled.input`
 	&:focus {
 		outline: none;
 		border-color: ${(props) => props.theme.colors.brand[500]};
-		background-color: rgba(55, 55, 55, 0.7);
+		background-color: ${(props) => props.theme.colors.backdrop.glass};
 		backdrop-filter: blur(10px);
 	}
 `;

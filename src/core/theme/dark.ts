@@ -107,6 +107,16 @@ export const darkTheme: AppTheme = {
         text: palette.colors.gray[300],
       },
     },
+    // Input colors
+    input: {
+      bg: palette.colors.gray[900],
+      text: palette.colors.white,
+      placeholder: palette.colors.gray[500],
+      border: palette.colors.gray[800],
+      borderHover: palette.colors.gray[700],
+      focusRing: palette.colors.gray[900],
+      gradientNeutral: palette.colors.gray[700],
+    },
     // hues
     brand: palette.colors.brand,
     gray: palette.colors.gray,
