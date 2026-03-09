@@ -1221,19 +1221,19 @@ const Newsletter: React.FC = () => {
                   <SetUpVisual>
                     <SetupRow>
                       <SetupDot $done>✓</SetupDot>
+                      <SetupRowLabel $done>Create Account</SetupRowLabel>
+                    </SetupRow>
+                    <SetupRow>
+                      <SetupDot $done>✓</SetupDot>
                       <SetupRowLabel $done>Connect Calendar</SetupRowLabel>
                     </SetupRow>
                     <SetupRow>
                       <SetupDot $done>✓</SetupDot>
-                      <SetupRowLabel $done>Turn On Autopilot</SetupRowLabel>
-                    </SetupRow>
-                    <SetupRow>
-                      <SetupDot $done>✓</SetupDot>
-                      <SetupRowLabel $done>Add First Tile</SetupRowLabel>
+                      <SetupRowLabel $done>Set Up Preferences</SetupRowLabel>
                     </SetupRow>
                     <SetupRow>
                       <SetupDot $active>◎</SetupDot>
-                      <SetupRowLabel>Schedule Running</SetupRowLabel>
+                      <SetupRowLabel>Adaptive Scheduling</SetupRowLabel>
                     </SetupRow>
                   </SetUpVisual>
                   <Chevron $open={setUpOpen}>&#9660;</Chevron>
