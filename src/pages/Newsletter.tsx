@@ -468,6 +468,145 @@ const StepLabel = styled.span`
   line-height: 1.3;
 `;
 
+// ─── Styles — Set Up Tiler Visual ────────────────────────────────────────────
+
+const SetUpVisual = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: ${palette.borderRadius.medium};
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  padding: 0.75rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: auto;
+    padding: 1rem 1.25rem;
+  }
+`;
+
+const setupPulse = css`
+  @keyframes setupPulse {
+    0%, 100% { box-shadow: 0 0 0 0 ${palette.colors.brand[500]}50; }
+    60%       { box-shadow: 0 0 0 5px ${palette.colors.brand[500]}00; }
+  }
+`;
+
+const SetupRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const SetupDot = styled.div<{ $done?: boolean; $active?: boolean }>`
+  ${setupPulse}
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  font-weight: bold;
+  background: ${({ $done, $active }) =>
+    $active
+      ? `${palette.colors.brand[500]}35`
+      : $done
+      ? `${palette.colors.brand[500]}25`
+      : `${palette.colors.gray[700]}60`};
+  border: 1px solid ${({ $done, $active }) =>
+    $active
+      ? palette.colors.brand[400]
+      : $done
+      ? `${palette.colors.brand[500]}55`
+      : `${palette.colors.gray[600]}40`};
+  color: ${({ $done, $active }) =>
+    $done || $active ? palette.colors.brand[400] : palette.colors.gray[600]};
+  animation: ${({ $active }) =>
+    $active ? "setupPulse 1.8s ease-in-out infinite" : "none"};
+`;
+
+const SetupRowLabel = styled.span<{ $done?: boolean }>`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 8px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${({ $done }) => ($done ? palette.colors.gray[300] : palette.colors.gray[500])};
+  line-height: 1;
+`;
+
+// ─── Styles — Set Up Tiler sub-item card ─────────────────────────────────────
+
+const SetupStepCard = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  padding-bottom: 0.5rem;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+`;
+
+const SetupStepMedia = styled.div`
+  flex: 0 0 55%;
+  border-radius: ${palette.borderRadius.medium};
+  overflow: hidden;
+  background: ${palette.colors.gray[800]};
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 640px) {
+    flex: unset;
+    width: 100%;
+  }
+`;
+
+const SetupStepText = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+`;
+
+const SetupStepBadge = styled.span`
+  display: inline-block;
+  width: fit-content;
+  padding: 0.2rem 0.6rem;
+  background: ${palette.colors.brand[500]}15;
+  border: 1px solid ${palette.colors.brand[500]}35;
+  border-radius: 9999px;
+  color: ${palette.colors.brand[400]};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 10px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+`;
+
+const SetupStepTitle = styled.span`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.base};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[200]};
+  line-height: 1.3;
+`;
+
+const SetupStepBody = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[500]};
+  line-height: 1.65;
+`;
+
 // ─── Styles — Core Blocks Grid ───────────────────────────────────────────────
 
 const BlocksGrid = styled.div`
@@ -598,6 +737,7 @@ const SubBodyText = styled.div`
 
 const Newsletter: React.FC = () => {
   const [whatIsOpen, setWhatIsOpen] = useState(false);
+  const [setUpOpen, setSetUpOpen] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
 
   // ── What Is Tiler sub-items ──────────────────────────────────────────────
@@ -644,6 +784,94 @@ const Newsletter: React.FC = () => {
             </ComparisonRow>
           ))}
         </ComparisonTable>
+      ),
+    },
+  ];
+
+  // ── Set Up Tiler — 4 onboarding steps ───────────────────────────────────
+  const setUpSubItems = [
+    {
+      title: "Step 1 — Connect Your Calendar",
+      content: (
+        <SetupStepCard>
+          <SetupStepMedia>
+            <MediaImage src="/gifs/connect-a-calendar.gif" alt="Connect a Calendar" />
+          </SetupStepMedia>
+          <SetupStepText>
+            <SetupStepBadge>Step 1</SetupStepBadge>
+            <SetupStepTitle>Your calendar is the foundation.</SetupStepTitle>
+            <SetupStepBody>
+              Connect Google Calendar, Outlook, or Apple Calendar and Tiler immediately sees
+              every fixed commitment — meetings, appointments, events. These become immovable
+              Blocks in your timeline. Everything else gets scheduled around them, automatically.
+              No manual entry. Just link and go.
+            </SetupStepBody>
+          </SetupStepText>
+        </SetupStepCard>
+      ),
+    },
+    {
+      title: "Step 2 — Turn On Autopilot",
+      content: (
+        <SetupStepCard>
+          <SetupStepMedia>
+            <MediaImage src="/gifs/set-up-tiler.gif" alt="Turn On Autopilot" />
+          </SetupStepMedia>
+          <SetupStepText>
+            <SetupStepBadge>Step 2</SetupStepBadge>
+            <SetupStepTitle>The switch that makes Tiler intelligent.</SetupStepTitle>
+            <SetupStepBody>
+              Autopilot is what separates Tiler from a calendar. With it on, you stop
+              placing tasks manually — Tiler handles placement. Add something to your list,
+              give it a duration, and it lands in the best available slot, around your
+              calendar and everything else on your day. Every update triggers an instant
+              recalculation. Set it once. Let it run.
+            </SetupStepBody>
+          </SetupStepText>
+        </SetupStepCard>
+      ),
+    },
+    {
+      title: "Step 3 — Add Your First Tile",
+      content: (
+        <SetupStepCard>
+          <SetupStepMedia>
+            <MediaImage src="/gifs/creating-flexible-tiles.gif" alt="Add Your First Tile" />
+          </SetupStepMedia>
+          <SetupStepText>
+            <SetupStepBadge>Step 3</SetupStepBadge>
+            <SetupStepTitle>A task with intent, not a fixed time.</SetupStepTitle>
+            <SetupStepBody>
+              A Tile is anything you need to do — without locking it to a specific hour.
+              Name it, estimate the duration, add an optional deadline, and Tiler places it
+              in the right slot automatically. Tiles move when your day shifts, stack
+              intelligently around your blocks, and get re-sequenced when things change.
+              Start with one thing. Watch what happens.
+            </SetupStepBody>
+          </SetupStepText>
+        </SetupStepCard>
+      ),
+    },
+    {
+      title: "Step 4 — Let Adaptive Scheduling Run",
+      content: (
+        <SetupStepCard>
+          <SetupStepMedia>
+            <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
+          </SetupStepMedia>
+          <SetupStepText>
+            <SetupStepBadge>Step 4</SetupStepBadge>
+            <SetupStepTitle>Your schedule now runs itself.</SetupStepTitle>
+            <SetupStepBody>
+              With your calendar connected, Autopilot on, and your first tiles added —
+              Tiler&rsquo;s adaptive engine is live. When a meeting runs long, a task gets
+              deferred, or a new event lands in your day, Tiler detects the change and
+              rebuilds your schedule around it in seconds. You don&rsquo;t reorganise
+              anything. One shift ripples through automatically, keeping your day realistic
+              without any manual work from you.
+            </SetupStepBody>
+          </SetupStepText>
+        </SetupStepCard>
       ),
     },
   ];
@@ -758,6 +986,55 @@ const Newsletter: React.FC = () => {
                 <ExpandableBodyInner>
                   <SubCollapseWrapper>
                     <Collapse items={whatIsSubItems} />
+                  </SubCollapseWrapper>
+                </ExpandableBodyInner>
+              </ExpandableBody>
+            </ExpandableSection>
+          </ExpandableWrapper>
+
+          {/* ── Set Up Tiler ── */}
+          <ExpandableWrapper>
+            <ExpandableSection>
+              <ExpandableHeader
+                $open={setUpOpen}
+                onClick={() => setSetUpOpen((o) => !o)}
+              >
+                <ExpandableTextSide>
+                  <SectionBadge>Set Up Tiler</SectionBadge>
+                  <SectionTitle>Ready in under 3 minutes.</SectionTitle>
+                  <SectionSummary>
+                    No complex onboarding. No 20-step wizard. Four small steps and
+                    you&rsquo;ll have a smarter schedule running by end of day.
+                  </SectionSummary>
+                </ExpandableTextSide>
+
+                <ExpandableHeaderRight>
+                  <SetUpVisual>
+                    <SetupRow>
+                      <SetupDot $done>✓</SetupDot>
+                      <SetupRowLabel $done>Connect Calendar</SetupRowLabel>
+                    </SetupRow>
+                    <SetupRow>
+                      <SetupDot $done>✓</SetupDot>
+                      <SetupRowLabel $done>Turn On Autopilot</SetupRowLabel>
+                    </SetupRow>
+                    <SetupRow>
+                      <SetupDot $done>✓</SetupDot>
+                      <SetupRowLabel $done>Add First Tile</SetupRowLabel>
+                    </SetupRow>
+                    <SetupRow>
+                      <SetupDot $active>◎</SetupDot>
+                      <SetupRowLabel>Schedule Running</SetupRowLabel>
+                    </SetupRow>
+                  </SetUpVisual>
+                  <Chevron $open={setUpOpen}>&#9660;</Chevron>
+                </ExpandableHeaderRight>
+              </ExpandableHeader>
+
+              <ExpandableBody $open={setUpOpen}>
+                <ExpandableBodyInner>
+                  <SubCollapseWrapper>
+                    <Collapse items={setUpSubItems} />
                   </SubCollapseWrapper>
                 </ExpandableBodyInner>
               </ExpandableBody>
