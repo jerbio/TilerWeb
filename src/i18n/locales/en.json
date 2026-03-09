@@ -164,7 +164,12 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
-			"locationLabel": "Location:"
+			"locationLabel": "Location:",
+			"save": "Save",
+			"cancel": "Cancel",
+			"validation": {
+				"endAfterStart": "End time must be after start time"
+			}
 		},
 		"mobileChatInput": {
       "placeholder": "Ask tiler anything..."

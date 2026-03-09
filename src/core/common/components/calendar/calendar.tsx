@@ -444,6 +444,27 @@ const Calendar = ({
 		setHasAutoScrolled(false);
 	}, [viewOptions.startDay]);
 
+	const handleEventUpdate = async (updates: { start: number; end: number }) => {
+		if (!selectedEventInfo) return;
+
+		try {
+			await scheduleService.updateSubCalendarEvent(selectedEventInfo.id, updates);
+
+			// Update local state optimistically
+			setSelectedEventInfo((prev) =>
+				prev
+					? {
+							...prev,
+							start: updates.start,
+							end: updates.end,
+						}
+					: null
+			);
+		} catch (error) {
+			console.error('Failed to update event:', error);
+		}
+	};
+
 	const calendarEventInfo = [
 		{
 			key: 'info',
@@ -455,6 +476,7 @@ const Calendar = ({
 						setSelectedEventInfo(null);
 						setSelectedEvent(null);
 					}}
+					onEventUpdate={handleEventUpdate}
 				/>
 			),
 		},

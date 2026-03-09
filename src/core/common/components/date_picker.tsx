@@ -9,40 +9,51 @@ type CustomDatePickerProps = {
 	value: string; // YYYY-MM-DD format
 	onChange: (date: string) => void;
 	placeholder?: string;
+	popperPlacement?: 'top' | 'bottom' | 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end';
+	compact?: boolean;
 };
 
-const DatePicker: React.FC<CustomDatePickerProps> = ({ label, value, onChange, placeholder }) => {
+const DatePicker: React.FC<CustomDatePickerProps> = ({
+	label,
+	value,
+	onChange,
+	placeholder,
+	popperPlacement,
+	compact = false,
+}) => {
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
-			// Use UTC methods to avoid timezone offset issues
-			const year = date.getUTCFullYear();
-			const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-			const day = String(date.getUTCDate()).padStart(2, '0');
+			// Use local time methods to match dayjs formatting
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
 			onChange(`${year}-${month}-${day}`);
 		} else {
 			onChange('');
 		}
 	};
 
-	// Parse YYYY-MM-DD as UTC to avoid timezone shifts
+	// Parse YYYY-MM-DD as local time to match dayjs formatting
 	const selectedDate = value
-		? new Date(Date.UTC(
+		? new Date(
 				parseInt(value.split('-')[0]),
 				parseInt(value.split('-')[1]) - 1,
 				parseInt(value.split('-')[2])
-			))
+			)
 		: null;
 
 	return (
 		<Container>
 			{label && <Label>{label}</Label>}
-			<DatePickerWrapper>
+			<DatePickerWrapper $compact={compact}>
 				<ReactDatePicker
 					selected={selectedDate}
 					onChange={handleChange}
 					dateFormat="MM/dd/yyyy"
 					placeholderText={placeholder}
 					showPopperArrow={false}
+					popperPlacement={popperPlacement}
+					portalId="datepicker-portal"
 				/>
 			</DatePickerWrapper>
 		</Container>
@@ -62,7 +73,7 @@ const Label = styled.label`
 	color: ${palette.colors.gray[400]};
 `;
 
-const DatePickerWrapper = styled.div`
+const DatePickerWrapper = styled.div<{ $compact?: boolean }>`
 	/* Style the input inside the date picker */
 	.react-datepicker-wrapper {
 		width: 100%;
@@ -76,9 +87,10 @@ const DatePickerWrapper = styled.div`
 		color: ${palette.colors.white};
 		font-size: ${palette.typography.fontSize.sm};
 		font-weight: ${palette.typography.fontWeight.normal};
-		padding: 0 ${palette.space.medium};
-		height: ${palette.inputHeights.medium};
+		padding: ${({ $compact }) => ($compact ? '4px 8px' : `0 ${palette.space.medium}`)};
+		height: ${({ $compact }) => ($compact ? '28px' : palette.inputHeights.medium)};
 		width: 100%;
+		min-width: ${({ $compact }) => ($compact ? '130px' : 'auto')};
 		cursor: pointer;
 		transition: border-color 0.2s ease-in-out;
 

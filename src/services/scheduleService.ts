@@ -104,6 +104,23 @@ class ScheduleService {
       throw normalizeError(error);
     }
   }
+
+  /**
+   * Update a SubCalendarEvent's start and/or end time.
+   * Returns the updated SubCalendarEvent payload.
+   */
+  async updateSubCalendarEvent(eventId: string, updates: { start?: number; end?: number }) {
+    try {
+      const response = await this.subCalendarEventApi.updateSubCalendarEvent({
+        id: eventId,
+        ...updates,
+      });
+      return response.Content;
+    } catch (error) {
+      console.error('Error updating SubCalendarEvent', error);
+      throw normalizeError(error);
+    }
+  }
 }
 
 export default ScheduleService;
