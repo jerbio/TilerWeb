@@ -623,15 +623,13 @@ const SetupCardSubtext = styled.p`
 const SetupSupportNote = styled.p`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.sm};
-  color: ${palette.colors.gray[600]};
-  line-height: 1.7;
+  color: ${palette.colors.gray[500]};
+  line-height: 1.75;
   margin: 0;
-  padding-top: 28px;
-  border-top: 1px solid ${palette.colors.gray[700]};
-  text-align: center;
-  max-width: 560px;
-  align-self: center;
-  width: 100%;
+  margin-top: 20px;
+  padding: 4px 0 8px 18px;
+  border-left: 2px solid ${palette.colors.brand[500]}44;
+  text-align: left;
 `;
 
 // ── Card 1: Sign up (JS-animated) ─────────────────────────────────────────────
