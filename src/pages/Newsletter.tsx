@@ -674,13 +674,13 @@ const FeaturesVisualIcon = styled.div<{ $bg: string }>`
 const FeaturesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 1.25rem 0 1rem;
 
-  @media (max-width: 860px) {
+  @media (max-width: 540px) {
     grid-template-columns: 1fr 1fr;
   }
-  @media (max-width: 540px) {
+  @media (max-width: 360px) {
     grid-template-columns: 1fr;
   }
 `;
@@ -688,11 +688,11 @@ const FeaturesGrid = styled.div`
 const FeatureCard = styled.div`
   background: ${palette.colors.gray[800]};
   border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.xLarge};
-  padding: 20px;
+  border-radius: ${palette.borderRadius.large};
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
   transition: border-color 0.3s, transform 0.3s;
 
   &:hover {
@@ -702,20 +702,20 @@ const FeatureCard = styled.div`
 `;
 
 const FeatureIconBox = styled.div<{ $bg: string }>`
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   background: ${({ $bg }) => $bg};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 17px;
   flex-shrink: 0;
 `;
 
 const FeatureName = styled.h3`
   font-family: ${palette.typography.fontFamily.inter};
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: ${palette.typography.fontWeight.semibold};
   color: ${palette.colors.gray[100]};
   margin: 0;
@@ -724,16 +724,16 @@ const FeatureName = styled.h3`
 
 const FeatureDesc = styled.p`
   font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
+  font-size: ${palette.typography.fontSize.xs};
   color: ${palette.colors.gray[400]};
-  line-height: 1.6;
+  line-height: 1.55;
   margin: 0;
   flex: 1;
 `;
 
 const FeatureBadge = styled.span`
   display: inline-block;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 9999px;
   background: ${palette.colors.gray[700]};
   color: ${palette.colors.gray[500]};
