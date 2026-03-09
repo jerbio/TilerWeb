@@ -556,9 +556,9 @@
 			"days": "Giorni",
 			"hours": "Ore",
 			"minutes": "Minuti",
-			"daysShort": "gg",
-			"hoursShort": "ora",
-			"minutesShort": "min",
+			"daysShort": "Gg",
+			"hoursShort": "Ora",
+			"minutesShort": "Min",
 			"confirm": "Conferma",
 			"cancel": "Annulla"
 		}

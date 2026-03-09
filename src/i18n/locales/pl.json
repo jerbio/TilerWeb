@@ -556,9 +556,9 @@
 			"days": "Dni",
 			"hours": "Godziny",
 			"minutes": "Minuty",
-			"daysShort": "dz",
-			"hoursShort": "godz",
-			"minutesShort": "min",
+			"daysShort": "Dz",
+			"hoursShort": "Godz",
+			"minutesShort": "Min",
 			"confirm": "Potwierdź",
 			"cancel": "Anuluj"
 		}

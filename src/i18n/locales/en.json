@@ -911,9 +911,9 @@
 			"days": "Days",
 			"hours": "Hours",
 			"minutes": "Minutes",
-			"daysShort": "day",
-			"hoursShort": "hr",
-			"minutesShort": "min",
+			"daysShort": "Day",
+			"hoursShort": "Hr",
+			"minutesShort": "Min",
 			"confirm": "Confirm",
 			"cancel": "Cancel"
 		},
