@@ -142,11 +142,6 @@ const HeroSubtitle = styled.p`
   line-height: 1.7;
 `;
 
-const CollapseWrapper = styled.div`
-  width: 100%;
-  max-width: 860px;
-`;
-
 const ContentRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -211,21 +206,21 @@ const BackgroundBlur = styled.div`
   pointer-events: none;
 `;
 
-// ─── Styles — What Is Tiler Section ──────────────────────────────────────────
+// ─── Styles — Shared Expandable Section ──────────────────────────────────────
 
-const WhatIsTilerWrapper = styled.div`
+const ExpandableWrapper = styled.div`
   width: 100%;
   max-width: 860px;
 `;
 
-const WhatIsTilerSection = styled.div`
+const ExpandableSection = styled.div`
   border: 1px solid ${palette.colors.gray[800]};
   border-radius: ${palette.borderRadius.large};
   background: ${palette.colors.gray[900]}80;
   overflow: hidden;
 `;
 
-const WhatIsTilerHeader = styled.button<{ $open: boolean }>`
+const ExpandableHeader = styled.button<{ $open: boolean }>`
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -246,7 +241,7 @@ const WhatIsTilerHeader = styled.button<{ $open: boolean }>`
   }
 `;
 
-const WhatIsTilerTextSide = styled.div`
+const ExpandableTextSide = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -288,65 +283,11 @@ const SectionSummary = styled.p`
   margin: 0;
 `;
 
-const WhatIsTilerHeaderRight = styled.div`
+const ExpandableHeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
   flex-shrink: 0;
-`;
-
-const WhatIsTilerVisual = styled.div`
-  width: 160px;
-  height: 120px;
-  border-radius: ${palette.borderRadius.medium};
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  flex-shrink: 0;
-
-  @media (max-width: 640px) {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-`;
-
-const mockTileColors: Record<string, string> = {
-  brand: palette.colors.brand[500],
-  orange: "#f97316",
-  teal: "#14b8a6",
-};
-
-const MockTile = styled.div<{ $color: keyof typeof mockTileColors }>`
-  border-radius: 4px;
-  padding: 0.3rem 0.5rem;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 9px;
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-
-  ${({ $color }) => css`
-    background: ${mockTileColors[$color]}30;
-    border: 1px solid ${mockTileColors[$color]}60;
-    color: ${mockTileColors[$color]};
-  `}
-`;
-
-const MockTileDot = styled.span<{ $color: keyof typeof mockTileColors }>`
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  ${({ $color }) => css`
-    background: ${mockTileColors[$color]};
-  `}
 `;
 
 const chevronBounce = css`
@@ -376,19 +317,152 @@ const Chevron = styled.span<{ $open: boolean }>`
   animation: ${({ $open }) => ($open ? "none" : "chevronBounce 1.6s ease-in-out infinite")};
 `;
 
-const WhatIsTilerExpanded = styled.div<{ $open: boolean }>`
+const ExpandableBody = styled.div<{ $open: boolean }>`
   display: grid;
   grid-template-rows: ${({ $open }) => ($open ? "1fr" : "0fr")};
   transition: grid-template-rows 0.35s ease-in-out;
 `;
 
-const WhatIsTilerExpandedInner = styled.div`
+const ExpandableBodyInner = styled.div`
   overflow: hidden;
 `;
 
 const SubCollapseWrapper = styled.div`
   padding: 0 1.5rem 1.5rem;
   border-top: 1px solid ${palette.colors.gray[800]};
+`;
+
+// ─── Styles — What Is Tiler Visual ───────────────────────────────────────────
+
+const mockTileColors: Record<string, string> = {
+  brand: palette.colors.brand[500],
+  orange: "#f97316",
+  teal: "#14b8a6",
+};
+
+const WhatIsTilerVisual = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: ${palette.borderRadius.medium};
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+`;
+
+const MockTile = styled.div<{ $color: keyof typeof mockTileColors }>`
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 9px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  ${({ $color }) => css`
+    background: ${mockTileColors[$color]}30;
+    border: 1px solid ${mockTileColors[$color]}60;
+    color: ${mockTileColors[$color]};
+  `}
+`;
+
+const MockTileDot = styled.span<{ $color: keyof typeof mockTileColors }>`
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  ${({ $color }) => css`
+    background: ${mockTileColors[$color]};
+  `}
+`;
+
+// ─── Styles — How To Use Tiler Visual ────────────────────────────────────────
+
+const HowToVisual = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: ${palette.borderRadius.medium};
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.875rem;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: auto;
+    padding: 1rem 1.25rem;
+  }
+`;
+
+const StepFlow = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StepBubble = styled.div<{ $done?: boolean }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${({ $done }) =>
+    $done ? "#14b8a620" : `${palette.colors.brand[500]}30`};
+  border: 1px solid ${({ $done }) =>
+    $done ? "#14b8a650" : `${palette.colors.brand[500]}50`};
+  color: ${({ $done }) => ($done ? "#14b8a6" : palette.colors.brand[400])};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+`;
+
+const StepLine = styled.div`
+  flex: 1;
+  height: 1px;
+  background: ${palette.colors.gray[700]};
+  position: relative;
+
+  &::after {
+    content: "▶";
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 6px;
+    color: ${palette.colors.gray[600]};
+    line-height: 1;
+  }
+`;
+
+const StepLabelRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+`;
+
+const StepLabel = styled.span`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 7.5px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[500]};
+  width: 32px;
+  text-align: center;
+  line-height: 1.3;
 `;
 
 // ─── Styles — Core Blocks Grid ───────────────────────────────────────────────
@@ -521,7 +595,9 @@ const SubBodyText = styled.div`
 
 const Newsletter: React.FC = () => {
   const [whatIsOpen, setWhatIsOpen] = useState(false);
+  const [howToOpen, setHowToOpen] = useState(false);
 
+  // ── What Is Tiler sub-items ──────────────────────────────────────────────
   const whatIsSubItems = [
     {
       title: "Tiler is an AI that runs your day.",
@@ -569,15 +645,33 @@ const Newsletter: React.FC = () => {
     },
   ];
 
-  const collapseItems = items.map((item) => ({
+  // ── How To Use Tiler — ordered subset of items ───────────────────────────
+  const howToOrder = [
+    "Connect a Calendar",
+    "How to Create a Block",
+    "Creating Flexible Tiles",
+    "How to Update a Tile",
+    "How Does Adaptive Scheduling Work?",
+    "Send a TileShare",
+    "Show My Route",
+    "Where Does Navigation Start?",
+    "Travel Time?",
+  ];
+
+  const howToItems = howToOrder.map(
+    (title) => items.find((i) => i.title === title)!,
+  );
+
+  const howToSubItems = howToItems.map((item) => ({
     title: item.title,
     content: (
       <ContentRow>
         <MediaPlaceholder>
-          {item.gif
-            ? <GifImage src={item.gif} alt={item.title} />
-            : <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
-          }
+          {item.gif ? (
+            <GifImage src={item.gif} alt={item.title} />
+          ) : (
+            <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
+          )}
         </MediaPlaceholder>
         <BodyText>{item.body}</BodyText>
       </ContentRow>
@@ -604,22 +698,22 @@ const Newsletter: React.FC = () => {
           </Hero>
 
           {/* ── What Is Tiler ── */}
-          <WhatIsTilerWrapper>
-            <WhatIsTilerSection>
-              <WhatIsTilerHeader
+          <ExpandableWrapper>
+            <ExpandableSection>
+              <ExpandableHeader
                 $open={whatIsOpen}
                 onClick={() => setWhatIsOpen((o) => !o)}
               >
-                <WhatIsTilerTextSide>
+                <ExpandableTextSide>
                   <SectionBadge>What Is Tiler</SectionBadge>
                   <SectionTitle>Not a calendar. An AI that runs your day</SectionTitle>
                   <SectionSummary>
                     Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts
                     when your day doesn&rsquo;t go to plan.
                   </SectionSummary>
-                </WhatIsTilerTextSide>
+                </ExpandableTextSide>
 
-                <WhatIsTilerHeaderRight>
+                <ExpandableHeaderRight>
                   <WhatIsTilerVisual>
                     <MockTile $color="brand">
                       <MockTileDot $color="brand" />
@@ -639,23 +733,64 @@ const Newsletter: React.FC = () => {
                     </MockTile>
                   </WhatIsTilerVisual>
                   <Chevron $open={whatIsOpen}>&#9660;</Chevron>
-                </WhatIsTilerHeaderRight>
-              </WhatIsTilerHeader>
+                </ExpandableHeaderRight>
+              </ExpandableHeader>
 
-              <WhatIsTilerExpanded $open={whatIsOpen}>
-                <WhatIsTilerExpandedInner>
+              <ExpandableBody $open={whatIsOpen}>
+                <ExpandableBodyInner>
                   <SubCollapseWrapper>
                     <Collapse items={whatIsSubItems} />
                   </SubCollapseWrapper>
-                </WhatIsTilerExpandedInner>
-              </WhatIsTilerExpanded>
-            </WhatIsTilerSection>
-          </WhatIsTilerWrapper>
+                </ExpandableBodyInner>
+              </ExpandableBody>
+            </ExpandableSection>
+          </ExpandableWrapper>
 
-          {/* ── How-To Rows ── */}
-          <CollapseWrapper>
-            <Collapse items={collapseItems} />
-          </CollapseWrapper>
+          {/* ── How To Use Tiler ── */}
+          <ExpandableWrapper>
+            <ExpandableSection>
+              <ExpandableHeader
+                $open={howToOpen}
+                onClick={() => setHowToOpen((o) => !o)}
+              >
+                <ExpandableTextSide>
+                  <SectionBadge>How To Use Tiler</SectionBadge>
+                  <SectionTitle>From intent to done. In seconds.</SectionTitle>
+                  <SectionSummary>
+                    Connect your calendar, add your tiles, and let Tiler build the rest. A
+                    step-by-step guide to running your day with Tiler.
+                  </SectionSummary>
+                </ExpandableTextSide>
+
+                <ExpandableHeaderRight>
+                  <HowToVisual>
+                    <StepFlow>
+                      <StepBubble>+</StepBubble>
+                      <StepLine />
+                      <StepBubble>⚡</StepBubble>
+                      <StepLine />
+                      <StepBubble $done>✓</StepBubble>
+                    </StepFlow>
+                    <StepLabelRow>
+                      <StepLabel>Add Tiles</StepLabel>
+                      <StepLabel>AI Plans</StepLabel>
+                      <StepLabel>Day Built</StepLabel>
+                    </StepLabelRow>
+                  </HowToVisual>
+                  <Chevron $open={howToOpen}>&#9660;</Chevron>
+                </ExpandableHeaderRight>
+              </ExpandableHeader>
+
+              <ExpandableBody $open={howToOpen}>
+                <ExpandableBodyInner>
+                  <SubCollapseWrapper>
+                    <Collapse items={howToSubItems} />
+                  </SubCollapseWrapper>
+                </ExpandableBodyInner>
+              </ExpandableBody>
+            </ExpandableSection>
+          </ExpandableWrapper>
+
         </PageWrapper>
       </Section>
     </>
