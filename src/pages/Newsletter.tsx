@@ -620,6 +620,20 @@ const SetupCardSubtext = styled.p`
   margin: 0;
 `;
 
+const SetupSupportNote = styled.p`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[600]};
+  line-height: 1.7;
+  margin: 0;
+  padding-top: 28px;
+  border-top: 1px solid ${palette.colors.gray[700]};
+  text-align: center;
+  max-width: 560px;
+  align-self: center;
+  width: 100%;
+`;
+
 // ── Card 1: Sign up (JS-animated) ─────────────────────────────────────────────
 const SaCalRow = styled.div`
   display: flex;
@@ -1199,8 +1213,9 @@ const Newsletter: React.FC = () => {
                   <SectionBadge>Set Up Tiler</SectionBadge>
                   <SectionTitle>Ready in under 3 minutes.</SectionTitle>
                   <SectionSummary>
-                    No complex onboarding. No 20-step wizard. Four small steps and
-                    you&rsquo;ll have a smarter schedule running by end of day.
+                    Your calendar, your preferences, your constraints — four steps
+                    that give Tiler everything it needs to run Adaptive Scheduling
+                    from day one.
                   </SectionSummary>
                 </ExpandableTextSide>
 
@@ -1374,6 +1389,16 @@ const Newsletter: React.FC = () => {
                     </SetupCard>
 
                   </SetupGrid>
+
+                  <SetupSupportNote>
+                    Each step is an input to Tiler&rsquo;s scheduling engine — your
+                    calendar tells it what&rsquo;s fixed, your preferences tell it how
+                    you move, and your time limits tell it when you&rsquo;re free.
+                    Together, they give Tiler the full picture it needs to run
+                    Adaptive Scheduling: a schedule that adjusts itself when
+                    things change.
+                  </SetupSupportNote>
+
                 </ExpandableBodyInner>
               </ExpandableBody>
             </ExpandableSection>
