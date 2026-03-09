@@ -10,17 +10,17 @@ import Collapse from '@/core/common/components/collapse';
 const items = [
   {
     title: "Set Up Tiler",
-    gif: "/gifs/set-up-tiler.gif",
+    media: "/gifs/set-up-tiler.gif",
     body: "Tiler works best when it\u2019s running in the background. Autopilot means you don\u2019t manually place tasks on your timeline; you simply tell Tiler what needs to get done, and it schedules everything around your day automatically. Once enabled, Tiler continuously adjusts your timeline as tasks are added, deferred, or as calendar events come in.",
   },
   {
     title: "How to Create a Block",
-    gif: "/gifs/how-to-create-a-block.gif",
+    media: "/gifs/how-to-create-a-block.gif",
     body: "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don\u2019t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable.",
   },
   {
     title: "Creating Flexible Tiles",
-    gif: "/gifs/creating-flexible-tiles.gif",
+    media: "/gifs/creating-flexible-tiles.gif",
     body: "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline \u2014 Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions.",
   },
   {
@@ -29,6 +29,7 @@ const items = [
   },
   {
     title: "How to Update a Tile",
+    media: "/gifs/how-to-update-a-tile.gif",
     body: "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don\u2019t need to move other tasks manually, the system handles the ripple effects.",
   },
   {
@@ -169,7 +170,7 @@ const MediaPlaceholder = styled.div`
   }
 `;
 
-const GifImage = styled.img`
+const MediaImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -652,9 +653,6 @@ const Newsletter: React.FC = () => {
     "Creating Flexible Tiles",
     "How to Update a Tile",
     "How Does Adaptive Scheduling Work?",
-    "Send a TileShare",
-    "Show My Route",
-    "Where Does Navigation Start?",
     "Travel Time?",
   ];
 
@@ -667,10 +665,10 @@ const Newsletter: React.FC = () => {
     content: (
       <ContentRow>
         <MediaPlaceholder>
-          {item.gif ? (
-            <GifImage src={item.gif} alt={item.title} />
+          {item.media ? (
+            <MediaImage src={item.media} alt={item.title} />
           ) : (
-            <MediaPlaceholderText>Video / GIF</MediaPlaceholderText>
+            <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
           )}
         </MediaPlaceholder>
         <BodyText>{item.body}</BodyText>
