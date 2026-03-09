@@ -556,8 +556,8 @@
 			"days": "Ημέρες",
 			"hours": "Ώρες",
 			"minutes": "Λεπτά",
-			"daysShort": "ημ",
-			"hoursShort": "ώρ",
+			"daysShort": "ημέρ",
+			"hoursShort": "ώρα",
 			"minutesShort": "λεπ",
 			"confirm": "Επιβεβαίωση",
 			"cancel": "Ακύρωση"

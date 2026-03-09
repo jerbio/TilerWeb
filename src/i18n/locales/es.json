@@ -556,9 +556,9 @@
 			"days": "Días",
 			"hours": "Horas",
 			"minutes": "Minutos",
-			"daysShort": "d",
+			"daysShort": "día",
 			"hoursShort": "h",
-			"minutesShort": "m",
+			"minutesShort": "min",
 			"confirm": "Confirmar",
 			"cancel": "Cancelar"
 		}

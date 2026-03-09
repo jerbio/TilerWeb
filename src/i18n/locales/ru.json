@@ -556,9 +556,9 @@
 			"days": "Дни",
 			"hours": "Часы",
 			"minutes": "Минуты",
-			"daysShort": "д",
+			"daysShort": "дн",
 			"hoursShort": "ч",
-			"minutesShort": "м",
+			"minutesShort": "мин",
 			"confirm": "Подтвердить",
 			"cancel": "Отменить"
 		}

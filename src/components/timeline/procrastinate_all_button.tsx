@@ -23,6 +23,7 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 	const [hours, setHours] = useState(0);
 	const [minutes, setMinutes] = useState(0);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const isDurationZero = days === 0 && hours === 0 && minutes === 0;
 	const getActivePersonaSession = useAppStore((s) => s.getActivePersonaSession);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
@@ -147,7 +148,7 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 						/>
 						<UnitLabel>{t('timeline.procrastinateAll.minutesShort')}</UnitLabel>
 					</DurationField>
-					<OverlayIconButton onClick={handleConfirm} aria-label={t('timeline.procrastinateAll.confirm')}>
+					<OverlayIconButton onClick={handleConfirm} disabled={isDurationZero} aria-label={t('timeline.procrastinateAll.confirm')}>
 						<Check size={16} />
 					</OverlayIconButton>
 					<OverlayIconButton onClick={handleCancel} aria-label={t('timeline.procrastinateAll.cancel')}>
@@ -265,7 +266,12 @@ const OverlayIconButton = styled.button`
 	padding: 0;
 	flex-shrink: 0;
 
-	&:hover {
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&:hover:not(:disabled) {
 		opacity: 0.8;
 	}
 `;

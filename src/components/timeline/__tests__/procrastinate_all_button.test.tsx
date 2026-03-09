@@ -97,9 +97,9 @@ vi.mock('react-i18next', () => ({
 				'timeline.procrastinateAll.days': 'Days',
 				'timeline.procrastinateAll.hours': 'Hours',
 				'timeline.procrastinateAll.minutes': 'Minutes',
-				'timeline.procrastinateAll.daysShort': 'd',
-				'timeline.procrastinateAll.hoursShort': 'h',
-				'timeline.procrastinateAll.minutesShort': 'm',
+				'timeline.procrastinateAll.daysShort': 'day',
+				'timeline.procrastinateAll.hoursShort': 'hr',
+				'timeline.procrastinateAll.minutesShort': 'min',
 				'timeline.procrastinateAll.confirm': 'Confirm',
 				'timeline.procrastinateAll.cancel': 'Cancel',
 			};
@@ -226,7 +226,7 @@ describe('ProcrastinateAllButton', () => {
 		const user = setupUser();
 
 		renderProcrastinateAllButton();
-		await openAndConfirm(user);
+		await openAndConfirm(user, { hours: 1 });
 
 		await waitFor(() => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
@@ -259,23 +259,14 @@ describe('ProcrastinateAllButton', () => {
 		});
 	});
 
-	it('sends zero duration when confirmed without changing inputs', async () => {
-		mockProcrastinateAllSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
+	it('disables confirm button when all duration values are zero', async () => {
 		const user = setupUser();
-
 		renderProcrastinateAllButton();
-		await openAndConfirm(user);
 
-		await waitFor(() => {
-			expect(mockProcrastinateAllSchedule).toHaveBeenCalledWith(
-				expect.objectContaining({
-					DurationDays: 0,
-					DurationHours: 0,
-					DurationMins: 0,
-					DurationInMs: 0,
-				}),
-			);
-		});
+		await user.click(screen.getByRole('button', { name: 'Defer all events' }));
+
+		const confirmBtn = screen.getByRole('button', { name: 'Confirm' });
+		expect(confirmBtn).toBeDisabled();
 	});
 
 	it('fetches location before deferring', async () => {
@@ -283,7 +274,7 @@ describe('ProcrastinateAllButton', () => {
 		const user = setupUser();
 
 		renderProcrastinateAllButton();
-		await openAndConfirm(user);
+		await openAndConfirm(user, { hours: 1 });
 
 		await waitFor(() => {
 			expect(mockGetCurrentLocation).toHaveBeenCalledTimes(1);
@@ -310,7 +301,7 @@ describe('ProcrastinateAllButton', () => {
 		const user = setupUser();
 
 		renderProcrastinateAllButton({ onLoadingChange });
-		await openAndConfirm(user);
+		await openAndConfirm(user, { hours: 1 });
 
 		await waitFor(() => {
 			expect(onLoadingChange).toHaveBeenCalledWith(true);

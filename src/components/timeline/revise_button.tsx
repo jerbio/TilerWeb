@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
@@ -66,7 +65,9 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 			aria-label={t('timeline.revise.ariaLabel')}
 			title={t('timeline.revise.tooltip')}
 		>
-			<RefreshCw size={16} />
+			<svg width="20" height="20" viewBox="8 11 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M25.25 13H10.25M13.5833 18H10.25M13.5833 23H10.25M17.75 23C18.2747 23.6996 19.0062 24.2164 19.841 24.4771C20.6757 24.7379 21.5713 24.7294 22.4009 24.4528C23.2306 24.1763 23.9522 23.6457 24.4635 22.9363C24.9748 22.2269 25.25 21.3745 25.25 20.5C25.25 19.5054 24.8549 18.5516 24.1516 17.8483C23.4484 17.1451 22.4946 16.75 21.5 16.75C20.3917 16.75 19.3833 17.2 18.6583 17.925L16.9167 19.6667M16.9167 19.6667V16.3333M16.9167 19.6667H20.25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
 		</ReviseIconButton>
 	);
 };

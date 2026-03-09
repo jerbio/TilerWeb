@@ -556,9 +556,9 @@
 			"days": "दिन",
 			"hours": "घंटे",
 			"minutes": "मिनट",
-			"daysShort": "दि",
-			"hoursShort": "घं",
-			"minutesShort": "मि",
+			"daysShort": "दिन",
+			"hoursShort": "घंटा",
+			"minutesShort": "मिनट",
 			"confirm": "पुष्टि करें",
 			"cancel": "रद्द करें"
 		}

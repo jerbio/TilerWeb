@@ -173,9 +173,9 @@
 			"days": "Jours",
 			"hours": "Heures",
 			"minutes": "Minutes",
-			"daysShort": "j",
+			"daysShort": "jour",
 			"hoursShort": "h",
-			"minutesShort": "m",
+			"minutesShort": "min",
 			"confirm": "Confirmer",
 			"cancel": "Annuler"
 		},

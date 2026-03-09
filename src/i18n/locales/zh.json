@@ -557,8 +557,8 @@
 			"hours": "小时",
 			"minutes": "分钟",
 			"daysShort": "天",
-			"hoursShort": "时",
-			"minutesShort": "分",
+			"hoursShort": "小时",
+			"minutesShort": "分钟",
 			"confirm": "确认",
 			"cancel": "取消"
 		}
