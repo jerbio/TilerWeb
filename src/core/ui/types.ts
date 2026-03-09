@@ -24,6 +24,7 @@ export enum NotificationAction {
 	SetAsNow = 'set-now',
 	Complete = 'complete',
 	Delete = 'delete',
+	Shuffle = 'shuffle',
 }
 
 /** Build a deterministic notification ID from an action and entity ID */

@@ -2,7 +2,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
-import { ScheduleCreateEventParams, ScheduleLookupOptions } from '@/core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleLookupOptions, ScheduleShuffleParams } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
 
@@ -179,6 +179,20 @@ class ScheduleService {
       return response.Content;
     } catch (error) {
       console.error('Error deleting calendar event', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Shuffle the user's schedule.
+   * Calls `POST /api/Schedule/Shuffle` and returns the updated schedule.
+   */
+  async shuffleSchedule(params: ScheduleShuffleParams) {
+    try {
+      const response = await this.scheduleApi.shuffle(params);
+      return response.Content;
+    } catch (error) {
+      console.error('Error shuffling schedule', error);
       throw normalizeError(error);
     }
   }

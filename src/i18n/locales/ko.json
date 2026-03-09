@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "이 이벤트를 완료하시겠습니까?",
 		"confirmDeleteTitle": "이 이벤트를 삭제하시겠습니까?",
 		"confirmAction": "확인",
-		"cancelAction": "취소"
+		"cancelAction": "취소",
+		"shuffle": {
+			"tooltip": "일정 섞기",
+			"ariaLabel": "일정 섞기",
+			"shuffling": "일정을 섞는 중...",
+			"success": "일정이 섞였습니다!",
+			"error": "섞기 실패. 다시 시도해 주세요."
+		}
 	},
 	"errors": {
 		"chatLimitReached": "채팅 한도에 도달했습니다. 나중에 다시 시도해 주세요.",

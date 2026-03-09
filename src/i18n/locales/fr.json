@@ -149,6 +149,13 @@
 		"confirmDeleteTitle": "Supprimer cet événement ?",
 		"confirmAction": "Confirmer",
 		"cancelAction": "Annuler",
+		"shuffle": {
+			"tooltip": "Mélanger le planning",
+			"ariaLabel": "Mélanger le planning",
+			"shuffling": "Mélange du planning...",
+			"success": "Planning mélangé !",
+			"error": "Le mélange a échoué. Veuillez réessayer."
+		},
 		"userInfo": {
 			"fullName": "Nom Complet",
 			"username": "Nom d'Utilisateur",

@@ -8,6 +8,7 @@ import { useTheme } from '@/core/theme/ThemeProvider';
 import { Env } from '@/config/config_getter';
 import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
 import SearchBar from './search_bar';
+import ShuffleButton from './shuffle_button';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -47,6 +48,7 @@ const TimelineHeader: React.FC = () => {
       </HeaderLeft>
       <SearchBar />
       <HeaderRight>
+				<ShuffleButton />
 				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
 					<Plus size={16} />
 				</CreateEventButton>

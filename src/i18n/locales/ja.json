@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "このイベントを完了しますか？",
 		"confirmDeleteTitle": "このイベントを削除しますか？",
 		"confirmAction": "確認",
-		"cancelAction": "キャンセル"
+		"cancelAction": "キャンセル",
+		"shuffle": {
+			"tooltip": "スケジュールをシャッフル",
+			"ariaLabel": "スケジュールをシャッフル",
+			"shuffling": "スケジュールをシャッフル中...",
+			"success": "スケジュールをシャッフルしました！",
+			"error": "シャッフルに失敗しました。もう一度お試しください。"
+		}
 	},
 	"errors": {
 		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",

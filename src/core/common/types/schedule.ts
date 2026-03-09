@@ -283,3 +283,20 @@ export type CalendarEventSearchParams = {
 
 /** Response shape for `GET /api/CalendarEvent/Name` */
 export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
+
+/** Common params shared across schedule update endpoints (Shuffle, Reoptimize, etc.) */
+export type ScheduleUpdateParams = {
+	UserLongitude?: string;
+	UserLatitude?: string;
+	UserLocationVerified?: string;
+	Version?: string;
+	TimeZone?: string;
+};
+
+/** Params for `POST /api/Schedule/Shuffle` */
+export type ScheduleShuffleParams = ScheduleUpdateParams & {
+	MobileApp?: boolean;
+	SocketId?: boolean;
+	TimeZoneOffset?: number;
+	IsTimeZoneAdjusted?: string;
+};

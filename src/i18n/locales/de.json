@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "Dieses Ereignis abschließen?",
 		"confirmDeleteTitle": "Dieses Ereignis löschen?",
 		"confirmAction": "Bestätigen",
-		"cancelAction": "Abbrechen"
+		"cancelAction": "Abbrechen",
+		"shuffle": {
+			"tooltip": "Zeitplan mischen",
+			"ariaLabel": "Zeitplan mischen",
+			"shuffling": "Zeitplan wird gemischt...",
+			"success": "Zeitplan gemischt!",
+			"error": "Mischen fehlgeschlagen. Bitte erneut versuchen."
+		}
 	},
 	"errors": {
 		"chatLimitReached": "Chat-Limit erreicht. Bitte versuchen Sie es später erneut.",

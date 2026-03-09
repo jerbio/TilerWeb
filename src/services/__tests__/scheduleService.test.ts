@@ -3,7 +3,7 @@ import ScheduleService from '../scheduleService';
 import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
-import { CalendarEvent } from '@/core/common/types/schedule';
+import { CalendarEvent, ScheduleShuffleParams } from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -15,6 +15,7 @@ vi.mock('@/config/config_getter', () => ({
 
 describe('ScheduleService', () => {
 	let service: ScheduleService;
+	let scheduleApi: ScheduleApi;
 	let calendarEventApi: CalendarEventApi;
 
 	const mockCalendarEvent: CalendarEvent = {
@@ -54,7 +55,7 @@ describe('ScheduleService', () => {
 	};
 
 	beforeEach(() => {
-		const scheduleApi = new ScheduleApi();
+		scheduleApi = new ScheduleApi();
 		const subCalendarEventApi = new SubCalendarEventApi();
 		calendarEventApi = new CalendarEventApi();
 		service = new ScheduleService(scheduleApi, subCalendarEventApi, calendarEventApi);
@@ -198,6 +199,45 @@ describe('ScheduleService', () => {
 
 			await expect(
 				service.deleteCalendarEvent('bad-id'),
+			).rejects.toThrow();
+		});
+	});
+
+	describe('shuffleSchedule', () => {
+		const shuffleParams: ScheduleShuffleParams = {
+			UserLongitude: '-73.9857',
+			UserLatitude: '40.7484',
+			UserLocationVerified: 'true',
+			MobileApp: true,
+			SocketId: true,
+			TimeZoneOffset: 0,
+			Version: 'v2',
+			TimeZone: 'America/New_York',
+			IsTimeZoneAdjusted: 'true',
+			UserName: 'testuser',
+			UserID: 'user-id-123',
+		};
+
+		it('calls shuffle on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.shuffle).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.shuffleSchedule(shuffleParams);
+
+			expect(scheduleApi.shuffle).toHaveBeenCalledWith(shuffleParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.shuffle).mockRejectedValueOnce(
+				new Error('Network error'),
+			);
+
+			await expect(
+				service.shuffleSchedule(shuffleParams),
 			).rejects.toThrow();
 		});
 	});

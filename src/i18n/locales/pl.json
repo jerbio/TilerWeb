@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "Ukończyć to wydarzenie?",
 		"confirmDeleteTitle": "Usunąć to wydarzenie?",
 		"confirmAction": "Potwierdź",
-		"cancelAction": "Anuluj"
+		"cancelAction": "Anuluj",
+		"shuffle": {
+			"tooltip": "Przetasuj harmonogram",
+			"ariaLabel": "Przetasuj harmonogram",
+			"shuffling": "Przetasowywanie harmonogramu...",
+			"success": "Harmonogram przetasowany!",
+			"error": "Przetasowanie nie powiodło się. Spróbuj ponownie."
+		}
 	},
 	"errors": {
 		"chatLimitReached": "Osiągnięto limit czatu. Spróbuj ponownie później.",

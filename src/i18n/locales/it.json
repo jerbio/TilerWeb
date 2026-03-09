@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "Completare questo evento?",
 		"confirmDeleteTitle": "Eliminare questo evento?",
 		"confirmAction": "Conferma",
-		"cancelAction": "Annulla"
+		"cancelAction": "Annulla",
+		"shuffle": {
+			"tooltip": "Mescola programma",
+			"ariaLabel": "Mescola programma",
+			"shuffling": "Mescolamento programma...",
+			"success": "Programma mescolato!",
+			"error": "Mescolamento fallito. Riprova."
+		}
 	},
 	"errors": {
 		"chatLimitReached": "Limite di chat raggiunto. Riprova più tardi.",

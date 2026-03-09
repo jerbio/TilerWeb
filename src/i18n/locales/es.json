@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "¿Completar este evento?",
 		"confirmDeleteTitle": "¿Eliminar este evento?",
 		"confirmAction": "Confirmar",
-		"cancelAction": "Cancelar"
+		"cancelAction": "Cancelar",
+		"shuffle": {
+			"tooltip": "Mezclar horario",
+			"ariaLabel": "Mezclar horario",
+			"shuffling": "Mezclando horario...",
+			"success": "¡Horario mezclado!",
+			"error": "Error al mezclar. Inténtalo de nuevo."
+		}
 	},
 	"errors": {
 		"chatLimitReached": "Límite de chat alcanzado. Por favor, inténtelo más tarde.",

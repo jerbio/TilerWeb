@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "完成此事件？",
 		"confirmDeleteTitle": "删除此事件？",
 		"confirmAction": "确认",
-		"cancelAction": "取消"
+		"cancelAction": "取消",
+		"shuffle": {
+			"tooltip": "打乱日程",
+			"ariaLabel": "打乱日程",
+			"shuffling": "正在打乱日程...",
+			"success": "日程已打乱！",
+			"error": "打乱失败，请重试。"
+		}
 	},
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",

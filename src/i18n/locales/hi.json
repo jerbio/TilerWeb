@@ -531,7 +531,14 @@
 		"confirmCompleteTitle": "इस इवेंट को पूर्ण करें?",
 		"confirmDeleteTitle": "इस इवेंट को हटाएँ?",
 		"confirmAction": "पुष्टि करें",
-		"cancelAction": "रद्द करें"
+		"cancelAction": "रद्द करें",
+		"shuffle": {
+			"tooltip": "शेड्यूल शफ़ल करें",
+			"ariaLabel": "शेड्यूल शफ़ल करें",
+			"shuffling": "शेड्यूल शफ़ल हो रहा है...",
+			"success": "शेड्यूल शफ़ल हो गया!",
+			"error": "शफ़ल विफल हुआ। कृपया पुनः प्रयास करें।"
+		}
 	},
 	"errors": {
 		"chatLimitReached": "चैट सीमा पूरी हो गई। कृपया बाद में पुनः प्रयास करें।",

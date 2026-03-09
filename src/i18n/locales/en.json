@@ -887,6 +887,13 @@
 		"confirmDeleteTitle": "Delete this event?",
 		"confirmAction": "Confirm",
 		"cancelAction": "Cancel",
+		"shuffle": {
+			"tooltip": "Shuffle schedule",
+			"ariaLabel": "Shuffle schedule",
+			"shuffling": "Shuffling schedule...",
+			"success": "Schedule shuffled!",
+			"error": "Shuffle failed. Please try again."
+		},
 		"userMenu": {
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",
