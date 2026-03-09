@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "タイル/ブロックを検索...",
+		"searchAriaLabel": "タイルまたはブロックを検索",
+		"clearSearch": "検索をクリア",
+		"loadMore": "もっと読み込む",
+		"loading": "読み込み中…",
+		"notFoundMessage": "おっと、'{{query}}'が見つかりませんでした。このタイトルでタイルを作成しますか？",
+		"notFoundDismiss": "いいえ",
+		"notFoundCreate": "作成",
+		"setAsNow": "現在に設定",
+		"markComplete": "完了",
+		"markDeleted": "削除",
+		"confirmCompleteTitle": "このイベントを完了しますか？",
+		"confirmDeleteTitle": "このイベントを削除しますか？",
+		"confirmAction": "確認",
+		"cancelAction": "キャンセル",
+		"shuffle": {
+			"tooltip": "スケジュールをシャッフル",
+			"ariaLabel": "スケジュールをシャッフル",
+			"shuffling": "スケジュールをシャッフル中...",
+			"success": "スケジュールをシャッフルしました！",
+			"error": "シャッフルに失敗しました。もう一度お試しください。"
+		},
+		"revise": {
+			"tooltip": "スケジュールを見直す",
+			"ariaLabel": "スケジュールを見直す",
+			"revising": "スケジュールを見直し中...",
+			"success": "スケジュールを見直しました！",
+			"error": "見直しに失敗しました。もう一度お試しください。"
+		},
+		"procrastinateAll": {
+			"tooltip": "すべてのイベントを延期",
+			"ariaLabel": "すべてのイベントを延期",
+			"deferring": "すべてのイベントを延期中...",
+			"success": "すべてのイベントが延期されました！",
+			"error": "延期に失敗しました。もう一度お試しください。",
+			"pickerTitle": "延期期間",
+			"days": "日",
+			"hours": "時間",
+			"minutes": "分",
+			"daysShort": "日",
+			"hoursShort": "時間",
+			"minutesShort": "分",
+			"confirm": "確認",
+			"cancel": "キャンセル"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",
 		"usernameAlreadyExists": "ユーザー名は既に存在します"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "現在のイベントに設定中...",
+			"setAsNowSuccess": "イベントを現在に設定しました！",
+			"completing": "イベントを完了中...",
+			"completeSuccess": "イベントが完了しました！",
+			"deleting": "イベントを削除中...",
+			"deleteSuccess": "イベントが削除されました！",
+			"actionFailed": "アクションに失敗しました。もう一度お試しください。"
+		}
 	}
 }

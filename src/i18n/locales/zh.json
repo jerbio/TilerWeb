@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "搜索磁贴/块...",
+		"searchAriaLabel": "搜索磁贴或块",
+		"clearSearch": "清除搜索",
+		"loadMore": "加载更多",
+		"loading": "加载中…",
+		"notFoundMessage": "哎呀，我们找不到'{{query}}'。您想用这个标题创建一个磁贴吗？",
+		"notFoundDismiss": "不用了",
+		"notFoundCreate": "创建",
+		"setAsNow": "设为当前",
+		"markComplete": "完成",
+		"markDeleted": "删除",
+		"confirmCompleteTitle": "完成此事件？",
+		"confirmDeleteTitle": "删除此事件？",
+		"confirmAction": "确认",
+		"cancelAction": "取消",
+		"shuffle": {
+			"tooltip": "打乱日程",
+			"ariaLabel": "打乱日程",
+			"shuffling": "正在打乱日程...",
+			"success": "日程已打乱！",
+			"error": "打乱失败，请重试。"
+		},
+		"revise": {
+			"tooltip": "修订日程",
+			"ariaLabel": "修订日程",
+			"revising": "正在修订日程...",
+			"success": "日程已修订！",
+			"error": "修订失败，请重试。"
+		},
+		"procrastinateAll": {
+			"tooltip": "推迟所有事件",
+			"ariaLabel": "推迟所有事件",
+			"deferring": "正在推迟所有事件...",
+			"success": "所有事件已推迟！",
+			"error": "推迟失败，请重试。",
+			"pickerTitle": "推迟时长",
+			"days": "天",
+			"hours": "小时",
+			"minutes": "分钟",
+			"daysShort": "天",
+			"hoursShort": "小时",
+			"minutesShort": "分钟",
+			"confirm": "确认",
+			"cancel": "取消"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",
 		"usernameAlreadyExists": "用户名已存在"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "正在设置为当前...",
+			"setAsNowSuccess": "事件已设为当前！",
+			"completing": "正在完成事件...",
+			"completeSuccess": "事件已完成！",
+			"deleting": "正在删除事件...",
+			"deleteSuccess": "事件已删除！",
+			"actionFailed": "操作失败，请重试。"
+		}
 	}
 }

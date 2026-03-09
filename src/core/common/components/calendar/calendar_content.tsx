@@ -1,11 +1,10 @@
 import calendarConfig from '@/core/constants/calendar_config';
 import React from 'react';
 import styled from 'styled-components';
-import CalendarEvents, { StyledEvent } from './calendar_events';
+import CalendarEvents, { CalendarBackgroundClickInfo, StyledEvent } from './calendar_events';
 import dayjs from 'dayjs';
-import { CalendarViewOptions } from './calendar';
+import { CalendarViewOptions } from './calendar.types';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
-import palette from '@/core/theme/palette';
 
 type CalendarContentProps = {
 	// Events to display in the calendar
@@ -20,6 +19,8 @@ type CalendarContentProps = {
 	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 	// Function to set styled non-viable events
 	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+  // Function to provide background click info
+  onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events for Calendar request handling */
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (chat → calendar highlight) */
@@ -36,6 +37,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setSelectedEventInfo,
 	calendarGridCanvasRef,
 	setStyledNonViableEvents,
+  onBackgroundClick,
 	styledEventsRef,
 	focusedEventId,
 	onViableEventClicked,
@@ -44,7 +46,10 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
     <Container>
       <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
         {/* Background */}
-        <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+        <CalendarBg
+          ref={calendarGridCanvasRef}
+          $width={viewOptions.width}
+        />
         {/* Timeline */}
         {Array.from({ length: 24 }).map((_, hourIndex) => {
           return (
@@ -65,6 +70,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
           setSelectedEvent={setSelectedEvent}
           setSelectedEventInfo={setSelectedEventInfo}
           onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+          onBackgroundClick={onBackgroundClick}
           styledEventsRef={styledEventsRef}
           focusedEventId={focusedEventId}
           onViableEventClicked={onViableEventClicked}
@@ -105,9 +111,9 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 	height: ${calendarConfig.CELL_HEIGHT};
 	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
 
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-color: #1f1f1f;
-	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
+	border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	background-color: ${({ theme }) => theme.colors.calendar.sidebarBg};
+	background-image: linear-gradient(to right, ${({ theme }) => theme.colors.calendar.grid} 33%, rgba(255, 255, 255, 0) 0%);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;
@@ -122,8 +128,8 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 			line-height: 1;
 			top: 4px;
 			right: 2px;
-			font-size: ${palette.typography.fontSize.xs};
-			color: ${palette.colors.gray[500]};
+			font-size: ${({ theme }) => theme.typography.fontSize.xs};
+			color: ${({ theme }) => theme.colors.gray[500]};
 		}
 	}
 `;

@@ -11,14 +11,14 @@ import React from 'react';
 import { act } from '@testing-library/react';
 import { CALENDAR_OVERLAY_CONTAINER_ID } from './StatusOverlay';
 
-// â”€â”€ Mock Zustand store â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Mock Zustand store ----------------------------------------
 
 const mockGetActivePersonaSession = vi.fn();
 
 vi.mock('@/global_state', () => ({
   __esModule: true,
   default: Object.assign(
-    // The Zustand hook itself â€” when called with a selector, invoke it
+    // The Zustand hook itself -- when called with a selector, invoke it
     (selector?: (state: unknown) => unknown) => {
       const state = {
         getActivePersonaSession: mockGetActivePersonaSession,
@@ -33,7 +33,7 @@ vi.mock('@/global_state', () => ({
   ),
 }));
 
-// â”€â”€ Mock i18n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Mock i18n ------------------------------------------------
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -42,7 +42,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Helpers --------------------------------------------------
 
 function createAction(overrides: Partial<VibeAction> = {}): VibeAction {
   return {
@@ -130,7 +130,7 @@ function setCurrentScheduleId(scheduleId: string | null) {
   });
 }
 
-// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Tests ----------------------------------------------------
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -275,7 +275,7 @@ describe('ActionPill schedule consistency', () => {
       renderActionPill(session1Action);
 
       const button = screen.getByRole('button');
-      // Should not be clickable â€” stale
+      // Should not be clickable -- stale
       expect(button.style.cursor).toBe('default');
 
     });
@@ -302,7 +302,7 @@ describe('ActionPill schedule consistency', () => {
 
       const button = screen.getByRole('button');
       // When scheduleId is null, we still allow click for backwards compat
-      // (unknown state â†’ clickable if entity info is present)
+      // (unknown state -> clickable if entity info is present)
       // This tests that the component handles null gracefully
       expect(button).toBeInTheDocument();
     });
@@ -315,7 +315,7 @@ describe('ActionPill schedule consistency', () => {
       renderActionPill(action);
 
       const button = screen.getByRole('button');
-      // Unknown state â€” allow click since we can't determine staleness
+      // Unknown state -- allow click since we can't determine staleness
       expect(button.style.cursor).toBe('pointer');
     });
   });
@@ -406,7 +406,7 @@ describe('ActionPill schedule consistency', () => {
       const button = screen.getByRole('button');
       await user.click(button);
 
-      // Should not trigger any dispatch â€” no console warnings about entity lookup
+      // Should not trigger any dispatch -- no console warnings about entity lookup
       expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -506,7 +506,7 @@ describe('ActionPill schedule consistency', () => {
       });
       expect(screen.getByText(/demo mode/i)).toBeInTheDocument();
 
-      // Second click â€” should still be clickable (cursor is pointer)
+      // Second click -- should still be clickable (cursor is pointer)
       expect(button.style.cursor).toBe('pointer');
     });
   });

@@ -1,11 +1,15 @@
-import {
-	ScheduleLookupOptions,
-	ScheduleLookupResponse,
-} from '../core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
+	public createEvent(params: ScheduleCreateEventParams) {
+		return this.apiRequest<ScheduleCreateEventResponse>('api/Schedule/Event', {
+			method: 'POST',
+			body: JSON.stringify({...params }),
+		});
+	}
+
 	private lookupSchedule(
 		params: Record<string, string>,
 	) {
@@ -50,5 +54,38 @@ export class ScheduleApi extends AppApi {
 		}).toString();
 
 		return this.apiRequest<ScheduleLookupResponse>(`api/Schedule?${urlParams}`);
+	}
+
+	/**
+	 * Shuffle the user's schedule.
+	 * `POST /api/Schedule/Shuffle`
+	 */
+	public shuffle(params: ScheduleShuffleParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Shuffle', {
+			method: 'POST',
+			body: JSON.stringify(params),
+		});
+	}
+
+	/**
+	 * Revise (re-optimize) the user's schedule.
+	 * `POST /api/Schedule/Revise`
+	 */
+	public revise(params: ScheduleReviseParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Revise', {
+			method: 'POST',
+			body: JSON.stringify(params),
+		});
+	}
+
+	/**
+	 * Procrastinate (defer) all events in the user's schedule.
+	 * `POST /api/Schedule/ProcrastinateAll`
+	 */
+	public procrastinateAll(params: ScheduleProcrastinateAllParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/ProcrastinateAll', {
+			method: 'POST',
+			body: JSON.stringify(params),
+		});
 	}
 }

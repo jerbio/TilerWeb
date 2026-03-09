@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Cerca un riquadro/blocco...",
+		"searchAriaLabel": "Cerca un riquadro o blocco",
+		"clearSearch": "Cancella ricerca",
+		"loadMore": "Carica altro",
+		"loading": "Caricamento…",
+		"notFoundMessage": "Ops, non abbiamo trovato '{{query}}'. Vuoi creare un riquadro con questo titolo?",
+		"notFoundDismiss": "No grazie",
+		"notFoundCreate": "Crea",
+		"setAsNow": "Imposta come adesso",
+		"markComplete": "Completa",
+		"markDeleted": "Elimina",
+		"confirmCompleteTitle": "Completare questo evento?",
+		"confirmDeleteTitle": "Eliminare questo evento?",
+		"confirmAction": "Conferma",
+		"cancelAction": "Annulla",
+		"shuffle": {
+			"tooltip": "Mescola programma",
+			"ariaLabel": "Mescola programma",
+			"shuffling": "Mescolamento programma...",
+			"success": "Programma mescolato!",
+			"error": "Mescolamento fallito. Riprova."
+		},
+		"revise": {
+			"tooltip": "Rivedere il programma",
+			"ariaLabel": "Rivedere il programma",
+			"revising": "Revisione del programma...",
+			"success": "Programma rivisto!",
+			"error": "Revisione fallita. Riprova."
+		},
+		"procrastinateAll": {
+			"tooltip": "Rimanda tutti gli eventi",
+			"ariaLabel": "Rimanda tutti gli eventi",
+			"deferring": "Rimandando tutti gli eventi...",
+			"success": "Tutti gli eventi rimandati!",
+			"error": "Rimando fallito. Riprova.",
+			"pickerTitle": "Durata del rimando",
+			"days": "Giorni",
+			"hours": "Ore",
+			"minutes": "Minuti",
+			"daysShort": "Gg",
+			"hoursShort": "Ora",
+			"minutesShort": "Min",
+			"confirm": "Conferma",
+			"cancel": "Annulla"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Limite di chat raggiunto. Riprova più tardi.",
 		"usernameAlreadyExists": "Nome utente già esistente"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Impostazione come attuale...",
+			"setAsNowSuccess": "Evento impostato come attuale!",
+			"completing": "Completamento evento...",
+			"completeSuccess": "Evento completato!",
+			"deleting": "Eliminazione evento...",
+			"deleteSuccess": "Evento eliminato!",
+			"actionFailed": "Azione fallita. Riprova."
+		}
 	}
 }

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { CalendarViewOptions } from '@/core/common/components/calendar/calendar';
+import { CalendarViewOptions } from '@/core/common/components/calendar/calendar.types';
 import calendarConfig from '@/core/constants/calendar_config';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 

@@ -1,4 +1,4 @@
-import { CalendarEventResponse, SubEventsOfCalendarResponse } from '../core/common/types/schedule';
+import { CalendarEventResponse, CalendarEventSearchParams, CalendarEventSearchResponse, SubEventsOfCalendarResponse } from '../core/common/types/schedule';
 import { PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
 
@@ -42,5 +42,63 @@ export class CalendarEventApi extends AppApi {
 	public getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
 		const urlParams = this.buildParams(eventId, options);
 		return this.apiRequest<SubEventsOfCalendarResponse>(`api/CalendarEvent/SubEvents?${urlParams}`);
+	}
+
+	/**
+	 * Search calendar events by name.
+	 * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
+	 */
+	public searchByName(params: CalendarEventSearchParams) {
+		const urlEntries: Record<string, string> = {
+			Data: params.data,
+			UserName: params.userName,
+			UserID: params.userId,
+			MobileApp: 'true',
+			Version: 'v2',
+		};
+
+		if (params.batchSize != null) {
+			urlEntries['batchSize'] = String(params.batchSize);
+		}
+		if (params.index != null) {
+			urlEntries['index'] = String(params.index);
+		}
+
+		const urlParams = new URLSearchParams(urlEntries).toString();
+
+		return this.apiRequest<CalendarEventSearchResponse>(`api/CalendarEvent/Name?${urlParams}`);
+	}
+
+	/**
+	 * Set a calendar event as the current ("now") event.
+	 * `POST /api/CalendarEvent/Now`  body: `{ ID: eventId }`
+	 */
+	public setAsNow(eventId: string) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Now', {
+			method: 'POST',
+			body: JSON.stringify({ ID: eventId }),
+		});
+	}
+
+	/**
+	 * Mark a calendar event as complete.
+	 * `POST /api/CalendarEvent/Complete`  body: `{ EventID: eventId }`
+	 */
+	public markAsComplete(eventId: string) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Complete', {
+			method: 'POST',
+			body: JSON.stringify({ EventID: eventId }),
+		});
+	}
+
+	/**
+	 * Delete a calendar event.
+	 * `DELETE /api/CalendarEvent`  body: `{ EventID: eventId }`
+	 */
+	public deleteCalendarEvent(eventId: string) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent', {
+			method: 'DELETE',
+			body: JSON.stringify({ EventID: eventId }),
+		});
 	}
 }

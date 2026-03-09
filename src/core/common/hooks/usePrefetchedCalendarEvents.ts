@@ -19,15 +19,45 @@ export default function usePrefetchedCalendarData({
 
   const latestLookupRequestRef = useRef<string | null>(null);
   const scheduleCacheRef = useRef<Map<string, Array<ScheduleSubCalendarEvent>>>(new Map());
-  const scheduleCache = scheduleCacheRef.current;
 
   const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
   const [loading, setLoading] = useState(true);
 
   // Get scheduleId from the active persona session to ensure consistency
   const activeSessionType = useAppStore((state) => state.activeSessionType);
-  const activePersonaSession = useAppStore((state) => activeSessionType === 'anonymous' ? state.anonymousPersonaSession : state.authenticatedPersonaSession);
+  const activePersonaSession = useAppStore((state) =>
+    activeSessionType === 'anonymous'
+      ? state.anonymousPersonaSession
+      : state.authenticatedPersonaSession
+  );
   const scheduleId = activePersonaSession?.scheduleId;
+
+  async function refetchEvents() {
+    if (!userId) return;
+
+    setLoading(true);
+
+    // Clear the entire cache so stale prefetched ranges are discarded
+    scheduleCacheRef.current = new Map();
+
+    const start = viewOptions.startDay.valueOf();
+    const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
+
+    // Re-fetch the current visible range
+    const refreshedEvents = await fetchSchedule(userId, start, end, false);
+
+		setEvents(refreshedEvents);
+    setLoading(false);
+
+    // Re-prefetch adjacent ranges so swiping is still instant
+    const nextStart = end;
+    const nextEnd = nextStart + TimeUtil.inMilliseconds(daysInView, 'd');
+    fetchSchedule(userId, nextStart, nextEnd, false);
+
+    const prevEnd = start;
+    const prevStart = prevEnd - TimeUtil.inMilliseconds(daysInView, 'd');
+    fetchSchedule(userId, prevStart, prevEnd, false);
+  }
 
   function makeCacheKey(
     uid: string,
@@ -40,9 +70,10 @@ export default function usePrefetchedCalendarData({
   }
 
   function enforceMaxCacheSize() {
-    if (scheduleCache.size > MAX_CACHE_ENTRIES) {
-      const firstKey = scheduleCache.keys().next().value || '';
-      scheduleCache.delete(firstKey);
+    const cache = scheduleCacheRef.current;
+    if (cache.size > MAX_CACHE_ENTRIES) {
+      const firstKey = cache.keys().next().value || '';
+      cache.delete(firstKey);
     }
   }
 
@@ -53,21 +84,15 @@ export default function usePrefetchedCalendarData({
     useCache = true
   ) {
     const personaId = activePersonaSession?.personaId || 'unknown-persona';
-    const cacheKey = makeCacheKey(
-      id,
-      startRange,
-      endRange,
-      scheduleId || null,
-      personaId
-    );
-    
+    const cacheKey = makeCacheKey(id, startRange, endRange, scheduleId || null, personaId);
+
     if (isDemoMode()) {
       const { calendarEvents } = getDemoData();
       return calendarEvents;
     }
 
     if (useCache) {
-      const cached = scheduleCache.get(cacheKey);
+      const cached = scheduleCacheRef.current.get(cacheKey);
       if (cached) {
         return cached;
       }
@@ -78,7 +103,7 @@ export default function usePrefetchedCalendarData({
       endRange,
     });
 
-    scheduleCache.set(cacheKey, lookup.subCalendarEvents);
+    scheduleCacheRef.current.set(cacheKey, lookup.subCalendarEvents);
     enforceMaxCacheSize();
     return lookup.subCalendarEvents;
   }
@@ -118,5 +143,5 @@ export default function usePrefetchedCalendarData({
     fetchSchedule(userId, prevStart, prevEnd, false);
   }, [userId, viewOptions.startDay, daysInView, scheduleId]);
 
-  return { events, loading };
+  return { events, loading, refetchEvents };
 }

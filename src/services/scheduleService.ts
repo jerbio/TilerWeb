@@ -2,7 +2,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
-import { ScheduleLookupOptions } from '@/core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleLookupOptions, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
 
@@ -25,6 +25,16 @@ class ScheduleService {
     this.subCalendarEventApi = subCalendarEventApi;
     this.calendarEventApi = calendarEventApi;
   }
+
+	async createEvent(params: ScheduleCreateEventParams) {
+		try {
+			const res = await this.scheduleApi.createEvent(params);
+			return res.Content;
+		} catch (error) {
+			console.error("Error creating sub-calendar event", error);
+			throw normalizeError(error);
+		}
+	}
 
   async lookupScheduleById(
     scheduleId: string,
@@ -118,6 +128,116 @@ class ScheduleService {
       return response.Content;
     } catch (error) {
       console.error('Error updating SubCalendarEvent', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Search calendar events by name.
+   * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
+   * Returns an array of CalendarEvent matching the search query.
+   */
+  async searchCalendarEventsByName(
+    query: string,
+    userName: string,
+    userId: string,
+    pagination?: { batchSize?: number; index?: number },
+  ) {
+    try {
+      const response = await this.calendarEventApi.searchByName({
+        data: query,
+        userName,
+        userId,
+        ...pagination,
+      });
+
+      return response.Content;
+    } catch (error) {
+      console.error('Error searching calendar events by name', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Set a calendar event as the current ("now") event.
+   * `POST /api/CalendarEvent/Now`
+   */
+  async setCalendarEventAsNow(eventId: string) {
+    try {
+      const response = await this.calendarEventApi.setAsNow(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error setting calendar event as now', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Mark a calendar event as complete.
+   * `POST /api/CalendarEvent/Complete`
+   */
+  async markCalendarEventComplete(eventId: string) {
+    try {
+      const response = await this.calendarEventApi.markAsComplete(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error marking calendar event as complete', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Delete a calendar event.
+   * `DELETE /api/CalendarEvent`
+   */
+  async deleteCalendarEvent(eventId: string) {
+    try {
+      const response = await this.calendarEventApi.deleteCalendarEvent(eventId);
+      return response.Content;
+    } catch (error) {
+      console.error('Error deleting calendar event', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Shuffle the user's schedule.
+   * Calls `POST /api/Schedule/Shuffle` and returns the updated schedule.
+   */
+  async shuffleSchedule(params: ScheduleShuffleParams) {
+    try {
+      const response = await this.scheduleApi.shuffle(params);
+      return response.Content;
+    } catch (error) {
+      console.error('Error shuffling schedule', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Revise (re-optimize) the user's schedule.
+   * Calls `POST /api/Schedule/Revise` and returns the updated schedule.
+   */
+  async reviseSchedule(params: ScheduleReviseParams) {
+    try {
+      const response = await this.scheduleApi.revise(params);
+      return response.Content;
+    } catch (error) {
+      console.error('Error revising schedule', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Procrastinate (defer) all events in the user's schedule.
+   * Calls `POST /api/Schedule/ProcrastinateAll` and returns the updated schedule.
+   */
+  async procrastinateAllSchedule(params: ScheduleProcrastinateAllParams) {
+    try {
+      const response = await this.scheduleApi.procrastinateAll(params);
+      return response.Content;
+    } catch (error) {
+      console.error('Error procrastinating all schedule events', error);
       throw normalizeError(error);
     }
   }

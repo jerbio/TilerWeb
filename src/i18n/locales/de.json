@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Nach einer Kachel/Block suchen...",
+		"searchAriaLabel": "Nach einer Kachel oder einem Block suchen",
+		"clearSearch": "Suche löschen",
+		"loadMore": "Mehr laden",
+		"loading": "Laden…",
+		"notFoundMessage": "Hoppla, wir konnten '{{query}}' nicht finden. Möchten Sie eine Kachel mit diesem Titel erstellen?",
+		"notFoundDismiss": "Nein danke",
+		"notFoundCreate": "Erstellen",
+		"setAsNow": "Jetzt setzen",
+		"markComplete": "Abschließen",
+		"markDeleted": "Löschen",
+		"confirmCompleteTitle": "Dieses Ereignis abschließen?",
+		"confirmDeleteTitle": "Dieses Ereignis löschen?",
+		"confirmAction": "Bestätigen",
+		"cancelAction": "Abbrechen",
+		"shuffle": {
+			"tooltip": "Zeitplan mischen",
+			"ariaLabel": "Zeitplan mischen",
+			"shuffling": "Zeitplan wird gemischt...",
+			"success": "Zeitplan gemischt!",
+			"error": "Mischen fehlgeschlagen. Bitte erneut versuchen."
+		},
+		"revise": {
+			"tooltip": "Zeitplan überarbeiten",
+			"ariaLabel": "Zeitplan überarbeiten",
+			"revising": "Zeitplan wird überarbeitet...",
+			"success": "Zeitplan überarbeitet!",
+			"error": "Überarbeitung fehlgeschlagen. Bitte erneut versuchen."
+		},
+		"procrastinateAll": {
+			"tooltip": "Alle Ereignisse verschieben",
+			"ariaLabel": "Alle Ereignisse verschieben",
+			"deferring": "Alle Ereignisse werden verschoben...",
+			"success": "Alle Ereignisse verschoben!",
+			"error": "Verschieben fehlgeschlagen. Bitte erneut versuchen.",
+			"pickerTitle": "Verschiebungsdauer",
+			"days": "Tage",
+			"hours": "Stunden",
+			"minutes": "Minuten",
+			"daysShort": "Tag",
+			"hoursShort": "Std",
+			"minutesShort": "Min",
+			"confirm": "Bestätigen",
+			"cancel": "Abbrechen"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Chat-Limit erreicht. Bitte versuchen Sie es später erneut.",
 		"usernameAlreadyExists": "Benutzername existiert bereits"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Wird als aktuell festgelegt...",
+			"setAsNowSuccess": "Ereignis als aktuell festgelegt!",
+			"completing": "Ereignis wird abgeschlossen...",
+			"completeSuccess": "Ereignis abgeschlossen!",
+			"deleting": "Ereignis wird gelöscht...",
+			"deleteSuccess": "Ereignis gelöscht!",
+			"actionFailed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+		}
 	}
 }

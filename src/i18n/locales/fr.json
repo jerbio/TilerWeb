@@ -134,6 +134,51 @@
 		"signingOut": "Déconnexion...",
 		"signOutSuccess": "Déconnexion réussie",
 		"signOutError": "Échec de la déconnexion",
+		"searchPlaceholder": "Rechercher une tuile/bloc...",
+		"searchAriaLabel": "Rechercher une tuile ou un bloc",
+		"clearSearch": "Effacer la recherche",
+		"loadMore": "Charger plus",
+		"loading": "Chargement…",
+		"notFoundMessage": "Oups, nous n'avons pas trouvé '{{query}}'. Souhaitez-vous créer une tuile à partir de ce titre ?",
+		"notFoundDismiss": "Non merci",
+		"notFoundCreate": "Créer",
+		"setAsNow": "Définir comme maintenant",
+		"markComplete": "Terminer",
+		"markDeleted": "Supprimer",
+		"confirmCompleteTitle": "Terminer cet événement ?",
+		"confirmDeleteTitle": "Supprimer cet événement ?",
+		"confirmAction": "Confirmer",
+		"cancelAction": "Annuler",
+		"shuffle": {
+			"tooltip": "Mélanger le planning",
+			"ariaLabel": "Mélanger le planning",
+			"shuffling": "Mélange du planning...",
+			"success": "Planning mélangé !",
+			"error": "Le mélange a échoué. Veuillez réessayer."
+		},
+		"revise": {
+			"tooltip": "Réviser le planning",
+			"ariaLabel": "Réviser le planning",
+			"revising": "Révision du planning...",
+			"success": "Planning révisé !",
+			"error": "La révision a échoué. Veuillez réessayer."
+		},
+		"procrastinateAll": {
+			"tooltip": "Reporter tous les événements",
+			"ariaLabel": "Reporter tous les événements",
+			"deferring": "Report de tous les événements...",
+			"success": "Tous les événements reportés !",
+			"error": "Échec du report. Veuillez réessayer.",
+			"pickerTitle": "Durée du report",
+			"days": "Jours",
+			"hours": "Heures",
+			"minutes": "Minutes",
+			"daysShort": "Jour",
+			"hoursShort": "H",
+			"minutesShort": "Min",
+			"confirm": "Confirmer",
+			"cancel": "Annuler"
+		},
 		"userInfo": {
 			"fullName": "Nom Complet",
 			"username": "Nom d'Utilisateur",
@@ -251,5 +296,16 @@
 	"errors": {
 		"chatLimitReached": "Limite de chat atteinte. Veuillez réessayer plus tard.",
 		"usernameAlreadyExists": "Le nom d'utilisateur existe déjà"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Définition en cours...",
+			"setAsNowSuccess": "Événement défini comme actuel !",
+			"completing": "Achèvement en cours...",
+			"completeSuccess": "Événement terminé !",
+			"deleting": "Suppression en cours...",
+			"deleteSuccess": "Événement supprimé !",
+			"actionFailed": "L'action a échoué. Veuillez réessayer."
+		}
 	}
 }

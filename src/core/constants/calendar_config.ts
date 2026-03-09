@@ -10,6 +10,7 @@ const calendarConfig = {
 	INFO_MODAL_HEIGHT: '260px',
 	INFO_MODAL_WIDTH: '300px',
 	INFO_MODAL_GAP: '12px',
+	CREATE_EVENT_MODAL_WIDTH: '600px',
 };
 
 export default calendarConfig;

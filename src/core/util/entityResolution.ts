@@ -50,7 +50,7 @@ interface EventLike {
 export function resolveEntityToTileId(
   entityId: string,
   entityType: CalendarEntityType,
-  events: readonly EventLike[],
+  events: readonly EventLike[]
 ): string | null {
   switch (entityType) {
     case CalendarEntityType.SubcalendarEvent: {
@@ -63,11 +63,11 @@ export function resolveEntityToTileId(
       // Find all child SubcalendarEvents sharing the same prefix,
       // excluding any CalendarEvent-shaped IDs.
       const children = events.filter(
-        (e) => e.id.startsWith(prefix + '_') && !isCalendarEventId(e.id),
+        (e) => e.id.startsWith(prefix + '_') && !isCalendarEventId(e.id)
       );
       if (children.length === 0) return null;
       // Return the earliest child by start time
-      const earliest = children.reduce((a, b) => (a.start <= b.start ? a : b));
+      const earliest = children.reduce((a, b) => (a.start <= b.start ? a : b), children[0]);
       return earliest.id;
     }
 

@@ -1,5 +1,5 @@
 {
-		"common": {
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "Skip",
@@ -152,6 +152,18 @@
 			}
 		}
 	},
+	"modals": {
+		"loading": {
+			"image": {
+        "alt": "Loading Indicator"
+			}
+		},
+		"success": {
+			"image": {
+        "alt": "Success Icon"
+			}
+		}
+	},
 	"calendar": {
 		"nonViable": {
 			"title": "Non-Viable Events",
@@ -164,15 +176,70 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
-			"locationLabel": "Location:",
+			"locationLabel": "View directions on map",
+			"secondaryActionsLabel": "Secondary Tile Actions:",
+			"secondaryActions": {
+				"editLabel": "Edit",
+				"deleteLabel": "Delete"
+			},
 			"save": "Save",
 			"cancel": "Cancel",
 			"validation": {
 				"endAfterStart": "End time must be after start time"
 			}
 		},
+		"createTile": {
+			"title": "Add a New Tile",
+			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+			"sections": {
+				"tileColor": "Select Tile Color",
+				"tileActions": "Tile Actions"
+			},
+			"tip": {
+				"description": "Press <b><key/></b> to create a new tile",
+				"keys": {
+					"enter": "Enter",
+					"return": "Return"
+				}
+			},
+			"message": {
+				"success": "<b>\"<action/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{action}}\" to your schedule"
+			},
+			"actions": {
+				"repeatTile": "Repeat the Tile",
+				"addTimeRestriction": "Add time restrictions",
+				"addLocationNickname": "Add location nickname"
+			},
+			"recurrence": {
+				"description": "I need to do this <repetition/> per <period/>",
+				"periods": {
+					"daily": "Day",
+					"weekly": "Week",
+					"monthly": "Month",
+					"yearly": "Year"
+				}
+			},
+			"timeRestrictions": {
+				"anytime": "Anytime",
+				"personalHours": "Personal Hours",
+				"workHours": "Work Hours",
+				"custom": "Custom"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Tile",
+				"collapse": "Less Options",
+				"expand": "More Options",
+				"viewInTimeline": "View Tile"
+			},
+			"summary": {
+				"title": "Summary",
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by"
+			}
+		},
 		"mobileChatInput": {
-      "placeholder": "Ask tiler anything..."
+			"placeholder": "Ask tiler anything..."
 		}
 	},
 	"home": {
@@ -811,6 +878,50 @@
 	},
 	"timeline": {
 		"searchPlaceholder": "Search for a tile/block...",
+		"searchAriaLabel": "Search for a tile or block",
+		"clearSearch": "Clear search",
+		"loadMore": "Load more",
+		"loading": "Loading…",
+		"notFoundMessage": "Oops, we couldn't find '{{query}}'. Would you like to create a Tile from this title?",
+		"notFoundDismiss": "No thanks",
+		"notFoundCreate": "Create",
+		"setAsNow": "Set as now",
+		"markComplete": "Complete",
+		"markDeleted": "Delete",
+		"confirmCompleteTitle": "Complete this event?",
+		"confirmDeleteTitle": "Delete this event?",
+		"confirmAction": "Confirm",
+		"cancelAction": "Cancel",
+		"shuffle": {
+			"tooltip": "Shuffle schedule",
+			"ariaLabel": "Shuffle schedule",
+			"shuffling": "Shuffling schedule...",
+			"success": "Schedule shuffled!",
+			"error": "Shuffle failed. Please try again."
+		},
+		"revise": {
+			"tooltip": "Revise schedule",
+			"ariaLabel": "Revise schedule",
+			"revising": "Revising schedule...",
+			"success": "Schedule revised!",
+			"error": "Revise failed. Please try again."
+		},
+		"procrastinateAll": {
+			"tooltip": "Defer all events",
+			"ariaLabel": "Defer all events",
+			"deferring": "Deferring all events...",
+			"success": "All events deferred!",
+			"error": "Defer failed. Please try again.",
+			"pickerTitle": "Defer Duration",
+			"days": "Days",
+			"hours": "Hours",
+			"minutes": "Minutes",
+			"daysShort": "Day",
+			"hoursShort": "Hr",
+			"minutesShort": "Min",
+			"confirm": "Confirm",
+			"cancel": "Cancel"
+		},
 		"userMenu": {
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",
@@ -821,5 +932,16 @@
 	"errors": {
 		"chatLimitReached": "Chat limit reached. Please try again later.",
 		"usernameAlreadyExists": "Username already exists"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Setting as current...",
+			"setAsNowSuccess": "Event set as current!",
+			"completing": "Completing event...",
+			"completeSuccess": "Event completed!",
+			"deleting": "Deleting event...",
+			"deleteSuccess": "Event deleted!",
+			"actionFailed": "Action failed. Please try again."
+		}
 	}
 }

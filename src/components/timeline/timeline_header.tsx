@@ -1,17 +1,24 @@
 import Logo from '@/core/common/components/icons/logo';
-import { Moon, Sun, User } from 'lucide-react';
+import { Moon, Plus, Sun, User } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Env } from '@/config/config_getter';
+import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
+import SearchBar from './search_bar';
+import ShuffleButton from './shuffle_button';
+import ReviseButton from './revise_button';
+import ProcrastinateAllButton from './procrastinate_all_button';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
+  const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+	const { setCreateTileModalOpen } = useCalendarUI();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -42,7 +49,14 @@ const TimelineHeader: React.FC = () => {
       <HeaderLeft>
         <Logo size={30} />
       </HeaderLeft>
+      <SearchBar />
       <HeaderRight>
+				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+				<ProcrastinateAllButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
+					<Plus size={16} />
+				</CreateEventButton>
         {Env.isDevelopment() && (
           <ThemeToggle onClick={toggleTheme}>
             {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
@@ -61,6 +75,18 @@ const TimelineHeader: React.FC = () => {
     </Header>
   );
 };
+
+const CreateEventButton = styled.button`
+	height: 36px;
+	width: 36px;
+	overflow: hidden;
+	color: ${(props) => props.theme.colors.button.brand.text};
+	background-color: ${({ theme }) => theme.colors.button.brand.bg};
+	border-radius: ${(props) => props.theme.borderRadius.large};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
 
 const ThemeToggle = styled.button`
 	height: 36px;

@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Поиск плитки/блока...",
+		"searchAriaLabel": "Поиск плитки или блока",
+		"clearSearch": "Очистить поиск",
+		"loadMore": "Загрузить ещё",
+		"loading": "Загрузка…",
+		"notFoundMessage": "Упс, мы не смогли найти '{{query}}'. Хотите создать плитку с этим названием?",
+		"notFoundDismiss": "Нет, спасибо",
+		"notFoundCreate": "Создать",
+		"setAsNow": "Установить как текущее",
+		"markComplete": "Завершить",
+		"markDeleted": "Удалить",
+		"confirmCompleteTitle": "Завершить это событие?",
+		"confirmDeleteTitle": "Удалить это событие?",
+		"confirmAction": "Подтвердить",
+		"cancelAction": "Отмена",
+		"shuffle": {
+			"tooltip": "Перемешать расписание",
+			"ariaLabel": "Перемешать расписание",
+			"shuffling": "Перемешивание расписания...",
+			"success": "Расписание перемешано!",
+			"error": "Ошибка перемешивания. Попробуйте ещё раз."
+		},
+		"revise": {
+			"tooltip": "Пересмотреть расписание",
+			"ariaLabel": "Пересмотреть расписание",
+			"revising": "Пересмотр расписания...",
+			"success": "Расписание пересмотрено!",
+			"error": "Ошибка пересмотра. Попробуйте ещё раз."
+		},
+		"procrastinateAll": {
+			"tooltip": "Отложить все события",
+			"ariaLabel": "Отложить все события",
+			"deferring": "Откладывание всех событий...",
+			"success": "Все события отложены!",
+			"error": "Ошибка откладывания. Попробуйте ещё раз.",
+			"pickerTitle": "Длительность откладывания",
+			"days": "Дни",
+			"hours": "Часы",
+			"minutes": "Минуты",
+			"daysShort": "дн",
+			"hoursShort": "ч",
+			"minutesShort": "мин",
+			"confirm": "Подтвердить",
+			"cancel": "Отменить"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Достигнут лимит чата. Пожалуйста, повторите попытку позже.",
 		"usernameAlreadyExists": "Имя пользователя уже существует"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Установка как текущего...",
+			"setAsNowSuccess": "Событие установлено как текущее!",
+			"completing": "Завершение события...",
+			"completeSuccess": "Событие завершено!",
+			"deleting": "Удаление события...",
+			"deleteSuccess": "Событие удалено!",
+			"actionFailed": "Действие не выполнено. Попробуйте ещё раз."
+		}
 	}
 }

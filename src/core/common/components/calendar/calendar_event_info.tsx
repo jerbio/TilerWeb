@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { ScheduleSubCalendarEvent } from '../../types/schedule';
 import styled from 'styled-components';
-import palette from '@/core/theme/palette';
 import {
   Calendar,
   CalendarArrowDown,
   CalendarArrowUp,
   Check,
   Clock,
-  MapPin,
+  ExternalLink,
   Pencil,
+  PencilLine,
   Repeat2,
-  SquareArrowOutUpRight,
   Star,
+  Trash,
   X,
 } from 'lucide-react';
 import { RGBColor } from '@/core/util/colors';
 import dayjs from 'dayjs';
-import CalendarUtil from '@/core/util/calendar';
 import TimeUtil from '@/core/util/time';
 import calendarConfig from '@/core/constants/calendar_config';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +28,9 @@ import {
   unixToTimeString,
   validateTimeRange,
 } from '@/core/util/eventTimeConversion';
+import Button from '../button';
+import LocationBG from '@/assets/event/location-bg.png';
+import { useTheme } from '@/core/theme/ThemeProvider';
 
 type CalendarEventInfoProps = {
   event: ScheduleSubCalendarEvent | null;
@@ -44,6 +46,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   isEditable = true,
 }) => {
   const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
 
   // Edit mode flags
   const [isEditingDate, setIsEditingDate] = useState(false);
@@ -134,7 +137,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   };
 
   return event ? (
-    <StyledCalendarEventInfo $color={eventColor}>
+    <StyledCalendarEventInfo $color={eventColor} $darkmode={isDarkMode}>
       <CalendarEventInfoHeader>
         <div className="icon">
           <Star size={16} color={eventColor.setLightness(0.6).toHex()} />
@@ -169,8 +172,6 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
                       setHasChanges(true);
                       setIsEditingDate(false);
                     }}
-                    compact
-                    popperPlacement="bottom"
                   />
                 </EditableFieldWrapper>
               ) : (
@@ -318,38 +319,35 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
         </SaveButtonContainer>
       )}
 
+      <hr />
+      <CalendarEventInfoActions>
+        <h3>{t('calendar.event.secondaryActionsLabel')}</h3>
+        <CalendarEventInfoActionItems>
+          <CalendarEventInfoActionButton size="medium" variant={'ghost'}>
+            {t('calendar.event.secondaryActions.editLabel')}
+            <PencilLine size={16} />
+          </CalendarEventInfoActionButton>
+          <CalendarEventInfoActionButton size="medium" variant={'ghost'}>
+            {t('calendar.event.secondaryActions.deleteLabel')}
+            <Trash size={16} />
+          </CalendarEventInfoActionButton>
+        </CalendarEventInfoActionItems>
+      </CalendarEventInfoActions>
+
       {event.location.address && (
         <>
           <hr />
           <CalendarEventInfoSection>
-            <CalendarEventInfoArticle>
-              <MapPin
-                size={16}
-                color={eventColor.setLightness(0.6).toHex()}
-                style={{ minWidth: 16, marginTop: '0.25rem' }}
-              />
-              <div>
-                <h3>{t('calendar.event.locationLabel')}</h3>
-                <p>
-                  <a
-                    href={CalendarUtil.getEventLocationLink(event)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="location"
-                  >
-                    <span>
-                      {event.location.address}
-                      <SquareArrowOutUpRight
-                        color={palette.colors.gray[500]}
-                        style={{ minWidth: 16 }}
-                      />
-                    </span>
-                  </a>
-                </p>
-              </div>
-            </CalendarEventInfoArticle>
+            <a href={event.location.address}>
+              <CalendarEventInfoLocation $color={eventColor}>
+                <img src={LocationBG} alt="" width={16} />
+                <div>
+                  <h3>{t('calendar.event.locationLabel')}</h3>
+                  <ExternalLink size={16} />
+                </div>
+              </CalendarEventInfoLocation>
+            </a>
           </CalendarEventInfoSection>
-          <CalendarEventLocation></CalendarEventLocation>
         </>
       )}
     </StyledCalendarEventInfo>
@@ -363,7 +361,7 @@ const EditableValue = styled.p<{ $isEditable: boolean }>`
   cursor: ${({ $isEditable }) => ($isEditable ? 'pointer' : 'default')};
   padding: 2px 4px;
   margin: -2px -4px;
-  border-radius: ${palette.borderRadius.small};
+  border-radius: ${({ theme }) => theme.borderRadius.small};
   transition: background-color 0.2s ease;
 
   .edit-icon {
@@ -372,11 +370,11 @@ const EditableValue = styled.p<{ $isEditable: boolean }>`
     flex-shrink: 0;
   }
 
-  ${({ $isEditable }) =>
+  ${({ $isEditable, theme }) =>
     $isEditable &&
     `
     &:hover {
-      background-color: ${palette.colors.gray[700]};
+      background-color: ${theme.colors.gray[700]};
 
       .edit-icon {
         opacity: 0.8;
@@ -386,15 +384,15 @@ const EditableValue = styled.p<{ $isEditable: boolean }>`
 `;
 
 const TimeDate = styled.span`
-  font-size: ${palette.typography.fontSize.xs};
-  color: ${palette.colors.gray[500]};
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  color: ${({ theme }) => theme.colors.gray[500]};
   margin-top: 2px;
 `;
 
 const EditableFieldWrapper = styled.div`
   /* TimeDropdown select styling */
   select {
-    font-size: ${palette.typography.fontSize.sm};
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
     padding: 4px 24px 4px 8px;
     height: 28px;
     min-width: 90px;
@@ -403,22 +401,22 @@ const EditableFieldWrapper = styled.div`
 
 const ValidationError = styled.div`
   padding: 8px 16px;
-  color: ${palette.colors.error[400]};
-  font-size: ${palette.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.error[400]};
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
 `;
 
 const SaveButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   padding: 8px 16px;
-  border-top: 1px solid ${palette.colors.gray[700]};
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[700]};
   gap: 8px;
 `;
 
 const IconButton = styled.button<{ $primary?: boolean }>`
   width: 28px;
   height: 28px;
-  border-radius: ${palette.borderRadius.medium};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
   cursor: pointer;
   transition: background-color 0.2s ease;
   border: none;
@@ -426,47 +424,106 @@ const IconButton = styled.button<{ $primary?: boolean }>`
   align-items: center;
   justify-content: center;
 
-  ${({ $primary }) =>
+  ${({ $primary, theme }) =>
     $primary
       ? `
-    background-color: ${palette.colors.brand[500]};
-    color: ${palette.colors.white};
+    background-color: ${theme.colors.brand[500]};
+    color: ${theme.colors.white};
 
     &:hover {
-      background-color: ${palette.colors.brand[600]};
+      background-color: ${theme.colors.brand[600]};
     }
   `
       : `
-    background-color: ${palette.colors.gray[700]};
-    color: ${palette.colors.gray[300]};
+    background-color: ${theme.colors.gray[700]};
+    color: ${theme.colors.gray[300]};
 
     &:hover {
-      background-color: ${palette.colors.gray[600]};
+      background-color: ${theme.colors.gray[600]};
     }
   `}
-`;
-
-const CalendarEventLocation = styled.div`
-  padding: 0 16px 16px 16px;
-  font-size: ${palette.typography.fontSize.xs};
-  color: ${palette.colors.gray[400]};
-
-  a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    font-weight: ${palette.typography.fontWeight.medium};
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 `;
 
 const CalendarEventInfoHeader = styled.header`
   position: sticky;
   top: 0;
+`;
+
+const CalendarEventInfoActions = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  h3 {
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+    font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+    color: ${({ theme }) => theme.colors.text.secondary};
+    leading: 1;
+  }
+`;
+
+const CalendarEventInfoActionItems = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const CalendarEventInfoActionButton = styled(Button)`
+  flex: 1;
+  border: 1px solid ${({ theme }) => theme.colors.calendar.border};
+`;
+
+const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
+  position: relative;
+  height: 100px;
+  border: 1px solid ${({ theme }) => theme.colors.calendar.border};
+  border-radius: ${({ theme }) => theme.borderRadius.large};
+  isolation: isolate;
+  overflow: hidden;
+  cursor: pointer;
+
+  img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  &:hover div {
+    transform: translate(-50%, -60%);
+
+    h3 {
+      color: ${(props) => props.$color.setLightness(0.8).toHex()};
+    }
+  }
+
+  div {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: ${({ theme }) => theme.borderRadius.large};
+    padding: 0.5rem;
+    transition: transform 0.3s ease;
+
+    h3 {
+      white-space: nowrap;
+      font-size: ${({ theme }) => theme.typography.fontSize.sm};
+      font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+      font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+      color: ${({ theme }) => theme.colors.white};
+      leading: 1;
+    }
+  }
 `;
 
 const CalendarEventInfoSection = styled.div`
@@ -478,8 +535,8 @@ const CalendarEventInfoArticleContainer = styled.div`
   display: grid;
   gap: 0.5rem;
   grid-template-columns: 1fr 1fr;
-  border-radius: ${palette.borderRadius.large};
-  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${({ theme }) => theme.borderRadius.large};
+  border: 1px solid ${({ theme }) => theme.colors.calendar.border};
 
   & > :first-child {
     grid-column: 1 / 3;
@@ -497,21 +554,21 @@ const CalendarEventInfoArticle = styled.article`
     flex-direction: column;
 
     h3 {
-      font-size: ${palette.typography.fontSize.sm};
-      font-family: ${palette.typography.fontFamily.urban};
-      font-weight: ${palette.typography.fontWeight.bold};
-      color: ${palette.colors.gray[400]};
+      font-size: ${({ theme }) => theme.typography.fontSize.sm};
+      font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+      font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+      color: ${({ theme }) => theme.colors.text.muted};
       leading: 1;
     }
 
     p {
-      font-size: ${palette.typography.fontSize.sm};
-      font-family: ${palette.typography.fontFamily.urban};
-      font-weight: ${palette.typography.fontWeight.bold};
-      color: ${palette.colors.gray[300]};
+      font-size: ${({ theme }) => theme.typography.fontSize.sm};
+      font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+      font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+      color: ${({ theme }) => theme.colors.text.secondary};
 
       a {
-        color: ${palette.colors.gray[300]};
+        color: ${({ theme }) => theme.colors.text.secondary};
         text-decoration: none;
         span {
           display: flex;
@@ -527,17 +584,18 @@ const CalendarEventInfoArticle = styled.article`
   }
 `;
 
-const StyledCalendarEventInfo = styled.div<{ $color: RGBColor }>`
-  background-color: ${palette.colors.gray[800]};
-  border-radius: ${palette.borderRadius.xLarge};
+const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolean }>`
+  background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
+  border-radius: ${({ theme }) => theme.borderRadius.xLarge};
   width: 100%;
   max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
   overflow-y: auto;
+  border: 1px solid ${({ theme, $darkmode }) => (!$darkmode ? theme.colors.gray[300] : 'transparent')};
 
   hr {
     border: none;
     height: 1px;
-    background-color: ${palette.colors.gray[700]};
+    background-color: ${({ theme }) => theme.colors.calendar.border};
   }
 
   header {
@@ -545,9 +603,9 @@ const StyledCalendarEventInfo = styled.div<{ $color: RGBColor }>`
     align-items: center;
     justify-content: flex-start;
     gap: 0.5rem;
-    background-color: ${(props) => props.$color.setLightness(0.2).toHex()};
+    background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 0.9).toHex()};
     padding: 8px 16px;
-    border-radius: ${palette.borderRadius.xLarge} ${palette.borderRadius.xLarge} 0 0;
+    border-radius: ${({ theme }) => theme.borderRadius.xLarge} ${({ theme }) => theme.borderRadius.xLarge} 0 0;
 
     .icon {
       display: flex;
@@ -555,43 +613,46 @@ const StyledCalendarEventInfo = styled.div<{ $color: RGBColor }>`
       align-items: center;
       width: 32px;
       height: 32px;
-      border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
-      border-radius: ${palette.borderRadius.medium};
+      background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 1).toHex()};
+      border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
+      border-radius: ${({ theme }) => theme.borderRadius.medium};
+    }
+
+    > button {
+      height: 28px;
+      width: 28px;
+      border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
+      border-radius: ${({ theme }) => theme.borderRadius.medium};
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
+      }
     }
   }
 
   .title {
     flex: 1;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
     h2 {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: ${palette.typography.fontSize.lg};
-      font-family: ${palette.typography.fontFamily.urban};
-      font-weight: ${palette.typography.fontWeight.bold};
-      color: ${(props) => props.$color.setLightness(0.8).toHex()};
-      line-height: 1.1;
+      font-size: ${({ theme }) => theme.typography.fontSize.lg};
+      font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+      font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+      color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.8 : 0.2).toHex()};
     }
     span {
-      font-size: ${palette.typography.fontSize.xs};
-      font-weight: ${palette.typography.fontWeight.medium};
-      color: ${(props) => props.$color.setLightness(0.6).toHex()};
-    }
-  }
-
-  button {
-    height: 28px;
-    width: 28px;
-    border: 1px solid ${(props) => props.$color.setLightness(0.3).toHex()};
-    border-radius: ${palette.borderRadius.medium};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: ${(props) => props.$color.setLightness(0.3).toHex()};
+      font-size: ${({ theme }) => theme.typography.fontSize.xs};
+      font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+      color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.6 : 0.4).toHex()};
     }
   }
 
@@ -603,15 +664,15 @@ const StyledCalendarEventInfo = styled.div<{ $color: RGBColor }>`
 
     h3 {
       margin-top: -0.5rem;
-      font-size: ${palette.typography.fontSize.base};
-      font-family: ${palette.typography.fontFamily.urban};
-      font-weight: ${palette.typography.fontWeight.semibold};
-      color: ${palette.colors.gray[100]};
+      font-size: ${({ theme }) => theme.typography.fontSize.base};
+      font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+      font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+      color: ${({ theme }) => theme.colors.gray[100]};
     }
 
     p {
-      font-size: ${palette.typography.fontSize.xs};
-      color: ${palette.colors.gray[300]};
+      font-size: ${({ theme }) => theme.typography.fontSize.xs};
+      color: ${({ theme }) => theme.colors.gray[300]};
     }
   }
 `;

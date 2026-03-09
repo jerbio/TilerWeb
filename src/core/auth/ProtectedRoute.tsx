@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router';
 import useAppStore from '@/global_state';
-import Spinner from '@/core/common/components/loader';
+import Loader from '@/core/common/components/loader';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 
@@ -13,7 +13,7 @@ export const ProtectedRoute: React.FC = () => {
 	if (isAuthLoading) {
 		return (
 			<LoadingContainer>
-				<Spinner />
+				<Loader />
 			</LoadingContainer>
 		);
 	}

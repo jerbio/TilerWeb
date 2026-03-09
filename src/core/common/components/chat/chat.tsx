@@ -379,7 +379,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     if (!anonymousUserId) return;
 
     webSocketCommunication.current = new SignalRService(anonymousUserId);
-    webSocketCommunication.current.createVibeConnection();
+    webSocketCommunication.current.createConnection();
     webSocketCommunication.current.subscribeToSocketDataReceipt((data: unknown) => {
       // Type guard and extract vibe data from WebSocket
       if (

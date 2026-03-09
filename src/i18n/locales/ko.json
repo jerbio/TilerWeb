@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "타일/블록 검색...",
+		"searchAriaLabel": "타일 또는 블록 검색",
+		"clearSearch": "검색 지우기",
+		"loadMore": "더 불러오기",
+		"loading": "로딩 중…",
+		"notFoundMessage": "이런, '{{query}}'을(를) 찾을 수 없습니다. 이 제목으로 타일을 만드시겠습니까?",
+		"notFoundDismiss": "아니요",
+		"notFoundCreate": "만들기",
+		"setAsNow": "지금으로 설정",
+		"markComplete": "완료",
+		"markDeleted": "삭제",
+		"confirmCompleteTitle": "이 이벤트를 완료하시겠습니까?",
+		"confirmDeleteTitle": "이 이벤트를 삭제하시겠습니까?",
+		"confirmAction": "확인",
+		"cancelAction": "취소",
+		"shuffle": {
+			"tooltip": "일정 섞기",
+			"ariaLabel": "일정 섞기",
+			"shuffling": "일정을 섞는 중...",
+			"success": "일정이 섞였습니다!",
+			"error": "섞기 실패. 다시 시도해 주세요."
+		},
+		"revise": {
+			"tooltip": "일정 수정",
+			"ariaLabel": "일정 수정",
+			"revising": "일정을 수정하는 중...",
+			"success": "일정이 수정되었습니다!",
+			"error": "수정 실패. 다시 시도해 주세요."
+		},
+		"procrastinateAll": {
+			"tooltip": "모든 이벤트 연기",
+			"ariaLabel": "모든 이벤트 연기",
+			"deferring": "모든 이벤트를 연기하는 중...",
+			"success": "모든 이벤트가 연기되었습니다!",
+			"error": "연기 실패. 다시 시도해 주세요.",
+			"pickerTitle": "연기 기간",
+			"days": "일",
+			"hours": "시간",
+			"minutes": "분",
+			"daysShort": "일",
+			"hoursShort": "시간",
+			"minutesShort": "분",
+			"confirm": "확인",
+			"cancel": "취소"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "채팅 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
 		"usernameAlreadyExists": "사용자 이름이 이미 존재합니다"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "현재로 설정 중...",
+			"setAsNowSuccess": "이벤트가 현재로 설정되었습니다!",
+			"completing": "이벤트 완료 중...",
+			"completeSuccess": "이벤트가 완료되었습니다!",
+			"deleting": "이벤트 삭제 중...",
+			"deleteSuccess": "이벤트가 삭제되었습니다!",
+			"actionFailed": "작업이 실패했습니다. 다시 시도해 주세요."
+		}
 	}
 }

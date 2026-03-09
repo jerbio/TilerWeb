@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
@@ -40,7 +40,7 @@ const uiToApiTransportMap: Record<TransportModeUI, TransportModeAPI> = {
 
 const PreferencesSettings: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const navigate = useAuthNavigate();
 
 	// Transportation mode
 	const [transportMode, setTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
@@ -167,7 +167,7 @@ const PreferencesSettings: React.FC = () => {
 	return (
 		<Container>
 			<Breadcrumb>
-				<BreadcrumbLink onClick={() => navigate('/')}>
+				<BreadcrumbLink onClick={() => navigate('home')}>
 					{t('settings.breadcrumb.home')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>

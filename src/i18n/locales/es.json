@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Buscar un mosaico/bloque...",
+		"searchAriaLabel": "Buscar un mosaico o bloque",
+		"clearSearch": "Borrar búsqueda",
+		"loadMore": "Cargar más",
+		"loading": "Cargando…",
+		"notFoundMessage": "Ups, no pudimos encontrar '{{query}}'. ¿Te gustaría crear un mosaico con este título?",
+		"notFoundDismiss": "No, gracias",
+		"notFoundCreate": "Crear",
+		"setAsNow": "Establecer como ahora",
+		"markComplete": "Completar",
+		"markDeleted": "Eliminar",
+		"confirmCompleteTitle": "¿Completar este evento?",
+		"confirmDeleteTitle": "¿Eliminar este evento?",
+		"confirmAction": "Confirmar",
+		"cancelAction": "Cancelar",
+		"shuffle": {
+			"tooltip": "Mezclar horario",
+			"ariaLabel": "Mezclar horario",
+			"shuffling": "Mezclando horario...",
+			"success": "¡Horario mezclado!",
+			"error": "Error al mezclar. Inténtalo de nuevo."
+		},
+		"revise": {
+			"tooltip": "Revisar horario",
+			"ariaLabel": "Revisar horario",
+			"revising": "Revisando horario...",
+			"success": "¡Horario revisado!",
+			"error": "Error al revisar. Inténtalo de nuevo."
+		},
+		"procrastinateAll": {
+			"tooltip": "Posponer todos los eventos",
+			"ariaLabel": "Posponer todos los eventos",
+			"deferring": "Posponiendo todos los eventos...",
+			"success": "¡Todos los eventos pospuestos!",
+			"error": "Error al posponer. Inténtalo de nuevo.",
+			"pickerTitle": "Duración del aplazamiento",
+			"days": "Días",
+			"hours": "Horas",
+			"minutes": "Minutos",
+			"daysShort": "Día",
+			"hoursShort": "H",
+			"minutesShort": "Min",
+			"confirm": "Confirmar",
+			"cancel": "Cancelar"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Límite de chat alcanzado. Por favor, inténtelo más tarde.",
 		"usernameAlreadyExists": "El nombre de usuario ya existe"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Configurando como actual...",
+			"setAsNowSuccess": "¡Evento configurado como actual!",
+			"completing": "Completando evento...",
+			"completeSuccess": "¡Evento completado!",
+			"deleting": "Eliminando evento...",
+			"deleteSuccess": "¡Evento eliminado!",
+			"actionFailed": "La acción falló. Inténtalo de nuevo."
+		}
 	}
 }

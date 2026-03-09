@@ -72,6 +72,7 @@ export async function findEventDate({
         if (calEvent.subEvents.length > 0) {
           const earliest = calEvent.subEvents.reduce(
             (a, b) => (a.start <= b.start ? a : b),
+            calEvent.subEvents[0],
           );
           return earliest.start;
         }

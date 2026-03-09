@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 import { useNavigate } from 'react-router';
 import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
-import Spinner from '@/core/common/components/loader';
+import Loader from '@/core/common/components/loader';
 import TimelineHeader from '@/components/timeline/timeline_header';
 import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
@@ -11,11 +11,12 @@ import { CalendarRequestProvider } from '@/core/common/components/calendar/Calen
 import Chat from '@/core/common/components/chat/chat';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
+import { CalendarUIProvider } from '@/core/common/components/calendar/CalendarUIProvider';
 
 const Timeline: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-	const theme = useTheme();
+  const theme = useTheme();
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const isAuthLoading = useAppStore((state) => state.isAuthLoading);
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
@@ -48,7 +49,7 @@ const Timeline: React.FC = () => {
     return (
       <Container>
         <LoadingContainer>
-          <Spinner />
+          <Loader />
         </LoadingContainer>
       </Container>
     );
@@ -110,25 +111,27 @@ const Timeline: React.FC = () => {
 
   return (
     <Container>
-      <TimelineHeader />
+      <CalendarUIProvider>
+        <TimelineHeader />
 
-      <TimelineContentContainer>
-        <TimelineContent ref={contentRef}>
-          <CalendarRequestProvider>
-            <CardContent>
-              {contentTransition((style, item) => (
-                <item.container
-                  style={style}
-                  key={item.key}
-                  $chatexpanded={chatExpanded}
-                >
-                  {item.content}
-                </item.container>
-              ))}
-            </CardContent>
-          </CalendarRequestProvider>
-        </TimelineContent>
-      </TimelineContentContainer>
+        <TimelineContentContainer>
+          <TimelineContent ref={contentRef}>
+            <CalendarRequestProvider>
+              <CardContent>
+                {contentTransition((style, item) => (
+                  <item.container
+                    style={style}
+                    key={item.key}
+                    $chatexpanded={chatExpanded}
+                  >
+                    {item.content}
+                  </item.container>
+                ))}
+              </CardContent>
+            </CalendarRequestProvider>
+          </TimelineContent>
+        </TimelineContentContainer>
+      </CalendarUIProvider>
     </Container>
   );
 };
@@ -136,17 +139,16 @@ const Timeline: React.FC = () => {
 const TimelineContent = styled.main`
 	position: absolute;
 	inset: 1.5rem;
-	border-radius: ${props => props.theme.borderRadius.xLarge};
-	background: ${props => `linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`}
-;
-	border: 2px solid ${props => props.theme.colors.border.default};
+	border-radius: ${(props) => props.theme.borderRadius.xLarge};
+	background: ${(props) =>
+    `linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`};
+	border: 2px solid ${(props) => props.theme.colors.border.default};
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	padding-top: 1.5rem;
 	overflow: hidden;
 
-	@media screen and (min-width: ${props => props.theme.screens.lg}) {
+	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		padding-block: 1.5rem;
 		padding-right: 2rem;
 		gap: 1.5rem;
@@ -173,16 +175,16 @@ const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
 	height: 100%;
-	background: ${props => props.theme.colors.gray[900]};
-	border-top: 1px solid ${props => props.theme.colors.gray[700]};
+	background: ${(props) => props.theme.colors.calendar.bg};
 
-	@media screen and (min-width: ${props => props.theme.screens.lg}) {
+	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 8)};
-		border: 1px solid ${props => props.theme.colors.gray[700]};
+		border: 1px solid ${(props) => props.theme.colors.calendar.border};
 		border-left: none;
-		border-radius: 0 ${props => props.theme.borderRadius.large} ${props => props.theme.borderRadius.large} 0;
+		border-radius: 0 ${(props) => props.theme.borderRadius.large}
+			${(props) => props.theme.borderRadius.large} 0;
 	}
-	@media screen and (min-width: ${props => props.theme.screens.xl}) {
+	@media screen and (min-width: ${(props) => props.theme.screens.xl}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 9)};
 	}
 `;
@@ -191,19 +193,19 @@ const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;
-	border: 2px solid #2a2a2a;
-	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
+	border: 2px solid ${(props) => props.theme.colors.border.default};
+	background: ${(props) => props.theme.colors.backdrop.glass};
 	backdrop-filter: blur(6px);
-	border-radius: ${props => props.theme.borderRadius.xxLarge};
+	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
 	display: ${(props) => (props.$chatexpanded ? 'none' : 'block')};
 
-	@media screen and (min-width: ${props => props.theme.screens.lg}) {
+	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 4)};
 		border: none;
 	}
-	@media screen and (min-width: ${props => props.theme.screens.xl}) {
+	@media screen and (min-width: ${(props) => props.theme.screens.xl}) {
 		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 3)};
 	}
 `;
@@ -215,21 +217,21 @@ const ChatExpandToggle = styled.button`
 	transform: translateY(-50%) translateX(50%);
 	width: 40px;
 	height: 40px;
-	background: ${props => props.theme.colors.gray[900]};
-	border: 1px solid ${props => props.theme.colors.gray[800]};
-	border-radius: ${props => props.theme.borderRadius.large};
+	background: ${(props) => props.theme.colors.background.card};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
+	border-radius: ${(props) => props.theme.borderRadius.large};
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	color: ${props => props.theme.colors.gray[300]};
+	color: ${(props) => props.theme.colors.text.secondary};
 	transition: all 0.2s ease;
 	z-index: 1000;
 	outline: none;
 
 	&:hover {
-		background: ${props => props.theme.colors.gray[800]};
-		color: white;
+		background: ${(props) => props.theme.colors.background.card2};
+		color: ${(props) => props.theme.colors.text.primary};
 	}
 `;
 
@@ -243,7 +245,7 @@ const CalendarContainerActionButtons = styled.div`
 	gap: 12px;
 	padding-left: 69px;
 
-	@media screen and (min-width: ${props => props.theme.screens.lg}) {
+	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		display: none;
 	}
 `;
@@ -261,7 +263,7 @@ const MessageCircleIcon = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: ${props => props.theme.colors.brand[500]};
+	color: ${(props) => props.theme.colors.brand[500]};
 	pointer-events: none;
 	z-index: 1;
 `;
@@ -269,31 +271,31 @@ const MessageCircleIcon = styled.div`
 const MobileChatInput = styled.input`
 	border: 1px sold red;
 	padding: 0.75rem 1rem 0.75rem 3rem;
-	border-radius: ${props => props.theme.borderRadius.xxLarge};
-	background-color: rgba(31, 31, 31, 0.6);
+	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
+	background-color: ${(props) => props.theme.colors.backdrop.glass};
 	backdrop-filter: blur(8px);
-	border: 1px solid rgba(55, 55, 55, 0.5);
-	color: ${props => props.theme.colors.gray[300]};
-	font-size: ${props => props.theme.typography.fontSize.sm};
-	font-family: ${props => props.theme.typography.fontFamily.inter};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
+	color: ${(props) => props.theme.colors.text.primary};
+	font-size: ${(props) => props.theme.typography.fontSize.sm};
+	font-family: ${(props) => props.theme.typography.fontFamily.inter};
 	cursor: pointer;
 	width: 100%;
 	transition: all 0.2s ease-in-out;
 
 	&::placeholder {
-		color: ${props => props.theme.colors.gray[500]};
+		color: ${(props) => props.theme.colors.gray[500]};
 	}
 
 	&:hover {
-		background-color: rgba(55, 55, 55, 0.7);
-		border-color: ${props => props.theme.colors.brand[500]};
+		background-color: ${(props) => props.theme.colors.backdrop.glass};
+		border-color: ${(props) => props.theme.colors.brand[500]};
 		backdrop-filter: blur(10px);
 	}
 
 	&:focus {
 		outline: none;
-		border-color: ${props => props.theme.colors.brand[500]};
-		background-color: rgba(55, 55, 55, 0.7);
+		border-color: ${(props) => props.theme.colors.brand[500]};
+		background-color: ${(props) => props.theme.colors.backdrop.glass};
 		backdrop-filter: blur(10px);
 	}
 `;
@@ -301,7 +303,7 @@ const MobileChatInput = styled.input`
 const Container = styled.div`
 	min-height: 100vh;
 	position: relative;
-	background: ${props => `linear-gradient(
+	background: ${(props) => `linear-gradient(
 		to bottom,
 		${props.theme.colors.background.page} 0%,
 		${props.theme.colors.background.page} 60%,
@@ -316,7 +318,7 @@ const Container = styled.div`
 		left: 0;
 		right: 0;
 		height: 40%;
-		background: ${props => `radial-gradient(
+		background: ${(props) => `radial-gradient(
 			ellipse at center bottom,
 			${props.theme.colors.brand[400]}80 0%,
 			${props.theme.colors.brand[500]}80 50%,

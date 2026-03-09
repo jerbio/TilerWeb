@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
-import Toggle from '@/core/common/components/Toggle';
+import Toggle from '@/core/common/components/toggle';
 import { userService } from '@/services';
 
 const NotificationPreferencesSettings: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const navigate = useAuthNavigate();
 
 	const [tileReminders, setTileReminders] = useState(false);
 	const [emailNotifications, setEmailNotifications] = useState(false);
@@ -95,7 +95,7 @@ const NotificationPreferencesSettings: React.FC = () => {
 	return (
 		<Container>
 			<Breadcrumb>
-				<BreadcrumbLink onClick={() => navigate('/')}>
+				<BreadcrumbLink onClick={() => navigate('home')}>
 					{t('settings.breadcrumb.home')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>

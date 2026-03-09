@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Szukaj kafelka/bloku...",
+		"searchAriaLabel": "Szukaj kafelka lub bloku",
+		"clearSearch": "Wyczyść wyszukiwanie",
+		"loadMore": "Załaduj więcej",
+		"loading": "Ładowanie…",
+		"notFoundMessage": "Ups, nie znaleźliśmy '{{query}}'. Czy chcesz utworzyć kafelek z tego tytułu?",
+		"notFoundDismiss": "Nie, dziękuję",
+		"notFoundCreate": "Utwórz",
+		"setAsNow": "Ustaw jako teraz",
+		"markComplete": "Ukończ",
+		"markDeleted": "Usuń",
+		"confirmCompleteTitle": "Ukończyć to wydarzenie?",
+		"confirmDeleteTitle": "Usunąć to wydarzenie?",
+		"confirmAction": "Potwierdź",
+		"cancelAction": "Anuluj",
+		"shuffle": {
+			"tooltip": "Przetasuj harmonogram",
+			"ariaLabel": "Przetasuj harmonogram",
+			"shuffling": "Przetasowywanie harmonogramu...",
+			"success": "Harmonogram przetasowany!",
+			"error": "Przetasowanie nie powiodło się. Spróbuj ponownie."
+		},
+		"revise": {
+			"tooltip": "Zrewiduj harmonogram",
+			"ariaLabel": "Zrewiduj harmonogram",
+			"revising": "Rewizja harmonogramu...",
+			"success": "Harmonogram zrewidowany!",
+			"error": "Rewizja nie powiodła się. Spróbuj ponownie."
+		},
+		"procrastinateAll": {
+			"tooltip": "Odłóż wszystkie wydarzenia",
+			"ariaLabel": "Odłóż wszystkie wydarzenia",
+			"deferring": "Odkładanie wszystkich wydarzeń...",
+			"success": "Wszystkie wydarzenia odłożone!",
+			"error": "Odkładanie nie powiodło się. Spróbuj ponownie.",
+			"pickerTitle": "Czas odkładania",
+			"days": "Dni",
+			"hours": "Godziny",
+			"minutes": "Minuty",
+			"daysShort": "Dz",
+			"hoursShort": "Godz",
+			"minutesShort": "Min",
+			"confirm": "Potwierdź",
+			"cancel": "Anuluj"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Osiągnięto limit czatu. Spróbuj ponownie później.",
 		"usernameAlreadyExists": "Nazwa użytkownika już istnieje"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Ustawianie jako bieżące...",
+			"setAsNowSuccess": "Wydarzenie ustawione jako bieżące!",
+			"completing": "Kończenie wydarzenia...",
+			"completeSuccess": "Wydarzenie ukończone!",
+			"deleting": "Usuwanie wydarzenia...",
+			"deleteSuccess": "Wydarzenie usunięte!",
+			"actionFailed": "Akcja nie powiodła się. Spróbuj ponownie."
+		}
 	}
 }

@@ -4,38 +4,45 @@ import { animated } from '@react-spring/web';
 import { Clock, LockKeyhole, MapPin } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 import TimeUtil from '@/core/util/time';
-import palette from '@/core/theme/palette';
 import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
+import { useTheme } from '@/core/theme/ThemeProvider';
 
 type CalendarEventProps = {
   event: StyledEvent;
   selectedEvent: string | null;
   setSelectedEvent: (eventId: string | null) => void;
-	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
+  setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
   onClick?: () => void;
-	/** When true, shows a pulse-glow ring to draw attention */
-	focused?: boolean;
+  /** When true, shows a pulse-glow ring to draw attention */
+  focused?: boolean;
 };
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
   event,
   selectedEvent,
   setSelectedEvent,
-	setSelectedEventInfo,
+  setSelectedEventInfo,
   onClick,
-	focused = false,
+  focused = false,
 }) => {
+  const { isDarkMode } = useTheme();
   return (
     <EventContainer
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
       key={event.id}
+      $darkmode={isDarkMode}
       $selected={selectedEvent === event.id}
       $focused={focused}
       $colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
     >
       <EventContent
         height={event.springStyles.height}
+        $darkmode={isDarkMode}
         $colors={{
           r: event.colorRed,
           g: event.colorGreen,
@@ -43,7 +50,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         }}
         onClick={() => {
           setSelectedEvent(event.id);
-					setSelectedEventInfo(event);
+          setSelectedEventInfo(event);
           onClick?.();
         }}
         variant={event.isRigid ? 'block' : 'tile'}
@@ -119,6 +126,7 @@ const EventContainer = styled(animated.div) <{
   $selected: boolean;
   $focused: boolean;
   $colors: RGB;
+  $darkmode: boolean;
 }>`
 	padding: 4px;
 	position: relative;
@@ -137,8 +145,8 @@ const EventContainer = styled(animated.div) <{
 		rect {
 			fill: transparent;
 			stroke-width: 2;
-			stroke: ${({ $colors, $selected }) => {
-    const newColor = colorUtil.setLightness($colors, 0.7);
+			stroke: ${({ $colors, $selected, $darkmode }) => {
+    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
     return $selected
       ? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
       : 'transparent';
@@ -159,22 +167,23 @@ const EventLockIcon = styled(LockKeyhole)`
 
 const EventContent = styled.div<{
   $colors: RGB;
+  $darkmode: boolean;
   height: number;
   variant: 'block' | 'tile';
 }>`
 	position: relative;
-	background-color: ${({ $colors }) => {
-    const newColor = colorUtil.setLightness($colors, 0.325);
+	background-color: ${({ $colors, $darkmode }) => {
+    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.325 : 0.9);
     return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
   }};
-	color: ${({ $colors }) => {
-    const newColor = colorUtil.setLightness($colors, 0.85);
+	color: ${({ $colors, $darkmode }) => {
+    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.3);
     return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
   }};
-	border: 1px solid
-		${({ $colors, variant }) => {
-    const blockColor = colorUtil.setLightness($colors, 0.6);
-    const tileColor = colorUtil.setLightness($colors, 0.1);
+	border: ${({ variant }) => (variant === 'block' ? 1.5 : 1)}px solid
+		${({ $colors, variant, $darkmode }) => {
+    const blockColor = colorUtil.setLightness($colors, $darkmode ? 0.6 : 0.5);
+    const tileColor = colorUtil.setLightness($colors, $darkmode ? 0.1 : 0.8);
     return variant === 'block'
       ? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
       : `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
@@ -201,7 +210,7 @@ const EventContent = styled.div<{
 			max-height: calc(${({ height }) => height}px - 46px);
 			text-overflow: ellipsis;
 			overflow: hidden;
-			font-weight: ${palette.typography.fontWeight.medium};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 			font-size: 13px;
 		}
 
@@ -220,12 +229,12 @@ const EventContent = styled.div<{
 	.location {
 		display: flex;
 		align-items: center;
-		font-size: ${palette.typography.fontSize.xs};
-		font-weight: ${palette.typography.fontWeight.semibold};
+		font-size: ${({ theme }) => theme.typography.fontSize.xs};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 		white-space: nowrap;
 
-		color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.7);
+		color: ${({ $colors, $darkmode }) => {
+    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.4);
     return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
   }};
 	}
@@ -243,12 +252,12 @@ const EventContent = styled.div<{
 		.clock.highlight {
 			padding-inline: 4px;
 			margin-right: 0.5ch;
-			color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.2);
+			color: ${({ $colors, $darkmode }) => {
+const newColor = colorUtil.setLightness($colors, $darkmode? 0.2 : 0.7);
     return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
   }};
-			background-color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.7);
+			background-color: ${({ $colors, $darkmode }) => {
+const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
     return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
   }};
 		}
@@ -258,13 +267,13 @@ const EventContent = styled.div<{
 		padding-inline: 2px;
 		min-width: 0;
 		&:hover {
-			background-color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.2);
+			background-color: ${({ $colors, $darkmode }) => {
+const newColor = colorUtil.setLightness($colors, $darkmode? 0.2 : 0.75);
     return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
   }};
 		}
 
-		border-radius: ${palette.borderRadius.little};
+		border-radius: ${({ theme }) => theme.borderRadius.little};
 		transition: background-color 0.2s ease;
 
 		span {

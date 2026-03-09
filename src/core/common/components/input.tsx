@@ -186,24 +186,24 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 
 	background: ${(props) =>
     props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${palette.colors.gray[700]}, ${palette.colors.gray[700]}, ${props.$bordergradient[0]})`
+      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
       : props.$variant === 'brand'
         ? palette.colors.brand[400] + '99'
-        : palette.colors.gray[800]};
+        : props.theme.colors.input.border};
 	border-radius: ${palette.borderRadius.little};
 
 	${StyledInputPrepend}, ${StyledInputAppend} {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 		transition: color 0.2s ease-in-out;
 	}
 
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
     props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${palette.colors.gray[700]}, ${palette.colors.gray[700]}, ${props.$bordergradient[0]})`
+      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
       : props.$variant === 'brand'
         ? palette.colors.brand[400] + 'CC'
-        : palette.colors.gray[700]};
+        : props.theme.colors.input.borderHover};
 	}
 
 	&:has(input:focus) {
@@ -211,7 +211,7 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 			${(props) =>
     props.$variant === 'brand'
       ? palette.colors.brand[400] + '33'
-      : palette.colors.gray[900]};
+      : props.theme.colors.input.focusRing};
 
 		${StyledInputPrepend}, ${StyledInputAppend} {
 			color: ${palette.colors.brand[400]};
@@ -225,7 +225,7 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 
 const StyledInput = styled.input<StyledInputProps>`
 	/* Background color */
-	background-color: ${palette.colors.gray[900]};
+	background-color: ${({ theme }) => theme.colors.input.bg};
 	border: none;
 	outline: none;
 
@@ -233,7 +233,7 @@ const StyledInput = styled.input<StyledInputProps>`
 	border-radius: 5px;
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1;
-	color: ${palette.colors.white};
+	color: ${({ theme }) => theme.colors.input.text};
 	height: 100%;
 
 	padding-left: calc(
@@ -252,18 +252,18 @@ const StyledInput = styled.input<StyledInputProps>`
         : palette.typography.fontSize.base};
 
 	&::placeholder {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 	}
 
 	&:read-only {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 		cursor: not-allowed;
 	}
 `;
 
 const StyledTextarea = styled.textarea<StyledInputProps>`
 	/* Background color */
-	background-color: ${palette.colors.gray[900]};
+	background-color: ${({ theme }) => theme.colors.input.bg};
 	border: none;
 	outline: none;
 	resize: none; /* Prevent manual resizing */
@@ -272,7 +272,7 @@ const StyledTextarea = styled.textarea<StyledInputProps>`
 	border-radius: 5px;
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1.5;
-	color: ${palette.colors.white};
+	color: ${({ theme }) => theme.colors.input.text};
 	height: 100%;
 
 	/* Fix vertical alignment for the textarea */
@@ -294,7 +294,7 @@ const StyledTextarea = styled.textarea<StyledInputProps>`
         : palette.typography.fontSize.base};
 
 	&::placeholder {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 		/* Improve placeholder vertical alignment */
 		position: relative;
 		top: 0;

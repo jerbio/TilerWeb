@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
 import CalendarUtil from './calendar';
-import { CalendarViewOptions } from '@/core/common/components/calendar/calendar';
+import { CalendarViewOptions } from '@/core/common/components/calendar/calendar.types';
 import {
 	ScheduleSubCalendarEvent,
 	ScheduleLookupTravelDetail,

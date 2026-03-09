@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { CalendarViewOptions } from '../components/calendar/calendar';
+import { CalendarViewOptions } from '../components/calendar/calendar.types';
 import calendarConfig from '../../constants/calendar_config';
 
 function useCalendarView(viewRef: React.RefObject<HTMLUListElement>, containerWidth: number, chatExpanded?: boolean) {

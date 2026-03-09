@@ -516,8 +516,66 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "टाइल/ब्लॉक खोजें...",
+		"searchAriaLabel": "टाइल या ब्लॉक खोजें",
+		"clearSearch": "खोज साफ़ करें",
+		"loadMore": "और लोड करें",
+		"loading": "लोड हो रहा है…",
+		"notFoundMessage": "उफ़, हमें '{{query}}' नहीं मिला। क्या आप इस शीर्षक से एक टाइल बनाना चाहेंगे?",
+		"notFoundDismiss": "नहीं धन्यवाद",
+		"notFoundCreate": "बनाएँ",
+		"setAsNow": "अभी के रूप में सेट करें",
+		"markComplete": "पूर्ण करें",
+		"markDeleted": "हटाएँ",
+		"confirmCompleteTitle": "इस इवेंट को पूर्ण करें?",
+		"confirmDeleteTitle": "इस इवेंट को हटाएँ?",
+		"confirmAction": "पुष्टि करें",
+		"cancelAction": "रद्द करें",
+		"shuffle": {
+			"tooltip": "शेड्यूल शफ़ल करें",
+			"ariaLabel": "शेड्यूल शफ़ल करें",
+			"shuffling": "शेड्यूल शफ़ल हो रहा है...",
+			"success": "शेड्यूल शफ़ल हो गया!",
+			"error": "शफ़ल विफल हुआ। कृपया पुनः प्रयास करें।"
+		},
+		"revise": {
+			"tooltip": "शेड्यूल संशोधित करें",
+			"ariaLabel": "शेड्यूल संशोधित करें",
+			"revising": "शेड्यूल संशोधित हो रहा है...",
+			"success": "शेड्यूल संशोधित हो गया!",
+			"error": "संशोधन विफल हुआ। कृपया पुनः प्रयास करें।"
+		},
+		"procrastinateAll": {
+			"tooltip": "सभी इवेंट स्थगित करें",
+			"ariaLabel": "सभी इवेंट स्थगित करें",
+			"deferring": "सभी इवेंट स्थगित हो रहे हैं...",
+			"success": "सभी इवेंट स्थगित हो गए!",
+			"error": "स्थगन विफल हुआ। कृपया पुनः प्रयास करें।",
+			"pickerTitle": "स्थगन अवधि",
+			"days": "दिन",
+			"hours": "घंटे",
+			"minutes": "मिनट",
+			"daysShort": "दिन",
+			"hoursShort": "घंटा",
+			"minutesShort": "मिनट",
+			"confirm": "पुष्टि करें",
+			"cancel": "रद्द करें"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "चैट सीमा पूरी हो गई। कृपया बाद में पुनः प्रयास करें।",
 		"usernameAlreadyExists": "उपयोगकर्ता नाम पहले से मौजूद है"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "वर्तमान के रूप में सेट हो रहा है...",
+			"setAsNowSuccess": "इवेंट वर्तमान के रूप में सेट किया गया!",
+			"completing": "इवेंट पूरा हो रहा है...",
+			"completeSuccess": "इवेंट पूरा हुआ!",
+			"deleting": "इवेंट हटाया जा रहा है...",
+			"deleteSuccess": "इवेंट हटाया गया!",
+			"actionFailed": "कार्रवाई विफल हुई। कृपया पुनः प्रयास करें।"
+		}
 	}
 }
