@@ -27,6 +27,8 @@ const UserAuthentication: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -127,7 +129,7 @@ const UserAuthentication: React.FC = () => {
             required
           />
 
-          <StyledButton variant="brand" size="large" type="submit" disabled={isLoading}>
+          <StyledButton variant="brand" size="large" type="submit" disabled={isLoading || !isValidEmail}>
             {isLoading
               ? t(isSignUp ? 'auth.signup.submitting' : 'auth.signin.submitting')
               : t(isSignUp ? 'auth.signup.submitButton' : 'auth.signin.submitButton')}
@@ -280,7 +282,6 @@ const Form = styled.form`
 
 const StyledButton = styled(Button)`
   width: 100%;
-  opacity: 0.6;
 `;
 
 const FooterText = styled.p`
