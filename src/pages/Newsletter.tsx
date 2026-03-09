@@ -1,11 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 import palette from '@/core/theme/palette';
 import SEO from '@/core/common/components/SEO';
 import Section from '../components/layout/section';
 import Collapse from '@/core/common/components/collapse';
 
-// ─── Data ────────────────────────────────────────────────────────────────────
+// ─── How-To Data ─────────────────────────────────────────────────────────────
 
 const items = [
   {
@@ -53,7 +53,45 @@ const items = [
   },
 ];
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
+// ─── What Is Tiler — Sub-item data ───────────────────────────────────────────
+
+const coreBlocks = [
+  {
+    emoji: "\uD83E\uDDE9",
+    label: "AutoTile",
+    title: "Tiles",
+    desc: "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently.",
+  },
+  {
+    emoji: "\uD83D\uDCCC",
+    label: "Locked",
+    title: "Blocks",
+    desc: "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them.",
+  },
+  {
+    emoji: "\uD83D\uDDFA\uFE0F",
+    label: "Location-aware",
+    title: "Route",
+    desc: "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop.",
+  },
+  {
+    emoji: "\uD83D\uDC65",
+    label: "Team & Family",
+    title: "TileShare",
+    desc: "Assign tiles to teammates or family. Everyone's calendar adapts around shared commitments automatically. Context travels with the task.",
+  },
+];
+
+const comparisonRows = [
+  { left: "You schedule everything manually", right: "AI builds your schedule from plain English" },
+  { left: "No awareness of travel time", right: "Auto-calculates and adds travel buffers" },
+  { left: "Static — won't adapt when things change", right: "Detects ripples and reschedules instantly" },
+  { left: "No navigation or route planning", right: "Navigate your day tile-to-tile with real transit" },
+  { left: "Shared calendars only — no task assignment", right: "TileShare: assign and track tasks with anyone" },
+  { left: "Nothing confirmed — events just appear", right: "Confirmation-first — you approve all changes" },
+];
+
+// ─── Styles — Existing ───────────────────────────────────────────────────────
 
 const PageWrapper = styled.div`
   display: flex;
@@ -173,9 +211,350 @@ const BackgroundBlur = styled.div`
   pointer-events: none;
 `;
 
+// ─── Styles — What Is Tiler Section ──────────────────────────────────────────
+
+const WhatIsTilerWrapper = styled.div`
+  width: 100%;
+  max-width: 860px;
+`;
+
+const WhatIsTilerSection = styled.div`
+  border: 1px solid ${palette.colors.gray[800]};
+  border-radius: ${palette.borderRadius.large};
+  background: ${palette.colors.gray[900]}80;
+  overflow: hidden;
+`;
+
+const WhatIsTilerHeader = styled.button<{ $open: boolean }>`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: ${palette.colors.gray[800]}40;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+`;
+
+const WhatIsTilerTextSide = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const SectionBadge = styled.span`
+  display: inline-block;
+  width: fit-content;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, ${palette.colors.brand[500]}20, ${palette.colors.brand[600]}30);
+  border: 1px solid ${palette.colors.brand[500]}40;
+  border-radius: 9999px;
+  color: ${palette.colors.brand[300]};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const SectionTitle = styled.h2`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: ${palette.typography.fontWeight.bold};
+  background: linear-gradient(to bottom, ${palette.colors.gray[100]}, ${palette.colors.gray[400]});
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+  line-height: 1.2;
+`;
+
+const SectionSummary = styled.p`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[500]};
+  line-height: 1.65;
+  margin: 0;
+`;
+
+const WhatIsTilerHeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+`;
+
+const WhatIsTilerVisual = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: ${palette.borderRadius.medium};
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+`;
+
+const mockTileColors: Record<string, string> = {
+  brand: palette.colors.brand[500],
+  orange: "#f97316",
+  teal: "#14b8a6",
+};
+
+const MockTile = styled.div<{ $color: keyof typeof mockTileColors }>`
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 9px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  ${({ $color }) => css`
+    background: ${mockTileColors[$color]}30;
+    border: 1px solid ${mockTileColors[$color]}60;
+    color: ${mockTileColors[$color]};
+  `}
+`;
+
+const MockTileDot = styled.span<{ $color: keyof typeof mockTileColors }>`
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  ${({ $color }) => css`
+    background: ${mockTileColors[$color]};
+  `}
+`;
+
+const Chevron = styled.span<{ $open: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${palette.colors.gray[500]};
+  font-size: 0.75rem;
+  transform: rotate(${({ $open }) => ($open ? "180deg" : "0deg")});
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+`;
+
+const WhatIsTilerExpanded = styled.div<{ $open: boolean }>`
+  display: grid;
+  grid-template-rows: ${({ $open }) => ($open ? "1fr" : "0fr")};
+  transition: grid-template-rows 0.35s ease-in-out;
+`;
+
+const WhatIsTilerExpandedInner = styled.div`
+  overflow: hidden;
+`;
+
+const SubCollapseWrapper = styled.div`
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid ${palette.colors.gray[800]};
+`;
+
+// ─── Styles — Core Blocks Grid ───────────────────────────────────────────────
+
+const BlocksGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const BlockCard = styled.div`
+  background: ${palette.colors.gray[800]}60;
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const BlockCardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const BlockEmoji = styled.span`
+  font-size: 1.1rem;
+`;
+
+const BlockTitle = styled.span`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[200]};
+`;
+
+const BlockBadge = styled.span`
+  margin-left: auto;
+  padding: 0.125rem 0.5rem;
+  background: ${palette.colors.brand[500]}20;
+  border: 1px solid ${palette.colors.brand[500]}40;
+  border-radius: 9999px;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 10px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.brand[400]};
+  white-space: nowrap;
+`;
+
+const BlockDesc = styled.p`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  color: ${palette.colors.gray[500]};
+  line-height: 1.55;
+  margin: 0;
+`;
+
+// ─── Styles — Comparison Table ───────────────────────────────────────────────
+
+const ComparisonTable = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: ${palette.borderRadius.medium};
+  overflow: hidden;
+  border: 1px solid ${palette.colors.gray[800]};
+  margin-bottom: 0.5rem;
+`;
+
+const ComparisonHeader = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: ${palette.colors.gray[800]};
+`;
+
+const ComparisonHeaderCell = styled.div<{ $side: "left" | "right" }>`
+  padding: 0.625rem 1rem;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: ${({ $side }) => ($side === "right" ? palette.colors.brand[400] : palette.colors.gray[500])};
+`;
+
+const ComparisonRow = styled.div<{ $even: boolean }>`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: ${({ $even }) => ($even ? `${palette.colors.gray[900]}80` : "transparent")};
+  border-top: 1px solid ${palette.colors.gray[800]};
+`;
+
+const ComparisonCell = styled.div<{ $side: "left" | "right" }>`
+  padding: 0.625rem 1rem;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  color: ${({ $side }) => ($side === "right" ? palette.colors.gray[300] : palette.colors.gray[600])};
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+
+  &::before {
+    content: ${({ $side }) => ($side === "right" ? '"✓"' : '"✕"')};
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-weight: bold;
+    color: ${({ $side }) =>
+      $side === "right" ? palette.colors.brand[400] : palette.colors.gray[700]};
+  }
+`;
+
+// ─── Sub-item content components ─────────────────────────────────────────────
+
+const SubBodyText = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.base};
+  color: ${palette.colors.gray[500]};
+  line-height: 1.65;
+  margin: 0 0 0.5rem;
+`;
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const Newsletter: React.FC = () => {
+  const [whatIsOpen, setWhatIsOpen] = useState(false);
+
+  const whatIsSubItems = [
+    {
+      title: "1. Not a Calendar. Autopilot AI",
+      content: (
+        <SubBodyText>
+          Tiler works best on Autopilot. Instead of manually placing tasks on your timeline, you
+          simply tell Tiler what needs to get done — it schedules everything around your day
+          automatically. When a meeting runs long, when you defer a task, when life shifts —
+          Tiler detects the ripple and adjusts your whole day in seconds. You set the intent. Tiler
+          handles the placement.
+        </SubBodyText>
+      ),
+    },
+    {
+      title: "2. The Four Core Blocks of Tiler",
+      content: (
+        <BlocksGrid>
+          {coreBlocks.map((block) => (
+            <BlockCard key={block.title}>
+              <BlockCardHeader>
+                <BlockEmoji>{block.emoji}</BlockEmoji>
+                <BlockTitle>{block.title}</BlockTitle>
+                <BlockBadge>{block.label}</BlockBadge>
+              </BlockCardHeader>
+              <BlockDesc>{block.desc}</BlockDesc>
+            </BlockCard>
+          ))}
+        </BlocksGrid>
+      ),
+    },
+    {
+      title: "3. How Tiler is Different",
+      content: (
+        <ComparisonTable>
+          <ComparisonHeader>
+            <ComparisonHeaderCell $side="left">Google Calendar</ComparisonHeaderCell>
+            <ComparisonHeaderCell $side="right">Tiler</ComparisonHeaderCell>
+          </ComparisonHeader>
+          {comparisonRows.map((row, i) => (
+            <ComparisonRow key={i} $even={i % 2 === 0}>
+              <ComparisonCell $side="left">{row.left}</ComparisonCell>
+              <ComparisonCell $side="right">{row.right}</ComparisonCell>
+            </ComparisonRow>
+          ))}
+        </ComparisonTable>
+      ),
+    },
+  ];
+
   const collapseItems = items.map((item) => ({
     title: item.title,
     content: (
@@ -210,6 +589,58 @@ const Newsletter: React.FC = () => {
             </HeroSubtitle>
           </Hero>
 
+          {/* ── What Is Tiler ── */}
+          <WhatIsTilerWrapper>
+            <WhatIsTilerSection>
+              <WhatIsTilerHeader
+                $open={whatIsOpen}
+                onClick={() => setWhatIsOpen((o) => !o)}
+              >
+                <WhatIsTilerTextSide>
+                  <SectionBadge>What Is Tiler</SectionBadge>
+                  <SectionTitle>Not a calendar. An AI that runs your day.</SectionTitle>
+                  <SectionSummary>
+                    Most calendar apps are passive — they display what you&rsquo;ve already
+                    planned and stop there. Tiler actively builds and manages your schedule. Describe
+                    what you need to do. Tiler finds the time, adds travel, resolves conflicts, and
+                    adapts when your day changes.
+                  </SectionSummary>
+                </WhatIsTilerTextSide>
+
+                <WhatIsTilerHeaderRight>
+                  <WhatIsTilerVisual>
+                    <MockTile $color="brand">
+                      <MockTileDot $color="brand" />
+                      Gym · 45 min
+                    </MockTile>
+                    <MockTile $color="orange">
+                      <MockTileDot $color="orange" />
+                      Travel · 12 min
+                    </MockTile>
+                    <MockTile $color="teal">
+                      <MockTileDot $color="teal" />
+                      Client Call · 1 hr
+                    </MockTile>
+                    <MockTile $color="brand">
+                      <MockTileDot $color="brand" />
+                      Groceries · 30 min
+                    </MockTile>
+                  </WhatIsTilerVisual>
+                  <Chevron $open={whatIsOpen}>&#9660;</Chevron>
+                </WhatIsTilerHeaderRight>
+              </WhatIsTilerHeader>
+
+              <WhatIsTilerExpanded $open={whatIsOpen}>
+                <WhatIsTilerExpandedInner>
+                  <SubCollapseWrapper>
+                    <Collapse items={whatIsSubItems} />
+                  </SubCollapseWrapper>
+                </WhatIsTilerExpandedInner>
+              </WhatIsTilerExpanded>
+            </WhatIsTilerSection>
+          </WhatIsTilerWrapper>
+
+          {/* ── How-To Rows ── */}
           <CollapseWrapper>
             <Collapse items={collapseItems} />
           </CollapseWrapper>
