@@ -349,15 +349,31 @@ const MockTileDot = styled.span<{ $color: keyof typeof mockTileColors }>`
   `}
 `;
 
+const chevronBounce = css`
+  @keyframes chevronBounce {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    50%       { transform: rotate(0deg) translateY(4px); }
+  }
+`;
+
 const Chevron = styled.span<{ $open: boolean }>`
+  ${chevronBounce}
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${palette.colors.gray[500]};
-  font-size: 0.75rem;
-  transform: rotate(${({ $open }) => ($open ? "180deg" : "0deg")});
-  transition: transform 0.3s ease;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: ${({ $open }) =>
+    $open ? `${palette.colors.brand[500]}25` : `${palette.colors.gray[700]}80`};
+  border: 1px solid ${({ $open }) =>
+    $open ? `${palette.colors.brand[500]}50` : `${palette.colors.gray[600]}60`};
+  color: ${({ $open }) => ($open ? palette.colors.brand[400] : palette.colors.gray[300])};
+  font-size: 0.7rem;
   flex-shrink: 0;
+  transform: rotate(${({ $open }) => ($open ? "180deg" : "0deg")});
+  transition: transform 0.3s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  animation: ${({ $open }) => ($open ? "none" : "chevronBounce 1.6s ease-in-out infinite")};
 `;
 
 const WhatIsTilerExpanded = styled.div<{ $open: boolean }>`
