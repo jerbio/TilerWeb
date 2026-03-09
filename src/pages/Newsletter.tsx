@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import palette from '@/core/theme/palette';
 import SEO from '@/core/common/components/SEO';
@@ -555,39 +555,42 @@ const SetupGrid = styled.div`
 
 const SetupCard = styled.div`
   background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
   border-radius: ${palette.borderRadius.xLarge};
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: border-color 0.3s, transform 0.3s;
+
+  &:hover {
+    border-color: ${palette.colors.brand[500]}40;
+    transform: translateY(-3px);
+  }
 `;
 
-const SetupCardMedia = styled.div`
-  width: 100%;
-  aspect-ratio: 16 / 10;
+// ── Animation area (220px, dark bg, clipped) ─────────────────────────────────
+const SetupAnim = styled.div`
+  height: 220px;
   background: ${palette.colors.gray[900]};
+  border-bottom: 1px solid ${palette.colors.gray[700]};
+  position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 `;
 
-const SetupCardContent = styled.div`
-  padding: 1.25rem;
+// ── Minimal body: step badge + title only ─────────────────────────────────────
+const SetupBody = styled.div`
+  padding: 20px 24px 24px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  flex: 1;
+  gap: 10px;
 `;
 
 const SetupCardStepBadge = styled.div`
-  width: 2rem;
-  height: 2rem;
+  width: 1.875rem;
+  height: 1.875rem;
   border-radius: 9999px;
   background: ${palette.colors.brand[500]};
   display: flex;
@@ -602,54 +605,271 @@ const SetupCardStepBadge = styled.div`
 
 const SetupCardTitle = styled.h3`
   font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.displayXs};
+  font-size: ${palette.typography.fontSize.xl};
   font-weight: ${palette.typography.fontWeight.semibold};
   color: ${palette.colors.gray[100]};
   margin: 0;
   line-height: 1.25;
 `;
 
-const SetupCardBody = styled.p`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  color: ${palette.colors.gray[400]};
-  line-height: 1.65;
-  margin: 0;
+// ── Card 1: Calendar connect (JS-animated) ────────────────────────────────────
+const SaCalRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 78%;
 `;
 
-const SetupCardCallout = styled.div`
-  background: ${palette.colors.gray[900]};
+const SaCalIcon = styled.div<{ $connected: boolean }>`
+  width: 48px;
+  height: 48px;
   border-radius: ${palette.borderRadius.medium};
-  padding: 0.75rem 1rem;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  color: ${palette.colors.gray[400]};
-  line-height: 1.55;
+  border: 2px solid ${({ $connected }) => $connected ? '#12B76A' : palette.colors.gray[700]};
+  background: ${palette.colors.gray[800]};
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: border-color 0.4s;
 `;
 
-const SetupCardCalloutLabel = styled.span`
+const SaCalIconTop = styled.div`
+  background: ${palette.colors.brand[500]};
+  height: 12px;
+  width: 100%;
+  flex-shrink: 0;
+`;
+
+const SaCalIconDate = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 17px;
+  font-weight: ${palette.typography.fontWeight.bold};
+  color: ${palette.colors.gray[100]};
+  line-height: 1;
+`;
+
+const SaCalInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SaCalName = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
   font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[200]};
+  color: ${palette.colors.gray[100]};
 `;
 
-const SetupCardCTA = styled.a`
-  display: inline-block;
-  width: fit-content;
-  margin-top: auto;
-  padding: 0.45rem 1rem;
-  border: 1px solid ${palette.colors.brand[500]}40;
+const SaCalStatus = styled.div<{ $ok: boolean }>`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  color: ${({ $ok }) => $ok ? '#12B76A' : palette.colors.gray[500]};
+  transition: color 0.4s;
+`;
+
+const SaCalCheck = styled.div<{ $show: boolean }>`
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #12B76A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  flex-shrink: 0;
+  opacity: ${({ $show }) => $show ? 1 : 0};
+  transition: opacity 0.4s;
+`;
+
+// ── Card 2: Autopilot toggle (CSS-only animation) ─────────────────────────────
+const toggleKnobAnim = css`
+  @keyframes saToggleKnob {
+    0%, 30%   { left: 3px; }
+    50%, 70%  { left: calc(100% - 21px); }
+    90%, 100% { left: 3px; }
+  }
+`;
+
+const toggleBgAnim = css`
+  @keyframes saToggleBg {
+    0%, 30%   { background: ${palette.colors.gray[700]}; }
+    50%, 70%  { background: ${palette.colors.brand[500]}; }
+    90%, 100% { background: ${palette.colors.gray[700]}; }
+  }
+`;
+
+const toggleStateAnim = css`
+  @keyframes saToggleState {
+    0%, 30%   { opacity: 0; }
+    50%, 70%  { opacity: 1; }
+    90%, 100% { opacity: 0; }
+  }
+`;
+
+const SaToggleScene = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+`;
+
+const SaToggleLabel = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[400]};
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+`;
+
+const SaToggleTrack = styled.div`
+  ${toggleBgAnim}
+  position: relative;
+  width: 62px;
+  height: 34px;
   border-radius: 9999px;
-  background: transparent;
-  color: ${palette.colors.brand[400]};
+  animation: saToggleBg 5s ease-in-out infinite;
+`;
+
+const SaToggleKnob = styled.div`
+  ${toggleKnobAnim}
+  position: absolute;
+  top: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  animation: saToggleKnob 5s ease-in-out infinite;
+`;
+
+const SaToggleState = styled.div`
+  ${toggleStateAnim}
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.medium};
-  cursor: pointer;
-  text-decoration: none;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.brand[400]};
+  animation: saToggleState 5s ease-in-out infinite;
+`;
 
-  &:hover {
-    background: ${palette.colors.brand[500]}15;
+// ── Card 3: Tile appearing (CSS-only animation) ───────────────────────────────
+const tileSlideInAnim = css`
+  @keyframes saTileSlideIn {
+    0%, 10%   { opacity: 0; transform: translateY(10px); }
+    30%, 75%  { opacity: 1; transform: translateY(0); }
+    90%, 100% { opacity: 0; transform: translateY(10px); }
   }
+`;
+
+const SaTileScene = styled.div`
+  width: 82%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+`;
+
+const SaTileItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.medium};
+`;
+
+const SaTileItemNew = styled(SaTileItem)`
+  ${tileSlideInAnim}
+  border-color: ${palette.colors.brand[500]}50;
+  background: ${palette.colors.brand[500]}12;
+  animation: saTileSlideIn 4.5s ease-in-out infinite;
+`;
+
+const SaTileDot = styled.div<{ $color?: string }>`
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color || palette.colors.brand[500]};
+  flex-shrink: 0;
+`;
+
+const SaTileLabel = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 11px;
+  color: ${palette.colors.gray[300]};
+  flex: 1;
+`;
+
+const SaTileTime = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 10px;
+  color: ${palette.colors.gray[600]};
+`;
+
+// ── Card 4: Adaptive scheduling (JS-animated) ────────────────────────────────
+const SaSchedScene = styled.div`
+  width: 88%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const SaSchedTimeLabel = styled.div`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 9px;
+  color: ${palette.colors.gray[600]};
+  margin-bottom: 1px;
+`;
+
+const SaSchedRow = styled.div`
+  display: flex;
+  gap: 5px;
+  align-items: center;
+`;
+
+const SaSchedBlock = styled.div<{
+  $bg: string;
+  $width?: string;
+  $shifted?: boolean;
+  $visible?: boolean;
+}>`
+  height: 28px;
+  border-radius: ${palette.borderRadius.little};
+  background: ${({ $bg }) => $bg};
+  width: ${({ $width }) => $width || 'auto'};
+  flex: ${({ $width }) => $width ? '0 0 auto' : '1'};
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 9px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: rgba(255, 255, 255, 0.75);
+  transform: translateX(${({ $shifted }) => $shifted ? '46px' : '0'});
+  opacity: ${({ $visible }) => $visible === false ? 0 : 1};
+  transition: transform 0.65s ease, opacity 0.45s ease;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+const SaSchedStatus = styled.div<{ $phase: string }>`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 10px;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${({ $phase }) =>
+    $phase === 'settled' ? '#12B76A' :
+    $phase === 'disrupted' ? palette.colors.brand[400] :
+    'transparent'};
+  margin-top: 3px;
+  transition: color 0.35s;
+  min-height: 15px;
 `;
 
 // ─── Styles — Core Blocks Grid ───────────────────────────────────────────────
@@ -784,6 +1004,35 @@ const Newsletter: React.FC = () => {
   const [whatIsOpen, setWhatIsOpen] = useState(false);
   const [setUpOpen, setSetUpOpen] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
+
+  // ── Set Up Tiler animation state ──────────────────────────────────────────
+  const [calStatus, setCalStatus] = useState<'idle' | 'connecting' | 'connected'>('idle');
+  const [schedPhase, setSchedPhase] = useState<'normal' | 'disrupted' | 'settled'>('normal');
+
+  useEffect(() => {
+    if (!setUpOpen) return;
+    const t: ReturnType<typeof setTimeout>[] = [];
+
+    // Card 1: calendar connect sequence (6.5s loop)
+    const calCycle = () => {
+      setCalStatus('idle');
+      t.push(setTimeout(() => setCalStatus('connecting'), 2000));
+      t.push(setTimeout(() => setCalStatus('connected'), 3200));
+      t.push(setTimeout(calCycle, 6500));
+    };
+    calCycle();
+
+    // Card 4: adaptive schedule rearrange (7s loop)
+    const schedCycle = () => {
+      setSchedPhase('normal');
+      t.push(setTimeout(() => setSchedPhase('disrupted'), 2000));
+      t.push(setTimeout(() => setSchedPhase('settled'), 3500));
+      t.push(setTimeout(schedCycle, 7000));
+    };
+    schedCycle();
+
+    return () => t.forEach(clearTimeout);
+  }, [setUpOpen]);
 
   // ── What Is Tiler sub-items ──────────────────────────────────────────────
   const whatIsSubItems = [
@@ -993,104 +1242,127 @@ const Newsletter: React.FC = () => {
               <ExpandableBody $open={setUpOpen}>
                 <ExpandableBodyInner>
                   <SetupGrid>
-                    {/* Step 1 — Connect your calendar */}
+
+                    {/* ── Card 1: Connect your calendar (JS animation) ── */}
                     <SetupCard>
-                      <SetupCardMedia>
-                        <img src="/gifs/connect-a-calendar.gif" alt="Connect your calendar" />
-                      </SetupCardMedia>
-                      <SetupCardContent>
+                      <SetupAnim>
+                        <SaCalRow>
+                          <SaCalIcon $connected={calStatus !== 'idle'}>
+                            <SaCalIconTop />
+                            <SaCalIconDate>17</SaCalIconDate>
+                          </SaCalIcon>
+                          <SaCalInfo>
+                            <SaCalName>Google Calendar</SaCalName>
+                            <SaCalStatus $ok={calStatus !== 'idle'}>
+                              {calStatus === 'idle'
+                                ? 'Tap to connect'
+                                : calStatus === 'connecting'
+                                ? 'Connecting…'
+                                : '✓ Connected'}
+                            </SaCalStatus>
+                          </SaCalInfo>
+                          <SaCalCheck $show={calStatus === 'connected'}>✓</SaCalCheck>
+                        </SaCalRow>
+                      </SetupAnim>
+                      <SetupBody>
                         <SetupCardStepBadge>1</SetupCardStepBadge>
                         <SetupCardTitle>Connect your calendar</SetupCardTitle>
-                        <SetupCardBody>
-                          Connect Google Calendar, Outlook, or Apple Calendar and Tiler
-                          immediately sees every fixed commitment — meetings, appointments,
-                          events. These become immovable Blocks in your timeline. Everything
-                          else gets scheduled around them, automatically. No manual entry.
-                          Just link and go.
-                        </SetupCardBody>
-                        <SetupCardCallout>
-                          <SetupCardCalloutLabel>Privacy: </SetupCardCalloutLabel>
-                          Tiler reads your calendar to check availability. It only writes
-                          changes you explicitly approve. You can revoke access at any time.
-                        </SetupCardCallout>
-                        <SetupCardCTA href="#">Connect calendar →</SetupCardCTA>
-                      </SetupCardContent>
+                      </SetupBody>
                     </SetupCard>
 
-                    {/* Step 2 — Turn on Autopilot */}
+                    {/* ── Card 2: Turn on Autopilot (CSS-only animation) ── */}
                     <SetupCard>
-                      <SetupCardMedia>
-                        <img src="/gifs/set-up-tiler.gif" alt="Turn on Autopilot" />
-                      </SetupCardMedia>
-                      <SetupCardContent>
+                      <SetupAnim>
+                        <SaToggleScene>
+                          <SaToggleLabel>Autopilot</SaToggleLabel>
+                          <SaToggleTrack>
+                            <SaToggleKnob />
+                          </SaToggleTrack>
+                          <SaToggleState>Scheduling enabled</SaToggleState>
+                        </SaToggleScene>
+                      </SetupAnim>
+                      <SetupBody>
                         <SetupCardStepBadge>2</SetupCardStepBadge>
                         <SetupCardTitle>Turn on Autopilot</SetupCardTitle>
-                        <SetupCardBody>
-                          Autopilot is what separates Tiler from a calendar. With it on, you
-                          stop placing tasks manually — Tiler handles placement. Add something
-                          to your list, give it a duration, and it lands in the best available
-                          slot, around your calendar and everything else on your day. Every
-                          update triggers an instant recalculation. Set it once. Let it run.
-                        </SetupCardBody>
-                        <SetupCardCallout>
-                          <SetupCardCalloutLabel>Tip: </SetupCardCalloutLabel>
-                          You can pause Autopilot at any time from Settings — your tiles stay
-                          in place, you just take manual control.
-                        </SetupCardCallout>
-                        <SetupCardCTA href="#">Go to settings →</SetupCardCTA>
-                      </SetupCardContent>
+                      </SetupBody>
                     </SetupCard>
 
-                    {/* Step 3 — Add your first tile */}
+                    {/* ── Card 3: Add your first tile (CSS-only animation) ── */}
                     <SetupCard>
-                      <SetupCardMedia>
-                        <img src="/gifs/creating-flexible-tiles.gif" alt="Add your first tile" />
-                      </SetupCardMedia>
-                      <SetupCardContent>
+                      <SetupAnim>
+                        <SaTileScene>
+                          <SaTileItem>
+                            <SaTileDot $color={palette.colors.gray[600]} />
+                            <SaTileLabel>9:00 — Team standup</SaTileLabel>
+                            <SaTileTime>1h</SaTileTime>
+                          </SaTileItem>
+                          <SaTileItemNew>
+                            <SaTileDot />
+                            <SaTileLabel>Read for 30 min</SaTileLabel>
+                            <SaTileTime>30m</SaTileTime>
+                          </SaTileItemNew>
+                          <SaTileItem>
+                            <SaTileDot $color={palette.colors.gray[600]} />
+                            <SaTileLabel>12:00 — Lunch</SaTileLabel>
+                            <SaTileTime>1h</SaTileTime>
+                          </SaTileItem>
+                        </SaTileScene>
+                      </SetupAnim>
+                      <SetupBody>
                         <SetupCardStepBadge>3</SetupCardStepBadge>
                         <SetupCardTitle>Add your first tile</SetupCardTitle>
-                        <SetupCardBody>
-                          A Tile is anything you need to do — without locking it to a specific
-                          hour. Name it, estimate the duration, add an optional deadline, and
-                          Tiler places it in the right slot automatically. Tiles move when your
-                          day shifts, stack intelligently around your blocks, and get
-                          re-sequenced when things change. Start with one thing. Watch what
-                          happens.
-                        </SetupCardBody>
-                        <SetupCardCallout>
-                          <SetupCardCalloutLabel>Tip: </SetupCardCalloutLabel>
-                          Try something simple first — &ldquo;Read for 30 minutes.&rdquo; Give
-                          it a deadline and watch Tiler find the perfect slot automatically.
-                        </SetupCardCallout>
-                        <SetupCardCTA href="#">Add a tile →</SetupCardCTA>
-                      </SetupCardContent>
+                      </SetupBody>
                     </SetupCard>
 
-                    {/* Step 4 — Let Adaptive Scheduling run */}
+                    {/* ── Card 4: Adaptive scheduling (JS animation) ── */}
                     <SetupCard>
-                      <SetupCardMedia>
-                        <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
-                      </SetupCardMedia>
-                      <SetupCardContent>
+                      <SetupAnim>
+                        <SaSchedScene>
+                          <SaSchedTimeLabel>Your schedule</SaSchedTimeLabel>
+                          <SaSchedRow>
+                            <SaSchedBlock
+                              $bg={palette.colors.gray[700]}
+                              $width="88px"
+                            >
+                              9am meeting
+                            </SaSchedBlock>
+                            <SaSchedBlock
+                              $bg={`${palette.colors.brand[500]}90`}
+                              $shifted={schedPhase === 'settled'}
+                            >
+                              Run · 30m
+                            </SaSchedBlock>
+                          </SaSchedRow>
+                          <SaSchedRow>
+                            <SaSchedBlock
+                              $bg={palette.colors.gray[700]}
+                              $width="88px"
+                              $visible={schedPhase !== 'normal'}
+                            >
+                              New: 10am
+                            </SaSchedBlock>
+                            <SaSchedBlock
+                              $bg={`${palette.colors.gray[600]}`}
+                              $visible={schedPhase !== 'normal'}
+                            >
+                              Urgent call
+                            </SaSchedBlock>
+                          </SaSchedRow>
+                          <SaSchedStatus $phase={schedPhase}>
+                            {schedPhase === 'disrupted'
+                              ? 'Recalculating…'
+                              : schedPhase === 'settled'
+                              ? '✓ Schedule rebuilt'
+                              : ''}
+                          </SaSchedStatus>
+                        </SaSchedScene>
+                      </SetupAnim>
+                      <SetupBody>
                         <SetupCardStepBadge>4</SetupCardStepBadge>
                         <SetupCardTitle>Let Adaptive Scheduling run</SetupCardTitle>
-                        <SetupCardBody>
-                          With your calendar connected, Autopilot on, and your first tiles
-                          added — Tiler&rsquo;s adaptive engine is live. When a meeting runs
-                          long, a task gets deferred, or a new event lands in your day, Tiler
-                          detects the change and rebuilds your schedule around it in seconds.
-                          You don&rsquo;t reorganise anything. One shift ripples through
-                          automatically, keeping your day realistic without any manual work
-                          from you.
-                        </SetupCardBody>
-                        <SetupCardCallout>
-                          <SetupCardCalloutLabel>Tip: </SetupCardCalloutLabel>
-                          When something shifts — a meeting moves, a task takes longer — Tiler
-                          rebuilds your day instantly. No manual fixes needed.
-                        </SetupCardCallout>
-                        <SetupCardCTA href="#">See how it works →</SetupCardCTA>
-                      </SetupCardContent>
+                      </SetupBody>
                     </SetupCard>
+
                   </SetupGrid>
                 </ExpandableBodyInner>
               </ExpandableBody>
