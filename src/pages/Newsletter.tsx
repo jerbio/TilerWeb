@@ -632,6 +632,117 @@ const SetupSupportNote = styled.p`
   text-align: left;
 `;
 
+// ─── Styles — Features section ────────────────────────────────────────────────
+
+const FeaturesVisual = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: ${palette.borderRadius.medium};
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    height: auto;
+  }
+`;
+
+const FeaturesVisualRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+`;
+
+const FeaturesVisualIcon = styled.div<{ $bg: string }>`
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: ${({ $bg }) => $bg};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+`;
+
+const FeaturesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1.25rem 0 1rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 540px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FeatureCard = styled.div`
+  background: ${palette.colors.gray[800]};
+  border: 1px solid ${palette.colors.gray[700]};
+  border-radius: ${palette.borderRadius.xLarge};
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.3s, transform 0.3s;
+
+  &:hover {
+    border-color: ${palette.colors.brand[500]}40;
+    transform: translateY(-2px);
+  }
+`;
+
+const FeatureIconBox = styled.div<{ $bg: string }>`
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: ${({ $bg }) => $bg};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+`;
+
+const FeatureName = styled.h3`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: 1rem;
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[100]};
+  margin: 0;
+  line-height: 1.3;
+`;
+
+const FeatureDesc = styled.p`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[400]};
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+`;
+
+const FeatureBadge = styled.span`
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: ${palette.colors.gray[700]};
+  color: ${palette.colors.gray[500]};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  align-self: flex-start;
+  margin-top: 2px;
+`;
+
 // ── Card 1: Sign up (JS-animated) ─────────────────────────────────────────────
 const SaCalRow = styled.div`
   display: flex;
@@ -983,6 +1094,7 @@ const SubBodyText = styled.div`
 const Newsletter: React.FC = () => {
   const [whatIsOpen, setWhatIsOpen] = useState(false);
   const [setUpOpen, setSetUpOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
 
   // ── Set Up Tiler animation state ──────────────────────────────────────────
@@ -1442,6 +1554,213 @@ const Newsletter: React.FC = () => {
                   <SubCollapseWrapper>
                     <Collapse items={howToSubItems} />
                   </SubCollapseWrapper>
+                </ExpandableBodyInner>
+              </ExpandableBody>
+            </ExpandableSection>
+          </ExpandableWrapper>
+
+          {/* ── Features ── */}
+          <ExpandableWrapper>
+            <ExpandableSection>
+              <ExpandableHeader
+                $open={featuresOpen}
+                onClick={() => setFeaturesOpen((o) => !o)}
+              >
+                <ExpandableTextSide>
+                  <SectionBadge>Features</SectionBadge>
+                  <SectionTitle>Everything Tiler can do.</SectionTitle>
+                  <SectionSummary>
+                    Every feature is built around one principle: your schedule
+                    should work for you, not the other way around.
+                  </SectionSummary>
+                </ExpandableTextSide>
+
+                <ExpandableHeaderRight>
+                  <FeaturesVisual>
+                    <FeaturesVisualRow>
+                      <FeaturesVisualIcon $bg="#1A2E3A">🧩</FeaturesVisualIcon>
+                      <FeaturesVisualIcon $bg="#3D1C2A">🤖</FeaturesVisualIcon>
+                      <FeaturesVisualIcon $bg="#1A2840">💬</FeaturesVisualIcon>
+                    </FeaturesVisualRow>
+                    <FeaturesVisualRow>
+                      <FeaturesVisualIcon $bg="#4A1A2A">🗣️</FeaturesVisualIcon>
+                      <FeaturesVisualIcon $bg="#1A3320">🚗</FeaturesVisualIcon>
+                      <FeaturesVisualIcon $bg="#1A2E3A">📍</FeaturesVisualIcon>
+                    </FeaturesVisualRow>
+                    <FeaturesVisualRow>
+                      <FeaturesVisualIcon $bg="#3D1C2A">🔄</FeaturesVisualIcon>
+                      <FeaturesVisualIcon $bg="#1A2040">📅</FeaturesVisualIcon>
+                      <FeaturesVisualIcon $bg="#1A2E3A">👥</FeaturesVisualIcon>
+                    </FeaturesVisualRow>
+                  </FeaturesVisual>
+                  <Chevron $open={featuresOpen}>&#9660;</Chevron>
+                </ExpandableHeaderRight>
+              </ExpandableHeader>
+
+              <ExpandableBody $open={featuresOpen}>
+                <ExpandableBodyInner>
+                  <FeaturesGrid>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A2E3A">🧩</FeatureIconBox>
+                      <FeatureName>Adaptive Tiles</FeatureName>
+                      <FeatureDesc>
+                        The core unit of Tiler. Each tile is a task, event, or
+                        habit with a duration — Tiler schedules them
+                        intelligently and moves them when your day changes.
+                      </FeatureDesc>
+                      <FeatureBadge>Core feature</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#3D1C2A">🤖</FeatureIconBox>
+                      <FeatureName>AI scheduling assistant</FeatureName>
+                      <FeatureDesc>
+                        Tiler asks clarifying questions, proposes the best
+                        available time, and builds a complete schedule including
+                        dependencies — always with your approval first.
+                      </FeatureDesc>
+                      <FeatureBadge>Core feature</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A2840">💬</FeatureIconBox>
+                      <FeatureName>Chat scheduling</FeatureName>
+                      <FeatureDesc>
+                        Tell Tiler what you need through a natural chat
+                        interface. It understands your intent and proposes a
+                        plan without you filling in a single form.
+                      </FeatureDesc>
+                      <FeatureBadge>Core feature</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#4A1A2A">🗣️</FeatureIconBox>
+                      <FeatureName>Natural language input</FeatureName>
+                      <FeatureDesc>
+                        Describe tasks in plain English — no forms, no
+                        dropdowns. Tiler understands context, urgency, duration,
+                        and location from how you naturally talk.
+                      </FeatureDesc>
+                      <FeatureBadge>Core feature</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A3320">🚗</FeatureIconBox>
+                      <FeatureName>Auto travel buffers</FeatureName>
+                      <FeatureDesc>
+                        Tiler automatically inserts realistic travel time
+                        between location-based tiles based on your actual
+                        distance and transit options. Back-to-back never means
+                        late.
+                      </FeatureDesc>
+                      <FeatureBadge>Unique to Tiler</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A2E3A">📍</FeatureIconBox>
+                      <FeatureName>Auto locations</FeatureName>
+                      <FeatureDesc>
+                        Link locations to tiles once and Tiler remembers. Every
+                        time that task appears, travel time is calculated
+                        automatically from wherever you are.
+                      </FeatureDesc>
+                      <FeatureBadge>Unique to Tiler</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#2A1A3A">⏰</FeatureIconBox>
+                      <FeatureName>Time restrictions</FeatureName>
+                      <FeatureDesc>
+                        Set the hours you&rsquo;re available and Tiler only
+                        schedules within those bounds. Your personal time stays
+                        yours — no task bleeds into off-hours unless you allow
+                        it.
+                      </FeatureDesc>
+                      <FeatureBadge>Preferences</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#3D1C2A">🔄</FeatureIconBox>
+                      <FeatureName>Adaptive rescheduling</FeatureName>
+                      <FeatureDesc>
+                        When a meeting runs long or a task gets missed, Tiler
+                        detects the ripple across your whole day and proposes
+                        fixes — instantly, with your approval before changing
+                        anything.
+                      </FeatureDesc>
+                      <FeatureBadge>Core feature</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A2040">📅</FeatureIconBox>
+                      <FeatureName>Calendar integration</FeatureName>
+                      <FeatureDesc>
+                        Connect Google Calendar or Outlook. Tiler reads your
+                        existing events and schedules all new tiles around them
+                        — no double bookings, ever. Supports multiple calendars.
+                      </FeatureDesc>
+                      <FeatureBadge>Integration</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A3320">📱</FeatureIconBox>
+                      <FeatureName>Cross-platform sync</FeatureName>
+                      <FeatureDesc>
+                        Web, iOS, and Android all stay in real-time sync. Start
+                        a task on your laptop and check in on your phone without
+                        missing a beat. One schedule, everywhere.
+                      </FeatureDesc>
+                      <FeatureBadge>Platform</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A3A20">🎯</FeatureIconBox>
+                      <FeatureName>Habit scheduling</FeatureName>
+                      <FeatureDesc>
+                        Add recurring habits and Tiler auto-fits them around
+                        your day — keeping you consistent with your routines
+                        without you having to think about it each morning.
+                      </FeatureDesc>
+                      <FeatureBadge>Wellness</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#3D1C2A">↩️</FeatureIconBox>
+                      <FeatureName>Defer &amp; reschedule</FeatureName>
+                      <FeatureDesc>
+                        Missed a tile? Tiler&rsquo;s Defer feature instantly
+                        finds the next best slot and reschedules with one tap.
+                        Never lose a task — just push it forward intelligently.
+                      </FeatureDesc>
+                      <FeatureBadge>Core feature</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A2040">🔔</FeatureIconBox>
+                      <FeatureName>Smart notifications</FeatureName>
+                      <FeatureDesc>
+                        Get alerted when it&rsquo;s time to leave for your next
+                        tile — with live transit updates if your route changes.
+                        Never miss a departure time because you lost track of
+                        the clock.
+                      </FeatureDesc>
+                      <FeatureBadge>Real-time</FeatureBadge>
+                    </FeatureCard>
+
+                    <FeatureCard>
+                      <FeatureIconBox $bg="#1A2E3A">👥</FeatureIconBox>
+                      <FeatureName>TileShare</FeatureName>
+                      <FeatureDesc>
+                        Share tiles with family or teammates. Assign who handles
+                        what. Track completion. Everyone&rsquo;s calendar adapts
+                        around shared commitments automatically — no extra apps
+                        needed.
+                      </FeatureDesc>
+                      <FeatureBadge>Collaboration</FeatureBadge>
+                    </FeatureCard>
+
+                  </FeaturesGrid>
                 </ExpandableBodyInner>
               </ExpandableBody>
             </ExpandableSection>
