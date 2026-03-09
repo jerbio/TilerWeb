@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import { toast } from 'sonner';
 import palette from '@/core/theme/palette';
 import Input from '@/core/common/components/input';
@@ -12,7 +12,7 @@ import { userService } from '@/services';
 
 const AccountSettings: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const navigate = useAuthNavigate();
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 
 	const [fullName, setFullName] = useState('');
@@ -92,7 +92,7 @@ const AccountSettings: React.FC = () => {
 	return (
 		<Container>
 			<Breadcrumb>
-				<BreadcrumbLink onClick={() => navigate('/signin')}>
+				<BreadcrumbLink onClick={() => navigate('home')}>
 					{t('settings.breadcrumb.home')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>

@@ -1,15 +1,16 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
-import { Outlet, useNavigate, useLocation } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { ChevronRight, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import Logo from '@/core/common/components/icons/logo';
 import useAppStore from '@/global_state';
 import { toast } from 'sonner';
 
 const SettingsLayout: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const navigate = useAuthNavigate();
 	const location = useLocation();
 	const logout = useAppStore((state) => state.logout);
 	const theme = useTheme();
@@ -55,7 +56,7 @@ const SettingsLayout: React.FC = () => {
 			{!isDetailPage ? (
 				<Content>
 					<Breadcrumb>
-						<BreadcrumbLink onClick={() => navigate('/')}>
+					<BreadcrumbLink onClick={() => navigate('home')}>
 							{t('settings.breadcrumb.home')}
 						</BreadcrumbLink>
 						<BreadcrumbSeparator>/</BreadcrumbSeparator>

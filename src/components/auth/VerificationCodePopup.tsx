@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import Input from '@/core/common/components/input';
@@ -25,7 +25,7 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
   onResendCode,
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const navigate = useAuthNavigate();
   const setAuthenticated = useAppStore((state) => state.setAuthenticated);
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +49,7 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
       // Success: Close popup, show success message, and redirect
       toast.success(t('auth.verification.success'));
       onClose();
-      navigate('/timeline');
+      navigate('home');
     } catch (error) {
       // Failure: Keep popup open and show error message
       toast.error(t('auth.verification.error'));
