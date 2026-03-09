@@ -34,6 +34,7 @@ const items = [
   },
   {
     title: "Connect a Calendar",
+    media: "/gifs/connect-a-calendar.gif",
     body: "Connecting your calendar allows Tiler to see your real commitments. Once synced, incoming calendar events appear as blocks in your timeline. You can accept, edit, or resolve conflicts directly inside Tiler. When events change, Tiler adapts your tiles around them so your day stays balanced and realistic.",
   },
   {
@@ -653,9 +654,27 @@ const Newsletter: React.FC = () => {
     "How to Create a Block",
     "Creating Flexible Tiles",
     "How to Update a Tile",
-    "How Does Adaptive Scheduling Work?",
     "Travel Time & Route",
   ];
+
+  const adaptiveItem = (() => {
+    const item = items.find((i) => i.title === "How Does Adaptive Scheduling Work?")!;
+    return [{
+      title: item.title,
+      content: (
+        <ContentRow>
+          <MediaPlaceholder>
+            {item.media ? (
+              <MediaImage src={item.media} alt={item.title} />
+            ) : (
+              <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
+            )}
+          </MediaPlaceholder>
+          <BodyText>{item.body}</BodyText>
+        </ContentRow>
+      ),
+    }];
+  })();
 
   const howToItems = howToOrder.map(
     (title) => items.find((i) => i.title === title)!,
@@ -788,6 +807,11 @@ const Newsletter: React.FC = () => {
                 </ExpandableBodyInner>
               </ExpandableBody>
             </ExpandableSection>
+          </ExpandableWrapper>
+
+          {/* ── Standalone items ── */}
+          <ExpandableWrapper>
+            <Collapse items={adaptiveItem} />
           </ExpandableWrapper>
 
         </PageWrapper>
