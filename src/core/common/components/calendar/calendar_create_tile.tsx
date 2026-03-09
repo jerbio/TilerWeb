@@ -12,16 +12,17 @@ import { Trans, useTranslation } from 'react-i18next';
 import LoadingModal from '../modals/loading-modal';
 import SuccessModal from '../modals/success-modal';
 import { scheduleService } from '@/services';
-import {
-  ScheduleCreateEventParams,
-  ScheduleCreateEventResponse,
-} from '../../types/schedule';
+import { ScheduleCreateEventParams, ScheduleCreateEventResponse } from '../../types/schedule';
 import { toast } from 'sonner';
 import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 import DatePicker from '../date_picker';
-import Toggle from '../toggle';
 import { useCalendarDispatch } from './CalendarRequestProvider';
-import { CalendarEntityType, CalendarRequestResult, CalendarRequestStatus, CalendarRequestType } from './calendarRequestContext';
+import {
+  CalendarEntityType,
+  CalendarRequestResult,
+  CalendarRequestStatus,
+  CalendarRequestType,
+} from './calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
 
 dayjs.extend(advancedFormat);
@@ -58,6 +59,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   isOpen,
   onClose,
   expanded,
+  setExpanded,
   tileColorOptions,
   formHandler,
   refetchEvents,
@@ -70,7 +72,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   const [successEvent, setSuccessEvent] = useState<ScheduleCreateEventResponse['Content'] | null>(
     null
   );
-	const [isNavigatingToEvent, setIsNavigatingToEvent] = useState(false);
+  const [isNavigatingToEvent, setIsNavigatingToEvent] = useState(false);
   const isValidSubmission = useMemo(() => {
     if (formData.action.trim().length === 0) return false;
     const duration = formData.durationHours * 60 + formData.durationMins;
@@ -82,6 +84,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
+				console.log('Submitting Form');
         event.preventDefault();
         submitForm();
       }
@@ -96,7 +99,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     };
   }, [isOpen, submitForm]);
 
-  const collapseItems = [
+  const tileActions = [
     {
       title: t('calendar.createTile.sections.tileColor'),
       content: (
@@ -115,113 +118,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             );
           })}
         </TileColorOptions>
-      ),
-    },
-    {
-      title: t('calendar.createTile.sections.tileActions'),
-      content: (
-        <>
-          <TileActionToggleContainer>
-            <div>
-              <h3>{t('calendar.createTile.actions.repeatTile')}</h3>
-              <Toggle
-                isOn={formData.isRecurring}
-                onChange={handleFormInputChange('isRecurring', { mode: 'static' })}
-              />
-            </div>
-            {formData.isRecurring && (
-              <TileActionContainer>
-                <DescriptionContainer>
-                  <Trans
-                    i18nKey="calendar.createTile.recurrence.description"
-                    components={{
-                      repetition: (
-                        <DescriptionInput
-                          value={formData.recurrenceCount}
-                          onChange={handleFormInputChange(
-                            'recurrenceCount',
-                            {
-                              restriction: 'integer',
-                            }
-                          )}
-                          minWidth={50}
-                          maxWidth={50}
-                          type="number"
-                        />
-                      ),
-                      period: (
-                        <DescriptionSelect
-                          value={formData.recurrenceType}
-                          onChange={handleFormInputChange(
-                            'recurrenceType'
-                          )}
-                        >
-                          <option value={TILE_RECURRENCE_TYPE.DAILY}>
-                            {t(
-                              'calendar.createTile.recurrence.periods.daily'
-                            )}
-                          </option>
-                          <option value={TILE_RECURRENCE_TYPE.WEEKLY}>
-                            {t(
-                              'calendar.createTile.recurrence.periods.weekly'
-                            )}
-                          </option>
-                          <option value={TILE_RECURRENCE_TYPE.MONTHLY}>
-                            {t(
-                              'calendar.createTile.recurrence.periods.monthly'
-                            )}
-                          </option>
-                          <option value={TILE_RECURRENCE_TYPE.YEARLY}>
-                            {t(
-                              'calendar.createTile.recurrence.periods.yearly'
-                            )}
-                          </option>
-                        </DescriptionSelect>
-                      ),
-                    }}
-                  />
-                </DescriptionContainer>
-                <Seperator />
-              </TileActionContainer>
-            )}
-            <div>
-              <h3>{t('calendar.createTile.actions.addTimeRestriction')}</h3>
-              <Toggle
-                isOn={formData.isTimeRestricted}
-                onChange={handleFormInputChange('isTimeRestricted', {
-                  mode: 'static',
-                })}
-              />
-            </div>
-            {formData.isTimeRestricted && (
-              <TileActionContainer>
-                <Seperator />
-              </TileActionContainer>
-            )}
-            <div>
-              <h3>{t('calendar.createTile.actions.addLocationNickname')}</h3>
-              <Toggle
-                isOn={formData.hasLocationNickname}
-                onChange={handleFormInputChange('hasLocationNickname', {
-                  mode: 'static',
-                })}
-              />
-            </div>
-            {formData.hasLocationNickname && (
-              <TileActionContainer>
-                <DescriptionContainer>
-                  <DescriptionInput
-                    value={formData.locationNickname}
-                    onChange={handleFormInputChange('locationNickname')}
-                    minWidth={50}
-                    maxWidth={250}
-                  />
-                </DescriptionContainer>
-                <Seperator />
-              </TileActionContainer>
-            )}
-          </TileActionToggleContainer>
-        </>
       ),
     },
   ];
@@ -250,7 +146,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       const newEvent = await scheduleService.createEvent(event);
       await refetchEvents();
       onClose();
-			setIsNavigatingToEvent(false);
+      setIsNavigatingToEvent(false);
       setSuccessEvent(newEvent);
       setSuccess(true);
     } catch (error) {
@@ -263,24 +159,28 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 
   function viewCreatedEvent() {
     if (successEvent === null || successEvent.calendarEvent.id === null) return;
-    calendarDispatch({
-      type: CalendarRequestType.FocusEvent,
-      entityId: successEvent.calendarEvent.id,
-      entityType: CalendarEntityType.CalendarEvent,
-      actionType: Actions.Add_New_Task,
-		},
+    calendarDispatch(
+      {
+        type: CalendarRequestType.FocusEvent,
+        entityId: successEvent.calendarEvent.id,
+        entityType: CalendarEntityType.CalendarEvent,
+        actionType: Actions.Add_New_Task,
+      },
       (result: CalendarRequestResult) => {
         if (result.status === CalendarRequestStatus.Navigating) {
           setIsNavigatingToEvent(true);
         } else {
           setIsNavigatingToEvent(false);
-					setSuccess(false);
+          setSuccess(false);
           if (result.status === CalendarRequestStatus.NotFound) {
-            console.warn('[CreateTile] Calendar could not find entity:', successEvent.calendarEvent.id);
+            console.warn(
+              '[CreateTile] Calendar could not find entity:',
+              successEvent.calendarEvent.id
+            );
           }
         }
       }
-		);
+    );
   }
 
   return (
@@ -302,7 +202,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
           {
             text: t('calendar.createTile.buttons.viewInTimeline'),
             onClick: viewCreatedEvent,
-						disabled: isNavigatingToEvent
+            disabled: isNavigatingToEvent,
           },
         ]}
       >
@@ -330,7 +230,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       </header>
 
       {/* Tile Description */}
-      <Section>
+      <Section $isexpanded={expanded}>
         <DescriptionContainer>
           <Trans
             i18nKey="calendar.createTile.description"
@@ -421,11 +321,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       {/* Tile Actions */}
       {expanded && (
         <>
-          <Section>
+          <Section $isexpanded={expanded}>
             <Collapse
               openIcon={<ChevronUp />}
               closeIcon={<ChevronDown />}
-              items={collapseItems}
+              items={tileActions}
               size="small"
               iconPosition="right"
               seperatorColor={theme.colors.border.strong}
@@ -453,6 +353,16 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         </>
       )}
       <ButtonContainer $isexpanded={expanded}>
+        <Button
+          variant={'ghost'}
+          onClick={() => {
+            setExpanded(!expanded);
+          }}
+        >
+          {expanded
+            ? t('calendar.createTile.buttons.collapse')
+            : t('calendar.createTile.buttons.expand')}
+        </Button>
         <Button variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
@@ -508,47 +418,13 @@ const Seperator = styled.hr`
 	background-color: ${(props) => props.theme.colors.border.strong};
 `;
 
-const Section = styled.section`
+const Section = styled.section<{ $isexpanded: boolean }>`
 	padding: 1rem 1.25rem;
 	width: 100%;
 	max-width: ${(props) => props.theme.screens.md};
 	margin-inline: auto;
-  border-inline: 1px solid ${(props) => props.theme.colors.border.strong};
-`;
-
-const TileActionContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	padding: 0.25rem;
-
-	> h3 {
-		font-size: ${(props) => props.theme.typography.fontSize.base};
-		font-family: ${(props) => props.theme.typography.fontFamily.urban};
-		font-weight: ${(props) => props.theme.typography.fontWeight.bold};
-		color: ${(props) => props.theme.colors.text.primary};
-		line-height: 1;
-	}
-`;
-
-const TileActionToggleContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	margin-bottom: 1rem;
-
-	& > div {
-		display: flex;
-		gap: 0.75rem;
-		justify-content: space-between;
-
-		h3 {
-			font-family: ${(props) => props.theme.typography.fontFamily.urban};
-			font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
-			font-size: ${(props) => props.theme.typography.fontSize.base};
-			color: ${(props) => props.theme.colors.text.primary};
-		}
-	}
+	border-inline: ${(props) => (props.$isexpanded ? '0px' : '1px')} solid
+		${(props) => props.theme.colors.border.strong};
 `;
 
 const TileColorOptions = styled.div`
@@ -570,14 +446,17 @@ const TileColorOption = styled.button<{ $color: RGBColor; $selected: boolean }>`
 	gap: 0.5rem;
 	position: relative;
 	outline: ${(props) =>
-    props.$selected ? `2px solid ${props.theme.colors.brand[500]}` : 'none'};
+    props.$selected ? `2px solid ${props.theme.colors.brand[500]}` : '2px solid transparent'};
 	outline-offset: 4px;
 	transition: outline 0.2s ease-in-out;
 `;
 
 const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
-	border: 1px solid ${(props) => props.theme.colors.border.strong};
+	${(props) =>
+    props.$isexpanded
+      ? `border-top: 1px solid ${props.theme.colors.border.strong};`
+      : `border: 1px solid ${props.theme.colors.border.strong};`}
 	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
 		${(props) => props.theme.borderRadius.xLarge};
 	display: flex;
@@ -585,13 +464,6 @@ const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	gap: 0.25rem;
 	padding: 0.5rem 1rem;
 	background-color: ${(props) => props.theme.colors.background.card};
-`;
-
-const DescriptionSelect = styled.select`
-	background: none;
-	outline: none;
-	color: ${(props) => props.theme.colors.highlight.text};
-	border-bottom: 1.5px dashed ${(props) => props.theme.colors.highlight.text} !important;
 `;
 
 const DescriptionDatePickerContainer = styled.div`
@@ -653,6 +525,7 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};
 	width: 100%;
+	isolation: isolate;
 
 	${(props) =>
     props.$isexpanded
@@ -668,10 +541,15 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 		`};
 
 	& > header {
+		z-index: 1;
 		width: 100%;
 		position: sticky;
 		top: 0;
-		border: 1px solid ${(props) => props.theme.colors.border.strong};
+
+		${(props) =>
+    props.$isexpanded
+      ? `border-bottom: 1px solid ${props.theme.colors.border.strong};`
+      : `border: 1px solid ${props.theme.colors.border.strong};`}
 		background-color: ${(props) => props.theme.colors.background.card};
 		display: flex;
 		align-items: center;
