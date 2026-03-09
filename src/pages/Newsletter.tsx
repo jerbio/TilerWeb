@@ -46,6 +46,7 @@ const items = [
   },
   {
     title: "Travel Time & Route",
+    media: "/gifs/travel-time-and-route.gif",
     body: "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn\u2019t a gap \u2014 it\u2019s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn\u2019t just tell you what to do. It gets you there.",
   },
   {
