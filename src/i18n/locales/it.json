@@ -545,6 +545,22 @@
 			"revising": "Revisione del programma...",
 			"success": "Programma rivisto!",
 			"error": "Revisione fallita. Riprova."
+		},
+		"procrastinateAll": {
+			"tooltip": "Rimanda tutti gli eventi",
+			"ariaLabel": "Rimanda tutti gli eventi",
+			"deferring": "Rimandando tutti gli eventi...",
+			"success": "Tutti gli eventi rimandati!",
+			"error": "Rimando fallito. Riprova.",
+			"pickerTitle": "Durata del rimando",
+			"days": "Giorni",
+			"hours": "Ore",
+			"minutes": "Minuti",
+			"daysShort": "g",
+			"hoursShort": "o",
+			"minutesShort": "m",
+			"confirm": "Conferma",
+			"cancel": "Annulla"
 		}
 	},
 	"errors": {

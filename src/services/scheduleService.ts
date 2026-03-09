@@ -2,7 +2,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
-import { ScheduleCreateEventParams, ScheduleLookupOptions, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleLookupOptions, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
 
@@ -207,6 +207,20 @@ class ScheduleService {
       return response.Content;
     } catch (error) {
       console.error('Error revising schedule', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Procrastinate (defer) all events in the user's schedule.
+   * Calls `POST /api/Schedule/ProcrastinateAll` and returns the updated schedule.
+   */
+  async procrastinateAllSchedule(params: ScheduleProcrastinateAllParams) {
+    try {
+      const response = await this.scheduleApi.procrastinateAll(params);
+      return response.Content;
+    } catch (error) {
+      console.error('Error procrastinating all schedule events', error);
       throw normalizeError(error);
     }
   }

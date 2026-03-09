@@ -545,6 +545,22 @@
 			"revising": "Rewizja harmonogramu...",
 			"success": "Harmonogram zrewidowany!",
 			"error": "Rewizja nie powiodła się. Spróbuj ponownie."
+		},
+		"procrastinateAll": {
+			"tooltip": "Odłóż wszystkie wydarzenia",
+			"ariaLabel": "Odłóż wszystkie wydarzenia",
+			"deferring": "Odkładanie wszystkich wydarzeń...",
+			"success": "Wszystkie wydarzenia odłożone!",
+			"error": "Odkładanie nie powiodło się. Spróbuj ponownie.",
+			"pickerTitle": "Czas odkładania",
+			"days": "Dni",
+			"hours": "Godziny",
+			"minutes": "Minuty",
+			"daysShort": "d",
+			"hoursShort": "g",
+			"minutesShort": "m",
+			"confirm": "Potwierdź",
+			"cancel": "Anuluj"
 		}
 	},
 	"errors": {

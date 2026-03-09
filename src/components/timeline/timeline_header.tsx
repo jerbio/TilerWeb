@@ -10,6 +10,7 @@ import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvi
 import SearchBar from './search_bar';
 import ShuffleButton from './shuffle_button';
 import ReviseButton from './revise_button';
+import ProcrastinateAllButton from './procrastinate_all_button';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -52,6 +53,7 @@ const TimelineHeader: React.FC = () => {
       <HeaderRight>
 				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+				<ProcrastinateAllButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
 					<Plus size={16} />
 				</CreateEventButton>

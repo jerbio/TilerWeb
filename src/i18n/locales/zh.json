@@ -545,6 +545,22 @@
 			"revising": "正在修订日程...",
 			"success": "日程已修订！",
 			"error": "修订失败，请重试。"
+		},
+		"procrastinateAll": {
+			"tooltip": "推迟所有事件",
+			"ariaLabel": "推迟所有事件",
+			"deferring": "正在推迟所有事件...",
+			"success": "所有事件已推迟！",
+			"error": "推迟失败，请重试。",
+			"pickerTitle": "推迟时长",
+			"days": "天",
+			"hours": "小时",
+			"minutes": "分钟",
+			"daysShort": "天",
+			"hoursShort": "时",
+			"minutesShort": "分",
+			"confirm": "确认",
+			"cancel": "取消"
 		}
 	},
 	"errors": {

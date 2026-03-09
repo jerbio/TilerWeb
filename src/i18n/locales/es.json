@@ -545,6 +545,22 @@
 			"revising": "Revisando horario...",
 			"success": "¡Horario revisado!",
 			"error": "Error al revisar. Inténtalo de nuevo."
+		},
+		"procrastinateAll": {
+			"tooltip": "Posponer todos los eventos",
+			"ariaLabel": "Posponer todos los eventos",
+			"deferring": "Posponiendo todos los eventos...",
+			"success": "¡Todos los eventos pospuestos!",
+			"error": "Error al posponer. Inténtalo de nuevo.",
+			"pickerTitle": "Duración del aplazamiento",
+			"days": "Días",
+			"hours": "Horas",
+			"minutes": "Minutos",
+			"daysShort": "d",
+			"hoursShort": "h",
+			"minutesShort": "m",
+			"confirm": "Confirmar",
+			"cancel": "Cancelar"
 		}
 	},
 	"errors": {

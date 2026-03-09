@@ -901,6 +901,22 @@
 			"success": "Schedule revised!",
 			"error": "Revise failed. Please try again."
 		},
+		"procrastinateAll": {
+			"tooltip": "Defer all events",
+			"ariaLabel": "Defer all events",
+			"deferring": "Deferring all events...",
+			"success": "All events deferred!",
+			"error": "Defer failed. Please try again.",
+			"pickerTitle": "Defer Duration",
+			"days": "Days",
+			"hours": "Hours",
+			"minutes": "Minutes",
+			"daysShort": "d",
+			"hoursShort": "h",
+			"minutesShort": "m",
+			"confirm": "Confirm",
+			"cancel": "Cancel"
+		},
 		"userMenu": {
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",

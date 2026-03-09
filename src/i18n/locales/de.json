@@ -545,6 +545,22 @@
 			"revising": "Zeitplan wird überarbeitet...",
 			"success": "Zeitplan überarbeitet!",
 			"error": "Überarbeitung fehlgeschlagen. Bitte erneut versuchen."
+		},
+		"procrastinateAll": {
+			"tooltip": "Alle Ereignisse verschieben",
+			"ariaLabel": "Alle Ereignisse verschieben",
+			"deferring": "Alle Ereignisse werden verschoben...",
+			"success": "Alle Ereignisse verschoben!",
+			"error": "Verschieben fehlgeschlagen. Bitte erneut versuchen.",
+			"pickerTitle": "Verschiebungsdauer",
+			"days": "Tage",
+			"hours": "Stunden",
+			"minutes": "Minuten",
+			"daysShort": "T",
+			"hoursShort": "Std",
+			"minutesShort": "Min",
+			"confirm": "Bestätigen",
+			"cancel": "Abbrechen"
 		}
 	},
 	"errors": {

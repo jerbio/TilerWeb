@@ -163,6 +163,22 @@
 			"success": "Planning révisé !",
 			"error": "La révision a échoué. Veuillez réessayer."
 		},
+		"procrastinateAll": {
+			"tooltip": "Reporter tous les événements",
+			"ariaLabel": "Reporter tous les événements",
+			"deferring": "Report de tous les événements...",
+			"success": "Tous les événements reportés !",
+			"error": "Échec du report. Veuillez réessayer.",
+			"pickerTitle": "Durée du report",
+			"days": "Jours",
+			"hours": "Heures",
+			"minutes": "Minutes",
+			"daysShort": "j",
+			"hoursShort": "h",
+			"minutesShort": "m",
+			"confirm": "Confirmer",
+			"cancel": "Annuler"
+		},
 		"userInfo": {
 			"fullName": "Nom Complet",
 			"username": "Nom d'Utilisateur",

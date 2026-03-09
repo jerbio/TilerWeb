@@ -3,7 +3,7 @@ import ScheduleService from '../scheduleService';
 import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
-import { CalendarEvent, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import { CalendarEvent, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -273,6 +273,43 @@ describe('ScheduleService', () => {
 
 			await expect(
 				service.reviseSchedule(reviseParams),
+			).rejects.toThrow();
+		});
+	});
+
+	describe('procrastinateAllSchedule', () => {
+		const procrastinateAllParams: ScheduleProcrastinateAllParams = {
+			UserLongitude: '-73.9857',
+			UserLatitude: '40.7484',
+			UserLocationVerified: 'true',
+			Version: 'v2',
+			TimeZone: 'America/New_York',
+			DurationDays: 0,
+			DurationHours: 0,
+			DurationMins: 0,
+			DurationInMs: 0,
+		};
+
+		it('calls procrastinateAll on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.procrastinateAll).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.procrastinateAllSchedule(procrastinateAllParams);
+
+			expect(scheduleApi.procrastinateAll).toHaveBeenCalledWith(procrastinateAllParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.procrastinateAll).mockRejectedValueOnce(
+				new Error('Network error'),
+			);
+
+			await expect(
+				service.procrastinateAllSchedule(procrastinateAllParams),
 			).rejects.toThrow();
 		});
 	});

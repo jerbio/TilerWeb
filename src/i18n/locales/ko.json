@@ -545,6 +545,22 @@
 			"revising": "일정을 수정하는 중...",
 			"success": "일정이 수정되었습니다!",
 			"error": "수정 실패. 다시 시도해 주세요."
+		},
+		"procrastinateAll": {
+			"tooltip": "모든 이벤트 연기",
+			"ariaLabel": "모든 이벤트 연기",
+			"deferring": "모든 이벤트를 연기하는 중...",
+			"success": "모든 이벤트가 연기되었습니다!",
+			"error": "연기 실패. 다시 시도해 주세요.",
+			"pickerTitle": "연기 기간",
+			"days": "일",
+			"hours": "시간",
+			"minutes": "분",
+			"daysShort": "일",
+			"hoursShort": "시",
+			"minutesShort": "분",
+			"confirm": "확인",
+			"cancel": "취소"
 		}
 	},
 	"errors": {

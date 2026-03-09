@@ -545,6 +545,22 @@
 			"revising": "スケジュールを見直し中...",
 			"success": "スケジュールを見直しました！",
 			"error": "見直しに失敗しました。もう一度お試しください。"
+		},
+		"procrastinateAll": {
+			"tooltip": "すべてのイベントを延期",
+			"ariaLabel": "すべてのイベントを延期",
+			"deferring": "すべてのイベントを延期中...",
+			"success": "すべてのイベントが延期されました！",
+			"error": "延期に失敗しました。もう一度お試しください。",
+			"pickerTitle": "延期期間",
+			"days": "日",
+			"hours": "時間",
+			"minutes": "分",
+			"daysShort": "日",
+			"hoursShort": "時",
+			"minutesShort": "分",
+			"confirm": "確認",
+			"cancel": "キャンセル"
 		}
 	},
 	"errors": {

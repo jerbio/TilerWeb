@@ -1,4 +1,4 @@
-import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse, ScheduleReviseParams, ScheduleShuffleParams } from '../core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
@@ -73,6 +73,17 @@ export class ScheduleApi extends AppApi {
 	 */
 	public revise(params: ScheduleReviseParams) {
 		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Revise', {
+			method: 'POST',
+			body: JSON.stringify(params),
+		});
+	}
+
+	/**
+	 * Procrastinate (defer) all events in the user's schedule.
+	 * `POST /api/Schedule/ProcrastinateAll`
+	 */
+	public procrastinateAll(params: ScheduleProcrastinateAllParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/ProcrastinateAll', {
 			method: 'POST',
 			body: JSON.stringify(params),
 		});

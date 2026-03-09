@@ -26,6 +26,7 @@ export enum NotificationAction {
 	Delete = 'delete',
 	Shuffle = 'shuffle',
 	Revise = 'revise',
+	ProcrastinateAll = 'procrastinate-all',
 }
 
 /** Build a deterministic notification ID from an action and entity ID */
