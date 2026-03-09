@@ -45,8 +45,8 @@ const items = [
     body: "TileShare lets you pass work to others without micromanaging. You can send a tile (or multiple tiles) to someone else, set expectations, and let Tiler handle scheduling on both sides. It\u2019s ideal for teams, partners, and shared responsibilities \u2014 the context travels with the task, not the reminders.",
   },
   {
-    title: "Travel Time?",
-    body: "Look for the orange rectangle living between your tiles. That\u2019s Tiler quietly accounting for reality \u2014 showing how long it will take to get from one place to the next. Tap it and you\u2019re on the map, route loaded, time counted.",
+    title: "Travel Time & Route",
+    body: "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn\u2019t a gap \u2014 it\u2019s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn\u2019t just tell you what to do. It gets you there.",
   },
   {
     title: "Where Does Navigation Start?",
@@ -653,7 +653,7 @@ const Newsletter: React.FC = () => {
     "Creating Flexible Tiles",
     "How to Update a Tile",
     "How Does Adaptive Scheduling Work?",
-    "Travel Time?",
+    "Travel Time & Route",
   ];
 
   const howToItems = howToOrder.map(
