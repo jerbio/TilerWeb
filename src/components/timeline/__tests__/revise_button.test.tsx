@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, setupUser, waitFor } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
-import ShuffleButton from '../shuffle_button';
+import ReviseButton from '../revise_button';
 
-const mockShuffleSchedule = vi.fn();
+const mockReviseSchedule = vi.fn();
 
 // Mock the services module
 vi.mock('@/services', () => ({
 	scheduleService: {
-		shuffleSchedule: (...args: unknown[]) => mockShuffleSchedule(...args),
+		reviseSchedule: (...args: unknown[]) => mockReviseSchedule(...args),
 	},
 }));
 
@@ -78,6 +78,7 @@ vi.mock('@/core/ui', () => ({
 		Complete: 'complete',
 		Delete: 'delete',
 		Shuffle: 'shuffle',
+		Revise: 'revise',
 	},
 }));
 
@@ -86,11 +87,11 @@ vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
 		t: (key: string) => {
 			const translations: Record<string, string> = {
-				'timeline.shuffle.tooltip': 'Shuffle schedule',
-				'timeline.shuffle.ariaLabel': 'Shuffle schedule',
-				'timeline.shuffle.shuffling': 'Shuffling schedule...',
-				'timeline.shuffle.success': 'Schedule shuffled!',
-				'timeline.shuffle.error': 'Shuffle failed. Please try again.',
+				'timeline.revise.tooltip': 'Revise schedule',
+				'timeline.revise.ariaLabel': 'Revise schedule',
+				'timeline.revise.revising': 'Revising schedule...',
+				'timeline.revise.success': 'Schedule revised!',
+				'timeline.revise.error': 'Revise failed. Please try again.',
 			};
 			return translations[key] ?? key;
 		},
@@ -98,14 +99,14 @@ vi.mock('react-i18next', () => ({
 	}),
 }));
 
-const renderShuffleButton = () =>
+const renderReviseButton = () =>
 	render(
 		<ThemeProvider theme={lightTheme}>
-			<ShuffleButton />
+			<ReviseButton />
 		</ThemeProvider>,
 	);
 
-describe('ShuffleButton', () => {
+describe('ReviseButton', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockGetCurrentLocation.mockResolvedValue({
@@ -121,63 +122,63 @@ describe('ShuffleButton', () => {
 		});
 	});
 
-	it('renders a shuffle button with correct aria-label', () => {
-		renderShuffleButton();
-		const button = screen.getByRole('button', { name: 'Shuffle schedule' });
+	it('renders a revise button with correct aria-label', () => {
+		renderReviseButton();
+		const button = screen.getByRole('button', { name: 'Revise schedule' });
 		expect(button).toBeInTheDocument();
 	});
 
-	it('shows loading notification and then success on successful shuffle', async () => {
-		mockShuffleSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
+	it('shows loading notification and then success on successful revise', async () => {
+		mockReviseSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
 		const user = setupUser();
 
-		renderShuffleButton();
-		const button = screen.getByRole('button', { name: 'Shuffle schedule' });
+		renderReviseButton();
+		const button = screen.getByRole('button', { name: 'Revise schedule' });
 		await user.click(button);
 
 		await waitFor(() => {
 			expect(mockShowNotification).toHaveBeenCalledWith(
-				'shuffle-schedule-shuffle',
-				'Shuffling schedule...',
+				'revise-schedule-revise',
+				'Revising schedule...',
 				'loading',
 			);
 		});
 
 		await waitFor(() => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
-				'shuffle-schedule-shuffle',
-				'Schedule shuffled!',
+				'revise-schedule-revise',
+				'Schedule revised!',
 				'success',
 			);
 		});
 	});
 
-	it('shows error notification when shuffle fails', async () => {
-		mockShuffleSchedule.mockRejectedValueOnce(new Error('Network error'));
+	it('shows error notification when revise fails', async () => {
+		mockReviseSchedule.mockRejectedValueOnce(new Error('Network error'));
 		const user = setupUser();
 
-		renderShuffleButton();
-		const button = screen.getByRole('button', { name: 'Shuffle schedule' });
+		renderReviseButton();
+		const button = screen.getByRole('button', { name: 'Revise schedule' });
 		await user.click(button);
 
 		await waitFor(() => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
-				'shuffle-schedule-shuffle',
-				'Shuffle failed. Please try again.',
+				'revise-schedule-revise',
+				'Revise failed. Please try again.',
 				'error',
 			);
 		});
 	});
 
-	it('sends correct params to shuffleSchedule', async () => {
-		mockShuffleSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
+	it('sends correct params to reviseSchedule', async () => {
+		mockReviseSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
 		const user = setupUser();
 
-		renderShuffleButton();
-		await user.click(screen.getByRole('button', { name: 'Shuffle schedule' }));
+		renderReviseButton();
+		await user.click(screen.getByRole('button', { name: 'Revise schedule' }));
 
 		await waitFor(() => {
-			expect(mockShuffleSchedule).toHaveBeenCalledWith({
+			expect(mockReviseSchedule).toHaveBeenCalledWith({
 				UserLongitude: '-73.9857',
 				UserLatitude: '40.7484',
 				UserLocationVerified: 'true',
@@ -191,16 +192,16 @@ describe('ShuffleButton', () => {
 		});
 	});
 
-	it('disables button while shuffle is in progress', async () => {
+	it('disables button while revise is in progress', async () => {
 		let resolvePromise: (value: unknown) => void;
 		const pending = new Promise((resolve) => {
 			resolvePromise = resolve;
 		});
-		mockShuffleSchedule.mockReturnValueOnce(pending);
+		mockReviseSchedule.mockReturnValueOnce(pending);
 		const user = setupUser();
 
-		renderShuffleButton();
-		const button = screen.getByRole('button', { name: 'Shuffle schedule' });
+		renderReviseButton();
+		const button = screen.getByRole('button', { name: 'Revise schedule' });
 		await user.click(button);
 
 		expect(button).toBeDisabled();
@@ -212,12 +213,12 @@ describe('ShuffleButton', () => {
 		});
 	});
 
-	it('fetches location before shuffling', async () => {
-		mockShuffleSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
+	it('fetches location before revising', async () => {
+		mockReviseSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
 		const user = setupUser();
 
-		renderShuffleButton();
-		await user.click(screen.getByRole('button', { name: 'Shuffle schedule' }));
+		renderReviseButton();
+		await user.click(screen.getByRole('button', { name: 'Revise schedule' }));
 
 		await waitFor(() => {
 			expect(mockGetCurrentLocation).toHaveBeenCalledTimes(1);
@@ -228,23 +229,23 @@ describe('ShuffleButton', () => {
 	it('is disabled when disabled prop is true', () => {
 		render(
 			<ThemeProvider theme={lightTheme}>
-				<ShuffleButton disabled />
+				<ReviseButton disabled />
 			</ThemeProvider>,
 		);
-		expect(screen.getByRole('button', { name: 'Shuffle schedule' })).toBeDisabled();
+		expect(screen.getByRole('button', { name: 'Revise schedule' })).toBeDisabled();
 	});
 
 	it('calls onLoadingChange when loading state changes', async () => {
-		mockShuffleSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
+		mockReviseSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
 		const onLoadingChange = vi.fn();
 		const user = setupUser();
 
 		render(
 			<ThemeProvider theme={lightTheme}>
-				<ShuffleButton onLoadingChange={onLoadingChange} />
+				<ReviseButton onLoadingChange={onLoadingChange} />
 			</ThemeProvider>,
 		);
-		await user.click(screen.getByRole('button', { name: 'Shuffle schedule' }));
+		await user.click(screen.getByRole('button', { name: 'Revise schedule' }));
 
 		await waitFor(() => {
 			expect(onLoadingChange).toHaveBeenCalledWith(true);

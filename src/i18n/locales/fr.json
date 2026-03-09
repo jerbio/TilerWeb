@@ -156,6 +156,13 @@
 			"success": "Planning mélangé !",
 			"error": "Le mélange a échoué. Veuillez réessayer."
 		},
+		"revise": {
+			"tooltip": "Réviser le planning",
+			"ariaLabel": "Réviser le planning",
+			"revising": "Révision du planning...",
+			"success": "Planning révisé !",
+			"error": "La révision a échoué. Veuillez réessayer."
+		},
 		"userInfo": {
 			"fullName": "Nom Complet",
 			"username": "Nom d'Utilisateur",

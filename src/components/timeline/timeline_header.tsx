@@ -9,9 +9,11 @@ import { Env } from '@/config/config_getter';
 import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
 import SearchBar from './search_bar';
 import ShuffleButton from './shuffle_button';
+import ReviseButton from './revise_button';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
+  const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -48,7 +50,8 @@ const TimelineHeader: React.FC = () => {
       </HeaderLeft>
       <SearchBar />
       <HeaderRight>
-				<ShuffleButton />
+				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
 					<Plus size={16} />
 				</CreateEventButton>

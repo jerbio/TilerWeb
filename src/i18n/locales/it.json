@@ -538,6 +538,13 @@
 			"shuffling": "Mescolamento programma...",
 			"success": "Programma mescolato!",
 			"error": "Mescolamento fallito. Riprova."
+		},
+		"revise": {
+			"tooltip": "Rivedere il programma",
+			"ariaLabel": "Rivedere il programma",
+			"revising": "Revisione del programma...",
+			"success": "Programma rivisto!",
+			"error": "Revisione fallita. Riprova."
 		}
 	},
 	"errors": {

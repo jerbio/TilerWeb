@@ -1,34 +1,34 @@
 import React, { useCallback, useState } from 'react';
-import { Shuffle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
 import locationService from '@/services/locationService';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
-import type { ScheduleShuffleParams } from '@/core/common/types/schedule';
+import type { ScheduleReviseParams } from '@/core/common/types/schedule';
 
-const SHUFFLE_NOTIFICATION_ID = 'schedule-shuffle';
+const REVISE_NOTIFICATION_ID = 'schedule-revise';
 
-interface ShuffleButtonProps {
+interface ReviseButtonProps {
 	disabled?: boolean;
 	onLoadingChange?: (loading: boolean) => void;
 }
 
-const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange }) => {
+const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }) => {
 	const { t } = useTranslation();
 	const [isLoading, setIsLoading] = useState(false);
 	const getActivePersonaSession = useAppStore((s) => s.getActivePersonaSession);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 
-	const handleShuffle = useCallback(async () => {
+	const handleRevise = useCallback(async () => {
 		if (isLoading) return;
 		setIsLoading(true);
 		onLoadingChange?.(true);
 
-		const nId = notificationId(NotificationAction.Shuffle, SHUFFLE_NOTIFICATION_ID);
-		showNotification(nId, t('timeline.shuffle.shuffling'), 'loading');
+		const nId = notificationId(NotificationAction.Revise, REVISE_NOTIFICATION_ID);
+		showNotification(nId, t('timeline.revise.revising'), 'loading');
 
 		try {
 			const locationData = await locationService.getCurrentLocation();
@@ -36,7 +36,7 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 			const session = getActivePersonaSession();
 			const userInfo = session?.userInfo;
 
-			const params: ScheduleShuffleParams = {
+			const params: ScheduleReviseParams = {
 				UserLongitude: locationApi.userLongitude,
 				UserLatitude: locationApi.userLatitude,
 				UserLocationVerified: locationApi.userLocationVerified,
@@ -48,11 +48,11 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 				IsTimeZoneAdjusted: 'true',
 			};
 
-			await scheduleService.shuffleSchedule(params);
-			updateNotification(nId, t('timeline.shuffle.success'), 'success');
+			await scheduleService.reviseSchedule(params);
+			updateNotification(nId, t('timeline.revise.success'), 'success');
 		} catch (error) {
-			console.error('Shuffle failed:', error);
-			updateNotification(nId, t('timeline.shuffle.error'), 'error');
+			console.error('Revise failed:', error);
+			updateNotification(nId, t('timeline.revise.error'), 'error');
 		} finally {
 			setIsLoading(false);
 			onLoadingChange?.(false);
@@ -60,18 +60,18 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 	}, [isLoading, getActivePersonaSession, showNotification, updateNotification, onLoadingChange, t]);
 
 	return (
-		<ShuffleIconButton
-			onClick={handleShuffle}
+		<ReviseIconButton
+			onClick={handleRevise}
 			disabled={isLoading || disabled}
-			aria-label={t('timeline.shuffle.ariaLabel')}
-			title={t('timeline.shuffle.tooltip')}
+			aria-label={t('timeline.revise.ariaLabel')}
+			title={t('timeline.revise.tooltip')}
 		>
-			<Shuffle size={16} />
-		</ShuffleIconButton>
+			<RefreshCw size={16} />
+		</ReviseIconButton>
 	);
 };
 
-const ShuffleIconButton = styled.button`
+const ReviseIconButton = styled.button`
 	height: 36px;
 	width: 36px;
 	overflow: hidden;
@@ -95,4 +95,4 @@ const ShuffleIconButton = styled.button`
 	}
 `;
 
-export default ShuffleButton;
+export default ReviseButton;

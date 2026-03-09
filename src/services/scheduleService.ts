@@ -2,7 +2,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
-import { ScheduleCreateEventParams, ScheduleLookupOptions, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleLookupOptions, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
 
@@ -193,6 +193,20 @@ class ScheduleService {
       return response.Content;
     } catch (error) {
       console.error('Error shuffling schedule', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Revise (re-optimize) the user's schedule.
+   * Calls `POST /api/Schedule/Revise` and returns the updated schedule.
+   */
+  async reviseSchedule(params: ScheduleReviseParams) {
+    try {
+      const response = await this.scheduleApi.revise(params);
+      return response.Content;
+    } catch (error) {
+      console.error('Error revising schedule', error);
       throw normalizeError(error);
     }
   }

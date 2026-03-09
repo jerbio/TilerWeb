@@ -538,6 +538,13 @@
 			"shuffling": "Mezclando horario...",
 			"success": "¡Horario mezclado!",
 			"error": "Error al mezclar. Inténtalo de nuevo."
+		},
+		"revise": {
+			"tooltip": "Revisar horario",
+			"ariaLabel": "Revisar horario",
+			"revising": "Revisando horario...",
+			"success": "¡Horario revisado!",
+			"error": "Error al revisar. Inténtalo de nuevo."
 		}
 	},
 	"errors": {

@@ -538,6 +538,13 @@
 			"shuffling": "正在打乱日程...",
 			"success": "日程已打乱！",
 			"error": "打乱失败，请重试。"
+		},
+		"revise": {
+			"tooltip": "修订日程",
+			"ariaLabel": "修订日程",
+			"revising": "正在修订日程...",
+			"success": "日程已修订！",
+			"error": "修订失败，请重试。"
 		}
 	},
 	"errors": {

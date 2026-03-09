@@ -1,4 +1,4 @@
-import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse, ScheduleShuffleParams } from '../core/common/types/schedule';
+import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse, ScheduleReviseParams, ScheduleShuffleParams } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
@@ -62,6 +62,17 @@ export class ScheduleApi extends AppApi {
 	 */
 	public shuffle(params: ScheduleShuffleParams) {
 		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Shuffle', {
+			method: 'POST',
+			body: JSON.stringify(params),
+		});
+	}
+
+	/**
+	 * Revise (re-optimize) the user's schedule.
+	 * `POST /api/Schedule/Revise`
+	 */
+	public revise(params: ScheduleReviseParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Revise', {
 			method: 'POST',
 			body: JSON.stringify(params),
 		});

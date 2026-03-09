@@ -538,6 +538,13 @@
 			"shuffling": "Zeitplan wird gemischt...",
 			"success": "Zeitplan gemischt!",
 			"error": "Mischen fehlgeschlagen. Bitte erneut versuchen."
+		},
+		"revise": {
+			"tooltip": "Zeitplan überarbeiten",
+			"ariaLabel": "Zeitplan überarbeiten",
+			"revising": "Zeitplan wird überarbeitet...",
+			"success": "Zeitplan überarbeitet!",
+			"error": "Überarbeitung fehlgeschlagen. Bitte erneut versuchen."
 		}
 	},
 	"errors": {

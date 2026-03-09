@@ -3,7 +3,7 @@ import ScheduleService from '../scheduleService';
 import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
-import { CalendarEvent, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import { CalendarEvent, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -214,8 +214,6 @@ describe('ScheduleService', () => {
 			Version: 'v2',
 			TimeZone: 'America/New_York',
 			IsTimeZoneAdjusted: 'true',
-			UserName: 'testuser',
-			UserID: 'user-id-123',
 		};
 
 		it('calls shuffle on scheduleApi and returns Content', async () => {
@@ -238,6 +236,43 @@ describe('ScheduleService', () => {
 
 			await expect(
 				service.shuffleSchedule(shuffleParams),
+			).rejects.toThrow();
+		});
+	});
+
+	describe('reviseSchedule', () => {
+		const reviseParams: ScheduleReviseParams = {
+			UserLongitude: '-73.9857',
+			UserLatitude: '40.7484',
+			UserLocationVerified: 'true',
+			MobileApp: true,
+			SocketId: true,
+			TimeZoneOffset: 0,
+			Version: 'v2',
+			TimeZone: 'America/New_York',
+			IsTimeZoneAdjusted: 'true',
+		};
+
+		it('calls revise on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.revise).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.reviseSchedule(reviseParams);
+
+			expect(scheduleApi.revise).toHaveBeenCalledWith(reviseParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.revise).mockRejectedValueOnce(
+				new Error('Network error'),
+			);
+
+			await expect(
+				service.reviseSchedule(reviseParams),
 			).rejects.toThrow();
 		});
 	});

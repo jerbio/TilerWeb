@@ -538,6 +538,13 @@
 			"shuffling": "Przetasowywanie harmonogramu...",
 			"success": "Harmonogram przetasowany!",
 			"error": "Przetasowanie nie powiodło się. Spróbuj ponownie."
+		},
+		"revise": {
+			"tooltip": "Zrewiduj harmonogram",
+			"ariaLabel": "Zrewiduj harmonogram",
+			"revising": "Rewizja harmonogramu...",
+			"success": "Harmonogram zrewidowany!",
+			"error": "Rewizja nie powiodła się. Spróbuj ponownie."
 		}
 	},
 	"errors": {

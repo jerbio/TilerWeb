@@ -538,6 +538,13 @@
 			"shuffling": "일정을 섞는 중...",
 			"success": "일정이 섞였습니다!",
 			"error": "섞기 실패. 다시 시도해 주세요."
+		},
+		"revise": {
+			"tooltip": "일정 수정",
+			"ariaLabel": "일정 수정",
+			"revising": "일정을 수정하는 중...",
+			"success": "일정이 수정되었습니다!",
+			"error": "수정 실패. 다시 시도해 주세요."
 		}
 	},
 	"errors": {

@@ -894,6 +894,13 @@
 			"success": "Schedule shuffled!",
 			"error": "Shuffle failed. Please try again."
 		},
+		"revise": {
+			"tooltip": "Revise schedule",
+			"ariaLabel": "Revise schedule",
+			"revising": "Revising schedule...",
+			"success": "Schedule revised!",
+			"error": "Revise failed. Please try again."
+		},
 		"userMenu": {
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",

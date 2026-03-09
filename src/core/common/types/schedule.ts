@@ -300,3 +300,11 @@ export type ScheduleShuffleParams = ScheduleUpdateParams & {
 	TimeZoneOffset?: number;
 	IsTimeZoneAdjusted?: string;
 };
+
+/** Params for `POST /api/Schedule/Revise` */
+export type ScheduleReviseParams = ScheduleUpdateParams & {
+	MobileApp?: boolean;
+	SocketId?: boolean;
+	TimeZoneOffset?: number;
+	IsTimeZoneAdjusted?: string;
+};
