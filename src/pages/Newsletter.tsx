@@ -540,71 +540,116 @@ const SetupRowLabel = styled.span<{ $done?: boolean }>`
   line-height: 1;
 `;
 
-// ─── Styles — Set Up Tiler sub-item card ─────────────────────────────────────
+// ─── Styles — Set Up Tiler card grid ─────────────────────────────────────────
 
-const SetupStepCard = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  align-items: flex-start;
-  padding-bottom: 0.5rem;
+const SetupGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding: 1.5rem 0 0.5rem;
 
   @media (max-width: 640px) {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 `;
 
-const SetupStepMedia = styled.div`
-  flex: 0 0 55%;
-  border-radius: ${palette.borderRadius.medium};
-  overflow: hidden;
+const SetupCard = styled.div`
   background: ${palette.colors.gray[800]};
-  aspect-ratio: 16 / 9;
+  border-radius: ${palette.borderRadius.xLarge};
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SetupCardMedia = styled.div`
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: ${palette.colors.gray[900]};
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  @media (max-width: 640px) {
-    flex: unset;
+  img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 `;
 
-const SetupStepText = styled.div`
-  flex: 1;
+const SetupCardContent = styled.div`
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.75rem;
+  flex: 1;
 `;
 
-const SetupStepBadge = styled.span`
-  display: inline-block;
-  width: fit-content;
-  padding: 0.2rem 0.6rem;
-  background: ${palette.colors.brand[500]}15;
-  border: 1px solid ${palette.colors.brand[500]}35;
+const SetupCardStepBadge = styled.div`
+  width: 2rem;
+  height: 2rem;
   border-radius: 9999px;
-  color: ${palette.colors.brand[400]};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  font-weight: ${palette.typography.fontWeight.semibold};
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-`;
-
-const SetupStepTitle = styled.span`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.base};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[200]};
-  line-height: 1.3;
-`;
-
-const SetupStepBody = styled.div`
+  background: ${palette.colors.brand[500]};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.sm};
-  color: ${palette.colors.gray[500]};
+  font-weight: ${palette.typography.fontWeight.bold};
+  flex-shrink: 0;
+`;
+
+const SetupCardTitle = styled.h3`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.displayXs};
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[100]};
+  margin: 0;
+  line-height: 1.25;
+`;
+
+const SetupCardBody = styled.p`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[400]};
   line-height: 1.65;
+  margin: 0;
+`;
+
+const SetupCardCallout = styled.div`
+  background: ${palette.colors.gray[900]};
+  border-radius: ${palette.borderRadius.medium};
+  padding: 0.75rem 1rem;
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  color: ${palette.colors.gray[400]};
+  line-height: 1.55;
+`;
+
+const SetupCardCalloutLabel = styled.span`
+  font-weight: ${palette.typography.fontWeight.semibold};
+  color: ${palette.colors.gray[200]};
+`;
+
+const SetupCardCTA = styled.a`
+  display: inline-block;
+  width: fit-content;
+  margin-top: auto;
+  padding: 0.45rem 1rem;
+  border: 1px solid ${palette.colors.brand[500]}40;
+  border-radius: 9999px;
+  background: transparent;
+  color: ${palette.colors.brand[400]};
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.sm};
+  font-weight: ${palette.typography.fontWeight.medium};
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    background: ${palette.colors.brand[500]}15;
+  }
 `;
 
 // ─── Styles — Core Blocks Grid ───────────────────────────────────────────────
@@ -788,93 +833,7 @@ const Newsletter: React.FC = () => {
     },
   ];
 
-  // ── Set Up Tiler — 4 onboarding steps ───────────────────────────────────
-  const setUpSubItems = [
-    {
-      title: "Step 1 — Connect Your Calendar",
-      content: (
-        <SetupStepCard>
-          <SetupStepMedia>
-            <MediaImage src="/gifs/connect-a-calendar.gif" alt="Connect a Calendar" />
-          </SetupStepMedia>
-          <SetupStepText>
-            <SetupStepBadge>Step 1</SetupStepBadge>
-            <SetupStepTitle>Your calendar is the foundation.</SetupStepTitle>
-            <SetupStepBody>
-              Connect Google Calendar, Outlook, or Apple Calendar and Tiler immediately sees
-              every fixed commitment — meetings, appointments, events. These become immovable
-              Blocks in your timeline. Everything else gets scheduled around them, automatically.
-              No manual entry. Just link and go.
-            </SetupStepBody>
-          </SetupStepText>
-        </SetupStepCard>
-      ),
-    },
-    {
-      title: "Step 2 — Turn On Autopilot",
-      content: (
-        <SetupStepCard>
-          <SetupStepMedia>
-            <MediaImage src="/gifs/set-up-tiler.gif" alt="Turn On Autopilot" />
-          </SetupStepMedia>
-          <SetupStepText>
-            <SetupStepBadge>Step 2</SetupStepBadge>
-            <SetupStepTitle>The switch that makes Tiler intelligent.</SetupStepTitle>
-            <SetupStepBody>
-              Autopilot is what separates Tiler from a calendar. With it on, you stop
-              placing tasks manually — Tiler handles placement. Add something to your list,
-              give it a duration, and it lands in the best available slot, around your
-              calendar and everything else on your day. Every update triggers an instant
-              recalculation. Set it once. Let it run.
-            </SetupStepBody>
-          </SetupStepText>
-        </SetupStepCard>
-      ),
-    },
-    {
-      title: "Step 3 — Add Your First Tile",
-      content: (
-        <SetupStepCard>
-          <SetupStepMedia>
-            <MediaImage src="/gifs/creating-flexible-tiles.gif" alt="Add Your First Tile" />
-          </SetupStepMedia>
-          <SetupStepText>
-            <SetupStepBadge>Step 3</SetupStepBadge>
-            <SetupStepTitle>A task with intent, not a fixed time.</SetupStepTitle>
-            <SetupStepBody>
-              A Tile is anything you need to do — without locking it to a specific hour.
-              Name it, estimate the duration, add an optional deadline, and Tiler places it
-              in the right slot automatically. Tiles move when your day shifts, stack
-              intelligently around your blocks, and get re-sequenced when things change.
-              Start with one thing. Watch what happens.
-            </SetupStepBody>
-          </SetupStepText>
-        </SetupStepCard>
-      ),
-    },
-    {
-      title: "Step 4 — Let Adaptive Scheduling Run",
-      content: (
-        <SetupStepCard>
-          <SetupStepMedia>
-            <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
-          </SetupStepMedia>
-          <SetupStepText>
-            <SetupStepBadge>Step 4</SetupStepBadge>
-            <SetupStepTitle>Your schedule now runs itself.</SetupStepTitle>
-            <SetupStepBody>
-              With your calendar connected, Autopilot on, and your first tiles added —
-              Tiler&rsquo;s adaptive engine is live. When a meeting runs long, a task gets
-              deferred, or a new event lands in your day, Tiler detects the change and
-              rebuilds your schedule around it in seconds. You don&rsquo;t reorganise
-              anything. One shift ripples through automatically, keeping your day realistic
-              without any manual work from you.
-            </SetupStepBody>
-          </SetupStepText>
-        </SetupStepCard>
-      ),
-    },
-  ];
+  // ── Set Up Tiler — 4 onboarding steps (rendered inline as SetupGrid) ───────
 
   // ── How To Use Tiler — ordered subset of items ───────────────────────────
   const howToOrder = [
@@ -1033,9 +992,106 @@ const Newsletter: React.FC = () => {
 
               <ExpandableBody $open={setUpOpen}>
                 <ExpandableBodyInner>
-                  <SubCollapseWrapper>
-                    <Collapse items={setUpSubItems} />
-                  </SubCollapseWrapper>
+                  <SetupGrid>
+                    {/* Step 1 — Connect your calendar */}
+                    <SetupCard>
+                      <SetupCardMedia>
+                        <img src="/gifs/connect-a-calendar.gif" alt="Connect your calendar" />
+                      </SetupCardMedia>
+                      <SetupCardContent>
+                        <SetupCardStepBadge>1</SetupCardStepBadge>
+                        <SetupCardTitle>Connect your calendar</SetupCardTitle>
+                        <SetupCardBody>
+                          Connect Google Calendar, Outlook, or Apple Calendar and Tiler
+                          immediately sees every fixed commitment — meetings, appointments,
+                          events. These become immovable Blocks in your timeline. Everything
+                          else gets scheduled around them, automatically. No manual entry.
+                          Just link and go.
+                        </SetupCardBody>
+                        <SetupCardCallout>
+                          <SetupCardCalloutLabel>Privacy: </SetupCardCalloutLabel>
+                          Tiler reads your calendar to check availability. It only writes
+                          changes you explicitly approve. You can revoke access at any time.
+                        </SetupCardCallout>
+                        <SetupCardCTA href="#">Connect calendar →</SetupCardCTA>
+                      </SetupCardContent>
+                    </SetupCard>
+
+                    {/* Step 2 — Turn on Autopilot */}
+                    <SetupCard>
+                      <SetupCardMedia>
+                        <img src="/gifs/set-up-tiler.gif" alt="Turn on Autopilot" />
+                      </SetupCardMedia>
+                      <SetupCardContent>
+                        <SetupCardStepBadge>2</SetupCardStepBadge>
+                        <SetupCardTitle>Turn on Autopilot</SetupCardTitle>
+                        <SetupCardBody>
+                          Autopilot is what separates Tiler from a calendar. With it on, you
+                          stop placing tasks manually — Tiler handles placement. Add something
+                          to your list, give it a duration, and it lands in the best available
+                          slot, around your calendar and everything else on your day. Every
+                          update triggers an instant recalculation. Set it once. Let it run.
+                        </SetupCardBody>
+                        <SetupCardCallout>
+                          <SetupCardCalloutLabel>Tip: </SetupCardCalloutLabel>
+                          You can pause Autopilot at any time from Settings — your tiles stay
+                          in place, you just take manual control.
+                        </SetupCardCallout>
+                        <SetupCardCTA href="#">Go to settings →</SetupCardCTA>
+                      </SetupCardContent>
+                    </SetupCard>
+
+                    {/* Step 3 — Add your first tile */}
+                    <SetupCard>
+                      <SetupCardMedia>
+                        <img src="/gifs/creating-flexible-tiles.gif" alt="Add your first tile" />
+                      </SetupCardMedia>
+                      <SetupCardContent>
+                        <SetupCardStepBadge>3</SetupCardStepBadge>
+                        <SetupCardTitle>Add your first tile</SetupCardTitle>
+                        <SetupCardBody>
+                          A Tile is anything you need to do — without locking it to a specific
+                          hour. Name it, estimate the duration, add an optional deadline, and
+                          Tiler places it in the right slot automatically. Tiles move when your
+                          day shifts, stack intelligently around your blocks, and get
+                          re-sequenced when things change. Start with one thing. Watch what
+                          happens.
+                        </SetupCardBody>
+                        <SetupCardCallout>
+                          <SetupCardCalloutLabel>Tip: </SetupCardCalloutLabel>
+                          Try something simple first — &ldquo;Read for 30 minutes.&rdquo; Give
+                          it a deadline and watch Tiler find the perfect slot automatically.
+                        </SetupCardCallout>
+                        <SetupCardCTA href="#">Add a tile →</SetupCardCTA>
+                      </SetupCardContent>
+                    </SetupCard>
+
+                    {/* Step 4 — Let Adaptive Scheduling run */}
+                    <SetupCard>
+                      <SetupCardMedia>
+                        <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
+                      </SetupCardMedia>
+                      <SetupCardContent>
+                        <SetupCardStepBadge>4</SetupCardStepBadge>
+                        <SetupCardTitle>Let Adaptive Scheduling run</SetupCardTitle>
+                        <SetupCardBody>
+                          With your calendar connected, Autopilot on, and your first tiles
+                          added — Tiler&rsquo;s adaptive engine is live. When a meeting runs
+                          long, a task gets deferred, or a new event lands in your day, Tiler
+                          detects the change and rebuilds your schedule around it in seconds.
+                          You don&rsquo;t reorganise anything. One shift ripples through
+                          automatically, keeping your day realistic without any manual work
+                          from you.
+                        </SetupCardBody>
+                        <SetupCardCallout>
+                          <SetupCardCalloutLabel>Tip: </SetupCardCalloutLabel>
+                          When something shifts — a meeting moves, a task takes longer — Tiler
+                          rebuilds your day instantly. No manual fixes needed.
+                        </SetupCardCallout>
+                        <SetupCardCTA href="#">See how it works →</SetupCardCTA>
+                      </SetupCardContent>
+                    </SetupCard>
+                  </SetupGrid>
                 </ExpandableBodyInner>
               </ExpandableBody>
             </ExpandableSection>
