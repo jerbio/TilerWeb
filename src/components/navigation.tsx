@@ -172,7 +172,7 @@ const Navigation: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navLinks = [
     { name: t('common.navigation.home'), href: '/' },
-    { name: t('common.navigation.features'), href: '/features' },
+    { name: t('common.navigation.discover'), href: '/newsletter' },
   ];
 
   function handleScroll() {

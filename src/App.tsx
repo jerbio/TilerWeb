@@ -3,7 +3,6 @@ import './App.css';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
 import Layout from './pages/Layout';
-import Features from './pages/Features';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
@@ -66,7 +65,6 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
-                  <Route path="/features" element={<Features />} />
                 </Route>
                 <Route
                   path="/waitlist"
