@@ -59,6 +59,13 @@ export const darkTheme: AppTheme = {
       circle: palette.colors.gray[400],
       circleChecked: palette.colors.white,
     },
+		// Radio Colors
+		radio: {
+			border: palette.colors.gray[600],
+			borderChecked: palette.colors.brand[400],
+			bg: palette.colors.gray[800],
+			circle: palette.colors.brand[400],
+		},
 		// Date picker colors
 		datepicker: {
       bg: palette.colors.gray[900],

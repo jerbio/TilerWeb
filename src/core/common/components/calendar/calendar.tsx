@@ -8,7 +8,12 @@ import {
   CalendarBackgroundClickInfo,
   StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import {
+  ScheduleRepeatFrequency,
+  ScheduleRepeatType,
+  ScheduleRepeatWeekday,
+  ScheduleSubCalendarEvent,
+} from '@/core/common/types/schedule';
 import Loader from '../loader';
 import CalendarEvent from './calendar_event';
 import Tooltip from '../tooltip';
@@ -31,7 +36,6 @@ import CalendarCreateTile, { InitialCreateTileFormState } from './calendar_creat
 import { RGB, RGBColor } from '@/core/util/colors';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
-import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 
 import { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './calendar-ui.provider';
@@ -62,7 +66,7 @@ const Calendar = ({
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
   const theme = useTheme();
-	const { createTile } = useCalendarUI(state => state);
+  const { createTile } = useCalendarUI((state) => state);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -446,10 +450,13 @@ const Calendar = ({
     deadline: dayjs(),
     color: new RGBColor(tileColorOptions[0]),
     isRecurring: false,
-    recurrenceCount: 1,
-    recurrenceType: TILE_RECURRENCE_TYPE.DAILY,
+    recurrenceEndDate: dayjs().add(1, 'week'),
+    recurrenceType: ScheduleRepeatType.Daily,
+    recurrenceFrequency: ScheduleRepeatFrequency.Daily,
+    recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
+    hasRecurrenceEndDate: false,
+    timeRestrictionType: null,
     isTimeRestricted: false,
-    timeRestrictionType: TILE_TIME_RESTRICTION_TYPE.DAILY,
     timeRestrictionStart: '00:00',
     timeRestrictionEnd: '23:59',
     hasLocationNickname: false,
@@ -465,11 +472,25 @@ const Calendar = ({
     // CONTENT_CLICK_OUTSIDE
     if (!selectedEvent) {
       const { formData, setFormData } = createTileFormHandler;
+			// Set Create Tile Form Based on day clicked
+			const clickedDay = dayjs(info.day);
+			const clickedDayValue = clickedDay.day();
+			let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
+
+			if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
+			else if (clickedDayValue === 2) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Tuesday;
+			else if (clickedDayValue === 3) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Wednesday;
+			else if (clickedDayValue === 4) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Thursday;
+			else if (clickedDayValue === 5) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Friday;
+			else if (clickedDayValue === 6) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
+			else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
+
       setFormData({
         ...formData,
-        deadline: dayjs(info.day),
+        deadline: clickedDay,
+				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
       });
-			createTile.actions.open();
+      createTile.actions.open();
     } else {
       setSelectedEvent(null);
       setSelectedEventInfo(null);

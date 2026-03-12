@@ -16,7 +16,7 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
   value,
   onChange,
   placeholder,
-  ghostInput,
+  ghostInput = false,
 }) => {
   const handleChange = (date: Date | Date[] | null): void => {
     if (date && !Array.isArray(date)) {
