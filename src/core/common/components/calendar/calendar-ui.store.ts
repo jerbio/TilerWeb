@@ -84,6 +84,15 @@ export const createCalendarUIStore = (demoMode: boolean) =>
                   ...state.createTile.state,
                   isOpen: false,
                   isExpanded: false,
+                  loading: {
+                    isActive: false,
+                    tileName: undefined,
+                  },
+                  success: {
+                    isOpen: false,
+                    isNavigatingToTile: false,
+                    tile: undefined,
+                  },
                 },
               },
             }))

@@ -166,7 +166,7 @@ export enum ScheduleRepeatWeekday {
   Saturday = "6",
 }
 
-export type ScheduleRepeatWeeklyData = `${ScheduleRepeatWeekday}` | `${ScheduleRepeatWeekday},string`;
+export type ScheduleRepeatWeeklyData = string;
 
 
 export type ScheduleCreateEventParams = {
@@ -206,7 +206,7 @@ export type ScheduleCreateEventParams = {
   // Frontend/client convention: 0=daily, 1=weekly, 2=monthly, 3=yearly.
   RepeatType?: ScheduleRepeatType;
   // Weekly-only selection. Backend expects a comma-separated string of DayOfWeek ints.
-  // Example: "1,3,5," for Monday/Wednesday/Friday.
+  // Example: "1,3,5" for Monday/Wednesday/Friday.
   RepeatWeeklyData?: ScheduleRepeatWeeklyData;
   // Actual recurrence unit used by backend.
   RepeatFrequency?: ScheduleRepeatFrequency;

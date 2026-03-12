@@ -642,7 +642,6 @@ const Calendar = ({
             refetchEvents={refetchEvents}
             formHandler={createTileFormHandler}
             tileColorOptions={tileColorOptions}
-            onClose={createTileFormHandler.resetForm}
           />,
           createTileModalPortalTarget
         )}

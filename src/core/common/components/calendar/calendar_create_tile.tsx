@@ -57,14 +57,12 @@ export type InitialCreateTileFormState = {
 };
 
 type CalendarCreateTileProps = {
-  onClose: () => void;
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
   tileColorOptions: RGB[];
   refetchEvents: () => Promise<void>;
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
-  onClose,
   tileColorOptions,
   formHandler,
   refetchEvents,
@@ -222,6 +220,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                   <RecurrenceWeekdayOptions>
                     {recurrenceWeekdayOptions.map((option) => (
                       <RecurrenceWeekdayOption
+												type='button'
                         name={option.label}
                         title={option.label}
                         key={option.value}
@@ -326,9 +325,9 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
   ];
 
   function closeModal() {
+    resetForm();
     ui.actions.close();
     ui.actions.collapse();
-    onClose();
   }
 
   async function submitForm() {
@@ -357,16 +356,18 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       if (formData.isRecurring) {
         event.RepeatType = formData.recurrenceType;
         event.RepeatFrequency = formData.recurrenceFrequency;
-				event.RepeatStartDay = dayjs().format('DD');
-				event.RepeatStartMonth = dayjs().format('MM');
+        event.RepeatStartDay = dayjs().format('DD');
+        event.RepeatStartMonth = dayjs().format('MM');
         event.RepeatStartYear = dayjs().format('YYYY');
-        event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
-        event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
-        event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
         if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
           event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
             ','
           ) as ScheduleRepeatWeeklyData;
+        }
+        if (formData.hasRecurrenceEndDate) {
+          event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
+          event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
+          event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
         }
       }
 
@@ -448,7 +449,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <div className="title">
           <h2>{t('calendar.createTile.title')}</h2>
         </div>
-        <button onClick={closeModal}>
+        <button type='button' onClick={closeModal}>
           <X size={16} color={theme.colors.text.primary} />
         </button>
       </header>
@@ -584,6 +585,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       )}
       <ButtonContainer $isexpanded={ui.state.isExpanded}>
         <Button
+					type='button'
           variant={'ghost'}
           onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
         >
@@ -591,7 +593,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             ? t('calendar.createTile.buttons.collapse')
             : t('calendar.createTile.buttons.expand')}
         </Button>
-        <Button variant={'ghost'} onClick={resetForm}>
+        <Button type='button' variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
         <Button
