@@ -300,6 +300,44 @@ const chevronBounce = css`
   }
 `;
 
+// ─── Hero visual content animations ──────────────────────────────────────────
+
+const tileSlideIn = css`
+  @keyframes tileSlideIn {
+    0%   { opacity: 0; transform: translateX(12px); }
+    12%  { opacity: 1; transform: translateX(0); }
+    80%  { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(-12px); }
+  }
+`;
+
+const setupRowReveal = css`
+  @keyframes setupRowReveal {
+    0%   { opacity: 0; transform: translateY(6px); }
+    12%  { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(6px); }
+  }
+`;
+
+const stepGlow = css`
+  @keyframes stepGlow {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    20%      { transform: scale(1.18); filter: brightness(1.5); }
+    40%      { transform: scale(1); filter: brightness(1); }
+  }
+`;
+
+const iconPopIn = css`
+  @keyframes iconPopIn {
+    0%   { opacity: 0; transform: scale(0.4); }
+    12%  { opacity: 1; transform: scale(1.1); }
+    22%  { opacity: 1; transform: scale(1); }
+    80%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.4); }
+  }
+`;
+
 const Chevron = styled.span<{ $open: boolean }>`
   ${chevronBounce}
   display: flex;
@@ -364,6 +402,7 @@ const WhatIsTilerVisual = styled.div`
 `;
 
 const MockTile = styled.div<{ $color: keyof typeof mockTileColors }>`
+  ${tileSlideIn}
   border-radius: 4px;
   padding: 0.3rem 0.5rem;
   font-family: ${palette.typography.fontFamily.inter};
@@ -373,6 +412,11 @@ const MockTile = styled.div<{ $color: keyof typeof mockTileColors }>`
   display: flex;
   align-items: center;
   gap: 0.3rem;
+  animation: tileSlideIn 3.5s ease-in-out infinite;
+
+  &:nth-child(2) { animation-delay: 0.15s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.45s; }
 
   ${({ $color }) => css`
     background: ${mockTileColors[$color]}30;
@@ -419,6 +463,7 @@ const StepFlow = styled.div`
 `;
 
 const StepBubble = styled.div<{ $done?: boolean }>`
+  ${stepGlow}
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -432,6 +477,10 @@ const StepBubble = styled.div<{ $done?: boolean }>`
   justify-content: center;
   font-size: 13px;
   flex-shrink: 0;
+  animation: stepGlow 3s ease-in-out infinite;
+
+  &:nth-child(3) { animation-delay: 0.8s; }
+  &:nth-child(5) { animation-delay: 1.6s; }
 `;
 
 const StepLine = styled.div`
@@ -498,9 +547,15 @@ const setupPulse = css`
 `;
 
 const SetupRow = styled.div`
+  ${setupRowReveal}
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  animation: setupRowReveal 4s ease-in-out infinite;
+
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.4s; }
+  &:nth-child(4) { animation-delay: 0.6s; }
 `;
 
 const SetupDot = styled.div<{ $done?: boolean; $active?: boolean }>`
@@ -657,9 +712,17 @@ const FeaturesVisualRow = styled.div`
   display: flex;
   gap: 0.5rem;
   justify-content: center;
+
+  &:nth-child(2) > * { animation-delay: 0.3s; }
+  &:nth-child(2) > *:nth-child(2) { animation-delay: 0.4s; }
+  &:nth-child(2) > *:nth-child(3) { animation-delay: 0.5s; }
+  &:nth-child(3) > * { animation-delay: 0.6s; }
+  &:nth-child(3) > *:nth-child(2) { animation-delay: 0.7s; }
+  &:nth-child(3) > *:nth-child(3) { animation-delay: 0.8s; }
 `;
 
 const FeaturesVisualIcon = styled.div<{ $bg: string }>`
+  ${iconPopIn}
   width: 30px;
   height: 30px;
   border-radius: 7px;
@@ -669,6 +732,10 @@ const FeaturesVisualIcon = styled.div<{ $bg: string }>`
   justify-content: center;
   font-size: 14px;
   flex-shrink: 0;
+  animation: iconPopIn 4s ease-in-out infinite;
+
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.2s; }
 `;
 
 const FeaturesGrid = styled.div`
