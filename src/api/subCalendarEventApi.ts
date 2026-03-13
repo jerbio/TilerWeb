@@ -2,9 +2,11 @@ import { SubCalendarEventLookupResponse } from '../core/common/types/schedule';
 import { AppApi } from './appApi';
 
 export type UpdateSubCalendarEventPayload = {
-	id: string;
-	start?: number;
-	end?: number;
+	Id: string;
+	SubCalendarEventStart?: number;
+	SubCalendarEventEnd?: number;
+	CalendarEventEnd?: number;
+	TimeZone: string;
 };
 
 export class SubCalendarEventApi extends AppApi {
@@ -19,11 +21,11 @@ export class SubCalendarEventApi extends AppApi {
 
 	/**
 	 * Update a SubCalendarEvent's start and/or end time.
-	 * `POST /api/SubCalendarEvent/Update`
+	 * `POST /api/SubCalendarEvent`
 	 */
 	public updateSubCalendarEvent(payload: UpdateSubCalendarEventPayload) {
 		return this.apiRequest<SubCalendarEventLookupResponse>(
-			'api/SubCalendarEvent/Update',
+			'api/SubCalendarEvent',
 			{
 				method: 'POST',
 				body: JSON.stringify(payload),

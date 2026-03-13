@@ -119,11 +119,17 @@ class ScheduleService {
    * Update a SubCalendarEvent's start and/or end time.
    * Returns the updated SubCalendarEvent payload.
    */
-  async updateSubCalendarEvent(eventId: string, updates: { start?: number; end?: number }) {
+  async updateSubCalendarEvent(
+    eventId: string,
+    updates: { start?: number; end?: number; calendarEnd?: number }
+  ) {
     try {
       const response = await this.subCalendarEventApi.updateSubCalendarEvent({
-        id: eventId,
-        ...updates,
+        Id: eventId,
+        SubCalendarEventStart: updates.start,
+        SubCalendarEventEnd: updates.end,
+        CalendarEventEnd: updates.calendarEnd,
+        TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       return response.Content;
     } catch (error) {

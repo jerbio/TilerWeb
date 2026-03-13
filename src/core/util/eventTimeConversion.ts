@@ -1,10 +1,11 @@
 import dayjs from 'dayjs';
 
 /**
- * Converts YYYY-MM-DD date and "h:mm A" time to unix timestamp (milliseconds)
+ * Converts YYYY-MM-DD date and "h:mm A" time (in local timezone) to unix timestamp (milliseconds).
+ * The returned timestamp is UTC (as all unix timestamps are).
  * @param date - Date string in YYYY-MM-DD format
  * @param time - Time string in "h:mm A" format (e.g., "10:30 AM", "2:00 PM")
- * @returns Unix timestamp in milliseconds
+ * @returns Unix timestamp in milliseconds (UTC)
  */
 export function dateTimeToUnix(date: string, time: string): number {
 	const [timePart, period] = time.split(' ');
@@ -19,22 +20,23 @@ export function dateTimeToUnix(date: string, time: string): number {
 		hour = 0;
 	}
 
+	// dayjs interprets the date/time in local timezone and valueOf() returns UTC timestamp
 	return dayjs(date).hour(hour).minute(minute).second(0).millisecond(0).valueOf();
 }
 
 /**
- * Converts unix timestamp to YYYY-MM-DD format
+ * Converts unix timestamp to YYYY-MM-DD format in local timezone
  * @param timestamp - Unix timestamp in milliseconds
- * @returns Date string in YYYY-MM-DD format
+ * @returns Date string in YYYY-MM-DD format (local timezone)
  */
 export function unixToDateString(timestamp: number): string {
 	return dayjs(timestamp).format('YYYY-MM-DD');
 }
 
 /**
- * Converts unix timestamp to "h:mm A" format (matching TimeDropdown format)
+ * Converts unix timestamp to "h:mm A" format in local timezone (matching TimeDropdown format)
  * @param timestamp - Unix timestamp in milliseconds
- * @returns Time string in "h:mm A" format (e.g., "10:30 AM")
+ * @returns Time string in "h:mm A" format (e.g., "10:30 AM") in local timezone
  */
 export function unixToTimeString(timestamp: number): string {
 	return dayjs(timestamp).format('h:mm A');

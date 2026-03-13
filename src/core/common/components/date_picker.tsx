@@ -8,34 +8,41 @@ type CustomDatePickerProps = {
 	value: string; // YYYY-MM-DD format
 	onChange: (date: string) => void;
 	placeholder?: string;
+	ghostInput?: boolean;
 };
 
-const DatePicker: React.FC<CustomDatePickerProps> = ({ label, value, onChange, placeholder }) => {
+const DatePicker: React.FC<CustomDatePickerProps> = ({
+	label,
+	value,
+	onChange,
+	placeholder,
+	ghostInput = false,
+}) => {
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
-			// Use UTC methods to avoid timezone offset issues
-			const year = date.getUTCFullYear();
-			const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-			const day = String(date.getUTCDate()).padStart(2, '0');
+			// Use local methods for consistency with display
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
 			onChange(`${year}-${month}-${day}`);
 		} else {
 			onChange('');
 		}
 	};
 
-	// Parse YYYY-MM-DD as UTC to avoid timezone shifts
+	// Parse YYYY-MM-DD as local date
 	const selectedDate = value
-		? new Date(Date.UTC(
+		? new Date(
 				parseInt(value.split('-')[0]),
 				parseInt(value.split('-')[1]) - 1,
 				parseInt(value.split('-')[2])
-			))
+			)
 		: null;
 
 	return (
 		<Container>
 			{label && <Label>{label}</Label>}
-			<DatePickerWrapper>
+			<DatePickerWrapper $ghostInput={ghostInput}>
 				<ReactDatePicker
 					selected={selectedDate}
 					onChange={handleChange}
@@ -61,18 +68,17 @@ const Label = styled.label`
 	color: ${(props) => props.theme.colors.gray[400]};
 `;
 
-const DatePickerWrapper = styled.div`
+const DatePickerWrapper = styled.div<{ $ghostInput: boolean }>`
 	/* Style the input inside the date picker */
 	.react-datepicker-wrapper {
 		width: 100%;
 	}
 
 	.react-datepicker__input-container input {
-		/* Match Input component styling */
-		background-color: ${(props) => props.theme.colors.gray[900]};
-		border: 1px solid ${(props) => props.theme.colors.gray[800]};
+		background-color: ${(props) => props.theme.colors.input.bg};
+		border: 1px solid ${(props) => props.theme.colors.input.border};
 		border-radius: ${(props) => props.theme.borderRadius.little};
-		color: ${(props) => props.theme.colors.white};
+		color: ${(props) => props.theme.colors.input.text};
 		font-size: ${(props) => props.theme.typography.fontSize.sm};
 		font-weight: ${(props) => props.theme.typography.fontWeight.normal};
 		padding: 0 ${(props) => props.theme.space.medium};
@@ -82,11 +88,11 @@ const DatePickerWrapper = styled.div`
 		transition: border-color 0.2s ease-in-out;
 
 		&::placeholder {
-			color: ${(props) => props.theme.colors.gray[500]};
+			color: ${(props) => props.theme.colors.input.placeholder};
 		}
 
 		&:hover {
-			border-color: ${(props) => props.theme.colors.gray[700]};
+			border-color: ${(props) => props.theme.colors.input.borderHover};
 		}
 
 		&:focus {
@@ -94,9 +100,16 @@ const DatePickerWrapper = styled.div`
 			border-color: ${(props) => props.theme.colors.brand[500]};
 			box-shadow: 0 0 0 4px ${(props) => props.theme.colors.brand[400]}33;
 		}
+
+		${(props) =>
+			props.$ghostInput &&
+			`
+			opacity: 0;
+			position: relative;
+			z-index: 2;
+		`}
 	}
 
-	/* Dark theme for calendar dropdown */
 	.react-datepicker-popper {
 		z-index: 9999;
 	}
@@ -106,7 +119,7 @@ const DatePickerWrapper = styled.div`
 		border: 1px solid ${(props) => props.theme.colors.border.default};
 		border-radius: ${(props) => props.theme.borderRadius.medium};
 		font-family: ${(props) => props.theme.typography.fontFamily.inter};
-		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
 	}
 
 	.react-datepicker__header {
@@ -115,14 +128,10 @@ const DatePickerWrapper = styled.div`
 		border-radius: ${(props) => props.theme.borderRadius.medium}
 			${(props) => props.theme.borderRadius.medium} 0 0;
 		padding-top: 12px;
-
-		& > h2 {
-			color: ${(props) => props.theme.colors.datepicker.headerText};
-		}
 	}
 
 	.react-datepicker__current-month {
-		color: ${(props) => props.theme.colors.white};
+		color: ${(props) => props.theme.colors.datepicker.headerText};
 		font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 		font-size: ${(props) => props.theme.typography.fontSize.sm};
 		margin-bottom: 8px;

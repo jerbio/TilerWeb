@@ -36,6 +36,7 @@ import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/ca
 import { CalendarViewOptions } from './calendar.types';
 export type { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './CalendarUIProvider.tsx';
+import { scheduleService } from '@/services';
 
 type CalendarProps = {
   events: Array<ScheduleSubCalendarEvent>;
@@ -294,7 +295,11 @@ const Calendar = ({
     setHasAutoScrolled(false);
   }, [viewOptions.startDay]);
 
-	const handleEventUpdate = async (updates: { start: number; end: number }) => {
+	const handleEventUpdate = async (updates: {
+    start?: number;
+    end?: number;
+    calendarEnd?: number;
+  }) => {
 		if (!selectedEventInfo) return;
 
 		try {
@@ -305,8 +310,11 @@ const Calendar = ({
 				prev
 					? {
 							...prev,
-							start: updates.start,
-							end: updates.end,
+              ...(updates.start !== undefined ? { start: updates.start } : {}),
+              ...(updates.end !== undefined ? { end: updates.end } : {}),
+              ...(updates.calendarEnd !== undefined
+                ? { calendarEventEnd: updates.calendarEnd }
+                : {}),
 						}
 					: null
 			);

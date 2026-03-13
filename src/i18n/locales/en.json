@@ -176,6 +176,7 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
+			"deadlineLabel": "Deadline:",
 			"locationLabel": "View directions on map",
 			"secondaryActionsLabel": "Secondary Tile Actions:",
 			"secondaryActions": {
