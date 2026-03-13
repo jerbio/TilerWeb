@@ -540,84 +540,134 @@ const SetupRowLabel = styled.span<{ $done?: boolean }>`
   line-height: 1;
 `;
 
-// ─── Styles — Set Up Tiler card grid ─────────────────────────────────────────
+// ─── Styles — Set Up Tiler step list (Google Maps navigation style) ──────────
 
-const SetupGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+const StepList = styled.div`
+  display: flex;
+  flex-direction: column;
   padding: 1.25rem 0 0.5rem;
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
-const SetupCard = styled.div`
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.xLarge};
-  overflow: hidden;
+const StepRowWrapper = styled.div`
+  display: flex;
+  align-items: stretch;
+`;
+
+const StepConnectorColumn = styled.div`
   display: flex;
   flex-direction: column;
-  transition: border-color 0.3s, transform 0.3s;
-
-  &:hover {
-    border-color: ${palette.colors.brand[500]}40;
-    transform: translateY(-3px);
-  }
-`;
-
-// ── Animation area (220px, dark bg, clipped) ─────────────────────────────────
-const SetupAnim = styled.div`
-  height: 170px;
-  background: ${palette.colors.gray[900]};
-  border-bottom: 1px solid ${palette.colors.gray[700]};
-  position: relative;
-  overflow: hidden;
-  display: flex;
   align-items: center;
-  justify-content: center;
-`;
-
-// ── Minimal body: step badge + title only ─────────────────────────────────────
-const SetupBody = styled.div`
-  padding: 14px 18px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const SetupCardStepBadge = styled.div`
-  width: 1.875rem;
-  height: 1.875rem;
-  border-radius: 9999px;
-  background: ${palette.colors.brand[500]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.bold};
+  width: 40px;
   flex-shrink: 0;
 `;
 
-const SetupCardTitle = styled.h3`
+const StepIcon = styled.div<{ $color: string }>`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: ${({ $color }) => `${$color}18`};
+  border: 1.5px solid ${({ $color }) => `${$color}50`};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+`;
+
+const StepConnectorLine = styled.div`
+  flex: 1;
+  width: 2px;
+  background: ${palette.colors.gray[700]};
+  min-height: 12px;
+`;
+
+const StepContent = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0 20px 12px;
+  border-bottom: 1px solid ${palette.colors.gray[800]};
+  min-height: 80px;
+
+  ${StepRowWrapper}:last-child & {
+    border-bottom: none;
+    padding-bottom: 12px;
+  }
+`;
+
+const StepTextBlock = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+`;
+
+const StepTitle = styled.h3`
   font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xl};
+  font-size: ${palette.typography.fontSize.base};
   font-weight: ${palette.typography.fontWeight.semibold};
   color: ${palette.colors.gray[100]};
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.3;
 `;
 
-const SetupCardSubtext = styled.p`
+const StepSubtext = styled.p`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.sm};
   color: ${palette.colors.gray[500]};
-  line-height: 1.5;
+  line-height: 1.4;
   margin: 0;
+`;
+
+const StepMetric = styled.span`
+  font-family: ${palette.typography.fontFamily.inter};
+  font-size: ${palette.typography.fontSize.xs};
+  color: ${palette.colors.gray[600]};
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: ${palette.colors.gray[700]};
+  }
+`;
+
+const StepThumb = styled.div`
+  width: 100px;
+  height: 70px;
+  border-radius: ${palette.borderRadius.medium};
+  background: ${palette.colors.gray[900]};
+  border: 1px solid ${palette.colors.gray[700]};
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  pointer-events: none;
+
+  > * {
+    transform: scale(0.55);
+    transform-origin: center center;
+  }
+
+  @media (max-width: 640px) {
+    width: 80px;
+    height: 60px;
+
+    > * {
+      transform: scale(0.45);
+    }
+  }
 `;
 
 const SetupSupportNote = styled.p`
@@ -1242,151 +1292,161 @@ const Newsletter: React.FC = () => {
 
               <ExpandableBody $open={setUpOpen}>
                 <ExpandableBodyInner>
-                  <SetupGrid>
+                  <StepList>
+                    {/* ── Step 1: Create your account ── */}
+                    <StepRowWrapper>
+                      <StepConnectorColumn>
+                        <StepIcon $color={palette.colors.brand[500]}>👤</StepIcon>
+                        <StepConnectorLine />
+                      </StepConnectorColumn>
+                      <StepContent>
+                        <StepTextBlock>
+                          <StepTitle>Create your account</StepTitle>
+                          <StepSubtext>Sign up with your email — free to start, no credit card needed.</StepSubtext>
+                          <StepMetric>~30 seconds</StepMetric>
+                        </StepTextBlock>
+                        <StepThumb>
+                          <SaSignupScene>
+                            <SaSignupInput>gloria@example.com</SaSignupInput>
+                            <SaSignupBtn $phase={signupPhase}>
+                              {signupPhase === 'idle'
+                                ? 'Create free account'
+                                : signupPhase === 'creating'
+                                ? 'Creating account…'
+                                : '✓ Account created!'}
+                            </SaSignupBtn>
+                          </SaSignupScene>
+                        </StepThumb>
+                      </StepContent>
+                    </StepRowWrapper>
 
-                    {/* ── Card 1: Create your account (JS animation) ── */}
-                    <SetupCard>
-                      <SetupAnim>
-                        <SaSignupScene>
-                          <SaSignupInput>gloria@example.com</SaSignupInput>
-                          <SaSignupBtn $phase={signupPhase}>
-                            {signupPhase === 'idle'
-                              ? 'Create free account'
-                              : signupPhase === 'creating'
-                              ? 'Creating account…'
-                              : '✓ Account created!'}
-                          </SaSignupBtn>
-                        </SaSignupScene>
-                      </SetupAnim>
-                      <SetupBody>
-                        <SetupCardStepBadge>1</SetupCardStepBadge>
-                        <SetupCardTitle>Create your account</SetupCardTitle>
-                        <SetupCardSubtext>
-                          Sign up with your email — free to start, no credit card needed.
-                        </SetupCardSubtext>
-                      </SetupBody>
-                    </SetupCard>
+                    {/* ── Step 2: Connect your calendar ── */}
+                    <StepRowWrapper>
+                      <StepConnectorColumn>
+                        <StepIcon $color="#14b8a6">📅</StepIcon>
+                        <StepConnectorLine />
+                      </StepConnectorColumn>
+                      <StepContent>
+                        <StepTextBlock>
+                          <StepTitle>Connect your calendar</StepTitle>
+                          <StepSubtext>Link Google or Outlook — Tiler reads your events and builds around them.</StepSubtext>
+                          <StepMetric>One tap</StepMetric>
+                        </StepTextBlock>
+                        <StepThumb>
+                          <SaCalRow>
+                            <SaCalIcon $connected={calStatus !== 'idle'}>
+                              <SaCalIconTop />
+                              <SaCalIconDate>17</SaCalIconDate>
+                            </SaCalIcon>
+                            <SaCalInfo>
+                              <SaCalName>Google Calendar</SaCalName>
+                              <SaCalStatus $ok={calStatus !== 'idle'}>
+                                {calStatus === 'idle'
+                                  ? 'Tap to connect'
+                                  : calStatus === 'connecting'
+                                  ? 'Connecting…'
+                                  : '✓ Connected'}
+                              </SaCalStatus>
+                            </SaCalInfo>
+                            <SaCalCheck $show={calStatus === 'connected'}>✓</SaCalCheck>
+                          </SaCalRow>
+                        </StepThumb>
+                      </StepContent>
+                    </StepRowWrapper>
 
-                    {/* ── Card 2: Connect your calendar (JS animation) ── */}
-                    <SetupCard>
-                      <SetupAnim>
-                        <SaCalRow>
-                          <SaCalIcon $connected={calStatus !== 'idle'}>
-                            <SaCalIconTop />
-                            <SaCalIconDate>17</SaCalIconDate>
-                          </SaCalIcon>
-                          <SaCalInfo>
-                            <SaCalName>Google Calendar</SaCalName>
-                            <SaCalStatus $ok={calStatus !== 'idle'}>
-                              {calStatus === 'idle'
-                                ? 'Tap to connect'
-                                : calStatus === 'connecting'
-                                ? 'Connecting…'
-                                : '✓ Connected'}
-                            </SaCalStatus>
-                          </SaCalInfo>
-                          <SaCalCheck $show={calStatus === 'connected'}>✓</SaCalCheck>
-                        </SaCalRow>
-                      </SetupAnim>
-                      <SetupBody>
-                        <SetupCardStepBadge>2</SetupCardStepBadge>
-                        <SetupCardTitle>Connect your calendar</SetupCardTitle>
-                        <SetupCardSubtext>
-                          Link Google or Outlook — Tiler reads your events and builds around them.
-                        </SetupCardSubtext>
-                      </SetupBody>
-                    </SetupCard>
+                    {/* ── Step 3: Set up your preferences ── */}
+                    <StepRowWrapper>
+                      <StepConnectorColumn>
+                        <StepIcon $color="#f59e0b">⚙️</StepIcon>
+                        <StepConnectorLine />
+                      </StepConnectorColumn>
+                      <StepContent>
+                        <StepTextBlock>
+                          <StepTitle>Set up your preferences</StepTitle>
+                          <StepSubtext>Choose your transit mode and set time limits in your profile.</StepSubtext>
+                          <StepMetric>~2 minutes</StepMetric>
+                        </StepTextBlock>
+                        <StepThumb>
+                          <SaPrefsScene>
+                            <SaPrefRow>
+                              <SaPrefLabel>Transit mode</SaPrefLabel>
+                              <SaTransitRow>
+                                <SaTransitOption $active={transitMode === 'drive'}>
+                                  🚗 Drive
+                                </SaTransitOption>
+                                <SaTransitOption $active={transitMode === 'transit'}>
+                                  🚌 Transit
+                                </SaTransitOption>
+                                <SaTransitOption $active={transitMode === 'walk'}>
+                                  🚶 Walk
+                                </SaTransitOption>
+                              </SaTransitRow>
+                            </SaPrefRow>
+                            <SaPrefRow>
+                              <SaPrefLabel>Work hours</SaPrefLabel>
+                              <SaTimeRange>
+                                <span>9:00 am</span>
+                                <span>→</span>
+                                <span>6:00 pm</span>
+                              </SaTimeRange>
+                            </SaPrefRow>
+                          </SaPrefsScene>
+                        </StepThumb>
+                      </StepContent>
+                    </StepRowWrapper>
 
-                    {/* ── Card 3: Set up your preferences (JS animation) ── */}
-                    <SetupCard>
-                      <SetupAnim>
-                        <SaPrefsScene>
-                          <SaPrefRow>
-                            <SaPrefLabel>Transit mode</SaPrefLabel>
-                            <SaTransitRow>
-                              <SaTransitOption $active={transitMode === 'drive'}>
-                                🚗 Drive
-                              </SaTransitOption>
-                              <SaTransitOption $active={transitMode === 'transit'}>
-                                🚌 Transit
-                              </SaTransitOption>
-                              <SaTransitOption $active={transitMode === 'walk'}>
-                                🚶 Walk
-                              </SaTransitOption>
-                            </SaTransitRow>
-                          </SaPrefRow>
-                          <SaPrefRow>
-                            <SaPrefLabel>Work hours</SaPrefLabel>
-                            <SaTimeRange>
-                              <span>9:00 am</span>
-                              <span>→</span>
-                              <span>6:00 pm</span>
-                            </SaTimeRange>
-                          </SaPrefRow>
-                        </SaPrefsScene>
-                      </SetupAnim>
-                      <SetupBody>
-                        <SetupCardStepBadge>3</SetupCardStepBadge>
-                        <SetupCardTitle>Set up your preferences</SetupCardTitle>
-                        <SetupCardSubtext>
-                          Choose your transit mode and set time limits in your profile.
-                        </SetupCardSubtext>
-                      </SetupBody>
-                    </SetupCard>
-
-                    {/* ── Card 4: Ready for Adaptive Scheduling (JS animation) ── */}
-                    <SetupCard>
-                      <SetupAnim>
-                        <SaSchedScene>
-                          <SaSchedTimeLabel>Your schedule</SaSchedTimeLabel>
-                          <SaSchedRow>
-                            <SaSchedBlock
-                              $bg={palette.colors.gray[700]}
-                              $width="88px"
-                            >
-                              9am meeting
-                            </SaSchedBlock>
-                            <SaSchedBlock
-                              $bg={`${palette.colors.brand[500]}90`}
-                              $shifted={schedPhase === 'settled'}
-                            >
-                              Run · 30m
-                            </SaSchedBlock>
-                          </SaSchedRow>
-                          <SaSchedRow>
-                            <SaSchedBlock
-                              $bg={palette.colors.gray[700]}
-                              $width="88px"
-                              $visible={schedPhase !== 'normal'}
-                            >
-                              New: 10am
-                            </SaSchedBlock>
-                            <SaSchedBlock
-                              $bg={`${palette.colors.gray[600]}`}
-                              $visible={schedPhase !== 'normal'}
-                            >
-                              Urgent call
-                            </SaSchedBlock>
-                          </SaSchedRow>
-                          <SaSchedStatus $phase={schedPhase}>
-                            {schedPhase === 'disrupted'
-                              ? 'Recalculating…'
-                              : schedPhase === 'settled'
-                              ? '✓ Schedule rebuilt'
-                              : ''}
-                          </SaSchedStatus>
-                        </SaSchedScene>
-                      </SetupAnim>
-                      <SetupBody>
-                        <SetupCardStepBadge>4</SetupCardStepBadge>
-                        <SetupCardTitle>Ready for Adaptive Scheduling</SetupCardTitle>
-                        <SetupCardSubtext>
-                          Your schedule is live — Tiler adapts automatically as your day changes.
-                        </SetupCardSubtext>
-                      </SetupBody>
-                    </SetupCard>
-
-                  </SetupGrid>
+                    {/* ── Step 4: Ready for Adaptive Scheduling ── */}
+                    <StepRowWrapper>
+                      <StepConnectorColumn>
+                        <StepIcon $color="#12B76A">⚡</StepIcon>
+                      </StepConnectorColumn>
+                      <StepContent>
+                        <StepTextBlock>
+                          <StepTitle>Ready for Adaptive Scheduling</StepTitle>
+                          <StepSubtext>Your schedule is live — Tiler adapts automatically as your day changes.</StepSubtext>
+                          <StepMetric>Automatic</StepMetric>
+                        </StepTextBlock>
+                        <StepThumb>
+                          <SaSchedScene>
+                            <SaSchedTimeLabel>Your schedule</SaSchedTimeLabel>
+                            <SaSchedRow>
+                              <SaSchedBlock $bg={palette.colors.gray[700]} $width="88px">
+                                9am meeting
+                              </SaSchedBlock>
+                              <SaSchedBlock
+                                $bg={`${palette.colors.brand[500]}90`}
+                                $shifted={schedPhase === 'settled'}
+                              >
+                                Run · 30m
+                              </SaSchedBlock>
+                            </SaSchedRow>
+                            <SaSchedRow>
+                              <SaSchedBlock
+                                $bg={palette.colors.gray[700]}
+                                $width="88px"
+                                $visible={schedPhase !== 'normal'}
+                              >
+                                New: 10am
+                              </SaSchedBlock>
+                              <SaSchedBlock
+                                $bg={`${palette.colors.gray[600]}`}
+                                $visible={schedPhase !== 'normal'}
+                              >
+                                Urgent call
+                              </SaSchedBlock>
+                            </SaSchedRow>
+                            <SaSchedStatus $phase={schedPhase}>
+                              {schedPhase === 'disrupted'
+                                ? 'Recalculating…'
+                                : schedPhase === 'settled'
+                                ? '✓ Schedule rebuilt'
+                                : ''}
+                            </SaSchedStatus>
+                          </SaSchedScene>
+                        </StepThumb>
+                      </StepContent>
+                    </StepRowWrapper>
+                  </StepList>
 
                   <SetupSupportNote>
                     Each step is an input to Tiler&rsquo;s scheduling engine — your
