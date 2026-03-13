@@ -63,25 +63,25 @@ const coreBlocks = [
     emoji: "\uD83E\uDDE9",
     label: "AutoTile",
     title: "Tiles",
-    desc: "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently.",
+    desc: "Flexible tasks that live in your calendar and work around your existing events until they find a time that fits. If something shifts, they move with it \u2014 so things like gym, errands, or deep work always land somewhere in your day.",
   },
   {
     emoji: "\uD83D\uDCCC",
     label: "Locked",
     title: "Blocks",
-    desc: "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them.",
+    desc: "Fixed events that stay exactly where you place them \u2014 meetings, flights, doctor visits. Tiler sees these as hard boundaries and builds the rest of your schedule around them, so nothing ever double-books.",
   },
   {
     emoji: "\uD83D\uDDFA\uFE0F",
     label: "Location-aware",
     title: "Route",
-    desc: "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop.",
+    desc: "Tiler maps your entire day from task to task using real-time location, city transit, and driving estimates. It adds travel buffers between stops automatically, so you know exactly when to leave and which route to take.",
   },
   {
     emoji: "\uD83D\uDC65",
     label: "Team & Family",
     title: "TileShare",
-    desc: "Assign tiles to teammates or family. Everyone's calendar adapts around shared commitments automatically. Context travels with the task.",
+    desc: "Send a task to a teammate, partner, or family member and it lands directly in their calendar. Both schedules adjust around it automatically \u2014 no group chat needed, no manual coordination.",
   },
 ];
 
