@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import palette from '@/core/theme/palette';
 import SEO from '@/core/common/components/SEO';
@@ -557,7 +557,7 @@ const StepConnectorColumn = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 40px;
+  width: 56px;
   flex-shrink: 0;
 `;
 
@@ -642,34 +642,6 @@ const StepMetric = styled.span`
   }
 `;
 
-const StepThumb = styled.div`
-  width: 100px;
-  height: 70px;
-  border-radius: ${palette.borderRadius.medium};
-  background: ${palette.colors.gray[900]};
-  border: 1px solid ${palette.colors.gray[700]};
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  pointer-events: none;
-
-  > * {
-    transform: scale(0.55);
-    transform-origin: center center;
-  }
-
-  @media (max-width: 640px) {
-    width: 80px;
-    height: 60px;
-
-    > * {
-      transform: scale(0.45);
-    }
-  }
-`;
-
 const SetupSupportNote = styled.p`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.sm};
@@ -680,226 +652,6 @@ const SetupSupportNote = styled.p`
   padding: 4px 0 8px 18px;
   border-left: 2px solid ${palette.colors.brand[500]}44;
   text-align: left;
-`;
-
-// ── Card 1: Sign up (JS-animated) ─────────────────────────────────────────────
-const SaCalRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 78%;
-`;
-
-const SaCalIcon = styled.div<{ $connected: boolean }>`
-  width: 48px;
-  height: 48px;
-  border-radius: ${palette.borderRadius.medium};
-  border: 2px solid ${({ $connected }) => $connected ? '#12B76A' : palette.colors.gray[700]};
-  background: ${palette.colors.gray[800]};
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-  transition: border-color 0.4s;
-`;
-
-const SaCalIconTop = styled.div`
-  background: ${palette.colors.brand[500]};
-  height: 12px;
-  width: 100%;
-  flex-shrink: 0;
-`;
-
-const SaCalIconDate = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 17px;
-  font-weight: ${palette.typography.fontWeight.bold};
-  color: ${palette.colors.gray[100]};
-  line-height: 1;
-`;
-
-const SaCalInfo = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const SaCalName = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[100]};
-`;
-
-const SaCalStatus = styled.div<{ $ok: boolean }>`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  color: ${({ $ok }) => $ok ? '#12B76A' : palette.colors.gray[500]};
-  transition: color 0.4s;
-`;
-
-const SaCalCheck = styled.div<{ $show: boolean }>`
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #12B76A;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: #fff;
-  flex-shrink: 0;
-  opacity: ${({ $show }) => $show ? 1 : 0};
-  transition: opacity 0.4s;
-`;
-
-// ── Card 1: Sign-up form (JS-animated) ────────────────────────────────────────
-const SaSignupScene = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 78%;
-`;
-
-const SaSignupInput = styled.div`
-  padding: 9px 12px;
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.medium};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  color: ${palette.colors.gray[400]};
-`;
-
-const SaSignupBtn = styled.div<{ $phase: 'idle' | 'creating' | 'done' }>`
-  padding: 9px 12px;
-  border-radius: ${palette.borderRadius.medium};
-  text-align: center;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: #fff;
-  background: ${({ $phase }) =>
-    $phase === 'done' ? '#12B76A' :
-    $phase === 'creating' ? palette.colors.gray[600] :
-    palette.colors.brand[500]};
-  transition: background 0.35s;
-`;
-
-// ── Card 3: Preferences (JS-animated) ────────────────────────────────────────
-const SaPrefsScene = styled.div`
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const SaPrefRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const SaPrefLabel = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  color: ${palette.colors.gray[600]};
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-`;
-
-const SaTransitRow = styled.div`
-  display: flex;
-  gap: 6px;
-`;
-
-const SaTransitOption = styled.div<{ $active: boolean }>`
-  flex: 1;
-  padding: 6px 4px;
-  border-radius: ${palette.borderRadius.medium};
-  border: 1px solid ${({ $active }) => $active ? `${palette.colors.brand[500]}40` : palette.colors.gray[700]};
-  background: ${({ $active }) => $active ? `${palette.colors.brand[500]}15` : palette.colors.gray[800]};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  text-align: center;
-  color: ${({ $active }) => $active ? palette.colors.brand[400] : palette.colors.gray[500]};
-  transition: all 0.4s;
-`;
-
-const SaTimeRange = styled.div`
-  padding: 7px 10px;
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.medium};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  color: ${palette.colors.gray[400]};
-  display: flex;
-  justify-content: space-between;
-`;
-
-// ── Card 4: Adaptive scheduling (JS-animated) ────────────────────────────────
-const SaSchedScene = styled.div`
-  width: 88%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const SaSchedTimeLabel = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 9px;
-  color: ${palette.colors.gray[600]};
-  margin-bottom: 1px;
-`;
-
-const SaSchedRow = styled.div`
-  display: flex;
-  gap: 5px;
-  align-items: center;
-`;
-
-const SaSchedBlock = styled.div<{
-  $bg: string;
-  $width?: string;
-  $shifted?: boolean;
-  $visible?: boolean;
-}>`
-  height: 28px;
-  border-radius: ${palette.borderRadius.little};
-  background: ${({ $bg }) => $bg};
-  width: ${({ $width }) => $width || 'auto'};
-  flex: ${({ $width }) => $width ? '0 0 auto' : '1'};
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 9px;
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: rgba(255, 255, 255, 0.75);
-  transform: translateX(${({ $shifted }) => $shifted ? '46px' : '0'});
-  opacity: ${({ $visible }) => $visible === false ? 0 : 1};
-  transition: transform 0.65s ease, opacity 0.45s ease;
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-const SaSchedStatus = styled.div<{ $phase: string }>`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${({ $phase }) =>
-    $phase === 'settled' ? '#12B76A' :
-    $phase === 'disrupted' ? palette.colors.brand[400] :
-    'transparent'};
-  margin-top: 3px;
-  transition: color 0.35s;
-  min-height: 15px;
 `;
 
 // ─── Styles — Core Blocks Grid ───────────────────────────────────────────────
@@ -1034,55 +786,6 @@ const Newsletter: React.FC = () => {
   const [whatIsOpen, setWhatIsOpen] = useState(false);
   const [setUpOpen, setSetUpOpen] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
-
-  // ── Set Up Tiler animation state ──────────────────────────────────────────
-  const [signupPhase, setSignupPhase] = useState<'idle' | 'creating' | 'done'>('idle');
-  const [calStatus, setCalStatus] = useState<'idle' | 'connecting' | 'connected'>('idle');
-  const [transitMode, setTransitMode] = useState<'drive' | 'transit' | 'walk'>('drive');
-  const [schedPhase, setSchedPhase] = useState<'normal' | 'disrupted' | 'settled'>('normal');
-
-  useEffect(() => {
-    if (!setUpOpen) return;
-    const t: ReturnType<typeof setTimeout>[] = [];
-
-    // Card 1: account creation button states (6s loop)
-    const signupCycle = () => {
-      setSignupPhase('idle');
-      t.push(setTimeout(() => setSignupPhase('creating'), 2000));
-      t.push(setTimeout(() => setSignupPhase('done'), 3200));
-      t.push(setTimeout(signupCycle, 6000));
-    };
-    signupCycle();
-
-    // Card 2: calendar connect sequence (6.5s loop)
-    const calCycle = () => {
-      setCalStatus('idle');
-      t.push(setTimeout(() => setCalStatus('connecting'), 2000));
-      t.push(setTimeout(() => setCalStatus('connected'), 3200));
-      t.push(setTimeout(calCycle, 6500));
-    };
-    calCycle();
-
-    // Card 3: transit mode cycling (6s loop)
-    const transitCycle = () => {
-      setTransitMode('drive');
-      t.push(setTimeout(() => setTransitMode('transit'), 2000));
-      t.push(setTimeout(() => setTransitMode('walk'), 3800));
-      t.push(setTimeout(transitCycle, 6000));
-    };
-    transitCycle();
-
-    // Card 4: adaptive schedule rearrange (7s loop)
-    const schedCycle = () => {
-      setSchedPhase('normal');
-      t.push(setTimeout(() => setSchedPhase('disrupted'), 2000));
-      t.push(setTimeout(() => setSchedPhase('settled'), 3500));
-      t.push(setTimeout(schedCycle, 7000));
-    };
-    schedCycle();
-
-    return () => t.forEach(clearTimeout);
-  }, [setUpOpen]);
 
   // ── What Is Tiler sub-items ──────────────────────────────────────────────
   const whatIsSubItems = [
@@ -1305,18 +1008,6 @@ const Newsletter: React.FC = () => {
                           <StepSubtext>Sign up with your email — free to start, no credit card needed.</StepSubtext>
                           <StepMetric>~30 seconds</StepMetric>
                         </StepTextBlock>
-                        <StepThumb>
-                          <SaSignupScene>
-                            <SaSignupInput>gloria@example.com</SaSignupInput>
-                            <SaSignupBtn $phase={signupPhase}>
-                              {signupPhase === 'idle'
-                                ? 'Create free account'
-                                : signupPhase === 'creating'
-                                ? 'Creating account…'
-                                : '✓ Account created!'}
-                            </SaSignupBtn>
-                          </SaSignupScene>
-                        </StepThumb>
                       </StepContent>
                     </StepRowWrapper>
 
@@ -1332,25 +1023,6 @@ const Newsletter: React.FC = () => {
                           <StepSubtext>Link Google or Outlook — Tiler reads your events and builds around them.</StepSubtext>
                           <StepMetric>One tap</StepMetric>
                         </StepTextBlock>
-                        <StepThumb>
-                          <SaCalRow>
-                            <SaCalIcon $connected={calStatus !== 'idle'}>
-                              <SaCalIconTop />
-                              <SaCalIconDate>17</SaCalIconDate>
-                            </SaCalIcon>
-                            <SaCalInfo>
-                              <SaCalName>Google Calendar</SaCalName>
-                              <SaCalStatus $ok={calStatus !== 'idle'}>
-                                {calStatus === 'idle'
-                                  ? 'Tap to connect'
-                                  : calStatus === 'connecting'
-                                  ? 'Connecting…'
-                                  : '✓ Connected'}
-                              </SaCalStatus>
-                            </SaCalInfo>
-                            <SaCalCheck $show={calStatus === 'connected'}>✓</SaCalCheck>
-                          </SaCalRow>
-                        </StepThumb>
                       </StepContent>
                     </StepRowWrapper>
 
@@ -1366,32 +1038,6 @@ const Newsletter: React.FC = () => {
                           <StepSubtext>Choose your transit mode and set time limits in your profile.</StepSubtext>
                           <StepMetric>~2 minutes</StepMetric>
                         </StepTextBlock>
-                        <StepThumb>
-                          <SaPrefsScene>
-                            <SaPrefRow>
-                              <SaPrefLabel>Transit mode</SaPrefLabel>
-                              <SaTransitRow>
-                                <SaTransitOption $active={transitMode === 'drive'}>
-                                  🚗 Drive
-                                </SaTransitOption>
-                                <SaTransitOption $active={transitMode === 'transit'}>
-                                  🚌 Transit
-                                </SaTransitOption>
-                                <SaTransitOption $active={transitMode === 'walk'}>
-                                  🚶 Walk
-                                </SaTransitOption>
-                              </SaTransitRow>
-                            </SaPrefRow>
-                            <SaPrefRow>
-                              <SaPrefLabel>Work hours</SaPrefLabel>
-                              <SaTimeRange>
-                                <span>9:00 am</span>
-                                <span>→</span>
-                                <span>6:00 pm</span>
-                              </SaTimeRange>
-                            </SaPrefRow>
-                          </SaPrefsScene>
-                        </StepThumb>
                       </StepContent>
                     </StepRowWrapper>
 
@@ -1406,44 +1052,6 @@ const Newsletter: React.FC = () => {
                           <StepSubtext>Your schedule is live — Tiler adapts automatically as your day changes.</StepSubtext>
                           <StepMetric>Automatic</StepMetric>
                         </StepTextBlock>
-                        <StepThumb>
-                          <SaSchedScene>
-                            <SaSchedTimeLabel>Your schedule</SaSchedTimeLabel>
-                            <SaSchedRow>
-                              <SaSchedBlock $bg={palette.colors.gray[700]} $width="88px">
-                                9am meeting
-                              </SaSchedBlock>
-                              <SaSchedBlock
-                                $bg={`${palette.colors.brand[500]}90`}
-                                $shifted={schedPhase === 'settled'}
-                              >
-                                Run · 30m
-                              </SaSchedBlock>
-                            </SaSchedRow>
-                            <SaSchedRow>
-                              <SaSchedBlock
-                                $bg={palette.colors.gray[700]}
-                                $width="88px"
-                                $visible={schedPhase !== 'normal'}
-                              >
-                                New: 10am
-                              </SaSchedBlock>
-                              <SaSchedBlock
-                                $bg={`${palette.colors.gray[600]}`}
-                                $visible={schedPhase !== 'normal'}
-                              >
-                                Urgent call
-                              </SaSchedBlock>
-                            </SaSchedRow>
-                            <SaSchedStatus $phase={schedPhase}>
-                              {schedPhase === 'disrupted'
-                                ? 'Recalculating…'
-                                : schedPhase === 'settled'
-                                ? '✓ Schedule rebuilt'
-                                : ''}
-                            </SaSchedStatus>
-                          </SaSchedScene>
-                        </StepThumb>
                       </StepContent>
                     </StepRowWrapper>
                   </StepList>
