@@ -3,9 +3,16 @@ import { AppApi } from './appApi';
 
 export type UpdateSubCalendarEventPayload = {
 	Id: string;
+	CalendarEventName?: string;
+	Split?: number;
 	SubCalendarEventStart?: number;
 	SubCalendarEventEnd?: number;
+	CalendarEventStart?: number;
 	CalendarEventEnd?: number;
+	CalendarType?: string;
+	Longitude?: number;
+	Latitude?: number;
+	LocationVerified?: boolean;
 	TimeZone: string;
 };
 

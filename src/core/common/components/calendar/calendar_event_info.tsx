@@ -32,7 +32,7 @@ import { useTheme } from '@/core/theme/ThemeProvider';
 type CalendarEventInfoProps = {
   event: ScheduleSubCalendarEvent | null;
   onClose?: () => void;
-  onEventUpdate?: (updates: { start?: number; end?: number; calendarEnd?: number }) => void;
+  onEventUpdate?: (updates: { name?: string; start?: number; end?: number; calendarEnd?: number }) => void;
   isEditable?: boolean;
 };
 
@@ -46,11 +46,13 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   const { isDarkMode } = useTheme();
 
   // Edit mode flags
+  const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingStartTime, setIsEditingStartTime] = useState(false);
   const [isEditingEndTime, setIsEditingEndTime] = useState(false);
   const [isEditingDeadline, setIsEditingDeadline] = useState(false);
 
   // Edited values
+  const [editedName, setEditedName] = useState('');
   const [editedDate, setEditedDate] = useState('');
   const [editedStartTime, setEditedStartTime] = useState('');
   const [editedEndTime, setEditedEndTime] = useState('');
@@ -65,12 +67,14 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   // Initialize state from event
   useEffect(() => {
     if (event) {
+      setEditedName(event.name);
       setEditedDate(unixToDateString(event.start));
       setEditedStartTime(unixToTimeString(event.start));
       setEditedEndTime(unixToTimeString(event.end));
       setEditedDeadline(unixToDateString(event.calendarEventEnd));
       setHasChanges(false);
       setValidationError(null);
+      setIsEditingName(false);
       setIsEditingStartTime(false);
       setIsEditingEndTime(false);
       setIsEditingDeadline(false);
@@ -94,6 +98,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
   const handleCancel = () => {
     if (event) {
+      setEditedName(event.name);
       setEditedDate(unixToDateString(event.start));
       setEditedStartTime(unixToTimeString(event.start));
       setEditedEndTime(unixToTimeString(event.end));
@@ -101,6 +106,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
     }
     setHasChanges(false);
     setValidationError(null);
+    setIsEditingName(false);
     setIsEditingStartTime(false);
     setIsEditingEndTime(false);
     setIsEditingDeadline(false);
@@ -121,8 +127,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
     const deadlineTime = dayjs(event.calendarEventEnd).format('h:mm A');
     const newCalendarEnd = dateTimeToUnix(editedDeadline, deadlineTime);
 
-    const updates: { start?: number; end?: number; calendarEnd?: number } = {};
+    const updates: { name?: string; start?: number; end?: number; calendarEnd?: number } = {};
 
+    if (editedName !== event.name) {
+      updates.name = editedName;
+    }
     if (newStart !== event.start) {
       updates.start = newStart;
     }
@@ -167,7 +176,41 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
           <Star size={16} color={eventColor.setLightness(0.6).toHex()} />
         </div>
         <div className="title">
-          <h2>{event.name}</h2>
+          {isEditingName ? (
+            <EditableFieldWrapper>
+              <NameInput
+                type="text"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                onBlur={() => {
+                  setIsEditingName(false);
+                  if (editedName !== event.name) {
+                    setHasChanges(true);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setIsEditingName(false);
+                    if (editedName !== event.name) {
+                      setHasChanges(true);
+                    }
+                  } else if (e.key === 'Escape') {
+                    setEditedName(event.name);
+                    setIsEditingName(false);
+                  }
+                }}
+                autoFocus
+              />
+            </EditableFieldWrapper>
+          ) : (
+            <EditableName
+              $isEditable={isEditable}
+              onClick={() => isEditable && setIsEditingName(true)}
+            >
+              <h2>{hasChanges ? editedName : event.name}</h2>
+              {isEditable && <Pencil size={14} className="edit-icon" />}
+            </EditableName>
+          )}
           {dayjs().isBefore(dayjs(event.start)) ? (
             <span>{t('calendar.event.dueIn', { time: getEventDueIn(event) })}</span>
           ) : null}
@@ -391,6 +434,58 @@ const EditableValue = styled.p<{ $isEditable: boolean }>`
       }
     }
   `}
+`;
+
+const EditableName = styled.div<{ $isEditable: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: ${({ $isEditable }) => ($isEditable ? 'pointer' : 'default')};
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+  transition: background-color 0.2s ease;
+
+  h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .edit-icon {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  ${({ $isEditable }) =>
+    $isEditable &&
+    `
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+
+      .edit-icon {
+        opacity: 0.8;
+      }
+    }
+  `}
+`;
+
+const NameInput = styled.input`
+  width: 100%;
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.brand[500]};
+  color: inherit;
+  outline: none;
+  padding: 2px 0;
+
+  &:focus {
+    border-bottom-color: ${({ theme }) => theme.colors.brand[400]};
+  }
 `;
 
 const TimeDate = styled.span`

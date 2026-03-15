@@ -121,11 +121,12 @@ class ScheduleService {
    */
   async updateSubCalendarEvent(
     eventId: string,
-    updates: { start?: number; end?: number; calendarEnd?: number }
+    updates: { name?: string; start?: number; end?: number; calendarEnd?: number }
   ) {
     try {
       const response = await this.subCalendarEventApi.updateSubCalendarEvent({
         Id: eventId,
+        CalendarEventName: updates.name,
         SubCalendarEventStart: updates.start,
         SubCalendarEventEnd: updates.end,
         CalendarEventEnd: updates.calendarEnd,

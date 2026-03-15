@@ -296,6 +296,7 @@ const Calendar = ({
   }, [viewOptions.startDay]);
 
 	const handleEventUpdate = async (updates: {
+    name?: string;
     start?: number;
     end?: number;
     calendarEnd?: number;
@@ -310,6 +311,7 @@ const Calendar = ({
 				prev
 					? {
 							...prev,
+              ...(updates.name !== undefined ? { name: updates.name } : {}),
               ...(updates.start !== undefined ? { start: updates.start } : {}),
               ...(updates.end !== undefined ? { end: updates.end } : {}),
               ...(updates.calendarEnd !== undefined
