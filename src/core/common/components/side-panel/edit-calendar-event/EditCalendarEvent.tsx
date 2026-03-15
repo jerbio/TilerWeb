@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import dayjs from 'dayjs';
-import { ArrowLeft, Save, Loader2, ChevronDown, Bookmark, MapPin, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, ChevronRight, Bookmark, MapPin, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CalendarEvent, CalendarEventUpdateParams, ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
 import { scheduleService } from '@/services';
@@ -40,8 +40,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   const [startTime, setStartTime] = useState(epochToTimeString(event.start));
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(epochToDate(event.end));
   const [endTime, setEndTime] = useState(epochToTimeString(event.end));
-  const [duration, setDuration] = useState<string>(
-    event.eachTileDuration != null ? String(Math.round(event.eachTileDuration / 60000)) : ''
+  const [durationHours, setDurationHours] = useState<string>(
+    event.eachTileDuration != null ? String(Math.floor(event.eachTileDuration / 3600000)) : ''
+  );
+  const [durationMinutes, setDurationMinutes] = useState<string>(
+    event.eachTileDuration != null ? String(Math.round((event.eachTileDuration % 3600000) / 60000)) : ''
+  );
+  const [splitCount, setSplitCount] = useState<string>(
+    event.splitCount != null ? String(event.splitCount) : ''
   );
   const [address, setAddress] = useState(event.address ?? '');
   const [addressDescription, setAddressDescription] = useState(event.addressDescription ?? '');
@@ -53,7 +59,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     return match >= 0 ? match : 0;
   });
   const [isRecurring, setIsRecurring] = useState(event.repetition?.isEnabled ?? false);
-  const [frequency, setFrequency] = useState(event.repetition?.frequency ?? '');
+  const [frequency, setFrequency] = useState((event.repetition?.frequency ?? '').toLowerCase());
   const [isForever, setIsForever] = useState(event.repetition?.isForever ?? false);
   const [repStartDate, setRepStartDate] = useState<dayjs.Dayjs | null>(
     epochToDate(event.repetition?.repetitionTimeline?.start ?? null)
@@ -106,7 +112,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     setEndTime(epochToTimeString(ev.end));
     setEndDate(epochToDate(ev.end));
     setEndTime(epochToTimeString(ev.end));
-    setDuration(ev.eachTileDuration != null ? String(Math.round(ev.eachTileDuration / 60000)) : '');
+    setDurationHours(ev.eachTileDuration != null ? String(Math.floor(ev.eachTileDuration / 3600000)) : '');
+    setDurationMinutes(ev.eachTileDuration != null ? String(Math.round((ev.eachTileDuration % 3600000) / 60000)) : '');
+    setSplitCount(ev.splitCount != null ? String(ev.splitCount) : '');
     setAddress(ev.address ?? '');
     setAddressDescription(ev.addressDescription ?? '');
     const r = ev.colorRed ?? 0;
@@ -115,7 +123,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     const match = COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
     setSelectedColor(match >= 0 ? match : 0);
     setIsRecurring(ev.repetition?.isEnabled ?? false);
-    setFrequency(ev.repetition?.frequency ?? '');
+    setFrequency((ev.repetition?.frequency ?? '').toLowerCase());
     setIsForever(ev.repetition?.isForever ?? false);
     setRepStartDate(epochToDate(ev.repetition?.repetitionTimeline?.start ?? null));
     setRepStartTime(epochToTimeString(ev.repetition?.repetitionTimeline?.start ?? null));
@@ -203,7 +211,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
       EventName: name,
       Start: startMs ?? undefined,
       End: endMs ?? undefined,
-      Duration: duration ? Number(duration) * 60000 : undefined,
+      Duration: (durationHours || durationMinutes)
+        ? (Number(durationHours || 0) * 3600000 + Number(durationMinutes || 0) * 60000)
+        : undefined,
+      Split: splitCount ? Number(splitCount) : undefined,
       CalAddress: address || undefined,
       CalAddressDescription: addressDescription || undefined,
       ColorConfig: {
@@ -255,6 +266,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
       {isLoading && <LoadingText>{t('calendarEvent.edit.loading')}</LoadingText>}
 
       {!isLoading && (
+      <>
       <Form>
         {/* Name */}
         <FieldGroup>
@@ -266,7 +278,19 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         <Section>
           <SectionHeader onClick={() => setTimeOpen((v) => !v)}>
             <SectionTitle>{t('calendarEvent.edit.timeSection')}</SectionTitle>
-            <Chevron $open={timeOpen}><ChevronDown size={16} /></Chevron>
+            <Chevron $open={timeOpen}><ChevronRight size={16} /></Chevron>
+            {!timeOpen && (startDate || endDate || durationHours || durationMinutes) && (
+              <PreviewText>
+                {[
+                  startDate && `${startDate.format('MMM D')} ${startTime}`,
+                  endDate && `${endDate.format('MMM D')} ${endTime}`,
+                  (durationHours || durationMinutes) && [
+                    durationHours && Number(durationHours) > 0 && t('calendarEvent.edit.durationHoursPreview', { count: durationHours }),
+                    durationMinutes && Number(durationMinutes) > 0 && t('calendarEvent.edit.durationMinutesPreview', { count: durationMinutes }),
+                  ].filter(Boolean).join(' '),
+                ].filter(Boolean).join(' \u00b7 ')}
+              </PreviewText>
+            )}
           </SectionHeader>
           {timeOpen && (
             <SectionBody>
@@ -308,12 +332,38 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
               </FieldGroup>
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.duration')}</Label>
+                <DurationRow>
+                  <DurationField>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={durationHours}
+                      onChange={(e) => setDurationHours(e.target.value)}
+                      placeholder="0"
+                    />
+                    <DurationUnit>{t('calendarEvent.edit.hours')}</DurationUnit>
+                  </DurationField>
+                  <DurationField>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={durationMinutes}
+                      onChange={(e) => setDurationMinutes(e.target.value)}
+                      placeholder="0"
+                    />
+                    <DurationUnit>{t('calendarEvent.edit.minutes')}</DurationUnit>
+                  </DurationField>
+                </DurationRow>
+              </FieldGroup>
+              <FieldGroup>
+                <Label>{t('calendarEvent.edit.split')}</Label>
                 <Input
                   type="number"
-                  min="0"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  placeholder={t('calendarEvent.edit.durationPlaceholder')}
+                  min="1"
+                  value={splitCount}
+                  onChange={(e) => setSplitCount(e.target.value)}
+                  placeholder={t('calendarEvent.edit.splitPlaceholder')}
                 />
               </FieldGroup>
             </SectionBody>
@@ -324,10 +374,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         <Section>
           <SectionHeader onClick={() => setRepetitionOpen((v) => !v)}>
             <SectionTitle>{t('calendarEvent.edit.repetitionSection')}</SectionTitle>
+            <Chevron $open={repetitionOpen}><ChevronRight size={16} /></Chevron>
             {!repetitionOpen && isRecurring && frequency && (
               <PreviewText>{frequency}</PreviewText>
             )}
-            <Chevron $open={repetitionOpen}><ChevronDown size={16} /></Chevron>
           </SectionHeader>
           {repetitionOpen && (
             <SectionBody>
@@ -438,10 +488,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         <Section>
           <SectionHeader onClick={() => setLocationOpen((v) => !v)}>
             <SectionTitle>{t('calendarEvent.edit.locationSection')}</SectionTitle>
+            <Chevron $open={locationOpen}><ChevronRight size={16} /></Chevron>
             {!locationOpen && (address || addressDescription) && (
-              <PreviewText>{[address, addressDescription].filter(Boolean).join(' · ')}</PreviewText>
+              <PreviewText>{[address, addressDescription].filter(Boolean).join(' \u00b7 ')}</PreviewText>
             )}
-            <Chevron $open={locationOpen}><ChevronDown size={16} /></Chevron>
           </SectionHeader>
           {locationOpen && (
             <SectionBody>
@@ -517,7 +567,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
             <SwatchPreview
               style={{ backgroundColor: `rgb(${COLOR_SWATCHES[selectedColor].r}, ${COLOR_SWATCHES[selectedColor].g}, ${COLOR_SWATCHES[selectedColor].b})` }}
             />
-            <Chevron $open={colorOpen}><ChevronDown size={16} /></Chevron>
+            <Chevron $open={colorOpen}><ChevronRight size={16} /></Chevron>
           </SectionHeader>
           {colorOpen && (
             <SectionBody>
@@ -536,11 +586,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
           )}
         </Section>
 
+      </Form>
+      <SaveFooter>
         <SaveButton onClick={handleSave} disabled={isSaving || !name.trim()}>
           {isSaving ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
           {t('calendarEvent.edit.save')}
         </SaveButton>
-      </Form>
+      </SaveFooter>
+      </>
       )}
     </Container>
   );
@@ -552,8 +605,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: auto;
-  padding: 1rem;
+  overflow: hidden;
 `;
 
 const LoadingText = styled.p`
@@ -568,6 +620,8 @@ const Header = styled.div`
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.25rem;
+  padding: 1rem 1rem 0;
+  flex-shrink: 0;
 `;
 
 const BackButton = styled.button`
@@ -600,6 +654,15 @@ const Form = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0 1rem;
+`;
+
+const SaveFooter = styled.div`
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
 `;
 
 /* ── Collapsible Section ── */
@@ -612,6 +675,7 @@ const Section = styled.div`
 const SectionHeader = styled.button`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   width: 100%;
   padding: 0.625rem 0.75rem;
   border: none;
@@ -621,7 +685,7 @@ const SectionHeader = styled.button`
   cursor: pointer;
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   font-weight: 600;
-  gap: 0.5rem;
+  gap: 0.25rem 0.5rem;
   text-align: left;
 
   &:hover {
@@ -630,29 +694,28 @@ const SectionHeader = styled.button`
 `;
 
 const SectionTitle = styled.span`
-  flex-shrink: 0;
+  flex: 1;
 `;
 
 const PreviewText = styled.span`
-  flex: 1;
+  flex-basis: 100%;
   font-weight: 400;
   font-size: ${({ theme }) => theme.typography.fontSize.xs};
   color: ${({ theme }) => theme.colors.text.muted};
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-transform: capitalize;
+  line-height: 1.4;
 `;
 
 const Chevron = styled.span<{ $open: boolean }>`
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   color: ${({ theme }) => theme.colors.text.muted};
   transition: transform 0.2s ease;
   ${({ $open }) =>
     $open &&
     css`
-      transform: rotate(180deg);
+      transform: rotate(90deg);
     `}
 `;
 
@@ -674,6 +737,24 @@ const DateTimeRow = styled.div`
     padding-top: 0;
     padding-bottom: 0;
   }
+`;
+
+const DurationRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+`;
+
+const DurationField = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 1;
+`;
+
+const DurationUnit = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.text.muted};
+  flex-shrink: 0;
 `;
 
 const DatePickerWrapper = styled.div`
@@ -908,20 +989,23 @@ const SwatchPreview = styled.div`
 const SwatchGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 0.5rem;
+  gap: 0.625rem;
+  justify-items: center;
 `;
 
 const Swatch = styled.button<{ $selected: boolean }>`
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   border: 2px solid ${({ $selected, theme }) => ($selected ? theme.colors.text.primary : 'transparent')};
+  box-shadow: ${({ $selected }) => ($selected ? '0 0 0 2px rgba(255,255,255,0.15)' : 'inset 0 1px 2px rgba(0,0,0,0.2)')};
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   outline: none;
 
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
   }
 `;
 
@@ -932,8 +1016,8 @@ const SaveButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  width: 100%;
   height: 40px;
-  margin-top: 0.5rem;
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) => theme.colors.brand[500]};

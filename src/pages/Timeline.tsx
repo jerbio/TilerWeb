@@ -237,12 +237,14 @@ const SidePanelContainer = styled(animated.div) <{ $sidepanelexpanded: boolean }
 	backdrop-filter: blur(6px);
 	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
 	display: ${(props) => (props.$sidepanelexpanded ? 'none' : 'block')};
+	overflow: hidden;
 
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span ${(props) => (props.$sidepanelexpanded ? 0 : 4)};
 		border: none;
+		min-height: 0;
 	}
 	@media screen and (min-width: ${(props) => props.theme.screens.xl}) {
 		grid-column: span ${(props) => (props.$sidepanelexpanded ? 0 : 3)};
