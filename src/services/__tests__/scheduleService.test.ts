@@ -429,4 +429,71 @@ service.lookupLocationById('bad-id'),
 ).rejects.toThrow();
 });
 });
+
+describe('searchLocations', () => {
+const mockLocations = [
+{
+id: 'saved-1',
+description: 'Saved Place',
+address: 'My Office',
+longitude: 0,
+latitude: 0,
+isVerified: false,
+isDefault: false,
+isNull: false,
+thirdPartyId: '',
+userId: 'user-123',
+source: 'none',
+nickname: 'office',
+},
+{
+id: 'ChIJ123',
+description: 'Google Place',
+address: 'Google Place 123 Main St',
+longitude: -73.99,
+latitude: 40.75,
+isVerified: true,
+isDefault: false,
+isNull: false,
+thirdPartyId: 'ChIJ123',
+userId: null,
+source: 'google',
+nickname: 'google place',
+},
+];
+
+it('calls searchByName on locationApi and returns Content', async () => {
+vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
+Error: { Code: '0', Message: 'SUCCESS' },
+Content: mockLocations,
+ServerStatus: null,
+});
+
+const result = await service.searchLocations('office');
+
+expect(locationApi.searchByName).toHaveBeenCalledWith('office');
+expect(result).toEqual(mockLocations);
+});
+
+it('returns empty array when no results', async () => {
+vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
+Error: { Code: '0', Message: 'SUCCESS' },
+Content: [],
+ServerStatus: null,
+});
+
+const result = await service.searchLocations('nonexistent');
+expect(result).toEqual([]);
+});
+
+it('throws normalized error on API failure', async () => {
+vi.mocked(locationApi.searchByName).mockRejectedValueOnce(
+new Error('Network error'),
+);
+
+await expect(
+service.searchLocations('fail'),
+).rejects.toThrow();
+});
+});
 });

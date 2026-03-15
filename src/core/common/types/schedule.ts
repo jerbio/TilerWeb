@@ -30,6 +30,7 @@ export type ScheduleSubCalendarEventLocation = {
 };
 
 export type LocationResponse = ApiResponse<ScheduleSubCalendarEventLocation>;
+export type LocationSearchResponse = ApiResponse<ScheduleSubCalendarEventLocation[]>;
 
 export type ScheduleSubCalendarEventBlob = {
   type: number;

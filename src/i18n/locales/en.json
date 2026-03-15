@@ -996,7 +996,12 @@
 			"saveSuccess": "Event updated!",
 			"saveFailed": "Failed to save. Please try again.",
 			"back": "Back",
-			"loading": "Loading event details..."
+			"loading": "Loading event details...",
+			"locationSearchPlaceholder": "Search for a location...",
+			"savedLocations": "Saved Locations",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Powered by Google",
+			"noLocationResults": "No locations found"
 		}
 	}
 }

@@ -244,6 +244,19 @@ class ScheduleService {
   }
 
   /**
+   * Search locations by name, including Google Maps results.
+   */
+  async searchLocations(query: string) {
+    try {
+      const response = await this.locationApi.searchByName(query);
+      return response.Content;
+    } catch (error) {
+      console.error('Error searching locations', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
    * Fetch a location by its ID.
    * `GET /api/Location?id=...&IdSearch.mobileApp=true`
    */

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, setupUser, waitFor } from '@/test/test-utils';
+import { act, render, screen, setupUser, waitFor } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import EditCalendarEvent from '../EditCalendarEvent';
@@ -10,11 +10,13 @@ import { CalendarEvent } from '@/core/common/types/schedule';
 const mockUpdateCalendarEvent = vi.fn();
 const mockLookupCalendarEventById = vi.fn();
 const mockLookupLocationById = vi.fn();
+const mockSearchLocations = vi.fn();
 vi.mock('@/services', () => ({
 	scheduleService: {
 		updateCalendarEvent: (...args: unknown[]) => mockUpdateCalendarEvent(...args),
 		lookupCalendarEventById: (...args: unknown[]) => mockLookupCalendarEventById(...args),
 		lookupLocationById: (...args: unknown[]) => mockLookupLocationById(...args),
+		searchLocations: (...args: unknown[]) => mockSearchLocations(...args),
 	},
 }));
 
@@ -115,6 +117,7 @@ describe('EditCalendarEvent', () => {
 		vi.clearAllMocks();
 		mockLookupCalendarEventById.mockResolvedValue(mockEvent);
 		mockLookupLocationById.mockResolvedValue({ address: '123 Main St', description: 'Near the park' });
+		mockSearchLocations.mockResolvedValue([]);
 	});
 
 	it('renders header with back button and title', () => {
@@ -712,6 +715,297 @@ await waitForLoaded();
 // Should still have the address from the event
 await user.click(screen.getByText('calendarEvent.edit.locationSection'));
 expect(screen.getByDisplayValue('123 Main St')).toBeInTheDocument();
+});
+});
+
+describe('location autocomplete', () => {
+const savedLocation = {
+id: 'saved-1',
+description: 'My Office',
+address: '100 Office Blvd',
+longitude: 0,
+latitude: 0,
+isVerified: false,
+isDefault: false,
+isNull: false,
+thirdPartyId: '',
+userId: 'user-123',
+source: 'none',
+nickname: 'office',
+};
+
+const googleLocation = {
+id: 'ChIJ123',
+description: 'Walmart Supercenter',
+address: 'Walmart Supercenter 745 us-287, lafayette, co 80026, usa',
+longitude: -105.10,
+latitude: 40.00,
+isVerified: true,
+isDefault: false,
+isNull: false,
+thirdPartyId: 'ChIJ123',
+userId: null,
+source: 'google',
+nickname: 'walmart supercenter',
+};
+
+it('calls searchLocations when typing in address field', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([savedLocation]);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'office');
+
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(mockSearchLocations).toHaveBeenCalledWith('office');
+});
+vi.useRealTimers();
+});
+
+it('shows saved locations with bookmark icon', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([savedLocation]);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'office');
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(screen.getByLabelText('saved')).toBeInTheDocument();
+});
+expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+vi.useRealTimers();
+});
+
+it('shows google results with map pin icon and attribution', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([googleLocation]);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'walmart');
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(screen.getByLabelText('google')).toBeInTheDocument();
+});
+expect(screen.getByText('calendarEvent.edit.poweredByGoogle')).toBeInTheDocument();
+vi.useRealTimers();
+});
+
+it('shows both saved and google icons when mixed', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([savedLocation, googleLocation]);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'wal');
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(screen.getByLabelText('saved')).toBeInTheDocument();
+expect(screen.getByLabelText('google')).toBeInTheDocument();
+});
+vi.useRealTimers();
+});
+
+it('populates address and description when selecting a result', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([savedLocation]);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'office');
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+});
+
+await user.click(screen.getByText('100 Office Blvd'));
+
+expect(addressInput).toHaveValue('100 Office Blvd');
+expect(screen.getByDisplayValue('My Office')).toBeInTheDocument();
+
+mockSearchLocations.mockClear();
+await vi.advanceTimersByTimeAsync(400);
+expect(mockSearchLocations).not.toHaveBeenCalled();
+vi.useRealTimers();
+});
+
+it('description field is a single-line input', async () => {
+const user = setupUser();
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const descField = screen.getByDisplayValue('Near the park');
+expect(descField.tagName).toBe('INPUT');
+});
+
+
+    it('shows a loading spinner while searching', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      let resolveSearch!: (value: typeof savedLocation[]) => void;
+      mockSearchLocations.mockImplementation(() => new Promise((r) => { resolveSearch = r; }));
+      const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+      await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+      const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+      await user.clear(addressInput);
+      await user.type(addressInput, 'office');
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      await act(async () => { resolveSearch([savedLocation]); });
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+it('does not search on initial load', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(mockSearchLocations).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+    it('does not search when selecting a location result', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      mockSearchLocations.mockResolvedValue([savedLocation]);
+      const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+      await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+      const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+      await user.clear(addressInput);
+      await user.type(addressInput, 'office');
+      await vi.advanceTimersByTimeAsync(400);
+
+      await waitFor(() => {
+        expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+      });
+
+      mockSearchLocations.mockClear();
+      await user.click(screen.getByText('100 Office Blvd'));
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(mockSearchLocations).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+    it('does not search when expanding the location section', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+
+      mockSearchLocations.mockClear();
+      await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(mockSearchLocations).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+
+    it('does not search on initial load', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(mockSearchLocations).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+    it('does not search when selecting a location result', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      mockSearchLocations.mockResolvedValue([savedLocation]);
+      const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+      await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+      const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+      await user.clear(addressInput);
+      await user.type(addressInput, 'office');
+      await vi.advanceTimersByTimeAsync(400);
+
+      await waitFor(() => {
+        expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+      });
+
+      mockSearchLocations.mockClear();
+      await user.click(screen.getByText('100 Office Blvd'));
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(mockSearchLocations).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+    it('does not search when expanding the location section', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+      renderComponent();
+      await waitForLoaded();
+
+      mockSearchLocations.mockClear();
+      await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+      await vi.advanceTimersByTimeAsync(400);
+
+      expect(mockSearchLocations).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+    it('does not search when input is empty', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await vi.advanceTimersByTimeAsync(400);
+
+expect(mockSearchLocations).not.toHaveBeenCalled();
+vi.useRealTimers();
 });
 });
 });

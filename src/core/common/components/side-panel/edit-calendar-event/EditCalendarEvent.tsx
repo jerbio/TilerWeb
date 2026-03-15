@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { ArrowLeft, Save, Loader2, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, ChevronDown, Bookmark, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { CalendarEvent, CalendarEventUpdateParams } from '@/core/common/types/schedule';
+import { CalendarEvent, CalendarEventUpdateParams, ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 
@@ -75,6 +75,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [locationResults, setLocationResults] = useState<ScheduleSubCalendarEventLocation[]>([]);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const userEditedAddressRef = useRef(false);
 
   // Section collapsed states — all start collapsed
   const [timeOpen, setTimeOpen] = useState(false);
@@ -102,6 +106,39 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     setRepetitionEndStr(msToDatetimeLocal(ev.repetition?.repetitionTimeline?.end ?? null));
     const wd = ev.repetition?.weekDays;
     setWeekDays(wd ? new Set(wd.split(',').map((s) => s.trim())) : new Set<string>());
+  };
+
+  // Debounced location search — only when the user types in the input
+  useEffect(() => {
+    if (!userEditedAddressRef.current) return;
+    userEditedAddressRef.current = false;
+    if (!address.trim()) {
+      setLocationResults([]);
+      setShowLocationDropdown(false);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const results = await scheduleService.searchLocations(address);
+        setLocationResults(results);
+        setShowLocationDropdown(results.length > 0);
+      } catch {
+        setLocationResults([]);
+        setShowLocationDropdown(false);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [address]);
+
+  const handleSelectLocation = (loc: ScheduleSubCalendarEventLocation) => {
+    setAddress(loc.address);
+    setAddressDescription(loc.description);
+    setShowLocationDropdown(false);
+    setLocationResults([]);
   };
 
   // Fetch full event details on mount
@@ -347,12 +384,60 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
             <SectionBody>
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.location')}</Label>
-                <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+                <AutocompleteWrapper>
+                  <Input
+                    value={address}
+                    onChange={(e) => { userEditedAddressRef.current = true; setAddress(e.target.value); }}
+                    placeholder={t('calendarEvent.edit.locationSearchPlaceholder')}
+                    onFocus={() => { if (locationResults.length > 0) setShowLocationDropdown(true); }}
+                  />
+                  {isSearching && (
+                    <SearchingIndicator role="status">
+                      <Loader2 size={16} className="spin" />
+                    </SearchingIndicator>
+                  )}
+                  {!isSearching && showLocationDropdown && locationResults.length > 0 && (
+                    <Dropdown>
+                      {(() => {
+                        const saved = locationResults.filter((l) => l.source !== 'google');
+                        const google = locationResults.filter((l) => l.source === 'google');
+                        return (
+                          <>
+                            {saved.map((loc) => (
+                              <DropdownItem key={loc.id} onClick={() => handleSelectLocation(loc)}>
+                                <ItemIcon aria-label="saved"><Bookmark size={14} /></ItemIcon>
+                                <DropdownItemText>
+                                  <DropdownItemAddress>{loc.address}</DropdownItemAddress>
+                                  {loc.description && loc.description !== loc.id && (
+                                    <DropdownItemDesc>{loc.description}</DropdownItemDesc>
+                                  )}
+                                </DropdownItemText>
+                              </DropdownItem>
+                            ))}
+                            {google.map((loc) => (
+                              <DropdownItem key={loc.id} onClick={() => handleSelectLocation(loc)}>
+                                <ItemIcon aria-label="google"><MapPin size={14} /></ItemIcon>
+                                <DropdownItemText>
+                                  <DropdownItemAddress>{loc.address}</DropdownItemAddress>
+                                  {loc.description && (
+                                    <DropdownItemDesc>{loc.description}</DropdownItemDesc>
+                                  )}
+                                </DropdownItemText>
+                              </DropdownItem>
+                            ))}
+                            {google.length > 0 && (
+                              <PoweredByGoogle>{t('calendarEvent.edit.poweredByGoogle')}</PoweredByGoogle>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </Dropdown>
+                  )}
+                </AutocompleteWrapper>
               </FieldGroup>
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.locationDescription')}</Label>
-                <TextArea
-                  rows={3}
+                <Input
                   value={addressDescription}
                   onChange={(e) => setAddressDescription(e.target.value)}
                   placeholder={t('calendarEvent.edit.locationDescriptionPlaceholder')}
@@ -555,31 +640,6 @@ const Input = styled.input`
   }
 `;
 
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid ${({ theme }) => theme.colors.input.border};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  background-color: ${({ theme }) => theme.colors.input.bg};
-  color: ${({ theme }) => theme.colors.input.text};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-family: inherit;
-  outline: none;
-  resize: vertical;
-  transition: border-color 0.15s ease;
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.input.placeholder};
-  }
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.input.borderHover};
-  }
-
-  &:focus {
-    border-color: ${({ theme }) => theme.colors.input.focusRing};
-  }
-`;
 
 const Select = styled.select`
   width: 100%;
@@ -630,6 +690,90 @@ const WeekDayChip = styled.button<{ $selected: boolean }>`
   font-size: ${({ theme }) => theme.typography.fontSize.xs};
   cursor: pointer;
   transition: all 0.15s ease;
+`;
+
+/* ── Location Autocomplete ── */
+
+const AutocompleteWrapper = styled.div``;
+
+const SearchingIndicator = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem;
+  color: ${({ theme }) => theme.colors.text.muted};
+
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const Dropdown = styled.div`
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background: ${({ theme }) => theme.colors.background.card};
+  margin-top: 4px;
+`;
+
+const DropdownItem = styled.button`
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  gap: 0.5rem;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.background.card2};
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+  }
+`;
+
+const ItemIcon = styled.span`
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const DropdownItemText = styled.span`
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+`;
+
+const DropdownItemAddress = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const DropdownItemDesc = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const PoweredByGoogle = styled.div`
+  padding: 0.375rem 0.75rem;
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  color: ${({ theme }) => theme.colors.text.muted};
+  text-align: right;
+  font-style: italic;
+  border-top: 1px solid ${({ theme }) => theme.colors.border.default};
 `;
 
 /* ── Color Swatches ── */
