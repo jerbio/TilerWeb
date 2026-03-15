@@ -1,98 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import SEO from '@/core/common/components/SEO';
 import Section from '../components/layout/section';
 import Collapse from '@/core/common/components/collapse';
 
-// ─── How-To Data ─────────────────────────────────────────────────────────────
-
-const items = [
-  {
-    title: "Set Up Tiler",
-    media: "/gifs/set-up-tiler.gif",
-    body: "Tiler works best when it\u2019s running in the background. Autopilot means you don\u2019t manually place tasks on your timeline; you simply tell Tiler what needs to get done, and it schedules everything around your day automatically. Once enabled, Tiler continuously adjusts your timeline as tasks are added, deferred, or as calendar events come in.",
-  },
-  {
-    title: "How to Create a Block",
-    media: "/gifs/how-to-create-a-block.gif",
-    body: "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don\u2019t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable.",
-  },
-  {
-    title: "Creating Flexible Tiles",
-    media: "/gifs/creating-flexible-tiles.gif",
-    body: "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline \u2014 Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions.",
-  },
-  {
-    title: "How Does Adaptive Scheduling Work?",
-    body: "Adaptive scheduling means your timeline updates itself when reality changes. If a meeting runs long, a task is deferred, or a new event is added, Tiler recalculates the rest of your day instantly. You don\u2019t reorganise your schedule, you make one adjustment, and the system resolves conflicts, shifts tiles, and keeps everything realistic.",
-  },
-  {
-    title: "How to Update a Tile",
-    media: "/gifs/how-to-update-a-tile.gif",
-    body: "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don\u2019t need to move other tasks manually, the system handles the ripple effects.",
-  },
-  {
-    title: "Connect a Calendar",
-    media: "/gifs/connect-a-calendar.gif",
-    body: "Connecting your calendar allows Tiler to see your real commitments. Once synced, incoming calendar events appear as blocks in your timeline. You can accept, edit, or resolve conflicts directly inside Tiler. When events change, Tiler adapts your tiles around them so your day stays balanced and realistic.",
-  },
-  {
-    title: "Show My Route",
-    body: "Tiler doesn\u2019t just tell you what to do. It helps you get there. With in-app navigation, your day becomes a route, not a list. Tiler factors in location and transit, guiding you from one tile to the next with real travel awareness. This is especially useful for errand days, on-the-go schedules, and multi-location workflows.",
-  },
-  {
-    title: "Send a TileShare",
-    body: "TileShare lets you pass work to others without micromanaging. You can send a tile (or multiple tiles) to someone else, set expectations, and let Tiler handle scheduling on both sides. It\u2019s ideal for teams, partners, and shared responsibilities \u2014 the context travels with the task, not the reminders.",
-  },
-  {
-    title: "Travel Time & Route",
-    media: "/gifs/travel-time-and-route.gif",
-    body: "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn\u2019t a gap \u2014 it\u2019s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn\u2019t just tell you what to do. It gets you there.",
-  },
-  {
-    title: "Where Does Navigation Start?",
-    body: "Tap Show Route and your timeline turns into a journey. One tile flows into the next, with directions baked in. Your day stops being a list and starts becoming a path.",
-  },
-];
-
-// ─── What Is Tiler — Sub-item data ───────────────────────────────────────────
-
-const coreBlocks = [
-  {
-    emoji: "\uD83E\uDDE9",
-    label: "AutoTile",
-    title: "Tiles",
-    desc: "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently.",
-  },
-  {
-    emoji: "\uD83D\uDCCC",
-    label: "Locked",
-    title: "Blocks",
-    desc: "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them.",
-  },
-  {
-    emoji: "\uD83D\uDDFA\uFE0F",
-    label: "Location-aware",
-    title: "Route",
-    desc: "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop.",
-  },
-  {
-    emoji: "\uD83D\uDC65",
-    label: "Team & Family",
-    title: "TileShare",
-    desc: "Assign tiles to teammates or family. Everyone's calendar adapts around shared commitments automatically. Context travels with the task.",
-  },
-];
-
-const comparisonRows = [
-  { left: "You schedule everything manually", right: "AI builds your schedule from plain English" },
-  { left: "No awareness of travel time", right: "Auto-calculates and adds travel buffers" },
-  { left: "Static — won't adapt when things change", right: "Detects ripples and reschedules instantly" },
-  { left: "No navigation or route planning", right: "Navigate your day tile-to-tile with real transit" },
-  { left: "Shared calendars only — no task assignment", right: "TileShare: assign and track tasks with anyone" },
-  { left: "Nothing confirmed — events just appear", right: "Confirmation-first — you approve all changes" },
-];
+// ─── Data arrays moved inside component for i18n (see useMemo blocks) ────────
 
 // ─── Styles — Existing ───────────────────────────────────────────────────────
 
@@ -1092,6 +1006,7 @@ const SubBodyText = styled.div`
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const Newsletter: React.FC = () => {
+  const { t } = useTranslation();
   const [whatIsOpen, setWhatIsOpen] = useState(false);
   const [setUpOpen, setSetUpOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
@@ -1103,63 +1018,148 @@ const Newsletter: React.FC = () => {
   const [transitMode, setTransitMode] = useState<'drive' | 'transit' | 'walk'>('drive');
   const [schedPhase, setSchedPhase] = useState<'normal' | 'disrupted' | 'settled'>('normal');
 
+  // ─── How-To Data (i18n) ──────────────────────────────────────────────────
+  const items = useMemo(() => [
+    {
+      title: t('discover.howToUseTiler.items.setUpTiler.title'),
+      media: "/gifs/set-up-tiler.gif",
+      body: t('discover.howToUseTiler.items.setUpTiler.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.createBlock.title'),
+      media: "/gifs/how-to-create-a-block.gif",
+      body: t('discover.howToUseTiler.items.createBlock.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.flexibleTiles.title'),
+      media: "/gifs/creating-flexible-tiles.gif",
+      body: t('discover.howToUseTiler.items.flexibleTiles.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.adaptiveScheduling.title'),
+      body: t('discover.howToUseTiler.items.adaptiveScheduling.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.updateTile.title'),
+      media: "/gifs/how-to-update-a-tile.gif",
+      body: t('discover.howToUseTiler.items.updateTile.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.connectCalendar.title'),
+      media: "/gifs/connect-a-calendar.gif",
+      body: t('discover.howToUseTiler.items.connectCalendar.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.showRoute.title'),
+      body: t('discover.howToUseTiler.items.showRoute.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.tileShare.title'),
+      body: t('discover.howToUseTiler.items.tileShare.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.travelTime.title'),
+      media: "/gifs/travel-time-and-route.gif",
+      body: t('discover.howToUseTiler.items.travelTime.body'),
+    },
+    {
+      title: t('discover.howToUseTiler.items.navigation.title'),
+      body: t('discover.howToUseTiler.items.navigation.body'),
+    },
+  ], [t]);
+
+  // ─── What Is Tiler — Sub-item data (i18n) ─────────────────────────────────
+  const coreBlocks = useMemo(() => [
+    {
+      emoji: "\uD83E\uDDE9",
+      label: t('discover.whatIsTiler.subItems.coreBlocks.tiles.label'),
+      title: t('discover.whatIsTiler.subItems.coreBlocks.tiles.title'),
+      desc: t('discover.whatIsTiler.subItems.coreBlocks.tiles.desc'),
+    },
+    {
+      emoji: "\uD83D\uDCCC",
+      label: t('discover.whatIsTiler.subItems.coreBlocks.blocks.label'),
+      title: t('discover.whatIsTiler.subItems.coreBlocks.blocks.title'),
+      desc: t('discover.whatIsTiler.subItems.coreBlocks.blocks.desc'),
+    },
+    {
+      emoji: "\uD83D\uDDFA\uFE0F",
+      label: t('discover.whatIsTiler.subItems.coreBlocks.route.label'),
+      title: t('discover.whatIsTiler.subItems.coreBlocks.route.title'),
+      desc: t('discover.whatIsTiler.subItems.coreBlocks.route.desc'),
+    },
+    {
+      emoji: "\uD83D\uDC65",
+      label: t('discover.whatIsTiler.subItems.coreBlocks.tileShare.label'),
+      title: t('discover.whatIsTiler.subItems.coreBlocks.tileShare.title'),
+      desc: t('discover.whatIsTiler.subItems.coreBlocks.tileShare.desc'),
+    },
+  ], [t]);
+
+  const comparisonRows = useMemo(() => [
+    { left: t('discover.whatIsTiler.subItems.comparison.rows.row1.left'), right: t('discover.whatIsTiler.subItems.comparison.rows.row1.right') },
+    { left: t('discover.whatIsTiler.subItems.comparison.rows.row2.left'), right: t('discover.whatIsTiler.subItems.comparison.rows.row2.right') },
+    { left: t('discover.whatIsTiler.subItems.comparison.rows.row3.left'), right: t('discover.whatIsTiler.subItems.comparison.rows.row3.right') },
+    { left: t('discover.whatIsTiler.subItems.comparison.rows.row4.left'), right: t('discover.whatIsTiler.subItems.comparison.rows.row4.right') },
+    { left: t('discover.whatIsTiler.subItems.comparison.rows.row5.left'), right: t('discover.whatIsTiler.subItems.comparison.rows.row5.right') },
+    { left: t('discover.whatIsTiler.subItems.comparison.rows.row6.left'), right: t('discover.whatIsTiler.subItems.comparison.rows.row6.right') },
+  ], [t]);
+
   useEffect(() => {
     if (!setUpOpen) return;
-    const t: ReturnType<typeof setTimeout>[] = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     // Card 1: account creation button states (6s loop)
     const signupCycle = () => {
       setSignupPhase('idle');
-      t.push(setTimeout(() => setSignupPhase('creating'), 2000));
-      t.push(setTimeout(() => setSignupPhase('done'), 3200));
-      t.push(setTimeout(signupCycle, 6000));
+      timers.push(setTimeout(() => setSignupPhase('creating'), 2000));
+      timers.push(setTimeout(() => setSignupPhase('done'), 3200));
+      timers.push(setTimeout(signupCycle, 6000));
     };
     signupCycle();
 
     // Card 2: calendar connect sequence (6.5s loop)
     const calCycle = () => {
       setCalStatus('idle');
-      t.push(setTimeout(() => setCalStatus('connecting'), 2000));
-      t.push(setTimeout(() => setCalStatus('connected'), 3200));
-      t.push(setTimeout(calCycle, 6500));
+      timers.push(setTimeout(() => setCalStatus('connecting'), 2000));
+      timers.push(setTimeout(() => setCalStatus('connected'), 3200));
+      timers.push(setTimeout(calCycle, 6500));
     };
     calCycle();
 
     // Card 3: transit mode cycling (6s loop)
     const transitCycle = () => {
       setTransitMode('drive');
-      t.push(setTimeout(() => setTransitMode('transit'), 2000));
-      t.push(setTimeout(() => setTransitMode('walk'), 3800));
-      t.push(setTimeout(transitCycle, 6000));
+      timers.push(setTimeout(() => setTransitMode('transit'), 2000));
+      timers.push(setTimeout(() => setTransitMode('walk'), 3800));
+      timers.push(setTimeout(transitCycle, 6000));
     };
     transitCycle();
 
     // Card 4: adaptive schedule rearrange (7s loop)
     const schedCycle = () => {
       setSchedPhase('normal');
-      t.push(setTimeout(() => setSchedPhase('disrupted'), 2000));
-      t.push(setTimeout(() => setSchedPhase('settled'), 3500));
-      t.push(setTimeout(schedCycle, 7000));
+      timers.push(setTimeout(() => setSchedPhase('disrupted'), 2000));
+      timers.push(setTimeout(() => setSchedPhase('settled'), 3500));
+      timers.push(setTimeout(schedCycle, 7000));
     };
     schedCycle();
 
-    return () => t.forEach(clearTimeout);
+    return () => timers.forEach(clearTimeout);
   }, [setUpOpen]);
 
   // ── What Is Tiler sub-items ──────────────────────────────────────────────
   const whatIsSubItems = [
     {
-      title: "Tiler is an AI that runs your day.",
+      title: t('discover.whatIsTiler.subItems.intro.title'),
       content: (
         <SubBodyText>
-          When a meeting runs long, or a task gets deferred, Tiler doesn&rsquo;t wait for you to
-          fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the
-          intent. Tiler handles the rest.
+          {t('discover.whatIsTiler.subItems.intro.body')}
         </SubBodyText>
       ),
     },
     {
-      title: "The Four Core Blocks of Tiler",
+      title: t('discover.whatIsTiler.subItems.coreBlocks.title'),
       content: (
         <BlocksGrid>
           {coreBlocks.map((block) => (
@@ -1176,12 +1176,12 @@ const Newsletter: React.FC = () => {
       ),
     },
     {
-      title: "How Tiler is Different",
+      title: t('discover.whatIsTiler.subItems.comparison.title'),
       content: (
         <ComparisonTable>
           <ComparisonHeader>
-            <ComparisonHeaderCell $side="left">Google Calendar</ComparisonHeaderCell>
-            <ComparisonHeaderCell $side="right">Tiler</ComparisonHeaderCell>
+            <ComparisonHeaderCell $side="left">{t('discover.whatIsTiler.subItems.comparison.headerLeft')}</ComparisonHeaderCell>
+            <ComparisonHeaderCell $side="right">{t('discover.whatIsTiler.subItems.comparison.headerRight')}</ComparisonHeaderCell>
           </ComparisonHeader>
           {comparisonRows.map((row, i) => (
             <ComparisonRow key={i} $even={i % 2 === 0}>
@@ -1198,15 +1198,15 @@ const Newsletter: React.FC = () => {
 
   // ── How To Use Tiler — ordered subset of items ───────────────────────────
   const howToOrder = [
-    "Connect a Calendar",
-    "How to Create a Block",
-    "Creating Flexible Tiles",
-    "How to Update a Tile",
-    "Travel Time & Route",
+    t('discover.howToUseTiler.items.connectCalendar.title'),
+    t('discover.howToUseTiler.items.createBlock.title'),
+    t('discover.howToUseTiler.items.flexibleTiles.title'),
+    t('discover.howToUseTiler.items.updateTile.title'),
+    t('discover.howToUseTiler.items.travelTime.title'),
   ];
 
   const adaptiveItem = (() => {
-    const item = items.find((i) => i.title === "How Does Adaptive Scheduling Work?")!;
+    const item = items.find((i) => i.title === t('discover.howToUseTiler.items.adaptiveScheduling.title'))!;
     return [{
       title: item.title,
       content: (
@@ -1215,7 +1215,7 @@ const Newsletter: React.FC = () => {
             {item.media ? (
               <MediaImage src={item.media} alt={item.title} />
             ) : (
-              <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
+              <MediaPlaceholderText>{t('discover.howToUseTiler.mediaPlaceholder')}</MediaPlaceholderText>
             )}
           </MediaPlaceholder>
           <BodyText>{item.body}</BodyText>
@@ -1236,7 +1236,7 @@ const Newsletter: React.FC = () => {
           {item.media ? (
             <MediaImage src={item.media} alt={item.title} />
           ) : (
-            <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
+            <MediaPlaceholderText>{t('discover.howToUseTiler.mediaPlaceholder')}</MediaPlaceholderText>
           )}
         </MediaPlaceholder>
         <BodyText>{item.body}</BodyText>
@@ -1247,19 +1247,18 @@ const Newsletter: React.FC = () => {
   return (
     <>
       <SEO
-        title="Newsletter - Tiler"
-        description="Explore the moments where your day finally makes sense. Find your way around the Tiler app and discover things to try in-app."
+        title={t('discover.seo.title')}
+        description={t('discover.seo.description')}
         canonicalUrl="/newsletter"
       />
       <Section>
         <BackgroundBlur />
         <PageWrapper>
           <Hero>
-            <Badge>Navigate Tiler</Badge>
-            <HeroTitle>Here&rsquo;s Where Everything Lives</HeroTitle>
+            <Badge>{t('discover.hero.badge')}</Badge>
+            <HeroTitle>{t('discover.hero.title')}</HeroTitle>
             <HeroSubtitle>
-              Explore the moments where your day finally makes sense. Find your way around the app.
-              Find things to try in-app.
+              {t('discover.hero.subtitle')}
             </HeroSubtitle>
           </Hero>
 
@@ -1271,11 +1270,10 @@ const Newsletter: React.FC = () => {
                 onClick={() => setWhatIsOpen((o) => !o)}
               >
                 <ExpandableTextSide>
-                  <SectionBadge>What Is Tiler</SectionBadge>
-                  <SectionTitle>Not a calendar. An AI that runs your day</SectionTitle>
+                  <SectionBadge>{t('discover.whatIsTiler.badge')}</SectionBadge>
+                  <SectionTitle>{t('discover.whatIsTiler.title')}</SectionTitle>
                   <SectionSummary>
-                    Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts
-                    when your day doesn&rsquo;t go to plan.
+                    {t('discover.whatIsTiler.summary')}
                   </SectionSummary>
                 </ExpandableTextSide>
 
@@ -1283,19 +1281,19 @@ const Newsletter: React.FC = () => {
                   <WhatIsTilerVisual>
                     <MockTile $color="brand">
                       <MockTileDot $color="brand" />
-                      Gym · 45 min
+                      {t('discover.whatIsTiler.mockTiles.gym')}
                     </MockTile>
                     <MockTile $color="orange">
                       <MockTileDot $color="orange" />
-                      Travel · 12 min
+                      {t('discover.whatIsTiler.mockTiles.travel')}
                     </MockTile>
                     <MockTile $color="teal">
                       <MockTileDot $color="teal" />
-                      Client Call · 1 hr
+                      {t('discover.whatIsTiler.mockTiles.clientCall')}
                     </MockTile>
                     <MockTile $color="brand">
                       <MockTileDot $color="brand" />
-                      Groceries · 30 min
+                      {t('discover.whatIsTiler.mockTiles.groceries')}
                     </MockTile>
                   </WhatIsTilerVisual>
                   <Chevron $open={whatIsOpen}>&#9660;</Chevron>
@@ -1320,12 +1318,10 @@ const Newsletter: React.FC = () => {
                 onClick={() => setSetUpOpen((o) => !o)}
               >
                 <ExpandableTextSide>
-                  <SectionBadge>Set Up Tiler</SectionBadge>
-                  <SectionTitle>Ready in under 3 minutes.</SectionTitle>
+                  <SectionBadge>{t('discover.setUpTiler.badge')}</SectionBadge>
+                  <SectionTitle>{t('discover.setUpTiler.title')}</SectionTitle>
                   <SectionSummary>
-                    Your calendar, your preferences, your constraints — four steps
-                    that give Tiler everything it needs to run Adaptive Scheduling
-                    from day one.
+                    {t('discover.setUpTiler.summary')}
                   </SectionSummary>
                 </ExpandableTextSide>
 
@@ -1333,19 +1329,19 @@ const Newsletter: React.FC = () => {
                   <SetUpVisual>
                     <SetupRow>
                       <SetupDot $done>✓</SetupDot>
-                      <SetupRowLabel $done>Create Account</SetupRowLabel>
+                      <SetupRowLabel $done>{t('discover.setUpTiler.heroLabels.createAccount')}</SetupRowLabel>
                     </SetupRow>
                     <SetupRow>
                       <SetupDot $done>✓</SetupDot>
-                      <SetupRowLabel $done>Connect Calendar</SetupRowLabel>
+                      <SetupRowLabel $done>{t('discover.setUpTiler.heroLabels.connectCalendar')}</SetupRowLabel>
                     </SetupRow>
                     <SetupRow>
                       <SetupDot $done>✓</SetupDot>
-                      <SetupRowLabel $done>Set Up Preferences</SetupRowLabel>
+                      <SetupRowLabel $done>{t('discover.setUpTiler.heroLabels.setUpPreferences')}</SetupRowLabel>
                     </SetupRow>
                     <SetupRow>
                       <SetupDot $active>◎</SetupDot>
-                      <SetupRowLabel>Adaptive Scheduling</SetupRowLabel>
+                      <SetupRowLabel>{t('discover.setUpTiler.heroLabels.adaptiveScheduling')}</SetupRowLabel>
                     </SetupRow>
                   </SetUpVisual>
                   <Chevron $open={setUpOpen}>&#9660;</Chevron>
@@ -1360,21 +1356,21 @@ const Newsletter: React.FC = () => {
                     <SetupCard>
                       <SetupAnim>
                         <SaSignupScene>
-                          <SaSignupInput>gloria@example.com</SaSignupInput>
+                          <SaSignupInput>{t('discover.setUpTiler.cards.card1.animation.emailPlaceholder')}</SaSignupInput>
                           <SaSignupBtn $phase={signupPhase}>
                             {signupPhase === 'idle'
-                              ? 'Create free account'
+                              ? t('discover.setUpTiler.cards.card1.animation.btnIdle')
                               : signupPhase === 'creating'
-                              ? 'Creating account…'
-                              : '✓ Account created!'}
+                              ? t('discover.setUpTiler.cards.card1.animation.btnCreating')
+                              : t('discover.setUpTiler.cards.card1.animation.btnDone')}
                           </SaSignupBtn>
                         </SaSignupScene>
                       </SetupAnim>
                       <SetupBody>
                         <SetupCardStepBadge>1</SetupCardStepBadge>
-                        <SetupCardTitle>Create your account</SetupCardTitle>
+                        <SetupCardTitle>{t('discover.setUpTiler.cards.card1.title')}</SetupCardTitle>
                         <SetupCardSubtext>
-                          Sign up with your email — free to start, no credit card needed.
+                          {t('discover.setUpTiler.cards.card1.subtext')}
                         </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
@@ -1385,16 +1381,16 @@ const Newsletter: React.FC = () => {
                         <SaCalRow>
                           <SaCalIcon $connected={calStatus !== 'idle'}>
                             <SaCalIconTop />
-                            <SaCalIconDate>17</SaCalIconDate>
+                            <SaCalIconDate>{t('discover.setUpTiler.cards.card2.animation.calendarDate')}</SaCalIconDate>
                           </SaCalIcon>
                           <SaCalInfo>
-                            <SaCalName>Google Calendar</SaCalName>
+                            <SaCalName>{t('discover.setUpTiler.cards.card2.animation.calendarName')}</SaCalName>
                             <SaCalStatus $ok={calStatus !== 'idle'}>
                               {calStatus === 'idle'
-                                ? 'Tap to connect'
+                                ? t('discover.setUpTiler.cards.card2.animation.tapToConnect')
                                 : calStatus === 'connecting'
-                                ? 'Connecting…'
-                                : '✓ Connected'}
+                                ? t('discover.setUpTiler.cards.card2.animation.connecting')
+                                : t('discover.setUpTiler.cards.card2.animation.connected')}
                             </SaCalStatus>
                           </SaCalInfo>
                           <SaCalCheck $show={calStatus === 'connected'}>✓</SaCalCheck>
@@ -1402,9 +1398,9 @@ const Newsletter: React.FC = () => {
                       </SetupAnim>
                       <SetupBody>
                         <SetupCardStepBadge>2</SetupCardStepBadge>
-                        <SetupCardTitle>Connect your calendar</SetupCardTitle>
+                        <SetupCardTitle>{t('discover.setUpTiler.cards.card2.title')}</SetupCardTitle>
                         <SetupCardSubtext>
-                          Link Google or Outlook — Tiler reads your events and builds around them.
+                          {t('discover.setUpTiler.cards.card2.subtext')}
                         </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
@@ -1414,34 +1410,34 @@ const Newsletter: React.FC = () => {
                       <SetupAnim>
                         <SaPrefsScene>
                           <SaPrefRow>
-                            <SaPrefLabel>Transit mode</SaPrefLabel>
+                            <SaPrefLabel>{t('discover.setUpTiler.cards.card3.animation.transitModeLabel')}</SaPrefLabel>
                             <SaTransitRow>
                               <SaTransitOption $active={transitMode === 'drive'}>
-                                🚗 Drive
+                                {t('discover.setUpTiler.cards.card3.animation.drive')}
                               </SaTransitOption>
                               <SaTransitOption $active={transitMode === 'transit'}>
-                                🚌 Transit
+                                {t('discover.setUpTiler.cards.card3.animation.transit')}
                               </SaTransitOption>
                               <SaTransitOption $active={transitMode === 'walk'}>
-                                🚶 Walk
+                                {t('discover.setUpTiler.cards.card3.animation.walk')}
                               </SaTransitOption>
                             </SaTransitRow>
                           </SaPrefRow>
                           <SaPrefRow>
-                            <SaPrefLabel>Work hours</SaPrefLabel>
+                            <SaPrefLabel>{t('discover.setUpTiler.cards.card3.animation.workHoursLabel')}</SaPrefLabel>
                             <SaTimeRange>
-                              <span>9:00 am</span>
+                              <span>{t('discover.setUpTiler.cards.card3.animation.workStart')}</span>
                               <span>→</span>
-                              <span>6:00 pm</span>
+                              <span>{t('discover.setUpTiler.cards.card3.animation.workEnd')}</span>
                             </SaTimeRange>
                           </SaPrefRow>
                         </SaPrefsScene>
                       </SetupAnim>
                       <SetupBody>
                         <SetupCardStepBadge>3</SetupCardStepBadge>
-                        <SetupCardTitle>Set up your preferences</SetupCardTitle>
+                        <SetupCardTitle>{t('discover.setUpTiler.cards.card3.title')}</SetupCardTitle>
                         <SetupCardSubtext>
-                          Choose your transit mode and set time limits in your profile.
+                          {t('discover.setUpTiler.cards.card3.subtext')}
                         </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
@@ -1450,19 +1446,19 @@ const Newsletter: React.FC = () => {
                     <SetupCard>
                       <SetupAnim>
                         <SaSchedScene>
-                          <SaSchedTimeLabel>Your schedule</SaSchedTimeLabel>
+                          <SaSchedTimeLabel>{t('discover.setUpTiler.cards.card4.animation.scheduleLabel')}</SaSchedTimeLabel>
                           <SaSchedRow>
                             <SaSchedBlock
                               $bg={palette.colors.gray[700]}
                               $width="88px"
                             >
-                              9am meeting
+                              {t('discover.setUpTiler.cards.card4.animation.meeting')}
                             </SaSchedBlock>
                             <SaSchedBlock
                               $bg={`${palette.colors.brand[500]}90`}
                               $shifted={schedPhase === 'settled'}
                             >
-                              Run · 30m
+                              {t('discover.setUpTiler.cards.card4.animation.run')}
                             </SaSchedBlock>
                           </SaSchedRow>
                           <SaSchedRow>
@@ -1471,29 +1467,29 @@ const Newsletter: React.FC = () => {
                               $width="88px"
                               $visible={schedPhase !== 'normal'}
                             >
-                              New: 10am
+                              {t('discover.setUpTiler.cards.card4.animation.newTime')}
                             </SaSchedBlock>
                             <SaSchedBlock
                               $bg={`${palette.colors.gray[600]}`}
                               $visible={schedPhase !== 'normal'}
                             >
-                              Urgent call
+                              {t('discover.setUpTiler.cards.card4.animation.urgentCall')}
                             </SaSchedBlock>
                           </SaSchedRow>
                           <SaSchedStatus $phase={schedPhase}>
                             {schedPhase === 'disrupted'
-                              ? 'Recalculating…'
+                              ? t('discover.setUpTiler.cards.card4.animation.recalculating')
                               : schedPhase === 'settled'
-                              ? '✓ Schedule rebuilt'
+                              ? t('discover.setUpTiler.cards.card4.animation.rebuilt')
                               : ''}
                           </SaSchedStatus>
                         </SaSchedScene>
                       </SetupAnim>
                       <SetupBody>
                         <SetupCardStepBadge>4</SetupCardStepBadge>
-                        <SetupCardTitle>Ready for Adaptive Scheduling</SetupCardTitle>
+                        <SetupCardTitle>{t('discover.setUpTiler.cards.card4.title')}</SetupCardTitle>
                         <SetupCardSubtext>
-                          Your schedule is live — Tiler adapts automatically as your day changes.
+                          {t('discover.setUpTiler.cards.card4.subtext')}
                         </SetupCardSubtext>
                       </SetupBody>
                     </SetupCard>
@@ -1501,12 +1497,7 @@ const Newsletter: React.FC = () => {
                   </SetupGrid>
 
                   <SetupSupportNote>
-                    Each step is an input to Tiler&rsquo;s scheduling engine — your
-                    calendar tells it what&rsquo;s fixed, your preferences tell it how
-                    you move, and your time limits tell it when you&rsquo;re free.
-                    Together, they give Tiler the full picture it needs to run
-                    Adaptive Scheduling: a schedule that adjusts itself when
-                    things change.
+                    {t('discover.setUpTiler.supportNote')}
                   </SetupSupportNote>
 
                 </ExpandableBodyInner>
@@ -1522,11 +1513,10 @@ const Newsletter: React.FC = () => {
                 onClick={() => setHowToOpen((o) => !o)}
               >
                 <ExpandableTextSide>
-                  <SectionBadge>How To Use Tiler</SectionBadge>
-                  <SectionTitle>From intent to done. In seconds.</SectionTitle>
+                  <SectionBadge>{t('discover.howToUseTiler.badge')}</SectionBadge>
+                  <SectionTitle>{t('discover.howToUseTiler.title')}</SectionTitle>
                   <SectionSummary>
-                    Connect your calendar, add your tiles, and let Tiler build the rest. A
-                    step-by-step guide to running your day with Tiler.
+                    {t('discover.howToUseTiler.summary')}
                   </SectionSummary>
                 </ExpandableTextSide>
 
@@ -1540,9 +1530,9 @@ const Newsletter: React.FC = () => {
                       <StepBubble $done>✓</StepBubble>
                     </StepFlow>
                     <StepLabelRow>
-                      <StepLabel>Add Tiles</StepLabel>
-                      <StepLabel>AI Plans</StepLabel>
-                      <StepLabel>Day Built</StepLabel>
+                      <StepLabel>{t('discover.howToUseTiler.heroLabels.addTiles')}</StepLabel>
+                      <StepLabel>{t('discover.howToUseTiler.heroLabels.aiPlans')}</StepLabel>
+                      <StepLabel>{t('discover.howToUseTiler.heroLabels.dayBuilt')}</StepLabel>
                     </StepLabelRow>
                   </HowToVisual>
                   <Chevron $open={howToOpen}>&#9660;</Chevron>
@@ -1567,11 +1557,10 @@ const Newsletter: React.FC = () => {
                 onClick={() => setFeaturesOpen((o) => !o)}
               >
                 <ExpandableTextSide>
-                  <SectionBadge>Features</SectionBadge>
-                  <SectionTitle>Everything Tiler can do.</SectionTitle>
+                  <SectionBadge>{t('discover.features.badge')}</SectionBadge>
+                  <SectionTitle>{t('discover.features.title')}</SectionTitle>
                   <SectionSummary>
-                    Every feature is built around one principle: your schedule
-                    should work for you, not the other way around.
+                    {t('discover.features.summary')}
                   </SectionSummary>
                 </ExpandableTextSide>
 
@@ -1603,161 +1592,100 @@ const Newsletter: React.FC = () => {
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A2E3A">🧩</FeatureIconBox>
-                      <FeatureName>Adaptive Tiles</FeatureName>
-                      <FeatureDesc>
-                        The core unit of Tiler. Each tile is a task, event, or
-                        habit with a duration — Tiler schedules them
-                        intelligently and moves them when your day changes.
-                      </FeatureDesc>
-                      <FeatureBadge>Core feature</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.adaptiveTiles.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.adaptiveTiles.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.adaptiveTiles.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#3D1C2A">🤖</FeatureIconBox>
-                      <FeatureName>AI scheduling assistant</FeatureName>
-                      <FeatureDesc>
-                        Tiler asks clarifying questions, proposes the best
-                        available time, and builds a complete schedule including
-                        dependencies — always with your approval first.
-                      </FeatureDesc>
-                      <FeatureBadge>Core feature</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.aiAssistant.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.aiAssistant.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.aiAssistant.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A2840">💬</FeatureIconBox>
-                      <FeatureName>Chat scheduling</FeatureName>
-                      <FeatureDesc>
-                        Tell Tiler what you need through a natural chat
-                        interface. It understands your intent and proposes a
-                        plan without you filling in a single form.
-                      </FeatureDesc>
-                      <FeatureBadge>Core feature</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.chatScheduling.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.chatScheduling.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.chatScheduling.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#4A1A2A">🗣️</FeatureIconBox>
-                      <FeatureName>Natural language input</FeatureName>
-                      <FeatureDesc>
-                        Describe tasks in plain English — no forms, no
-                        dropdowns. Tiler understands context, urgency, duration,
-                        and location from how you naturally talk.
-                      </FeatureDesc>
-                      <FeatureBadge>Core feature</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.naturalLanguage.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.naturalLanguage.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.naturalLanguage.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A3320">🚗</FeatureIconBox>
-                      <FeatureName>Auto travel buffers</FeatureName>
-                      <FeatureDesc>
-                        Tiler automatically inserts realistic travel time
-                        between location-based tiles based on your actual
-                        distance and transit options. Back-to-back never means
-                        late.
-                      </FeatureDesc>
-                      <FeatureBadge>Unique to Tiler</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.autoTravel.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.autoTravel.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.autoTravel.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A2E3A">📍</FeatureIconBox>
-                      <FeatureName>Auto locations</FeatureName>
-                      <FeatureDesc>
-                        Link locations to tiles once and Tiler remembers. Every
-                        time that task appears, travel time is calculated
-                        automatically from wherever you are.
-                      </FeatureDesc>
-                      <FeatureBadge>Unique to Tiler</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.autoLocations.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.autoLocations.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.autoLocations.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#2A1A3A">⏰</FeatureIconBox>
-                      <FeatureName>Time restrictions</FeatureName>
-                      <FeatureDesc>
-                        Set the hours you&rsquo;re available and Tiler only
-                        schedules within those bounds. Your personal time stays
-                        yours — no task bleeds into off-hours unless you allow
-                        it.
-                      </FeatureDesc>
-                      <FeatureBadge>Preferences</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.timeRestrictions.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.timeRestrictions.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.timeRestrictions.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#3D1C2A">🔄</FeatureIconBox>
-                      <FeatureName>Adaptive rescheduling</FeatureName>
-                      <FeatureDesc>
-                        When a meeting runs long or a task gets missed, Tiler
-                        detects the ripple across your whole day and proposes
-                        fixes — instantly, with your approval before changing
-                        anything.
-                      </FeatureDesc>
-                      <FeatureBadge>Core feature</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.adaptiveRescheduling.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.adaptiveRescheduling.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.adaptiveRescheduling.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A2040">📅</FeatureIconBox>
-                      <FeatureName>Calendar integration</FeatureName>
-                      <FeatureDesc>
-                        Connect Google Calendar or Outlook. Tiler reads your
-                        existing events and schedules all new tiles around them
-                        — no double bookings, ever. Supports multiple calendars.
-                      </FeatureDesc>
-                      <FeatureBadge>Integration</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.calendarIntegration.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.calendarIntegration.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.calendarIntegration.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A3320">📱</FeatureIconBox>
-                      <FeatureName>Cross-platform sync</FeatureName>
-                      <FeatureDesc>
-                        Web, iOS, and Android all stay in real-time sync. Start
-                        a task on your laptop and check in on your phone without
-                        missing a beat. One schedule, everywhere.
-                      </FeatureDesc>
-                      <FeatureBadge>Platform</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.crossPlatform.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.crossPlatform.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.crossPlatform.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A3A20">🎯</FeatureIconBox>
-                      <FeatureName>Habit scheduling</FeatureName>
-                      <FeatureDesc>
-                        Add recurring habits and Tiler auto-fits them around
-                        your day — keeping you consistent with your routines
-                        without you having to think about it each morning.
-                      </FeatureDesc>
-                      <FeatureBadge>Wellness</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.habitScheduling.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.habitScheduling.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.habitScheduling.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#3D1C2A">↩️</FeatureIconBox>
-                      <FeatureName>Defer &amp; reschedule</FeatureName>
-                      <FeatureDesc>
-                        Missed a tile? Tiler&rsquo;s Defer feature instantly
-                        finds the next best slot and reschedules with one tap.
-                        Never lose a task — just push it forward intelligently.
-                      </FeatureDesc>
-                      <FeatureBadge>Core feature</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.deferReschedule.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.deferReschedule.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.deferReschedule.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A2040">🔔</FeatureIconBox>
-                      <FeatureName>Smart notifications</FeatureName>
-                      <FeatureDesc>
-                        Get alerted when it&rsquo;s time to leave for your next
-                        tile — with live transit updates if your route changes.
-                        Never miss a departure time because you lost track of
-                        the clock.
-                      </FeatureDesc>
-                      <FeatureBadge>Real-time</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.smartNotifications.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.smartNotifications.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.smartNotifications.badge')}</FeatureBadge>
                     </FeatureCard>
 
                     <FeatureCard>
                       <FeatureIconBox $bg="#1A2E3A">👥</FeatureIconBox>
-                      <FeatureName>TileShare</FeatureName>
-                      <FeatureDesc>
-                        Share tiles with family or teammates. Assign who handles
-                        what. Track completion. Everyone&rsquo;s calendar adapts
-                        around shared commitments automatically — no extra apps
-                        needed.
-                      </FeatureDesc>
-                      <FeatureBadge>Collaboration</FeatureBadge>
+                      <FeatureName>{t('discover.features.cards.tileShareFeature.name')}</FeatureName>
+                      <FeatureDesc>{t('discover.features.cards.tileShareFeature.desc')}</FeatureDesc>
+                      <FeatureBadge>{t('discover.features.cards.tileShareFeature.badge')}</FeatureBadge>
                     </FeatureCard>
 
                   </FeaturesGrid>
