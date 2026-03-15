@@ -291,6 +291,13 @@ const ExpandableHeaderRight = styled.div`
   align-items: center;
   gap: 1rem;
   flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+  }
 `;
 
 const chevronBounce = css`
