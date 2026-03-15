@@ -24,10 +24,6 @@ const items = [
     body: "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline \u2014 Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions.",
   },
   {
-    title: "How Does Adaptive Scheduling Work?",
-    body: "Adaptive scheduling means your timeline updates itself when reality changes. If a meeting runs long, a task is deferred, or a new event is added, Tiler recalculates the rest of your day instantly. You don\u2019t reorganise your schedule, you make one adjustment, and the system resolves conflicts, shifts tiles, and keeps everything realistic.",
-  },
-  {
     title: "How to Update a Tile",
     media: "/gifs/how-to-update-a-tile.gif",
     body: "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don\u2019t need to move other tasks manually, the system handles the ripple effects.",
@@ -1205,25 +1201,6 @@ const Newsletter: React.FC = () => {
     "Travel Time & Route",
   ];
 
-  const adaptiveItem = (() => {
-    const item = items.find((i) => i.title === "How Does Adaptive Scheduling Work?")!;
-    return [{
-      title: item.title,
-      content: (
-        <ContentRow>
-          <MediaPlaceholder>
-            {item.media ? (
-              <MediaImage src={item.media} alt={item.title} />
-            ) : (
-              <MediaPlaceholderText>Image / GIF</MediaPlaceholderText>
-            )}
-          </MediaPlaceholder>
-          <BodyText>{item.body}</BodyText>
-        </ContentRow>
-      ),
-    }];
-  })();
-
   const howToItems = howToOrder.map(
     (title) => items.find((i) => i.title === title)!,
   );
@@ -1764,11 +1741,6 @@ const Newsletter: React.FC = () => {
                 </ExpandableBodyInner>
               </ExpandableBody>
             </ExpandableSection>
-          </ExpandableWrapper>
-
-          {/* ── Standalone items ── */}
-          <ExpandableWrapper>
-            <Collapse items={adaptiveItem} />
           </ExpandableWrapper>
 
         </PageWrapper>
