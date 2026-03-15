@@ -26,6 +26,8 @@ export enum CalendarRequestStatus {
 export enum CalendarRequestType {
   FocusEvent = 'focus_event',
   NavigateToDate = 'navigate_to_date',
+  GoToToday = 'go_to_today',
+  NavigateWeek = 'navigate_week',
 }
 
 /** Result reported back to the dispatcher after the calendar processes a request */
@@ -80,8 +82,23 @@ export interface NavigateToDateRequest {
   pendingFocusEntityId?: string;
 }
 
+/**
+ * Ask the calendar to navigate its view back to today.
+ */
+export interface GoToTodayRequest {
+  type: CalendarRequestType.GoToToday;
+}
+
+/**
+ * Ask the calendar to shift its view by one week forward or backward.
+ */
+export interface NavigateWeekRequest {
+  type: CalendarRequestType.NavigateWeek;
+  direction: 'back' | 'forward';
+}
+
 /** Discriminated union of every request the calendar can handle */
-export type CalendarRequest = FocusEventRequest | NavigateToDateRequest;
+export type CalendarRequest = FocusEventRequest | NavigateToDateRequest | GoToTodayRequest | NavigateWeekRequest;
 
 // ── Envelope — wraps a request with transport-level concerns ───
 

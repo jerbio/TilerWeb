@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Search, X, HelpCircle, Play, Check, Trash2 } from 'lucide-react';
+import { Search, X, HelpCircle, Play, Check, Trash2, Pencil } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { scheduleService } from '@/services';
@@ -43,6 +43,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const openCreateTile = useCalendarUI(state => state.createTile.actions.open);
+	const openEditTile = useCalendarUI(state => state.editTile.actions.open);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 
@@ -318,6 +319,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
 									</ConfirmInline>
 								) : (
 									<ResultActions data-testid="result-actions">
+										<ActionButton
+											data-testid="action-edit"
+											title={t('timeline.editEvent')}
+											onClick={(e) => { e.stopPropagation(); openEditTile(event); setShowDropdown(false); }}
+											disabled={isInteractionBlocked}
+										>
+											<Pencil size={12} />
+										</ActionButton>
 										<ActionButton
 											data-testid="action-set-as-now"
 											title={t('timeline.setAsNow')}

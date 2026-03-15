@@ -1,5 +1,6 @@
 import { createStore } from 'zustand';
-import { ScheduleCreateEventResponse } from '../../types/schedule';
+import dayjs from 'dayjs';
+import { CalendarEvent, ScheduleCreateEventResponse } from '../../types/schedule';
 
 type CreateTileState = {
   isOpen: boolean;
@@ -33,11 +34,32 @@ type CreateTileActions = {
   navigateToTileComplete: () => void;
 };
 
+type EditTileState = {
+  isOpen: boolean;
+  event: CalendarEvent | null;
+};
+
+type EditTileActions = {
+  open: (event: CalendarEvent) => void;
+  close: () => void;
+};
+
+type ViewInfo = {
+  startDay: dayjs.Dayjs;
+  daysInView: number;
+};
+
 export type CalendarUIStore = {
   createTile: {
     state: CreateTileState;
     actions: CreateTileActions;
   };
+  editTile: {
+    state: EditTileState;
+    actions: EditTileActions;
+  };
+  viewInfo: ViewInfo;
+  setViewInfo: (info: ViewInfo) => void;
 };
 
 export const createCalendarUIStore = (demoMode: boolean) =>
@@ -194,6 +216,39 @@ export const createCalendarUIStore = (demoMode: boolean) =>
                   ...state.createTile.state,
                   success: { isOpen: false, isNavigatingToTile: false },
                 },
+              },
+            }))
+          ),
+        },
+      },
+
+      viewInfo: {
+        startDay: dayjs().startOf('day'),
+        daysInView: 7,
+      },
+      setViewInfo: (info: ViewInfo) => set({ viewInfo: info }),
+
+      editTile: {
+        state: {
+          isOpen: false,
+          event: null,
+        },
+
+        actions: {
+          open: guarded((event: CalendarEvent) =>
+            set((state) => ({
+              editTile: {
+                ...state.editTile,
+                state: { isOpen: true, event },
+              },
+            }))
+          ),
+
+          close: guarded(() =>
+            set((state) => ({
+              editTile: {
+                ...state.editTile,
+                state: { isOpen: false, event: null },
               },
             }))
           ),

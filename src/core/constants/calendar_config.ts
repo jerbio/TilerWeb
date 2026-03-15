@@ -1,6 +1,7 @@
 import palette from '@/core/theme/palette';
 
 const calendarConfig = {
+	DATE_NAV_HEIGHT: '28px',
 	HEADER_HEIGHT: '34px',
 	TIMELINE_WIDTH: '70px',
 	BORDER_COLOR: palette.colors.gray[700],

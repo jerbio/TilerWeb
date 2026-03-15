@@ -167,6 +167,7 @@ const Calendar = ({
   const calendarGridCanvasRef = useRef<HTMLCanvasElement>(null);
   const calendarGridPrevCanvasRef = useRef<HTMLCanvasElement>(null);
   const calendarGridNextCanvasRef = useRef<HTMLCanvasElement>(null);
+
   function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
     canvas.width = width;
     canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * 24;
@@ -315,8 +316,9 @@ const Calendar = ({
     const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
 
     const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
+    const totalHeaderHeight = parseInt(calendarConfig.HEADER_HEIGHT);
     const innerAbsoluteX = event.springStyles.x + parseInt(calendarConfig.TIMELINE_WIDTH);
-    const innerAbsoluteY = event.springStyles.y + parseInt(calendarConfig.HEADER_HEIGHT);
+    const innerAbsoluteY = event.springStyles.y + totalHeaderHeight;
     const innerAbsoluteWidth = event.springStyles.width;
 
     const containerRect = contentContainerRef.current?.getBoundingClientRect();
@@ -351,11 +353,11 @@ const Calendar = ({
     if (calculatedY + INFO_MODAL_HEIGHT > containerHeight) {
       // Not enough space at the bottom, adjust upwards
       calculatedY =
-        containerHeight + parseInt(calendarConfig.HEADER_HEIGHT) - INFO_MODAL_HEIGHT;
+        containerHeight + totalHeaderHeight - INFO_MODAL_HEIGHT;
     }
-    if (calculatedY < parseInt(calendarConfig.HEADER_HEIGHT)) {
+    if (calculatedY < totalHeaderHeight) {
       // Still not enough space, clamp to top edge
-      calculatedY = parseInt(calendarConfig.HEADER_HEIGHT) + INFO_MODAL_GAP;
+      calculatedY = totalHeaderHeight + INFO_MODAL_GAP;
     }
 
     setCalendarEventInfoPos({ x: calculatedX, y: calculatedY });
@@ -500,22 +502,23 @@ const Calendar = ({
 
   return (
     <CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>
-      <CalendarHeader>
-        <CalendarHeaderActions>
-          <ChangeViewButton
-            disabled={eventsLoading}
-            onClick={() => changeDayView('left')}
-          >
-            <ChevronLeftIcon size={16} />
-          </ChangeViewButton>
-          <ChangeViewButton
-            disabled={eventsLoading}
-            onClick={() => changeDayView('right')}
-          >
-            <ChevronRightIcon size={16} />
-          </ChangeViewButton>
-        </CalendarHeaderActions>
-        <CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
+      <CalendarHeaderWrapper>
+        <CalendarHeader>
+          <CalendarHeaderActions>
+            <ChangeViewButton
+              disabled={eventsLoading}
+              onClick={() => changeDayView('left')}
+            >
+              <ChevronLeftIcon size={16} />
+            </ChangeViewButton>
+            <ChangeViewButton
+              disabled={eventsLoading}
+              onClick={() => changeDayView('right')}
+            >
+              <ChevronRightIcon size={16} />
+            </ChangeViewButton>
+          </CalendarHeaderActions>
+          <CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
           {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
             const day = viewOptions.startDay.add(index, 'day');
             const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
@@ -564,8 +567,9 @@ const Calendar = ({
               </CalendarHeaderDateItem>
             );
           })}
-        </CalendarHeaderDateList>
-      </CalendarHeader>
+          </CalendarHeaderDateList>
+        </CalendarHeader>
+      </CalendarHeaderWrapper>
       {/* Non-Viable Events Overlays */}
       {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
         const day = viewOptions.startDay.add(index, 'day');
@@ -729,11 +733,17 @@ const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	user-select: none;
 `;
 
-const CalendarHeader = styled.div`
+const CalendarHeaderWrapper = styled.div`
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+`;
+
+const CalendarHeader = styled.div`
 	height: ${calendarConfig.HEADER_HEIGHT};
 	background-color: ${({ theme }) => theme.colors.calendar.headerBg};
 	display: flex;
@@ -891,7 +901,7 @@ const NonViableEventsContainer = styled.div<{
   $cellwidth: number;
 }>`
 	position: absolute;
-	top: calc(${calendarConfig.HEADER_HEIGHT});
+	top: ${calendarConfig.HEADER_HEIGHT};
 	left: ${({ $cellwidth, $index }) =>
     `${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
 	pacity: ${({ $visible }) => ($visible ? 1 : 0)};

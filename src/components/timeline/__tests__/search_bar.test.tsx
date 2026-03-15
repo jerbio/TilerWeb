@@ -63,6 +63,16 @@ useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
 					navigateToTileComplete: vi.fn(),
 				},
 			},
+			editTile: {
+				state: {
+					isOpen: false,
+					event: null,
+				},
+				actions: {
+					open: vi.fn(),
+					close: vi.fn(),
+				},
+			},
 		};
 		return selector ? selector(mockStore) : mockStore;
 	},

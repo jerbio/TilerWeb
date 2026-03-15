@@ -29,6 +29,8 @@ export type ScheduleSubCalendarEventLocation = {
   nickname: string;
 };
 
+export type LocationResponse = ApiResponse<ScheduleSubCalendarEventLocation>;
+
 export type ScheduleSubCalendarEventBlob = {
   type: number;
   note: string;
@@ -318,6 +320,64 @@ export type CalendarEventSearchParams = {
 
 /** Response shape for `GET /api/CalendarEvent/Name` */
 export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
+
+/** Params for `POST /api/CalendarEvent/Update` */
+export type CalendarEventUpdateParams = {
+	EventID: string;
+	EventName?: string;
+	Start?: number;
+	End?: number;
+	Duration?: number;
+	Split?: number;
+	LocationId?: string;
+	IsLocationCleared?: string;
+	CalAddress?: string;
+	CalAddressDescription?: string;
+	IsCalAddressVerified?: string;
+	Notes?: string;
+	Priority?: string;
+	IsLocked?: boolean;
+	IsAutoDeadline?: string;
+	IsAutoReviseDeadline?: string;
+	isRestricted?: string;
+	RestrictionStart?: string;
+	RestrictionEnd?: string;
+	isWorkWeek?: string;
+	isEveryDay?: string;
+	RestrictionProfileId?: string;
+	RestrictiveWeek?: {
+		restrictionProfileId?: string;
+		WeekDayOption?: { Start?: string; Index?: string; End?: string }[];
+		isEnabled?: string;
+	};
+	RepetitionConfig?: {
+		IsEnabled?: boolean;
+		IsForever?: boolean;
+		RepetitionStart?: number;
+		RepetitionEnd?: number;
+		TileStart?: number;
+		TileEnd?: number;
+		Frequency?: string;
+		DayOfWeekRepetitions?: string[];
+	};
+	ColorConfig?: {
+		IsEnabled?: boolean;
+		Red?: string;
+		Green?: string;
+		Blue?: string;
+		Opacity?: string;
+	};
+	AllEvents?: number;
+	UserLongitude?: string;
+	UserLatitude?: string;
+	UserLocationVerified?: string;
+	MobileApp?: boolean;
+	SocketId?: boolean;
+	TimeZoneOffset?: number;
+	Version?: string;
+	TimeZone?: string;
+	IsTimeZoneAdjusted?: string;
+};
 
 /** Common params shared across schedule update endpoints (Shuffle, Reoptimize, etc.) */
 export type ScheduleUpdateParams = {
