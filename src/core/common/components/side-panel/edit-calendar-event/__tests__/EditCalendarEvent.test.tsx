@@ -235,8 +235,11 @@ describe('EditCalendarEvent', () => {
 	});
 
 	it('enables save button when name has content', async () => {
+		const user = setupUser();
 		renderComponent();
 		await waitForLoaded();
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
 		const saveBtn = screen.getByText('calendarEvent.edit.save').closest('button');
 		expect(saveBtn).not.toBeDisabled();
 	});
@@ -247,6 +250,9 @@ describe('EditCalendarEvent', () => {
 		renderComponent();
 		await waitForLoaded();
 
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
+
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
 		await waitFor(() => {
@@ -255,7 +261,7 @@ describe('EditCalendarEvent', () => {
 
 		const params = mockUpdateCalendarEvent.mock.calls[0][0];
 		expect(params.EventID).toBe('evt-1');
-		expect(params.EventName).toBe('work out');
+		expect(params.EventName).toBe('work out!');
 		expect(params.MobileApp).toBe(true);
 		expect(params.Version).toBe('v2');
 		expect(params.ColorConfig).toEqual({
@@ -272,6 +278,9 @@ describe('EditCalendarEvent', () => {
 		mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
 		renderComponent();
 		await waitForLoaded();
+
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
 
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
@@ -298,6 +307,9 @@ describe('EditCalendarEvent', () => {
 		renderComponent();
 		await waitForLoaded();
 
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
+
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
 		await waitFor(() => {
@@ -310,6 +322,9 @@ describe('EditCalendarEvent', () => {
 		mockUpdateCalendarEvent.mockRejectedValueOnce(new Error('Network error'));
 		renderComponent();
 		await waitForLoaded();
+
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
 
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
@@ -328,6 +343,9 @@ describe('EditCalendarEvent', () => {
 		renderComponent();
 		await waitForLoaded();
 
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
+
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
 		await waitFor(() => {
@@ -341,6 +359,9 @@ describe('EditCalendarEvent', () => {
 		mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
 		renderComponent();
 		await waitForLoaded();
+
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
 
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
@@ -370,6 +391,9 @@ describe('EditCalendarEvent', () => {
 		mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 		renderComponent(nonRecurringEvent);
 		await waitForLoaded();
+
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
 
 		await user.click(screen.getByText('calendarEvent.edit.save'));
 
@@ -580,7 +604,6 @@ describe('EditCalendarEvent', () => {
 			// Now form should be visible with fetched data
 			expect(screen.getByDisplayValue('Fetched Name')).toBeInTheDocument();
 			expect(screen.getByText('calendarEvent.edit.timeSection')).toBeInTheDocument();
-			expect(screen.getByText('calendarEvent.edit.save')).toBeInTheDocument();
 		});
 
 		it('shows form with prop data after fetch fails', async () => {
@@ -592,7 +615,6 @@ describe('EditCalendarEvent', () => {
 			});
 
 			expect(screen.getByDisplayValue('work out')).toBeInTheDocument();
-			expect(screen.getByText('calendarEvent.edit.save')).toBeInTheDocument();
 		});
 
 		it('populates form with fetched data', async () => {

@@ -84,6 +84,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   const [isSearching, setIsSearching] = useState(false);
   const userEditedAddressRef = useRef(false);
 
+  // Snapshot of form values after loading, used to detect changes
+  const initialFormRef = useRef<Record<string, string> | null>(null);
+
   // Section collapsed states — all start collapsed
   const [timeOpen, setTimeOpen] = useState(false);
   const [repetitionOpen, setRepetitionOpen] = useState(false);
@@ -132,6 +135,35 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     const wd = ev.repetition?.weekDays;
     setWeekDays(wd ? new Set(wd.split(',').map((s) => s.trim())) : new Set<string>());
   };
+
+  const snapshotForm = () => {
+    initialFormRef.current = {
+      name, startDate: startDate?.valueOf()?.toString() ?? '', startTime,
+      endDate: endDate?.valueOf()?.toString() ?? '', endTime,
+      durationHours, durationMinutes, splitCount,
+      address, addressDescription, selectedColor: String(selectedColor),
+      isRecurring: String(isRecurring), frequency, isForever: String(isForever),
+      repStartDate: repStartDate?.valueOf()?.toString() ?? '', repStartTime,
+      repEndDate: repEndDate?.valueOf()?.toString() ?? '', repEndTime,
+      weekDays: Array.from(weekDays).sort().join(','),
+    };
+  };
+
+  const isDirty = (() => {
+    const init = initialFormRef.current;
+    if (!init) return false;
+    const current: Record<string, string> = {
+      name, startDate: startDate?.valueOf()?.toString() ?? '', startTime,
+      endDate: endDate?.valueOf()?.toString() ?? '', endTime,
+      durationHours, durationMinutes, splitCount,
+      address, addressDescription, selectedColor: String(selectedColor),
+      isRecurring: String(isRecurring), frequency, isForever: String(isForever),
+      repStartDate: repStartDate?.valueOf()?.toString() ?? '', repStartTime,
+      repEndDate: repEndDate?.valueOf()?.toString() ?? '', repEndTime,
+      weekDays: Array.from(weekDays).sort().join(','),
+    };
+    return Object.keys(init).some((k) => init[k] !== current[k]);
+  })();
 
   // Debounced location search — only when the user types in the input
   useEffect(() => {
@@ -197,6 +229,13 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
       });
     return () => { cancelled = true; };
   }, [event.id]);
+
+  // Snapshot form values once loading finishes
+  useEffect(() => {
+    if (!isLoading && !initialFormRef.current) {
+      snapshotForm();
+    }
+  });
 
   const handleSave = async () => {
     if (!event.id) return;
@@ -587,12 +626,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         </Section>
 
       </Form>
-      <SaveFooter>
-        <SaveButton onClick={handleSave} disabled={isSaving || !name.trim()}>
-          {isSaving ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
-          {t('calendarEvent.edit.save')}
-        </SaveButton>
-      </SaveFooter>
+      {isDirty && (
+        <SaveFooter>
+          <SaveButton onClick={handleSave} disabled={isSaving || !name.trim()}>
+            {isSaving ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
+            {t('calendarEvent.edit.save')}
+          </SaveButton>
+        </SaveFooter>
+      )}
       </>
       )}
     </Container>
