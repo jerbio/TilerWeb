@@ -47,6 +47,10 @@ vi.mock('react-i18next', () => ({
 	}),
 }));
 
+vi.mock('@/core/theme/ThemeProvider', () => ({
+	useTheme: () => ({ isDarkMode: false, toggleTheme: vi.fn() }),
+}));
+
 // ── Test Data ──
 
 const mockEvent: CalendarEvent = {
@@ -215,8 +219,9 @@ describe('EditCalendarEvent', () => {
 		await waitForLoaded();
 		await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
 		expect(screen.getByText('calendarEvent.edit.recurring')).toBeInTheDocument();
-		const select = screen.getByRole('combobox');
-		expect(select).toHaveValue('weekly');
+		const selects = screen.getAllByRole('combobox');
+		const frequencySelect = selects.find((s) => (s as HTMLSelectElement).value === 'weekly');
+		expect(frequencySelect).toBeDefined();
 	});
 
 	it('disables save button when name is empty', async () => {

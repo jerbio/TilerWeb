@@ -7,8 +7,9 @@ type CalendarDatePickerProps = {
   isOpen: boolean;
   onClose: () => void;
   onDateSelect: (date: dayjs.Dayjs) => void;
-  startDay: dayjs.Dayjs;
-  daysInView: number;
+  startDay?: dayjs.Dayjs;
+  daysInView?: number;
+  selectedDate?: dayjs.Dayjs;
 };
 
 const CalendarDatePicker = ({
@@ -17,14 +18,18 @@ const CalendarDatePicker = ({
   onDateSelect,
   startDay,
   daysInView,
+  selectedDate,
 }: CalendarDatePickerProps) => {
   const [displayMonth, setDisplayMonth] = useState(dayjs().startOf('month'));
   const containerRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   // Reset to current view month when opening
   useEffect(() => {
     if (isOpen) {
-      setDisplayMonth(startDay.startOf('month'));
+      const anchor = selectedDate ?? startDay ?? dayjs();
+      setDisplayMonth(anchor.startOf('month'));
     }
   }, [isOpen]);
 
@@ -34,7 +39,7 @@ const CalendarDatePicker = ({
 
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        onClose();
+        onCloseRef.current();
       }
     };
 
@@ -47,22 +52,23 @@ const CalendarDatePicker = ({
       clearTimeout(timer);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   // Close on Escape
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const today = dayjs().startOf('day');
-  const viewStart = startDay.startOf('day');
-  const viewEnd = viewStart.add(daysInView - 1, 'day').startOf('day');
+  const viewStart = startDay?.startOf('day');
+  const viewEnd = viewStart && daysInView ? viewStart.add(daysInView - 1, 'day').startOf('day') : undefined;
+  const selected = selectedDate?.startOf('day');
 
   const prevMonth = useCallback(() => {
     setDisplayMonth((m) => m.subtract(1, 'month'));
@@ -123,7 +129,7 @@ const CalendarDatePicker = ({
         {rows.map((row, rowIdx) => (
           <WeekRow
             key={rowIdx}
-            $isViewedWeek={row.some(
+            $isViewedWeek={!!(viewStart && viewEnd) && row.some(
               (d) =>
                 (d.isSame(viewStart, 'day') || d.isAfter(viewStart, 'day')) &&
                 (d.isSame(viewEnd, 'day') || d.isBefore(viewEnd, 'day'))
@@ -132,7 +138,8 @@ const CalendarDatePicker = ({
             {row.map((date, colIdx) => {
               const isToday = date.isSame(today, 'day');
               const isOutsideMonth = !date.isSame(displayMonth, 'month');
-              const isInViewedWeek =
+              const isSelected = !!selected && date.isSame(selected, 'day');
+              const isInViewedWeek = !!(viewStart && viewEnd) &&
                 (date.isSame(viewStart, 'day') || date.isAfter(viewStart, 'day')) &&
                 (date.isSame(viewEnd, 'day') || date.isBefore(viewEnd, 'day'));
 
@@ -142,6 +149,7 @@ const CalendarDatePicker = ({
                   $isToday={isToday}
                   $isOutsideMonth={isOutsideMonth}
                   $isInViewedWeek={isInViewedWeek}
+                  $isSelected={isSelected}
                   onClick={() => handleSelect(date)}
                 >
                   {date.date()}
@@ -239,6 +247,7 @@ const DateCell = styled.button<{
   $isToday: boolean;
   $isOutsideMonth: boolean;
   $isInViewedWeek: boolean;
+  $isSelected: boolean;
 }>`
   width: 28px;
   height: 28px;
@@ -250,20 +259,20 @@ const DateCell = styled.button<{
   font-weight: 500;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   cursor: pointer;
-  background-color: ${({ $isToday, theme }) =>
-    $isToday ? theme.colors.datepicker.dateSelectedBg : 'transparent'};
-  color: ${({ $isToday, $isOutsideMonth, theme }) => {
-    if ($isToday) return theme.colors.datepicker.dateSelectedText;
+  background-color: ${({ $isToday, $isSelected, theme }) =>
+    $isToday || $isSelected ? theme.colors.datepicker.dateSelectedBg : 'transparent'};
+  color: ${({ $isToday, $isSelected, $isOutsideMonth, theme }) => {
+    if ($isToday || $isSelected) return theme.colors.datepicker.dateSelectedText;
     if ($isOutsideMonth) return theme.colors.datepicker.dateOutsideMonthText;
     return theme.colors.datepicker.dateText;
   }};
   transition: background-color 0.15s ease, color 0.15s ease;
 
   &:hover {
-    background-color: ${({ $isToday, theme }) =>
-      $isToday ? theme.colors.datepicker.dateSelectedBg : theme.colors.datepicker.dateHoverBg};
-    color: ${({ $isToday, theme }) =>
-      $isToday ? theme.colors.datepicker.dateSelectedText : theme.colors.datepicker.dateHoverText};
+    background-color: ${({ $isToday, $isSelected, theme }) =>
+      $isToday || $isSelected ? theme.colors.datepicker.dateSelectedBg : theme.colors.datepicker.dateHoverBg};
+    color: ${({ $isToday, $isSelected, theme }) =>
+      $isToday || $isSelected ? theme.colors.datepicker.dateSelectedText : theme.colors.datepicker.dateHoverText};
   }
 `;
 

@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { ArrowLeft, Save, Loader2, ChevronDown, Bookmark, MapPin } from 'lucide-react';
+import dayjs from 'dayjs';
+import { ArrowLeft, Save, Loader2, ChevronDown, Bookmark, MapPin, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CalendarEvent, CalendarEventUpdateParams, ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
+import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
+import TimeDropdown from '@/core/common/components/TimeDropdown';
+import { epochToDate, epochToTimeString, combineDateAndTimeString } from '@/core/common/utils/timeUtils';
 
 const COLOR_SWATCHES: { r: number; g: number; b: number }[] = [
   { r: 237, g: 18, b: 59 },   // brand red
@@ -26,28 +30,16 @@ interface EditCalendarEventProps {
   onClose: () => void;
 }
 
-/** Convert a ms-epoch to a `datetime-local` input value. */
-function msToDatetimeLocal(ms: number | null): string {
-  if (ms == null) return '';
-  const d = new Date(ms);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-/** Convert a `datetime-local` input value back to ms-epoch. */
-function datetimeLocalToMs(value: string): number | null {
-  if (!value) return null;
-  return new Date(value).getTime();
-}
-
 const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose }) => {
   const { t } = useTranslation();
   const showNotification = useUiStore((s) => s.notification.show);
   const updateNotification = useUiStore((s) => s.notification.update);
 
   const [name, setName] = useState(event.name ?? '');
-  const [startStr, setStartStr] = useState(msToDatetimeLocal(event.start));
-  const [endStr, setEndStr] = useState(msToDatetimeLocal(event.end));
+  const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(epochToDate(event.start));
+  const [startTime, setStartTime] = useState(epochToTimeString(event.start));
+  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(epochToDate(event.end));
+  const [endTime, setEndTime] = useState(epochToTimeString(event.end));
   const [duration, setDuration] = useState<string>(
     event.eachTileDuration != null ? String(Math.round(event.eachTileDuration / 60000)) : ''
   );
@@ -63,11 +55,17 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   const [isRecurring, setIsRecurring] = useState(event.repetition?.isEnabled ?? false);
   const [frequency, setFrequency] = useState(event.repetition?.frequency ?? '');
   const [isForever, setIsForever] = useState(event.repetition?.isForever ?? false);
-  const [repetitionStartStr, setRepetitionStartStr] = useState(
-    msToDatetimeLocal(event.repetition?.repetitionTimeline?.start ?? null)
+  const [repStartDate, setRepStartDate] = useState<dayjs.Dayjs | null>(
+    epochToDate(event.repetition?.repetitionTimeline?.start ?? null)
   );
-  const [repetitionEndStr, setRepetitionEndStr] = useState(
-    msToDatetimeLocal(event.repetition?.repetitionTimeline?.end ?? null)
+  const [repStartTime, setRepStartTime] = useState(
+    epochToTimeString(event.repetition?.repetitionTimeline?.start ?? null)
+  );
+  const [repEndDate, setRepEndDate] = useState<dayjs.Dayjs | null>(
+    epochToDate(event.repetition?.repetitionTimeline?.end ?? null)
+  );
+  const [repEndTime, setRepEndTime] = useState(
+    epochToTimeString(event.repetition?.repetitionTimeline?.end ?? null)
   );
   const [weekDays, setWeekDays] = useState<Set<string>>(() => {
     const wd = event.repetition?.weekDays;
@@ -86,11 +84,28 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   const [locationOpen, setLocationOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
 
+  // Date picker open states
+  const [startPickerOpen, setStartPickerOpen] = useState(false);
+  const [endPickerOpen, setEndPickerOpen] = useState(false);
+  const [repStartPickerOpen, setRepStartPickerOpen] = useState(false);
+  const [repEndPickerOpen, setRepEndPickerOpen] = useState(false);
+
+  const closeAllPickers = () => {
+    setStartPickerOpen(false);
+    setEndPickerOpen(false);
+    setRepStartPickerOpen(false);
+    setRepEndPickerOpen(false);
+  };
+
   /** Populate all form fields from a CalendarEvent. */
   const populateForm = (ev: CalendarEvent) => {
     setName(ev.name ?? '');
-    setStartStr(msToDatetimeLocal(ev.start));
-    setEndStr(msToDatetimeLocal(ev.end));
+    setStartDate(epochToDate(ev.start));
+    setStartTime(epochToTimeString(ev.start));
+    setEndDate(epochToDate(ev.end));
+    setEndTime(epochToTimeString(ev.end));
+    setEndDate(epochToDate(ev.end));
+    setEndTime(epochToTimeString(ev.end));
     setDuration(ev.eachTileDuration != null ? String(Math.round(ev.eachTileDuration / 60000)) : '');
     setAddress(ev.address ?? '');
     setAddressDescription(ev.addressDescription ?? '');
@@ -102,8 +117,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     setIsRecurring(ev.repetition?.isEnabled ?? false);
     setFrequency(ev.repetition?.frequency ?? '');
     setIsForever(ev.repetition?.isForever ?? false);
-    setRepetitionStartStr(msToDatetimeLocal(ev.repetition?.repetitionTimeline?.start ?? null));
-    setRepetitionEndStr(msToDatetimeLocal(ev.repetition?.repetitionTimeline?.end ?? null));
+    setRepStartDate(epochToDate(ev.repetition?.repetitionTimeline?.start ?? null));
+    setRepStartTime(epochToTimeString(ev.repetition?.repetitionTimeline?.start ?? null));
+    setRepEndDate(epochToDate(ev.repetition?.repetitionTimeline?.end ?? null));
+    setRepEndTime(epochToTimeString(ev.repetition?.repetitionTimeline?.end ?? null));
     const wd = ev.repetition?.weekDays;
     setWeekDays(wd ? new Set(wd.split(',').map((s) => s.trim())) : new Set<string>());
   };
@@ -177,8 +194,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     if (!event.id) return;
     setIsSaving(true);
 
-    const startMs = datetimeLocalToMs(startStr);
-    const endMs = datetimeLocalToMs(endStr);
+    const startMs = combineDateAndTimeString(startDate, startTime);
+    const endMs = combineDateAndTimeString(endDate, endTime);
     const swatch = COLOR_SWATCHES[selectedColor];
 
     const params: CalendarEventUpdateParams = {
@@ -205,8 +222,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         IsEnabled: true,
         Frequency: frequency,
         IsForever: isForever,
-        RepetitionStart: datetimeLocalToMs(repetitionStartStr) ?? undefined,
-        RepetitionEnd: datetimeLocalToMs(repetitionEndStr) ?? undefined,
+        RepetitionStart: combineDateAndTimeString(repStartDate, repStartTime) ?? undefined,
+        RepetitionEnd: combineDateAndTimeString(repEndDate, repEndTime) ?? undefined,
         DayOfWeekRepetitions: frequency === 'weekly' ? Array.from(weekDays) : undefined,
       };
     }
@@ -255,11 +272,39 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
             <SectionBody>
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.start')}</Label>
-                <Input type="datetime-local" value={startStr} onChange={(e) => setStartStr(e.target.value)} />
+                <DateTimeRow>
+                  <DatePickerWrapper>
+                    <DateTrigger onClick={() => { closeAllPickers(); setStartPickerOpen((v) => !v); }} type="button">
+                      <Calendar size={14} />
+                      {startDate ? startDate.format('MMM D, YYYY') : t('calendarEvent.edit.selectDate')}
+                    </DateTrigger>
+                    <CalendarDatePicker
+                      isOpen={startPickerOpen}
+                      onClose={() => setStartPickerOpen(false)}
+                      onDateSelect={(d) => { setStartDate(d); setStartPickerOpen(false); }}
+                      selectedDate={startDate ?? undefined}
+                    />
+                  </DatePickerWrapper>
+                  <TimeDropdown value={startTime} onChange={setStartTime} interval={15} />
+                </DateTimeRow>
               </FieldGroup>
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.end')}</Label>
-                <Input type="datetime-local" value={endStr} onChange={(e) => setEndStr(e.target.value)} />
+                <DateTimeRow>
+                  <DatePickerWrapper>
+                    <DateTrigger onClick={() => { closeAllPickers(); setEndPickerOpen((v) => !v); }} type="button">
+                      <Calendar size={14} />
+                      {endDate ? endDate.format('MMM D, YYYY') : t('calendarEvent.edit.selectDate')}
+                    </DateTrigger>
+                    <CalendarDatePicker
+                      isOpen={endPickerOpen}
+                      onClose={() => setEndPickerOpen(false)}
+                      onDateSelect={(d) => { setEndDate(d); setEndPickerOpen(false); }}
+                      selectedDate={endDate ?? undefined}
+                    />
+                  </DatePickerWrapper>
+                  <TimeDropdown value={endTime} onChange={setEndTime} interval={15} />
+                </DateTimeRow>
               </FieldGroup>
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.duration')}</Label>
@@ -322,22 +367,40 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
               {isRecurring && !isForever && (
                 <>
                   <FieldGroup>
-                    <Label htmlFor="rep-start">{t('calendarEvent.edit.repetitionStart')}</Label>
-                    <Input
-                      id="rep-start"
-                      type="datetime-local"
-                      value={repetitionStartStr}
-                      onChange={(e) => setRepetitionStartStr(e.target.value)}
-                    />
+                    <Label>{t('calendarEvent.edit.repetitionStart')}</Label>
+                    <DateTimeRow>
+                      <DatePickerWrapper>
+                        <DateTrigger onClick={() => { closeAllPickers(); setRepStartPickerOpen((v) => !v); }} type="button" aria-label={t('calendarEvent.edit.repetitionStart')}>
+                          <Calendar size={14} />
+                          {repStartDate ? repStartDate.format('MMM D, YYYY') : t('calendarEvent.edit.selectDate')}
+                        </DateTrigger>
+                        <CalendarDatePicker
+                          isOpen={repStartPickerOpen}
+                          onClose={() => setRepStartPickerOpen(false)}
+                          onDateSelect={(d) => { setRepStartDate(d); setRepStartPickerOpen(false); }}
+                          selectedDate={repStartDate ?? undefined}
+                        />
+                      </DatePickerWrapper>
+                      <TimeDropdown value={repStartTime} onChange={setRepStartTime} interval={15} />
+                    </DateTimeRow>
                   </FieldGroup>
                   <FieldGroup>
-                    <Label htmlFor="rep-end">{t('calendarEvent.edit.repetitionEnd')}</Label>
-                    <Input
-                      id="rep-end"
-                      type="datetime-local"
-                      value={repetitionEndStr}
-                      onChange={(e) => setRepetitionEndStr(e.target.value)}
-                    />
+                    <Label>{t('calendarEvent.edit.repetitionEnd')}</Label>
+                    <DateTimeRow>
+                      <DatePickerWrapper>
+                        <DateTrigger onClick={() => { closeAllPickers(); setRepEndPickerOpen((v) => !v); }} type="button" aria-label={t('calendarEvent.edit.repetitionEnd')}>
+                          <Calendar size={14} />
+                          {repEndDate ? repEndDate.format('MMM D, YYYY') : t('calendarEvent.edit.selectDate')}
+                        </DateTrigger>
+                        <CalendarDatePicker
+                          isOpen={repEndPickerOpen}
+                          onClose={() => setRepEndPickerOpen(false)}
+                          onDateSelect={(d) => { setRepEndDate(d); setRepEndPickerOpen(false); }}
+                          selectedDate={repEndDate ?? undefined}
+                        />
+                      </DatePickerWrapper>
+                      <TimeDropdown value={repEndTime} onChange={setRepEndTime} interval={15} />
+                    </DateTimeRow>
                   </FieldGroup>
                 </>
               )}
@@ -544,7 +607,6 @@ const Form = styled.div`
 const Section = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.border.default};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  overflow: hidden;
 `;
 
 const SectionHeader = styled.button`
@@ -553,6 +615,7 @@ const SectionHeader = styled.button`
   width: 100%;
   padding: 0.625rem 0.75rem;
   border: none;
+  border-radius: inherit;
   background: ${({ theme }) => theme.colors.background.card2};
   color: ${({ theme }) => theme.colors.text.primary};
   cursor: pointer;
@@ -601,6 +664,55 @@ const SectionBody = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.border.default};
 `;
 
+const DateTimeRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  > select {
+    height: 36px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+`;
+
+const DatePickerWrapper = styled.div`
+  position: relative;
+  flex: 1;
+  min-width: 0;
+`;
+
+const DateTrigger = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 36px;
+  padding: 0 0.75rem;
+  border: 1px solid ${({ theme }) => theme.colors.input.border};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colors.input.bg};
+  color: ${({ theme }) => theme.colors.input.text};
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  text-align: left;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.input.borderHover};
+  }
+
+  &:focus {
+    border-color: ${({ theme }) => theme.colors.input.focusRing};
+    outline: none;
+  }
+
+  svg {
+    flex-shrink: 0;
+    color: ${({ theme }) => theme.colors.text.muted};
+  }
+`;
+
 /* ── Form Primitives ── */
 
 const FieldGroup = styled.div`
@@ -624,6 +736,7 @@ const Input = styled.input`
   background-color: ${({ theme }) => theme.colors.input.bg};
   color: ${({ theme }) => theme.colors.input.text};
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  accent-color: ${({ theme }) => theme.colors.brand[500]};
   outline: none;
   transition: border-color 0.15s ease;
 
@@ -638,6 +751,11 @@ const Input = styled.input`
   &:focus {
     border-color: ${({ theme }) => theme.colors.input.focusRing};
   }
+
+  &::-webkit-calendar-picker-indicator {
+    filter: ${({ theme }) => theme.colors.text.primary === theme.colors.white ? 'invert(1)' : 'none'};
+    cursor: pointer;
+  }
 `;
 
 
@@ -650,6 +768,7 @@ const Select = styled.select`
   background-color: ${({ theme }) => theme.colors.input.bg};
   color: ${({ theme }) => theme.colors.input.text};
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  accent-color: ${({ theme }) => theme.colors.brand[500]};
   outline: none;
   cursor: pointer;
 

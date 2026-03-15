@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 /**
  * Milliseconds in common time units
  */
@@ -140,4 +142,39 @@ export const calculateBedTimeEnd = (bedTimeStart: string, sleepDurationMs: numbe
 	endMs = endMs % MS_PER_DAY;
 
 	return msToTimeString(endMs);
+};
+
+/**
+ * Extracts the date portion (start of day) from a millisecond epoch timestamp.
+ * Returns a dayjs object set to midnight of that date, or null if input is null/undefined.
+ */
+export const epochToDate = (ms: number | null): dayjs.Dayjs | null => {
+	if (ms == null) return null;
+	return dayjs(ms).startOf('day');
+};
+
+/**
+ * Extracts a 12-hour time string (e.g., "5:00 AM") from a millisecond epoch timestamp.
+ * Returns an empty string if input is null/undefined.
+ */
+export const epochToTimeString = (ms: number | null): string => {
+	if (ms == null) return '';
+	const d = dayjs(ms);
+	const msSinceMidnight = (d.hour() * 60 + d.minute()) * MS_PER_MINUTE;
+	return msToTimeString(msSinceMidnight);
+};
+
+/**
+ * Combines a dayjs date with a time string (e.g., "5:00 AM") into a millisecond epoch timestamp.
+ * Returns null if the date is null. Falls back to the date's epoch if the time string is empty/invalid.
+ */
+export const combineDateAndTimeString = (date: dayjs.Dayjs | null, time: string): number | null => {
+	if (!date) return null;
+	if (!time) return date.valueOf();
+	const msSinceMidnight = timeStringToMs(time);
+	if (msSinceMidnight === 0 && time !== '12:00 AM') return date.valueOf();
+	const totalMinutes = Math.floor(msSinceMidnight / MS_PER_MINUTE);
+	const hours = Math.floor(totalMinutes / 60);
+	const mins = totalMinutes % 60;
+	return date.hour(hours).minute(mins).second(0).millisecond(0).valueOf();
 };
