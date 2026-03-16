@@ -129,6 +129,10 @@ const CalendarEvents = ({
       }
 
       // Split events that span multiple days
+      // Preserve original start/end before splitting overwrites them
+      const originalStart = event.start;
+      const originalEnd = event.end;
+
       if (!start.isSame(end, 'day')) {
         const days = end.endOf('day').diff(start.startOf('day'), 'day') + 1;
         for (let i = 0; i < days; i++) {
@@ -138,12 +142,16 @@ const CalendarEvents = ({
             key: `${event.id}-${i}`,
             start: i === 0 ? start.unix() * 1000 : day.startOf('day').unix() * 1000,
             end: i === days - 1 ? end.unix() * 1000 : day.endOf('day').unix() * 1000,
+            originalStart,
+            originalEnd,
           });
         }
       } else {
         currentViewEvents.push({
           ...event,
           key: event.id,
+          originalStart,
+          originalEnd,
         });
       }
     }
