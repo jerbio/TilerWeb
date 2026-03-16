@@ -28,4 +28,11 @@ export default [
 			'react/react-in-jsx-scope': 'off', // Not needed with React 17+ JSX transform
 		},
 	},
+	// Disable prop-types for TSX files only
+	{
+		files: ['**/*.tsx'],
+		rules: {
+			'react/prop-types': 'off',
+		},
+	},
 ];

@@ -169,6 +169,16 @@ export enum ScheduleRepeatWeekday {
   Saturday = "6",
 }
 
+export enum ScheduleRepeatStartType {
+  Default = "0",
+  On = "1",
+}
+
+export enum ScheduleRepeatEndType {
+  Never = "0",
+  On = "1",
+}
+
 export type ScheduleRepeatWeeklyData = string;
 
 

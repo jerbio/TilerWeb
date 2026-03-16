@@ -9,7 +9,9 @@ import {
   StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
 import {
+  ScheduleRepeatEndType,
   ScheduleRepeatFrequency,
+  ScheduleRepeatStartType,
   ScheduleRepeatType,
   ScheduleRepeatWeekday,
   ScheduleSubCalendarEvent,
@@ -32,13 +34,14 @@ import {
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
-import CalendarCreateTile, { InitialCreateTileFormState } from './calendar_create_tile';
-import { RGB, RGBColor } from '@/core/util/colors';
+import CalendarCreateTile, { InitialCreateTileFormState } from './create_tile';
+import { RGBColor } from '@/core/util/colors';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
 
 import { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './calendar-ui.provider';
+import { eventColorOptions } from './data';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -434,29 +437,22 @@ const Calendar = ({
   }, [isMobile]);
 
   // Create Tile State
-  const tileColorOptions: Array<RGB> = [
-    { r: 255, g: 159, b: 28 },
-    { r: 0, g: 188, b: 212 },
-    { r: 204, g: 51, b: 0 },
-    { r: 102, g: 122, b: 62 },
-    { r: 33, g: 150, b: 243 },
-    { r: 126, g: 87, b: 194 },
-    { r: 152, g: 255, b: 197 },
-    { r: 219, g: 58, b: 94 },
-  ];
   const initialCreateTileFormState: InitialCreateTileFormState = {
+		start: dayjs(),
     action: '',
     location: '',
     durationHours: 0,
     durationMins: 0,
     deadline: dayjs(),
-    color: new RGBColor(tileColorOptions[0]),
+    color: new RGBColor(eventColorOptions[0]),
     isRecurring: false,
-    recurrenceEndDate: dayjs().add(1, 'week'),
     recurrenceType: ScheduleRepeatType.Daily,
     recurrenceFrequency: ScheduleRepeatFrequency.Daily,
     recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
-    hasRecurrenceEndDate: false,
+    recurrenceStartType: ScheduleRepeatStartType.Default,
+		recurrenceStartDate: dayjs(),
+		recurrenceEndType: ScheduleRepeatEndType.Never,
+    recurrenceEndDate: dayjs().add(1, 'week'),
     timeRestrictionType: null,
     isTimeRestricted: false,
     timeRestrictionStart: '00:00',
@@ -489,7 +485,9 @@ const Calendar = ({
 
       setFormData({
         ...formData,
+				start: clickedDay,
         deadline: clickedDay,
+				recurrenceStartDate: clickedDay,
 				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
       });
       createTile.actions.open();
@@ -645,7 +643,6 @@ const Calendar = ({
           <CalendarCreateTile
             refetchEvents={refetchEvents}
             formHandler={createTileFormHandler}
-            tileColorOptions={tileColorOptions}
           />,
           createTileModalPortalTarget
         )}
