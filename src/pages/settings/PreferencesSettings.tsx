@@ -343,7 +343,7 @@ const PreferencesSettings: React.FC = () => {
 							onChange={() => setTransportMode(TransportModeUI.Bike)}
 							disabled={isLoading}
 						/>
-						<RadioLabel>{t('settings.sections.tilePreferences.byBike')}</RadioLabel>
+						<RadioLabel>{t('settings.sections.tilePreferences.cycling')}</RadioLabel>
 					</RadioOption>
 					<RadioOption>
 						<RadioInput
@@ -353,7 +353,7 @@ const PreferencesSettings: React.FC = () => {
 							onChange={() => setTransportMode(TransportModeUI.Drive)}
 							disabled={isLoading}
 						/>
-						<RadioLabel>{t('settings.sections.tilePreferences.iDrive')}</RadioLabel>
+						<RadioLabel>{t('settings.sections.tilePreferences.driving')}</RadioLabel>
 					</RadioOption>
 					<RadioOption>
 						<RadioInput
@@ -363,7 +363,7 @@ const PreferencesSettings: React.FC = () => {
 							onChange={() => setTransportMode(TransportModeUI.Bus)}
 							disabled={isLoading}
 						/>
-						<RadioLabel>{t('settings.sections.tilePreferences.byBus')}</RadioLabel>
+						<RadioLabel>{t('settings.sections.tilePreferences.transit')}</RadioLabel>
 					</RadioOption>
 				</RadioGroup>
 			</Section>

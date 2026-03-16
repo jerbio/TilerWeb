@@ -577,5 +577,62 @@
 			"deleteSuccess": "이벤트가 삭제되었습니다!",
 			"actionFailed": "작업이 실패했습니다. 다시 시도해 주세요."
 		}
+	},
+	"settings": {
+		"title": "설정",
+		"back": "뒤로",
+		"logout": "로그아웃",
+		"breadcrumb": {
+			"home": "홈",
+			"settings": "설정"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "타일 환경설정",
+				"description": "이동 수단을 정의하고 Tiler가 일일 시간 패턴을 이해하도록 도와주세요",
+				"howMoveAround": "어떻게 이동하시나요?",
+				"cycling": "자전거",
+				"driving": "운전",
+				"transit": "대중교통",
+				"defineTimeRestrictions": "시간 제한 정의",
+				"myWorkHours": "내 근무 시간",
+				"myPersonalHours": "내 개인 시간",
+				"setBlockOutHours": "차단 시간 설정",
+				"bedTime": "취침 시간",
+				"startsAt": "시작 시간",
+				"endsAt": "종료 시간",
+				"saveChanges": "변경 사항 저장",
+				"saving": "저장 중...",
+				"saveSuccess": "타일 환경설정이 성공적으로 업데이트되었습니다",
+				"saveError": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요.",
+				"bedTimeStartRequired": "취침 시작 시간을 선택해 주세요",
+				"bedTimeEndRequired": "기상 시간을 선택해 주세요",
+				"scheduleIncompleteDay": "{{label}}: {{day}}의 시작 시간과 종료 시간을 모두 설정해 주세요",
+				"dayLabels": {
+					"sun": "일",
+					"mon": "월",
+					"tue": "화",
+					"wed": "수",
+					"thu": "목",
+					"fri": "금",
+					"sat": "토"
+				},
+				"dayNames": {
+					"sun": "일요일",
+					"mon": "월요일",
+					"tue": "화요일",
+					"wed": "수요일",
+					"thu": "목요일",
+					"fri": "금요일",
+					"sat": "토요일"
+				},
+				"start": "시작",
+				"end": "종료",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "오전",
+				"pm": "오후"
+			}
+		}
 	}
 }

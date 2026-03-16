@@ -118,9 +118,9 @@ describe('PreferencesSettings', () => {
 			renderWithProviders(<PreferencesSettings />);
 
 			await waitFor(() => {
-				expect(screen.getByText('By bike')).toBeInTheDocument();
-				expect(screen.getByText('I drive')).toBeInTheDocument();
-				expect(screen.getByText('By Bus')).toBeInTheDocument();
+				expect(screen.getByText('Cycling')).toBeInTheDocument();
+				expect(screen.getByText('Driving')).toBeInTheDocument();
+				expect(screen.getByText('Transit')).toBeInTheDocument();
 			});
 		});
 
@@ -396,7 +396,7 @@ describe('PreferencesSettings', () => {
 			renderWithProviders(<PreferencesSettings />);
 
 			await waitFor(() => {
-				const bikeRadio = screen.getByLabelText('By bike');
+				const bikeRadio = screen.getByLabelText('Cycling');
 				expect(bikeRadio).toBeChecked();
 			});
 		});
@@ -411,7 +411,7 @@ describe('PreferencesSettings', () => {
 			renderWithProviders(<PreferencesSettings />);
 
 			await waitFor(() => {
-				const busRadio = screen.getByLabelText('By Bus');
+				const busRadio = screen.getByLabelText('Transit');
 				expect(busRadio).toBeChecked();
 			});
 		});
@@ -430,7 +430,7 @@ describe('PreferencesSettings', () => {
 			});
 
 			// Click bike option
-			fireEvent.click(screen.getByLabelText('By bike'));
+			fireEvent.click(screen.getByLabelText('Cycling'));
 
 			// Save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -578,7 +578,7 @@ describe('PreferencesSettings', () => {
 			});
 
 			// Change only transport mode
-			fireEvent.click(screen.getByLabelText('By Bus'));
+			fireEvent.click(screen.getByLabelText('Transit'));
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
