@@ -29,7 +29,7 @@ export function useEditTilePanelSync({
   const wasPushedRef = useRef(false);
 
   useEffect(() => {
-    if (editTileIsOpen && editTileEvent) {
+    if (editTileIsOpen && editTileEvent && !wasPushedRef.current) {
       pushPanel({ content: null }); // actual content is wired by the caller
       setSidePanelExpanded(false);
       wasPushedRef.current = true;

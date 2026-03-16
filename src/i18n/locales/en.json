@@ -943,7 +943,9 @@
 			"signOutSuccess": "You have been successfully signed out",
 			"signOutError": "Failed to sign out. Please try again.",
 			"defaultUsername": "User"
-		}
+		},
+		"expandPanel": "Expand panel",
+		"collapsePanel": "Collapse panel"
 	},
 	"errors": {
 		"chatLimitReached": "Chat limit reached. Please try again later.",

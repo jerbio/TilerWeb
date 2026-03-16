@@ -123,7 +123,7 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
           </CalendarContainerActionButtons>
           {isDesktop && (
             <SidePanelExpandToggle
-              title={sidePanelExpanded ? 'Collapse panel' : 'Expand panel'}
+              title={sidePanelExpanded ? t('timeline.expandPanel') : t('timeline.collapsePanel')}
               onClick={() => setSidePanelExpanded(!sidePanelExpanded)}
             >
               {sidePanelExpanded ? <ChevronLeft /> : <ChevronRight />}
