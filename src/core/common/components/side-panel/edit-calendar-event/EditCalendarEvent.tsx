@@ -177,7 +177,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   useEffect(() => {
     if (!userEditedAddressRef.current) return;
     userEditedAddressRef.current = false;
-    if (!address.trim()) {
+    if (address.trim().length < 3) {
       setLocationResults([]);
       setShowLocationDropdown(false);
       setIsSearching(false);
@@ -275,8 +275,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
       Split: splitCount ? Number(splitCount) : undefined,
       LocationId: locationId || undefined,
       IsLocationCleared: isLocationCleared ? 'true' : undefined,
-      CalAddress: !locationId && address ? address : undefined,
-      CalAddressDescription: !locationId && addressDescription ? addressDescription : undefined,
+      CalAddress: !locationId && (address || addressDescription) ? address : undefined,
+      CalAddressDescription: !locationId && (address || addressDescription) ? addressDescription : undefined,
       ColorConfig: {
         IsEnabled: true,
         Red: String(swatch.r),
@@ -571,6 +571,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
                       </ClearButton>
                     )}
                   </InputWithClear>
+                  {address.trim().length > 0 && address.trim().length < 3 && (
+                    <HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>
+                  )}
                   {isSearching && (
                     <SearchingIndicator role="status">
                       <Loader2 size={16} className="spin" />
@@ -991,6 +994,12 @@ const ClearButton = styled.button`
 `;
 
 const AutocompleteWrapper = styled.div``;
+
+const HintText = styled.p`
+  margin: 0.25rem 0 0;
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  color: ${({ theme }) => theme.colors.text.muted};
+`;
 
 const SearchingIndicator = styled.div`
   display: flex;

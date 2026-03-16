@@ -1003,6 +1003,7 @@
 			"back": "Back",
 			"loading": "Loading event details...",
 			"clearLocation": "Clear location",
+			"locationMinChars": "Type at least 3 characters to search",
 			"locationSearchPlaceholder": "Search for a location...",
 			"savedLocations": "Saved Locations",
 			"googleResults": "Google Maps",
