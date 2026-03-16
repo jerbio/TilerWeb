@@ -126,7 +126,7 @@ describe('EditCalendarEvent', () => {
 
 	it('renders header with back button and title', () => {
 		renderComponent();
-		expect(screen.getByText('calendarEvent.edit.title')).toBeInTheDocument();
+		expect(screen.getByText('calendarEvent.edit.titleTile')).toBeInTheDocument();
 		expect(screen.getByLabelText('calendarEvent.edit.back')).toBeInTheDocument();
 	});
 

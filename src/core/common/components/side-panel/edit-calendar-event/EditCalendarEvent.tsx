@@ -320,7 +320,13 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         <BackButton onClick={onClose} aria-label={t('calendarEvent.edit.back')}>
           <ArrowLeft size={18} />
         </BackButton>
-        <Title>{t('calendarEvent.edit.title')}</Title>
+        <Title>{t(
+          event.isRigid === true
+            ? 'calendarEvent.edit.titleBlock'
+            : event.isRigid === false
+              ? 'calendarEvent.edit.titleTile'
+              : 'calendarEvent.edit.title'
+        )}</Title>
       </Header>
 
       {isLoading && (

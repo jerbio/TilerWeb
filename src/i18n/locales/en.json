@@ -962,7 +962,9 @@
 			"actionFailed": "Action failed. Please try again."
 		},
 		"edit": {
-			"title": "Edit Event",
+			"title": "Edit",
+			"titleBlock": "Edit Block",
+			"titleTile": "Edit Tile",
 			"nameSection": "Name",
 			"timeSection": "Time & Duration",
 			"repetitionSection": "Repetition",

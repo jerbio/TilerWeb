@@ -271,7 +271,7 @@ const CalendarEvents = ({
           let n = i;
           let newChainLength = 0;
           // Assign new chain keys
-          while (result[n].properties.eventChainKey === oldChainKey) {
+          while (n < result.length && result[n].properties.eventChainKey === oldChainKey) {
             result[n].properties.eventChainKey = event.key;
             result[n].properties.eventChainIndex = n - i;
             n++;
@@ -279,13 +279,13 @@ const CalendarEvents = ({
           }
           let l = i;
           // Assign new chain lengths
-          while (result[l].properties.eventChainKey === event.key) {
+          while (l < result.length && result[l].properties.eventChainKey === event.key) {
             result[l].properties.eventChainLength = newChainLength;
             l++;
           }
           // Update old chain lengths
           let o = i - 1;
-          while (result[o].properties.eventChainKey === oldChainKey) {
+          while (o >= 0 && result[o].properties.eventChainKey === oldChainKey) {
             result[o].properties.eventChainLength -= newChainLength;
             o--;
           }
