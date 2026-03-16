@@ -787,10 +787,21 @@
 					"fri": "F",
 					"sat": "S"
 				},
+				"dayNames": {
+					"sun": "Sunday",
+					"mon": "Monday",
+					"tue": "Tuesday",
+					"wed": "Wednesday",
+					"thu": "Thursday",
+					"fri": "Friday",
+					"sat": "Saturday"
+				},
 				"start": "Start",
 				"end": "End",
 				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM"
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",

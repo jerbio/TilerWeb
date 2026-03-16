@@ -127,12 +127,12 @@ const PreferencesSettings: React.FC = () => {
 
 	const handleSaveChanges = async () => {
 		// Validate schedule profiles: each day must have both start and end, or neither
-		const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+		const dayNameKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 		for (const day of workSchedule) {
 			if ((day.startTime && !day.endTime) || (!day.startTime && day.endTime)) {
 				toast.error(t('settings.sections.tilePreferences.scheduleIncompleteDay', {
 					label: t('settings.sections.tilePreferences.myWorkHours'),
-					day: dayNames[day.dayIndex],
+					day: t(`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`),
 				}));
 				return;
 			}
@@ -141,7 +141,7 @@ const PreferencesSettings: React.FC = () => {
 			if ((day.startTime && !day.endTime) || (!day.startTime && day.endTime)) {
 				toast.error(t('settings.sections.tilePreferences.scheduleIncompleteDay', {
 					label: t('settings.sections.tilePreferences.myPersonalHours'),
-					day: dayNames[day.dayIndex],
+					day: t(`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`),
 				}));
 				return;
 			}
