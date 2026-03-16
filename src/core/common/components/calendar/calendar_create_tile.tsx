@@ -340,6 +340,14 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                                 }
                               )(dayjs(date))
                             }
+                            maxDate={
+                              formData.recurrenceEndType ===
+                                ScheduleRepeatEndType.On
+                                ? dayjs(
+                                  formData.recurrenceEndDate
+                                ).format('YYYY-MM-DD')
+                                : undefined
+                            }
                           />
                         </DescriptionDatePickerContainer>
                       ),
@@ -404,6 +412,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                                 }
                               )(dayjs(date))
                             }
+                            minDate={dayjs(
+                              formData.recurrenceStartType ===
+                                ScheduleRepeatStartType.On
+                                ? formData.recurrenceStartDate
+                                : formData.start
+                            ).format('YYYY-MM-DD')}
                           />
                         </DescriptionDatePickerContainer>
                       ),
@@ -531,7 +545,10 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 
   return (
     <StyledCalendarCreateEvent
-      onSubmit={(e) => { e.preventDefault(); submitForm(); }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        submitForm();
+      }}
       $isexpanded={ui.state.isExpanded}
     >
       <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
@@ -634,6 +651,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                   <DatePicker
                     ghostInput
                     value={dayjs(formData.deadline).format('YYYY-MM-DD')}
+                    minDate={dayjs().format('YYYY-MM-DD')}
                     onChange={(date) =>
                       handleFormInputChange('deadline', {
                         mode: 'static',
@@ -714,11 +732,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <Button type="button" variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
-        <Button
-          variant="brand"
-          type="submit"
-          disabled={!isValidSubmission}
-        >
+        <Button variant="brand" type="submit" disabled={!isValidSubmission}>
           {t('calendar.createTile.buttons.submit')}
         </Button>
       </ButtonContainer>
