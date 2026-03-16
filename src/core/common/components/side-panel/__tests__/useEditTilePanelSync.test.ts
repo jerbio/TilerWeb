@@ -44,12 +44,14 @@ describe('useEditTilePanelSync', () => {
 	let popPanel: ReturnType<typeof vi.fn>;
 	let closeEditTile: ReturnType<typeof vi.fn>;
 	let setSidePanelExpanded: ReturnType<typeof vi.fn>;
+	let setMobileChatVisible: ReturnType<typeof vi.fn>;
 
 	beforeEach(() => {
 		pushPanel = vi.fn();
 		popPanel = vi.fn();
 		closeEditTile = vi.fn();
 		setSidePanelExpanded = vi.fn();
+		setMobileChatVisible = vi.fn();
 	});
 
 	it('pushes panel when editTile opens', () => {
@@ -61,6 +63,7 @@ describe('useEditTilePanelSync', () => {
 				popPanel,
 				closeEditTile,
 				setSidePanelExpanded,
+				setMobileChatVisible,
 			}),
 		);
 
@@ -76,6 +79,7 @@ describe('useEditTilePanelSync', () => {
 				popPanel,
 				closeEditTile,
 				setSidePanelExpanded,
+				setMobileChatVisible,
 			}),
 		);
 
@@ -91,6 +95,7 @@ describe('useEditTilePanelSync', () => {
 				popPanel,
 				closeEditTile,
 				setSidePanelExpanded,
+				setMobileChatVisible,
 			}),
 		);
 
@@ -106,6 +111,7 @@ describe('useEditTilePanelSync', () => {
 				popPanel,
 				closeEditTile,
 				setSidePanelExpanded,
+				setMobileChatVisible,
 			}),
 		);
 
@@ -122,6 +128,7 @@ describe('useEditTilePanelSync', () => {
 					popPanel,
 					closeEditTile,
 					setSidePanelExpanded,
+					setMobileChatVisible,
 				}),
 			{ initialProps: { isOpen: true, event: mockEvent as CalendarEvent | null } },
 		);
@@ -144,6 +151,7 @@ describe('useEditTilePanelSync', () => {
 				popPanel,
 				closeEditTile,
 				setSidePanelExpanded,
+				setMobileChatVisible,
 			}),
 		);
 
@@ -159,6 +167,7 @@ describe('useEditTilePanelSync', () => {
 				popPanel,
 				closeEditTile,
 				setSidePanelExpanded,
+				setMobileChatVisible,
 			}),
 		);
 

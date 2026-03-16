@@ -323,7 +323,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         <Title>{t('calendarEvent.edit.title')}</Title>
       </Header>
 
-      {isLoading && <LoadingText>{t('calendarEvent.edit.loading')}</LoadingText>}
+      {isLoading && (
+        <LoadingContainer data-testid="edit-event-loading">
+          <Spinner size={24} />
+          <LoadingText>{t(
+            event.isRigid === true
+              ? 'calendarEvent.edit.loadingBlock'
+              : event.isRigid === false
+                ? 'calendarEvent.edit.loadingTile'
+                : 'calendarEvent.edit.loading'
+          )}</LoadingText>
+        </LoadingContainer>
+      )}
 
       {!isLoading && (
       <>
@@ -680,11 +691,28 @@ const Container = styled.div`
   overflow: hidden;
 `;
 
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex: 1;
+`;
+
 const LoadingText = styled.p`
-  text-align: center;
-  padding: 1rem 0;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-size: 0.875rem;
+`;
+
+const Spinner = styled(Loader2)`
+  animation: spin 1s linear infinite;
+  color: ${({ theme }) => theme.colors.text.secondary};
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 `;
 
 const Header = styled.div`

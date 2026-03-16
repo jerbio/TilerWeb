@@ -9,6 +9,7 @@ interface UseEditTilePanelSyncOptions {
   popPanel: () => void;
   closeEditTile: () => void;
   setSidePanelExpanded: (expanded: boolean) => void;
+  setMobileChatVisible: (visible: boolean) => void;
 }
 
 /**
@@ -25,6 +26,7 @@ export function useEditTilePanelSync({
   popPanel,
   closeEditTile,
   setSidePanelExpanded,
+  setMobileChatVisible,
 }: UseEditTilePanelSyncOptions) {
   const wasPushedRef = useRef(false);
 
@@ -32,18 +34,20 @@ export function useEditTilePanelSync({
     if (editTileIsOpen && editTileEvent && !wasPushedRef.current) {
       pushPanel({ content: null }); // actual content is wired by the caller
       setSidePanelExpanded(false);
+      setMobileChatVisible(true);
       wasPushedRef.current = true;
     } else if (!editTileIsOpen && wasPushedRef.current) {
       popPanel();
       wasPushedRef.current = false;
     }
-  }, [editTileIsOpen, editTileEvent, pushPanel, popPanel, setSidePanelExpanded]);
+  }, [editTileIsOpen, editTileEvent, pushPanel, popPanel, setSidePanelExpanded, setMobileChatVisible]);
 
   const closePanelAndStore = useCallback(() => {
     popPanel();
     closeEditTile();
+    setMobileChatVisible(false);
     wasPushedRef.current = false;
-  }, [popPanel, closeEditTile]);
+  }, [popPanel, closeEditTile, setMobileChatVisible]);
 
   return { closePanelAndStore };
 }

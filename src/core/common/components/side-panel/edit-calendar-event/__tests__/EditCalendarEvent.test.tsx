@@ -576,7 +576,7 @@ describe('EditCalendarEvent', () => {
 			mockLookupCalendarEventById.mockReturnValueOnce(new Promise(() => {})); // never resolves
 			renderComponent();
 
-			expect(screen.getByText('calendarEvent.edit.loading')).toBeInTheDocument();
+			expect(screen.getByTestId('edit-event-loading')).toBeInTheDocument();
 		});
 
 		it('hides form fields while loading', () => {

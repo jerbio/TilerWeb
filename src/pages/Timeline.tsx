@@ -84,6 +84,7 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
     popPanel,
     closeEditTile,
     setSidePanelExpanded,
+    setMobileChatVisible,
   });
 
   useEffect(() => {
