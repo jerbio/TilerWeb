@@ -484,23 +484,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     }
   }, [isValidSubmission, formData, ui, refetchEvents, resetForm, calendarDispatch, t, theme]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        submitForm();
-      }
-    };
-    if (ui.state.isOpen) {
-      document.addEventListener('keydown', onKeyDown);
-    } else {
-      document.removeEventListener('keydown', onKeyDown);
-    }
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [ui.state.isOpen, submitForm]);
-
   function viewCreatedEvent() {
     const successTile = ui.state.success.tile;
     if (!successTile || successTile.calendarEvent.id === null) return;
@@ -528,9 +511,27 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     );
   }
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        // Trigger form submit
+        submitForm();
+      }
+    };
+    if (ui.state.isOpen) {
+      document.addEventListener('keydown', onKeyDown);
+    } else {
+      document.removeEventListener('keydown', onKeyDown);
+    }
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [ui.state.isOpen, submitForm]);
+
   return (
     <StyledCalendarCreateEvent
-      onSubmit={(e) => e.preventDefault()}
+      onSubmit={(e) => { e.preventDefault(); submitForm(); }}
       $isexpanded={ui.state.isExpanded}
     >
       <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
@@ -716,7 +717,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <Button
           variant="brand"
           type="submit"
-          onClick={submitForm}
           disabled={!isValidSubmission}
         >
           {t('calendar.createTile.buttons.submit')}
