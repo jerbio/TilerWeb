@@ -78,9 +78,9 @@ describe('UserService - Schedule Profile', () => {
 
 			expect(userApi.getScheduleProfile).toHaveBeenCalled();
 			expect(result.travelMedium).toBe('bicycling');
-			expect(result.personalHoursRestrictionProfile.daySelection).toHaveLength(7);
-			expect(result.workHoursRestrictionProfile.daySelection[0]).toBeNull();
-			expect(result.workHoursRestrictionProfile.daySelection[1]?.weekday).toBe(1);
+			expect(result.personalHoursRestrictionProfile!.daySelection).toHaveLength(7);
+			expect(result.workHoursRestrictionProfile!.daySelection![0]).toBeNull();
+			expect(result.workHoursRestrictionProfile!.daySelection![1]?.weekday).toBe(1);
 		});
 
 		it('throws on API error code', async () => {
@@ -124,7 +124,7 @@ describe('UserService - Schedule Profile', () => {
 			const result = await service.updateScheduleProfile(updateParams);
 
 			expect(userApi.updateScheduleProfile).toHaveBeenCalledWith(updateParams);
-			expect(result.personalHoursRestrictionProfile.isEnabled).toBe(true);
+			expect(result.personalHoursRestrictionProfile!.isEnabled).toBe(true);
 		});
 
 		it('throws on API error code', async () => {
