@@ -9,7 +9,9 @@ import {
   StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
 import {
+  ScheduleRepeatEndType,
   ScheduleRepeatFrequency,
+  ScheduleRepeatStartType,
   ScheduleRepeatType,
   ScheduleRepeatWeekday,
   ScheduleSubCalendarEvent,
@@ -443,6 +445,7 @@ const Calendar = ({
     { r: 219, g: 58, b: 94 },
   ];
   const initialCreateTileFormState: InitialCreateTileFormState = {
+		start: dayjs(),
     action: '',
     location: '',
     durationHours: 0,
@@ -450,11 +453,13 @@ const Calendar = ({
     deadline: dayjs(),
     color: new RGBColor(tileColorOptions[0]),
     isRecurring: false,
-    recurrenceEndDate: dayjs().add(1, 'week'),
     recurrenceType: ScheduleRepeatType.Daily,
     recurrenceFrequency: ScheduleRepeatFrequency.Daily,
     recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
-    hasRecurrenceEndDate: false,
+    recurrenceStartType: ScheduleRepeatStartType.Default,
+		recurrenceStartDate: dayjs(),
+		recurrenceEndType: ScheduleRepeatEndType.Never,
+    recurrenceEndDate: dayjs().add(1, 'week'),
     timeRestrictionType: null,
     isTimeRestricted: false,
     timeRestrictionStart: '00:00',
@@ -487,7 +492,9 @@ const Calendar = ({
 
       setFormData({
         ...formData,
+				start: clickedDay,
         deadline: clickedDay,
+				recurrenceStartDate: clickedDay,
 				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
       });
       createTile.actions.open();

@@ -4,7 +4,7 @@ import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../button';
 import { RGB, RGBColor } from '@/core/util/colors';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import AutosizeInput from '../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
@@ -13,7 +13,9 @@ import SuccessModal from '../modals/success-modal';
 import { scheduleService } from '@/services';
 import {
   ScheduleCreateEventParams,
+  ScheduleRepeatEndType,
   ScheduleRepeatFrequency,
+  ScheduleRepeatStartType,
   ScheduleRepeatType,
   ScheduleRepeatWeekday,
   ScheduleRepeatWeeklyData,
@@ -36,6 +38,7 @@ import Radio from '../radio';
 dayjs.extend(advancedFormat);
 
 export type InitialCreateTileFormState = {
+  start: dayjs.Dayjs;
   action: string;
   location: string;
   durationHours: number;
@@ -46,7 +49,9 @@ export type InitialCreateTileFormState = {
   recurrenceType: ScheduleRepeatType;
   recurrenceFrequency: ScheduleRepeatFrequency;
   recurrenceWeeklyDays: ScheduleRepeatWeekday[];
-  hasRecurrenceEndDate: boolean;
+  recurrenceStartType: ScheduleRepeatStartType;
+  recurrenceStartDate: dayjs.Dayjs;
+  recurrenceEndType: ScheduleRepeatEndType;
   recurrenceEndDate: dayjs.Dayjs;
   isTimeRestricted: boolean;
   timeRestrictionType: null;
@@ -135,22 +140,34 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     },
   ];
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        submitForm();
-      }
-    };
-    if (ui.state.isOpen) {
-      document.addEventListener('keydown', onKeyDown);
-    } else {
-      document.removeEventListener('keydown', onKeyDown);
-    }
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [ui.state.isOpen, submitForm]);
+  const recurrenceStartTypeOptions = [
+    {
+      label: (
+        <Trans
+          i18nKey="calendar.createTile.sections.recurrenceStartType.default"
+          components={{
+            date: <>{dayjs(formData.start).format('D MMM YYYY')}</>,
+          }}
+        />
+      ),
+      value: ScheduleRepeatStartType.Default,
+    },
+    {
+      label: t('calendar.createTile.sections.recurrenceStartType.on'),
+      value: ScheduleRepeatStartType.On,
+    },
+  ];
+
+  const recurrenceEndTypeOptions = [
+    {
+      label: t('calendar.createTile.sections.recurrenceEndType.never'),
+      value: ScheduleRepeatEndType.Never,
+    },
+    {
+      label: t('calendar.createTile.sections.recurrenceEndType.on'),
+      value: ScheduleRepeatEndType.On,
+    },
+  ];
 
   const tileOptions = [
     {
@@ -212,15 +229,15 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
               {/* Recurrence Weekly Days Selection */}
               {formData.recurrenceType === ScheduleRepeatType.Weekly && (
                 <>
-                  <RecurrenceWeekdayOptionsHeader>
+                  <TileOptionSubHeader>
                     {t(
                       'calendar.createTile.sections.recurrenceWeeklyDays.title'
                     )}
-                  </RecurrenceWeekdayOptionsHeader>
+                  </TileOptionSubHeader>
                   <RecurrenceWeekdayOptions>
                     {recurrenceWeekdayOptions.map((option) => (
                       <RecurrenceWeekdayOption
-												type='button'
+                        type="button"
                         name={option.label}
                         title={option.label}
                         key={option.value}
@@ -266,16 +283,93 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
                   </RecurrenceWeekdayOptions>
                 </>
               )}
+              {/* Recurrence Start Date Selection */}
+              <TileOptionSubHeader>
+                {t('calendar.createTile.sections.recurrenceStartType.title')}
+              </TileOptionSubHeader>
+              <RecurrenceEndTypeOptions>
+                {recurrenceStartTypeOptions.map((option) => (
+                  <Radio
+                    key={option.value}
+                    label={option.label}
+                    checked={option.value === formData.recurrenceStartType}
+                    disabled={false}
+                    name="recurrenceStartType"
+                    onChange={(checked) => {
+                      if (checked) {
+                        handleFormInputChange('recurrenceStartType', {
+                          mode: 'static',
+                        })(option.value);
+                      }
+                    }}
+                  />
+                ))}
+              </RecurrenceEndTypeOptions>
+              {formData.recurrenceStartType === ScheduleRepeatStartType.On && (
+                <DescriptionContainer
+                  style={{ border: `1px solid ${theme.colors.border.default}` }}
+                >
+                  <Trans
+                    i18nKey="calendar.createTile.sections.recurrenceStartDate.description"
+                    components={{
+                      date: (
+                        <DescriptionDatePickerContainer>
+                          <DescriptionDatePickerDisplay>
+                            {dayjs(formData.recurrenceStartDate)
+                              .toDate()
+                              .toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                              })}
+                            <Calendar
+                              color={theme.colors.text.secondary}
+                              size={20}
+                            />
+                          </DescriptionDatePickerDisplay>
+                          <DatePicker
+                            ghostInput
+                            value={dayjs(
+                              formData.recurrenceStartDate
+                            ).format('YYYY-MM-DD')}
+                            onChange={(date) =>
+                              handleFormInputChange(
+                                'recurrenceStartDate',
+                                {
+                                  mode: 'static',
+                                }
+                              )(dayjs(date))
+                            }
+                          />
+                        </DescriptionDatePickerContainer>
+                      ),
+                    }}
+                  />
+                </DescriptionContainer>
+              )}
               {/* Recurrence End Date Selection */}
-              <Toggle
-                label={t('calendar.createTile.sections.recurrenceEndDate.title')}
-                isOn={formData.hasRecurrenceEndDate}
-                onChange={handleFormInputChange('hasRecurrenceEndDate', {
-                  mode: 'static',
-                })}
-                containerStyle={{ paddingBlock: '0rem', borderBottom: 'none' }}
-              />
-              {formData.hasRecurrenceEndDate && (
+              <TileOptionSubHeader>
+                {t('calendar.createTile.sections.recurrenceEndType.title')}
+              </TileOptionSubHeader>
+              <RecurrenceEndTypeOptions>
+                {recurrenceEndTypeOptions.map((option) => (
+                  <Radio
+                    key={option.value}
+                    label={option.label}
+                    checked={option.value === formData.recurrenceEndType}
+                    disabled={false}
+                    name="recurrenceEndType"
+                    onChange={(checked) => {
+                      if (checked) {
+                        handleFormInputChange('recurrenceEndType', {
+                          mode: 'static',
+                        })(option.value);
+                      }
+                    }}
+                  />
+                ))}
+              </RecurrenceEndTypeOptions>
+              {formData.recurrenceEndType === ScheduleRepeatEndType.On && (
                 <DescriptionContainer
                   style={{ border: `1px solid ${theme.colors.border.default}` }}
                 >
@@ -330,7 +424,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     ui.actions.collapse();
   }
 
-  async function submitForm() {
+  const submitForm = useCallback(async () => {
     if (!isValidSubmission) return;
     ui.actions.startLoading(formData.action);
     try {
@@ -356,18 +450,24 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       if (formData.isRecurring) {
         event.RepeatType = formData.recurrenceType;
         event.RepeatFrequency = formData.recurrenceFrequency;
-        event.RepeatStartDay = dayjs().format('DD');
-        event.RepeatStartMonth = dayjs().format('MM');
-        event.RepeatStartYear = dayjs().format('YYYY');
         if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
           event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
             ','
           ) as ScheduleRepeatWeeklyData;
         }
-        if (formData.hasRecurrenceEndDate) {
+        if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
           event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
           event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
           event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
+        }
+        if (formData.recurrenceStartType === ScheduleRepeatStartType.Default) {
+          event.RepeatStartDay = dayjs(formData.start).format('DD');
+          event.RepeatStartMonth = dayjs(formData.start).format('MM');
+          event.RepeatStartYear = dayjs(formData.start).format('YYYY');
+        } else if (formData.recurrenceStartType === ScheduleRepeatStartType.On) {
+          event.RepeatStartDay = dayjs(formData.recurrenceStartDate).format('DD');
+          event.RepeatStartMonth = dayjs(formData.recurrenceStartDate).format('MM');
+          event.RepeatStartYear = dayjs(formData.recurrenceStartDate).format('YYYY');
         }
       }
 
@@ -382,7 +482,24 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
     } finally {
       ui.actions.endLoading();
     }
-  }
+  }, [isValidSubmission, formData, ui, refetchEvents, resetForm, calendarDispatch, t, theme]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        submitForm();
+      }
+    };
+    if (ui.state.isOpen) {
+      document.addEventListener('keydown', onKeyDown);
+    } else {
+      document.removeEventListener('keydown', onKeyDown);
+    }
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [ui.state.isOpen, submitForm]);
 
   function viewCreatedEvent() {
     const successTile = ui.state.success.tile;
@@ -449,7 +566,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
         <div className="title">
           <h2>{t('calendar.createTile.title')}</h2>
         </div>
-        <button type='button' onClick={closeModal}>
+        <button type="button" onClick={closeModal}>
           <X size={16} color={theme.colors.text.primary} />
         </button>
       </header>
@@ -585,7 +702,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
       )}
       <ButtonContainer $isexpanded={ui.state.isExpanded}>
         <Button
-					type='button'
+          type="button"
           variant={'ghost'}
           onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
         >
@@ -593,7 +710,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
             ? t('calendar.createTile.buttons.collapse')
             : t('calendar.createTile.buttons.expand')}
         </Button>
-        <Button type='button' variant={'ghost'} onClick={resetForm}>
+        <Button type="button" variant={'ghost'} onClick={resetForm}>
           {t('calendar.createTile.buttons.reset')}
         </Button>
         <Button
@@ -710,6 +827,11 @@ const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	background-color: ${(props) => props.theme.colors.background.card};
 `;
 
+const RecurrenceEndTypeOptions = styled.div`
+	display: flex;
+	gap: 1rem;
+`;
+
 const RecurrenceWeekdayOption = styled.button<{ $selected: boolean }>`
 	height: 2rem;
 	width: 2rem;
@@ -731,12 +853,6 @@ const RecurrenceWeekdayOption = styled.button<{ $selected: boolean }>`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-`;
-
-const RecurrenceWeekdayOptionsHeader = styled.h3`
-	font-family: ${(props) => props.theme.typography.fontFamily.urban};
-	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
-	color: ${(props) => props.theme.colors.text.secondary};
 `;
 
 const RecurrenceWeekdayOptions = styled.div`
@@ -772,6 +888,14 @@ const TileActionToggleContainer = styled.div`
 		font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 		color: ${(props) => props.theme.colors.text.primary};
 	}
+`;
+
+const TileOptionSubHeader = styled.header`
+	font-family: ${(props) => props.theme.typography.fontFamily.urban};
+	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
+	font-size: ${(props) => props.theme.typography.fontSize.base};
+	color: ${(props) => props.theme.colors.text.secondary};
+	line-height: 1;
 `;
 
 const TileOptionHeader = styled.header`
