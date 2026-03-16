@@ -235,4 +235,130 @@ describe('WeeklySchedule', () => {
 			});
 		});
 	});
+
+	describe('Copy / Paste', () => {
+		it('shows a copy button only on days that have both start and end times', () => {
+			const schedule = buildSchedule([
+				undefined,
+				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
+			]);
+
+			renderWithTheme(
+				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
+			);
+
+			expect(screen.getByTestId('copy-btn-1')).toBeInTheDocument();
+			expect(screen.queryByTestId('copy-btn-0')).not.toBeInTheDocument();
+		});
+
+		it('does not show copy buttons when disabled', () => {
+			const schedule = buildSchedule([
+				undefined,
+				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
+			]);
+
+			renderWithTheme(
+				<WeeklySchedule schedule={schedule} onChange={vi.fn()} disabled />,
+			);
+
+			expect(screen.queryByTestId('copy-btn-1')).not.toBeInTheDocument();
+		});
+
+		it('enters copy mode when copy is clicked and shows paste buttons on other days', async () => {
+			const user = userEvent.setup();
+			const schedule = buildSchedule([
+				undefined,
+				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
+				{ dayIndex: 2, startTime: '9:00 AM', endTime: '5:00 PM' },
+			]);
+
+			renderWithTheme(
+				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
+			);
+
+			await user.click(screen.getByTestId('copy-btn-1'));
+
+			// Source day shows active/check icon
+			expect(screen.getByTestId('copy-active-1')).toBeInTheDocument();
+			// Other days show paste buttons
+			expect(screen.getByTestId('paste-btn-0')).toBeInTheDocument();
+			expect(screen.getByTestId('paste-btn-2')).toBeInTheDocument();
+			// No copy buttons visible during copy mode
+			expect(screen.queryByTestId('copy-btn-1')).not.toBeInTheDocument();
+			expect(screen.queryByTestId('copy-btn-2')).not.toBeInTheDocument();
+		});
+
+		it('calls onChange with copied times when paste is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const schedule = buildSchedule([
+				undefined,
+				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
+			]);
+
+			renderWithTheme(
+				<WeeklySchedule schedule={schedule} onChange={onChange} />,
+			);
+
+			// Copy Monday's times
+			await user.click(screen.getByTestId('copy-btn-1'));
+			// Paste to Sunday
+			await user.click(screen.getByTestId('paste-btn-0'));
+
+			expect(onChange).toHaveBeenCalledWith(0, 'startTime', '8:00 AM');
+			expect(onChange).toHaveBeenCalledWith(0, 'endTime', '6:00 PM');
+		});
+
+		it('stays in copy mode after pasting so multiple days can be pasted to', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const schedule = buildSchedule([
+				undefined,
+				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
+			]);
+
+			renderWithTheme(
+				<WeeklySchedule schedule={schedule} onChange={onChange} />,
+			);
+
+			// Copy Monday's times
+			await user.click(screen.getByTestId('copy-btn-1'));
+			// Paste to Sunday
+			await user.click(screen.getByTestId('paste-btn-0'));
+			// Still in copy mode — paste buttons still visible on other days
+			expect(screen.getByTestId('copy-active-1')).toBeInTheDocument();
+			expect(screen.getByTestId('paste-btn-2')).toBeInTheDocument();
+			expect(screen.getByTestId('paste-btn-3')).toBeInTheDocument();
+
+			// Paste to Wednesday too
+			await user.click(screen.getByTestId('paste-btn-3'));
+			expect(onChange).toHaveBeenCalledWith(3, 'startTime', '8:00 AM');
+			expect(onChange).toHaveBeenCalledWith(3, 'endTime', '6:00 PM');
+
+			// Still in copy mode
+			expect(screen.getByTestId('copy-active-1')).toBeInTheDocument();
+		});
+
+		it('exits copy mode when the active copy indicator is clicked', async () => {
+			const user = userEvent.setup();
+			const schedule = buildSchedule([
+				undefined,
+				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
+			]);
+
+			renderWithTheme(
+				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
+			);
+
+			await user.click(screen.getByTestId('copy-btn-1'));
+			expect(screen.getByTestId('copy-active-1')).toBeInTheDocument();
+
+			// Click the active indicator to cancel
+			await user.click(screen.getByTestId('copy-active-1'));
+
+			// Back to normal — copy button reappears
+			expect(screen.getByTestId('copy-btn-1')).toBeInTheDocument();
+			expect(screen.queryByTestId('paste-btn-0')).not.toBeInTheDocument();
+		});
+	});
 });

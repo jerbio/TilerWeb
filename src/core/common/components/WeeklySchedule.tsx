@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
@@ -35,6 +35,17 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const isDisabled = disabled || readOnly;
+	const [copiedTimes, setCopiedTimes] = useState<{ startTime: string; endTime: string; dayIndex: number } | null>(null);
+
+	const handleCopy = (dayIndex: number, startTime: string, endTime: string) => {
+		setCopiedTimes({ startTime, endTime, dayIndex });
+	};
+
+	const handlePaste = (dayIndex: number) => {
+		if (!copiedTimes) return;
+		onChange(dayIndex, 'startTime', copiedTimes.startTime);
+		onChange(dayIndex, 'endTime', copiedTimes.endTime);
+	};
 
 	return (
 		<Container $size={size}>
@@ -83,7 +94,45 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 								disabled={isDisabled}
 							/>
 						</TimeRow>
-					</DayColumn>
+					{!isDisabled && (
+						<CopyPasteAction $size={size}>
+							{copiedTimes ? (
+								copiedTimes.dayIndex === index ? (
+									<IconButton
+										$size={size}
+										$active
+										onClick={() => setCopiedTimes(null)}
+										data-testid={`copy-active-${index}`}
+										title={t('settings.sections.tilePreferences.cancelCopy')}
+									>
+										<CheckIcon $size={size} />
+									</IconButton>
+								) : (
+									<IconButton
+										$size={size}
+										onClick={() => handlePaste(index)}
+										data-testid={`paste-btn-${index}`}
+										title={t('settings.sections.tilePreferences.paste')}
+									>
+										<PasteIcon $size={size} />
+									</IconButton>
+								)
+							) : (
+								day.startTime && day.endTime ? (
+									<IconButton
+										$size={size}
+										onClick={() => handleCopy(index, day.startTime, day.endTime)}
+										data-testid={`copy-btn-${index}`}
+										title={t('settings.sections.tilePreferences.copyTimes')}
+									>
+										<CopyIcon $size={size} />
+									</IconButton>
+								) : (
+									<IconPlaceholder $size={size} />
+								)
+							)}
+						</CopyPasteAction>
+					)}					</DayColumn>
 				);
 			})}
 		</Container>
@@ -165,5 +214,72 @@ const TimeRow = styled.div<{ $size: WeeklyScheduleSize }>`
 			: `min-width: ${$size === WeeklyScheduleSize.Lg ? '120px' : '90px'};`}
 	}
 `;
+
+// ── Copy / Paste Action ────────────────────────────────────────
+
+const iconSizeMap = {
+	[WeeklyScheduleSize.Sm]: 14,
+	[WeeklyScheduleSize.Md]: 18,
+	[WeeklyScheduleSize.Lg]: 24,
+};
+
+const CopyPasteAction = styled.div<{ $size: WeeklyScheduleSize }>`
+	display: flex;
+	justify-content: center;
+	min-height: ${({ $size }) => iconSizeMap[$size] + 4}px;
+`;
+
+const IconButton = styled.button<{ $size: WeeklyScheduleSize; $active?: boolean }>`
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	color: ${({ $active, theme }) => $active ? theme.colors.brand[500] : theme.colors.text.secondary};
+	opacity: 0.7;
+	transition: opacity 0.15s ease, color 0.15s ease;
+
+	&:hover {
+		opacity: 1;
+		color: ${({ theme }) => theme.colors.brand[400]};
+	}
+`;
+
+const IconPlaceholder = styled.div<{ $size: WeeklyScheduleSize }>`
+	width: ${({ $size }) => iconSizeMap[$size]}px;
+	height: ${({ $size }) => iconSizeMap[$size]}px;
+`;
+
+const CopyIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
+	const s = iconSizeMap[$size];
+	return (
+		<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+			<rect x="9" y="9" width="13" height="13" rx="2" />
+			<path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+		</svg>
+	);
+};
+
+const PasteIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
+	const s = iconSizeMap[$size];
+	return (
+		<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+			<path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+			<rect x="8" y="2" width="8" height="4" rx="1" />
+		</svg>
+	);
+};
+
+const CheckIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
+	const s = iconSizeMap[$size];
+	return (
+		<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+			<polyline points="20 6 9 17 4 12" />
+		</svg>
+	);
+};
 
 export default WeeklySchedule;
