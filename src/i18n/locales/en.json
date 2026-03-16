@@ -776,7 +776,21 @@
 				"saveError": "Failed to save changes. Please try again.",
 				"customSaved": "Custom time restrictions saved",
 				"bedTimeStartRequired": "Please select a bed time start",
-				"bedTimeEndRequired": "Please select a bed time end"
+				"bedTimeEndRequired": "Please select a bed time end",
+				"scheduleIncompleteDay": "{{label}}: please set both start and end times for {{day}}",
+				"dayLabels": {
+					"sun": "S",
+					"mon": "M",
+					"tue": "T",
+					"wed": "W",
+					"thu": "T",
+					"fri": "F",
+					"sat": "S"
+				},
+				"start": "Start",
+				"end": "End",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",
