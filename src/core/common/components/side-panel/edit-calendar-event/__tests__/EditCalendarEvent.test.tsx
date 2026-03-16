@@ -1034,5 +1034,124 @@ await vi.advanceTimersByTimeAsync(400);
 expect(mockSearchLocations).not.toHaveBeenCalled();
 vi.useRealTimers();
 });
+
+it('sends LocationId when selecting a saved location', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([savedLocation]);
+mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'office');
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+});
+await user.click(screen.getByText('100 Office Blvd'));
+await user.click(screen.getByText('calendarEvent.edit.save'));
+
+await waitFor(() => {
+expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+});
+
+const params = mockUpdateCalendarEvent.mock.calls[0][0];
+expect(params.LocationId).toBe('saved-1');
+expect(params.CalAddress).toBeUndefined();
+expect(params.CalAddressDescription).toBeUndefined();
+expect(params.IsLocationCleared).toBeUndefined();
+vi.useRealTimers();
+});
+
+it('does not send LocationId when selecting a Google location', async () => {
+vi.useFakeTimers({ shouldAdvanceTime: true });
+mockSearchLocations.mockResolvedValue([googleLocation]);
+mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'walmart');
+await vi.advanceTimersByTimeAsync(400);
+
+await waitFor(() => {
+expect(screen.getByText('Walmart Supercenter 745 us-287, lafayette, co 80026, usa')).toBeInTheDocument();
+});
+await user.click(screen.getByText('Walmart Supercenter 745 us-287, lafayette, co 80026, usa'));
+await user.click(screen.getByText('calendarEvent.edit.save'));
+
+await waitFor(() => {
+expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+});
+
+const params = mockUpdateCalendarEvent.mock.calls[0][0];
+expect(params.LocationId).toBeUndefined();
+expect(params.CalAddress).toBe('Walmart Supercenter 745 us-287, lafayette, co 80026, usa');
+expect(params.CalAddressDescription).toBe('Walmart Supercenter');
+vi.useRealTimers();
+});
+
+it('clears locationId when user manually edits address', async () => {
+mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+const user = setupUser();
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+await user.clear(addressInput);
+await user.type(addressInput, 'Custom address');
+await user.click(screen.getByText('calendarEvent.edit.save'));
+
+await waitFor(() => {
+expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+});
+
+const params = mockUpdateCalendarEvent.mock.calls[0][0];
+expect(params.LocationId).toBeUndefined();
+expect(params.CalAddress).toBe('Custom address');
+});
+
+it('sends IsLocationCleared when user clears location', async () => {
+mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+const user = setupUser();
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+await user.click(screen.getByLabelText('calendarEvent.edit.clearLocation'));
+await user.click(screen.getByText('calendarEvent.edit.save'));
+
+await waitFor(() => {
+expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+});
+
+const params = mockUpdateCalendarEvent.mock.calls[0][0];
+expect(params.IsLocationCleared).toBe('true');
+expect(params.LocationId).toBeUndefined();
+expect(params.CalAddress).toBeUndefined();
+});
+
+it('clears address and description fields when clicking clear button', async () => {
+const user = setupUser();
+renderComponent();
+await waitForLoaded();
+await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+const addressInput = screen.getByPlaceholderText('calendarEvent.edit.locationSearchPlaceholder');
+expect(addressInput).toHaveValue('123 Main St');
+
+await user.click(screen.getByLabelText('calendarEvent.edit.clearLocation'));
+
+expect(addressInput).toHaveValue('');
+expect(screen.queryByDisplayValue('Near the park')).not.toBeInTheDocument();
+});
 });
 });

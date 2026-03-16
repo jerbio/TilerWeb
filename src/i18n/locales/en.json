@@ -1002,6 +1002,7 @@
 			"saveFailed": "Failed to save. Please try again.",
 			"back": "Back",
 			"loading": "Loading event details...",
+			"clearLocation": "Clear location",
 			"locationSearchPlaceholder": "Search for a location...",
 			"savedLocations": "Saved Locations",
 			"googleResults": "Google Maps",

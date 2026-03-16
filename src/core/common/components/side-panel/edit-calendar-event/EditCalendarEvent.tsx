@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import dayjs from 'dayjs';
-import { ArrowLeft, Save, Loader2, ChevronRight, Bookmark, MapPin, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, ChevronRight, Bookmark, MapPin, Calendar, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CalendarEvent, CalendarEventUpdateParams, ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
 import { scheduleService } from '@/services';
@@ -51,13 +51,16 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   );
   const [address, setAddress] = useState(event.address ?? '');
   const [addressDescription, setAddressDescription] = useState(event.addressDescription ?? '');
-  const [selectedColor, setSelectedColor] = useState(() => {
-    const r = event.colorRed ?? 0;
-    const g = event.colorGreen ?? 0;
-    const b = event.colorBlue ?? 0;
-    const match = COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
-    return match >= 0 ? match : 0;
+  const [locationId, setLocationId] = useState<string | null>(event.locationId ?? null);
+  const [isLocationCleared, setIsLocationCleared] = useState(false);
+  const [customColor, setCustomColor] = useState<{ r: number; g: number; b: number }>({
+    r: event.colorRed ?? 0, g: event.colorGreen ?? 0, b: event.colorBlue ?? 0,
   });
+  const [selectedColor, setSelectedColor] = useState(() => {
+    const { r, g, b } = customColor;
+    return COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
+  });
+  const activeColor = selectedColor >= 0 ? COLOR_SWATCHES[selectedColor] : customColor;
   const [isRecurring, setIsRecurring] = useState(event.repetition?.isEnabled ?? false);
   const [frequency, setFrequency] = useState((event.repetition?.frequency ?? '').toLowerCase());
   const [isForever, setIsForever] = useState(event.repetition?.isForever ?? false);
@@ -120,11 +123,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
     setSplitCount(ev.splitCount != null ? String(ev.splitCount) : '');
     setAddress(ev.address ?? '');
     setAddressDescription(ev.addressDescription ?? '');
+    setLocationId(ev.locationId ?? null);
+    setIsLocationCleared(false);
     const r = ev.colorRed ?? 0;
     const g = ev.colorGreen ?? 0;
     const b = ev.colorBlue ?? 0;
+    setCustomColor({ r, g, b });
     const match = COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
-    setSelectedColor(match >= 0 ? match : 0);
+    setSelectedColor(match);
     setIsRecurring(ev.repetition?.isEnabled ?? false);
     setFrequency((ev.repetition?.frequency ?? '').toLowerCase());
     setIsForever(ev.repetition?.isForever ?? false);
@@ -141,7 +147,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
       name, startDate: startDate?.valueOf()?.toString() ?? '', startTime,
       endDate: endDate?.valueOf()?.toString() ?? '', endTime,
       durationHours, durationMinutes, splitCount,
-      address, addressDescription, selectedColor: String(selectedColor),
+      address, addressDescription, locationId: locationId ?? '',
+      isLocationCleared: String(isLocationCleared), selectedColor: String(selectedColor),
       isRecurring: String(isRecurring), frequency, isForever: String(isForever),
       repStartDate: repStartDate?.valueOf()?.toString() ?? '', repStartTime,
       repEndDate: repEndDate?.valueOf()?.toString() ?? '', repEndTime,
@@ -156,7 +163,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
       name, startDate: startDate?.valueOf()?.toString() ?? '', startTime,
       endDate: endDate?.valueOf()?.toString() ?? '', endTime,
       durationHours, durationMinutes, splitCount,
-      address, addressDescription, selectedColor: String(selectedColor),
+      address, addressDescription, locationId: locationId ?? '',
+      isLocationCleared: String(isLocationCleared), selectedColor: String(selectedColor),
       isRecurring: String(isRecurring), frequency, isForever: String(isForever),
       repStartDate: repStartDate?.valueOf()?.toString() ?? '', repStartTime,
       repEndDate: repEndDate?.valueOf()?.toString() ?? '', repEndTime,
@@ -194,8 +202,19 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   const handleSelectLocation = (loc: ScheduleSubCalendarEventLocation) => {
     setAddress(loc.address);
     setAddressDescription(loc.description);
+    setLocationId(loc.source !== 'google' ? loc.id : null);
+    setIsLocationCleared(false);
     setShowLocationDropdown(false);
     setLocationResults([]);
+  };
+
+  const handleClearLocation = () => {
+    setAddress('');
+    setAddressDescription('');
+    setLocationId(null);
+    setIsLocationCleared(true);
+    setLocationResults([]);
+    setShowLocationDropdown(false);
   };
 
   // Fetch full event details on mount
@@ -243,7 +262,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 
     const startMs = combineDateAndTimeString(startDate, startTime);
     const endMs = combineDateAndTimeString(endDate, endTime);
-    const swatch = COLOR_SWATCHES[selectedColor];
+    const swatch = activeColor;
 
     const params: CalendarEventUpdateParams = {
       EventID: event.id,
@@ -254,8 +273,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
         ? (Number(durationHours || 0) * 3600000 + Number(durationMinutes || 0) * 60000)
         : undefined,
       Split: splitCount ? Number(splitCount) : undefined,
-      CalAddress: address || undefined,
-      CalAddressDescription: addressDescription || undefined,
+      LocationId: locationId || undefined,
+      IsLocationCleared: isLocationCleared ? 'true' : undefined,
+      CalAddress: !locationId && address ? address : undefined,
+      CalAddressDescription: !locationId && addressDescription ? addressDescription : undefined,
       ColorConfig: {
         IsEnabled: true,
         Red: String(swatch.r),
@@ -537,12 +558,19 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
               <FieldGroup>
                 <Label>{t('calendarEvent.edit.location')}</Label>
                 <AutocompleteWrapper>
-                  <Input
-                    value={address}
-                    onChange={(e) => { userEditedAddressRef.current = true; setAddress(e.target.value); }}
-                    placeholder={t('calendarEvent.edit.locationSearchPlaceholder')}
-                    onFocus={() => { if (locationResults.length > 0) setShowLocationDropdown(true); }}
-                  />
+                  <InputWithClear>
+                    <Input
+                      value={address}
+                      onChange={(e) => { userEditedAddressRef.current = true; setLocationId(null); setIsLocationCleared(false); setAddress(e.target.value); }}
+                      placeholder={t('calendarEvent.edit.locationSearchPlaceholder')}
+                      onFocus={() => { if (locationResults.length > 0) setShowLocationDropdown(true); }}
+                    />
+                    {(address || addressDescription) && (
+                      <ClearButton type="button" onClick={handleClearLocation} aria-label={t('calendarEvent.edit.clearLocation')}>
+                        <X size={14} />
+                      </ClearButton>
+                    )}
+                  </InputWithClear>
                   {isSearching && (
                     <SearchingIndicator role="status">
                       <Loader2 size={16} className="spin" />
@@ -604,7 +632,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
           <SectionHeader onClick={() => setColorOpen((v) => !v)}>
             <SectionTitle>{t('calendarEvent.edit.colorSection')}</SectionTitle>
             <SwatchPreview
-              style={{ backgroundColor: `rgb(${COLOR_SWATCHES[selectedColor].r}, ${COLOR_SWATCHES[selectedColor].g}, ${COLOR_SWATCHES[selectedColor].b})` }}
+              style={{ backgroundColor: `rgb(${activeColor.r}, ${activeColor.g}, ${activeColor.b})` }}
             />
             <Chevron $open={colorOpen}><ChevronRight size={16} /></Chevron>
           </SectionHeader>
@@ -934,6 +962,33 @@ const WeekDayChip = styled.button<{ $selected: boolean }>`
 `;
 
 /* ── Location Autocomplete ── */
+
+const InputWithClear = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+const ClearButton = styled.button`
+  position: absolute;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.background.card2};
+  color: ${({ theme }) => theme.colors.text.muted};
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.primary};
+    background: ${({ theme }) => theme.colors.border.default};
+  }
+`;
 
 const AutocompleteWrapper = styled.div``;
 
