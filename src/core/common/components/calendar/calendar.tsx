@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
+import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
 import {
   CalendarBackgroundClickInfo,
   StyledEvent,
@@ -173,7 +174,7 @@ const Calendar = ({
 
   function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
     canvas.width = width;
-    canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * 24;
+    canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY;
   }
   function drawCalendarGrid(
     canvas: HTMLCanvasElement,
