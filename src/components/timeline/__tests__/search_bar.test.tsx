@@ -4,6 +4,7 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import SearchBar from '../search_bar';
 import { CalendarEvent } from '@/core/common/types/schedule';
+import { CalendarUIStore } from '@/core/common/components/calendar/calendar-ui.store';
 
 const mockSearchCalendarEventsByName = vi.fn();
 const mockSetCalendarEventAsNow = vi.fn();
@@ -38,15 +39,45 @@ vi.mock('@/global_state', () => ({
 	),
 }));
 
-// Mock CalendarUIProvider
-vi.mock('@/core/common/components/calendar/CalendarUIProvider', () => ({
-	useCalendarUI: () => ({
-		setCreateTileModalOpen: vi.fn(),
-		isCreateTileModalOpen: false,
-		setCreateTileModalExpanded: vi.fn(),
-		isCreateTileModalExpanded: false,
-	}),
+// Mock zustand Calendar UI store
+vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
+useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
+		const mockStore = {
+			createTile: {
+				state: {
+					isOpen: false,
+					isExpanded: false,
+					loading: { isActive: false },
+					success: { isOpen: false, isNavigatingToTile: false },
+				},
+				actions: {
+					open: vi.fn(),
+					close: vi.fn(),
+					expand: vi.fn(),
+					collapse: vi.fn(),
+					startLoading: vi.fn(),
+					endLoading: vi.fn(),
+					showSuccess: vi.fn(),
+					hideSuccess: vi.fn(),
+					navigateToTile: vi.fn(),
+					navigateToTileComplete: vi.fn(),
+				},
+			},
+			editTile: {
+				state: {
+					isOpen: false,
+					event: null,
+				},
+				actions: {
+					open: vi.fn(),
+					close: vi.fn(),
+				},
+			},
+		};
+		return selector ? selector(mockStore) : mockStore;
+	},
 }));
+
 
 // Mock ThemeProvider
 vi.mock('@/core/theme/ThemeProvider', () => ({

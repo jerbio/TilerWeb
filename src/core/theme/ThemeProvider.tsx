@@ -28,6 +28,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
   const themeObject = isDarkMode ? darkTheme : lightTheme;
 
+  React.useEffect(() => {
+    document.documentElement.style.colorScheme = isDarkMode ? 'dark' : 'light';
+  }, [isDarkMode]);
+
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
       <StyledThemeProvider theme={themeObject}>

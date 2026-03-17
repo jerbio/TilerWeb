@@ -4,11 +4,19 @@ import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
+import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
 import {
   CalendarBackgroundClickInfo,
   StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import {
+  ScheduleRepeatEndType,
+  ScheduleRepeatFrequency,
+  ScheduleRepeatStartType,
+  ScheduleRepeatType,
+  ScheduleRepeatWeekday,
+  ScheduleSubCalendarEvent,
+} from '@/core/common/types/schedule';
 import Loader from '../loader';
 import CalendarEvent from './calendar_event';
 import Tooltip from '../tooltip';
@@ -27,15 +35,15 @@ import {
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
 import useIsMobile from '../../hooks/useIsMobile';
-import CalendarCreateTile, { InitialCreateTileFormState } from './calendar_create_tile';
-import { RGB, RGBColor } from '@/core/util/colors';
+import CalendarCreateTile, { InitialCreateTileFormState } from './create_tile';
+import { RGBColor } from '@/core/util/colors';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
-import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/calendar';
 
 import { CalendarViewOptions } from './calendar.types';
+import { useCalendarUI } from './calendar-ui.provider';
+import { eventColorOptions } from './data';
 export type { CalendarViewOptions } from './calendar.types';
-import { useCalendarUI } from './CalendarUIProvider.tsx';
 import { scheduleService } from '@/services';
 
 type CalendarProps = {
@@ -62,13 +70,8 @@ const Calendar = ({
   const viableEvents = events.filter((event) => event.isViable);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
-  const {
-    isCreateTileModalOpen,
-    setCreateTileModalOpen,
-    isCreateTileModalExpanded,
-    setCreateTileModalExpanded,
-  } = useCalendarUI();
   const theme = useTheme();
+  const { createTile } = useCalendarUI((state) => state);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -170,9 +173,10 @@ const Calendar = ({
   const calendarGridCanvasRef = useRef<HTMLCanvasElement>(null);
   const calendarGridPrevCanvasRef = useRef<HTMLCanvasElement>(null);
   const calendarGridNextCanvasRef = useRef<HTMLCanvasElement>(null);
+
   function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
     canvas.width = width;
-    canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * 24;
+    canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY;
   }
   function drawCalendarGrid(
     canvas: HTMLCanvasElement,
@@ -353,8 +357,9 @@ const Calendar = ({
     const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
 
     const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
+    const totalHeaderHeight = parseInt(calendarConfig.HEADER_HEIGHT);
     const innerAbsoluteX = event.springStyles.x + parseInt(calendarConfig.TIMELINE_WIDTH);
-    const innerAbsoluteY = event.springStyles.y + parseInt(calendarConfig.HEADER_HEIGHT);
+    const innerAbsoluteY = event.springStyles.y + totalHeaderHeight;
     const innerAbsoluteWidth = event.springStyles.width;
 
     const containerRect = contentContainerRef.current?.getBoundingClientRect();
@@ -389,11 +394,11 @@ const Calendar = ({
     if (calculatedY + INFO_MODAL_HEIGHT > containerHeight) {
       // Not enough space at the bottom, adjust upwards
       calculatedY =
-        containerHeight + parseInt(calendarConfig.HEADER_HEIGHT) - INFO_MODAL_HEIGHT;
+        containerHeight + totalHeaderHeight - INFO_MODAL_HEIGHT;
     }
-    if (calculatedY < parseInt(calendarConfig.HEADER_HEIGHT)) {
+    if (calculatedY < totalHeaderHeight) {
       // Still not enough space, clamp to top edge
-      calculatedY = parseInt(calendarConfig.HEADER_HEIGHT) + INFO_MODAL_GAP;
+      calculatedY = totalHeaderHeight + INFO_MODAL_GAP;
     }
 
     setCalendarEventInfoPos({ x: calculatedX, y: calculatedY });
@@ -445,9 +450,9 @@ const Calendar = ({
       y: 0,
     },
     to: {
-      opacity: isCreateTileModalOpen ? 1 : 0,
-      scale: isCreateTileModalOpen ? 1 : 0.9,
-      y: isCreateTileModalOpen ? 0 : 100,
+      opacity: createTile.state.isOpen ? 1 : 0,
+      scale: createTile.state.isOpen ? 1 : 0.9,
+      y: createTile.state.isOpen ? 0 : 100,
     },
     config: {
       duration: 200,
@@ -470,48 +475,60 @@ const Calendar = ({
   }, [isMobile]);
 
   // Create Tile State
-  const tileColorOptions: Array<RGB> = [
-    { r: 255, g: 159, b: 28 },
-    { r: 0, g: 188, b: 212 },
-    { r: 204, g: 51, b: 0 },
-    { r: 102, g: 122, b: 62 },
-    { r: 33, g: 150, b: 243 },
-    { r: 126, g: 87, b: 194 },
-    { r: 152, g: 255, b: 197 },
-    { r: 219, g: 58, b: 94 },
-  ];
   const initialCreateTileFormState: InitialCreateTileFormState = {
+		start: dayjs(),
     action: '',
     location: '',
     durationHours: 0,
     durationMins: 0,
     deadline: dayjs(),
-    color: new RGBColor(tileColorOptions[0]),
+    color: new RGBColor(eventColorOptions[0]),
     isRecurring: false,
-    recurrenceCount: 1,
-    recurrenceType: TILE_RECURRENCE_TYPE.DAILY,
+    recurrenceType: ScheduleRepeatType.Daily,
+    recurrenceFrequency: ScheduleRepeatFrequency.Daily,
+    recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
+    recurrenceStartType: ScheduleRepeatStartType.Default,
+		recurrenceStartDate: dayjs(),
+		recurrenceEndType: ScheduleRepeatEndType.Never,
+    recurrenceEndDate: dayjs().add(1, 'week'),
+    timeRestrictionType: null,
     isTimeRestricted: false,
-    timeRestrictionType: TILE_TIME_RESTRICTION_TYPE.DAILY,
     timeRestrictionStart: '00:00',
     timeRestrictionEnd: '23:59',
     hasLocationNickname: false,
     locationNickname: '',
   };
   const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-  function closeCreateTileModal() {
-    createTileFormHandler.resetForm();
-    setCreateTileModalOpen(false);
-    setCreateTileModalExpanded(false);
-  }
+  const createTileModalContainerRef = useRef<HTMLDivElement>(null);
+  const createTileModalPortalTarget = createTile.state.isExpanded
+    ? document.body
+    : createTileModalContainerRef.current;
+
   function onBackgroundClick(info: CalendarBackgroundClickInfo) {
     // CONTENT_CLICK_OUTSIDE
     if (!selectedEvent) {
       const { formData, setFormData } = createTileFormHandler;
+			// Set Create Tile Form Based on day clicked
+			const clickedDay = dayjs(info.day);
+			const clickedDayValue = clickedDay.day();
+			let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
+
+			if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
+			else if (clickedDayValue === 2) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Tuesday;
+			else if (clickedDayValue === 3) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Wednesday;
+			else if (clickedDayValue === 4) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Thursday;
+			else if (clickedDayValue === 5) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Friday;
+			else if (clickedDayValue === 6) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
+			else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
+
       setFormData({
         ...formData,
-        deadline: dayjs(info.day),
+				start: clickedDay,
+        deadline: clickedDay,
+				recurrenceStartDate: clickedDay,
+				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
       });
-      setCreateTileModalOpen(true);
+      createTile.actions.open();
     } else {
       setSelectedEvent(null);
       setSelectedEventInfo(null);
@@ -521,22 +538,23 @@ const Calendar = ({
 
   return (
     <CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>
-      <CalendarHeader>
-        <CalendarHeaderActions>
-          <ChangeViewButton
-            disabled={eventsLoading}
-            onClick={() => changeDayView('left')}
-          >
-            <ChevronLeftIcon size={16} />
-          </ChangeViewButton>
-          <ChangeViewButton
-            disabled={eventsLoading}
-            onClick={() => changeDayView('right')}
-          >
-            <ChevronRightIcon size={16} />
-          </ChangeViewButton>
-        </CalendarHeaderActions>
-        <CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
+      <CalendarHeaderWrapper>
+        <CalendarHeader>
+          <CalendarHeaderActions>
+            <ChangeViewButton
+              disabled={eventsLoading}
+              onClick={() => changeDayView('left')}
+            >
+              <ChevronLeftIcon size={16} />
+            </ChangeViewButton>
+            <ChangeViewButton
+              disabled={eventsLoading}
+              onClick={() => changeDayView('right')}
+            >
+              <ChevronRightIcon size={16} />
+            </ChangeViewButton>
+          </CalendarHeaderActions>
+          <CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
           {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
             const day = viewOptions.startDay.add(index, 'day');
             const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
@@ -585,8 +603,9 @@ const Calendar = ({
               </CalendarHeaderDateItem>
             );
           })}
-        </CalendarHeaderDateList>
-      </CalendarHeader>
+          </CalendarHeaderDateList>
+        </CalendarHeader>
+      </CalendarHeaderWrapper>
       {/* Non-Viable Events Overlays */}
       {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
         const day = viewOptions.startDay.add(index, 'day');
@@ -638,49 +657,34 @@ const Calendar = ({
       ))}
 
       {/* Create Modal Overlay */}
-      {!isCreateTileModalExpanded ? (
-        <CalendarCreateEventModalBackdrop
-          $visible={isCreateTileModalOpen}
-          onClick={() => setCreateTileModalOpen(false)}
-        >
-          <CalendarCreateEventModalWrapper>
-            <CalendarCreateEventModalContainer
-              $expanded={isCreateTileModalExpanded}
-              style={{
-                scale: calendarCreateEventSpring.scale,
-                opacity: calendarCreateEventSpring.opacity,
-                transform: calendarCreateEventSpring.y.to(
-                  (y) => `translate(-50%, calc(${y}px - 50%))`
-                ),
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <CalendarCreateTile
-                refetchEvents={refetchEvents}
-                isOpen={isCreateTileModalOpen}
-                formHandler={createTileFormHandler}
-                tileColorOptions={tileColorOptions}
-                expanded={isCreateTileModalExpanded}
-                setExpanded={setCreateTileModalExpanded}
-                onClose={closeCreateTileModal}
-              />
-            </CalendarCreateEventModalContainer>
-          </CalendarCreateEventModalWrapper>
-        </CalendarCreateEventModalBackdrop>
-      ) : (
+      <CalendarCreateEventModalBackdrop
+        $visible={createTile.state.isOpen}
+        onClick={createTile.actions.close}
+      >
+        <CalendarCreateEventModalWrapper>
+          <CalendarCreateEventModalContainer
+            ref={createTileModalContainerRef}
+            $expanded={createTile.state.isExpanded}
+            style={{
+              scale: calendarCreateEventSpring.scale,
+              opacity: calendarCreateEventSpring.opacity,
+              transform: calendarCreateEventSpring.y.to(
+                (y) => `translate(-50%, calc(${y}px - 50%))`
+              ),
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </CalendarCreateEventModalWrapper>
+      </CalendarCreateEventModalBackdrop>
+      {createTileModalPortalTarget &&
         createPortal(
           <CalendarCreateTile
             refetchEvents={refetchEvents}
-            isOpen={isCreateTileModalOpen}
             formHandler={createTileFormHandler}
-            tileColorOptions={tileColorOptions}
-            expanded={isCreateTileModalExpanded}
-            setExpanded={setCreateTileModalExpanded}
-            onClose={closeCreateTileModal}
           />,
-          document.body
-        )
-      )}
+          createTileModalPortalTarget
+        )}
+
       {/* Calendar Content */}
       <CalendarContentContainer
         id="calendar-content-container"
@@ -764,11 +768,17 @@ const CalendarContainer = styled.div<{ $isMounted: boolean }>`
 	user-select: none;
 `;
 
-const CalendarHeader = styled.div`
+const CalendarHeaderWrapper = styled.div`
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+`;
+
+const CalendarHeader = styled.div`
 	height: ${calendarConfig.HEADER_HEIGHT};
 	background-color: ${({ theme }) => theme.colors.calendar.headerBg};
 	display: flex;
@@ -907,7 +917,8 @@ const ShowNonViableEventsButton = styled.button<{ $active: boolean }>`
 	height: 32px;
 	background-color: transparent;
 	box-shadow: 0 0 0 1px
-		${({ $active, theme }) => ($active ? theme.colors.calendar.headerDayText : 'transparent')} inset;
+		${({ $active, theme }) => ($active ? theme.colors.calendar.headerDayText : 'transparent')}
+		inset;
 	display: grid;
 	place-items: center;
 	border-radius: ${({ theme }) => theme.borderRadius.xxLarge};
@@ -925,7 +936,7 @@ const NonViableEventsContainer = styled.div<{
   $cellwidth: number;
 }>`
 	position: absolute;
-	top: calc(${calendarConfig.HEADER_HEIGHT});
+	top: ${calendarConfig.HEADER_HEIGHT};
 	left: ${({ $cellwidth, $index }) =>
     `${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
 	pacity: ${({ $visible }) => ($visible ? 1 : 0)};

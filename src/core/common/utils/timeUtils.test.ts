@@ -6,6 +6,9 @@ import {
 	calculateSleepDurationMs,
 	calculateBedTimeStart,
 	calculateBedTimeEnd,
+	epochToDate,
+	epochToTimeString,
+	combineDateAndTimeString,
 } from './timeUtils';
 
 const MS_PER_MINUTE = 60 * 1000;
@@ -312,6 +315,117 @@ describe('timeUtils', () => {
 				// Verify the ms value is the same
 				expect(timeStringToMs(input)).toBe(timeStringToMs(normalized));
 			});
+		});
+	});
+
+	describe('epochToDate', () => {
+		it('should return null for null input', () => {
+			expect(epochToDate(null)).toBeNull();
+		});
+
+		it('should return start of day for a midday timestamp', () => {
+			// 2026-03-15 14:30:00 UTC
+			const ts = new Date(2026, 2, 15, 14, 30, 0).getTime();
+			const result = epochToDate(ts)!;
+			expect(result.hour()).toBe(0);
+			expect(result.minute()).toBe(0);
+			expect(result.second()).toBe(0);
+			expect(result.date()).toBe(15);
+			expect(result.month()).toBe(2); // March (0-indexed)
+			expect(result.year()).toBe(2026);
+		});
+
+		it('should return start of day for a midnight timestamp', () => {
+			const ts = new Date(2026, 0, 1, 0, 0, 0).getTime();
+			const result = epochToDate(ts)!;
+			expect(result.hour()).toBe(0);
+			expect(result.minute()).toBe(0);
+			expect(result.date()).toBe(1);
+			expect(result.month()).toBe(0);
+		});
+	});
+
+	describe('epochToTimeString', () => {
+		it('should return empty string for null input', () => {
+			expect(epochToTimeString(null)).toBe('');
+		});
+
+		it('should extract "2:30 PM" from a 14:30 timestamp', () => {
+			const ts = new Date(2026, 2, 15, 14, 30, 0).getTime();
+			expect(epochToTimeString(ts)).toBe('2:30 PM');
+		});
+
+		it('should extract "12:00 AM" from midnight', () => {
+			const ts = new Date(2026, 2, 15, 0, 0, 0).getTime();
+			expect(epochToTimeString(ts)).toBe('12:00 AM');
+		});
+
+		it('should extract "12:00 PM" from noon', () => {
+			const ts = new Date(2026, 2, 15, 12, 0, 0).getTime();
+			expect(epochToTimeString(ts)).toBe('12:00 PM');
+		});
+
+		it('should extract "11:59 PM" from 23:59', () => {
+			const ts = new Date(2026, 2, 15, 23, 59, 0).getTime();
+			expect(epochToTimeString(ts)).toBe('11:59 PM');
+		});
+	});
+
+	describe('combineDateAndTimeString', () => {
+		it('should return null for null date', () => {
+			expect(combineDateAndTimeString(null, '5:00 AM')).toBeNull();
+		});
+
+		it('should return date epoch when time is empty', () => {
+			const ts = new Date(2026, 2, 15, 0, 0, 0).getTime();
+			const date = epochToDate(ts)!;
+			expect(combineDateAndTimeString(date, '')).toBe(date.valueOf());
+		});
+
+		it('should combine date and time correctly', () => {
+			const ts = new Date(2026, 2, 15, 0, 0, 0).getTime();
+			const date = epochToDate(ts)!;
+			const result = combineDateAndTimeString(date, '2:30 PM')!;
+			const d = new Date(result);
+			expect(d.getHours()).toBe(14);
+			expect(d.getMinutes()).toBe(30);
+			expect(d.getSeconds()).toBe(0);
+			expect(d.getDate()).toBe(15);
+		});
+
+		it('should handle midnight "12:00 AM"', () => {
+			const ts = new Date(2026, 2, 15, 0, 0, 0).getTime();
+			const date = epochToDate(ts)!;
+			const result = combineDateAndTimeString(date, '12:00 AM')!;
+			const d = new Date(result);
+			expect(d.getHours()).toBe(0);
+			expect(d.getMinutes()).toBe(0);
+		});
+
+		it('should handle noon "12:00 PM"', () => {
+			const ts = new Date(2026, 2, 15, 0, 0, 0).getTime();
+			const date = epochToDate(ts)!;
+			const result = combineDateAndTimeString(date, '12:00 PM')!;
+			const d = new Date(result);
+			expect(d.getHours()).toBe(12);
+			expect(d.getMinutes()).toBe(0);
+		});
+
+		it('should fall back to date epoch for invalid time string', () => {
+			const ts = new Date(2026, 2, 15, 0, 0, 0).getTime();
+			const date = epochToDate(ts)!;
+			expect(combineDateAndTimeString(date, 'invalid')).toBe(date.valueOf());
+		});
+
+		it('round-trips with epochToDate and epochToTimeString', () => {
+			const original = new Date(2026, 5, 20, 17, 45, 0).getTime();
+			const date = epochToDate(original)!;
+			const time = epochToTimeString(original);
+			const result = combineDateAndTimeString(date, time)!;
+			// Should match original to the minute (seconds zeroed)
+			expect(new Date(result).getHours()).toBe(17);
+			expect(new Date(result).getMinutes()).toBe(45);
+			expect(new Date(result).getDate()).toBe(20);
 		});
 	});
 });

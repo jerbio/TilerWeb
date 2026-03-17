@@ -1,4 +1,5 @@
 import calendarConfig from '@/core/constants/calendar_config';
+import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
 import React from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
@@ -19,7 +20,7 @@ const CalendarContentDummy: React.FC<CalendarContentProps> = ({
         {/* Background */}
         <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
         {/* Timeline */}
-        {Array.from({ length: 24 }).map((_, hourIndex) => {
+        {Array.from({ length: HOURS_IN_DAY }).map((_, hourIndex) => {
           return (
             <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
               <div>
@@ -43,7 +44,7 @@ const Container = styled.div`
 
 const StyledCalendarContent = styled.div<{ $cellwidth: number }>`
 	width: 100%;
-	height: ${parseInt(calendarConfig.CELL_HEIGHT) * 24}px; /* 24 hours */
+	height: ${parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY}px;
 	position: relative;
 	isolation: isolate;
 `;

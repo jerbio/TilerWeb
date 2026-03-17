@@ -29,6 +29,9 @@ export type ScheduleSubCalendarEventLocation = {
   nickname: string;
 };
 
+export type LocationResponse = ApiResponse<ScheduleSubCalendarEventLocation>;
+export type LocationSearchResponse = ApiResponse<ScheduleSubCalendarEventLocation[]>;
+
 export type ScheduleSubCalendarEventBlob = {
   type: number;
   note: string;
@@ -74,7 +77,6 @@ export type ScheduleSubCalendarEventTravelDetail = {
 };
 
 // ── ScheduleSubCalendarEvent ───────────────────────────────────
-
 export type ScheduleSubCalendarEvent = {
   id: string;
   start: number;
@@ -146,6 +148,43 @@ export type ScheduleLookupOptions = {
   endRange: number;
 };
 
+export enum ScheduleRepeatType {
+  Daily = "0",
+  Weekly = "1",
+  Monthly = "2",
+  Yearly = "3",
+}
+
+export enum ScheduleRepeatFrequency {
+  Daily = "Daily",
+  Weekly = "Weekly",
+  Monthly = "Monthly",
+  Yearly = "Yearly",
+}
+
+export enum ScheduleRepeatWeekday {
+  Sunday = "0",
+  Monday = "1",
+  Tuesday = "2",
+  Wednesday = "3",
+  Thursday = "4",
+  Friday = "5",
+  Saturday = "6",
+}
+
+export enum ScheduleRepeatStartType {
+  Default = "0",
+  On = "1",
+}
+
+export enum ScheduleRepeatEndType {
+  Never = "0",
+  On = "1",
+}
+
+export type ScheduleRepeatWeeklyData = string;
+
+
 export type ScheduleCreateEventParams = {
   BColor?: string;
   RColor?: string;
@@ -169,22 +208,31 @@ export type ScheduleCreateEventParams = {
   LocationSource?: string;
   LocationTag?: string;
   Name?: string;
-  RepeatData?: string;
+
+  // Legacy/loosely used by backend. Keep nullable string.
+  RepeatData?: string | null;
+  // Required for recurrence end when repeating.
   RepeatEndDay?: string;
   RepeatEndMonth?: string;
   RepeatEndYear?: string;
+  // Present on backend model, but currently ignored by NewCalEvent recurrence construction.
   RepeatStartDay?: string;
   RepeatStartMonth?: string;
   RepeatStartYear?: string;
-  RepeatType?: string;
-  RepeatWeeklyData?: string;
+  // Frontend/client convention: 0=daily, 1=weekly, 2=monthly, 3=yearly.
+  RepeatType?: ScheduleRepeatType;
+  // Weekly-only selection. Backend expects a comma-separated string of DayOfWeek ints.
+  // Example: "1,3,5" for Monday/Wednesday/Friday.
+  RepeatWeeklyData?: ScheduleRepeatWeeklyData;
+  // Actual recurrence unit used by backend.
+  RepeatFrequency?: ScheduleRepeatFrequency;
+
   Rigid?: string;
   StartDay?: string;
   StartHour?: string;
   StartMinute?: string;
   StartMonth?: string;
   StartYear?: string;
-  RepeatFrequency?: string;
   PredictionDurationInMs?: string;
   PredictionLocationDescription?: string;
   PredictionEnabled?: string;
@@ -195,15 +243,7 @@ export type ScheduleCreateEventParams = {
   isEveryDay?: string;
   nextTileSuggestionId?: string;
   RestrictionProfileId?: string;
-  RestrictiveWeek?: {
-    restrictionProfileId?: string;
-    WeekDayOption?: {
-      Start?: string;
-      Index?: string;
-      End?: string;
-    }[];
-    isEnabled?: string;
-  };
+  RestrictiveWeek?: CalendarEventRestrictiveWeek;
   TimeZoneOrigin?: string;
   AutoReviseDeadline?: string;
   IsCompleteOnElapsed?: string;
@@ -286,6 +326,72 @@ export type CalendarEventSearchParams = {
 
 /** Response shape for `GET /api/CalendarEvent/Name` */
 export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
+
+/** Params for `POST /api/CalendarEvent/Update` */
+
+export type CalendarEventWeekDayOption = {
+	Start?: string;
+	Index?: string;
+	End?: string;
+};
+
+export type CalendarEventRestrictiveWeek = {
+	restrictionProfileId?: string;
+	WeekDayOption?: CalendarEventWeekDayOption[];
+	isEnabled?: string;
+};
+
+export type CalendarEventRepetitionConfig = {
+	IsEnabled?: boolean;
+	IsForever?: boolean;
+	RepetitionStart?: number;
+	RepetitionEnd?: number;
+	TileStart?: number;
+	TileEnd?: number;
+	Frequency?: string;
+	DayOfWeekRepetitions?: string[];
+};
+
+export type CalendarEventColorConfig = {
+	IsEnabled?: boolean;
+	Red?: string;
+	Green?: string;
+	Blue?: string;
+	Opacity?: string;
+};
+
+export type CalendarEventUpdateParams = ScheduleUpdateParams & {
+	EventID: string;
+	EventName?: string;
+	Start?: number;
+	End?: number;
+	Duration?: number;
+	Split?: number;
+	LocationId?: string;
+	IsLocationCleared?: string;
+	CalAddress?: string;
+	CalAddressDescription?: string;
+	IsCalAddressVerified?: string;
+	Notes?: string;
+	Priority?: string;
+	IsLocked?: boolean;
+	IsAutoDeadline?: string;
+	IsAutoReviseDeadline?: string;
+	isRestricted?: string;
+	RestrictionStart?: string;
+	RestrictionEnd?: string;
+	isWorkWeek?: string;
+	isEveryDay?: string;
+	RestrictionProfileId?: string;
+	RestrictiveWeek?: CalendarEventRestrictiveWeek;
+	RepetitionConfig?: CalendarEventRepetitionConfig;
+	ColorConfig?: CalendarEventColorConfig;
+	AllEvents?: number;
+	MobileApp?: boolean;
+	SocketId?: boolean;
+	TimeZoneOffset?: number;
+	IsTimeZoneAdjusted?: string;
+};
 
 /** Common params shared across schedule update endpoints (Shuffle, Reoptimize, etc.) */
 export type ScheduleUpdateParams = {
