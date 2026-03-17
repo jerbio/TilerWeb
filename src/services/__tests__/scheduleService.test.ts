@@ -396,6 +396,49 @@ describe('ScheduleService', () => {
 			expect(typeof calledWith.TimeZone).toBe('string');
 		});
 
+		it('includes CalendarEventName when name is provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', { name: 'Updated Event Name' });
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				CalendarEventName: 'Updated Event Name',
+				SubCalendarEventStart: undefined,
+				SubCalendarEventEnd: undefined,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('includes all fields when name, times, and deadline are provided together', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				name: 'Full Update',
+				start: 1769930000000,
+				end: 1769933600000,
+				calendarEnd: 1770600000000,
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				CalendarEventName: 'Full Update',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: 1770600000000,
+				TimeZone: expect.any(String),
+			});
+		});
+
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockRejectedValueOnce(
 				new Error('Network error'),

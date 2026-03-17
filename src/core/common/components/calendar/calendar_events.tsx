@@ -13,6 +13,7 @@ import calendarConfig from '@/core/constants/calendar_config';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
+import { splitEventByDay } from '@/core/util/eventSplitting';
 
 type CalendarEventsProps = {
   viewOptions: CalendarViewOptions;
@@ -120,40 +121,12 @@ const CalendarEvents = ({
     // Filter and process events to only include those in the current view
     for (const event of events) {
       const start = dayjs(event.start);
-      let end = dayjs(event.end);
+      const end = dayjs(event.end);
       if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
 
-      // 💡 Treat midnight as still part of previous day
-      if (end.hour() === 0 && end.minute() === 0 && end.second() === 0) {
-        end = end.subtract(1, 'millisecond');
-      }
-
-      // Split events that span multiple days
-      // Preserve original start/end before splitting overwrites them
-      const originalStart = event.start;
-      const originalEnd = event.end;
-
-      if (!start.isSame(end, 'day')) {
-        const days = end.endOf('day').diff(start.startOf('day'), 'day') + 1;
-        for (let i = 0; i < days; i++) {
-          const day = start.add(i, 'day');
-          currentViewEvents.push({
-            ...event,
-            key: `${event.id}-${i}`,
-            start: i === 0 ? start.unix() * 1000 : day.startOf('day').unix() * 1000,
-            end: i === days - 1 ? end.unix() * 1000 : day.endOf('day').unix() * 1000,
-            originalStart,
-            originalEnd,
-          });
-        }
-      } else {
-        currentViewEvents.push({
-          ...event,
-          key: event.id,
-          originalStart,
-          originalEnd,
-        });
-      }
+      // Split multi-day events and preserve original times
+      const segments = splitEventByDay(event);
+      currentViewEvents.push(...segments);
     }
 
     // Process travel details of all events in the current view

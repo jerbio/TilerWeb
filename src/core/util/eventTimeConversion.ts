@@ -29,7 +29,7 @@ export function dateTimeToUnix(date: string, time: string): number {
  * @param timestamp - Unix timestamp in milliseconds
  * @returns Date string in YYYY-MM-DD format (local timezone)
  */
-export function unixToDateString(timestamp: number): string {
+export function timeToDate(timestamp: number): string {
 	return dayjs(timestamp).format('YYYY-MM-DD');
 }
 
@@ -56,5 +56,25 @@ export function validateTimeRange(
 ): boolean {
 	const startUnix = dateTimeToUnix(date, startTime);
 	const endUnix = dateTimeToUnix(date, endTime);
+	return endUnix > startUnix;
+}
+
+/**
+ * Validates that end datetime is after start datetime (supports different dates).
+ * Use this for multi-day event validation where start and end dates may differ.
+ * @param startDate - Start date in YYYY-MM-DD format
+ * @param startTime - Start time in "h:mm A" format
+ * @param endDate - End date in YYYY-MM-DD format
+ * @param endTime - End time in "h:mm A" format
+ * @returns true if end datetime is strictly after start datetime
+ */
+export function validateDateTimeRange(
+	startDate: string,
+	startTime: string,
+	endDate: string,
+	endTime: string
+): boolean {
+	const startUnix = dateTimeToUnix(startDate, startTime);
+	const endUnix = dateTimeToUnix(endDate, endTime);
 	return endUnix > startUnix;
 }

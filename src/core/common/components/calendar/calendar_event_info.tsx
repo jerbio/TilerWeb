@@ -22,7 +22,7 @@ import DatePicker from '@/core/common/components/date_picker';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
 import {
   dateTimeToUnix,
-  unixToDateString,
+  timeToDate,
   unixToTimeString,
 } from '@/core/util/eventTimeConversion';
 import LocationBG from '@/assets/event/location-bg.png';
@@ -80,11 +80,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   useEffect(() => {
     if (event) {
       setEditedName(event.name);
-      setEditedStartDate(unixToDateString(eventStart));
+      setEditedStartDate(timeToDate(eventStart));
       setEditedStartTime(unixToTimeString(eventStart));
-      setEditedEndDate(unixToDateString(eventEnd));
+      setEditedEndDate(timeToDate(eventEnd));
       setEditedEndTime(unixToTimeString(eventEnd));
-      setEditedDeadline(unixToDateString(event.calendarEventEnd));
+      setEditedDeadline(timeToDate(event.calendarEventEnd));
       setHasChanges(false);
       setValidationError(null);
       setIsEditingName(false);
@@ -121,11 +121,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   const handleCancel = () => {
     if (event) {
       setEditedName(event.name);
-      setEditedStartDate(unixToDateString(eventStart));
+      setEditedStartDate(timeToDate(eventStart));
       setEditedStartTime(unixToTimeString(eventStart));
-      setEditedEndDate(unixToDateString(eventEnd));
+      setEditedEndDate(timeToDate(eventEnd));
       setEditedEndTime(unixToTimeString(eventEnd));
-      setEditedDeadline(unixToDateString(event.calendarEventEnd));
+      setEditedDeadline(timeToDate(event.calendarEventEnd));
     }
     setHasChanges(false);
     setValidationError(null);

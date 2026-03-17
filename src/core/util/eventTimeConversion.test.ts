@@ -1,19 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import {
 	dateTimeToUnix,
-	unixToDateString,
+	timeToDate,
 	unixToTimeString,
 	validateTimeRange,
+	validateDateTimeRange,
 } from './eventTimeConversion';
 
 describe('eventTimeConversion', () => {
-	describe('unixToDateString', () => {
+	describe('timeToDate', () => {
 		it('converts unix timestamp to YYYY-MM-DD format in local time', () => {
 			// Create a specific local time date
 			const localDate = new Date(2026, 3, 5, 14, 30, 0); // April 5, 2026, 2:30 PM local
 			const timestamp = localDate.getTime();
 
-			const result = unixToDateString(timestamp);
+			const result = timeToDate(timestamp);
 
 			// Should return the local date, not shifted by timezone
 			expect(result).toBe('2026-04-05');
@@ -22,21 +23,21 @@ describe('eventTimeConversion', () => {
 		it('preserves date across different times of day', () => {
 			// Test morning time
 			const morning = new Date(2026, 3, 5, 8, 0, 0); // 8:00 AM local
-			expect(unixToDateString(morning.getTime())).toBe('2026-04-05');
+			expect(timeToDate(morning.getTime())).toBe('2026-04-05');
 
 			// Test evening time
 			const evening = new Date(2026, 3, 5, 20, 0, 0); // 8:00 PM local
-			expect(unixToDateString(evening.getTime())).toBe('2026-04-05');
+			expect(timeToDate(evening.getTime())).toBe('2026-04-05');
 
 			// Test near midnight
 			const nearMidnight = new Date(2026, 3, 5, 23, 59, 0); // 11:59 PM local
-			expect(unixToDateString(nearMidnight.getTime())).toBe('2026-04-05');
+			expect(timeToDate(nearMidnight.getTime())).toBe('2026-04-05');
 		});
 
 		it('handles date boundaries correctly', () => {
 			// Just after midnight
 			const afterMidnight = new Date(2026, 3, 6, 0, 1, 0); // April 6, 12:01 AM
-			expect(unixToDateString(afterMidnight.getTime())).toBe('2026-04-06');
+			expect(timeToDate(afterMidnight.getTime())).toBe('2026-04-06');
 		});
 	});
 
@@ -104,13 +105,13 @@ describe('eventTimeConversion', () => {
 	});
 
 	describe('round-trip consistency', () => {
-		it('unixToDateString and unixToTimeString should be consistent with dateTimeToUnix', () => {
+		it('timeToDate and unixToTimeString should be consistent with dateTimeToUnix', () => {
 			// Start with a known timestamp
 			const originalDate = new Date(2026, 3, 5, 14, 30, 0); // April 5, 2026, 2:30 PM
 			const originalTimestamp = originalDate.getTime();
 
 			// Convert to strings
-			const dateStr = unixToDateString(originalTimestamp);
+			const dateStr = timeToDate(originalTimestamp);
 			const timeStr = unixToTimeString(originalTimestamp);
 
 			// Convert back to timestamp
@@ -131,7 +132,7 @@ describe('eventTimeConversion', () => {
 
 			for (const original of testCases) {
 				const timestamp = original.getTime();
-				const dateStr = unixToDateString(timestamp);
+				const dateStr = timeToDate(timestamp);
 				const timeStr = unixToTimeString(timestamp);
 				const roundTrip = dateTimeToUnix(dateStr, timeStr);
 
@@ -163,6 +164,81 @@ describe('eventTimeConversion', () => {
 		it('handles times crossing noon correctly', () => {
 			const result = validateTimeRange('2026-04-05', '11:00 AM', '1:00 PM');
 			expect(result).toBe(true);
+		});
+	});
+
+	describe('validateDateTimeRange', () => {
+		describe('same date scenarios', () => {
+			it('returns true when end time is after start time on same date', () => {
+				const result = validateDateTimeRange('2026-04-05', '9:00 AM', '2026-04-05', '5:00 PM');
+				expect(result).toBe(true);
+			});
+
+			it('returns false when end time equals start time on same date', () => {
+				const result = validateDateTimeRange('2026-04-05', '9:00 AM', '2026-04-05', '9:00 AM');
+				expect(result).toBe(false);
+			});
+
+			it('returns false when end time is before start time on same date', () => {
+				const result = validateDateTimeRange('2026-04-05', '5:00 PM', '2026-04-05', '9:00 AM');
+				expect(result).toBe(false);
+			});
+		});
+
+		describe('different date scenarios (multi-day events)', () => {
+			it('returns true when end date is after start date', () => {
+				// Event from April 5 at 10 PM to April 6 at 8 AM
+				const result = validateDateTimeRange('2026-04-05', '10:00 PM', '2026-04-06', '8:00 AM');
+				expect(result).toBe(true);
+			});
+
+			it('returns true when end time is earlier but date is later (overnight event)', () => {
+				// Event from April 5 at 11 PM to April 6 at 2 AM
+				const result = validateDateTimeRange('2026-04-05', '11:00 PM', '2026-04-06', '2:00 AM');
+				expect(result).toBe(true);
+			});
+
+			it('returns true for multi-day events spanning several days', () => {
+				// Event from April 5 at 6 PM to April 8 at 10 AM
+				const result = validateDateTimeRange('2026-04-05', '6:00 PM', '2026-04-08', '10:00 AM');
+				expect(result).toBe(true);
+			});
+
+			it('returns false when end date is before start date', () => {
+				// Invalid: end date is before start date
+				const result = validateDateTimeRange('2026-04-06', '9:00 AM', '2026-04-05', '5:00 PM');
+				expect(result).toBe(false);
+			});
+
+			it('returns false when dates are swapped even with same times', () => {
+				const result = validateDateTimeRange('2026-04-06', '9:00 AM', '2026-04-05', '9:00 AM');
+				expect(result).toBe(false);
+			});
+		});
+
+		describe('edge cases', () => {
+			it('handles midnight correctly for overnight events', () => {
+				// Event ending at exactly midnight next day
+				const result = validateDateTimeRange('2026-04-05', '10:00 PM', '2026-04-06', '12:00 AM');
+				expect(result).toBe(true);
+			});
+
+			it('handles events starting at midnight', () => {
+				const result = validateDateTimeRange('2026-04-05', '12:00 AM', '2026-04-05', '8:00 AM');
+				expect(result).toBe(true);
+			});
+
+			it('handles month boundaries', () => {
+				// Event from March 31 to April 1
+				const result = validateDateTimeRange('2026-03-31', '10:00 PM', '2026-04-01', '2:00 AM');
+				expect(result).toBe(true);
+			});
+
+			it('handles year boundaries', () => {
+				// Event from Dec 31 to Jan 1
+				const result = validateDateTimeRange('2026-12-31', '11:00 PM', '2027-01-01', '1:00 AM');
+				expect(result).toBe(true);
+			});
 		});
 	});
 });
