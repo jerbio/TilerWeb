@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScheduleSubCalendarEvent } from '../../types/schedule';
 import styled from 'styled-components';
 import {
@@ -16,17 +16,21 @@ import {
 import { RGBColor } from '@/core/util/colors';
 import dayjs from 'dayjs';
 import TimeUtil from '@/core/util/time';
-import calendarConfig from '@/core/constants/calendar_config';
 import { useTranslation } from 'react-i18next';
 import DatePicker from '@/core/common/components/date_picker';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
 import {
+  adjustEndDateTime,
   dateTimeToUnix,
+  calculateDuration,
+  formatDueIn,
   timeToDate,
   unixToTimeString,
+  validateDateTimeRange,
 } from '@/core/util/eventTimeConversion';
 import LocationBG from '@/assets/event/location-bg.png';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import calendarConfig from '@/core/constants/calendar_config';
 import Loader from '../loader';
 
 type CalendarEventInfoProps = {
@@ -49,10 +53,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
   // Edit mode flags
   const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingStartTime, setIsEditingStartTime] = useState(false);
-  const [isEditingStartDate, setIsEditingStartDate] = useState(false);
-  const [isEditingEndTime, setIsEditingEndTime] = useState(false);
-  const [isEditingEndDate, setIsEditingEndDate] = useState(false);
+  const [isEditingStart, setIsEditingStart] = useState(false);
+  const [isEditingEnd, setIsEditingEnd] = useState(false);
   const [isEditingDeadline, setIsEditingDeadline] = useState(false);
 
   // Edited values
@@ -69,8 +71,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   // Validation error
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Ref for scrolling to save buttons
-  const saveButtonsRef = useRef<HTMLDivElement>(null);
+
 
   // Use original times (preserved before visual splitting) or fall back to start/end
   const eventStart = event?.originalStart ?? event?.start ?? 0;
@@ -88,35 +89,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
       setHasChanges(false);
       setValidationError(null);
       setIsEditingName(false);
-      setIsEditingStartTime(false);
-      setIsEditingStartDate(false);
-      setIsEditingEndTime(false);
-      setIsEditingEndDate(false);
+      setIsEditingStart(false);
+      setIsEditingEnd(false);
       setIsEditingDeadline(false);
     }
   }, [event, eventStart, eventEnd]);
-
-  // Auto-scroll to save buttons when changes are made
-  useEffect(() => {
-    if (hasChanges && saveButtonsRef.current) {
-      saveButtonsRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, [hasChanges]);
-
-  function getEventDueIn(startTime: number) {
-    const now = dayjs();
-    const start = dayjs(startTime);
-    const diffInHours = start.diff(now, 'hour');
-    if (diffInHours < 1) {
-      const diffInMinutes = start.diff(now, 'minute');
-      return `${diffInMinutes} minutes`;
-    } else if (diffInHours < 24) {
-      return `${diffInHours} hours`;
-    } else {
-      const diffInDays = start.diff(now, 'day');
-      return `${diffInDays} days`;
-    }
-  }
 
   const handleCancel = () => {
     if (event) {
@@ -130,24 +107,22 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
     setHasChanges(false);
     setValidationError(null);
     setIsEditingName(false);
-    setIsEditingStartTime(false);
-    setIsEditingStartDate(false);
-    setIsEditingEndTime(false);
-    setIsEditingEndDate(false);
+    setIsEditingStart(false);
+    setIsEditingEnd(false);
     setIsEditingDeadline(false);
   };
 
   const handleSave = () => {
     if (!event) return;
 
-    const newStart = dateTimeToUnix(editedStartDate, editedStartTime);
-    const newEnd = dateTimeToUnix(editedEndDate, editedEndTime);
-
     // Validate that end datetime is after start datetime
-    if (newEnd <= newStart) {
+    if (!validateDateTimeRange(editedStartDate, editedStartTime, editedEndDate, editedEndTime)) {
       setValidationError(t('calendar.event.validation.endAfterStart'));
       return;
     }
+
+    const newStart = dateTimeToUnix(editedStartDate, editedStartTime);
+    const newEnd = dateTimeToUnix(editedEndDate, editedEndTime);
 
     setValidationError(null);
     const deadlineTime = dayjs(event.calendarEventEnd).format('h:mm A');
@@ -186,9 +161,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   // Compute duration display
   const getDurationDisplay = () => {
     if (hasChanges && editedStartDate && editedStartTime && editedEndDate && editedEndTime) {
-      const startUnix = dateTimeToUnix(editedStartDate, editedStartTime);
-      const endUnix = dateTimeToUnix(editedEndDate, editedEndTime);
-      return TimeUtil.rangeDuration(dayjs(startUnix), dayjs(endUnix));
+      return calculateDuration(editedStartDate, editedStartTime, editedEndDate, editedEndTime);
     }
     return event
       ? TimeUtil.rangeDuration(dayjs(eventStart), dayjs(eventEnd))
@@ -199,7 +172,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
     <StyledCalendarEventInfo $color={eventColor} $darkmode={isDarkMode}>
       <CalendarEventInfoHeader>
         <div className="icon">
-          <Star size={16} color={eventColor.setLightness(0.6).toHex()} />
+          {event.emojis ? (
+            <span className="emoji">{event.emojis}</span>
+          ) : (
+            <Star size={16} color={eventColor.setLightness(0.6).toHex()} />
+          )}
         </div>
         <div className="title">
           {isEditingName ? (
@@ -238,13 +215,28 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
             </EditableName>
           )}
           {dayjs().isBefore(dayjs(eventStart)) ? (
-            <span>{t('calendar.event.dueIn', { time: getEventDueIn(eventStart) })}</span>
+            <span>{t('calendar.event.dueIn', { time: formatDueIn(eventStart) })}</span>
           ) : null}
         </div>
-        <button onClick={onClose}>
-          <X size={16} color={eventColor.setLightness(0.5).toHex()} />
-        </button>
+        {hasChanges ? (
+          <HeaderActions>
+            <IconButton onClick={handleCancel} title={t('calendar.event.cancel')}>
+              <X size={16} />
+            </IconButton>
+            <IconButton $primary onClick={handleSave} title={t('calendar.event.save')}>
+              <Check size={16} />
+            </IconButton>
+          </HeaderActions>
+        ) : (
+          <button onClick={onClose}>
+            <X size={16} color={eventColor.setLightness(0.5).toHex()} />
+          </button>
+        )}
       </CalendarEventInfoHeader>
+      <ScrollableBody>
+      {validationError && (
+        <ValidationError>{validationError}</ValidationError>
+      )}
       <CalendarEventInfoSection>
         <CalendarEventInfoArticleContainer>
           {/* Start Time Field */}
@@ -256,51 +248,58 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
             />
             <div>
               <h3>{t('calendar.event.startLabel')}</h3>
-              {isEditingStartTime ? (
-                <EditableFieldWrapper>
-                  <TimeDropdown
-                    value={editedStartTime}
-                    onChange={(time) => {
-                      setEditedStartTime(time);
-                      setHasChanges(true);
-                      setIsEditingStartTime(false);
-                    }}
-                    interval={15}
-                  />
-                </EditableFieldWrapper>
+              {isEditingStart ? (
+                <>
+                  <EditableFieldWrapper>
+                    <TimeDropdown
+                      value={editedStartTime}
+                      onChange={(time) => {
+                        const adjusted = adjustEndDateTime(
+                          editedStartDate, editedStartTime,
+                          editedStartDate, time,
+                          editedEndDate, editedEndTime
+                        );
+                        setEditedStartTime(time);
+                        setEditedEndDate(adjusted.endDate);
+                        setEditedEndTime(adjusted.endTime);
+                        setHasChanges(true);
+                      }}
+                      interval={15}
+                    />
+                  </EditableFieldWrapper>
+                  <EditableFieldWrapper>
+                    <DatePicker
+                      value={editedStartDate}
+                      onChange={(date) => {
+                        if (!date) return;
+                        const adjusted = adjustEndDateTime(
+                          editedStartDate, editedStartTime,
+                          date, editedStartTime,
+                          editedEndDate, editedEndTime
+                        );
+                        setEditedStartDate(date);
+                        setEditedEndDate(adjusted.endDate);
+                        setEditedEndTime(adjusted.endTime);
+                        setHasChanges(true);
+                      }}
+                      portalId="datepicker-portal"
+                    />
+                  </EditableFieldWrapper>
+                </>
               ) : (
                 <EditableValue
                   $isEditable={isEditable}
-                  onClick={() => isEditable && setIsEditingStartTime(true)}
-                >
-                  <span>{hasChanges ? editedStartTime : dayjs(eventStart).format('h:mm A')}</span>
-                  {isEditable && <Pencil size={12} className="edit-icon" />}
-                </EditableValue>
-              )}
-              {isEditingStartDate ? (
-                <EditableFieldWrapper>
-                  <DatePicker
-                    value={editedStartDate}
-                    onChange={(date) => {
-                      if (!date) return;
-                      setEditedStartDate(date);
-                      setHasChanges(true);
-                      setIsEditingStartDate(false);
-                    }}
-                  />
-                </EditableFieldWrapper>
-              ) : (
-                <EditableTimeDate
-                  $isEditable={isEditable}
-                  onClick={() => isEditable && setIsEditingStartDate(true)}
+                  onClick={() => isEditable && setIsEditingStart(true)}
                 >
                   <span>
+                    {hasChanges ? editedStartTime : dayjs(eventStart).format('h:mm A')}
+                    {' · '}
                     {hasChanges
                       ? dayjs(editedStartDate).format('D MMM')
                       : dayjs(eventStart).format('D MMM')}
                   </span>
-                  {isEditable && <Pencil size={10} className="edit-icon" />}
-                </EditableTimeDate>
+                  {isEditable && <Pencil size={12} className="edit-icon" />}
+                </EditableValue>
               )}
             </div>
           </CalendarEventInfoArticle>
@@ -314,51 +313,44 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
             />
             <div>
               <h3>{t('calendar.event.endLabel')}</h3>
-              {isEditingEndTime ? (
-                <EditableFieldWrapper>
-                  <TimeDropdown
-                    value={editedEndTime}
-                    onChange={(time) => {
-                      setEditedEndTime(time);
-                      setHasChanges(true);
-                      setIsEditingEndTime(false);
-                    }}
-                    interval={15}
-                  />
-                </EditableFieldWrapper>
+              {isEditingEnd ? (
+                <>
+                  <EditableFieldWrapper>
+                    <TimeDropdown
+                      value={editedEndTime}
+                      onChange={(time) => {
+                        setEditedEndTime(time);
+                        setHasChanges(true);
+                      }}
+                      interval={15}
+                    />
+                  </EditableFieldWrapper>
+                  <EditableFieldWrapper>
+                    <DatePicker
+                      value={editedEndDate}
+                      onChange={(date) => {
+                        if (!date) return;
+                        setEditedEndDate(date);
+                        setHasChanges(true);
+                      }}
+                      portalId="datepicker-portal"
+                    />
+                  </EditableFieldWrapper>
+                </>
               ) : (
                 <EditableValue
                   $isEditable={isEditable}
-                  onClick={() => isEditable && setIsEditingEndTime(true)}
-                >
-                  <span>{hasChanges ? editedEndTime : dayjs(eventEnd).format('h:mm A')}</span>
-                  {isEditable && <Pencil size={12} className="edit-icon" />}
-                </EditableValue>
-              )}
-              {isEditingEndDate ? (
-                <EditableFieldWrapper>
-                  <DatePicker
-                    value={editedEndDate}
-                    onChange={(date) => {
-                      if (!date) return;
-                      setEditedEndDate(date);
-                      setHasChanges(true);
-                      setIsEditingEndDate(false);
-                    }}
-                  />
-                </EditableFieldWrapper>
-              ) : (
-                <EditableTimeDate
-                  $isEditable={isEditable}
-                  onClick={() => isEditable && setIsEditingEndDate(true)}
+                  onClick={() => isEditable && setIsEditingEnd(true)}
                 >
                   <span>
+                    {hasChanges ? editedEndTime : dayjs(eventEnd).format('h:mm A')}
+                    {' · '}
                     {hasChanges
                       ? dayjs(editedEndDate).format('D MMM')
                       : dayjs(eventEnd).format('D MMM')}
                   </span>
-                  {isEditable && <Pencil size={10} className="edit-icon" />}
-                </EditableTimeDate>
+                  {isEditable && <Pencil size={12} className="edit-icon" />}
+                </EditableValue>
               )}
             </div>
           </CalendarEventInfoArticle>
@@ -382,6 +374,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
                       setHasChanges(true);
                       setIsEditingDeadline(false);
                     }}
+                    portalId="datepicker-portal"
                   />
                 </EditableFieldWrapper>
               ) : (
@@ -428,22 +421,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
         </CalendarEventInfoArticleContainer>
       </CalendarEventInfoSection>
 
-      {/* Validation Error */}
-      {validationError && (
-        <ValidationError>{validationError}</ValidationError>
-      )}
 
-      {/* Save/Cancel Buttons */}
-      {hasChanges && (
-        <SaveButtonContainer ref={saveButtonsRef}>
-          <IconButton onClick={handleCancel} title={t('calendar.event.cancel')}>
-            <X size={16} />
-          </IconButton>
-          <IconButton $primary onClick={handleSave} title={t('calendar.event.save')}>
-            <Check size={16} />
-          </IconButton>
-        </SaveButtonContainer>
-      )}
 
       {event.location.address && (
         <>
@@ -461,6 +439,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
           </CalendarEventInfoSection>
         </>
       )}
+      </ScrollableBody>
 
       {/* Loading Overlay */}
       <LoadingOverlay $loading={isSaving}>
@@ -551,41 +530,9 @@ const NameInput = styled.input`
   }
 `;
 
-const EditableTimeDate = styled.span<{ $isEditable: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: ${({ theme }) => theme.typography.fontSize.xs};
-  color: ${({ theme }) => theme.colors.gray[500]};
-  margin-top: 2px;
-  cursor: ${({ $isEditable }) => ($isEditable ? 'pointer' : 'default')};
-  padding: 1px 3px;
-  margin-left: -3px;
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-  transition: background-color 0.2s ease;
-
-  .edit-icon {
-    opacity: 0.3;
-    transition: opacity 0.2s ease;
-    flex-shrink: 0;
-  }
-
-  ${({ $isEditable, theme }) =>
-    $isEditable &&
-    `
-    &:hover {
-      background-color: ${theme.colors.gray[700]};
-
-      .edit-icon {
-        opacity: 0.7;
-      }
-    }
-  `}
-`;
-
 const EditableFieldWrapper = styled.div`
-  /* TimeDropdown select styling */
-  select {
+  /* TimeDropdown compact trigger styling */
+  button {
     font-size: ${({ theme }) => theme.typography.fontSize.sm};
     padding: 4px 24px 4px 8px;
     height: 28px;
@@ -593,13 +540,14 @@ const EditableFieldWrapper = styled.div`
   }
 
   .react-datepicker-wrapper {
-    width: 150px;
+    width: 100%;
   }
 
   .react-datepicker__input-container input {
     height: 28px;
-    padding: 4px 8px;
-    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    padding: 4px 4px;
+    font-size: ${({ theme }) => theme.typography.fontSize.xs};
+    width: 100%;
   }
 `;
 
@@ -609,12 +557,29 @@ const ValidationError = styled.div`
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
 `;
 
-const SaveButtonContainer = styled.div`
+const HeaderActions = styled.div`
   display: flex;
-  justify-content: flex-end;
-  padding: 8px 16px;
-  border-top: 1px solid ${({ theme }) => theme.colors.gray[700]};
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
+`;
+
+const ScrollableBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: ${({ theme }) => theme.colors.gray[400]};
+    border-radius: 4px;
+  }
+  scrollbar-width: thin;
+  scrollbar-color: ${({ theme }) => theme.colors.gray[400]} transparent;
 `;
 
 const LoadingOverlay = styled.div<{ $loading: boolean }>`
@@ -664,10 +629,7 @@ const IconButton = styled.button<{ $primary?: boolean }>`
   `}
 `;
 
-const CalendarEventInfoHeader = styled.header`
-  position: sticky;
-  top: 0;
-`;
+const CalendarEventInfoHeader = styled.header``;
 
 const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
   position: relative;
@@ -730,6 +692,7 @@ const CalendarEventInfoArticleContainer = styled.div`
   display: grid;
   gap: 0.5rem;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   border-radius: ${({ theme }) => theme.borderRadius.large};
   border: 1px solid ${({ theme }) => theme.colors.calendar.border};
 `;
@@ -743,6 +706,8 @@ const CalendarEventInfoArticle = styled.article`
     display: flex;
     gap: 0.1rem;
     flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
 
     h3 {
       font-size: ${({ theme }) => theme.typography.fontSize.sm};
@@ -777,11 +742,13 @@ const CalendarEventInfoArticle = styled.article`
 
 const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolean }>`
   position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
   background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
   border-radius: ${({ theme }) => theme.borderRadius.xLarge};
   width: 100%;
-  max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
-  overflow-y: auto;
+  overflow: hidden;
   border: 1px solid ${({ theme, $darkmode }) => (!$darkmode ? theme.colors.gray[300] : 'transparent')};
 
   hr {
@@ -805,9 +772,16 @@ const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolea
       align-items: center;
       width: 32px;
       height: 32px;
+      flex-shrink: 0;
+      overflow: hidden;
       background-color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 1).toHex()};
       border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.8).toHex()};
       border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+      .emoji {
+        font-size: 18px;
+        line-height: 1;
+      }
     }
 
     > button {

@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import TimeUtil from './time';
 
 /**
  * Converts YYYY-MM-DD date and "h:mm A" time (in local timezone) to unix timestamp (milliseconds).
@@ -77,4 +78,73 @@ export function validateDateTimeRange(
 	const startUnix = dateTimeToUnix(startDate, startTime);
 	const endUnix = dateTimeToUnix(endDate, endTime);
 	return endUnix > startUnix;
+}
+
+/**
+ * Returns a human-readable "due in" string for an upcoming event.
+ * Handles singular/plural for minutes, hours, and days.
+ * @param startTimeMs - Event start time as unix timestamp (milliseconds)
+ * @param nowMs - Current time as unix timestamp (milliseconds). Defaults to Date.now().
+ */
+export function formatDueIn(startTimeMs: number, nowMs?: number): string {
+	const now = nowMs ?? Date.now();
+	const diffMs = startTimeMs - now;
+	const diffMinutes = Math.floor(diffMs / 60_000);
+	const diffHours = Math.floor(diffMs / 3_600_000);
+	const diffDays = Math.floor(diffMs / 86_400_000);
+
+	if (diffHours < 1) {
+		return `${diffMinutes} ${diffMinutes === 1 ? 'minute' : 'minutes'}`;
+	} else if (diffHours < 24) {
+		return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'}`;
+	} else {
+		return `${diffDays} ${diffDays === 1 ? 'day' : 'days'}`;
+	}
+}
+
+/**
+ * Calculates a human-readable duration string from start/end date+time strings.
+ * When the end time is before the start time on the same date, assumes the end
+ * crosses midnight and adds 24 hours.
+ */
+export function calculateDuration(
+	startDate: string,
+	startTime: string,
+	endDate: string,
+	endTime: string
+): string {
+	const startUnix = dateTimeToUnix(startDate, startTime);
+	let endUnix = dateTimeToUnix(endDate, endTime);
+
+	if (endUnix <= startUnix && startDate === endDate) {
+		// End time crosses midnight — advance end by 24 hours
+		endUnix += 24 * 60 * 60 * 1000;
+	}
+
+	return TimeUtil.rangeDuration(dayjs(startUnix), dayjs(endUnix));
+}
+
+/**
+ * Adjusts the end date/time to preserve the original duration when the start changes.
+ * Computes duration between old start and old end, then applies it to the new start.
+ */
+export function adjustEndDateTime(
+	oldStartDate: string,
+	oldStartTime: string,
+	newStartDate: string,
+	newStartTime: string,
+	oldEndDate: string,
+	oldEndTime: string
+): { endDate: string; endTime: string } {
+	const oldStartUnix = dateTimeToUnix(oldStartDate, oldStartTime);
+	const oldEndUnix = dateTimeToUnix(oldEndDate, oldEndTime);
+	const duration = oldEndUnix - oldStartUnix;
+
+	const newStartUnix = dateTimeToUnix(newStartDate, newStartTime);
+	const newEndUnix = newStartUnix + duration;
+
+	return {
+		endDate: timeToDate(newEndUnix),
+		endTime: unixToTimeString(newEndUnix),
+	};
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDatePicker from 'react-datepicker';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import 'react-datepicker/dist/react-datepicker.css';
 
 type CustomDatePickerProps = {
@@ -9,6 +9,7 @@ type CustomDatePickerProps = {
 	onChange: (date: string) => void;
 	placeholder?: string;
 	ghostInput?: boolean;
+	portalId?: string;
 };
 
 const DatePicker: React.FC<CustomDatePickerProps> = ({
@@ -17,6 +18,7 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	onChange,
 	placeholder,
 	ghostInput = false,
+	portalId,
 }) => {
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
@@ -42,6 +44,7 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	return (
 		<Container>
 			{label && <Label>{label}</Label>}
+			{portalId && <DatePickerPortalStyles />}
 			<DatePickerWrapper $ghostInput={ghostInput}>
 				<ReactDatePicker
 					selected={selectedDate}
@@ -49,6 +52,7 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 					dateFormat="MM/dd/yyyy"
 					placeholderText={placeholder}
 					showPopperArrow={false}
+					portalId={portalId}
 				/>
 			</DatePickerWrapper>
 		</Container>
@@ -198,6 +202,100 @@ const DatePickerWrapper = styled.div<{ $ghostInput: boolean }>`
 
 	.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
 		border-color: ${(props) => props.theme.colors.datepicker.headerButtonHover};
+	}
+`;
+
+const DatePickerPortalStyles = createGlobalStyle`
+	#datepicker-portal {
+		.react-datepicker-popper {
+			z-index: 9999;
+		}
+
+		.react-datepicker {
+			background-color: ${(props) => props.theme.colors.datepicker.bg};
+			border: 1px solid ${(props) => props.theme.colors.border.default};
+			border-radius: ${(props) => props.theme.borderRadius.medium};
+			font-family: ${(props) => props.theme.typography.fontFamily.inter};
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+		}
+
+		.react-datepicker__header {
+			background-color: ${(props) => props.theme.colors.datepicker.headerBg};
+			border-bottom: 1px solid ${(props) => props.theme.colors.border.strong};
+			border-radius: ${(props) => props.theme.borderRadius.medium}
+				${(props) => props.theme.borderRadius.medium} 0 0;
+			padding-top: 12px;
+		}
+
+		.react-datepicker__current-month {
+			color: ${(props) => props.theme.colors.datepicker.headerText};
+			font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
+			font-size: ${(props) => props.theme.typography.fontSize.sm};
+			margin-bottom: 8px;
+		}
+
+		.react-datepicker__day-name {
+			color: ${(props) => props.theme.colors.datepicker.dayText};
+			font-size: ${(props) => props.theme.typography.fontSize.xs};
+			font-weight: ${(props) => props.theme.typography.fontWeight.medium};
+		}
+
+		.react-datepicker__day {
+			color: ${(props) => props.theme.colors.datepicker.dateText};
+			border-radius: ${(props) => props.theme.borderRadius.small};
+			transition: all 0.2s ease;
+
+			&:hover {
+				background-color: ${(props) => props.theme.colors.datepicker.dateHoverBg};
+				color: ${(props) => props.theme.colors.datepicker.dateHoverText};
+			}
+		}
+
+		.react-datepicker__day--selected {
+			background-color: ${(props) => props.theme.colors.datepicker.dateSelectedBg};
+			color: ${(props) => props.theme.colors.datepicker.dateSelectedText} !important;
+			font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
+
+			&:hover {
+				background-color: ${(props) => props.theme.colors.datepicker.dateSelectedBg};
+				color: ${(props) => props.theme.colors.datepicker.dateSelectedText};
+			}
+		}
+
+		.react-datepicker__day--keyboard-selected {
+			background-color: ${(props) => props.theme.colors.datepicker.dateHoverBg};
+			color: ${(props) => props.theme.colors.datepicker.dateHoverText};
+		}
+
+		.react-datepicker__day--today {
+			font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
+			color: ${(props) => props.theme.colors.brand[400]};
+		}
+
+		.react-datepicker__day--disabled {
+			color: ${(props) => props.theme.colors.datepicker.dateDisabledText};
+			cursor: not-allowed;
+
+			&:hover {
+				background-color: transparent;
+			}
+		}
+
+		.react-datepicker__day--outside-month {
+			color: ${(props) => props.theme.colors.datepicker.dateOutsideMonthText};
+		}
+
+		.react-datepicker__navigation {
+			top: 12px;
+		}
+
+		.react-datepicker__navigation-icon::before {
+			border-color: ${(props) => props.theme.colors.datepicker.headerButton};
+		}
+
+		.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+			border-color: ${(props) => props.theme.colors.datepicker.headerButtonHover};
+		}
 	}
 `;
 

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/core/theme/ThemeProvider';
@@ -43,6 +44,10 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 	const { isDarkMode } = useTheme();
 	const { t } = useTranslation();
 	const timeOptions = React.useMemo(() => generateTimeOptions(interval), [interval]);
+	const [isOpen, setIsOpen] = useState(false);
+	const triggerRef = useRef<HTMLButtonElement>(null);
+	const listRef = useRef<HTMLDivElement>(null);
+	const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
 
 	const localizeTime = (time: string): string => {
 		const am = t('settings.sections.tilePreferences.am');
@@ -50,26 +55,98 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 		return time.replace(/\bAM\b/, am).replace(/\bPM\b/, pm);
 	};
 
+	const displayValue = value ? localizeTime(value) : placeholder || '';
+
+	const openDropdown = useCallback(() => {
+		if (disabled) return;
+		const rect = triggerRef.current?.getBoundingClientRect();
+		if (rect) {
+			setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+		}
+		setIsOpen(true);
+	}, [disabled]);
+
+	// Auto-scroll to selected item when opened
+	useEffect(() => {
+		if (isOpen && listRef.current && value) {
+			const selectedEl = listRef.current.querySelector('[data-selected="true"]');
+			if (selectedEl) {
+				selectedEl.scrollIntoView({ block: 'center' });
+			}
+		}
+	}, [isOpen, value]);
+
+	// Close on outside click
+	useEffect(() => {
+		if (!isOpen) return;
+		const handleClick = (e: MouseEvent) => {
+			if (
+				triggerRef.current?.contains(e.target as Node) ||
+				listRef.current?.contains(e.target as Node)
+			)
+				return;
+			setIsOpen(false);
+		};
+		document.addEventListener('mousedown', handleClick);
+		return () => document.removeEventListener('mousedown', handleClick);
+	}, [isOpen]);
+
+	// Close on Escape
+	useEffect(() => {
+		if (!isOpen) return;
+		const handleKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') setIsOpen(false);
+		};
+		document.addEventListener('keydown', handleKey);
+		return () => document.removeEventListener('keydown', handleKey);
+	}, [isOpen]);
+
 	return (
-		<StyledSelect
-			$isDark={isDarkMode}
-			value={value}
-			onChange={(e) => onChange(e.target.value)}
-			disabled={disabled}
-		>
-			{placeholder && <option value="">{placeholder}</option>}
-			{timeOptions.map((time) => (
-				<option key={time} value={time}>
-					{localizeTime(time)}
-				</option>
-			))}
-		</StyledSelect>
+		<>
+			<Trigger
+				ref={triggerRef}
+				$isDark={isDarkMode}
+				onClick={openDropdown}
+				disabled={disabled}
+				type="button"
+			>
+				{displayValue}
+				<ChevronSvg width="12" height="12" viewBox="0 0 12 12">
+					<path fill="currentColor" d="M6 9L1 4h10z" />
+				</ChevronSvg>
+			</Trigger>
+			{isOpen &&
+				createPortal(
+					<DropdownList
+						ref={listRef}
+						$isDark={isDarkMode}
+						style={{ top: dropdownPos.top, left: dropdownPos.left }}
+					>
+						{timeOptions.map((time) => (
+							<DropdownItem
+								key={time}
+								$selected={time === value}
+								data-selected={time === value}
+								onClick={() => {
+									onChange(time);
+									setIsOpen(false);
+								}}
+							>
+								{localizeTime(time)}
+							</DropdownItem>
+						))}
+					</DropdownList>,
+					document.body
+				)}
+		</>
 	);
 };
 
-const StyledSelect = styled.select<{ $isDark: boolean }>`
+const Trigger = styled.button<{ $isDark: boolean }>`
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	appearance: none;
-	color-scheme: ${({ $isDark }) => ($isDark ? 'dark' : 'light')};
 	background-color: ${({ theme }) => theme.colors.background.card};
 	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -78,13 +155,11 @@ const StyledSelect = styled.select<{ $isDark: boolean }>`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	cursor: pointer;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A3A3A3' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-position: right 0.75rem center;
+	position: relative;
 	transition: border-color 0.2s ease;
 
 	&:hover:not(:disabled) {
-		border-color: ${({ theme }) => theme.colors.gray[700]};
+		border-color: ${({ theme }) => theme.colors.gray[500]};
 	}
 
 	&:focus {
@@ -97,11 +172,45 @@ const StyledSelect = styled.select<{ $isDark: boolean }>`
 		opacity: 0.5;
 		cursor: not-allowed;
 	}
+`;
 
-	option {
-		background-color: ${({ theme }) => theme.colors.background.card};
-		color: ${({ theme }) => theme.colors.text.primary};
-		padding: 0.5rem;
+const ChevronSvg = styled.svg`
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0.5;
+`;
+
+const DropdownList = styled.div<{ $isDark: boolean }>`
+	position: fixed;
+	z-index: 10000;
+	max-height: 200px;
+	overflow-y: auto;
+	min-width: 120px;
+	background-color: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	padding: 4px 0;
+
+	scrollbar-width: thin;
+	scrollbar-color: ${({ theme }) => theme.colors.gray[600]} transparent;
+`;
+
+const DropdownItem = styled.div<{ $selected: boolean }>`
+	padding: 6px 12px;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	color: ${({ $selected, theme }) =>
+		$selected ? theme.colors.brand[400] : theme.colors.text.primary};
+	background-color: ${({ $selected, theme }) =>
+		$selected ? theme.colors.gray[800] : 'transparent'};
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+
+	&:hover {
+		background-color: ${({ theme }) => theme.colors.gray[700]};
 	}
 `;
 
