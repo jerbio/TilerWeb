@@ -17,7 +17,7 @@ const TimelineHeader: React.FC = () => {
   const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const menuRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
 	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
 
   // Close menu when clicking outside
@@ -69,7 +69,7 @@ const TimelineHeader: React.FC = () => {
           <ProfileContainer>
             <User size={18} />
           </ProfileContainer>
-          <ProfileSheet open={profileSheetOpen} ref={menuRef} user={authenticatedUser} />
+          <ProfileSheet open={profileSheetOpen} containerRef={menuRef} user={authenticatedUser} />
         </ProfileTrigger>
       </HeaderRight>
     </Header>
@@ -101,7 +101,7 @@ const ThemeToggle = styled.button`
 	justify-content: center;
 `;
 
-const ProfileTrigger = styled.button`
+const ProfileTrigger = styled.div`
 	position: relative;
 	background: none;
 	border: none;
