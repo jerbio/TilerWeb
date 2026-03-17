@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ScheduleSubCalendarEvent } from '../../types/schedule';
 import styled from 'styled-components';
 import {
@@ -27,12 +27,14 @@ import {
 } from '@/core/util/eventTimeConversion';
 import LocationBG from '@/assets/event/location-bg.png';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import Loader from '../loader';
 
 type CalendarEventInfoProps = {
   event: ScheduleSubCalendarEvent | null;
   onClose?: () => void;
   onEventUpdate?: (updates: { name?: string; start?: number; end?: number; calendarEnd?: number }) => void;
   isEditable?: boolean;
+  isSaving?: boolean;
 };
 
 const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
@@ -40,6 +42,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   onClose,
   onEventUpdate,
   isEditable = true,
+  isSaving = false,
 }) => {
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
@@ -66,6 +69,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   // Validation error
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  // Ref for scrolling to save buttons
+  const saveButtonsRef = useRef<HTMLDivElement>(null);
+
   // Use original times (preserved before visual splitting) or fall back to start/end
   const eventStart = event?.originalStart ?? event?.start ?? 0;
   const eventEnd = event?.originalEnd ?? event?.end ?? 0;
@@ -89,6 +95,13 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
       setIsEditingDeadline(false);
     }
   }, [event, eventStart, eventEnd]);
+
+  // Auto-scroll to save buttons when changes are made
+  useEffect(() => {
+    if (hasChanges && saveButtonsRef.current) {
+      saveButtonsRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [hasChanges]);
 
   function getEventDueIn(startTime: number) {
     const now = dayjs();
@@ -422,7 +435,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
       {/* Save/Cancel Buttons */}
       {hasChanges && (
-        <SaveButtonContainer>
+        <SaveButtonContainer ref={saveButtonsRef}>
           <IconButton onClick={handleCancel} title={t('calendar.event.cancel')}>
             <X size={16} />
           </IconButton>
@@ -448,6 +461,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
           </CalendarEventInfoSection>
         </>
       )}
+
+      {/* Loading Overlay */}
+      <LoadingOverlay $loading={isSaving}>
+        <Loader />
+      </LoadingOverlay>
     </StyledCalendarEventInfo>
   ) : null;
 };
@@ -599,6 +617,22 @@ const SaveButtonContainer = styled.div`
   gap: 8px;
 `;
 
+const LoadingOverlay = styled.div<{ $loading: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: ${({ theme }) => theme.borderRadius.xLarge};
+  opacity: ${({ $loading }) => ($loading ? 0.9 : 0)};
+  pointer-events: ${({ $loading }) => ($loading ? 'auto' : 'none')};
+  transition: opacity 0.2s ease;
+`;
+
 const IconButton = styled.button<{ $primary?: boolean }>`
   width: 28px;
   height: 28px;
@@ -742,6 +776,7 @@ const CalendarEventInfoArticle = styled.article`
 `;
 
 const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolean }>`
+  position: relative;
   background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
   border-radius: ${({ theme }) => theme.borderRadius.xLarge};
   width: 100%;

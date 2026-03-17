@@ -75,6 +75,7 @@ const Calendar = ({
 
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
   const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
+  const [isSavingEvent, setIsSavingEvent] = useState(false);
 
   // Ref holding all styled events (populated by CalendarEvents)
   const styledEventsRef = useRef<StyledEvent[]>([]);
@@ -303,6 +304,7 @@ const Calendar = ({
   }) => {
 		if (!selectedEventInfo) return;
 
+		setIsSavingEvent(true);
 		try {
 			await scheduleService.updateSubCalendarEvent(selectedEventInfo.id, updates);
 
@@ -322,6 +324,8 @@ const Calendar = ({
 			);
 		} catch (error) {
 			console.error('Failed to update event:', error);
+		} finally {
+			setIsSavingEvent(false);
 		}
 	};
 
@@ -337,6 +341,7 @@ const Calendar = ({
             setSelectedEvent(null);
           }}
 					onEventUpdate={handleEventUpdate}
+					isSaving={isSavingEvent}
         />
       ),
     },
