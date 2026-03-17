@@ -307,5 +307,62 @@
 			"deleteSuccess": "Événement supprimé !",
 			"actionFailed": "L'action a échoué. Veuillez réessayer."
 		}
+	},
+	"settings": {
+		"title": "Paramètres",
+		"back": "Retour",
+		"logout": "Déconnexion",
+		"breadcrumb": {
+			"home": "Accueil",
+			"settings": "Paramètres"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "Préférences de Tuile",
+				"description": "Définissez vos modes de déplacement et aidez Tiler à comprendre vos habitudes quotidiennes",
+				"howMoveAround": "Comment vous déplacez-vous ?",
+				"cycling": "Vélo",
+				"driving": "Conduite",
+				"transit": "Transport en commun",
+				"defineTimeRestrictions": "Définissez vos restrictions horaires",
+				"myWorkHours": "Mes heures de travail",
+				"myPersonalHours": "Mes heures personnelles",
+				"setBlockOutHours": "Définir les heures bloquées",
+				"bedTime": "Heure du coucher",
+				"startsAt": "Commence à",
+				"endsAt": "Finit à",
+				"saveChanges": "Enregistrer les modifications",
+				"saving": "Enregistrement...",
+				"saveSuccess": "Préférences de tuile mises à jour avec succès",
+				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
+				"bedTimeStartRequired": "Veuillez sélectionner une heure de coucher",
+				"bedTimeEndRequired": "Veuillez sélectionner une heure de réveil",
+				"scheduleIncompleteDay": "{{label}} : veuillez définir les heures de début et de fin pour {{day}}",
+				"dayLabels": {
+					"sun": "D",
+					"mon": "L",
+					"tue": "M",
+					"wed": "M",
+					"thu": "J",
+					"fri": "V",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Dimanche",
+					"mon": "Lundi",
+					"tue": "Mardi",
+					"wed": "Mercredi",
+					"thu": "Jeudi",
+					"fri": "Vendredi",
+					"sat": "Samedi"
+				},
+				"start": "Début",
+				"end": "Fin",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
+			}
+		}
 	}
 }

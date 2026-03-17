@@ -1,4 +1,5 @@
 import { UserApi, UpdateUserRequest, UserSettings, UpdateSettingsRequest } from '@/api/userApi';
+import { UpdateScheduleProfileParams, ScheduleProfileResponse } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import { TilerResponseError } from '@/core/common/types/errors';
 
@@ -69,6 +70,36 @@ export class UserService {
 			return response.Content.settings;
 		} catch (error) {
 			console.error('Error updating user settings', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getScheduleProfile(): Promise<ScheduleProfileResponse['Content']> {
+		try {
+			const response = await this.userApi.getScheduleProfile();
+
+			if (response.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(response.Error);
+			}
+
+			return response.Content;
+		} catch (error) {
+			console.error('Error fetching schedule profile', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async updateScheduleProfile(params: UpdateScheduleProfileParams): Promise<ScheduleProfileResponse['Content']> {
+		try {
+			const response = await this.userApi.updateScheduleProfile(params);
+
+			if (response.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(response.Error);
+			}
+
+			return response.Content;
+		} catch (error) {
+			console.error('Error updating schedule profile', error);
 			throw normalizeError(error);
 		}
 	}

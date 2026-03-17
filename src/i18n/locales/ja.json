@@ -577,5 +577,62 @@
 			"deleteSuccess": "イベントが削除されました！",
 			"actionFailed": "アクションに失敗しました。もう一度お試しください。"
 		}
+	},
+	"settings": {
+		"title": "設定",
+		"back": "戻る",
+		"logout": "ログアウト",
+		"breadcrumb": {
+			"home": "ホーム",
+			"settings": "設定"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "タイル設定",
+				"description": "移動手段を定義し、Tilerが日々の時間パターンを理解するのを助けましょう",
+				"howMoveAround": "どうやって移動しますか？",
+				"cycling": "自転車",
+				"driving": "車",
+				"transit": "公共交通機関",
+				"defineTimeRestrictions": "時間制限を定義",
+				"myWorkHours": "勤務時間",
+				"myPersonalHours": "個人の時間",
+				"setBlockOutHours": "ブロック時間を設定",
+				"bedTime": "就寝時間",
+				"startsAt": "開始時刻",
+				"endsAt": "終了時刻",
+				"saveChanges": "変更を保存",
+				"saving": "保存中...",
+				"saveSuccess": "タイル設定が正常に更新されました",
+				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
+				"bedTimeStartRequired": "就寝開始時刻を選択してください",
+				"bedTimeEndRequired": "起床時刻を選択してください",
+				"scheduleIncompleteDay": "{{label}}: {{day}}の開始時刻と終了時刻の両方を設定してください",
+				"dayLabels": {
+					"sun": "日",
+					"mon": "月",
+					"tue": "火",
+					"wed": "水",
+					"thu": "木",
+					"fri": "金",
+					"sat": "土"
+				},
+				"dayNames": {
+					"sun": "日曜日",
+					"mon": "月曜日",
+					"tue": "火曜日",
+					"wed": "水曜日",
+					"thu": "木曜日",
+					"fri": "金曜日",
+					"sat": "土曜日"
+				},
+				"start": "開始",
+				"end": "終了",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "午前",
+				"pm": "午後"
+			}
+		}
 	}
 }

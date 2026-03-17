@@ -449,7 +449,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
         <>
           <hr />
           <CalendarEventInfoSection>
-            <a href={event.location.address}>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location.address)}`} target="_blank" rel="noopener noreferrer">
               <CalendarEventInfoLocation $color={eventColor}>
                 <img src={LocationBG} alt="" width={16} />
                 <div>

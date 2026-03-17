@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/core/theme/ThemeProvider';
 
 interface TimeDropdownProps {
@@ -40,7 +41,14 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 	disabled = false,
 }) => {
 	const { isDarkMode } = useTheme();
+	const { t } = useTranslation();
 	const timeOptions = React.useMemo(() => generateTimeOptions(interval), [interval]);
+
+	const localizeTime = (time: string): string => {
+		const am = t('settings.sections.tilePreferences.am');
+		const pm = t('settings.sections.tilePreferences.pm');
+		return time.replace(/\bAM\b/, am).replace(/\bPM\b/, pm);
+	};
 
 	return (
 		<StyledSelect
@@ -52,7 +60,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 			{placeholder && <option value="">{placeholder}</option>}
 			{timeOptions.map((time) => (
 				<option key={time} value={time}>
-					{time}
+					{localizeTime(time)}
 				</option>
 			))}
 		</StyledSelect>

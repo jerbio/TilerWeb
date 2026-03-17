@@ -577,5 +577,62 @@
 			"deleteSuccess": "事件已删除！",
 			"actionFailed": "操作失败，请重试。"
 		}
+	},
+	"settings": {
+		"title": "设置",
+		"back": "返回",
+		"logout": "退出登录",
+		"breadcrumb": {
+			"home": "首页",
+			"settings": "设置"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "图块偏好",
+				"description": "定义您的出行方式，帮助Tiler理解您的日常时间模式",
+				"howMoveAround": "您如何出行？",
+				"cycling": "骑行",
+				"driving": "驾车",
+				"transit": "公共交通",
+				"defineTimeRestrictions": "定义您的时间限制",
+				"myWorkHours": "我的工作时间",
+				"myPersonalHours": "我的个人时间",
+				"setBlockOutHours": "设置屏蔽时间",
+				"bedTime": "就寝时间",
+				"startsAt": "开始于",
+				"endsAt": "结束于",
+				"saveChanges": "保存更改",
+				"saving": "保存中...",
+				"saveSuccess": "图块偏好已成功更新",
+				"saveError": "保存失败，请重试。",
+				"bedTimeStartRequired": "请选择就寝开始时间",
+				"bedTimeEndRequired": "请选择起床时间",
+				"scheduleIncompleteDay": "{{label}}：请为{{day}}设置开始和结束时间",
+				"dayLabels": {
+					"sun": "日",
+					"mon": "一",
+					"tue": "二",
+					"wed": "三",
+					"thu": "四",
+					"fri": "五",
+					"sat": "六"
+				},
+				"dayNames": {
+					"sun": "星期日",
+					"mon": "星期一",
+					"tue": "星期二",
+					"wed": "星期三",
+					"thu": "星期四",
+					"fri": "星期五",
+					"sat": "星期六"
+				},
+				"start": "开始",
+				"end": "结束",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "上午",
+				"pm": "下午"
+			}
+		}
 	}
 }

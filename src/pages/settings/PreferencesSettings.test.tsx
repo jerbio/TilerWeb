@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { BrowserRouter } from 'react-router';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import PreferencesSettings from './PreferencesSettings';
@@ -12,6 +12,8 @@ vi.mock('@/services', () => ({
 	userService: {
 		getSettings: vi.fn(),
 		updateSettings: vi.fn(),
+		getScheduleProfile: vi.fn(),
+		updateScheduleProfile: vi.fn(),
 	},
 }));
 
@@ -95,6 +97,10 @@ describe('PreferencesSettings', () => {
 		// Default mock implementation
 		(userService.getSettings as Mock).mockResolvedValue(createMockSettings());
 		(userService.updateSettings as Mock).mockResolvedValue(createMockSettings());
+		(userService.getScheduleProfile as Mock).mockResolvedValue({
+			scheduleProfile: { personalHoursRestrictionProfile: null, workHoursRestrictionProfile: null },
+		});
+		(userService.updateScheduleProfile as Mock).mockResolvedValue({});
 	});
 
 	describe('Rendering', () => {
@@ -112,9 +118,9 @@ describe('PreferencesSettings', () => {
 			renderWithProviders(<PreferencesSettings />);
 
 			await waitFor(() => {
-				expect(screen.getByText('By bike')).toBeInTheDocument();
-				expect(screen.getByText('I drive')).toBeInTheDocument();
-				expect(screen.getByText('By Bus')).toBeInTheDocument();
+				expect(screen.getByText('Cycling')).toBeInTheDocument();
+				expect(screen.getByText('Driving')).toBeInTheDocument();
+				expect(screen.getByText('Transit')).toBeInTheDocument();
 			});
 		});
 
@@ -194,11 +200,10 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			// Find all select elements (bed time dropdowns)
-			const selects = screen.getAllByRole('combobox');
+			// Find bed time dropdowns (scoped to bed-time section)
+			const bedTimeSection = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection).getAllByRole('combobox');
 			const startTimeSelect = selects[0];
-
-			// Select a start time
 			fireEvent.change(startTimeSelect, { target: { value: '10:00 PM' } });
 
 			// Click save
@@ -229,8 +234,9 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			// Find all select elements (bed time dropdowns)
-			const selects = screen.getAllByRole('combobox');
+			// Find bed time dropdowns (scoped to bed-time section)
+			const bedTimeSection = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection).getAllByRole('combobox');
 			const endTimeSelect = selects[1];
 
 			// Select an end time only
@@ -264,8 +270,9 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			// Find all select elements (bed time dropdowns)
-			const selects = screen.getAllByRole('combobox');
+			// Find bed time dropdowns (scoped to bed-time section)
+			const bedTimeSection = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection).getAllByRole('combobox');
 			const startTimeSelect = selects[0];
 			const endTimeSelect = selects[1];
 
@@ -328,7 +335,8 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const selects = screen.getAllByRole('combobox');
+			const bedTimeSection1 = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection1).getAllByRole('combobox');
 			fireEvent.change(selects[0], { target: { value: '10:00 PM' } });
 			fireEvent.change(selects[1], { target: { value: '6:00 AM' } });
 
@@ -359,7 +367,8 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const selects = screen.getAllByRole('combobox');
+			const bedTimeSection2 = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection2).getAllByRole('combobox');
 			fireEvent.change(selects[0], { target: { value: '2:00 AM' } });
 			fireEvent.change(selects[1], { target: { value: '10:00 AM' } });
 
@@ -387,7 +396,7 @@ describe('PreferencesSettings', () => {
 			renderWithProviders(<PreferencesSettings />);
 
 			await waitFor(() => {
-				const bikeRadio = screen.getByLabelText('By bike');
+				const bikeRadio = screen.getByLabelText('Cycling');
 				expect(bikeRadio).toBeChecked();
 			});
 		});
@@ -402,7 +411,7 @@ describe('PreferencesSettings', () => {
 			renderWithProviders(<PreferencesSettings />);
 
 			await waitFor(() => {
-				const busRadio = screen.getByLabelText('By Bus');
+				const busRadio = screen.getByLabelText('Transit');
 				expect(busRadio).toBeChecked();
 			});
 		});
@@ -421,7 +430,7 @@ describe('PreferencesSettings', () => {
 			});
 
 			// Click bike option
-			fireEvent.click(screen.getByLabelText('By bike'));
+			fireEvent.click(screen.getByLabelText('Cycling'));
 
 			// Save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -452,7 +461,8 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const selects = screen.getAllByRole('combobox');
+			const bedTimeSection3 = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection3).getAllByRole('combobox');
 			const startTimeSelect = selects[0];
 			const endTimeSelect = selects[1];
 
@@ -482,7 +492,8 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const selects = screen.getAllByRole('combobox');
+			const bedTimeSection4 = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection4).getAllByRole('combobox');
 			const startTimeSelect = selects[0];
 			const endTimeSelect = selects[1];
 
@@ -512,9 +523,8 @@ describe('PreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const selects = screen.getAllByRole('combobox');
-
-			// User changes start time from 10 PM to 11 PM, end stays at 4 AM
+			const bedTimeSection5 = screen.getByTestId('bed-time-section');
+			const selects = within(bedTimeSection5).getAllByRole('combobox');
 			// New sleep duration should be 5 hours (11 PM to 4 AM)
 			fireEvent.change(selects[0], { target: { value: '11:00 PM' } });
 
@@ -568,7 +578,7 @@ describe('PreferencesSettings', () => {
 			});
 
 			// Change only transport mode
-			fireEvent.click(screen.getByLabelText('By Bus'));
+			fireEvent.click(screen.getByLabelText('Transit'));
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -578,6 +588,107 @@ describe('PreferencesSettings', () => {
 						TravelMedium: 'transit',
 					},
 				});
+			});
+		});
+	});
+
+	describe('Schedule Profile Validation', () => {
+		it('should show error when a work hour day has start but no end', async () => {
+			const { toast } = await import('sonner');
+
+			renderWithProviders(<PreferencesSettings />);
+
+			await waitFor(() => {
+				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
+			});
+
+			// Set only a start time on Monday (day-column-1) via work hours schedule
+			const workSection = screen.getAllByTestId('day-column-1')[0];
+			const selects = within(workSection).getAllByRole('combobox');
+			fireEvent.change(selects[0], { target: { value: '9:00 AM' } });
+
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			await waitFor(() => {
+				expect(toast.error).toHaveBeenCalledWith(
+					expect.stringContaining('Monday'),
+				);
+			});
+
+			expect(userService.updateScheduleProfile).not.toHaveBeenCalled();
+		});
+
+		it('should show error when a personal hour day has end but no start', async () => {
+			const { toast } = await import('sonner');
+
+			renderWithProviders(<PreferencesSettings />);
+
+			await waitFor(() => {
+				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
+			});
+
+			// Set only an end time on Wednesday (day-column-3) via personal hours schedule (second instance)
+			const personalWedColumns = screen.getAllByTestId('day-column-3');
+			const personalColumn = personalWedColumns[1];
+			const selects = within(personalColumn).getAllByRole('combobox');
+			fireEvent.change(selects[1], { target: { value: '5:00 PM' } });
+
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			await waitFor(() => {
+				expect(toast.error).toHaveBeenCalledWith(
+					expect.stringContaining('Wednesday'),
+				);
+			});
+
+			expect(userService.updateScheduleProfile).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('Restriction Profile Disabled State', () => {
+		it('should send IsEnabled false when all work days are toggled off', async () => {
+			// Start with Monday enabled in work hours
+			(userService.getScheduleProfile as Mock).mockResolvedValue({
+				personalHoursRestrictionProfile: null,
+				workHoursRestrictionProfile: {
+					id: 'work-id',
+					isEnabled: true,
+					timeZone: 'America/Denver',
+					daySelection: [
+						null,
+						{ id: 'mon', weekday: 1, restrictionTimeLine: { id: 'tl', start: 28800000, duration: 36000000, end: 64800000, timeZone: 'America/Denver' }, timeZone: 'America/Denver' },
+						null, null, null, null, null,
+					],
+				},
+			});
+			(userService.updateScheduleProfile as Mock).mockResolvedValue({
+				workHoursRestrictionProfile: { id: 'work-id', isEnabled: false, timeZone: 'America/Denver', daySelection: [null, null, null, null, null, null, null] },
+				personalHoursRestrictionProfile: null,
+			});
+
+			renderWithProviders(<PreferencesSettings />);
+
+			await waitFor(() => {
+				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
+			});
+
+			// Toggle Monday off (first instance of day-circle-1 is work hours)
+			const mondayCircle = screen.getAllByTestId('day-circle-1')[0];
+			fireEvent.click(mondayCircle);
+
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			await waitFor(() => {
+				expect(userService.updateScheduleProfile).toHaveBeenCalledWith(
+					expect.objectContaining({
+						WorkRestrictionProfile: expect.objectContaining({
+							IsEnabled: false,
+							RestrictiveWeek: expect.objectContaining({
+								isEnabled: 'false',
+							}),
+						}),
+					}),
+				);
 			});
 		});
 	});

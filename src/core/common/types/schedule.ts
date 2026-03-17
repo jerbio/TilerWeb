@@ -319,3 +319,82 @@ export type ScheduleProcrastinateAllParams = ScheduleUpdateParams & {
 	DurationMins?: number;
 	DurationInMs?: number;
 };
+
+// ── Restriction Profile types ──────────────────────────────────
+
+export type DaySchedule = {
+	dayIndex: number;
+	startTime: string;
+	endTime: string;
+};
+
+export type RestrictionTimeLine = {
+	id: string | null;
+	start: number | null;
+	duration: number | null;
+	end: number | null;
+	timeZone: string | null;
+};
+
+export type DaySelection = {
+	id: string | null;
+	weekday: number | null;
+	restrictionTimeLine: RestrictionTimeLine | null;
+	timeZone: string | null;
+};
+
+export type RestrictionProfile = {
+	id: string | null;
+	isEnabled: boolean | null;
+	timeZone: string | null;
+	daySelection: (DaySelection | null)[] | null;
+};
+
+// ── Schedule Profile types ─────────────────────────────────────
+
+/** Response shape for `GET /api/User/ScheduleProfile?version=v2` */
+export type ScheduleProfileResponse = ApiResponse<{
+	travelMedium: string | null;
+	pinPreference: string | null;
+	endTimeOfDay: string | null;
+	sleepDuration: number | null;
+	endOfDay: string | null;
+	timeZone: string | null;
+	timeZoneDifference: number | null;
+	personalHoursRestrictionProfile: RestrictionProfile | null;
+	workHoursRestrictionProfile: RestrictionProfile | null;
+}>;
+
+export type WeekDayOption = {
+	Start: string;
+	Index: string;
+	End: string;
+};
+
+export type RestrictiveWeekParam = {
+	restrictionProfileId?: string;
+	WeekDayOption?: WeekDayOption[];
+	isEnabled?: string;
+};
+
+export type RestrictionProfileParam = {
+	Id?: string;
+	IsEnabled?: boolean;
+	RestrictionProfileType?: string;
+	RestrictiveWeek?: RestrictiveWeekParam;
+};
+
+/** Params for `POST /api/User/ScheduleProfile` */
+export type UpdateScheduleProfileParams = ScheduleUpdateParams & {
+	SleepDurationInMs?: number;
+	EndOfDay?: string;
+	TimeZone?: string;
+	TravelMedium?: string;
+	PinPreference?: string;
+	PersonalRestrictionProfile?: RestrictionProfileParam;
+	WorkRestrictionProfile?: RestrictionProfileParam;
+	MobileApp?: boolean;
+	SocketId?: boolean;
+	TimeZoneOffset?: number;
+	IsTimeZoneAdjusted?: string;
+};

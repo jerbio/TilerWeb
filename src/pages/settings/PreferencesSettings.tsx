@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useAuthNavigate from '@/hooks/useNavigateHome';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
+import WeeklySchedule, { WeeklyScheduleSize, type DaySchedule } from '@/core/common/components/WeeklySchedule';
 import { userService } from '@/services';
 import {
 	calculateSleepDurationMs,
 	calculateBedTimeEnd,
 	normalizeTimeString,
 } from '@/core/common/utils/timeUtils';
+import {
+	restrictionProfileToSchedule,
+	scheduleToWeekDayOptions,
+	isScheduleActive,
+} from '@/core/common/utils/restrictionUtils';
 
 
 // Map API values to UI values
@@ -55,22 +61,39 @@ const PreferencesSettings: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 
+	// Work hours restriction
+	const [workSchedule, setWorkSchedule] = useState<DaySchedule[]>(
+		() => Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' })),
+	);
+	const [originalWorkSchedule, setOriginalWorkSchedule] = useState<DaySchedule[]>([]);
+	const [workProfileId, setWorkProfileId] = useState<string>('');
+
+	// Personal hours restriction
+	const [personalSchedule, setPersonalSchedule] = useState<DaySchedule[]>(
+		() => Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' })),
+	);
+	const [originalPersonalSchedule, setOriginalPersonalSchedule] = useState<DaySchedule[]>([]);
+	const [personalProfileId, setPersonalProfileId] = useState<string>('');
+
 	useEffect(() => {
 		const fetchSettings = async () => {
 			try {
-				const settings = await userService.getSettings();
-				const { scheduleProfile } = settings;
+				const [settings, scheduleProfile] = await Promise.all([
+					userService.getSettings(),
+					userService.getScheduleProfile(),
+				]);
+				const { scheduleProfile: sp } = settings;
 
 				// Transport mode
-				const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
+				const apiValue = sp.travelMedium as TransportModeAPI;
 				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
 				setTransportMode(uiValue);
 				setOriginalTransportMode(uiValue);
 
-				// Bed time - endTimeOfDay is when the day ends (bed time start), sleepDuration is in milliseconds
-				const rawStartTime = scheduleProfile.endTimeOfDay || '';
+				// Bed time
+				const rawStartTime = sp.endTimeOfDay || '';
 				const startTime = normalizeTimeString(rawStartTime);
-				const sleepDuration = scheduleProfile.sleepDuration || 0;
+				const sleepDuration = sp.sleepDuration || 0;
 				const endTime = startTime && sleepDuration > 0
 					? calculateBedTimeEnd(startTime, sleepDuration)
 					: '';
@@ -79,6 +102,18 @@ const PreferencesSettings: React.FC = () => {
 				setBedTimeEnd(endTime);
 				setOriginalBedTimeStart(startTime);
 				setOriginalBedTimeEnd(endTime);
+
+				// Work hours restriction
+				const workSched = restrictionProfileToSchedule(scheduleProfile.workHoursRestrictionProfile);
+				setWorkSchedule(workSched);
+				setOriginalWorkSchedule(workSched);
+				setWorkProfileId(scheduleProfile.workHoursRestrictionProfile?.id || '');
+
+				// Personal hours restriction
+				const personalSched = restrictionProfileToSchedule(scheduleProfile.personalHoursRestrictionProfile);
+				setPersonalSchedule(personalSched);
+				setOriginalPersonalSchedule(personalSched);
+				setPersonalProfileId(scheduleProfile.personalHoursRestrictionProfile?.id || '');
 			} catch (error) {
 				console.error('Failed to fetch settings:', error);
 				toast.error(t('settings.sections.tilePreferences.saveError'));
@@ -91,6 +126,27 @@ const PreferencesSettings: React.FC = () => {
 	}, [t]);
 
 	const handleSaveChanges = async () => {
+		// Validate schedule profiles: each day must have both start and end, or neither
+		const dayNameKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+		for (const day of workSchedule) {
+			if ((day.startTime && !day.endTime) || (!day.startTime && day.endTime)) {
+				toast.error(t('settings.sections.tilePreferences.scheduleIncompleteDay', {
+					label: t('settings.sections.tilePreferences.myWorkHours'),
+					day: t(`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`),
+				}));
+				return;
+			}
+		}
+		for (const day of personalSchedule) {
+			if ((day.startTime && !day.endTime) || (!day.startTime && day.endTime)) {
+				toast.error(t('settings.sections.tilePreferences.scheduleIncompleteDay', {
+					label: t('settings.sections.tilePreferences.myPersonalHours'),
+					day: t(`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`),
+				}));
+				return;
+			}
+		}
+
 		// Validate bed time: both must be set or both must be empty
 		const hasBedTimeStart = bedTimeStart !== '';
 		const hasBedTimeEnd = bedTimeEnd !== '';
@@ -122,38 +178,83 @@ const PreferencesSettings: React.FC = () => {
 			changedScheduleProfile.EndTimeOfDay = bedTimeStart;
 		}
 
+		// Check if restriction profiles changed
+		const workChanged = JSON.stringify(workSchedule) !== JSON.stringify(originalWorkSchedule);
+		const personalChanged = JSON.stringify(personalSchedule) !== JSON.stringify(originalPersonalSchedule);
+
 		// If nothing changed, don't make API call
-		if (Object.keys(changedScheduleProfile).length === 0) {
+		if (Object.keys(changedScheduleProfile).length === 0 && !workChanged && !personalChanged) {
 			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
 			return;
 		}
 
 		setIsSaving(true);
 		try {
-			const settings = await userService.updateSettings({
-				ScheduleProfile: changedScheduleProfile,
-			});
-			// Update state with server response
-			const { scheduleProfile } = settings;
+			// Save settings (transport, bed time) if changed
+			if (Object.keys(changedScheduleProfile).length > 0) {
+				const settings = await userService.updateSettings({
+					ScheduleProfile: changedScheduleProfile,
+				});
+				const { scheduleProfile } = settings;
 
-			// Transport mode
-			const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
-			const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
-			setTransportMode(uiValue);
-			setOriginalTransportMode(uiValue);
+				const apiValue = scheduleProfile.travelMedium as TransportModeAPI;
+				const uiValue = apiToUiTransportMap[apiValue] || TransportModeUI.Drive;
+				setTransportMode(uiValue);
+				setOriginalTransportMode(uiValue);
 
-			// Bed time - endTimeOfDay is bed time start
-			const rawStartTime = scheduleProfile.endTimeOfDay || '';
-			const startTime = normalizeTimeString(rawStartTime);
-			const sleepDuration = scheduleProfile.sleepDuration || 0;
-			const endTime = startTime && sleepDuration > 0
-				? calculateBedTimeEnd(startTime, sleepDuration)
-				: '';
+				const rawStartTime = scheduleProfile.endTimeOfDay || '';
+				const startTime = normalizeTimeString(rawStartTime);
+				const sleepDuration = scheduleProfile.sleepDuration || 0;
+				const endTime = startTime && sleepDuration > 0
+					? calculateBedTimeEnd(startTime, sleepDuration)
+					: '';
 
-			setBedTimeStart(startTime);
-			setBedTimeEnd(endTime);
-			setOriginalBedTimeStart(startTime);
-			setOriginalBedTimeEnd(endTime);
+				setBedTimeStart(startTime);
+				setBedTimeEnd(endTime);
+				setOriginalBedTimeStart(startTime);
+				setOriginalBedTimeEnd(endTime);
+			}
+
+			// Save restriction profiles if changed
+			if (workChanged || personalChanged) {
+				const profileParams: Record<string, unknown> = {};
+
+				if (workChanged) {
+					const workActive = isScheduleActive(workSchedule);
+					profileParams.WorkRestrictionProfile = {
+						Id: workProfileId || undefined,
+						IsEnabled: workActive,
+						RestrictiveWeek: {
+							WeekDayOption: scheduleToWeekDayOptions(workSchedule),
+							isEnabled: workActive ? 'true' : 'false',
+						},
+					};
+				}
+
+				if (personalChanged) {
+					const personalActive = isScheduleActive(personalSchedule);
+					profileParams.PersonalRestrictionProfile = {
+						Id: personalProfileId || undefined,
+						IsEnabled: personalActive,
+						RestrictiveWeek: {
+							WeekDayOption: scheduleToWeekDayOptions(personalSchedule),
+							isEnabled: personalActive ? 'true' : 'false',
+						},
+					};
+				}
+
+				const updatedProfile = await userService.updateScheduleProfile(profileParams);
+
+				const newWorkSched = restrictionProfileToSchedule(updatedProfile.workHoursRestrictionProfile);
+				setWorkSchedule(newWorkSched);
+				setOriginalWorkSchedule(newWorkSched);
+				setWorkProfileId(updatedProfile.workHoursRestrictionProfile?.id || '');
+
+				const newPersonalSched = restrictionProfileToSchedule(updatedProfile.personalHoursRestrictionProfile);
+				setPersonalSchedule(newPersonalSched);
+				setOriginalPersonalSchedule(newPersonalSched);
+				setPersonalProfileId(updatedProfile.personalHoursRestrictionProfile?.id || '');
+			}
 
 			toast.success(t('settings.sections.tilePreferences.saveSuccess'));
 		} catch (error) {
@@ -163,6 +264,54 @@ const PreferencesSettings: React.FC = () => {
 			setIsSaving(false);
 		}
 	};
+
+	const handleWorkScheduleChange = useCallback(
+		(dayIndex: number, field: 'startTime' | 'endTime', value: string) => {
+			setWorkSchedule((prev) =>
+				prev.map((day) =>
+					day.dayIndex === dayIndex ? { ...day, [field]: value } : day,
+				),
+			);
+		},
+		[],
+	);
+
+	const handleWorkDayToggle = useCallback(
+		(dayIndex: number, selected: boolean) => {
+			setWorkSchedule((prev) =>
+				prev.map((day) =>
+					day.dayIndex === dayIndex
+						? { ...day, startTime: selected ? t('settings.sections.tilePreferences.defaultStartTime') : '', endTime: selected ? t('settings.sections.tilePreferences.defaultEndTime') : '' }
+						: day,
+				),
+			);
+		},
+		[t],
+	);
+
+	const handlePersonalScheduleChange = useCallback(
+		(dayIndex: number, field: 'startTime' | 'endTime', value: string) => {
+			setPersonalSchedule((prev) =>
+				prev.map((day) =>
+					day.dayIndex === dayIndex ? { ...day, [field]: value } : day,
+				),
+			);
+		},
+		[],
+	);
+
+	const handlePersonalDayToggle = useCallback(
+		(dayIndex: number, selected: boolean) => {
+			setPersonalSchedule((prev) =>
+				prev.map((day) =>
+					day.dayIndex === dayIndex
+						? { ...day, startTime: selected ? t('settings.sections.tilePreferences.defaultStartTime') : '', endTime: selected ? t('settings.sections.tilePreferences.defaultEndTime') : '' }
+						: day,
+				),
+			);
+		},
+		[t],
+	);
 
 	return (
 		<Container>
@@ -194,7 +343,7 @@ const PreferencesSettings: React.FC = () => {
 							onChange={() => setTransportMode(TransportModeUI.Bike)}
 							disabled={isLoading}
 						/>
-						<RadioLabel>{t('settings.sections.tilePreferences.byBike')}</RadioLabel>
+						<RadioLabel>{t('settings.sections.tilePreferences.cycling')}</RadioLabel>
 					</RadioOption>
 					<RadioOption>
 						<RadioInput
@@ -204,7 +353,7 @@ const PreferencesSettings: React.FC = () => {
 							onChange={() => setTransportMode(TransportModeUI.Drive)}
 							disabled={isLoading}
 						/>
-						<RadioLabel>{t('settings.sections.tilePreferences.iDrive')}</RadioLabel>
+						<RadioLabel>{t('settings.sections.tilePreferences.driving')}</RadioLabel>
 					</RadioOption>
 					<RadioOption>
 						<RadioInput
@@ -214,15 +363,41 @@ const PreferencesSettings: React.FC = () => {
 							onChange={() => setTransportMode(TransportModeUI.Bus)}
 							disabled={isLoading}
 						/>
-						<RadioLabel>{t('settings.sections.tilePreferences.byBus')}</RadioLabel>
+						<RadioLabel>{t('settings.sections.tilePreferences.transit')}</RadioLabel>
 					</RadioOption>
 				</RadioGroup>
 			</Section>
 
 			<Section>
+				<SectionTitle>{t('settings.sections.tilePreferences.defineTimeRestrictions')}</SectionTitle>
+
+				<RestrictionBlock>
+					<RestrictionLabel>{t('settings.sections.tilePreferences.myWorkHours')}:</RestrictionLabel>
+					<WeeklySchedule
+						schedule={workSchedule}
+						onChange={handleWorkScheduleChange}
+						onDayToggle={handleWorkDayToggle}
+						disabled={isLoading}
+						size={WeeklyScheduleSize.Sm}
+					/>
+				</RestrictionBlock>
+
+				<RestrictionBlock>
+					<RestrictionLabel>{t('settings.sections.tilePreferences.myPersonalHours')}:</RestrictionLabel>
+					<WeeklySchedule
+						schedule={personalSchedule}
+						onChange={handlePersonalScheduleChange}
+						onDayToggle={handlePersonalDayToggle}
+						disabled={isLoading}
+						size={WeeklyScheduleSize.Sm}
+					/>
+				</RestrictionBlock>
+			</Section>
+
+			<Section>
 				<SectionTitle>{t('settings.sections.tilePreferences.setBlockOutHours')}</SectionTitle>
 
-				<TimeRestrictionRow>
+				<TimeRestrictionRow data-testid="bed-time-section">
 					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.bedTime')}:</TimeRestrictionLabel>
 					<TimeSelectorsGroup>
 						<TimeDropdown
@@ -401,6 +576,17 @@ const TimeSeparator = styled.span`
 const SaveButtonContainer = styled.div`
 	display: flex;
 	justify-content: flex-end;
+`;
+
+const RestrictionBlock = styled.div`
+	margin-bottom: 2rem;
+`;
+
+const RestrictionLabel = styled.h4`
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	margin: 0 0 1rem 0;
 `;
 
 export default PreferencesSettings;
