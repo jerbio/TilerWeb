@@ -17,6 +17,7 @@ const ColorOptions: React.FC<ColorOptionsProps> = ({
         const optionRGBColor = new RGBColor(color);
         return (
           <TileColorOption
+						type='button'
             key={optionRGBColor.toHex()}
             $color={optionRGBColor}
             $selected={optionRGBColor.equals(formData.color)}

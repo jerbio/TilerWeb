@@ -201,6 +201,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
       }}
       $isexpanded={ui.state.isExpanded}
     >
+      <button style={{ display: 'none' }} data-testid="open-create-tile" type="button" onClick={ui.actions.open} />
       <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
         <p>
           {t('calendar.createTile.message.pending', {
@@ -225,7 +226,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
             i18nKey="calendar.createTile.message.success"
             components={{
               b: <b />,
-              action: <>{ui.state.success.tile?.calendarEvent.name}</>,
+              action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
             }}
           />
         </p>
