@@ -577,5 +577,62 @@
 			"deleteSuccess": "इवेंट हटाया गया!",
 			"actionFailed": "कार्रवाई विफल हुई। कृपया पुनः प्रयास करें।"
 		}
+	},
+	"settings": {
+		"title": "सेटिंग्स",
+		"back": "वापस",
+		"logout": "लॉग आउट",
+		"breadcrumb": {
+			"home": "होम",
+			"settings": "सेटिंग्स"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "टाइल प्राथमिकताएँ",
+				"description": "परिभाषित करें कि आप कैसे घूमते हैं और Tiler को आपके दैनिक समय पैटर्न समझने में मदद करें",
+				"howMoveAround": "आप कैसे घूमते हैं?",
+				"cycling": "साइकिलिंग",
+				"driving": "ड्राइविंग",
+				"transit": "सार्वजनिक परिवहन",
+				"defineTimeRestrictions": "अपनी समय सीमाएँ परिभाषित करें",
+				"myWorkHours": "मेरे काम के घंटे",
+				"myPersonalHours": "मेरे निजी घंटे",
+				"setBlockOutHours": "ब्लॉक आउट घंटे सेट करें",
+				"bedTime": "सोने का समय",
+				"startsAt": "शुरू होता है",
+				"endsAt": "समाप्त होता है",
+				"saveChanges": "परिवर्तन सहेजें",
+				"saving": "सहेजा जा रहा है...",
+				"saveSuccess": "टाइल प्राथमिकताएँ सफलतापूर्वक अपडेट हुईं",
+				"saveError": "परिवर्तन सहेजने में विफल। कृपया पुनः प्रयास करें।",
+				"bedTimeStartRequired": "कृपया सोने की शुरूआत का समय चुनें",
+				"bedTimeEndRequired": "कृपया सोने की समाप्ति का समय चुनें",
+				"scheduleIncompleteDay": "{{label}}: कृपया {{day}} के लिए शुरू और समाप्ति समय दोनों सेट करें",
+				"dayLabels": {
+					"sun": "र",
+					"mon": "सो",
+					"tue": "मं",
+					"wed": "बु",
+					"thu": "गु",
+					"fri": "शु",
+					"sat": "श"
+				},
+				"dayNames": {
+					"sun": "रविवार",
+					"mon": "सोमवार",
+					"tue": "मंगलवार",
+					"wed": "बुधवार",
+					"thu": "गुरुवार",
+					"fri": "शुक्रवार",
+					"sat": "शनिवार"
+				},
+				"start": "शुरू",
+				"end": "समाप्त",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "पूर्वाह्न",
+				"pm": "अपराह्न"
+			}
+		}
 	}
 }

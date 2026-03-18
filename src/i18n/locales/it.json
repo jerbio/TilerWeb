@@ -556,9 +556,9 @@
 			"days": "Giorni",
 			"hours": "Ore",
 			"minutes": "Minuti",
-			"daysShort": "gg",
-			"hoursShort": "ora",
-			"minutesShort": "min",
+			"daysShort": "Gg",
+			"hoursShort": "Ora",
+			"minutesShort": "Min",
 			"confirm": "Conferma",
 			"cancel": "Annulla"
 		}
@@ -576,6 +576,63 @@
 			"deleting": "Eliminazione evento...",
 			"deleteSuccess": "Evento eliminato!",
 			"actionFailed": "Azione fallita. Riprova."
+		}
+	},
+	"settings": {
+		"title": "Impostazioni",
+		"back": "Indietro",
+		"logout": "Esci",
+		"breadcrumb": {
+			"home": "Home",
+			"settings": "Impostazioni"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "Preferenze Tile",
+				"description": "Definisci come ti sposti e aiuta Tiler a capire i tuoi schemi temporali quotidiani",
+				"howMoveAround": "Come ti sposti?",
+				"cycling": "Ciclismo",
+				"driving": "Guida",
+				"transit": "Trasporto pubblico",
+				"defineTimeRestrictions": "Definisci le tue restrizioni temporali",
+				"myWorkHours": "I miei orari di lavoro",
+				"myPersonalHours": "I miei orari personali",
+				"setBlockOutHours": "Imposta ore bloccate",
+				"bedTime": "Ora di andare a letto",
+				"startsAt": "Inizia alle",
+				"endsAt": "Finisce alle",
+				"saveChanges": "Salva modifiche",
+				"saving": "Salvataggio...",
+				"saveSuccess": "Preferenze tile aggiornate con successo",
+				"saveError": "Impossibile salvare le modifiche. Riprova.",
+				"bedTimeStartRequired": "Seleziona un orario di inizio per il sonno",
+				"bedTimeEndRequired": "Seleziona un orario di fine per il sonno",
+				"scheduleIncompleteDay": "{{label}}: imposta sia l'orario di inizio che di fine per {{day}}",
+				"dayLabels": {
+					"sun": "D",
+					"mon": "L",
+					"tue": "M",
+					"wed": "M",
+					"thu": "G",
+					"fri": "V",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Domenica",
+					"mon": "Lunedì",
+					"tue": "Martedì",
+					"wed": "Mercoledì",
+					"thu": "Giovedì",
+					"fri": "Venerdì",
+					"sat": "Sabato"
+				},
+				"start": "Inizio",
+				"end": "Fine",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
+			}
 		}
 	}
 }

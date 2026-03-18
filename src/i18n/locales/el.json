@@ -577,5 +577,62 @@
 			"deleteSuccess": "Το συμβάν διαγράφηκε!",
 			"actionFailed": "Η ενέργεια απέτυχε. Δοκιμάστε ξανά."
 		}
+	},
+	"settings": {
+		"title": "Ρυθμίσεις",
+		"back": "Πίσω",
+		"logout": "Αποσύνδεση",
+		"breadcrumb": {
+			"home": "Αρχική",
+			"settings": "Ρυθμίσεις"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "Προτιμήσεις Πλακιδίων",
+				"description": "Καθορίστε πώς μετακινείστε και βοηθήστε το Tiler να κατανοήσει τα καθημερινά σας χρονικά μοτίβα",
+				"howMoveAround": "Πώς μετακινείστε;",
+				"cycling": "Ποδηλασία",
+				"driving": "Οδήγηση",
+				"transit": "Μέσα μεταφοράς",
+				"defineTimeRestrictions": "Καθορίστε τους χρονικούς περιορισμούς σας",
+				"myWorkHours": "Οι ώρες εργασίας μου",
+				"myPersonalHours": "Οι προσωπικές μου ώρες",
+				"setBlockOutHours": "Ορίστε ώρες αποκλεισμού",
+				"bedTime": "Ώρα ύπνου",
+				"startsAt": "Αρχίζει στις",
+				"endsAt": "Τελειώνει στις",
+				"saveChanges": "Αποθήκευση αλλαγών",
+				"saving": "Αποθήκευση...",
+				"saveSuccess": "Οι προτιμήσεις ενημερώθηκαν επιτυχώς",
+				"saveError": "Αποτυχία αποθήκευσης. Δοκιμάστε ξανά.",
+				"bedTimeStartRequired": "Παρακαλώ επιλέξτε ώρα έναρξης ύπνου",
+				"bedTimeEndRequired": "Παρακαλώ επιλέξτε ώρα αφύπνισης",
+				"scheduleIncompleteDay": "{{label}}: παρακαλώ ορίστε ώρες έναρξης και λήξης για {{day}}",
+				"dayLabels": {
+					"sun": "Κ",
+					"mon": "Δ",
+					"tue": "Τ",
+					"wed": "Τ",
+					"thu": "Π",
+					"fri": "Π",
+					"sat": "Σ"
+				},
+				"dayNames": {
+					"sun": "Κυριακή",
+					"mon": "Δευτέρα",
+					"tue": "Τρίτη",
+					"wed": "Τετάρτη",
+					"thu": "Πέμπτη",
+					"fri": "Παρασκευή",
+					"sat": "Σάββατο"
+				},
+				"start": "Έναρξη",
+				"end": "Λήξη",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "π.μ.",
+				"pm": "μ.μ."
+			}
+		}
 	}
 }

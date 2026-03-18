@@ -556,9 +556,9 @@
 			"days": "Días",
 			"hours": "Horas",
 			"minutes": "Minutos",
-			"daysShort": "día",
-			"hoursShort": "h",
-			"minutesShort": "min",
+			"daysShort": "Día",
+			"hoursShort": "H",
+			"minutesShort": "Min",
 			"confirm": "Confirmar",
 			"cancel": "Cancelar"
 		}
@@ -576,6 +576,63 @@
 			"deleting": "Eliminando evento...",
 			"deleteSuccess": "¡Evento eliminado!",
 			"actionFailed": "La acción falló. Inténtalo de nuevo."
+		}
+	},
+	"settings": {
+		"title": "Configuración",
+		"back": "Atrás",
+		"logout": "Cerrar sesión",
+		"breadcrumb": {
+			"home": "Inicio",
+			"settings": "Configuración"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "Preferencias de Mosaico",
+				"description": "Define cómo te desplazas y ayuda a Tiler a entender tus patrones de tiempo diarios",
+				"howMoveAround": "¿Cómo te desplazas?",
+				"cycling": "Ciclismo",
+				"driving": "Conducción",
+				"transit": "Transporte público",
+				"defineTimeRestrictions": "Define tus restricciones de tiempo",
+				"myWorkHours": "Mis horas de trabajo",
+				"myPersonalHours": "Mis horas personales",
+				"setBlockOutHours": "Establecer horas bloqueadas",
+				"bedTime": "Hora de dormir",
+				"startsAt": "Comienza a las",
+				"endsAt": "Termina a las",
+				"saveChanges": "Guardar cambios",
+				"saving": "Guardando...",
+				"saveSuccess": "Preferencias de mosaico actualizadas correctamente",
+				"saveError": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+				"bedTimeStartRequired": "Por favor selecciona una hora de inicio para dormir",
+				"bedTimeEndRequired": "Por favor selecciona una hora de fin para dormir",
+				"scheduleIncompleteDay": "{{label}}: establece tanto la hora de inicio como la de fin para {{day}}",
+				"dayLabels": {
+					"sun": "D",
+					"mon": "L",
+					"tue": "M",
+					"wed": "X",
+					"thu": "J",
+					"fri": "V",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Domingo",
+					"mon": "Lunes",
+					"tue": "Martes",
+					"wed": "Miércoles",
+					"thu": "Jueves",
+					"fri": "Viernes",
+					"sat": "Sábado"
+				},
+				"start": "Inicio",
+				"end": "Fin",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "a.m.",
+				"pm": "p.m."
+			}
 		}
 	}
 }

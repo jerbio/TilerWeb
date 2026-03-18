@@ -556,9 +556,9 @@
 			"days": "Dni",
 			"hours": "Godziny",
 			"minutes": "Minuty",
-			"daysShort": "dz",
-			"hoursShort": "godz",
-			"minutesShort": "min",
+			"daysShort": "Dz",
+			"hoursShort": "Godz",
+			"minutesShort": "Min",
 			"confirm": "Potwierdź",
 			"cancel": "Anuluj"
 		}
@@ -576,6 +576,63 @@
 			"deleting": "Usuwanie wydarzenia...",
 			"deleteSuccess": "Wydarzenie usunięte!",
 			"actionFailed": "Akcja nie powiodła się. Spróbuj ponownie."
+		}
+	},
+	"settings": {
+		"title": "Ustawienia",
+		"back": "Wstecz",
+		"logout": "Wyloguj się",
+		"breadcrumb": {
+			"home": "Strona główna",
+			"settings": "Ustawienia"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "Preferencje kafelków",
+				"description": "Określ, jak się przemieszczasz i pomóż Tiler zrozumieć Twoje codzienne wzorce czasowe",
+				"howMoveAround": "Jak się przemieszczasz?",
+				"cycling": "Rower",
+				"driving": "Samochód",
+				"transit": "Komunikacja miejska",
+				"defineTimeRestrictions": "Zdefiniuj swoje ograniczenia czasowe",
+				"myWorkHours": "Moje godziny pracy",
+				"myPersonalHours": "Moje godziny osobiste",
+				"setBlockOutHours": "Ustaw godziny blokady",
+				"bedTime": "Pora snu",
+				"startsAt": "Zaczyna się o",
+				"endsAt": "Kończy się o",
+				"saveChanges": "Zapisz zmiany",
+				"saving": "Zapisywanie...",
+				"saveSuccess": "Preferencje kafelków zostały pomyślnie zaktualizowane",
+				"saveError": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+				"bedTimeStartRequired": "Proszę wybrać godzinę rozpoczęcia snu",
+				"bedTimeEndRequired": "Proszę wybrać godzinę zakończenia snu",
+				"scheduleIncompleteDay": "{{label}}: ustaw godzinę rozpoczęcia i zakończenia dla {{day}}",
+				"dayLabels": {
+					"sun": "N",
+					"mon": "P",
+					"tue": "W",
+					"wed": "Ś",
+					"thu": "C",
+					"fri": "P",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Niedziela",
+					"mon": "Poniedziałek",
+					"tue": "Wtorek",
+					"wed": "Środa",
+					"thu": "Czwartek",
+					"fri": "Piątek",
+					"sat": "Sobota"
+				},
+				"start": "Początek",
+				"end": "Koniec",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
+			}
 		}
 	}
 }

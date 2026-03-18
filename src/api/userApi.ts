@@ -1,4 +1,5 @@
 import { ApiCodeResponse } from '@/core/common/types/api';
+import { ScheduleProfileResponse, UpdateScheduleProfileParams } from '@/core/common/types/schedule';
 import { AppApi } from './appApi';
 
 export interface UserResponse {
@@ -163,6 +164,19 @@ export class UserApi extends AppApi {
 		return this.apiRequest<UpdateSettingsResponse>('api/User/Settings', {
 			method: 'POST',
 			body: JSON.stringify(settings),
+		});
+	}
+
+	public getScheduleProfile() {
+		return this.apiRequest<ScheduleProfileResponse>('api/User/ScheduleProfile?version=v2', {
+			method: 'GET',
+		});
+	}
+
+	public updateScheduleProfile(params: UpdateScheduleProfileParams) {
+		return this.apiRequest<ScheduleProfileResponse>('api/User/ScheduleProfile', {
+			method: 'POST',
+			body: JSON.stringify(params),
 		});
 	}
 

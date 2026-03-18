@@ -116,6 +116,30 @@ class ScheduleService {
   }
 
   /**
+   * Update a SubCalendarEvent's start and/or end time.
+   * Returns the updated SubCalendarEvent payload.
+   */
+  async updateSubCalendarEvent(
+    eventId: string,
+    updates: { name?: string; start?: number; end?: number; calendarEnd?: number }
+  ) {
+    try {
+      const response = await this.subCalendarEventApi.updateSubCalendarEvent({
+        Id: eventId,
+        CalendarEventName: updates.name,
+        SubCalendarEventStart: updates.start,
+        SubCalendarEventEnd: updates.end,
+        CalendarEventEnd: updates.calendarEnd,
+        TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+      return response.Content;
+    } catch (error) {
+      console.error('Error updating SubCalendarEvent', error);
+      throw normalizeError(error);
+    }
+  }
+
+  /**
    * Search calendar events by name.
    * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
    * Returns an array of CalendarEvent matching the search query.

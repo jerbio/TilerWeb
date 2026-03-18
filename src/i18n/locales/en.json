@@ -176,11 +176,17 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
+			"deadlineLabel": "Deadline:",
 			"locationLabel": "View directions on map",
 			"secondaryActionsLabel": "Secondary Tile Actions:",
 			"secondaryActions": {
 				"editLabel": "Edit",
 				"deleteLabel": "Delete"
+			},
+			"save": "Save",
+			"cancel": "Cancel",
+			"validation": {
+				"endAfterStart": "End time must be after start time"
 			}
 		},
 		"createTile": {
@@ -800,9 +806,9 @@
 				"description": "Define how you move around and help Tiler understand your daily time patterns",
 				"placeholder": "Tile preferences settings coming soon...",
 				"howMoveAround": "How do you move around?",
-				"byBike": "By bike",
-				"iDrive": "I drive",
-				"byBus": "By Bus",
+				"cycling": "Cycling",
+				"driving": "Driving",
+				"transit": "Transit",
 				"defineTimeRestrictions": "Define your time restrictions",
 				"myWorkHours": "My Work Hours",
 				"myPersonalHours": "My Personal Hours",
@@ -819,7 +825,35 @@
 				"saveError": "Failed to save changes. Please try again.",
 				"customSaved": "Custom time restrictions saved",
 				"bedTimeStartRequired": "Please select a bed time start",
-				"bedTimeEndRequired": "Please select a bed time end"
+				"bedTimeEndRequired": "Please select a bed time end",
+				"scheduleIncompleteDay": "{{label}}: please set both start and end times for {{day}}",
+				"dayLabels": {
+					"sun": "S",
+					"mon": "M",
+					"tue": "T",
+					"wed": "W",
+					"thu": "T",
+					"fri": "F",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Sunday",
+					"mon": "Monday",
+					"tue": "Tuesday",
+					"wed": "Wednesday",
+					"thu": "Thursday",
+					"fri": "Friday",
+					"sat": "Saturday"
+				},
+				"start": "Start",
+				"end": "End",
+				"copyTimes": "Copy times",
+				"paste": "Paste times",
+				"cancelCopy": "Cancel copy",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",
@@ -954,9 +988,9 @@
 			"days": "Days",
 			"hours": "Hours",
 			"minutes": "Minutes",
-			"daysShort": "day",
-			"hoursShort": "hr",
-			"minutesShort": "min",
+			"daysShort": "Day",
+			"hoursShort": "Hr",
+			"minutesShort": "Min",
 			"confirm": "Confirm",
 			"cancel": "Cancel"
 		},
