@@ -8,7 +8,9 @@ import {
   Clock,
   ExternalLink,
   Pencil,
+  Play,
   Repeat2,
+  SkipForward,
   Star,
   Target,
   X,
@@ -37,6 +39,9 @@ type CalendarEventInfoProps = {
   event: ScheduleSubCalendarEvent | null;
   onClose?: () => void;
   onEventUpdate?: (updates: { name?: string; start?: number; end?: number; calendarEnd?: number }) => void;
+  onSetAsNow?: () => Promise<void>;
+  onMarkComplete?: () => Promise<void>;
+  onDefer?: () => void;
   isEditable?: boolean;
   isSaving?: boolean;
 };
@@ -45,6 +50,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   event,
   onClose,
   onEventUpdate,
+  onSetAsNow,
+  onMarkComplete,
+  onDefer,
   isEditable = true,
   isSaving = false,
 }) => {
@@ -71,7 +79,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
   // Validation error
   const [validationError, setValidationError] = useState<string | null>(null);
 
-
+  // Action button states
+  const [actionLoading, setActionLoading] = useState<'now' | 'complete' | null>(null);
+  const [confirmingComplete, setConfirmingComplete] = useState(false);
 
   // Use original times (preserved before visual splitting) or fall back to start/end
   const eventStart = event?.originalStart ?? event?.start ?? 0;
@@ -92,6 +102,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
       setIsEditingStart(false);
       setIsEditingEnd(false);
       setIsEditingDeadline(false);
+      setActionLoading(null);
+      setConfirmingComplete(false);
     }
   }, [event, eventStart, eventEnd]);
 
@@ -150,6 +162,27 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
     onEventUpdate?.(updates);
     setHasChanges(false);
+  };
+
+  const handleSetAsNow = async () => {
+    if (!onSetAsNow || actionLoading) return;
+    setActionLoading('now');
+    try {
+      await onSetAsNow();
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleConfirmComplete = async () => {
+    if (!onMarkComplete || actionLoading) return;
+    setConfirmingComplete(false);
+    setActionLoading('complete');
+    try {
+      await onMarkComplete();
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const eventColor = new RGBColor({
@@ -421,7 +454,55 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
         </CalendarEventInfoArticleContainer>
       </CalendarEventInfoSection>
 
-
+      {(onSetAsNow || onMarkComplete || onDefer) && (
+        <EventActionsSection>
+          {confirmingComplete ? (
+            <ConfirmRow>
+              <ConfirmLabel>{t('calendar.event.confirmComplete')}</ConfirmLabel>
+              <ConfirmButton $success onClick={handleConfirmComplete}>
+                {t('timeline.confirmAction')}
+              </ConfirmButton>
+              <ConfirmButton onClick={() => setConfirmingComplete(false)}>
+                {t('timeline.cancelAction')}
+              </ConfirmButton>
+            </ConfirmRow>
+          ) : (
+            <EventActionsRow>
+              {onSetAsNow && (
+                <EventActionButton
+                  onClick={handleSetAsNow}
+                  disabled={!!actionLoading || hasChanges}
+                  title={t('calendar.event.actions.setAsNow')}
+                >
+                  {actionLoading === 'now' ? <ActionSpinner /> : <Play size={14} />}
+                  <span>{t('calendar.event.actions.setAsNow')}</span>
+                </EventActionButton>
+              )}
+              {onMarkComplete && (
+                <EventActionButton
+                  onClick={() => setConfirmingComplete(true)}
+                  disabled={!!actionLoading || hasChanges}
+                  title={t('calendar.event.actions.complete')}
+                  $success
+                >
+                  {actionLoading === 'complete' ? <ActionSpinner /> : <Check size={14} />}
+                  <span>{t('calendar.event.actions.complete')}</span>
+                </EventActionButton>
+              )}
+              {onDefer && (
+                <EventActionButton
+                  onClick={onDefer}
+                  disabled={!!actionLoading || hasChanges}
+                  title={t('calendar.event.actions.defer')}
+                >
+                  <SkipForward size={14} />
+                  <span>{t('calendar.event.actions.defer')}</span>
+                </EventActionButton>
+              )}
+            </EventActionsRow>
+          )}
+        </EventActionsSection>
+      )}
 
       {event.location.address && (
         <>
@@ -680,6 +761,104 @@ const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
       color: ${({ theme }) => theme.colors.white};
       leading: 1;
     }
+  }
+`;
+
+const EventActionsSection = styled.div`
+  padding: 8px 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.calendar.border};
+`;
+
+const EventActionsRow = styled.div`
+  display: flex;
+  gap: 6px;
+`;
+
+const EventActionButton = styled.button<{ $success?: boolean; $danger?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+  padding: 6px 8px;
+  border: 1px solid ${({ theme, $success, $danger }) =>
+    $success ? 'rgba(18, 183, 106, 0.3)'
+    : $danger ? 'rgba(220, 38, 38, 0.3)'
+    : theme.colors.calendar.border};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background: transparent;
+  color: ${({ theme, $success, $danger }) =>
+    $success ? '#12b76a'
+    : $danger ? '#dc2626'
+    : theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: ${({ $success, $danger }) =>
+      $success ? 'rgba(18, 183, 106, 0.1)'
+      : $danger ? 'rgba(220, 38, 38, 0.1)'
+      : 'rgba(255, 255, 255, 0.05)'};
+    border-color: ${({ theme, $success, $danger }) =>
+      $success ? 'rgba(18, 183, 106, 0.5)'
+      : $danger ? 'rgba(220, 38, 38, 0.5)'
+      : theme.colors.text.muted};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+`;
+
+const ActionSpinner = styled.div`
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid ${({ theme }) => theme.colors.border.default};
+  border-top-color: ${({ theme }) => theme.colors.text.secondary};
+  border-radius: 50%;
+  animation: action-spin 0.6s linear infinite;
+
+  @keyframes action-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const ConfirmRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const ConfirmLabel = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  color: ${({ theme }) => theme.colors.text.muted};
+  white-space: nowrap;
+  flex: 1;
+`;
+
+const ConfirmButton = styled.button<{ $success?: boolean }>`
+  padding: 4px 10px;
+  border: 1px solid ${({ theme, $success }) =>
+    $success ? 'rgba(18, 183, 106, 0.4)' : theme.colors.border.default};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background: ${({ $success }) =>
+    $success ? 'rgba(18, 183, 106, 0.1)' : 'transparent'};
+  color: ${({ theme, $success }) =>
+    $success ? '#12b76a' : theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ theme, $success }) =>
+      $success ? 'rgba(18, 183, 106, 0.2)' : theme.colors.background.card2};
   }
 `;
 

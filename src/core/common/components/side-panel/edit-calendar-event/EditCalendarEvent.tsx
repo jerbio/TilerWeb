@@ -221,7 +221,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
-    scheduleService.lookupCalendarEventById(event.id)
+    scheduleService.lookupCalendarEventById(event.id!)
       .then(async (full) => {
         if (cancelled) return;
         populateForm(full);
@@ -362,8 +362,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
                   startDate && `${startDate.format('MMM D')} ${startTime}`,
                   endDate && `${endDate.format('MMM D')} ${endTime}`,
                   (durationHours || durationMinutes) && [
-                    durationHours && Number(durationHours) > 0 && t('calendarEvent.edit.durationHoursPreview', { count: durationHours }),
-                    durationMinutes && Number(durationMinutes) > 0 && t('calendarEvent.edit.durationMinutesPreview', { count: durationMinutes }),
+                    durationHours && Number(durationHours) > 0 && t('calendarEvent.edit.durationHoursPreview', { count: Number(durationHours) }),
+                    durationMinutes && Number(durationMinutes) > 0 && t('calendarEvent.edit.durationMinutesPreview', { count: Number(durationMinutes) }),
                   ].filter(Boolean).join(' '),
                 ].filter(Boolean).join(' \u00b7 ')}
               </PreviewText>

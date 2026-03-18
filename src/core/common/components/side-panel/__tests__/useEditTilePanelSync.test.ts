@@ -40,11 +40,16 @@ const mockEvent: CalendarEvent = {
 };
 
 describe('useEditTilePanelSync', () => {
-	let pushPanel: ReturnType<typeof vi.fn>;
-	let popPanel: ReturnType<typeof vi.fn>;
-	let closeEditTile: ReturnType<typeof vi.fn>;
-	let setSidePanelExpanded: ReturnType<typeof vi.fn>;
-	let setMobileChatVisible: ReturnType<typeof vi.fn>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let pushPanel: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let popPanel: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let closeEditTile: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let setSidePanelExpanded: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let setMobileChatVisible: any;
 
 	beforeEach(() => {
 		pushPanel = vi.fn();

@@ -45,6 +45,7 @@ import { useCalendarUI } from './calendar-ui.provider';
 import { eventColorOptions } from './data';
 export type { CalendarViewOptions } from './calendar.types';
 import { scheduleService } from '@/services';
+import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 
 type CalendarProps = {
   events: Array<ScheduleSubCalendarEvent>;
@@ -79,6 +80,9 @@ const Calendar = ({
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
   const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
   const [isSavingEvent, setIsSavingEvent] = useState(false);
+
+  const showNotification = useUiStore((s) => s.notification.show);
+  const updateNotification = useUiStore((s) => s.notification.update);
 
   // Ref holding all styled events (populated by CalendarEvents)
   const styledEventsRef = useRef<StyledEvent[]>([]);
@@ -333,6 +337,46 @@ const Calendar = ({
 		}
 	};
 
+	const handleSetAsNow = async () => {
+		if (!selectedEventInfo) return;
+		const eventId = selectedEventInfo.id;
+		const notifId = notificationId(NotificationAction.SetAsNow, eventId);
+		showNotification(notifId, t('calendarEvent.notifications.settingAsNow'), 'loading');
+		try {
+			await scheduleService.setCalendarEventAsNow(eventId);
+			updateNotification(notifId, t('calendarEvent.notifications.setAsNowSuccess'), 'success');
+			setSelectedEventInfo(null);
+			setSelectedEvent(null);
+			await refetchEvents();
+		} catch (error) {
+			console.error('Set as now failed:', error);
+			updateNotification(notifId, t('calendarEvent.notifications.actionFailed'), 'error');
+		}
+	};
+
+	const handleMarkComplete = async () => {
+		if (!selectedEventInfo) return;
+		const eventId = selectedEventInfo.id;
+		const notifId = notificationId(NotificationAction.Complete, eventId);
+		showNotification(notifId, t('calendarEvent.notifications.completing'), 'loading');
+		try {
+			await scheduleService.markCalendarEventComplete(eventId);
+			updateNotification(notifId, t('calendarEvent.notifications.completeSuccess'), 'success');
+			setSelectedEventInfo(null);
+			setSelectedEvent(null);
+			await refetchEvents();
+		} catch (error) {
+			console.error('Mark complete failed:', error);
+			updateNotification(notifId, t('calendarEvent.notifications.actionFailed'), 'error');
+		}
+	};
+
+	const handleDefer = () => {
+		if (!selectedEventInfo) return;
+		// TODO: wire to single-event defer API when available
+		console.log('Defer event:', selectedEventInfo.id);
+	};
+
   const calendarEventInfo = [
     {
       key: 'info',
@@ -345,6 +389,9 @@ const Calendar = ({
             setSelectedEvent(null);
           }}
 					onEventUpdate={handleEventUpdate}
+					onSetAsNow={handleSetAsNow}
+					onMarkComplete={handleMarkComplete}
+					onDefer={handleDefer}
 					isSaving={isSavingEvent}
         />
       ),

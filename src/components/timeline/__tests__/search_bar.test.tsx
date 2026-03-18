@@ -73,7 +73,7 @@ useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
 					close: vi.fn(),
 				},
 			},
-		};
+		} as unknown as CalendarUIStore;
 		return selector ? selector(mockStore) : mockStore;
 	},
 }));

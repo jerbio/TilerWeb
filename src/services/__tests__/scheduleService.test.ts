@@ -4,7 +4,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { LocationApi } from '@/api/locationApi';
-import { CalendarEvent, CalendarEventUpdateParams, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import { CalendarEvent, CalendarEventUpdateParams, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -326,7 +326,7 @@ describe('ScheduleService', () => {
 			end: 1769929200000,
 			name: 'Test Event',
 			calendarEventEnd: 1770532200000,
-		};
+		} as unknown as ScheduleSubCalendarEvent;
 
 		it('calls updateSubCalendarEvent on subCalendarEventApi with start and end times', async () => {
 			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({

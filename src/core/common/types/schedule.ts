@@ -23,8 +23,8 @@ export type ScheduleSubCalendarEventLocation = {
   isVerified: boolean;
   isDefault: boolean;
   isNull: boolean;
-  thirdPartyId: string;
-  userId: string;
+  thirdPartyId: string | null;
+  userId: string | null;
   source: string;
   nickname: string;
 };

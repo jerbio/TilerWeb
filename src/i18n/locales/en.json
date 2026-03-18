@@ -185,6 +185,12 @@
 			},
 			"save": "Save",
 			"cancel": "Cancel",
+			"confirmComplete": "Complete this event?",
+			"actions": {
+				"setAsNow": "Now",
+				"complete": "Complete",
+				"defer": "Defer"
+			},
 			"validation": {
 				"endAfterStart": "End time must be after start time"
 			}
