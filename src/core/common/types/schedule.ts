@@ -120,7 +120,7 @@ export type ScheduleSubCalendarEvent = {
   colorGreen: number;
   colorBlue: number;
   isRecurring: boolean;
-  emojis: null;
+  emojis: string | null;
   isReadOnly: boolean;
   restrictionProfile: null;
   isWhatIf: boolean;

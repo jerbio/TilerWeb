@@ -964,7 +964,6 @@ const CalendarEventInfoModalContainer = styled(a.div)`
 	z-index: 1000;
 	width: ${calendarConfig.INFO_MODAL_WIDTH};
 	height: fit-content;
-	max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
 `;
 
 const CalendarCreateEventModalBackdrop = styled.div<{ $visible: boolean }>`
