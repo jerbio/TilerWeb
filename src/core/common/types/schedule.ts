@@ -79,6 +79,9 @@ export type ScheduleSubCalendarEvent = {
   id: string;
   start: number;
   end: number;
+  // Original start/end times preserved before visual splitting
+  originalStart?: number;
+  originalEnd?: number;
   isSleep: boolean;
   sleepDay: number;
   isWake: boolean;

@@ -176,11 +176,17 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
+			"deadlineLabel": "Deadline:",
 			"locationLabel": "View directions on map",
 			"secondaryActionsLabel": "Secondary Tile Actions:",
 			"secondaryActions": {
 				"editLabel": "Edit",
 				"deleteLabel": "Delete"
+			},
+			"save": "Save",
+			"cancel": "Cancel",
+			"validation": {
+				"endAfterStart": "End time must be after start time"
 			}
 		},
 		"createTile": {

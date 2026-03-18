@@ -36,6 +36,7 @@ import { TILE_RECURRENCE_TYPE, TILE_TIME_RESTRICTION_TYPE } from '../../types/ca
 import { CalendarViewOptions } from './calendar.types';
 export type { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './CalendarUIProvider.tsx';
+import { scheduleService } from '@/services';
 
 type CalendarProps = {
   events: Array<ScheduleSubCalendarEvent>;
@@ -74,6 +75,7 @@ const Calendar = ({
 
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
   const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
+  const [isSavingEvent, setIsSavingEvent] = useState(false);
 
   // Ref holding all styled events (populated by CalendarEvents)
   const styledEventsRef = useRef<StyledEvent[]>([]);
@@ -294,6 +296,39 @@ const Calendar = ({
     setHasAutoScrolled(false);
   }, [viewOptions.startDay]);
 
+	const handleEventUpdate = async (updates: {
+    name?: string;
+    start?: number;
+    end?: number;
+    calendarEnd?: number;
+  }) => {
+		if (!selectedEventInfo) return;
+
+		setIsSavingEvent(true);
+		try {
+			await scheduleService.updateSubCalendarEvent(selectedEventInfo.id, updates);
+
+			// Update local state optimistically
+			setSelectedEventInfo((prev) =>
+				prev
+					? {
+							...prev,
+              ...(updates.name !== undefined ? { name: updates.name } : {}),
+              ...(updates.start !== undefined ? { start: updates.start } : {}),
+              ...(updates.end !== undefined ? { end: updates.end } : {}),
+              ...(updates.calendarEnd !== undefined
+                ? { calendarEventEnd: updates.calendarEnd }
+                : {}),
+						}
+					: null
+			);
+		} catch (error) {
+			console.error('Failed to update event:', error);
+		} finally {
+			setIsSavingEvent(false);
+		}
+	};
+
   const calendarEventInfo = [
     {
       key: 'info',
@@ -305,6 +340,8 @@ const Calendar = ({
             setSelectedEventInfo(null);
             setSelectedEvent(null);
           }}
+					onEventUpdate={handleEventUpdate}
+					isSaving={isSavingEvent}
         />
       ),
     },
