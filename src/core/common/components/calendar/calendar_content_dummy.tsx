@@ -6,33 +6,33 @@ import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar.types';
 
 type CalendarContentProps = {
-  viewOptions: CalendarViewOptions;
-  calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
+	viewOptions: CalendarViewOptions;
+	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 };
 
 const CalendarContentDummy: React.FC<CalendarContentProps> = ({
-  viewOptions,
-  calendarGridCanvasRef,
+	viewOptions,
+	calendarGridCanvasRef,
 }) => {
-  return (
-    <Container>
-      <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
-        {/* Background */}
-        <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
-        {/* Timeline */}
-        {Array.from({ length: HOURS_IN_DAY }).map((_, hourIndex) => {
-          return (
-            <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
-              <div>
-                {/* eg. "8 AM" */}
-                <span>{dayjs().hour(hourIndex).format('h A')}</span>
-              </div>
-            </CalendarCellTime>
-          );
-        })}
-      </StyledCalendarContent>
-    </Container>
-  );
+	return (
+		<Container>
+			<StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
+				{/* Background */}
+				<CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+				{/* Timeline */}
+				{Array.from({ length: HOURS_IN_DAY }).map((_, hourIndex) => {
+					return (
+						<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
+							<div>
+								{/* eg. "8 AM" */}
+								<span>{dayjs().hour(hourIndex).format('h A')}</span>
+							</div>
+						</CalendarCellTime>
+					);
+				})}
+			</StyledCalendarContent>
+		</Container>
+	);
 };
 
 const Container = styled.div`

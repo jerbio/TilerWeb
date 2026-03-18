@@ -155,12 +155,12 @@
 	"modals": {
 		"loading": {
 			"image": {
-        "alt": "Loading Indicator"
+				"alt": "Loading Indicator"
 			}
 		},
 		"success": {
 			"image": {
-        "alt": "Success Icon"
+				"alt": "Success Icon"
 			}
 		}
 	},
@@ -176,11 +176,17 @@
 			"endLabel": "Ends:",
 			"durationLabel": "Duration:",
 			"repetitionLabel": "Repeats:",
+			"deadlineLabel": "Deadline:",
 			"locationLabel": "View directions on map",
 			"secondaryActionsLabel": "Secondary Tile Actions:",
 			"secondaryActions": {
 				"editLabel": "Edit",
 				"deleteLabel": "Delete"
+			},
+			"save": "Save",
+			"cancel": "Cancel",
+			"validation": {
+				"endAfterStart": "End time must be after start time"
 			}
 		},
 		"createTile": {
@@ -190,38 +196,38 @@
 				"tileColor": "Select Tile Color",
 				"tileActions": "Tile Actions",
 				"recurrenceType": {
-          "daily": "Daily",
-          "weekly": "Weekly",
-          "monthly": "Monthly",
-          "yearly": "Yearly"
+					"daily": "Daily",
+					"weekly": "Weekly",
+					"monthly": "Monthly",
+					"yearly": "Yearly"
 				},
 				"recurrenceStartType": {
 					"title": "Starts",
-          "default": "Default (<date/>)",
-          "on": "On"
+					"default": "Default (<date/>)",
+					"on": "On"
 				},
 				"recurrenceEndType": {
 					"title": "Ends",
-          "never": "Never",
-          "on": "On"
+					"never": "Never",
+					"on": "On"
 				},
 				"recurrenceStartDate": {
 					"title": "End Date",
-          "description": "The repetition starts <date/>"
+					"description": "The repetition starts <date/>"
 				},
 				"recurrenceEndDate": {
 					"title": "End Date",
-          "description": "The repetition ends on <date/>"
+					"description": "The repetition ends on <date/>"
 				},
 				"recurrenceWeeklyDays": {
 					"title": "Repeat On",
-          "monday": "Monday",
-          "tuesday": "Tuesday",
-          "wednesday": "Wednesday",
-          "thursday": "Thursday",
-          "friday": "Friday",
-          "saturday": "Saturday",
-          "sunday": "Sunday"
+					"monday": "Monday",
+					"tuesday": "Tuesday",
+					"wednesday": "Wednesday",
+					"thursday": "Thursday",
+					"friday": "Friday",
+					"saturday": "Saturday",
+					"sunday": "Sunday"
 				}
 			},
 			"tip": {
@@ -791,16 +797,16 @@
 				"description": "Define how you move around and help Tiler understand your daily time patterns",
 				"placeholder": "Tile preferences settings coming soon...",
 				"howMoveAround": "How do you move around?",
-				"byBike": "By bike",
-				"iDrive": "I drive",
-				"byBus": "By Bus",
+				"cycling": "Cycling",
+				"driving": "Driving",
+				"transit": "Transit",
 				"defineTimeRestrictions": "Define your time restrictions",
 				"myWorkHours": "My Work Hours",
 				"myPersonalHours": "My Personal Hours",
 				"setBlockOutHours": "Set your block out hours",
 				"bedTime": "Bed Time",
-			"startsAt": "Starts at",
-			"endsAt": "Ends at",
+				"startsAt": "Starts at",
+				"endsAt": "Ends at",
 				"useCustom": "Use custom",
 				"customTimeRestrictions": "Custom time restrictions",
 				"reset": "Reset",
@@ -810,7 +816,35 @@
 				"saveError": "Failed to save changes. Please try again.",
 				"customSaved": "Custom time restrictions saved",
 				"bedTimeStartRequired": "Please select a bed time start",
-				"bedTimeEndRequired": "Please select a bed time end"
+				"bedTimeEndRequired": "Please select a bed time end",
+				"scheduleIncompleteDay": "{{label}}: please set both start and end times for {{day}}",
+				"dayLabels": {
+					"sun": "S",
+					"mon": "M",
+					"tue": "T",
+					"wed": "W",
+					"thu": "T",
+					"fri": "F",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Sunday",
+					"mon": "Monday",
+					"tue": "Tuesday",
+					"wed": "Wednesday",
+					"thu": "Thursday",
+					"fri": "Friday",
+					"sat": "Saturday"
+				},
+				"start": "Start",
+				"end": "End",
+				"copyTimes": "Copy times",
+				"paste": "Paste times",
+				"cancelCopy": "Cancel copy",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
 			},
 			"tilerContacts": {
 				"title": "Tiler Contacts",
@@ -946,9 +980,9 @@
 			"days": "Days",
 			"hours": "Hours",
 			"minutes": "Minutes",
-			"daysShort": "day",
-			"hoursShort": "hr",
-			"minutesShort": "min",
+			"daysShort": "Day",
+			"hoursShort": "Hr",
+			"minutesShort": "Min",
 			"confirm": "Confirm",
 			"cancel": "Cancel"
 		},

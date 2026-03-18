@@ -1,4 +1,8 @@
-import { Persona, PersonaResponse, PersonaAnonymousUserResponse } from '../core/common/types/persona';
+import {
+	Persona,
+	PersonaResponse,
+	PersonaAnonymousUserResponse,
+} from '../core/common/types/persona';
 import { AppApi } from './appApi';
 
 export class PersonaApi extends AppApi {
@@ -9,14 +13,16 @@ export class PersonaApi extends AppApi {
 	public createAnonymousUser(persona: Persona) {
 		return this.apiRequest<PersonaAnonymousUserResponse>('api/Anonymous/Persona', {
 			method: 'POST',
-			body: JSON.stringify({...persona,
-      TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString()}),
+			body: JSON.stringify({
+				...persona,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			}),
 		});
 	}
 
 	public createPersonaWithAudio(description: string, audioFile: Blob | null | undefined) {
 		const formData = new FormData();
-		if(audioFile) {
+		if (audioFile) {
 			formData.append('AudioFile', audioFile, 'recording.webm');
 		}
 		formData.append('Description', description);

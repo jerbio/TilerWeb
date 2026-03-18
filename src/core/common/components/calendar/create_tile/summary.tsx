@@ -7,45 +7,45 @@ import { useTheme } from '@/core/theme/ThemeProvider';
 import { InitialCreateTileFormState } from '.';
 
 type SummaryProps = {
-  formData: InitialCreateTileFormState;
+	formData: InitialCreateTileFormState;
 };
 
 const Summary: React.FC<SummaryProps> = ({ formData }) => {
 	const { t } = useTranslation();
-  const { isDarkMode } = useTheme();
+	const { isDarkMode } = useTheme();
 
-  return (
-    <SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
-      <header>{t('calendar.createTile.summary.title')}</header>
-      <p>
-        <Trans
-          i18nKey="calendar.createTile.summary.description"
-          components={{
-            b: <b />,
-          }}
-          values={{
-            action: formData.action,
-            location: formData.location,
-            hours: formData.durationHours,
-            minutes: formData.durationMins,
-            deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }),
-          }}
-        />
-      </p>
-    </SummaryContainer>
-  );
+	return (
+		<SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
+			<header>{t('calendar.createTile.summary.title')}</header>
+			<p>
+				<Trans
+					i18nKey="calendar.createTile.summary.description"
+					components={{
+						b: <b />,
+					}}
+					values={{
+						action: formData.action,
+						location: formData.location,
+						hours: formData.durationHours,
+						minutes: formData.durationMins,
+						deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+							year: 'numeric',
+							month: '2-digit',
+							day: '2-digit',
+						}),
+					}}
+				/>
+			</p>
+		</SummaryContainer>
+	);
 };
 
 export default Summary;
 
 const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
 	${({ theme, $darkmode, $color }) => {
-    const summaryColor = new RGBColor($color);
-    return `
+		const summaryColor = new RGBColor($color);
+		return `
 			position: sticky;
 			bottom: calc(52px + 1rem);
 			font-family: ${theme.typography.fontFamily.urban};
@@ -82,5 +82,5 @@ const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
         transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 			}
 		`;
-  }}
+	}}
 `;

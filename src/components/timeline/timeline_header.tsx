@@ -17,91 +17,100 @@ import { CalendarRequestType } from '@/core/common/components/calendar/calendarR
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
 
 const TimelineHeader: React.FC = () => {
-  const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
-  const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
+	const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
+	const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<HTMLButtonElement>(null);
 	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
-  const viewInfo = useCalendarUI((state) => state.viewInfo);
-  const dispatch = useCalendarDispatch();
+	const viewInfo = useCalendarUI((state) => state.viewInfo);
+	const dispatch = useCalendarDispatch();
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        triggerRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
-        setProfileSheetOpen(false);
-      }
-    };
+	// Close menu when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				menuRef.current &&
+				triggerRef.current &&
+				!menuRef.current.contains(event.target as Node) &&
+				!triggerRef.current.contains(event.target as Node)
+			) {
+				setProfileSheetOpen(false);
+			}
+		};
 
-    if (profileSheetOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+		if (profileSheetOpen) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [profileSheetOpen]);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [profileSheetOpen]);
 
-  const { isDarkMode, toggleTheme } = useTheme();
+	const { isDarkMode, toggleTheme } = useTheme();
 
-  return (
-    <Header>
-      <HeaderLeft>
-        <Logo size={30} />
-      </HeaderLeft>
-      <SearchBar />
-      <HeaderRight>
-        <DateNavGroup>
-          <TodayButton onClick={() => dispatch({ type: CalendarRequestType.GoToToday })}>
-            <span>{dayjs().format('MMM')}</span>
-            <span>{dayjs().format('DD')}</span>
-          </TodayButton>
-          <DatePickerTrigger onClick={() => setIsDatePickerOpen((prev) => !prev)}>
-            <CalendarIcon size={14} />
-          </DatePickerTrigger>
-          <CalendarDatePicker
-            isOpen={isDatePickerOpen}
-            onClose={() => setIsDatePickerOpen(false)}
-            onDateSelect={(date) =>
-              dispatch({
-                type: CalendarRequestType.NavigateToDate,
-                date: date.toISOString(),
-              })
-            }
-            startDay={viewInfo.startDay}
-            daysInView={viewInfo.daysInView}
-          />
-        </DateNavGroup>
-				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
-				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
-				<ProcrastinateAllButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+	return (
+		<Header>
+			<HeaderLeft>
+				<Logo size={30} />
+			</HeaderLeft>
+			<SearchBar />
+			<HeaderRight>
+				<DateNavGroup>
+					<TodayButton onClick={() => dispatch({ type: CalendarRequestType.GoToToday })}>
+						<span>{dayjs().format('MMM')}</span>
+						<span>{dayjs().format('DD')}</span>
+					</TodayButton>
+					<DatePickerTrigger onClick={() => setIsDatePickerOpen((prev) => !prev)}>
+						<CalendarIcon size={14} />
+					</DatePickerTrigger>
+					<CalendarDatePicker
+						isOpen={isDatePickerOpen}
+						onClose={() => setIsDatePickerOpen(false)}
+						onDateSelect={(date) =>
+							dispatch({
+								type: CalendarRequestType.NavigateToDate,
+								date: date.toISOString(),
+							})
+						}
+						startDay={viewInfo.startDay}
+						daysInView={viewInfo.daysInView}
+					/>
+				</DateNavGroup>
+				<ShuffleButton
+					disabled={isScheduleActionLoading}
+					onLoadingChange={setIsScheduleActionLoading}
+				/>
+				<ReviseButton
+					disabled={isScheduleActionLoading}
+					onLoadingChange={setIsScheduleActionLoading}
+				/>
+				<ProcrastinateAllButton
+					disabled={isScheduleActionLoading}
+					onLoadingChange={setIsScheduleActionLoading}
+				/>
 				<CreateEventButton onClick={openCreateTile}>
 					<Plus size={16} />
 				</CreateEventButton>
-        {Env.isDevelopment() && (
-          <ThemeToggle onClick={toggleTheme}>
-            {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-          </ThemeToggle>
-        )}
-        <ProfileTrigger
-          ref={triggerRef}
-          onClick={() => setProfileSheetOpen(!profileSheetOpen)}
-        >
-          <ProfileContainer>
-            <User size={18} />
-          </ProfileContainer>
-          <ProfileSheet open={profileSheetOpen} ref={menuRef} user={authenticatedUser} />
-        </ProfileTrigger>
-      </HeaderRight>
-    </Header>
-  );
+				{Env.isDevelopment() && (
+					<ThemeToggle onClick={toggleTheme}>
+						{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
+					</ThemeToggle>
+				)}
+				<ProfileTrigger
+					ref={triggerRef}
+					onClick={() => setProfileSheetOpen(!profileSheetOpen)}
+				>
+					<ProfileContainer>
+						<User size={18} />
+					</ProfileContainer>
+					<ProfileSheet open={profileSheetOpen} ref={menuRef} user={authenticatedUser} />
+				</ProfileTrigger>
+			</HeaderRight>
+		</Header>
+	);
 };
 
 const CreateEventButton = styled.button`
@@ -192,7 +201,8 @@ const TodayButton = styled.button`
 	color: ${({ theme }) => theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.large} 0 0 ${({ theme }) => theme.borderRadius.large};
+	border-radius: ${({ theme }) => theme.borderRadius.large} 0 0
+		${({ theme }) => theme.borderRadius.large};
 	cursor: pointer;
 	white-space: nowrap;
 	transition: background-color 0.2s ease;
@@ -213,7 +223,8 @@ const DatePickerTrigger = styled.button`
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-left: none;
-	border-radius: 0 ${({ theme }) => theme.borderRadius.large} ${({ theme }) => theme.borderRadius.large} 0;
+	border-radius: 0 ${({ theme }) => theme.borderRadius.large}
+		${({ theme }) => theme.borderRadius.large} 0;
 	cursor: pointer;
 	transition: background-color 0.2s ease;
 

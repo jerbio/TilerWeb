@@ -17,7 +17,8 @@ const MicrophoneButton = styled.button<{ $isRecording: boolean }>`
 		$isRecording
 			? `linear-gradient(135deg, ${palette.colors.brand[500]}, ${palette.colors.brand[600]})`
 			: palette.colors.gray[800]};
-	color: ${({ $isRecording }) => ($isRecording ? palette.colors.white : palette.colors.gray[400])};
+	color: ${({ $isRecording }) =>
+		$isRecording ? palette.colors.white : palette.colors.gray[400]};
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -302,7 +303,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const [isTranscribing, setIsTranscribing] = useState(false);
-	
+
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const audioChunksRef = useRef<Blob[]>([]);
 	const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -323,7 +324,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 				mediaRecorderRef.current.stop();
 			}
 			if (mediaStreamRef.current) {
-				mediaStreamRef.current.getTracks().forEach(track => track.stop());
+				mediaStreamRef.current.getTracks().forEach((track) => track.stop());
 			}
 		};
 	}, []);
@@ -342,7 +343,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 			}
 			// Stop media stream tracks
 			if (mediaStreamRef.current) {
-				mediaStreamRef.current.getTracks().forEach(track => track.stop());
+				mediaStreamRef.current.getTracks().forEach((track) => track.stop());
 				mediaStreamRef.current = null;
 			}
 			setIsRecording(false);
@@ -353,33 +354,33 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 				mediaStreamRef.current = stream; // Store stream reference
 				audioChunksRef.current = []; // Reset chunks
-				
+
 				mediaRecorderRef.current = new MediaRecorder(stream);
-				
+
 				mediaRecorderRef.current.ondataavailable = (event) => {
 					if (event.data.size > 0) {
 						audioChunksRef.current.push(event.data);
 					}
 				};
-				
+
 				mediaRecorderRef.current.onstop = async () => {
 					// Create audio blob from chunks
 					const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-					
+
 					// Create URL for playback
 					const url = URL.createObjectURL(audioBlob);
 					setAudioURL(url);
-					
+
 					if (onAudioRecorded) {
 						onAudioRecorded(audioBlob);
 					}
-					
+
 					// Stop all tracks to release microphone
 					if (mediaStreamRef.current) {
-						mediaStreamRef.current.getTracks().forEach(track => track.stop());
+						mediaStreamRef.current.getTracks().forEach((track) => track.stop());
 						mediaStreamRef.current = null;
 					}
-					
+
 					if (onRecordingStop) {
 						onRecordingStop();
 					}
@@ -402,7 +403,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 						}
 					}
 				};
-				
+
 				mediaRecorderRef.current.onerror = (event) => {
 					console.error('MediaRecorder error:', event);
 					if (onError) {
@@ -410,9 +411,9 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 					}
 					setIsRecording(false);
 				};
-				
+
 				mediaRecorderRef.current.start();
-				
+
 				setIsRecording(true);
 				if (onRecordingStart) {
 					onRecordingStart();
@@ -501,7 +502,7 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 					<span>{listeningText}</span>
 				</RecordingIndicator>
 			)}
-			
+
 			{showIndicator && (
 				<TranscribingIndicator $isTranscribing={isTranscribing}>
 					<TranscribingDots>
@@ -512,33 +513,37 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
 					<span>{t('common.voiceInput.transcribing')}</span>
 				</TranscribingIndicator>
 			)}
-			
+
 			{/* Audio Playback Controls */}
 			{audioURL && (
 				<>
 					<audio ref={audioRef} src={audioURL} style={{ display: 'none' }} />
 					<AudioPlaybackContainer $visible={!isRecording && !isTranscribing}>
-						<PlaybackButton onClick={togglePlayback} $isPlaying={isPlaying} title={isPlaying ? pauseLabel : playLabel}>
+						<PlaybackButton
+							onClick={togglePlayback}
+							$isPlaying={isPlaying}
+							title={isPlaying ? pauseLabel : playLabel}
+						>
 							{isPlaying ? <Pause size={16} /> : <Play size={16} />}
 						</PlaybackButton>
-						
+
 						<AudioWaveform>
 							{[12, 18, 24, 18, 22, 16, 20, 14].map((height, i) => (
 								<WaveBar key={i} $height={height} $isPlaying={isPlaying} />
 							))}
 						</AudioWaveform>
-						
+
 						<AudioDuration>
 							{formatTime(currentTime)} / {formatTime(duration)}
 						</AudioDuration>
-						
+
 						<DeleteButton onClick={deleteRecording} title={deleteLabel}>
 							<X size={14} />
 						</DeleteButton>
 					</AudioPlaybackContainer>
 				</>
 			)}
-			
+
 			<MicrophoneButton
 				type="button"
 				$isRecording={isRecording}

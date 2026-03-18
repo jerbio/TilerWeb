@@ -26,7 +26,7 @@ const NavigationContainer = styled.div`
 	isolation: isolate;
 `;
 
-const NavigationWrapper = styled(a.nav) <{ $isopen: boolean; $shrink: boolean }>`
+const NavigationWrapper = styled(a.nav)<{ $isopen: boolean; $shrink: boolean }>`
 	display: grid;
 	place-items: center;
 	padding: 0 1.5rem;
@@ -40,17 +40,17 @@ const NavigationWrapper = styled(a.nav) <{ $isopen: boolean; $shrink: boolean }>
 	width: calc(100% - 64px);
 
 	border: ${(props) =>
-    props.$shrink && !props.$isopen
-      ? `1px solid ${palette.colors.gray[800]}`
-      : '1px solid transparent'};
+		props.$shrink && !props.$isopen
+			? `1px solid ${palette.colors.gray[800]}`
+			: '1px solid transparent'};
 	background-color: ${(props) =>
-    props.$shrink && !props.$isopen ? palette.colors.glass : 'transparent'};
+		props.$shrink && !props.$isopen ? palette.colors.glass : 'transparent'};
 	border-radius: ${(props) => (props.$shrink ? palette.borderRadius.xxLarge : 0)};
 	height: ${(props) => (props.$shrink ? '60px' : '80px')};
 	max-width: ${(props) => (props.$shrink ? '800px' : '100%')};
 
 	transition: ${(props) =>
-    `
+		`
 		background-color ${props.$shrink ? '0.5s' : '0s'} cubic-bezier(0.4, 0, 0.2, 1),
 		border ${props.$shrink ? '0.5s' : '0s'} cubic-bezier(0.4, 0, 0.2, 1),
 		height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
@@ -118,11 +118,11 @@ const MobileNav = styled.div<{ $isopen: boolean; $shrink: boolean }>`
 	backdrop-filter: blur(16px);
 	opacity: ${(props) => (props.$isopen ? 1 : 0)};
 	background-color: ${(props) =>
-    props.$shrink && props.$isopen ? palette.colors.glass : '#000000'};
+		props.$shrink && props.$isopen ? palette.colors.glass : '#000000'};
 	border: ${(props) =>
-    props.$shrink && props.$isopen
-      ? `1px solid ${palette.colors.gray[800]}`
-      : '0px solid transparent'};
+		props.$shrink && props.$isopen
+			? `1px solid ${palette.colors.gray[800]}`
+			: '0px solid transparent'};
 	border-radius: ${(props) => (props.$shrink ? `${palette.borderRadius.xxLarge}` : 0)};
 
 	position: absolute;
@@ -166,197 +166,204 @@ const MobileNavLinks = styled.div<{ $shrink: boolean }>`
 `;
 
 const Navigation: React.FC = () => {
-  const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAtTop, setIsAtTop] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const navLinks = [
-    { name: t('common.navigation.home'), href: '/' },
-    { name: t('common.navigation.features'), href: '/features' },
-  ];
+	const { t } = useTranslation();
+	const [isOpen, setIsOpen] = useState(false);
+	const [isAtTop, setIsAtTop] = useState(true);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const navLinks = [
+		{ name: t('common.navigation.home'), href: '/' },
+		{ name: t('common.navigation.features'), href: '/features' },
+	];
 
-  function handleScroll() {
-    if (window.scrollY === 0) {
-      setIsAtTop(true);
-    } else {
-      setIsAtTop(false);
-    }
-  }
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+	function handleScroll() {
+		if (window.scrollY === 0) {
+			setIsAtTop(true);
+		} else {
+			setIsAtTop(false);
+		}
+	}
+	useEffect(() => {
+		window.addEventListener('scroll', handleScroll);
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+		};
+	}, []);
 
-  function handleTryFreeClick() {
-    analytics.trackButtonClick('Try Free', 'Navigation', {
-      isModalOpen: isModalOpen,
-      isOnHomePage: window.location.pathname === '/',
-    });
+	function handleTryFreeClick() {
+		analytics.trackButtonClick('Try Free', 'Navigation', {
+			isModalOpen: isModalOpen,
+			isOnHomePage: window.location.pathname === '/',
+		});
 
-    setIsOpen(false); // Close mobile menu if open
-    
-    // Redirect to sign in page
-    window.location.href = '/signin';
-  }
+		setIsOpen(false); // Close mobile menu if open
 
-  function handleModalClose() {
-    analytics.trackEvent('Modal', 'Close', 'Custom Persona Modal', undefined, {
-      location: 'Navigation',
-    });
-    
-    setIsModalOpen(false);
-    
-    // Dispatch event to re-enable carousel
-    if (window.location.pathname === '/') {
-      window.dispatchEvent(new CustomEvent('customPersonaModalDismissed'));
-    }
-  }
+		// Redirect to sign in page
+		window.location.href = '/signin';
+	}
 
-  async function handleModalSubmit(description: string, audioFile?: Blob) {
-    // Keep modal open with spinner while API processes
-    // The modal's isSubmitting state will show the spinner
-    
-    analytics.trackEvent('Modal', 'Submit', 'Custom Persona Modal', undefined, {
-      hasAudio: !!audioFile,
-      descriptionLength: description.length,
-      location: 'Navigation',
-    });
-    
-    // If there's an audio file or description, send it to the backend
-    try {
-      const personaApi = new PersonaApi();
-      const response = await personaApi.createPersonaWithAudio(description, audioFile);
-      const finalDescription = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
-      const anonymousUser = response?.Content?.anonymousUserWithPersona?.anonymousUser;
-      
-      // Close modal after API completes successfully
-      setIsModalOpen(false);
-      
-      // Don't dispatch dismiss event on submit - persona will be selected/expanded
-      
-      // Navigate to home page with the persona
-      const params = new URLSearchParams();
-      params.set('customPersona', 'true');
-      params.set('description', finalDescription);
-      
-      if (window.location.pathname === '/') {
-        // Already on home page, dispatch event with complete persona data and user info
-        window.dispatchEvent(
-          new CustomEvent('createCustomPersona', { 
-            detail: { 
-              persona: {
-                id: 'custom-persona',
-                name: finalDescription,
-                description: finalDescription,
-              },
-              anonymousUser: anonymousUser,  // Include user data from API
-            } 
-          })
-        );
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        // Navigate to home page
-        window.location.href = `/?${params.toString()}`;
-      }
-    } catch (error) {
-      console.error('Error uploading audio:', error);
-      // Close modal on error too
-      setIsModalOpen(false);
-      // TODO: Show error message to user in toast
-    }
-  }
+	function handleModalClose() {
+		analytics.trackEvent('Modal', 'Close', 'Custom Persona Modal', undefined, {
+			location: 'Navigation',
+		});
 
-  return (
-    <NavigationContainerSticky>
-      <NavigationContainer>
-        <NavigationWrapper $isopen={isOpen} $shrink={!isAtTop}>
-          <NavigationItemsWrapper>
-            <Logo size={32} />
-            <NavItems>
-              {navLinks.map((link) => (
-                <NavItem key={link.name}>
-                  <NavLink 
-                    href={link.href}
-                    onClick={() => {
-                      analytics.trackNavigation(link.href, 'Desktop Navigation', {
-                        linkName: link.name,
-                      });
-                    }}
-                  >
-                    {link.name}
-                  </NavLink>
-                </NavItem>
-              ))}
-            </NavItems>
-            <ButtonsWrapper>
-              <Button
-                size="small"
-                onClick={handleTryFreeClick}
-                bordergradient={[palette.colors.brand[400]]}
-              >
-                {t('common.buttons.tryFree')}
-              </Button>
-            </ButtonsWrapper>
-            <MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? (
-                <X size={24} color={palette.colors.gray[300]} />
-              ) : (
-                <Menu size={24} color={palette.colors.gray[300]} />
-              )}
-            </MobileMenuToggle>
-          </NavigationItemsWrapper>
-        </NavigationWrapper>
-        <MobileNav $isopen={isOpen} $shrink={!isAtTop}>
-          <MobileNavLinks $shrink={!isAtTop}>
-            {navLinks.map((link) => (
-              <NavLink 
-                key={link.name} 
-                href={link.href}
-                onClick={() => {
-                  analytics.trackNavigation(link.href, 'Mobile Navigation', {
-                    linkName: link.name,
-                  });
-                  setIsOpen(false);
-                }}
-              >
-                {link.name}
-              </NavLink>
-            ))}
-          </MobileNavLinks>
-          <hr />
-          <Button
-            height={40}
-            onClick={handleTryFreeClick}
-            bordergradient={[palette.colors.brand[500]]}
-            size="small"
-          >
-            {t('common.buttons.tryFree')}
-          </Button>
-          <div style={{ height: '12px' }} />
-          <Button
-            height={40}
-            variant="secondary"
-            onClick={() => {
-              analytics.trackButtonClick('Sign Up', 'Mobile Navigation', {
-                destination: 'https://tiler.app/?waitlistSignUp=true',
-              });
-              window.open('https://tiler.app/?waitlistSignUp=true', '_blank');
-            }}
-            size="small"
-          >
-            {t('common.buttons.signUp')}
-          </Button>
-        </MobileNav>
-      </NavigationContainer>
-      <CustomPersonaModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSubmit={handleModalSubmit}
-      />
-    </NavigationContainerSticky>
-  );
+		setIsModalOpen(false);
+
+		// Dispatch event to re-enable carousel
+		if (window.location.pathname === '/') {
+			window.dispatchEvent(new CustomEvent('customPersonaModalDismissed'));
+		}
+	}
+
+	async function handleModalSubmit(description: string, audioFile?: Blob) {
+		// Keep modal open with spinner while API processes
+		// The modal's isSubmitting state will show the spinner
+
+		analytics.trackEvent('Modal', 'Submit', 'Custom Persona Modal', undefined, {
+			hasAudio: !!audioFile,
+			descriptionLength: description.length,
+			location: 'Navigation',
+		});
+
+		// If there's an audio file or description, send it to the backend
+		try {
+			const personaApi = new PersonaApi();
+			const response = await personaApi.createPersonaWithAudio(description, audioFile);
+			const finalDescription =
+				response?.Content?.anonymousUserWithPersona?.userDescription ||
+				description ||
+				'Custom';
+			const anonymousUser = response?.Content?.anonymousUserWithPersona?.anonymousUser;
+
+			// Close modal after API completes successfully
+			setIsModalOpen(false);
+
+			// Don't dispatch dismiss event on submit - persona will be selected/expanded
+
+			// Navigate to home page with the persona
+			const params = new URLSearchParams();
+			params.set('customPersona', 'true');
+			params.set('description', finalDescription);
+
+			if (window.location.pathname === '/') {
+				// Already on home page, dispatch event with complete persona data and user info
+				window.dispatchEvent(
+					new CustomEvent('createCustomPersona', {
+						detail: {
+							persona: {
+								id: 'custom-persona',
+								name: finalDescription,
+								description: finalDescription,
+							},
+							anonymousUser: anonymousUser, // Include user data from API
+						},
+					})
+				);
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+			} else {
+				// Navigate to home page
+				window.location.href = `/?${params.toString()}`;
+			}
+		} catch (error) {
+			console.error('Error uploading audio:', error);
+			// Close modal on error too
+			setIsModalOpen(false);
+			// TODO: Show error message to user in toast
+		}
+	}
+
+	return (
+		<NavigationContainerSticky>
+			<NavigationContainer>
+				<NavigationWrapper $isopen={isOpen} $shrink={!isAtTop}>
+					<NavigationItemsWrapper>
+						<Logo size={32} />
+						<NavItems>
+							{navLinks.map((link) => (
+								<NavItem key={link.name}>
+									<NavLink
+										href={link.href}
+										onClick={() => {
+											analytics.trackNavigation(
+												link.href,
+												'Desktop Navigation',
+												{
+													linkName: link.name,
+												}
+											);
+										}}
+									>
+										{link.name}
+									</NavLink>
+								</NavItem>
+							))}
+						</NavItems>
+						<ButtonsWrapper>
+							<Button
+								size="small"
+								onClick={handleTryFreeClick}
+								bordergradient={[palette.colors.brand[400]]}
+							>
+								{t('common.buttons.tryFree')}
+							</Button>
+						</ButtonsWrapper>
+						<MobileMenuToggle onClick={() => setIsOpen(!isOpen)}>
+							{isOpen ? (
+								<X size={24} color={palette.colors.gray[300]} />
+							) : (
+								<Menu size={24} color={palette.colors.gray[300]} />
+							)}
+						</MobileMenuToggle>
+					</NavigationItemsWrapper>
+				</NavigationWrapper>
+				<MobileNav $isopen={isOpen} $shrink={!isAtTop}>
+					<MobileNavLinks $shrink={!isAtTop}>
+						{navLinks.map((link) => (
+							<NavLink
+								key={link.name}
+								href={link.href}
+								onClick={() => {
+									analytics.trackNavigation(link.href, 'Mobile Navigation', {
+										linkName: link.name,
+									});
+									setIsOpen(false);
+								}}
+							>
+								{link.name}
+							</NavLink>
+						))}
+					</MobileNavLinks>
+					<hr />
+					<Button
+						height={40}
+						onClick={handleTryFreeClick}
+						bordergradient={[palette.colors.brand[500]]}
+						size="small"
+					>
+						{t('common.buttons.tryFree')}
+					</Button>
+					<div style={{ height: '12px' }} />
+					<Button
+						height={40}
+						variant="secondary"
+						onClick={() => {
+							analytics.trackButtonClick('Sign Up', 'Mobile Navigation', {
+								destination: 'https://tiler.app/?waitlistSignUp=true',
+							});
+							window.open('https://tiler.app/?waitlistSignUp=true', '_blank');
+						}}
+						size="small"
+					>
+						{t('common.buttons.signUp')}
+					</Button>
+				</MobileNav>
+			</NavigationContainer>
+			<CustomPersonaModal
+				isOpen={isModalOpen}
+				onClose={handleModalClose}
+				onSubmit={handleModalSubmit}
+			/>
+		</NavigationContainerSticky>
+	);
 };
 
 export default Navigation;

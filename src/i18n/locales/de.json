@@ -1,5 +1,5 @@
 {
-		"common": {
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "Überspringen",
@@ -576,6 +576,63 @@
 			"deleting": "Ereignis wird gelöscht...",
 			"deleteSuccess": "Ereignis gelöscht!",
 			"actionFailed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+		}
+	},
+	"settings": {
+		"title": "Einstellungen",
+		"back": "Zurück",
+		"logout": "Abmelden",
+		"breadcrumb": {
+			"home": "Startseite",
+			"settings": "Einstellungen"
+		},
+		"sections": {
+			"tilePreferences": {
+				"title": "Kachel-Einstellungen",
+				"description": "Definieren Sie, wie Sie sich fortbewegen, und helfen Sie Tiler, Ihre täglichen Zeitmuster zu verstehen",
+				"howMoveAround": "Wie bewegen Sie sich fort?",
+				"cycling": "Radfahren",
+				"driving": "Autofahren",
+				"transit": "ÖPNV",
+				"defineTimeRestrictions": "Definieren Sie Ihre Zeitbeschränkungen",
+				"myWorkHours": "Meine Arbeitszeiten",
+				"myPersonalHours": "Meine persönlichen Stunden",
+				"setBlockOutHours": "Blockzeiten festlegen",
+				"bedTime": "Schlafenszeit",
+				"startsAt": "Beginnt um",
+				"endsAt": "Endet um",
+				"saveChanges": "Änderungen speichern",
+				"saving": "Speichern...",
+				"saveSuccess": "Kachel-Einstellungen erfolgreich aktualisiert",
+				"saveError": "Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+				"bedTimeStartRequired": "Bitte wählen Sie eine Schlafenszeit-Startzeit",
+				"bedTimeEndRequired": "Bitte wählen Sie eine Schlafenszeit-Endzeit",
+				"scheduleIncompleteDay": "{{label}}: Bitte legen Sie Start- und Endzeiten für {{day}} fest",
+				"dayLabels": {
+					"sun": "S",
+					"mon": "M",
+					"tue": "D",
+					"wed": "M",
+					"thu": "D",
+					"fri": "F",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Sonntag",
+					"mon": "Montag",
+					"tue": "Dienstag",
+					"wed": "Mittwoch",
+					"thu": "Donnerstag",
+					"fri": "Freitag",
+					"sat": "Samstag"
+				},
+				"start": "Start",
+				"end": "Ende",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
+			}
 		}
 	}
 }

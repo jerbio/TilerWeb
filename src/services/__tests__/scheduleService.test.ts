@@ -4,7 +4,14 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { LocationApi } from '@/api/locationApi';
-import { CalendarEvent, CalendarEventUpdateParams, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import {
+	CalendarEvent,
+	CalendarEventUpdateParams,
+	ScheduleProcrastinateAllParams,
+	ScheduleReviseParams,
+	ScheduleShuffleParams,
+	ScheduleSubCalendarEvent,
+} from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -18,6 +25,7 @@ vi.mock('@/config/config_getter', () => ({
 describe('ScheduleService', () => {
 	let service: ScheduleService;
 	let scheduleApi: ScheduleApi;
+	let subCalendarEventApi: SubCalendarEventApi;
 	let calendarEventApi: CalendarEventApi;
 	let locationApi: LocationApi;
 
@@ -59,10 +67,15 @@ describe('ScheduleService', () => {
 
 	beforeEach(() => {
 		scheduleApi = new ScheduleApi();
-		const subCalendarEventApi = new SubCalendarEventApi();
+		subCalendarEventApi = new SubCalendarEventApi();
 		calendarEventApi = new CalendarEventApi();
 		locationApi = new LocationApi();
-		service = new ScheduleService(scheduleApi, subCalendarEventApi, calendarEventApi, locationApi);
+		service = new ScheduleService(
+			scheduleApi,
+			subCalendarEventApi,
+			calendarEventApi,
+			locationApi
+		);
 	});
 
 	describe('searchCalendarEventsByName', () => {
@@ -73,7 +86,11 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			const results = await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123');
+			const results = await service.searchCalendarEventsByName(
+				'work out',
+				'ashtondemo',
+				'user-id-123'
+			);
 
 			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
 				data: 'work out',
@@ -95,7 +112,10 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123', { batchSize: 10, index: 1 });
+			await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123', {
+				batchSize: 10,
+				index: 1,
+			});
 
 			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
 				data: 'work out',
@@ -113,18 +133,22 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			const results = await service.searchCalendarEventsByName('nonexistent', 'ashtondemo', 'user-id-123');
+			const results = await service.searchCalendarEventsByName(
+				'nonexistent',
+				'ashtondemo',
+				'user-id-123'
+			);
 
 			expect(results).toEqual([]);
 		});
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.searchByName).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
 			await expect(
-				service.searchCalendarEventsByName('drinks', 'ashtondemo', 'user-id-123'),
+				service.searchCalendarEventsByName('drinks', 'ashtondemo', 'user-id-123')
 			).rejects.toThrow();
 		});
 	});
@@ -145,13 +169,9 @@ describe('ScheduleService', () => {
 		});
 
 		it('throws normalized error on API failure', async () => {
-			vi.mocked(calendarEventApi.setAsNow).mockRejectedValueOnce(
-				new Error('Network error'),
-			);
+			vi.mocked(calendarEventApi.setAsNow).mockRejectedValueOnce(new Error('Network error'));
 
-			await expect(
-				service.setCalendarEventAsNow('bad-id'),
-			).rejects.toThrow();
+			await expect(service.setCalendarEventAsNow('bad-id')).rejects.toThrow();
 		});
 	});
 
@@ -172,12 +192,10 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.markAsComplete).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
-			await expect(
-				service.markCalendarEventComplete('bad-id'),
-			).rejects.toThrow();
+			await expect(service.markCalendarEventComplete('bad-id')).rejects.toThrow();
 		});
 	});
 
@@ -198,12 +216,10 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.deleteCalendarEvent).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
-			await expect(
-				service.deleteCalendarEvent('bad-id'),
-			).rejects.toThrow();
+			await expect(service.deleteCalendarEvent('bad-id')).rejects.toThrow();
 		});
 	});
 
@@ -234,13 +250,9 @@ describe('ScheduleService', () => {
 		});
 
 		it('throws normalized error on API failure', async () => {
-			vi.mocked(scheduleApi.shuffle).mockRejectedValueOnce(
-				new Error('Network error'),
-			);
+			vi.mocked(scheduleApi.shuffle).mockRejectedValueOnce(new Error('Network error'));
 
-			await expect(
-				service.shuffleSchedule(shuffleParams),
-			).rejects.toThrow();
+			await expect(service.shuffleSchedule(shuffleParams)).rejects.toThrow();
 		});
 	});
 
@@ -271,13 +283,9 @@ describe('ScheduleService', () => {
 		});
 
 		it('throws normalized error on API failure', async () => {
-			vi.mocked(scheduleApi.revise).mockRejectedValueOnce(
-				new Error('Network error'),
-			);
+			vi.mocked(scheduleApi.revise).mockRejectedValueOnce(new Error('Network error'));
 
-			await expect(
-				service.reviseSchedule(reviseParams),
-			).rejects.toThrow();
+			await expect(service.reviseSchedule(reviseParams)).rejects.toThrow();
 		});
 	});
 
@@ -309,11 +317,11 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(scheduleApi.procrastinateAll).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
 			await expect(
-				service.procrastinateAllSchedule(procrastinateAllParams),
+				service.procrastinateAllSchedule(procrastinateAllParams)
 			).rejects.toThrow();
 		});
 	});
@@ -344,12 +352,10 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.updateCalendarEvent).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
-			await expect(
-				service.updateCalendarEvent(updateParams),
-			).rejects.toThrow();
+			await expect(service.updateCalendarEvent(updateParams)).rejects.toThrow();
 		});
 	});
 
@@ -374,126 +380,261 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			await service.lookupCalendarEventById('evt-1', { batchSize: 5, 'index': 2 });
+			await service.lookupCalendarEventById('evt-1', { batchSize: 5, index: 2 });
 
-			expect(calendarEventApi.getCalendarEvent).toHaveBeenCalledWith('evt-1', { batchSize: 5, index: 2 });
+			expect(calendarEventApi.getCalendarEvent).toHaveBeenCalledWith('evt-1', {
+				batchSize: 5,
+				index: 2,
+			});
 		});
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.getCalendarEvent).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
+			);
+
+			await expect(service.lookupCalendarEventById('evt-1')).rejects.toThrow();
+		});
+	});
+
+	describe('updateSubCalendarEvent', () => {
+		const mockSubCalendarEvent = {
+			id: 'sub-event-123',
+			start: 1769925600000,
+			end: 1769929200000,
+			name: 'Test Event',
+			calendarEventEnd: 1770532200000,
+		} as unknown as ScheduleSubCalendarEvent;
+
+		it('calls updateSubCalendarEvent on subCalendarEventApi with start and end times', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const updates = { start: 1769930000000, end: 1769933600000 };
+			const result = await service.updateSubCalendarEvent('sub-event-123', updates);
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+			expect(result).toEqual(mockSubCalendarEvent);
+		});
+
+		it('calls updateSubCalendarEvent with only start time when end is not provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const updates = { start: 1769930000000 };
+			await service.updateSubCalendarEvent('sub-event-123', updates);
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: undefined,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('calls updateSubCalendarEvent with calendarEnd when provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const updates = {
+				start: 1769930000000,
+				end: 1769933600000,
+				calendarEnd: 1770600000000,
+			};
+			await service.updateSubCalendarEvent('sub-event-123', updates);
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: 1770600000000,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('includes timezone in the payload', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 });
+
+			const calledWith = vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mock
+				.calls[0][0];
+			expect(calledWith.TimeZone).toBeDefined();
+			expect(typeof calledWith.TimeZone).toBe('string');
+		});
+
+		it('includes CalendarEventName when name is provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', { name: 'Updated Event Name' });
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				CalendarEventName: 'Updated Event Name',
+				SubCalendarEventStart: undefined,
+				SubCalendarEventEnd: undefined,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('includes all fields when name, times, and deadline are provided together', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				name: 'Full Update',
+				start: 1769930000000,
+				end: 1769933600000,
+				calendarEnd: 1770600000000,
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				CalendarEventName: 'Full Update',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: 1770600000000,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
 			);
 
 			await expect(
-				service.lookupCalendarEventById('evt-1'),
+				service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 })
 			).rejects.toThrow();
 		});
 	});
 
-describe('lookupLocationById', () => {
-it('calls getLocation on locationApi and returns Content', async () => {
-const mockLocation = {
-id: '7147101b-b226-4bf0-95f5-b9a6959c4689',
-description: 'Office',
-address: '123 Main St',
-longitude: -73.9857,
-latitude: 40.7484,
-isVerified: true,
-isDefault: false,
-isNull: false,
-thirdPartyId: null,
-userId: 'user-123',
-source: 'none',
-nickname: 'My Office',
-};
+	describe('lookupLocationById', () => {
+		it('calls getLocation on locationApi and returns Content', async () => {
+			const mockLocation = {
+				id: '7147101b-b226-4bf0-95f5-b9a6959c4689',
+				description: 'Office',
+				address: '123 Main St',
+				longitude: -73.9857,
+				latitude: 40.7484,
+				isVerified: true,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: null,
+				userId: 'user-123',
+				source: 'none',
+				nickname: 'My Office',
+			};
 
-vi.mocked(locationApi.getLocation).mockResolvedValueOnce({
-Error: { Code: '0', Message: 'SUCCESS' },
-Content: mockLocation,
-ServerStatus: null,
-});
+			vi.mocked(locationApi.getLocation).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockLocation,
+				ServerStatus: null,
+			});
 
-const result = await service.lookupLocationById('7147101b-b226-4bf0-95f5-b9a6959c4689');
+			const result = await service.lookupLocationById('7147101b-b226-4bf0-95f5-b9a6959c4689');
 
-expect(locationApi.getLocation).toHaveBeenCalledWith('7147101b-b226-4bf0-95f5-b9a6959c4689');
-expect(result).toEqual(mockLocation);
-});
+			expect(locationApi.getLocation).toHaveBeenCalledWith(
+				'7147101b-b226-4bf0-95f5-b9a6959c4689'
+			);
+			expect(result).toEqual(mockLocation);
+		});
 
-it('throws normalized error on API failure', async () => {
-vi.mocked(locationApi.getLocation).mockRejectedValueOnce(
-new Error('Network error'),
-);
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(locationApi.getLocation).mockRejectedValueOnce(new Error('Network error'));
 
-await expect(
-service.lookupLocationById('bad-id'),
-).rejects.toThrow();
-});
-});
+			await expect(service.lookupLocationById('bad-id')).rejects.toThrow();
+		});
+	});
 
-describe('searchLocations', () => {
-const mockLocations = [
-{
-id: 'saved-1',
-description: 'Saved Place',
-address: 'My Office',
-longitude: 0,
-latitude: 0,
-isVerified: false,
-isDefault: false,
-isNull: false,
-thirdPartyId: '',
-userId: 'user-123',
-source: 'none',
-nickname: 'office',
-},
-{
-id: 'ChIJ123',
-description: 'Google Place',
-address: 'Google Place 123 Main St',
-longitude: -73.99,
-latitude: 40.75,
-isVerified: true,
-isDefault: false,
-isNull: false,
-thirdPartyId: 'ChIJ123',
-userId: null,
-source: 'google',
-nickname: 'google place',
-},
-];
+	describe('searchLocations', () => {
+		const mockLocations = [
+			{
+				id: 'saved-1',
+				description: 'Saved Place',
+				address: 'My Office',
+				longitude: 0,
+				latitude: 0,
+				isVerified: false,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: '',
+				userId: 'user-123',
+				source: 'none',
+				nickname: 'office',
+			},
+			{
+				id: 'ChIJ123',
+				description: 'Google Place',
+				address: 'Google Place 123 Main St',
+				longitude: -73.99,
+				latitude: 40.75,
+				isVerified: true,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: 'ChIJ123',
+				userId: null,
+				source: 'google',
+				nickname: 'google place',
+			},
+		];
 
-it('calls searchByName on locationApi and returns Content', async () => {
-vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
-Error: { Code: '0', Message: 'SUCCESS' },
-Content: mockLocations,
-ServerStatus: null,
-});
+		it('calls searchByName on locationApi and returns Content', async () => {
+			vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockLocations,
+				ServerStatus: null,
+			});
 
-const result = await service.searchLocations('office');
+			const result = await service.searchLocations('office');
 
-expect(locationApi.searchByName).toHaveBeenCalledWith('office');
-expect(result).toEqual(mockLocations);
-});
+			expect(locationApi.searchByName).toHaveBeenCalledWith('office');
+			expect(result).toEqual(mockLocations);
+		});
 
-it('returns empty array when no results', async () => {
-vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
-Error: { Code: '0', Message: 'SUCCESS' },
-Content: [],
-ServerStatus: null,
-});
+		it('returns empty array when no results', async () => {
+			vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: [],
+				ServerStatus: null,
+			});
 
-const result = await service.searchLocations('nonexistent');
-expect(result).toEqual([]);
-});
+			const result = await service.searchLocations('nonexistent');
+			expect(result).toEqual([]);
+		});
 
-it('throws normalized error on API failure', async () => {
-vi.mocked(locationApi.searchByName).mockRejectedValueOnce(
-new Error('Network error'),
-);
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(locationApi.searchByName).mockRejectedValueOnce(new Error('Network error'));
 
-await expect(
-service.searchLocations('fail'),
-).rejects.toThrow();
-});
-});
+			await expect(service.searchLocations('fail')).rejects.toThrow();
+		});
+	});
 });

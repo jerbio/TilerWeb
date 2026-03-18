@@ -81,7 +81,9 @@ describe('timeUtils', () => {
 			});
 
 			it('should handle seconds', () => {
-				expect(timeStringToMs('10:30:45')).toBe(10 * MS_PER_HOUR + 30 * MS_PER_MINUTE + 45 * 1000);
+				expect(timeStringToMs('10:30:45')).toBe(
+					10 * MS_PER_HOUR + 30 * MS_PER_MINUTE + 45 * 1000
+				);
 			});
 		});
 

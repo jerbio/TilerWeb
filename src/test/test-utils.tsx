@@ -19,7 +19,8 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>
 	render(ui, { wrapper: AllTheProviders, ...options });
 
 // Setup userEvent instance (preferred over fireEvent)
-export const setupUser = () => userEvent.setup();
+export const setupUser = (options?: Parameters<typeof userEvent.setup>[0]) =>
+	userEvent.setup(options);
 
 // Re-export everything from testing-library
 export * from '@testing-library/react';

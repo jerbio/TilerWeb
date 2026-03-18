@@ -21,37 +21,31 @@ const Form = styled.form`
 
 const Waitlist: React.FC = () => {
 	const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+	const [email, setEmail] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
 		navigate('/waitlist?email=' + encodeURIComponent(email));
 		return;
+	};
 
-  };
-
-  return (
-    <Section width={1024} paddingBlock={0}>
-      <Form onSubmit={handleSubmit}>
-        <Input
-          sized="large"
-          type="email"
-          placeholder="Your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <Button
-          type="submit"
-          size="large"
-          height={44}
-          variant="brand"
-        >
-          Join Waitlist
-        </Button>
-      </Form>
-    </Section>
-  );
+	return (
+		<Section width={1024} paddingBlock={0}>
+			<Form onSubmit={handleSubmit}>
+				<Input
+					sized="large"
+					type="email"
+					placeholder="Your email"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
+					required
+				/>
+				<Button type="submit" size="large" height={44} variant="brand">
+					Join Waitlist
+				</Button>
+			</Form>
+		</Section>
+	);
 };
 
 export default Waitlist;

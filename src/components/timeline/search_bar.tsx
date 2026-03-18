@@ -39,11 +39,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [actionLoading, setActionLoading] = useState<Record<string, string>>({});
-	const [confirmingAction, setConfirmingAction] = useState<{ eventId: string; action: 'complete' | 'delete' } | null>(null);
+	const [confirmingAction, setConfirmingAction] = useState<{
+		eventId: string;
+		action: 'complete' | 'delete';
+	} | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-	const openCreateTile = useCalendarUI(state => state.createTile.actions.open);
-	const openEditTile = useCalendarUI(state => state.editTile.actions.open);
+	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
+	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 
@@ -65,7 +68,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 					searchQuery,
 					authenticatedUser.username,
 					authenticatedUser.id,
-					{ batchSize: pageSize, index: 0 },
+					{ batchSize: pageSize, index: 0 }
 				);
 				setResults(searchResults);
 				setHasSearched(true);
@@ -85,7 +88,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				setIsLoading(false);
 			}
 		},
-		[authenticatedUser, onResults, pageSize],
+		[authenticatedUser, onResults, pageSize]
 	);
 
 	const loadMore = useCallback(async () => {
@@ -98,7 +101,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				query,
 				authenticatedUser.username,
 				authenticatedUser.id,
-				{ batchSize: pageSize, index: nextPage * pageSize },
+				{ batchSize: pageSize, index: nextPage * pageSize }
 			);
 			setResults((prev) => [...prev, ...moreResults]);
 			setCurrentPage(nextPage);
@@ -151,33 +154,40 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		setShowDropdown(false);
 	};
 
-	const handleSetAsNow = useCallback(async (eventId: string) => {
-		setActionLoading((prev) => ({ ...prev, [eventId]: 'now' }));
-		const notifId = notificationId(NotificationAction.SetAsNow, eventId);
-		showNotification(notifId, t('calendarEvent.notifications.settingAsNow'), 'loading');
-		// Dismiss search bar immediately — don't wait for the request
-		setQuery('');
-		setResults([]);
-		setHasSearched(false);
-		setShowDropdown(false);
-		setCurrentPage(0);
-		setHasMore(false);
-		onSearch?.('');
-		onResults?.([]);
-		try {
-			await scheduleService.setCalendarEventAsNow(eventId);
-			updateNotification(notifId, t('calendarEvent.notifications.setAsNowSuccess'), 'success');
-		} catch (error) {
-			console.error('Set as now failed:', error);
-			updateNotification(notifId, t('calendarEvent.notifications.actionFailed'), 'error');
-		} finally {
-			setActionLoading((prev) => {
-				const next = { ...prev };
-				delete next[eventId];
-				return next;
-			});
-		}
-	}, [showNotification, updateNotification, t, onSearch, onResults]);
+	const handleSetAsNow = useCallback(
+		async (eventId: string) => {
+			setActionLoading((prev) => ({ ...prev, [eventId]: 'now' }));
+			const notifId = notificationId(NotificationAction.SetAsNow, eventId);
+			showNotification(notifId, t('calendarEvent.notifications.settingAsNow'), 'loading');
+			// Dismiss search bar immediately — don't wait for the request
+			setQuery('');
+			setResults([]);
+			setHasSearched(false);
+			setShowDropdown(false);
+			setCurrentPage(0);
+			setHasMore(false);
+			onSearch?.('');
+			onResults?.([]);
+			try {
+				await scheduleService.setCalendarEventAsNow(eventId);
+				updateNotification(
+					notifId,
+					t('calendarEvent.notifications.setAsNowSuccess'),
+					'success'
+				);
+			} catch (error) {
+				console.error('Set as now failed:', error);
+				updateNotification(notifId, t('calendarEvent.notifications.actionFailed'), 'error');
+			} finally {
+				setActionLoading((prev) => {
+					const next = { ...prev };
+					delete next[eventId];
+					return next;
+				});
+			}
+		},
+		[showNotification, updateNotification, t, onSearch, onResults]
+	);
 
 	const handleMarkComplete = useCallback((eventId: string) => {
 		setConfirmingAction({ eventId, action: 'complete' });
@@ -192,14 +202,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		const { eventId, action } = confirmingAction;
 		setConfirmingAction(null);
 		setActionLoading((prev) => ({ ...prev, [eventId]: action }));
-		const notifAction = action === 'complete' ? NotificationAction.Complete : NotificationAction.Delete;
+		const notifAction =
+			action === 'complete' ? NotificationAction.Complete : NotificationAction.Delete;
 		const notifId = notificationId(notifAction, eventId);
-		const loadingMsg = action === 'complete'
-			? t('calendarEvent.notifications.completing')
-			: t('calendarEvent.notifications.deleting');
-		const successMsg = action === 'complete'
-			? t('calendarEvent.notifications.completeSuccess')
-			: t('calendarEvent.notifications.deleteSuccess');
+		const loadingMsg =
+			action === 'complete'
+				? t('calendarEvent.notifications.completing')
+				: t('calendarEvent.notifications.deleting');
+		const successMsg =
+			action === 'complete'
+				? t('calendarEvent.notifications.completeSuccess')
+				: t('calendarEvent.notifications.deleteSuccess');
 		showNotification(notifId, loadingMsg, 'loading');
 		// Dismiss search bar immediately — don't wait for the request
 		setQuery('');
@@ -279,7 +292,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			{showResults && (
 				<ResultsDropdown data-testid="search-results-dropdown">
 					{results.map((event) => {
-						const rgb = { r: event.colorRed ?? 0, g: event.colorGreen ?? 0, b: event.colorBlue ?? 0 };
+						const rgb = {
+							r: event.colorRed ?? 0,
+							g: event.colorGreen ?? 0,
+							b: event.colorBlue ?? 0,
+						};
 						const adjusted = isDarkMode ? colorUtil.setLightness(rgb, 0.6) : rgb;
 						const eventId = event.id ?? '';
 						const itemAction = actionLoading[eventId];
@@ -304,7 +321,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 										</ConfirmText>
 										<ConfirmButton
 											data-testid="confirm-yes"
-											onClick={(e) => { e.stopPropagation(); handleConfirmAction(); }}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleConfirmAction();
+											}}
 											$danger={confirmingAction.action === 'delete'}
 											$success={confirmingAction.action === 'complete'}
 										>
@@ -312,7 +332,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 										</ConfirmButton>
 										<ConfirmButton
 											data-testid="confirm-cancel"
-											onClick={(e) => { e.stopPropagation(); handleCancelConfirm(); }}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleCancelConfirm();
+											}}
 										>
 											{t('timeline.cancelAction')}
 										</ConfirmButton>
@@ -322,7 +345,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 										<ActionButton
 											data-testid="action-edit"
 											title={t('timeline.editEvent')}
-											onClick={(e) => { e.stopPropagation(); openEditTile(event); setShowDropdown(false); }}
+											onClick={(e) => {
+												e.stopPropagation();
+												openEditTile(event);
+												setShowDropdown(false);
+											}}
 											disabled={isInteractionBlocked}
 										>
 											<Pencil size={12} />
@@ -330,27 +357,48 @@ const SearchBar: React.FC<SearchBarProps> = ({
 										<ActionButton
 											data-testid="action-set-as-now"
 											title={t('timeline.setAsNow')}
-											onClick={(e) => { e.stopPropagation(); handleSetAsNow(eventId); }}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleSetAsNow(eventId);
+											}}
 											disabled={isInteractionBlocked}
 										>
-											{itemAction === 'now' ? <ActionSpinner /> : <Play size={12} />}
+											{itemAction === 'now' ? (
+												<ActionSpinner />
+											) : (
+												<Play size={12} />
+											)}
 										</ActionButton>
 										<ActionButton
 											data-testid="action-mark-complete"
 											title={t('timeline.markComplete')}
-											onClick={(e) => { e.stopPropagation(); handleMarkComplete(eventId); }}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleMarkComplete(eventId);
+											}}
 											disabled={isInteractionBlocked}
 										>
-											{itemAction === 'complete' ? <ActionSpinner /> : <Check size={12} />}
+											{itemAction === 'complete' ? (
+												<ActionSpinner />
+											) : (
+												<Check size={12} />
+											)}
 										</ActionButton>
 										<ActionButton
 											data-testid="action-delete"
 											title={t('timeline.markDeleted')}
-											onClick={(e) => { e.stopPropagation(); handleDelete(eventId); }}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleDelete(eventId);
+											}}
 											disabled={isInteractionBlocked}
 											$danger
 										>
-											{itemAction === 'delete' ? <ActionSpinner /> : <Trash2 size={12} />}
+											{itemAction === 'delete' ? (
+												<ActionSpinner />
+											) : (
+												<Trash2 size={12} />
+											)}
 										</ActionButton>
 									</ResultActions>
 								)}
@@ -374,12 +422,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
 					<NotFoundIcon>
 						<HelpCircle size={24} />
 					</NotFoundIcon>
-					<NotFoundText>
-						{t('timeline.notFoundMessage', { query })}
-					</NotFoundText>
+					<NotFoundText>{t('timeline.notFoundMessage', { query })}</NotFoundText>
 					<NotFoundActions>
-						<DismissButton onClick={handleDismissNotFound}>{t('timeline.notFoundDismiss')}</DismissButton>
-						<CreateButton onClick={handleCreate}>{t('timeline.notFoundCreate')}</CreateButton>
+						<DismissButton onClick={handleDismissNotFound}>
+							{t('timeline.notFoundDismiss')}
+						</DismissButton>
+						<CreateButton onClick={handleCreate}>
+							{t('timeline.notFoundCreate')}
+						</CreateButton>
 					</NotFoundActions>
 				</NotFoundPrompt>
 			)}
@@ -537,13 +587,14 @@ const ActionButton = styled.button<{ $danger?: boolean }>`
 	color: ${({ theme, $danger }) => ($danger ? theme.colors.text.muted : theme.colors.text.muted)};
 	cursor: pointer;
 	padding: 0;
-	transition: background 0.1s ease, color 0.1s ease;
+	transition:
+		background 0.1s ease,
+		color 0.1s ease;
 
 	&:hover:not(:disabled) {
 		background: ${({ theme, $danger }) =>
 			$danger ? 'rgba(220, 38, 38, 0.1)' : theme.colors.background.card2};
-		color: ${({ $danger, theme }) =>
-			$danger ? '#dc2626' : theme.colors.text.primary};
+		color: ${({ $danger, theme }) => ($danger ? '#dc2626' : theme.colors.text.primary)};
 	}
 
 	&:disabled {
@@ -582,19 +633,18 @@ const ConfirmText = styled.span`
 
 const ConfirmButton = styled.button<{ $danger?: boolean; $success?: boolean }>`
 	padding: 2px 8px;
-	border: 1px solid ${({ theme, $danger, $success }) =>
-		$danger ? 'rgba(220, 38, 38, 0.4)'
-		: $success ? 'rgba(18, 183, 106, 0.4)'
-		: theme.colors.border.default};
+	border: 1px solid
+		${({ theme, $danger, $success }) =>
+			$danger
+				? 'rgba(220, 38, 38, 0.4)'
+				: $success
+					? 'rgba(18, 183, 106, 0.4)'
+					: theme.colors.border.default};
 	border-radius: 4px;
 	background: ${({ $danger, $success }) =>
-		$danger ? 'rgba(220, 38, 38, 0.1)'
-		: $success ? 'rgba(18, 183, 106, 0.1)'
-		: 'transparent'};
+		$danger ? 'rgba(220, 38, 38, 0.1)' : $success ? 'rgba(18, 183, 106, 0.1)' : 'transparent'};
 	color: ${({ theme, $danger, $success }) =>
-		$danger ? '#dc2626'
-		: $success ? '#12b76a'
-		: theme.colors.text.secondary};
+		$danger ? '#dc2626' : $success ? '#12b76a' : theme.colors.text.secondary};
 	font-size: 11px;
 	cursor: pointer;
 	white-space: nowrap;
@@ -602,9 +652,11 @@ const ConfirmButton = styled.button<{ $danger?: boolean; $success?: boolean }>`
 
 	&:hover {
 		background: ${({ theme, $danger, $success }) =>
-			$danger ? 'rgba(220, 38, 38, 0.2)'
-			: $success ? 'rgba(18, 183, 106, 0.2)'
-			: theme.colors.background.card2};
+			$danger
+				? 'rgba(220, 38, 38, 0.2)'
+				: $success
+					? 'rgba(18, 183, 106, 0.2)'
+					: theme.colors.background.card2};
 	}
 `;
 

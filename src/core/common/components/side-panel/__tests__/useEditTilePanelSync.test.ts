@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useEditTilePanelSync } from '../useEditTilePanelSync';
 import { CalendarEvent } from '@/core/common/types/schedule';
+import { SidePanelEntry } from '../side_panel_types';
 
 const mockEvent: CalendarEvent = {
 	id: 'evt-1',
@@ -40,18 +41,18 @@ const mockEvent: CalendarEvent = {
 };
 
 describe('useEditTilePanelSync', () => {
-	let pushPanel: ReturnType<typeof vi.fn>;
-	let popPanel: ReturnType<typeof vi.fn>;
-	let closeEditTile: ReturnType<typeof vi.fn>;
-	let setSidePanelExpanded: ReturnType<typeof vi.fn>;
-	let setMobileChatVisible: ReturnType<typeof vi.fn>;
+	let pushPanel: ReturnType<typeof vi.fn<(entry: SidePanelEntry) => void>>;
+	let popPanel: ReturnType<typeof vi.fn<() => void>>;
+	let closeEditTile: ReturnType<typeof vi.fn<() => void>>;
+	let setSidePanelExpanded: ReturnType<typeof vi.fn<(expanded: boolean) => void>>;
+	let setMobileChatVisible: ReturnType<typeof vi.fn<(visible: boolean) => void>>;
 
 	beforeEach(() => {
-		pushPanel = vi.fn();
-		popPanel = vi.fn();
-		closeEditTile = vi.fn();
-		setSidePanelExpanded = vi.fn();
-		setMobileChatVisible = vi.fn();
+		pushPanel = vi.fn<(entry: SidePanelEntry) => void>();
+		popPanel = vi.fn<() => void>();
+		closeEditTile = vi.fn<() => void>();
+		setSidePanelExpanded = vi.fn<(expanded: boolean) => void>();
+		setMobileChatVisible = vi.fn<(visible: boolean) => void>();
 	});
 
 	it('pushes panel when editTile opens', () => {
@@ -64,7 +65,7 @@ describe('useEditTilePanelSync', () => {
 				closeEditTile,
 				setSidePanelExpanded,
 				setMobileChatVisible,
-			}),
+			})
 		);
 
 		expect(pushPanel).toHaveBeenCalledOnce();
@@ -80,7 +81,7 @@ describe('useEditTilePanelSync', () => {
 				closeEditTile,
 				setSidePanelExpanded,
 				setMobileChatVisible,
-			}),
+			})
 		);
 
 		expect(pushPanel).not.toHaveBeenCalled();
@@ -96,7 +97,7 @@ describe('useEditTilePanelSync', () => {
 				closeEditTile,
 				setSidePanelExpanded,
 				setMobileChatVisible,
-			}),
+			})
 		);
 
 		expect(setSidePanelExpanded).toHaveBeenCalledWith(false);
@@ -112,7 +113,7 @@ describe('useEditTilePanelSync', () => {
 				closeEditTile,
 				setSidePanelExpanded,
 				setMobileChatVisible,
-			}),
+			})
 		);
 
 		expect(setSidePanelExpanded).not.toHaveBeenCalled();
@@ -130,7 +131,7 @@ describe('useEditTilePanelSync', () => {
 					setSidePanelExpanded,
 					setMobileChatVisible,
 				}),
-			{ initialProps: { isOpen: true, event: mockEvent as CalendarEvent | null } },
+			{ initialProps: { isOpen: true, event: mockEvent as CalendarEvent | null } }
 		);
 
 		expect(pushPanel).toHaveBeenCalledOnce();
@@ -152,7 +153,7 @@ describe('useEditTilePanelSync', () => {
 				closeEditTile,
 				setSidePanelExpanded,
 				setMobileChatVisible,
-			}),
+			})
 		);
 
 		expect(popPanel).not.toHaveBeenCalled();
@@ -168,7 +169,7 @@ describe('useEditTilePanelSync', () => {
 				closeEditTile,
 				setSidePanelExpanded,
 				setMobileChatVisible,
-			}),
+			})
 		);
 
 		// The push call should have passed an entry whose onClose we can extract

@@ -28,110 +28,110 @@ import NotificationToast from './core/ui/NotificationToast';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
-  const location = useLocation();
+	const location = useLocation();
 
-  useEffect(() => {
-    // Track page view on route change
-    const pageName = location.pathname === '/' ? 'Home' : location.pathname.slice(1);
-    analytics.trackPageView(pageName, {
-      path: location.pathname,
-      search: location.search,
-      referrer: document.referrer,
-    });
-  }, [location]);
+	useEffect(() => {
+		// Track page view on route change
+		const pageName = location.pathname === '/' ? 'Home' : location.pathname.slice(1);
+		analytics.trackPageView(pageName, {
+			path: location.pathname,
+			search: location.search,
+			referrer: document.referrer,
+		});
+	}, [location]);
 
-  return null;
+	return null;
 };
 
 const App: React.FC = () => {
-  // Dev tools for testing
-  const { isOverlayVisible, closeOverlay } = useDevTools();
+	// Dev tools for testing
+	const { isOverlayVisible, closeOverlay } = useDevTools();
 
-  // Track app initialization
-  useEffect(() => {
-    analytics.trackEvent('App', 'Initialized', undefined, undefined, {
-      userAgent: navigator.userAgent,
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
-    });
-  }, []);
+	// Track app initialization
+	useEffect(() => {
+		analytics.trackEvent('App', 'Initialized', undefined, undefined, {
+			userAgent: navigator.userAgent,
+			screenWidth: window.innerWidth,
+			screenHeight: window.innerHeight,
+		});
+	}, []);
 
-  return (
-    <ThemeProvider defaultTheme='dark'>
-      <HelmetProvider>
-        <ConsentProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <AnalyticsTracker />
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="/features" element={<Features />} />
-                </Route>
-                <Route
-                  path="/waitlist"
-                  element={
-                    <>
-                      <Waitlist />
-                      <FooterSection />
-                    </>
-                  }
-                />
+	return (
+		<ThemeProvider defaultTheme="dark">
+			<HelmetProvider>
+				<ConsentProvider>
+					<AuthProvider>
+						<BrowserRouter>
+							<AnalyticsTracker />
+							<Routes>
+								<Route path="/" element={<Layout />}>
+									<Route index element={<Home />} />
+									<Route path="/features" element={<Features />} />
+								</Route>
+								<Route
+									path="/waitlist"
+									element={
+										<>
+											<Waitlist />
+											<FooterSection />
+										</>
+									}
+								/>
 
-                {/* Public Routes - redirect to /timeline if already authenticated */}
-                <Route element={<PublicRoute />}>
-                  <Route
-                    path="/signup"
-                    element={
-                      <>
-                        <UserAuthentication />
-                        <FooterSection />
-                      </>
-                    }
-                  />
-                  <Route
-                    path="/signin"
-                    element={
-                      <>
-                        <UserAuthentication />
-                        <FooterSection />
-                      </>
-                    }
-                  />
-                </Route>
+								{/* Public Routes - redirect to /timeline if already authenticated */}
+								<Route element={<PublicRoute />}>
+									<Route
+										path="/signup"
+										element={
+											<>
+												<UserAuthentication />
+												<FooterSection />
+											</>
+										}
+									/>
+									<Route
+										path="/signin"
+										element={
+											<>
+												<UserAuthentication />
+												<FooterSection />
+											</>
+										}
+									/>
+								</Route>
 
-                {/* Protected Routes - redirect to /signin if not authenticated */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/timeline" element={<Timeline />} />
-                  <Route path="/settings" element={<SettingsLayout />}>
-                    <Route
-                      index
-                      element={<Navigate to="/settings" replace />}
-                    />
-                    <Route path="account" element={<AccountSettings />} />
-                    <Route
-                      path="preferences"
-                      element={<PreferencesSettings />}
-                    />
-                    <Route
-                      path="notifications"
-                      element={<NotificationPreferencesSettings />}
-                    />
-                  </Route>
-                </Route>
-              </Routes>
-              <Toaster position="bottom-left" theme="system" />
-              <NotificationToast />
-            </BrowserRouter>
-          </AuthProvider>
+								{/* Protected Routes - redirect to /signin if not authenticated */}
+								<Route element={<ProtectedRoute />}>
+									<Route path="/timeline" element={<Timeline />} />
+									<Route path="/settings" element={<SettingsLayout />}>
+										<Route
+											index
+											element={<Navigate to="/settings" replace />}
+										/>
+										<Route path="account" element={<AccountSettings />} />
+										<Route
+											path="preferences"
+											element={<PreferencesSettings />}
+										/>
+										<Route
+											path="notifications"
+											element={<NotificationPreferencesSettings />}
+										/>
+									</Route>
+								</Route>
+							</Routes>
+							<Toaster position="bottom-left" theme="system" />
+							<NotificationToast />
+						</BrowserRouter>
+					</AuthProvider>
 
-          {/* Dev tools - only rendered in development mode */}
-          <DevUserIdOverlay isVisible={isOverlayVisible} onClose={closeOverlay} />
-          <DevModeBadge />
-        </ConsentProvider>
-      </HelmetProvider>
-    </ThemeProvider>
-  );
+					{/* Dev tools - only rendered in development mode */}
+					<DevUserIdOverlay isVisible={isOverlayVisible} onClose={closeOverlay} />
+					<DevModeBadge />
+				</ConsentProvider>
+			</HelmetProvider>
+		</ThemeProvider>
+	);
 };
 
 export default App;

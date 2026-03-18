@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarEventApi } from '../calendarEventApi';
-import { CalendarEvent, CalendarEventResponse, CalendarEventSearchResponse, CalendarEventUpdateParams } from '@/core/common/types/schedule';
+import {
+	CalendarEvent,
+	CalendarEventResponse,
+	CalendarEventSearchResponse,
+	CalendarEventUpdateParams,
+} from '@/core/common/types/schedule';
 
 // Mock config to provide a base URL
 vi.mock('@/config/config_getter', () => ({
@@ -43,7 +48,9 @@ describe('CalendarEventApi', () => {
 				isReadOnly: false,
 				isProcrastinateEvent: false,
 				isRigid: false,
-				uiConfig: { id: '9dc0da1f-f7f9-42db-aefd-f491352d0c64' } as CalendarEvent['uiConfig'],
+				uiConfig: {
+					id: '9dc0da1f-f7f9-42db-aefd-f491352d0c64',
+				} as CalendarEvent['uiConfig'],
 				repetition: null,
 				eachTileDuration: 5400000,
 				restrictionProfile: null,
@@ -68,7 +75,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockSearchResults), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.searchByName({
@@ -93,7 +100,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockSearchResults), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.searchByName({
@@ -111,7 +118,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockSearchResults), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.searchByName({
@@ -134,7 +141,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockSearchResults), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.searchByName({
@@ -155,7 +162,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(
@@ -163,7 +170,7 @@ describe('CalendarEventApi', () => {
 					data: 'bad-query',
 					userName: 'ashtondemo',
 					userId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d',
-				}),
+				})
 			).rejects.toThrow();
 		});
 	});
@@ -180,16 +187,17 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.setAsNow('event-id-123');
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			expect(request.url).toContain('api/CalendarEvent/Now');
 			expect(request.method).toBe('POST');
@@ -202,7 +210,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.setAsNow('event-id-123');
@@ -215,7 +223,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(api.setAsNow('bad-id')).rejects.toThrow();
@@ -234,16 +242,17 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.markAsComplete('event-id-456');
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			expect(request.url).toContain('api/CalendarEvent/Complete');
 			expect(request.method).toBe('POST');
@@ -256,7 +265,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.markAsComplete('event-id-456');
@@ -269,7 +278,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(api.markAsComplete('bad-id')).rejects.toThrow();
@@ -288,16 +297,17 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.deleteCalendarEvent('event-id-789');
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			expect(request.url).toContain('api/CalendarEvent');
 			expect(request.url).not.toContain('api/CalendarEvent/');
@@ -311,7 +321,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.deleteCalendarEvent('event-id-789');
@@ -324,7 +334,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(api.deleteCalendarEvent('bad-id')).rejects.toThrow();
@@ -361,16 +371,17 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.updateCalendarEvent(updateParams);
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			expect(request.url).toContain('api/CalendarEvent/Update');
 			expect(request.method).toBe('POST');
@@ -383,7 +394,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.updateCalendarEvent(updateParams);
@@ -396,7 +407,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(api.updateCalendarEvent(updateParams)).rejects.toThrow();
@@ -415,7 +426,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.getCalendarEvent('event-id-123');
@@ -434,7 +445,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.getCalendarEvent('event-id-123', { batchSize: 5, index: 2 });
@@ -451,7 +462,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.getCalendarEvent('event-id-123');
@@ -464,7 +475,7 @@ describe('CalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(api.getCalendarEvent('bad-id')).rejects.toThrow();
