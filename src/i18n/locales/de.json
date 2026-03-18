@@ -1,5 +1,5 @@
 {
-		"common": {
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "Überspringen",
@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "Startseite",
-			"features": "Funktionen",
-			"waitlist": "Warteliste"
+			"waitlist": "Warteliste",
+			"discover": "Funktionen"
 		},
 		"voiceInput": {
 			"listening": "Hören...",
@@ -495,16 +495,46 @@
 					"label": "Welche Integrationen verwenden Sie?",
 					"placeholder": "z.B. Google Kalender, Outlook, Apple Kalender",
 					"options": [
-						{ "value": "google", "label": "Google Kalender" },
-						{ "value": "outlook", "label": "Microsoft Outlook Kalender" },
-						{ "value": "apple", "label": "Apple Kalender" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google Kalender"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook Kalender"
+						},
+						{
+							"value": "apple",
+							"label": "Apple Kalender"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {

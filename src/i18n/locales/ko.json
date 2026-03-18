@@ -1,5 +1,5 @@
 {
-		"common": {
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "건너뛰기",
@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "홈",
-			"features": "기능",
-			"waitlist": "대기자 명단"
+			"waitlist": "대기자 명단",
+			"discover": "기능"
 		},
 		"voiceInput": {
 			"listening": "듣는 중...",
@@ -495,16 +495,46 @@
 					"label": "어떤 통합을 사용하시나요?",
 					"placeholder": "예: Google 캘린더, Outlook, Apple 캘린더",
 					"options": [
-						{ "value": "google", "label": "Google 캘린더" },
-						{ "value": "outlook", "label": "Microsoft Outlook 캘린더" },
-						{ "value": "apple", "label": "Apple 캘린더" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google 캘린더"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook 캘린더"
+						},
+						{
+							"value": "apple",
+							"label": "Apple 캘린더"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {

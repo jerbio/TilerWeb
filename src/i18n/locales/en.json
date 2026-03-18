@@ -972,5 +972,16 @@
 			"deleteSuccess": "Event deleted!",
 			"actionFailed": "Action failed. Please try again."
 		}
+	},
+	"discover": {
+		"seo": {
+			"title": "Discover - Tiler",
+			"description": "Explore the moments where your day finally makes sense. Find your way around the Tiler app and discover things to try in-app."
+		},
+		"hero": {
+			"badge": "Navigate Tiler",
+			"title": "Here\u2019s Where Everything Lives",
+			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
+		}
 	}
 }
