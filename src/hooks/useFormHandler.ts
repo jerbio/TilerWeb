@@ -20,7 +20,7 @@ export default function useFormHandler<T extends { [field: string]: unknown }>(f
         }
 
         if (options?.restriction === 'integer') {
-          eventData = Math.max(0, parseInt(eventData, 10));
+          eventData = Math.max(0, parseInt(eventData || '0', 10));
         }
 
         setFormData((prev) => ({

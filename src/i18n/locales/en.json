@@ -270,7 +270,8 @@
 			},
 			"summary": {
 				"title": "Summary",
-				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>",
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
+				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
           "daily": "day",
           "weekly": "week",

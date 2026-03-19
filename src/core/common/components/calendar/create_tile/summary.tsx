@@ -50,6 +50,24 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
             }),
           }}
         />
+        {!formData.isRecurring && (
+          <Trans
+            components={{ b: <b /> }}
+            i18nKey="calendar.createTile.summary.range"
+            values={{
+              start: dayjs(formData.start).toDate().toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+              end: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+            }}
+          />
+        )}
         {formData.isRecurring && (
           <>
             <Trans

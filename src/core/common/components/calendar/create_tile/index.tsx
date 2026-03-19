@@ -33,6 +33,7 @@ import { useCalendarUI } from '../calendar-ui.provider';
 import CreateTileSummary from './summary';
 import CreateTileOptions from './options';
 import CreateTileInfoInline from './info_inline';
+import CreateTileInfo from './info';
 
 dayjs.extend(advancedFormat);
 
@@ -98,14 +99,23 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         DurationDays: '0',
         DurationHours: formData.durationHours.toString(),
         DurationMinute: formData.durationMins.toString(),
-        EndYear: dayjs(formData.deadline).format('YYYY'),
-        EndMonth: dayjs(formData.deadline).format('MM'),
-        EndDay: dayjs(formData.deadline).format('DD'),
-        EndHour: '23',
-        EndMinute: '59',
         isRestricted: 'false',
         MobileApp: true,
       };
+
+			// Time Ranges
+			if (!formData.isRecurring) {
+        event.StartYear = dayjs(formData.start).format('YYYY');
+        event.StartMonth = dayjs(formData.start).format('MM');
+        event.StartDay = dayjs(formData.start).format('DD');
+        event.StartHour = dayjs(formData.start).format('00');
+        event.StartMinute = dayjs(formData.start).format('00');
+        event.EndYear = dayjs(formData.deadline).format('YYYY');
+        event.EndMonth = dayjs(formData.deadline).format('MM');
+        event.EndDay = dayjs(formData.deadline).format('DD');
+        event.EndHour = dayjs(formData.deadline).format('23');
+        event.EndMinute = dayjs(formData.deadline).format('59');
+			}
 
       // Repetition
       if (formData.isRecurring) {
@@ -201,7 +211,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
       }}
       $isexpanded={ui.state.isExpanded}
     >
-      <button style={{ display: 'none' }} data-testid="open-create-tile" type="button" onClick={ui.actions.open} />
+      <button
+        style={{ display: 'none' }}
+        data-testid="open-create-tile"
+        type="button"
+        onClick={ui.actions.open}
+      />
       <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
         <p>
           {t('calendar.createTile.message.pending', {
@@ -240,15 +255,17 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         </button>
       </header>
 
-      {/* Tile Info (Inline) */}
-      <Section $isexpanded={ui.state.isExpanded}>
-				<CreateTileInfoInline formHandler={formHandler} />
-      </Section>
-
-			{/* Tile Info (Classic) */}
-			<Section $isexpanded={ui.state.isExpanded}>
-				{/* Classic UI Goes here */}
-			</Section>
+      {ui.state.isExpanded ? (
+				/* Tile Info (Classic) */
+        <Section $isexpanded={ui.state.isExpanded}>
+          <CreateTileInfo formHandler={formHandler} />
+        </Section>
+      ) : (
+				/* Tile Info (Inline) */
+        <Section $isexpanded={ui.state.isExpanded}>
+          <CreateTileInfoInline formHandler={formHandler} />
+        </Section>
+      )}
 
       <Seperator />
       <TipContainer>

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
+import { Asterisk } from 'lucide-react';
 
 type InputProps = {
   label?: React.ReactNode;
@@ -31,6 +32,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
   disabled = false,
   variant = 'default',
   sized = 'medium',
+  required,
   height,
   bordergradient,
   label,
@@ -85,7 +87,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
   return label ? (
     <div>
       <StyledLabel htmlFor={id} {...styledProps}>
-        {label}
+        {label} {required && <StyledLabelRequired><Asterisk size={12} /></StyledLabelRequired>}
       </StyledLabel>
       {styledInput}
     </div>
@@ -120,8 +122,13 @@ const Textarea: React.FC<TextareaProps> = ({
   );
 };
 
+const StyledLabelRequired = styled.span`
+	color: ${({ theme }) => theme.colors.error[400]};
+`;
+
 const StyledLabel = styled.label<StyledInputProps>`
-	display: block;
+	display: flex;
+	gap: .25rem;
 	margin-bottom: 6px;
 	font-size: ${(props) =>
     props.$sized === 'small'
@@ -130,7 +137,7 @@ const StyledLabel = styled.label<StyledInputProps>`
         ? palette.typography.fontSize.xs
         : palette.typography.fontSize.sm};
 	font-weight: ${palette.typography.fontWeight.medium};
-	color: ${palette.colors.gray[400]};
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const StyledInputPrepend = styled.div`
@@ -241,8 +248,8 @@ const StyledInput = styled.input<StyledInputProps>`
 			6px + ${(props) => (props.$prepend ? '20px' : '0px')}
 	);
 	padding-right: calc(
-		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px +
-			${(props) => (props.$append ? '32px' : '0px')}
+		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} -
+			6px + ${(props) => (props.$append ? '32px' : '0px')}
 	);
 	font-size: ${(props) =>
     props.$sized === 'small'

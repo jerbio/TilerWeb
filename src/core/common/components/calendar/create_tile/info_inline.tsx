@@ -81,7 +81,7 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
               <DatePicker
                 ghostInput
                 value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-                minDate={dayjs().format('YYYY-MM-DD')}
+                minDate={dayjs(formData.start).format('YYYY-MM-DD')}
                 onChange={(date) =>
                   handleFormInputChange('deadline', {
                     mode: 'static',

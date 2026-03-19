@@ -19,7 +19,7 @@ const Toggle: React.FC<ToggleProps> = ({ label, isOn, onChange, disabled = false
 	return (
 		<ToggleRow style={containerStyle}>
 			{label && <ToggleLabel>{label}</ToggleLabel>}
-			<ToggleSwitch $isOn={isOn} $disabled={disabled} onClick={handleClick}>
+			<ToggleSwitch type='button' $isOn={isOn} $disabled={disabled} onClick={handleClick}>
 				<ToggleKnob $isOn={isOn} />
 			</ToggleSwitch>
 		</ToggleRow>
