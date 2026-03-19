@@ -138,7 +138,7 @@ const ThemeToggle = styled.button`
 	justify-content: center;
 `;
 
-const ProfileTrigger = styled.button`
+const ProfileTrigger = styled.div`
 	position: relative;
 	background: none;
 	border: none;

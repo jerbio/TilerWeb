@@ -43,7 +43,7 @@
 		},
 		"navigation": {
 			"home": "Home",
-			"features": "Features",
+			"discover": "Discover",
 			"waitlist": "Waitlist"
 		},
 		"voiceInput": {
@@ -270,7 +270,16 @@
 			},
 			"summary": {
 				"title": "Summary",
-				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>"
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>",
+				"recurrenceFrequency": {
+          "daily": "day",
+          "weekly": "week",
+          "monthly": "month",
+          "yearly": "year"
+				},
+				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
+				"recurringStart": " from <b>{{recurrenceStart}}</b>",
+				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
 			}
 		},
 		"mobileChatInput": {
@@ -1063,6 +1072,17 @@
 			"googleResults": "Google Maps",
 			"poweredByGoogle": "Powered by Google",
 			"noLocationResults": "No locations found"
+		}
+	},
+	"discover": {
+		"seo": {
+			"title": "Discover - Tiler",
+			"description": "Explore the moments where your day finally makes sense. Find your way around the Tiler app and discover things to try in-app."
+		},
+		"hero": {
+			"badge": "Navigate Tiler",
+			"title": "Here\u2019s Where Everything Lives",
+			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
 		}
 	}
 }

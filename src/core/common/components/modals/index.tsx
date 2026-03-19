@@ -51,29 +51,31 @@ const Modal: React.FC<ModalProps> = ({
 		}
 	}, [timeLeft, setShow]);
 
-	return createPortal(
-		<Overlay onClick={closeModal} $show={show}>
-			<ModalContainer onClick={(e) => e.stopPropagation()}>
-				<Header style={headerStyle}>
-					<h3>{headerText}</h3>
-					{setShow && (
-						<CloseButtonTimerWrapper
-							$isclosing={timerExists}
-							closeTimeLeftRatio={timerExists ? timeLeft / closeTimeout : 0}
-						>
-							<CloseButton onClick={closeModal}>
-								<X color={theme.colors.text.secondary} size={16} />
-							</CloseButton>
-							{timerExists && <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>}
-						</CloseButtonTimerWrapper>
-					)}
-				</Header>
-				<ModalBody>{children}</ModalBody>
-				{footer && <ModalFooter>{footer}</ModalFooter>}
-			</ModalContainer>
-		</Overlay>,
-		document.body
-	);
+  return createPortal(
+    <Overlay onClick={closeModal} $show={show}>
+      <ModalContainer onClick={(e) => e.stopPropagation()}>
+        <Header style={headerStyle}>
+          <h3>{headerText}</h3>
+          {setShow && (
+            <CloseButtonTimerWrapper
+              $isclosing={timerExists}
+              closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
+            >
+              <CloseButton onClick={closeModal}>
+                <X color={theme.colors.text.secondary} size={16} />
+              </CloseButton>
+              {timerExists && (
+                <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>
+              )}
+            </CloseButtonTimerWrapper>
+          )}
+        </Header>
+        <ModalBody>{children}</ModalBody>
+        {footer && <ModalFooter>{footer}</ModalFooter>}
+      </ModalContainer>
+    </Overlay>,
+    document.body
+  );
 };
 
 const CloseButtonTimer = styled.div`
@@ -86,7 +88,7 @@ const CloseButtonTimer = styled.div`
 	color: ${(props) => props.theme.colors.text.muted};
 `;
 
-const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; closeTimeLeftRatio: number }>`
+const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; closetimeleftratio: number }>`
 	height: 36px;
 	width: 36px;
 	margin-left: auto;
@@ -105,8 +107,8 @@ const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; closeTimeLeftR
 		border-radius: calc(${(props) => props.theme.borderRadius.medium} + 0.125rem);
 		background: conic-gradient(
 			${(props) => props.theme.colors.text.secondary} 0deg
-				${(props) => props.closeTimeLeftRatio * 360}deg,
-			/* sector angle */ transparent ${(props) => props.closeTimeLeftRatio * 360}deg 360deg
+				${(props) => props.closetimeleftratio * 360}deg,
+			/* sector angle */ transparent ${(props) => props.closetimeleftratio * 360}deg 360deg
 		);
 	}
 `;

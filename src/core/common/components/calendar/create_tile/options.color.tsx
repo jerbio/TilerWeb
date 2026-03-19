@@ -11,23 +11,24 @@ type ColorOptionsProps = {
 const ColorOptions: React.FC<ColorOptionsProps> = ({
 	formHandler: { formData, handleFormInputChange },
 }) => {
-	return (
-		<TileColorOptions>
-			{eventColorOptions.map((color) => {
-				const optionRGBColor = new RGBColor(color);
-				return (
-					<TileColorOption
-						key={optionRGBColor.toHex()}
-						$color={optionRGBColor}
-						$selected={optionRGBColor.equals(formData.color)}
-						onClick={() => {
-							handleFormInputChange('color', { mode: 'static' })(optionRGBColor);
-						}}
-					></TileColorOption>
-				);
-			})}
-		</TileColorOptions>
-	);
+  return (
+    <TileColorOptions>
+      {eventColorOptions.map((color) => {
+        const optionRGBColor = new RGBColor(color);
+        return (
+          <TileColorOption
+						type='button'
+            key={optionRGBColor.toHex()}
+            $color={optionRGBColor}
+            $selected={optionRGBColor.equals(formData.color)}
+            onClick={() => {
+              handleFormInputChange('color', { mode: 'static' })(optionRGBColor);
+            }}
+          ></TileColorOption>
+        );
+      })}
+    </TileColorOptions>
+  );
 };
 
 export default ColorOptions;

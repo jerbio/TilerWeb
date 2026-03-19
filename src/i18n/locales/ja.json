@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "ホーム",
-			"features": "機能",
-			"waitlist": "ウェイティングリスト"
+			"waitlist": "ウェイティングリスト",
+			"discover": "機能"
 		},
 		"voiceInput": {
 			"listening": "聞いています...",
@@ -495,16 +495,46 @@
 					"label": "どの統合を使用しますか？",
 					"placeholder": "例：Googleカレンダー、Outlook、Appleカレンダー",
 					"options": [
-						{ "value": "google", "label": "Googleカレンダー" },
-						{ "value": "outlook", "label": "Microsoft Outlookカレンダー" },
-						{ "value": "apple", "label": "Appleカレンダー" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Googleカレンダー"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlookカレンダー"
+						},
+						{
+							"value": "apple",
+							"label": "Appleカレンダー"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {

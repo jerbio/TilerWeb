@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "Главная",
-			"features": "Функции",
-			"waitlist": "Список ожидания"
+			"waitlist": "Список ожидания",
+			"discover": "Функции"
 		},
 		"voiceInput": {
 			"listening": "Слушаю...",
@@ -495,16 +495,46 @@
 					"label": "Какие интеграции вы используете?",
 					"placeholder": "например, Google Календарь, Outlook, Apple Календарь",
 					"options": [
-						{ "value": "google", "label": "Google Календарь" },
-						{ "value": "outlook", "label": "Microsoft Outlook Календарь" },
-						{ "value": "apple", "label": "Apple Календарь" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google Календарь"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook Календарь"
+						},
+						{
+							"value": "apple",
+							"label": "Apple Календарь"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {

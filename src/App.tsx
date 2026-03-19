@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
+import Newsletter from './pages/Newsletter';
 import Layout from './pages/Layout';
-import Features from './pages/Features';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
@@ -56,27 +56,27 @@ const App: React.FC = () => {
 		});
 	}, []);
 
-	return (
-		<ThemeProvider defaultTheme="dark">
-			<HelmetProvider>
-				<ConsentProvider>
-					<AuthProvider>
-						<BrowserRouter>
-							<AnalyticsTracker />
-							<Routes>
-								<Route path="/" element={<Layout />}>
-									<Route index element={<Home />} />
-									<Route path="/features" element={<Features />} />
-								</Route>
-								<Route
-									path="/waitlist"
-									element={
-										<>
-											<Waitlist />
-											<FooterSection />
-										</>
-									}
-								/>
+  return (
+    <ThemeProvider defaultTheme='dark'>
+      <HelmetProvider>
+        <ConsentProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <AnalyticsTracker />
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="/newsletter" element={<Newsletter />} />
+                </Route>
+                <Route
+                  path="/waitlist"
+                  element={
+                    <>
+                      <Waitlist />
+                      <FooterSection />
+                    </>
+                  }
+                />
 
 								{/* Public Routes - redirect to /timeline if already authenticated */}
 								<Route element={<PublicRoute />}>

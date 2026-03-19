@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "होम",
-			"features": "विशेषताएँ",
-			"waitlist": "प्रतीक्षा सूची"
+			"waitlist": "प्रतीक्षा सूची",
+			"discover": "विशेषताएँ"
 		},
 		"voiceInput": {
 			"listening": "सुन रहा है...",
@@ -495,16 +495,46 @@
 					"label": "आप कौन से एकीकरण का उपयोग करते हैं?",
 					"placeholder": "उदा. Google कैलेंडर, आउटलुक, एप्पल कैलेंडर",
 					"options": [
-						{ "value": "google", "label": "Google कैलेंडर" },
-						{ "value": "outlook", "label": "Microsoft आउटलुक कैलेंडर" },
-						{ "value": "apple", "label": "Apple कैलेंडर" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google कैलेंडर"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft आउटलुक कैलेंडर"
+						},
+						{
+							"value": "apple",
+							"label": "Apple कैलेंडर"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {

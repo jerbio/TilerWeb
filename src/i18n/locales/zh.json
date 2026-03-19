@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "主页",
-			"features": "功能",
-			"waitlist": "等候名单"
+			"waitlist": "等候名单",
+			"discover": "功能"
 		},
 		"voiceInput": {
 			"listening": "正在聆听...",
@@ -495,16 +495,46 @@
 					"label": "您使用哪些集成？",
 					"placeholder": "例如 Google日历、Outlook、Apple日历",
 					"options": [
-						{ "value": "google", "label": "Google日历" },
-						{ "value": "outlook", "label": "Microsoft Outlook日历" },
-						{ "value": "apple", "label": "Apple日历" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google日历"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook日历"
+						},
+						{
+							"value": "apple",
+							"label": "Apple日历"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {

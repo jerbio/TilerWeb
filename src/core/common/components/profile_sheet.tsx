@@ -84,6 +84,11 @@ const AnimatedProfileMenu = styled(animated.div)`
 	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 	transform-origin: top right;
 	z-index: 1000;
+padding-inline: 1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.5rem;
 `;
 
 const ProfileHeader = styled.div`
