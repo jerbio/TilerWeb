@@ -194,7 +194,41 @@
 			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
 			"sections": {
 				"tileColor": "Select Tile Color",
-				"tileActions": "Tile Actions"
+				"tileActions": "Tile Actions",
+				"recurrenceType": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "yearly": "Yearly"
+				},
+				"recurrenceStartType": {
+					"title": "Starts",
+          "default": "Default (<date/>)",
+          "on": "On"
+				},
+				"recurrenceEndType": {
+					"title": "Ends",
+          "never": "Never",
+          "on": "On"
+				},
+				"recurrenceStartDate": {
+					"title": "End Date",
+          "description": "The repetition starts <date/>"
+				},
+				"recurrenceEndDate": {
+					"title": "End Date",
+          "description": "The repetition ends on <date/>"
+				},
+				"recurrenceWeeklyDays": {
+					"title": "Repeat On",
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+				}
 			},
 			"tip": {
 				"description": "Press <b><key/></b> to create a new tile",
@@ -236,7 +270,16 @@
 			},
 			"summary": {
 				"title": "Summary",
-				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by"
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>",
+				"recurrenceFrequency": {
+          "daily": "day",
+          "weekly": "week",
+          "monthly": "month",
+          "yearly": "year"
+				},
+				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
+				"recurringStart": " from <b>{{recurrenceStart}}</b>",
+				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
 			}
 		},
 		"mobileChatInput": {

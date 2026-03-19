@@ -6,19 +6,19 @@ import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Env } from '@/config/config_getter';
-import { useCalendarUI } from '@/core/common/components/calendar/CalendarUIProvider';
 import SearchBar from './search_bar';
 import ShuffleButton from './shuffle_button';
 import ReviseButton from './revise_button';
 import ProcrastinateAllButton from './procrastinate_all_button';
+import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 
 const TimelineHeader: React.FC = () => {
   const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
   const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
   const authenticatedUser = useAppStore((state) => state.authenticatedUser);
   const menuRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-	const { setCreateTileModalOpen } = useCalendarUI();
+  const triggerRef = useRef<HTMLDivElement>(null);
+	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -54,7 +54,7 @@ const TimelineHeader: React.FC = () => {
 				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
 				<ProcrastinateAllButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
-				<CreateEventButton onClick={() => setCreateTileModalOpen(true)}>
+				<CreateEventButton onClick={openCreateTile}>
 					<Plus size={16} />
 				</CreateEventButton>
         {Env.isDevelopment() && (
@@ -69,7 +69,7 @@ const TimelineHeader: React.FC = () => {
           <ProfileContainer>
             <User size={18} />
           </ProfileContainer>
-          <ProfileSheet open={profileSheetOpen} ref={menuRef} user={authenticatedUser} />
+          <ProfileSheet open={profileSheetOpen} containerRef={menuRef} user={authenticatedUser} />
         </ProfileTrigger>
       </HeaderRight>
     </Header>
@@ -101,7 +101,7 @@ const ThemeToggle = styled.button`
 	justify-content: center;
 `;
 
-const ProfileTrigger = styled.button`
+const ProfileTrigger = styled.div`
 	position: relative;
 	background: none;
 	border: none;

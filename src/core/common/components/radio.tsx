@@ -6,7 +6,8 @@ type RadioProps = {
   checked?: boolean;
   disabled?: boolean;
   name?: string;
-  onChange?: () => void;
+  onChange?: (checked: boolean) => void;
+  label?: React.ReactNode;
 };
 
 const Radio: React.FC<RadioProps> = ({
@@ -14,6 +15,7 @@ const Radio: React.FC<RadioProps> = ({
   disabled = false,
   name,
   onChange,
+  label,
 }) => {
   return (
     <Wrapper $disabled={disabled}>
@@ -22,9 +24,10 @@ const Radio: React.FC<RadioProps> = ({
         checked={checked}
         disabled={disabled}
         name={name}
-        onChange={onChange}
+        onChange={(e) => onChange && onChange(e.target.checked)}
       />
       <Circle $checked={checked} />
+      {label && <Label>{label}</Label>}
     </Wrapper>
   );
 };
@@ -47,10 +50,10 @@ const Circle = styled.div<{ $checked: boolean }>`
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
-	background-color: ${palette.colors.gray[800]};
+	background-color: ${({ theme }) => theme.colors.radio.bg};
 	border: 2px solid
-		${({ $checked }) =>
-			$checked ? palette.colors.brand[400] : palette.colors.gray[600]};
+		${({ $checked, theme }) =>
+    $checked ? theme.colors.radio.borderChecked : theme.colors.radio.border};
 	transition:
 		border-color 0.2s ease-in-out,
 		background-color 0.2s ease-in-out;
@@ -63,10 +66,17 @@ const Circle = styled.div<{ $checked: boolean }>`
 		width: 10px;
 		height: 10px;
 		border-radius: 50%;
-		background-color: ${palette.colors.brand[400]};
+		background-color: ${({ theme }) => theme.colors.radio.circle};
 		transform: translate(-50%, -50%) scale(${({ $checked }) => ($checked ? 1 : 0)});
 		transition: transform 0.2s ease-in-out;
 	}
+`;
+
+const Label = styled.span`
+	margin-left: 8px;
+	font-size: 16px;
+	font-weight: ${palette.typography.fontWeight.semibold};
+	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 export default Radio;

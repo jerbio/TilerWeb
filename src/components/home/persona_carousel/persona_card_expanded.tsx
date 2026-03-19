@@ -19,7 +19,7 @@ import Loader from '@/core/common/components/loader';
 import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 import { createPortal } from 'react-dom';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
-import { CalendarUIProvider } from '@/core/common/components/calendar/CalendarUIProvider';
+import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 
 type PersonaExpandedCardProps = {
   persona: Persona;

@@ -51,14 +51,6 @@ export const lightTheme: AppTheme = {
       sidebarButtonHover: palette.colors.gray[200],
       sidebarButtonActive: palette.colors.gray[200],
 			eventInfoModalBg: palette.colors.white,
-      summary: {
-        bg: 'hsla(36, 60%, 95%, 1)',
-        border: 'hsla(34, 32%, 91%, 1)',
-        text: 'hsla(34, 32%, 50%, 1)',
-        boldText: 'hsla(34, 32%, 40%, 1)',
-        headerBg: palette.colors.white,
-        header: 'hsla(234, 10%, 39%, 1)',
-      },
     },
     // Toggle colors
     toggle: {
@@ -67,6 +59,13 @@ export const lightTheme: AppTheme = {
       circle: palette.colors.white,
       circleChecked: palette.colors.white,
     },
+		// Radio Colors
+		radio: {
+			border: palette.colors.gray[300],
+			borderChecked: palette.colors.brand[400],
+			bg: palette.colors.gray[100],
+			circle: palette.colors.brand[400],
+		},
     // Date picker colors
     datepicker: {
       bg: palette.colors.white,

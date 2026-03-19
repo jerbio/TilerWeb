@@ -44,14 +44,6 @@ export const darkTheme: AppTheme = {
 			sidebarButtonHover: palette.colors.gray[800],
 			sidebarButtonActive: palette.colors.gray[700],
 			eventInfoModalBg: palette.colors.gray[800],
-      summary: {
-        bg: 'hsla(36, 70%, 16%, 1)',
-        border: 'hsla(36, 71%, 19%, 1)',
-        text: 'hsla(36, 30%, 65%, 1)',
-        boldText: palette.colors.white,
-        headerBg: 'hsla(36, 70%, 21%, 1)',
-        header: 'hsla(36, 21%, 73%, 1)',
-      },
     },
     // Border colors
     border: {
@@ -67,6 +59,13 @@ export const darkTheme: AppTheme = {
       circle: palette.colors.gray[400],
       circleChecked: palette.colors.white,
     },
+		// Radio Colors
+		radio: {
+			border: palette.colors.gray[600],
+			borderChecked: palette.colors.brand[400],
+			bg: palette.colors.gray[800],
+			circle: palette.colors.brand[400],
+		},
 		// Date picker colors
 		datepicker: {
       bg: palette.colors.gray[900],

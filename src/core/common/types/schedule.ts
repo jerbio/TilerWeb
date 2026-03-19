@@ -74,7 +74,6 @@ export type ScheduleSubCalendarEventTravelDetail = {
 };
 
 // ── ScheduleSubCalendarEvent ───────────────────────────────────
-
 export type ScheduleSubCalendarEvent = {
   id: string;
   start: number;
@@ -146,6 +145,43 @@ export type ScheduleLookupOptions = {
   endRange: number;
 };
 
+export enum ScheduleRepeatType {
+  Daily = "0",
+  Weekly = "1",
+  Monthly = "2",
+  Yearly = "3",
+}
+
+export enum ScheduleRepeatFrequency {
+  Daily = "Daily",
+  Weekly = "Weekly",
+  Monthly = "Monthly",
+  Yearly = "Yearly",
+}
+
+export enum ScheduleRepeatWeekday {
+  Sunday = "0",
+  Monday = "1",
+  Tuesday = "2",
+  Wednesday = "3",
+  Thursday = "4",
+  Friday = "5",
+  Saturday = "6",
+}
+
+export enum ScheduleRepeatStartType {
+  Default = "0",
+  On = "1",
+}
+
+export enum ScheduleRepeatEndType {
+  Never = "0",
+  On = "1",
+}
+
+export type ScheduleRepeatWeeklyData = string;
+
+
 export type ScheduleCreateEventParams = {
   BColor?: string;
   RColor?: string;
@@ -169,22 +205,31 @@ export type ScheduleCreateEventParams = {
   LocationSource?: string;
   LocationTag?: string;
   Name?: string;
-  RepeatData?: string;
+
+  // Legacy/loosely used by backend. Keep nullable string.
+  RepeatData?: string | null;
+  // Required for recurrence end when repeating.
   RepeatEndDay?: string;
   RepeatEndMonth?: string;
   RepeatEndYear?: string;
+  // Present on backend model, but currently ignored by NewCalEvent recurrence construction.
   RepeatStartDay?: string;
   RepeatStartMonth?: string;
   RepeatStartYear?: string;
-  RepeatType?: string;
-  RepeatWeeklyData?: string;
+  // Frontend/client convention: 0=daily, 1=weekly, 2=monthly, 3=yearly.
+  RepeatType?: ScheduleRepeatType;
+  // Weekly-only selection. Backend expects a comma-separated string of DayOfWeek ints.
+  // Example: "1,3,5" for Monday/Wednesday/Friday.
+  RepeatWeeklyData?: ScheduleRepeatWeeklyData;
+  // Actual recurrence unit used by backend.
+  RepeatFrequency?: ScheduleRepeatFrequency;
+
   Rigid?: string;
   StartDay?: string;
   StartHour?: string;
   StartMinute?: string;
   StartMonth?: string;
   StartYear?: string;
-  RepeatFrequency?: string;
   PredictionDurationInMs?: string;
   PredictionLocationDescription?: string;
   PredictionEnabled?: string;

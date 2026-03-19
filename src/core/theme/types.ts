@@ -70,6 +70,13 @@ export type AppTheme = {
       circle: string;
       circleChecked: string;
     };
+		// Radio Colors
+		radio: {
+			border: string;
+			borderChecked: string;
+			bg: string;
+			circle: string;
+		};
     // Date picker colors
     datepicker: {
       bg: string;
@@ -103,14 +110,6 @@ export type AppTheme = {
       sidebarButtonHover: string;
       sidebarButtonActive: string;
 			eventInfoModalBg: string;
-      summary: {
-        bg: string;
-        border: string;
-        text: string;
-        boldText: string;
-        headerBg: string;
-        header: string;
-      };
     };
     // Button colors
     button: {
