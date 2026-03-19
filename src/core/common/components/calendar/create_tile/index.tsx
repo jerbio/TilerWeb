@@ -105,16 +105,18 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 
 			// Time Ranges
 			if (!formData.isRecurring) {
-        event.StartYear = dayjs(formData.start).format('YYYY');
-        event.StartMonth = dayjs(formData.start).format('MM');
-        event.StartDay = dayjs(formData.start).format('DD');
-        event.StartHour = dayjs(formData.start).format('00');
-        event.StartMinute = dayjs(formData.start).format('00');
-        event.EndYear = dayjs(formData.deadline).format('YYYY');
-        event.EndMonth = dayjs(formData.deadline).format('MM');
-        event.EndDay = dayjs(formData.deadline).format('DD');
-        event.EndHour = dayjs(formData.deadline).format('23');
-        event.EndMinute = dayjs(formData.deadline).format('59');
+				const windowStart = formData.start.startOf('day');
+				const windowEnd = formData.deadline.endOf('day');
+        event.StartYear = dayjs(windowStart).format('YYYY');
+        event.StartMonth = dayjs(windowStart).format('MM');
+        event.StartDay = dayjs(windowStart).format('DD');
+        event.StartHour = dayjs(windowStart).format('HH');
+        event.StartMinute = dayjs(windowStart).format('mm');
+        event.EndYear = dayjs(windowEnd).format('YYYY');
+        event.EndMonth = dayjs(windowEnd).format('MM');
+        event.EndDay = dayjs(windowEnd).format('DD');
+        event.EndHour = dayjs(windowEnd).format('HH');
+        event.EndMinute = dayjs(windowEnd).format('mm');
 			}
 
       // Repetition
