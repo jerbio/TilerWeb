@@ -5,7 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // Base configuration shared across all environments
 const baseConfig: UserConfig = {
-	plugins: [react(), basicSsl(), tsconfigPaths()],
+	plugins: [react(), ...(process.env.NO_SSL ? [] : [basicSsl()]), tsconfigPaths()],
 };
 
 // Development configuration
