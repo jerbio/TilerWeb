@@ -16,7 +16,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
   return (
     <Grid>
       <Input
-        sized="large"
         label="Tile Name"
         required
         name="action"
@@ -25,7 +24,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
         onChange={handleFormInputChange('action')}
       />
       <Input
-        sized="large"
         label="Tile Location"
         name="location"
         placeholder={'Where is this tile held?'}
@@ -33,7 +31,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
         onChange={handleFormInputChange('location')}
       />
       <Input
-        sized="large"
         label="Tile Duration (hours)"
         required
         type="number"
@@ -45,7 +42,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
         })}
       />
       <Input
-        sized="large"
         label="Tile Duration (mins)"
         required
         type="number"
