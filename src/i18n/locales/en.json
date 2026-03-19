@@ -1025,6 +1025,81 @@
 			"badge": "Navigate Tiler",
 			"title": "Here\u2019s Where Everything Lives",
 			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
+		},
+		"whatIsTiler": {
+			"badge": "What Is Tiler",
+			"title": "Not a calendar. An AI that runs your day",
+			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn\u2019t go to plan.",
+			"visual": {
+				"tile1": "Gym \u00b7 45 min",
+				"tile2": "Travel \u00b7 12 min",
+				"tile3": "Client Call \u00b7 1 hr",
+				"tile4": "Groceries \u00b7 30 min"
+			},
+			"subItems": {
+				"aiRunsDay": {
+					"title": "Tiler is an AI that runs your day.",
+					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn\u2019t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
+				},
+				"fourCoreBlocks": {
+					"title": "The Four Core Blocks of Tiler"
+				},
+				"howDifferent": {
+					"title": "How Tiler is Different"
+				}
+			},
+			"coreBlocks": {
+				"tiles": {
+					"label": "AutoTile",
+					"title": "Tiles",
+					"desc": "Flexible tasks. Set a goal and duration \u2014 Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
+				},
+				"blocks": {
+					"label": "Locked",
+					"title": "Blocks",
+					"desc": "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them."
+				},
+				"route": {
+					"label": "Location-aware",
+					"title": "Route",
+					"desc": "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop."
+				},
+				"tileShare": {
+					"label": "Team & Family",
+					"title": "TileShare",
+					"desc": "Assign tiles to teammates or family. Everyone\u2019s calendar adapts around shared commitments automatically. Context travels with the task."
+				}
+			},
+			"comparison": {
+				"headerLeft": "Google Calendar",
+				"headerRight": "Tiler",
+				"rows": [
+					{
+						"left": "You schedule everything manually",
+						"right": "AI builds your schedule from plain English"
+					},
+					{
+						"left": "No awareness of travel time",
+						"right": "Auto-calculates and adds travel buffers"
+					},
+					{
+						"left": "Static \u2014 won\u2019t adapt when things change",
+						"right": "Detects ripples and reschedules instantly"
+					},
+					{
+						"left": "No navigation or route planning",
+						"right": "Navigate your day tile-to-tile with real transit"
+					},
+					{
+						"left": "Shared calendars only \u2014 no task assignment",
+						"right": "TileShare: assign and track tasks with anyone"
+					},
+					{
+						"left": "Nothing confirmed \u2014 events just appear",
+						"right": "Confirmation-first \u2014 you approve all changes"
+					}
+				]
+			}
 		}
 	}
 }
