@@ -91,6 +91,13 @@ class LocationService {
         return defaultLocation;
       }
 
+      // Avoid unnecessary geolocation calls when browser permission is already denied.
+      if (await this.isGeolocationPermissionDenied()) {
+        const defaultLocation = this.getDefaultLocation();
+        this.currentLocationData = defaultLocation;
+        return defaultLocation;
+      }
+
       // Get the current position with a timeout
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -130,10 +137,35 @@ class LocationService {
         return locationData;
       }
     } catch (err) {
-      console.error('Geolocation error:', err);
+      const geolocationError = err as GeolocationPositionError;
+      if (!this.isPermissionDeniedError(geolocationError)) {
+        console.error('Geolocation error:', err);
+      }
       const defaultLocation = this.getDefaultLocation();
       this.currentLocationData = defaultLocation;
       return defaultLocation;
+    }
+  }
+
+  /**
+   * Browser geolocation permission denial is expected user behavior, not a hard error.
+   */
+  private isPermissionDeniedError(err: GeolocationPositionError | null | undefined): boolean {
+    return err?.code === 1;
+  }
+
+  private async isGeolocationPermissionDenied(): Promise<boolean> {
+    if (!navigator.permissions?.query) {
+      return false;
+    }
+
+    try {
+      const permission = await navigator.permissions.query({
+        name: 'geolocation' as PermissionName,
+      });
+      return permission.state === 'denied';
+    } catch {
+      return false;
     }
   }
 
