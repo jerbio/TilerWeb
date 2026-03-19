@@ -5,6 +5,7 @@ import {
   ChatVibeRequestResponse,
   ChatMessageBody,
   ChatMessagesResponse,
+  ChatMessagesParams,
   VibeSessionsResponse,
   VibeSessionParams,
 } from '@/core/common/types/chat';
@@ -12,10 +13,23 @@ import { AppApi } from './appApi';
 
 export class ChatApi extends AppApi {
   // Messages
-  public getMessages(sessionId: string) {
-    return this.apiRequest<ChatMessagesResponse>(
-      `api/Vibe/Chat?SessionId=${encodeURIComponent(sessionId)}`
-    );
+  public getMessages(sessionId: string, pagination?: ChatMessagesParams) {
+    const params = [`SessionId=${encodeURIComponent(sessionId)}`];
+
+    if (pagination?.anonymousUserId) {
+      params.push(`AnonymousUserId=${encodeURIComponent(pagination.anonymousUserId)}`);
+    }
+    if (pagination?.batchSize !== undefined) {
+      params.push(`BatchSize=${pagination.batchSize}`);
+    }
+    if (pagination?.index !== undefined) {
+      params.push(`Index=${pagination.index}`);
+    }
+    if (pagination?.order) {
+      params.push(`Order=${pagination.order}`);
+    }
+
+    return this.apiRequest<ChatMessagesResponse>(`api/Vibe/Chat?${params.join('&')}`);
   }
 
   // Sessions

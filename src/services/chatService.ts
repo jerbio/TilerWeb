@@ -1,5 +1,6 @@
 import {
   ChatMessageBody,
+  ChatMessagesParams,
   PromptWithActions,
   VibeSessionsResponse,
   VibeSessionParams,
@@ -15,9 +16,9 @@ class ChatService {
     this.chatApi = chatApi;
   }
 
-  async getMessages(sessionId: string) {
+  async getMessages(sessionId: string, pagination?: ChatMessagesParams) {
     try {
-      const messages = await this.chatApi.getMessages(sessionId);
+      const messages = await this.chatApi.getMessages(sessionId, pagination);
       return messages;
     } catch (error) {
 			console.error('Error fetching chat messages', error);

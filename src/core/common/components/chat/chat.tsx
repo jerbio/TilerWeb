@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FormEvent, useRef } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState, FormEvent, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ChevronLeftIcon, SendHorizontal, CircleStop, History, SquarePen } from 'lucide-react';
 import SessionHistory from '@/core/common/components/chat/session-history/SessionHistory';
@@ -253,6 +253,10 @@ type ChatProps = {
   onClose?: () => void;
 };
 
+const MESSAGE_BATCH_SIZE = 10;
+const ACTION_BATCH_SIZE = 10;
+const SCROLL_TOP_THRESHOLD = 40;
+
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -265,6 +269,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesListRef = useRef<HTMLDivElement>(null);
   const webSocketCommunication = useRef<SignalRService | null>(null);
+  const actionsByIdRef = useRef<Record<string, VibeAction>>({});
+  const nextMessageIndexRef = useRef(0);
+  const shouldPreserveScrollPositionRef = useRef(false);
+  const shouldAutoScrollToBottomRef = useRef(false);
+  const previousScrollHeightRef = useRef(0);
+  const previousScrollTopRef = useRef(0);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<PromptWithActions[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -272,6 +282,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [sessionId, setSessionId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isBatchLoading, setIsBatchLoading] = useState(false);
+  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
   const [wsStatusKey, setWsStatusKey] = useState<string | null>(null);
@@ -442,30 +454,46 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     fetchAndSetLatestSession();
   }, [activePersonaSession?.userId, activePersonaSession?.personaId]);
 
-  // Load chat messages when relevant dependencies change
-  useEffect(() => {
-    loadChatMessages(sessionId);
-  }, [sessionId, scheduleId, selectedPersonaId]);
+  const extractTimestamp = useCallback((id: string): number => {
+    const match = id.match(/(\d{18})/);
+    return match ? parseInt(match[1], 10) : 0;
+  }, []);
 
-  const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
+  const sortMessagesChronologically = useCallback(
+    (sourceMessages: PromptWithActions[]) =>
+      [...sourceMessages].sort((a, b) => extractTimestamp(a.id) - extractTimestamp(b.id)),
+    [extractTimestamp]
+  );
 
-  useEffect(() => {
-    if (messages.length > 0 && messagesListRef.current) {
-      messagesListRef.current.scrollTo({
-        top: messagesListRef.current.scrollHeight,
-        behavior: 'smooth',
+  const mergeMessages = useCallback(
+    (existingMessages: PromptWithActions[], incomingMessages: PromptWithActions[]) => {
+      const merged = new Map(existingMessages.map((entry) => [entry.id, entry]));
+
+      incomingMessages.forEach((incoming) => {
+        const previous = merged.get(incoming.id);
+        if (previous) {
+          merged.set(incoming.id, {
+            ...previous,
+            ...incoming,
+            actions: incoming.actions.length > 0 ? incoming.actions : previous.actions,
+            actionIds: incoming.actionIds ?? previous.actionIds,
+          });
+        } else {
+          merged.set(incoming.id, incoming);
+        }
       });
-    }
-  }, [messages]);
 
-  // Helper function to update messages with actions progressively
-  const updateMessagesWithActions = (
-    rawMessages: PromptWithActions[],
-    actionsMap: Record<string, VibeAction>
-  ) => {
-    const updatedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-      const actionIds: string[] = entry.actionIds ?? [];
-      const resolvedActions = actionIds.map((id) => actionsMap[id]).filter(Boolean);
+      return sortMessagesChronologically(Array.from(merged.values()));
+    },
+    [sortMessagesChronologically]
+  );
+
+  const mapMessagesWithActions = useCallback((rawMessages: PromptWithActions[]) => {
+    return rawMessages.map((entry) => {
+      const actionIds = entry.actionIds ?? [];
+      const resolvedActions = actionIds
+        .map((id) => actionsByIdRef.current[id])
+        .filter((action): action is VibeAction => Boolean(action));
 
       return {
         id: entry.id,
@@ -478,179 +506,181 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         actions: resolvedActions,
       };
     });
+  }, []);
 
-    // Sort by timestamp
-    updatedMessages.sort((a, b) => {
-      const extractTimestamp = (id: string): number => {
-        const match = id.match(/(\d{18})/);
-        return match ? parseInt(match[1], 10) : 0;
-      };
-      return extractTimestamp(a.id) - extractTimestamp(b.id);
-    });
+  const fetchActionsForMessages = useCallback(async (rawMessages: PromptWithActions[]) => {
+    const uniqueActionIds = Array.from(
+      new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
+    );
+    const missingActionIds = uniqueActionIds.filter((id) => !actionsByIdRef.current[id]);
 
-    // Update state with partial results
-    setMessages((prevMessages) => {
-      const existingIds = new Set(prevMessages.map((m) => m.id));
-      const uniqueNewMessages = updatedMessages.filter((m) => !existingIds.has(m.id));
+    if (!missingActionIds.length) return;
 
-      const mergedMessages = prevMessages.map((prevMessage) => {
-        const updatedMessage = updatedMessages.find((m) => m.id === prevMessage.id);
-        return updatedMessage || prevMessage;
-      });
-
-      return [...mergedMessages, ...uniqueNewMessages];
-    });
-  };
-
-  const loadChatMessages = async (sid?: string) => {
-    setIsLoading(true);
-    setError(null);
-
+    setIsBatchLoading(true);
     try {
-      // Dev mode takes priority - always fetch from API with dev userId (skip demo)
-      const devUserIdOverride = useAppStore.getState().devUserIdOverride;
-      const isDevMode = !!devUserIdOverride;
-
-      // Priority 1: Demo mode (only if NOT in dev mode) - inject demo data
-      if (!isDevMode && isDemoMode()) {
-        const { chatMessages } = getDemoData();
-        setMessages(chatMessages);
-        setRequestId(chatMessages[chatMessages.length - 1]?.requestId || 'request-demo-001');
-        setIsLoading(false);
-        return;
-      }
-
-      // Exit early if we still don't have a session ID
-      if (!sid) {
-        setIsLoading(false);
-        return;
-      }
-      
-      const data = await chatService.getMessages(sid);
-      const rawMessages = data.Content.chats || [];
-      if (!rawMessages || rawMessages.length === 0) return;
-
-      // Collect all unique actionIds, ordered by message timestamp (newest first)
-      const messagesByTimestamp = rawMessages
-        .map((entry) => ({
-          ...entry,
-          timestamp: (() => {
-            const match = entry.id.match(/(\d{18})/);
-            return match ? parseInt(match[1], 10) : 0;
-          })(),
-        }))
-        .sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
-
-      const uniqueActionIds = Array.from(
-        new Set(
-          messagesByTimestamp.flatMap((entry) => entry.actionIds || []).filter(Boolean)
-        )
-      );
-
-      // Fetch and map actions by ID with batching
-      let allActionsMap: Record<string, VibeAction> = {};
-      if (uniqueActionIds.length > 0) {
-        const BATCH_SIZE = 10;
-        const shouldBatch = uniqueActionIds.length > BATCH_SIZE;
-
-        if (shouldBatch) {
-          setIsBatchLoading(true);
-
-          // Create batches (most recent actions first)
-          const batches: string[][] = [];
-          for (let i = 0; i < uniqueActionIds.length; i += BATCH_SIZE) {
-            batches.push(uniqueActionIds.slice(i, i + BATCH_SIZE));
-          }
-
-          // Process batches sequentially, updating UI after each batch
-          for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-            const batch = batches[batchIndex];
-            const isLastBatch = batchIndex === batches.length - 1;
-
-            try {
-              const fetchedActions = await chatService.getActions(batch);
-              const batchActionsMap = fetchedActions.reduce(
-                (acc, action) => {
-                  acc[action.id] = action;
-                  return acc;
-                },
-                {} as Record<string, VibeAction>
-              );
-
-              // Merge with existing actions
-              allActionsMap = { ...allActionsMap, ...batchActionsMap };
-
-              // Update messages with current actions if not the last batch
-              if (!isLastBatch) {
-                updateMessagesWithActions(rawMessages, allActionsMap);
-              }
-            } catch (error) {
-              console.error(`Error fetching batch ${batchIndex + 1}:`, error);
-            }
-          }
-
-          setIsBatchLoading(false);
-        } else {
-          // Single request for small number of actions
-          const fetchedActions = await chatService.getActions(uniqueActionIds);
-          allActionsMap = fetchedActions.reduce(
-            (acc, action) => {
-              acc[action.id] = action;
-              return acc;
-            },
-            {} as Record<string, VibeAction>
-          );
+      for (let i = 0; i < missingActionIds.length; i += ACTION_BATCH_SIZE) {
+        const batch = missingActionIds.slice(i, i + ACTION_BATCH_SIZE);
+        try {
+          const fetchedActions = await chatService.getActions(batch);
+          fetchedActions.forEach((action) => {
+            actionsByIdRef.current[action.id] = action;
+          });
+        } catch (error) {
+          console.error('Error fetching action batch:', error);
         }
       }
+    } finally {
+      setIsBatchLoading(false);
+    }
+  }, []);
 
-      // Map messages with resolved actions
-      const loadedMessages: PromptWithActions[] = rawMessages.map((entry) => {
-        const actionIds: string[] = entry.actionIds ?? [];
-        const resolvedActions = actionIds.map((id) => allActionsMap[id]).filter(Boolean);
+  const loadInitialChatMessages = useCallback(
+    async (sid?: string) => {
+      setIsLoading(true);
+      setError(null);
+      setMessages([]);
+      setRequestId(null);
+      setHasMoreMessages(false);
+      nextMessageIndexRef.current = 0;
+      actionsByIdRef.current = {};
+      shouldPreserveScrollPositionRef.current = false;
+      shouldAutoScrollToBottomRef.current = false;
 
-        return {
-          id: entry.id,
-          origin: entry.origin,
-          content: entry.content,
-          actionId: entry.actionId,
-          requestId: entry.requestId,
-          sessionId: entry.sessionId,
-          actionIds,
-          actions: resolvedActions,
-        };
-      });
+      try {
+        const devUserIdOverride = useAppStore.getState().devUserIdOverride;
+        const isDevMode = !!devUserIdOverride;
 
-      setMessages((prevMessages) => {
-        const existingIds = new Set(prevMessages.map((m) => m.id));
-        const uniqueNewMessages = loadedMessages.filter((m) => !existingIds.has(m.id));
+        if (!isDevMode && isDemoMode()) {
+          const { chatMessages } = getDemoData();
+          setMessages(sortMessagesChronologically(chatMessages));
+          setRequestId(chatMessages[chatMessages.length - 1]?.requestId || 'request-demo-001');
+          setHasMoreMessages(false);
+          shouldAutoScrollToBottomRef.current = true;
+          return;
+        }
 
-        // Merge actions for existing messages
-        const updatedMessages = prevMessages.map((prevMessage) => {
-          const updatedMessage = loadedMessages.find((m) => m.id === prevMessage.id);
-          return updatedMessage || prevMessage;
+        if (!sid) return;
+
+        const data = await chatService.getMessages(sid, {
+          index: 0,
+          batchSize: MESSAGE_BATCH_SIZE,
+          order: 'desc',
+          anonymousUserId: anonymousUserId || undefined,
         });
 
-        const mergedMessages = [...updatedMessages, ...uniqueNewMessages];
+        const rawMessages = data.Content.chats || [];
+        if (!rawMessages.length) {
+          setHasMoreMessages(false);
+          return;
+        }
 
-        // Sort by timestamp extracted from ID (chronological order) - single sort on final result
-        mergedMessages.sort((a, b) => {
-          const extractTimestamp = (id: string): number => {
-            const match = id.match(/(\d{18})/); // Extract 18-digit timestamp
-            return match ? parseInt(match[1], 10) : 0;
-          };
-          return extractTimestamp(a.id) - extractTimestamp(b.id);
-        });
+        await fetchActionsForMessages(rawMessages);
+        const hydratedMessages = mapMessagesWithActions(rawMessages);
+        const sortedMessages = sortMessagesChronologically(hydratedMessages);
 
-        return mergedMessages;
+        setMessages(sortedMessages);
+        setRequestId(sortedMessages[sortedMessages.length - 1]?.requestId || null);
+        setHasMoreMessages(rawMessages.length === MESSAGE_BATCH_SIZE);
+        nextMessageIndexRef.current = rawMessages.length;
+        shouldAutoScrollToBottomRef.current = true;
+      } catch (err) {
+        if (err instanceof Error) setError(err.message);
+        else setError(t('home.expanded.chat.errorLoadMessages'));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [anonymousUserId, fetchActionsForMessages, mapMessagesWithActions, sortMessagesChronologically, t]
+  );
+
+  const loadOlderMessages = useCallback(async () => {
+    if (!sessionId || isLoading || isLoadingOlderMessages || !hasMoreMessages) return;
+
+    const messagesList = messagesListRef.current;
+    if (messagesList) {
+      previousScrollHeightRef.current = messagesList.scrollHeight;
+      previousScrollTopRef.current = messagesList.scrollTop;
+      shouldPreserveScrollPositionRef.current = true;
+    }
+
+    setIsLoadingOlderMessages(true);
+    try {
+      const data = await chatService.getMessages(sessionId, {
+        index: nextMessageIndexRef.current,
+        batchSize: MESSAGE_BATCH_SIZE,
+        order: 'desc',
+        anonymousUserId: anonymousUserId || undefined,
       });
-      setRequestId(loadedMessages[loadedMessages.length - 1]?.requestId || null);
+
+      const rawMessages = data.Content.chats || [];
+      if (!rawMessages.length) {
+        setHasMoreMessages(false);
+        shouldPreserveScrollPositionRef.current = false;
+        return;
+      }
+
+      await fetchActionsForMessages(rawMessages);
+      const hydratedMessages = mapMessagesWithActions(rawMessages);
+
+      setMessages((prevMessages) => mergeMessages(prevMessages, hydratedMessages));
+      nextMessageIndexRef.current += rawMessages.length;
+      setHasMoreMessages(rawMessages.length === MESSAGE_BATCH_SIZE);
     } catch (err) {
+      shouldPreserveScrollPositionRef.current = false;
       if (err instanceof Error) setError(err.message);
       else setError(t('home.expanded.chat.errorLoadMessages'));
     } finally {
-      setIsLoading(false);
+      setIsLoadingOlderMessages(false);
     }
-  };
+  }, [
+    anonymousUserId,
+    fetchActionsForMessages,
+    hasMoreMessages,
+    isLoading,
+    isLoadingOlderMessages,
+    mapMessagesWithActions,
+    mergeMessages,
+    sessionId,
+    t,
+  ]);
+
+  // Load chat messages when relevant dependencies change
+  useEffect(() => {
+    loadInitialChatMessages(sessionId);
+  }, [loadInitialChatMessages, scheduleId, selectedPersonaId, sessionId]);
+
+  useEffect(() => {
+    const messagesList = messagesListRef.current;
+    if (!messagesList) return;
+
+    const handleScroll = () => {
+      if (messagesList.scrollTop <= SCROLL_TOP_THRESHOLD) {
+        loadOlderMessages();
+      }
+    };
+
+    messagesList.addEventListener('scroll', handleScroll);
+    return () => messagesList.removeEventListener('scroll', handleScroll);
+  }, [loadOlderMessages]);
+
+  useLayoutEffect(() => {
+    const messagesList = messagesListRef.current;
+    if (!messagesList || messages.length === 0) return;
+
+    if (shouldPreserveScrollPositionRef.current) {
+      const scrollDelta = messagesList.scrollHeight - previousScrollHeightRef.current;
+      messagesList.scrollTop = previousScrollTopRef.current + scrollDelta;
+      shouldPreserveScrollPositionRef.current = false;
+      return;
+    }
+
+    if (shouldAutoScrollToBottomRef.current) {
+      messagesList.scrollTop = messagesList.scrollHeight;
+      shouldAutoScrollToBottomRef.current = false;
+    }
+  }, [messages]);
+
+  const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -727,10 +757,16 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         })
       );
 
-      // Append new messages to existing state
-      const sortedMessages = sortMessageById([...messages, ...newMessages]);
-      setMessages(() => sortedMessages);
-      setRequestId(newMessages[0]?.requestId || null);
+      newMessages.forEach((newMessage) => {
+        (newMessage.actions || []).forEach((action) => {
+          actionsByIdRef.current[action.id] = action;
+        });
+      });
+
+      shouldAutoScrollToBottomRef.current = true;
+      setMessages((prevMessages) => mergeMessages(prevMessages, newMessages));
+      setRequestId(newMessages[newMessages.length - 1]?.requestId || null);
+      nextMessageIndexRef.current += newMessages.length;
 
       // Update session ID from the first prompt
       const sessionIdFromResponse = newMessages[0]?.sessionId;
@@ -758,13 +794,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
     }
   };
 
-  const sortMessageById = (messages: PromptWithActions[]) => {
-    return messages.sort((a, b) => {
-      if (a.id < b.id) return -1;
-      if (a.id > b.id) return 1;
-      return 0;
-    });
-  }
   const acceptAllChanges = async () => {
     // Track accept changes action
     analytics.trackChatEvent('Accept Changes', {
