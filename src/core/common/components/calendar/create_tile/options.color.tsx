@@ -8,7 +8,7 @@ type ColorOptionsProps = {
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
-const ColorOptions: React.FC<ColorOptionsProps> = ({
+const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
   formHandler: { formData, handleFormInputChange },
 }) => {
   return (
@@ -31,7 +31,7 @@ const ColorOptions: React.FC<ColorOptionsProps> = ({
   );
 };
 
-export default ColorOptions;
+export default CreateTileColorOptions;
 
 const TileColorOptions = styled.div`
 	display: flex;

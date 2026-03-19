@@ -1,5 +1,5 @@
 import useFormHandler from '@/hooks/useFormHandler';
-import { Calendar, Keyboard, X } from 'lucide-react';
+import { Keyboard, X } from 'lucide-react';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../../button';
@@ -21,7 +21,6 @@ import {
   ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
 import { toast } from 'sonner';
-import DatePicker from '../../date_picker';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import {
   CalendarEntityType,
@@ -31,8 +30,9 @@ import {
 } from '../calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
 import { useCalendarUI } from '../calendar-ui.provider';
-import Summary from './summary';
-import Options from './options';
+import CreateTileSummary from './summary';
+import CreateTileOptions from './options';
+import CreateTileInfoInline from './info_inline';
 
 dayjs.extend(advancedFormat);
 
@@ -67,7 +67,7 @@ type CalendarCreateTileProps = {
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
   const ui = useCalendarUI((state) => state.createTile);
-  const { formData, handleFormInputChange, resetForm } = formHandler;
+  const { formData, resetForm } = formHandler;
   const theme = useStyledTheme();
   const { t } = useTranslation();
 
@@ -240,81 +240,15 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         </button>
       </header>
 
-      {/* Tile Description */}
+      {/* Tile Info (Inline) */}
       <Section $isexpanded={ui.state.isExpanded}>
-        <DescriptionContainer>
-          <Trans
-            i18nKey="calendar.createTile.description"
-            components={{
-              action: (
-                <DescriptionInput
-                  markRequired
-                  value={formData.action}
-                  onChange={handleFormInputChange('action')}
-                  minWidth={50}
-                  maxWidth={250}
-                />
-              ),
-              location: (
-                <DescriptionInput
-                  value={formData.location}
-                  onChange={handleFormInputChange('location')}
-                  minWidth={50}
-                  maxWidth={250}
-                />
-              ),
-              hours: (
-                <DescriptionInput
-                  markRequired
-                  value={formData.durationHours}
-                  onChange={handleFormInputChange('durationHours', {
-                    restriction: 'integer',
-                  })}
-                  minWidth={50}
-                  maxWidth={50}
-                  type="number"
-                />
-              ),
-              minutes: (
-                <DescriptionInput
-                  markRequired
-                  value={formData.durationMins}
-                  onChange={handleFormInputChange('durationMins', {
-                    restriction: 'integer',
-                  })}
-                  minWidth={50}
-                  maxWidth={50}
-                  type="number"
-                />
-              ),
-              date: (
-                <DescriptionDatePickerContainer>
-                  <DescriptionDatePickerDisplay>
-                    {dayjs(formData.deadline)
-                      .toDate()
-                      .toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      })}
-                    <Calendar color={theme.colors.text.secondary} size={20} />
-                  </DescriptionDatePickerDisplay>
-                  <DatePicker
-                    ghostInput
-                    value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-                    minDate={dayjs().format('YYYY-MM-DD')}
-                    onChange={(date) =>
-                      handleFormInputChange('deadline', {
-                        mode: 'static',
-                      })(dayjs(date))
-                    }
-                  />
-                </DescriptionDatePickerContainer>
-              ),
-            }}
-          />
-        </DescriptionContainer>
+				<CreateTileInfoInline formHandler={formHandler} />
       </Section>
+
+			{/* Tile Info (Classic) */}
+			<Section $isexpanded={ui.state.isExpanded}>
+				{/* Classic UI Goes here */}
+			</Section>
 
       <Seperator />
       <TipContainer>
@@ -334,10 +268,10 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
       {ui.state.isExpanded && (
         <>
           <Section $isexpanded={ui.state.isExpanded}>
-            <Options formHandler={formHandler} />
+            <CreateTileOptions formHandler={formHandler} />
           </Section>
           <Spacer />
-          <Summary formData={formData} />
+          <CreateTileSummary formData={formData} />
         </>
       )}
       <ButtonContainer $isexpanded={ui.state.isExpanded}>
@@ -395,12 +329,13 @@ const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	background-color: ${(props) => props.theme.colors.background.card};
 `;
 
-export const DescriptionDatePickerContainer = styled.div`
+// -- INLINE FIELDS --
+export const InlineDatePickerContainer = styled.div`
 	width: 150px;
 	position: relative;
 `;
 
-export const DescriptionDatePickerDisplay = styled.div`
+export const InlineDatePickerDisplay = styled.div`
 	position: absolute;
 	inset: 0;
 	background: none;
@@ -415,12 +350,12 @@ export const DescriptionDatePickerDisplay = styled.div`
 	align-items: center;
 `;
 
-const DescriptionInput = styled(AutosizeInput)`
+export const InlineInput = styled(AutosizeInput)`
 	color: ${(props) => props.theme.colors.highlight.text};
 	border-bottom: 1.5px dashed ${(props) => props.theme.colors.highlight.text} !important;
 `;
 
-export const DescriptionContainer = styled.div`
+export const InlineControl = styled.div`
 	box-shadow: 0 0 0 1.5px ${(props) => props.theme.colors.border};
 	border-radius: ${(props) => props.theme.borderRadius.xLarge};
 	padding: 1rem 1.25rem;

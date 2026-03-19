@@ -11,14 +11,14 @@ import {
   ScheduleRepeatWeekday,
 } from '../../../types/schedule';
 import { InitialCreateTileFormState } from '.';
-import ColorOptions from './options.color';
-import ActionsOptions from './options.actions';
+import CreateTileColorOptions from './options.color';
+import CreateTileActionsOptions from './options.actions';
 
 type OptionsProps = {
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
-const Options: React.FC<OptionsProps> = ({ formHandler }) => {
+const CreateTileOptions: React.FC<OptionsProps> = ({ formHandler }) => {
   const { t } = useTranslation();
   const { formData } = formHandler;
 
@@ -108,12 +108,12 @@ const Options: React.FC<OptionsProps> = ({ formHandler }) => {
   const tileOptions = [
     {
       title: t('calendar.createTile.sections.tileColor'),
-      content: <ColorOptions formHandler={formHandler} />,
+      content: <CreateTileColorOptions formHandler={formHandler} />,
     },
     {
       title: t('calendar.createTile.sections.tileActions'),
       content: (
-        <ActionsOptions
+        <CreateTileActionsOptions
           formHandler={formHandler}
           recurrenceTypeOptions={recurrenceTypeOptions}
           recurrenceEndTypeOptions={recurrenceEndTypeOptions}
@@ -136,7 +136,7 @@ const Options: React.FC<OptionsProps> = ({ formHandler }) => {
   );
 };
 
-export default Options;
+export default CreateTileOptions;
 
 const TileOptionHeader = styled.header`
 	font-size: ${(props) => props.theme.typography.fontSize.lg};

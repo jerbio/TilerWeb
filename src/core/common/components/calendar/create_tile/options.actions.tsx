@@ -14,9 +14,9 @@ import {
 import DatePicker from '../../date_picker';
 import Toggle from '../../Toggle';
 import {
-  DescriptionContainer,
-  DescriptionDatePickerContainer,
-  DescriptionDatePickerDisplay,
+  InlineControl,
+  InlineDatePickerContainer,
+  InlineDatePickerDisplay,
   InitialCreateTileFormState,
 } from '.';
 import Radio from '../../radio';
@@ -33,7 +33,7 @@ type ActionsOptionsProps = {
   recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
 };
 
-const ActionsOptions: React.FC<ActionsOptionsProps> = ({
+const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
   formHandler: { formData, handleFormInputChange },
 	recurrenceTypeOptions,
 	recurrenceWeekdayOptions,
@@ -147,15 +147,15 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
             ))}
           </RecurrenceEndTypeOptions>
           {formData.recurrenceStartType === ScheduleRepeatStartType.On && (
-            <DescriptionContainer
+            <InlineControl
               style={{ border: `1px solid ${theme.colors.border.default}` }}
             >
               <Trans
                 i18nKey="calendar.createTile.sections.recurrenceStartDate.description"
                 components={{
                   date: (
-                    <DescriptionDatePickerContainer>
-                      <DescriptionDatePickerDisplay>
+                    <InlineDatePickerContainer>
+                      <InlineDatePickerDisplay>
                         {dayjs(formData.recurrenceStartDate)
                           .toDate()
                           .toLocaleDateString(undefined, {
@@ -167,7 +167,7 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                           color={theme.colors.text.secondary}
                           size={20}
                         />
-                      </DescriptionDatePickerDisplay>
+                      </InlineDatePickerDisplay>
                       <DatePicker
                         ghostInput
                         value={dayjs(formData.recurrenceStartDate).format(
@@ -187,11 +187,11 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                             : undefined
                         }
                       />
-                    </DescriptionDatePickerContainer>
+                    </InlineDatePickerContainer>
                   ),
                 }}
               />
-            </DescriptionContainer>
+            </InlineControl>
           )}
           {/* Recurrence End Date Selection */}
           <TileActionHeader>
@@ -216,15 +216,15 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
             ))}
           </RecurrenceEndTypeOptions>
           {formData.recurrenceEndType === ScheduleRepeatEndType.On && (
-            <DescriptionContainer
+            <InlineControl
               style={{ border: `1px solid ${theme.colors.border.default}` }}
             >
               <Trans
                 i18nKey="calendar.createTile.sections.recurrenceEndDate.description"
                 components={{
                   date: (
-                    <DescriptionDatePickerContainer>
-                      <DescriptionDatePickerDisplay>
+                    <InlineDatePickerContainer>
+                      <InlineDatePickerDisplay>
                         {dayjs(formData.recurrenceEndDate)
                           .toDate()
                           .toLocaleDateString(undefined, {
@@ -236,7 +236,7 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                           color={theme.colors.text.secondary}
                           size={20}
                         />
-                      </DescriptionDatePickerDisplay>
+                      </InlineDatePickerDisplay>
                       <DatePicker
                         ghostInput
                         value={dayjs(formData.recurrenceEndDate).format(
@@ -254,11 +254,11 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                             : formData.start
                         ).format('YYYY-MM-DD')}
                       />
-                    </DescriptionDatePickerContainer>
+                    </InlineDatePickerContainer>
                   ),
                 }}
               />
-            </DescriptionContainer>
+            </InlineControl>
           )}
         </TileActionContainer>
       )}
@@ -266,7 +266,7 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
   );
 };
 
-export default ActionsOptions;
+export default CreateTileActionsOptions;
 
 const StyledActionsOptions = styled.div`
 	display: flex;

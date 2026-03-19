@@ -15,7 +15,7 @@ type SummaryProps = {
   formData: InitialCreateTileFormState;
 };
 
-const Summary: React.FC<SummaryProps> = ({ formData }) => {
+const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
 
@@ -96,7 +96,7 @@ const Summary: React.FC<SummaryProps> = ({ formData }) => {
   );
 };
 
-export default Summary;
+export default CreateTileSummary;
 
 const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
 	${({ theme, $darkmode, $color }) => {
