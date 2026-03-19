@@ -5,7 +5,6 @@ import TileCardSection from '../components/home/tile_card_section';
 import CalendarIntegrationSection from '../components/home/integration_section';
 import HeroSection from '../components/home/hero_section';
 import VideoIframeSection from '../components/home/video_iframe_section';
-import Waitlist from '../components/home/waitlist_input';
 import AppDownloadSection from '../components/home/app_download_section';
 import FAQ from '../components/home/faq_section';
 import DemoExplainerSection from '../components/home/demo_explainer_section';
@@ -63,7 +62,6 @@ const Home: React.FC = () => {
 			<TileCardSection />
 			<CalendarIntegrationSection />
 			<FAQ />
-			<Waitlist />
 			<AppDownloadSection />
 		</>
 	);
