@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useState, useMemo } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
 import {
@@ -88,83 +88,164 @@ const SetupRowLabel = styled.span<{ $done?: boolean }>`
   line-height: 1;
 `;
 
-// ─── Set Up Tiler Card Grid ─────────────────────────────────────────────────
+// ─── Google Maps-style Step List ─────────────────────────────────────────────
 
-const SetupGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  padding: 1.25rem 0 0.5rem;
+const StepList = styled.div`
+  padding: 1.5rem 1.5rem 0.5rem;
 
   @media (max-width: 640px) {
-    grid-template-columns: 1fr;
+    padding: 1.25rem 1rem 0.5rem;
   }
 `;
 
-const SetupCard = styled.div`
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.xLarge};
-  overflow: hidden;
+const StepItem = styled.div`
   display: flex;
-  flex-direction: column;
-  transition: border-color 0.3s, transform 0.3s;
-
-  &:hover {
-    border-color: ${palette.colors.brand[500]}40;
-    transform: translateY(-3px);
-  }
-`;
-
-const SetupAnim = styled.div`
-  height: 170px;
-  background: ${palette.colors.gray[900]};
-  border-bottom: 1px solid ${palette.colors.gray[700]};
+  gap: 1rem;
   position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
-const SetupBody = styled.div`
-  padding: 14px 18px 18px;
+const StepIconColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  width: 28px;
 `;
 
-const SetupCardStepBadge = styled.div`
-  width: 1.875rem;
-  height: 1.875rem;
-  border-radius: 9999px;
-  background: ${palette.colors.brand[500]};
+const dotPulse = keyframes`
+  0%, 100% { box-shadow: 0 0 0 0 ${palette.colors.brand[500]}50; }
+  50%       { box-shadow: 0 0 0 6px ${palette.colors.brand[500]}00; }
+`;
+
+const StepCircle = styled.div<{ $active?: boolean; $last?: boolean }>`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.bold};
   flex-shrink: 0;
+  background: ${({ $active, $last }) =>
+    $last
+      ? `${palette.colors.brand[500]}20`
+      : $active
+      ? `${palette.colors.brand[500]}25`
+      : `${palette.colors.gray[800]}`};
+  border: 2px solid ${({ $active, $last }) =>
+    $last
+      ? palette.colors.brand[400]
+      : $active
+      ? `${palette.colors.brand[500]}60`
+      : palette.colors.gray[600]};
+  animation: ${({ $last }) => ($last ? css`${dotPulse} 2s ease-in-out infinite` : 'none')};
 `;
 
-const SetupCardTitle = styled.h3`
+const StepConnector = styled.div`
+  flex: 1;
+  width: 2px;
+  background: ${palette.colors.gray[700]};
+  min-height: 24px;
+`;
+
+const StepContent = styled.div<{ $last?: boolean }>`
+  flex: 1;
+  padding-bottom: ${({ $last }) => ($last ? '0' : '1.5rem')};
+
+  @media (max-width: 640px) {
+    padding-bottom: ${({ $last }) => ($last ? '0' : '1.25rem')};
+  }
+`;
+
+const StepTitle = styled.h3`
   font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xl};
+  font-size: ${palette.typography.fontSize.base};
   font-weight: ${palette.typography.fontWeight.semibold};
   color: ${palette.colors.gray[100]};
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.75;
 `;
 
-const SetupCardSubtext = styled.p`
+const StepDesc = styled.p`
   font-family: ${palette.typography.fontFamily.inter};
   font-size: ${palette.typography.fontSize.sm};
   color: ${palette.colors.gray[500]};
-  line-height: 1.5;
-  margin: 0;
+  margin: 0.25rem 0 0;
+  line-height: 1.6;
 `;
+
+// ─── Step Icons (small SVG illustrations) ────────────────────────────────────
+
+const fadeCheck = keyframes`
+  0%, 70% { opacity: 0; transform: scale(0.5); }
+  100%    { opacity: 1; transform: scale(1); }
+`;
+
+const gentlePulse = keyframes`
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+`;
+
+const gentleRotate = keyframes`
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const sparkle = keyframes`
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.2); }
+`;
+
+const IconSvg = styled.svg`
+  width: 14px;
+  height: 14px;
+`;
+
+const UserIcon = () => (
+  <IconSvg viewBox="0 0 24 24" fill="none" stroke={palette.colors.brand[400]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+    <circle cx="17" cy="4" r="2.5" fill="#12B76A" stroke="#12B76A" strokeWidth="1.5" opacity="0.9">
+      <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.6;0.85;1" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <path d="M16 4l0.7 0.7 1.3-1.4" stroke="#fff" strokeWidth="1.5" fill="none">
+      <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.65;0.9;1" dur="3s" repeatCount="indefinite" />
+    </path>
+  </IconSvg>
+);
+
+const CalendarIcon = () => (
+  <IconSvg viewBox="0 0 24 24" fill="none" stroke={palette.colors.brand[400]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+    <circle cx="12" cy="15" r="1.5" fill={palette.colors.brand[400]} stroke="none">
+      <animate attributeName="r" values="1.5;2.2;1.5" dur="2s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
+    </circle>
+  </IconSvg>
+);
+
+const GearIcon = () => (
+  <IconSvg viewBox="0 0 24 24" fill="none" stroke={palette.colors.brand[400]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'none' }}>
+    <g>
+      <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="8s" repeatCount="indefinite" />
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </g>
+  </IconSvg>
+);
+
+const SparkleIcon = () => (
+  <IconSvg viewBox="0 0 24 24" fill={palette.colors.brand[400]} stroke="none">
+    <g>
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
+      <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" />
+    </g>
+  </IconSvg>
+);
+
+// ─── Support Note ────────────────────────────────────────────────────────────
 
 const SetupSupportNote = styled.p`
   font-family: ${palette.typography.fontFamily.inter};
@@ -178,280 +259,37 @@ const SetupSupportNote = styled.p`
   text-align: left;
 `;
 
-// ─── Card 1: Sign-up form (JS-animated) ─────────────────────────────────────
-
-const SaSignupScene = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 78%;
-`;
-
-const SaSignupInput = styled.div`
-  padding: 9px 12px;
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.medium};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  color: ${palette.colors.gray[400]};
-`;
-
-const SaSignupBtn = styled.div<{ $phase: 'idle' | 'creating' | 'done' }>`
-  padding: 9px 12px;
-  border-radius: ${palette.borderRadius.medium};
-  text-align: center;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: #fff;
-  background: ${({ $phase }) =>
-    $phase === 'done' ? '#12B76A' :
-    $phase === 'creating' ? palette.colors.gray[600] :
-    palette.colors.brand[500]};
-  transition: background 0.35s;
-`;
-
-// ─── Card 2: Calendar connect (JS-animated) ─────────────────────────────────
-
-const SaCalRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 78%;
-`;
-
-const SaCalIcon = styled.div<{ $connected: boolean }>`
-  width: 48px;
-  height: 48px;
-  border-radius: ${palette.borderRadius.medium};
-  border: 2px solid ${({ $connected }) => $connected ? '#12B76A' : palette.colors.gray[700]};
-  background: ${palette.colors.gray[800]};
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-  transition: border-color 0.4s;
-`;
-
-const SaCalIconTop = styled.div`
-  background: ${palette.colors.brand[500]};
-  height: 12px;
-  width: 100%;
-  flex-shrink: 0;
-`;
-
-const SaCalIconDate = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 17px;
-  font-weight: ${palette.typography.fontWeight.bold};
-  color: ${palette.colors.gray[100]};
-  line-height: 1;
-`;
-
-const SaCalInfo = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const SaCalName = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.sm};
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${palette.colors.gray[100]};
-`;
-
-const SaCalStatus = styled.div<{ $ok: boolean }>`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: ${palette.typography.fontSize.xs};
-  color: ${({ $ok }) => $ok ? '#12B76A' : palette.colors.gray[500]};
-  transition: color 0.4s;
-`;
-
-const SaCalCheck = styled.div<{ $show: boolean }>`
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #12B76A;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: #fff;
-  flex-shrink: 0;
-  opacity: ${({ $show }) => $show ? 1 : 0};
-  transition: opacity 0.4s;
-`;
-
-// ─── Card 3: Preferences (JS-animated) ──────────────────────────────────────
-
-const SaPrefsScene = styled.div`
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const SaPrefRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const SaPrefLabel = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  color: ${palette.colors.gray[600]};
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-`;
-
-const SaTransitRow = styled.div`
-  display: flex;
-  gap: 6px;
-`;
-
-const SaTransitOption = styled.div<{ $active: boolean }>`
-  flex: 1;
-  padding: 6px 4px;
-  border-radius: ${palette.borderRadius.medium};
-  border: 1px solid ${({ $active }) => $active ? `${palette.colors.brand[500]}40` : palette.colors.gray[700]};
-  background: ${({ $active }) => $active ? `${palette.colors.brand[500]}15` : palette.colors.gray[800]};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  text-align: center;
-  color: ${({ $active }) => $active ? palette.colors.brand[400] : palette.colors.gray[500]};
-  transition: all 0.4s;
-`;
-
-const SaTimeRange = styled.div`
-  padding: 7px 10px;
-  background: ${palette.colors.gray[800]};
-  border: 1px solid ${palette.colors.gray[700]};
-  border-radius: ${palette.borderRadius.medium};
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  color: ${palette.colors.gray[400]};
-  display: flex;
-  justify-content: space-between;
-`;
-
-// ─── Card 4: Adaptive scheduling (JS-animated) ──────────────────────────────
-
-const SaSchedScene = styled.div`
-  width: 88%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const SaSchedTimeLabel = styled.div`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 9px;
-  color: ${palette.colors.gray[600]};
-  margin-bottom: 1px;
-`;
-
-const SaSchedRow = styled.div`
-  display: flex;
-  gap: 5px;
-  align-items: center;
-`;
-
-const SaSchedBlock = styled.div<{
-  $bg: string;
-  $width?: string;
-  $shifted?: boolean;
-  $visible?: boolean;
-}>`
-  height: 28px;
-  border-radius: ${palette.borderRadius.little};
-  background: ${({ $bg }) => $bg};
-  width: ${({ $width }) => $width || 'auto'};
-  flex: ${({ $width }) => $width ? '0 0 auto' : '1'};
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 9px;
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: rgba(255, 255, 255, 0.75);
-  transform: translateX(${({ $shifted }) => $shifted ? '46px' : '0'});
-  opacity: ${({ $visible }) => $visible === false ? 0 : 1};
-  transition: transform 0.65s ease, opacity 0.45s ease;
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-const SaSchedStatus = styled.div<{ $phase: string }>`
-  font-family: ${palette.typography.fontFamily.inter};
-  font-size: 10px;
-  font-weight: ${palette.typography.fontWeight.semibold};
-  color: ${({ $phase }) =>
-    $phase === 'settled' ? '#12B76A' :
-    $phase === 'disrupted' ? palette.colors.brand[400] :
-    'transparent'};
-  margin-top: 3px;
-  transition: color 0.35s;
-  min-height: 15px;
-`;
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const SetUpTilerSection: React.FC = () => {
   const { t } = useTranslation();
   const [setUpOpen, setSetUpOpen] = useState(false);
 
-  // Animation state
-  const [signupPhase, setSignupPhase] = useState<'idle' | 'creating' | 'done'>('idle');
-  const [calStatus, setCalStatus] = useState<'idle' | 'connecting' | 'connected'>('idle');
-  const [transitMode, setTransitMode] = useState<'drive' | 'transit' | 'walk'>('drive');
-  const [schedPhase, setSchedPhase] = useState<'normal' | 'disrupted' | 'settled'>('normal');
-
-  useEffect(() => {
-    if (!setUpOpen) return;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    const signupCycle = () => {
-      setSignupPhase('idle');
-      timers.push(setTimeout(() => setSignupPhase('creating'), 2000));
-      timers.push(setTimeout(() => setSignupPhase('done'), 3200));
-      timers.push(setTimeout(signupCycle, 6000));
-    };
-    signupCycle();
-
-    const calCycle = () => {
-      setCalStatus('idle');
-      timers.push(setTimeout(() => setCalStatus('connecting'), 2000));
-      timers.push(setTimeout(() => setCalStatus('connected'), 3200));
-      timers.push(setTimeout(calCycle, 6500));
-    };
-    calCycle();
-
-    const transitCycle = () => {
-      setTransitMode('drive');
-      timers.push(setTimeout(() => setTransitMode('transit'), 2000));
-      timers.push(setTimeout(() => setTransitMode('walk'), 3800));
-      timers.push(setTimeout(transitCycle, 6000));
-    };
-    transitCycle();
-
-    const schedCycle = () => {
-      setSchedPhase('normal');
-      timers.push(setTimeout(() => setSchedPhase('disrupted'), 2000));
-      timers.push(setTimeout(() => setSchedPhase('settled'), 3500));
-      timers.push(setTimeout(schedCycle, 7000));
-    };
-    schedCycle();
-
-    return () => timers.forEach(clearTimeout);
-  }, [setUpOpen]);
+  const steps = useMemo(
+    () => [
+      {
+        icon: <UserIcon />,
+        title: t('discover.setUpTiler.cards.account.title'),
+        desc: t('discover.setUpTiler.cards.account.subtext'),
+      },
+      {
+        icon: <CalendarIcon />,
+        title: t('discover.setUpTiler.cards.calendar.title'),
+        desc: t('discover.setUpTiler.cards.calendar.subtext'),
+      },
+      {
+        icon: <GearIcon />,
+        title: t('discover.setUpTiler.cards.preferences.title'),
+        desc: t('discover.setUpTiler.cards.preferences.subtext'),
+      },
+      {
+        icon: <SparkleIcon />,
+        title: t('discover.setUpTiler.cards.adaptive.title'),
+        desc: t('discover.setUpTiler.cards.adaptive.subtext'),
+      },
+    ],
+    [t]
+  );
 
   return (
     <ExpandableWrapper>
@@ -491,145 +329,29 @@ const SetUpTilerSection: React.FC = () => {
 
         <ExpandableBody $open={setUpOpen}>
           <ExpandableBodyInner>
-            <SetupGrid>
-
-              {/* Card 1: Create your account */}
-              <SetupCard>
-                <SetupAnim>
-                  <SaSignupScene>
-                    <SaSignupInput>gloria@example.com</SaSignupInput>
-                    <SaSignupBtn $phase={signupPhase}>
-                      {signupPhase === 'idle'
-                        ? t('discover.setUpTiler.cards.account.btnIdle')
-                        : signupPhase === 'creating'
-                        ? t('discover.setUpTiler.cards.account.btnCreating')
-                        : t('discover.setUpTiler.cards.account.btnDone')}
-                    </SaSignupBtn>
-                  </SaSignupScene>
-                </SetupAnim>
-                <SetupBody>
-                  <SetupCardStepBadge>1</SetupCardStepBadge>
-                  <SetupCardTitle>{t('discover.setUpTiler.cards.account.title')}</SetupCardTitle>
-                  <SetupCardSubtext>{t('discover.setUpTiler.cards.account.subtext')}</SetupCardSubtext>
-                </SetupBody>
-              </SetupCard>
-
-              {/* Card 2: Connect your calendar */}
-              <SetupCard>
-                <SetupAnim>
-                  <SaCalRow>
-                    <SaCalIcon $connected={calStatus !== 'idle'}>
-                      <SaCalIconTop />
-                      <SaCalIconDate>17</SaCalIconDate>
-                    </SaCalIcon>
-                    <SaCalInfo>
-                      <SaCalName>{t('discover.setUpTiler.cards.calendar.calName')}</SaCalName>
-                      <SaCalStatus $ok={calStatus !== 'idle'}>
-                        {calStatus === 'idle'
-                          ? t('discover.setUpTiler.cards.calendar.statusIdle')
-                          : calStatus === 'connecting'
-                          ? t('discover.setUpTiler.cards.calendar.statusConnecting')
-                          : t('discover.setUpTiler.cards.calendar.statusConnected')}
-                      </SaCalStatus>
-                    </SaCalInfo>
-                    <SaCalCheck $show={calStatus === 'connected'}>✓</SaCalCheck>
-                  </SaCalRow>
-                </SetupAnim>
-                <SetupBody>
-                  <SetupCardStepBadge>2</SetupCardStepBadge>
-                  <SetupCardTitle>{t('discover.setUpTiler.cards.calendar.title')}</SetupCardTitle>
-                  <SetupCardSubtext>{t('discover.setUpTiler.cards.calendar.subtext')}</SetupCardSubtext>
-                </SetupBody>
-              </SetupCard>
-
-              {/* Card 3: Set up your preferences */}
-              <SetupCard>
-                <SetupAnim>
-                  <SaPrefsScene>
-                    <SaPrefRow>
-                      <SaPrefLabel>{t('discover.setUpTiler.cards.preferences.transitLabel')}</SaPrefLabel>
-                      <SaTransitRow>
-                        <SaTransitOption $active={transitMode === 'drive'}>
-                          🚗 {t('discover.setUpTiler.cards.preferences.drive')}
-                        </SaTransitOption>
-                        <SaTransitOption $active={transitMode === 'transit'}>
-                          🚌 {t('discover.setUpTiler.cards.preferences.transit')}
-                        </SaTransitOption>
-                        <SaTransitOption $active={transitMode === 'walk'}>
-                          🚶 {t('discover.setUpTiler.cards.preferences.walk')}
-                        </SaTransitOption>
-                      </SaTransitRow>
-                    </SaPrefRow>
-                    <SaPrefRow>
-                      <SaPrefLabel>{t('discover.setUpTiler.cards.preferences.workHoursLabel')}</SaPrefLabel>
-                      <SaTimeRange>
-                        <span>9:00 am</span>
-                        <span>→</span>
-                        <span>6:00 pm</span>
-                      </SaTimeRange>
-                    </SaPrefRow>
-                  </SaPrefsScene>
-                </SetupAnim>
-                <SetupBody>
-                  <SetupCardStepBadge>3</SetupCardStepBadge>
-                  <SetupCardTitle>{t('discover.setUpTiler.cards.preferences.title')}</SetupCardTitle>
-                  <SetupCardSubtext>{t('discover.setUpTiler.cards.preferences.subtext')}</SetupCardSubtext>
-                </SetupBody>
-              </SetupCard>
-
-              {/* Card 4: Ready for Adaptive Scheduling */}
-              <SetupCard>
-                <SetupAnim>
-                  <SaSchedScene>
-                    <SaSchedTimeLabel>{t('discover.setUpTiler.cards.adaptive.schedLabel')}</SaSchedTimeLabel>
-                    <SaSchedRow>
-                      <SaSchedBlock $bg={palette.colors.gray[700]} $width="88px">
-                        {t('discover.setUpTiler.cards.adaptive.meeting')}
-                      </SaSchedBlock>
-                      <SaSchedBlock
-                        $bg={`${palette.colors.brand[500]}90`}
-                        $shifted={schedPhase === 'settled'}
-                      >
-                        {t('discover.setUpTiler.cards.adaptive.run')}
-                      </SaSchedBlock>
-                    </SaSchedRow>
-                    <SaSchedRow>
-                      <SaSchedBlock
-                        $bg={palette.colors.gray[700]}
-                        $width="88px"
-                        $visible={schedPhase !== 'normal'}
-                      >
-                        {t('discover.setUpTiler.cards.adaptive.newTime')}
-                      </SaSchedBlock>
-                      <SaSchedBlock
-                        $bg={`${palette.colors.gray[600]}`}
-                        $visible={schedPhase !== 'normal'}
-                      >
-                        {t('discover.setUpTiler.cards.adaptive.urgentCall')}
-                      </SaSchedBlock>
-                    </SaSchedRow>
-                    <SaSchedStatus $phase={schedPhase}>
-                      {schedPhase === 'disrupted'
-                        ? t('discover.setUpTiler.cards.adaptive.recalculating')
-                        : schedPhase === 'settled'
-                        ? t('discover.setUpTiler.cards.adaptive.rebuilt')
-                        : ''}
-                    </SaSchedStatus>
-                  </SaSchedScene>
-                </SetupAnim>
-                <SetupBody>
-                  <SetupCardStepBadge>4</SetupCardStepBadge>
-                  <SetupCardTitle>{t('discover.setUpTiler.cards.adaptive.title')}</SetupCardTitle>
-                  <SetupCardSubtext>{t('discover.setUpTiler.cards.adaptive.subtext')}</SetupCardSubtext>
-                </SetupBody>
-              </SetupCard>
-
-            </SetupGrid>
+            <StepList>
+              {steps.map((step, i) => {
+                const isLast = i === steps.length - 1;
+                return (
+                  <StepItem key={i}>
+                    <StepIconColumn>
+                      <StepCircle $active={!isLast} $last={isLast}>
+                        {step.icon}
+                      </StepCircle>
+                      {!isLast && <StepConnector />}
+                    </StepIconColumn>
+                    <StepContent $last={isLast}>
+                      <StepTitle>{step.title}</StepTitle>
+                      <StepDesc>{step.desc}</StepDesc>
+                    </StepContent>
+                  </StepItem>
+                );
+              })}
+            </StepList>
 
             <SetupSupportNote>
               {t('discover.setUpTiler.supportNote')}
             </SetupSupportNote>
-
           </ExpandableBodyInner>
         </ExpandableBody>
       </ExpandableSection>
