@@ -10,6 +10,7 @@ import {
   HeroSubtitle,
   BackgroundBlur,
 } from '../components/discover/shared';
+import FeaturesSection from '../components/discover/FeaturesSection';
 
 const Newsletter: React.FC = () => {
   const { t } = useTranslation();
@@ -29,6 +30,8 @@ const Newsletter: React.FC = () => {
             <HeroTitle>{t('discover.hero.title')}</HeroTitle>
             <HeroSubtitle>{t('discover.hero.subtitle')}</HeroSubtitle>
           </Hero>
+
+          <FeaturesSection />
         </PageWrapper>
       </Section>
     </>
