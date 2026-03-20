@@ -25,6 +25,11 @@ const buildSchedule = (overrides?: (Partial<DaySchedule> | undefined)[]): DaySch
 		...(overrides?.[i] ?? {}),
 	}));
 
+const getTimeButtonsInDay = (dayIndex: number) => {
+	const dayColumn = screen.getByTestId(`day-column-${dayIndex}`);
+	return within(dayColumn).getAllByRole('button').slice(0, 2);
+};
+
 describe('WeeklySchedule', () => {
 	describe('Rendering', () => {
 		it('renders all 7 day labels', () => {
@@ -42,11 +47,11 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
 			);
 
-			// Start/End appear as <option> placeholder text inside each dropdown
-			const startOptions = screen.getAllByRole('option', { name: 'Start' });
-			const endOptions = screen.getAllByRole('option', { name: 'End' });
-			expect(startOptions).toHaveLength(7);
-			expect(endOptions).toHaveLength(7);
+			// TimeDropdown renders trigger buttons instead of native select elements.
+			const startButtons = screen.getAllByRole('button', { name: 'Start' });
+			const endButtons = screen.getAllByRole('button', { name: 'End' });
+			expect(startButtons).toHaveLength(7);
+			expect(endButtons).toHaveLength(7);
 		});
 
 		it('displays provided start and end times', () => {
@@ -59,10 +64,9 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
 			);
 
-			const mondayColumn = screen.getByTestId('day-column-1');
-			const selects = within(mondayColumn).getAllByRole('combobox');
-			expect(selects[0]).toHaveValue('8:00 AM');
-			expect(selects[1]).toHaveValue('6:00 PM');
+			const [startButton, endButton] = getTimeButtonsInDay(1);
+			expect(startButton).toHaveTextContent('8:00 AM');
+			expect(endButton).toHaveTextContent('6:00 PM');
 		});
 
 		it('renders empty dropdowns when no time is set', () => {
@@ -70,10 +74,9 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
 			);
 
-			const sundayColumn = screen.getByTestId('day-column-0');
-			const selects = within(sundayColumn).getAllByRole('combobox');
-			expect(selects[0]).toHaveValue('');
-			expect(selects[1]).toHaveValue('');
+			const [startButton, endButton] = getTimeButtonsInDay(0);
+			expect(startButton).toHaveTextContent('Start');
+			expect(endButton).toHaveTextContent('End');
 		});
 	});
 
@@ -116,9 +119,9 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={schedule} onChange={onChange} />,
 			);
 
-			const mondayColumn = screen.getByTestId('day-column-1');
-			const selects = within(mondayColumn).getAllByRole('combobox');
-			await user.selectOptions(selects[0], '9:00 AM');
+			const [startButton] = getTimeButtonsInDay(1);
+			await user.click(startButton);
+			await user.click(await screen.findByText('9:00 AM'));
 
 			expect(onChange).toHaveBeenCalledWith(1, 'startTime', '9:00 AM');
 		});
@@ -135,9 +138,9 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={schedule} onChange={onChange} />,
 			);
 
-			const mondayColumn = screen.getByTestId('day-column-1');
-			const selects = within(mondayColumn).getAllByRole('combobox');
-			await user.selectOptions(selects[1], '6:00 PM');
+			const [, endButton] = getTimeButtonsInDay(1);
+			await user.click(endButton);
+			await user.click(await screen.findByText('6:00 PM'));
 
 			expect(onChange).toHaveBeenCalledWith(1, 'endTime', '6:00 PM');
 		});
@@ -216,9 +219,9 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} disabled />,
 			);
 
-			const selects = screen.getAllByRole('combobox');
-			selects.forEach((select) => {
-				expect(select).toBeDisabled();
+			const timeButtons = screen.getAllByRole('button', { name: /^(Start|End)$/ });
+			timeButtons.forEach((button) => {
+				expect(button).toBeDisabled();
 			});
 		});
 	});
@@ -229,9 +232,9 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} readOnly />,
 			);
 
-			const selects = screen.getAllByRole('combobox');
-			selects.forEach((select) => {
-				expect(select).toBeDisabled();
+			const timeButtons = screen.getAllByRole('button', { name: /^(Start|End)$/ });
+			timeButtons.forEach((button) => {
+				expect(button).toBeDisabled();
 			});
 		});
 	});

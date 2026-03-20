@@ -1,7 +1,9 @@
 import '@testing-library/jest-dom/vitest';
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { server } from './mocks/server';
+
+// Note: beforeAll, afterAll, afterEach, beforeEach, vi are available as globals
+// when vitest.config.ts has `globals: true`
 
 // Start MSW server before all tests
 beforeAll(() => {
@@ -32,6 +34,11 @@ beforeEach(() => {
 afterEach(() => {
 	vi.useRealTimers();
 });
+
+// JSDOM does not implement scrollIntoView; components call it when opening dropdowns.
+if (!Element.prototype.scrollIntoView) {
+	Element.prototype.scrollIntoView = vi.fn();
+}
 
 // Mock static assets with unique identifiers to allow verification
 vi.mock('@/assets/add_block.svg', () => ({ default: 'mock:add_block.svg' }));
