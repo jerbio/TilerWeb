@@ -205,9 +205,11 @@ describe('PreferencesSettings', () => {
 
 			// Find bed time dropdowns (scoped to bed-time section)
 			const bedTimeSection = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection).getAllByRole('combobox');
-			const startTimeSelect = selects[0];
-			fireEvent.change(startTimeSelect, { target: { value: '10:00 PM' } });
+			const dropdownButtons = within(bedTimeSection).getAllByRole('button');
+			const startTimeButton = dropdownButtons[0];
+			// Click to open dropdown and select time
+			fireEvent.click(startTimeButton);
+			fireEvent.click(screen.getByText('10:00 PM'));
 
 			// Click save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -239,11 +241,12 @@ describe('PreferencesSettings', () => {
 
 			// Find bed time dropdowns (scoped to bed-time section)
 			const bedTimeSection = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection).getAllByRole('combobox');
-			const endTimeSelect = selects[1];
+			const dropdownButtons = within(bedTimeSection).getAllByRole('button');
+			const endTimeButton = dropdownButtons[1];
 
-			// Select an end time only
-			fireEvent.change(endTimeSelect, { target: { value: '6:00 AM' } });
+			// Click to open dropdown and select end time only
+			fireEvent.click(endTimeButton);
+			fireEvent.click(screen.getByText('6:00 AM'));
 
 			// Click save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -275,13 +278,15 @@ describe('PreferencesSettings', () => {
 
 			// Find bed time dropdowns (scoped to bed-time section)
 			const bedTimeSection = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection).getAllByRole('combobox');
-			const startTimeSelect = selects[0];
-			const endTimeSelect = selects[1];
+			const dropdownButtons = within(bedTimeSection).getAllByRole('button');
+			const startTimeButton = dropdownButtons[0];
+			const endTimeButton = dropdownButtons[1];
 
-			// Select both times
-			fireEvent.change(startTimeSelect, { target: { value: '10:00 PM' } });
-			fireEvent.change(endTimeSelect, { target: { value: '6:00 AM' } });
+			// Select both times by clicking dropdowns and options
+			fireEvent.click(startTimeButton);
+			fireEvent.click(screen.getByText('10:00 PM'));
+			fireEvent.click(endTimeButton);
+			fireEvent.click(screen.getByText('6:00 AM'));
 
 			// Click save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -339,9 +344,13 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection1 = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection1).getAllByRole('combobox');
-			fireEvent.change(selects[0], { target: { value: '10:00 PM' } });
-			fireEvent.change(selects[1], { target: { value: '6:00 AM' } });
+			const dropdownButtons = within(bedTimeSection1).getAllByRole('button');
+			// Select start time
+			fireEvent.click(dropdownButtons[0]);
+			fireEvent.click(screen.getByText('10:00 PM'));
+			// Select end time
+			fireEvent.click(dropdownButtons[1]);
+			fireEvent.click(screen.getByText('6:00 AM'));
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -371,9 +380,13 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection2 = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection2).getAllByRole('combobox');
-			fireEvent.change(selects[0], { target: { value: '2:00 AM' } });
-			fireEvent.change(selects[1], { target: { value: '10:00 AM' } });
+			const dropdownButtons = within(bedTimeSection2).getAllByRole('button');
+			// Select start time
+			fireEvent.click(dropdownButtons[0]);
+			fireEvent.click(screen.getByText('2:00 AM'));
+			// Select end time
+			fireEvent.click(dropdownButtons[1]);
+			fireEvent.click(screen.getByText('10:00 AM'));
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -465,19 +478,20 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection3 = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection3).getAllByRole('combobox');
-			const startTimeSelect = selects[0];
-			const endTimeSelect = selects[1];
+			const dropdownButtons = within(bedTimeSection3).getAllByRole('button');
+			const startTimeButton = dropdownButtons[0];
+			const endTimeButton = dropdownButtons[1];
 
 			// Verify initial values
-			expect(startTimeSelect).toHaveValue('10:00 PM');
-			expect(endTimeSelect).toHaveValue('4:00 AM');
+			expect(startTimeButton).toHaveTextContent('10:00 PM');
+			expect(endTimeButton).toHaveTextContent('4:00 AM');
 
 			// User changes start time from 10 PM to 11 PM
-			fireEvent.change(startTimeSelect, { target: { value: '11:00 PM' } });
+			fireEvent.click(startTimeButton);
+			fireEvent.click(screen.getByText('11:00 PM'));
 
 			// End time should remain at 4:00 AM (NOT shift to 5:00 AM)
-			expect(endTimeSelect).toHaveValue('4:00 AM');
+			expect(endTimeButton).toHaveTextContent('4:00 AM');
 		});
 
 		it('should NOT shift start time when end time is changed', async () => {
@@ -496,19 +510,20 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection4 = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection4).getAllByRole('combobox');
-			const startTimeSelect = selects[0];
-			const endTimeSelect = selects[1];
+			const dropdownButtons = within(bedTimeSection4).getAllByRole('button');
+			const startTimeButton = dropdownButtons[0];
+			const endTimeButton = dropdownButtons[1];
 
 			// Verify initial values
-			expect(startTimeSelect).toHaveValue('10:00 PM');
-			expect(endTimeSelect).toHaveValue('6:00 AM');
+			expect(startTimeButton).toHaveTextContent('10:00 PM');
+			expect(endTimeButton).toHaveTextContent('6:00 AM');
 
 			// User changes end time from 6 AM to 7 AM
-			fireEvent.change(endTimeSelect, { target: { value: '7:00 AM' } });
+			fireEvent.click(endTimeButton);
+			fireEvent.click(screen.getByText('7:00 AM'));
 
 			// Start time should remain at 10:00 PM
-			expect(startTimeSelect).toHaveValue('10:00 PM');
+			expect(startTimeButton).toHaveTextContent('10:00 PM');
 		});
 
 		it('should calculate new sleep duration based on user-selected times (not shift end time)', async () => {
@@ -527,9 +542,10 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection5 = screen.getByTestId('bed-time-section');
-			const selects = within(bedTimeSection5).getAllByRole('combobox');
+			const dropdownButtons = within(bedTimeSection5).getAllByRole('button');
 			// New sleep duration should be 5 hours (11 PM to 4 AM)
-			fireEvent.change(selects[0], { target: { value: '11:00 PM' } });
+			fireEvent.click(dropdownButtons[0]);
+			fireEvent.click(screen.getByText('11:00 PM'));
 
 			// Save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -607,8 +623,9 @@ describe('PreferencesSettings', () => {
 
 			// Set only a start time on Monday (day-column-1) via work hours schedule
 			const workSection = screen.getAllByTestId('day-column-1')[0];
-			const selects = within(workSection).getAllByRole('combobox');
-			fireEvent.change(selects[0], { target: { value: '9:00 AM' } });
+			const dropdownButtons = within(workSection).getAllByRole('button');
+			fireEvent.click(dropdownButtons[0]);
+			fireEvent.click(screen.getByText('9:00 AM'));
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -631,8 +648,9 @@ describe('PreferencesSettings', () => {
 			// Set only an end time on Wednesday (day-column-3) via personal hours schedule (second instance)
 			const personalWedColumns = screen.getAllByTestId('day-column-3');
 			const personalColumn = personalWedColumns[1];
-			const selects = within(personalColumn).getAllByRole('combobox');
-			fireEvent.change(selects[1], { target: { value: '5:00 PM' } });
+			const dropdownButtons = within(personalColumn).getAllByRole('button');
+			fireEvent.click(dropdownButtons[1]);
+			fireEvent.click(screen.getByText('5:00 PM'));
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
