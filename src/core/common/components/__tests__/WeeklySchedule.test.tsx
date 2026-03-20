@@ -42,11 +42,11 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
 			);
 
-			// Start/End appear as <option> placeholder text inside each dropdown
-			const startOptions = screen.getAllByRole('option', { name: 'Start' });
-			const endOptions = screen.getAllByRole('option', { name: 'End' });
-			expect(startOptions).toHaveLength(7);
-			expect(endOptions).toHaveLength(7);
+			// Start/End appear as placeholder text inside each dropdown button
+			const startButtons = screen.getAllByRole('button', { name: 'Start' });
+			const endButtons = screen.getAllByRole('button', { name: 'End' });
+			expect(startButtons).toHaveLength(7);
+			expect(endButtons).toHaveLength(7);
 		});
 
 		it('displays provided start and end times', () => {
@@ -60,9 +60,9 @@ describe('WeeklySchedule', () => {
 			);
 
 			const mondayColumn = screen.getByTestId('day-column-1');
-			const selects = within(mondayColumn).getAllByRole('combobox');
-			expect(selects[0]).toHaveValue('8:00 AM');
-			expect(selects[1]).toHaveValue('6:00 PM');
+			const dropdownButtons = within(mondayColumn).getAllByRole('button');
+			expect(dropdownButtons[0]).toHaveTextContent('8:00 AM');
+			expect(dropdownButtons[1]).toHaveTextContent('6:00 PM');
 		});
 
 		it('renders empty dropdowns when no time is set', () => {
@@ -71,9 +71,10 @@ describe('WeeklySchedule', () => {
 			);
 
 			const sundayColumn = screen.getByTestId('day-column-0');
-			const selects = within(sundayColumn).getAllByRole('combobox');
-			expect(selects[0]).toHaveValue('');
-			expect(selects[1]).toHaveValue('');
+			const dropdownButtons = within(sundayColumn).getAllByRole('button');
+			// When no time is set, buttons show placeholder text
+			expect(dropdownButtons[0]).toHaveTextContent('Start');
+			expect(dropdownButtons[1]).toHaveTextContent('End');
 		});
 	});
 
@@ -117,8 +118,11 @@ describe('WeeklySchedule', () => {
 			);
 
 			const mondayColumn = screen.getByTestId('day-column-1');
-			const selects = within(mondayColumn).getAllByRole('combobox');
-			await user.selectOptions(selects[0], '9:00 AM');
+			const dropdownButtons = within(mondayColumn).getAllByRole('button');
+			// Click to open dropdown
+			await user.click(dropdownButtons[0]);
+			// Click the time option in the portal dropdown
+			await user.click(screen.getByText('9:00 AM'));
 
 			expect(onChange).toHaveBeenCalledWith(1, 'startTime', '9:00 AM');
 		});
@@ -136,8 +140,11 @@ describe('WeeklySchedule', () => {
 			);
 
 			const mondayColumn = screen.getByTestId('day-column-1');
-			const selects = within(mondayColumn).getAllByRole('combobox');
-			await user.selectOptions(selects[1], '6:00 PM');
+			const dropdownButtons = within(mondayColumn).getAllByRole('button');
+			// Click to open dropdown
+			await user.click(dropdownButtons[1]);
+			// Click the time option in the portal dropdown
+			await user.click(screen.getByText('6:00 PM'));
 
 			expect(onChange).toHaveBeenCalledWith(1, 'endTime', '6:00 PM');
 		});
@@ -216,9 +223,10 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} disabled />,
 			);
 
-			const selects = screen.getAllByRole('combobox');
-			selects.forEach((select) => {
-				expect(select).toBeDisabled();
+			// Get all dropdown buttons (14 total: 2 per day × 7 days)
+			const dropdownButtons = screen.getAllByRole('button', { name: /Start|End/i });
+			dropdownButtons.forEach((button) => {
+				expect(button).toBeDisabled();
 			});
 		});
 	});
@@ -229,9 +237,10 @@ describe('WeeklySchedule', () => {
 				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} readOnly />,
 			);
 
-			const selects = screen.getAllByRole('combobox');
-			selects.forEach((select) => {
-				expect(select).toBeDisabled();
+			// Get all dropdown buttons (14 total: 2 per day × 7 days)
+			const dropdownButtons = screen.getAllByRole('button', { name: /Start|End/i });
+			dropdownButtons.forEach((button) => {
+				expect(button).toBeDisabled();
 			});
 		});
 	});
