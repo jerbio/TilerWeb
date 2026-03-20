@@ -11,6 +11,7 @@ import {
   BackgroundBlur,
 } from '../components/discover/shared';
 import HowToUseTilerSection from '../components/discover/HowToUseTilerSection';
+import FeaturesSection from '../components/discover/FeaturesSection';
 
 const Newsletter: React.FC = () => {
   const { t } = useTranslation();
@@ -32,6 +33,7 @@ const Newsletter: React.FC = () => {
           </Hero>
 
           <HowToUseTilerSection />
+          <FeaturesSection />
         </PageWrapper>
       </Section>
     </>
