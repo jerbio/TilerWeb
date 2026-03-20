@@ -21,11 +21,11 @@ import { Actions } from '@/core/constants/enums';
  * - `unknown`  – not enough information (no nonces, or no current schedule)
  */
 export enum ScheduleState {
-  Current = 'current',
-  Stale = 'stale',
-  Pending = 'pending',
-  Removed = 'removed',
-  Unknown = 'unknown',
+	Current = 'current',
+	Stale = 'stale',
+	Pending = 'pending',
+	Removed = 'removed',
+	Unknown = 'unknown',
 }
 
 /**
@@ -36,39 +36,35 @@ export enum ScheduleState {
  * @returns One of the `ScheduleState` values
  */
 export function getActionScheduleState(
-  action: VibeAction,
-  currentScheduleId: string | null,
+	action: VibeAction,
+	currentScheduleId: string | null
 ): ScheduleState {
-  // Remove actions — the tile is gone regardless of schedule version
-  if (action.type === Actions.Remove_Existing_Task) {
-    return ScheduleState.Removed;
-  }
+	// Remove actions — the tile is gone regardless of schedule version
+	if (action.type === Actions.Remove_Existing_Task) {
+		return ScheduleState.Removed;
+	}
 
-  // If we don't know the current schedule, we can't assess consistency
-  if (!currentScheduleId) {
-    return ScheduleState.Unknown;
-  }
+	// If we don't know the current schedule, we can't assess consistency
+	if (!currentScheduleId) {
+		return ScheduleState.Unknown;
+	}
 
-  const { beforeScheduleId, afterScheduleId } = action;
+	const { beforeScheduleId, afterScheduleId } = action;
 
-  // If the action has an afterScheduleId it was already accepted
-  if (afterScheduleId) {
-    return afterScheduleId === currentScheduleId
-      ? ScheduleState.Current
-      : ScheduleState.Stale;
-  }
+	// If the action has an afterScheduleId it was already accepted
+	if (afterScheduleId) {
+		return afterScheduleId === currentScheduleId ? ScheduleState.Current : ScheduleState.Stale;
+	}
 
-  // No afterScheduleId — this action hasn't been accepted yet
-  if (beforeScheduleId) {
-    // If beforeScheduleId matches current, the action is pending accept
-    // on the schedule the calendar currently displays
-    return beforeScheduleId === currentScheduleId
-      ? ScheduleState.Pending
-      : ScheduleState.Stale; // schedule has moved on since this action was created
-  }
+	// No afterScheduleId — this action hasn't been accepted yet
+	if (beforeScheduleId) {
+		// If beforeScheduleId matches current, the action is pending accept
+		// on the schedule the calendar currently displays
+		return beforeScheduleId === currentScheduleId ? ScheduleState.Pending : ScheduleState.Stale; // schedule has moved on since this action was created
+	}
 
-  // No nonces at all
-  return ScheduleState.Unknown;
+	// No nonces at all
+	return ScheduleState.Unknown;
 }
 
 /**
@@ -76,8 +72,8 @@ export function getActionScheduleState(
  * is expected to be on the calendar the user is currently viewing.
  */
 export function isActionOnCurrentSchedule(
-  action: VibeAction,
-  currentScheduleId: string | null,
+	action: VibeAction,
+	currentScheduleId: string | null
 ): boolean {
-  return getActionScheduleState(action, currentScheduleId) === ScheduleState.Current;
+	return getActionScheduleState(action, currentScheduleId) === ScheduleState.Current;
 }

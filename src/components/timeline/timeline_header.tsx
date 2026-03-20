@@ -13,67 +13,80 @@ import ProcrastinateAllButton from './procrastinate_all_button';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 
 const TimelineHeader: React.FC = () => {
-  const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
-  const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
-  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
+	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
+	const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
+	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<HTMLDivElement>(null);
 	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        triggerRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
-        setProfileSheetOpen(false);
-      }
-    };
+	// Close menu when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				menuRef.current &&
+				triggerRef.current &&
+				!menuRef.current.contains(event.target as Node) &&
+				!triggerRef.current.contains(event.target as Node)
+			) {
+				setProfileSheetOpen(false);
+			}
+		};
 
-    if (profileSheetOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+		if (profileSheetOpen) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [profileSheetOpen]);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [profileSheetOpen]);
 
-  const { isDarkMode, toggleTheme } = useTheme();
+	const { isDarkMode, toggleTheme } = useTheme();
 
-  return (
-    <Header>
-      <HeaderLeft>
-        <Logo size={30} />
-      </HeaderLeft>
-      <SearchBar />
-      <HeaderRight>
-				<ShuffleButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
-				<ReviseButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
-				<ProcrastinateAllButton disabled={isScheduleActionLoading} onLoadingChange={setIsScheduleActionLoading} />
+	return (
+		<Header>
+			<HeaderLeft>
+				<Logo size={30} />
+			</HeaderLeft>
+			<SearchBar />
+			<HeaderRight>
+				<ShuffleButton
+					disabled={isScheduleActionLoading}
+					onLoadingChange={setIsScheduleActionLoading}
+				/>
+				<ReviseButton
+					disabled={isScheduleActionLoading}
+					onLoadingChange={setIsScheduleActionLoading}
+				/>
+				<ProcrastinateAllButton
+					disabled={isScheduleActionLoading}
+					onLoadingChange={setIsScheduleActionLoading}
+				/>
 				<CreateEventButton onClick={openCreateTile}>
 					<Plus size={16} />
 				</CreateEventButton>
-        {Env.isDevelopment() && (
-          <ThemeToggle onClick={toggleTheme}>
-            {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-          </ThemeToggle>
-        )}
-        <ProfileTrigger
-          ref={triggerRef}
-          onClick={() => setProfileSheetOpen(!profileSheetOpen)}
-        >
-          <ProfileContainer>
-            <User size={18} />
-          </ProfileContainer>
-          <ProfileSheet open={profileSheetOpen} containerRef={menuRef} user={authenticatedUser} />
-        </ProfileTrigger>
-      </HeaderRight>
-    </Header>
-  );
+				{Env.isDevelopment() && (
+					<ThemeToggle onClick={toggleTheme}>
+						{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
+					</ThemeToggle>
+				)}
+				<ProfileTrigger
+					ref={triggerRef}
+					onClick={() => setProfileSheetOpen(!profileSheetOpen)}
+				>
+					<ProfileContainer>
+						<User size={18} />
+					</ProfileContainer>
+					<ProfileSheet
+						open={profileSheetOpen}
+						containerRef={menuRef}
+						user={authenticatedUser}
+					/>
+				</ProfileTrigger>
+			</HeaderRight>
+		</Header>
+	);
 };
 
 const CreateEventButton = styled.button`

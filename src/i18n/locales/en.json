@@ -155,12 +155,12 @@
 	"modals": {
 		"loading": {
 			"image": {
-        "alt": "Loading Indicator"
+				"alt": "Loading Indicator"
 			}
 		},
 		"success": {
 			"image": {
-        "alt": "Success Icon"
+				"alt": "Success Icon"
 			}
 		}
 	},
@@ -196,38 +196,38 @@
 				"tileColor": "Select Tile Color",
 				"tileActions": "Tile Actions",
 				"recurrenceType": {
-          "daily": "Daily",
-          "weekly": "Weekly",
-          "monthly": "Monthly",
-          "yearly": "Yearly"
+					"daily": "Daily",
+					"weekly": "Weekly",
+					"monthly": "Monthly",
+					"yearly": "Yearly"
 				},
 				"recurrenceStartType": {
 					"title": "Starts",
-          "default": "Default (<date/>)",
-          "on": "On"
+					"default": "Default (<date/>)",
+					"on": "On"
 				},
 				"recurrenceEndType": {
 					"title": "Ends",
-          "never": "Never",
-          "on": "On"
+					"never": "Never",
+					"on": "On"
 				},
 				"recurrenceStartDate": {
 					"title": "End Date",
-          "description": "The repetition starts <date/>"
+					"description": "The repetition starts <date/>"
 				},
 				"recurrenceEndDate": {
 					"title": "End Date",
-          "description": "The repetition ends on <date/>"
+					"description": "The repetition ends on <date/>"
 				},
 				"recurrenceWeeklyDays": {
 					"title": "Repeat On",
-          "monday": "Monday",
-          "tuesday": "Tuesday",
-          "wednesday": "Wednesday",
-          "thursday": "Thursday",
-          "friday": "Friday",
-          "saturday": "Saturday",
-          "sunday": "Sunday"
+					"monday": "Monday",
+					"tuesday": "Tuesday",
+					"wednesday": "Wednesday",
+					"thursday": "Thursday",
+					"friday": "Friday",
+					"saturday": "Saturday",
+					"sunday": "Sunday"
 				}
 			},
 			"tip": {
@@ -273,10 +273,10 @@
 				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
 				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
-          "daily": "day",
-          "weekly": "week",
-          "monthly": "month",
-          "yearly": "year"
+					"daily": "day",
+					"weekly": "week",
+					"monthly": "month",
+					"yearly": "year"
 				},
 				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
 				"recurringStart": " from <b>{{recurrenceStart}}</b>",
@@ -815,8 +815,8 @@
 				"myPersonalHours": "My Personal Hours",
 				"setBlockOutHours": "Set your block out hours",
 				"bedTime": "Bed Time",
-			"startsAt": "Starts at",
-			"endsAt": "Ends at",
+				"startsAt": "Starts at",
+				"endsAt": "Ends at",
 				"useCustom": "Use custom",
 				"customTimeRestrictions": "Custom time restrictions",
 				"reset": "Reset",

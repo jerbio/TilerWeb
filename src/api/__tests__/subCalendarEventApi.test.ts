@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SubCalendarEventApi } from '../subCalendarEventApi';
-import { ScheduleSubCalendarEvent, SubCalendarEventLookupResponse } from '@/core/common/types/schedule';
+import {
+	ScheduleSubCalendarEvent,
+	SubCalendarEventLookupResponse,
+} from '@/core/common/types/schedule';
 
 // Mock config to provide a base URL
 vi.mock('@/config/config_getter', () => ({
@@ -105,7 +108,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.getSubCalendarEvent('sub-event-123');
@@ -123,7 +126,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.getSubCalendarEvent('sub-event-123');
@@ -137,7 +140,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(api.getSubCalendarEvent('bad-id')).rejects.toThrow();
@@ -150,7 +153,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.updateSubCalendarEvent({
@@ -162,9 +165,10 @@ describe('SubCalendarEventApi', () => {
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			expect(request.url).toContain('api/SubCalendarEvent');
 			expect(request.method).toBe('POST');
@@ -182,7 +186,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.updateSubCalendarEvent({
@@ -194,9 +198,10 @@ describe('SubCalendarEventApi', () => {
 			});
 
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			const body = await request.json();
 			expect(body.CalendarEventEnd).toBe(1770600000000);
@@ -207,7 +212,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			const result = await api.updateSubCalendarEvent({
@@ -225,7 +230,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
 					status: 500,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await expect(
@@ -233,7 +238,7 @@ describe('SubCalendarEventApi', () => {
 					Id: 'bad-id',
 					SubCalendarEventStart: 1769930000000,
 					TimeZone: 'America/New_York',
-				}),
+				})
 			).rejects.toThrow();
 		});
 
@@ -242,7 +247,7 @@ describe('SubCalendarEventApi', () => {
 				new Response(JSON.stringify(mockResponse), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
-				}),
+				})
 			);
 
 			await api.updateSubCalendarEvent({
@@ -252,9 +257,10 @@ describe('SubCalendarEventApi', () => {
 			});
 
 			const callArgs = fetchSpy.mock.calls[0];
-			const request = callArgs[0] instanceof Request
-				? callArgs[0]
-				: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
 			const body = await request.json();
 			expect(body.Id).toBe('sub-event-123');

@@ -50,11 +50,7 @@ export function unixToTimeString(timestamp: number): string {
  * @param endTime - End time in "h:mm A" format
  * @returns true if end time is after start time
  */
-export function validateTimeRange(
-	date: string,
-	startTime: string,
-	endTime: string
-): boolean {
+export function validateTimeRange(date: string, startTime: string, endTime: string): boolean {
 	const startUnix = dateTimeToUnix(date, startTime);
 	const endUnix = dateTimeToUnix(date, endTime);
 	return endUnix > startUnix;

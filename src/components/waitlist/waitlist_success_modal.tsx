@@ -5,41 +5,41 @@ import React from 'react';
 import styled from 'styled-components';
 
 const WaitlistSuccessModal: React.FC<{ open: boolean }> = ({ open }) => {
-  return (
-    <StyledWaitlistSuccessModal $open={open} onClick={(e) => e.stopPropagation()}>
-      <LogoContainer>
-        <Logo size={36} />
-      </LogoContainer>
-      <ContentContainer>
-        <Header>Welcome to Tiler Chat</Header>
-        <Description>
-          You’re officially on the waitlist! Stay tuned for early access and exclusive
-          updates.
-        </Description>
-      </ContentContainer>
-      <Divider />
-      <ContentContainer>
-        <SmallHeader>
-          Stay <span>Connected</span> With Us<span>.</span>
-        </SmallHeader>
-        <Description>
-          Never miss an update, join our community and stay connected.
-        </Description>
-        <SocialButtons>
-          {socials.map((social) => (
-            <a
-              key={social.i18Name}
-              href={social.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img src={social.button} height={32} />
-            </a>
-          ))}
-        </SocialButtons>
-      </ContentContainer>
-    </StyledWaitlistSuccessModal>
-  );
+	return (
+		<StyledWaitlistSuccessModal $open={open} onClick={(e) => e.stopPropagation()}>
+			<LogoContainer>
+				<Logo size={36} />
+			</LogoContainer>
+			<ContentContainer>
+				<Header>Welcome to Tiler Chat</Header>
+				<Description>
+					You’re officially on the waitlist! Stay tuned for early access and exclusive
+					updates.
+				</Description>
+			</ContentContainer>
+			<Divider />
+			<ContentContainer>
+				<SmallHeader>
+					Stay <span>Connected</span> With Us<span>.</span>
+				</SmallHeader>
+				<Description>
+					Never miss an update, join our community and stay connected.
+				</Description>
+				<SocialButtons>
+					{socials.map((social) => (
+						<a
+							key={social.i18Name}
+							href={social.link}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<img src={social.button} height={32} />
+						</a>
+					))}
+				</SocialButtons>
+			</ContentContainer>
+		</StyledWaitlistSuccessModal>
+	);
 };
 
 const SocialButtons = styled.div`

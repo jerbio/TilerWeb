@@ -114,7 +114,7 @@ const HeroSection: React.FC = () => {
 		});
 
 		setIsModalOpen(true);
-		
+
 		// Dispatch event to focus on custom persona in carousel
 		if (window.location.pathname === '/') {
 			window.dispatchEvent(new CustomEvent('focusCustomPersona'));
@@ -129,9 +129,9 @@ const HeroSection: React.FC = () => {
 		analytics.trackEvent('Modal', 'Close', 'Custom Persona Modal', undefined, {
 			location: 'Hero Section',
 		});
-		
+
 		setIsModalOpen(false);
-		
+
 		// Dispatch event to re-enable carousel
 		if (window.location.pathname === '/') {
 			window.dispatchEvent(new CustomEvent('customPersonaModalDismissed'));
@@ -144,30 +144,33 @@ const HeroSection: React.FC = () => {
 			descriptionLength: description.length,
 			location: 'Hero Section',
 		});
-		
+
 		try {
 			const personaApi = new PersonaApi();
 			const response = await personaApi.createPersonaWithAudio(description, audioFile);
-			const finalDescription = response?.Content?.anonymousUserWithPersona?.userDescription || description || 'Custom';
+			const finalDescription =
+				response?.Content?.anonymousUserWithPersona?.userDescription ||
+				description ||
+				'Custom';
 			const anonymousUser = response?.Content?.anonymousUserWithPersona?.anonymousUser;
-			
+
 			setIsModalOpen(false);
-			
+
 			const params = new URLSearchParams();
 			params.set('customPersona', 'true');
 			params.set('description', finalDescription);
-			
+
 			if (window.location.pathname === '/') {
 				window.dispatchEvent(
-					new CustomEvent('createCustomPersona', { 
-						detail: { 
+					new CustomEvent('createCustomPersona', {
+						detail: {
 							persona: {
 								id: 'custom-persona',
 								name: finalDescription,
 								description: finalDescription,
 							},
 							anonymousUser: anonymousUser,
-						} 
+						},
 					})
 				);
 				window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -180,18 +183,18 @@ const HeroSection: React.FC = () => {
 		}
 	}
 
-		return (
+	return (
 		<Section>
-		<HeroWrapper>
-			{/* Top-left corner - Lunch scenario */}
-			<HeroAnimatedBackground position="top-left" scenarioIndex={0} />
-			{/* Top-right corner - Errands scenario */}
-			<HeroAnimatedBackground position="top-right" scenarioIndex={1} />
-			{/* Bottom-left corner - Client meeting scenario */}
-			<HeroAnimatedBackground position="bottom-left" scenarioIndex={2} />
-			{/* Bottom-right corner - Dentist scenario */}
-			<HeroAnimatedBackground position="bottom-right" scenarioIndex={3} />
-			<ContentWrapper>
+			<HeroWrapper>
+				{/* Top-left corner - Lunch scenario */}
+				<HeroAnimatedBackground position="top-left" scenarioIndex={0} />
+				{/* Top-right corner - Errands scenario */}
+				<HeroAnimatedBackground position="top-right" scenarioIndex={1} />
+				{/* Bottom-left corner - Client meeting scenario */}
+				<HeroAnimatedBackground position="bottom-left" scenarioIndex={2} />
+				{/* Bottom-right corner - Dentist scenario */}
+				<HeroAnimatedBackground position="bottom-right" scenarioIndex={3} />
+				<ContentWrapper>
 					<SectionHeaders
 						headerText={t('home.hero.title')}
 						subHeaderText={t('home.hero.subtitle')}
@@ -213,13 +216,17 @@ const HeroSection: React.FC = () => {
 						</FeatureItem>
 					</FeaturesList>
 					<ButtonContainer>
-						<Button variant="brand" onClick={handleGetStartedClick}>{t('common.buttons.tryFree')}</Button>
-						<Button variant="secondary" onClick={handleExploreClick}>{t('common.buttons.explore')}</Button>
+						<Button variant="brand" onClick={handleGetStartedClick}>
+							{t('common.buttons.tryFree')}
+						</Button>
+						<Button variant="secondary" onClick={handleExploreClick}>
+							{t('common.buttons.explore')}
+						</Button>
 					</ButtonContainer>
 				</ContentWrapper>
 			</HeroWrapper>
-			<CustomPersonaModal 
-				isOpen={isModalOpen} 
+			<CustomPersonaModal
+				isOpen={isModalOpen}
 				onClose={handleModalClose}
 				onSubmit={handleModalSubmit}
 			/>

@@ -5,30 +5,30 @@ import useFormHandler from '@/hooks/useFormHandler';
 import { InitialCreateTileFormState } from '.';
 
 type ColorOptionsProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
 const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
   formHandler: { formData, handleFormInputChange },
 }) => {
-  return (
-    <TileColorOptions>
-      {eventColorOptions.map((color) => {
-        const optionRGBColor = new RGBColor(color);
-        return (
-          <TileColorOption
-						type='button'
-            key={optionRGBColor.toHex()}
-            $color={optionRGBColor}
-            $selected={optionRGBColor.equals(formData.color)}
-            onClick={() => {
-              handleFormInputChange('color', { mode: 'static' })(optionRGBColor);
-            }}
-          ></TileColorOption>
-        );
-      })}
-    </TileColorOptions>
-  );
+	return (
+		<TileColorOptions>
+			{eventColorOptions.map((color) => {
+				const optionRGBColor = new RGBColor(color);
+				return (
+					<TileColorOption
+						type="button"
+						key={optionRGBColor.toHex()}
+						$color={optionRGBColor}
+						$selected={optionRGBColor.equals(formData.color)}
+						onClick={() => {
+							handleFormInputChange('color', { mode: 'static' })(optionRGBColor);
+						}}
+					></TileColorOption>
+				);
+			})}
+		</TileColorOptions>
+	);
 };
 
 export default CreateTileColorOptions;
@@ -52,7 +52,7 @@ const TileColorOption = styled.button<{ $color: RGBColor; $selected: boolean }>`
 	gap: 0.5rem;
 	position: relative;
 	outline: ${(props) =>
-    props.$selected ? `2px solid ${props.theme.colors.brand[500]}` : '2px solid transparent'};
+		props.$selected ? `2px solid ${props.theme.colors.brand[500]}` : '2px solid transparent'};
 	outline-offset: 4px;
 	transition: outline 0.2s ease-in-out;
 `;

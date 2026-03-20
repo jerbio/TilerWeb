@@ -49,61 +49,67 @@ VITE_ANALYTICS_ENDPOINT=https://your-analytics-api.com/events
 ### 1. Calendar Component (`calendar.tsx`)
 
 **Events Tracked:**
+
 - `Calendar View Loaded` - When the calendar component mounts
-  - Properties: `daysInView`, `startDate`
+    - Properties: `daysInView`, `startDate`
 - `Navigate Days` - When user navigates between days
-  - Properties: `direction`, `daysChanged`, `newStartDate`
+    - Properties: `direction`, `daysChanged`, `newStartDate`
 
 ### 1b. Calendar Events Component (`calendar_events.tsx`)
 
 **Events Tracked:**
+
 - `Event Selected` - When user clicks on a calendar event/tile
-  - Properties: `eventId`, `eventName`, `isRigid`, `isTardy`, `hasLocation`, `duration`, `startTime`
+    - Properties: `eventId`, `eventName`, `isRigid`, `isTardy`, `hasLocation`, `duration`, `startTime`
 - `Travel Detail Clicked` - When user clicks on a travel detail (transit between events)
-  - Properties: `travelMedium`, `duration`, `hasStartLocation`, `hasEndLocation`
+    - Properties: `travelMedium`, `duration`, `hasStartLocation`, `hasEndLocation`
 
 ### 2. Chat Component (`chat.tsx`)
 
 **Events Tracked:**
+
 - `Chat Opened` - When chat component mounts
-  - Properties: `personaId`, `hasExistingSession`
+    - Properties: `personaId`, `hasExistingSession`
 - `Message Sent` - When user sends a chat message
-  - Properties: `messageLength`, `hasContext`, `personaId`
+    - Properties: `messageLength`, `hasContext`, `personaId`
 - `Accept Changes` - When user accepts proposed changes
-  - Properties: `requestId`, `personaId`
+    - Properties: `requestId`, `personaId`
 - `New Chat Started` - When user starts a new chat session
-  - Properties: `personaId`, `previousSessionId`
+    - Properties: `personaId`, `previousSessionId`
 - `Context Removed` - When user removes a context item
-  - Properties: `contextName`, `contextEntityId`, `personaId`
+    - Properties: `contextName`, `contextEntityId`, `personaId`
 - **Error Events:**
-  - `Chat Limit Reached`
-  - `Chat Message Send Failed`
+    - `Chat Limit Reached`
+    - `Chat Message Send Failed`
 
 ### 3. Navigation Component (`navigation.tsx`)
 
 **Events Tracked:**
+
 - `Try Free` button click
-  - Properties: `isModalOpen`, `isOnHomePage`
+    - Properties: `isModalOpen`, `isOnHomePage`
 
 ### 4. Waitlist Form (`WaitlistForm.tsx`)
 
 **Events Tracked:**
+
 - `Waitlist Form Step` - Progress through form steps
-  - Properties: `step`, `stepName`
+    - Properties: `step`, `stepName`
 - `Waitlist Form` - Final form submission
-  - Properties: `profession`, `integrationsCount`, `hasUseCase`
+    - Properties: `profession`, `integrationsCount`, `hasUseCase`
 - **Error Events:**
-  - `Waitlist Signup Failed`
+    - `Waitlist Signup Failed`
 
 ### 5. Persona Card Expanded (`persona_card_expanded.tsx`)
 
 **Events Tracked:**
+
 - `Persona Card Expanded` - When a persona card is expanded
-  - Properties: `personaId`, `personaName`, `hasExistingUser`
+    - Properties: `personaId`, `personaName`, `hasExistingUser`
 - `Persona Card Collapsed` - When a persona card is collapsed
-  - Properties: `personaId`, `personaName`
+    - Properties: `personaId`, `personaName`
 - `Mobile Chat Closed` - When mobile chat overlay is closed
-  - Properties: `personaId`
+    - Properties: `personaId`
 
 ## Event Categories
 
@@ -131,9 +137,9 @@ The system supports user identification for logged-in users:
 
 ```typescript
 analytics.identifyUser(userId, {
-  email: 'user@example.com',
-  name: 'User Name',
-  plan: 'premium'
+	email: 'user@example.com',
+	name: 'User Name',
+	plan: 'premium',
 });
 ```
 
@@ -148,6 +154,7 @@ analytics.disable();
 ## Development Mode
 
 In development mode (`VITE_NODE_ENV=development`):
+
 - All events are logged to the console
 - Events are still sent to configured providers
 - Debug information is more verbose
@@ -157,22 +164,25 @@ In development mode (`VITE_NODE_ENV=development`):
 To add analytics to a new component:
 
 1. Import the analytics utility:
+
 ```typescript
 import analytics from '@/core/util/analytics';
 ```
 
 2. Track events at appropriate points:
+
 ```typescript
 const handleAction = () => {
-  analytics.trackEvent('Category', 'Action', 'Label', undefined, {
-    customProperty: 'value'
-  });
-  
-  // Your action logic...
+	analytics.trackEvent('Category', 'Action', 'Label', undefined, {
+		customProperty: 'value',
+	});
+
+	// Your action logic...
 };
 ```
 
 3. Use specialized tracking methods when available:
+
 ```typescript
 // For button clicks
 analytics.trackButtonClick('Download', 'Hero Section');
@@ -232,6 +242,7 @@ Potential improvements to the analytics system:
 ## Support
 
 For questions or issues with the analytics implementation, refer to:
+
 - Analytics utility: `src/core/util/analytics.ts`
 - This documentation
 - Your analytics provider's documentation

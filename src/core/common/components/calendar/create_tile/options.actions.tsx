@@ -5,11 +5,11 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
-  ScheduleRepeatEndType,
-  ScheduleRepeatFrequency,
-  ScheduleRepeatStartType,
-  ScheduleRepeatType,
-  ScheduleRepeatWeekday,
+	ScheduleRepeatEndType,
+	ScheduleRepeatFrequency,
+	ScheduleRepeatStartType,
+	ScheduleRepeatType,
+	ScheduleRepeatWeekday,
 } from '../../../types/schedule';
 import DatePicker from '../../date_picker';
 import Toggle from '../../Toggle';
@@ -22,15 +22,15 @@ import {
 import Radio from '../../radio';
 
 type ActionsOptionsProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-  recurrenceTypeOptions: {
-    value: ScheduleRepeatType;
-    label: string;
-    frequency: ScheduleRepeatFrequency;
-  }[];
-  recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
-  recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
-  recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
+	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	recurrenceTypeOptions: {
+		value: ScheduleRepeatType;
+		label: string;
+		frequency: ScheduleRepeatFrequency;
+	}[];
+	recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
+	recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
+	recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
 };
 
 const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
@@ -38,10 +38,10 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 	recurrenceTypeOptions,
 	recurrenceWeekdayOptions,
 	recurrenceStartTypeOptions,
-	recurrenceEndTypeOptions
+	recurrenceEndTypeOptions,
 }) => {
-  const { t } = useTranslation();
-  const theme = useStyledTheme();
+	const { t } = useTranslation();
+	const theme = useStyledTheme();
 
   return (
     <StyledActionsOptions>
@@ -313,13 +313,13 @@ const RecurrenceWeekdayOption = styled.button<{ $selected: boolean }>`
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.bold};
 	background-color: ${(props) =>
-    props.$selected
-      ? props.theme.colors.datepicker.dateSelectedBg
-      : props.theme.colors.datepicker.dateHoverBg};
+		props.$selected
+			? props.theme.colors.datepicker.dateSelectedBg
+			: props.theme.colors.datepicker.dateHoverBg};
 	color: ${(props) =>
-    props.$selected
-      ? props.theme.colors.datepicker.dateSelectedText
-      : props.theme.colors.text.secondary};
+		props.$selected
+			? props.theme.colors.datepicker.dateSelectedText
+			: props.theme.colors.text.secondary};
 	transition: all 0.2s ease-in-out;
 	outline-offset: 4px;
 	outline: 2px solid transparent;

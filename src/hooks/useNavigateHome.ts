@@ -21,7 +21,7 @@ const useAuthNavigate = () => {
 				return;
 			}
 
-			const path = typeof to === 'string' ? to : to.pathname ?? '';
+			const path = typeof to === 'string' ? to : (to.pathname ?? '');
 
 			if (path === 'home') {
 				routerNavigate(isAuthenticated ? '/timeline' : '/', options);
@@ -29,7 +29,7 @@ const useAuthNavigate = () => {
 				routerNavigate(to, options);
 			}
 		},
-		[routerNavigate, isAuthenticated],
+		[routerNavigate, isAuthenticated]
 	);
 
 	return navigate;

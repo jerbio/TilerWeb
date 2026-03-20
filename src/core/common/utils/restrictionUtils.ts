@@ -5,7 +5,9 @@ import { msToTimeString } from '@/core/common/utils/timeUtils';
  * Converts a RestrictionProfile from the API into a DaySchedule array for the WeeklySchedule component.
  * Returns 7 entries (Sun-Sat), with empty strings for days without restrictions.
  */
-export const restrictionProfileToSchedule = (profile: RestrictionProfile | null | undefined): DaySchedule[] => {
+export const restrictionProfileToSchedule = (
+	profile: RestrictionProfile | null | undefined
+): DaySchedule[] => {
 	const empty: DaySchedule[] = Array.from({ length: 7 }, (_, i) => ({
 		dayIndex: i,
 		startTime: '',
@@ -26,7 +28,8 @@ export const restrictionProfileToSchedule = (profile: RestrictionProfile | null 
 
 		empty[i] = {
 			dayIndex: i,
-			startTime: restrictionTimeLine.start != null ? msToTimeString(restrictionTimeLine.start) : '',
+			startTime:
+				restrictionTimeLine.start != null ? msToTimeString(restrictionTimeLine.start) : '',
 			endTime: restrictionTimeLine.end != null ? msToTimeString(restrictionTimeLine.end) : '',
 		};
 	}
