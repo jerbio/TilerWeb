@@ -13,7 +13,11 @@ const ExplainerWrapper = styled.div`
 const Badge = styled.span`
 	display: inline-block;
 	padding: 0.375rem 0.875rem;
-	background: linear-gradient(135deg, ${palette.colors.brand[500]}20, ${palette.colors.brand[600]}30);
+	background: linear-gradient(
+		135deg,
+		${palette.colors.brand[500]}20,
+		${palette.colors.brand[600]}30
+	);
 	border: 1px solid ${palette.colors.brand[500]}40;
 	border-radius: 9999px;
 	color: ${palette.colors.brand[300]};

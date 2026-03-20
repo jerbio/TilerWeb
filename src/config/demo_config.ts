@@ -1,6 +1,6 @@
 /**
  * Onboarding Demo Data Configuration
- * 
+ *
  * This file contains mock data to render the UI appropriately for onboarding guide demonstrations.
  * This is NOT a separate mode - it's temporary data injection for the onboarding guide.
  */
@@ -35,23 +35,25 @@ export const isOnboardingDemoMode = () => isOnboardingDemoActive;
 // Demo Mode Flags (kept for backwards compatibility but controlled by setOnboardingDemoActive)
 export const DEMO_FLAGS = {
 	/** Enable demo mode - shows mock data and ensures all UI elements are rendered */
-	get ENABLED() { return isOnboardingDemoActive; },
-	
+	get ENABLED() {
+		return isOnboardingDemoActive;
+	},
+
 	/** Force render chat messages even if chat session is empty */
 	FORCE_RENDER_CHAT_MESSAGES: true,
-	
+
 	/** Force render accept button in chat */
 	FORCE_RENDER_ACCEPT_BUTTON: true,
-	
+
 	/** Force render calendar with events */
 	FORCE_RENDER_CALENDAR_EVENTS: true,
-	
+
 	/** Show demo badge in UI */
 	SHOW_DEMO_BADGE: true,
-	
+
 	/** Auto-trigger onboarding guide after persona expansion */
 	AUTO_TRIGGER_ONBOARDING: true,
-	
+
 	/** Delay before triggering onboarding (ms) */
 	ONBOARDING_DELAY: 2000,
 } as const;
@@ -91,7 +93,7 @@ import type { PromptWithActions } from '@/core/common/types/chat';
 import { Status } from '@/core/constants/enums';
 
 const getMessageTimestamp = (minutesAgo: number): number => {
-	return Date.now() - (minutesAgo * 60 * 1000);
+	return Date.now() - minutesAgo * 60 * 1000;
 };
 
 export const DEMO_CHAT_MESSAGES: PromptWithActions[] = [
@@ -107,7 +109,8 @@ export const DEMO_CHAT_MESSAGES: PromptWithActions[] = [
 	{
 		id: `prompt-demo-${getMessageTimestamp(9)}`,
 		origin: 'tiler',
-		content: "I've scheduled your morning workout for 7:00 AM tomorrow. Would you like me to add a reminder?",
+		content:
+			"I've scheduled your morning workout for 7:00 AM tomorrow. Would you like me to add a reminder?",
 		actionId: 'action-demo-001',
 		requestId: 'request-demo-001',
 		sessionId: 'session-demo-001',
@@ -202,7 +205,7 @@ const getEmptyTravelDetail = (): ScheduleSubCalendarEvent['travelDetail'] => ({
 		duration: 0,
 		calTimeLine: { start: 0, end: 0, duration: 0, occupiedSlots: null },
 		projectionType: ['TravelSubCalendarEvent'] as ['TravelSubCalendarEvent'],
-	}
+	},
 });
 
 export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
@@ -686,7 +689,7 @@ export const isDemoMode = (): boolean => {
  */
 export const activateOnboardingDemo = (personaId: string) => {
 	setOnboardingDemoActive(true);
-	
+
 	// Store temporary flag in sessionStorage (clears on tab close)
 	sessionStorage.setItem('onboarding_demo_active', 'true');
 	sessionStorage.setItem('onboarding_demo_persona', personaId);
@@ -698,7 +701,7 @@ export const activateOnboardingDemo = (personaId: string) => {
  */
 export const deactivateOnboardingDemo = () => {
 	setOnboardingDemoActive(false);
-	
+
 	// Clear temporary flags
 	sessionStorage.removeItem('onboarding_demo_active');
 	sessionStorage.removeItem('onboarding_demo_persona');

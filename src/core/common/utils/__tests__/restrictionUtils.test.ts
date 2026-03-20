@@ -17,8 +17,30 @@ describe('restrictionUtils', () => {
 	describe('restrictionProfileToSchedule', () => {
 		it('converts a full 7-day restriction profile to DaySchedule[]', () => {
 			const profile = makeProfile([
-				{ id: 's', weekday: 0, restrictionTimeLine: { id: 'st', start: 0, duration: 86400000, end: 0, timeZone: 'America/Denver' }, timeZone: 'America/Denver' },
-				{ id: 'm', weekday: 1, restrictionTimeLine: { id: 'mt', start: 28800000, duration: 36000000, end: 64800000, timeZone: 'America/Denver' }, timeZone: 'America/Denver' },
+				{
+					id: 's',
+					weekday: 0,
+					restrictionTimeLine: {
+						id: 'st',
+						start: 0,
+						duration: 86400000,
+						end: 0,
+						timeZone: 'America/Denver',
+					},
+					timeZone: 'America/Denver',
+				},
+				{
+					id: 'm',
+					weekday: 1,
+					restrictionTimeLine: {
+						id: 'mt',
+						start: 28800000,
+						duration: 36000000,
+						end: 64800000,
+						timeZone: 'America/Denver',
+					},
+					timeZone: 'America/Denver',
+				},
 				null,
 				null,
 				null,
@@ -87,8 +109,23 @@ describe('restrictionUtils', () => {
 		it('handles null restrictionTimeLine in a daySelection entry', () => {
 			const profile = makeProfile([
 				{ id: 'sun', weekday: 0, restrictionTimeLine: null, timeZone: 'America/Denver' },
-				{ id: 'm', weekday: 1, restrictionTimeLine: { id: 'mt', start: 28800000, duration: 36000000, end: 64800000, timeZone: 'America/Denver' }, timeZone: 'America/Denver' },
-				null, null, null, null, null,
+				{
+					id: 'm',
+					weekday: 1,
+					restrictionTimeLine: {
+						id: 'mt',
+						start: 28800000,
+						duration: 36000000,
+						end: 64800000,
+						timeZone: 'America/Denver',
+					},
+					timeZone: 'America/Denver',
+				},
+				null,
+				null,
+				null,
+				null,
+				null,
 			]);
 
 			const result = restrictionProfileToSchedule(profile);
@@ -103,8 +140,24 @@ describe('restrictionUtils', () => {
 
 		it('handles null start/end in restrictionTimeLine', () => {
 			const profile = makeProfile([
-				{ id: 'sun', weekday: 0, restrictionTimeLine: { id: 'st', start: null, duration: null, end: null, timeZone: null }, timeZone: 'America/Denver' },
-				null, null, null, null, null, null,
+				{
+					id: 'sun',
+					weekday: 0,
+					restrictionTimeLine: {
+						id: 'st',
+						start: null,
+						duration: null,
+						end: null,
+						timeZone: null,
+					},
+					timeZone: 'America/Denver',
+				},
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
 			]);
 
 			const result = restrictionProfileToSchedule(profile);
@@ -118,7 +171,18 @@ describe('restrictionUtils', () => {
 				null,
 				null,
 				null,
-				{ id: 'w', weekday: 3, restrictionTimeLine: { id: 'wt', start: 32400000, duration: 28800000, end: 61200000, timeZone: 'America/Denver' }, timeZone: 'America/Denver' },
+				{
+					id: 'w',
+					weekday: 3,
+					restrictionTimeLine: {
+						id: 'wt',
+						start: 32400000,
+						duration: 28800000,
+						end: 61200000,
+						timeZone: 'America/Denver',
+					},
+					timeZone: 'America/Denver',
+				},
 				null,
 				null,
 				null,

@@ -5,9 +5,9 @@ import { locationService, LocationData } from '@/services/locationService';
 
 // Define prop types for styled components
 interface StyledProps {
-  $isLoading?: boolean; // Using $ prefix to avoid DOM attribute warnings
-  $isEditing?: boolean;
-  $useDefaultLocation?: boolean;
+	$isLoading?: boolean; // Using $ prefix to avoid DOM attribute warnings
+	$isEditing?: boolean;
+	$useDefaultLocation?: boolean;
 }
 
 // Pulse animation loader component
@@ -18,11 +18,17 @@ const PulseIndicator = styled.span`
 	background: ${({ theme }) => theme.colors.brand[500]};
 	display: inline-block;
 	animation: pulse 1.5s infinite;
-	
+
 	@keyframes pulse {
-		0% { opacity: 0.4; }
-		50% { opacity: 1; }
-		100% { opacity: 0.4; }
+		0% {
+			opacity: 0.4;
+		}
+		50% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0.4;
+		}
 	}
 `;
 
@@ -32,25 +38,29 @@ const LocationContainer = styled.div<StyledProps>`
 	padding: 8px 12px;
 	background-color: ${({ theme }) => theme.colors.background.card2};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-style: ${props => props.$useDefaultLocation && !props.$isEditing ? 'dashed' : 'solid'};
-	border-color: ${({ $useDefaultLocation, $isEditing, theme }) => $useDefaultLocation && !$isEditing ? theme.colors.brand[400] : theme.colors.border.default};
+	border-style: ${(props) =>
+		props.$useDefaultLocation && !props.$isEditing ? 'dashed' : 'solid'};
+	border-color: ${({ $useDefaultLocation, $isEditing, theme }) =>
+		$useDefaultLocation && !$isEditing ? theme.colors.brand[400] : theme.colors.border.default};
 	border-radius: 6px;
 	font-size: 0.75rem;
 	color: ${({ theme }) => theme.colors.text.secondary};
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	cursor: ${props => props.$isLoading ? 'default' : 'pointer'};
+	cursor: ${(props) => (props.$isLoading ? 'default' : 'pointer')};
 	transition: all 0.2s ease-in-out;
 	position: relative;
 	overflow: visible;
-	
+
 	&:hover {
-		border-color: ${({ $isLoading, theme }) => $isLoading ? theme.colors.border.default : theme.colors.brand[500]};
-		color: ${({ $isLoading, theme }) => $isLoading ? theme.colors.text.secondary : theme.colors.text.primary};
-		box-shadow: ${props => props.$isLoading ? 'none' : '0 0 5px rgba(237, 18, 59, 0.3)'};
+		border-color: ${({ $isLoading, theme }) =>
+			$isLoading ? theme.colors.border.default : theme.colors.brand[500]};
+		color: ${({ $isLoading, theme }) =>
+			$isLoading ? theme.colors.text.secondary : theme.colors.text.primary};
+		box-shadow: ${(props) => (props.$isLoading ? 'none' : '0 0 5px rgba(237, 18, 59, 0.3)')};
 	}
-	
+
 	&:before {
 		content: '';
 		position: absolute;
@@ -61,9 +71,9 @@ const LocationContainer = styled.div<StyledProps>`
 		background-color: ${({ theme }) => theme.colors.brand[500]};
 		transition: width 0.3s ease;
 	}
-	
+
 	&:hover:before {
-		width: ${props => props.$isLoading ? '0' : '100%'};
+		width: ${(props) => (props.$isLoading ? '0' : '100%')};
 	}
 `;
 
@@ -83,13 +93,13 @@ const LocationInput = styled.input`
 	font-size: 0.75rem;
 	width: 100%;
 	transition: all 0.2s ease;
-	
+
 	&:focus {
 		outline: none;
 		border-color: ${({ theme }) => theme.colors.brand[500]};
 		box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.brand[500]};
 	}
-	
+
 	&::placeholder {
 		color: ${({ theme }) => theme.colors.text.muted};
 	}
@@ -105,11 +115,11 @@ const SubmitButton = styled.button`
 	font-weight: 500;
 	cursor: pointer;
 	transition: background-color 0.2s ease;
-	
+
 	&:hover {
 		background-color: ${({ theme }) => theme.colors.brand[600]};
 	}
-	
+
 	&:active {
 		background-color: ${({ theme }) => theme.colors.brand[700]};
 	}
@@ -120,7 +130,7 @@ const LocationIconWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	z-index: 10;
-	
+
 	/* Create more hover area for better tooltip triggering */
 	&:before {
 		content: '';
@@ -134,10 +144,12 @@ const LocationIconWrapper = styled.div`
 `;
 
 const LocationIcon = styled.svg<StyledProps>`
-	color: ${props => 
-		props.$isEditing ? props.theme.colors.brand[400] : 
-		props.$useDefaultLocation ? props.theme.colors.brand[300] : 'currentColor'
-	};
+	color: ${(props) =>
+		props.$isEditing
+			? props.theme.colors.brand[400]
+			: props.$useDefaultLocation
+				? props.theme.colors.brand[300]
+				: 'currentColor'};
 `;
 
 const TooltipContainer = styled.div`
@@ -163,7 +175,9 @@ const Tooltip = styled.div`
 	z-index: 10000;
 	opacity: 0;
 	visibility: hidden;
-	transition: opacity 0.3s, visibility 0.3s;
+	transition:
+		opacity 0.3s,
+		visibility 0.3s;
 	pointer-events: none;
 `;
 
@@ -194,8 +208,9 @@ const LocationText = styled.span<StyledProps>`
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	font-style: ${props => props.$useDefaultLocation ? 'italic' : 'normal'};
-	color: ${({ $useDefaultLocation, theme }) => $useDefaultLocation ? theme.colors.text.secondary : theme.colors.text.muted};
+	font-style: ${(props) => (props.$useDefaultLocation ? 'italic' : 'normal')};
+	color: ${({ $useDefaultLocation, theme }) =>
+		$useDefaultLocation ? theme.colors.text.secondary : theme.colors.text.muted};
 `;
 
 const DefaultBadgeContainer = styled.div`
@@ -231,7 +246,9 @@ const DefaultBadgeTooltip = styled.div`
 	z-index: 10000;
 	opacity: 0;
 	visibility: hidden;
-	transition: opacity 0.3s, visibility 0.3s;
+	transition:
+		opacity 0.3s,
+		visibility 0.3s;
 	pointer-events: none;
 `;
 
@@ -261,7 +278,9 @@ const UserLocation: React.FC = () => {
 	const { t } = useTranslation();
 	const theme = useTheme();
 
-	const [locationData, setLocationData] = useState<LocationData>(locationService.getDefaultLocation());
+	const [locationData, setLocationData] = useState<LocationData>(
+		locationService.getDefaultLocation()
+	);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error] = useState<string | null>(null);
 	const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -270,7 +289,7 @@ const UserLocation: React.FC = () => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const tooltipRef = useRef<HTMLDivElement>(null);
 	const locationRef = useRef<HTMLDivElement>(null);
-	
+
 	// Location data is now managed locally by the service
 
 	// Location service handles all location logic now
@@ -311,21 +330,22 @@ const UserLocation: React.FC = () => {
 			const locationElement = locationRef.current;
 			const tooltipRect = tooltipElement.getBoundingClientRect();
 			locationElement.getBoundingClientRect(); // Get element dimensions
-			
+
 			// Check if the tooltip would be cut off at the top
 			if (tooltipRect.top < 0) {
 				// Position below instead
-				tooltipElement.style.top = "auto";
-				tooltipElement.style.bottom = "auto";
-				tooltipElement.style.transform = "translateX(-50%)";
-				tooltipElement.style.top = "100%";
-				
+				tooltipElement.style.top = 'auto';
+				tooltipElement.style.bottom = 'auto';
+				tooltipElement.style.transform = 'translateX(-50%)';
+				tooltipElement.style.top = '100%';
+
 				// Flip the arrow to point upward
-				const arrow = tooltipElement.querySelector("::after") as HTMLElement;
+				const arrow = tooltipElement.querySelector('::after') as HTMLElement;
 				if (arrow) {
-					arrow.style.bottom = "auto";
-					arrow.style.top = "-10px";
-					arrow.style.borderColor = "transparent transparent " + theme.colors.background.card2 + " transparent";
+					arrow.style.bottom = 'auto';
+					arrow.style.top = '-10px';
+					arrow.style.borderColor =
+						'transparent transparent ' + theme.colors.background.card2 + ' transparent';
 				}
 			}
 		}
@@ -370,7 +390,9 @@ const UserLocation: React.FC = () => {
 			setIsLocationFetching(true);
 
 			try {
-				const newLocationData = await locationService.getLocationFromAddress(customLocation.trim());
+				const newLocationData = await locationService.getLocationFromAddress(
+					customLocation.trim()
+				);
 				setLocationData(newLocationData);
 				// Cache the manual location so it persists between re-renders
 				locationService.setManualLocation(newLocationData);
@@ -407,13 +429,13 @@ const UserLocation: React.FC = () => {
 		if (e.currentTarget.contains(e.relatedTarget as Node)) {
 			return;
 		}
-		
+
 		// Small delay to allow for form submission if clicked on submit button
 		setTimeout(() => {
 			setIsEditing(false);
 		}, 200);
 	};
-	
+
 	// Don't display anything if there's an error
 	if (error) {
 		return null;
@@ -421,7 +443,7 @@ const UserLocation: React.FC = () => {
 
 	// Message explaining the benefits of setting a custom location
 	const locationBenefitMessage = t('home.expanded.chat.userLocation.locationBenefitMessage');
-	
+
 	return (
 		<LocationContainer
 			$isLoading={isLoading}
@@ -453,28 +475,29 @@ const UserLocation: React.FC = () => {
 				>
 					{/* Fixed tooltip that appears at the top of the viewport */}
 					<Tooltip id="location-icon-tooltip">
-						{isLocationFetching ?
-							t('home.expanded.chat.userLocation.gettingCurrentLocation') :
-							isEditing ?
-								t('home.expanded.chat.userLocation.enterLocation') :
-								(!locationData.verified ?
-									<>
-										{t('home.expanded.chat.userLocation.usingDefaultLocation')}
-										<br /><br />
-										{locationBenefitMessage}
-									</> :
-									t('home.expanded.chat.userLocation.clickIconToGetLocation')
-								)
-						}
+						{isLocationFetching ? (
+							t('home.expanded.chat.userLocation.gettingCurrentLocation')
+						) : isEditing ? (
+							t('home.expanded.chat.userLocation.enterLocation')
+						) : !locationData.verified ? (
+							<>
+								{t('home.expanded.chat.userLocation.usingDefaultLocation')}
+								<br />
+								<br />
+								{locationBenefitMessage}
+							</>
+						) : (
+							t('home.expanded.chat.userLocation.clickIconToGetLocation')
+						)}
 						{/* Arrow pointing to the location icon */}
 						<TooltipArrow />
 					</Tooltip>
 				</TooltipContainer>
 			</LocationIconWrapper>
-			
+
 			{isEditing ? (
-				<LocationForm 
-					onSubmit={handleSubmit} 
+				<LocationForm
+					onSubmit={handleSubmit}
 					onBlur={handleBlur}
 					onClick={(e) => e.stopPropagation()} // Prevent form clicks from bubbling
 				>
@@ -493,23 +516,27 @@ const UserLocation: React.FC = () => {
 					/>
 					<ButtonContainer onClick={(e) => e.stopPropagation()}>
 						{customLocation !== locationService.getDefaultLocation().location && (
-							<DefaultButton 
-								type="button" 
+							<DefaultButton
+								type="button"
 								onClick={(e) => {
 									e.stopPropagation();
 									e.preventDefault(); // Prevent form submission
-									setCustomLocation(locationService.getDefaultLocation().location);
+									setCustomLocation(
+										locationService.getDefaultLocation().location
+									);
 								}}
 							>
 								Default
 							</DefaultButton>
 						)}
-						<SubmitButton 
+						<SubmitButton
 							type="submit"
 							onClick={(e) => e.stopPropagation()}
 							disabled={isLocationFetching}
 						>
-							{isLocationFetching ? t('home.expanded.chat.userLocation.saving') : t('home.expanded.chat.userLocation.save')}
+							{isLocationFetching
+								? t('home.expanded.chat.userLocation.saving')
+								: t('home.expanded.chat.userLocation.save')}
 						</SubmitButton>
 					</ButtonContainer>
 				</LocationForm>
@@ -517,7 +544,9 @@ const UserLocation: React.FC = () => {
 				<LocationText $useDefaultLocation={!locationData.verified}>
 					{isLoading || isLocationFetching ? (
 						<>
-							{isLocationFetching ? t('home.expanded.chat.userLocation.gettingCurrentLocation') : t('home.expanded.chat.userLocation.gettingLocation')}
+							{isLocationFetching
+								? t('home.expanded.chat.userLocation.gettingCurrentLocation')
+								: t('home.expanded.chat.userLocation.gettingLocation')}
 							<PulseIndicator />
 						</>
 					) : (
@@ -525,7 +554,7 @@ const UserLocation: React.FC = () => {
 							{locationData.location}
 							{!locationData.verified ? (
 								<DefaultBadgeContainer>
-									<DefaultBadge 
+									<DefaultBadge
 										onClick={(e) => {
 											e.stopPropagation(); // Prevent triggering LocationContainer click
 											setIsEditing(true); // Start editing directly from badge click
@@ -535,7 +564,7 @@ const UserLocation: React.FC = () => {
 									>
 										{t('home.expanded.chat.userLocation.default')}
 									</DefaultBadge>
-									
+
 									{/* Fixed tooltip that always appears at the top center of the viewport */}
 									<DefaultBadgeTooltip id="default-badge-tooltip">
 										{locationBenefitMessage}
@@ -544,7 +573,7 @@ const UserLocation: React.FC = () => {
 									</DefaultBadgeTooltip>
 								</DefaultBadgeContainer>
 							) : (
-								<ResetLink 
+								<ResetLink
 									onClick={(e) => {
 										e.stopPropagation();
 										resetToDefault();
@@ -557,7 +586,7 @@ const UserLocation: React.FC = () => {
 					)}
 				</LocationText>
 			)}
-			
+
 			{/* Animation is handled in the styled component */}
 		</LocationContainer>
 	);

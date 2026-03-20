@@ -89,7 +89,9 @@ export class UserService {
 		}
 	}
 
-	async updateScheduleProfile(params: UpdateScheduleProfileParams): Promise<ScheduleProfileResponse['Content']> {
+	async updateScheduleProfile(
+		params: UpdateScheduleProfileParams
+	): Promise<ScheduleProfileResponse['Content']> {
 		try {
 			const response = await this.userApi.updateScheduleProfile(params);
 

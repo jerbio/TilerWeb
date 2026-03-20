@@ -7,37 +7,37 @@ import palette from '@/core/theme/palette';
 type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
 type TooltipProps = {
-  text: string;
-  children: React.ReactNode;
-  position?: TooltipPosition;
-  maxWidth?: number;
+	text: string;
+	children: React.ReactNode;
+	position?: TooltipPosition;
+	maxWidth?: number;
 };
 
 const Tooltip: React.FC<TooltipProps> = ({ text, children, position = 'top', maxWidth }) => {
-  const [show, setShow] = useState(false);
+	const [show, setShow] = useState(false);
 
-  const styles = useSpring({
-    opacity: show ? 1 : 0,
-    transform: show
-      ? 'translate(0px, 0px)'
-      : position === 'top'
-        ? 'translateY(5px)'
-        : position === 'bottom'
-          ? 'translateY(-5px)'
-          : position === 'left'
-            ? 'translateX(5px)'
-            : 'translateX(-5px)',
-    config: { tension: 250, friction: 20 },
-  });
+	const styles = useSpring({
+		opacity: show ? 1 : 0,
+		transform: show
+			? 'translate(0px, 0px)'
+			: position === 'top'
+				? 'translateY(5px)'
+				: position === 'bottom'
+					? 'translateY(-5px)'
+					: position === 'left'
+						? 'translateX(5px)'
+						: 'translateX(-5px)',
+		config: { tension: 250, friction: 20 },
+	});
 
-  return (
-    <Wrapper onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-      {children}
-      <Bubble style={styles} position={position} $maxwidth={maxWidth || 200}>
-        {text}
-      </Bubble>
-    </Wrapper>
-  );
+	return (
+		<Wrapper onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+			{children}
+			<Bubble style={styles} position={position} $maxwidth={maxWidth || 200}>
+				{text}
+			</Bubble>
+		</Wrapper>
+	);
 };
 
 const Wrapper = styled.div`
@@ -45,7 +45,7 @@ const Wrapper = styled.div`
 	display: inline-block;
 `;
 
-const Bubble = styled(animated.div) <{ position: TooltipPosition; $maxwidth: number }>`
+const Bubble = styled(animated.div)<{ position: TooltipPosition; $maxwidth: number }>`
 	position: absolute;
 	background: ${palette.colors.gray[800]};
 	color: ${palette.colors.gray[200]};
@@ -58,32 +58,32 @@ const Bubble = styled(animated.div) <{ position: TooltipPosition; $maxwidth: num
 	width: max-content;
 
 	${({ position }) =>
-    position === 'top' &&
-    css`
+		position === 'top' &&
+		css`
 			bottom: 120%;
 			left: 50%;
 			transform: translateX(-50%);
 		`}
 
 	${({ position }) =>
-    position === 'bottom' &&
-    css`
+		position === 'bottom' &&
+		css`
 			top: 120%;
 			left: 50%;
 			transform: translateX(-50%);
 		`}
 
   ${({ position }) =>
-    position === 'left' &&
-    css`
+		position === 'left' &&
+		css`
 			right: 110%;
 			top: 50%;
 			transform: translateY(-50%);
 		`}
 
   ${({ position }) =>
-    position === 'right' &&
-    css`
+		position === 'right' &&
+		css`
 			left: 110%;
 			top: 50%;
 			transform: translateY(-50%);

@@ -7,29 +7,29 @@ import styled from 'styled-components';
 import CHAT_ILLUSTRATION from '@/assets/persona/chat-illustration.svg';
 
 const PersonaLimitWarning: React.FC<{ open: boolean }> = ({ open }) => {
-  return (
-    <PersonaLimitContainer $open={open}>
-      <LogoContainer>
-        <Logo size={36} />
-      </LogoContainer>
-      <HeaderContainer>
-        <HeaderChip>Chat limit Reached</HeaderChip>
-        <Header>Want more than 20 prompts?</Header>
-      </HeaderContainer>
-      <img src={CHAT_ILLUSTRATION} height={180} width={200} />
-      <LimitDescription>
-        Get early access to unlimited chats, smart integrations, and the full Tiler
-        experience.
-      </LimitDescription>
-      <ButtonContainer>
-        <Button variant="brand">
-          <span>Join the waitlist</span>
-          <ArrowRight />
-        </Button>
-        <span>Spots are limited - Save yours now.</span>
-      </ButtonContainer>
-    </PersonaLimitContainer>
-  );
+	return (
+		<PersonaLimitContainer $open={open}>
+			<LogoContainer>
+				<Logo size={36} />
+			</LogoContainer>
+			<HeaderContainer>
+				<HeaderChip>Chat limit Reached</HeaderChip>
+				<Header>Want more than 20 prompts?</Header>
+			</HeaderContainer>
+			<img src={CHAT_ILLUSTRATION} height={180} width={200} />
+			<LimitDescription>
+				Get early access to unlimited chats, smart integrations, and the full Tiler
+				experience.
+			</LimitDescription>
+			<ButtonContainer>
+				<Button variant="brand">
+					<span>Join the waitlist</span>
+					<ArrowRight />
+				</Button>
+				<span>Spots are limited - Save yours now.</span>
+			</ButtonContainer>
+		</PersonaLimitContainer>
+	);
 };
 
 const ButtonContainer = styled.div`

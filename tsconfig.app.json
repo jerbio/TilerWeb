@@ -3,7 +3,7 @@
 		/* Configure paths */
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"],
+			"@/*": ["src/*"]
 		},
 
 		/* Vitest globals */
@@ -29,6 +29,6 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true,
-	},
+		"noUncheckedSideEffectImports": true
+	}
 }

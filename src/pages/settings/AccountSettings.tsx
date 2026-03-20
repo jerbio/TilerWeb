@@ -55,7 +55,9 @@ const AccountSettings: React.FC = () => {
 			if (dateOfBirth) {
 				const [year, month, day] = dateOfBirth.split('-');
 				if (year && month && day) {
-					const date = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+					const date = new Date(
+						Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day))
+					);
 					dateOfBirthUtcEpoch = date.getTime();
 				}
 			}
@@ -63,8 +65,14 @@ const AccountSettings: React.FC = () => {
 			// Extract country code and phone number
 			// Assuming phone number might include country code or just the number
 			const phoneNumberClean = phoneNumber.replace(/\D/g, ''); // Remove non-digits
-			const countryCode = phoneNumberClean.length > 10 ? parseInt(phoneNumberClean.substring(0, phoneNumberClean.length - 10)) : 0;
-			const phoneNumberOnly = phoneNumberClean.length > 10 ? phoneNumberClean.substring(phoneNumberClean.length - 10) : phoneNumberClean;
+			const countryCode =
+				phoneNumberClean.length > 10
+					? parseInt(phoneNumberClean.substring(0, phoneNumberClean.length - 10))
+					: 0;
+			const phoneNumberOnly =
+				phoneNumberClean.length > 10
+					? phoneNumberClean.substring(phoneNumberClean.length - 10)
+					: phoneNumberClean;
 
 			await userService.updateUser({
 				FirstName: firstName,
@@ -143,7 +151,9 @@ const AccountSettings: React.FC = () => {
 					<FormGroup>
 						<Input
 							label={t('settings.sections.accountInfo.fields.phoneNumber')}
-							placeholder={t('settings.sections.accountInfo.fields.phoneNumberPlaceholder')}
+							placeholder={t(
+								'settings.sections.accountInfo.fields.phoneNumberPlaceholder'
+							)}
 							value={phoneNumber}
 							onChange={(e) => setPhoneNumber(e.target.value)}
 							type="tel"
@@ -157,7 +167,9 @@ const AccountSettings: React.FC = () => {
 							label={t('settings.sections.accountInfo.fields.dateOfBirth')}
 							value={dateOfBirth}
 							onChange={setDateOfBirth}
-							placeholder={t('settings.sections.accountInfo.fields.dateOfBirthPlaceholder')}
+							placeholder={t(
+								'settings.sections.accountInfo.fields.dateOfBirthPlaceholder'
+							)}
 						/>
 					</FormGroup>
 					<FormGroup $alignEnd>

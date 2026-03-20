@@ -11,7 +11,7 @@ const renderWithTheme = (ui: React.ReactElement) => {
 	return render(
 		<I18nextProvider i18n={i18n}>
 			<ThemeProvider defaultTheme="dark">{ui}</ThemeProvider>
-		</I18nextProvider>,
+		</I18nextProvider>
 	);
 };
 
@@ -28,9 +28,7 @@ const buildSchedule = (overrides?: (Partial<DaySchedule> | undefined)[]): DaySch
 describe('WeeklySchedule', () => {
 	describe('Rendering', () => {
 		it('renders all 7 day labels', () => {
-			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />);
 
 			const dayHeaders = screen.getAllByTestId(/^day-label-/);
 			expect(dayHeaders).toHaveLength(7);
@@ -38,9 +36,7 @@ describe('WeeklySchedule', () => {
 		});
 
 		it('renders Start and End as dropdown placeholders for each day', () => {
-			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />);
 
 			// Start/End appear as <option> placeholder text inside each dropdown
 			const startOptions = screen.getAllByRole('option', { name: 'Start' });
@@ -55,9 +51,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={vi.fn()} />);
 
 			const mondayColumn = screen.getByTestId('day-column-1');
 			const selects = within(mondayColumn).getAllByRole('combobox');
@@ -66,9 +60,7 @@ describe('WeeklySchedule', () => {
 		});
 
 		it('renders empty dropdowns when no time is set', () => {
-			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />);
 
 			const sundayColumn = screen.getByTestId('day-column-0');
 			const selects = within(sundayColumn).getAllByRole('combobox');
@@ -80,7 +72,7 @@ describe('WeeklySchedule', () => {
 	describe('Sizing', () => {
 		it('renders with default "md" size', () => {
 			const { container } = renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />,
+				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} />
 			);
 
 			const wrapper = container.firstChild as HTMLElement;
@@ -89,7 +81,11 @@ describe('WeeklySchedule', () => {
 
 		it('accepts "sm" size prop', () => {
 			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} size={WeeklyScheduleSize.Sm} />,
+				<WeeklySchedule
+					schedule={buildSchedule()}
+					onChange={vi.fn()}
+					size={WeeklyScheduleSize.Sm}
+				/>
 			);
 
 			const dayHeaders = screen.getAllByTestId(/^day-label-/);
@@ -98,7 +94,11 @@ describe('WeeklySchedule', () => {
 
 		it('accepts "lg" size prop', () => {
 			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} size={WeeklyScheduleSize.Lg} />,
+				<WeeklySchedule
+					schedule={buildSchedule()}
+					onChange={vi.fn()}
+					size={WeeklyScheduleSize.Lg}
+				/>
 			);
 
 			const dayHeaders = screen.getAllByTestId(/^day-label-/);
@@ -112,9 +112,7 @@ describe('WeeklySchedule', () => {
 			const onChange = vi.fn();
 			const schedule = buildSchedule();
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={onChange} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={onChange} />);
 
 			const mondayColumn = screen.getByTestId('day-column-1');
 			const selects = within(mondayColumn).getAllByRole('combobox');
@@ -131,9 +129,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '5:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={onChange} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={onChange} />);
 
 			const mondayColumn = screen.getByTestId('day-column-1');
 			const selects = within(mondayColumn).getAllByRole('combobox');
@@ -148,7 +144,7 @@ describe('WeeklySchedule', () => {
 			const schedule = buildSchedule();
 
 			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} onDayToggle={onDayToggle} />,
+				<WeeklySchedule schedule={schedule} onChange={vi.fn()} onDayToggle={onDayToggle} />
 			);
 
 			await user.click(screen.getByTestId('day-circle-2'));
@@ -165,7 +161,7 @@ describe('WeeklySchedule', () => {
 			]);
 
 			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} onDayToggle={onDayToggle} />,
+				<WeeklySchedule schedule={schedule} onChange={vi.fn()} onDayToggle={onDayToggle} />
 			);
 
 			await user.click(screen.getByTestId('day-circle-1'));
@@ -179,7 +175,12 @@ describe('WeeklySchedule', () => {
 			const schedule = buildSchedule();
 
 			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} onDayToggle={onDayToggle} disabled />,
+				<WeeklySchedule
+					schedule={schedule}
+					onChange={vi.fn()}
+					onDayToggle={onDayToggle}
+					disabled
+				/>
 			);
 
 			await user.click(screen.getByTestId('day-circle-0'));
@@ -195,9 +196,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={vi.fn()} />);
 
 			const selectedCircle = screen.getByTestId('day-circle-1');
 			const unselectedCircle = screen.getByTestId('day-circle-0');
@@ -213,7 +212,7 @@ describe('WeeklySchedule', () => {
 	describe('Disabled state', () => {
 		it('disables all dropdowns when disabled prop is true', () => {
 			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} disabled />,
+				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} disabled />
 			);
 
 			const selects = screen.getAllByRole('combobox');
@@ -226,7 +225,7 @@ describe('WeeklySchedule', () => {
 	describe('Read-only state', () => {
 		it('disables all dropdowns when readOnly prop is true', () => {
 			renderWithTheme(
-				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} readOnly />,
+				<WeeklySchedule schedule={buildSchedule()} onChange={vi.fn()} readOnly />
 			);
 
 			const selects = screen.getAllByRole('combobox');
@@ -243,9 +242,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={vi.fn()} />);
 
 			expect(screen.getByTestId('copy-btn-1')).toBeInTheDocument();
 			expect(screen.queryByTestId('copy-btn-0')).not.toBeInTheDocument();
@@ -257,9 +254,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} disabled />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={vi.fn()} disabled />);
 
 			expect(screen.queryByTestId('copy-btn-1')).not.toBeInTheDocument();
 		});
@@ -272,9 +267,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 2, startTime: '9:00 AM', endTime: '5:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={vi.fn()} />);
 
 			await user.click(screen.getByTestId('copy-btn-1'));
 
@@ -296,9 +289,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={onChange} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={onChange} />);
 
 			// Copy Monday's times
 			await user.click(screen.getByTestId('copy-btn-1'));
@@ -317,9 +308,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={onChange} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={onChange} />);
 
 			// Copy Monday's times
 			await user.click(screen.getByTestId('copy-btn-1'));
@@ -346,9 +335,7 @@ describe('WeeklySchedule', () => {
 				{ dayIndex: 1, startTime: '8:00 AM', endTime: '6:00 PM' },
 			]);
 
-			renderWithTheme(
-				<WeeklySchedule schedule={schedule} onChange={vi.fn()} />,
-			);
+			renderWithTheme(<WeeklySchedule schedule={schedule} onChange={vi.fn()} />);
 
 			await user.click(screen.getByTestId('copy-btn-1'));
 			expect(screen.getByTestId('copy-active-1')).toBeInTheDocument();

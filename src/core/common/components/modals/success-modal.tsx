@@ -9,53 +9,53 @@ import { useTheme } from '@/core/theme/ThemeProvider';
 import Button from '../button';
 
 type SuccessModalProps = {
-  show: boolean;
-  setShow: (show: boolean) => void;
-  children?: React.ReactNode;
-  closeTimeout?: number;
-  actions?: Array<{ text: string; onClick: () => void, disabled?: boolean }>;
+	show: boolean;
+	setShow: (show: boolean) => void;
+	children?: React.ReactNode;
+	closeTimeout?: number;
+	actions?: Array<{ text: string; onClick: () => void; disabled?: boolean }>;
 };
 
 const SuccessModal: React.FC<SuccessModalProps> = ({
-  show,
-  setShow,
-  children,
-  actions,
-  closeTimeout,
+	show,
+	setShow,
+	children,
+	actions,
+	closeTimeout,
 }) => {
-  const { t } = useTranslation();
-  const { isDarkMode } = useTheme();
-  const loadingEllipse = isDarkMode ? DarkLoadingEllipse : LightLoadingEllipse;
+	const { t } = useTranslation();
+	const { isDarkMode } = useTheme();
+	const loadingEllipse = isDarkMode ? DarkLoadingEllipse : LightLoadingEllipse;
 
-  return createPortal(
-    <Modal
-      show={show}
-      setShow={setShow}
-      headerStyle={{ border: 'none' }}
-      closeTimeout={closeTimeout}
-      footer={
-        actions
-          ? actions.map((action, index) => (
-            <SuccessAction
-              size="large"
-              variant="ghost"
-              key={index}
-              onClick={action.onClick}
-              disabled={action.disabled}
-            >
-              {action.text}
-            </SuccessAction>
-          ))
-          : null
-      }
-    >
-      <SuccessContent>
-        <img src={loadingEllipse} alt={t('modals.success.image.alt')} />
-        {children}
-      </SuccessContent>
-    </Modal>,
-    document.body
-  );
+	return createPortal(
+		<Modal
+			show={show}
+			setShow={setShow}
+			headerStyle={{ border: 'none' }}
+			closeTimeout={closeTimeout}
+			footer={
+				actions
+					? actions.map((action, index) => (
+							<SuccessAction
+								size="large"
+								variant="ghost"
+								key={index}
+								onClick={action.onClick}
+								disabled={action.disabled}
+							>
+								{action.text}
+							</SuccessAction>
+						))
+					: null
+			}
+		>
+			<SuccessContent>
+				<img src={loadingEllipse} alt={t('modals.success.image.alt')} />
+				{children}
+			</SuccessContent>
+		</Modal>,
+		document.body
+	);
 };
 
 const SuccessAction = styled(Button)`
