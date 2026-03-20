@@ -51,31 +51,29 @@ const Modal: React.FC<ModalProps> = ({
 		}
 	}, [timeLeft, setShow]);
 
-  return createPortal(
-    <Overlay onClick={closeModal} $show={show}>
-      <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <Header style={headerStyle}>
-          <h3>{headerText}</h3>
-          {setShow && (
-            <CloseButtonTimerWrapper
-              $isclosing={timerExists}
-              closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
-            >
-              <CloseButton onClick={closeModal}>
-                <X color={theme.colors.text.secondary} size={16} />
-              </CloseButton>
-              {timerExists && (
-                <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>
-              )}
-            </CloseButtonTimerWrapper>
-          )}
-        </Header>
-        <ModalBody>{children}</ModalBody>
-        {footer && <ModalFooter>{footer}</ModalFooter>}
-      </ModalContainer>
-    </Overlay>,
-    document.body
-  );
+	return createPortal(
+		<Overlay onClick={closeModal} $show={show}>
+			<ModalContainer onClick={(e) => e.stopPropagation()}>
+				<Header style={headerStyle}>
+					<h3>{headerText}</h3>
+					{setShow && (
+						<CloseButtonTimerWrapper
+							$isclosing={timerExists}
+							closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
+						>
+							<CloseButton onClick={closeModal}>
+								<X color={theme.colors.text.secondary} size={16} />
+							</CloseButton>
+							{timerExists && <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>}
+						</CloseButtonTimerWrapper>
+					)}
+				</Header>
+				<ModalBody>{children}</ModalBody>
+				{footer && <ModalFooter>{footer}</ModalFooter>}
+			</ModalContainer>
+		</Overlay>,
+		document.body
+	);
 };
 
 const CloseButtonTimer = styled.div`

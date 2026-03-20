@@ -272,10 +272,10 @@
 				"title": "Summary",
 				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>",
 				"recurrenceFrequency": {
-          "daily": "day",
-          "weekly": "week",
-          "monthly": "month",
-          "yearly": "year"
+					"daily": "day",
+					"weekly": "week",
+					"monthly": "month",
+					"yearly": "year"
 				},
 				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
 				"recurringStart": " from <b>{{recurrenceStart}}</b>",
@@ -1083,6 +1083,83 @@
 			"badge": "Navigate Tiler",
 			"title": "Here\u2019s Where Everything Lives",
 			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
+		},
+		"features": {
+			"badge": "Features",
+			"title": "Everything Tiler can do.",
+			"summary": "Every feature is built around one principle: your schedule should work for you, not the other way around.",
+			"items": {
+				"adaptiveTiles": {
+					"name": "Adaptive Tiles",
+					"desc": "The core unit of Tiler. Each tile is a task, event, or habit with a duration \u2014 Tiler schedules them intelligently and moves them when your day changes.",
+					"badge": "Core feature"
+				},
+				"aiScheduling": {
+					"name": "AI scheduling assistant",
+					"desc": "Tiler asks clarifying questions, proposes the best available time, and builds a complete schedule including dependencies \u2014 always with your approval first.",
+					"badge": "Core feature"
+				},
+				"chatScheduling": {
+					"name": "Chat scheduling",
+					"desc": "Tell Tiler what you need through a natural chat interface. It understands your intent and proposes a plan without you filling in a single form.",
+					"badge": "Core feature"
+				},
+				"naturalLanguage": {
+					"name": "Natural language input",
+					"desc": "Describe tasks in plain English \u2014 no forms, no dropdowns. Tiler understands context, urgency, duration, and location from how you naturally talk.",
+					"badge": "Core feature"
+				},
+				"autoTravel": {
+					"name": "Auto travel buffers",
+					"desc": "Tiler automatically inserts realistic travel time between location-based tiles based on your actual distance and transit options. Back-to-back never means late.",
+					"badge": "Unique to Tiler"
+				},
+				"autoLocations": {
+					"name": "Auto locations",
+					"desc": "Link locations to tiles once and Tiler remembers. Every time that task appears, travel time is calculated automatically from wherever you are.",
+					"badge": "Unique to Tiler"
+				},
+				"timeRestrictions": {
+					"name": "Time restrictions",
+					"desc": "Set the hours you\u2019re available and Tiler only schedules within those bounds. Your personal time stays yours \u2014 no task bleeds into off-hours unless you allow it.",
+					"badge": "Preferences"
+				},
+				"adaptiveRescheduling": {
+					"name": "Adaptive rescheduling",
+					"desc": "When a meeting runs long or a task gets missed, Tiler detects the ripple across your whole day and proposes fixes \u2014 instantly, with your approval before changing anything.",
+					"badge": "Core feature"
+				},
+				"calendarIntegration": {
+					"name": "Calendar integration",
+					"desc": "Connect Google Calendar or Outlook. Tiler reads your existing events and schedules all new tiles around them \u2014 no double bookings, ever. Supports multiple calendars.",
+					"badge": "Integration"
+				},
+				"crossPlatform": {
+					"name": "Cross-platform sync",
+					"desc": "Web, iOS, and Android all stay in real-time sync. Start a task on your laptop and check in on your phone without missing a beat. One schedule, everywhere.",
+					"badge": "Platform"
+				},
+				"habitScheduling": {
+					"name": "Habit scheduling",
+					"desc": "Add recurring habits and Tiler auto-fits them around your day \u2014 keeping you consistent with your routines without you having to think about it each morning.",
+					"badge": "Wellness"
+				},
+				"deferReschedule": {
+					"name": "Defer & reschedule",
+					"desc": "Missed a tile? Tiler\u2019s Defer feature instantly finds the next best slot and reschedules with one tap. Never lose a task \u2014 just push it forward intelligently.",
+					"badge": "Core feature"
+				},
+				"smartNotifications": {
+					"name": "Smart notifications",
+					"desc": "Get alerted when it\u2019s time to leave for your next tile \u2014 with live transit updates if your route changes. Never miss a departure time because you lost track of the clock.",
+					"badge": "Real-time"
+				},
+				"tileShare": {
+					"name": "TileShare",
+					"desc": "Share tiles with family or teammates. Assign who handles what. Track completion. Everyone\u2019s calendar adapts around shared commitments automatically \u2014 no extra apps needed.",
+					"badge": "Collaboration"
+				}
+			}
 		}
 	}
 }

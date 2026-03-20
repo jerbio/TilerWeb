@@ -465,49 +465,49 @@ const Calendar = ({
 		}
 	}, [isMobile]);
 
-  // Create Tile State
-  const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-  const createTileModalContainerRef = useRef<HTMLDivElement>(null);
-  const createTileModalPortalTarget = createTile.state.isExpanded
-    ? document.body
-    : createTileModalContainerRef.current;
+	// Create Tile State
+	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
+	const createTileModalContainerRef = useRef<HTMLDivElement>(null);
+	const createTileModalPortalTarget = createTile.state.isExpanded
+		? document.body
+		: createTileModalContainerRef.current;
 
-  function onBackgroundClick(info: CalendarBackgroundClickInfo) {
-    // CONTENT_CLICK_OUTSIDE
-    if (!selectedEvent) {
-      const { formData, setFormData } = createTileFormHandler;
-      // Set Create Tile Form Based on day clicked
-      const clickedDay = dayjs(info.day);
-      const clickedDayValue = clickedDay.day();
-      let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
+	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
+		// CONTENT_CLICK_OUTSIDE
+		if (!selectedEvent) {
+			const { formData, setFormData } = createTileFormHandler;
+			// Set Create Tile Form Based on day clicked
+			const clickedDay = dayjs(info.day);
+			const clickedDayValue = clickedDay.day();
+			let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
 
-      if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
-      else if (clickedDayValue === 2)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Tuesday;
-      else if (clickedDayValue === 3)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Wednesday;
-      else if (clickedDayValue === 4)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Thursday;
-      else if (clickedDayValue === 5)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Friday;
-      else if (clickedDayValue === 6)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
-      else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
+			if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
+			else if (clickedDayValue === 2)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Tuesday;
+			else if (clickedDayValue === 3)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Wednesday;
+			else if (clickedDayValue === 4)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Thursday;
+			else if (clickedDayValue === 5)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Friday;
+			else if (clickedDayValue === 6)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
+			else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
 
-      setFormData({
-        ...formData,
-        start: clickedDay,
-        deadline: clickedDay,
-        recurrenceStartDate: clickedDay,
-        recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
-      });
-      createTile.actions.open();
-    } else {
-      setSelectedEvent(null);
-      setSelectedEventInfo(null);
-    }
-    setShowNonViableEvents(null);
-  }
+			setFormData({
+				...formData,
+				start: clickedDay,
+				deadline: clickedDay,
+				recurrenceStartDate: clickedDay,
+				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
+			});
+			createTile.actions.open();
+		} else {
+			setSelectedEvent(null);
+			setSelectedEventInfo(null);
+		}
+		setShowNonViableEvents(null);
+	}
 
 	return (
 		<CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>

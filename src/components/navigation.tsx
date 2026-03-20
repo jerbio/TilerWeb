@@ -166,14 +166,14 @@ const MobileNavLinks = styled.div<{ $shrink: boolean }>`
 `;
 
 const Navigation: React.FC = () => {
-  const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAtTop, setIsAtTop] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const navLinks = [
-    { name: t('common.navigation.home'), href: '/' },
-    { name: t('common.navigation.discover'), href: '/newsletter' },
-  ];
+	const { t } = useTranslation();
+	const [isOpen, setIsOpen] = useState(false);
+	const [isAtTop, setIsAtTop] = useState(true);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const navLinks = [
+		{ name: t('common.navigation.home'), href: '/' },
+		{ name: t('common.navigation.discover'), href: '/newsletter' },
+	];
 
 	function handleScroll() {
 		if (window.scrollY === 0) {

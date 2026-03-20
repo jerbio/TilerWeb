@@ -193,52 +193,57 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		};
 	}, [ui.state.isOpen, submitForm]);
 
-  return (
-    <StyledCalendarCreateEvent
-      onSubmit={(e) => {
-        e.preventDefault();
-        submitForm();
-      }}
-      $isexpanded={ui.state.isExpanded}
-    >
-      <button style={{ display: 'none' }} data-testid="open-create-tile" type="button" onClick={ui.actions.open} />
-      <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
-        <p>
-          {t('calendar.createTile.message.pending', {
-            action: ui.state.loading.tileName,
-          })}
-        </p>
-      </LoadingModal>
-      <SuccessModal
-        show={ui.state.success.isOpen}
-        setShow={ui.actions.hideSuccess}
-        closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
-        actions={[
-          {
-            text: t('calendar.createTile.buttons.viewInTimeline'),
-            onClick: viewCreatedEvent,
-            disabled: ui.state.success.isNavigatingToTile,
-          },
-        ]}
-      >
-        <p>
-          <Trans
-            i18nKey="calendar.createTile.message.success"
-            components={{
-              b: <b />,
-              action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
-            }}
-          />
-        </p>
-      </SuccessModal>
-      <header>
-        <div className="title">
-          <h2>{t('calendar.createTile.title')}</h2>
-        </div>
-        <button type="button" onClick={closeModal}>
-          <X size={16} color={theme.colors.text.primary} />
-        </button>
-      </header>
+	return (
+		<StyledCalendarCreateEvent
+			onSubmit={(e) => {
+				e.preventDefault();
+				submitForm();
+			}}
+			$isexpanded={ui.state.isExpanded}
+		>
+			<button
+				style={{ display: 'none' }}
+				data-testid="open-create-tile"
+				type="button"
+				onClick={ui.actions.open}
+			/>
+			<LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
+				<p>
+					{t('calendar.createTile.message.pending', {
+						action: ui.state.loading.tileName,
+					})}
+				</p>
+			</LoadingModal>
+			<SuccessModal
+				show={ui.state.success.isOpen}
+				setShow={ui.actions.hideSuccess}
+				closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
+				actions={[
+					{
+						text: t('calendar.createTile.buttons.viewInTimeline'),
+						onClick: viewCreatedEvent,
+						disabled: ui.state.success.isNavigatingToTile,
+					},
+				]}
+			>
+				<p>
+					<Trans
+						i18nKey="calendar.createTile.message.success"
+						components={{
+							b: <b />,
+							action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
+						}}
+					/>
+				</p>
+			</SuccessModal>
+			<header>
+				<div className="title">
+					<h2>{t('calendar.createTile.title')}</h2>
+				</div>
+				<button type="button" onClick={closeModal}>
+					<X size={16} color={theme.colors.text.primary} />
+				</button>
+			</header>
 
 			{/* Tile Description */}
 			<Section $isexpanded={ui.state.isExpanded}>
