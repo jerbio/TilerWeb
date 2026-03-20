@@ -127,7 +127,7 @@ describe('eventTimeConversion', () => {
 		it('maintains date consistency when converting back and forth', () => {
 			// This test specifically catches the timezone bug where dates shift
 			const testCases = [
-				new Date(2026, 3, 5, 8, 0, 0),  // Morning
+				new Date(2026, 3, 5, 8, 0, 0), // Morning
 				new Date(2026, 3, 5, 14, 0, 0), // Afternoon
 				new Date(2026, 3, 5, 20, 0, 0), // Evening
 				new Date(2026, 3, 5, 23, 0, 0), // Late night
@@ -173,17 +173,32 @@ describe('eventTimeConversion', () => {
 	describe('validateDateTimeRange', () => {
 		describe('same date scenarios', () => {
 			it('returns true when end time is after start time on same date', () => {
-				const result = validateDateTimeRange('2026-04-05', '9:00 AM', '2026-04-05', '5:00 PM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'9:00 AM',
+					'2026-04-05',
+					'5:00 PM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('returns false when end time equals start time on same date', () => {
-				const result = validateDateTimeRange('2026-04-05', '9:00 AM', '2026-04-05', '9:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'9:00 AM',
+					'2026-04-05',
+					'9:00 AM'
+				);
 				expect(result).toBe(false);
 			});
 
 			it('returns false when end time is before start time on same date', () => {
-				const result = validateDateTimeRange('2026-04-05', '5:00 PM', '2026-04-05', '9:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'5:00 PM',
+					'2026-04-05',
+					'9:00 AM'
+				);
 				expect(result).toBe(false);
 			});
 		});
@@ -191,30 +206,55 @@ describe('eventTimeConversion', () => {
 		describe('different date scenarios (multi-day events)', () => {
 			it('returns true when end date is after start date', () => {
 				// Event from April 5 at 10 PM to April 6 at 8 AM
-				const result = validateDateTimeRange('2026-04-05', '10:00 PM', '2026-04-06', '8:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'10:00 PM',
+					'2026-04-06',
+					'8:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('returns true when end time is earlier but date is later (overnight event)', () => {
 				// Event from April 5 at 11 PM to April 6 at 2 AM
-				const result = validateDateTimeRange('2026-04-05', '11:00 PM', '2026-04-06', '2:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'11:00 PM',
+					'2026-04-06',
+					'2:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('returns true for multi-day events spanning several days', () => {
 				// Event from April 5 at 6 PM to April 8 at 10 AM
-				const result = validateDateTimeRange('2026-04-05', '6:00 PM', '2026-04-08', '10:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'6:00 PM',
+					'2026-04-08',
+					'10:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('returns false when end date is before start date', () => {
 				// Invalid: end date is before start date
-				const result = validateDateTimeRange('2026-04-06', '9:00 AM', '2026-04-05', '5:00 PM');
+				const result = validateDateTimeRange(
+					'2026-04-06',
+					'9:00 AM',
+					'2026-04-05',
+					'5:00 PM'
+				);
 				expect(result).toBe(false);
 			});
 
 			it('returns false when dates are swapped even with same times', () => {
-				const result = validateDateTimeRange('2026-04-06', '9:00 AM', '2026-04-05', '9:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-06',
+					'9:00 AM',
+					'2026-04-05',
+					'9:00 AM'
+				);
 				expect(result).toBe(false);
 			});
 		});
@@ -222,24 +262,44 @@ describe('eventTimeConversion', () => {
 		describe('edge cases', () => {
 			it('handles midnight correctly for overnight events', () => {
 				// Event ending at exactly midnight next day
-				const result = validateDateTimeRange('2026-04-05', '10:00 PM', '2026-04-06', '12:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'10:00 PM',
+					'2026-04-06',
+					'12:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('handles events starting at midnight', () => {
-				const result = validateDateTimeRange('2026-04-05', '12:00 AM', '2026-04-05', '8:00 AM');
+				const result = validateDateTimeRange(
+					'2026-04-05',
+					'12:00 AM',
+					'2026-04-05',
+					'8:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('handles month boundaries', () => {
 				// Event from March 31 to April 1
-				const result = validateDateTimeRange('2026-03-31', '10:00 PM', '2026-04-01', '2:00 AM');
+				const result = validateDateTimeRange(
+					'2026-03-31',
+					'10:00 PM',
+					'2026-04-01',
+					'2:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 
 			it('handles year boundaries', () => {
 				// Event from Dec 31 to Jan 1
-				const result = validateDateTimeRange('2026-12-31', '11:00 PM', '2027-01-01', '1:00 AM');
+				const result = validateDateTimeRange(
+					'2026-12-31',
+					'11:00 PM',
+					'2027-01-01',
+					'1:00 AM'
+				);
 				expect(result).toBe(true);
 			});
 		});
@@ -247,8 +307,8 @@ describe('eventTimeConversion', () => {
 
 	describe('formatDueIn', () => {
 		it('returns minutes when event is less than 1 hour away', () => {
-			const now = new Date(2026, 2, 17, 10, 0, 0).getTime();     // 10:00 AM
-			const start = new Date(2026, 2, 17, 10, 30, 0).getTime();  // 10:30 AM
+			const now = new Date(2026, 2, 17, 10, 0, 0).getTime(); // 10:00 AM
+			const start = new Date(2026, 2, 17, 10, 30, 0).getTime(); // 10:30 AM
 			expect(formatDueIn(start, now)).toBe('30 minutes');
 		});
 
@@ -260,7 +320,7 @@ describe('eventTimeConversion', () => {
 
 		it('returns hours when event is 1-23 hours away', () => {
 			const now = new Date(2026, 2, 17, 10, 0, 0).getTime();
-			const start = new Date(2026, 2, 17, 15, 0, 0).getTime();  // 5 hours later
+			const start = new Date(2026, 2, 17, 15, 0, 0).getTime(); // 5 hours later
 			expect(formatDueIn(start, now)).toBe('5 hours');
 		});
 
@@ -272,7 +332,7 @@ describe('eventTimeConversion', () => {
 
 		it('returns days when event is 24+ hours away', () => {
 			const now = new Date(2026, 2, 17, 10, 0, 0).getTime();
-			const start = new Date(2026, 2, 20, 10, 0, 0).getTime();  // 3 days later
+			const start = new Date(2026, 2, 20, 10, 0, 0).getTime(); // 3 days later
 			expect(formatDueIn(start, now)).toBe('3 days');
 		});
 
@@ -295,11 +355,15 @@ describe('eventTimeConversion', () => {
 
 	describe('calculateDuration', () => {
 		it('returns correct duration for same-day event', () => {
-			expect(calculateDuration('2026-04-05', '9:00 AM', '2026-04-05', '11:30 AM')).toBe('2h 30m');
+			expect(calculateDuration('2026-04-05', '9:00 AM', '2026-04-05', '11:30 AM')).toBe(
+				'2h 30m'
+			);
 		});
 
 		it('returns correct duration for multi-hour event', () => {
-			expect(calculateDuration('2026-04-05', '4:01 PM', '2026-04-05', '6:00 PM')).toBe('1h 59m');
+			expect(calculateDuration('2026-04-05', '4:01 PM', '2026-04-05', '6:00 PM')).toBe(
+				'1h 59m'
+			);
 		});
 
 		it('handles midnight crossing on same date by adding 24h', () => {
@@ -308,7 +372,9 @@ describe('eventTimeConversion', () => {
 		});
 
 		it('handles midnight crossing: 12:30 PM to 1:30 AM same date', () => {
-			expect(calculateDuration('2026-04-05', '12:30 PM', '2026-04-05', '1:30 AM')).toBe('13h');
+			expect(calculateDuration('2026-04-05', '12:30 PM', '2026-04-05', '1:30 AM')).toBe(
+				'13h'
+			);
 		});
 
 		it('handles correct multi-day event without adding 24h', () => {
@@ -329,9 +395,12 @@ describe('eventTimeConversion', () => {
 		it('shifts end time forward when start time moves forward', () => {
 			// Start moves from 2:00 PM to 3:00 PM (+1h), end should shift from 4:00 PM to 5:00 PM
 			const result = adjustEndDateTime(
-				'2026-04-05', '2:00 PM',  // old start
-				'2026-04-05', '3:00 PM',  // new start
-				'2026-04-05', '4:00 PM'   // old end
+				'2026-04-05',
+				'2:00 PM', // old start
+				'2026-04-05',
+				'3:00 PM', // new start
+				'2026-04-05',
+				'4:00 PM' // old end
 			);
 			expect(result.endDate).toBe('2026-04-05');
 			expect(result.endTime).toBe('5:00 PM');
@@ -340,9 +409,12 @@ describe('eventTimeConversion', () => {
 		it('shifts end time backward when start time moves backward', () => {
 			// Start moves from 3:00 PM to 1:00 PM (-2h), end should shift from 5:00 PM to 3:00 PM
 			const result = adjustEndDateTime(
-				'2026-04-05', '3:00 PM',
-				'2026-04-05', '1:00 PM',
-				'2026-04-05', '5:00 PM'
+				'2026-04-05',
+				'3:00 PM',
+				'2026-04-05',
+				'1:00 PM',
+				'2026-04-05',
+				'5:00 PM'
 			);
 			expect(result.endDate).toBe('2026-04-05');
 			expect(result.endTime).toBe('3:00 PM');
@@ -351,9 +423,12 @@ describe('eventTimeConversion', () => {
 		it('shifts end date when start time crosses midnight', () => {
 			// 2h event: 11:00 PM to 1:00 AM next day. Move start to 11:30 PM -> end becomes 1:30 AM next day
 			const result = adjustEndDateTime(
-				'2026-04-05', '11:00 PM',
-				'2026-04-05', '11:30 PM',
-				'2026-04-06', '1:00 AM'
+				'2026-04-05',
+				'11:00 PM',
+				'2026-04-05',
+				'11:30 PM',
+				'2026-04-06',
+				'1:00 AM'
 			);
 			expect(result.endDate).toBe('2026-04-06');
 			expect(result.endTime).toBe('1:30 AM');
@@ -362,9 +437,12 @@ describe('eventTimeConversion', () => {
 		it('shifts end to next day when start change pushes past midnight', () => {
 			// 3h event: 9:00 PM to midnight (12:00 AM next day). Move start to 10:00 PM -> end 1:00 AM next day
 			const result = adjustEndDateTime(
-				'2026-04-05', '9:00 PM',
-				'2026-04-05', '10:00 PM',
-				'2026-04-06', '12:00 AM'
+				'2026-04-05',
+				'9:00 PM',
+				'2026-04-05',
+				'10:00 PM',
+				'2026-04-06',
+				'12:00 AM'
 			);
 			expect(result.endDate).toBe('2026-04-06');
 			expect(result.endTime).toBe('1:00 AM');
@@ -373,9 +451,12 @@ describe('eventTimeConversion', () => {
 		it('handles start date change preserving duration', () => {
 			// Move start from Apr 5 to Apr 6, same time. End should also move by 1 day.
 			const result = adjustEndDateTime(
-				'2026-04-05', '2:00 PM',
-				'2026-04-06', '2:00 PM',
-				'2026-04-05', '4:00 PM'
+				'2026-04-05',
+				'2:00 PM',
+				'2026-04-06',
+				'2:00 PM',
+				'2026-04-05',
+				'4:00 PM'
 			);
 			expect(result.endDate).toBe('2026-04-06');
 			expect(result.endTime).toBe('4:00 PM');
@@ -384,9 +465,12 @@ describe('eventTimeConversion', () => {
 		it('preserves duration with 15-minute increments', () => {
 			// 1h 59m event. Move start from 4:01 PM to 4:15 PM -> end from 6:00 PM to 6:14 PM
 			const result = adjustEndDateTime(
-				'2026-04-05', '4:01 PM',
-				'2026-04-05', '4:15 PM',
-				'2026-04-05', '6:00 PM'
+				'2026-04-05',
+				'4:01 PM',
+				'2026-04-05',
+				'4:15 PM',
+				'2026-04-05',
+				'6:00 PM'
 			);
 			expect(result.endDate).toBe('2026-04-05');
 			expect(result.endTime).toBe('6:14 PM');
@@ -394,9 +478,12 @@ describe('eventTimeConversion', () => {
 
 		it('handles same start time (no change)', () => {
 			const result = adjustEndDateTime(
-				'2026-04-05', '2:00 PM',
-				'2026-04-05', '2:00 PM',
-				'2026-04-05', '4:00 PM'
+				'2026-04-05',
+				'2:00 PM',
+				'2026-04-05',
+				'2:00 PM',
+				'2026-04-05',
+				'4:00 PM'
 			);
 			expect(result.endDate).toBe('2026-04-05');
 			expect(result.endTime).toBe('4:00 PM');

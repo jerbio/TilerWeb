@@ -52,7 +52,7 @@ vi.mock('@/global_state', () => ({
 					},
 				}),
 			}),
-		},
+		}
 	),
 }));
 
@@ -109,17 +109,20 @@ vi.mock('react-i18next', () => ({
 	}),
 }));
 
-const renderProcrastinateAllButton = (props?: { disabled?: boolean; onLoadingChange?: (l: boolean) => void }) =>
+const renderProcrastinateAllButton = (props?: {
+	disabled?: boolean;
+	onLoadingChange?: (l: boolean) => void;
+}) =>
 	render(
 		<ThemeProvider theme={lightTheme}>
 			<ProcrastinateAllButton {...props} />
-		</ThemeProvider>,
+		</ThemeProvider>
 	);
 
 /** Helper: open the overlay, fill inputs, and confirm */
 const openAndConfirm = async (
 	user: ReturnType<typeof setupUser>,
-	opts: { days?: number; hours?: number; minutes?: number } = {},
+	opts: { days?: number; hours?: number; minutes?: number } = {}
 ) => {
 	// Click the hourglass button to open overlay
 	await user.click(screen.getByRole('button', { name: 'Defer all events' }));
@@ -208,7 +211,7 @@ describe('ProcrastinateAllButton', () => {
 			expect(mockShowNotification).toHaveBeenCalledWith(
 				'procrastinate-all-schedule-procrastinate-all',
 				'Deferring all events...',
-				'loading',
+				'loading'
 			);
 		});
 
@@ -216,7 +219,7 @@ describe('ProcrastinateAllButton', () => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
 				'procrastinate-all-schedule-procrastinate-all',
 				'All events deferred!',
-				'success',
+				'success'
 			);
 		});
 	});
@@ -232,7 +235,7 @@ describe('ProcrastinateAllButton', () => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
 				'procrastinate-all-schedule-procrastinate-all',
 				'Defer failed. Please try again.',
-				'error',
+				'error'
 			);
 		});
 	});

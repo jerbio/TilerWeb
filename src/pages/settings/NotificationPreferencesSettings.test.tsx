@@ -27,7 +27,9 @@ vi.mock('sonner', () => ({
 import { userService } from '@/services';
 
 // Helper to create mock settings
-const createMockSettings = (overrides: Partial<UserSettings['userPreference']> = {}): UserSettings => ({
+const createMockSettings = (
+	overrides: Partial<UserSettings['userPreference']> = {}
+): UserSettings => ({
 	userPreference: {
 		id: 'test-preference-id',
 		notifcationEnabled: true,
@@ -48,7 +50,7 @@ const createMockSettings = (overrides: Partial<UserSettings['userPreference']> =
 		travelMedium: 'driving',
 		pinPreference: 'start',
 		sleepDuration: 8.0,
-		endTimeOfDay: ''
+		endTimeOfDay: '',
 	},
 	mobileUiScheme: {
 		id: 'test-mobile-ui-id',
@@ -208,9 +210,9 @@ describe('NotificationPreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 
 			fireEvent.click(toggleSwitches[0]);
 
@@ -225,9 +227,9 @@ describe('NotificationPreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 
 			fireEvent.click(toggleSwitches[1]);
 			expect(toggleSwitches[1]).toBeInTheDocument();
@@ -240,9 +242,9 @@ describe('NotificationPreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 
 			fireEvent.click(toggleSwitches[2]);
 			expect(toggleSwitches[2]).toBeInTheDocument();
@@ -279,9 +281,9 @@ describe('NotificationPreferencesSettings', () => {
 			});
 
 			// Toggle email notifications
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 			fireEvent.click(toggleSwitches[1]);
 
 			// Click save
@@ -304,9 +306,9 @@ describe('NotificationPreferencesSettings', () => {
 			});
 
 			// Toggle a setting
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 			fireEvent.click(toggleSwitches[0]);
 
 			// Click save
@@ -331,9 +333,9 @@ describe('NotificationPreferencesSettings', () => {
 			});
 
 			// Toggle a setting
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 			fireEvent.click(toggleSwitches[0]);
 
 			// Click save
@@ -362,9 +364,9 @@ describe('NotificationPreferencesSettings', () => {
 			});
 
 			// Toggle only email notifications (index 1)
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 			fireEvent.click(toggleSwitches[1]);
 
 			// Click save
@@ -386,9 +388,9 @@ describe('NotificationPreferencesSettings', () => {
 				expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
 			});
 
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 
 			// Toggle tile reminders (index 0) and push notifications (index 2)
 			fireEvent.click(toggleSwitches[0]);
@@ -422,9 +424,9 @@ describe('NotificationPreferencesSettings', () => {
 			});
 
 			// Toggle email notifications
-			const toggleSwitches = screen.getAllByRole('button').filter(
-				(btn) => btn.querySelector('div') !== null
-			);
+			const toggleSwitches = screen
+				.getAllByRole('button')
+				.filter((btn) => btn.querySelector('div') !== null);
 			fireEvent.click(toggleSwitches[1]);
 
 			// Click save

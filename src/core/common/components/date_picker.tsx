@@ -10,8 +10,8 @@ type CustomDatePickerProps = {
 	placeholder?: string;
 	ghostInput?: boolean;
 	portalId?: string;
-  minDate?: string; // YYYY-MM-DD format, disables selection before this date
-  maxDate?: string; // YYYY-MM-DD format, disables selection after this date
+	minDate?: string; // YYYY-MM-DD format, disables selection before this date
+	maxDate?: string; // YYYY-MM-DD format, disables selection after this date
 };
 
 const DatePicker: React.FC<CustomDatePickerProps> = ({
@@ -21,8 +21,8 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	placeholder,
 	ghostInput = false,
 	portalId,
-  minDate,
-  maxDate,
+	minDate,
+	maxDate,
 }) => {
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
@@ -45,45 +45,45 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 			)
 		: null;
 
-  // Parse minDate if provided
-  const minDateObj = minDate
-    ? new Date(
-        Date.UTC(
-          parseInt(minDate.split('-')[0]),
-          parseInt(minDate.split('-')[1]) - 1,
-          parseInt(minDate.split('-')[2])
-        )
-      )
-    : undefined;
+	// Parse minDate if provided
+	const minDateObj = minDate
+		? new Date(
+				Date.UTC(
+					parseInt(minDate.split('-')[0]),
+					parseInt(minDate.split('-')[1]) - 1,
+					parseInt(minDate.split('-')[2])
+				)
+			)
+		: undefined;
 
-  // Parse maxDate if provided
-  const maxDateObj = maxDate
-    ? new Date(
-        Date.UTC(
-          parseInt(maxDate.split('-')[0]),
-          parseInt(maxDate.split('-')[1]) - 1,
-          parseInt(maxDate.split('-')[2])
-        )
-      )
-    : undefined;
+	// Parse maxDate if provided
+	const maxDateObj = maxDate
+		? new Date(
+				Date.UTC(
+					parseInt(maxDate.split('-')[0]),
+					parseInt(maxDate.split('-')[1]) - 1,
+					parseInt(maxDate.split('-')[2])
+				)
+			)
+		: undefined;
 
-  return (
-    <Container>
-      {label && <Label>{label}</Label>}
-      {portalId && <DatePickerPortalStyles />}
-      <DatePickerWrapper $ghostInput={ghostInput}>
-        <ReactDatePicker
-          selected={selectedDate}
-          onChange={handleChange}
-          dateFormat="MM/dd/yyyy"
-          placeholderText={placeholder}
-          showPopperArrow={false}
-          minDate={minDateObj}
-          maxDate={maxDateObj}
-        />
-      </DatePickerWrapper>
-    </Container>
-  );
+	return (
+		<Container>
+			{label && <Label>{label}</Label>}
+			{portalId && <DatePickerPortalStyles />}
+			<DatePickerWrapper $ghostInput={ghostInput}>
+				<ReactDatePicker
+					selected={selectedDate}
+					onChange={handleChange}
+					dateFormat="MM/dd/yyyy"
+					placeholderText={placeholder}
+					showPopperArrow={false}
+					minDate={minDateObj}
+					maxDate={maxDateObj}
+				/>
+			</DatePickerWrapper>
+		</Container>
+	);
 };
 
 const Container = styled.div`

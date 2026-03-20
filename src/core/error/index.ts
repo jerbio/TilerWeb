@@ -9,14 +9,18 @@ export function normalizeError(error: unknown) {
 			throw new ChatLimitError(serverError);
 		}
 		// Otherwise, throw a regular Error with the localized message
-		throw new Error(typeof serverError.message === 'string' ? serverError.message : String(serverError.message));
+		throw new Error(
+			typeof serverError.message === 'string'
+				? serverError.message
+				: String(serverError.message)
+		);
 	}
 
 	// Handle existing Error instances
 	if (error instanceof Error) {
 		return error;
 	}
-	
+
 	// Fall back to generic error
 	throw new Error(String(error));
 }

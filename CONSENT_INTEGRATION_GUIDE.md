@@ -28,12 +28,15 @@ That's it! The consent banner will automatically show to users who haven't made 
 ## Components
 
 ### ConsentProvider
+
 The main provider that manages consent state and displays the banner/modal.
 
 **Props:**
+
 - `children` - Your app components
 
 **Usage:**
+
 ```typescript
 <ConsentProvider>
   <App />
@@ -41,27 +44,33 @@ The main provider that manages consent state and displays the banner/modal.
 ```
 
 ### CookieConsentBanner
+
 The bottom banner that appears when users first visit. Automatically shown by `ConsentProvider`.
 
 **Features:**
+
 - Accept All / Reject All buttons
 - Customize button to open settings
 - Auto-dismisses after user makes a choice
 - Mobile responsive
 
 ### PrivacySettingsModal
+
 Detailed privacy settings modal with toggles for each consent type. Automatically shown by `ConsentProvider`.
 
 **Consent Types:**
+
 - **Necessary** - Always enabled, cannot be disabled
 - **Analytics** - Website analytics and tracking
 - **Marketing** - Marketing and advertising cookies
 - **Preferences** - User preference storage
 
 ### PrivacySettingsButton
+
 A styled button component for your settings page.
 
 **Usage:**
+
 ```typescript
 import { PrivacySettingsButton } from '@/core/common/components/consent';
 
@@ -119,7 +128,7 @@ import { consentManager } from '@/core/common/components/consent';
 
 // Check if user has consented
 if (consentManager.hasConsent()) {
-  // User has made a choice
+	// User has made a choice
 }
 
 // Get current preferences
@@ -127,15 +136,15 @@ const preferences = consentManager.getPreferences();
 
 // Check specific consent
 if (consentManager.hasAnalyticsConsent()) {
-  // Track analytics
+	// Track analytics
 }
 
 // Save preferences
 consentManager.savePreferences({
-  necessary: true,
-  analytics: true,
-  marketing: false,
-  preferences: true,
+	necessary: true,
+	analytics: true,
+	marketing: false,
+	preferences: true,
 });
 
 // Accept/Reject all
@@ -144,7 +153,7 @@ consentManager.rejectAll();
 
 // Subscribe to changes
 const unsubscribe = consentManager.subscribe(() => {
-  console.log('Consent preferences changed');
+	console.log('Consent preferences changed');
 });
 ```
 
@@ -164,10 +173,12 @@ private applyConsent(preferences: ConsentPreferences): void {
 ```
 
 When a user grants analytics consent:
+
 - `analytics.enable()` is called
 - All subsequent analytics events will be tracked
 
 When a user denies analytics consent:
+
 - `analytics.disable()` is called
 - No analytics events will be sent
 
@@ -179,11 +190,11 @@ Edit `ConsentPreferences` in `consent-manager.ts`:
 
 ```typescript
 export type ConsentPreferences = {
-  necessary: boolean;
-  analytics: boolean;
-  marketing: boolean;
-  preferences: boolean;
-  // Add your custom types here
+	necessary: boolean;
+	analytics: boolean;
+	marketing: boolean;
+	preferences: boolean;
+	// Add your custom types here
 };
 ```
 
@@ -196,8 +207,8 @@ All components use styled-components and the app's palette. To customize:
 ```typescript
 // In any consent component
 const CustomBanner = styled(BannerContainer)`
-  // Your custom styles
-  background: linear-gradient(...);
+	// Your custom styles
+	background: linear-gradient(...);
 `;
 ```
 
@@ -230,33 +241,37 @@ const CONSENT_STORAGE_KEY = 'user-consent-preferences';
 ```
 
 Stored format:
+
 ```json
 {
-  "timestamp": "2025-01-17T12:00:00.000Z",
-  "version": "1.0",
-  "preferences": {
-    "necessary": true,
-    "analytics": true,
-    "marketing": false,
-    "preferences": true
-  }
+	"timestamp": "2025-01-17T12:00:00.000Z",
+	"version": "1.0",
+	"preferences": {
+		"necessary": true,
+		"analytics": true,
+		"marketing": false,
+		"preferences": true
+	}
 }
 ```
 
 ## Testing
 
 ### Test the Banner
+
 1. Clear localStorage: `localStorage.removeItem('user-consent-preferences')`
 2. Refresh page
 3. Banner should appear
 
 ### Test the Modal
+
 1. Click "Customize" on the banner
 2. Toggle consent options
 3. Click "Save Settings"
 4. Verify in localStorage
 
 ### Test Analytics Integration
+
 1. Reject all cookies
 2. Check console - no analytics events should appear
 3. Accept all cookies
@@ -268,23 +283,23 @@ Stored format:
 Update your privacy policy page to explain:
 
 1. **What cookies you use**
-   - Necessary: Session management, security
-   - Analytics: Google Analytics, usage tracking
-   - Marketing: Ad tracking (if applicable)
-   - Preferences: Language, theme settings
+    - Necessary: Session management, security
+    - Analytics: Google Analytics, usage tracking
+    - Marketing: Ad tracking (if applicable)
+    - Preferences: Language, theme settings
 
 2. **How users can control cookies**
-   - Through the consent banner
-   - Through privacy settings
-   - By contacting support
+    - Through the consent banner
+    - Through privacy settings
+    - By contacting support
 
 3. **Data retention**
-   - How long you keep data
-   - How to request deletion
+    - How long you keep data
+    - How to request deletion
 
 4. **Third-party services**
-   - Google Analytics
-   - Any other tracking services
+    - Google Analytics
+    - Any other tracking services
 
 ## GDPR/CCPA Compliance
 
@@ -295,9 +310,10 @@ The consent system helps with compliance by:
 ✅ **Easy opt-out** - Users can change preferences anytime  
 ✅ **Granular control** - Users can accept/reject specific categories  
 ✅ **Persistent choice** - Consent decision is remembered  
-✅ **Transparent** - Shows what's enabled in settings  
+✅ **Transparent** - Shows what's enabled in settings
 
 **Still required:**
+
 - Privacy policy page
 - Data processing agreements
 - Data deletion procedures
@@ -306,21 +322,25 @@ The consent system helps with compliance by:
 ## Troubleshooting
 
 ### Banner not showing
+
 - Check if consent is already saved in localStorage
 - Clear localStorage and refresh
 - Verify ConsentProvider wraps your app
 
 ### Analytics still disabled after accepting
+
 - Check browser console for errors
 - Verify analytics.ts is imported correctly
 - Check environment variables are set
 
 ### Modal won't open
+
 - Verify ConsentProvider is in your component tree
 - Check for React context errors
 - Ensure useConsent() is called within ConsentProvider
 
 ### Preferences not saving
+
 - Check browser localStorage is enabled
 - Check for localStorage quota errors
 - Verify consentManager.savePreferences() is called
@@ -338,6 +358,7 @@ The consent system helps with compliance by:
 ## Examples
 
 ### Adding to Navigation Footer
+
 ```typescript
 import { PrivacySettingsButton } from '@/core/common/components/consent';
 
@@ -354,6 +375,7 @@ function Footer() {
 ```
 
 ### Conditional Feature Rendering
+
 ```typescript
 import { useConsent } from '@/core/common/components/consent';
 
@@ -369,6 +391,7 @@ function MarketingWidget() {
 ```
 
 ### Manual Consent Trigger
+
 ```typescript
 function CustomButton() {
   const { openSettings } = useConsent();
@@ -386,6 +409,7 @@ function CustomButton() {
 ## Summary
 
 The consent system provides:
+
 - ✅ GDPR/CCPA-friendly consent collection
 - ✅ Beautiful, mobile-responsive UI
 - ✅ Automatic analytics integration

@@ -5,8 +5,8 @@ export class BetaUserApi extends AppApi {
 	public signUp(betaUserBody: BetaUserBody) {
 		const postBody = {
 			...betaUserBody,
-			FullUrl: window?.location?.href??"",
-		}
+			FullUrl: window?.location?.href ?? '',
+		};
 		return this.apiRequest<void>('api/EmailList', {
 			method: 'POST',
 			body: JSON.stringify(postBody),

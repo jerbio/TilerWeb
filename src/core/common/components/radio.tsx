@@ -3,33 +3,33 @@ import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 
 type RadioProps = {
-  checked?: boolean;
-  disabled?: boolean;
-  name?: string;
-  onChange?: (checked: boolean) => void;
-  label?: React.ReactNode;
+	checked?: boolean;
+	disabled?: boolean;
+	name?: string;
+	onChange?: (checked: boolean) => void;
+	label?: React.ReactNode;
 };
 
 const Radio: React.FC<RadioProps> = ({
-  checked = false,
-  disabled = false,
-  name,
-  onChange,
-  label,
+	checked = false,
+	disabled = false,
+	name,
+	onChange,
+	label,
 }) => {
-  return (
-    <Wrapper $disabled={disabled}>
-      <HiddenRadio
-        type="radio"
-        checked={checked}
-        disabled={disabled}
-        name={name}
-        onChange={(e) => onChange && onChange(e.target.checked)}
-      />
-      <Circle $checked={checked} />
-      {label && <Label>{label}</Label>}
-    </Wrapper>
-  );
+	return (
+		<Wrapper $disabled={disabled}>
+			<HiddenRadio
+				type="radio"
+				checked={checked}
+				disabled={disabled}
+				name={name}
+				onChange={(e) => onChange && onChange(e.target.checked)}
+			/>
+			<Circle $checked={checked} />
+			{label && <Label>{label}</Label>}
+		</Wrapper>
+	);
 };
 
 const Wrapper = styled.label<{ $disabled: boolean }>`
@@ -53,7 +53,7 @@ const Circle = styled.div<{ $checked: boolean }>`
 	background-color: ${({ theme }) => theme.colors.radio.bg};
 	border: 2px solid
 		${({ $checked, theme }) =>
-    $checked ? theme.colors.radio.borderChecked : theme.colors.radio.border};
+			$checked ? theme.colors.radio.borderChecked : theme.colors.radio.border};
 	transition:
 		border-color 0.2s ease-in-out,
 		background-color 0.2s ease-in-out;

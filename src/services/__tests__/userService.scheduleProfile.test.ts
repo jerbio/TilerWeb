@@ -24,13 +24,25 @@ const mockScheduleProfileContent: ScheduleProfileResponse['Content'] = {
 			{
 				id: 'sun-id',
 				weekday: 0,
-				restrictionTimeLine: { id: 'sun-tl', start: 0, duration: 86400000, end: 0, timeZone: 'America/Denver' },
+				restrictionTimeLine: {
+					id: 'sun-tl',
+					start: 0,
+					duration: 86400000,
+					end: 0,
+					timeZone: 'America/Denver',
+				},
 				timeZone: 'America/Denver',
 			},
 			{
 				id: 'mon-id',
 				weekday: 1,
-				restrictionTimeLine: { id: 'mon-tl', start: 21600000, duration: 43200000, end: 64800000, timeZone: 'America/Denver' },
+				restrictionTimeLine: {
+					id: 'mon-tl',
+					start: 21600000,
+					duration: 43200000,
+					end: 64800000,
+					timeZone: 'America/Denver',
+				},
 				timeZone: 'America/Denver',
 			},
 			null,
@@ -49,10 +61,20 @@ const mockScheduleProfileContent: ScheduleProfileResponse['Content'] = {
 			{
 				id: 'work-mon-id',
 				weekday: 1,
-				restrictionTimeLine: { id: 'work-mon-tl', start: 28800000, duration: 36000000, end: 64800000, timeZone: 'America/Denver' },
+				restrictionTimeLine: {
+					id: 'work-mon-tl',
+					start: 28800000,
+					duration: 36000000,
+					end: 64800000,
+					timeZone: 'America/Denver',
+				},
 				timeZone: 'America/Denver',
 			},
-			null, null, null, null, null,
+			null,
+			null,
+			null,
+			null,
+			null,
 		],
 	},
 };
@@ -106,9 +128,7 @@ describe('UserService - Schedule Profile', () => {
 				Id: 'personal-id',
 				IsEnabled: true,
 				RestrictiveWeek: {
-					WeekDayOption: [
-						{ Index: '1', Start: '21600000', End: '64800000' },
-					],
+					WeekDayOption: [{ Index: '1', Start: '21600000', End: '64800000' }],
 					isEnabled: 'true',
 				},
 			},

@@ -8,7 +8,7 @@ export type Persona = {
 	occupation: string | null;
 	isActive: boolean | null;
 	createdAt: string | null;
-	updatedAt: string | null
+	updatedAt: string | null;
 	imageUrl: string | null;
 	tilePreferences: Array<{
 		Id: string;

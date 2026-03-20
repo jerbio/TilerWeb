@@ -14,12 +14,22 @@ interface NotificationSlice {
 	 * Loading notifications persist until explicitly updated or dismissed.
 	 * Other types auto-dismiss after `autoDismissMs` (default 3 s).
 	 */
-	show: (id: string, message: string, type: NotificationType, autoDismissMs?: number | null) => void;
+	show: (
+		id: string,
+		message: string,
+		type: NotificationType,
+		autoDismissMs?: number | null
+	) => void;
 	/**
 	 * Update an existing notification (e.g. transition loading → success).
 	 * If the id does not exist this is a no-op.
 	 */
-	update: (id: string, message: string, type: NotificationType, autoDismissMs?: number | null) => void;
+	update: (
+		id: string,
+		message: string,
+		type: NotificationType,
+		autoDismissMs?: number | null
+	) => void;
 	/** Dismiss (remove) a notification by id. */
 	dismiss: (id: string) => void;
 	/** Remove all notifications. */
@@ -30,10 +40,7 @@ export interface UiState {
 	notification: NotificationSlice;
 }
 
-const resolveAutoDismiss = (
-	type: NotificationType,
-	explicit?: number | null,
-): number | null => {
+const resolveAutoDismiss = (type: NotificationType, explicit?: number | null): number | null => {
 	if (explicit !== undefined) return explicit;
 	return type === 'loading' ? null : DEFAULT_AUTO_DISMISS_MS;
 };

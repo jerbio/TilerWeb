@@ -74,11 +74,15 @@ const StatusOverlay: React.FC<StatusOverlayProps> = ({
 			data-testid="status-overlay"
 		>
 			<Banner $accent={VARIANT_COLORS[variant]} onClick={(e) => e.stopPropagation()}>
-				{loading ? <SpinnerIcon size={20} data-testid="status-overlay-spinner" /> : <AccentBar $color={VARIANT_COLORS[variant]} />}
+				{loading ? (
+					<SpinnerIcon size={20} data-testid="status-overlay-spinner" />
+				) : (
+					<AccentBar $color={VARIANT_COLORS[variant]} />
+				)}
 				<BannerText>{message}</BannerText>
 			</Banner>
 		</Backdrop>,
-		portalTarget,
+		portalTarget
 	);
 };
 

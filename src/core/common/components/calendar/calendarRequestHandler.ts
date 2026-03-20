@@ -44,13 +44,12 @@ export interface CalendarRequestHandlerDeps {
 /** Scroll the calendar content container so the given event is visible */
 function scrollToEvent(
 	styledEvent: StyledEvent,
-	contentContainerRef: React.RefObject<HTMLDivElement>,
+	contentContainerRef: React.RefObject<HTMLDivElement>
 ): void {
 	if (!contentContainerRef.current) return;
 	const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 	const eventStart = dayjs(styledEvent.start);
-	const hourFraction =
-		eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+	const hourFraction = eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
 	const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
 
 	contentContainerRef.current.scrollTo({
@@ -70,7 +69,7 @@ function focusOnStyledEvent(
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
 		| 'setFocusedEventId'
-	>,
+	>
 ): void {
 	if (styledEvent.isViable) {
 		deps.setShowNonViableEvents(null);
@@ -99,7 +98,7 @@ function focusOnStyledEvent(
  * Designed to be used inside a `useCallback` in the Calendar component.
  */
 export function createCalendarRequestHandler(
-	deps: CalendarRequestHandlerDeps,
+	deps: CalendarRequestHandlerDeps
 ): (envelope: CalendarRequestEnvelope) => void {
 	return (envelope) => {
 		const { request, onResult } = envelope;
@@ -111,7 +110,7 @@ export function createCalendarRequestHandler(
 			const resolvedTileId = resolveEntityToTileId(
 				entityId,
 				entityType,
-				deps.styledEventsRef.current,
+				deps.styledEventsRef.current
 			);
 
 			const styledEvent = resolvedTileId
@@ -174,7 +173,10 @@ export function createCalendarRequestHandler(
 							if (!calEvent || calEvent.start == null) return null;
 							return {
 								start: calEvent.start,
-								subEvents: (subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
+								subEvents: (subEvents ?? []).map((s) => ({
+									id: s.id,
+									start: s.start,
+								})),
 							};
 						} catch {
 							return null;
@@ -221,7 +223,7 @@ export function retryPendingFocus(
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
 		| 'setFocusedEventId'
-	>,
+	>
 ): void {
 	const { entityId, entityType, onResult } = deps.pendingFocusRef.current!;
 	deps.pendingFocusRef.current = null;
@@ -229,7 +231,7 @@ export function retryPendingFocus(
 	const resolvedTileId = resolveEntityToTileId(
 		entityId,
 		entityType,
-		deps.styledEventsRef.current,
+		deps.styledEventsRef.current
 	);
 
 	const styledEvent = resolvedTileId
