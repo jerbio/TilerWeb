@@ -8,31 +8,31 @@ import LinkedInButton from '@/assets/social/linkedin_button.svg';
 import XButton from '@/assets/social/x_button.svg';
 
 type Social = {
-  link: string;
-  logo: string;
-  button: string;
-  i18Name: string;
+	link: string;
+	logo: string;
+	button: string;
+	i18Name: string;
 };
 const socials: Array<Social> = [
-  {
-    link: 'https://www.facebook.com/profile.php?id=100094419297775',
-    logo: FacebookLogo,
-    button: FacebookButton,
-    i18Name: 'common.social.facebook',
-  },
-  {
-    link: 'https://www.linkedin.com/company/tilerapp',
-    logo: LinkedInLogo,
-    button: LinkedInButton,
-    i18Name: 'common.social.linkedin',
-  },
-  {
-    link: 'https://www.instagram.com/tiler.app/',
-    logo: InstagramLogo,
-    button: InstagramButton,
-    i18Name: 'common.social.instagram',
-  },
-  { link: 'https://x.com/Tiler_app', logo: XLogo, button: XButton, i18Name: 'common.social.x' },
+	{
+		link: 'https://www.facebook.com/profile.php?id=100094419297775',
+		logo: FacebookLogo,
+		button: FacebookButton,
+		i18Name: 'common.social.facebook',
+	},
+	{
+		link: 'https://www.linkedin.com/company/tilerapp',
+		logo: LinkedInLogo,
+		button: LinkedInButton,
+		i18Name: 'common.social.linkedin',
+	},
+	{
+		link: 'https://www.instagram.com/tiler.app/',
+		logo: InstagramLogo,
+		button: InstagramButton,
+		i18Name: 'common.social.instagram',
+	},
+	{ link: 'https://x.com/Tiler_app', logo: XLogo, button: XButton, i18Name: 'common.social.x' },
 ];
 
 export default socials;

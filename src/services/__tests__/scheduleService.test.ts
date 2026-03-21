@@ -3,7 +3,12 @@ import ScheduleService from '../scheduleService';
 import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
-import { CalendarEvent, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '@/core/common/types/schedule';
+import {
+	CalendarEvent,
+	ScheduleProcrastinateAllParams,
+	ScheduleReviseParams,
+	ScheduleShuffleParams,
+} from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -70,7 +75,11 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			const results = await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123');
+			const results = await service.searchCalendarEventsByName(
+				'work out',
+				'ashtondemo',
+				'user-id-123'
+			);
 
 			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
 				data: 'work out',
@@ -92,7 +101,10 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123', { batchSize: 10, index: 1 });
+			await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123', {
+				batchSize: 10,
+				index: 1,
+			});
 
 			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
 				data: 'work out',
@@ -110,18 +122,22 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			const results = await service.searchCalendarEventsByName('nonexistent', 'ashtondemo', 'user-id-123');
+			const results = await service.searchCalendarEventsByName(
+				'nonexistent',
+				'ashtondemo',
+				'user-id-123'
+			);
 
 			expect(results).toEqual([]);
 		});
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.searchByName).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
 			await expect(
-				service.searchCalendarEventsByName('drinks', 'ashtondemo', 'user-id-123'),
+				service.searchCalendarEventsByName('drinks', 'ashtondemo', 'user-id-123')
 			).rejects.toThrow();
 		});
 	});
@@ -142,13 +158,9 @@ describe('ScheduleService', () => {
 		});
 
 		it('throws normalized error on API failure', async () => {
-			vi.mocked(calendarEventApi.setAsNow).mockRejectedValueOnce(
-				new Error('Network error'),
-			);
+			vi.mocked(calendarEventApi.setAsNow).mockRejectedValueOnce(new Error('Network error'));
 
-			await expect(
-				service.setCalendarEventAsNow('bad-id'),
-			).rejects.toThrow();
+			await expect(service.setCalendarEventAsNow('bad-id')).rejects.toThrow();
 		});
 	});
 
@@ -169,12 +181,10 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.markAsComplete).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
-			await expect(
-				service.markCalendarEventComplete('bad-id'),
-			).rejects.toThrow();
+			await expect(service.markCalendarEventComplete('bad-id')).rejects.toThrow();
 		});
 	});
 
@@ -195,12 +205,10 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(calendarEventApi.deleteCalendarEvent).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
-			await expect(
-				service.deleteCalendarEvent('bad-id'),
-			).rejects.toThrow();
+			await expect(service.deleteCalendarEvent('bad-id')).rejects.toThrow();
 		});
 	});
 
@@ -231,13 +239,9 @@ describe('ScheduleService', () => {
 		});
 
 		it('throws normalized error on API failure', async () => {
-			vi.mocked(scheduleApi.shuffle).mockRejectedValueOnce(
-				new Error('Network error'),
-			);
+			vi.mocked(scheduleApi.shuffle).mockRejectedValueOnce(new Error('Network error'));
 
-			await expect(
-				service.shuffleSchedule(shuffleParams),
-			).rejects.toThrow();
+			await expect(service.shuffleSchedule(shuffleParams)).rejects.toThrow();
 		});
 	});
 
@@ -268,13 +272,9 @@ describe('ScheduleService', () => {
 		});
 
 		it('throws normalized error on API failure', async () => {
-			vi.mocked(scheduleApi.revise).mockRejectedValueOnce(
-				new Error('Network error'),
-			);
+			vi.mocked(scheduleApi.revise).mockRejectedValueOnce(new Error('Network error'));
 
-			await expect(
-				service.reviseSchedule(reviseParams),
-			).rejects.toThrow();
+			await expect(service.reviseSchedule(reviseParams)).rejects.toThrow();
 		});
 	});
 
@@ -306,11 +306,11 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(scheduleApi.procrastinateAll).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
 			await expect(
-				service.procrastinateAllSchedule(procrastinateAllParams),
+				service.procrastinateAllSchedule(procrastinateAllParams)
 			).rejects.toThrow();
 		});
 	});
@@ -370,7 +370,11 @@ describe('ScheduleService', () => {
 				ServerStatus: null,
 			});
 
-			const updates = { start: 1769930000000, end: 1769933600000, calendarEnd: 1770600000000 };
+			const updates = {
+				start: 1769930000000,
+				end: 1769933600000,
+				calendarEnd: 1770600000000,
+			};
 			await service.updateSubCalendarEvent('sub-event-123', updates);
 
 			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
@@ -391,7 +395,8 @@ describe('ScheduleService', () => {
 
 			await service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 });
 
-			const calledWith = vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mock.calls[0][0];
+			const calledWith = vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mock
+				.calls[0][0];
 			expect(calledWith.TimeZone).toBeDefined();
 			expect(typeof calledWith.TimeZone).toBe('string');
 		});
@@ -441,11 +446,11 @@ describe('ScheduleService', () => {
 
 		it('throws normalized error on API failure', async () => {
 			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockRejectedValueOnce(
-				new Error('Network error'),
+				new Error('Network error')
 			);
 
 			await expect(
-				service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 }),
+				service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 })
 			).rejects.toThrow();
 		});
 	});

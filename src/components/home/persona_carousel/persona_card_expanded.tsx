@@ -22,450 +22,450 @@ import { CalendarRequestProvider } from '@/core/common/components/calendar/Calen
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 
 type PersonaExpandedCardProps = {
-  persona: Persona;
-  expanded: boolean;
-  onCollapse: () => void;
-  expandedWidth: number;
-  personaUsers: PersonaUsers;
-  setPersonaUser: PersonaUserSetter;
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
+	persona: Persona;
+	expanded: boolean;
+	onCollapse: () => void;
+	expandedWidth: number;
+	personaUsers: PersonaUsers;
+	setPersonaUser: PersonaUserSetter;
+	onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
-  expanded,
-  persona,
-  onCollapse,
-  expandedWidth,
-  personaUsers,
-  setPersonaUser,
-  onClick,
+	expanded,
+	persona,
+	onCollapse,
+	expandedWidth,
+	personaUsers,
+	setPersonaUser,
+	onClick,
 }) => {
-  const { t } = useTranslation();
-  const [mobileChatVisible, setMobileChatVisible] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [demoModeKey, setDemoModeKey] = useState(0); // Force re-render when demo mode changes
-  const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
-  const showChat = isDesktop || mobileChatVisible;
-  const personaUserId = personaUsers[persona.id]?.userId || null;
-  const activePersonaSession = useAppStore((state) => state.anonymousPersonaSession);
-  const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
-  const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
+	const { t } = useTranslation();
+	const [mobileChatVisible, setMobileChatVisible] = useState(false);
+	const [showOnboarding, setShowOnboarding] = useState(false);
+	const [demoModeKey, setDemoModeKey] = useState(0); // Force re-render when demo mode changes
+	const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
+	const showChat = isDesktop || mobileChatVisible;
+	const personaUserId = personaUsers[persona.id]?.userId || null;
+	const activePersonaSession = useAppStore((state) => state.anonymousPersonaSession);
+	const setActivePersonaSession = useAppStore((state) => state.setActivePersonaSession);
+	const devUserIdOverride = useAppStore((state) => state.devUserIdOverride);
 
-  // Use PersonaSessionManager for centralized session management
-  const { createSession } = usePersonaSessionManager();
+	// Use PersonaSessionManager for centralized session management
+	const { createSession } = usePersonaSessionManager();
 
-  const [isCreatingPersona, setIsCreatingPersona] = useState(false);
-  const [processingStep, setProcessingStep] = useState(0);
+	const [isCreatingPersona, setIsCreatingPersona] = useState(false);
+	const [processingStep, setProcessingStep] = useState(0);
 
-  // Backend processing steps
-  const PROCESSING_STEPS = [
-    {
-      title: t('common.customPersonaModal.processing.creatingUser'),
-      description: t('common.customPersonaModal.processing.creatingUserDesc'),
-    },
-    {
-      title: t('common.customPersonaModal.processing.generatingProfile'),
-      description: t('common.customPersonaModal.processing.generatingProfileDesc'),
-    },
-    {
-      title: t('common.customPersonaModal.processing.generatingTiles'),
-      description: t('common.customPersonaModal.processing.generatingTilesDesc'),
-    },
-    {
-      title: t('common.customPersonaModal.processing.optimizing'),
-      description: t('common.customPersonaModal.processing.optimizingDesc'),
-    },
-  ];
+	// Backend processing steps
+	const PROCESSING_STEPS = [
+		{
+			title: t('common.customPersonaModal.processing.creatingUser'),
+			description: t('common.customPersonaModal.processing.creatingUserDesc'),
+		},
+		{
+			title: t('common.customPersonaModal.processing.generatingProfile'),
+			description: t('common.customPersonaModal.processing.generatingProfileDesc'),
+		},
+		{
+			title: t('common.customPersonaModal.processing.generatingTiles'),
+			description: t('common.customPersonaModal.processing.generatingTilesDesc'),
+		},
+		{
+			title: t('common.customPersonaModal.processing.optimizing'),
+			description: t('common.customPersonaModal.processing.optimizingDesc'),
+		},
+	];
 
-  function handleClose(fullCollapse: boolean = false) {
-    if (fullCollapse) {
-      // Track full collapse
-      analytics.trackPersonaEvent('Persona Card Collapsed', {
-        personaId: persona.id,
-        personaName: persona.name,
-      });
+	function handleClose(fullCollapse: boolean = false) {
+		if (fullCollapse) {
+			// Track full collapse
+			analytics.trackPersonaEvent('Persona Card Collapsed', {
+				personaId: persona.id,
+				personaName: persona.name,
+			});
 
-      // Full collapse: clear the active persona session and close the card
-      setActivePersonaSession(null);
-      setMobileChatVisible(false);
-      onCollapse();
-    } else {
-      // Mobile chat close: only hide the chat overlay, keep persona session active
-      analytics.trackPersonaEvent('Mobile Chat Closed', {
-        personaId: persona.id,
-      });
-      setMobileChatVisible(false);
-    }
-  }
+			// Full collapse: clear the active persona session and close the card
+			setActivePersonaSession(null);
+			setMobileChatVisible(false);
+			onCollapse();
+		} else {
+			// Mobile chat close: only hide the chat overlay, keep persona session active
+			analytics.trackPersonaEvent('Mobile Chat Closed', {
+				personaId: persona.id,
+			});
+			setMobileChatVisible(false);
+		}
+	}
 
-  async function getPersonaUser() {
-    setIsCreatingPersona(true);
-    setProcessingStep(0);
+	async function getPersonaUser() {
+		setIsCreatingPersona(true);
+		setProcessingStep(0);
 
-    // Simulate progressive steps with intervals
-    const stepInterval = setInterval(() => {
-      setProcessingStep((prev) => {
-        if (prev < PROCESSING_STEPS.length - 1) {
-          return prev + 1;
-        }
-        return prev;
-      });
-    }, 2000); // Progress every 2 seconds
+		// Simulate progressive steps with intervals
+		const stepInterval = setInterval(() => {
+			setProcessingStep((prev) => {
+				if (prev < PROCESSING_STEPS.length - 1) {
+					return prev + 1;
+				}
+				return prev;
+			});
+		}, 2000); // Progress every 2 seconds
 
-    try {
-      // Check if dev mode override is active
-      if (devUserIdOverride) {
-        // DEV MODE: Use the custom user ID instead of creating a new one
+		try {
+			// Check if dev mode override is active
+			if (devUserIdOverride) {
+				// DEV MODE: Use the custom user ID instead of creating a new one
 
-        // Set the persona user with the override ID
-        setPersonaUser(persona.id, {
-          userId: devUserIdOverride,
-          personaInfo: { name: persona.name },
-        });
+				// Set the persona user with the override ID
+				setPersonaUser(persona.id, {
+					userId: devUserIdOverride,
+					personaInfo: { name: persona.name },
+				});
 
-        // Create a persona session using PersonaSessionManager
-        // This automatically handles dev override and syncs to localStorage + global state
-        createSession({
-          personaId: PersonaId.AnonymousPersonaId,
-          personaName: persona.name,
-          userId: devUserIdOverride, // Manager will automatically apply dev override
-          scheduleId: null,
-          chatSessionId: '',
-          chatContext: [],
-          userInfo: null, // Will be populated on first API call
-          scheduleLastUpdatedBy: null,
-        });
+				// Create a persona session using PersonaSessionManager
+				// This automatically handles dev override and syncs to localStorage + global state
+				createSession({
+					personaId: PersonaId.AnonymousPersonaId,
+					personaName: persona.name,
+					userId: devUserIdOverride, // Manager will automatically apply dev override
+					scheduleId: null,
+					chatSessionId: '',
+					chatContext: [],
+					userInfo: null, // Will be populated on first API call
+					scheduleLastUpdatedBy: null,
+				});
 
-        clearInterval(stepInterval);
-        setProcessingStep(PROCESSING_STEPS.length);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsCreatingPersona(false);
-        setProcessingStep(0);
-        return;
-      }
+				clearInterval(stepInterval);
+				setProcessingStep(PROCESSING_STEPS.length);
+				await new Promise((resolve) => setTimeout(resolve, 1000));
+				setIsCreatingPersona(false);
+				setProcessingStep(0);
+				return;
+			}
 
-      // NORMAL MODE: Create a new anonymous user
-      const personaUser = await personaService.createAnonymousUser(persona);
-      const newUserId = personaUser.anonymousUser.id;
+			// NORMAL MODE: Create a new anonymous user
+			const personaUser = await personaService.createAnonymousUser(persona);
+			const newUserId = personaUser.anonymousUser.id;
 
-      if (!newUserId) {
-        console.error('Failed to create user for persona: userId is null');
-        clearInterval(stepInterval);
-        setIsCreatingPersona(false);
-        setProcessingStep(0);
-        return;
-      }
+			if (!newUserId) {
+				console.error('Failed to create user for persona: userId is null');
+				clearInterval(stepInterval);
+				setIsCreatingPersona(false);
+				setProcessingStep(0);
+				return;
+			}
 
-      setPersonaUser(persona.id, {
-        userId: newUserId,
-        personaInfo: { name: persona.name },
-      });
+			setPersonaUser(persona.id, {
+				userId: newUserId,
+				personaInfo: { name: persona.name },
+			});
 
-      // Create a new persona session using PersonaSessionManager
-      // This automatically syncs to both localStorage and global state
-      createSession({
-        personaId: PersonaId.AnonymousPersonaId,
-        personaName: persona.name,
-        userId: newUserId,
-        scheduleId: null,
-        chatSessionId: '',
-        chatContext: [],
-        userInfo: {
-          id: newUserId,
-          username: personaUser.anonymousUser.username || '',
-          timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
-          timeZone: personaUser.anonymousUser.timeZone || 'UTC',
-          email: personaUser.anonymousUser.email,
-          endOfDay: personaUser.anonymousUser.endOfDay || '',
-          phoneNumber: personaUser.anonymousUser.phoneNumber,
-          fullName: personaUser.anonymousUser.fullName || '',
-          firstName: personaUser.anonymousUser.firstName || '',
-          lastName: personaUser.anonymousUser.lastName || '',
-          countryCode: personaUser.anonymousUser.countryCode || '1',
-          dateOfBirth: '',
-        },
-        scheduleLastUpdatedBy: null,
-      });
+			// Create a new persona session using PersonaSessionManager
+			// This automatically syncs to both localStorage and global state
+			createSession({
+				personaId: PersonaId.AnonymousPersonaId,
+				personaName: persona.name,
+				userId: newUserId,
+				scheduleId: null,
+				chatSessionId: '',
+				chatContext: [],
+				userInfo: {
+					id: newUserId,
+					username: personaUser.anonymousUser.username || '',
+					timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
+					timeZone: personaUser.anonymousUser.timeZone || 'UTC',
+					email: personaUser.anonymousUser.email,
+					endOfDay: personaUser.anonymousUser.endOfDay || '',
+					phoneNumber: personaUser.anonymousUser.phoneNumber,
+					fullName: personaUser.anonymousUser.fullName || '',
+					firstName: personaUser.anonymousUser.firstName || '',
+					lastName: personaUser.anonymousUser.lastName || '',
+					countryCode: personaUser.anonymousUser.countryCode || '1',
+					dateOfBirth: '',
+				},
+				scheduleLastUpdatedBy: null,
+			});
 
-      clearInterval(stepInterval);
+			clearInterval(stepInterval);
 
-      // Show all steps as complete (all checkmarks)
-      setProcessingStep(PROCESSING_STEPS.length);
+			// Show all steps as complete (all checkmarks)
+			setProcessingStep(PROCESSING_STEPS.length);
 
-      // Wait 1 second to show all checkmarks before hiding
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Wait 1 second to show all checkmarks before hiding
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      setIsCreatingPersona(false);
-      setProcessingStep(0);
-    } catch (error) {
-      clearInterval(stepInterval);
-      console.error("Couldn't create profile for persona: ", error);
-      setIsCreatingPersona(false);
-      setProcessingStep(0);
-    }
-  }
+			setIsCreatingPersona(false);
+			setProcessingStep(0);
+		} catch (error) {
+			clearInterval(stepInterval);
+			console.error("Couldn't create profile for persona: ", error);
+			setIsCreatingPersona(false);
+			setProcessingStep(0);
+		}
+	}
 
-  async function loadExistingPersonaSession(userId: string) {
-    // Load or create persona session for existing user
-    setActivePersonaSession({
-      personaId: persona.id,
-      personaName: persona.name,
-      userId: userId,
-      scheduleId: activePersonaSession?.scheduleId || null,
-      chatSessionId: activePersonaSession?.chatSessionId || '',
-      chatContext: activePersonaSession?.chatContext || [],
-      userInfo: activePersonaSession?.userInfo || null,
-      scheduleLastUpdatedBy: activePersonaSession?.scheduleLastUpdatedBy || null,
-    });
-  }
+	async function loadExistingPersonaSession(userId: string) {
+		// Load or create persona session for existing user
+		setActivePersonaSession({
+			personaId: persona.id,
+			personaName: persona.name,
+			userId: userId,
+			scheduleId: activePersonaSession?.scheduleId || null,
+			chatSessionId: activePersonaSession?.chatSessionId || '',
+			chatContext: activePersonaSession?.chatContext || [],
+			userInfo: activePersonaSession?.userInfo || null,
+			scheduleLastUpdatedBy: activePersonaSession?.scheduleLastUpdatedBy || null,
+		});
+	}
 
-  useEffect(() => {
-    if (expanded) {
-      // Track persona card expansion
-      analytics.trackPersonaEvent('Persona Card Expanded', {
-        personaId: persona.id,
-        personaName: persona.name,
-        hasExistingUser: !!personaUserId,
-      });
+	useEffect(() => {
+		if (expanded) {
+			// Track persona card expansion
+			analytics.trackPersonaEvent('Persona Card Expanded', {
+				personaId: persona.id,
+				personaName: persona.name,
+				hasExistingUser: !!personaUserId,
+			});
 
-      if (!personaUserId) {
-        // Only create a new user if one doesn't exist
-        // For custom persona, the user is already created via createPersonaWithAudio
-        getPersonaUser();
-      } else {
-        // Check if we need to switch persona sessions
-        if (!activePersonaSession || activePersonaSession.personaId !== persona.id) {
-          loadExistingPersonaSession(personaUserId);
-        }
-      }
-    }
-  }, [expanded, persona.id]);
+			if (!personaUserId) {
+				// Only create a new user if one doesn't exist
+				// For custom persona, the user is already created via createPersonaWithAudio
+				getPersonaUser();
+			} else {
+				// Check if we need to switch persona sessions
+				if (!activePersonaSession || activePersonaSession.personaId !== persona.id) {
+					loadExistingPersonaSession(personaUserId);
+				}
+			}
+		}
+	}, [expanded, persona.id]);
 
-  // Listen for onboarding mobile chat open/close events
-  useEffect(() => {
-    const handleOpenMobileChat = () => {
-      setMobileChatVisible(true);
-    };
+	// Listen for onboarding mobile chat open/close events
+	useEffect(() => {
+		const handleOpenMobileChat = () => {
+			setMobileChatVisible(true);
+		};
 
-    const handleCloseMobileChat = () => {
-      setMobileChatVisible(false);
-    };
+		const handleCloseMobileChat = () => {
+			setMobileChatVisible(false);
+		};
 
-    window.addEventListener('onboarding-open-mobile-chat', handleOpenMobileChat);
-    window.addEventListener('onboarding-close-mobile-chat', handleCloseMobileChat);
-    return () => {
-      window.removeEventListener('onboarding-open-mobile-chat', handleOpenMobileChat);
-      window.removeEventListener('onboarding-close-mobile-chat', handleCloseMobileChat);
-    };
-  }, []);
+		window.addEventListener('onboarding-open-mobile-chat', handleOpenMobileChat);
+		window.addEventListener('onboarding-close-mobile-chat', handleCloseMobileChat);
+		return () => {
+			window.removeEventListener('onboarding-open-mobile-chat', handleOpenMobileChat);
+			window.removeEventListener('onboarding-close-mobile-chat', handleCloseMobileChat);
+		};
+	}, []);
 
-  // Trigger onboarding guide after persona creation completes
-  useEffect(() => {
-    // When persona creation finishes, check if we should show onboarding
-    if (!isCreatingPersona && expanded && personaUserId) {
-      // Check for skip parameter: add ?skipOnboarding=true to URL to force show onboarding
-      const urlParams = new URLSearchParams(window.location.search);
-      const forceShowOnboarding =
-        urlParams.get('skipOnboarding') === 'false' ||
-        urlParams.get('showOnboarding') === 'true';
+	// Trigger onboarding guide after persona creation completes
+	useEffect(() => {
+		// When persona creation finishes, check if we should show onboarding
+		if (!isCreatingPersona && expanded && personaUserId) {
+			// Check for skip parameter: add ?skipOnboarding=true to URL to force show onboarding
+			const urlParams = new URLSearchParams(window.location.search);
+			const forceShowOnboarding =
+				urlParams.get('skipOnboarding') === 'false' ||
+				urlParams.get('showOnboarding') === 'true';
 
-      const hasSeenOnboarding = forceShowOnboarding
-        ? null
-        : localStorage.getItem('tiler_onboarding_completed');
+			const hasSeenOnboarding = forceShowOnboarding
+				? null
+				: localStorage.getItem('tiler_onboarding_completed');
 
-      if (!hasSeenOnboarding && !showOnboarding) {
-        // Show onboarding guide after animation completes (give extra time for layout to fully settle)
-        const timer = setTimeout(async () => {
-          // Activate demo mode before showing onboarding
-          const { activateOnboardingDemo } = await import('@/config/demo_config');
-          activateOnboardingDemo(persona.id);
+			if (!hasSeenOnboarding && !showOnboarding) {
+				// Show onboarding guide after animation completes (give extra time for layout to fully settle)
+				const timer = setTimeout(async () => {
+					// Activate demo mode before showing onboarding
+					const { activateOnboardingDemo } = await import('@/config/demo_config');
+					activateOnboardingDemo(persona.id);
 
-          // Force re-render of PersonaCalendar and Chat to pick up demo data
-          setDemoModeKey((prev) => prev + 1);
+					// Force re-render of PersonaCalendar and Chat to pick up demo data
+					setDemoModeKey((prev) => prev + 1);
 
-          // Wait a tick for demo mode to propagate
-          await new Promise((resolve) => setTimeout(resolve, 100));
+					// Wait a tick for demo mode to propagate
+					await new Promise((resolve) => setTimeout(resolve, 100));
 
-          // Trigger onboarding guide
-          setShowOnboarding(true);
-        }, 800);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [isCreatingPersona, expanded, personaUserId, showOnboarding, persona.id]);
+					// Trigger onboarding guide
+					setShowOnboarding(true);
+				}, 800);
+				return () => clearTimeout(timer);
+			}
+		}
+	}, [isCreatingPersona, expanded, personaUserId, showOnboarding, persona.id]);
 
-  const content = [
-    {
-      key: 'calendar',
-      container: CalendarContainer,
-      content: (
-        <React.Fragment>
-          <PersonaCalendar
-            key={`calendar-${demoModeKey}`}
-            expandedWidth={expandedWidth}
-            userId={personaUserId}
-          />
-          <CalendarContainerActionButtons>
-            <MobileChatInputWrapper>
-              <MessageCircleIcon>
-                <MessageCircle size={18} />
-              </MessageCircleIcon>
-              <MobileChatInput
-                onClick={() => setMobileChatVisible(!mobileChatVisible)}
-                placeholder={t('home.expanded.mobileChatPlaceholder')}
-                readOnly
-                data-onboarding-mobile-chat-input
-              />
-            </MobileChatInputWrapper>
-          </CalendarContainerActionButtons>
-        </React.Fragment>
-      ),
-    },
-    {
-      key: 'chat',
-      container: ChatContainer,
-      content: <Chat key={`chat-${demoModeKey}`} onClose={() => handleClose(isDesktop)} />,
-    },
-  ];
+	const content = [
+		{
+			key: 'calendar',
+			container: CalendarContainer,
+			content: (
+				<React.Fragment>
+					<PersonaCalendar
+						key={`calendar-${demoModeKey}`}
+						expandedWidth={expandedWidth}
+						userId={personaUserId}
+					/>
+					<CalendarContainerActionButtons>
+						<MobileChatInputWrapper>
+							<MessageCircleIcon>
+								<MessageCircle size={18} />
+							</MessageCircleIcon>
+							<MobileChatInput
+								onClick={() => setMobileChatVisible(!mobileChatVisible)}
+								placeholder={t('home.expanded.mobileChatPlaceholder')}
+								readOnly
+								data-onboarding-mobile-chat-input
+							/>
+						</MobileChatInputWrapper>
+					</CalendarContainerActionButtons>
+				</React.Fragment>
+			),
+		},
+		{
+			key: 'chat',
+			container: ChatContainer,
+			content: <Chat key={`chat-${demoModeKey}`} onClose={() => handleClose(isDesktop)} />,
+		},
+	];
 
-  // Content revealing animations
-  const cardSpringRef = useSpringRef();
-  const cardSpring = useSpring({
-    ref: cardSpringRef,
-    from: { opacity: 0 },
-    to: { opacity: expanded ? 1 : 0 },
-  });
+	// Content revealing animations
+	const cardSpringRef = useSpringRef();
+	const cardSpring = useSpring({
+		ref: cardSpringRef,
+		from: { opacity: 0 },
+		to: { opacity: expanded ? 1 : 0 },
+	});
 
-  const contentTransRef = useSpringRef();
-  const contentTransition = useTransition(
-    expanded ? (showChat ? content : content.slice(0, 1)) : [],
-    {
-      keys: (item) => item.key,
-      ref: contentTransRef,
-      from: { opacity: 0, scale: 1.05 },
-      enter: { opacity: 1, scale: 1 },
-      leave: { opacity: 0, scale: 1 },
-      trail: expanded ? 200 : 0,
-      config: { tension: expanded ? 200 : 300 },
-    }
-  );
+	const contentTransRef = useSpringRef();
+	const contentTransition = useTransition(
+		expanded ? (showChat ? content : content.slice(0, 1)) : [],
+		{
+			keys: (item) => item.key,
+			ref: contentTransRef,
+			from: { opacity: 0, scale: 1.05 },
+			enter: { opacity: 1, scale: 1 },
+			leave: { opacity: 0, scale: 1 },
+			trail: expanded ? 200 : 0,
+			config: { tension: expanded ? 200 : 300 },
+		}
+	);
 
-  useChain(
-    expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
-    expanded ? [0, 0.75] : [0, 1],
-    300
-  );
+	useChain(
+		expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
+		expanded ? [0, 0.75] : [0, 1],
+		300
+	);
 
-  return (
-    <CalendarUIProvider demoMode>
-      <CalendarRequestProvider>
-        <CardContainer
-          $display={expanded}
-          style={cardSpring}
-          onClick={onClick}
-          data-persona-card-container
-        >
-          <Header>
-            <h2>{persona.name}</h2>
-            <MobileCloseButtonContainer>
-              <Button variant="ghost" height={32} onClick={() => handleClose(true)}>
-                <ChevronLeftIcon size={16} />
-                <span>Back</span>
-              </Button>
-            </MobileCloseButtonContainer>
-          </Header>
-          <CardContent>
-            {contentTransition((style, item) => (
-              <item.container style={style} key={item.key}>
-                {item.content}
-              </item.container>
-            ))}
-          </CardContent>
+	return (
+		<CalendarUIProvider demoMode>
+			<CalendarRequestProvider>
+				<CardContainer
+					$display={expanded}
+					style={cardSpring}
+					onClick={onClick}
+					data-persona-card-container
+				>
+					<Header>
+						<h2>{persona.name}</h2>
+						<MobileCloseButtonContainer>
+							<Button variant="ghost" height={32} onClick={() => handleClose(true)}>
+								<ChevronLeftIcon size={16} />
+								<span>Back</span>
+							</Button>
+						</MobileCloseButtonContainer>
+					</Header>
+					<CardContent>
+						{contentTransition((style, item) => (
+							<item.container style={style} key={item.key}>
+								{item.content}
+							</item.container>
+						))}
+					</CardContent>
 
-          {/* Loading overlay for persona creation */}
-          <LoadingOverlay $visible={isCreatingPersona}>
-            <LoadingContent>
-              <Loader />
-              <LoadingMessage>
-                <LoadingTitle>
-                  {t('common.customPersonaModal.processing.title')}
-                </LoadingTitle>
-                <LoadingDescription>
-                  {t('common.customPersonaModal.processing.description')}
-                </LoadingDescription>
-              </LoadingMessage>
-              <ProgressSteps>
-                {PROCESSING_STEPS.map((step, index) => {
-                  const isActive = processingStep === index;
-                  const isComplete = processingStep > index;
-                  return (
-                    <ProgressStep
-                      key={index}
-                      $isActive={isActive}
-                      $isComplete={isComplete}
-                    >
-                      <StepIndicator
-                        $isActive={isActive}
-                        $isComplete={isComplete}
-                      >
-                        {isComplete ? <Check size={14} /> : index + 1}
-                      </StepIndicator>
-                      <StepText $isActive={isActive} $isComplete={isComplete}>
-                        {step.title}
-                      </StepText>
-                    </ProgressStep>
-                  );
-                })}
-              </ProgressSteps>
-            </LoadingContent>
-          </LoadingOverlay>
-        </CardContainer>
+					{/* Loading overlay for persona creation */}
+					<LoadingOverlay $visible={isCreatingPersona}>
+						<LoadingContent>
+							<Loader />
+							<LoadingMessage>
+								<LoadingTitle>
+									{t('common.customPersonaModal.processing.title')}
+								</LoadingTitle>
+								<LoadingDescription>
+									{t('common.customPersonaModal.processing.description')}
+								</LoadingDescription>
+							</LoadingMessage>
+							<ProgressSteps>
+								{PROCESSING_STEPS.map((step, index) => {
+									const isActive = processingStep === index;
+									const isComplete = processingStep > index;
+									return (
+										<ProgressStep
+											key={index}
+											$isActive={isActive}
+											$isComplete={isComplete}
+										>
+											<StepIndicator
+												$isActive={isActive}
+												$isComplete={isComplete}
+											>
+												{isComplete ? <Check size={14} /> : index + 1}
+											</StepIndicator>
+											<StepText $isActive={isActive} $isComplete={isComplete}>
+												{step.title}
+											</StepText>
+										</ProgressStep>
+									);
+								})}
+							</ProgressSteps>
+						</LoadingContent>
+					</LoadingOverlay>
+				</CardContainer>
 
-        {/* Onboarding guide - rendered as portal to document.body to avoid z-index issues */}
-        {createPortal(
-          <OnboardingGuide
-            isVisible={showOnboarding}
-            onComplete={async () => {
-              // Deactivate demo mode
-              const { deactivateOnboardingDemo } = await import(
-                '@/config/demo_config'
-              );
-              deactivateOnboardingDemo();
+				{/* Onboarding guide - rendered as portal to document.body to avoid z-index issues */}
+				{createPortal(
+					<OnboardingGuide
+						isVisible={showOnboarding}
+						onComplete={async () => {
+							// Deactivate demo mode
+							const { deactivateOnboardingDemo } = await import(
+								'@/config/demo_config'
+							);
+							deactivateOnboardingDemo();
 
-              // Force re-render to switch back to real data
-              setDemoModeKey((prev) => prev + 1);
+							// Force re-render to switch back to real data
+							setDemoModeKey((prev) => prev + 1);
 
-              localStorage.setItem('tiler_onboarding_completed', 'true');
-              setShowOnboarding(false);
-              analytics.trackPersonaEvent('Onboarding Completed', {
-                personaId: persona.id,
-              });
-            }}
-            onSkip={async () => {
-              // Deactivate demo mode
-              const { deactivateOnboardingDemo } = await import(
-                '@/config/demo_config'
-              );
-              deactivateOnboardingDemo();
+							localStorage.setItem('tiler_onboarding_completed', 'true');
+							setShowOnboarding(false);
+							analytics.trackPersonaEvent('Onboarding Completed', {
+								personaId: persona.id,
+							});
+						}}
+						onSkip={async () => {
+							// Deactivate demo mode
+							const { deactivateOnboardingDemo } = await import(
+								'@/config/demo_config'
+							);
+							deactivateOnboardingDemo();
 
-              // Force re-render to switch back to real data
-              setDemoModeKey((prev) => prev + 1);
+							// Force re-render to switch back to real data
+							setDemoModeKey((prev) => prev + 1);
 
-              localStorage.setItem('tiler_onboarding_completed', 'true');
-              setShowOnboarding(false);
-              analytics.trackPersonaEvent('Onboarding Skipped', {
-                personaId: persona.id,
-              });
-            }}
-          />,
-          document.body
-        )}
-      </CalendarRequestProvider>
-    </CalendarUIProvider>
-  );
+							localStorage.setItem('tiler_onboarding_completed', 'true');
+							setShowOnboarding(false);
+							analytics.trackPersonaEvent('Onboarding Skipped', {
+								personaId: persona.id,
+							});
+						}}
+					/>,
+					document.body
+				)}
+			</CalendarRequestProvider>
+		</CalendarUIProvider>
+	);
 };
 
-const CardContainer = styled(animated.section) <{ $display: boolean }>`
+const CardContainer = styled(animated.section)<{ $display: boolean }>`
 	overflow: hidden;
 	background: linear-gradient(to right, ${palette.colors.black}, ${palette.colors.gray[900]});
 	border-radius: ${palette.borderRadius.xxLarge};
@@ -688,11 +688,11 @@ const ProgressStep = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 	gap: 0.75rem;
 	padding: 0.5rem 0.75rem;
 	background: ${({ $isActive, $isComplete }) =>
-    $isComplete
-      ? palette.colors.brand[900] + '40'
-      : $isActive
-        ? palette.colors.gray[800]
-        : 'transparent'};
+		$isComplete
+			? palette.colors.brand[900] + '40'
+			: $isActive
+				? palette.colors.gray[800]
+				: 'transparent'};
 	border-radius: ${palette.borderRadius.medium};
 	transition: all 0.3s ease;
 `;
@@ -709,18 +709,18 @@ const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 	flex-shrink: 0;
 
 	${({ $isComplete, $isActive }) =>
-    $isComplete
-      ? `
+		$isComplete
+			? `
 		background: ${palette.colors.brand[500]};
 		color: ${palette.colors.white};
 	`
-      : $isActive
-        ? `
+			: $isActive
+				? `
 		background: ${palette.colors.gray[700]};
 		color: ${palette.colors.gray[300]};
 		border: 2px solid ${palette.colors.brand[500]};
 	`
-        : `
+				: `
 		background: ${palette.colors.gray[800]};
 		color: ${palette.colors.gray[600]};
 		border: 2px solid ${palette.colors.gray[700]};
@@ -730,9 +730,9 @@ const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 const StepText = styled.span<{ $isActive: boolean; $isComplete: boolean }>`
 	font-size: ${palette.typography.fontSize.sm};
 	color: ${({ $isComplete, $isActive }) =>
-    $isComplete || $isActive ? palette.colors.gray[200] : palette.colors.gray[500]};
+		$isComplete || $isActive ? palette.colors.gray[200] : palette.colors.gray[500]};
 	font-weight: ${({ $isActive }) =>
-    $isActive ? palette.typography.fontWeight.medium : palette.typography.fontWeight.normal};
+		$isActive ? palette.typography.fontWeight.medium : palette.typography.fontWeight.normal};
 	transition: all 0.3s ease;
 `;
 

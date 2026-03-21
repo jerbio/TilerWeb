@@ -7,35 +7,35 @@ import { keyframes } from 'styled-components';
 
 type LoaderProps = {
 	message?: string;
-}
+};
 
-export const Loader: React.FC<LoaderProps> = ({ message = "" }) => {
-  const SIZE = 72;
-  return (
+export const Loader: React.FC<LoaderProps> = ({ message = '' }) => {
+	const SIZE = 72;
+	return (
 		<Container>
-    <LoaderContainer $size={SIZE}>
-      <LoaderCircle size={SIZE} />
-      <div>
-        <Logo size={SIZE / 3} />
-      </div>
-    </LoaderContainer>
+			<LoaderContainer $size={SIZE}>
+				<LoaderCircle size={SIZE} />
+				<div>
+					<Logo size={SIZE / 3} />
+				</div>
+			</LoaderContainer>
 			<LoaderMessage>{message}</LoaderMessage>
-    </Container>
-  );
+		</Container>
+	);
 };
 
 const Container = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: .5rem;
+	gap: 0.5rem;
 	align-items: center;
 `;
 
 const LoaderMessage = styled.div`
-	color: ${props => props.theme.colors.text.primary};
-  font-family: ${props => props.theme.typography.fontFamily.urban};
-  font-weight: ${props => props.theme.typography.fontWeight.bold};
-  font-size: ${props => props.theme.typography.fontSize.base};
+	color: ${(props) => props.theme.colors.text.primary};
+	font-family: ${(props) => props.theme.typography.fontFamily.urban};
+	font-weight: ${(props) => props.theme.typography.fontWeight.bold};
+	font-size: ${(props) => props.theme.typography.fontSize.base};
 `;
 
 const spin = keyframes`

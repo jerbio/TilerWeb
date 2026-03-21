@@ -10,95 +10,95 @@ import { StyledEvent } from './calendar_events';
 import { useTheme } from '@/core/theme/ThemeProvider';
 
 type CalendarEventProps = {
-  event: StyledEvent;
-  selectedEvent: string | null;
-  setSelectedEvent: (eventId: string | null) => void;
-  setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
-  onClick?: () => void;
-  /** When true, shows a pulse-glow ring to draw attention */
-  focused?: boolean;
+	event: StyledEvent;
+	selectedEvent: string | null;
+	setSelectedEvent: (eventId: string | null) => void;
+	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
+	onClick?: () => void;
+	/** When true, shows a pulse-glow ring to draw attention */
+	focused?: boolean;
 };
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
-  event,
-  selectedEvent,
-  setSelectedEvent,
-  setSelectedEventInfo,
-  onClick,
-  focused = false,
+	event,
+	selectedEvent,
+	setSelectedEvent,
+	setSelectedEventInfo,
+	onClick,
+	focused = false,
 }) => {
-  const { isDarkMode } = useTheme();
-  return (
-    <EventContainer
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      key={event.id}
-      $darkmode={isDarkMode}
-      $selected={selectedEvent === event.id}
-      $focused={focused}
-      $colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
-    >
-      <EventContent
-        height={event.springStyles.height}
-        $darkmode={isDarkMode}
-        $colors={{
-          r: event.colorRed,
-          g: event.colorGreen,
-          b: event.colorBlue,
-        }}
-        onClick={() => {
-          setSelectedEvent(event.id);
-          setSelectedEventInfo(event);
-          onClick?.();
-        }}
-        variant={event.isRigid ? 'block' : 'tile'}
-      >
-        <header>
-          <h3>{event.name}</h3>
-          <EventLockIcon className="lock-icon" size={14} />
-        </header>
-        <footer>
-          <div className="duration">
-            <div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
-              <Clock size={14} style={{ minWidth: 18 }} />
-              {event.isTardy && <span>Late</span>}
-            </div>
-            <span>
-              {TimeUtil.rangeDuration(
-                dayjs(event.start, 'unix'),
-                dayjs(event.end, 'unix')
-              )}
-            </span>
-          </div>
-          {event.location?.address && (
-            <a
-              href={CalendarUtil.getEventLocationLink(event)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="location"
-            >
-              <MapPin size={14} style={{ minWidth: 16 }} />
-              <span>{event.location.description}</span>
-            </a>
-          )}
-        </footer>
-      </EventContent>
-      {/* Border SVG for styling */}
-      <svg viewBox="0 0 1 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <rect
-          x="0"
-          y="0"
-          rx="0.08"
-          ry="0.08"
-          width="1"
-          height="4"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-    </EventContainer>
-  );
+	const { isDarkMode } = useTheme();
+	return (
+		<EventContainer
+			onClick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}
+			key={event.id}
+			$darkmode={isDarkMode}
+			$selected={selectedEvent === event.id}
+			$focused={focused}
+			$colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
+		>
+			<EventContent
+				height={event.springStyles.height}
+				$darkmode={isDarkMode}
+				$colors={{
+					r: event.colorRed,
+					g: event.colorGreen,
+					b: event.colorBlue,
+				}}
+				onClick={() => {
+					setSelectedEvent(event.id);
+					setSelectedEventInfo(event);
+					onClick?.();
+				}}
+				variant={event.isRigid ? 'block' : 'tile'}
+			>
+				<header>
+					<h3>{event.name}</h3>
+					<EventLockIcon className="lock-icon" size={14} />
+				</header>
+				<footer>
+					<div className="duration">
+						<div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
+							<Clock size={14} style={{ minWidth: 18 }} />
+							{event.isTardy && <span>Late</span>}
+						</div>
+						<span>
+							{TimeUtil.rangeDuration(
+								dayjs(event.start, 'unix'),
+								dayjs(event.end, 'unix')
+							)}
+						</span>
+					</div>
+					{event.location?.address && (
+						<a
+							href={CalendarUtil.getEventLocationLink(event)}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="location"
+						>
+							<MapPin size={14} style={{ minWidth: 16 }} />
+							<span>{event.location.description}</span>
+						</a>
+					)}
+				</footer>
+			</EventContent>
+			{/* Border SVG for styling */}
+			<svg viewBox="0 0 1 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+				<rect
+					x="0"
+					y="0"
+					rx="0.08"
+					ry="0.08"
+					width="1"
+					height="4"
+					vectorEffect="non-scaling-stroke"
+				/>
+			</svg>
+		</EventContainer>
+	);
 };
 
 const dashRotate = keyframes`
@@ -122,11 +122,11 @@ const focusPulse = keyframes`
   }
 `;
 
-const EventContainer = styled(animated.div) <{
-  $selected: boolean;
-  $focused: boolean;
-  $colors: RGB;
-  $darkmode: boolean;
+const EventContainer = styled(animated.div)<{
+	$selected: boolean;
+	$focused: boolean;
+	$colors: RGB;
+	$darkmode: boolean;
 }>`
 	padding: 4px;
 	position: relative;
@@ -146,11 +146,11 @@ const EventContainer = styled(animated.div) <{
 			fill: transparent;
 			stroke-width: 2;
 			stroke: ${({ $colors, $selected, $darkmode }) => {
-    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
-    return $selected
-      ? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-      : 'transparent';
-  }};
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
+				return $selected
+					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+					: 'transparent';
+			}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -166,28 +166,28 @@ const EventLockIcon = styled(LockKeyhole)`
 `;
 
 const EventContent = styled.div<{
-  $colors: RGB;
-  $darkmode: boolean;
-  height: number;
-  variant: 'block' | 'tile';
+	$colors: RGB;
+	$darkmode: boolean;
+	height: number;
+	variant: 'block' | 'tile';
 }>`
 	position: relative;
 	background-color: ${({ $colors, $darkmode }) => {
-    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.325 : 0.9);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+		const newColor = colorUtil.setLightness($colors, $darkmode ? 0.325 : 0.9);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 	color: ${({ $colors, $darkmode }) => {
-    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.3);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+		const newColor = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.3);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
 	border: ${({ variant }) => (variant === 'block' ? 1.5 : 1)}px solid
 		${({ $colors, variant, $darkmode }) => {
-    const blockColor = colorUtil.setLightness($colors, $darkmode ? 0.6 : 0.5);
-    const tileColor = colorUtil.setLightness($colors, $darkmode ? 0.1 : 0.8);
-    return variant === 'block'
-      ? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
-      : `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
-  }};
+			const blockColor = colorUtil.setLightness($colors, $darkmode ? 0.6 : 0.5);
+			const tileColor = colorUtil.setLightness($colors, $darkmode ? 0.1 : 0.8);
+			return variant === 'block'
+				? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
+				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
+		}};
 	height: 100%;
 	padding: 7px 8px;
 	border-radius: 10px;
@@ -234,9 +234,9 @@ const EventContent = styled.div<{
 		white-space: nowrap;
 
 		color: ${({ $colors, $darkmode }) => {
-    const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.4);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+			const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.4);
+			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+		}};
 	}
 
 	.duration {
@@ -253,13 +253,13 @@ const EventContent = styled.div<{
 			padding-inline: 4px;
 			margin-right: 0.5ch;
 			color: ${({ $colors, $darkmode }) => {
-const newColor = colorUtil.setLightness($colors, $darkmode? 0.2 : 0.7);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.2 : 0.7);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
 			background-color: ${({ $colors, $darkmode }) => {
-const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
 		}
 	}
 
@@ -268,9 +268,9 @@ const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
 		min-width: 0;
 		&:hover {
 			background-color: ${({ $colors, $darkmode }) => {
-const newColor = colorUtil.setLightness($colors, $darkmode? 0.2 : 0.75);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.2 : 0.75);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
 		}
 
 		border-radius: ${({ theme }) => theme.borderRadius.little};
