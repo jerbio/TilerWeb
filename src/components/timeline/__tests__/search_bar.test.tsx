@@ -5,6 +5,7 @@ import { lightTheme } from '@/core/theme/light';
 import SearchBar from '../search_bar';
 import { CalendarEvent } from '@/core/common/types/schedule';
 import { CalendarUIStore } from '@/core/common/components/calendar/calendar-ui.store';
+import dayjs from 'dayjs';
 
 const mockSearchCalendarEventsByName = vi.fn();
 const mockSetCalendarEventAsNow = vi.fn();
@@ -63,6 +64,21 @@ vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 					navigateToTileComplete: vi.fn(),
 				},
 			},
+			editTile: {
+				state: {
+					isOpen: false,
+					event: null,
+				},
+				actions: {
+					open: vi.fn(),
+					close: vi.fn(),
+				},
+			},
+			viewInfo: {
+				startDay: dayjs(),
+				daysInView: 7,
+			},
+			setViewInfo: vi.fn(),
 		};
 		return selector ? selector(mockStore) : mockStore;
 	},

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import 'dayjs/locale/fr';
 import 'dayjs/locale/pl';
 import 'dayjs/locale/es';
@@ -13,6 +14,7 @@ import 'dayjs/locale/ko';
 import 'dayjs/locale/hi';
 
 dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
 
 type TimeUnit = 'w' | 'd' | 'h' | 'm';
 const _quantities: Record<TimeUnit, number> = {
