@@ -175,26 +175,6 @@ const StepDesc = styled.p`
 
 // ─── Step Icons (small SVG illustrations) ────────────────────────────────────
 
-const fadeCheck = keyframes`
-  0%, 70% { opacity: 0; transform: scale(0.5); }
-  100%    { opacity: 1; transform: scale(1); }
-`;
-
-const gentlePulse = keyframes`
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.15); }
-`;
-
-const gentleRotate = keyframes`
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
-const sparkle = keyframes`
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.2); }
-`;
-
 const IconSvg = styled.svg`
   width: 14px;
   height: 14px;
