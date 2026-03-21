@@ -1084,6 +1084,38 @@
 			"title": "Here\u2019s Where Everything Lives",
 			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
 		},
+		"howToUseTiler": {
+			"badge": "How To Use Tiler",
+			"title": "From intent to done. In seconds.",
+			"summary": "Connect your calendar, add your tiles, and let Tiler build the rest. A step-by-step guide to running your day with Tiler.",
+			"visual": {
+				"step1": "Add Tiles",
+				"step2": "AI Plans",
+				"step3": "Day Built"
+			},
+			"items": {
+				"connectCalendar": {
+					"title": "Connect a Calendar",
+					"body": "Connecting your calendar allows Tiler to see your real commitments. Once synced, incoming calendar events appear as blocks in your timeline. You can accept, edit, or resolve conflicts directly inside Tiler. When events change, Tiler adapts your tiles around them so your day stays balanced and realistic."
+				},
+				"createBlock": {
+					"title": "How to Create a Block",
+					"body": "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don\u2019t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable."
+				},
+				"flexibleTiles": {
+					"title": "Creating Flexible Tiles",
+					"body": "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline \u2014 Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions."
+				},
+				"updateTile": {
+					"title": "How to Update a Tile",
+					"body": "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don\u2019t need to move other tasks manually, the system handles the ripple effects."
+				},
+				"travelTime": {
+					"title": "Travel Time & Route",
+					"body": "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn\u2019t a gap \u2014 it\u2019s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn\u2019t just tell you what to do. It gets you there."
+				}
+			}
+		},
 		"features": {
 			"badge": "Features",
 			"title": "Everything Tiler can do.",
