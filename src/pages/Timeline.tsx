@@ -14,126 +14,126 @@ import { useTranslation } from 'react-i18next';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 
 const Timeline: React.FC = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-  const isAuthLoading = useAppStore((state) => state.isAuthLoading);
-  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const [mobileChatVisible, setMobileChatVisible] = useState(false);
-  const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
-  const showChat = isDesktop || mobileChatVisible;
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [expandedWidth, setExpandedWidth] = useState(0);
-  const [chatExpanded, setChatExpanded] = useState(false);
+	const { t } = useTranslation();
+	const navigate = useNavigate();
+	const theme = useTheme();
+	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const isAuthLoading = useAppStore((state) => state.isAuthLoading);
+	const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+	const [mobileChatVisible, setMobileChatVisible] = useState(false);
+	const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
+	const showChat = isDesktop || mobileChatVisible;
+	const contentRef = useRef<HTMLDivElement>(null);
+	const [expandedWidth, setExpandedWidth] = useState(0);
+	const [chatExpanded, setChatExpanded] = useState(false);
 
-  useEffect(() => {
-    if (!isAuthLoading && !isAuthenticated) {
-      navigate('/signin');
-    }
-  }, [isAuthLoading, isAuthenticated, navigate]);
+	useEffect(() => {
+		if (!isAuthLoading && !isAuthenticated) {
+			navigate('/signin');
+		}
+	}, [isAuthLoading, isAuthenticated, navigate]);
 
-  useEffect(() => {
-    const resizeTimelineWidth = () => {
-      if (contentRef.current) {
-        setExpandedWidth(contentRef.current.offsetWidth);
-      }
-    };
+	useEffect(() => {
+		const resizeTimelineWidth = () => {
+			if (contentRef.current) {
+				setExpandedWidth(contentRef.current.offsetWidth);
+			}
+		};
 
-    resizeTimelineWidth();
-    window.addEventListener('resize', resizeTimelineWidth);
-    return () => window.removeEventListener('resize', resizeTimelineWidth);
-  }, []);
+		resizeTimelineWidth();
+		window.addEventListener('resize', resizeTimelineWidth);
+		return () => window.removeEventListener('resize', resizeTimelineWidth);
+	}, []);
 
-  if (isAuthLoading) {
-    return (
-      <Container>
-        <LoadingContainer>
-          <Loader />
-        </LoadingContainer>
-      </Container>
-    );
-  }
+	if (isAuthLoading) {
+		return (
+			<Container>
+				<LoadingContainer>
+					<Loader />
+				</LoadingContainer>
+			</Container>
+		);
+	}
 
-  if (!authenticatedUser || !isAuthenticated) {
-    return null; // Will redirect to signin
-  }
+	if (!authenticatedUser || !isAuthenticated) {
+		return null; // Will redirect to signin
+	}
 
-  const content = [
-    {
-      key: 'calendar',
-      container: CalendarContainer,
-      content: (
-        <React.Fragment>
-          <CalendarWrapper
-            chatExpanded={chatExpanded}
-            userId={authenticatedUser.id}
-            width={expandedWidth}
-          />
-          <CalendarContainerActionButtons>
-            <MobileChatInputWrapper>
-              <MessageCircleIcon>
-                <MessageCircle size={18} />
-              </MessageCircleIcon>
-              <MobileChatInput
-                onClick={() => setMobileChatVisible(!mobileChatVisible)}
-                placeholder={t('calendar.mobileChatInput.placeholder')}
-                readOnly
-              />
-            </MobileChatInputWrapper>
-          </CalendarContainerActionButtons>
-          {isDesktop && (
-            <ChatExpandToggle
-              title={chatExpanded ? 'Collapse chat' : 'Expand chat'}
-              onClick={() => setChatExpanded(!chatExpanded)}
-            >
-              {chatExpanded ? <ChevronLeft /> : <ChevronRight />}
-            </ChatExpandToggle>
-          )}
-        </React.Fragment>
-      ),
-    },
-    {
-      key: 'chat',
-      container: ChatContainer,
-      content: <Chat onClose={() => setMobileChatVisible(false)} />,
-    },
-  ];
+	const content = [
+		{
+			key: 'calendar',
+			container: CalendarContainer,
+			content: (
+				<React.Fragment>
+					<CalendarWrapper
+						chatExpanded={chatExpanded}
+						userId={authenticatedUser.id}
+						width={expandedWidth}
+					/>
+					<CalendarContainerActionButtons>
+						<MobileChatInputWrapper>
+							<MessageCircleIcon>
+								<MessageCircle size={18} />
+							</MessageCircleIcon>
+							<MobileChatInput
+								onClick={() => setMobileChatVisible(!mobileChatVisible)}
+								placeholder={t('calendar.mobileChatInput.placeholder')}
+								readOnly
+							/>
+						</MobileChatInputWrapper>
+					</CalendarContainerActionButtons>
+					{isDesktop && (
+						<ChatExpandToggle
+							title={chatExpanded ? 'Collapse chat' : 'Expand chat'}
+							onClick={() => setChatExpanded(!chatExpanded)}
+						>
+							{chatExpanded ? <ChevronLeft /> : <ChevronRight />}
+						</ChatExpandToggle>
+					)}
+				</React.Fragment>
+			),
+		},
+		{
+			key: 'chat',
+			container: ChatContainer,
+			content: <Chat onClose={() => setMobileChatVisible(false)} />,
+		},
+	];
 
-  const contentTransition = useTransition(showChat ? content : content.slice(0, 1), {
-    keys: (item) => item.key,
-    from: { opacity: 0, scale: 1.05 },
-    enter: { opacity: 1, scale: 1 },
-    leave: { opacity: 0, scale: 1 },
-    trail: 200,
-    config: { tension: 200 },
-  });
+	const contentTransition = useTransition(showChat ? content : content.slice(0, 1), {
+		keys: (item) => item.key,
+		from: { opacity: 0, scale: 1.05 },
+		enter: { opacity: 1, scale: 1 },
+		leave: { opacity: 0, scale: 1 },
+		trail: 200,
+		config: { tension: 200 },
+	});
 
-  return (
-    <Container>
-      <CalendarUIProvider>
-        <TimelineHeader />
+	return (
+		<Container>
+			<CalendarUIProvider>
+				<TimelineHeader />
 
-        <TimelineContentContainer>
-          <TimelineContent ref={contentRef}>
-            <CalendarRequestProvider>
-              <CardContent>
-                {contentTransition((style, item) => (
-                  <item.container
-                    style={style}
-                    key={item.key}
-                    $chatexpanded={chatExpanded}
-                  >
-                    {item.content}
-                  </item.container>
-                ))}
-              </CardContent>
-            </CalendarRequestProvider>
-          </TimelineContent>
-        </TimelineContentContainer>
-      </CalendarUIProvider>
-    </Container>
-  );
+				<TimelineContentContainer>
+					<TimelineContent ref={contentRef}>
+						<CalendarRequestProvider>
+							<CardContent>
+								{contentTransition((style, item) => (
+									<item.container
+										style={style}
+										key={item.key}
+										$chatexpanded={chatExpanded}
+									>
+										{item.content}
+									</item.container>
+								))}
+							</CardContent>
+						</CalendarRequestProvider>
+					</TimelineContent>
+				</TimelineContentContainer>
+			</CalendarUIProvider>
+		</Container>
+	);
 };
 
 const TimelineContent = styled.main`
@@ -141,7 +141,7 @@ const TimelineContent = styled.main`
 	inset: 1.5rem;
 	border-radius: ${(props) => props.theme.borderRadius.xLarge};
 	background: ${(props) =>
-    `linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`};
+		`linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`};
 	border: 2px solid ${(props) => props.theme.colors.border.default};
 	display: flex;
 	flex-direction: column;
@@ -171,7 +171,7 @@ const CardContent = styled.div`
 	height: calc(100% - 3rem);
 `;
 
-const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
+const CalendarContainer = styled(animated.div)<{ $chatexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
 	height: 100%;
@@ -189,7 +189,7 @@ const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	}
 `;
 
-const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
+const ChatContainer = styled(animated.div)<{ $chatexpanded: boolean }>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;

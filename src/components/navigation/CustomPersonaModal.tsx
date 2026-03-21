@@ -243,7 +243,7 @@ const StepIndicator = styled.div<{ $isActive: boolean; $isComplete: boolean }>`
 	font-size: ${palette.typography.fontSize.xs};
 	font-weight: ${palette.typography.fontWeight.bold};
 	flex-shrink: 0;
-	
+
 	${({ $isComplete, $isActive }) =>
 		$isComplete
 			? `
@@ -278,11 +278,7 @@ interface CustomPersonaModalProps {
 	onSubmit: (description: string, audioFile?: Blob) => Promise<void>;
 }
 
-const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
-	isOpen,
-	onClose,
-	onSubmit,
-}) => {
+const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({ isOpen, onClose, onSubmit }) => {
 	const { t } = useTranslation();
 	const [description, setDescription] = useState('');
 	const [placeholder, setPlaceholder] = useState('');
@@ -358,12 +354,16 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 			// Deleting effect
 			const deleteNextChar = () => {
 				if (currentIndex < currentSuggestion.length) {
-					setPlaceholder(currentSuggestion.slice(0, currentSuggestion.length - currentIndex - 1));
+					setPlaceholder(
+						currentSuggestion.slice(0, currentSuggestion.length - currentIndex - 1)
+					);
 					currentIndex++;
 					timeoutId = setTimeout(deleteNextChar, 30); // Deletion speed (faster)
 				} else {
 					// Move to next suggestion
-					setCurrentSuggestionIndex((prev) => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length);
+					setCurrentSuggestionIndex(
+						(prev) => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length
+					);
 					setIsTyping(true);
 				}
 			};
@@ -391,25 +391,25 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 		if (description.trim() || audioBlob) {
 			setIsSubmitting(true);
 			setProcessingStep(0);
-			
+
 			// Simulate progressive steps with intervals
 			const stepInterval = setInterval(() => {
-				setProcessingStep(prev => {
+				setProcessingStep((prev) => {
 					if (prev < PROCESSING_STEPS.length - 1) {
 						return prev + 1;
 					}
 					return prev;
 				});
 			}, 2000); // Progress every 2 seconds
-			
+
 			try {
 				// Keep modal open with spinner until API completes
 				// Only send audio if it wasn't transcribed (i.e., user didn't use auto-transcribe)
 				const audioToSend = isTranscribed ? undefined : audioBlob;
 				await onSubmit(description, audioToSend);
-				
+
 				clearInterval(stepInterval);
-				
+
 				// Show all steps as complete (all checkmarks)
 				setProcessingStep(PROCESSING_STEPS.length);
 
@@ -417,10 +417,10 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 				if (personaCarousel) {
 					personaCarousel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 				}
-				
+
 				// Wait 1 second to show all checkmarks before closing
-				await new Promise(resolve => setTimeout(resolve, 1000));
-				
+				await new Promise((resolve) => setTimeout(resolve, 1000));
+
 				// Only clear form after successful submission
 				// Modal will be closed by parent component (navigation.tsx)
 				setDescription('');
@@ -441,14 +441,14 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 
 	const handleClose = () => {
 		if (isSubmitting) return; // Prevent closing during submission
-		
+
 		// Clean up state
 		setDescription('');
 		setIsRecording(false);
 		setAudioBlob(undefined);
 		setIsTranscribed(false);
 		setProcessingStep(0);
-		
+
 		onClose();
 	};
 
@@ -480,11 +480,13 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						<X size={24} />
 					</CloseButton>
 				</ModalHeader>
-				<ModalDescription>
-					{t('common.customPersonaModal.description')}
-				</ModalDescription>
+				<ModalDescription>{t('common.customPersonaModal.description')}</ModalDescription>
 				<TextAreaWrapper>
-					<PlaceholderOverlay $visible={!description && placeholder.length > 0 && !isRecording && !isSubmitting}>
+					<PlaceholderOverlay
+						$visible={
+							!description && placeholder.length > 0 && !isRecording && !isSubmitting
+						}
+					>
 						{placeholder}
 					</PlaceholderOverlay>
 					<TextArea
@@ -509,7 +511,9 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						}}
 						onTranscriptionComplete={(transcription) => {
 							// Append transcription to existing description
-							setDescription(prev => prev ? `${prev}\n${transcription}` : transcription);
+							setDescription((prev) =>
+								prev ? `${prev}\n${transcription}` : transcription
+							);
 							// Mark that this audio was transcribed, so we don't send the blob
 							setIsTranscribed(true);
 						}}
@@ -524,25 +528,29 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({
 						disabled={(!description.trim() && !audioBlob) || isSubmitting}
 						style={{ flex: 1 }}
 					>
-						{isSubmitting ? t('common.buttons.creating') : t('common.buttons.createSchedule')}
+						{isSubmitting
+							? t('common.buttons.creating')
+							: t('common.buttons.createSchedule')}
 					</Button>
-					<Button 
-						variant="secondary" 
-						onClick={handleClose} 
+					<Button
+						variant="secondary"
+						onClick={handleClose}
 						style={{ flex: 1 }}
 						disabled={isSubmitting}
 					>
 						{t('common.buttons.cancel')}
 					</Button>
 				</ButtonWrapper>
-				
+
 				{/* Loading overlay - positioned last to appear on top */}
 				<LoadingOverlay $visible={isSubmitting}>
 					<LoadingContent>
 						<Loader />
 						<LoadingMessage>
 							<LoadingTitle>{PROCESSING_STEPS[processingStep]?.title}</LoadingTitle>
-							<LoadingDescription>{PROCESSING_STEPS[processingStep]?.description}</LoadingDescription>
+							<LoadingDescription>
+								{PROCESSING_STEPS[processingStep]?.description}
+							</LoadingDescription>
 						</LoadingMessage>
 						<ProgressSteps>
 							{PROCESSING_STEPS.map((step, index) => (

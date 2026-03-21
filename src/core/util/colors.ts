@@ -24,8 +24,8 @@ export class RGBColor {
 	}
 
 	equals(other: RGBColor): boolean {
-    return this.r === other.r && this.g === other.g && this.b === other.b;
-  }
+		return this.r === other.r && this.g === other.g && this.b === other.b;
+	}
 }
 
 function rgbToHex({ r, g, b }: RGB): string {

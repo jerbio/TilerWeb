@@ -19,8 +19,8 @@ type CalendarContentProps = {
 	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 	// Function to set styled non-viable events
 	setStyledNonViableEvents: (events: StyledEvent[]) => void;
-  // Function to provide background click info
-  onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
+	// Function to provide background click info
+	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events for Calendar request handling */
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (chat → calendar highlight) */
@@ -37,47 +37,44 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setSelectedEventInfo,
 	calendarGridCanvasRef,
 	setStyledNonViableEvents,
-  onBackgroundClick,
+	onBackgroundClick,
 	styledEventsRef,
 	focusedEventId,
 	onViableEventClicked,
 }) => {
-  return (
-    <Container>
-      <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
-        {/* Background */}
-        <CalendarBg
-          ref={calendarGridCanvasRef}
-          $width={viewOptions.width}
-        />
-        {/* Timeline */}
-        {Array.from({ length: 24 }).map((_, hourIndex) => {
-          return (
-            <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
-              <div>
-                {/* eg. "8 AM" */}
-                <span>{dayjs().hour(hourIndex).format('h A')}</span>
-              </div>
-            </CalendarCellTime>
-          );
-        })}
-        {/* Events */}
-        <CalendarEvents
-          events={events}
-          viewOptions={viewOptions}
-          headerWidth={viewOptions.width}
-          selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEvent}
-          setSelectedEventInfo={setSelectedEventInfo}
-          onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
-          onBackgroundClick={onBackgroundClick}
-          styledEventsRef={styledEventsRef}
-          focusedEventId={focusedEventId}
-          onViableEventClicked={onViableEventClicked}
-        />
-      </StyledCalendarContent>
-    </Container>
-  );
+	return (
+		<Container>
+			<StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
+				{/* Background */}
+				<CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+				{/* Timeline */}
+				{Array.from({ length: 24 }).map((_, hourIndex) => {
+					return (
+						<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
+							<div>
+								{/* eg. "8 AM" */}
+								<span>{dayjs().hour(hourIndex).format('h A')}</span>
+							</div>
+						</CalendarCellTime>
+					);
+				})}
+				{/* Events */}
+				<CalendarEvents
+					events={events}
+					viewOptions={viewOptions}
+					headerWidth={viewOptions.width}
+					selectedEvent={selectedEvent}
+					setSelectedEvent={setSelectedEvent}
+					setSelectedEventInfo={setSelectedEventInfo}
+					onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+					onBackgroundClick={onBackgroundClick}
+					styledEventsRef={styledEventsRef}
+					focusedEventId={focusedEventId}
+					onViableEventClicked={onViableEventClicked}
+				/>
+			</StyledCalendarContent>
+		</Container>
+	);
 };
 
 const Container = styled.div`
@@ -113,7 +110,11 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 
 	border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
 	background-color: ${({ theme }) => theme.colors.calendar.sidebarBg};
-	background-image: linear-gradient(to right, ${({ theme }) => theme.colors.calendar.grid} 33%, rgba(255, 255, 255, 0) 0%);
+	background-image: linear-gradient(
+		to right,
+		${({ theme }) => theme.colors.calendar.grid} 33%,
+		rgba(255, 255, 255, 0) 0%
+	);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;

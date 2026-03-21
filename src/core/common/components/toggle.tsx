@@ -9,7 +9,13 @@ interface ToggleProps {
 	containerStyle?: React.CSSProperties;
 }
 
-const Toggle: React.FC<ToggleProps> = ({ label, isOn, onChange, disabled = false, containerStyle }) => {
+const Toggle: React.FC<ToggleProps> = ({
+	label,
+	isOn,
+	onChange,
+	disabled = false,
+	containerStyle,
+}) => {
 	const handleClick = () => {
 		if (!disabled) {
 			onChange(!isOn);
@@ -76,7 +82,8 @@ const ToggleSwitch = styled.button<{ $isOn: boolean; $disabled?: boolean }>`
 const ToggleKnob = styled.div<{ $isOn: boolean }>`
 	width: 22px;
 	height: 22px;
-background-color: ${({ theme, $isOn }) => $isOn ? theme.colors.toggle.circleChecked : theme.colors.toggle.circle};
+	background-color: ${({ theme, $isOn }) =>
+		$isOn ? theme.colors.toggle.circleChecked : theme.colors.toggle.circle};
 	border-radius: 50%;
 	transition: margin-left 0.2s ease;
 	margin-left: ${({ $isOn }) => ($isOn ? '23px' : '3px')};

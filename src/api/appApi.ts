@@ -12,10 +12,7 @@ export class AppApi {
 		return this.defaultDomain + path;
 	}
 
-	async apiRequest<T>(
-		endpoint: string,
-		options?: RequestOptions
-	): Promise<T> {
+	async apiRequest<T>(endpoint: string, options?: RequestOptions): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
 		const { responseType, ...fetchOptions } = options || {};
 		const requestOptions: RequestInit = {
@@ -39,23 +36,30 @@ export class AppApi {
 						throw errorBody;
 					}
 					// Otherwise, throw a ServerError with the parsed body as details
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint, errorBody);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						errorBody
+					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
-					if (jsonError instanceof ServerError || (jsonError && typeof jsonError === 'object' && 'Error' in jsonError)) {
+					if (
+						jsonError instanceof ServerError ||
+						(jsonError && typeof jsonError === 'object' && 'Error' in jsonError)
+					) {
 						throw jsonError;
 					}
 					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
 				}
 			}
-			
+
 			// Handle text responses if specified
 			const responseTypeToUse = responseType || 'json';
 			if (responseTypeToUse === 'text') {
 				const text = await res.text();
 				return text as T;
 			}
-			
+
 			return (await res.json()) as T;
 		} catch (error) {
 			console.error(error, 'from api req');
@@ -68,10 +72,7 @@ export class AppApi {
 		}
 	}
 
-	async apiRequestFormData<T>(
-		endpoint: string,
-		options?: RequestInit
-	): Promise<T> {
+	async apiRequestFormData<T>(endpoint: string, options?: RequestInit): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
 
 		// Destructure to exclude headers from the spread
@@ -97,10 +98,17 @@ export class AppApi {
 						throw errorBody;
 					}
 					// Otherwise, throw a ServerError with the parsed body as details
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint, errorBody);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						errorBody
+					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
-					if (jsonError instanceof ServerError || (jsonError && typeof jsonError === 'object' && 'Error' in jsonError)) {
+					if (
+						jsonError instanceof ServerError ||
+						(jsonError && typeof jsonError === 'object' && 'Error' in jsonError)
+					) {
 						throw jsonError;
 					}
 					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);

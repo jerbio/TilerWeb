@@ -7,84 +7,84 @@ import { Env } from '@/config/config_getter';
  * Only active in development mode
  */
 function useDevTools() {
-  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-  const isDevMode = Env.isDevToolsEnabled();
+	const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+	const isDevMode = Env.isDevToolsEnabled();
 
-  useEffect(() => {
-    if (!isDevMode) return;
+	useEffect(() => {
+		if (!isDevMode) return;
 
-    let uPressed = false;
-    let timeoutId: number | null = null;
+		let uPressed = false;
+		let timeoutId: number | null = null;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Check for Ctrl+Shift modifier keys
-      if (!(event.ctrlKey || event.metaKey) || !event.shiftKey) {
-        return;
-      }
+		const handleKeyDown = (event: KeyboardEvent) => {
+			// Check for Ctrl+Shift modifier keys
+			if (!(event.ctrlKey || event.metaKey) || !event.shiftKey) {
+				return;
+			}
 
-      // Track U key press
-      if (event.key === 'U') {
-        event.preventDefault();
-        uPressed = true;
-        
-        // Reset after 2 seconds if F12 isn't pressed
-        if (timeoutId) window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(() => {
-          uPressed = false;
-        }, 2000);
-      }
-      
-      // Track F12 key press
-      if (event.key === 'F12') {
-        event.preventDefault();
-        
-        // If U was already pressed, toggle overlay
-        if (uPressed) {
-          setIsOverlayVisible((prev) => !prev);
-          // Reset state
-          uPressed = false;
-          if (timeoutId) window.clearTimeout(timeoutId);
-        }
-      }
-    };
+			// Track U key press
+			if (event.key === 'U') {
+				event.preventDefault();
+				uPressed = true;
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-      // Reset if modifier keys are released
-      if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
-        uPressed = false;
-        if (timeoutId) {
-          window.clearTimeout(timeoutId);
-          timeoutId = null;
-        }
-      }
-    };
+				// Reset after 2 seconds if F12 isn't pressed
+				if (timeoutId) window.clearTimeout(timeoutId);
+				timeoutId = window.setTimeout(() => {
+					uPressed = false;
+				}, 2000);
+			}
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+			// Track F12 key press
+			if (event.key === 'F12') {
+				event.preventDefault();
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      if (timeoutId) window.clearTimeout(timeoutId);
-    };
-  }, [isDevMode]);
+				// If U was already pressed, toggle overlay
+				if (uPressed) {
+					setIsOverlayVisible((prev) => !prev);
+					// Reset state
+					uPressed = false;
+					if (timeoutId) window.clearTimeout(timeoutId);
+				}
+			}
+		};
 
-  const toggleOverlay = () => {
-    if (isDevMode) {
-      setIsOverlayVisible((prev) => !prev);
-    }
-  };
+		const handleKeyUp = (event: KeyboardEvent) => {
+			// Reset if modifier keys are released
+			if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+				uPressed = false;
+				if (timeoutId) {
+					window.clearTimeout(timeoutId);
+					timeoutId = null;
+				}
+			}
+		};
 
-  const closeOverlay = () => {
-    setIsOverlayVisible(false);
-  };
+		window.addEventListener('keydown', handleKeyDown);
+		window.addEventListener('keyup', handleKeyUp);
 
-  return {
-    isOverlayVisible,
-    toggleOverlay,
-    closeOverlay,
-    isDevMode,
-  };
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('keyup', handleKeyUp);
+			if (timeoutId) window.clearTimeout(timeoutId);
+		};
+	}, [isDevMode]);
+
+	const toggleOverlay = () => {
+		if (isDevMode) {
+			setIsOverlayVisible((prev) => !prev);
+		}
+	};
+
+	const closeOverlay = () => {
+		setIsOverlayVisible(false);
+	};
+
+	return {
+		isOverlayVisible,
+		toggleOverlay,
+		closeOverlay,
+		isDevMode,
+	};
 }
 
 export default useDevTools;

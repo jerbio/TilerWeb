@@ -103,12 +103,16 @@ const NotificationPreferencesSettings: React.FC = () => {
 					{t('settings.breadcrumb.settings')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>
-				<BreadcrumbCurrent>{t('settings.sections.notificationPreferences.title')}</BreadcrumbCurrent>
+				<BreadcrumbCurrent>
+					{t('settings.sections.notificationPreferences.title')}
+				</BreadcrumbCurrent>
 			</Breadcrumb>
 
 			<Header>
 				<Title>{t('settings.sections.notificationPreferences.title')}</Title>
-				<Description>{t('settings.sections.notificationPreferences.description')}</Description>
+				<Description>
+					{t('settings.sections.notificationPreferences.description')}
+				</Description>
 			</Header>
 
 			<Section>
@@ -133,7 +137,11 @@ const NotificationPreferencesSettings: React.FC = () => {
 			</Section>
 
 			<SaveButtonContainer>
-				<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving || isLoading}>
+				<Button
+					variant="brand"
+					onClick={handleSaveChanges}
+					disabled={isSaving || isLoading}
+				>
 					{isSaving
 						? t('settings.sections.notificationPreferences.saving')
 						: t('settings.sections.notificationPreferences.saveChanges')}

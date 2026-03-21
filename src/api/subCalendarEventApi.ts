@@ -31,12 +31,9 @@ export class SubCalendarEventApi extends AppApi {
 	 * `POST /api/SubCalendarEvent`
 	 */
 	public updateSubCalendarEvent(payload: UpdateSubCalendarEventPayload) {
-		return this.apiRequest<SubCalendarEventLookupResponse>(
-			'api/SubCalendarEvent',
-			{
-				method: 'POST',
-				body: JSON.stringify(payload),
-			}
-		);
+		return this.apiRequest<SubCalendarEventLookupResponse>('api/SubCalendarEvent', {
+			method: 'POST',
+			body: JSON.stringify(payload),
+		});
 	}
 }

@@ -2,10 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
 import CalendarUtil from './calendar';
 import { CalendarViewOptions } from '@/core/common/components/calendar/calendar.types';
-import {
-	ScheduleSubCalendarEvent,
-	ScheduleLookupTravelDetail,
-} from '@/core/common/types/schedule';
+import { ScheduleSubCalendarEvent, ScheduleLookupTravelDetail } from '@/core/common/types/schedule';
 
 // Mock calendar config
 vi.mock('@/core/constants/calendar_config', () => ({

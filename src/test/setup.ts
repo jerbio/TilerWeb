@@ -3,6 +3,9 @@ import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { server } from './mocks/server';
 
+// Mock scrollIntoView since jsdom doesn't implement it
+Element.prototype.scrollIntoView = vi.fn();
+
 // Start MSW server before all tests
 beforeAll(() => {
 	server.listen({ onUnhandledRequest: 'warn' });
