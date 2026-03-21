@@ -35,7 +35,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const isDisabled = disabled || readOnly;
-	const [copiedTimes, setCopiedTimes] = useState<{ startTime: string; endTime: string; dayIndex: number } | null>(null);
+	const [copiedTimes, setCopiedTimes] = useState<{
+		startTime: string;
+		endTime: string;
+		dayIndex: number;
+	} | null>(null);
 
 	const handleCopy = (dayIndex: number, startTime: string, endTime: string) => {
 		setCopiedTimes({ startTime, endTime, dayIndex });
@@ -70,11 +74,14 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 							onClick={handleCircleClick}
 							data-testid={`day-circle-${index}`}
 						>
-							<DayLabel data-testid={`day-label-${index}`} $size={size} $selected={isSelected}>
+							<DayLabel
+								data-testid={`day-label-${index}`}
+								$size={size}
+								$selected={isSelected}
+							>
 								{label}
 							</DayLabel>
 						</DayCircle>
-
 						<TimeRow $size={size}>
 							<TimeDropdown
 								value={day.startTime}
@@ -84,7 +91,6 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 								disabled={isDisabled}
 							/>
 						</TimeRow>
-
 						<TimeRow $size={size}>
 							<TimeDropdown
 								value={day.endTime}
@@ -94,34 +100,37 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 								disabled={isDisabled}
 							/>
 						</TimeRow>
-					{!isDisabled && (
-						<CopyPasteAction $size={size}>
-							{copiedTimes ? (
-								copiedTimes.dayIndex === index ? (
+						{!isDisabled && (
+							<CopyPasteAction $size={size}>
+								{copiedTimes ? (
+									copiedTimes.dayIndex === index ? (
+										<IconButton
+											$size={size}
+											$active
+											onClick={() => setCopiedTimes(null)}
+											data-testid={`copy-active-${index}`}
+											title={t(
+												'settings.sections.tilePreferences.cancelCopy'
+											)}
+										>
+											<CheckIcon $size={size} />
+										</IconButton>
+									) : (
+										<IconButton
+											$size={size}
+											onClick={() => handlePaste(index)}
+											data-testid={`paste-btn-${index}`}
+											title={t('settings.sections.tilePreferences.paste')}
+										>
+											<PasteIcon $size={size} />
+										</IconButton>
+									)
+								) : day.startTime && day.endTime ? (
 									<IconButton
 										$size={size}
-										$active
-										onClick={() => setCopiedTimes(null)}
-										data-testid={`copy-active-${index}`}
-										title={t('settings.sections.tilePreferences.cancelCopy')}
-									>
-										<CheckIcon $size={size} />
-									</IconButton>
-								) : (
-									<IconButton
-										$size={size}
-										onClick={() => handlePaste(index)}
-										data-testid={`paste-btn-${index}`}
-										title={t('settings.sections.tilePreferences.paste')}
-									>
-										<PasteIcon $size={size} />
-									</IconButton>
-								)
-							) : (
-								day.startTime && day.endTime ? (
-									<IconButton
-										$size={size}
-										onClick={() => handleCopy(index, day.startTime, day.endTime)}
+										onClick={() =>
+											handleCopy(index, day.startTime, day.endTime)
+										}
 										data-testid={`copy-btn-${index}`}
 										title={t('settings.sections.tilePreferences.copyTimes')}
 									>
@@ -129,10 +138,10 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 									</IconButton>
 								) : (
 									<IconPlaceholder $size={size} />
-								)
-							)}
-						</CopyPasteAction>
-					)}					</DayColumn>
+								)}
+							</CopyPasteAction>
+						)}{' '}
+					</DayColumn>
 				);
 			})}
 		</Container>
@@ -142,16 +151,36 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 // ── Size config ────────────────────────────────────────────────
 
 const sizeConfig = {
-	[WeeklyScheduleSize.Sm]: { circle: 28, font: 'xxs' as const, gap: '0.25rem', timeFont: 'xxs' as const },
-	[WeeklyScheduleSize.Md]: { circle: 40, font: 'sm' as const, gap: '0.5rem', timeFont: 'xs' as const },
-	[WeeklyScheduleSize.Lg]: { circle: 56, font: 'lg' as const, gap: '0.75rem', timeFont: 'sm' as const },
+	[WeeklyScheduleSize.Sm]: {
+		circle: 28,
+		font: 'xxs' as const,
+		gap: '0.25rem',
+		timeFont: 'xxs' as const,
+	},
+	[WeeklyScheduleSize.Md]: {
+		circle: 40,
+		font: 'sm' as const,
+		gap: '0.5rem',
+		timeFont: 'xs' as const,
+	},
+	[WeeklyScheduleSize.Lg]: {
+		circle: 56,
+		font: 'lg' as const,
+		gap: '0.75rem',
+		timeFont: 'sm' as const,
+	},
 };
 
 // ── Styled Components ──────────────────────────────────────────
 
 const Container = styled.div<{ $size: WeeklyScheduleSize }>`
 	display: flex;
-	gap: ${({ $size }) => ($size === WeeklyScheduleSize.Sm ? '0.25rem' : $size === WeeklyScheduleSize.Lg ? '1.5rem' : '0.75rem')};
+	gap: ${({ $size }) =>
+		$size === WeeklyScheduleSize.Sm
+			? '0.25rem'
+			: $size === WeeklyScheduleSize.Lg
+				? '1.5rem'
+				: '0.75rem'};
 	align-items: flex-start;
 	${({ $size }) => $size === WeeklyScheduleSize.Sm && 'width: 100%;'}
 `;
@@ -164,7 +193,11 @@ const DayColumn = styled.div<{ $size: WeeklyScheduleSize }>`
 	${({ $size }) => $size === WeeklyScheduleSize.Sm && 'flex: 1; min-width: 0;'}
 `;
 
-const DayCircle = styled.div<{ $size: WeeklyScheduleSize; $selected: boolean; $clickable: boolean }>`
+const DayCircle = styled.div<{
+	$size: WeeklyScheduleSize;
+	$selected: boolean;
+	$clickable: boolean;
+}>`
 	${({ $size, $selected, $clickable, theme }) => {
 		const sz = sizeConfig[$size].circle;
 		return css`
@@ -176,12 +209,17 @@ const DayCircle = styled.div<{ $size: WeeklyScheduleSize; $selected: boolean; $c
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			transition: background 0.15s ease, border-color 0.15s ease;
-			${$clickable && css`
+			transition:
+				background 0.15s ease,
+				border-color 0.15s ease;
+			${$clickable &&
+			css`
 				cursor: pointer;
 				&:hover {
 					border-color: ${theme.colors.brand[400]};
-					background: ${$selected ? theme.colors.brand[600] : theme.colors.brand[500] + '1a'};
+					background: ${$selected
+						? theme.colors.brand[600]
+						: theme.colors.brand[500] + '1a'};
 				}
 			`}
 		`;
@@ -191,7 +229,7 @@ const DayCircle = styled.div<{ $size: WeeklyScheduleSize; $selected: boolean; $c
 const DayLabel = styled.span<{ $size: WeeklyScheduleSize; $selected: boolean }>`
 	font-size: ${({ $size, theme }) => theme.typography.fontSize[sizeConfig[$size].font]};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-	color: ${({ $selected, theme }) => $selected ? '#fff' : theme.colors.text.primary};
+	color: ${({ $selected, theme }) => ($selected ? '#fff' : theme.colors.text.primary)};
 	user-select: none;
 `;
 
@@ -206,12 +244,13 @@ const TimeRow = styled.div<{ $size: WeeklyScheduleSize }>`
 			$size === WeeklyScheduleSize.Sm
 				? '0.15rem 0.75rem 0.15rem 0.1rem'
 				: $size === WeeklyScheduleSize.Lg
-				? '0.5rem 2.5rem 0.5rem 1rem'
-				: '0.35rem 2rem 0.35rem 0.75rem'};
+					? '0.5rem 2.5rem 0.5rem 1rem'
+					: '0.35rem 2rem 0.35rem 0.75rem'};
 		font-size: ${({ $size, theme }) => theme.typography.fontSize[sizeConfig[$size].timeFont]};
-		${({ $size }) => $size === WeeklyScheduleSize.Sm
-			? 'width: 100%; min-width: 0; background-position: right 0.15rem center; background-size: 8px 8px; overflow: hidden; text-overflow: ellipsis;'
-			: `min-width: ${$size === WeeklyScheduleSize.Lg ? '120px' : '90px'};`}
+		${({ $size }) =>
+			$size === WeeklyScheduleSize.Sm
+				? 'width: 100%; min-width: 0; background-position: right 0.15rem center; background-size: 8px 8px; overflow: hidden; text-overflow: ellipsis;'
+				: `min-width: ${$size === WeeklyScheduleSize.Lg ? '120px' : '90px'};`}
 	}
 `;
 
@@ -238,9 +277,12 @@ const IconButton = styled.button<{ $size: WeeklyScheduleSize; $active?: boolean 
 	align-items: center;
 	justify-content: center;
 	border-radius: 4px;
-	color: ${({ $active, theme }) => $active ? theme.colors.brand[500] : theme.colors.text.secondary};
+	color: ${({ $active, theme }) =>
+		$active ? theme.colors.brand[500] : theme.colors.text.secondary};
 	opacity: 0.7;
-	transition: opacity 0.15s ease, color 0.15s ease;
+	transition:
+		opacity 0.15s ease,
+		color 0.15s ease;
 
 	&:hover {
 		opacity: 1;
@@ -256,7 +298,16 @@ const IconPlaceholder = styled.div<{ $size: WeeklyScheduleSize }>`
 const CopyIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
 	const s = iconSizeMap[$size];
 	return (
-		<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+		<svg
+			width={s}
+			height={s}
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
 			<rect x="9" y="9" width="13" height="13" rx="2" />
 			<path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
 		</svg>
@@ -266,7 +317,16 @@ const CopyIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
 const PasteIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
 	const s = iconSizeMap[$size];
 	return (
-		<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+		<svg
+			width={s}
+			height={s}
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
 			<path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
 			<rect x="8" y="2" width="8" height="4" rx="1" />
 		</svg>
@@ -276,7 +336,16 @@ const PasteIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
 const CheckIcon: React.FC<{ $size: WeeklyScheduleSize }> = ({ $size }) => {
 	const s = iconSizeMap[$size];
 	return (
-		<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+		<svg
+			width={s}
+			height={s}
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
 			<polyline points="20 6 9 17 4 12" />
 		</svg>
 	);

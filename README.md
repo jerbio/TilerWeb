@@ -16,22 +16,22 @@ A smart calendar and task management web application that helps users schedule t
 
 ## Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| Framework | React 18 + TypeScript |
-| Build Tool | Vite 6 |
-| Styling | styled-components |
-| State Management | Zustand |
-| Routing | React Router 7 |
-| Real-time | SignalR |
-| i18n | i18next |
-| Testing | Vitest + React Testing Library + MSW |
+| Category         | Technology                           |
+| ---------------- | ------------------------------------ |
+| Framework        | React 18 + TypeScript                |
+| Build Tool       | Vite 6                               |
+| Styling          | styled-components                    |
+| State Management | Zustand                              |
+| Routing          | React Router 7                       |
+| Real-time        | SignalR                              |
+| i18n             | i18next                              |
+| Testing          | Vitest + React Testing Library + MSW |
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
@@ -56,12 +56,12 @@ VITE_ANALYTICS_PROVIDER=console
 VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_BASE_URL` | Backend API base URL | Yes |
-| `VITE_NODE_ENV` | `development` or `production` | Yes |
-| `VITE_ANALYTICS_PROVIDER` | `google`, `mixpanel`, `custom`, or `console` | No |
-| `VITE_GA_MEASUREMENT_ID` | Google Analytics measurement ID | No |
+| Variable                  | Description                                  | Required |
+| ------------------------- | -------------------------------------------- | -------- |
+| `VITE_BASE_URL`           | Backend API base URL                         | Yes      |
+| `VITE_NODE_ENV`           | `development` or `production`                | Yes      |
+| `VITE_ANALYTICS_PROVIDER` | `google`, `mixpanel`, `custom`, or `console` | No       |
+| `VITE_GA_MEASUREMENT_ID`  | Google Analytics measurement ID              | No       |
 
 ### Running the App
 
@@ -78,16 +78,16 @@ npm run preview
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server with HMR |
-| `npm run build` | TypeScript compile + production build |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
-| `npm run test` | Run tests in watch mode |
-| `npm run test:run` | Run tests once |
-| `npm run test:coverage` | Run tests with coverage report |
+| Script                  | Description                           |
+| ----------------------- | ------------------------------------- |
+| `npm run dev`           | Start development server with HMR     |
+| `npm run build`         | TypeScript compile + production build |
+| `npm run preview`       | Preview production build locally      |
+| `npm run lint`          | Run ESLint                            |
+| `npm run format`        | Format code with Prettier             |
+| `npm run test`          | Run tests in watch mode               |
+| `npm run test:run`      | Run tests once                        |
+| `npm run test:coverage` | Run tests with coverage report        |
 
 ## Project Structure
 
@@ -145,4 +145,3 @@ Tests use **Vitest** with **jsdom** environment and **MSW** for API mocking.
 ## License
 
 Proprietary - All rights reserved.
-

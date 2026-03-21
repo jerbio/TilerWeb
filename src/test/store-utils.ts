@@ -1,10 +1,5 @@
 import { create } from 'zustand';
-import {
-	ChatContextType,
-	PersonaSession,
-	SessionType,
-	UserInfo,
-} from '@/global_state';
+import { ChatContextType, PersonaSession, SessionType, UserInfo } from '@/global_state';
 
 // Minimal AppState interface for testing
 interface TestAppState {
@@ -40,7 +35,24 @@ interface TestAppState {
 }
 
 // Default test state
-const defaultTestState: Omit<TestAppState, 'setActivePersonaSession' | 'updateActivePersonaSession' | 'getActivePersonaSession' | 'addChatContext' | 'removeChatContext' | 'clearChatContext' | 'setScheduleId' | 'setScheduleLastUpdatedBy' | 'setUserInfo' | 'setChatSessionId' | 'setDevUserIdOverride' | 'switchSessionType' | 'checkAuth' | 'logout' | 'setAuthenticated'> = {
+const defaultTestState: Omit<
+	TestAppState,
+	| 'setActivePersonaSession'
+	| 'updateActivePersonaSession'
+	| 'getActivePersonaSession'
+	| 'addChatContext'
+	| 'removeChatContext'
+	| 'clearChatContext'
+	| 'setScheduleId'
+	| 'setScheduleLastUpdatedBy'
+	| 'setUserInfo'
+	| 'setChatSessionId'
+	| 'setDevUserIdOverride'
+	| 'switchSessionType'
+	| 'checkAuth'
+	| 'logout'
+	| 'setAuthenticated'
+> = {
 	authenticatedPersonaSession: null,
 	anonymousPersonaSession: null,
 	activeSessionType: SessionType.ANONYMOUS,

@@ -15,7 +15,10 @@ interface ProcrastinateAllButtonProps {
 	onLoadingChange?: (loading: boolean) => void;
 }
 
-const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disabled, onLoadingChange }) => {
+const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({
+	disabled,
+	onLoadingChange,
+}) => {
 	const { t } = useTranslation();
 	const [isLoading, setIsLoading] = useState(false);
 	const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -60,7 +63,10 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 		setIsLoading(true);
 		onLoadingChange?.(true);
 
-		const nId = notificationId(NotificationAction.ProcrastinateAll, PROCRASTINATE_ALL_NOTIFICATION_ID);
+		const nId = notificationId(
+			NotificationAction.ProcrastinateAll,
+			PROCRASTINATE_ALL_NOTIFICATION_ID
+		);
 		showNotification(nId, t('timeline.procrastinateAll.deferring'), 'loading');
 
 		try {
@@ -95,7 +101,17 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 			setHours(0);
 			setMinutes(0);
 		}
-	}, [isLoading, days, hours, minutes, getActivePersonaSession, showNotification, updateNotification, onLoadingChange, t]);
+	}, [
+		isLoading,
+		days,
+		hours,
+		minutes,
+		getActivePersonaSession,
+		showNotification,
+		updateNotification,
+		onLoadingChange,
+		t,
+	]);
 
 	return (
 		<Container ref={containerRef}>
@@ -105,8 +121,20 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 				aria-label={t('timeline.procrastinateAll.ariaLabel')}
 				title={t('timeline.procrastinateAll.tooltip')}
 			>
-				<svg width="20" height="20" viewBox="8 9 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M11.9165 15.5V20.5M15.2498 15.5H17.7498V12.1667L23.5832 18L17.7498 23.8333V20.5H15.2498V15.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+				<svg
+					width="20"
+					height="20"
+					viewBox="8 9 20 18"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M11.9165 15.5V20.5M15.2498 15.5H17.7498V12.1667L23.5832 18L17.7498 23.8333V20.5H15.2498V15.5Z"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
 				</svg>
 			</ProcrastinateAllIconButton>
 
@@ -131,7 +159,9 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 							min={0}
 							max={23}
 							value={hours}
-							onChange={(e) => setHours(Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))}
+							onChange={(e) =>
+								setHours(Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))
+							}
 							aria-label={t('timeline.procrastinateAll.hours')}
 						/>
 						<UnitLabel>{t('timeline.procrastinateAll.hoursShort')}</UnitLabel>
@@ -143,15 +173,24 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({ disable
 							min={0}
 							max={59}
 							value={minutes}
-							onChange={(e) => setMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+							onChange={(e) =>
+								setMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))
+							}
 							aria-label={t('timeline.procrastinateAll.minutes')}
 						/>
 						<UnitLabel>{t('timeline.procrastinateAll.minutesShort')}</UnitLabel>
 					</DurationField>
-					<OverlayIconButton onClick={handleConfirm} disabled={isDurationZero} aria-label={t('timeline.procrastinateAll.confirm')}>
+					<OverlayIconButton
+						onClick={handleConfirm}
+						disabled={isDurationZero}
+						aria-label={t('timeline.procrastinateAll.confirm')}
+					>
 						<Check size={16} />
 					</OverlayIconButton>
-					<OverlayIconButton onClick={handleCancel} aria-label={t('timeline.procrastinateAll.cancel')}>
+					<OverlayIconButton
+						onClick={handleCancel}
+						aria-label={t('timeline.procrastinateAll.cancel')}
+					>
 						<X size={16} />
 					</OverlayIconButton>
 				</Overlay>

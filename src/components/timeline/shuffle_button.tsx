@@ -57,7 +57,14 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 			setIsLoading(false);
 			onLoadingChange?.(false);
 		}
-	}, [isLoading, getActivePersonaSession, showNotification, updateNotification, onLoadingChange, t]);
+	}, [
+		isLoading,
+		getActivePersonaSession,
+		showNotification,
+		updateNotification,
+		onLoadingChange,
+		t,
+	]);
 
 	return (
 		<ShuffleIconButton

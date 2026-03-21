@@ -3,41 +3,42 @@ import { useTranslation } from 'react-i18next';
 import SEO from '@/core/common/components/SEO';
 import Section from '../components/layout/section';
 import {
-  PageWrapper,
-  Hero,
-  Badge,
-  HeroTitle,
-  HeroSubtitle,
-  BackgroundBlur,
+	PageWrapper,
+	Hero,
+	Badge,
+	HeroTitle,
+	HeroSubtitle,
+	BackgroundBlur,
 } from '../components/discover/shared';
 import WhatIsTilerSection from '../components/discover/WhatIsTilerSection';
 import FeaturesSection from '../components/discover/FeaturesSection';
 
 const Newsletter: React.FC = () => {
-  const { t } = useTranslation();
+	const { t } = useTranslation();
 
-  return (
-    <>
-      <SEO
-        title={t('discover.seo.title')}
-        description={t('discover.seo.description')}
-        canonicalUrl="/newsletter"
-      />
-      <Section>
-        <BackgroundBlur />
-        <PageWrapper>
-          <Hero>
-            <Badge>{t('discover.hero.badge')}</Badge>
-            <HeroTitle>{t('discover.hero.title')}</HeroTitle>
-            <HeroSubtitle>{t('discover.hero.subtitle')}</HeroSubtitle>
-          </Hero>
+	return (
+		<>
+			<SEO
+				title={t('discover.seo.title')}
+				description={t('discover.seo.description')}
+				canonicalUrl="/newsletter"
+			/>
+			<Section>
+				<BackgroundBlur />
+				<PageWrapper>
+					<Hero>
+						<Badge>{t('discover.hero.badge')}</Badge>
+						<HeroTitle>{t('discover.hero.title')}</HeroTitle>
+						<HeroSubtitle>{t('discover.hero.subtitle')}</HeroSubtitle>
+					</Hero>
 
-          <WhatIsTilerSection />
-          <FeaturesSection />
-        </PageWrapper>
-      </Section>
-    </>
-  );
+					<WhatIsTilerSection />
+					<FeaturesSection />
+				</PageWrapper>
+			</Section>
+		</>
+	);
+
 };
 
 export default Newsletter;

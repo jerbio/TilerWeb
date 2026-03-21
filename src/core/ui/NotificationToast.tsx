@@ -34,7 +34,7 @@ const NotificationToast: React.FC = () => {
 			}, ms);
 			timersRef.current.set(id, timer);
 		},
-		[dismiss],
+		[dismiss]
 	);
 
 	useEffect(() => {
@@ -126,8 +126,16 @@ const ToastContainer = styled.div`
 `;
 
 const typeColors: Record<NotificationType, { bg: string; border: string; icon: string }> = {
-	loading: { bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.25)', icon: '#3b82f6' },
-	success: { bg: 'rgba(18, 183, 106, 0.08)', border: 'rgba(18, 183, 106, 0.25)', icon: '#12b76a' },
+	loading: {
+		bg: 'rgba(59, 130, 246, 0.08)',
+		border: 'rgba(59, 130, 246, 0.25)',
+		icon: '#3b82f6',
+	},
+	success: {
+		bg: 'rgba(18, 183, 106, 0.08)',
+		border: 'rgba(18, 183, 106, 0.25)',
+		icon: '#12b76a',
+	},
 	error: { bg: 'rgba(220, 38, 38, 0.08)', border: 'rgba(220, 38, 38, 0.25)', icon: '#dc2626' },
 	info: { bg: 'rgba(107, 114, 128, 0.08)', border: 'rgba(107, 114, 128, 0.25)', icon: '#6b7280' },
 };

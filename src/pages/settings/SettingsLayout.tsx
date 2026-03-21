@@ -56,7 +56,7 @@ const SettingsLayout: React.FC = () => {
 			{!isDetailPage ? (
 				<Content>
 					<Breadcrumb>
-					<BreadcrumbLink onClick={() => navigate('home')}>
+						<BreadcrumbLink onClick={() => navigate('home')}>
 							{t('settings.breadcrumb.home')}
 						</BreadcrumbLink>
 						<BreadcrumbSeparator>/</BreadcrumbSeparator>
@@ -70,7 +70,9 @@ const SettingsLayout: React.FC = () => {
 							<SettingsItem key={section.path} onClick={() => navigate(section.path)}>
 								<SettingsItemContent>
 									<SettingsItemTitle>{section.title}</SettingsItemTitle>
-									<SettingsItemDescription>{section.description}</SettingsItemDescription>
+									<SettingsItemDescription>
+										{section.description}
+									</SettingsItemDescription>
 								</SettingsItemContent>
 								<ChevronRight size={20} color={theme.colors.text.secondary} />
 							</SettingsItem>
