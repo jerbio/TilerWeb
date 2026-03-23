@@ -1,6 +1,7 @@
 import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
+import { LocationApi } from '@/api/locationApi';
 import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
 import {
 	ScheduleCreateEventParams,
@@ -8,6 +9,7 @@ import {
 	ScheduleProcrastinateAllParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
+	CalendarEventUpdateParams,
 } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
@@ -21,15 +23,18 @@ class ScheduleService {
 	private scheduleApi: ScheduleApi;
 	private subCalendarEventApi: SubCalendarEventApi;
 	private calendarEventApi: CalendarEventApi;
+	private locationApi: LocationApi;
 
 	constructor(
 		scheduleApi: ScheduleApi,
 		subCalendarEventApi: SubCalendarEventApi,
-		calendarEventApi: CalendarEventApi
+		calendarEventApi: CalendarEventApi,
+		locationApi: LocationApi
 	) {
 		this.scheduleApi = scheduleApi;
 		this.subCalendarEventApi = subCalendarEventApi;
 		this.calendarEventApi = calendarEventApi;
+		this.locationApi = locationApi;
 	}
 
 	async createEvent(params: ScheduleCreateEventParams) {
@@ -214,6 +219,20 @@ class ScheduleService {
 	}
 
 	/**
+	 * Update a calendar event.
+	 * `POST /api/CalendarEvent/Update`
+	 */
+	async updateCalendarEvent(params: CalendarEventUpdateParams) {
+		try {
+			const response = await this.calendarEventApi.updateCalendarEvent(params);
+			return response.Content;
+		} catch (error) {
+			console.error('Error updating calendar event', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
 	 * Shuffle the user's schedule.
 	 * Calls `POST /api/Schedule/Shuffle` and returns the updated schedule.
 	 */
@@ -251,6 +270,33 @@ class ScheduleService {
 			return response.Content;
 		} catch (error) {
 			console.error('Error procrastinating all schedule events', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Search locations by name, including Google Maps results.
+	 */
+	async searchLocations(query: string) {
+		try {
+			const response = await this.locationApi.searchByName(query);
+			return response.Content;
+		} catch (error) {
+			console.error('Error searching locations', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Fetch a location by its ID.
+	 * `GET /api/Location?id=...&IdSearch.mobileApp=true`
+	 */
+	async lookupLocationById(locationId: string) {
+		try {
+			const response = await this.locationApi.getLocation(locationId);
+			return response.Content;
+		} catch (error) {
+			console.error('Error fetching location by ID', error);
 			throw normalizeError(error);
 		}
 	}

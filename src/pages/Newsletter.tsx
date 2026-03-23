@@ -10,6 +10,7 @@ import {
 	HeroSubtitle,
 	BackgroundBlur,
 } from '../components/discover/shared';
+import HowToUseTilerSection from '../components/discover/HowToUseTilerSection';
 import FeaturesSection from '../components/discover/FeaturesSection';
 
 const Newsletter: React.FC = () => {
@@ -31,11 +32,13 @@ const Newsletter: React.FC = () => {
 						<HeroSubtitle>{t('discover.hero.subtitle')}</HeroSubtitle>
 					</Hero>
 
+					<HowToUseTilerSection />
 					<FeaturesSection />
 				</PageWrapper>
 			</Section>
 		</>
 	);
+
 };
 
 export default Newsletter;
