@@ -574,6 +574,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           return;
         }
 
+        setIsLoading(false);
         await fetchActionsForMessages(rawMessages);
         const hydratedMessages = mapMessagesWithActions(rawMessages);
         const sortedMessages = sortMessagesChronologically(hydratedMessages);
