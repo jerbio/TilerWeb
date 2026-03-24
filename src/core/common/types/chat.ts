@@ -71,6 +71,10 @@ export type ChatMessagesResponse = ApiResponse<{
 	chats: PromptWithActions[];
 }>;
 
+export interface ChatMessagesParams extends PaginationParams {
+  anonymousUserId?: string;
+}
+
 export type ChatMessageBody = {
 	EntityId: string;
 	SessionId?: string;

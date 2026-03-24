@@ -205,6 +205,38 @@ export function createCalendarRequestHandler(
 			focusOnStyledEvent(styledEvent, deps);
 			onResult?.({ status: CalendarRequestStatus.Found, entityId });
 		}
+
+		if (request.type === CalendarRequestType.NavigateToDate) {
+			const targetDay = dayjs(request.date).startOf('day');
+			deps.setShowNonViableEvents(null);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setViewOptions((prev) => ({
+				...prev,
+				startDay: targetDay,
+			}));
+		}
+
+		if (request.type === CalendarRequestType.GoToToday) {
+			deps.setShowNonViableEvents(null);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setViewOptions((prev) => ({
+				...prev,
+				startDay: dayjs().startOf('day'),
+			}));
+		}
+
+		if (request.type === CalendarRequestType.NavigateWeek) {
+			const offset = request.direction === 'back' ? -7 : 7;
+			deps.setShowNonViableEvents(null);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setViewOptions((prev) => ({
+				...prev,
+				startDay: prev.startDay.add(offset, 'day'),
+			}));
+		}
 	};
 }
 

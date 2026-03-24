@@ -1,5 +1,5 @@
 import useFormHandler from '@/hooks/useFormHandler';
-import { Calendar, Keyboard, X } from 'lucide-react';
+import { Keyboard, X } from 'lucide-react';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../../button';
@@ -21,7 +21,6 @@ import {
 	ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
 import { toast } from 'sonner';
-import DatePicker from '../../date_picker';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import {
 	CalendarEntityType,
@@ -31,8 +30,10 @@ import {
 } from '../calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
 import { useCalendarUI } from '../calendar-ui.provider';
-import Summary from './summary';
-import Options from './options';
+import CreateTileSummary from './summary';
+import CreateTileOptions from './options';
+import CreateTileInfoInline from './info_inline';
+import CreateTileInfo from './info';
 
 dayjs.extend(advancedFormat);
 
@@ -66,10 +67,10 @@ type CalendarCreateTileProps = {
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
-	const ui = useCalendarUI((state) => state.createTile);
-	const { formData, handleFormInputChange, resetForm } = formHandler;
-	const theme = useStyledTheme();
-	const { t } = useTranslation();
+  const ui = useCalendarUI((state) => state.createTile);
+  const { formData, resetForm } = formHandler;
+  const theme = useStyledTheme();
+  const { t } = useTranslation();
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.action.trim().length === 0) return false;
@@ -85,55 +86,66 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		ui.actions.collapse();
 	}
 
-	const submitForm = useCallback(async () => {
-		if (!isValidSubmission) return;
-		ui.actions.startLoading(formData.action);
-		try {
-			const event: ScheduleCreateEventParams = {
-				Name: formData.action,
-				RColor: formData.color.r.toString(),
-				GColor: formData.color.g.toString(),
-				BColor: formData.color.b.toString(),
-				LocationAddress: formData.location,
-				DurationDays: '0',
-				DurationHours: formData.durationHours.toString(),
-				DurationMinute: formData.durationMins.toString(),
-				EndYear: dayjs(formData.deadline).format('YYYY'),
-				EndMonth: dayjs(formData.deadline).format('MM'),
-				EndDay: dayjs(formData.deadline).format('DD'),
-				EndHour: '23',
-				EndMinute: '59',
-				isRestricted: 'false',
-				MobileApp: true,
-			};
+  const submitForm = useCallback(async () => {
+    if (!isValidSubmission) return;
+    ui.actions.startLoading(formData.action);
+    try {
+      const event: ScheduleCreateEventParams = {
+        Name: formData.action,
+        RColor: formData.color.r.toString(),
+        GColor: formData.color.g.toString(),
+        BColor: formData.color.b.toString(),
+        LocationAddress: formData.location,
+        DurationDays: '0',
+        DurationHours: formData.durationHours.toString(),
+        DurationMinute: formData.durationMins.toString(),
+        isRestricted: 'false',
+        MobileApp: true,
+      };
 
-			// Repetition
-			if (formData.isRecurring) {
-				event.RepeatType = formData.recurrenceType;
-				event.RepeatFrequency = formData.recurrenceFrequency;
-				if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
-					if (formData.recurrenceWeeklyDays.length === 0) {
-						event.RepeatWeeklyData = '1';
-					}
-					event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
-						','
-					) as ScheduleRepeatWeeklyData;
-				}
-				if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
-					event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
-					event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
-					event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
-				}
-				if (formData.recurrenceStartType === ScheduleRepeatStartType.Default) {
-					event.RepeatStartDay = dayjs(formData.start).format('DD');
-					event.RepeatStartMonth = dayjs(formData.start).format('MM');
-					event.RepeatStartYear = dayjs(formData.start).format('YYYY');
-				} else if (formData.recurrenceStartType === ScheduleRepeatStartType.On) {
-					event.RepeatStartDay = dayjs(formData.recurrenceStartDate).format('DD');
-					event.RepeatStartMonth = dayjs(formData.recurrenceStartDate).format('MM');
-					event.RepeatStartYear = dayjs(formData.recurrenceStartDate).format('YYYY');
-				}
+			// Time Ranges
+			if (!formData.isRecurring) {
+				const windowStart = formData.start.startOf('day');
+				const windowEnd = formData.deadline.endOf('day');
+        event.StartYear = dayjs(windowStart).format('YYYY');
+        event.StartMonth = dayjs(windowStart).format('MM');
+        event.StartDay = dayjs(windowStart).format('DD');
+        event.StartHour = dayjs(windowStart).format('HH');
+        event.StartMinute = dayjs(windowStart).format('mm');
+        event.EndYear = dayjs(windowEnd).format('YYYY');
+        event.EndMonth = dayjs(windowEnd).format('MM');
+        event.EndDay = dayjs(windowEnd).format('DD');
+        event.EndHour = dayjs(windowEnd).format('HH');
+        event.EndMinute = dayjs(windowEnd).format('mm');
 			}
+
+      // Repetition
+      if (formData.isRecurring) {
+        event.RepeatType = formData.recurrenceType;
+        event.RepeatFrequency = formData.recurrenceFrequency;
+        if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
+          if (formData.recurrenceWeeklyDays.length === 0) {
+            event.RepeatWeeklyData = '1';
+          }
+          event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
+            ','
+          ) as ScheduleRepeatWeeklyData;
+        }
+        if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
+          event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
+          event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
+          event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
+        }
+        if (formData.recurrenceStartType === ScheduleRepeatStartType.Default) {
+          event.RepeatStartDay = dayjs(formData.start).format('DD');
+          event.RepeatStartMonth = dayjs(formData.start).format('MM');
+          event.RepeatStartYear = dayjs(formData.start).format('YYYY');
+        } else if (formData.recurrenceStartType === ScheduleRepeatStartType.On) {
+          event.RepeatStartDay = dayjs(formData.recurrenceStartDate).format('DD');
+          event.RepeatStartMonth = dayjs(formData.recurrenceStartDate).format('MM');
+          event.RepeatStartYear = dayjs(formData.recurrenceStartDate).format('YYYY');
+        }
+      }
 
 			const newEvent = await scheduleService.createEvent(event);
 			await refetchEvents();
@@ -193,133 +205,69 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		};
 	}, [ui.state.isOpen, submitForm]);
 
-	return (
-		<StyledCalendarCreateEvent
-			onSubmit={(e) => {
-				e.preventDefault();
-				submitForm();
-			}}
-			$isexpanded={ui.state.isExpanded}
-		>
-			<button
-				style={{ display: 'none' }}
-				data-testid="open-create-tile"
-				type="button"
-				onClick={ui.actions.open}
-			/>
-			<LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
-				<p>
-					{t('calendar.createTile.message.pending', {
-						action: ui.state.loading.tileName,
-					})}
-				</p>
-			</LoadingModal>
-			<SuccessModal
-				show={ui.state.success.isOpen}
-				setShow={ui.actions.hideSuccess}
-				closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
-				actions={[
-					{
-						text: t('calendar.createTile.buttons.viewInTimeline'),
-						onClick: viewCreatedEvent,
-						disabled: ui.state.success.isNavigatingToTile,
-					},
-				]}
-			>
-				<p>
-					<Trans
-						i18nKey="calendar.createTile.message.success"
-						components={{
-							b: <b />,
-							action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
-						}}
-					/>
-				</p>
-			</SuccessModal>
-			<header>
-				<div className="title">
-					<h2>{t('calendar.createTile.title')}</h2>
-				</div>
-				<button type="button" onClick={closeModal}>
-					<X size={16} color={theme.colors.text.primary} />
-				</button>
-			</header>
+  return (
+    <StyledCalendarCreateEvent
+      onSubmit={(e) => {
+        e.preventDefault();
+        submitForm();
+      }}
+      $isexpanded={ui.state.isExpanded}
+    >
+      <button
+        style={{ display: 'none' }}
+        data-testid="open-create-tile"
+        type="button"
+        onClick={ui.actions.open}
+      />
+      <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
+        <p>
+          {t('calendar.createTile.message.pending', {
+            action: ui.state.loading.tileName,
+          })}
+        </p>
+      </LoadingModal>
+      <SuccessModal
+        show={ui.state.success.isOpen}
+        setShow={ui.actions.hideSuccess}
+        closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
+        actions={[
+          {
+            text: t('calendar.createTile.buttons.viewInTimeline'),
+            onClick: viewCreatedEvent,
+            disabled: ui.state.success.isNavigatingToTile,
+          },
+        ]}
+      >
+        <p>
+          <Trans
+            i18nKey="calendar.createTile.message.success"
+            components={{
+              b: <b />,
+              action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
+            }}
+          />
+        </p>
+      </SuccessModal>
+      <header>
+        <div className="title">
+          <h2>{t('calendar.createTile.title')}</h2>
+        </div>
+        <button type="button" onClick={closeModal}>
+          <X size={16} color={theme.colors.text.primary} />
+        </button>
+      </header>
 
-			{/* Tile Description */}
-			<Section $isexpanded={ui.state.isExpanded}>
-				<DescriptionContainer>
-					<Trans
-						i18nKey="calendar.createTile.description"
-						components={{
-							action: (
-								<DescriptionInput
-									markRequired
-									value={formData.action}
-									onChange={handleFormInputChange('action')}
-									minWidth={50}
-									maxWidth={250}
-								/>
-							),
-							location: (
-								<DescriptionInput
-									value={formData.location}
-									onChange={handleFormInputChange('location')}
-									minWidth={50}
-									maxWidth={250}
-								/>
-							),
-							hours: (
-								<DescriptionInput
-									markRequired
-									value={formData.durationHours}
-									onChange={handleFormInputChange('durationHours', {
-										restriction: 'integer',
-									})}
-									minWidth={50}
-									maxWidth={50}
-									type="number"
-								/>
-							),
-							minutes: (
-								<DescriptionInput
-									markRequired
-									value={formData.durationMins}
-									onChange={handleFormInputChange('durationMins', {
-										restriction: 'integer',
-									})}
-									minWidth={50}
-									maxWidth={50}
-									type="number"
-								/>
-							),
-							date: (
-								<DescriptionDatePickerContainer>
-									<DescriptionDatePickerDisplay>
-										{dayjs(formData.deadline)
-											.toDate()
-											.toLocaleDateString(undefined, {
-												year: 'numeric',
-												month: '2-digit',
-												day: '2-digit',
-											})}
-										<Calendar color={theme.colors.text.secondary} size={20} />
-									</DescriptionDatePickerDisplay>
-									<DatePicker
-										ghostInput
-										value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-										minDate={dayjs().format('YYYY-MM-DD')}
-										onChange={(date) =>
-											handleFormInputChange('deadline', {
-												mode: 'static',
-											})(dayjs(date))
-										}
-									/>
-								</DescriptionDatePickerContainer>
-							),
-						}}
-					/>
-				</DescriptionContainer>
-			</Section>
+      {ui.state.isExpanded ? (
+				/* Tile Info (Classic) */
+        <Section $isexpanded={ui.state.isExpanded}>
+          <CreateTileInfo formHandler={formHandler} />
+        </Section>
+      ) : (
+				/* Tile Info (Inline) */
+        <Section $isexpanded={ui.state.isExpanded}>
+          <CreateTileInfoInline formHandler={formHandler} />
+        </Section>
+      )}
 
 			<Seperator />
 			<TipContainer>
@@ -335,35 +283,35 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				</p>
 			</TipContainer>
 
-			{/* Tile Actions */}
-			{ui.state.isExpanded && (
-				<>
-					<Section $isexpanded={ui.state.isExpanded}>
-						<Options formHandler={formHandler} />
-					</Section>
-					<Spacer />
-					<Summary formData={formData} />
-				</>
-			)}
-			<ButtonContainer $isexpanded={ui.state.isExpanded}>
-				<Button
-					type="button"
-					variant={'ghost'}
-					onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
-				>
-					{ui.state.isExpanded
-						? t('calendar.createTile.buttons.collapse')
-						: t('calendar.createTile.buttons.expand')}
-				</Button>
-				<Button type="button" variant={'ghost'} onClick={resetForm}>
-					{t('calendar.createTile.buttons.reset')}
-				</Button>
-				<Button variant="brand" type="submit" disabled={!isValidSubmission}>
-					{t('calendar.createTile.buttons.submit')}
-				</Button>
-			</ButtonContainer>
-		</StyledCalendarCreateEvent>
-	);
+      {/* Tile Actions */}
+      {ui.state.isExpanded && (
+        <>
+          <Section $isexpanded={ui.state.isExpanded}>
+            <CreateTileOptions formHandler={formHandler} />
+          </Section>
+          <Spacer />
+          <CreateTileSummary formData={formData} />
+        </>
+      )}
+      <ButtonContainer $isexpanded={ui.state.isExpanded}>
+        <Button
+          type="button"
+          variant={'ghost'}
+          onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
+        >
+          {ui.state.isExpanded
+            ? t('calendar.createTile.buttons.collapse')
+            : t('calendar.createTile.buttons.expand')}
+        </Button>
+        <Button type="button" variant={'ghost'} onClick={resetForm}>
+          {t('calendar.createTile.buttons.reset')}
+        </Button>
+        <Button variant="brand" type="submit" disabled={!isValidSubmission}>
+          {t('calendar.createTile.buttons.submit')}
+        </Button>
+      </ButtonContainer>
+    </StyledCalendarCreateEvent>
+  );
 };
 
 const Spacer = styled.div`
@@ -400,12 +348,13 @@ const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	background-color: ${(props) => props.theme.colors.background.card};
 `;
 
-export const DescriptionDatePickerContainer = styled.div`
+// -- INLINE FIELDS --
+export const InlineDatePickerContainer = styled.div`
 	width: 150px;
 	position: relative;
 `;
 
-export const DescriptionDatePickerDisplay = styled.div`
+export const InlineDatePickerDisplay = styled.div`
 	position: absolute;
 	inset: 0;
 	background: none;
@@ -420,12 +369,12 @@ export const DescriptionDatePickerDisplay = styled.div`
 	align-items: center;
 `;
 
-const DescriptionInput = styled(AutosizeInput)`
+export const InlineInput = styled(AutosizeInput)`
 	color: ${(props) => props.theme.colors.highlight.text};
 	border-bottom: 1.5px dashed ${(props) => props.theme.colors.highlight.text} !important;
 `;
 
-export const DescriptionContainer = styled.div`
+export const InlineControl = styled.div`
 	box-shadow: 0 0 0 1.5px ${(props) => props.theme.colors.border};
 	border-radius: ${(props) => props.theme.borderRadius.xLarge};
 	padding: 1rem 1.25rem;

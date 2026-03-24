@@ -191,7 +191,30 @@
 		},
 		"createTile": {
 			"title": "Add a New Tile",
-			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+			"info": {
+				"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+				"action": {
+					"label": "Tile Name",
+					"placeholder": "What is the name of this tile?"
+				},
+				"location": {
+					"label": "Tile Location",
+					"placeholder": "Where is this tile held?"
+				},
+				"hours": {
+					"label": "Tile Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+        "minutes": {
+          "label": "Tile Duration (Minutes)",
+          "placeholder": "How many mins will it take?"
+        },
+				"range": {
+					"label": "Time Range",
+					"description": "Schedule between",
+					"conjunction": "and"
+				}
+			},
 			"sections": {
 				"tileColor": "Select Tile Color",
 				"tileActions": "Tile Actions",
@@ -270,7 +293,8 @@
 			},
 			"summary": {
 				"title": "Summary",
-				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>",
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
+				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
 					"daily": "day",
 					"weekly": "week",
@@ -957,6 +981,7 @@
 		"notFoundMessage": "Oops, we couldn't find '{{query}}'. Would you like to create a Tile from this title?",
 		"notFoundDismiss": "No thanks",
 		"notFoundCreate": "Create",
+		"editEvent": "Edit",
 		"setAsNow": "Set as now",
 		"markComplete": "Complete",
 		"markDeleted": "Delete",
@@ -999,7 +1024,9 @@
 			"signOutSuccess": "You have been successfully signed out",
 			"signOutError": "Failed to sign out. Please try again.",
 			"defaultUsername": "User"
-		}
+		},
+		"expandPanel": "Expand panel",
+		"collapsePanel": "Collapse panel"
 	},
 	"errors": {
 		"chatLimitReached": "Chat limit reached. Please try again later.",
@@ -1014,6 +1041,61 @@
 			"deleting": "Deleting event...",
 			"deleteSuccess": "Event deleted!",
 			"actionFailed": "Action failed. Please try again."
+		},
+		"edit": {
+			"title": "Edit",
+			"titleBlock": "Edit Block",
+			"titleTile": "Edit Tile",
+			"nameSection": "Name",
+			"timeSection": "Time & Duration",
+			"repetitionSection": "Repetition",
+			"locationSection": "Location",
+			"colorSection": "Color",
+			"name": "Name",
+			"start": "Start",
+			"end": "End",
+			"duration": "Duration",
+			"hours": "hrs",
+			"minutes": "min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Split count",
+			"splitPlaceholder": "e.g. 3",
+			"location": "Address",
+			"locationDescription": "Description",
+			"locationDescriptionPlaceholder": "Additional location details...",
+			"color": "Color",
+			"recurring": "Recurring",
+			"selectFrequency": "Select frequency",
+			"daily": "Daily",
+			"weekly": "Weekly",
+			"monthly": "Monthly",
+			"yearly": "Yearly",
+			"forever": "Repeat forever",
+			"repetitionStart": "Repetition start",
+			"repetitionEnd": "Repetition end",
+			"sun": "Sun",
+			"mon": "Mon",
+			"tue": "Tue",
+			"wed": "Wed",
+			"thu": "Thu",
+			"fri": "Fri",
+			"sat": "Sat",
+			"save": "Save",
+			"saving": "Saving changes...",
+			"saveSuccess": "Event updated!",
+			"saveFailed": "Failed to save. Please try again.",
+			"back": "Back",
+			"loading": "Loading details...",
+			"loadingBlock": "Loading block details...",
+			"loadingTile": "Loading tile details...",
+			"clearLocation": "Clear location",
+			"locationMinChars": "Type at least 3 characters to search",
+			"locationSearchPlaceholder": "Search for a location...",
+			"savedLocations": "Saved Locations",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Powered by Google",
+			"noLocationResults": "No locations found"
 		}
 	},
 	"discover": {
