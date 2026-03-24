@@ -1045,6 +1045,8 @@
 			"completeSuccess": "Event completed!",
 			"deferring": "Deferring event...",
 			"deferSuccess": "Event deferred!",
+			"updating": "Saving changes...",
+			"updateSuccess": "Changes saved!",
 			"deleting": "Deleting event...",
 			"deleteSuccess": "Event deleted!",
 			"actionFailed": "Action failed. Please try again."

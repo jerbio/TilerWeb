@@ -40,24 +40,15 @@ import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 type CalendarEventInfoProps = {
 	event: ScheduleSubCalendarEvent | null;
 	onClose?: () => void;
-	onEventUpdate?: (updates: {
-		name?: string;
-		start?: number;
-		end?: number;
-		calendarEnd?: number;
-	}) => void;
 	onEventAction?: () => void;
 	isEditable?: boolean;
-	isSaving?: boolean;
 };
 
 const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	event,
 	onClose,
-	onEventUpdate,
 	onEventAction,
 	isEditable = true,
-	isSaving = false,
 }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
@@ -135,8 +126,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		setIsEditingDeadline(false);
 	};
 
-	const handleSave = () => {
-		if (!event) return;
+	const handleSave = useCallback(async () => {
+		if (!event || actionLoading) return;
 
 		// Validate that end datetime is after start datetime
 		if (
@@ -173,9 +164,25 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			return;
 		}
 
-		onEventUpdate?.(updates);
-		setHasChanges(false);
-	};
+		setActionLoading('complete');
+		const nId = notificationId(NotificationAction.Update, event.id);
+		showNotification(nId, t('calendarEvent.notifications.updating'), 'loading');
+		try {
+			await scheduleService.updateSubCalendarEvent(event.id, updates);
+			updateNotification(nId, t('calendarEvent.notifications.updateSuccess'), 'success');
+			setHasChanges(false);
+			setIsEditingName(false);
+			setIsEditingStart(false);
+			setIsEditingEnd(false);
+			setIsEditingDeadline(false);
+			onEventAction?.();
+		} catch (error) {
+			console.error('Update failed:', error);
+			updateNotification(nId, t('calendarEvent.notifications.actionFailed'), 'error');
+		} finally {
+			setActionLoading(null);
+		}
+	}, [event, actionLoading, editedName, editedStartDate, editedStartTime, editedEndDate, editedEndTime, editedDeadline, eventStart, eventEnd, showNotification, updateNotification, t, onEventAction]);
 
 	const handleComplete = useCallback(async () => {
 		if (!event || actionLoading) return;
@@ -659,7 +666,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			)}
 
 			{/* Loading Overlay */}
-			<LoadingOverlay $loading={isSaving}>
+			<LoadingOverlay $loading={!!actionLoading}>
 				<Loader />
 			</LoadingOverlay>
 		</StyledCalendarEventInfo>

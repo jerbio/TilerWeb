@@ -12,6 +12,7 @@ vi.mock('@/services', () => ({
 		completeScheduleEvent: vi.fn(),
 		setScheduleEventAsNow: vi.fn(),
 		procrastinateScheduleEvent: vi.fn(),
+		updateSubCalendarEvent: vi.fn(),
 	},
 }));
 
@@ -379,6 +380,97 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 			// Resolve to clean up
 			resolveComplete!({ subCalendarEvents: [] });
+		});
+	});
+
+	describe('Save (update) action', () => {
+		it('calls scheduleService.updateSubCalendarEvent with changed name', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce({
+				subCalendarEvents: [],
+			});
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Click the event name to enter edit mode
+			const nameElement = screen.getByText('Test Event');
+			fireEvent.click(nameElement);
+
+			// Change the name
+			const nameInput = screen.getByDisplayValue('Test Event');
+			fireEvent.change(nameInput, { target: { value: 'Updated Event' } });
+			fireEvent.blur(nameInput);
+
+			// Click Save button
+			const saveButton = screen.getByTitle('Save');
+			fireEvent.click(saveButton);
+
+			await waitFor(() => {
+				expect(scheduleService.updateSubCalendarEvent).toHaveBeenCalledWith(
+					'sub-event-id-123',
+					expect.objectContaining({ name: 'Updated Event' })
+				);
+			});
+		});
+
+		it('calls onEventAction after successful save', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce({
+				subCalendarEvents: [],
+			});
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Edit name
+			fireEvent.click(screen.getByText('Test Event'));
+			const nameInput = screen.getByDisplayValue('Test Event');
+			fireEvent.change(nameInput, { target: { value: 'Updated Event' } });
+			fireEvent.blur(nameInput);
+
+			// Save
+			fireEvent.click(screen.getByTitle('Save'));
+
+			await waitFor(() => {
+				expect(mockOnEventAction).toHaveBeenCalled();
+			});
+		});
+
+		it('does not call onEventAction on save failure', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Edit name
+			fireEvent.click(screen.getByText('Test Event'));
+			const nameInput = screen.getByDisplayValue('Test Event');
+			fireEvent.change(nameInput, { target: { value: 'Updated Event' } });
+			fireEvent.blur(nameInput);
+
+			// Save
+			fireEvent.click(screen.getByTitle('Save'));
+
+			await waitFor(() => {
+				expect(scheduleService.updateSubCalendarEvent).toHaveBeenCalled();
+			});
+			expect(mockOnEventAction).not.toHaveBeenCalled();
 		});
 	});
 });

@@ -84,7 +84,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Events/Complete`
 	 */
 	public completeEvent(eventId: string) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Events/Complete', {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Complete', {
 			method: 'POST',
 			body: JSON.stringify({ EventID: eventId, Version: 'v2' }),
 		});
