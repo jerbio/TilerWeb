@@ -206,10 +206,88 @@ describe('CalendarCreateTile UI', () => {
 		expect(payload.RepeatWeeklyData).toBeUndefined();
 	});
 
-	it('sets weekly recurrence fields correctly', async () => {
-		const createMock = vi
-			.spyOn(scheduleService, 'createEvent')
-			.mockResolvedValue(mockCreateTileResponse);
+  it('sets time window fields correctly when not recurring', async () => {
+    const createMock = vi
+      .spyOn(scheduleService, 'createEvent')
+      .mockResolvedValue(mockCreateTileResponse);
+
+    const start = dayjs('2026-03-20');
+    const end = dayjs('2026-03-21');
+
+    await renderWithProviders(
+      <CalendarCreateTile
+        formHandler={getFormHandler({
+          ...mockValidFormState,
+          isRecurring: false,
+          start,
+          deadline: end,
+        })}
+        refetchEvents={vi.fn()}
+      />
+    );
+
+    const submitBtn = screen.getByRole('button', {
+      name: /calendar.createTile.buttons.submit/i,
+    });
+
+    await userEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(createMock).toHaveBeenCalled();
+    });
+
+    const payload = createMock.mock.calls[0][0];
+
+    expect(payload.StartYear).toBe('2026');
+    expect(payload.StartMonth).toBe('03');
+    expect(payload.StartDay).toBe('20');
+		expect(payload.StartHour).toBe('00');
+    expect(payload.StartMinute).toBe('00');
+
+    expect(payload.EndYear).toBe('2026');
+    expect(payload.EndMonth).toBe('03');
+    expect(payload.EndDay).toBe('21');
+		expect(payload.EndHour).toBe('23');
+    expect(payload.EndMinute).toBe('59');
+  });
+
+  it('does not include time window fields when recurring', async () => {
+    const createMock = vi
+      .spyOn(scheduleService, 'createEvent')
+      .mockResolvedValue(mockCreateTileResponse);
+
+    await renderWithProviders(
+      <CalendarCreateTile
+        formHandler={getFormHandler({
+          ...mockValidFormState,
+          isRecurring: true,
+          start: dayjs(),
+          deadline: dayjs().add(1, 'day'),
+        })}
+        refetchEvents={vi.fn()}
+      />
+    );
+
+    const submitBtn = screen.getByRole('button', {
+      name: /calendar.createTile.buttons.submit/i,
+    });
+
+    await userEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(createMock).toHaveBeenCalled();
+    });
+
+    const payload = createMock.mock.calls[0][0];
+
+    expect(payload.StartYear).toBeUndefined();
+    expect(payload.EndYear).toBeUndefined();
+  });
+
+  it('sets weekly recurrence fields correctly', async () => {
+    const createMock = vi
+      .spyOn(scheduleService, 'createEvent')
+      .mockResolvedValue(mockCreateTileResponse);
 
 		await renderWithProviders(
 			<CalendarCreateTile

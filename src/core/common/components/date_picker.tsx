@@ -6,12 +6,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 type CustomDatePickerProps = {
 	label?: string;
 	value: string; // YYYY-MM-DD format
+	ghostInput?: boolean;
 	onChange: (date: string) => void;
 	placeholder?: string;
-	ghostInput?: boolean;
-	portalId?: string;
 	minDate?: string; // YYYY-MM-DD format, disables selection before this date
 	maxDate?: string; // YYYY-MM-DD format, disables selection after this date
+	portalId?: string;
 };
 
 const DatePicker: React.FC<CustomDatePickerProps> = ({
@@ -20,9 +20,9 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	onChange,
 	placeholder,
 	ghostInput = false,
-	portalId,
 	minDate,
 	maxDate,
+	portalId,
 }) => {
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
@@ -80,6 +80,7 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 					showPopperArrow={false}
 					minDate={minDateObj}
 					maxDate={maxDateObj}
+					portalId={portalId}
 				/>
 			</DatePickerWrapper>
 		</Container>

@@ -12,10 +12,10 @@ import Button from './button';
 type ProfileSheetProps = {
 	user: UserInfo | null;
 	open: boolean;
-	containerRef: React.RefObject<HTMLDivElement>;
+	ref: React.RefObject<HTMLDivElement>;
 };
 
-const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, containerRef, user }) => {
+const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 	const logout = useAppStore((state) => state.logout);
 	const navigate = useNavigate();
 	const { t } = useTranslation();
@@ -40,7 +40,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, containerRef, user })
 
 	return (
 		<AnimatedProfileMenu
-			ref={containerRef}
+			ref={ref}
 			style={{
 				opacity: openSheetSpring.opacity,
 				transform: openSheetSpring.scale.to((s) => `scale(${s})`),

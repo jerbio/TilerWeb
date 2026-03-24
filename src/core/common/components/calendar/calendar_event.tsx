@@ -53,7 +53,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 					setSelectedEventInfo(event);
 					onClick?.();
 				}}
-				variant={event.isRigid ? 'block' : 'tile'}
+				$variant={event.isRigid ? 'block' : 'tile'}
 			>
 				<header>
 					<h3>{event.name}</h3>
@@ -169,7 +169,7 @@ const EventContent = styled.div<{
 	$colors: RGB;
 	$darkmode: boolean;
 	height: number;
-	variant: 'block' | 'tile';
+	$variant: 'block' | 'tile';
 }>`
 	position: relative;
 	background-color: ${({ $colors, $darkmode }) => {
@@ -180,11 +180,11 @@ const EventContent = styled.div<{
 		const newColor = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.3);
 		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 	}};
-	border: ${({ variant }) => (variant === 'block' ? 1.5 : 1)}px solid
-		${({ $colors, variant, $darkmode }) => {
+	border: ${({ $variant }) => ($variant === 'block' ? 1.5 : 1)}px solid
+		${({ $colors, $variant, $darkmode }) => {
 			const blockColor = colorUtil.setLightness($colors, $darkmode ? 0.6 : 0.5);
 			const tileColor = colorUtil.setLightness($colors, $darkmode ? 0.1 : 0.8);
-			return variant === 'block'
+			return $variant === 'block'
 				? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
 				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
 		}};
@@ -215,7 +215,7 @@ const EventContent = styled.div<{
 		}
 
 		${EventLockIcon} {
-			display: ${({ variant }) => (variant === 'block' ? 'block' : 'none')};
+			display: ${({ $variant }) => ($variant === 'block' ? 'block' : 'none')};
 		}
 	}
 

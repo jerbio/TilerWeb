@@ -59,7 +59,7 @@ const Modal: React.FC<ModalProps> = ({
 					{setShow && (
 						<CloseButtonTimerWrapper
 							$isclosing={timerExists}
-							closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
+							$closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
 						>
 							<CloseButton onClick={closeModal}>
 								<X color={theme.colors.text.secondary} size={16} />
@@ -86,7 +86,7 @@ const CloseButtonTimer = styled.div`
 	color: ${(props) => props.theme.colors.text.muted};
 `;
 
-const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; closetimeleftratio: number }>`
+const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; $closetimeleftratio: number }>`
 	height: 36px;
 	width: 36px;
 	margin-left: auto;
@@ -105,8 +105,8 @@ const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; closetimeleftr
 		border-radius: calc(${(props) => props.theme.borderRadius.medium} + 0.125rem);
 		background: conic-gradient(
 			${(props) => props.theme.colors.text.secondary} 0deg
-				${(props) => props.closetimeleftratio * 360}deg,
-			/* sector angle */ transparent ${(props) => props.closetimeleftratio * 360}deg 360deg
+				${(props) => props.$closetimeleftratio * 360}deg,
+			/* sector angle */ transparent ${(props) => props.$closetimeleftratio * 360}deg 360deg
 		);
 	}
 `;

@@ -15,9 +15,9 @@ type SummaryProps = {
 	formData: InitialCreateTileFormState;
 };
 
-const Summary: React.FC<SummaryProps> = ({ formData }) => {
-	const { t } = useTranslation();
-	const { isDarkMode } = useTheme();
+const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
+  const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
 
 	const frequencyDescription = React.useMemo(() => {
 		if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Yearly)
@@ -29,74 +29,92 @@ const Summary: React.FC<SummaryProps> = ({ formData }) => {
 		return t('calendar.createTile.summary.recurrenceFrequency.daily');
 	}, [formData.recurrenceFrequency, t]);
 
-	return (
-		<SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
-			<header>{t('calendar.createTile.summary.title')}</header>
-			<p>
-				<Trans
-					i18nKey="calendar.createTile.summary.description"
-					components={{
-						b: <b />,
-					}}
-					values={{
-						action: formData.action,
-						location: formData.location,
-						hours: formData.durationHours,
-						minutes: formData.durationMins,
-						deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-							year: 'numeric',
-							month: '2-digit',
-							day: '2-digit',
-						}),
-					}}
-				/>
-				{formData.isRecurring && (
-					<>
-						<Trans
-							components={{ b: <b /> }}
-							i18nKey="calendar.createTile.summary.recurring"
-							values={{ recurrenceFrequency: frequencyDescription }}
-						/>
-						<Trans
-							components={{ b: <b /> }}
-							i18nKey="calendar.createTile.summary.recurringStart"
-							values={{
-								recurrenceStart: dayjs(
-									formData.recurrenceStartType === ScheduleRepeatStartType.Default
-										? formData.start
-										: formData.recurrenceStartDate
-								)
-									.toDate()
-									.toLocaleDateString(undefined, {
-										year: 'numeric',
-										month: '2-digit',
-										day: '2-digit',
-									}),
-							}}
-						/>
-						{formData.recurrenceEndType === ScheduleRepeatEndType.On && (
-							<Trans
-								components={{ b: <b /> }}
-								i18nKey="calendar.createTile.summary.recurringEnd"
-								values={{
-									recurrenceEnd: dayjs(formData.recurrenceEndDate)
-										.toDate()
-										.toLocaleDateString(undefined, {
-											year: 'numeric',
-											month: '2-digit',
-											day: '2-digit',
-										}),
-								}}
-							/>
-						)}
-					</>
-				)}
-			</p>
-		</SummaryContainer>
-	);
+  return (
+    <SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
+      <header>{t('calendar.createTile.summary.title')}</header>
+      <p>
+        <Trans
+          i18nKey="calendar.createTile.summary.description"
+          components={{
+            b: <b />,
+          }}
+          values={{
+            action: formData.action,
+            location: formData.location,
+            hours: formData.durationHours,
+            minutes: formData.durationMins,
+            deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }),
+          }}
+        />
+        {!formData.isRecurring && (
+          <Trans
+            components={{ b: <b /> }}
+            i18nKey="calendar.createTile.summary.range"
+            values={{
+              start: dayjs(formData.start).toDate().toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+              end: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+            }}
+          />
+        )}
+        {formData.isRecurring && (
+          <>
+            <Trans
+              components={{ b: <b /> }}
+              i18nKey="calendar.createTile.summary.recurring"
+              values={{ recurrenceFrequency: frequencyDescription }}
+            />
+            <Trans
+              components={{ b: <b /> }}
+              i18nKey="calendar.createTile.summary.recurringStart"
+              values={{
+                recurrenceStart: dayjs(
+                  formData.recurrenceStartType === ScheduleRepeatStartType.Default
+                    ? formData.start
+                    : formData.recurrenceStartDate
+                )
+                  .toDate()
+                  .toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                  }),
+              }}
+            />
+            {formData.recurrenceEndType === ScheduleRepeatEndType.On && (
+              <Trans
+                components={{ b: <b /> }}
+                i18nKey="calendar.createTile.summary.recurringEnd"
+                values={{
+                  recurrenceEnd: dayjs(formData.recurrenceEndDate)
+                    .toDate()
+                    .toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    }),
+                }}
+              />
+            )}
+          </>
+        )}
+      </p>
+    </SummaryContainer>
+  );
 };
 
-export default Summary;
+export default CreateTileSummary;
 
 const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
 	${({ theme, $darkmode, $color }) => {

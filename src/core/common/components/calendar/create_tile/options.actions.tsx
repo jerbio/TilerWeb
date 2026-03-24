@@ -14,10 +14,10 @@ import {
 import DatePicker from '../../date_picker';
 import Toggle from '../../Toggle';
 import {
-	DescriptionContainer,
-	DescriptionDatePickerContainer,
-	DescriptionDatePickerDisplay,
-	InitialCreateTileFormState,
+  InlineControl,
+  InlineDatePickerContainer,
+  InlineDatePickerDisplay,
+  InitialCreateTileFormState,
 } from '.';
 import Radio from '../../radio';
 
@@ -33,8 +33,8 @@ type ActionsOptionsProps = {
 	recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
 };
 
-const ActionsOptions: React.FC<ActionsOptionsProps> = ({
-	formHandler: { formData, handleFormInputChange },
+const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
+  formHandler: { formData, handleFormInputChange },
 	recurrenceTypeOptions,
 	recurrenceWeekdayOptions,
 	recurrenceStartTypeOptions,
@@ -43,230 +43,230 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
 	const { t } = useTranslation();
 	const theme = useStyledTheme();
 
-	return (
-		<StyledActionsOptions>
-			<Toggle
-				label={t('calendar.createTile.actions.repeatTile')}
-				isOn={formData.isRecurring}
-				onChange={handleFormInputChange('isRecurring', { mode: 'static' })}
-				containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}
-			/>
-			{formData.isRecurring && (
-				<TileActionContainer>
-					{/* Recurrence Type Selection */}
-					<RecurrenceOptions>
-						{recurrenceTypeOptions.map((option) => (
-							<Radio
-								key={option.value}
-								label={option.label}
-								checked={option.value === formData.recurrenceType}
-								disabled={false}
-								name="recurrenceType"
-								onChange={(checked) => {
-									if (checked) {
-										handleFormInputChange('recurrenceType', {
-											mode: 'static',
-										})(option.value);
-										handleFormInputChange('recurrenceFrequency', {
-											mode: 'static',
-										})(option.frequency);
-									}
-								}}
-							/>
-						))}
-					</RecurrenceOptions>
-					{/* Recurrence Weekly Days Selection */}
-					{formData.recurrenceType === ScheduleRepeatType.Weekly && (
-						<>
-							<TileActionHeader>
-								{t('calendar.createTile.sections.recurrenceWeeklyDays.title')}
-							</TileActionHeader>
-							<RecurrenceWeekdayOptions>
-								{recurrenceWeekdayOptions.map((option) => (
-									<RecurrenceWeekdayOption
-										type="button"
-										name={option.label}
-										title={option.label}
-										key={option.value}
-										onClick={() => {
-											const isSelected =
-												formData.recurrenceWeeklyDays.includes(
-													option.value
-												);
-											const allowUnselect =
-												formData.recurrenceWeeklyDays.length > 1;
-											if (isSelected && allowUnselect) {
-												handleFormInputChange('recurrenceWeeklyDays', {
-													mode: 'static',
-												})(
-													formData.recurrenceWeeklyDays.filter(
-														(day) => day !== option.value
-													)
-												);
-											}
-											if (!isSelected) {
-												handleFormInputChange('recurrenceWeeklyDays', {
-													mode: 'static',
-												})(
-													formData.recurrenceWeeklyDays.concat(
-														option.value
-													)
-												);
-											}
-										}}
-										$selected={formData.recurrenceWeeklyDays.includes(
-											option.value
-										)}
-									>
-										{option.label[0]}
-									</RecurrenceWeekdayOption>
-								))}
-							</RecurrenceWeekdayOptions>
-						</>
-					)}
-					{/* Recurrence Start Date Selection */}
-					<TileActionHeader>
-						{t('calendar.createTile.sections.recurrenceStartType.title')}
-					</TileActionHeader>
-					<RecurrenceEndTypeOptions>
-						{recurrenceStartTypeOptions.map((option) => (
-							<Radio
-								key={option.value}
-								label={option.label}
-								checked={option.value === formData.recurrenceStartType}
-								disabled={false}
-								name="recurrenceStartType"
-								onChange={(checked) => {
-									if (checked) {
-										handleFormInputChange('recurrenceStartType', {
-											mode: 'static',
-										})(option.value);
-									}
-								}}
-							/>
-						))}
-					</RecurrenceEndTypeOptions>
-					{formData.recurrenceStartType === ScheduleRepeatStartType.On && (
-						<DescriptionContainer
-							style={{ border: `1px solid ${theme.colors.border.default}` }}
-						>
-							<Trans
-								i18nKey="calendar.createTile.sections.recurrenceStartDate.description"
-								components={{
-									date: (
-										<DescriptionDatePickerContainer>
-											<DescriptionDatePickerDisplay>
-												{dayjs(formData.recurrenceStartDate)
-													.toDate()
-													.toLocaleDateString(undefined, {
-														year: 'numeric',
-														month: '2-digit',
-														day: '2-digit',
-													})}
-												<Calendar
-													color={theme.colors.text.secondary}
-													size={20}
-												/>
-											</DescriptionDatePickerDisplay>
-											<DatePicker
-												ghostInput
-												value={dayjs(formData.recurrenceStartDate).format(
-													'YYYY-MM-DD'
-												)}
-												onChange={(date) =>
-													handleFormInputChange('recurrenceStartDate', {
-														mode: 'static',
-													})(dayjs(date))
-												}
-												maxDate={
-													formData.recurrenceEndType ===
-													ScheduleRepeatEndType.On
-														? dayjs(formData.recurrenceEndDate).format(
-																'YYYY-MM-DD'
-															)
-														: undefined
-												}
-											/>
-										</DescriptionDatePickerContainer>
-									),
-								}}
-							/>
-						</DescriptionContainer>
-					)}
-					{/* Recurrence End Date Selection */}
-					<TileActionHeader>
-						{t('calendar.createTile.sections.recurrenceEndType.title')}
-					</TileActionHeader>
-					<RecurrenceEndTypeOptions>
-						{recurrenceEndTypeOptions.map((option) => (
-							<Radio
-								key={option.value}
-								label={option.label}
-								checked={option.value === formData.recurrenceEndType}
-								disabled={false}
-								name="recurrenceEndType"
-								onChange={(checked) => {
-									if (checked) {
-										handleFormInputChange('recurrenceEndType', {
-											mode: 'static',
-										})(option.value);
-									}
-								}}
-							/>
-						))}
-					</RecurrenceEndTypeOptions>
-					{formData.recurrenceEndType === ScheduleRepeatEndType.On && (
-						<DescriptionContainer
-							style={{ border: `1px solid ${theme.colors.border.default}` }}
-						>
-							<Trans
-								i18nKey="calendar.createTile.sections.recurrenceEndDate.description"
-								components={{
-									date: (
-										<DescriptionDatePickerContainer>
-											<DescriptionDatePickerDisplay>
-												{dayjs(formData.recurrenceEndDate)
-													.toDate()
-													.toLocaleDateString(undefined, {
-														year: 'numeric',
-														month: '2-digit',
-														day: '2-digit',
-													})}
-												<Calendar
-													color={theme.colors.text.secondary}
-													size={20}
-												/>
-											</DescriptionDatePickerDisplay>
-											<DatePicker
-												ghostInput
-												value={dayjs(formData.recurrenceEndDate).format(
-													'YYYY-MM-DD'
-												)}
-												onChange={(date) =>
-													handleFormInputChange('recurrenceEndDate', {
-														mode: 'static',
-													})(dayjs(date))
-												}
-												minDate={dayjs(
-													formData.recurrenceStartType ===
-														ScheduleRepeatStartType.On
-														? formData.recurrenceStartDate
-														: formData.start
-												).format('YYYY-MM-DD')}
-											/>
-										</DescriptionDatePickerContainer>
-									),
-								}}
-							/>
-						</DescriptionContainer>
-					)}
-				</TileActionContainer>
-			)}
-		</StyledActionsOptions>
-	);
+  return (
+    <StyledActionsOptions>
+      <Toggle
+        label={t('calendar.createTile.actions.repeatTile')}
+        isOn={formData.isRecurring}
+        onChange={handleFormInputChange('isRecurring', { mode: 'static' })}
+        containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}
+      />
+      {formData.isRecurring && (
+        <TileActionContainer>
+          {/* Recurrence Type Selection */}
+          <RecurrenceOptions>
+            {recurrenceTypeOptions.map((option) => (
+              <Radio
+                key={option.value}
+                label={option.label}
+                checked={option.value === formData.recurrenceType}
+                disabled={false}
+                name="recurrenceType"
+                onChange={(checked) => {
+                  if (checked) {
+                    handleFormInputChange('recurrenceType', {
+                      mode: 'static',
+                    })(option.value);
+                    handleFormInputChange('recurrenceFrequency', {
+                      mode: 'static',
+                    })(option.frequency);
+                  }
+                }}
+              />
+            ))}
+          </RecurrenceOptions>
+          {/* Recurrence Weekly Days Selection */}
+          {formData.recurrenceType === ScheduleRepeatType.Weekly && (
+            <>
+              <TileActionHeader>
+                {t('calendar.createTile.sections.recurrenceWeeklyDays.title')}
+              </TileActionHeader>
+              <RecurrenceWeekdayOptions>
+                {recurrenceWeekdayOptions.map((option) => (
+                  <RecurrenceWeekdayOption
+                    type="button"
+                    name={option.label}
+                    title={option.label}
+                    key={option.value}
+                    onClick={() => {
+                      const isSelected =
+                        formData.recurrenceWeeklyDays.includes(
+                          option.value
+                        );
+                      const allowUnselect =
+                        formData.recurrenceWeeklyDays.length > 1;
+                      if (isSelected && allowUnselect) {
+                        handleFormInputChange('recurrenceWeeklyDays', {
+                          mode: 'static',
+                        })(
+                          formData.recurrenceWeeklyDays.filter(
+                            (day) => day !== option.value
+                          )
+                        );
+                      }
+                      if (!isSelected) {
+                        handleFormInputChange('recurrenceWeeklyDays', {
+                          mode: 'static',
+                        })(
+                          formData.recurrenceWeeklyDays.concat(
+                            option.value
+                          )
+                        );
+                      }
+                    }}
+                    $selected={formData.recurrenceWeeklyDays.includes(
+                      option.value
+                    )}
+                  >
+                    {option.label[0]}
+                  </RecurrenceWeekdayOption>
+                ))}
+              </RecurrenceWeekdayOptions>
+            </>
+          )}
+          {/* Recurrence Start Date Selection */}
+          <TileActionHeader>
+            {t('calendar.createTile.sections.recurrenceStartType.title')}
+          </TileActionHeader>
+          <RecurrenceEndTypeOptions>
+            {recurrenceStartTypeOptions.map((option) => (
+              <Radio
+                key={option.value}
+                label={option.label}
+                checked={option.value === formData.recurrenceStartType}
+                disabled={false}
+                name="recurrenceStartType"
+                onChange={(checked) => {
+                  if (checked) {
+                    handleFormInputChange('recurrenceStartType', {
+                      mode: 'static',
+                    })(option.value);
+                  }
+                }}
+              />
+            ))}
+          </RecurrenceEndTypeOptions>
+          {formData.recurrenceStartType === ScheduleRepeatStartType.On && (
+            <InlineControl
+              style={{ border: `1px solid ${theme.colors.border.default}` }}
+            >
+              <Trans
+                i18nKey="calendar.createTile.sections.recurrenceStartDate.description"
+                components={{
+                  date: (
+                    <InlineDatePickerContainer>
+                      <InlineDatePickerDisplay>
+                        {dayjs(formData.recurrenceStartDate)
+                          .toDate()
+                          .toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })}
+                        <Calendar
+                          color={theme.colors.text.secondary}
+                          size={20}
+                        />
+                      </InlineDatePickerDisplay>
+                      <DatePicker
+                        ghostInput
+                        value={dayjs(formData.recurrenceStartDate).format(
+                          'YYYY-MM-DD'
+                        )}
+                        onChange={(date) =>
+                          handleFormInputChange('recurrenceStartDate', {
+                            mode: 'static',
+                          })(dayjs(date))
+                        }
+                        maxDate={
+                          formData.recurrenceEndType ===
+                            ScheduleRepeatEndType.On
+                            ? dayjs(formData.recurrenceEndDate).format(
+                              'YYYY-MM-DD'
+                            )
+                            : undefined
+                        }
+                      />
+                    </InlineDatePickerContainer>
+                  ),
+                }}
+              />
+            </InlineControl>
+          )}
+          {/* Recurrence End Date Selection */}
+          <TileActionHeader>
+            {t('calendar.createTile.sections.recurrenceEndType.title')}
+          </TileActionHeader>
+          <RecurrenceEndTypeOptions>
+            {recurrenceEndTypeOptions.map((option) => (
+              <Radio
+                key={option.value}
+                label={option.label}
+                checked={option.value === formData.recurrenceEndType}
+                disabled={false}
+                name="recurrenceEndType"
+                onChange={(checked) => {
+                  if (checked) {
+                    handleFormInputChange('recurrenceEndType', {
+                      mode: 'static',
+                    })(option.value);
+                  }
+                }}
+              />
+            ))}
+          </RecurrenceEndTypeOptions>
+          {formData.recurrenceEndType === ScheduleRepeatEndType.On && (
+            <InlineControl
+              style={{ border: `1px solid ${theme.colors.border.default}` }}
+            >
+              <Trans
+                i18nKey="calendar.createTile.sections.recurrenceEndDate.description"
+                components={{
+                  date: (
+                    <InlineDatePickerContainer>
+                      <InlineDatePickerDisplay>
+                        {dayjs(formData.recurrenceEndDate)
+                          .toDate()
+                          .toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })}
+                        <Calendar
+                          color={theme.colors.text.secondary}
+                          size={20}
+                        />
+                      </InlineDatePickerDisplay>
+                      <DatePicker
+                        ghostInput
+                        value={dayjs(formData.recurrenceEndDate).format(
+                          'YYYY-MM-DD'
+                        )}
+                        onChange={(date) =>
+                          handleFormInputChange('recurrenceEndDate', {
+                            mode: 'static',
+                          })(dayjs(date))
+                        }
+                        minDate={dayjs(
+                          formData.recurrenceStartType ===
+                            ScheduleRepeatStartType.On
+                            ? formData.recurrenceStartDate
+                            : formData.start
+                        ).format('YYYY-MM-DD')}
+                      />
+                    </InlineDatePickerContainer>
+                  ),
+                }}
+              />
+            </InlineControl>
+          )}
+        </TileActionContainer>
+      )}
+    </StyledActionsOptions>
+  );
 };
 
-export default ActionsOptions;
+export default CreateTileActionsOptions;
 
 const StyledActionsOptions = styled.div`
 	display: flex;
