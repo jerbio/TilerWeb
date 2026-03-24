@@ -1,22 +1,23 @@
-import { PersonaApi } from "@/api/personaApi";
-import PersonaService from "./personaService";
-import { ScheduleApi } from "@/api/scheduleApi";
-import { SubCalendarEventApi } from "@/api/subCalendarEventApi";
-import { CalendarEventApi } from "@/api/calendarEventApi";
-import ScheduleService from "./scheduleService";
-import { ChatApi } from "@/api/chatApi";
-import ChatService from "./chatService";
-import { WaitlistApi } from "@/api/waitlistApi";
-import { WaitlistService } from "./waitlistService";
-import { BetaUserApi } from "@/api/betaUserApi";
-import { BetaUserService } from "./betaUserService";
-import { EmailListApi } from "@/api/emailListApi";
-import { EmailListService } from "./emailListService";
-import { AuthApi } from "@/api/authApi";
-import { AuthService } from "./authService";
-import { UserApi } from "@/api/userApi";
-import { UserService } from "./userService";
-import { personaUserService } from "./personaUserService";
+import { PersonaApi } from '@/api/personaApi';
+import PersonaService from './personaService';
+import { ScheduleApi } from '@/api/scheduleApi';
+import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
+import { CalendarEventApi } from '@/api/calendarEventApi';
+import ScheduleService from './scheduleService';
+import { ChatApi } from '@/api/chatApi';
+import ChatService from './chatService';
+import { WaitlistApi } from '@/api/waitlistApi';
+import { WaitlistService } from './waitlistService';
+import { BetaUserApi } from '@/api/betaUserApi';
+import { BetaUserService } from './betaUserService';
+import { EmailListApi } from '@/api/emailListApi';
+import { EmailListService } from './emailListService';
+import { AuthApi } from '@/api/authApi';
+import { LocationApi } from '@/api/locationApi';
+import { AuthService } from './authService';
+import { UserApi } from '@/api/userApi';
+import { UserService } from './userService';
+import { personaUserService } from './personaUserService';
 
 // Init APIs
 const personaApi = new PersonaApi();
@@ -28,11 +29,17 @@ const waitlistApi = new WaitlistApi();
 const betaUserApi = new BetaUserApi();
 const emailListApi = new EmailListApi();
 const authApi = new AuthApi();
+const locationApi = new LocationApi();
 const userApi = new UserApi();
 
 // Init Services
 export const personaService = new PersonaService(personaApi);
-export const scheduleService = new ScheduleService(scheduleApi, subCalendarEventApi, calendarEventApi);
+export const scheduleService = new ScheduleService(
+	scheduleApi,
+	subCalendarEventApi,
+	calendarEventApi,
+	locationApi
+);
 export const chatService = new ChatService(chatApi);
 export const waitlistService = new WaitlistService(waitlistApi);
 export const betaUserService = new BetaUserService(betaUserApi);

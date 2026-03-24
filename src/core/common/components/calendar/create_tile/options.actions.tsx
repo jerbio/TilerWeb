@@ -5,43 +5,43 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
-  ScheduleRepeatEndType,
-  ScheduleRepeatFrequency,
-  ScheduleRepeatStartType,
-  ScheduleRepeatType,
-  ScheduleRepeatWeekday,
+	ScheduleRepeatEndType,
+	ScheduleRepeatFrequency,
+	ScheduleRepeatStartType,
+	ScheduleRepeatType,
+	ScheduleRepeatWeekday,
 } from '../../../types/schedule';
 import DatePicker from '../../date_picker';
 import Toggle from '../../Toggle';
 import {
-  DescriptionContainer,
-  DescriptionDatePickerContainer,
-  DescriptionDatePickerDisplay,
+  InlineControl,
+  InlineDatePickerContainer,
+  InlineDatePickerDisplay,
   InitialCreateTileFormState,
 } from '.';
 import Radio from '../../radio';
 
 type ActionsOptionsProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-  recurrenceTypeOptions: {
-    value: ScheduleRepeatType;
-    label: string;
-    frequency: ScheduleRepeatFrequency;
-  }[];
-  recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
-  recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
-  recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
+	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	recurrenceTypeOptions: {
+		value: ScheduleRepeatType;
+		label: string;
+		frequency: ScheduleRepeatFrequency;
+	}[];
+	recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
+	recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
+	recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
 };
 
-const ActionsOptions: React.FC<ActionsOptionsProps> = ({
+const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
   formHandler: { formData, handleFormInputChange },
 	recurrenceTypeOptions,
 	recurrenceWeekdayOptions,
 	recurrenceStartTypeOptions,
-	recurrenceEndTypeOptions
+	recurrenceEndTypeOptions,
 }) => {
-  const { t } = useTranslation();
-  const theme = useStyledTheme();
+	const { t } = useTranslation();
+	const theme = useStyledTheme();
 
   return (
     <StyledActionsOptions>
@@ -147,15 +147,15 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
             ))}
           </RecurrenceEndTypeOptions>
           {formData.recurrenceStartType === ScheduleRepeatStartType.On && (
-            <DescriptionContainer
+            <InlineControl
               style={{ border: `1px solid ${theme.colors.border.default}` }}
             >
               <Trans
                 i18nKey="calendar.createTile.sections.recurrenceStartDate.description"
                 components={{
                   date: (
-                    <DescriptionDatePickerContainer>
-                      <DescriptionDatePickerDisplay>
+                    <InlineDatePickerContainer>
+                      <InlineDatePickerDisplay>
                         {dayjs(formData.recurrenceStartDate)
                           .toDate()
                           .toLocaleDateString(undefined, {
@@ -167,7 +167,7 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                           color={theme.colors.text.secondary}
                           size={20}
                         />
-                      </DescriptionDatePickerDisplay>
+                      </InlineDatePickerDisplay>
                       <DatePicker
                         ghostInput
                         value={dayjs(formData.recurrenceStartDate).format(
@@ -187,11 +187,11 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                             : undefined
                         }
                       />
-                    </DescriptionDatePickerContainer>
+                    </InlineDatePickerContainer>
                   ),
                 }}
               />
-            </DescriptionContainer>
+            </InlineControl>
           )}
           {/* Recurrence End Date Selection */}
           <TileActionHeader>
@@ -216,15 +216,15 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
             ))}
           </RecurrenceEndTypeOptions>
           {formData.recurrenceEndType === ScheduleRepeatEndType.On && (
-            <DescriptionContainer
+            <InlineControl
               style={{ border: `1px solid ${theme.colors.border.default}` }}
             >
               <Trans
                 i18nKey="calendar.createTile.sections.recurrenceEndDate.description"
                 components={{
                   date: (
-                    <DescriptionDatePickerContainer>
-                      <DescriptionDatePickerDisplay>
+                    <InlineDatePickerContainer>
+                      <InlineDatePickerDisplay>
                         {dayjs(formData.recurrenceEndDate)
                           .toDate()
                           .toLocaleDateString(undefined, {
@@ -236,7 +236,7 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                           color={theme.colors.text.secondary}
                           size={20}
                         />
-                      </DescriptionDatePickerDisplay>
+                      </InlineDatePickerDisplay>
                       <DatePicker
                         ghostInput
                         value={dayjs(formData.recurrenceEndDate).format(
@@ -254,11 +254,11 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
                             : formData.start
                         ).format('YYYY-MM-DD')}
                       />
-                    </DescriptionDatePickerContainer>
+                    </InlineDatePickerContainer>
                   ),
                 }}
               />
-            </DescriptionContainer>
+            </InlineControl>
           )}
         </TileActionContainer>
       )}
@@ -266,7 +266,7 @@ const ActionsOptions: React.FC<ActionsOptionsProps> = ({
   );
 };
 
-export default ActionsOptions;
+export default CreateTileActionsOptions;
 
 const StyledActionsOptions = styled.div`
 	display: flex;
@@ -313,13 +313,13 @@ const RecurrenceWeekdayOption = styled.button<{ $selected: boolean }>`
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.bold};
 	background-color: ${(props) =>
-    props.$selected
-      ? props.theme.colors.datepicker.dateSelectedBg
-      : props.theme.colors.datepicker.dateHoverBg};
+		props.$selected
+			? props.theme.colors.datepicker.dateSelectedBg
+			: props.theme.colors.datepicker.dateHoverBg};
 	color: ${(props) =>
-    props.$selected
-      ? props.theme.colors.datepicker.dateSelectedText
-      : props.theme.colors.text.secondary};
+		props.$selected
+			? props.theme.colors.datepicker.dateSelectedText
+			: props.theme.colors.text.secondary};
 	transition: all 0.2s ease-in-out;
 	outline-offset: 4px;
 	outline: 2px solid transparent;

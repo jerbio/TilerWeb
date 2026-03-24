@@ -7,26 +7,26 @@ import { useTranslation } from 'react-i18next';
 import Modal from '.';
 
 type LoadingModalProps = {
-  show: boolean;
-  setShow: (show: boolean) => void;
-  children?: React.ReactNode;
+	show: boolean;
+	setShow: (show: boolean) => void;
+	children?: React.ReactNode;
 };
 
 const LoadingModal: React.FC<LoadingModalProps> = ({ show, children }) => {
-  const { t } = useTranslation();
+	const { t } = useTranslation();
 
-  return createPortal(
-    <Modal show={show} headerStyle={{ display: 'none' }}>
-      <Content>
-        <LoadingIcon>
-          <img src={LoadingEllipse} alt={t('modals.loading.image.alt')} />
-          <Logo size={30} />
-        </LoadingIcon>
-        {children}
-      </Content>
-    </Modal>,
-    document.body
-  );
+	return createPortal(
+		<Modal show={show} headerStyle={{ display: 'none' }}>
+			<Content>
+				<LoadingIcon>
+					<img src={LoadingEllipse} alt={t('modals.loading.image.alt')} />
+					<Logo size={30} />
+				</LoadingIcon>
+				{children}
+			</Content>
+		</Modal>,
+		document.body
+	);
 };
 
 const LoadingIcon = styled.div`

@@ -1,279 +1,279 @@
 export interface LocationData {
-  location: string;
-  longitude?: number;
-  latitude?: number;
-  verified: boolean;
+	location: string;
+	longitude?: number;
+	latitude?: number;
+	verified: boolean;
 }
 
 export interface LocationCoordinates {
-  latitude: number;
-  longitude: number;
-  displayName: string;
+	latitude: number;
+	longitude: number;
+	displayName: string;
 }
 
 class LocationService {
-  // Default location: National Museum of African American History and Culture in DC
-  private readonly DEFAULT_LOCATION = "Empire State Building, New York, NY";
-  
-  // Cache for the current location data
-  private currentLocationData: LocationData | null = null;
+	// Default location: National Museum of African American History and Culture in DC
+	private readonly DEFAULT_LOCATION = 'Empire State Building, New York, NY';
 
-  // Cache for the locally set manual location
-  private cachedManualLocation: LocationData | null = null;
+	// Cache for the current location data
+	private currentLocationData: LocationData | null = null;
 
-  /**
-   * Get the default location data
-   */
-  getDefaultLocation(): LocationData {
-    return {
-      location: this.DEFAULT_LOCATION,
-      verified: false,
-    };
-  }
+	// Cache for the locally set manual location
+	private cachedManualLocation: LocationData | null = null;
 
-  /**
-   * Set a manually entered location (persists until cleared)
-   */
-  setManualLocation(location: LocationData): void {
-    this.cachedManualLocation = location;
-  }
+	/**
+	 * Get the default location data
+	 */
+	getDefaultLocation(): LocationData {
+		return {
+			location: this.DEFAULT_LOCATION,
+			verified: false,
+		};
+	}
 
-  /**
-   * Clear the manually entered location
-   */
-  clearManualLocation(): void {
-    this.cachedManualLocation = null;
-  }
+	/**
+	 * Set a manually entered location (persists until cleared)
+	 */
+	setManualLocation(location: LocationData): void {
+		this.cachedManualLocation = location;
+	}
 
-  /**
-   * Check if a manual location is set
-   */
-  hasManualLocation(): boolean {
-    return this.cachedManualLocation !== null;
-  }
+	/**
+	 * Clear the manually entered location
+	 */
+	clearManualLocation(): void {
+		this.cachedManualLocation = null;
+	}
 
-  /**
-   * Set the current location data (used when user manually enters an address)
-   */
-  setCurrentLocation(locationData: LocationData): void {
-    this.currentLocationData = locationData;
-  }
+	/**
+	 * Check if a manual location is set
+	 */
+	hasManualLocation(): boolean {
+		return this.cachedManualLocation !== null;
+	}
 
-  /**
-   * Get the user's current location
-   * Returns cached location if available, otherwise uses browser geolocation API
-   */
-  async getCurrentLocation(): Promise<LocationData> {
-    // If we have a cached location (manually set or previously fetched), return it
-    if (this.currentLocationData) {
-      return this.currentLocationData;
-    }
+	/**
+	 * Set the current location data (used when user manually enters an address)
+	 */
+	setCurrentLocation(locationData: LocationData): void {
+		this.currentLocationData = locationData;
+	}
 
-    return this.fetchBrowserLocation();
-  }
+	/**
+	 * Get the user's current location
+	 * Returns cached location if available, otherwise uses browser geolocation API
+	 */
+	async getCurrentLocation(): Promise<LocationData> {
+		// If we have a cached location (manually set or previously fetched), return it
+		if (this.currentLocationData) {
+			return this.currentLocationData;
+		}
 
-  /**
-   * Force refresh location from browser geolocation API (ignores cache)
-   */
-  async refreshLocationFromBrowser(): Promise<LocationData> {
-    return this.fetchBrowserLocation();
-  }
+		return this.fetchBrowserLocation();
+	}
 
-  /**
-   * Fetch location from browser geolocation API
-   */
-  private async fetchBrowserLocation(): Promise<LocationData> {
-    try {
-      // Check if geolocation is supported by the browser
-      if (!navigator.geolocation) {
-        const defaultLocation = this.getDefaultLocation();
-        this.currentLocationData = defaultLocation;
-        return defaultLocation;
-      }
+	/**
+	 * Force refresh location from browser geolocation API (ignores cache)
+	 */
+	async refreshLocationFromBrowser(): Promise<LocationData> {
+		return this.fetchBrowserLocation();
+	}
 
-      // Avoid unnecessary geolocation calls when browser permission is already denied.
-      if (await this.isGeolocationPermissionDenied()) {
-        const defaultLocation = this.getDefaultLocation();
-        this.currentLocationData = defaultLocation;
-        return defaultLocation;
-      }
+	/**
+	 * Fetch location from browser geolocation API
+	 */
+	private async fetchBrowserLocation(): Promise<LocationData> {
+		try {
+			// Check if geolocation is supported by the browser
+			if (!navigator.geolocation) {
+				const defaultLocation = this.getDefaultLocation();
+				this.currentLocationData = defaultLocation;
+				return defaultLocation;
+			}
 
-      // Get the current position with a timeout
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          timeout: 10000,
-          enableHighAccuracy: true
-        });
-      });
+			// Avoid unnecessary geolocation calls when browser permission is already denied.
+			if (await this.isGeolocationPermissionDenied()) {
+				const defaultLocation = this.getDefaultLocation();
+				this.currentLocationData = defaultLocation;
+				return defaultLocation;
+			}
 
-      const { latitude, longitude } = position.coords;
+			// Get the current position with a timeout
+			const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+				navigator.geolocation.getCurrentPosition(resolve, reject, {
+					timeout: 10000,
+					enableHighAccuracy: true,
+				});
+			});
 
-      try {
-        // Use reverse geocoding to get a human-readable address
-        const address = await this.reverseGeocode(latitude, longitude);
+			const { latitude, longitude } = position.coords;
 
-        const locationData = {
-          location: address,
-          longitude,
-          latitude,
-          verified: true,
-        };
-        
-        this.currentLocationData = locationData;
-        return locationData;
-      } catch (err) {
-        // If reverse geocoding fails, just use coordinates
-        console.error('Reverse geocoding failed:', err);
-        const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+			try {
+				// Use reverse geocoding to get a human-readable address
+				const address = await this.reverseGeocode(latitude, longitude);
 
-        const locationData = {
-          location: coords,
-          longitude,
-          latitude,
-          verified: true,
-        };
-        
-        this.currentLocationData = locationData;
-        return locationData;
-      }
-    } catch (err) {
-      const geolocationError = err as GeolocationPositionError;
-      if (!this.isPermissionDeniedError(geolocationError)) {
-        console.error('Geolocation error:', err);
-      }
-      const defaultLocation = this.getDefaultLocation();
-      this.currentLocationData = defaultLocation;
-      return defaultLocation;
-    }
-  }
+				const locationData = {
+					location: address,
+					longitude,
+					latitude,
+					verified: true,
+				};
 
-  /**
-   * Browser geolocation permission denial is expected user behavior, not a hard error.
-   */
-  private isPermissionDeniedError(err: GeolocationPositionError | null | undefined): boolean {
-    return err?.code === 1;
-  }
+				this.currentLocationData = locationData;
+				return locationData;
+			} catch (err) {
+				// If reverse geocoding fails, just use coordinates
+				console.error('Reverse geocoding failed:', err);
+				const coords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
-  private async isGeolocationPermissionDenied(): Promise<boolean> {
-    if (!navigator.permissions?.query) {
-      return false;
-    }
+				const locationData = {
+					location: coords,
+					longitude,
+					latitude,
+					verified: true,
+				};
 
-    try {
-      const permission = await navigator.permissions.query({
-        name: 'geolocation' as PermissionName,
-      });
-      return permission.state === 'denied';
-    } catch {
-      return false;
-    }
-  }
+				this.currentLocationData = locationData;
+				return locationData;
+			}
+		} catch (err) {
+			const geolocationError = err as GeolocationPositionError;
+			if (!this.isPermissionDeniedError(geolocationError)) {
+				console.error('Geolocation error:', err);
+			}
+			const defaultLocation = this.getDefaultLocation();
+			this.currentLocationData = defaultLocation;
+			return defaultLocation;
+		}
+	}
 
-  /**
-   * Convert coordinates to human-readable address using reverse geocoding
-   */
-  async reverseGeocode(latitude: number, longitude: number): Promise<string> {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-    );
+	/**
+	 * Browser geolocation permission denial is expected user behavior, not a hard error.
+	 */
+	private isPermissionDeniedError(err: GeolocationPositionError | null | undefined): boolean {
+		return err?.code === 1;
+	}
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch location information');
-    }
+	private async isGeolocationPermissionDenied(): Promise<boolean> {
+		if (!navigator.permissions?.query) {
+			return false;
+		}
 
-    const data = await response.json();
-    return data.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-  }
+		try {
+			const permission = await navigator.permissions.query({
+				name: 'geolocation' as PermissionName,
+			});
+			return permission.state === 'denied';
+		} catch {
+			return false;
+		}
+	}
 
-  /**
-   * Convert address to coordinates using geocoding
-   */
-  async geocodeAddress(address: string): Promise<LocationCoordinates | null> {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`
-      );
+	/**
+	 * Convert coordinates to human-readable address using reverse geocoding
+	 */
+	async reverseGeocode(latitude: number, longitude: number): Promise<string> {
+		const response = await fetch(
+			`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+		);
 
-      if (!response.ok) {
-        throw new Error('Failed to geocode address');
-      }
+		if (!response.ok) {
+			throw new Error('Failed to fetch location information');
+		}
 
-      const data = await response.json();
+		const data = await response.json();
+		return data.display_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+	}
 
-      if (data && data.length > 0) {
-        const result = data[0];
-        return {
-          latitude: parseFloat(result.lat),
-          longitude: parseFloat(result.lon),
-          displayName: result.display_name
-        };
-      }
+	/**
+	 * Convert address to coordinates using geocoding
+	 */
+	async geocodeAddress(address: string): Promise<LocationCoordinates | null> {
+		try {
+			const response = await fetch(
+				`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`
+			);
 
-      return null;
-    } catch (err) {
-      console.error('Geocoding failed', err);
-      return null;
-    }
-  }
+			if (!response.ok) {
+				throw new Error('Failed to geocode address');
+			}
 
-  /**
-   * Get location data from a custom address input
-   */
-  async getLocationFromAddress(address: string): Promise<LocationData> {
-    // Check if the entered location is the default
-    if (address.trim() === this.DEFAULT_LOCATION) {
-      const defaultLocation = this.getDefaultLocation();
-      this.currentLocationData = defaultLocation;
-      return defaultLocation;
-    }
+			const data = await response.json();
 
-    try {
-      // Try to geocode the entered address to get coordinates
-      const geocodedResult = await this.geocodeAddress(address.trim());
+			if (data && data.length > 0) {
+				const result = data[0];
+				return {
+					latitude: parseFloat(result.lat),
+					longitude: parseFloat(result.lon),
+					displayName: result.display_name,
+				};
+			}
 
-      if (geocodedResult) {
-        const locationData = {
-          location: geocodedResult.displayName,
-          longitude: geocodedResult.longitude,
-          latitude: geocodedResult.latitude,
-          verified: true,
-        };
-        
-        // Cache the location data
-        this.currentLocationData = locationData;
-        return locationData;
-      } else {
-        // If geocoding fails, just use the entered text
-        const locationData = {
-          location: address.trim(),
-          verified: false,
-        };
-        
-        this.currentLocationData = locationData;
-        return locationData;
-      }
-    } catch (err) {
-      console.error('Error processing address:', err);
-      const locationData = {
-        location: address.trim(),
-        verified: false,
-      };
-      
-      this.currentLocationData = locationData;
-      return locationData;
-    }
-  }
+			return null;
+		} catch (err) {
+			console.error('Geocoding failed', err);
+			return null;
+		}
+	}
 
-  /**
-   * Convert LocationData to API-compatible format
-   */
-  toApiFormat(locationData: LocationData) {
-    return {
-      userLongitude: locationData.longitude?.toString() ?? '',
-      userLatitude: locationData.latitude?.toString() ?? '',
-      userLocationVerified: locationData.verified ? "true" : "false",
-    };
-  }
+	/**
+	 * Get location data from a custom address input
+	 */
+	async getLocationFromAddress(address: string): Promise<LocationData> {
+		// Check if the entered location is the default
+		if (address.trim() === this.DEFAULT_LOCATION) {
+			const defaultLocation = this.getDefaultLocation();
+			this.currentLocationData = defaultLocation;
+			return defaultLocation;
+		}
+
+		try {
+			// Try to geocode the entered address to get coordinates
+			const geocodedResult = await this.geocodeAddress(address.trim());
+
+			if (geocodedResult) {
+				const locationData = {
+					location: geocodedResult.displayName,
+					longitude: geocodedResult.longitude,
+					latitude: geocodedResult.latitude,
+					verified: true,
+				};
+
+				// Cache the location data
+				this.currentLocationData = locationData;
+				return locationData;
+			} else {
+				// If geocoding fails, just use the entered text
+				const locationData = {
+					location: address.trim(),
+					verified: false,
+				};
+
+				this.currentLocationData = locationData;
+				return locationData;
+			}
+		} catch (err) {
+			console.error('Error processing address:', err);
+			const locationData = {
+				location: address.trim(),
+				verified: false,
+			};
+
+			this.currentLocationData = locationData;
+			return locationData;
+		}
+	}
+
+	/**
+	 * Convert LocationData to API-compatible format
+	 */
+	toApiFormat(locationData: LocationData) {
+		return {
+			userLongitude: locationData.longitude?.toString() ?? '',
+			userLatitude: locationData.latitude?.toString() ?? '',
+			userLocationVerified: locationData.verified ? 'true' : 'false',
+		};
+	}
 }
 
 // Export a singleton instance

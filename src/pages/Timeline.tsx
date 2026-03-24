@@ -9,131 +9,178 @@ import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 import Chat from '@/core/common/components/chat/chat';
+import { SidePanel, useSidePanelStack } from '@/core/common/components/side-panel';
+import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
+import EditCalendarEvent from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEvent';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
-import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
+import {
+	CalendarUIProvider,
+	useCalendarUI,
+} from '@/core/common/components/calendar/calendar-ui.provider';
 
 const Timeline: React.FC = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-  const isAuthLoading = useAppStore((state) => state.isAuthLoading);
-  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const [mobileChatVisible, setMobileChatVisible] = useState(false);
-  const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
-  const showChat = isDesktop || mobileChatVisible;
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [expandedWidth, setExpandedWidth] = useState(0);
-  const [chatExpanded, setChatExpanded] = useState(false);
+	const navigate = useNavigate();
+	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const isAuthLoading = useAppStore((state) => state.isAuthLoading);
+	const isAuthenticated = useAppStore((state) => state.isAuthenticated);
 
-  useEffect(() => {
-    if (!isAuthLoading && !isAuthenticated) {
-      navigate('/signin');
-    }
-  }, [isAuthLoading, isAuthenticated, navigate]);
+	useEffect(() => {
+		if (!isAuthLoading && !isAuthenticated) {
+			navigate('/signin');
+		}
+	}, [isAuthLoading, isAuthenticated, navigate]);
 
-  useEffect(() => {
-    const resizeTimelineWidth = () => {
-      if (contentRef.current) {
-        setExpandedWidth(contentRef.current.offsetWidth);
-      }
-    };
+	if (isAuthLoading) {
+		return (
+			<Container>
+				<LoadingContainer>
+					<Loader />
+				</LoadingContainer>
+			</Container>
+		);
+	}
 
-    resizeTimelineWidth();
-    window.addEventListener('resize', resizeTimelineWidth);
-    return () => window.removeEventListener('resize', resizeTimelineWidth);
-  }, []);
+	if (!authenticatedUser || !isAuthenticated) {
+		return null; // Will redirect to signin
+	}
 
-  if (isAuthLoading) {
-    return (
-      <Container>
-        <LoadingContainer>
-          <Loader />
-        </LoadingContainer>
-      </Container>
-    );
-  }
+	return (
+		<Container>
+			<CalendarUIProvider>
+				<TimelineInner userId={authenticatedUser.id} />
+			</CalendarUIProvider>
+		</Container>
+	);
+};
 
-  if (!authenticatedUser || !isAuthenticated) {
-    return null; // Will redirect to signin
-  }
+const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
+	const { t } = useTranslation();
+	const theme = useTheme();
+	const [mobileChatVisible, setMobileChatVisible] = useState(false);
+	const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
+	const showChat = isDesktop || mobileChatVisible;
+	const contentRef = useRef<HTMLDivElement>(null);
+	const [expandedWidth, setExpandedWidth] = useState(0);
+	const [sidePanelExpanded, setSidePanelExpanded] = useState(false);
+	const {
+		stack: panelStack,
+		push: pushPanel,
+		pop: popPanel,
+	} = useSidePanelStack([{ content: <Chat onClose={() => setMobileChatVisible(false)} /> }]);
 
-  const content = [
-    {
-      key: 'calendar',
-      container: CalendarContainer,
-      content: (
-        <React.Fragment>
-          <CalendarWrapper
-            chatExpanded={chatExpanded}
-            userId={authenticatedUser.id}
-            width={expandedWidth}
-          />
-          <CalendarContainerActionButtons>
-            <MobileChatInputWrapper>
-              <MessageCircleIcon>
-                <MessageCircle size={18} />
-              </MessageCircleIcon>
-              <MobileChatInput
-                onClick={() => setMobileChatVisible(!mobileChatVisible)}
-                placeholder={t('calendar.mobileChatInput.placeholder')}
-                readOnly
-              />
-            </MobileChatInputWrapper>
-          </CalendarContainerActionButtons>
-          {isDesktop && (
-            <ChatExpandToggle
-              title={chatExpanded ? 'Collapse chat' : 'Expand chat'}
-              onClick={() => setChatExpanded(!chatExpanded)}
-            >
-              {chatExpanded ? <ChevronLeft /> : <ChevronRight />}
-            </ChatExpandToggle>
-          )}
-        </React.Fragment>
-      ),
-    },
-    {
-      key: 'chat',
-      container: ChatContainer,
-      content: <Chat onClose={() => setMobileChatVisible(false)} />,
-    },
-  ];
+	// React to editTile store changes and push/pop edit panel
+	const editTileIsOpen = useCalendarUI((s) => s.editTile.state.isOpen);
+	const editTileEvent = useCalendarUI((s) => s.editTile.state.event);
+	const closeEditTile = useCalendarUI((s) => s.editTile.actions.close);
 
-  const contentTransition = useTransition(showChat ? content : content.slice(0, 1), {
-    keys: (item) => item.key,
-    from: { opacity: 0, scale: 1.05 },
-    enter: { opacity: 1, scale: 1 },
-    leave: { opacity: 0, scale: 1 },
-    trail: 200,
-    config: { tension: 200 },
-  });
+	const { closePanelAndStore } = useEditTilePanelSync({
+		editTileIsOpen,
+		editTileEvent,
+		pushPanel: () =>
+			pushPanel({
+				content: (
+					<EditCalendarEvent
+						event={editTileEvent!}
+						onClose={() => closePanelAndStore()}
+					/>
+				),
+			}),
+		popPanel,
+		closeEditTile,
+		setSidePanelExpanded,
+		setMobileChatVisible,
+	});
 
-  return (
-    <Container>
-      <CalendarUIProvider>
-        <TimelineHeader />
+	useEffect(() => {
+		const resizeTimelineWidth = () => {
+			if (contentRef.current) {
+				setExpandedWidth(contentRef.current.offsetWidth);
+			}
+		};
 
-        <TimelineContentContainer>
-          <TimelineContent ref={contentRef}>
-            <CalendarRequestProvider>
-              <CardContent>
-                {contentTransition((style, item) => (
-                  <item.container
-                    style={style}
-                    key={item.key}
-                    $chatexpanded={chatExpanded}
-                  >
-                    {item.content}
-                  </item.container>
-                ))}
-              </CardContent>
-            </CalendarRequestProvider>
-          </TimelineContent>
-        </TimelineContentContainer>
-      </CalendarUIProvider>
-    </Container>
-  );
+		resizeTimelineWidth();
+		window.addEventListener('resize', resizeTimelineWidth);
+		return () => window.removeEventListener('resize', resizeTimelineWidth);
+	}, []);
+
+	const content = [
+		{
+			key: 'calendar',
+			container: CalendarContainer,
+			content: (
+				<React.Fragment>
+					<CalendarWrapper
+						chatExpanded={sidePanelExpanded}
+						userId={userId}
+						width={expandedWidth}
+					/>
+					<CalendarContainerActionButtons>
+						<MobileChatInputWrapper>
+							<MessageCircleIcon>
+								<MessageCircle size={18} />
+							</MessageCircleIcon>
+							<MobileChatInput
+								onClick={() => setMobileChatVisible(!mobileChatVisible)}
+								placeholder={t('calendar.mobileChatInput.placeholder')}
+								readOnly
+							/>
+						</MobileChatInputWrapper>
+					</CalendarContainerActionButtons>
+					{isDesktop && (
+						<SidePanelExpandToggle
+							title={
+								sidePanelExpanded
+									? t('timeline.expandPanel')
+									: t('timeline.collapsePanel')
+							}
+							onClick={() => setSidePanelExpanded(!sidePanelExpanded)}
+						>
+							{sidePanelExpanded ? <ChevronLeft /> : <ChevronRight />}
+						</SidePanelExpandToggle>
+					)}
+				</React.Fragment>
+			),
+		},
+		{
+			key: 'side-panel',
+			container: SidePanelContainer,
+			content: <SidePanel stack={panelStack} />,
+		},
+	];
+
+	const contentTransition = useTransition(showChat ? content : content.slice(0, 1), {
+		keys: (item) => item.key,
+		from: { opacity: 0, scale: 1.05 },
+		enter: { opacity: 1, scale: 1 },
+		leave: { opacity: 0, scale: 1 },
+		trail: 200,
+		config: { tension: 200 },
+	});
+
+	return (
+		<>
+			<CalendarRequestProvider>
+				<TimelineHeader />
+
+				<TimelineContentContainer>
+					<TimelineContent ref={contentRef}>
+						<CardContent>
+							{contentTransition((style, item) => (
+								<item.container
+									style={style}
+									key={item.key}
+									$sidepanelexpanded={sidePanelExpanded}
+								>
+									{item.content}
+								</item.container>
+							))}
+						</CardContent>
+					</TimelineContent>
+				</TimelineContentContainer>
+			</CalendarRequestProvider>
+		</>
+	);
 };
 
 const TimelineContent = styled.main`
@@ -141,7 +188,7 @@ const TimelineContent = styled.main`
 	inset: 1.5rem;
 	border-radius: ${(props) => props.theme.borderRadius.xLarge};
 	background: ${(props) =>
-    `linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`};
+		`linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`};
 	border: 2px solid ${(props) => props.theme.colors.border.default};
 	display: flex;
 	flex-direction: column;
@@ -171,25 +218,25 @@ const CardContent = styled.div`
 	height: calc(100% - 3rem);
 `;
 
-const CalendarContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
+const CalendarContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>`
 	position: relative;
 	grid-column: span 12;
 	height: 100%;
 	background: ${(props) => props.theme.colors.calendar.bg};
 
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
-		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 8)};
+		grid-column: span ${(props) => (props.$sidepanelexpanded ? 12 : 8)};
 		border: 1px solid ${(props) => props.theme.colors.calendar.border};
 		border-left: none;
 		border-radius: 0 ${(props) => props.theme.borderRadius.large}
 			${(props) => props.theme.borderRadius.large} 0;
 	}
 	@media screen and (min-width: ${(props) => props.theme.screens.xl}) {
-		grid-column: span ${(props) => (props.$chatexpanded ? 12 : 9)};
+		grid-column: span ${(props) => (props.$sidepanelexpanded ? 12 : 9)};
 	}
 `;
 
-const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
+const SidePanelContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;
@@ -197,20 +244,22 @@ const ChatContainer = styled(animated.div) <{ $chatexpanded: boolean }>`
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
 	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
-	display: ${(props) => (props.$chatexpanded ? 'none' : 'block')};
+	display: ${(props) => (props.$sidepanelexpanded ? 'none' : 'block')};
+	overflow: hidden;
 
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		position: static;
 		background: transparent;
-		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 4)};
+		grid-column: span ${(props) => (props.$sidepanelexpanded ? 0 : 4)};
 		border: none;
+		min-height: 0;
 	}
 	@media screen and (min-width: ${(props) => props.theme.screens.xl}) {
-		grid-column: span ${(props) => (props.$chatexpanded ? 0 : 3)};
+		grid-column: span ${(props) => (props.$sidepanelexpanded ? 0 : 3)};
 	}
 `;
 
-const ChatExpandToggle = styled.button`
+const SidePanelExpandToggle = styled.button`
 	position: absolute;
 	top: 75%;
 	right: 0;

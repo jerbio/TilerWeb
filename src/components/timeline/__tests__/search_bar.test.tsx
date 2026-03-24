@@ -5,6 +5,7 @@ import { lightTheme } from '@/core/theme/light';
 import SearchBar from '../search_bar';
 import { CalendarEvent } from '@/core/common/types/schedule';
 import { CalendarUIStore } from '@/core/common/components/calendar/calendar-ui.store';
+import dayjs from 'dayjs';
 
 const mockSearchCalendarEventsByName = vi.fn();
 const mockSetCalendarEventAsNow = vi.fn();
@@ -35,13 +36,13 @@ vi.mock('@/global_state', () => ({
 			getState: () => ({
 				authenticatedUser: { id: 'user-id-123', username: 'testuser' },
 			}),
-		},
+		}
 	),
 }));
 
 // Mock zustand Calendar UI store
 vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
-useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
+	useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
 		const mockStore = {
 			createTile: {
 				state: {
@@ -63,11 +64,25 @@ useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
 					navigateToTileComplete: vi.fn(),
 				},
 			},
+			editTile: {
+				state: {
+					isOpen: false,
+					event: null,
+				},
+				actions: {
+					open: vi.fn(),
+					close: vi.fn(),
+				},
+			},
+			viewInfo: {
+				startDay: dayjs(),
+				daysInView: 7,
+			},
+			setViewInfo: vi.fn(),
 		};
 		return selector ? selector(mockStore) : mockStore;
 	},
 }));
-
 
 // Mock ThemeProvider
 vi.mock('@/core/theme/ThemeProvider', () => ({
@@ -481,13 +496,18 @@ describe('SearchBar', () => {
 
 		// Use mockImplementation so debounce timing doesn't exhaust mock values
 		mockSearchCalendarEventsByName.mockImplementation(
-			(_query: string, _userName: string, _userId: string, pagination?: { batchSize?: number; index?: number }) => {
+			(
+				_query: string,
+				_userName: string,
+				_userId: string,
+				pagination?: { batchSize?: number; index?: number }
+			) => {
 				const idx = pagination?.index ?? 0;
 				if (idx === 0) return Promise.resolve(firstPage);
 				if (idx === 10) return Promise.resolve(secondPage);
 				if (idx === 20) return Promise.resolve(thirdPage);
 				return Promise.resolve([]);
-			},
+			}
 		);
 
 		renderWithTheme(<SearchBar />);
@@ -503,7 +523,7 @@ describe('SearchBar', () => {
 			'tile',
 			'testuser',
 			'user-id-123',
-			{ batchSize: 10, index: 0 },
+			{ batchSize: 10, index: 0 }
 		);
 
 		// First load more: index should be 10 (1 * 10), not 1
@@ -516,7 +536,7 @@ describe('SearchBar', () => {
 			'tile',
 			'testuser',
 			'user-id-123',
-			{ batchSize: 10, index: 10 },
+			{ batchSize: 10, index: 10 }
 		);
 
 		// Second load more: index should be 20 (2 * 10), not 2
@@ -529,7 +549,7 @@ describe('SearchBar', () => {
 			'tile',
 			'testuser',
 			'user-id-123',
-			{ batchSize: 10, index: 20 },
+			{ batchSize: 10, index: 20 }
 		);
 	});
 
@@ -612,7 +632,7 @@ describe('SearchBar', () => {
 			<div>
 				<SearchBar />
 				<button data-testid="outside-element">Outside</button>
-			</div>,
+			</div>
 		);
 
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -636,7 +656,7 @@ describe('SearchBar', () => {
 			<div>
 				<SearchBar />
 				<button data-testid="outside-element">Outside</button>
-			</div>,
+			</div>
 		);
 
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -841,7 +861,9 @@ describe('SearchBar', () => {
 		it('dismisses search bar immediately when an action is triggered', async () => {
 			let resolveAction: (value: unknown) => void;
 			mockSetCalendarEventAsNow.mockReturnValue(
-				new Promise((resolve) => { resolveAction = resolve; }),
+				new Promise((resolve) => {
+					resolveAction = resolve;
+				})
 			);
 			const user = await searchAndGetResults();
 

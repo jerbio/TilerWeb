@@ -1,4 +1,12 @@
-import { ScheduleCreateEventParams, ScheduleCreateEventResponse, ScheduleLookupOptions, ScheduleLookupResponse, ScheduleProcrastinateAllParams, ScheduleReviseParams, ScheduleShuffleParams } from '../core/common/types/schedule';
+import {
+	ScheduleCreateEventParams,
+	ScheduleCreateEventResponse,
+	ScheduleLookupOptions,
+	ScheduleLookupResponse,
+	ScheduleProcrastinateAllParams,
+	ScheduleReviseParams,
+	ScheduleShuffleParams,
+} from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
@@ -6,13 +14,11 @@ export class ScheduleApi extends AppApi {
 	public createEvent(params: ScheduleCreateEventParams) {
 		return this.apiRequest<ScheduleCreateEventResponse>('api/Schedule/Event', {
 			method: 'POST',
-			body: JSON.stringify({...params }),
+			body: JSON.stringify({ ...params }),
 		});
 	}
 
-	private lookupSchedule(
-		params: Record<string, string>,
-	) {
+	private lookupSchedule(params: Record<string, string>) {
 		const urlParams = new URLSearchParams({
 			mobileApp: true.toString(),
 			...params,
@@ -21,10 +27,7 @@ export class ScheduleApi extends AppApi {
 		return this.apiRequest<ScheduleLookupResponse>(`api/Schedule/Lookup?${urlParams}`);
 	}
 
-	public lookupScheduleById(
-		scheduleId: string,
-		options: ScheduleLookupOptions,
-	) {
+	public lookupScheduleById(scheduleId: string, options: ScheduleLookupOptions) {
 		return this.lookupSchedule({
 			scheduleId,
 			startRange: options.startRange.toString(),
@@ -32,10 +35,7 @@ export class ScheduleApi extends AppApi {
 		});
 	}
 
-	public lookupScheduleByUserId(
-		userId: string,
-		options: ScheduleLookupOptions,
-	) {
+	public lookupScheduleByUserId(userId: string, options: ScheduleLookupOptions) {
 		return this.lookupSchedule({
 			lookupUserId: userId,
 			startRange: options.startRange.toString(),

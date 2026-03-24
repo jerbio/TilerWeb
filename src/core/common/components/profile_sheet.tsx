@@ -10,66 +10,66 @@ import { useTranslation } from 'react-i18next';
 import Button from './button';
 
 type ProfileSheetProps = {
-  user: UserInfo | null;
-  open: boolean;
-  containerRef: React.RefObject<HTMLDivElement>;
+	user: UserInfo | null;
+	open: boolean;
+	ref: React.RefObject<HTMLDivElement>;
 };
 
-const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, containerRef, user }) => {
-  const logout = useAppStore((state) => state.logout);
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const theme = useTheme();
+const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
+	const logout = useAppStore((state) => state.logout);
+	const navigate = useNavigate();
+	const { t } = useTranslation();
+	const theme = useTheme();
 
-  const openSheetSpring = useSpring({
-    opacity: open ? 1 : 0,
-    scale: open ? 1 : 0.9,
-    config: { tension: 300, friction: 25 },
-  });
+	const openSheetSpring = useSpring({
+		opacity: open ? 1 : 0,
+		scale: open ? 1 : 0.9,
+		config: { tension: 300, friction: 25 },
+	});
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success(t('timeline.userMenu.signOutSuccess'));
-      navigate('/signin');
-    } catch (error) {
-      toast.error(t('timeline.userMenu.signOutError'));
-      console.error('Logout failed:', error);
-    }
-  };
+	const handleLogout = async () => {
+		try {
+			await logout();
+			toast.success(t('timeline.userMenu.signOutSuccess'));
+			navigate('/signin');
+		} catch (error) {
+			toast.error(t('timeline.userMenu.signOutError'));
+			console.error('Logout failed:', error);
+		}
+	};
 
-  return (
-    <AnimatedProfileMenu
-      ref={containerRef}
-      style={{
-        opacity: openSheetSpring.opacity,
-        transform: openSheetSpring.scale.to((s) => `scale(${s})`),
-        pointerEvents: open ? 'all' : 'none',
-      }}
-    >
-      <ProfileHeader onClick={() => navigate('/settings')}>
-        <ProfileAvatar>
-          <User size={24} />
-        </ProfileAvatar>
-        <ProfileInfo>
-          <ProfileName>
-            {user?.fullName ||
-              user?.firstName ||
-              user?.username ||
-              t('timeline.userMenu.defaultUsername')}
-          </ProfileName>
-          {user?.email && <ProfileEmail>{user.email}</ProfileEmail>}
-        </ProfileInfo>
-      </ProfileHeader>
+	return (
+		<AnimatedProfileMenu
+			ref={ref}
+			style={{
+				opacity: openSheetSpring.opacity,
+				transform: openSheetSpring.scale.to((s) => `scale(${s})`),
+				pointerEvents: open ? 'all' : 'none',
+			}}
+		>
+			<ProfileHeader onClick={() => navigate('/settings')}>
+				<ProfileAvatar>
+					<User size={24} />
+				</ProfileAvatar>
+				<ProfileInfo>
+					<ProfileName>
+						{user?.fullName ||
+							user?.firstName ||
+							user?.username ||
+							t('timeline.userMenu.defaultUsername')}
+					</ProfileName>
+					{user?.email && <ProfileEmail>{user.email}</ProfileEmail>}
+				</ProfileInfo>
+			</ProfileHeader>
 
-      <ProfileDivider />
+			<ProfileDivider />
 
-      <LogoutButton variant="ghost" onClick={handleLogout}>
-        <LogOut size={16} color={theme.colors.error[400]} />
-        {t('timeline.userMenu.logout')}
-      </LogoutButton>
-    </AnimatedProfileMenu>
-  );
+			<LogoutButton variant="ghost" onClick={handleLogout}>
+				<LogOut size={16} color={theme.colors.error[400]} />
+				{t('timeline.userMenu.logout')}
+			</LogoutButton>
+		</AnimatedProfileMenu>
+	);
 };
 
 const AnimatedProfileMenu = styled(animated.div)`
@@ -84,7 +84,7 @@ const AnimatedProfileMenu = styled(animated.div)`
 	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 	transform-origin: top right;
 	z-index: 1000;
-padding-inline: 1rem;
+	padding-inline: 1rem;
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;

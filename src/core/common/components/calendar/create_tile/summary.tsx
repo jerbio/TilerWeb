@@ -6,28 +6,28 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { InitialCreateTileFormState } from '.';
 import {
-  ScheduleRepeatEndType,
-  ScheduleRepeatFrequency,
-  ScheduleRepeatStartType,
+	ScheduleRepeatEndType,
+	ScheduleRepeatFrequency,
+	ScheduleRepeatStartType,
 } from '@/core/common/types/schedule';
 
 type SummaryProps = {
-  formData: InitialCreateTileFormState;
+	formData: InitialCreateTileFormState;
 };
 
-const Summary: React.FC<SummaryProps> = ({ formData }) => {
+const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
 
-  const frequencyDescription = React.useMemo(() => {
-    if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Yearly)
-      return t('calendar.createTile.summary.recurrenceFrequency.yearly');
-    if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Monthly)
-      return t('calendar.createTile.summary.recurrenceFrequency.monthly');
-    if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Weekly)
-      return t('calendar.createTile.summary.recurrenceFrequency.weekly');
-    return t('calendar.createTile.summary.recurrenceFrequency.daily');
-  }, [formData.recurrenceFrequency, t]);
+	const frequencyDescription = React.useMemo(() => {
+		if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Yearly)
+			return t('calendar.createTile.summary.recurrenceFrequency.yearly');
+		if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Monthly)
+			return t('calendar.createTile.summary.recurrenceFrequency.monthly');
+		if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Weekly)
+			return t('calendar.createTile.summary.recurrenceFrequency.weekly');
+		return t('calendar.createTile.summary.recurrenceFrequency.daily');
+	}, [formData.recurrenceFrequency, t]);
 
   return (
     <SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
@@ -50,6 +50,24 @@ const Summary: React.FC<SummaryProps> = ({ formData }) => {
             }),
           }}
         />
+        {!formData.isRecurring && (
+          <Trans
+            components={{ b: <b /> }}
+            i18nKey="calendar.createTile.summary.range"
+            values={{
+              start: dayjs(formData.start).toDate().toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+              end: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+            }}
+          />
+        )}
         {formData.isRecurring && (
           <>
             <Trans
@@ -96,12 +114,12 @@ const Summary: React.FC<SummaryProps> = ({ formData }) => {
   );
 };
 
-export default Summary;
+export default CreateTileSummary;
 
 const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
 	${({ theme, $darkmode, $color }) => {
-    const summaryColor = new RGBColor($color);
-    return `
+		const summaryColor = new RGBColor($color);
+		return `
 line-height: 1.5;
 			position: sticky;
 			bottom: calc(52px + 1rem);
@@ -139,5 +157,5 @@ line-height: 1.5;
         transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 			}
 		`;
-  }}
+	}}
 `;

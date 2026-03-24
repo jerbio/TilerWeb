@@ -52,7 +52,7 @@ vi.mock('@/global_state', () => ({
 					},
 				}),
 			}),
-		},
+		}
 	),
 }));
 
@@ -102,7 +102,7 @@ const renderShuffleButton = () =>
 	render(
 		<ThemeProvider theme={lightTheme}>
 			<ShuffleButton />
-		</ThemeProvider>,
+		</ThemeProvider>
 	);
 
 describe('ShuffleButton', () => {
@@ -139,7 +139,7 @@ describe('ShuffleButton', () => {
 			expect(mockShowNotification).toHaveBeenCalledWith(
 				'shuffle-schedule-shuffle',
 				'Shuffling schedule...',
-				'loading',
+				'loading'
 			);
 		});
 
@@ -147,7 +147,7 @@ describe('ShuffleButton', () => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
 				'shuffle-schedule-shuffle',
 				'Schedule shuffled!',
-				'success',
+				'success'
 			);
 		});
 	});
@@ -164,7 +164,7 @@ describe('ShuffleButton', () => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
 				'shuffle-schedule-shuffle',
 				'Shuffle failed. Please try again.',
-				'error',
+				'error'
 			);
 		});
 	});
@@ -229,7 +229,7 @@ describe('ShuffleButton', () => {
 		render(
 			<ThemeProvider theme={lightTheme}>
 				<ShuffleButton disabled />
-			</ThemeProvider>,
+			</ThemeProvider>
 		);
 		expect(screen.getByRole('button', { name: 'Shuffle schedule' })).toBeDisabled();
 	});
@@ -242,7 +242,7 @@ describe('ShuffleButton', () => {
 		render(
 			<ThemeProvider theme={lightTheme}>
 				<ShuffleButton onLoadingChange={onLoadingChange} />
-			</ThemeProvider>,
+			</ThemeProvider>
 		);
 		await user.click(screen.getByRole('button', { name: 'Shuffle schedule' }));
 

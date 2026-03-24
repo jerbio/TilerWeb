@@ -5,7 +5,10 @@ import useAuthNavigate from '@/hooks/useNavigateHome';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
-import WeeklySchedule, { WeeklyScheduleSize, type DaySchedule } from '@/core/common/components/WeeklySchedule';
+import WeeklySchedule, {
+	WeeklyScheduleSize,
+	type DaySchedule,
+} from '@/core/common/components/WeeklySchedule';
 import { userService } from '@/services';
 import {
 	calculateSleepDurationMs,
@@ -17,7 +20,6 @@ import {
 	scheduleToWeekDayOptions,
 	isScheduleActive,
 } from '@/core/common/utils/restrictionUtils';
-
 
 // Map API values to UI values
 enum TransportModeUI {
@@ -50,7 +52,9 @@ const PreferencesSettings: React.FC = () => {
 
 	// Transportation mode
 	const [transportMode, setTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
-	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>(TransportModeUI.Drive);
+	const [originalTransportMode, setOriginalTransportMode] = useState<TransportModeUI>(
+		TransportModeUI.Drive
+	);
 
 	// Bed time
 	const [bedTimeStart, setBedTimeStart] = useState('');
@@ -62,15 +66,15 @@ const PreferencesSettings: React.FC = () => {
 	const [isSaving, setIsSaving] = useState(false);
 
 	// Work hours restriction
-	const [workSchedule, setWorkSchedule] = useState<DaySchedule[]>(
-		() => Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' })),
+	const [workSchedule, setWorkSchedule] = useState<DaySchedule[]>(() =>
+		Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
 	);
 	const [originalWorkSchedule, setOriginalWorkSchedule] = useState<DaySchedule[]>([]);
 	const [workProfileId, setWorkProfileId] = useState<string>('');
 
 	// Personal hours restriction
-	const [personalSchedule, setPersonalSchedule] = useState<DaySchedule[]>(
-		() => Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' })),
+	const [personalSchedule, setPersonalSchedule] = useState<DaySchedule[]>(() =>
+		Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
 	);
 	const [originalPersonalSchedule, setOriginalPersonalSchedule] = useState<DaySchedule[]>([]);
 	const [personalProfileId, setPersonalProfileId] = useState<string>('');
@@ -94,9 +98,10 @@ const PreferencesSettings: React.FC = () => {
 				const rawStartTime = sp.endTimeOfDay || '';
 				const startTime = normalizeTimeString(rawStartTime);
 				const sleepDuration = sp.sleepDuration || 0;
-				const endTime = startTime && sleepDuration > 0
-					? calculateBedTimeEnd(startTime, sleepDuration)
-					: '';
+				const endTime =
+					startTime && sleepDuration > 0
+						? calculateBedTimeEnd(startTime, sleepDuration)
+						: '';
 
 				setBedTimeStart(startTime);
 				setBedTimeEnd(endTime);
@@ -104,13 +109,17 @@ const PreferencesSettings: React.FC = () => {
 				setOriginalBedTimeEnd(endTime);
 
 				// Work hours restriction
-				const workSched = restrictionProfileToSchedule(scheduleProfile.workHoursRestrictionProfile);
+				const workSched = restrictionProfileToSchedule(
+					scheduleProfile.workHoursRestrictionProfile
+				);
 				setWorkSchedule(workSched);
 				setOriginalWorkSchedule(workSched);
 				setWorkProfileId(scheduleProfile.workHoursRestrictionProfile?.id || '');
 
 				// Personal hours restriction
-				const personalSched = restrictionProfileToSchedule(scheduleProfile.personalHoursRestrictionProfile);
+				const personalSched = restrictionProfileToSchedule(
+					scheduleProfile.personalHoursRestrictionProfile
+				);
 				setPersonalSchedule(personalSched);
 				setOriginalPersonalSchedule(personalSched);
 				setPersonalProfileId(scheduleProfile.personalHoursRestrictionProfile?.id || '');
@@ -130,19 +139,27 @@ const PreferencesSettings: React.FC = () => {
 		const dayNameKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 		for (const day of workSchedule) {
 			if ((day.startTime && !day.endTime) || (!day.startTime && day.endTime)) {
-				toast.error(t('settings.sections.tilePreferences.scheduleIncompleteDay', {
-					label: t('settings.sections.tilePreferences.myWorkHours'),
-					day: t(`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`),
-				}));
+				toast.error(
+					t('settings.sections.tilePreferences.scheduleIncompleteDay', {
+						label: t('settings.sections.tilePreferences.myWorkHours'),
+						day: t(
+							`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`
+						),
+					})
+				);
 				return;
 			}
 		}
 		for (const day of personalSchedule) {
 			if ((day.startTime && !day.endTime) || (!day.startTime && day.endTime)) {
-				toast.error(t('settings.sections.tilePreferences.scheduleIncompleteDay', {
-					label: t('settings.sections.tilePreferences.myPersonalHours'),
-					day: t(`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`),
-				}));
+				toast.error(
+					t('settings.sections.tilePreferences.scheduleIncompleteDay', {
+						label: t('settings.sections.tilePreferences.myPersonalHours'),
+						day: t(
+							`settings.sections.tilePreferences.dayNames.${dayNameKeys[day.dayIndex]}`
+						),
+					})
+				);
 				return;
 			}
 		}
@@ -180,7 +197,8 @@ const PreferencesSettings: React.FC = () => {
 
 		// Check if restriction profiles changed
 		const workChanged = JSON.stringify(workSchedule) !== JSON.stringify(originalWorkSchedule);
-		const personalChanged = JSON.stringify(personalSchedule) !== JSON.stringify(originalPersonalSchedule);
+		const personalChanged =
+			JSON.stringify(personalSchedule) !== JSON.stringify(originalPersonalSchedule);
 
 		// If nothing changed, don't make API call
 		if (Object.keys(changedScheduleProfile).length === 0 && !workChanged && !personalChanged) {
@@ -205,9 +223,10 @@ const PreferencesSettings: React.FC = () => {
 				const rawStartTime = scheduleProfile.endTimeOfDay || '';
 				const startTime = normalizeTimeString(rawStartTime);
 				const sleepDuration = scheduleProfile.sleepDuration || 0;
-				const endTime = startTime && sleepDuration > 0
-					? calculateBedTimeEnd(startTime, sleepDuration)
-					: '';
+				const endTime =
+					startTime && sleepDuration > 0
+						? calculateBedTimeEnd(startTime, sleepDuration)
+						: '';
 
 				setBedTimeStart(startTime);
 				setBedTimeEnd(endTime);
@@ -245,12 +264,16 @@ const PreferencesSettings: React.FC = () => {
 
 				const updatedProfile = await userService.updateScheduleProfile(profileParams);
 
-				const newWorkSched = restrictionProfileToSchedule(updatedProfile.workHoursRestrictionProfile);
+				const newWorkSched = restrictionProfileToSchedule(
+					updatedProfile.workHoursRestrictionProfile
+				);
 				setWorkSchedule(newWorkSched);
 				setOriginalWorkSchedule(newWorkSched);
 				setWorkProfileId(updatedProfile.workHoursRestrictionProfile?.id || '');
 
-				const newPersonalSched = restrictionProfileToSchedule(updatedProfile.personalHoursRestrictionProfile);
+				const newPersonalSched = restrictionProfileToSchedule(
+					updatedProfile.personalHoursRestrictionProfile
+				);
 				setPersonalSchedule(newPersonalSched);
 				setOriginalPersonalSchedule(newPersonalSched);
 				setPersonalProfileId(updatedProfile.personalHoursRestrictionProfile?.id || '');
@@ -268,12 +291,10 @@ const PreferencesSettings: React.FC = () => {
 	const handleWorkScheduleChange = useCallback(
 		(dayIndex: number, field: 'startTime' | 'endTime', value: string) => {
 			setWorkSchedule((prev) =>
-				prev.map((day) =>
-					day.dayIndex === dayIndex ? { ...day, [field]: value } : day,
-				),
+				prev.map((day) => (day.dayIndex === dayIndex ? { ...day, [field]: value } : day))
 			);
 		},
-		[],
+		[]
 	);
 
 	const handleWorkDayToggle = useCallback(
@@ -281,23 +302,29 @@ const PreferencesSettings: React.FC = () => {
 			setWorkSchedule((prev) =>
 				prev.map((day) =>
 					day.dayIndex === dayIndex
-						? { ...day, startTime: selected ? t('settings.sections.tilePreferences.defaultStartTime') : '', endTime: selected ? t('settings.sections.tilePreferences.defaultEndTime') : '' }
-						: day,
-				),
+						? {
+								...day,
+								startTime: selected
+									? t('settings.sections.tilePreferences.defaultStartTime')
+									: '',
+								endTime: selected
+									? t('settings.sections.tilePreferences.defaultEndTime')
+									: '',
+							}
+						: day
+				)
 			);
 		},
-		[t],
+		[t]
 	);
 
 	const handlePersonalScheduleChange = useCallback(
 		(dayIndex: number, field: 'startTime' | 'endTime', value: string) => {
 			setPersonalSchedule((prev) =>
-				prev.map((day) =>
-					day.dayIndex === dayIndex ? { ...day, [field]: value } : day,
-				),
+				prev.map((day) => (day.dayIndex === dayIndex ? { ...day, [field]: value } : day))
 			);
 		},
-		[],
+		[]
 	);
 
 	const handlePersonalDayToggle = useCallback(
@@ -305,12 +332,20 @@ const PreferencesSettings: React.FC = () => {
 			setPersonalSchedule((prev) =>
 				prev.map((day) =>
 					day.dayIndex === dayIndex
-						? { ...day, startTime: selected ? t('settings.sections.tilePreferences.defaultStartTime') : '', endTime: selected ? t('settings.sections.tilePreferences.defaultEndTime') : '' }
-						: day,
-				),
+						? {
+								...day,
+								startTime: selected
+									? t('settings.sections.tilePreferences.defaultStartTime')
+									: '',
+								endTime: selected
+									? t('settings.sections.tilePreferences.defaultEndTime')
+									: '',
+							}
+						: day
+				)
 			);
 		},
-		[t],
+		[t]
 	);
 
 	return (
@@ -324,7 +359,9 @@ const PreferencesSettings: React.FC = () => {
 					{t('settings.breadcrumb.settings')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>
-				<BreadcrumbCurrent>{t('settings.sections.tilePreferences.title')}</BreadcrumbCurrent>
+				<BreadcrumbCurrent>
+					{t('settings.sections.tilePreferences.title')}
+				</BreadcrumbCurrent>
 			</Breadcrumb>
 
 			<Header>
@@ -369,10 +406,14 @@ const PreferencesSettings: React.FC = () => {
 			</Section>
 
 			<Section>
-				<SectionTitle>{t('settings.sections.tilePreferences.defineTimeRestrictions')}</SectionTitle>
+				<SectionTitle>
+					{t('settings.sections.tilePreferences.defineTimeRestrictions')}
+				</SectionTitle>
 
 				<RestrictionBlock>
-					<RestrictionLabel>{t('settings.sections.tilePreferences.myWorkHours')}:</RestrictionLabel>
+					<RestrictionLabel>
+						{t('settings.sections.tilePreferences.myWorkHours')}:
+					</RestrictionLabel>
 					<WeeklySchedule
 						schedule={workSchedule}
 						onChange={handleWorkScheduleChange}
@@ -383,7 +424,9 @@ const PreferencesSettings: React.FC = () => {
 				</RestrictionBlock>
 
 				<RestrictionBlock>
-					<RestrictionLabel>{t('settings.sections.tilePreferences.myPersonalHours')}:</RestrictionLabel>
+					<RestrictionLabel>
+						{t('settings.sections.tilePreferences.myPersonalHours')}:
+					</RestrictionLabel>
 					<WeeklySchedule
 						schedule={personalSchedule}
 						onChange={handlePersonalScheduleChange}
@@ -395,10 +438,14 @@ const PreferencesSettings: React.FC = () => {
 			</Section>
 
 			<Section>
-				<SectionTitle>{t('settings.sections.tilePreferences.setBlockOutHours')}</SectionTitle>
+				<SectionTitle>
+					{t('settings.sections.tilePreferences.setBlockOutHours')}
+				</SectionTitle>
 
 				<TimeRestrictionRow data-testid="bed-time-section">
-					<TimeRestrictionLabel>{t('settings.sections.tilePreferences.bedTime')}:</TimeRestrictionLabel>
+					<TimeRestrictionLabel>
+						{t('settings.sections.tilePreferences.bedTime')}:
+					</TimeRestrictionLabel>
 					<TimeSelectorsGroup>
 						<TimeDropdown
 							value={bedTimeStart}
@@ -416,13 +463,16 @@ const PreferencesSettings: React.FC = () => {
 			</Section>
 
 			<SaveButtonContainer>
-				<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving || isLoading}>
+				<Button
+					variant="brand"
+					onClick={handleSaveChanges}
+					disabled={isSaving || isLoading}
+				>
 					{isSaving
 						? t('settings.sections.tilePreferences.saving')
 						: t('settings.sections.tilePreferences.saveChanges')}
 				</Button>
 			</SaveButtonContainer>
-
 		</Container>
 	);
 };

@@ -52,7 +52,7 @@ vi.mock('@/global_state', () => ({
 					},
 				}),
 			}),
-		},
+		}
 	),
 }));
 
@@ -103,7 +103,7 @@ const renderReviseButton = () =>
 	render(
 		<ThemeProvider theme={lightTheme}>
 			<ReviseButton />
-		</ThemeProvider>,
+		</ThemeProvider>
 	);
 
 describe('ReviseButton', () => {
@@ -140,7 +140,7 @@ describe('ReviseButton', () => {
 			expect(mockShowNotification).toHaveBeenCalledWith(
 				'revise-schedule-revise',
 				'Revising schedule...',
-				'loading',
+				'loading'
 			);
 		});
 
@@ -148,7 +148,7 @@ describe('ReviseButton', () => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
 				'revise-schedule-revise',
 				'Schedule revised!',
-				'success',
+				'success'
 			);
 		});
 	});
@@ -165,7 +165,7 @@ describe('ReviseButton', () => {
 			expect(mockUpdateNotification).toHaveBeenCalledWith(
 				'revise-schedule-revise',
 				'Revise failed. Please try again.',
-				'error',
+				'error'
 			);
 		});
 	});
@@ -230,7 +230,7 @@ describe('ReviseButton', () => {
 		render(
 			<ThemeProvider theme={lightTheme}>
 				<ReviseButton disabled />
-			</ThemeProvider>,
+			</ThemeProvider>
 		);
 		expect(screen.getByRole('button', { name: 'Revise schedule' })).toBeDisabled();
 	});
@@ -243,7 +243,7 @@ describe('ReviseButton', () => {
 		render(
 			<ThemeProvider theme={lightTheme}>
 				<ReviseButton onLoadingChange={onLoadingChange} />
-			</ThemeProvider>,
+			</ThemeProvider>
 		);
 		await user.click(screen.getByRole('button', { name: 'Revise schedule' }));
 

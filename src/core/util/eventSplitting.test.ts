@@ -9,8 +9,6 @@ function createMockEvent(
 ): ScheduleSubCalendarEvent {
 	return {
 		id: 'test-event-123',
-		start: overrides.start,
-		end: overrides.end,
 		name: 'Test Event',
 		isSleep: false,
 		sleepDay: 0,

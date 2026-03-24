@@ -4,78 +4,76 @@ import styled, { useTheme } from 'styled-components';
 import { X } from 'lucide-react';
 
 type ModalProps = {
-  headerText?: string;
-  headerStyle?: React.CSSProperties;
-  show: boolean;
-  setShow?: (show: boolean) => void;
-  children?: React.ReactNode;
-  footer?: React.ReactNode;
-  closeTimeout?: number;
+	headerText?: string;
+	headerStyle?: React.CSSProperties;
+	show: boolean;
+	setShow?: (show: boolean) => void;
+	children?: React.ReactNode;
+	footer?: React.ReactNode;
+	closeTimeout?: number;
 };
 
 const Modal: React.FC<ModalProps> = ({
-  show,
-  setShow,
-  children,
-  headerText = '',
-  headerStyle,
-  footer,
-  closeTimeout,
+	show,
+	setShow,
+	children,
+	headerText = '',
+	headerStyle,
+	footer,
+	closeTimeout,
 }) => {
-  const theme = useTheme();
-  const [intervalId, setIntervalId] = React.useState<number>();
-  const [timeLeft, setTimeLeft] = React.useState<number>(closeTimeout ?? 0);
-  const timerExists = show && !!setShow && closeTimeout !== undefined;
+	const theme = useTheme();
+	const [intervalId, setIntervalId] = React.useState<number>();
+	const [timeLeft, setTimeLeft] = React.useState<number>(closeTimeout ?? 0);
+	const timerExists = show && !!setShow && closeTimeout !== undefined;
 
-  function closeModal() {
-    setShow?.(false);
-    clearInterval(intervalId);
-    setTimeLeft(0);
-  }
+	function closeModal() {
+		setShow?.(false);
+		clearInterval(intervalId);
+		setTimeLeft(0);
+	}
 
-  useEffect(() => {
-    if (timerExists) {
+	useEffect(() => {
+		if (timerExists) {
 			setTimeLeft(closeTimeout);
-      const id = window.setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-      setIntervalId(id);
-    }
+			const id = window.setInterval(() => {
+				setTimeLeft((prev) => prev - 1);
+			}, 1000);
+			setIntervalId(id);
+		}
 
-    return () => clearInterval(intervalId);
-  }, [show, setShow, closeTimeout]);
+		return () => clearInterval(intervalId);
+	}, [show, setShow, closeTimeout]);
 
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      closeModal();
-    }
-  }, [timeLeft, setShow]);
+	useEffect(() => {
+		if (timeLeft <= 0) {
+			closeModal();
+		}
+	}, [timeLeft, setShow]);
 
-  return createPortal(
-    <Overlay onClick={closeModal} $show={show}>
-      <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <Header style={headerStyle}>
-          <h3>{headerText}</h3>
-          {setShow && (
-            <CloseButtonTimerWrapper
-              $isclosing={timerExists}
-              $closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
-            >
-              <CloseButton onClick={closeModal}>
-                <X color={theme.colors.text.secondary} size={16} />
-              </CloseButton>
-              {timerExists && (
-                <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>
-              )}
-            </CloseButtonTimerWrapper>
-          )}
-        </Header>
-        <ModalBody>{children}</ModalBody>
-        {footer && <ModalFooter>{footer}</ModalFooter>}
-      </ModalContainer>
-    </Overlay>,
-    document.body
-  );
+	return createPortal(
+		<Overlay onClick={closeModal} $show={show}>
+			<ModalContainer onClick={(e) => e.stopPropagation()}>
+				<Header style={headerStyle}>
+					<h3>{headerText}</h3>
+					{setShow && (
+						<CloseButtonTimerWrapper
+							$isclosing={timerExists}
+							$closetimeleftratio={timerExists ? timeLeft / closeTimeout : 0}
+						>
+							<CloseButton onClick={closeModal}>
+								<X color={theme.colors.text.secondary} size={16} />
+							</CloseButton>
+							{timerExists && <CloseButtonTimer>{timeLeft}s</CloseButtonTimer>}
+						</CloseButtonTimerWrapper>
+					)}
+				</Header>
+				<ModalBody>{children}</ModalBody>
+				{footer && <ModalFooter>{footer}</ModalFooter>}
+			</ModalContainer>
+		</Overlay>,
+		document.body
+	);
 };
 
 const CloseButtonTimer = styled.div`
@@ -96,7 +94,7 @@ const CloseButtonTimerWrapper = styled.div<{ $isclosing: boolean; $closetimeleft
 	padding: 0.25rem;
 	border-radius: calc(${(props) => props.theme.borderRadius.medium} + 0.125rem);
 	background-color: ${(props) =>
-    props.$isclosing ? props.theme.colors.border.default : props.theme.colors.background.card};
+		props.$isclosing ? props.theme.colors.border.default : props.theme.colors.background.card};
 	isolate: isolate;
 
 	&::after {

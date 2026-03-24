@@ -6,36 +6,38 @@ import { ActionType } from '@/core/common/types/chat';
 
 /** Entity types that the calendar knows how to display */
 export enum CalendarEntityType {
-  SubcalendarEvent = 'SubcalendarEvent',
-  CalendarEvent = 'CalendarEvent',
-  RestrictionProfile = 'RestrictionProfile',
-  None = 'None',
+	SubcalendarEvent = 'SubcalendarEvent',
+	CalendarEvent = 'CalendarEvent',
+	RestrictionProfile = 'RestrictionProfile',
+	None = 'None',
 }
 
 /** Status codes reported back after the calendar processes a request */
 export enum CalendarRequestStatus {
-  Found = 'found',
-  NotFound = 'not_found',
-  Navigating = 'navigating',
-  Stale = 'stale',
-  DemoMode = 'demo_mode',
-  Error = 'error',
+	Found = 'found',
+	NotFound = 'not_found',
+	Navigating = 'navigating',
+	Stale = 'stale',
+	DemoMode = 'demo_mode',
+	Error = 'error',
 }
 
 /** Discriminant values for each calendar request kind */
 export enum CalendarRequestType {
-  FocusEvent = 'focus_event',
-  NavigateToDate = 'navigate_to_date',
+	FocusEvent = 'focus_event',
+	NavigateToDate = 'navigate_to_date',
+	GoToToday = 'go_to_today',
+	NavigateWeek = 'navigate_week',
 }
 
 /** Result reported back to the dispatcher after the calendar processes a request */
 export type CalendarRequestResult =
-  | { status: CalendarRequestStatus.Found; entityId: string }
-  | { status: CalendarRequestStatus.NotFound; entityId: string }
-  | { status: CalendarRequestStatus.Navigating; entityId: string }
-  | { status: CalendarRequestStatus.Stale; entityId: string }
-  | { status: CalendarRequestStatus.DemoMode; entityId: string }
-  | { status: CalendarRequestStatus.Error; message: string };
+	| { status: CalendarRequestStatus.Found; entityId: string }
+	| { status: CalendarRequestStatus.NotFound; entityId: string }
+	| { status: CalendarRequestStatus.Navigating; entityId: string }
+	| { status: CalendarRequestStatus.Stale; entityId: string }
+	| { status: CalendarRequestStatus.DemoMode; entityId: string }
+	| { status: CalendarRequestStatus.Error; message: string };
 
 /**
  * Schedule context attached to a request so the calendar listener
@@ -45,8 +47,8 @@ export type CalendarRequestResult =
  * - `currentScheduleId` — the schedule version the calendar currently displays (from Zustand)
  */
 export interface ScheduleContext {
-  afterScheduleId: string | null;
-  currentScheduleId: string | null;
+	afterScheduleId: string | null;
+	currentScheduleId: string | null;
 }
 
 // ── Individual request types ───────────────────────────────────
@@ -58,12 +60,12 @@ export interface ScheduleContext {
  * Handled by Calendar internally.
  */
 export interface FocusEventRequest {
-  type: CalendarRequestType.FocusEvent;
-  entityId: string;
-  entityType: CalendarEntityType;
-  actionType: ActionType;
-  /** Optional schedule context for staleness detection */
-  scheduleContext?: ScheduleContext;
+	type: CalendarRequestType.FocusEvent;
+	entityId: string;
+	entityType: CalendarEntityType;
+	actionType: ActionType;
+	/** Optional schedule context for staleness detection */
+	scheduleContext?: ScheduleContext;
 }
 
 /**
@@ -73,15 +75,34 @@ export interface FocusEventRequest {
  * currently loaded date range.
  */
 export interface NavigateToDateRequest {
-  type: CalendarRequestType.NavigateToDate;
-  /** ISO-8601 date string or unix ms timestamp */
-  date: string | number;
-  /** Optional: after navigating, re-attempt this pending focus */
-  pendingFocusEntityId?: string;
+	type: CalendarRequestType.NavigateToDate;
+	/** ISO-8601 date string or unix ms timestamp */
+	date: string | number;
+	/** Optional: after navigating, re-attempt this pending focus */
+	pendingFocusEntityId?: string;
+}
+
+/**
+ * Ask the calendar to navigate its view back to today.
+ */
+export interface GoToTodayRequest {
+	type: CalendarRequestType.GoToToday;
+}
+
+/**
+ * Ask the calendar to shift its view by one week forward or backward.
+ */
+export interface NavigateWeekRequest {
+	type: CalendarRequestType.NavigateWeek;
+	direction: 'back' | 'forward';
 }
 
 /** Discriminated union of every request the calendar can handle */
-export type CalendarRequest = FocusEventRequest | NavigateToDateRequest;
+export type CalendarRequest =
+	| FocusEventRequest
+	| NavigateToDateRequest
+	| GoToTodayRequest
+	| NavigateWeekRequest;
 
 // ── Envelope — wraps a request with transport-level concerns ───
 
@@ -91,9 +112,9 @@ export type CalendarRequest = FocusEventRequest | NavigateToDateRequest;
  * envelope; dispatchers provide the request + optional onResult.
  */
 export interface CalendarRequestEnvelope {
-  request: CalendarRequest;
-  /** Optional callback so the dispatcher can react to the outcome */
-  onResult?: (result: CalendarRequestResult) => void;
+	request: CalendarRequest;
+	/** Optional callback so the dispatcher can react to the outcome */
+	onResult?: (result: CalendarRequestResult) => void;
 }
 
 // ── Listener callback signature ────────────────────────────────

@@ -1,11 +1,16 @@
-import { CalendarEventResponse, CalendarEventSearchParams, CalendarEventSearchResponse, SubEventsOfCalendarResponse } from '../core/common/types/schedule';
+﻿import {
+	CalendarEventResponse,
+	CalendarEventSearchParams,
+	CalendarEventSearchResponse,
+	CalendarEventUpdateParams,
+	SubEventsOfCalendarResponse,
+} from '../core/common/types/schedule';
 import { PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
 
-export type CalendarEventQueryOptions = PaginationParams
+export type CalendarEventQueryOptions = PaginationParams;
 
 export class CalendarEventApi extends AppApi {
-
 	/** Build query-string params shared by both endpoints. */
 	private buildParams(eventId: string, options?: CalendarEventQueryOptions): string {
 		const params: Record<string, string> = { EventID: eventId };
@@ -41,7 +46,9 @@ export class CalendarEventApi extends AppApi {
 	 */
 	public getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
 		const urlParams = this.buildParams(eventId, options);
-		return this.apiRequest<SubEventsOfCalendarResponse>(`api/CalendarEvent/SubEvents?${urlParams}`);
+		return this.apiRequest<SubEventsOfCalendarResponse>(
+			`api/CalendarEvent/SubEvents?${urlParams}`
+		);
 	}
 
 	/**
@@ -99,6 +106,17 @@ export class CalendarEventApi extends AppApi {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent', {
 			method: 'DELETE',
 			body: JSON.stringify({ EventID: eventId }),
+		});
+	}
+
+	/**
+	 * Update a calendar event.
+	 * `POST /api/CalendarEvent/Update`
+	 */
+	public updateCalendarEvent(params: CalendarEventUpdateParams) {
+		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
+			method: 'POST',
+			body: JSON.stringify(params),
 		});
 	}
 }
