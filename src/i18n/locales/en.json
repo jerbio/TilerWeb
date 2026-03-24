@@ -191,7 +191,30 @@
 		},
 		"createTile": {
 			"title": "Add a New Tile",
-			"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+			"info": {
+				"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+				"action": {
+					"label": "Tile Name",
+					"placeholder": "What is the name of this tile?"
+				},
+				"location": {
+					"label": "Tile Location",
+					"placeholder": "Where is this tile held?"
+				},
+				"hours": {
+					"label": "Tile Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+        "minutes": {
+          "label": "Tile Duration (Minutes)",
+          "placeholder": "How many mins will it take?"
+        },
+				"range": {
+					"label": "Time Range",
+					"description": "Schedule between",
+					"conjunction": "and"
+				}
+			},
 			"sections": {
 				"tileColor": "Select Tile Color",
 				"tileActions": "Tile Actions",
@@ -270,7 +293,8 @@
 			},
 			"summary": {
 				"title": "Summary",
-				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>, and I need to get it done by <b>{{deadline}}</b>",
+				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
+				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
 					"daily": "day",
 					"weekly": "week",
