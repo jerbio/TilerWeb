@@ -693,7 +693,7 @@ const EditableValue = styled.p<{ $isEditable: boolean }>`
 		$isEditable &&
 		`
     &:hover {
-      background-color: ${theme.colors.gray[700]};
+      background-color: ${theme.colors.background.card2};
 
       .edit-icon {
         opacity: 0.8;
@@ -724,11 +724,11 @@ const EditableName = styled.div<{ $isEditable: boolean }>`
 		flex-shrink: 0;
 	}
 
-	${({ $isEditable }) =>
+	${({ $isEditable, theme }) =>
 		$isEditable &&
 		`
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: ${theme.colors.background.card2};
 
       .edit-icon {
         opacity: 0.8;
@@ -974,11 +974,11 @@ const IconButton = styled.button<{ $primary?: boolean }>`
     }
   `
 			: `
-    background-color: ${theme.colors.gray[700]};
-    color: ${theme.colors.gray[300]};
+    background-color: ${theme.colors.background.card2};
+    color: ${theme.colors.text.secondary};
 
     &:hover {
-      background-color: ${theme.colors.gray[600]};
+      background-color: ${theme.colors.calendar.sidebarButtonHover};
     }
   `}
 `;
