@@ -185,6 +185,11 @@
 			},
 			"save": "Save",
 			"cancel": "Cancel",
+			"actions": {
+				"complete": "Complete",
+				"now": "Now",
+				"defer": "Defer"
+			},
 			"validation": {
 				"endAfterStart": "End time must be after start time"
 			}
@@ -1038,6 +1043,8 @@
 			"setAsNowSuccess": "Event set as current!",
 			"completing": "Completing event...",
 			"completeSuccess": "Event completed!",
+			"deferring": "Deferring event...",
+			"deferSuccess": "Event deferred!",
 			"deleting": "Deleting event...",
 			"deleteSuccess": "Event deleted!",
 			"actionFailed": "Action failed. Please try again."

@@ -7,6 +7,7 @@ import {
 	ScheduleCreateEventParams,
 	ScheduleLookupOptions,
 	ScheduleProcrastinateAllParams,
+	ScheduleProcrastinateEventParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
 	CalendarEventUpdateParams,
@@ -256,6 +257,48 @@ class ScheduleService {
 			return response.Content;
 		} catch (error) {
 			console.error('Error revising schedule', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Mark a single event as complete via Schedule API.
+	 * `POST /api/Schedule/Events/Complete`
+	 */
+	async completeScheduleEvent(eventId: string) {
+		try {
+			const response = await this.scheduleApi.completeEvent(eventId);
+			return response.Content;
+		} catch (error) {
+			console.error('Error completing schedule event', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Set a single event as the current ("now") event via Schedule API.
+	 * `POST /api/Schedule/Event/Now`
+	 */
+	async setScheduleEventAsNow(eventId: string) {
+		try {
+			const response = await this.scheduleApi.setEventAsNow(eventId);
+			return response.Content;
+		} catch (error) {
+			console.error('Error setting schedule event as now', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Procrastinate (defer) a single event via Schedule API.
+	 * `POST /api/Schedule/Event/Procrastinate`
+	 */
+	async procrastinateScheduleEvent(params: ScheduleProcrastinateEventParams) {
+		try {
+			const response = await this.scheduleApi.procrastinateEvent(params);
+			return response.Content;
+		} catch (error) {
+			console.error('Error procrastinating schedule event', error);
 			throw normalizeError(error);
 		}
 	}

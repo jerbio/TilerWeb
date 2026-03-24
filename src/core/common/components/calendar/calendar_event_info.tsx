@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ScheduleSubCalendarEvent } from '../../types/schedule';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
 	CalendarArrowDown,
 	CalendarArrowUp,
 	Check,
+	ChevronRight,
 	Clock,
 	ExternalLink,
 	Pencil,
+	Play,
 	Repeat2,
 	Star,
 	Target,
@@ -32,6 +34,8 @@ import LocationBG from '@/assets/event/location-bg.png';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import calendarConfig from '@/core/constants/calendar_config';
 import Loader from '../loader';
+import { scheduleService } from '@/services';
+import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 
 type CalendarEventInfoProps = {
 	event: ScheduleSubCalendarEvent | null;
@@ -42,6 +46,7 @@ type CalendarEventInfoProps = {
 		end?: number;
 		calendarEnd?: number;
 	}) => void;
+	onEventAction?: () => void;
 	isEditable?: boolean;
 	isSaving?: boolean;
 };
@@ -50,6 +55,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	event,
 	onClose,
 	onEventUpdate,
+	onEventAction,
 	isEditable = true,
 	isSaving = false,
 }) => {
@@ -75,6 +81,20 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
 	// Validation error
 	const [validationError, setValidationError] = useState<string | null>(null);
+
+	// Action loading state
+	const [actionLoading, setActionLoading] = useState<'complete' | 'now' | 'defer' | null>(null);
+
+	// Defer duration picker state
+	const [showDeferPicker, setShowDeferPicker] = useState(false);
+	const [deferDays, setDeferDays] = useState(0);
+	const [deferHours, setDeferHours] = useState(0);
+	const [deferMinutes, setDeferMinutes] = useState(0);
+	const isDeferDurationZero = deferDays === 0 && deferHours === 0 && deferMinutes === 0;
+
+	// Notification helpers
+	const showNotification = useUiStore((s) => s.notification.show);
+	const updateNotification = useUiStore((s) => s.notification.update);
 
 	// Use original times (preserved before visual splitting) or fall back to start/end
 	const eventStart = event?.originalStart ?? event?.start ?? 0;
@@ -156,6 +176,83 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		onEventUpdate?.(updates);
 		setHasChanges(false);
 	};
+
+	const handleComplete = useCallback(async () => {
+		if (!event || actionLoading) return;
+		setActionLoading('complete');
+		const nId = notificationId(NotificationAction.Complete, event.id);
+		showNotification(nId, t('calendarEvent.notifications.completing'), 'loading');
+		try {
+			await scheduleService.completeScheduleEvent(event.id);
+			updateNotification(nId, t('calendarEvent.notifications.completeSuccess'), 'success');
+			onEventAction?.();
+		} catch (error) {
+			console.error('Complete failed:', error);
+			updateNotification(nId, t('calendarEvent.notifications.actionFailed'), 'error');
+		} finally {
+			setActionLoading(null);
+		}
+	}, [event, actionLoading, showNotification, updateNotification, t, onEventAction]);
+
+	const handleSetAsNow = useCallback(async () => {
+		if (!event || actionLoading) return;
+		setActionLoading('now');
+		const nId = notificationId(NotificationAction.SetAsNow, event.id);
+		showNotification(nId, t('calendarEvent.notifications.settingAsNow'), 'loading');
+		try {
+			await scheduleService.setScheduleEventAsNow(event.id);
+			updateNotification(nId, t('calendarEvent.notifications.setAsNowSuccess'), 'success');
+			onEventAction?.();
+		} catch (error) {
+			console.error('Set as now failed:', error);
+			updateNotification(nId, t('calendarEvent.notifications.actionFailed'), 'error');
+		} finally {
+			setActionLoading(null);
+		}
+	}, [event, actionLoading, showNotification, updateNotification, t, onEventAction]);
+
+	const handleToggleDeferPicker = useCallback(() => {
+		if (actionLoading) return;
+		setShowDeferPicker((prev) => !prev);
+		setDeferDays(0);
+		setDeferHours(0);
+		setDeferMinutes(0);
+	}, [actionLoading]);
+
+	const handleCancelDefer = useCallback(() => {
+		setShowDeferPicker(false);
+		setDeferDays(0);
+		setDeferHours(0);
+		setDeferMinutes(0);
+	}, []);
+
+	const handleConfirmDefer = useCallback(async () => {
+		if (!event || actionLoading || isDeferDurationZero) return;
+		setShowDeferPicker(false);
+		setActionLoading('defer');
+		const nId = notificationId(NotificationAction.Procrastinate, event.id);
+		showNotification(nId, t('calendarEvent.notifications.deferring'), 'loading');
+		try {
+			const totalMs = ((deferDays * 24 + deferHours) * 60 + deferMinutes) * 60 * 1000;
+			await scheduleService.procrastinateScheduleEvent({
+				EventID: event.id,
+				DurationDays: deferDays,
+				DurationHours: deferHours,
+				DurationMins: deferMinutes,
+				DurationInMs: totalMs,
+			});
+			updateNotification(nId, t('calendarEvent.notifications.deferSuccess'), 'success');
+			onEventAction?.();
+		} catch (error) {
+			console.error('Defer failed:', error);
+			updateNotification(nId, t('calendarEvent.notifications.actionFailed'), 'error');
+		} finally {
+			setActionLoading(null);
+			setDeferDays(0);
+			setDeferHours(0);
+			setDeferMinutes(0);
+		}
+	}, [event, actionLoading, isDeferDurationZero, deferDays, deferHours, deferMinutes, showNotification, updateNotification, t, onEventAction]);
 
 	const eventColor = new RGBColor({
 		r: event ? event.colorRed : 128,
@@ -461,6 +558,106 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 				)}
 			</ScrollableBody>
 
+			{/* Action Buttons / Defer Duration Picker */}
+			{!hasChanges && (
+				<EventActionBar>
+					{showDeferPicker ? (
+						<>
+							<DeferDurationField>
+								<DeferDurationInput
+									type="number"
+									inputMode="numeric"
+									min={0}
+									max={365}
+									value={deferDays}
+									onChange={(e) => setDeferDays(Math.max(0, parseInt(e.target.value) || 0))}
+									aria-label={t('timeline.procrastinateAll.days')}
+								/>
+								<DeferUnitLabel>{t('timeline.procrastinateAll.daysShort')}</DeferUnitLabel>
+							</DeferDurationField>
+							<DeferDurationField>
+								<DeferDurationInput
+									type="number"
+									inputMode="numeric"
+									min={0}
+									max={23}
+									value={deferHours}
+									onChange={(e) => setDeferHours(Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))}
+									aria-label={t('timeline.procrastinateAll.hours')}
+								/>
+								<DeferUnitLabel>{t('timeline.procrastinateAll.hoursShort')}</DeferUnitLabel>
+							</DeferDurationField>
+							<DeferDurationField>
+								<DeferDurationInput
+									type="number"
+									inputMode="numeric"
+									min={0}
+									max={59}
+									value={deferMinutes}
+									onChange={(e) => setDeferMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+									aria-label={t('timeline.procrastinateAll.minutes')}
+								/>
+								<DeferUnitLabel>{t('timeline.procrastinateAll.minutesShort')}</DeferUnitLabel>
+							</DeferDurationField>
+							<DeferPickerIconButton
+								onClick={handleConfirmDefer}
+								disabled={isDeferDurationZero}
+								aria-label={t('timeline.procrastinateAll.confirm')}
+							>
+								{actionLoading === 'defer' ? <ActionSpinner /> : <Check size={16} />}
+							</DeferPickerIconButton>
+							<DeferPickerIconButton
+								onClick={handleCancelDefer}
+								aria-label={t('timeline.procrastinateAll.cancel')}
+							>
+								<X size={16} />
+							</DeferPickerIconButton>
+						</>
+					) : (
+						<>
+							<EventActionButton
+								onClick={handleComplete}
+								disabled={!!actionLoading}
+								title={t('calendar.event.actions.complete')}
+							>
+								<div className="action-icon">
+									{actionLoading === 'complete' ? (
+										<ActionSpinner />
+									) : (
+										<Check size={20} />
+									)}
+								</div>
+								<span>{t('calendar.event.actions.complete')}</span>
+							</EventActionButton>
+							<EventActionButton
+								onClick={handleSetAsNow}
+								disabled={!!actionLoading}
+								title={t('calendar.event.actions.now')}
+							>
+								<div className="action-icon">
+									{actionLoading === 'now' ? (
+										<ActionSpinner />
+									) : (
+										<Play size={20} />
+									)}
+								</div>
+								<span>{t('calendar.event.actions.now')}</span>
+							</EventActionButton>
+							<EventActionButton
+								onClick={handleToggleDeferPicker}
+								disabled={!!actionLoading}
+								title={t('calendar.event.actions.defer')}
+							>
+								<div className="action-icon">
+									<ChevronRight size={20} />
+								</div>
+								<span>{t('calendar.event.actions.defer')}</span>
+							</EventActionButton>
+						</>
+					)}
+				</EventActionBar>
+			)}
+
 			{/* Loading Overlay */}
 			<LoadingOverlay $loading={isSaving}>
 				<Loader />
@@ -600,6 +797,136 @@ const ScrollableBody = styled.div`
 	}
 	scrollbar-width: thin;
 	scrollbar-color: ${({ theme }) => theme.colors.gray[400]} transparent;
+`;
+
+const spin = keyframes`
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+`;
+
+const ActionSpinner = styled.div`
+	width: 20px;
+	height: 20px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: ${spin} 0.6s linear infinite;
+`;
+
+const EventActionBar = styled.div`
+	display: flex;
+	justify-content: space-evenly;
+	align-items: flex-start;
+	padding: 14px 16px 10px;
+	min-height: 84px;
+	box-sizing: border-box;
+	border-top: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	flex-shrink: 0;
+`;
+
+const EventActionButton = styled.button`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	background: none;
+	border: none;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	cursor: pointer;
+	padding: 0;
+	transition: opacity 0.2s ease;
+
+	.action-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: ${({ theme }) => theme.colors.background.card2};
+		border: 1px solid ${({ theme }) => theme.colors.border.default};
+		transition: background-color 0.2s ease;
+	}
+
+	span {
+		font-size: ${({ theme }) => theme.typography.fontSize.xs};
+		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+		color: ${({ theme }) => theme.colors.text.muted};
+	}
+
+	&:hover:not(:disabled) .action-icon {
+		background: ${({ theme }) => theme.colors.calendar.sidebarButtonHover};
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+`;
+
+const DeferDurationField = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+`;
+
+const DeferUnitLabel = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	color: ${({ theme }) => theme.colors.text.muted};
+	user-select: none;
+`;
+
+const DeferDurationInput = styled.input`
+	width: 44px;
+	height: 44px;
+	padding: 0 4px;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.primary};
+	background: ${({ theme }) => theme.colors.background.card2};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 50%;
+	text-align: center;
+	box-sizing: border-box;
+
+	-moz-appearance: textfield;
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	&:focus {
+		outline: none;
+		border-color: ${({ theme }) => theme.colors.brand[500]};
+	}
+`;
+
+const DeferPickerIconButton = styled.button`
+	height: 44px;
+	width: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: ${({ theme }) => theme.colors.button.primary.text};
+	background-color: ${({ theme }) => theme.colors.button.primary.bg};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 50%;
+	cursor: pointer;
+	padding: 0;
+	flex-shrink: 0;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&:hover:not(:disabled) {
+		opacity: 0.8;
+	}
 `;
 
 const LoadingOverlay = styled.div<{ $loading: boolean }>`

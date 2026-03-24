@@ -417,6 +417,16 @@ export type ScheduleReviseParams = ScheduleUpdateParams & {
 	IsTimeZoneAdjusted?: string;
 };
 
+/** Params for `POST /api/Schedule/Event/Procrastinate` */
+export type ScheduleProcrastinateEventParams = {
+	EventID: string;
+	Version?: string;
+	DurationDays?: number;
+	DurationHours?: number;
+	DurationMins?: number;
+	DurationInMs?: number;
+};
+
 /** Params for `POST /api/Schedule/ProcrastinateAll` */
 export type ScheduleProcrastinateAllParams = ScheduleUpdateParams & {
 	DurationDays?: number;
