@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Input from '../../input';
 import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 type InfoProps = {
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
@@ -13,40 +14,43 @@ type InfoProps = {
 const CreateTileInfo: React.FC<InfoProps> = ({
   formHandler: { formData, handleFormInputChange },
 }) => {
+	const { t } = useTranslation();
+
   return (
     <Grid>
       <Input
-        label="Tile Name"
+        label={t('calendar.createTile.info.action.label')}
         required
         name="action"
-        placeholder={'What is the name of this tile?'}
+        placeholder={t('calendar.createTile.info.action.placeholder')}
         value={formData.action}
         onChange={handleFormInputChange('action')}
       />
       <Input
-        label="Tile Location"
+        label={t('calendar.createTile.info.location.label')}
         name="location"
-        placeholder={'Where is this tile held?'}
+        placeholder={t('calendar.createTile.info.location.placeholder')}
         value={formData.location}
         onChange={handleFormInputChange('location')}
       />
       <Input
-        label="Tile Duration (hours)"
+        label={t('calendar.createTile.info.hours.label')}
         required
         type="number"
         name="durationHours"
-        placeholder={'How many hrs will it take?'}
+        placeholder={t('calendar.createTile.info.hours.placeholder')}
         value={formData.durationHours}
         onChange={handleFormInputChange('durationHours', {
           restriction: 'integer',
         })}
       />
       <Input
-        label="Tile Duration (mins)"
+        label={t('calendar.createTile.info.minutes.label')}
         required
         type="number"
         name="durationMins"
-        placeholder={'How many mins will it take?'}
+				step="5"
+        placeholder={t('calendar.createTile.info.minutes.placeholder')}
         value={formData.durationMins}
         onChange={handleFormInputChange('durationMins', {
           restriction: 'integer',
@@ -54,9 +58,9 @@ const CreateTileInfo: React.FC<InfoProps> = ({
       />
       {!formData.isRecurring && (
         <RangeContainer>
-          <h3>Time Range</h3>
+          <h3>{t('calendar.createTile.info.range.label')}</h3>
           <RangeDescription>
-            <p>Schedule between</p>
+            <p>{t('calendar.createTile.info.range.description')}</p>
             <DatePicker
               value={dayjs(formData.start).format('YYYY-MM-DD')}
               maxDate={dayjs(formData.deadline).format('YYYY-MM-DD')}
@@ -66,7 +70,7 @@ const CreateTileInfo: React.FC<InfoProps> = ({
                 })(dayjs(date))
               }
             />
-            <p>and</p>
+            <p>{t('calendar.createTile.info.range.conjunction')}</p>
             <DatePicker
               value={dayjs(formData.deadline).format('YYYY-MM-DD')}
               minDate={dayjs(formData.start).format('YYYY-MM-DD')}

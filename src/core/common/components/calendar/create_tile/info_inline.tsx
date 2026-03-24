@@ -25,7 +25,7 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
   return (
     <InlineControl>
       <Trans
-        i18nKey="calendar.createTile.description"
+        i18nKey="calendar.createTile.info.description"
         components={{
           action: (
             <InlineInput
@@ -60,6 +60,7 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
             <InlineInput
               markRequired
               value={formData.durationMins}
+							step={5}
               onChange={handleFormInputChange('durationMins', {
                 restriction: 'integer',
               })}
