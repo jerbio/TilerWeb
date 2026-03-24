@@ -1108,80 +1108,54 @@
 			"title": "Here\u2019s Where Everything Lives",
 			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
 		},
-		"whatIsTiler": {
-			"badge": "What Is Tiler",
-			"title": "Not a calendar. An AI that runs your day",
-			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn\u2019t go to plan.",
+		"setUpTiler": {
+			"badge": "Set Up Tiler",
+			"title": "Ready in under 3 minutes.",
+			"summary": "Your calendar, your preferences, your constraints \u2014 four steps that give Tiler everything it needs to run Adaptive Scheduling from day one.",
 			"visual": {
-				"tile1": "Gym \u00b7 45 min",
-				"tile2": "Travel \u00b7 12 min",
-				"tile3": "Client Call \u00b7 1 hr",
-				"tile4": "Groceries \u00b7 30 min"
+				"step1": "Create Account",
+				"step2": "Connect Calendar",
+				"step3": "Set Up Preferences",
+				"step4": "Adaptive Scheduling"
 			},
-			"subItems": {
-				"aiRunsDay": {
-					"title": "Tiler is an AI that runs your day.",
-					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn\u2019t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
+			"cards": {
+				"account": {
+					"title": "Create your account",
+					"subtext": "Sign up with your email \u2014 free to start, no credit card needed.",
+					"btnIdle": "Create free account",
+					"btnCreating": "Creating account\u2026",
+					"btnDone": "\u2713 Account created!"
 				},
-				"fourCoreBlocks": {
-					"title": "The Four Core Blocks of Tiler"
+				"calendar": {
+					"title": "Connect your calendar",
+					"subtext": "Link Google or Outlook \u2014 Tiler reads your events and builds around them.",
+					"calName": "Google Calendar",
+					"statusIdle": "Tap to connect",
+					"statusConnecting": "Connecting\u2026",
+					"statusConnected": "\u2713 Connected"
 				},
-				"howDifferent": {
-					"title": "How Tiler is Different"
+				"preferences": {
+					"title": "Set up your preferences",
+					"subtext": "Choose your transit mode and set time limits in your profile.",
+					"transitLabel": "Transit mode",
+					"drive": "Drive",
+					"transit": "Transit",
+					"walk": "Walk",
+					"workHoursLabel": "Work hours"
+				},
+				"adaptive": {
+					"title": "Ready for Adaptive Scheduling",
+					"subtext": "Your schedule is live \u2014 Tiler adapts automatically as your day changes.",
+					"schedLabel": "Your schedule",
+					"meeting": "9am meeting",
+					"run": "Run \u00b7 30m",
+					"newTime": "New: 10am",
+					"urgentCall": "Urgent call",
+					"recalculating": "Recalculating\u2026",
+					"rebuilt": "\u2713 Schedule rebuilt"
 				}
 			},
-			"coreBlocks": {
-				"tiles": {
-					"label": "AutoTile",
-					"title": "Tiles",
-					"desc": "Flexible tasks. Set a goal and duration \u2014 Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
-				},
-				"blocks": {
-					"label": "Locked",
-					"title": "Blocks",
-					"desc": "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them."
-				},
-				"route": {
-					"label": "Location-aware",
-					"title": "Route",
-					"desc": "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop."
-				},
-				"tileShare": {
-					"label": "Team & Family",
-					"title": "TileShare",
-					"desc": "Assign tiles to teammates or family. Everyone\u2019s calendar adapts around shared commitments automatically. Context travels with the task."
-				}
-			},
-			"comparison": {
-				"headerLeft": "Google Calendar",
-				"headerRight": "Tiler",
-				"rows": [
-					{
-						"left": "You schedule everything manually",
-						"right": "AI builds your schedule from plain English"
-					},
-					{
-						"left": "No awareness of travel time",
-						"right": "Auto-calculates and adds travel buffers"
-					},
-					{
-						"left": "Static \u2014 won\u2019t adapt when things change",
-						"right": "Detects ripples and reschedules instantly"
-					},
-					{
-						"left": "No navigation or route planning",
-						"right": "Navigate your day tile-to-tile with real transit"
-					},
-					{
-						"left": "Shared calendars only \u2014 no task assignment",
-						"right": "TileShare: assign and track tasks with anyone"
-					},
-					{
-						"left": "Nothing confirmed \u2014 events just appear",
-						"right": "Confirmation-first \u2014 you approve all changes"
-					}
-				]
-			}
+			"supportNote": "Each step is an input to Tiler\u2019s scheduling engine \u2014 your calendar tells it what\u2019s fixed, your preferences tell it how you move, and your time limits tell it when you\u2019re free. Together, they give Tiler the full picture it needs to run Adaptive Scheduling: a schedule that adjusts itself when things change."
 		},
 		"features": {
 			"badge": "Features",
