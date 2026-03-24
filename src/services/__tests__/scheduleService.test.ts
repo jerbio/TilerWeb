@@ -8,6 +8,7 @@ import {
 	CalendarEvent,
 	CalendarEventUpdateParams,
 	ScheduleProcrastinateAllParams,
+	ScheduleProcrastinateEventParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
 	ScheduleSubCalendarEvent,
@@ -322,6 +323,85 @@ describe('ScheduleService', () => {
 
 			await expect(
 				service.procrastinateAllSchedule(procrastinateAllParams)
+			).rejects.toThrow();
+		});
+	});
+
+	describe('completeScheduleEvent', () => {
+		const eventId = 'event-id-123';
+
+		it('calls completeEvent on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.completeEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.completeScheduleEvent(eventId);
+
+			expect(scheduleApi.completeEvent).toHaveBeenCalledWith(eventId);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.completeEvent).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.completeScheduleEvent(eventId)).rejects.toThrow();
+		});
+	});
+
+	describe('setScheduleEventAsNow', () => {
+		const eventId = 'event-id-123';
+
+		it('calls setEventAsNow on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.setEventAsNow).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.setScheduleEventAsNow(eventId);
+
+			expect(scheduleApi.setEventAsNow).toHaveBeenCalledWith(eventId);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.setEventAsNow).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.setScheduleEventAsNow(eventId)).rejects.toThrow();
+		});
+	});
+
+	describe('procrastinateScheduleEvent', () => {
+		const procrastinateParams: ScheduleProcrastinateEventParams = {
+			EventID: 'event-id-123',
+			DurationDays: 1,
+			DurationHours: 2,
+			DurationMins: 30,
+			DurationInMs: 95400000,
+		};
+
+		it('calls procrastinateEvent on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.procrastinateEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.procrastinateScheduleEvent(procrastinateParams);
+
+			expect(scheduleApi.procrastinateEvent).toHaveBeenCalledWith(procrastinateParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.procrastinateEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(
+				service.procrastinateScheduleEvent(procrastinateParams)
 			).rejects.toThrow();
 		});
 	});

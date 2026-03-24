@@ -185,9 +185,15 @@
 			},
 			"save": "Save",
 			"cancel": "Cancel",
+			"actions": {
+				"complete": "Complete",
+				"now": "Now",
+				"defer": "Defer"
+			},
 			"validation": {
 				"endAfterStart": "End time must be after start time"
-			}
+			},
+			"moreOptions": "More options"
 		},
 		"createTile": {
 			"title": "Add a New Tile",
@@ -1038,6 +1044,10 @@
 			"setAsNowSuccess": "Event set as current!",
 			"completing": "Completing event...",
 			"completeSuccess": "Event completed!",
+			"deferring": "Deferring event...",
+			"deferSuccess": "Event deferred!",
+			"updating": "Saving changes...",
+			"updateSuccess": "Changes saved!",
 			"deleting": "Deleting event...",
 			"deleteSuccess": "Event deleted!",
 			"actionFailed": "Action failed. Please try again."
