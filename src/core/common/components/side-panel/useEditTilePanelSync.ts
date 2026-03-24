@@ -29,6 +29,7 @@ export function useEditTilePanelSync({
 	setMobileChatVisible,
 }: UseEditTilePanelSyncOptions) {
 	const wasPushedRef = useRef(false);
+	const prevEventIdRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (editTileIsOpen && editTileEvent && !wasPushedRef.current) {
@@ -36,9 +37,21 @@ export function useEditTilePanelSync({
 			setSidePanelExpanded(false);
 			setMobileChatVisible(true);
 			wasPushedRef.current = true;
+			prevEventIdRef.current = editTileEvent.id;
+		} else if (
+			editTileIsOpen &&
+			editTileEvent &&
+			wasPushedRef.current &&
+			editTileEvent.id !== prevEventIdRef.current
+		) {
+			// Event changed while panel already open — replace with new event
+			popPanel();
+			pushPanel({ content: null });
+			prevEventIdRef.current = editTileEvent.id;
 		} else if (!editTileIsOpen && wasPushedRef.current) {
 			popPanel();
 			wasPushedRef.current = false;
+			prevEventIdRef.current = null;
 		}
 	}, [
 		editTileIsOpen,
@@ -54,6 +67,7 @@ export function useEditTilePanelSync({
 		closeEditTile();
 		setMobileChatVisible(false);
 		wasPushedRef.current = false;
+		prevEventIdRef.current = null;
 	}, [popPanel, closeEditTile, setMobileChatVisible]);
 
 	return { closePanelAndStore };

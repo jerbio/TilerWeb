@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ScheduleSubCalendarEvent } from '../../types/schedule';
+import { CalendarEvent, ScheduleSubCalendarEvent } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
 	CalendarArrowDown,
@@ -11,6 +11,7 @@ import {
 	Pencil,
 	Play,
 	Repeat2,
+	Settings,
 	Star,
 	Target,
 	X,
@@ -32,10 +33,11 @@ import {
 } from '@/core/util/eventTimeConversion';
 import LocationBG from '@/assets/event/location-bg.png';
 import { useTheme } from '@/core/theme/ThemeProvider';
-import calendarConfig from '@/core/constants/calendar_config';
 import Loader from '../loader';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
+import { useCalendarUI } from './calendar-ui.provider';
+import { getCalendarEventId } from '@/core/util/entityResolution';
 
 type CalendarEventInfoProps = {
 	event: ScheduleSubCalendarEvent | null;
@@ -52,6 +54,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
+	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
 
 	// Edit mode flags
 	const [isEditingName, setIsEditingName] = useState(false);
@@ -340,9 +343,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 						</IconButton>
 					</HeaderActions>
 				) : (
-					<button onClick={onClose}>
-						<X size={16} color={eventColor.setLightness(0.5).toHex()} />
-					</button>
+					<HeaderActions>
+						<button onClick={onClose}>
+							<X size={16} color={eventColor.setLightness(0.5).toHex()} />
+						</button>
+					</HeaderActions>
 				)}
 			</CalendarEventInfoHeader>
 			<ScrollableBody>
@@ -565,6 +570,23 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 				)}
 			</ScrollableBody>
 
+			{/* More Options Row */}
+			{!hasChanges && (
+				<MoreOptionsRow
+					onClick={() => {
+						if (!event) return;
+						const calendarEventId = getCalendarEventId(event.id);
+						openEditTile({ id: calendarEventId } as CalendarEvent);
+						onClose?.();
+					}}
+					$color={eventColor}
+				>
+					<Settings size={16} />
+					<span>{t('calendar.event.moreOptions')}</span>
+					<ChevronRight size={16} />
+				</MoreOptionsRow>
+			)}
+
 			{/* Action Buttons / Defer Duration Picker */}
 			{!hasChanges && (
 				<EventActionBar>
@@ -626,6 +648,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 								onClick={handleComplete}
 								disabled={!!actionLoading}
 								title={t('calendar.event.actions.complete')}
+								$color={eventColor}
+								$darkmode={isDarkMode}
 							>
 								<div className="action-icon">
 									{actionLoading === 'complete' ? (
@@ -640,6 +664,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 								onClick={handleSetAsNow}
 								disabled={!!actionLoading}
 								title={t('calendar.event.actions.now')}
+								$color={eventColor}
+								$darkmode={isDarkMode}
 							>
 								<div className="action-icon">
 									{actionLoading === 'now' ? (
@@ -654,6 +680,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 								onClick={handleToggleDeferPicker}
 								disabled={!!actionLoading}
 								title={t('calendar.event.actions.defer')}
+								$color={eventColor}
+								$darkmode={isDarkMode}
 							>
 								<div className="action-icon">
 									<ChevronRight size={20} />
@@ -789,20 +817,6 @@ const HeaderActions = styled.div`
 
 const ScrollableBody = styled.div`
 	flex: 1;
-	overflow-y: auto;
-	overflow-x: hidden;
-
-	&::-webkit-scrollbar {
-		width: 4px;
-	}
-	&::-webkit-scrollbar-track {
-		background: transparent;
-	}
-	&::-webkit-scrollbar-thumb {
-		background-color: ${({ theme }) => theme.colors.gray[400]};
-		border-radius: 4px;
-	}
-	scrollbar-width: thin;
 	scrollbar-color: ${({ theme }) => theme.colors.gray[400]} transparent;
 `;
 
@@ -820,6 +834,33 @@ const ActionSpinner = styled.div`
 	animation: ${spin} 0.6s linear infinite;
 `;
 
+const MoreOptionsRow = styled.button<{ $color: RGBColor }>`
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 16px;
+	background: none;
+	border: none;
+	border-top: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	cursor: pointer;
+	color: ${({ $color }) => $color.setLightness(0.6).toHex()};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	transition: background-color 0.2s ease;
+	flex-shrink: 0;
+
+	span {
+		flex: 1;
+		text-align: left;
+	}
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.calendar.sidebarButtonHover};
+	}
+`;
+
 const EventActionBar = styled.div`
 	display: flex;
 	justify-content: space-evenly;
@@ -831,14 +872,14 @@ const EventActionBar = styled.div`
 	flex-shrink: 0;
 `;
 
-const EventActionButton = styled.button`
+const EventActionButton = styled.button<{ $color: RGBColor; $darkmode: boolean }>`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 6px;
 	background: none;
 	border: none;
-	color: ${({ theme }) => theme.colors.text.secondary};
+	color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.6 : 0.4).toHex()};
 	cursor: pointer;
 	padding: 0;
 	transition: opacity 0.2s ease;
@@ -850,8 +891,8 @@ const EventActionButton = styled.button`
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
-		background: ${({ theme }) => theme.colors.background.card2};
-		border: 1px solid ${({ theme }) => theme.colors.border.default};
+		background: transparent;
+		border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.7).toHex()};
 		transition: background-color 0.2s ease;
 	}
 
@@ -859,11 +900,11 @@ const EventActionButton = styled.button`
 		font-size: ${({ theme }) => theme.typography.fontSize.xs};
 		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 		font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-		color: ${({ theme }) => theme.colors.text.muted};
+		color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.6 : 0.4).toHex()};
 	}
 
 	&:hover:not(:disabled) .action-icon {
-		background: ${({ theme }) => theme.colors.calendar.sidebarButtonHover};
+		background: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 0.85).toHex()};
 	}
 
 	&:disabled {
@@ -1098,11 +1139,9 @@ const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolea
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
 	background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	width: 100%;
-	overflow: hidden;
 	border: 1px solid
 		${({ theme, $darkmode }) => (!$darkmode ? theme.colors.gray[300] : 'transparent')};
 

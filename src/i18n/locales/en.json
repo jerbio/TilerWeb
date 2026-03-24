@@ -192,7 +192,8 @@
 			},
 			"validation": {
 				"endAfterStart": "End time must be after start time"
-			}
+			},
+			"moreOptions": "More options"
 		},
 		"createTile": {
 			"title": "Add a New Tile",

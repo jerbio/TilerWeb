@@ -5,6 +5,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n/config';
 import CalendarEventInfo from '../calendar_event_info';
 import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { CalendarUIProvider } from '../calendar-ui.provider';
 
 // Mock services
 vi.mock('@/services', () => ({
@@ -59,7 +60,9 @@ const createMockEvent = (
 const renderWithProviders = (ui: React.ReactElement) =>
 	render(
 		<I18nextProvider i18n={i18n}>
-			<ThemeProvider defaultTheme="light">{ui}</ThemeProvider>
+			<ThemeProvider defaultTheme="light">
+				<CalendarUIProvider>{ui}</CalendarUIProvider>
+			</ThemeProvider>
 		</I18nextProvider>
 	);
 
