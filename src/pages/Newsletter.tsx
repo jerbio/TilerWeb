@@ -23,7 +23,7 @@ const Newsletter: React.FC = () => {
 			<SEO
 				title={t('discover.seo.title')}
 				description={t('discover.seo.description')}
-				canonicalUrl="/newsletter"
+				canonicalUrl="/discover"
 			/>
 			<Section>
 				<BackgroundBlur />

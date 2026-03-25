@@ -66,7 +66,7 @@ const App: React.FC = () => {
 							<Routes>
 								<Route path="/" element={<Layout />}>
 									<Route index element={<Home />} />
-									<Route path="/newsletter" element={<Newsletter />} />
+									<Route path="/discover" element={<Newsletter />} />
 								</Route>
 								<Route
 									path="/waitlist"
