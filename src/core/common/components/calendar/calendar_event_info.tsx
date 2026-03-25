@@ -39,6 +39,8 @@ import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useCalendarUI } from './calendar-ui.provider';
 import { getCalendarEventId } from '@/core/util/entityResolution';
+import calendarConfig from '@/core/constants/calendar_config';
+import CyclingEmoji from './cycling_emoji';
 
 type CalendarEventInfoProps = {
 	event: ScheduleSubCalendarEvent | null;
@@ -326,7 +328,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			<CalendarEventInfoHeader>
 				<div className="icon">
 					{event.emojis ? (
-						<span className="emoji">{event.emojis}</span>
+						<CyclingEmoji emojis={event.emojis} />
 					) : (
 						<Star size={16} color={eventColor.setLightness(0.6).toHex()} />
 					)}
@@ -881,6 +883,8 @@ const HeaderActions = styled.div`
 
 const ScrollableBody = styled.div`
 	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
 	scrollbar-color: ${({ theme }) => theme.colors.gray[400]} transparent;
 `;
 
@@ -1203,6 +1207,8 @@ const StyledCalendarEventInfo = styled.div<{ $color: RGBColor; $darkmode: boolea
 	position: relative;
 	display: flex;
 	flex-direction: column;
+	max-height: ${calendarConfig.INFO_MODAL_HEIGHT};
+	overflow: hidden;
 	background-color: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	width: 100%;
