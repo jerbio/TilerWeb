@@ -3,7 +3,7 @@ import { act } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { CalendarUIStore, createCalendarUIStore } from '../calendar-ui.store';
 import { StoreApi } from 'zustand';
-import { CalendarEvent, ScheduleCreateEventResponse } from '@/core/common/types/schedule';
+import { CalendarEvent, ScheduleCreateEventResponse, ThirdPartyType } from '@/core/common/types/schedule';
 
 const demoMode = false;
 let store: StoreApi<CalendarUIStore>;
@@ -33,7 +33,7 @@ const mockCalendarEvent: CalendarEvent = {
 	splitCount: 4,
 	completeCount: 0,
 	deletionCount: 0,
-	thirdpartyType: 'tiler',
+	thirdpartyType: ThirdPartyType.Tiler,
 	thirdPartyId: null,
 	thirdPartyUserId: null,
 	colorOpacity: null,

@@ -27,6 +27,7 @@ export enum NotificationAction {
 	Update = 'update',
 	Shuffle = 'shuffle',
 	Revise = 'revise',
+	Procrastinate = 'procrastinate',
 	ProcrastinateAll = 'procrastinate-all',
 }
 

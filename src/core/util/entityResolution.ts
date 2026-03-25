@@ -17,6 +17,17 @@ export function extractCalendarEventPrefix(entityId: string): string {
 }
 
 /**
+ * Derives the parent CalendarEvent ID from any entity ID (sub-event or calendar event).
+ *
+ * CalendarEvent IDs follow the pattern `prefix_0_0`. Given a SubcalendarEvent ID
+ * like `prefix_ijkl_mnop`, this extracts the shared prefix and appends `_0_0`.
+ * If the ID is already a CalendarEvent ID, it is returned unchanged.
+ */
+export function getCalendarEventId(entityId: string): string {
+	return `${extractCalendarEventPrefix(entityId)}_0_0`;
+}
+
+/**
  * Returns `true` if the given ID has the CalendarEvent format (`xxxx_xxxx_0_0`).
  *
  * This is used to exclude CalendarEvent-shaped entries from the child search,

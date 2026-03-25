@@ -4,6 +4,7 @@ import {
 	ScheduleShuffleParams,
 	ScheduleReviseParams,
 	ScheduleProcrastinateAllParams,
+	ScheduleProcrastinateEventParams,
 	ScheduleLookupResponse,
 } from '@/core/common/types/schedule';
 
@@ -198,6 +199,164 @@ describe('ScheduleApi', () => {
 			);
 
 			await expect(api.procrastinateAll(procrastinateAllParams)).rejects.toThrow();
+		});
+	});
+
+	describe('completeEvent', () => {
+		const eventId = 'event-id-123';
+
+		it('sends POST to api/Schedule/Event/Complete with correct body', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			await api.completeEvent(eventId);
+
+			expect(fetchSpy).toHaveBeenCalledTimes(1);
+			const callArgs = fetchSpy.mock.calls[0];
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+
+			expect(request.url).toContain('api/Schedule/Event/Complete');
+			expect(request.method).toBe('POST');
+			const body = await request.json();
+			expect(body).toEqual({ EventID: eventId, Version: 'v2' });
+		});
+
+		it('returns ScheduleLookupResponse on success', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			const result = await api.completeEvent(eventId);
+
+			expect(result).toEqual(mockShuffleResponse);
+		});
+
+		it('throws on HTTP error', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({ Error: { Code: '500', Message: 'Internal Server Error' } }),
+					{ status: 500 }
+				)
+			);
+
+			await expect(api.completeEvent(eventId)).rejects.toThrow();
+		});
+	});
+
+	describe('setEventAsNow', () => {
+		const eventId = 'event-id-123';
+
+		it('sends POST to api/Schedule/Event/Now with correct body', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			await api.setEventAsNow(eventId);
+
+			expect(fetchSpy).toHaveBeenCalledTimes(1);
+			const callArgs = fetchSpy.mock.calls[0];
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+
+			expect(request.url).toContain('api/Schedule/Event/Now');
+			expect(request.method).toBe('POST');
+			const body = await request.json();
+			expect(body).toEqual({ EventID: eventId, Version: 'v2' });
+		});
+
+		it('returns ScheduleLookupResponse on success', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			const result = await api.setEventAsNow(eventId);
+
+			expect(result).toEqual(mockShuffleResponse);
+		});
+
+		it('throws on HTTP error', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({ Error: { Code: '500', Message: 'Internal Server Error' } }),
+					{ status: 500 }
+				)
+			);
+
+			await expect(api.setEventAsNow(eventId)).rejects.toThrow();
+		});
+	});
+
+	describe('procrastinateEvent', () => {
+		const procrastinateParams: ScheduleProcrastinateEventParams = {
+			EventID: 'event-id-123',
+			DurationDays: 1,
+			DurationHours: 2,
+			DurationMins: 30,
+			DurationInMs: 95400000,
+		};
+
+		it('sends POST to api/Schedule/Event/Procrastinate with correct body', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			await api.procrastinateEvent(procrastinateParams);
+
+			expect(fetchSpy).toHaveBeenCalledTimes(1);
+			const callArgs = fetchSpy.mock.calls[0];
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+
+			expect(request.url).toContain('api/Schedule/Event/Procrastinate');
+			expect(request.method).toBe('POST');
+			const body = await request.json();
+			expect(body).toEqual({ ...procrastinateParams, Version: 'v2' });
+		});
+
+		it('uses provided Version when specified', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			const paramsWithVersion = { ...procrastinateParams, Version: 'v3' };
+			await api.procrastinateEvent(paramsWithVersion);
+
+			const callArgs = fetchSpy.mock.calls[0];
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+			const body = await request.json();
+			expect(body.Version).toBe('v3');
+		});
+
+		it('returns ScheduleLookupResponse on success', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+			);
+
+			const result = await api.procrastinateEvent(procrastinateParams);
+
+			expect(result).toEqual(mockShuffleResponse);
+		});
+
+		it('throws on HTTP error', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({ Error: { Code: '500', Message: 'Internal Server Error' } }),
+					{ status: 500 }
+				)
+			);
+
+			await expect(api.procrastinateEvent(procrastinateParams)).rejects.toThrow();
 		});
 	});
 });

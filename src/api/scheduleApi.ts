@@ -1,9 +1,11 @@
 import {
 	ScheduleCreateEventParams,
 	ScheduleCreateEventResponse,
+	ScheduleDeleteEventParams,
 	ScheduleLookupOptions,
 	ScheduleLookupResponse,
 	ScheduleProcrastinateAllParams,
+	ScheduleProcrastinateEventParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
 } from '../core/common/types/schedule';
@@ -79,12 +81,56 @@ export class ScheduleApi extends AppApi {
 	}
 
 	/**
+	 * Mark a single event as complete.
+	 * `POST /api/Schedule/Event/Complete`
+	 */
+	public completeEvent(eventId: string) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Complete', {
+			method: 'POST',
+			body: JSON.stringify({ EventID: eventId, Version: 'v2' }),
+		});
+	}
+
+	/**
+	 * Set a single event as the current ("now") event.
+	 * `POST /api/Schedule/Event/Now`
+	 */
+	public setEventAsNow(eventId: string) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Now', {
+			method: 'POST',
+			body: JSON.stringify({ EventID: eventId, Version: 'v2' }),
+		});
+	}
+
+	/**
+	 * Procrastinate (defer) a single event.
+	 * `POST /api/Schedule/Event/Procrastinate`
+	 */
+	public procrastinateEvent(params: ScheduleProcrastinateEventParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Procrastinate', {
+			method: 'POST',
+			body: JSON.stringify({ ...params, Version: params.Version ?? 'v2' }),
+		});
+	}
+
+	/**
 	 * Procrastinate (defer) all events in the user's schedule.
 	 * `POST /api/Schedule/ProcrastinateAll`
 	 */
 	public procrastinateAll(params: ScheduleProcrastinateAllParams) {
 		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/ProcrastinateAll', {
 			method: 'POST',
+			body: JSON.stringify(params),
+		});
+	}
+
+	/**
+	 * Delete a schedule event.
+	 * `DELETE /api/Schedule/Event`
+	 */
+	public deleteEvent(params: ScheduleDeleteEventParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event', {
+			method: 'DELETE',
 			body: JSON.stringify(params),
 		});
 	}

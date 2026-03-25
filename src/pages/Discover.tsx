@@ -11,9 +11,11 @@ import {
 	BackgroundBlur,
 } from '../components/discover/shared';
 import WhatIsTilerSection from '../components/discover/WhatIsTilerSection';
+import SetUpTilerSection from '../components/discover/SetUpTilerSection';
+import HowToUseTilerSection from '../components/discover/HowToUseTilerSection';
 import FeaturesSection from '../components/discover/FeaturesSection';
 
-const Newsletter: React.FC = () => {
+const Discover: React.FC = () => {
 	const { t } = useTranslation();
 
 	return (
@@ -21,7 +23,7 @@ const Newsletter: React.FC = () => {
 			<SEO
 				title={t('discover.seo.title')}
 				description={t('discover.seo.description')}
-				canonicalUrl="/newsletter"
+				canonicalUrl="/discover"
 			/>
 			<Section>
 				<BackgroundBlur />
@@ -33,6 +35,8 @@ const Newsletter: React.FC = () => {
 					</Hero>
 
 					<WhatIsTilerSection />
+					<SetUpTilerSection />
+					<HowToUseTilerSection />
 					<FeaturesSection />
 				</PageWrapper>
 			</Section>
@@ -41,4 +45,4 @@ const Newsletter: React.FC = () => {
 
 };
 
-export default Newsletter;
+export default Discover;

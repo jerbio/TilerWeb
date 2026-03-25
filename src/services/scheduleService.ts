@@ -7,6 +7,7 @@ import {
 	ScheduleCreateEventParams,
 	ScheduleLookupOptions,
 	ScheduleProcrastinateAllParams,
+	ScheduleProcrastinateEventParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
 	CalendarEventUpdateParams,
@@ -132,7 +133,7 @@ class ScheduleService {
 	 */
 	async updateSubCalendarEvent(
 		eventId: string,
-		updates: { name?: string; start?: number; end?: number; calendarEnd?: number }
+		updates: { name?: string; start?: number; end?: number; calendarEnd?: number; thirdPartyEventId?: string; thirdPartyUserId?: string, calendarType?: string }
 	) {
 		try {
 			const response = await this.subCalendarEventApi.updateSubCalendarEvent({
@@ -142,6 +143,9 @@ class ScheduleService {
 				SubCalendarEventEnd: updates.end,
 				CalendarEventEnd: updates.calendarEnd,
 				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				ThirdPartyEventID: updates.thirdPartyEventId,
+				ThirdPartyUserID: updates.thirdPartyUserId,
+				CalendarType: updates.calendarType,
 			});
 			return response.Content;
 		} catch (error) {
@@ -219,6 +223,25 @@ class ScheduleService {
 	}
 
 	/**
+	 * Delete a schedule event (third-party aware).
+	 * `DELETE /api/Schedule/Event`
+	 */
+	async deleteScheduleEvent(eventId: string, thirdPartyType: string, thirdPartyEventId: string, thirdPartyUserId: string) {
+		try {
+			const response = await this.scheduleApi.deleteEvent({
+				EventID: eventId,
+				ThirdPartyType: thirdPartyType,
+				ThirdPartyEventID: thirdPartyEventId,
+				ThirdPartyUserID: thirdPartyUserId,
+			});
+			return response.Content;
+		} catch (error) {
+			console.error('Error deleting schedule event', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
 	 * Update a calendar event.
 	 * `POST /api/CalendarEvent/Update`
 	 */
@@ -256,6 +279,48 @@ class ScheduleService {
 			return response.Content;
 		} catch (error) {
 			console.error('Error revising schedule', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Mark a single event as complete via Schedule API.
+	 * `POST /api/Schedule/Event/Complete`
+	 */
+	async completeScheduleEvent(eventId: string) {
+		try {
+			const response = await this.scheduleApi.completeEvent(eventId);
+			return response.Content;
+		} catch (error) {
+			console.error('Error completing schedule event', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Set a single event as the current ("now") event via Schedule API.
+	 * `POST /api/Schedule/Event/Now`
+	 */
+	async setScheduleEventAsNow(eventId: string) {
+		try {
+			const response = await this.scheduleApi.setEventAsNow(eventId);
+			return response.Content;
+		} catch (error) {
+			console.error('Error setting schedule event as now', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Procrastinate (defer) a single event via Schedule API.
+	 * `POST /api/Schedule/Event/Procrastinate`
+	 */
+	async procrastinateScheduleEvent(params: ScheduleProcrastinateEventParams) {
+		try {
+			const response = await this.scheduleApi.procrastinateEvent(params);
+			return response.Content;
+		} catch (error) {
+			console.error('Error procrastinating schedule event', error);
 			throw normalizeError(error);
 		}
 	}

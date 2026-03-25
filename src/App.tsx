@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
-import Newsletter from './pages/Newsletter';
+import Discover from './pages/Discover';
 import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
@@ -66,7 +66,7 @@ const App: React.FC = () => {
 							<Routes>
 								<Route path="/" element={<Layout />}>
 									<Route index element={<Home />} />
-									<Route path="/newsletter" element={<Newsletter />} />
+									<Route path="/discover" element={<Discover />} />
 								</Route>
 								<Route
 									path="/waitlist"
