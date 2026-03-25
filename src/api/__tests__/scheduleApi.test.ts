@@ -205,7 +205,7 @@ describe('ScheduleApi', () => {
 	describe('completeEvent', () => {
 		const eventId = 'event-id-123';
 
-		it('sends POST to api/Schedule/Events/Complete with correct body', async () => {
+		it('sends POST to api/Schedule/Event/Complete with correct body', async () => {
 			fetchSpy.mockResolvedValueOnce(
 				new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
 			);
@@ -219,7 +219,7 @@ describe('ScheduleApi', () => {
 					? callArgs[0]
 					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
 
-			expect(request.url).toContain('api/Schedule/Events/Complete');
+			expect(request.url).toContain('api/Schedule/Event/Complete');
 			expect(request.method).toBe('POST');
 			const body = await request.json();
 			expect(body).toEqual({ EventID: eventId, Version: 'v2' });

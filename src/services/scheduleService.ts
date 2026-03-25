@@ -263,7 +263,7 @@ class ScheduleService {
 
 	/**
 	 * Mark a single event as complete via Schedule API.
-	 * `POST /api/Schedule/Events/Complete`
+	 * `POST /api/Schedule/Event/Complete`
 	 */
 	async completeScheduleEvent(eventId: string) {
 		try {

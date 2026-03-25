@@ -81,7 +81,7 @@ export class ScheduleApi extends AppApi {
 
 	/**
 	 * Mark a single event as complete.
-	 * `POST /api/Schedule/Events/Complete`
+	 * `POST /api/Schedule/Event/Complete`
 	 */
 	public completeEvent(eventId: string) {
 		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Complete', {
