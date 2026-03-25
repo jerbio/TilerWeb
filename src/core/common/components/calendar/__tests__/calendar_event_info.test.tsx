@@ -361,7 +361,8 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	describe('Button disabled state', () => {
 		it('disables all action buttons while an action is loading', async () => {
 			// Make complete hang (never resolves during this test)
-			let resolveComplete: (value: unknown) => void;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			let resolveComplete: (value: any) => void;
 			vi.mocked(scheduleService.completeScheduleEvent).mockImplementation(
 				() => new Promise((resolve) => { resolveComplete = resolve; })
 			);
@@ -388,9 +389,9 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 	describe('Save (update) action', () => {
 		it('calls scheduleService.updateSubCalendarEvent with changed name', async () => {
-			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce({
-				subCalendarEvents: [],
-			});
+			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
+				createMockEvent() as ScheduleSubCalendarEvent
+			);
 
 			renderWithProviders(
 				<CalendarEventInfo
@@ -422,9 +423,9 @@ describe('CalendarEventInfo – Action Buttons', () => {
 		});
 
 		it('calls onEventAction after successful save', async () => {
-			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce({
-				subCalendarEvents: [],
-			});
+			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
+				createMockEvent() as ScheduleSubCalendarEvent
+			);
 
 			renderWithProviders(
 				<CalendarEventInfo

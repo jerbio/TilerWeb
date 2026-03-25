@@ -22,7 +22,7 @@ const TimelineHeader: React.FC = () => {
 	const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const triggerRef = useRef<HTMLButtonElement>(null);
+	const triggerRef = useRef<HTMLDivElement>(null);
 	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
 	const viewInfo = useCalendarUI((state) => state.viewInfo);
 	const dispatch = useCalendarDispatch();
