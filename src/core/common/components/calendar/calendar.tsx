@@ -291,6 +291,12 @@ const Calendar = ({
 		setHasAutoScrolled(false);
 	}, [viewOptions.startDay]);
 
+	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number; maxHeight: number }>({
+		x: 100,
+		y: 100,
+		maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
+	});
+
 	const calendarEventInfo = [
 		{
 			key: 'info',
@@ -305,6 +311,7 @@ const Calendar = ({
 					onEventAction={() => {
 						refetchEvents();
 					}}
+					maxHeight={calendarEventInfoPos.maxHeight}
 				/>
 			),
 		},
@@ -350,22 +357,24 @@ const Calendar = ({
 			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
 			calculatedY += eventIndex * 66;
 		}
-		if (calculatedY + INFO_MODAL_HEIGHT > containerHeight) {
+		// Total height of CalendarContainer = content area + header
+		const calendarContainerHeight = containerHeight + totalHeaderHeight;
+
+		if (calculatedY + INFO_MODAL_HEIGHT > calendarContainerHeight) {
 			// Not enough space at the bottom, adjust upwards
-			calculatedY = containerHeight + totalHeaderHeight - INFO_MODAL_HEIGHT;
+			calculatedY = calendarContainerHeight - INFO_MODAL_HEIGHT;
 		}
-		if (calculatedY < totalHeaderHeight) {
+		if (calculatedY < totalHeaderHeight + INFO_MODAL_GAP) {
 			// Still not enough space, clamp to top edge
 			calculatedY = totalHeaderHeight + INFO_MODAL_GAP;
 		}
 
-		setCalendarEventInfoPos({ x: calculatedX, y: calculatedY });
+		// Cap modal height to available vertical space
+		const maxHeight = Math.min(INFO_MODAL_HEIGHT, calendarContainerHeight - calculatedY);
+
+		setCalendarEventInfoPos({ x: calculatedX, y: calculatedY, maxHeight });
 	};
 
-	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number }>({
-		x: 100,
-		y: 100,
-	});
 	useEffect(() => {
 		if (selectedEventInfo) {
 			calculateEventInfoCoordinates(selectedEventInfo!);

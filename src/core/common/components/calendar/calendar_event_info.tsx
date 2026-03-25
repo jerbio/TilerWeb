@@ -47,6 +47,7 @@ type CalendarEventInfoProps = {
 	onClose?: () => void;
 	onEventAction?: () => void;
 	isEditable?: boolean;
+	maxHeight?: number;
 };
 
 const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
@@ -54,6 +55,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	onClose,
 	onEventAction,
 	isEditable = true,
+	maxHeight,
 }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
@@ -324,7 +326,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	};
 
 	return event ? (
-		<StyledCalendarEventInfo $color={eventColor} $darkmode={isDarkMode}>
+		<StyledCalendarEventInfo
+			$color={eventColor}
+			$darkmode={isDarkMode}
+			style={maxHeight ? { maxHeight } : undefined}
+		>
 			<CalendarEventInfoHeader>
 				<div className="icon">
 					{event.emojis ? (
@@ -1092,7 +1098,7 @@ const IconButton = styled.button<{ $primary?: boolean }>`
   `}
 `;
 
-const CalendarEventInfoHeader = styled.header``;
+const CalendarEventInfoHeader = styled.header`\n\tflex-shrink: 0;\n`;
 
 const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
 	position: relative;
