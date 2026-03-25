@@ -14,6 +14,7 @@ vi.mock('@/services', () => ({
 		setScheduleEventAsNow: vi.fn(),
 		procrastinateScheduleEvent: vi.fn(),
 		updateSubCalendarEvent: vi.fn(),
+		deleteScheduleEvent: vi.fn(),
 	},
 }));
 
@@ -475,6 +476,109 @@ describe('CalendarEventInfo – Action Buttons', () => {
 				expect(scheduleService.updateSubCalendarEvent).toHaveBeenCalled();
 			});
 			expect(mockOnEventAction).not.toHaveBeenCalled();
+		});
+
+		it('does not include third-party fields when saving a Tiler event', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
+				createMockEvent() as ScheduleSubCalendarEvent
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Tiler,
+						thirdPartyId: 'some-id',
+						thirdPartyUserId: 'some-user',
+					})}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Edit name
+			fireEvent.click(screen.getByText('Test Event'));
+			const nameInput = screen.getByDisplayValue('Test Event');
+			fireEvent.change(nameInput, { target: { value: 'Updated Event' } });
+			fireEvent.blur(nameInput);
+
+			// Save
+			fireEvent.click(screen.getByTitle('Save'));
+
+			await waitFor(() => {
+				expect(scheduleService.updateSubCalendarEvent).toHaveBeenCalled();
+			});
+
+			const [, updates] = vi.mocked(scheduleService.updateSubCalendarEvent).mock.calls[0];
+			expect(updates).toEqual(expect.objectContaining({ name: 'Updated Event' }));
+			expect(updates).not.toHaveProperty('calendarType');
+		});
+	});
+
+	describe('Third-party event behavior', () => {
+		it('shows Delete button instead of Complete/Now/Defer for third-party events', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			expect(screen.getByTitle('Delete')).toBeInTheDocument();
+			expect(screen.queryByTitle('Complete')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Now')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Defer')).not.toBeInTheDocument();
+		});
+
+		it('does not show name edit pencil icon for third-party events', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Name should be displayed but not editable
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+			// The edit-icon pencil should not be present for the name
+			const nameContainer = screen.getByText('Test Event').closest('div');
+			expect(nameContainer?.querySelector('.edit-icon')).not.toBeInTheDocument();
+		});
+
+		it('calls deleteScheduleEvent with third-party fields when Delete is clicked', async () => {
+			vi.mocked(scheduleService.deleteScheduleEvent).mockResolvedValueOnce(
+				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<infer T> ? T : never
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+
+			await waitFor(() => {
+				expect(scheduleService.deleteScheduleEvent).toHaveBeenCalledWith(
+					expect.any(String),
+					ThirdPartyType.Google,
+					'google-event-123',
+					'google-user-456'
+				);
+			});
 		});
 	});
 });

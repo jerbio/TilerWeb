@@ -616,6 +616,81 @@ describe('ScheduleService', () => {
 				service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 })
 			).rejects.toThrow();
 		});
+
+		it('includes ThirdPartyEventID and ThirdPartyUserID when provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				start: 1769930000000,
+				thirdPartyEventId: 'google-event-abc',
+				thirdPartyUserId: 'google-user-xyz',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					SubCalendarEventStart: 1769930000000,
+					ThirdPartyEventID: 'google-event-abc',
+					ThirdPartyUserID: 'google-user-xyz',
+					TimeZone: expect.any(String),
+				})
+			);
+		});
+
+		it('includes CalendarType when provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				start: 1769930000000,
+				calendarType: 'google',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					CalendarType: 'google',
+					TimeZone: expect.any(String),
+				})
+			);
+		});
+
+		it('includes all third-party fields together with name and times', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				name: 'Google Meeting',
+				start: 1769930000000,
+				end: 1769933600000,
+				thirdPartyEventId: 'google-event-abc',
+				thirdPartyUserId: 'google-user-xyz',
+				calendarType: 'google',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					CalendarEventName: 'Google Meeting',
+					SubCalendarEventStart: 1769930000000,
+					SubCalendarEventEnd: 1769933600000,
+					ThirdPartyEventID: 'google-event-abc',
+					ThirdPartyUserID: 'google-user-xyz',
+					CalendarType: 'google',
+					TimeZone: expect.any(String),
+				})
+			);
+		});
 	});
 
 	describe('lookupLocationById', () => {
