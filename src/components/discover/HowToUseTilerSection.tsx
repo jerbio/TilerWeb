@@ -2,6 +2,11 @@ import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import palette from '@/core/theme/palette';
+import connectCalendarGif from '@/assets/gifs/connect-a-calendar.gif';
+import createBlockGif from '@/assets/gifs/how-to-create-a-block.gif';
+import flexibleTilesGif from '@/assets/gifs/creating-flexible-tiles.gif';
+import updateTileGif from '@/assets/gifs/how-to-update-a-tile.gif';
+import travelTimeGif from '@/assets/gifs/travel-time-and-route.gif';
 import Collapse from '@/core/common/components/collapse';
 import {
   ExpandableWrapper,
@@ -112,27 +117,27 @@ const HOW_TO_ITEMS: HowToItem[] = [
   {
     titleKey: 'discover.howToUseTiler.items.connectCalendar.title',
     bodyKey: 'discover.howToUseTiler.items.connectCalendar.body',
-    media: '/gifs/connect-a-calendar.gif',
+    media: connectCalendarGif,
   },
   {
     titleKey: 'discover.howToUseTiler.items.createBlock.title',
     bodyKey: 'discover.howToUseTiler.items.createBlock.body',
-    media: '/gifs/how-to-create-a-block.gif',
+    media: createBlockGif,
   },
   {
     titleKey: 'discover.howToUseTiler.items.flexibleTiles.title',
     bodyKey: 'discover.howToUseTiler.items.flexibleTiles.body',
-    media: '/gifs/creating-flexible-tiles.gif',
+    media: flexibleTilesGif,
   },
   {
     titleKey: 'discover.howToUseTiler.items.updateTile.title',
     bodyKey: 'discover.howToUseTiler.items.updateTile.body',
-    media: '/gifs/how-to-update-a-tile.gif',
+    media: updateTileGif,
   },
   {
     titleKey: 'discover.howToUseTiler.items.travelTime.title',
     bodyKey: 'discover.howToUseTiler.items.travelTime.body',
-    media: '/gifs/travel-time-and-route.gif',
+    media: travelTimeGif,
   },
 ];
 
