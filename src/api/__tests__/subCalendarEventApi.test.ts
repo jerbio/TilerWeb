@@ -3,6 +3,7 @@ import { SubCalendarEventApi } from '../subCalendarEventApi';
 import {
 	ScheduleSubCalendarEvent,
 	SubCalendarEventLookupResponse,
+	ThirdPartyType,
 } from '@/core/common/types/schedule';
 
 // Mock config to provide a base URL
@@ -41,7 +42,7 @@ describe('SubCalendarEventApi', () => {
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: 'tiler',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 0,

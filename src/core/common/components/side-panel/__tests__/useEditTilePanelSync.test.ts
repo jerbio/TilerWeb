@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useEditTilePanelSync } from '../useEditTilePanelSync';
-import { CalendarEvent } from '@/core/common/types/schedule';
+import { CalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
 import { SidePanelEntry } from '../side_panel_types';
 
 const mockEvent: CalendarEvent = {
@@ -15,7 +15,7 @@ const mockEvent: CalendarEvent = {
 	splitCount: 4,
 	completeCount: 0,
 	deletionCount: 0,
-	thirdpartyType: 'tiler',
+	thirdpartyType: ThirdPartyType.Tiler,
 	thirdPartyId: null,
 	thirdPartyUserId: null,
 	colorOpacity: null,

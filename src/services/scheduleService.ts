@@ -133,7 +133,7 @@ class ScheduleService {
 	 */
 	async updateSubCalendarEvent(
 		eventId: string,
-		updates: { name?: string; start?: number; end?: number; calendarEnd?: number }
+		updates: { name?: string; start?: number; end?: number; calendarEnd?: number; thirdPartyEventId?: string; thirdPartyUserId?: string, calendarType?: string }
 	) {
 		try {
 			const response = await this.subCalendarEventApi.updateSubCalendarEvent({
@@ -143,6 +143,9 @@ class ScheduleService {
 				SubCalendarEventEnd: updates.end,
 				CalendarEventEnd: updates.calendarEnd,
 				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				ThirdPartyEventID: updates.thirdPartyEventId,
+				ThirdPartyUserID: updates.thirdPartyUserId,
+				CalendarType: updates.calendarType,
 			});
 			return response.Content;
 		} catch (error) {
@@ -215,6 +218,25 @@ class ScheduleService {
 			return response.Content;
 		} catch (error) {
 			console.error('Error deleting calendar event', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Delete a schedule event (third-party aware).
+	 * `DELETE /api/Schedule/Event`
+	 */
+	async deleteScheduleEvent(eventId: string, thirdPartyType: string, thirdPartyEventId: string, thirdPartyUserId: string) {
+		try {
+			const response = await this.scheduleApi.deleteEvent({
+				EventID: eventId,
+				ThirdPartyType: thirdPartyType,
+				ThirdPartyEventID: thirdPartyEventId,
+				ThirdPartyUserID: thirdPartyUserId,
+			});
+			return response.Content;
+		} catch (error) {
+			console.error('Error deleting schedule event', error);
 			throw normalizeError(error);
 		}
 	}

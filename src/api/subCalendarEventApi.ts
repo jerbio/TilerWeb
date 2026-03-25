@@ -14,6 +14,8 @@ export type UpdateSubCalendarEventPayload = {
 	Latitude?: number;
 	LocationVerified?: boolean;
 	TimeZone: string;
+	ThirdPartyEventID?: string;
+	ThirdPartyUserID?: string;
 };
 
 export class SubCalendarEventApi extends AppApi {

@@ -1,6 +1,7 @@
 import {
 	ScheduleCreateEventParams,
 	ScheduleCreateEventResponse,
+	ScheduleDeleteEventParams,
 	ScheduleLookupOptions,
 	ScheduleLookupResponse,
 	ScheduleProcrastinateAllParams,
@@ -119,6 +120,17 @@ export class ScheduleApi extends AppApi {
 	public procrastinateAll(params: ScheduleProcrastinateAllParams) {
 		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/ProcrastinateAll', {
 			method: 'POST',
+			body: JSON.stringify(params),
+		});
+	}
+
+	/**
+	 * Delete a schedule event.
+	 * `DELETE /api/Schedule/Event`
+	 */
+	public deleteEvent(params: ScheduleDeleteEventParams) {
+		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event', {
+			method: 'DELETE',
 			body: JSON.stringify(params),
 		});
 	}

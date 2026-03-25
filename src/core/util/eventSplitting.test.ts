@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import { splitEventByDay } from './eventSplitting';
-import { ScheduleSubCalendarEvent } from '../common/types/schedule';
+import { ScheduleSubCalendarEvent, ThirdPartyType } from '../common/types/schedule';
 
 // Helper to create a minimal mock event
 function createMockEvent(
@@ -29,7 +29,7 @@ function createMockEvent(
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: 'tiler',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 0,

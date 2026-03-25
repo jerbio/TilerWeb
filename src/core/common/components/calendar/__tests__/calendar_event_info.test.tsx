@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n/config';
 import CalendarEventInfo from '../calendar_event_info';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ScheduleSubCalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
 import { CalendarUIProvider } from '../calendar-ui.provider';
 
 // Mock services
@@ -53,7 +53,7 @@ const createMockEvent = (
 		blob: { type: 0, note: '', id: 'blob-id' },
 		styleProperties: {},
 		split: 0,
-		thirdPartyType: 'tiler',
+		thirdPartyType: ThirdPartyType.Tiler,
 		...overrides,
 	}) as ScheduleSubCalendarEvent;
 

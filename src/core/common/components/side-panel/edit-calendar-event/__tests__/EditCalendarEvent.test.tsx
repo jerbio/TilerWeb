@@ -3,7 +3,7 @@ import { act, render, screen, setupUser, waitFor } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import EditCalendarEvent from '../EditCalendarEvent';
-import { CalendarEvent } from '@/core/common/types/schedule';
+import { CalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
 
 // ── Mocks ──
 
@@ -64,7 +64,7 @@ const mockEvent: CalendarEvent = {
 	splitCount: 4,
 	completeCount: 0,
 	deletionCount: 0,
-	thirdpartyType: 'tiler',
+	thirdpartyType: ThirdPartyType.Tiler,
 	thirdPartyId: null,
 	thirdPartyUserId: null,
 	colorOpacity: 1,

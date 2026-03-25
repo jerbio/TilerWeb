@@ -178,6 +178,7 @@ export const DEMO_CHAT_MESSAGES: PromptWithActions[] = [
 
 // Demo Calendar Events (matching ScheduleSubCalendarEvent structure)
 import type { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ThirdPartyType } from '@/core/common/types/schedule';
 
 // Helper to create a base event timestamp (tomorrow at various times)
 const tomorrow = new Date();
@@ -236,7 +237,7 @@ export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: '',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 1,
@@ -318,7 +319,7 @@ export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: '',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 2,
@@ -400,7 +401,7 @@ export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: '',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 3,
@@ -482,7 +483,7 @@ export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: '',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 4,
@@ -564,7 +565,7 @@ export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
 		locationId: null,
 		locationValidationId: '',
 		isCompleteAfterElapsedEnabled: false,
-		thirdPartyType: '',
+		thirdPartyType: ThirdPartyType.Tiler,
 		thirdPartyUserId: null,
 		thirdPartyId: '',
 		priority: 5,

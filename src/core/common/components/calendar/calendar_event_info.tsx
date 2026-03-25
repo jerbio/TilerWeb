@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CalendarEvent, ScheduleSubCalendarEvent } from '../../types/schedule';
+import { CalendarEvent, ScheduleSubCalendarEvent, ThirdPartyType } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
 	CalendarArrowDown,
@@ -14,6 +14,7 @@ import {
 	Settings,
 	Star,
 	Target,
+	Trash2,
 	X,
 } from 'lucide-react';
 import { RGBColor } from '@/core/util/colors';
@@ -56,6 +57,10 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const { isDarkMode } = useTheme();
 	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
 
+	const isThirdPartyEvent = event?.thirdPartyType !== ThirdPartyType.Tiler;
+	// Third-party events (e.g. Google Calendar) are never editable
+	const effectiveEditable = isEditable && !isThirdPartyEvent;
+
 	// Edit mode flags
 	const [isEditingName, setIsEditingName] = useState(false);
 	const [isEditingStart, setIsEditingStart] = useState(false);
@@ -77,7 +82,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const [validationError, setValidationError] = useState<string | null>(null);
 
 	// Action loading state
-	const [actionLoading, setActionLoading] = useState<'complete' | 'now' | 'defer' | null>(null);
+	const [actionLoading, setActionLoading] = useState<'complete' | 'now' | 'defer' | 'delete' | null>(null);
 
 	// Defer duration picker state
 	const [showDeferPicker, setShowDeferPicker] = useState(false);
@@ -147,7 +152,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		const deadlineTime = dayjs(event.calendarEventEnd).format('h:mm A');
 		const newCalendarEnd = dateTimeToUnix(editedDeadline, deadlineTime);
 
-		const updates: { name?: string; start?: number; end?: number; calendarEnd?: number } = {};
+		const updates: { name?: string; start?: number; end?: number; calendarEnd?: number; thirdPartyEventId?: string; thirdPartyUserId?: string; calendarType?: string } = {};
 
 		if (editedName !== event.name) {
 			updates.name = editedName;
@@ -167,6 +172,16 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			return;
 		}
 
+		if (event.thirdPartyId) {
+			updates.thirdPartyEventId = event.thirdPartyId;
+		}
+		if (event.thirdPartyUserId) {
+			updates.thirdPartyUserId = event.thirdPartyUserId;
+		}
+		if (event.thirdPartyType && event.thirdPartyType !== ThirdPartyType.Tiler) {
+			updates.calendarType = event.thirdPartyType;
+			updates.name = editedName;
+		}
 		setActionLoading('complete');
 		const nId = notificationId(NotificationAction.Update, event.id);
 		showNotification(nId, t('calendarEvent.notifications.updating'), 'loading');
@@ -264,6 +279,29 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		}
 	}, [event, actionLoading, isDeferDurationZero, deferDays, deferHours, deferMinutes, showNotification, updateNotification, t, onEventAction]);
 
+	const handleDelete = useCallback(async () => {
+		if (!event || actionLoading) return;
+		setActionLoading('delete');
+		const calendarEventId = getCalendarEventId(event.id);
+		const nId = notificationId(NotificationAction.Delete, calendarEventId);
+		showNotification(nId, t('calendarEvent.notifications.deleting'), 'loading');
+		try {
+			await scheduleService.deleteScheduleEvent(
+				calendarEventId,
+				event.thirdPartyType,
+				event.thirdPartyId,
+				event.thirdPartyUserId ?? ''
+			);
+			updateNotification(nId, t('calendarEvent.notifications.deleteSuccess'), 'success');
+			onEventAction?.();
+		} catch (error) {
+			console.error('Delete failed:', error);
+			updateNotification(nId, t('calendarEvent.notifications.actionFailed'), 'error');
+		} finally {
+			setActionLoading(null);
+		}
+	}, [event, actionLoading, showNotification, updateNotification, t, onEventAction]);
+
 	const eventColor = new RGBColor({
 		r: event ? event.colorRed : 128,
 		g: event ? event.colorGreen : 128,
@@ -322,11 +360,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 						</EditableFieldWrapper>
 					) : (
 						<EditableName
-							$isEditable={isEditable}
-							onClick={() => isEditable && setIsEditingName(true)}
+							$isEditable={effectiveEditable}
+							onClick={() => effectiveEditable && setIsEditingName(true)}
 						>
 							<h2>{hasChanges ? editedName : event.name}</h2>
-							{isEditable && <Pencil size={14} className="edit-icon" />}
+							{effectiveEditable && <Pencil size={14} className="edit-icon" />}
 						</EditableName>
 					)}
 					{dayjs().isBefore(dayjs(eventStart)) ? (
@@ -480,45 +518,47 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 							</div>
 						</CalendarEventInfoArticle>
 
-						{/* Deadline Field (full width row) */}
-						<CalendarEventInfoArticle style={{ gridColumn: '1 / 3' }}>
-							<Target
-								size={16}
-								color={eventColor.setLightness(0.6).toHex()}
-								style={{ minWidth: 16, marginTop: '0.25rem' }}
-							/>
-							<div>
-								<h3>{t('calendar.event.deadlineLabel')}</h3>
-								{isEditingDeadline ? (
-									<EditableFieldWrapper>
-										<DatePicker
-											value={editedDeadline}
-											onChange={(date) => {
-												if (!date) return;
-												setEditedDeadline(date);
-												setHasChanges(true);
-												setIsEditingDeadline(false);
-											}}
-											portalId="datepicker-portal"
-										/>
-									</EditableFieldWrapper>
-								) : (
-									<EditableValue
-										$isEditable={isEditable}
-										onClick={() => isEditable && setIsEditingDeadline(true)}
-									>
-										<span>
-											{hasChanges
-												? dayjs(editedDeadline).format('ddd, D MMMM, YYYY')
-												: dayjs(event.calendarEventEnd).format(
-														'ddd, D MMMM, YYYY'
-													)}
-										</span>
-										{isEditable && <Pencil size={12} className="edit-icon" />}
-									</EditableValue>
-								)}
-							</div>
-						</CalendarEventInfoArticle>
+						{/* Deadline Field (full width row) — Tiler events only */}
+						{!isThirdPartyEvent && (
+							<CalendarEventInfoArticle style={{ gridColumn: '1 / 3' }}>
+								<Target
+									size={16}
+									color={eventColor.setLightness(0.6).toHex()}
+									style={{ minWidth: 16, marginTop: '0.25rem' }}
+								/>
+								<div>
+									<h3>{t('calendar.event.deadlineLabel')}</h3>
+									{isEditingDeadline ? (
+										<EditableFieldWrapper>
+											<DatePicker
+												value={editedDeadline}
+												onChange={(date) => {
+													if (!date) return;
+													setEditedDeadline(date);
+													setHasChanges(true);
+													setIsEditingDeadline(false);
+												}}
+												portalId="datepicker-portal"
+											/>
+										</EditableFieldWrapper>
+									) : (
+										<EditableValue
+											$isEditable={effectiveEditable}
+											onClick={() => effectiveEditable && setIsEditingDeadline(true)}
+										>
+											<span>
+												{hasChanges
+													? dayjs(editedDeadline).format('ddd, D MMMM, YYYY')
+													: dayjs(event.calendarEventEnd).format(
+															'ddd, D MMMM, YYYY'
+														)}
+											</span>
+											{effectiveEditable && <Pencil size={12} className="edit-icon" />}
+										</EditableValue>
+									)}
+								</div>
+							</CalendarEventInfoArticle>
+						)}
 
 						{/* Duration Field (read-only, auto-updates) */}
 						<CalendarEventInfoArticle>
@@ -533,18 +573,20 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 							</div>
 						</CalendarEventInfoArticle>
 
-						{/* Repetition Field */}
-						<CalendarEventInfoArticle>
-							<Repeat2
-								size={16}
-								color={eventColor.setLightness(0.6).toHex()}
-								style={{ minWidth: 16, marginTop: '0.25rem' }}
-							/>
-							<div>
-								<h3>{t('calendar.event.repetitionLabel')}</h3>
-								<p>{event.isRecurring ? 'Yes' : 'No'}</p>
-							</div>
-						</CalendarEventInfoArticle>
+						{/* Repetition Field — Tiler events only */}
+						{!isThirdPartyEvent && (
+							<CalendarEventInfoArticle>
+								<Repeat2
+									size={16}
+									color={eventColor.setLightness(0.6).toHex()}
+									style={{ minWidth: 16, marginTop: '0.25rem' }}
+								/>
+								<div>
+									<h3>{t('calendar.event.repetitionLabel')}</h3>
+									<p>{event.isRecurring ? 'Yes' : 'No'}</p>
+								</div>
+							</CalendarEventInfoArticle>
+						)}
 					</CalendarEventInfoArticleContainer>
 				</CalendarEventInfoSection>
 
@@ -571,7 +613,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			</ScrollableBody>
 
 			{/* More Options Row */}
-			{!hasChanges && (
+			{!hasChanges && !isThirdPartyEvent && (
 				<MoreOptionsRow
 					onClick={() => {
 						if (!event) return;
@@ -588,7 +630,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			)}
 
 			{/* Action Buttons / Defer Duration Picker */}
-			{!hasChanges && (
+			{!hasChanges && !isThirdPartyEvent && (
 				<EventActionBar>
 					{showDeferPicker ? (
 						<>
@@ -690,6 +732,28 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 							</EventActionButton>
 						</>
 					)}
+				</EventActionBar>
+			)}
+
+			{/* Delete button for third-party events */}
+			{!hasChanges && isThirdPartyEvent && (
+				<EventActionBar>
+					<EventActionButton
+						onClick={handleDelete}
+						disabled={!!actionLoading}
+						title={t('timeline.markDeleted')}
+						$color={eventColor}
+						$darkmode={isDarkMode}
+					>
+						<div className="action-icon">
+							{actionLoading === 'delete' ? (
+								<ActionSpinner />
+							) : (
+								<Trash2 size={20} />
+							)}
+						</div>
+						<span>{t('timeline.markDeleted')}</span>
+					</EventActionButton>
 				</EventActionBar>
 			)}
 

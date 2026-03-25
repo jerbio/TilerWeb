@@ -77,6 +77,11 @@ export type ScheduleSubCalendarEventTravelDetail = {
 };
 
 // ── ScheduleSubCalendarEvent ───────────────────────────────────
+export enum ThirdPartyType {
+	Tiler = 'tiler',
+	Google = 'google',
+}
+
 export type ScheduleSubCalendarEvent = {
 	id: string;
 	start: number;
@@ -103,8 +108,8 @@ export type ScheduleSubCalendarEvent = {
 	locationId: null;
 	locationValidationId: string;
 	isCompleteAfterElapsedEnabled: boolean;
-	thirdPartyType: string;
-	thirdPartyUserId: null;
+	thirdPartyType: ThirdPartyType | string;
+	thirdPartyUserId: string | null;
 	thirdPartyId: string;
 	priority: number;
 	tileShareDesignatedId: null;
@@ -283,7 +288,7 @@ export type CalendarEvent = {
 	splitCount: number | null;
 	completeCount: number | null;
 	deletionCount: number | null;
-	thirdpartyType: string | null;
+	thirdpartyType: ThirdPartyType | string | null;
 	thirdPartyId: string | null;
 	thirdPartyUserId: string | null;
 	colorOpacity: number | null;
@@ -425,6 +430,14 @@ export type ScheduleProcrastinateEventParams = {
 	DurationHours?: number;
 	DurationMins?: number;
 	DurationInMs?: number;
+};
+
+/** Params for `DELETE /api/Schedule/Event` */
+export type ScheduleDeleteEventParams = {
+	EventID: string;
+	ThirdPartyType: string;
+	ThirdPartyEventID: string;
+	ThirdPartyUserID: string;
 };
 
 /** Params for `POST /api/Schedule/ProcrastinateAll` */

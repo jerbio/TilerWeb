@@ -12,6 +12,7 @@ import {
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
 	ScheduleSubCalendarEvent,
+	ThirdPartyType,
 } from '@/core/common/types/schedule';
 
 // Mock the API classes
@@ -41,7 +42,7 @@ describe('ScheduleService', () => {
 		splitCount: 4,
 		completeCount: 0,
 		deletionCount: 0,
-		thirdpartyType: 'tiler',
+		thirdpartyType: ThirdPartyType.Tiler,
 		thirdPartyId: null,
 		thirdPartyUserId: null,
 		colorOpacity: null,
