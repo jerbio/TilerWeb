@@ -16,15 +16,18 @@ vi.mock('@/config/config_getter', () => ({
 }));
 
 // Mock locationService so scheduleRequest's getLocationData() resolves consistently
+const mockLocation = vi.hoisted(() => ({
+	location: 'Empire State Building, New York, NY',
+	longitude: -73.9857,
+	latitude: 40.7484,
+	verified: true,
+}));
+
+// Mock locationService so scheduleRequest's getLocationData() resolves consistently
 vi.mock('@/services/locationService', () => ({
 	__esModule: true,
 	default: {
-		getCurrentLocation: vi.fn().mockResolvedValue({
-			location: 'Empire State Building, New York, NY',
-			longitude: -73.9857,
-			latitude: 40.7484,
-			verified: true,
-		}),
+		getCurrentLocation: vi.fn().mockResolvedValue(mockLocation),
 	},
 }));
 
@@ -49,9 +52,9 @@ describe('ScheduleApi', () => {
 
 	describe('shuffle', () => {
 		const shuffleParams: ScheduleShuffleParams = {
-			UserLongitude: '-73.9857',
-			UserLatitude: '40.7484',
-			UserLocationVerified: 'true',
+			UserLongitude: String(mockLocation.longitude),
+			UserLatitude: String(mockLocation.latitude),
+			UserLocationVerified: String(mockLocation.verified),
 			MobileApp: true,
 			SocketId: true,
 			TimeZoneOffset: 0,
@@ -105,9 +108,9 @@ describe('ScheduleApi', () => {
 
 	describe('revise', () => {
 		const reviseParams: ScheduleReviseParams = {
-			UserLongitude: '-73.9857',
-			UserLatitude: '40.7484',
-			UserLocationVerified: 'true',
+			UserLongitude: String(mockLocation.longitude),
+			UserLatitude: String(mockLocation.latitude),
+			UserLocationVerified: String(mockLocation.verified),
 			MobileApp: true,
 			SocketId: true,
 			TimeZoneOffset: 0,
@@ -161,9 +164,9 @@ describe('ScheduleApi', () => {
 
 	describe('procrastinateAll', () => {
 		const procrastinateAllParams: ScheduleProcrastinateAllParams = {
-			UserLongitude: '-73.9857',
-			UserLatitude: '40.7484',
-			UserLocationVerified: 'true',
+			UserLongitude: String(mockLocation.longitude),
+			UserLatitude: String(mockLocation.latitude),
+			UserLocationVerified: String(mockLocation.verified),
 			Version: 'v2',
 			TimeZone: 'America/New_York',
 			DurationDays: 0,
@@ -238,9 +241,9 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				EventID: eventId,
 				Version: 'v2',
-				UserLongitude: '-73.9857',
-				UserLatitude: '40.7484',
-				UserLocationVerified: 'true',
+				UserLongitude: String(mockLocation.longitude),
+				UserLatitude: String(mockLocation.latitude),
+				UserLocationVerified: String(mockLocation.verified),
 			});
 		});
 
@@ -289,9 +292,9 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				EventID: eventId,
 				Version: 'v2',
-				UserLongitude: '-73.9857',
-				UserLatitude: '40.7484',
-				UserLocationVerified: 'true',
+				UserLongitude: String(mockLocation.longitude),
+				UserLatitude: String(mockLocation.latitude),
+				UserLocationVerified: String(mockLocation.verified),
 			});
 		});
 
@@ -346,9 +349,9 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				...procrastinateParams,
 				Version: 'v2',
-				UserLongitude: '-73.9857',
-				UserLatitude: '40.7484',
-				UserLocationVerified: 'true',
+				UserLongitude: String(mockLocation.longitude),
+				UserLatitude: String(mockLocation.latitude),
+				UserLocationVerified: String(mockLocation.verified),
 			});
 		});
 

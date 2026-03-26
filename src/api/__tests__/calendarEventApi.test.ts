@@ -16,15 +16,18 @@ vi.mock('@/config/config_getter', () => ({
 }));
 
 // Mock locationService so updateCalendarEvent's getLocationData() resolves consistently
+const mockLocation = vi.hoisted(() => ({
+	location: 'Empire State Building, New York, NY',
+	longitude: -73.9857,
+	latitude: 40.7484,
+	verified: true,
+}));
+
+// Mock locationService so updateCalendarEvent's getLocationData() resolves consistently
 vi.mock('@/services/locationService', () => ({
 	__esModule: true,
 	default: {
-		getCurrentLocation: vi.fn().mockResolvedValue({
-			location: 'Empire State Building, New York, NY',
-			longitude: -73.9857,
-			latitude: 40.7484,
-			verified: true,
-		}),
+		getCurrentLocation: vi.fn().mockResolvedValue(mockLocation),
 	},
 }));
 
@@ -402,9 +405,9 @@ describe('CalendarEventApi', () => {
 			const body = await request.json();
 			expect(body).toEqual({
 				...updateParams,
-				UserLongitude: '-73.9857',
-				UserLatitude: '40.7484',
-				UserLocationVerified: 'true',
+				UserLongitude: String(mockLocation.longitude),
+				UserLatitude: String(mockLocation.latitude),
+				UserLocationVerified: String(mockLocation.verified),
 			});
 		});
 
