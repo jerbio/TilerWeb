@@ -1,258 +1,311 @@
 import { createStore } from 'zustand';
 import dayjs from 'dayjs';
-import { CalendarEvent, ScheduleCreateEventResponse } from '../../types/schedule';
+import {
+  CalendarEvent,
+  RestrictionProfile,
+  ScheduleCreateEventResponse,
+} from '../../types/schedule';
 
 type CreateTileState = {
-	isOpen: boolean;
-	isExpanded: boolean;
+  isOpen: boolean;
+  isExpanded: boolean;
+  restrictionProfile: {
+    work: RestrictionProfile | null;
+    personal: RestrictionProfile | null;
+    loading: boolean;
+  };
 
-	loading: {
-		isActive: boolean;
-		tileName?: string;
-	};
+  loading: {
+    isActive: boolean;
+    tileName?: string;
+  };
 
-	success: {
-		isOpen: boolean;
-		isNavigatingToTile: boolean;
-		tile?: ScheduleCreateEventResponse['Content'];
-	};
+  success: {
+    isOpen: boolean;
+    isNavigatingToTile: boolean;
+    tile?: ScheduleCreateEventResponse['Content'];
+  };
 };
 
 type CreateTileActions = {
-	open: () => void;
-	close: () => void;
-	expand: () => void;
-	collapse: () => void;
+  open: () => void;
+  close: () => void;
+  expand: () => void;
+  collapse: () => void;
 
-	startLoading: (tileName: string) => void;
-	endLoading: () => void;
+  startLoading: (tileName: string) => void;
+  endLoading: () => void;
 
-	showSuccess: (tile: ScheduleCreateEventResponse['Content']) => void;
-	hideSuccess: () => void;
+  showSuccess: (tile: ScheduleCreateEventResponse['Content']) => void;
+  hideSuccess: () => void;
 
-	navigateToTile: () => void;
-	navigateToTileComplete: () => void;
+  navigateToTile: () => void;
+  navigateToTileComplete: () => void;
+
+  loadRestrictionProfiles: () => void;
+  loadRestrictionProfilesComplete: (
+    work: RestrictionProfile | null,
+    personal: RestrictionProfile | null
+  ) => void;
 };
 
 type EditTileState = {
-	isOpen: boolean;
-	event: CalendarEvent | null;
+  isOpen: boolean;
+  event: CalendarEvent | null;
 };
 
 type EditTileActions = {
-	open: (event: CalendarEvent) => void;
-	close: () => void;
+  open: (event: CalendarEvent) => void;
+  close: () => void;
 };
 
 type ViewInfo = {
-	startDay: dayjs.Dayjs;
-	daysInView: number;
+  startDay: dayjs.Dayjs;
+  daysInView: number;
 };
 
 export type CalendarUIStore = {
-	createTile: {
-		state: CreateTileState;
-		actions: CreateTileActions;
-	};
-	editTile: {
-		state: EditTileState;
-		actions: EditTileActions;
-	};
-	viewInfo: ViewInfo;
-	setViewInfo: (info: ViewInfo) => void;
+  createTile: {
+    state: CreateTileState;
+    actions: CreateTileActions;
+  };
+  editTile: {
+    state: EditTileState;
+    actions: EditTileActions;
+  };
+  viewInfo: ViewInfo;
+  setViewInfo: (info: ViewInfo) => void;
 };
 
 export const createCalendarUIStore = (demoMode: boolean) =>
-	createStore<CalendarUIStore>((set) => {
-		// DEMO MODE safeguard
-		function guarded<A extends unknown[]>(fn: (...args: A) => void): (...args: A) => void {
-			return (...args: A) => {
-				if (demoMode) return;
-				fn(...args);
-			};
-		}
+  createStore<CalendarUIStore>((set) => {
+    // DEMO MODE safeguard
+    function guarded<A extends unknown[]>(fn: (...args: A) => void): (...args: A) => void {
+      return (...args: A) => {
+        if (demoMode) return;
+        fn(...args);
+      };
+    }
 
-		return {
-			createTile: {
-				state: {
-					isOpen: false,
-					isExpanded: false,
+    return {
+      createTile: {
+        state: {
+          isOpen: false,
+          isExpanded: false,
 
-					loading: {
-						isActive: false,
-					},
+          restrictionProfile: {
+            work: null,
+            personal: null,
+            loading: false,
+          },
 
-					success: {
-						isOpen: false,
-						isNavigatingToTile: false,
-					},
-				},
+          loading: {
+            isActive: false,
+          },
 
-				actions: {
-					open: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: { ...state.createTile.state, isOpen: true },
-							},
-						}))
-					),
+          success: {
+            isOpen: false,
+            isNavigatingToTile: false,
+          },
+        },
 
-					close: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									isOpen: false,
-									isExpanded: false,
-									loading: {
-										isActive: false,
-										tileName: undefined,
-									},
-									success: {
-										isOpen: false,
-										isNavigatingToTile: false,
-										tile: undefined,
-									},
-								},
-							},
-						}))
-					),
+        actions: {
+          open: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: { ...state.createTile.state, isOpen: true },
+              },
+            }))
+          ),
 
-					expand: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: { ...state.createTile.state, isExpanded: true },
-							},
-						}))
-					),
+          close: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  isOpen: false,
+                  isExpanded: false,
+                  loading: {
+                    isActive: false,
+                    tileName: undefined,
+                  },
+                  success: {
+                    isOpen: false,
+                    isNavigatingToTile: false,
+                    tile: undefined,
+                  },
+                },
+              },
+            }))
+          ),
 
-					collapse: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: { ...state.createTile.state, isExpanded: false },
-							},
-						}))
-					),
+          expand: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: { ...state.createTile.state, isExpanded: true },
+              },
+            }))
+          ),
 
-					startLoading: guarded((tileName: string) =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									loading: { isActive: true, tileName },
-								},
-							},
-						}))
-					),
+          collapse: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: { ...state.createTile.state, isExpanded: false },
+              },
+            }))
+          ),
 
-					endLoading: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									loading: { isActive: false },
-								},
-							},
-						}))
-					),
+          startLoading: guarded((tileName: string) =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  loading: { isActive: true, tileName },
+                },
+              },
+            }))
+          ),
 
-					navigateToTile: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									success: {
-										...state.createTile.state.success,
-										isNavigatingToTile: true,
-									},
-								},
-							},
-						}))
-					),
+          endLoading: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  loading: { isActive: false },
+                },
+              },
+            }))
+          ),
 
-					navigateToTileComplete: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									success: {
-										...state.createTile.state.success,
-										isNavigatingToTile: false,
-									},
-								},
-							},
-						}))
-					),
+          navigateToTile: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  success: {
+                    ...state.createTile.state.success,
+                    isNavigatingToTile: true,
+                  },
+                },
+              },
+            }))
+          ),
 
-					showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									success: {
-										...state.createTile.state.success,
-										isOpen: true,
-										tile,
-									},
-								},
-							},
-						}))
-					),
+          navigateToTileComplete: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  success: {
+                    ...state.createTile.state.success,
+                    isNavigatingToTile: false,
+                  },
+                },
+              },
+            }))
+          ),
 
-					hideSuccess: guarded(() =>
-						set((state) => ({
-							createTile: {
-								...state.createTile,
-								state: {
-									...state.createTile.state,
-									success: { isOpen: false, isNavigatingToTile: false },
-								},
-							},
-						}))
-					),
-				},
-			},
+          showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  success: {
+                    ...state.createTile.state.success,
+                    isOpen: true,
+                    tile,
+                  },
+                },
+              },
+            }))
+          ),
 
-			viewInfo: {
-				startDay: dayjs().startOf('day'),
-				daysInView: 7,
-			},
-			setViewInfo: (info: ViewInfo) => set({ viewInfo: info }),
+          hideSuccess: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  success: { isOpen: false, isNavigatingToTile: false },
+                },
+              },
+            }))
+          ),
 
-			editTile: {
-				state: {
-					isOpen: false,
-					event: null,
-				},
+          loadRestrictionProfiles: guarded(() =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  restrictionProfile: {
+                    loading: true,
+                    work: null,
+                    personal: null,
+                  },
+                },
+              },
+            }))
+          ),
 
-				actions: {
-					open: guarded((event: CalendarEvent) =>
-						set((state) => ({
-							editTile: {
-								...state.editTile,
-								state: { isOpen: true, event },
-							},
-						}))
-					),
+          loadRestrictionProfilesComplete: guarded((work, personal) =>
+            set((state) => ({
+              createTile: {
+                ...state.createTile,
+                state: {
+                  ...state.createTile.state,
+                  restrictionProfile: {
+                    loading: false,
+                    work,
+                    personal,
+                  },
+                },
+              },
+            }))
+          ),
+        },
+      },
 
-					close: guarded(() =>
-						set((state) => ({
-							editTile: {
-								...state.editTile,
-								state: { isOpen: false, event: null },
-							},
-						}))
-					),
-				},
-			},
-		};
-	});
+      viewInfo: {
+        startDay: dayjs().startOf('day'),
+        daysInView: 7,
+      },
+      setViewInfo: (info: ViewInfo) => set({ viewInfo: info }),
+
+      editTile: {
+        state: {
+          isOpen: false,
+          event: null,
+        },
+
+        actions: {
+          open: guarded((event: CalendarEvent) =>
+            set((state) => ({
+              editTile: {
+                ...state.editTile,
+                state: { isOpen: true, event },
+              },
+            }))
+          ),
+
+          close: guarded(() =>
+            set((state) => ({
+              editTile: {
+                ...state.editTile,
+                state: { isOpen: false, event: null },
+              },
+            }))
+          ),
+        },
+      },
+    };
+  });

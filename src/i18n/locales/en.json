@@ -257,6 +257,12 @@
 					"friday": "Friday",
 					"saturday": "Saturday",
 					"sunday": "Sunday"
+				},
+				"restrictionType": {
+					"anytime": "Anytime",
+					"work": "Work Hours",
+					"personal": "Personal Hours",
+					"custom": "Custom"
 				}
 			},
 			"tip": {
@@ -272,8 +278,13 @@
 			},
 			"actions": {
 				"repeatTile": "Repeat the Tile",
-				"addTimeRestriction": "Add time restrictions",
+				"timeRestriction": "Time Restrictions",
 				"addLocationNickname": "Add location nickname"
+			},
+			"errors": {
+				"scheduleProfile": "Failed to load Personal/Work Hours",
+				"workProfileNotFound": "Work hours restriction profile not found",
+				"personalProfileNotFound": "Personal hours restriction profile not found"
 			},
 			"recurrence": {
 				"description": "I need to do this <repetition/> per <period/>",
