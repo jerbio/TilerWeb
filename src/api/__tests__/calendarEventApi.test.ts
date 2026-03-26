@@ -15,6 +15,19 @@ vi.mock('@/config/config_getter', () => ({
 	},
 }));
 
+// Mock locationService so updateCalendarEvent's getLocationData() resolves consistently
+vi.mock('@/services/locationService', () => ({
+	__esModule: true,
+	default: {
+		getCurrentLocation: vi.fn().mockResolvedValue({
+			location: 'Empire State Building, New York, NY',
+			longitude: -73.9857,
+			latitude: 40.7484,
+			verified: true,
+		}),
+	},
+}));
+
 // Spy on global fetch
 const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
@@ -387,7 +400,12 @@ describe('CalendarEventApi', () => {
 			expect(request.url).toContain('api/CalendarEvent/Update');
 			expect(request.method).toBe('POST');
 			const body = await request.json();
-			expect(body).toEqual(updateParams);
+			expect(body).toEqual({
+				...updateParams,
+				UserLongitude: '-73.9857',
+				UserLatitude: '40.7484',
+				UserLocationVerified: 'true',
+			});
 		});
 
 		it('returns parsed response on success', async () => {

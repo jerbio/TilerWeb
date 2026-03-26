@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
-import locationService from '@/services/locationService';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import type { ScheduleProcrastinateAllParams } from '@/core/common/types/schedule';
 
@@ -70,17 +69,12 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({
 		showNotification(nId, t('timeline.procrastinateAll.deferring'), 'loading');
 
 		try {
-			const locationData = await locationService.getCurrentLocation();
-			const locationApi = locationService.toApiFormat(locationData);
 			const session = getActivePersonaSession();
 			const userInfo = session?.userInfo;
 
 			const totalMs = ((days * 24 + hours) * 60 + minutes) * 60 * 1000;
 
 			const params: ScheduleProcrastinateAllParams = {
-				UserLongitude: locationApi.userLongitude,
-				UserLatitude: locationApi.userLatitude,
-				UserLocationVerified: locationApi.userLocationVerified,
 				Version: 'v2',
 				TimeZone: userInfo?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
 				DurationDays: days,

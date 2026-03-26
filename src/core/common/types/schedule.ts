@@ -423,9 +423,8 @@ export type ScheduleReviseParams = ScheduleUpdateParams & {
 };
 
 /** Params for `POST /api/Schedule/Event/Procrastinate` */
-export type ScheduleProcrastinateEventParams = {
+export type ScheduleProcrastinateEventParams = ScheduleUpdateParams & {
 	EventID: string;
-	Version?: string;
 	DurationDays?: number;
 	DurationHours?: number;
 	DurationMins?: number;
@@ -433,7 +432,7 @@ export type ScheduleProcrastinateEventParams = {
 };
 
 /** Params for `DELETE /api/Schedule/Event` */
-export type ScheduleDeleteEventParams = {
+export type ScheduleDeleteEventParams = ScheduleUpdateParams &{
 	EventID: string;
 	ThirdPartyType: string;
 	ThirdPartyEventID: string;

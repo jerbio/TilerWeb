@@ -1,5 +1,6 @@
 import ServerError from '@/core/error/server';
 import { Env } from '../config/config_getter';
+import locationService from '../services/locationService';
 
 type RequestOptions = RequestInit & {
 	headers?: Headers;
@@ -127,5 +128,13 @@ export class AppApi {
 
 	get defaultDomain(): string {
 		return this.#baseUrl;
+	}
+
+	/**
+	 * Fetch the current user location for injection into schedule-mutating requests.
+	 * Subclasses call this rather than depending on locationService directly.
+	 */
+	protected getLocationData() {
+		return locationService.getCurrentLocation();
 	}
 }

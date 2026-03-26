@@ -13,11 +13,32 @@ import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
 
 export class ScheduleApi extends AppApi {
-	public createEvent(params: ScheduleCreateEventParams) {
-		return this.apiRequest<ScheduleCreateEventResponse>('api/Schedule/Event', {
-			method: 'POST',
-			body: JSON.stringify({ ...params }),
+	/**
+	 * Wraps every schedule-mutating request with automatic user-location injection.
+	 * Spreads location fields after caller params so they always reflect the
+	 * device's current position, and defaults Version to 'v2'.
+	 */
+	private async scheduleRequest<T>(method: string, endpoint: string, params: object): Promise<T> {
+		const loc = await this.getLocationData();
+		const enriched = {
+			Version: 'v2',
+			...params,
+			UserLongitude: loc.longitude?.toString() ?? '',
+			UserLatitude: loc.latitude?.toString() ?? '',
+			UserLocationVerified: loc.verified ? 'true' : 'false',
+		};
+		return this.apiRequest<T>(endpoint, {
+			method,
+			body: JSON.stringify(enriched),
 		});
+	}
+
+	private schedulePost<T>(endpoint: string, params: object): Promise<T> {
+		return this.scheduleRequest<T>('POST', endpoint, params);
+	}
+
+	public createEvent(params: ScheduleCreateEventParams) {
+		return this.schedulePost<ScheduleCreateEventResponse>('api/Schedule/Event', params);
 	}
 
 	private lookupSchedule(params: Record<string, string>) {
@@ -63,10 +84,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Shuffle`
 	 */
 	public shuffle(params: ScheduleShuffleParams) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Shuffle', {
-			method: 'POST',
-			body: JSON.stringify(params),
-		});
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Shuffle', params);
 	}
 
 	/**
@@ -74,10 +92,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Revise`
 	 */
 	public revise(params: ScheduleReviseParams) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Revise', {
-			method: 'POST',
-			body: JSON.stringify(params),
-		});
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Revise', params);
 	}
 
 	/**
@@ -85,10 +100,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Event/Complete`
 	 */
 	public completeEvent(eventId: string) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Complete', {
-			method: 'POST',
-			body: JSON.stringify({ EventID: eventId, Version: 'v2' }),
-		});
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Complete', { EventID: eventId });
 	}
 
 	/**
@@ -96,10 +108,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Event/Now`
 	 */
 	public setEventAsNow(eventId: string) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Now', {
-			method: 'POST',
-			body: JSON.stringify({ EventID: eventId, Version: 'v2' }),
-		});
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Now', { EventID: eventId });
 	}
 
 	/**
@@ -107,10 +116,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Event/Procrastinate`
 	 */
 	public procrastinateEvent(params: ScheduleProcrastinateEventParams) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event/Procrastinate', {
-			method: 'POST',
-			body: JSON.stringify({ ...params, Version: params.Version ?? 'v2' }),
-		});
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Procrastinate', params);
 	}
 
 	/**
@@ -118,10 +124,7 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/ProcrastinateAll`
 	 */
 	public procrastinateAll(params: ScheduleProcrastinateAllParams) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/ProcrastinateAll', {
-			method: 'POST',
-			body: JSON.stringify(params),
-		});
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/ProcrastinateAll', params);
 	}
 
 	/**
@@ -129,9 +132,6 @@ export class ScheduleApi extends AppApi {
 	 * `DELETE /api/Schedule/Event`
 	 */
 	public deleteEvent(params: ScheduleDeleteEventParams) {
-		return this.apiRequest<ScheduleLookupResponse>('api/Schedule/Event', {
-			method: 'DELETE',
-			body: JSON.stringify(params),
-		});
+		return this.scheduleRequest<ScheduleLookupResponse>('DELETE', 'api/Schedule/Event', params);
 	}
 }
