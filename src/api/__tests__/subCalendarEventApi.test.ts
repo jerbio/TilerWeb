@@ -13,6 +13,22 @@ vi.mock('@/config/config_getter', () => ({
 	},
 }));
 
+// Mock locationService so updateSubCalendarEvent's getLocationData() resolves consistently
+const mockLocation = vi.hoisted(() => ({
+	location: 'Empire State Building, New York, NY',
+	longitude: -73.9857,
+	latitude: 40.7484,
+	verified: true,
+}));
+
+// Mock locationService so updateSubCalendarEvent's getLocationData() resolves consistently
+vi.mock('@/services/locationService', () => ({
+	__esModule: true,
+	default: {
+		getCurrentLocation: vi.fn().mockResolvedValue(mockLocation),
+	},
+}));
+
 // Spy on global fetch
 const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
@@ -179,6 +195,9 @@ describe('SubCalendarEventApi', () => {
 				SubCalendarEventStart: 1769930000000,
 				SubCalendarEventEnd: 1769933600000,
 				TimeZone: 'America/New_York',
+				Longitude: mockLocation.longitude,
+				Latitude: mockLocation.latitude,
+				LocationVerified: mockLocation.verified,
 			});
 		});
 

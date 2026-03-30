@@ -13,17 +13,6 @@ vi.mock('@/services', () => ({
 	},
 }));
 
-// Mock the locationService
-const mockGetCurrentLocation = vi.fn();
-const mockToApiFormat = vi.fn();
-vi.mock('@/services/locationService', () => ({
-	__esModule: true,
-	default: {
-		getCurrentLocation: (...args: unknown[]) => mockGetCurrentLocation(...args),
-		toApiFormat: (...args: unknown[]) => mockToApiFormat(...args),
-	},
-}));
-
 // Mock the global state
 vi.mock('@/global_state', () => ({
 	__esModule: true,
@@ -109,17 +98,6 @@ const renderReviseButton = () =>
 describe('ReviseButton', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockGetCurrentLocation.mockResolvedValue({
-			location: 'Empire State Building, New York, NY',
-			longitude: -73.9857,
-			latitude: 40.7484,
-			verified: true,
-		});
-		mockToApiFormat.mockReturnValue({
-			userLongitude: '-73.9857',
-			userLatitude: '40.7484',
-			userLocationVerified: 'true',
-		});
 	});
 
 	it('renders a revise button with correct aria-label', () => {
@@ -179,9 +157,6 @@ describe('ReviseButton', () => {
 
 		await waitFor(() => {
 			expect(mockReviseSchedule).toHaveBeenCalledWith({
-				UserLongitude: '-73.9857',
-				UserLatitude: '40.7484',
-				UserLocationVerified: 'true',
 				MobileApp: true,
 				SocketId: true,
 				TimeZoneOffset: -5,
@@ -210,19 +185,6 @@ describe('ReviseButton', () => {
 		resolvePromise!({ subCalendarEvents: [] });
 		await waitFor(() => {
 			expect(button).not.toBeDisabled();
-		});
-	});
-
-	it('fetches location before revising', async () => {
-		mockReviseSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
-		const user = setupUser();
-
-		renderReviseButton();
-		await user.click(screen.getByRole('button', { name: 'Revise schedule' }));
-
-		await waitFor(() => {
-			expect(mockGetCurrentLocation).toHaveBeenCalledTimes(1);
-			expect(mockToApiFormat).toHaveBeenCalledTimes(1);
 		});
 	});
 

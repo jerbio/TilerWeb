@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
-import locationService from '@/services/locationService';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import type { ScheduleShuffleParams } from '@/core/common/types/schedule';
 
@@ -31,15 +30,10 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 		showNotification(nId, t('timeline.shuffle.shuffling'), 'loading');
 
 		try {
-			const locationData = await locationService.getCurrentLocation();
-			const locationApi = locationService.toApiFormat(locationData);
 			const session = getActivePersonaSession();
 			const userInfo = session?.userInfo;
 
 			const params: ScheduleShuffleParams = {
-				UserLongitude: locationApi.userLongitude,
-				UserLatitude: locationApi.userLatitude,
-				UserLocationVerified: locationApi.userLocationVerified,
 				MobileApp: true,
 				SocketId: true,
 				TimeZoneOffset: userInfo?.timeZoneDifference ?? 0,

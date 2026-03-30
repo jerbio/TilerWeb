@@ -112,11 +112,19 @@ export class CalendarEventApi extends AppApi {
 	/**
 	 * Update a calendar event.
 	 * `POST /api/CalendarEvent/Update`
+	 * Automatically enriches params with the device's current location.
 	 */
-	public updateCalendarEvent(params: CalendarEventUpdateParams) {
+	public async updateCalendarEvent(params: CalendarEventUpdateParams) {
+		const loc = await this.getLocationData();
+		const enriched: CalendarEventUpdateParams = {
+			...params,
+			UserLongitude: params.UserLongitude ?? loc.longitude?.toString() ?? '',
+			UserLatitude: params.UserLatitude ?? loc.latitude?.toString() ?? '',
+			UserLocationVerified: params.UserLocationVerified ?? (loc.verified ? 'true' : 'false'),
+		};
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
 			method: 'POST',
-			body: JSON.stringify(params),
+			body: JSON.stringify(enriched),
 		});
 	}
 }
