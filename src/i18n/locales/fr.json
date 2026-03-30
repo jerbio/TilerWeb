@@ -368,5 +368,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Envoyer un commentaire",
+		"title": "Envoyer un commentaire",
+		"category": "Catégorie",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Demande de fonctionnalité",
+			"Improvement": "Amélioration",
+			"Other": "Autre"
+		},
+		"titleLabel": "Titre",
+		"titlePlaceholder": "Résumé bref de votre commentaire",
+		"descriptionLabel": "Description",
+		"descriptionPlaceholder": "Dites-nous en plus sur votre commentaire...",
+		"submit": "Envoyer",
+		"submitting": "Envoi en cours...",
+		"submitSuccess": "Merci pour votre commentaire !",
+		"submitError": "Échec de l'envoi du commentaire. Veuillez réessayer."
 	}
 }

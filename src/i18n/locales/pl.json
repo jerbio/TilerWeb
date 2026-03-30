@@ -664,5 +664,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Wyślij opinię",
+		"title": "Wyślij opinię",
+		"category": "Kategoria",
+		"categories": {
+			"Bug": "Błąd",
+			"Feature Request": "Prośba o funkcję",
+			"Improvement": "Ulepszenie",
+			"Other": "Inne"
+		},
+		"titleLabel": "Tytuł",
+		"titlePlaceholder": "Krótkie podsumowanie opinii",
+		"descriptionLabel": "Opis",
+		"descriptionPlaceholder": "Powiedz nam więcej o swojej opinii...",
+		"submit": "Wyślij",
+		"submitting": "Wysyłanie...",
+		"submitSuccess": "Dziękujemy za opinię!",
+		"submitError": "Nie udało się wysłać opinii. Spróbuj ponownie."
 	}
 }

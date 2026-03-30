@@ -664,5 +664,24 @@
 				"pm": "午後"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "フィードバックを送信",
+		"title": "フィードバックを送信",
+		"category": "カテゴリ",
+		"categories": {
+			"Bug": "バグ",
+			"Feature Request": "機能リクエスト",
+			"Improvement": "改善",
+			"Other": "その他"
+		},
+		"titleLabel": "タイトル",
+		"titlePlaceholder": "フィードバックの簡単な要約",
+		"descriptionLabel": "説明",
+		"descriptionPlaceholder": "フィードバックについて詳しく教えてください...",
+		"submit": "送信",
+		"submitting": "送信中...",
+		"submitSuccess": "フィードバックありがとうございます！",
+		"submitError": "フィードバックの送信に失敗しました。もう一度お試しください。"
 	}
 }

@@ -664,5 +664,24 @@
 				"pm": "오후"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "피드백 보내기",
+		"title": "피드백 보내기",
+		"category": "카테고리",
+		"categories": {
+			"Bug": "버그",
+			"Feature Request": "기능 요청",
+			"Improvement": "개선",
+			"Other": "기타"
+		},
+		"titleLabel": "제목",
+		"titlePlaceholder": "피드백 간략 요약",
+		"descriptionLabel": "설명",
+		"descriptionPlaceholder": "피드백에 대해 자세히 알려주세요...",
+		"submit": "제출",
+		"submitting": "제출 중...",
+		"submitSuccess": "피드백 감사합니다!",
+		"submitError": "피드백 제출에 실패했습니다. 다시 시도해 주세요."
 	}
 }

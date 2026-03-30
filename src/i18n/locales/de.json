@@ -664,5 +664,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Feedback senden",
+		"title": "Feedback senden",
+		"category": "Kategorie",
+		"categories": {
+			"Bug": "Fehler",
+			"Feature Request": "Funktionsanfrage",
+			"Improvement": "Verbesserung",
+			"Other": "Sonstiges"
+		},
+		"titleLabel": "Titel",
+		"titlePlaceholder": "Kurze Zusammenfassung Ihres Feedbacks",
+		"descriptionLabel": "Beschreibung",
+		"descriptionPlaceholder": "Erzählen Sie uns mehr über Ihr Feedback...",
+		"submit": "Absenden",
+		"submitting": "Wird gesendet...",
+		"submitSuccess": "Vielen Dank für Ihr Feedback!",
+		"submitError": "Feedback konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
 	}
 }

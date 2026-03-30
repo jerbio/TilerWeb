@@ -664,5 +664,24 @@
 				"pm": "अपराह्न"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "प्रतिक्रिया भेजें",
+		"title": "प्रतिक्रिया भेजें",
+		"category": "श्रेणी",
+		"categories": {
+			"Bug": "बग",
+			"Feature Request": "सुविधा अनुरोध",
+			"Improvement": "सुधार",
+			"Other": "अन्य"
+		},
+		"titleLabel": "शीर्षक",
+		"titlePlaceholder": "अपनी प्रतिक्रिया का संक्षिप्त सारांश",
+		"descriptionLabel": "विवरण",
+		"descriptionPlaceholder": "अपनी प्रतिक्रिया के बारे में और बताएं...",
+		"submit": "जमा करें",
+		"submitting": "जमा हो रहा है...",
+		"submitSuccess": "आपकी प्रतिक्रिया के लिए धन्यवाद!",
+		"submitError": "प्रतिक्रिया जमा करने में विफल। कृपया पुनः प्रयास करें।"
 	}
 }

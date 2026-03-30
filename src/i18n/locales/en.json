@@ -1351,5 +1351,24 @@
 				}
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Send Feedback",
+		"title": "Send Feedback",
+		"category": "Category",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Feature Request",
+			"Improvement": "Improvement",
+			"Other": "Other"
+		},
+		"titleLabel": "Title",
+		"titlePlaceholder": "Brief summary of your feedback",
+		"descriptionLabel": "Description",
+		"descriptionPlaceholder": "Tell us more about your feedback...",
+		"submit": "Submit",
+		"submitting": "Submitting...",
+		"submitSuccess": "Thank you for your feedback!",
+		"submitError": "Failed to submit feedback. Please try again."
 	}
 }

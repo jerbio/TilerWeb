@@ -664,5 +664,24 @@
 				"pm": "p.m."
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Enviar comentario",
+		"title": "Enviar comentario",
+		"category": "Categoría",
+		"categories": {
+			"Bug": "Error",
+			"Feature Request": "Solicitud de función",
+			"Improvement": "Mejora",
+			"Other": "Otro"
+		},
+		"titleLabel": "Título",
+		"titlePlaceholder": "Resumen breve de su comentario",
+		"descriptionLabel": "Descripción",
+		"descriptionPlaceholder": "Cuéntenos más sobre su comentario...",
+		"submit": "Enviar",
+		"submitting": "Enviando...",
+		"submitSuccess": "¡Gracias por su comentario!",
+		"submitError": "No se pudo enviar el comentario. Por favor, inténtelo de nuevo."
 	}
 }

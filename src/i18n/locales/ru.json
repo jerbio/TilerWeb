@@ -664,5 +664,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Отправить отзыв",
+		"title": "Отправить отзыв",
+		"category": "Категория",
+		"categories": {
+			"Bug": "Ошибка",
+			"Feature Request": "Запрос функции",
+			"Improvement": "Улучшение",
+			"Other": "Другое"
+		},
+		"titleLabel": "Заголовок",
+		"titlePlaceholder": "Краткое описание вашего отзыва",
+		"descriptionLabel": "Описание",
+		"descriptionPlaceholder": "Расскажите подробнее о вашем отзыве...",
+		"submit": "Отправить",
+		"submitting": "Отправка...",
+		"submitSuccess": "Спасибо за ваш отзыв!",
+		"submitError": "Не удалось отправить отзыв. Пожалуйста, попробуйте снова."
 	}
 }
