@@ -181,7 +181,7 @@ const inputStyles = `
 const Input = styled.input`
 	${inputStyles}
 	padding: 0.625rem 0.75rem;
-	background-color: ${(props) => props.theme.colors.background.default};
+	background-color: ${(props) => props.theme.colors.background};
 	border: 1px solid ${(props) => props.theme.colors.border.default};
 	color: ${(props) => props.theme.colors.text.primary};
 
@@ -194,7 +194,7 @@ const Input = styled.input`
 const Select = styled.select`
 	${inputStyles}
 	padding: 0.625rem 0.75rem;
-	background-color: ${(props) => props.theme.colors.background.default};
+	background-color: ${(props) => props.theme.colors.background};
 	border: 1px solid ${(props) => props.theme.colors.border.default};
 	color: ${(props) => props.theme.colors.text.primary};
 
@@ -207,7 +207,7 @@ const Select = styled.select`
 const TextArea = styled.textarea`
 	${inputStyles}
 	padding: 0.625rem 0.75rem;
-	background-color: ${(props) => props.theme.colors.background.default};
+	background-color: ${(props) => props.theme.colors.background};
 	border: 1px solid ${(props) => props.theme.colors.border.default};
 	color: ${(props) => props.theme.colors.text.primary};
 	resize: vertical;

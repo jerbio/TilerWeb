@@ -581,4 +581,109 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 		});
 	});
+
+	describe('Read-only mode (readOnly prop)', () => {
+		it('hides Complete, Now, and Defer action buttons when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByTitle('Complete')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Now')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Defer')).not.toBeInTheDocument();
+		});
+
+		it('hides More Options row when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByText('More options')).not.toBeInTheDocument();
+		});
+
+		it('hides Delete button for third-party events when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByTitle('Delete')).not.toBeInTheDocument();
+		});
+
+		it('does not show edit pencil icon on event name when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+			const nameContainer = screen.getByText('Test Event').closest('div');
+			expect(nameContainer?.querySelector('.edit-icon')).not.toBeInTheDocument();
+		});
+
+		it('does not enter name editing mode on click when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			fireEvent.click(screen.getByText('Test Event'));
+
+			// Should not show an input field
+			expect(screen.queryByDisplayValue('Test Event')).not.toBeInTheDocument();
+			// Name should still be a heading, not editable
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+		});
+
+		it('still displays event details (start, end, duration) in read-only mode', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			// Event name is visible
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+			// Time labels are visible
+			expect(screen.getByText('Starts:')).toBeInTheDocument();
+			expect(screen.getByText('Ends:')).toBeInTheDocument();
+			expect(screen.getByText('Duration:')).toBeInTheDocument();
+		});
+
+		it('does not show edit pencil icons on time fields when readOnly is true', () => {
+			const { container } = renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			const allEditIcons = container.querySelectorAll('.edit-icon');
+			expect(allEditIcons.length).toBe(0);
+		});
+	});
 });

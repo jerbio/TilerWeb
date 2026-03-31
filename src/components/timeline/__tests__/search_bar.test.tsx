@@ -44,6 +44,7 @@ vi.mock('@/global_state', () => ({
 vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 	useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
 		const mockStore = {
+			demoMode: false,
 			createTile: {
 				state: {
 					isOpen: false,

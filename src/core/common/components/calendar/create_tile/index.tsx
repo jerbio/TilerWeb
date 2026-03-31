@@ -41,6 +41,10 @@ export type InitialCreateTileFormState = {
 	start: dayjs.Dayjs;
 	action: string;
 	location: string;
+	locationId: string | null;
+	locationSource: string;
+	locationIsVerified: boolean;
+	locationTag: string;
 	durationHours: number;
 	durationMins: number;
 	deadline: dayjs.Dayjs;
@@ -96,6 +100,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         GColor: formData.color.g.toString(),
         BColor: formData.color.b.toString(),
         LocationAddress: formData.location,
+        LookupString: formData.location || undefined,
+        LocationIsVerified: formData.locationIsVerified ? 'true' : 'false',
+        LocationId: formData.locationId || undefined,
+        LocationSource: formData.locationSource || undefined,
+        LocationTag: formData.locationTag || undefined,
         DurationDays: '0',
         DurationHours: formData.durationHours.toString(),
         DurationMinute: formData.durationMins.toString(),

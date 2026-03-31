@@ -50,6 +50,7 @@ type ViewInfo = {
 };
 
 export type CalendarUIStore = {
+	demoMode: boolean;
 	createTile: {
 		state: CreateTileState;
 		actions: CreateTileActions;
@@ -73,6 +74,7 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 		}
 
 		return {
+			demoMode,
 			createTile: {
 				state: {
 					isOpen: false,

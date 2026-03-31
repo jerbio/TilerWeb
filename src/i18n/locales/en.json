@@ -207,6 +207,10 @@
 					"label": "Tile Location",
 					"placeholder": "Where is this tile held?"
 				},
+				"locationTag": {
+					"label": "Location Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
 				"hours": {
 					"label": "Tile Duration (Hours)",
 					"placeholder": "How many hrs will it take?"
