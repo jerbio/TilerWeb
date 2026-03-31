@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
 export default function useFormHandler<T extends { [field: string]: unknown }>(fields: T) {
-	const newFields: T = JSON.parse(JSON.stringify(fields));
-	const [formData, setFormData] = useState(newFields);
+	const [formData, setFormData] = useState({ ...fields });
 
 	const resetForm = () => {
-		setFormData(newFields);
+		setFormData({ ...fields });
 	};
 
 	const handleFormInputChange =

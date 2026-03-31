@@ -446,7 +446,10 @@ const CalendarEvents = ({
 								g: detail.colorGreen,
 								b: detail.colorBlue,
 							}}
-							onClick={() => handleTravelDetailClick(detail)}
+							onClick={(e) => {
+								e.stopPropagation();
+								handleTravelDetailClick(detail);
+							}}
 						>
 							<span>
 								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}

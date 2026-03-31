@@ -65,16 +65,17 @@ type ViewInfo = {
 };
 
 export type CalendarUIStore = {
-  createTile: {
-    state: CreateTileState;
-    actions: CreateTileActions;
-  };
-  editTile: {
-    state: EditTileState;
-    actions: EditTileActions;
-  };
-  viewInfo: ViewInfo;
-  setViewInfo: (info: ViewInfo) => void;
+	demoMode: boolean;
+	createTile: {
+		state: CreateTileState;
+		actions: CreateTileActions;
+	};
+	editTile: {
+		state: EditTileState;
+		actions: EditTileActions;
+	};
+	viewInfo: ViewInfo;
+	setViewInfo: (info: ViewInfo) => void;
 };
 
 export const createCalendarUIStore = (demoMode: boolean) =>
@@ -87,11 +88,12 @@ export const createCalendarUIStore = (demoMode: boolean) =>
       };
     }
 
-    return {
-      createTile: {
-        state: {
-          isOpen: false,
-          isExpanded: false,
+		return {
+			demoMode,
+			createTile: {
+				state: {
+					isOpen: false,
+					isExpanded: false,
 
           restrictionProfile: {
             work: null,

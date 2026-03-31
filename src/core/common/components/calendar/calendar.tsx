@@ -297,6 +297,8 @@ const Calendar = ({
 		maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
 	});
 
+	const demoMode = useCalendarUI((state) => state.demoMode);
+
 	const calendarEventInfo = [
 		{
 			key: 'info',
@@ -312,6 +314,7 @@ const Calendar = ({
 						refetchEvents();
 					}}
 					maxHeight={calendarEventInfoPos.maxHeight}
+					readOnly={demoMode}
 				/>
 			),
 		},

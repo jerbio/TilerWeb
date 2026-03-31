@@ -47,6 +47,7 @@ type CalendarEventInfoProps = {
 	onClose?: () => void;
 	onEventAction?: () => void;
 	isEditable?: boolean;
+	readOnly?: boolean;
 	maxHeight?: number;
 };
 
@@ -55,6 +56,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	onClose,
 	onEventAction,
 	isEditable = true,
+	readOnly = false,
 	maxHeight,
 }) => {
 	const { t } = useTranslation();
@@ -63,7 +65,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
 	const isThirdPartyEvent = event?.thirdPartyType !== ThirdPartyType.Tiler;
 	// Third-party events (e.g. Google Calendar) are never editable
-	const effectiveEditable = isEditable && !isThirdPartyEvent;
+	// readOnly mode also disables all editing
+	const effectiveEditable = isEditable && !isThirdPartyEvent && !readOnly;
 
 	// Edit mode flags
 	const [isEditingName, setIsEditingName] = useState(false);
@@ -455,8 +458,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={isEditable}
-										onClick={() => isEditable && setIsEditingStart(true)}
+										$isEditable={effectiveEditable}
+										onClick={() => effectiveEditable && setIsEditingStart(true)}
 									>
 										<span>
 											{hasChanges
@@ -467,7 +470,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedStartDate).format('D MMM')
 												: dayjs(eventStart).format('D MMM')}
 										</span>
-										{isEditable && <Pencil size={12} className="edit-icon" />}
+										{effectiveEditable && <Pencil size={12} className="edit-icon" />}
 									</EditableValue>
 								)}
 							</div>
@@ -508,8 +511,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={isEditable}
-										onClick={() => isEditable && setIsEditingEnd(true)}
+										$isEditable={effectiveEditable}
+										onClick={() => effectiveEditable && setIsEditingEnd(true)}
 									>
 										<span>
 											{hasChanges
@@ -520,7 +523,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedEndDate).format('D MMM')
 												: dayjs(eventEnd).format('D MMM')}
 										</span>
-										{isEditable && <Pencil size={12} className="edit-icon" />}
+										{effectiveEditable && <Pencil size={12} className="edit-icon" />}
 									</EditableValue>
 								)}
 							</div>
@@ -621,7 +624,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			</ScrollableBody>
 
 			{/* More Options Row */}
-			{!hasChanges && !isThirdPartyEvent && (
+			{!hasChanges && !isThirdPartyEvent && !readOnly && (
 				<MoreOptionsRow
 					onClick={() => {
 						if (!event) return;
@@ -638,7 +641,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			)}
 
 			{/* Action Buttons / Defer Duration Picker */}
-			{!hasChanges && !isThirdPartyEvent && (
+			{!hasChanges && !isThirdPartyEvent && !readOnly && (
 				<EventActionBar>
 					{showDeferPicker ? (
 						<>
@@ -744,7 +747,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			)}
 
 			{/* Delete button for third-party events */}
-			{!hasChanges && isThirdPartyEvent && (
+			{!hasChanges && isThirdPartyEvent && !readOnly && (
 				<EventActionBar>
 					<EventActionButton
 						onClick={handleDelete}

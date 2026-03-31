@@ -207,6 +207,10 @@
 					"label": "Tile Location",
 					"placeholder": "Where is this tile held?"
 				},
+				"locationTag": {
+					"label": "Location Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
 				"hours": {
 					"label": "Tile Duration (Hours)",
 					"placeholder": "How many hrs will it take?"
@@ -1076,6 +1080,7 @@
 			"name": "Name",
 			"start": "Start",
 			"end": "End",
+			"selectDate": "Select date",
 			"duration": "Duration",
 			"hours": "hrs",
 			"minutes": "min",
@@ -1363,5 +1368,24 @@
 				}
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Send Feedback",
+		"title": "Send Feedback",
+		"category": "Category",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Feature Request",
+			"Improvement": "Improvement",
+			"Other": "Other"
+		},
+		"titleLabel": "Title",
+		"titlePlaceholder": "Brief summary of your feedback",
+		"descriptionLabel": "Description",
+		"descriptionPlaceholder": "Tell us more about your feedback...",
+		"submit": "Submit",
+		"submitting": "Submitting...",
+		"submitSuccess": "Thank you for your feedback!",
+		"submitError": "Failed to submit feedback. Please try again."
 	}
 }

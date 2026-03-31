@@ -42,28 +42,32 @@ dayjs.extend(advancedFormat);
 
 
 export type InitialCreateTileFormState = {
-  start: dayjs.Dayjs;
-  action: string;
-  location: string;
-  durationHours: number;
-  durationMins: number;
-  deadline: dayjs.Dayjs;
-  color: RGBColor;
-  isRecurring: boolean;
-  recurrenceType: ScheduleRepeatType;
-  recurrenceFrequency: ScheduleRepeatFrequency;
-  recurrenceWeeklyDays: ScheduleRepeatWeekday[];
-  recurrenceStartType: ScheduleRepeatStartType;
-  recurrenceStartDate: dayjs.Dayjs;
-  recurrenceEndType: ScheduleRepeatEndType;
-  recurrenceEndDate: dayjs.Dayjs;
-  isTimeRestricted: boolean;
-  timeRestrictionType: CreateTileRestrictionType;
-	customTimeRestrictionSchedule: DaySchedule[];
-  timeRestrictionStart: string;
-  timeRestrictionEnd: string;
+	start: dayjs.Dayjs;
+	action: string;
+	location: string;
+	locationId: string | null;
+	locationSource: string;
+	locationIsVerified: boolean;
+	locationTag: string;
   hasLocationNickname: boolean;
-  locationNickname: string;
+	locationNickname: string;
+	durationHours: number;
+	durationMins: number;
+	deadline: dayjs.Dayjs;
+	color: RGBColor;
+	isRecurring: boolean;
+	recurrenceType: ScheduleRepeatType;
+	recurrenceFrequency: ScheduleRepeatFrequency;
+	recurrenceWeeklyDays: ScheduleRepeatWeekday[];
+	recurrenceStartType: ScheduleRepeatStartType;
+	recurrenceStartDate: dayjs.Dayjs;
+	recurrenceEndType: ScheduleRepeatEndType;
+	recurrenceEndDate: dayjs.Dayjs;
+	isTimeRestricted: boolean;
+	timeRestrictionType: CreateTileRestrictionType;
+	customTimeRestrictionSchedule: DaySchedule[];
+	timeRestrictionStart: string;
+	timeRestrictionEnd: string;
 };
 
 type CalendarCreateTileProps = {
@@ -101,6 +105,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         GColor: formData.color.g.toString(),
         BColor: formData.color.b.toString(),
         LocationAddress: formData.location,
+        LookupString: formData.location || undefined,
+        LocationIsVerified: formData.locationIsVerified ? 'true' : 'false',
+        LocationId: formData.locationId || undefined,
+        LocationSource: formData.locationSource || undefined,
+        LocationTag: formData.locationTag || undefined,
         DurationDays: '0',
         DurationHours: formData.durationHours.toString(),
         DurationMinute: formData.durationMins.toString(),
