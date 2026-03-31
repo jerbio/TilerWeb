@@ -724,5 +724,24 @@
 				"pm": "下午"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "发送反馈",
+		"title": "发送反馈",
+		"category": "类别",
+		"categories": {
+			"Bug": "错误",
+			"Feature Request": "功能请求",
+			"Improvement": "改进",
+			"Other": "其他"
+		},
+		"titleLabel": "标题",
+		"titlePlaceholder": "简要描述您的反馈",
+		"descriptionLabel": "描述",
+		"descriptionPlaceholder": "告诉我们更多关于您的反馈...",
+		"submit": "提交",
+		"submitting": "提交中...",
+		"submitSuccess": "感谢您的反馈！",
+		"submitError": "提交反馈失败，请重试。"
 	}
 }

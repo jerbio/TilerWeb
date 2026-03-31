@@ -724,5 +724,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Invia feedback",
+		"title": "Invia feedback",
+		"category": "Categoria",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Richiesta di funzionalità",
+			"Improvement": "Miglioramento",
+			"Other": "Altro"
+		},
+		"titleLabel": "Titolo",
+		"titlePlaceholder": "Breve riepilogo del tuo feedback",
+		"descriptionLabel": "Descrizione",
+		"descriptionPlaceholder": "Dicci di più sul tuo feedback...",
+		"submit": "Invia",
+		"submitting": "Invio in corso...",
+		"submitSuccess": "Grazie per il tuo feedback!",
+		"submitError": "Invio del feedback non riuscito. Riprova."
 	}
 }

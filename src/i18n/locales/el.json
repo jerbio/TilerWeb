@@ -724,5 +724,24 @@
 				"pm": "μ.μ."
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Αποστολή σχολίων",
+		"title": "Αποστολή σχολίων",
+		"category": "Κατηγορία",
+		"categories": {
+			"Bug": "Σφάλμα",
+			"Feature Request": "Αίτημα λειτουργίας",
+			"Improvement": "Βελτίωση",
+			"Other": "Άλλο"
+		},
+		"titleLabel": "Τίτλος",
+		"titlePlaceholder": "Σύντομη περίληψη των σχολίων σας",
+		"descriptionLabel": "Περιγραφή",
+		"descriptionPlaceholder": "Πείτε μας περισσότερα για τα σχόλιά σας...",
+		"submit": "Υποβολή",
+		"submitting": "Υποβολή...",
+		"submitSuccess": "Ευχαριστούμε για τα σχόλιά σας!",
+		"submitError": "Αποτυχία υποβολής σχολίων. Παρακαλώ δοκιμάστε ξανά."
 	}
 }

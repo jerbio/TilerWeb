@@ -17,6 +17,8 @@ import { LocationApi } from '@/api/locationApi';
 import { AuthService } from './authService';
 import { UserApi } from '@/api/userApi';
 import { UserService } from './userService';
+import { FeedbackApi } from '@/api/feedbackApi';
+import { FeedbackService } from './feedbackService';
 import { personaUserService } from './personaUserService';
 
 // Init APIs
@@ -31,6 +33,7 @@ const emailListApi = new EmailListApi();
 const authApi = new AuthApi();
 const locationApi = new LocationApi();
 const userApi = new UserApi();
+const feedbackApi = new FeedbackApi();
 
 // Init Services
 export const personaService = new PersonaService(personaApi);
@@ -46,4 +49,5 @@ export const betaUserService = new BetaUserService(betaUserApi);
 export const emailListService = new EmailListService(emailListApi);
 export const authService = new AuthService(authApi);
 export const userService = new UserService(userApi);
+export const feedbackService = new FeedbackService(feedbackApi);
 export { personaUserService };
