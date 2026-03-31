@@ -1,4 +1,4 @@
-import { RGB, RGBColor } from '@/core/util/colors';
+import { RGBColor } from '@/core/util/colors';
 import { InitialCreateTileFormState } from './create_tile';
 import dayjs from 'dayjs';
 import {
@@ -8,17 +8,7 @@ import {
   ScheduleRepeatType,
   ScheduleRepeatWeekday,
 } from '../../types/schedule';
-
-export const eventColorOptions: Array<RGB> = [
-  { r: 255, g: 159, b: 28 },
-  { r: 0, g: 188, b: 212 },
-  { r: 204, g: 51, b: 0 },
-  { r: 102, g: 122, b: 62 },
-  { r: 33, g: 150, b: 243 },
-  { r: 126, g: 87, b: 194 },
-  { r: 152, g: 255, b: 197 },
-  { r: 219, g: 58, b: 94 },
-];
+import { eventColors } from '@/core/constants/calendar_options';
 
 export enum CreateTileRestrictionType {
   Anytime = '0',
@@ -34,7 +24,7 @@ export const initialCreateTileFormState: InitialCreateTileFormState = {
   durationHours: 0,
   durationMins: 0,
   deadline: dayjs(),
-  color: new RGBColor(eventColorOptions[0]),
+  color: new RGBColor(eventColors[0]),
   isRecurring: false,
   recurrenceType: ScheduleRepeatType.Daily,
   recurrenceFrequency: ScheduleRepeatFrequency.Daily,

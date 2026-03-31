@@ -282,6 +282,7 @@
 				"addLocationNickname": "Add location nickname"
 			},
 			"errors": {
+				"couldNotCreate": "Could not create tile. Please try again.",
 				"scheduleProfile": "Failed to load Personal/Work Hours",
 				"workProfileNotFound": "Work hours restriction profile not found",
 				"personalProfileNotFound": "Personal hours restriction profile not found"
