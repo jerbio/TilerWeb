@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CalendarEvent, ScheduleSubCalendarEvent, ThirdPartyType } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
@@ -123,6 +123,33 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			setIsEditingDeadline(false);
 		}
 	}, [event, eventStart, eventEnd]);
+
+	// Close on Escape key, or exit edit mode if an input field is active
+	const isEditingAnyRef = useRef(false);
+	isEditingAnyRef.current = isEditingName || isEditingStart || isEditingEnd || isEditingDeadline;
+
+	const onCloseRef = useRef(onClose);
+	onCloseRef.current = onClose;
+
+	useEffect(() => {
+		if (!event) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				e.stopImmediatePropagation();
+				if (isEditingAnyRef.current) {
+					setIsEditingName(false);
+					setIsEditingStart(false);
+					setIsEditingEnd(false);
+					setIsEditingDeadline(false);
+					(document.activeElement as HTMLElement)?.blur();
+				} else {
+					onCloseRef.current?.();
+				}
+			}
+		};
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [event]);
 
 	const handleCancel = () => {
 		if (event) {
@@ -362,6 +389,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 											setHasChanges(true);
 										}
 									} else if (e.key === 'Escape') {
+										e.stopPropagation();
 										setEditedName(event.name);
 										setIsEditingName(false);
 									}
