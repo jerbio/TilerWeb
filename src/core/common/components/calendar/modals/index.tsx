@@ -1,4 +1,3 @@
-import calendarConfig from '@/core/constants/calendar_config';
 import { a, useSpring } from '@react-spring/web';
 import React from 'react';
 import styled from 'styled-components';
@@ -8,6 +7,7 @@ type CalendarModalProps = {
   onBackdropClick?: () => void;
   containerRef?: React.RefObject<HTMLDivElement>;
   children?: React.ReactNode;
+	width?: number
 };
 
 const CalendarModal: React.FC<CalendarModalProps> = ({
@@ -15,6 +15,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
   containerRef,
   onBackdropClick,
   open,
+  width
 }) => {
   const modalPopooutAnimation = useSpring({
     from: {
@@ -36,6 +37,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
     <ModalBackdrop $visible={open} onClick={onBackdropClick}>
       <ModalWrapper>
         <ModalContainer
+					$width={width}
           ref={containerRef}
           style={{
             scale: modalPopooutAnimation.scale,
@@ -74,13 +76,13 @@ const ModalWrapper = styled.div`
 	height: 100%;
 `;
 
-const ModalContainer = styled(a.div)`
+const ModalContainer = styled(a.div)<{ $width?: number }>`
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	z-index: 1001;
 	width: calc(100% - 32px);
-	max-width: ${calendarConfig.CREATE_EVENT_MODAL_WIDTH};
+	max-width: ${({ $width }) => $width ? `${$width}px` : '600px'};
 `;
 
 export default CalendarModal;

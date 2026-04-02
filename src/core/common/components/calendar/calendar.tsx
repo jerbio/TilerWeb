@@ -36,6 +36,7 @@ import { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './calendar-ui.provider';
 import { initialCreateTileFormState } from './data';
 import CalendarModal from './modals';
+import CalendarCreateSelection from './calendar_create_selection';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -63,7 +64,7 @@ const Calendar = ({
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
   const theme = useTheme();
-  const { createTile } = useCalendarUI((state) => state);
+  const { createTile, createSelection } = useCalendarUI((state) => state);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -468,7 +469,7 @@ const Calendar = ({
         recurrenceStartDate: clickedDay,
         recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
       });
-      createTile.actions.open();
+      createSelection.actions.open();
     } else {
       setSelectedEvent(null);
       setSelectedEventInfo(null);
@@ -596,14 +597,22 @@ const Calendar = ({
         </item.container>
       ))}
 
-			{/* TODO: Create Choice Modal Overlay */}
+      {/* TODO: Create Type Modal Overlay */}
+      <CalendarModal
+        open={createSelection.state.isOpen}
+        onBackdropClick={createSelection.actions.close}
+				width={270}
+			>
+				<CalendarCreateSelection />
+			</CalendarModal>
 
       {/* Create Tile Modal Overlay */}
-			<CalendarModal
-				open={createTile.state.isOpen}
+      <CalendarModal
+        open={createTile.state.isOpen}
         onBackdropClick={createTile.actions.close}
         containerRef={createTileModalContainerRef}
-			/>
+				width={calendarConfig.CREATE_TILE_MODAL_WIDTH}
+      />
       {createTileModalPortalTarget &&
         createPortal(
           <CalendarCreateTile
@@ -904,6 +913,5 @@ const CalendarEventInfoModalContainer = styled(a.div)`
 	width: ${calendarConfig.INFO_MODAL_WIDTH};
 	height: fit-content;
 `;
-
 
 export default Calendar;

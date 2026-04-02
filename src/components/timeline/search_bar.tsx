@@ -45,7 +45,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	} | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
+	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
@@ -150,7 +150,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	};
 
 	const handleCreate = () => {
-		openCreateTile();
+		openCreateSelection();
 		setShowDropdown(false);
 	};
 

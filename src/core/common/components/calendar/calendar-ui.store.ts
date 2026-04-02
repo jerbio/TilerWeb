@@ -6,11 +6,11 @@ import {
   ScheduleCreateEventResponse,
 } from '../../types/schedule';
 
-type CreateTypeState = {
+type CreateSelectionState = {
   isOpen: boolean;
 };
 
-type CreateTypeActions = {
+type CreateSelectionActions = {
   open: () => void;
   close: () => void;
 };
@@ -75,9 +75,9 @@ type ViewInfo = {
 
 export type CalendarUIStore = {
   demoMode: boolean;
-  createType: {
-    state: CreateTypeState;
-    actions: CreateTypeActions;
+  createSelection: {
+    state: CreateSelectionState;
+    actions: CreateSelectionActions;
   }
   createTile: {
     state: CreateTileState;
@@ -103,24 +103,24 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 
     return {
       demoMode,
-      createType: {
+      createSelection: {
         state: {
           isOpen: false,
         },
         actions: {
           open: guarded(() =>
             set((state) => ({
-              createType: {
-                ...state.createType,
-                state: { ...state.createType.state, isOpen: true },
+              createSelection: {
+                ...state.createSelection,
+                state: { ...state.createSelection.state, isOpen: true },
               },
             }))
           ),
           close: guarded(() =>
             set((state) => ({
-              createType: {
-                ...state.createType,
-                state: { ...state.createType.state, isOpen: false },
+              createSelection: {
+                ...state.createSelection,
+                state: { ...state.createSelection.state, isOpen: false },
               },
             }))
           ),
