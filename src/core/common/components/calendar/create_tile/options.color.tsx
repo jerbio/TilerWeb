@@ -1,8 +1,8 @@
 import { RGBColor } from '@/core/util/colors';
-import { eventColorOptions } from '@/core/common/components/calendar/data';
 import styled from 'styled-components';
 import useFormHandler from '@/hooks/useFormHandler';
-import type { InitialCreateTileFormState } from '.';
+import { InitialCreateTileFormState } from '.';
+import { eventColors } from '@/core/constants/calendar_options';
 
 type ColorOptionsProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
@@ -13,7 +13,7 @@ const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
 }) => {
 	return (
 		<TileColorOptions>
-			{eventColorOptions.map((color) => {
+			{eventColors.map((color) => {
 				const optionRGBColor = new RGBColor(color);
 				const hexColor = optionRGBColor.setLightness(0.6).toHex();
 				return (

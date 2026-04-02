@@ -2,14 +2,14 @@ import useFormHandler from '@/hooks/useFormHandler';
 import { Calendar } from 'lucide-react';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
-	ScheduleRepeatEndType,
-	ScheduleRepeatFrequency,
-	ScheduleRepeatStartType,
-	ScheduleRepeatType,
-	ScheduleRepeatWeekday,
+  ScheduleRepeatEndType,
+  ScheduleRepeatFrequency,
+  ScheduleRepeatStartType,
+  ScheduleRepeatType,
+  ScheduleRepeatWeekday,
 } from '../../../types/schedule';
 import DatePicker from '../../date_picker';
 import Toggle from '../../Toggle';
@@ -20,28 +20,77 @@ import {
   InitialCreateTileFormState,
 } from '.';
 import Radio from '../../radio';
+import { CreateTileRestrictionType } from '../data';
+import { useCalendarUI } from '../calendar-ui.provider';
+import WeeklySchedule, { WeeklyScheduleSize } from '../../WeeklySchedule';
 
 type ActionsOptionsProps = {
-	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-	recurrenceTypeOptions: {
-		value: ScheduleRepeatType;
-		label: string;
-		frequency: ScheduleRepeatFrequency;
-	}[];
-	recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
-	recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
-	recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
+  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+  recurrenceTypeOptions: {
+    value: ScheduleRepeatType;
+    label: string;
+    frequency: ScheduleRepeatFrequency;
+  }[];
+  recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
+  recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
+  recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
+  restrictionTypeOptions: { value: CreateTileRestrictionType; label: string }[];
 };
 
 const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
-  formHandler: { formData, handleFormInputChange },
-	recurrenceTypeOptions,
-	recurrenceWeekdayOptions,
-	recurrenceStartTypeOptions,
-	recurrenceEndTypeOptions,
+  formHandler: { formData, handleFormInputChange, setFormData },
+  recurrenceTypeOptions,
+  recurrenceWeekdayOptions,
+  recurrenceStartTypeOptions,
+  recurrenceEndTypeOptions,
+  restrictionTypeOptions,
 }) => {
-	const { t } = useTranslation();
-	const theme = useStyledTheme();
+  const { t } = useTranslation();
+  const theme = useStyledTheme();
+  const ui = useCalendarUI((state) => state.createTile);
+
+	// If restriction profiles are loading, set the restriction type to Anytime
+  useEffect(() => {
+    if (ui.state.restrictionProfile.loading) {
+      handleFormInputChange('timeRestrictionType', {
+        mode: 'static',
+      })(CreateTileRestrictionType.Anytime);
+    }
+  }, [ui.state.restrictionProfile.loading]);
+
+  const handleCustomRestrictionScheduleChange = useCallback(
+    (dayIndex: number, field: 'startTime' | 'endTime', value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        customTimeRestrictionSchedule: prev.customTimeRestrictionSchedule.map((day) =>
+          day.dayIndex === dayIndex ? { ...day, [field]: value } : day
+        ),
+      }));
+    },
+    []
+  );
+
+  const handleCustomRestrictionDayToggle = useCallback(
+    (dayIndex: number, selected: boolean) => {
+      setFormData((prev) => ({
+        ...prev,
+        customTimeRestrictionSchedule: prev.customTimeRestrictionSchedule.map((day) =>
+          day.dayIndex === dayIndex
+            ? {
+              ...day,
+              startTime: selected
+                ? t('settings.sections.tilePreferences.defaultStartTime')
+                : '',
+              endTime: selected
+                ? t('settings.sections.tilePreferences.defaultEndTime')
+                : '',
+            }
+            : day
+        ),
+      }));
+    },
+    [t]
+  );
 
   return (
     <StyledActionsOptions>
@@ -262,6 +311,51 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
           )}
         </TileActionContainer>
       )}
+      <Toggle
+        label={t('calendar.createTile.actions.timeRestriction')}
+        isOn={formData.isTimeRestricted}
+        onChange={handleFormInputChange('isTimeRestricted', { mode: 'static' })}
+        containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}
+      />
+      {formData.isTimeRestricted && (
+        <TileActionContainer>
+          {/* Restriction Type Selection */}
+          <RestrictionOptions>
+            {restrictionTypeOptions.map((option) => (
+              <Radio
+                key={option.value}
+                label={option.label}
+                checked={option.value === formData.timeRestrictionType}
+                disabled={
+                  option.value === CreateTileRestrictionType.WorkHours
+                    ? !ui.state.restrictionProfile.work
+                    : option.value === CreateTileRestrictionType.PersonalHours
+                      ? !ui.state.restrictionProfile.personal
+                      : false
+                }
+                name="timeRestrictionType"
+                onChange={(checked) => {
+                  if (checked) {
+                    handleFormInputChange('timeRestrictionType', {
+                      mode: 'static',
+                    })(option.value);
+                  }
+                }}
+              />
+            ))}
+          </RestrictionOptions>
+          {/* Custom Restriction Selection */}
+          {formData.timeRestrictionType === CreateTileRestrictionType.Custom && (
+            <WeeklySchedule
+              schedule={formData.customTimeRestrictionSchedule}
+              onChange={handleCustomRestrictionScheduleChange}
+              onDayToggle={handleCustomRestrictionDayToggle}
+              disabled={false}
+              size={WeeklyScheduleSize.Sm}
+            />
+          )}
+        </TileActionContainer>
+      )}
     </StyledActionsOptions>
   );
 };
@@ -271,7 +365,6 @@ export default CreateTileActionsOptions;
 const StyledActionsOptions = styled.div`
 	display: flex;
 	flex-direction: column;
-	margin-bottom: 1rem;
 
 	label {
 		font-family: ${(props) => props.theme.typography.fontFamily.urban};
@@ -313,13 +406,13 @@ const RecurrenceWeekdayOption = styled.button<{ $selected: boolean }>`
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.bold};
 	background-color: ${(props) =>
-		props.$selected
-			? props.theme.colors.datepicker.dateSelectedBg
-			: props.theme.colors.datepicker.dateHoverBg};
+    props.$selected
+      ? props.theme.colors.datepicker.dateSelectedBg
+      : props.theme.colors.datepicker.dateHoverBg};
 	color: ${(props) =>
-		props.$selected
-			? props.theme.colors.datepicker.dateSelectedText
-			: props.theme.colors.text.secondary};
+    props.$selected
+      ? props.theme.colors.datepicker.dateSelectedText
+      : props.theme.colors.text.secondary};
 	transition: all 0.2s ease-in-out;
 	outline-offset: 4px;
 	outline: 2px solid transparent;
@@ -331,6 +424,12 @@ const RecurrenceWeekdayOption = styled.button<{ $selected: boolean }>`
 const RecurrenceWeekdayOptions = styled.div`
 	display: flex;
 	gap: 0.75rem;
+`;
+
+const RestrictionOptions = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
 `;
 
 const RecurrenceOptions = styled.div`
