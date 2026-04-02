@@ -6,6 +6,15 @@ import {
   ScheduleCreateEventResponse,
 } from '../../types/schedule';
 
+type CreateTypeState = {
+  isOpen: boolean;
+};
+
+type CreateTypeActions = {
+  open: () => void;
+  close: () => void;
+};
+
 type CreateTileState = {
   isOpen: boolean;
   isExpanded: boolean;
@@ -65,17 +74,21 @@ type ViewInfo = {
 };
 
 export type CalendarUIStore = {
-	demoMode: boolean;
-	createTile: {
-		state: CreateTileState;
-		actions: CreateTileActions;
-	};
-	editTile: {
-		state: EditTileState;
-		actions: EditTileActions;
-	};
-	viewInfo: ViewInfo;
-	setViewInfo: (info: ViewInfo) => void;
+  demoMode: boolean;
+  createType: {
+    state: CreateTypeState;
+    actions: CreateTypeActions;
+  }
+  createTile: {
+    state: CreateTileState;
+    actions: CreateTileActions;
+  };
+  editTile: {
+    state: EditTileState;
+    actions: EditTileActions;
+  };
+  viewInfo: ViewInfo;
+  setViewInfo: (info: ViewInfo) => void;
 };
 
 export const createCalendarUIStore = (demoMode: boolean) =>
@@ -88,12 +101,35 @@ export const createCalendarUIStore = (demoMode: boolean) =>
       };
     }
 
-		return {
-			demoMode,
+    return {
+      demoMode,
+      createType: {
+        state: {
+          isOpen: false,
+        },
+        actions: {
+          open: guarded(() =>
+            set((state) => ({
+              createType: {
+                ...state.createType,
+                state: { ...state.createType.state, isOpen: true },
+              },
+            }))
+          ),
+          close: guarded(() =>
+            set((state) => ({
+              createType: {
+                ...state.createType,
+                state: { ...state.createType.state, isOpen: false },
+              },
+            }))
+          ),
+        },
+      },
 			createTile: {
-				state: {
-					isOpen: false,
-					isExpanded: false,
+        state: {
+          isOpen: false,
+          isExpanded: false,
 
           restrictionProfile: {
             work: null,
