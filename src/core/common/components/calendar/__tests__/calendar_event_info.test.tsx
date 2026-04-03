@@ -553,6 +553,24 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			expect(nameContainer?.querySelector('.edit-icon')).not.toBeInTheDocument();
 		});
 
+		it('still shows time edit pencil icons for third-party events', () => {
+			const { container } = renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Start/end time pencil icons should still be present for third-party events
+			const allEditIcons = container.querySelectorAll('.edit-icon');
+			expect(allEditIcons.length).toBe(2);
+		});
+
 		it('calls deleteScheduleEvent with third-party fields when Delete is clicked', async () => {
 			vi.mocked(scheduleService.deleteScheduleEvent).mockResolvedValueOnce(
 				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<infer T> ? T : never

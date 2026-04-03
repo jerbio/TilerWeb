@@ -486,8 +486,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={effectiveEditable}
-										onClick={() => effectiveEditable && setIsEditingStart(true)}
+										$isEditable={isEditable && !readOnly}
+										onClick={() => isEditable && !readOnly && setIsEditingStart(true)}
 									>
 										<span>
 											{hasChanges
@@ -498,7 +498,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedStartDate).format('D MMM')
 												: dayjs(eventStart).format('D MMM')}
 										</span>
-										{effectiveEditable && <Pencil size={12} className="edit-icon" />}
+										{isEditable && !readOnly && <Pencil size={12} className="edit-icon" />}
 									</EditableValue>
 								)}
 							</div>
@@ -539,8 +539,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={effectiveEditable}
-										onClick={() => effectiveEditable && setIsEditingEnd(true)}
+										$isEditable={isEditable && !readOnly}
+										onClick={() => isEditable && !readOnly && setIsEditingEnd(true)}
 									>
 										<span>
 											{hasChanges
@@ -551,7 +551,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedEndDate).format('D MMM')
 												: dayjs(eventEnd).format('D MMM')}
 										</span>
-										{effectiveEditable && <Pencil size={12} className="edit-icon" />}
+										{isEditable && !readOnly && <Pencil size={12} className="edit-icon" />}
 									</EditableValue>
 								)}
 							</div>
