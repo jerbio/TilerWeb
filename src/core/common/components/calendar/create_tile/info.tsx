@@ -6,7 +6,7 @@ import Input from '../../input';
 import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Bookmark, MapPin, X, Loader2 } from 'lucide-react';
+import { Bookmark, MapPin, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { scheduleService } from '@/services';
 import { ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
 
@@ -105,11 +105,23 @@ const CreateTileInfo: React.FC<InfoProps> = ({
             onFocus={() => {
               if (locationResults.length > 0) setShowLocationDropdown(true);
             }}
+            onBlur={() => {
+              setTimeout(() => setShowLocationDropdown(false), 150);
+            }}
           />
           {formData.location && (
             <ClearButton type="button" onClick={handleClearLocation}>
               <X size={14} />
             </ClearButton>
+          )}
+          {formData.locationIsVerified && formData.location && (
+            <VerifiedBadge
+              data-testid="location-verified-badge"
+              title={t('location.verified.tooltip')}
+            >
+              <CheckCircle2 size={12} />
+              {t('location.verified.label')}
+            </VerifiedBadge>
           )}
           <LocationOverlay>
             {formData.location.trim().length > 0 && formData.location.trim().length < 3 && (
@@ -415,3 +427,18 @@ const PoweredByGoogle = styled.div`
 `;
 
 export default CreateTileInfo;
+
+const VerifiedBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  color: ${({ theme }) => theme.colors.success[600]};
+  font-weight: 500;
+  margin-top: 0.25rem;
+  cursor: default;
+
+  svg {
+    flex-shrink: 0;
+  }
+`;
