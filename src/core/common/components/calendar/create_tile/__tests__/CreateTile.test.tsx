@@ -77,7 +77,7 @@ const mockGetScheduleProfileResponse = {
   personalHoursRestrictionProfile: { id: 'personal-123' },
 } as Awaited<ReturnType<typeof userService.getScheduleProfile>>;
 
-describe('CalendarCreateTile UI', () => {
+describe('CalendarCreateTile', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
