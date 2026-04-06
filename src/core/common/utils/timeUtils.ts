@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
  * Time constants
  */
 export const HOURS_IN_DAY = 24;
+export const MINUTES_IN_DAY = HOURS_IN_DAY * 60;
 
 /**
  * Milliseconds in common time units

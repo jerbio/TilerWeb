@@ -58,6 +58,39 @@ type CreateTileActions = {
   ) => void;
 };
 
+type CreateBlockState = {
+  isOpen: boolean;
+  isExpanded: boolean;
+
+
+  loading: {
+    isActive: boolean;
+    blockName?: string;
+  };
+
+  success: {
+    isOpen: boolean;
+    isNavigatingToBlock: boolean;
+    block?: ScheduleCreateEventResponse['Content'];
+  };
+};
+
+type CreateBlockActions = {
+  open: () => void;
+  close: () => void;
+  expand: () => void;
+  collapse: () => void;
+
+  startLoading: (blockName: string) => void;
+  endLoading: () => void;
+
+  showSuccess: (tile: ScheduleCreateEventResponse['Content']) => void;
+  hideSuccess: () => void;
+
+  navigateToBlock: () => void;
+  navigateToBlockComplete: () => void;
+};
+
 type EditTileState = {
   isOpen: boolean;
   event: CalendarEvent | null;
@@ -78,7 +111,11 @@ export type CalendarUIStore = {
   createSelection: {
     state: CreateSelectionState;
     actions: CreateSelectionActions;
-  }
+  };
+  createBlock: {
+    state: CreateBlockState;
+    actions: CreateBlockActions;
+  };
   createTile: {
     state: CreateTileState;
     actions: CreateTileActions;
@@ -109,84 +146,89 @@ export const createCalendarUIStore = (demoMode: boolean) =>
         },
         actions: {
           open: guarded(() =>
-            set((state) => ({
-              createSelection: {
-                ...state.createSelection,
-                state: { ...state.createSelection.state, isOpen: true },
-              },
-            }))
+            set((state) => {
+							// Don't open if one of the other create forms is selected
+							if (state.createTile.state.isOpen) return state;
+							if (state.createBlock.state.isOpen) return state;
+              return ({
+                createSelection: {
+                  ...state.createSelection,
+                  state: { ...state.createSelection.state, isOpen: true },
+                },
+							});
+						})
           ),
-          close: guarded(() =>
-            set((state) => ({
-              createSelection: {
-                ...state.createSelection,
-                state: { ...state.createSelection.state, isOpen: false },
-              },
-            }))
-          ),
+  close: guarded(() =>
+    set((state) => ({
+      createSelection: {
+        ...state.createSelection,
+        state: { ...state.createSelection.state, isOpen: false },
+      },
+    }))
+  ),
         },
       },
-			createTile: {
-        state: {
-          isOpen: false,
-          isExpanded: false,
+createTile: {
+  state: {
+    isOpen: false,
+      isExpanded: false,
 
-          restrictionProfile: {
-            work: null,
-            personal: null,
-            loading: false,
+        restrictionProfile: {
+      work: null,
+        personal: null,
+          loading: false,
           },
 
-          loading: {
-            isActive: false,
+    loading: {
+      isActive: false,
           },
 
-          success: {
-            isOpen: false,
-            isNavigatingToTile: false,
+    success: {
+      isOpen: false,
+        isNavigatingToTile: false,
           },
+  },
+
+  actions: {
+    open: guarded(() =>
+      set((state) => ({
+        createTile: {
+          ...state.createTile,
+          state: { ...state.createTile.state, isOpen: true },
         },
+      }))
+    ),
 
-        actions: {
-          open: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: { ...state.createTile.state, isOpen: true },
+      close: guarded(() =>
+        set((state) => ({
+          createTile: {
+            ...state.createTile,
+            state: {
+              ...state.createTile.state,
+              isOpen: false,
+              isExpanded: false,
+              loading: {
+                isActive: false,
+                tileName: undefined,
               },
-            }))
-          ),
+              success: {
+                isOpen: false,
+                isNavigatingToTile: false,
+                tile: undefined,
+              },
+            },
+          },
+        }))
+      ),
 
-          close: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  isOpen: false,
-                  isExpanded: false,
-                  loading: {
-                    isActive: false,
-                    tileName: undefined,
-                  },
-                  success: {
-                    isOpen: false,
-                    isNavigatingToTile: false,
-                    tile: undefined,
-                  },
-                },
-              },
-            }))
-          ),
-
-          expand: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: { ...state.createTile.state, isExpanded: true },
-              },
-            }))
-          ),
+        expand: guarded(() =>
+          set((state) => ({
+            createTile: {
+              ...state.createTile,
+              state: { ...state.createTile.state, isExpanded: true },
+            },
+          }))
+        ),
 
           collapse: guarded(() =>
             set((state) => ({
@@ -197,153 +239,301 @@ export const createCalendarUIStore = (demoMode: boolean) =>
             }))
           ),
 
-          startLoading: guarded((tileName: string) =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  loading: { isActive: true, tileName },
-                },
-              },
-            }))
-          ),
-
-          endLoading: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  loading: { isActive: false },
-                },
-              },
-            }))
-          ),
-
-          navigateToTile: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  success: {
-                    ...state.createTile.state.success,
-                    isNavigatingToTile: true,
+            startLoading: guarded((tileName: string) =>
+              set((state) => ({
+                createTile: {
+                  ...state.createTile,
+                  state: {
+                    ...state.createTile.state,
+                    loading: { isActive: true, tileName },
                   },
                 },
-              },
-            }))
-          ),
+              }))
+            ),
 
-          navigateToTileComplete: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  success: {
-                    ...state.createTile.state.success,
-                    isNavigatingToTile: false,
+              endLoading: guarded(() =>
+                set((state) => ({
+                  createTile: {
+                    ...state.createTile,
+                    state: {
+                      ...state.createTile.state,
+                      loading: { isActive: false },
+                    },
                   },
-                },
-              },
-            }))
-          ),
+                }))
+              ),
 
-          showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  success: {
-                    ...state.createTile.state.success,
-                    isOpen: true,
-                    tile,
-                  },
-                },
-              },
-            }))
-          ),
+                navigateToTile: guarded(() =>
+                  set((state) => ({
+                    createTile: {
+                      ...state.createTile,
+                      state: {
+                        ...state.createTile.state,
+                        success: {
+                          ...state.createTile.state.success,
+                          isNavigatingToTile: true,
+                        },
+                      },
+                    },
+                  }))
+                ),
 
-          hideSuccess: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  success: { isOpen: false, isNavigatingToTile: false },
-                },
-              },
-            }))
-          ),
+                  navigateToTileComplete: guarded(() =>
+                    set((state) => ({
+                      createTile: {
+                        ...state.createTile,
+                        state: {
+                          ...state.createTile.state,
+                          success: {
+                            ...state.createTile.state.success,
+                            isNavigatingToTile: false,
+                          },
+                        },
+                      },
+                    }))
+                  ),
 
-          loadRestrictionProfiles: guarded(() =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  restrictionProfile: {
-                    loading: true,
-                    work: null,
-                    personal: null,
-                  },
-                },
-              },
-            }))
-          ),
+                    showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
+                      set((state) => ({
+                        createTile: {
+                          ...state.createTile,
+                          state: {
+                            ...state.createTile.state,
+                            success: {
+                              ...state.createTile.state.success,
+                              isOpen: true,
+                              tile,
+                            },
+                          },
+                        },
+                      }))
+                    ),
 
-          loadRestrictionProfilesComplete: guarded((work, personal) =>
-            set((state) => ({
-              createTile: {
-                ...state.createTile,
-                state: {
-                  ...state.createTile.state,
-                  restrictionProfile: {
-                    loading: false,
-                    work,
-                    personal,
-                  },
-                },
-              },
-            }))
-          ),
+                      hideSuccess: guarded(() =>
+                        set((state) => ({
+                          createTile: {
+                            ...state.createTile,
+                            state: {
+                              ...state.createTile.state,
+                              success: { isOpen: false, isNavigatingToTile: false },
+                            },
+                          },
+                        }))
+                      ),
+
+                        loadRestrictionProfiles: guarded(() =>
+                          set((state) => ({
+                            createTile: {
+                              ...state.createTile,
+                              state: {
+                                ...state.createTile.state,
+                                restrictionProfile: {
+                                  loading: true,
+                                  work: null,
+                                  personal: null,
+                                },
+                              },
+                            },
+                          }))
+                        ),
+
+                          loadRestrictionProfilesComplete: guarded((work, personal) =>
+                            set((state) => ({
+                              createTile: {
+                                ...state.createTile,
+                                state: {
+                                  ...state.createTile.state,
+                                  restrictionProfile: {
+                                    loading: false,
+                                    work,
+                                    personal,
+                                  },
+                                },
+                              },
+                            }))
+                          ),
         },
-      },
+},
 
-      viewInfo: {
-        startDay: dayjs().startOf('day'),
-        daysInView: 7,
-      },
-      setViewInfo: (info: ViewInfo) => set({ viewInfo: info }),
+createBlock: {
+  state: {
+    isOpen: false,
+      isExpanded: false,
 
-      editTile: {
-        state: {
-          isOpen: false,
-          event: null,
+        loading: {
+      isActive: false,
+          },
+    success: {
+      isOpen: false,
+        isNavigatingToBlock: false,
+          },
+  },
+
+  actions: {
+    open: guarded(() =>
+      set((state) => ({
+        createBlock: {
+          ...state.createBlock,
+          state: { ...state.createBlock.state, isOpen: true },
         },
+      }))
+    ),
 
-        actions: {
-          open: guarded((event: CalendarEvent) =>
+      close: guarded(() =>
+        set((state) => ({
+          createBlock: {
+            ...state.createBlock,
+            state: {
+              ...state.createBlock.state,
+              isOpen: false,
+              isExpanded: false,
+              loading: {
+                isActive: false,
+                tileName: undefined,
+              },
+              success: {
+                isOpen: false,
+                isNavigatingToBlock: false,
+                block: undefined,
+              },
+            },
+          },
+        }))
+      ),
+
+        expand: guarded(() =>
+          set((state) => ({
+            createBlock: {
+              ...state.createBlock,
+              state: { ...state.createBlock.state, isExpanded: true },
+            },
+          }))
+        ),
+
+          collapse: guarded(() =>
             set((state) => ({
-              editTile: {
-                ...state.editTile,
-                state: { isOpen: true, event },
+              createBlock: {
+                ...state.createBlock,
+                state: { ...state.createBlock.state, isExpanded: false },
               },
             }))
           ),
 
-          close: guarded(() =>
-            set((state) => ({
-              editTile: {
-                ...state.editTile,
-                state: { isOpen: false, event: null },
-              },
-            }))
-          ),
+            startLoading: guarded((blockName: string) =>
+              set((state) => ({
+                createBlock: {
+                  ...state.createBlock,
+                  state: {
+                    ...state.createBlock.state,
+                    loading: { isActive: true, blockName },
+                  },
+                },
+              }))
+            ),
+
+              endLoading: guarded(() =>
+                set((state) => ({
+                  createBlock: {
+                    ...state.createBlock,
+                    state: {
+                      ...state.createBlock.state,
+                      loading: { isActive: false },
+                    },
+                  },
+                }))
+              ),
+
+                navigateToBlock: guarded(() =>
+                  set((state) => ({
+                    createBlock: {
+                      ...state.createBlock,
+                      state: {
+                        ...state.createBlock.state,
+                        success: {
+                          ...state.createBlock.state.success,
+                          isNavigatingToBlock: true,
+                        },
+                      },
+                    },
+                  }))
+                ),
+
+                  navigateToBlockComplete: guarded(() =>
+                    set((state) => ({
+                      createBlock: {
+                        ...state.createBlock,
+                        state: {
+                          ...state.createBlock.state,
+                          success: {
+                            ...state.createBlock.state.success,
+                            isNavigatingToBlock: false,
+                          },
+                        },
+                      },
+                    }))
+                  ),
+
+                    showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
+                      set((state) => ({
+                        createBlock: {
+                          ...state.createBlock,
+                          state: {
+                            ...state.createBlock.state,
+                            success: {
+                              ...state.createBlock.state.success,
+                              isOpen: true,
+                              block: tile,
+                            },
+                          },
+                        },
+                      }))
+                    ),
+
+                      hideSuccess: guarded(() =>
+                        set((state) => ({
+                          createBlock: {
+                            ...state.createBlock,
+                            state: {
+                              ...state.createBlock.state,
+                              success: { isOpen: false, isNavigatingToBlock: false },
+                            },
+                          },
+                        }))
+                      ),
         },
+},
+
+viewInfo: {
+  startDay: dayjs().startOf('day'),
+    daysInView: 7,
       },
+setViewInfo: (info: ViewInfo) => set({ viewInfo: info }),
+
+  editTile: {
+  state: {
+    isOpen: false,
+      event: null,
+        },
+
+  actions: {
+    open: guarded((event: CalendarEvent) =>
+      set((state) => ({
+        editTile: {
+          ...state.editTile,
+          state: { isOpen: true, event },
+        },
+      }))
+    ),
+
+      close: guarded(() =>
+        set((state) => ({
+          editTile: {
+            ...state.editTile,
+            state: { isOpen: false, event: null },
+          },
+        }))
+      ),
+        },
+},
     };
   });

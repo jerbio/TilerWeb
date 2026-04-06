@@ -1,6 +1,6 @@
 import useFormHandler from '@/hooks/useFormHandler';
 import React, { useState, useEffect, useRef } from 'react';
-import { InitialCreateTileFormState } from '.';
+import { InitialCreateBlockFormState } from '.';
 import styled from 'styled-components';
 import Input from '../../input';
 import DatePicker from '../../date_picker';
@@ -9,14 +9,18 @@ import { useTranslation } from 'react-i18next';
 import { Bookmark, MapPin, X, Loader2 } from 'lucide-react';
 import { scheduleService } from '@/services';
 import { ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
+import TimeDropdown from '../../TimeDropdown';
+import { useCalendarUI } from '../calendar-ui.provider';
+import calendarConfig from '@/core/constants/calendar_config';
 
 type InfoProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+  formHandler: ReturnType<typeof useFormHandler<InitialCreateBlockFormState>>;
 };
 
-const CreateTileInfo: React.FC<InfoProps> = ({
+const CreateBlockInfo: React.FC<InfoProps> = ({
   formHandler: { formData, handleFormInputChange, setFormData },
 }) => {
+  const ui = useCalendarUI((state) => state.createBlock);
   const { t } = useTranslation();
   const [locationResults, setLocationResults] = useState<ScheduleSubCalendarEventLocation[]>([]);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -75,21 +79,65 @@ const CreateTileInfo: React.FC<InfoProps> = ({
   };
 
   return (
-    <Grid>
+    <Grid $isexpanded={ui.state.isExpanded}>
       <Input
-				containerStyle={{ gridColumn: 'span 2' }}
-        label={t('calendar.createTile.info.action.label')}
+        containerStyle={{ gridColumn: 'span 2' }}
+        label={t('calendar.createBlock.info.name.label')}
         required
-        name="action"
-        placeholder={t('calendar.createTile.info.action.placeholder')}
-        value={formData.action}
-        onChange={handleFormInputChange('action')}
+        name="name"
+        placeholder={t('calendar.createBlock.info.name.placeholder')}
+        value={formData.name}
+        onChange={handleFormInputChange('name')}
       />
-      <LocationFieldGroup>
+      <InputContainer>
+        <label>{t('calendar.createBlock.info.start.label')}</label>
+        <DatePicker
+          value={dayjs(formData.start).format('YYYY-MM-DD')}
+          placeholder={t('calendar.createBlock.info.start.placeholder')}
+          onChange={(date) =>
+            handleFormInputChange('start', {
+              mode: 'static',
+            })(dayjs(date))
+          }
+        />
+      </InputContainer>
+      <InputContainer>
+        <label>{t('calendar.createBlock.info.startTime.label')}</label>
+        <TimeDropdown
+          interval={calendarConfig.CREATE_EVENT_MINUTE_INTERVAL}
+          value={formData.startTime}
+          onChange={handleFormInputChange('startTime', { mode: 'static' })}
+          placeholder={t('calendar.createBlock.info.startTime.placeholder')}
+        />
+      </InputContainer>
+      <Input
+        label={t('calendar.createBlock.info.hours.label')}
+        required
+        type="number"
+        name="durationHours"
+        placeholder={t('calendar.createBlock.info.hours.placeholder')}
+        value={formData.durationHours}
+        onChange={handleFormInputChange('durationHours', {
+          restriction: 'integer',
+        })}
+      />
+      <Input
+        label={t('calendar.createBlock.info.minutes.label')}
+        required
+        type="number"
+        name="durationMins"
+        step="5"
+        placeholder={t('calendar.createBlock.info.minutes.placeholder')}
+        value={formData.durationMins}
+        onChange={handleFormInputChange('durationMins', {
+          restriction: 'integer',
+        })}
+      />
+      <LocationFieldGroup style={{ gridColumn: 'span 2' }}>
         <Input
-          label={t('calendar.createTile.info.location.label')}
+          label={t('calendar.createBlock.info.location.label')}
           name="location"
-          placeholder={t('calendar.createTile.info.location.placeholder')}
+          placeholder={t('calendar.createBlock.info.location.placeholder')}
           value={formData.location}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             userEditedLocationRef.current = true;
@@ -180,71 +228,14 @@ const CreateTileInfo: React.FC<InfoProps> = ({
           )}
         </LocationOverlay>
       </LocationFieldGroup>
-      <Input
-        label={t('calendar.createTile.info.locationTag.label')}
-        name="locationTag"
-        placeholder={t('calendar.createTile.info.locationTag.placeholder')}
-        value={formData.locationTag}
-        onChange={handleFormInputChange('locationTag')}
-      />
-      <Input
-        label={t('calendar.createTile.info.hours.label')}
-        required
-        type="number"
-        name="durationHours"
-        placeholder={t('calendar.createTile.info.hours.placeholder')}
-        value={formData.durationHours}
-        onChange={handleFormInputChange('durationHours', {
-          restriction: 'integer',
-        })}
-      />
-      <Input
-        label={t('calendar.createTile.info.minutes.label')}
-        required
-        type="number"
-        name="durationMins"
-        step="5"
-        placeholder={t('calendar.createTile.info.minutes.placeholder')}
-        value={formData.durationMins}
-        onChange={handleFormInputChange('durationMins', {
-          restriction: 'integer',
-        })}
-      />
-      {!formData.isRecurring && (
-        <RangeContainer>
-          <h3>{t('calendar.createTile.info.range.label')}</h3>
-          <RangeDescription>
-            <p>{t('calendar.createTile.info.range.description')}</p>
-            <DatePicker
-              value={dayjs(formData.start).format('YYYY-MM-DD')}
-              maxDate={dayjs(formData.deadline).format('YYYY-MM-DD')}
-              onChange={(date) =>
-                handleFormInputChange('start', {
-                  mode: 'static',
-                })(dayjs(date))
-              }
-            />
-            <p>{t('calendar.createTile.info.range.conjunction')}</p>
-            <DatePicker
-              value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-              minDate={dayjs(formData.start).format('YYYY-MM-DD')}
-              onChange={(date) =>
-                handleFormInputChange('deadline', {
-                  mode: 'static',
-                })(dayjs(date))
-              }
-            />
-          </RangeDescription>
-        </RangeContainer>
-      )}
     </Grid>
   );
 };
 
-const Grid = styled.div`
+const Grid = styled.div<{ $isexpanded: boolean }>`
 	display: grid;
 	gap: 1rem;
-	margin-block: 2rem;
+	margin-block: ${({ $isexpanded }) => ($isexpanded ? '2rem' : '0')};
 
 	label,
 	h3 {
@@ -259,36 +250,10 @@ const Grid = styled.div`
 	}
 `;
 
-const RangeContainer = styled.div`
+const InputContainer = styled.div`
 	display: flex;
 	flex-direction: column;
-	grid-column: span 2;
-
-	h3 {
-		display: flex;
-		gap: 0.25rem;
-		margin-bottom: 3px;
-	}
-`;
-
-const RangeDescription = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
-	gap: 1ch;
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	color: ${({ theme }) => theme.colors.text.secondary};
-
-	& > div {
-		input {
-			padding-inline: 1rem !important;
-		}
-
-		@media (min-width: ${({ theme }) => theme.screens.sm}) {
-			flex: 1;
-		}
-	}
+	gap: 6px;
 `;
 
 const LocationFieldGroup = styled.div`
@@ -420,4 +385,4 @@ const PoweredByGoogle = styled.div`
 	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
 `;
 
-export default CreateTileInfo;
+export default CreateBlockInfo;

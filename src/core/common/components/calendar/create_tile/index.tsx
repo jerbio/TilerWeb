@@ -40,34 +40,33 @@ import { CreateTileRestrictionType } from '../data';
 
 dayjs.extend(advancedFormat);
 
-
 export type InitialCreateTileFormState = {
-	start: dayjs.Dayjs;
-	action: string;
-	location: string;
-	locationId: string | null;
-	locationSource: string;
-	locationIsVerified: boolean;
-	locationTag: string;
+  start: dayjs.Dayjs;
+  action: string;
+  location: string;
+  locationId: string | null;
+  locationSource: string;
+  locationIsVerified: boolean;
+  locationTag: string;
   hasLocationNickname: boolean;
-	locationNickname: string;
-	durationHours: number;
-	durationMins: number;
-	deadline: dayjs.Dayjs;
-	color: RGBColor;
-	isRecurring: boolean;
-	recurrenceType: ScheduleRepeatType;
-	recurrenceFrequency: ScheduleRepeatFrequency;
-	recurrenceWeeklyDays: ScheduleRepeatWeekday[];
-	recurrenceStartType: ScheduleRepeatStartType;
-	recurrenceStartDate: dayjs.Dayjs;
-	recurrenceEndType: ScheduleRepeatEndType;
-	recurrenceEndDate: dayjs.Dayjs;
-	isTimeRestricted: boolean;
-	timeRestrictionType: CreateTileRestrictionType;
-	customTimeRestrictionSchedule: DaySchedule[];
-	timeRestrictionStart: string;
-	timeRestrictionEnd: string;
+  locationNickname: string;
+  durationHours: number;
+  durationMins: number;
+  deadline: dayjs.Dayjs;
+  color: RGBColor;
+  isRecurring: boolean;
+  recurrenceType: ScheduleRepeatType;
+  recurrenceFrequency: ScheduleRepeatFrequency;
+  recurrenceWeeklyDays: ScheduleRepeatWeekday[];
+  recurrenceStartType: ScheduleRepeatStartType;
+  recurrenceStartDate: dayjs.Dayjs;
+  recurrenceEndType: ScheduleRepeatEndType;
+  recurrenceEndDate: dayjs.Dayjs;
+  isTimeRestricted: boolean;
+  timeRestrictionType: CreateTileRestrictionType;
+  customTimeRestrictionSchedule: DaySchedule[];
+  timeRestrictionStart: string;
+  timeRestrictionEnd: string;
 };
 
 type CalendarCreateTileProps = {
@@ -80,6 +79,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
   const { formData, resetForm } = formHandler;
   const theme = useStyledTheme();
   const { t } = useTranslation();
+  const calendarDispatch = useCalendarDispatch();
 
   const isValidSubmission = useMemo(() => {
     if (formData.action.trim().length === 0) return false;
@@ -87,7 +87,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
     if (duration === 0) return false;
     return true;
   }, [formData]);
-  const calendarDispatch = useCalendarDispatch();
 
   function closeModal() {
     resetForm();
@@ -164,25 +163,29 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
       // Restriction
       if (formData.isTimeRestricted) {
         event.isRestricted = ScheduleBooleanString.True;
-				event.Rigid = ScheduleBooleanString.False;
-				if (formData.timeRestrictionType === CreateTileRestrictionType.Anytime) {
-					event.isRestricted = ScheduleBooleanString.False;
-				} else if (formData.timeRestrictionType === CreateTileRestrictionType.WorkHours) {
-					if (!ui.state.restrictionProfile.work?.id) throw new Error(t('calendar.createTile.errors.workProfileNotFound'));
+        event.Rigid = ScheduleBooleanString.False;
+        if (formData.timeRestrictionType === CreateTileRestrictionType.Anytime) {
+          event.isRestricted = ScheduleBooleanString.False;
+        } else if (formData.timeRestrictionType === CreateTileRestrictionType.WorkHours) {
+          if (!ui.state.restrictionProfile.work?.id)
+            throw new Error(t('calendar.createTile.errors.workProfileNotFound'));
           event.RestrictionProfileId = ui.state.restrictionProfile.work.id;
-				} else if (formData.timeRestrictionType === CreateTileRestrictionType.PersonalHours) {
-          if (!ui.state.restrictionProfile.personal?.id) throw new Error(t('calendar.createTile.errors.personalProfileNotFound'));
+        } else if (
+          formData.timeRestrictionType === CreateTileRestrictionType.PersonalHours
+        ) {
+          if (!ui.state.restrictionProfile.personal?.id)
+            throw new Error(t('calendar.createTile.errors.personalProfileNotFound'));
           event.RestrictionProfileId = ui.state.restrictionProfile.personal.id;
-				} else {
-					event.RestrictiveWeek = {
-						isEnabled: ScheduleBooleanString.True,
-						WeekDayOption: formData.customTimeRestrictionSchedule.map((day) => ({
-							Start: day.startTime,
-							End: day.endTime,
+        } else {
+          event.RestrictiveWeek = {
+            isEnabled: ScheduleBooleanString.True,
+            WeekDayOption: formData.customTimeRestrictionSchedule.map((day) => ({
+              Start: day.startTime,
+              End: day.endTime,
               Index: day.dayIndex.toString(),
-						}))
-					}
-				} 
+            })),
+          };
+        }
       }
 
       const newEvent = await scheduleService.createEvent(event);
@@ -231,7 +234,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
       const scheduleProfile = await userService.getScheduleProfile();
       const { workHoursRestrictionProfile: work, personalHoursRestrictionProfile: personal } =
         scheduleProfile;
-			ui.actions.loadRestrictionProfilesComplete(work, personal);
+      ui.actions.loadRestrictionProfilesComplete(work, personal);
     } catch (error) {
       console.error('Failed to get schedule profile:', error);
       toast.error(t('calendar.createTile.errors.scheduleProfile'));
@@ -239,7 +242,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
   }
 
   useEffect(() => {
-		if (ui.state.isExpanded) {
+    if (ui.state.isExpanded) {
       getUserRestrictionProfiles();
     }
   }, [ui.state.isExpanded]);
@@ -350,7 +353,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
           <CreateTileSummary formData={formData} />
         </>
       )}
-      <ButtonContainer $isexpanded={ui.state.isExpanded}>
+      <StyledCalendarCreateEventActions $isexpanded={ui.state.isExpanded}>
         <Button
           type="button"
           variant={'ghost'}
@@ -366,7 +369,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         <Button variant="brand" type="submit" disabled={!isValidSubmission}>
           {t('calendar.createTile.buttons.submit')}
         </Button>
-      </ButtonContainer>
+      </StyledCalendarCreateEventActions>
     </StyledCalendarCreateEvent>
   );
 };
@@ -388,21 +391,6 @@ const Section = styled.section<{ $isexpanded: boolean }>`
 	margin-inline: auto;
 	border-inline: ${(props) => (props.$isexpanded ? '0px' : '1px')} solid
 		${(props) => props.theme.colors.border.strong};
-`;
-
-const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
-	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
-	${(props) =>
-    props.$isexpanded
-      ? `border-top: 1px solid ${props.theme.colors.border.strong};`
-      : `border: 1px solid ${props.theme.colors.border.strong};`}
-	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
-		${(props) => props.theme.borderRadius.xLarge};
-	display: flex;
-	justify-content: flex-end;
-	gap: 0.25rem;
-	padding: 0.5rem 1rem;
-	background-color: ${(props) => props.theme.colors.background.card};
 `;
 
 // -- INLINE FIELDS --
@@ -464,7 +452,22 @@ const TipContainer = styled.div`
 	}
 `;
 
-const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
+export const StyledCalendarCreateEventActions = styled.div<{ $isexpanded: boolean }>`
+	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
+	${(props) =>
+    props.$isexpanded
+      ? `border-top: 1px solid ${props.theme.colors.border.strong};`
+      : `border: 1px solid ${props.theme.colors.border.strong};`}
+	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
+		${(props) => props.theme.borderRadius.xLarge};
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.25rem;
+	padding: 0.5rem 1rem;
+	background-color: ${(props) => props.theme.colors.background.card};
+`;
+
+export const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 	display: flex;
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};

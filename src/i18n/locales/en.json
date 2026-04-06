@@ -195,6 +195,46 @@
 			},
 			"moreOptions": "More options"
 		},
+		"createBlock": {
+			"title": "Add a New Block",
+			"info": {
+				"name": {
+					"label": "Block Name",
+					"placeholder": "What is the name of this block?"
+				},
+				"start": {
+					"label": "Block Start",
+					"placeholder": "What day does this block start?"
+				},
+				"startTime": {
+          "label": "Block Start Time",
+          "placeholder": "What time does this block start?"
+				},
+				"hours": {
+					"label": "Block Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+        "minutes": {
+          "label": "Block Duration (Minutes)",
+          "placeholder": "How many mins will it take?"
+        },
+				"location": {
+					"label": "Tile Location",
+					"placeholder": "Where is this block held?"
+				}
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{name}}\" to your schedule"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Block",
+				"collapse": "Less Options",
+				"expand": "More Options",
+				"viewInTimeline": "View Block"
+			}
+		},
 		"createTile": {
 			"title": "Add a New Tile",
 			"info": {

@@ -9,6 +9,7 @@ import {
   ScheduleRepeatWeekday,
 } from '../../types/schedule';
 import { eventColors } from '@/core/constants/calendar_options';
+import { InitialCreateBlockFormState } from './create_block';
 
 export enum CreateTileRestrictionType {
   Anytime = '0',
@@ -48,4 +49,26 @@ export const initialCreateTileFormState: InitialCreateTileFormState = {
   })),
 	timeRestrictionStart: '00:00',
 	timeRestrictionEnd: '23:59',
+};
+
+export const initialCreateBlockFormState: InitialCreateBlockFormState = {
+	name: '',
+	start: dayjs(),
+	startTime: '12:00 PM',
+	durationHours: 0,
+	durationMins: 0,
+	location: '',
+	locationId: null,
+	locationSource: '',
+	locationIsVerified: false,
+	locationTag: '',
+	color: new RGBColor(eventColors[0]),
+	isRecurring: false,
+	recurrenceType: ScheduleRepeatType.Daily,
+	recurrenceFrequency: ScheduleRepeatFrequency.Daily,
+	recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
+	recurrenceStartType: ScheduleRepeatStartType.Default,
+	recurrenceStartDate: dayjs(),
+	recurrenceEndType: ScheduleRepeatEndType.Never,
+	recurrenceEndDate: dayjs().add(1, 'week'),
 };

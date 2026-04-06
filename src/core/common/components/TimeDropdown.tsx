@@ -5,141 +5,145 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/core/theme/ThemeProvider';
 
 interface TimeDropdownProps {
-	value: string;
-	onChange: (value: string) => void;
-	placeholder?: string;
-	interval?: 15 | 30 | 60; // minutes between options
-	disabled?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  interval?: 15 | 30 | 60; // minutes between options
+  disabled?: boolean;
+}
+
+export function getTimeOption(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  const displayMinutes = mins.toString().padStart(2, '0');
+
+  if (mins === 0) {
+    return `${displayHour}:00 ${period}`;
+  } else {
+    return `${displayHour}:${displayMinutes} ${period}`;
+  }
 }
 
 // Generate time options for all hours of the day
 const generateTimeOptions = (interval: 15 | 30 | 60 = 30): string[] => {
-	const options: string[] = [];
-	const minutesInDay = 24 * 60;
+  const options: string[] = [];
+  const minutesInDay = 24 * 60;
 
-	for (let minutes = 0; minutes < minutesInDay; minutes += interval) {
-		const hours = Math.floor(minutes / 60);
-		const mins = minutes % 60;
-		const period = hours >= 12 ? 'PM' : 'AM';
-		const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-		const displayMinutes = mins.toString().padStart(2, '0');
+  for (let minutes = 0; minutes < minutesInDay; minutes += interval) {
+		options.push(getTimeOption(minutes));
+  }
 
-		if (mins === 0) {
-			options.push(`${displayHour}:00 ${period}`);
-		} else {
-			options.push(`${displayHour}:${displayMinutes} ${period}`);
-		}
-	}
-
-	return options;
+  return options;
 };
 
 const TimeDropdown: React.FC<TimeDropdownProps> = ({
-	value,
-	onChange,
-	placeholder,
-	interval = 30,
-	disabled = false,
+  value,
+  onChange,
+  placeholder,
+  interval = 30,
+  disabled = false,
 }) => {
-	const { isDarkMode } = useTheme();
-	const { t } = useTranslation();
-	const timeOptions = React.useMemo(() => generateTimeOptions(interval), [interval]);
-	const [isOpen, setIsOpen] = useState(false);
-	const triggerRef = useRef<HTMLButtonElement>(null);
-	const listRef = useRef<HTMLDivElement>(null);
-	const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  const { isDarkMode } = useTheme();
+  const { t } = useTranslation();
+  const timeOptions = React.useMemo(() => generateTimeOptions(interval), [interval]);
+  const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
 
-	const localizeTime = (time: string): string => {
-		const am = t('settings.sections.tilePreferences.am');
-		const pm = t('settings.sections.tilePreferences.pm');
-		return time.replace(/\bAM\b/, am).replace(/\bPM\b/, pm);
-	};
+  const localizeTime = (time: string): string => {
+    const am = t('settings.sections.tilePreferences.am');
+    const pm = t('settings.sections.tilePreferences.pm');
+    return time.replace(/\bAM\b/, am).replace(/\bPM\b/, pm);
+  };
 
-	const displayValue = value ? localizeTime(value) : placeholder || '';
+  const displayValue = value ? localizeTime(value) : placeholder || '';
 
-	const openDropdown = useCallback(() => {
-		if (disabled) return;
-		const rect = triggerRef.current?.getBoundingClientRect();
-		if (rect) {
-			setDropdownPos({ top: rect.bottom + 4, left: rect.left });
-		}
-		setIsOpen(true);
-	}, [disabled]);
+  const openDropdown = useCallback(() => {
+    if (disabled) return;
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) {
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+    }
+    setIsOpen(true);
+  }, [disabled]);
 
-	// Auto-scroll to selected item when opened
-	useEffect(() => {
-		if (isOpen && listRef.current && value) {
-			const selectedEl = listRef.current.querySelector('[data-selected="true"]');
-			if (selectedEl) {
-				selectedEl.scrollIntoView({ block: 'center' });
-			}
-		}
-	}, [isOpen, value]);
+  // Auto-scroll to selected item when opened
+  useEffect(() => {
+    if (isOpen && listRef.current && value) {
+      const selectedEl = listRef.current.querySelector('[data-selected="true"]');
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'center' });
+      }
+    }
+  }, [isOpen, value]);
 
-	// Close on outside click
-	useEffect(() => {
-		if (!isOpen) return;
-		const handleClick = (e: MouseEvent) => {
-			if (
-				triggerRef.current?.contains(e.target as Node) ||
-				listRef.current?.contains(e.target as Node)
-			)
-				return;
-			setIsOpen(false);
-		};
-		document.addEventListener('mousedown', handleClick);
-		return () => document.removeEventListener('mousedown', handleClick);
-	}, [isOpen]);
+  // Close on outside click
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        triggerRef.current?.contains(e.target as Node) ||
+        listRef.current?.contains(e.target as Node)
+      )
+        return;
+      setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isOpen]);
 
-	// Close on Escape
-	useEffect(() => {
-		if (!isOpen) return;
-		const handleKey = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') setIsOpen(false);
-		};
-		document.addEventListener('keydown', handleKey);
-		return () => document.removeEventListener('keydown', handleKey);
-	}, [isOpen]);
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [isOpen]);
 
-	return (
-		<>
-			<Trigger
-				ref={triggerRef}
-				$isDark={isDarkMode}
-				onClick={openDropdown}
-				disabled={disabled}
-				type="button"
-			>
-				{displayValue}
-				<ChevronSvg width="12" height="12" viewBox="0 0 12 12">
-					<path fill="currentColor" d="M6 9L1 4h10z" />
-				</ChevronSvg>
-			</Trigger>
-			{isOpen &&
-				createPortal(
-					<DropdownList
-						ref={listRef}
-						$isDark={isDarkMode}
-						style={{ top: dropdownPos.top, left: dropdownPos.left }}
-					>
-						{timeOptions.map((time) => (
-							<DropdownItem
-								key={time}
-								$selected={time === value}
-								data-selected={time === value}
-								onClick={() => {
-									onChange(time);
-									setIsOpen(false);
-								}}
-							>
-								{localizeTime(time)}
-							</DropdownItem>
-						))}
-					</DropdownList>,
-					document.body
-				)}
-		</>
-	);
+  return (
+    <>
+      <Trigger
+        ref={triggerRef}
+        $isDark={isDarkMode}
+        onClick={openDropdown}
+        disabled={disabled}
+        type="button"
+      >
+        {displayValue}
+        <ChevronSvg width="12" height="12" viewBox="0 0 12 12">
+          <path fill="currentColor" d="M6 9L1 4h10z" />
+        </ChevronSvg>
+      </Trigger>
+      {isOpen &&
+        createPortal(
+          <DropdownList
+            ref={listRef}
+            $isDark={isDarkMode}
+            style={{ top: dropdownPos.top, left: dropdownPos.left }}
+          >
+            {timeOptions.map((time) => (
+              <DropdownItem
+                key={time}
+                $selected={time === value}
+                data-selected={time === value}
+                onClick={() => {
+                  onChange(time);
+                  setIsOpen(false);
+                }}
+              >
+                {localizeTime(time)}
+              </DropdownItem>
+            ))}
+          </DropdownList>,
+          document.body
+        )}
+    </>
+  );
 };
 
 const Trigger = styled.button<{ $isDark: boolean }>`
@@ -152,7 +156,7 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 	color: ${({ theme }) => theme.colors.text.primary};
-	padding: 0.75rem 2.5rem 0.75rem .75rem;
+	padding: 0.75rem 2.5rem 0.75rem 0.75rem;
 	font-size: 13px;
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	cursor: pointer;
@@ -205,9 +209,9 @@ const DropdownItem = styled.div<{ $selected: boolean }>`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	color: ${({ $selected, theme }) =>
-		$selected ? theme.colors.brand[400] : theme.colors.text.primary};
+    $selected ? theme.colors.brand[400] : theme.colors.text.primary};
 	background-color: ${({ $selected, theme }) =>
-		$selected ? theme.colors.gray[800] : 'transparent'};
+    $selected ? theme.colors.gray[800] : 'transparent'};
 	cursor: pointer;
 	transition: background-color 0.15s ease;
 

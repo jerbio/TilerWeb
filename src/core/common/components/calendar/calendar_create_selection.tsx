@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useCalendarUI } from './calendar-ui.provider';
 
 export const CalendarCreateSelection: React.FC = () => {
-  const { createTile, createSelection } = useCalendarUI((state) => state);
+  const { createTile, createSelection, createBlock } = useCalendarUI((state) => state);
 
   function openCreateTile() {
     createSelection.actions.close();
@@ -13,7 +13,7 @@ export const CalendarCreateSelection: React.FC = () => {
 
   function openCreateBlock() {
     createSelection.actions.close();
-    // TODO: Implement modal state for creating a block
+		createBlock.actions.open();
   }
 
   return (
@@ -70,6 +70,10 @@ const Selection = styled.button`
 			opacity: 1;
 			transform: translateX(0);
 		}
+
+		h3 {
+      color: ${({ theme }) => theme.colors.text.primary};
+    }
 	}
 
 	& > :last-child {
@@ -100,11 +104,12 @@ const Selection = styled.button`
 	h3 {
 		font-size: ${({ theme }) => theme.typography.fontSize.base};
 		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-		font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-		color: ${({ theme }) => theme.colors.text.primary};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+		color: ${({ theme }) => theme.colors.text.secondary};
 		text-align: left;
 		leading: 1;
 		flex: 1;
+		transition: color 0.2s ease;
 	}
 
 	transition: background-color 0.2s ease;

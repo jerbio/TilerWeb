@@ -4,6 +4,7 @@ import palette from '@/core/theme/palette';
 import { Asterisk } from 'lucide-react';
 
 type InputProps = {
+	containerStyle?: React.CSSProperties;
 	label?: React.ReactNode;
 	disabled?: boolean;
 	variant?: 'default' | 'brand';
@@ -29,6 +30,7 @@ type StyledInputProps = {
 
 export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
 const BaseInput: React.FC<BaseInputProps> = ({
+	containerStyle,
   disabled = false,
   variant = 'default',
   sized = 'medium',
@@ -63,7 +65,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
 	}
 
 	const styledInput = (
-		<StyledInputWrapper {...styledProps}>
+		<StyledInputWrapper {...styledProps} style={containerStyle}>
 			{prepend && <StyledInputPrepend>{prepend}</StyledInputPrepend>}
 			{searchList && (
 				<datalist id={listId}>
@@ -85,7 +87,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
 	);
 
   return label ? (
-    <div>
+    <div style={containerStyle}>
       <StyledLabel htmlFor={id} {...styledProps}>
         {label} {required && <StyledLabelRequired><Asterisk size={12} /></StyledLabelRequired>}
       </StyledLabel>

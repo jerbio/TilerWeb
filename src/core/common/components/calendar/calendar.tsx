@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
-import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
+import { HOURS_IN_DAY, MINUTES_IN_DAY } from '@/core/common/utils/timeUtils';
 import {
   CalendarBackgroundClickInfo,
   StyledEvent,
@@ -34,9 +34,11 @@ import { createPortal } from 'react-dom';
 
 import { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './calendar-ui.provider';
-import { initialCreateTileFormState } from './data';
+import { initialCreateBlockFormState, initialCreateTileFormState } from './data';
 import CalendarModal from './modals';
 import CalendarCreateSelection from './calendar_create_selection';
+import CalendarCreateBlock from './create_block';
+import { getTimeOption } from '../TimeDropdown';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -64,7 +66,7 @@ const Calendar = ({
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
   const theme = useTheme();
-  const { createTile, createSelection } = useCalendarUI((state) => state);
+  const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
 
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
@@ -433,7 +435,14 @@ const Calendar = ({
     }
   }, [isMobile]);
 
-  // Create Tile State
+  // Create Block Form State
+  const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
+  const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
+  const createBlockModalPortalTarget = createBlock.state.isExpanded
+    ? document.body
+    : createBlockModalContainerRef.current;
+
+  // Create Tile Form State
   const createTileFormHandler = useFormHandler(initialCreateTileFormState);
   const createTileModalContainerRef = useRef<HTMLDivElement>(null);
   const createTileModalPortalTarget = createTile.state.isExpanded
@@ -443,10 +452,29 @@ const Calendar = ({
   function onBackgroundClick(info: CalendarBackgroundClickInfo) {
     // CONTENT_CLICK_OUTSIDE
     if (!selectedEvent) {
-      const { formData, setFormData } = createTileFormHandler;
-      // Set Create Tile Form Based on day clicked
       const clickedDay = dayjs(info.day);
       const clickedDayValue = clickedDay.day();
+      const clickedHour = info.hour;
+      // Round minutes
+      const clickedMinute =
+        Math.round(info.minute / calendarConfig.CREATE_EVENT_MINUTE_INTERVAL) *
+        calendarConfig.CREATE_EVENT_MINUTE_INTERVAL;
+
+      // Set Create Block From Based on day and time clicked
+      const { formData: createBlockForm, setFormData: setCreateBlockForm } =
+        createBlockFormHandler;
+			const maxStartTimeMinutes = MINUTES_IN_DAY - calendarConfig.CREATE_EVENT_MINUTE_INTERVAL;
+			const startTimeMinutes = Math.min(clickedHour * 60 + clickedMinute, maxStartTimeMinutes);
+
+      setCreateBlockForm({
+        ...createBlockForm,
+        start: clickedDay,
+        startTime: getTimeOption(startTimeMinutes),
+      });
+
+      // Set Create Tile Form Based on day clicked
+      const { formData: createTileForm, setFormData: setCreateTileForm } =
+        createTileFormHandler;
       let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
 
       if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
@@ -462,8 +490,8 @@ const Calendar = ({
         recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
       else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
 
-      setFormData({
-        ...formData,
+      setCreateTileForm({
+        ...createTileForm,
         start: clickedDay,
         deadline: clickedDay,
         recurrenceStartDate: clickedDay,
@@ -601,17 +629,33 @@ const Calendar = ({
       <CalendarModal
         open={createSelection.state.isOpen}
         onBackdropClick={createSelection.actions.close}
-				width={270}
-			>
-				<CalendarCreateSelection />
-			</CalendarModal>
+        width={270}
+      >
+        <CalendarCreateSelection />
+      </CalendarModal>
+
+      {/* Create Block Modal Overlay */}
+      <CalendarModal
+        open={createBlock.state.isOpen}
+        onBackdropClick={createBlock.actions.close}
+        containerRef={createBlockModalContainerRef}
+        width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
+      />
+      {createBlockModalPortalTarget &&
+        createPortal(
+          <CalendarCreateBlock
+            refetchEvents={refetchEvents}
+            formHandler={createBlockFormHandler}
+          />,
+          createBlockModalPortalTarget
+        )}
 
       {/* Create Tile Modal Overlay */}
       <CalendarModal
         open={createTile.state.isOpen}
         onBackdropClick={createTile.actions.close}
         containerRef={createTileModalContainerRef}
-				width={calendarConfig.CREATE_TILE_MODAL_WIDTH}
+        width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
       />
       {createTileModalPortalTarget &&
         createPortal(

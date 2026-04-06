@@ -11,7 +11,8 @@ const calendarConfig = {
 	INFO_MODAL_HEIGHT: '600px',
 	INFO_MODAL_WIDTH: '300px',
 	INFO_MODAL_GAP: '12px',
-	CREATE_TILE_MODAL_WIDTH: 600,
+	CREATE_EVENT_MODAL_WIDTH: 600,
+	CREATE_EVENT_MINUTE_INTERVAL: 15 as const,
 };
 
 export default calendarConfig;
