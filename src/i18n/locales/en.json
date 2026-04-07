@@ -1427,5 +1427,11 @@
 		"submitting": "Submitting...",
 		"submitSuccess": "Thank you for your feedback!",
 		"submitError": "Failed to submit feedback. Please try again."
-	}
-}
+        },
+        "location": {
+                "verified": {
+                        "label": "Verified",
+                        "tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
+                }
+			}
+		}

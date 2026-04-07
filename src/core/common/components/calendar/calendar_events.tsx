@@ -10,6 +10,9 @@ import palette from '@/core/theme/palette';
 import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import calendarConfig from '@/core/constants/calendar_config';
+import { computeStaggerLayout } from './layout/event_layout';
+import { LayoutEvent } from './layout/event_layout.types';
+import { getStaggerIncrement, getMinEventHeight, MAX_STAGGER_RATIO } from './layout/event_layout.constants';
 import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
 import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
@@ -53,6 +56,8 @@ export type StyledEvent = CurrentViewEvent & {
 		width: number;
 		height: number;
 	};
+	/** Z-index computed by stagger layout engine */
+	_staggerZIndex?: number;
 };
 export type StyledTravelDetail = CurrentViewTravelDetail & {
 	springStyles: {
@@ -155,142 +160,67 @@ const CalendarEvents = ({
 	}, [events, viewOptions]);
 
 	const styledEvents = useMemo(() => {
-		const result = [] as Array<StyledEvent>;
-
-		// sort by start time
-		currentViewEvents.sort((a, b) => {
-			return dayjs(a.start, 'unix').diff(dayjs(b.start, 'unix'));
-		});
-
-		// Calculate chains of intersected events
-		for (let i = 0; i < currentViewEvents.length; i++) {
-			const event = currentViewEvents[i];
-
+		// Compute bounding boxes for all events
+		const eventBoxes = currentViewEvents.map((event) => {
 			const s = dayjs(event.start, 'unix');
 			const e = dayjs(event.end, 'unix');
-			const eventBox = CalendarUtil.getBoundingBox(s, e, viewOptions, headerWidth);
-			const { x, y, width, height } = eventBox;
-			const eventStartInHours = s.hour() + s.minute() / 60; // 11:30PM -> 23.5
-			const eventEndInHours = e.hour() + e.minute() / 60; // 11:45AM -> 11.75
+			const box = CalendarUtil.getBoundingBox(s, e, viewOptions, headerWidth);
+			return { event, box, s, e };
+		});
 
-			const prevEvent = result[result.length - 1] as StyledEvent | undefined;
-			const isEventSameDayAsPrev = dayjs(event.start, 'unix').isSame(
-				dayjs(prevEvent?.start, 'unix'),
-				'day'
-			);
+		// Build layout inputs for viable events
+		const layoutEvents: LayoutEvent[] = [];
+		const layoutIndexMap = new Map<string, number>(); // event.key -> index in eventBoxes
 
-			const isIntersectingWithPrev =
-				prevEvent &&
-				prevEvent.isViable &&
-				isEventSameDayAsPrev &&
-				CalendarUtil.isInterseting(eventBox, prevEvent.springStyles);
-
-			let styledEvent: StyledEvent;
-			if (prevEvent && isIntersectingWithPrev && event.isViable) {
-				const eventChainKey = prevEvent.properties.eventChainKey;
-				const eventChainIndex = prevEvent.properties.eventChainIndex + 1;
-
-				// Update event chain length of previously chained events
-				for (let eci = 0; eci < eventChainIndex; eci++) {
-					const chainedEvent = result[result.length - 1 - eci];
-					chainedEvent.properties.eventChainLength++;
-				}
-
-				styledEvent = {
-					...event,
-					properties: {
-						startHourFraction: eventStartInHours,
-						endHourFraction: eventEndInHours,
-						eventChainKey,
-						eventChainIndex,
-						eventChainLength: eventChainIndex + 1,
-					},
-					springStyles: { x, y, width, height },
-				};
-			} else {
-				styledEvent = {
-					...event,
-					properties: {
-						startHourFraction: eventStartInHours,
-						endHourFraction: eventEndInHours,
-						eventChainKey: event.key,
-						eventChainIndex: 0,
-						eventChainLength: 1,
-					},
-					springStyles: { x, y, width, height },
-				};
+		for (let i = 0; i < eventBoxes.length; i++) {
+			const { event, box } = eventBoxes[i];
+			if (event.isViable) {
+				layoutEvents.push({
+					id: event.key,
+					start: event.start,
+					end: event.end,
+					x: box.x,
+					y: box.y,
+					width: box.width,
+					height: box.height,
+				});
 			}
-
-			result.push(styledEvent);
+			layoutIndexMap.set(event.key, i);
 		}
 
-		let currentChainKey = '';
-		let currentChainFirstEnd = 0;
+		// Compute stagger layout
+		const viewportWidth = window.innerWidth;
+		const staggerResults = computeStaggerLayout(layoutEvents, {
+			staggerIncrement: getStaggerIncrement(viewportWidth),
+			maxStaggerRatio: MAX_STAGGER_RATIO,
+			minEventHeight: getMinEventHeight(viewportWidth),
+		});
+		const staggerMap = new Map(staggerResults.map((r) => [r.id, r]));
 
-		// Break chains if they are too long
-		for (let i = 0; i < result.length; i++) {
-			const event = result[i];
-			const chainKey = event.properties.eventChainKey;
-			const chainLength = event.properties.eventChainLength;
-			const chainIndex = event.properties.eventChainIndex;
+		// Build StyledEvent array
+		const result: Array<StyledEvent> = eventBoxes.map(({ event, box, s, e }) => {
+			const eventStartInHours = s.hour() + s.minute() / 60;
+			const eventEndInHours = e.hour() + e.minute() / 60;
+			const stagger = staggerMap.get(event.key);
 
-			// Check new chain
-			if (chainKey !== currentChainKey) {
-				currentChainKey = chainKey;
-				currentChainFirstEnd = event.end;
-				continue;
-			}
-
-			if (chainLength > 2) {
-				// Skip if last event of chain
-				if (chainIndex === chainLength - 1) continue;
-				const breakingCondition = event.start > currentChainFirstEnd;
-				if (breakingCondition) {
-					const oldChainKey = currentChainKey;
-					currentChainKey = event.key;
-					currentChainFirstEnd = event.end;
-					let n = i;
-					let newChainLength = 0;
-					// Assign new chain keys
-					while (
-						n < result.length &&
-						result[n].properties.eventChainKey === oldChainKey
-					) {
-						result[n].properties.eventChainKey = event.key;
-						result[n].properties.eventChainIndex = n - i;
-						n++;
-						newChainLength++;
-					}
-					let l = i;
-					// Assign new chain lengths
-					while (l < result.length && result[l].properties.eventChainKey === event.key) {
-						result[l].properties.eventChainLength = newChainLength;
-						l++;
-					}
-					// Update old chain lengths
-					let o = i - 1;
-					while (o >= 0 && result[o].properties.eventChainKey === oldChainKey) {
-						result[o].properties.eventChainLength -= newChainLength;
-						o--;
-					}
-				}
-			}
-		}
-
-		// Divide width of chained events
-		for (let i = 0; i < result.length; i++) {
-			const event = result[i];
-			const chainIndex = event.properties.eventChainIndex;
-			const chainLength = event.properties.eventChainLength;
-			if (event.properties.eventChainLength > 1) {
-				const fullWidth = event.springStyles.width;
-				event.springStyles.x += chainIndex * (fullWidth / chainLength);
-				const lastChainEventWidth = fullWidth / chainLength;
-				const chainEventWidth = (lastChainEventWidth * 7) / 6;
-				event.springStyles.width =
-					chainIndex === chainLength - 1 ? lastChainEventWidth : chainEventWidth;
-			}
-		}
+			return {
+				...event,
+				properties: {
+					startHourFraction: eventStartInHours,
+					endHourFraction: eventEndInHours,
+					eventChainKey: event.key,
+					eventChainIndex: stagger?.staggerLevel ?? 0,
+					eventChainLength: 1,
+				},
+				springStyles: {
+					x: stagger?.x ?? box.x,
+					y: box.y,
+					width: stagger?.width ?? box.width,
+					height: stagger?.height ?? box.height,
+				},
+				_staggerZIndex: stagger?.zIndex ?? 0,
+			};
+		});
 
 		return result;
 	}, [currentViewEvents]);
@@ -414,6 +344,7 @@ const CalendarEvents = ({
 						style={style}
 						$selected={selectedEvent === event.id}
 						$focused={focusedEventId === event.id}
+						$zIndex={event._staggerZIndex ?? 0}
 					>
 						<CalendarEvent
 							event={event}
@@ -483,15 +414,15 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventPositioner = styled(animated.div)<{ $selected: boolean; $focused: boolean }>`
+const EventPositioner = styled(animated.div)<{ $selected: boolean; $focused: boolean; $zIndex: number }>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: ${({ $selected, $focused }) => ($selected || $focused ? 999 : 'auto')};
+	z-index: ${({ $selected, $focused, $zIndex }) => ($selected || $focused ? 999 : $zIndex || 'auto')};
 	display: flex;
 
 	&:hover {
-		z-index: 10;
+		z-index: 998;
 		pointer-events: auto;
 	}
 `;

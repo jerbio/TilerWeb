@@ -1227,4 +1227,118 @@ describe('EditCalendarEvent', () => {
 			expect(screen.queryByDisplayValue('Near the park')).not.toBeInTheDocument();
 		});
 	});
+
+	describe('location verified badge', () => {
+		it('shows verified badge when location is pre-loaded with isVerified=true', async () => {
+			mockLookupLocationById.mockResolvedValue({
+				address: '123 Main St',
+				description: 'Near the park',
+				isVerified: true,
+			});
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+			expect(screen.getByTestId('location-verified-badge')).toBeInTheDocument();
+		});
+
+		it('does not show verified badge when location is not verified', async () => {
+			// default mock has no isVerified field (treated as false)
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+			expect(screen.queryByTestId('location-verified-badge')).not.toBeInTheDocument();
+		});
+
+		it('shows verified badge after selecting a verified location from dropdown', async () => {
+			vi.useFakeTimers({ shouldAdvanceTime: true });
+			const googleResult = {
+				id: 'g1',
+				address: '456 Google Pl',
+				description: 'Some Place',
+				source: 'google',
+				isVerified: true,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: null,
+				userId: null,
+				longitude: 0,
+				latitude: 0,
+				nickname: '',
+			};
+			mockSearchLocations.mockResolvedValue([googleResult]);
+			const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			const addressInput = screen.getByPlaceholderText(
+				'calendarEvent.edit.locationSearchPlaceholder'
+			);
+			await user.clear(addressInput);
+			await user.type(addressInput, 'google');
+			await vi.advanceTimersByTimeAsync(400);
+
+			await waitFor(() => {
+				expect(screen.getByText('456 Google Pl')).toBeInTheDocument();
+			});
+			await user.click(screen.getByText('456 Google Pl'));
+
+			expect(screen.getByTestId('location-verified-badge')).toBeInTheDocument();
+			vi.useRealTimers();
+		});
+
+		it('removes verified badge when user manually edits address', async () => {
+			mockLookupLocationById.mockResolvedValue({
+				address: '123 Main St',
+				description: 'Near the park',
+				isVerified: true,
+			});
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			expect(screen.getByTestId('location-verified-badge')).toBeInTheDocument();
+
+			const addressInput = screen.getByDisplayValue('123 Main St');
+			await user.type(addressInput, ' extra');
+
+			expect(screen.queryByTestId('location-verified-badge')).not.toBeInTheDocument();
+		});
+
+		it('removes verified badge when location is cleared', async () => {
+			mockLookupLocationById.mockResolvedValue({
+				address: '123 Main St',
+				description: 'Near the park',
+				isVerified: true,
+			});
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			expect(screen.getByTestId('location-verified-badge')).toBeInTheDocument();
+
+			await user.click(screen.getByLabelText('calendarEvent.edit.clearLocation'));
+
+			expect(screen.queryByTestId('location-verified-badge')).not.toBeInTheDocument();
+		});
+
+		it('verified badge has tooltip title attribute', async () => {
+			mockLookupLocationById.mockResolvedValue({
+				address: '123 Main St',
+				description: 'Near the park',
+				isVerified: true,
+			});
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			const badge = screen.getByTestId('location-verified-badge');
+			expect(badge).toHaveAttribute('title', 'location.verified.tooltip');
+		});
+	});
 });

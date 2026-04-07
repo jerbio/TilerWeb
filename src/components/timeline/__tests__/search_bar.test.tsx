@@ -49,6 +49,7 @@ vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 				state: {
 					isOpen: false,
 					isExpanded: false,
+					restrictionProfile: { work: null, personal: null, loading: false },
 					loading: { isActive: false },
 					success: { isOpen: false, isNavigatingToTile: false },
 				},
@@ -63,6 +64,8 @@ vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 					hideSuccess: vi.fn(),
 					navigateToTile: vi.fn(),
 					navigateToTileComplete: vi.fn(),
+					loadRestrictionProfiles: vi.fn(),
+					loadRestrictionProfilesComplete: vi.fn(),
 				},
 			},
 			editTile: {

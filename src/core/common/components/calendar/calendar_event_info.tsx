@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CalendarEvent, ScheduleSubCalendarEvent, ThirdPartyType } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
@@ -123,6 +123,33 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			setIsEditingDeadline(false);
 		}
 	}, [event, eventStart, eventEnd]);
+
+	// Close on Escape key, or exit edit mode if an input field is active
+	const isEditingAnyRef = useRef(false);
+	isEditingAnyRef.current = isEditingName || isEditingStart || isEditingEnd || isEditingDeadline;
+
+	const onCloseRef = useRef(onClose);
+	onCloseRef.current = onClose;
+
+	useEffect(() => {
+		if (!event) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				e.stopImmediatePropagation();
+				if (isEditingAnyRef.current) {
+					setIsEditingName(false);
+					setIsEditingStart(false);
+					setIsEditingEnd(false);
+					setIsEditingDeadline(false);
+					(document.activeElement as HTMLElement)?.blur();
+				} else {
+					onCloseRef.current?.();
+				}
+			}
+		};
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [event]);
 
 	const handleCancel = () => {
 		if (event) {
@@ -362,6 +389,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 											setHasChanges(true);
 										}
 									} else if (e.key === 'Escape') {
+										e.stopPropagation();
 										setEditedName(event.name);
 										setIsEditingName(false);
 									}
@@ -458,8 +486,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={effectiveEditable}
-										onClick={() => effectiveEditable && setIsEditingStart(true)}
+										$isEditable={isEditable && !readOnly}
+										onClick={() => isEditable && !readOnly && setIsEditingStart(true)}
 									>
 										<span>
 											{hasChanges
@@ -470,7 +498,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedStartDate).format('D MMM')
 												: dayjs(eventStart).format('D MMM')}
 										</span>
-										{effectiveEditable && <Pencil size={12} className="edit-icon" />}
+										{isEditable && !readOnly && <Pencil size={12} className="edit-icon" />}
 									</EditableValue>
 								)}
 							</div>
@@ -511,8 +539,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={effectiveEditable}
-										onClick={() => effectiveEditable && setIsEditingEnd(true)}
+										$isEditable={isEditable && !readOnly}
+										onClick={() => isEditable && !readOnly && setIsEditingEnd(true)}
 									>
 										<span>
 											{hasChanges
@@ -523,7 +551,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedEndDate).format('D MMM')
 												: dayjs(eventEnd).format('D MMM')}
 										</span>
-										{effectiveEditable && <Pencil size={12} className="edit-icon" />}
+										{isEditable && !readOnly && <Pencil size={12} className="edit-icon" />}
 									</EditableValue>
 								)}
 							</div>
