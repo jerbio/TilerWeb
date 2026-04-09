@@ -190,6 +190,7 @@ const ClearButton = styled.button`
 	position: absolute;
 	right: 6px;
 	top: 50%;
+	transform: translateY(-50%);
 	display: flex;
 	align-items: center;
 	justify-content: center;
