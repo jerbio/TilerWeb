@@ -203,12 +203,20 @@
 					"placeholder": "What is the name of this block?"
 				},
 				"start": {
-					"label": "Start",
+					"label": "Start Day",
 					"placeholder": "What day does this block start?"
 				},
 				"startTime": {
           "label": "Start Time",
           "placeholder": "What time does this block start?"
+				},
+				"end": {
+					"label": "End Day",
+					"placeholder": "What day does this block end?"
+				},
+				"endTime": {
+          "label": "End Time",
+          "placeholder": "What time does this block end?"
 				},
 				"hours": {
 					"label": "Duration (Hours)",
@@ -222,6 +230,9 @@
 					"label": "Location",
 					"placeholder": "Where is this block held?"
 				}
+			},
+			"errors": {
+        "invalidDuration": "Invalid duration. End time must be after start time."
 			},
 			"message": {
 				"success": "<b>\"<name/>\"</b> has been added to your schedule",

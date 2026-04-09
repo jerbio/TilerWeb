@@ -38,7 +38,6 @@ import { initialCreateBlockFormState, initialCreateTileFormState } from './data'
 import CalendarModal from './modals';
 import CalendarCreateSelection from './calendar_create_selection';
 import CalendarCreateBlock from './create_block';
-import { getTimeOption } from '../TimeDropdown';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -463,13 +462,17 @@ const Calendar = ({
       // Set Create Block From Based on day and time clicked
       const { formData: createBlockForm, setFormData: setCreateBlockForm } =
         createBlockFormHandler;
-			const maxStartTimeMinutes = MINUTES_IN_DAY - calendarConfig.CREATE_EVENT_MINUTE_INTERVAL;
-			const startTimeMinutes = Math.min(clickedHour * 60 + clickedMinute, maxStartTimeMinutes);
+      const maxStartTimeMinutes =
+        MINUTES_IN_DAY - calendarConfig.CREATE_EVENT_DEFAULT_DURATION;
+      const startTimeMinutes = Math.min(
+        clickedHour * 60 + clickedMinute,
+        maxStartTimeMinutes
+      );
 
       setCreateBlockForm({
         ...createBlockForm,
         start: clickedDay,
-        startTime: getTimeOption(startTimeMinutes),
+        startTime: TimeUtil.minsToMeridian(startTimeMinutes),
       });
 
       // Set Create Tile Form Based on day clicked

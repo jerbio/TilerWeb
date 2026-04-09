@@ -13,6 +13,7 @@ const calendarConfig = {
 	INFO_MODAL_GAP: '12px',
 	CREATE_EVENT_MODAL_WIDTH: 600,
 	CREATE_EVENT_MINUTE_INTERVAL: 15 as const,
+	CREATE_EVENT_DEFAULT_DURATION: 30 as const,
 };
 
 export default calendarConfig;

@@ -89,7 +89,8 @@ describe('CalendarCreateBlock', () => {
   it('enables submit when valid', async () => {
     const form = setupForm({
       name: 'Deep Work',
-      durationHours: 1,
+			start: dayjs('2001-05-24'),
+			startTime: '11:30 PM',
     });
 
     renderWithProviders(<CalendarCreateBlock formHandler={form} refetchEvents={vi.fn()} />);
@@ -103,9 +104,10 @@ describe('CalendarCreateBlock', () => {
   it('submits correct payload', async () => {
     const form = setupForm({
       name: 'Deep Work',
-      durationHours: 1,
       startTime: '11:30 PM',
 			start: dayjs('2001-05-24'),
+			end: dayjs('2001-05-25'),
+      endTime: '12:45 AM',
     });
     const refetchEvents = vi.fn();
 
@@ -130,7 +132,9 @@ describe('CalendarCreateBlock', () => {
 
     expect(payload.Name).toBe('Deep Work');
     expect(payload.Rigid).toBe('true');
+    expect(payload.DurationDays).toBe('0');
     expect(payload.DurationHours).toBe('1');
+		expect(payload.DurationMinute).toBe('15');
 		// Start Time
 		expect(payload.StartDay).toBe('24');
     expect(payload.StartMonth).toBe('05');
@@ -142,7 +146,7 @@ describe('CalendarCreateBlock', () => {
     expect(payload.EndMonth).toBe('05');
     expect(payload.EndYear).toBe('2001');
     expect(payload.EndHour).toBe('0');
-    expect(payload.EndMinute).toBe('30');
+    expect(payload.EndMinute).toBe('45');
 
     expect(refetchEvents).toHaveBeenCalled();
   });

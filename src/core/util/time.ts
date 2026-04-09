@@ -39,8 +39,8 @@ class TimeUtil {
     }
   }
 
-	static meridianToMins(time: string): number {
-		const [timeStr, meridian] = time.split(' ');
+  static meridianToMins(time: string): number {
+    const [timeStr, meridian] = time.split(' ');
     const [hourStr, minuteStr] = timeStr.split(':');
     let hour = parseInt(hourStr, 10);
     const minute = parseInt(minuteStr, 10);
@@ -51,22 +51,19 @@ class TimeUtil {
     } else if (meridian === 'AM' && hour === 12) {
       hour = 0;
     }
-		return hour * 60 + minute;
+    return hour * 60 + minute;
   }
 
-  static rangeDuration(start: dayjs.Dayjs, end: dayjs.Dayjs): string {
+  static minutesDuration(minutes: number): string {
     const quantitiesInMins = Object.entries(_quantities).map(
       ([unit, quantity]) => [unit, quantity / (60 * 1000)] as [TimeUnit, number]
     );
 
-    const totalSeconds = end.diff(start, 'second');
-    let totalMinutes = Math.ceil(totalSeconds / 60);
-
     const parts = quantitiesInMins
       .map(([unit, divisor]) => {
-        const value = Math.floor(totalMinutes / divisor);
+        const value = Math.floor(minutes / divisor);
         if (value > 0) {
-          totalMinutes -= value * divisor;
+          minutes -= value * divisor;
           return `${value}${unit}`;
         }
         return '';
@@ -74,6 +71,13 @@ class TimeUtil {
       .filter(Boolean);
 
     return parts.join(' ') || '0m';
+  }
+
+  static rangeDuration(start: dayjs.Dayjs, end: dayjs.Dayjs): string {
+    const totalSeconds = end.diff(start, 'second');
+    const totalMinutes = Math.ceil(totalSeconds / 60);
+
+		return this.minutesDuration(totalMinutes);
   }
 
   static inMilliseconds(value: number, unit: TimeUnit): number {

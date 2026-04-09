@@ -32,6 +32,7 @@ import CreateBlockInfo from './info';
 import { toast } from 'sonner';
 import { scheduleService } from '@/services';
 import TimeUtil from '@/core/util/time';
+import { MINUTES_IN_DAY } from '@/core/common/utils/timeUtils';
 
 dayjs.extend(advancedFormat);
 
@@ -39,8 +40,8 @@ export type InitialCreateBlockFormState = {
   name: string;
   start: dayjs.Dayjs;
   startTime: string;
-  durationHours: number;
-  durationMins: number;
+  end: dayjs.Dayjs;
+  endTime: string;
   location: string;
   locationId: string | null;
   locationSource: string;
@@ -74,24 +75,38 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 
   const isValidSubmission = useMemo(() => {
     if (formData.name.trim().length === 0) return false;
-    const duration = formData.durationHours * 60 + formData.durationMins;
-    if (duration === 0) return false;
+    const startInMinutes = TimeUtil.meridianToMins(formData.startTime);
+    const endInMinutes = TimeUtil.meridianToMins(formData.endTime);
+    const start = dayjs(formData.start)
+      .set('hour', Math.floor(startInMinutes / 60))
+      .set('minute', startInMinutes % 60);
+    const end = dayjs(formData.end)
+      .set('hour', Math.floor(endInMinutes / 60))
+      .set('minute', endInMinutes % 60);
+    const duration = end.diff(start, 'minutes');
+    if (duration <= 0) return false;
     return true;
   }, [formData]);
 
   async function submitForm() {
     if (!isValidSubmission) return;
     ui.actions.startLoading(formData.name);
-    try {
-			const startMinutes = TimeUtil.meridianToMins(formData.startTime);
-      const startHour = startMinutes / 60;
-      const startMinute = startMinutes % 60;
 
-      // Compute end time based on start time and duration
-      const start = dayjs(formData.start).set('hour', startHour).set('minute', startMinute);
-      const end = start
-        .add(formData.durationHours, 'hour')
-        .add(formData.durationMins, 'minute');
+    try {
+      const startInMinutes = TimeUtil.meridianToMins(formData.startTime);
+      const endInMinutes = TimeUtil.meridianToMins(formData.endTime);
+      const start = dayjs(formData.start)
+        .set('hour', Math.floor(startInMinutes / 60))
+        .set('minute', startInMinutes % 60);
+      const end = dayjs(formData.end)
+        .set('hour', Math.floor(endInMinutes / 60))
+        .set('minute', endInMinutes % 60);
+
+			// Compute duration
+			const duration = end.diff(start, 'minutes');
+			const durationDays = Math.floor(duration / MINUTES_IN_DAY);
+			const durationHours = Math.floor((duration % MINUTES_IN_DAY) / 60);
+      const durationMinutes = Math.floor(duration % 60);
 
       const event: ScheduleCreateEventParams = {
         Rigid: ScheduleBooleanString.True,
@@ -105,19 +120,19 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
         LocationId: formData.locationId || undefined,
         LocationSource: formData.locationSource || undefined,
         LocationTag: formData.locationTag || undefined,
-        StartDay: formData.start.format('DD'),
-        StartYear: formData.start.format('YYYY'),
-        StartMonth: formData.start.format('MM'),
-        StartHour: startHour.toString(),
-        StartMinute: startMinute.toString(),
+        StartDay: start.format('DD'),
+        StartYear: start.format('YYYY'),
+        StartMonth: start.format('MM'),
+        StartHour: start.hour().toString(),
+        StartMinute: start.minute().toString(),
         EndDay: end.format('DD'),
         EndYear: end.format('YYYY'),
         EndMonth: end.format('MM'),
         EndHour: end.hour().toString(),
         EndMinute: end.minute().toString(),
-        DurationDays: '0',
-        DurationHours: formData.durationHours.toString(),
-        DurationMinute: formData.durationMins.toString(),
+        DurationDays: String(durationDays),
+        DurationHours: String(durationHours),
+        DurationMinute: String(durationMinutes),
         isRestricted: ScheduleBooleanString.False,
         MobileApp: true,
       };
@@ -149,7 +164,7 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
         type: CalendarRequestType.FocusEvent,
         entityId: successBlock.calendarEvent.id,
         entityType: CalendarEntityType.CalendarEvent,
-       actionType: Actions.Add_New_Task,
+        actionType: Actions.Add_New_Task,
       },
       (result: CalendarRequestResult) => {
         if (result.status === CalendarRequestStatus.Navigating) {
