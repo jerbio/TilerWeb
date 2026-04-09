@@ -31,6 +31,7 @@ import { StyledCalendarCreateEvent, StyledCalendarCreateEventActions } from '../
 import CreateBlockInfo from './info';
 import { toast } from 'sonner';
 import { scheduleService } from '@/services';
+import TimeUtil from '@/core/util/time';
 
 dayjs.extend(advancedFormat);
 
@@ -82,14 +83,9 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
     if (!isValidSubmission) return;
     ui.actions.startLoading(formData.name);
     try {
-			const [startTime, startMeridian] = formData.startTime.split(' ');
-      let startHour = Number(startTime.split(':')[0]);
-      if (startMeridian === 'AM' && startHour === 12) {
-        startHour = 0;
-      } else if (startMeridian === 'PM' && startHour !== 12) {
-        startHour += 12;
-      }
-      const startMinute = Number(startTime.split(':')[1]);
+			const startMinutes = TimeUtil.meridianToMins(formData.startTime);
+      const startHour = startMinutes / 60;
+      const startMinute = startMinutes % 60;
 
       // Compute end time based on start time and duration
       const start = dayjs(formData.start).set('hour', startHour).set('minute', startMinute);
@@ -153,7 +149,7 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
         type: CalendarRequestType.FocusEvent,
         entityId: successBlock.calendarEvent.id,
         entityType: CalendarEntityType.CalendarEvent,
-        actionType: Actions.Add_New_Task,
+       actionType: Actions.Add_New_Task,
       },
       (result: CalendarRequestResult) => {
         if (result.status === CalendarRequestStatus.Navigating) {

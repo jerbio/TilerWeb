@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import TimeUtil from '@/core/util/time';
 
 interface TimeDropdownProps {
   value: string;
@@ -12,27 +13,13 @@ interface TimeDropdownProps {
   disabled?: boolean;
 }
 
-export function getTimeOption(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const period = hours >= 12 ? 'PM' : 'AM';
-  const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-  const displayMinutes = mins.toString().padStart(2, '0');
-
-  if (mins === 0) {
-    return `${displayHour}:00 ${period}`;
-  } else {
-    return `${displayHour}:${displayMinutes} ${period}`;
-  }
-}
-
 // Generate time options for all hours of the day
 const generateTimeOptions = (interval: 15 | 30 | 60 = 30): string[] => {
   const options: string[] = [];
   const minutesInDay = 24 * 60;
 
   for (let minutes = 0; minutes < minutesInDay; minutes += interval) {
-		options.push(getTimeOption(minutes));
+		options.push(TimeUtil.minsToMeridian(minutes));
   }
 
   return options;

@@ -199,27 +199,27 @@
 			"title": "Add a New Block",
 			"info": {
 				"name": {
-					"label": "Block Name",
+					"label": "Name",
 					"placeholder": "What is the name of this block?"
 				},
 				"start": {
-					"label": "Block Start",
+					"label": "Start",
 					"placeholder": "What day does this block start?"
 				},
 				"startTime": {
-          "label": "Block Start Time",
+          "label": "Start Time",
           "placeholder": "What time does this block start?"
 				},
 				"hours": {
-					"label": "Block Duration (Hours)",
+					"label": "Duration (Hours)",
 					"placeholder": "How many hrs will it take?"
 				},
         "minutes": {
-          "label": "Block Duration (Minutes)",
+          "label": "Duration (Minutes)",
           "placeholder": "How many mins will it take?"
         },
 				"location": {
-					"label": "Tile Location",
+					"label": "Location",
 					"placeholder": "Where is this block held?"
 				}
 			},
