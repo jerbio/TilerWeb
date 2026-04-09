@@ -677,6 +677,28 @@
 			"settings": "Ustawienia"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Informacje o koncie",
+				"description": "Przeglądaj swoje konto i zmieniaj dane osobowe",
+				"fields": {
+					"fullName": "Imię i nazwisko",
+					"username": "Nazwa użytkownika",
+					"email": "Adres e-mail",
+					"phoneNumber": "Numer telefonu",
+					"phoneNumberPlaceholder": "Dodaj numer telefonu",
+					"countryCode": "Numer kierunkowy kraju",
+					"countryCodeSearch": "Szukaj krajów...",
+					"countryCodeNoResults": "Nie znaleziono krajów",
+					"dateOfBirth": "Data urodzenia",
+					"dateOfBirthPlaceholder": "DD.MM.RRRR"
+				},
+				"saveChanges": "Zapisz zmiany",
+				"saving": "Zapisywanie...",
+				"deleteAccount": "Usuń moje konto",
+				"saveSuccess": "Informacje o koncie zostały pomyślnie zaktualizowane",
+				"saveError": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+				"deleteNotImplemented": "Funkcja usuwania konta będzie wkrótce dostępna"
+			},
 			"tilePreferences": {
 				"title": "Preferencje kafelków",
 				"description": "Określ, jak się przemieszczasz i pomóż Tiler zrozumieć Twoje codzienne wzorce czasowe",

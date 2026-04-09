@@ -677,6 +677,28 @@
 			"settings": "设置"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "账户信息",
+				"description": "查看您的账户并修改个人信息",
+				"fields": {
+					"fullName": "全名",
+					"username": "用户名",
+					"email": "电子邮箱",
+					"phoneNumber": "电话号码",
+					"phoneNumberPlaceholder": "添加电话号码",
+					"countryCode": "国家区号",
+					"countryCodeSearch": "搜索国家...",
+					"countryCodeNoResults": "未找到国家",
+					"dateOfBirth": "出生日期",
+					"dateOfBirthPlaceholder": "年/月/日"
+				},
+				"saveChanges": "保存更改",
+				"saving": "保存中...",
+				"deleteAccount": "删除我的账户",
+				"saveSuccess": "账户信息更新成功",
+				"saveError": "保存更改失败，请重试。",
+				"deleteNotImplemented": "删除账户功能即将推出"
+			},
 			"tilePreferences": {
 				"title": "图块偏好",
 				"description": "定义您的出行方式，帮助Tiler理解您的日常时间模式",

@@ -837,6 +837,9 @@
 					"email": "Email Address",
 					"phoneNumber": "Phone Number",
 					"phoneNumberPlaceholder": "Add phone number",
+					"countryCode": "Country Code",
+					"countryCodeSearch": "Search countries...",
+					"countryCodeNoResults": "No countries found",
 					"dateOfBirth": "Date of Birth",
 					"dateOfBirthPlaceholder": "MM/DD/YYYY"
 				},

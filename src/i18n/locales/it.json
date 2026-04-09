@@ -677,6 +677,28 @@
 			"settings": "Impostazioni"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Informazioni account",
+				"description": "Rivedi il tuo account e modifica le tue informazioni personali",
+				"fields": {
+					"fullName": "Nome completo",
+					"username": "Nome utente",
+					"email": "Indirizzo e-mail",
+					"phoneNumber": "Numero di telefono",
+					"phoneNumberPlaceholder": "Aggiungi numero di telefono",
+					"countryCode": "Prefisso internazionale",
+					"countryCodeSearch": "Cerca paesi...",
+					"countryCodeNoResults": "Nessun paese trovato",
+					"dateOfBirth": "Data di nascita",
+					"dateOfBirthPlaceholder": "GG/MM/AAAA"
+				},
+				"saveChanges": "Salva modifiche",
+				"saving": "Salvataggio...",
+				"deleteAccount": "Elimina il mio account",
+				"saveSuccess": "Informazioni account aggiornate con successo",
+				"saveError": "Impossibile salvare le modifiche. Riprova.",
+				"deleteNotImplemented": "La funzione di eliminazione account sarà disponibile a breve"
+			},
 			"tilePreferences": {
 				"title": "Preferenze Tile",
 				"description": "Definisci come ti sposti e aiuta Tiler a capire i tuoi schemi temporali quotidiani",
