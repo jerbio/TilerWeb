@@ -154,12 +154,19 @@ export function createCalendarRequestHandler(
 				deps.setSelectedEvent(null);
 				onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
 
+				// Track completion / deletion state from within the lookup callbacks
+				let isEventComplete = false;
+				let isEventDeleted = false;
+
 				findEventDate({
 					entityId,
 					entityType,
 					lookupSubCalEvent: async (id) => {
 						try {
-							return await scheduleService.lookupSubCalendarEventById(id);
+							const event = await scheduleService.lookupSubCalendarEventById(id);
+							if (event.isEnabled === false) isEventDeleted = true;
+							if (event.isComplete) isEventComplete = true;
+							return event;
 						} catch {
 							return null;
 						}
@@ -171,6 +178,8 @@ export function createCalendarRequestHandler(
 								scheduleService.getSubEventsOfCalendar(id),
 							]);
 							if (!calEvent || calEvent.start == null) return null;
+							if (calEvent.isEnabled === false) isEventDeleted = true;
+							if (calEvent.isComplete) isEventComplete = true;
 							return {
 								start: calEvent.start,
 								subEvents: (subEvents ?? []).map((s) => ({
@@ -184,7 +193,17 @@ export function createCalendarRequestHandler(
 					},
 				}).then((startMs) => {
 					if (startMs == null) {
-						onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
+						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						return;
+					}
+
+					if (isEventDeleted) {
+						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						return;
+					}
+
+					if (isEventComplete) {
+						onResult?.({ status: CalendarRequestStatus.Completed, entityId });
 						return;
 					}
 
