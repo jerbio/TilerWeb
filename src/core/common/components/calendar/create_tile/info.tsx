@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Bookmark, MapPin, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { scheduleService } from '@/services';
-import { ScheduleSubCalendarEventLocation } from '@/core/common/types/schedule';
+import { EventLocation } from '@/core/common/types/schedule';
 
 type InfoProps = {
   formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
@@ -18,7 +18,7 @@ const CreateTileInfo: React.FC<InfoProps> = ({
   formHandler: { formData, handleFormInputChange, setFormData },
 }) => {
 	const { t } = useTranslation();
-	const [locationResults, setLocationResults] = useState<ScheduleSubCalendarEventLocation[]>([]);
+	const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
 	const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
 	const userEditedLocationRef = useRef(false);
@@ -48,7 +48,7 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 		return () => clearTimeout(timer);
 	}, [formData.location]);
 
-	const handleSelectLocation = (loc: ScheduleSubCalendarEventLocation) => {
+	const handleSelectLocation = (loc: EventLocation) => {
 		setFormData((prev) => ({
 			...prev,
 			location: loc.address,

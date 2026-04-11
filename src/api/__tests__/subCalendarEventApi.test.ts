@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SubCalendarEventApi } from '../subCalendarEventApi';
 import {
-	ScheduleSubCalendarEvent,
+	SubCalendarEvent,
 	SubCalendarEventLookupResponse,
 	ThirdPartyType,
 } from '@/core/common/types/schedule';
@@ -35,7 +35,7 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 describe('SubCalendarEventApi', () => {
 	let api: SubCalendarEventApi;
 
-	const mockSubCalendarEvent: ScheduleSubCalendarEvent = {
+	const mockSubCalendarEvent: SubCalendarEvent = {
 		id: 'sub-event-123',
 		start: 1769925600000,
 		end: 1769929200000,

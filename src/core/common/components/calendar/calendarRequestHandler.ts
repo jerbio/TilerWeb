@@ -8,7 +8,7 @@ import {
 	CalendarRequestResult,
 } from './calendarRequestContext';
 import { StyledEvent } from './calendar_events';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { SubCalendarEvent } from '@/core/common/types/schedule';
 import { CalendarViewOptions } from './calendar.types';
 import { resolveEntityToTileId } from '@/core/util/entityResolution';
 import { findEventDate } from '@/core/util/eventDateLookup';
@@ -30,7 +30,7 @@ export interface CalendarRequestHandlerDeps {
 	pendingFocusRef: React.MutableRefObject<PendingFocus | null>;
 	contentContainerRef: React.RefObject<HTMLDivElement>;
 	focusTimeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
-	events: ScheduleSubCalendarEvent[];
+	events: SubCalendarEvent[];
 	allowEventLookup: boolean;
 	setShowNonViableEvents: (val: dayjs.Dayjs | null) => void;
 	setSelectedEventInfo: (val: StyledEvent | null) => void;

@@ -13,14 +13,14 @@ import calendarConfig from '@/core/constants/calendar_config';
 import { computeStaggerLayout } from './layout/event_layout';
 import { LayoutEvent } from './layout/event_layout.types';
 import { getStaggerIncrement, getMinEventHeight, MAX_STAGGER_RATIO } from './layout/event_layout.constants';
-import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ScheduleLookupTravelDetail, SubCalendarEvent } from '@/core/common/types/schedule';
 import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
 import { splitEventByDay } from '@/core/util/eventSplitting';
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
-	events: Array<ScheduleSubCalendarEvent>;
+	events: Array<SubCalendarEvent>;
 	headerWidth: number;
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
@@ -34,7 +34,7 @@ type CalendarEventsProps = {
 	/** Called when a viable event tile on the grid is clicked */
 	onViableEventClicked?: () => void;
 };
-type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
+type CurrentViewEvent = SubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
 	key: string;
 	colorRed: number;

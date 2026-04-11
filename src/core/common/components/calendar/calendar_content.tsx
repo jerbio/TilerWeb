@@ -5,12 +5,12 @@ import styled from 'styled-components';
 import CalendarEvents, { CalendarBackgroundClickInfo, StyledEvent } from './calendar_events';
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar.types';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { SubCalendarEvent } from '@/core/common/types/schedule';
 import CurrentTimeIndicator from './current_time_indicator';
 
 type CalendarContentProps = {
 	// Events to display in the calendar
-	events: ScheduleSubCalendarEvent[];
+	events: SubCalendarEvent[];
 	// View options for the calendar
 	viewOptions: CalendarViewOptions;
 	// Selected event state

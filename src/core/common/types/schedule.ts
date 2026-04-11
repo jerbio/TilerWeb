@@ -1,7 +1,7 @@
 import { ApiResponse } from './api';
 
 // ── Shared extracted types ──────────────────────────────────────
-export type ScheduleSubCalendarEventColor = {
+export type EventColor = {
   colorSelection: number;
   r: number;
   g: number;
@@ -9,12 +9,12 @@ export type ScheduleSubCalendarEventColor = {
   o: number;
 };
 
-export type ScheduleSubCalendarEventStyleProperties = {
+export type StyleProperties = {
   id: string;
-  color: ScheduleSubCalendarEventColor;
+  color: EventColor;
 };
 
-export type ScheduleSubCalendarEventLocation = {
+export type EventLocation = {
   id: string;
   description: string;
   address: string;
@@ -29,37 +29,37 @@ export type ScheduleSubCalendarEventLocation = {
   nickname: string;
 };
 
-export type LocationResponse = ApiResponse<ScheduleSubCalendarEventLocation>;
-export type LocationSearchResponse = ApiResponse<ScheduleSubCalendarEventLocation[]>;
+export type LocationResponse = ApiResponse<EventLocation>;
+export type LocationSearchResponse = ApiResponse<EventLocation[]>;
 
-export type ScheduleSubCalendarEventBlob = {
+export type NotesBlob = {
   type: number;
   note: string;
   id: string;
 };
 
-export type ScheduleSubCalendarEventTimeline = {
+export type EventTimeline = {
   start: number;
   end: number;
   duration: number;
   occupiedSlots: null;
 };
 
-export type ScheduleSubCalendarEventRepetition = {
+export type RepetitionConfig = {
   id: string;
   isEnabled: boolean;
   frequency: string;
   weekDays: string;
   isForever: boolean;
-  tileTimeline: ScheduleSubCalendarEventTimeline;
-  repetitionTimeline: ScheduleSubCalendarEventTimeline;
+  tileTimeline: EventTimeline;
+  repetitionTimeline: EventTimeline;
 };
 
-export type ScheduleSubCalendarEventTravelPath = {
+export type TravelPath = {
   start: number;
   end: number;
-  startLocation?: ScheduleSubCalendarEventLocation | null;
-  endLocation?: ScheduleSubCalendarEventLocation | null;
+  startLocation?: EventLocation | null;
+  endLocation?: EventLocation | null;
   isRigid: boolean;
   travelLegs: [];
   travelMedium: string;
@@ -67,22 +67,22 @@ export type ScheduleSubCalendarEventTravelPath = {
   isDisabled: boolean;
   isDefault: boolean;
   duration: number;
-  calTimeLine: ScheduleSubCalendarEventTimeline;
+  calTimeLine: EventTimeline;
   projectionType: ['TravelSubCalendarEvent'];
 };
 
-export type ScheduleSubCalendarEventTravelDetail = {
-  before: ScheduleSubCalendarEventTravelPath | null;
-  after: ScheduleSubCalendarEventTravelPath | null;
+export type TravelDetail = {
+  before: TravelPath | null;
+  after: TravelPath | null;
 };
 
-// ── ScheduleSubCalendarEvent ───────────────────────────────────
+// ── SubCalendarEvent ─────────────────────────────────────────
 export enum ThirdPartyType {
   Tiler = 'tiler',
   Google = 'google',
 }
 
-export type ScheduleSubCalendarEvent = {
+export type SubCalendarEvent = {
   id: string;
   start: number;
   end: number;
@@ -117,7 +117,7 @@ export type ScheduleSubCalendarEvent = {
   name: string;
   address: string;
   addressDescription: string;
-  location: ScheduleSubCalendarEventLocation;
+  location: EventLocation;
   description: string;
   searchdDescription: string;
   rangeStart: number;
@@ -132,20 +132,20 @@ export type ScheduleSubCalendarEvent = {
   restrictionProfile: null;
   isWhatIf: boolean;
   jsonProjectionType: string;
-  blob: ScheduleSubCalendarEventBlob;
-  styleProperties: ScheduleSubCalendarEventStyleProperties;
+  blob: NotesBlob;
+  styleProperties: StyleProperties;
   split: number;
   calendarEventStart: number;
   calendarEventEnd: number;
   SubCalCalEventStart: number;
   SubCalCalEventEnd: number;
-  travelDetail: ScheduleSubCalendarEventTravelDetail;
+  travelDetail: TravelDetail;
 };
 
-export type ScheduleLookupTravelDetail = ScheduleSubCalendarEventTravelPath | null;
+export type ScheduleLookupTravelDetail = TravelPath | null;
 
 export type ScheduleLookupResponse = ApiResponse<{
-  subCalendarEvents: Array<ScheduleSubCalendarEvent>;
+  subCalendarEvents: Array<SubCalendarEvent>;
 }>;
 
 export type ScheduleLookupOptions = {
@@ -279,14 +279,14 @@ export type ScheduleCreateEventParams = {
 };
 
 export type ScheduleCreateEventResponse = ApiResponse<
-  ScheduleSubCalendarEvent & {
+  SubCalendarEvent & {
     calendarEvent: CalendarEvent;
   }
 >;
 // ── Single-event lookup response types ─────────────────────────
 
 /** Response shape for `GET /api/SubCalendarEvent?EventID=...` */
-export type SubCalendarEventLookupResponse = ApiResponse<ScheduleSubCalendarEvent>;
+export type SubCalendarEventLookupResponse = ApiResponse<SubCalendarEvent>;
 
 // ── CalendarEvent (parent event with child subEvents) ──────────
 
@@ -316,22 +316,22 @@ export type CalendarEvent = {
   isReadOnly: boolean | null;
   isProcrastinateEvent: boolean | null;
   isRigid: boolean | null;
-  uiConfig: ScheduleSubCalendarEventStyleProperties | null;
-  repetition: ScheduleSubCalendarEventRepetition | null;
+  uiConfig: StyleProperties | null;
+  repetition: RepetitionConfig | null;
   eachTileDuration: number | null;
   restrictionProfile: null;
   emojis: string | null;
   isWhatIf: boolean | null;
   entityName: string | null;
-  blob: ScheduleSubCalendarEventBlob | null;
-  subEvents: Array<ScheduleSubCalendarEvent> | null;
+  blob: NotesBlob | null;
+  subEvents: Array<SubCalendarEvent> | null;
   isAutoReviseDeadline?: boolean;
   isAutoDeadline?: boolean;
 };
 
 export type CalendarEventResponse = ApiResponse<CalendarEvent>;
 
-export type SubEventsOfCalendarResponse = ApiResponse<ScheduleSubCalendarEvent[]>;
+export type SubEventsOfCalendarResponse = ApiResponse<SubCalendarEvent[]>;
 
 /** Params for `GET /api/CalendarEvent/Name` — search tiles by name */
 export type CalendarEventSearchParams = {

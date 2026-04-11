@@ -9,7 +9,7 @@ import {
 	CalendarBackgroundClickInfo,
 	StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
-import { ScheduleRepeatWeekday, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ScheduleRepeatWeekday, SubCalendarEvent } from '@/core/common/types/schedule';
 import Loader from '../loader';
 import CalendarEvent from './calendar_event';
 import Tooltip from '../tooltip';
@@ -38,7 +38,7 @@ import { initialCreateTileFormState } from './data';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
-	events: Array<ScheduleSubCalendarEvent>;
+	events: Array<SubCalendarEvent>;
 	eventsLoading: boolean;
 	viewRef: React.RefObject<HTMLUListElement>;
 	viewOptions: CalendarViewOptions;

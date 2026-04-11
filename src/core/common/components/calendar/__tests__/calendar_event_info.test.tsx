@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n/config';
 import CalendarEventInfo from '../calendar_event_info';
-import { ScheduleSubCalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
+import { SubCalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
 import { CalendarUIProvider } from '../calendar-ui.provider';
 
 // Mock services
@@ -22,8 +22,8 @@ import { scheduleService } from '@/services';
 
 // Minimal mock event that satisfies the component's usage
 const createMockEvent = (
-	overrides: Partial<ScheduleSubCalendarEvent> = {}
-): ScheduleSubCalendarEvent =>
+	overrides: Partial<SubCalendarEvent> = {}
+): SubCalendarEvent =>
 	({
 		id: 'sub-event-id-123',
 		name: 'Test Event',
@@ -56,7 +56,7 @@ const createMockEvent = (
 		split: 0,
 		thirdPartyType: ThirdPartyType.Tiler,
 		...overrides,
-	}) as ScheduleSubCalendarEvent;
+	}) as SubCalendarEvent;
 
 const renderWithProviders = (ui: React.ReactElement) =>
 	render(
@@ -391,7 +391,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	describe('Save (update) action', () => {
 		it('calls scheduleService.updateSubCalendarEvent with changed name', async () => {
 			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
-				createMockEvent() as ScheduleSubCalendarEvent
+				createMockEvent() as SubCalendarEvent
 			);
 
 			renderWithProviders(
@@ -425,7 +425,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('calls onEventAction after successful save', async () => {
 			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
-				createMockEvent() as ScheduleSubCalendarEvent
+				createMockEvent() as SubCalendarEvent
 			);
 
 			renderWithProviders(
@@ -480,7 +480,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('does not include third-party fields when saving a Tiler event', async () => {
 			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
-				createMockEvent() as ScheduleSubCalendarEvent
+				createMockEvent() as SubCalendarEvent
 			);
 
 			renderWithProviders(
