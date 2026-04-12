@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import { ScheduleSubCalendarEvent } from '../common/types/schedule';
+import { SubCalendarEvent } from '../common/types/schedule';
 
-export type SplitEvent = ScheduleSubCalendarEvent & {
+export type SplitEvent = SubCalendarEvent & {
 	key: string;
 	originalStart: number;
 	originalEnd: number;
@@ -15,7 +15,7 @@ export type SplitEvent = ScheduleSubCalendarEvent & {
  * @param event - The event to potentially split
  * @returns Array of event segments (single element for same-day events, multiple for multi-day)
  */
-export function splitEventByDay(event: ScheduleSubCalendarEvent): SplitEvent[] {
+export function splitEventByDay(event: SubCalendarEvent): SplitEvent[] {
 	const start = dayjs(event.start);
 	let end = dayjs(event.end);
 

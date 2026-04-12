@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { CalendarEvent, ScheduleSubCalendarEvent, ThirdPartyType } from '../../types/schedule';
+import { CalendarEvent, SubCalendarEvent, ThirdPartyType } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
 	CalendarArrowDown,
@@ -43,7 +43,7 @@ import calendarConfig from '@/core/constants/calendar_config';
 import CyclingEmoji from './cycling_emoji';
 
 type CalendarEventInfoProps = {
-	event: ScheduleSubCalendarEvent | null;
+	event: SubCalendarEvent | null;
 	onClose?: () => void;
 	onEventAction?: () => void;
 	isEditable?: boolean;

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import TimeUtil from '../../util/time';
 import { scheduleService } from '@/services';
-import { ScheduleSubCalendarEvent } from '../types/schedule';
+import { SubCalendarEvent } from '../types/schedule';
 import useAppStore from '../../../global_state';
 import dayjs from 'dayjs';
 import { getDemoData, isDemoMode } from '@/config/demo_config';
@@ -18,9 +18,9 @@ export default function usePrefetchedCalendarData({
 	const MAX_CACHE_ENTRIES = 12;
 
 	const latestLookupRequestRef = useRef<string | null>(null);
-	const scheduleCacheRef = useRef<Map<string, Array<ScheduleSubCalendarEvent>>>(new Map());
+	const scheduleCacheRef = useRef<Map<string, Array<SubCalendarEvent>>>(new Map());
 
-	const [events, setEvents] = useState<Array<ScheduleSubCalendarEvent>>([]);
+	const [events, setEvents] = useState<Array<SubCalendarEvent>>([]);
 	const [loading, setLoading] = useState(true);
 
 	// Get scheduleId from the active persona session to ensure consistency
