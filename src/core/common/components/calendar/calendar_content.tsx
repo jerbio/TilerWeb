@@ -21,6 +21,8 @@ type CalendarContentProps = {
 	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 	// Function to set styled non-viable events
 	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+	// Function to set styled long-duration events (>15h, non-procrastinate)
+	setStyledLongDurationEvents: (events: StyledEvent[]) => void;
 	// Function to provide background click info
 	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events for Calendar request handling */
@@ -39,6 +41,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setSelectedEventInfo,
 	calendarGridCanvasRef,
 	setStyledNonViableEvents,
+	setStyledLongDurationEvents,
 	onBackgroundClick,
 	styledEventsRef,
 	focusedEventId,
@@ -71,6 +74,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 					setSelectedEvent={setSelectedEvent}
 					setSelectedEventInfo={setSelectedEventInfo}
 					onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+					onLongDurationEventsChange={(events) => setStyledLongDurationEvents(events)}
 					onBackgroundClick={onBackgroundClick}
 					styledEventsRef={styledEventsRef}
 					focusedEventId={focusedEventId}
