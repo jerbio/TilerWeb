@@ -2,19 +2,19 @@ import { RGBColor } from '@/core/util/colors';
 import { InitialCreateTileFormState } from './create_tile';
 import dayjs from 'dayjs';
 import {
-  ScheduleRepeatEndType,
-  ScheduleRepeatFrequency,
-  ScheduleRepeatStartType,
-  ScheduleRepeatType,
-  ScheduleRepeatWeekday,
+	ScheduleRepeatEndType,
+	ScheduleRepeatFrequency,
+	ScheduleRepeatStartType,
+	ScheduleRepeatType,
+	ScheduleRepeatWeekday,
 } from '../../types/schedule';
 import { eventColors } from '@/core/constants/calendar_options';
 
 export enum CreateTileRestrictionType {
-  Anytime = '0',
-  WorkHours = '1',
-  PersonalHours = '2',
-  Custom = '3',
+	Anytime = '0',
+	WorkHours = '1',
+	PersonalHours = '2',
+	Custom = '3',
 }
 
 export const initialCreateTileFormState: InitialCreateTileFormState = {
@@ -25,7 +25,7 @@ export const initialCreateTileFormState: InitialCreateTileFormState = {
 	locationSource: '',
 	locationIsVerified: false,
 	locationTag: '',
-  hasLocationNickname: false,
+	hasLocationNickname: false,
 	locationNickname: '',
 	durationHours: 0,
 	durationMins: 0,
@@ -39,13 +39,13 @@ export const initialCreateTileFormState: InitialCreateTileFormState = {
 	recurrenceStartDate: dayjs(),
 	recurrenceEndType: ScheduleRepeatEndType.Never,
 	recurrenceEndDate: dayjs().add(1, 'week'),
-  isTimeRestricted: false,
+	isTimeRestricted: false,
 	timeRestrictionType: CreateTileRestrictionType.Custom,
-  customTimeRestrictionSchedule: Array.from({ length: 7 }, (_, i) => ({
-    dayIndex: i,
-    startTime: '',
-    endTime: '',
-  })),
+	customTimeRestrictionSchedule: Array.from({ length: 7 }, (_, i) => ({
+		dayIndex: i,
+		startTime: '',
+		endTime: '',
+	})),
 	timeRestrictionStart: '00:00',
 	timeRestrictionEnd: '23:59',
 };

@@ -806,7 +806,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															setShowLocationDropdown(true);
 													}}
 													onBlur={() => {
-														setTimeout(() => setShowLocationDropdown(false), 150);
+														setTimeout(
+															() => setShowLocationDropdown(false),
+															150
+														);
 													}}
 												/>
 												{(address || addressDescription) && (

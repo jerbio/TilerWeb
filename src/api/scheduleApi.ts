@@ -100,7 +100,9 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Event/Complete`
 	 */
 	public completeEvent(eventId: string) {
-		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Complete', { EventID: eventId });
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Complete', {
+			EventID: eventId,
+		});
 	}
 
 	/**
@@ -108,7 +110,9 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Event/Now`
 	 */
 	public setEventAsNow(eventId: string) {
-		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Now', { EventID: eventId });
+		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Now', {
+			EventID: eventId,
+		});
 	}
 
 	/**
@@ -116,7 +120,10 @@ export class ScheduleApi extends AppApi {
 	 * `POST /api/Schedule/Event/Procrastinate`
 	 */
 	public procrastinateEvent(params: ScheduleProcrastinateEventParams) {
-		return this.schedulePost<ScheduleLookupResponse>('api/Schedule/Event/Procrastinate', params);
+		return this.schedulePost<ScheduleLookupResponse>(
+			'api/Schedule/Event/Procrastinate',
+			params
+		);
 	}
 
 	/**

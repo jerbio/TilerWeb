@@ -9,7 +9,7 @@ type ColorOptionsProps = {
 };
 
 const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
-  formHandler: { formData, handleFormInputChange },
+	formHandler: { formData, handleFormInputChange },
 }) => {
 	return (
 		<TileColorOptions>

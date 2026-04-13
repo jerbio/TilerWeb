@@ -21,9 +21,7 @@ const AccountSettings: React.FC = () => {
 	const [email, setEmail] = useState('');
 	const [username, setUsername] = useState('');
 	const [phoneNumber, setPhoneNumber] = useState('');
-	const [countryCode, setCountryCode] = useState<CountryCode>(
-		COUNTRY_CODES[0]
-	);
+	const [countryCode, setCountryCode] = useState<CountryCode>(COUNTRY_CODES[0]);
 	const [countryCodeOpen, setCountryCodeOpen] = useState(false);
 	const [countrySearch, setCountrySearch] = useState('');
 	const countryTriggerRef = useRef<HTMLButtonElement>(null);
@@ -45,7 +43,11 @@ const AccountSettings: React.FC = () => {
 	const openCountryDropdown = useCallback(() => {
 		const rect = countryTriggerRef.current?.getBoundingClientRect();
 		if (rect) {
-			setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: Math.max(rect.width, 260) });
+			setDropdownPos({
+				top: rect.bottom + 4,
+				left: rect.left,
+				width: Math.max(rect.width, 260),
+			});
 		}
 		setCountryCodeOpen(true);
 		setCountrySearch('');
@@ -487,8 +489,7 @@ const CountryDropdownItem = styled.div<{ $selected: boolean }>`
 	padding: 6px 12px;
 	font-size: ${palette.typography.fontSize.sm};
 	font-weight: ${palette.typography.fontWeight.medium};
-	color: ${({ $selected }) =>
-		$selected ? palette.colors.brand[400] : 'inherit'};
+	color: ${({ $selected }) => ($selected ? palette.colors.brand[400] : 'inherit')};
 	background-color: ${({ $selected, theme }) =>
 		$selected ? theme.colors.gray[800] : 'transparent'};
 	cursor: pointer;

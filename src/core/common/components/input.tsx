@@ -29,18 +29,18 @@ type StyledInputProps = {
 
 export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
 const BaseInput: React.FC<BaseInputProps> = ({
-  disabled = false,
-  variant = 'default',
-  sized = 'medium',
-  required,
-  height,
-  bordergradient,
-  label,
-  prepend,
-  append,
-  searchList,
-  onSearchSelect,
-  ...props
+	disabled = false,
+	variant = 'default',
+	sized = 'medium',
+	required,
+	height,
+	bordergradient,
+	label,
+	prepend,
+	append,
+	searchList,
+	onSearchSelect,
+	...props
 }) => {
 	const styledProps = {
 		$disabled: disabled,
@@ -84,16 +84,21 @@ const BaseInput: React.FC<BaseInputProps> = ({
 		</StyledInputWrapper>
 	);
 
-  return label ? (
-    <div>
-      <StyledLabel htmlFor={id} {...styledProps}>
-        {label} {required && <StyledLabelRequired><Asterisk size={12} /></StyledLabelRequired>}
-      </StyledLabel>
-      {styledInput}
-    </div>
-  ) : (
-    styledInput
-  );
+	return label ? (
+		<div>
+			<StyledLabel htmlFor={id} {...styledProps}>
+				{label}{' '}
+				{required && (
+					<StyledLabelRequired>
+						<Asterisk size={12} />
+					</StyledLabelRequired>
+				)}
+			</StyledLabel>
+			{styledInput}
+		</div>
+	) : (
+		styledInput
+	);
 };
 
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
@@ -128,7 +133,7 @@ const StyledLabelRequired = styled.span`
 
 const StyledLabel = styled.label<StyledInputProps>`
 	display: flex;
-	gap: .25rem;
+	gap: 0.25rem;
 	margin-bottom: 6px;
 	font-size: ${(props) =>
 		props.$sized === 'small'

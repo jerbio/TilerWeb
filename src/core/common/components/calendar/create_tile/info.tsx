@@ -11,11 +11,11 @@ import { scheduleService } from '@/services';
 import { EventLocation } from '@/core/common/types/schedule';
 
 type InfoProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
 const CreateTileInfo: React.FC<InfoProps> = ({
-  formHandler: { formData, handleFormInputChange, setFormData },
+	formHandler: { formData, handleFormInputChange, setFormData },
 }) => {
 	const { t } = useTranslation();
 	const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
@@ -74,165 +74,191 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 		setShowLocationDropdown(false);
 	};
 
-  return (
-    <Grid>
-      <Input
-        label={t('calendar.createTile.info.action.label')}
-        required
-        name="action"
-        placeholder={t('calendar.createTile.info.action.placeholder')}
-        value={formData.action}
-        onChange={handleFormInputChange('action')}
-      />
-      <InlineRow>
-        <LocationFieldGroup>
-          <Input
-            label={t('calendar.createTile.info.location.label')}
-            name="location"
-            placeholder={t('calendar.createTile.info.location.placeholder')}
-            value={formData.location}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              userEditedLocationRef.current = true;
-              setFormData((prev) => ({
-                ...prev,
-                location: e.target.value,
-                locationId: null,
-                locationSource: '',
-                locationIsVerified: false,
-                locationTag: '',
-              }));
-            }}
-            onFocus={() => {
-              if (locationResults.length > 0) setShowLocationDropdown(true);
-            }}
-            onBlur={() => {
-              setTimeout(() => setShowLocationDropdown(false), 150);
-            }}
-          />
-          {formData.location && (
-            <ClearButton type="button" onClick={handleClearLocation}>
-              <X size={14} />
-            </ClearButton>
-          )}
-          {formData.locationIsVerified && formData.location && (
-            <VerifiedBadge
-              data-testid="location-verified-badge"
-              title={t('location.verified.tooltip')}
-            >
-              <CheckCircle2 size={12} />
-              {t('location.verified.label')}
-            </VerifiedBadge>
-          )}
-          <LocationOverlay>
-            {formData.location.trim().length > 0 && formData.location.trim().length < 3 && (
-              <HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>
-            )}
-            {isSearching && (
-              <SearchingIndicator role="status">
-                <Loader2 size={16} className="spin" />
-              </SearchingIndicator>
-            )}
-            {!isSearching && showLocationDropdown && locationResults.length > 0 && (
-              <Dropdown>
-                {(() => {
-                  const saved = locationResults.filter((l) => l.source !== 'google');
-                  const google = locationResults.filter((l) => l.source === 'google');
-                  return (
-                    <>
-                      {saved.map((loc) => (
-                        <DropdownItem key={loc.id} onClick={() => handleSelectLocation(loc)}>
-                          <ItemIcon><Bookmark size={14} /></ItemIcon>
-                          <DropdownItemText>
-                            <DropdownItemAddress>{loc.address}</DropdownItemAddress>
-                            {loc.description && loc.description !== loc.id && (
-                              <DropdownItemDesc>{loc.description}</DropdownItemDesc>
-                            )}
-                          </DropdownItemText>
-                        </DropdownItem>
-                      ))}
-                      {google.map((loc) => (
-                        <DropdownItem key={loc.id} onClick={() => handleSelectLocation(loc)}>
-                          <ItemIcon><MapPin size={14} /></ItemIcon>
-                          <DropdownItemText>
-                            <DropdownItemAddress>{loc.address}</DropdownItemAddress>
-                            {loc.description && (
-                              <DropdownItemDesc>{loc.description}</DropdownItemDesc>
-                            )}
-                          </DropdownItemText>
-                        </DropdownItem>
-                      ))}
-                      {google.length > 0 && (
-                        <PoweredByGoogle>{t('calendarEvent.edit.poweredByGoogle')}</PoweredByGoogle>
-                      )}
-                    </>
-                  );
-                })()}
-              </Dropdown>
-            )}
-          </LocationOverlay>
-        </LocationFieldGroup>
-        <Input
-          label={t('calendar.createTile.info.locationTag.label')}
-          name="locationTag"
-          placeholder={t('calendar.createTile.info.locationTag.placeholder')}
-          value={formData.locationTag}
-          onChange={handleFormInputChange('locationTag')}
-        />
-      </InlineRow>
-      <InlineRow>
-        <Input
-          label={t('calendar.createTile.info.hours.label')}
-          required
-          type="number"
-          name="durationHours"
-          placeholder={t('calendar.createTile.info.hours.placeholder')}
-          value={formData.durationHours}
-          onChange={handleFormInputChange('durationHours', {
-            restriction: 'integer',
-          })}
-        />
-        <Input
-          label={t('calendar.createTile.info.minutes.label')}
-          required
-          type="number"
-          name="durationMins"
-          step="5"
-          placeholder={t('calendar.createTile.info.minutes.placeholder')}
-          value={formData.durationMins}
-          onChange={handleFormInputChange('durationMins', {
-            restriction: 'integer',
-          })}
-        />
-      </InlineRow>
-      {!formData.isRecurring && (
-        <RangeContainer>
-          <h3>{t('calendar.createTile.info.range.label')}</h3>
-          <RangeDescription>
-            <p>{t('calendar.createTile.info.range.description')}</p>
-            <DatePicker
-              value={dayjs(formData.start).format('YYYY-MM-DD')}
-              maxDate={dayjs(formData.deadline).format('YYYY-MM-DD')}
-              onChange={(date) =>
-                handleFormInputChange('start', {
-                  mode: 'static',
-                })(dayjs(date))
-              }
-            />
-            <p>{t('calendar.createTile.info.range.conjunction')}</p>
-            <DatePicker
-              value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-              minDate={dayjs(formData.start).format('YYYY-MM-DD')}
-              onChange={(date) =>
-                handleFormInputChange('deadline', {
-                  mode: 'static',
-                })(dayjs(date))
-              }
-            />
-          </RangeDescription>
-        </RangeContainer>
-      )}
-    </Grid>
-  );
+	return (
+		<Grid>
+			<Input
+				label={t('calendar.createTile.info.action.label')}
+				required
+				name="action"
+				placeholder={t('calendar.createTile.info.action.placeholder')}
+				value={formData.action}
+				onChange={handleFormInputChange('action')}
+			/>
+			<InlineRow>
+				<LocationFieldGroup>
+					<Input
+						label={t('calendar.createTile.info.location.label')}
+						name="location"
+						placeholder={t('calendar.createTile.info.location.placeholder')}
+						value={formData.location}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							userEditedLocationRef.current = true;
+							setFormData((prev) => ({
+								...prev,
+								location: e.target.value,
+								locationId: null,
+								locationSource: '',
+								locationIsVerified: false,
+								locationTag: '',
+							}));
+						}}
+						onFocus={() => {
+							if (locationResults.length > 0) setShowLocationDropdown(true);
+						}}
+						onBlur={() => {
+							setTimeout(() => setShowLocationDropdown(false), 150);
+						}}
+					/>
+					{formData.location && (
+						<ClearButton type="button" onClick={handleClearLocation}>
+							<X size={14} />
+						</ClearButton>
+					)}
+					{formData.locationIsVerified && formData.location && (
+						<VerifiedBadge
+							data-testid="location-verified-badge"
+							title={t('location.verified.tooltip')}
+						>
+							<CheckCircle2 size={12} />
+							{t('location.verified.label')}
+						</VerifiedBadge>
+					)}
+					<LocationOverlay>
+						{formData.location.trim().length > 0 &&
+							formData.location.trim().length < 3 && (
+								<HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>
+							)}
+						{isSearching && (
+							<SearchingIndicator role="status">
+								<Loader2 size={16} className="spin" />
+							</SearchingIndicator>
+						)}
+						{!isSearching && showLocationDropdown && locationResults.length > 0 && (
+							<Dropdown>
+								{(() => {
+									const saved = locationResults.filter(
+										(l) => l.source !== 'google'
+									);
+									const google = locationResults.filter(
+										(l) => l.source === 'google'
+									);
+									return (
+										<>
+											{saved.map((loc) => (
+												<DropdownItem
+													key={loc.id}
+													onClick={() => handleSelectLocation(loc)}
+												>
+													<ItemIcon>
+														<Bookmark size={14} />
+													</ItemIcon>
+													<DropdownItemText>
+														<DropdownItemAddress>
+															{loc.address}
+														</DropdownItemAddress>
+														{loc.description &&
+															loc.description !== loc.id && (
+																<DropdownItemDesc>
+																	{loc.description}
+																</DropdownItemDesc>
+															)}
+													</DropdownItemText>
+												</DropdownItem>
+											))}
+											{google.map((loc) => (
+												<DropdownItem
+													key={loc.id}
+													onClick={() => handleSelectLocation(loc)}
+												>
+													<ItemIcon>
+														<MapPin size={14} />
+													</ItemIcon>
+													<DropdownItemText>
+														<DropdownItemAddress>
+															{loc.address}
+														</DropdownItemAddress>
+														{loc.description && (
+															<DropdownItemDesc>
+																{loc.description}
+															</DropdownItemDesc>
+														)}
+													</DropdownItemText>
+												</DropdownItem>
+											))}
+											{google.length > 0 && (
+												<PoweredByGoogle>
+													{t('calendarEvent.edit.poweredByGoogle')}
+												</PoweredByGoogle>
+											)}
+										</>
+									);
+								})()}
+							</Dropdown>
+						)}
+					</LocationOverlay>
+				</LocationFieldGroup>
+				<Input
+					label={t('calendar.createTile.info.locationTag.label')}
+					name="locationTag"
+					placeholder={t('calendar.createTile.info.locationTag.placeholder')}
+					value={formData.locationTag}
+					onChange={handleFormInputChange('locationTag')}
+				/>
+			</InlineRow>
+			<InlineRow>
+				<Input
+					label={t('calendar.createTile.info.hours.label')}
+					required
+					type="number"
+					name="durationHours"
+					placeholder={t('calendar.createTile.info.hours.placeholder')}
+					value={formData.durationHours}
+					onChange={handleFormInputChange('durationHours', {
+						restriction: 'integer',
+					})}
+				/>
+				<Input
+					label={t('calendar.createTile.info.minutes.label')}
+					required
+					type="number"
+					name="durationMins"
+					step="5"
+					placeholder={t('calendar.createTile.info.minutes.placeholder')}
+					value={formData.durationMins}
+					onChange={handleFormInputChange('durationMins', {
+						restriction: 'integer',
+					})}
+				/>
+			</InlineRow>
+			{!formData.isRecurring && (
+				<RangeContainer>
+					<h3>{t('calendar.createTile.info.range.label')}</h3>
+					<RangeDescription>
+						<p>{t('calendar.createTile.info.range.description')}</p>
+						<DatePicker
+							value={dayjs(formData.start).format('YYYY-MM-DD')}
+							maxDate={dayjs(formData.deadline).format('YYYY-MM-DD')}
+							onChange={(date) =>
+								handleFormInputChange('start', {
+									mode: 'static',
+								})(dayjs(date))
+							}
+						/>
+						<p>{t('calendar.createTile.info.range.conjunction')}</p>
+						<DatePicker
+							value={dayjs(formData.deadline).format('YYYY-MM-DD')}
+							minDate={dayjs(formData.start).format('YYYY-MM-DD')}
+							onChange={(date) =>
+								handleFormInputChange('deadline', {
+									mode: 'static',
+								})(dayjs(date))
+							}
+						/>
+					</RangeDescription>
+				</RangeContainer>
+			)}
+		</Grid>
+	);
 };
 
 const Grid = styled.div`
@@ -429,16 +455,16 @@ const PoweredByGoogle = styled.div`
 export default CreateTileInfo;
 
 const VerifiedBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: ${({ theme }) => theme.typography.fontSize.xs};
-  color: ${({ theme }) => theme.colors.success[600]};
-  font-weight: 500;
-  margin-top: 0.25rem;
-  cursor: default;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.success[600]};
+	font-weight: 500;
+	margin-top: 0.25rem;
+	cursor: default;
 
-  svg {
-    flex-shrink: 0;
-  }
+	svg {
+		flex-shrink: 0;
+	}
 `;

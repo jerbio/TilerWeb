@@ -12,23 +12,23 @@ import LoadingModal from '../../modals/loading-modal';
 import SuccessModal from '../../modals/success-modal';
 import { scheduleService, userService } from '@/services';
 import {
-  DaySchedule,
-  ScheduleBooleanString,
-  ScheduleCreateEventParams,
-  ScheduleRepeatEndType,
-  ScheduleRepeatFrequency,
-  ScheduleRepeatStartType,
-  ScheduleRepeatType,
-  ScheduleRepeatWeekday,
-  ScheduleRepeatWeeklyData,
+	DaySchedule,
+	ScheduleBooleanString,
+	ScheduleCreateEventParams,
+	ScheduleRepeatEndType,
+	ScheduleRepeatFrequency,
+	ScheduleRepeatStartType,
+	ScheduleRepeatType,
+	ScheduleRepeatWeekday,
+	ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
 import { toast } from 'sonner';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import {
-  CalendarEntityType,
-  CalendarRequestResult,
-  CalendarRequestStatus,
-  CalendarRequestType,
+	CalendarEntityType,
+	CalendarRequestResult,
+	CalendarRequestStatus,
+	CalendarRequestType,
 } from '../calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
 import { useCalendarUI } from '../calendar-ui.provider';
@@ -40,7 +40,6 @@ import { CreateTileRestrictionType } from '../data';
 
 dayjs.extend(advancedFormat);
 
-
 export type InitialCreateTileFormState = {
 	start: dayjs.Dayjs;
 	action: string;
@@ -49,7 +48,7 @@ export type InitialCreateTileFormState = {
 	locationSource: string;
 	locationIsVerified: boolean;
 	locationTag: string;
-  hasLocationNickname: boolean;
+	hasLocationNickname: boolean;
 	locationNickname: string;
 	durationHours: number;
 	durationMins: number;
@@ -71,304 +70,308 @@ export type InitialCreateTileFormState = {
 };
 
 type CalendarCreateTileProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-  refetchEvents: () => Promise<void>;
+	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	refetchEvents: () => Promise<void>;
 };
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
-  const ui = useCalendarUI((state) => state.createTile);
-  const { formData, resetForm } = formHandler;
-  const theme = useStyledTheme();
-  const { t } = useTranslation();
+	const ui = useCalendarUI((state) => state.createTile);
+	const { formData, resetForm } = formHandler;
+	const theme = useStyledTheme();
+	const { t } = useTranslation();
 
-  const isValidSubmission = useMemo(() => {
-    if (formData.action.trim().length === 0) return false;
-    const duration = formData.durationHours * 60 + formData.durationMins;
-    if (duration === 0) return false;
-    return true;
-  }, [formData]);
-  const calendarDispatch = useCalendarDispatch();
+	const isValidSubmission = useMemo(() => {
+		if (formData.action.trim().length === 0) return false;
+		const duration = formData.durationHours * 60 + formData.durationMins;
+		if (duration === 0) return false;
+		return true;
+	}, [formData]);
+	const calendarDispatch = useCalendarDispatch();
 
-  function closeModal() {
-    resetForm();
-    ui.actions.close();
-    ui.actions.collapse();
-  }
+	function closeModal() {
+		resetForm();
+		ui.actions.close();
+		ui.actions.collapse();
+	}
 
-  const submitForm = useCallback(async () => {
-    if (!isValidSubmission) return;
-    ui.actions.startLoading(formData.action);
-    try {
-      const event: ScheduleCreateEventParams = {
-        Name: formData.action,
-        RColor: formData.color.r.toString(),
-        GColor: formData.color.g.toString(),
-        BColor: formData.color.b.toString(),
-        LocationAddress: formData.location,
-        LookupString: formData.location || undefined,
-        LocationIsVerified: formData.locationIsVerified ? 'true' : 'false',
-        LocationId: formData.locationId || undefined,
-        LocationSource: formData.locationSource || undefined,
-        LocationTag: formData.locationTag || undefined,
-        DurationDays: '0',
-        DurationHours: formData.durationHours.toString(),
-        DurationMinute: formData.durationMins.toString(),
-        isRestricted: ScheduleBooleanString.False,
-        MobileApp: true,
-      };
+	const submitForm = useCallback(async () => {
+		if (!isValidSubmission) return;
+		ui.actions.startLoading(formData.action);
+		try {
+			const event: ScheduleCreateEventParams = {
+				Name: formData.action,
+				RColor: formData.color.r.toString(),
+				GColor: formData.color.g.toString(),
+				BColor: formData.color.b.toString(),
+				LocationAddress: formData.location,
+				LookupString: formData.location || undefined,
+				LocationIsVerified: formData.locationIsVerified ? 'true' : 'false',
+				LocationId: formData.locationId || undefined,
+				LocationSource: formData.locationSource || undefined,
+				LocationTag: formData.locationTag || undefined,
+				DurationDays: '0',
+				DurationHours: formData.durationHours.toString(),
+				DurationMinute: formData.durationMins.toString(),
+				isRestricted: ScheduleBooleanString.False,
+				MobileApp: true,
+			};
 
-      // Time Ranges
-      if (!formData.isRecurring) {
-        const windowStart = formData.start.startOf('day');
-        const windowEnd = formData.deadline.endOf('day');
-        event.StartYear = dayjs(windowStart).format('YYYY');
-        event.StartMonth = dayjs(windowStart).format('MM');
-        event.StartDay = dayjs(windowStart).format('DD');
-        event.StartHour = dayjs(windowStart).format('HH');
-        event.StartMinute = dayjs(windowStart).format('mm');
-        event.EndYear = dayjs(windowEnd).format('YYYY');
-        event.EndMonth = dayjs(windowEnd).format('MM');
-        event.EndDay = dayjs(windowEnd).format('DD');
-        event.EndHour = dayjs(windowEnd).format('HH');
-        event.EndMinute = dayjs(windowEnd).format('mm');
-      }
+			// Time Ranges
+			if (!formData.isRecurring) {
+				const windowStart = formData.start.startOf('day');
+				const windowEnd = formData.deadline.endOf('day');
+				event.StartYear = dayjs(windowStart).format('YYYY');
+				event.StartMonth = dayjs(windowStart).format('MM');
+				event.StartDay = dayjs(windowStart).format('DD');
+				event.StartHour = dayjs(windowStart).format('HH');
+				event.StartMinute = dayjs(windowStart).format('mm');
+				event.EndYear = dayjs(windowEnd).format('YYYY');
+				event.EndMonth = dayjs(windowEnd).format('MM');
+				event.EndDay = dayjs(windowEnd).format('DD');
+				event.EndHour = dayjs(windowEnd).format('HH');
+				event.EndMinute = dayjs(windowEnd).format('mm');
+			}
 
-      // Repetition
-      if (formData.isRecurring) {
-        event.RepeatType = formData.recurrenceType;
-        event.RepeatFrequency = formData.recurrenceFrequency;
-        if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
-          if (formData.recurrenceWeeklyDays.length === 0) {
-            event.RepeatWeeklyData = '1';
-          }
-          event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
-            ','
-          ) as ScheduleRepeatWeeklyData;
-        }
-        if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
-          event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
-          event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
-          event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
-        }
-        if (formData.recurrenceStartType === ScheduleRepeatStartType.Default) {
-          event.RepeatStartDay = dayjs(formData.start).format('DD');
-          event.RepeatStartMonth = dayjs(formData.start).format('MM');
-          event.RepeatStartYear = dayjs(formData.start).format('YYYY');
-        } else if (formData.recurrenceStartType === ScheduleRepeatStartType.On) {
-          event.RepeatStartDay = dayjs(formData.recurrenceStartDate).format('DD');
-          event.RepeatStartMonth = dayjs(formData.recurrenceStartDate).format('MM');
-          event.RepeatStartYear = dayjs(formData.recurrenceStartDate).format('YYYY');
-        }
-      }
+			// Repetition
+			if (formData.isRecurring) {
+				event.RepeatType = formData.recurrenceType;
+				event.RepeatFrequency = formData.recurrenceFrequency;
+				if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
+					if (formData.recurrenceWeeklyDays.length === 0) {
+						event.RepeatWeeklyData = '1';
+					}
+					event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
+						','
+					) as ScheduleRepeatWeeklyData;
+				}
+				if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
+					event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
+					event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
+					event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
+				}
+				if (formData.recurrenceStartType === ScheduleRepeatStartType.Default) {
+					event.RepeatStartDay = dayjs(formData.start).format('DD');
+					event.RepeatStartMonth = dayjs(formData.start).format('MM');
+					event.RepeatStartYear = dayjs(formData.start).format('YYYY');
+				} else if (formData.recurrenceStartType === ScheduleRepeatStartType.On) {
+					event.RepeatStartDay = dayjs(formData.recurrenceStartDate).format('DD');
+					event.RepeatStartMonth = dayjs(formData.recurrenceStartDate).format('MM');
+					event.RepeatStartYear = dayjs(formData.recurrenceStartDate).format('YYYY');
+				}
+			}
 
-      // Restriction
-      if (formData.isTimeRestricted) {
-        event.isRestricted = ScheduleBooleanString.True;
+			// Restriction
+			if (formData.isTimeRestricted) {
+				event.isRestricted = ScheduleBooleanString.True;
 				event.Rigid = ScheduleBooleanString.False;
 				if (formData.timeRestrictionType === CreateTileRestrictionType.Anytime) {
 					event.isRestricted = ScheduleBooleanString.False;
 				} else if (formData.timeRestrictionType === CreateTileRestrictionType.WorkHours) {
-					if (!ui.state.restrictionProfile.work?.id) throw new Error(t('calendar.createTile.errors.workProfileNotFound'));
-          event.RestrictionProfileId = ui.state.restrictionProfile.work.id;
-				} else if (formData.timeRestrictionType === CreateTileRestrictionType.PersonalHours) {
-          if (!ui.state.restrictionProfile.personal?.id) throw new Error(t('calendar.createTile.errors.personalProfileNotFound'));
-          event.RestrictionProfileId = ui.state.restrictionProfile.personal.id;
+					if (!ui.state.restrictionProfile.work?.id)
+						throw new Error(t('calendar.createTile.errors.workProfileNotFound'));
+					event.RestrictionProfileId = ui.state.restrictionProfile.work.id;
+				} else if (
+					formData.timeRestrictionType === CreateTileRestrictionType.PersonalHours
+				) {
+					if (!ui.state.restrictionProfile.personal?.id)
+						throw new Error(t('calendar.createTile.errors.personalProfileNotFound'));
+					event.RestrictionProfileId = ui.state.restrictionProfile.personal.id;
 				} else {
 					event.RestrictiveWeek = {
 						isEnabled: ScheduleBooleanString.True,
 						WeekDayOption: formData.customTimeRestrictionSchedule.map((day) => ({
 							Start: day.startTime,
 							End: day.endTime,
-              Index: day.dayIndex.toString(),
-						}))
+							Index: day.dayIndex.toString(),
+						})),
+					};
+				}
+			}
+
+			const newEvent = await scheduleService.createEvent(event);
+			await refetchEvents();
+			closeModal();
+			ui.actions.navigateToTileComplete();
+			ui.actions.showSuccess(newEvent);
+		} catch (error) {
+			console.error(error);
+			toast.error(String(error));
+		} finally {
+			ui.actions.endLoading();
+		}
+	}, [isValidSubmission, formData, ui, refetchEvents, resetForm, calendarDispatch, t, theme]);
+
+	function viewCreatedEvent() {
+		const successTile = ui.state.success.tile;
+		if (!successTile || successTile.calendarEvent.id === null) return;
+		calendarDispatch(
+			{
+				type: CalendarRequestType.FocusEvent,
+				entityId: successTile.calendarEvent.id,
+				entityType: CalendarEntityType.CalendarEvent,
+				actionType: Actions.Add_New_Task,
+			},
+			(result: CalendarRequestResult) => {
+				if (result.status === CalendarRequestStatus.Navigating) {
+					ui.actions.navigateToTile();
+				} else {
+					ui.actions.navigateToTileComplete();
+					ui.actions.hideSuccess();
+					if (result.status === CalendarRequestStatus.NotFound) {
+						console.warn(
+							'[CreateTile] Calendar could not find entity:',
+							successTile.calendarEvent.id
+						);
 					}
-				} 
-      }
+				}
+			}
+		);
+	}
 
-      const newEvent = await scheduleService.createEvent(event);
-      await refetchEvents();
-      closeModal();
-      ui.actions.navigateToTileComplete();
-      ui.actions.showSuccess(newEvent);
-    } catch (error) {
-      console.error(error);
-      toast.error(String(error));
-    } finally {
-      ui.actions.endLoading();
-    }
-  }, [isValidSubmission, formData, ui, refetchEvents, resetForm, calendarDispatch, t, theme]);
-
-  function viewCreatedEvent() {
-    const successTile = ui.state.success.tile;
-    if (!successTile || successTile.calendarEvent.id === null) return;
-    calendarDispatch(
-      {
-        type: CalendarRequestType.FocusEvent,
-        entityId: successTile.calendarEvent.id,
-        entityType: CalendarEntityType.CalendarEvent,
-        actionType: Actions.Add_New_Task,
-      },
-      (result: CalendarRequestResult) => {
-        if (result.status === CalendarRequestStatus.Navigating) {
-          ui.actions.navigateToTile();
-        } else {
-          ui.actions.navigateToTileComplete();
-          ui.actions.hideSuccess();
-          if (result.status === CalendarRequestStatus.NotFound) {
-            console.warn(
-              '[CreateTile] Calendar could not find entity:',
-              successTile.calendarEvent.id
-            );
-          }
-        }
-      }
-    );
-  }
-
-  async function getUserRestrictionProfiles() {
-    try {
-      ui.actions.loadRestrictionProfiles();
-      const scheduleProfile = await userService.getScheduleProfile();
-      const { workHoursRestrictionProfile: work, personalHoursRestrictionProfile: personal } =
-        scheduleProfile;
+	async function getUserRestrictionProfiles() {
+		try {
+			ui.actions.loadRestrictionProfiles();
+			const scheduleProfile = await userService.getScheduleProfile();
+			const { workHoursRestrictionProfile: work, personalHoursRestrictionProfile: personal } =
+				scheduleProfile;
 			ui.actions.loadRestrictionProfilesComplete(work, personal);
-    } catch (error) {
-      console.error('Failed to get schedule profile:', error);
-      toast.error(t('calendar.createTile.errors.scheduleProfile'));
-    }
-  }
+		} catch (error) {
+			console.error('Failed to get schedule profile:', error);
+			toast.error(t('calendar.createTile.errors.scheduleProfile'));
+		}
+	}
 
-  useEffect(() => {
+	useEffect(() => {
 		if (ui.state.isExpanded) {
-      getUserRestrictionProfiles();
-    }
-  }, [ui.state.isExpanded]);
+			getUserRestrictionProfiles();
+		}
+	}, [ui.state.isExpanded]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        // Trigger form submit
-        submitForm();
-      }
-    };
-    if (ui.state.isOpen) {
-      document.addEventListener('keydown', onKeyDown);
-    } else {
-      document.removeEventListener('keydown', onKeyDown);
-    }
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [ui.state.isOpen, submitForm]);
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				// Trigger form submit
+				submitForm();
+			}
+		};
+		if (ui.state.isOpen) {
+			document.addEventListener('keydown', onKeyDown);
+		} else {
+			document.removeEventListener('keydown', onKeyDown);
+		}
+		return () => {
+			document.removeEventListener('keydown', onKeyDown);
+		};
+	}, [ui.state.isOpen, submitForm]);
 
-  return (
-    <StyledCalendarCreateEvent
-      onSubmit={(e) => {
-        e.preventDefault();
-        submitForm();
-      }}
-      $isexpanded={ui.state.isExpanded}
-    >
-      <button
-        style={{ display: 'none' }}
-        data-testid="open-create-tile"
-        type="button"
-        onClick={ui.actions.open}
-      />
-      <LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
-        <p>
-          {t('calendar.createTile.message.pending', {
-            action: ui.state.loading.tileName,
-          })}
-        </p>
-      </LoadingModal>
-      <SuccessModal
-        show={ui.state.success.isOpen}
-        setShow={ui.actions.hideSuccess}
-        closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
-        actions={[
-          {
-            text: t('calendar.createTile.buttons.viewInTimeline'),
-            onClick: viewCreatedEvent,
-            disabled: ui.state.success.isNavigatingToTile,
-          },
-        ]}
-      >
-        <p>
-          <Trans
-            i18nKey="calendar.createTile.message.success"
-            components={{
-              b: <b />,
-              action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
-            }}
-          />
-        </p>
-      </SuccessModal>
-      <header>
-        <div className="title">
-          <h2>{t('calendar.createTile.title')}</h2>
-        </div>
-        <button type="button" onClick={closeModal}>
-          <X size={16} color={theme.colors.text.primary} />
-        </button>
-      </header>
+	return (
+		<StyledCalendarCreateEvent
+			onSubmit={(e) => {
+				e.preventDefault();
+				submitForm();
+			}}
+			$isexpanded={ui.state.isExpanded}
+		>
+			<button
+				style={{ display: 'none' }}
+				data-testid="open-create-tile"
+				type="button"
+				onClick={ui.actions.open}
+			/>
+			<LoadingModal show={ui.state.loading.isActive} setShow={ui.actions.endLoading}>
+				<p>
+					{t('calendar.createTile.message.pending', {
+						action: ui.state.loading.tileName,
+					})}
+				</p>
+			</LoadingModal>
+			<SuccessModal
+				show={ui.state.success.isOpen}
+				setShow={ui.actions.hideSuccess}
+				closeTimeout={!ui.state.success.isNavigatingToTile ? 15 : undefined}
+				actions={[
+					{
+						text: t('calendar.createTile.buttons.viewInTimeline'),
+						onClick: viewCreatedEvent,
+						disabled: ui.state.success.isNavigatingToTile,
+					},
+				]}
+			>
+				<p>
+					<Trans
+						i18nKey="calendar.createTile.message.success"
+						components={{
+							b: <b />,
+							action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
+						}}
+					/>
+				</p>
+			</SuccessModal>
+			<header>
+				<div className="title">
+					<h2>{t('calendar.createTile.title')}</h2>
+				</div>
+				<button type="button" onClick={closeModal}>
+					<X size={16} color={theme.colors.text.primary} />
+				</button>
+			</header>
 
-      {ui.state.isExpanded ? (
-        /* Tile Info (Classic) */
-        <Section $isexpanded={ui.state.isExpanded}>
-          <CreateTileInfo formHandler={formHandler} />
-        </Section>
-      ) : (
-        /* Tile Info (Inline) */
-        <Section $isexpanded={ui.state.isExpanded}>
-          <CreateTileInfoInline formHandler={formHandler} />
-        </Section>
-      )}
+			{ui.state.isExpanded ? (
+				/* Tile Info (Classic) */
+				<Section $isexpanded={ui.state.isExpanded}>
+					<CreateTileInfo formHandler={formHandler} />
+				</Section>
+			) : (
+				/* Tile Info (Inline) */
+				<Section $isexpanded={ui.state.isExpanded}>
+					<CreateTileInfoInline formHandler={formHandler} />
+				</Section>
+			)}
 
-      <Seperator />
-      <TipContainer>
-        <Keyboard size={20} />
-        <p>
-          <Trans
-            i18nKey="calendar.createTile.tip.description"
-            components={{
-              b: <b />,
-              key: <>{t('calendar.createTile.tip.keys.enter')}</>,
-            }}
-          />
-        </p>
-      </TipContainer>
+			<Seperator />
+			<TipContainer>
+				<Keyboard size={20} />
+				<p>
+					<Trans
+						i18nKey="calendar.createTile.tip.description"
+						components={{
+							b: <b />,
+							key: <>{t('calendar.createTile.tip.keys.enter')}</>,
+						}}
+					/>
+				</p>
+			</TipContainer>
 
-      {/* Tile Actions */}
-      {ui.state.isExpanded && (
-        <>
-          <Section $isexpanded={ui.state.isExpanded}>
-            <CreateTileOptions formHandler={formHandler} />
-          </Section>
-          <Spacer />
-          <CreateTileSummary formData={formData} />
-        </>
-      )}
-      <ButtonContainer $isexpanded={ui.state.isExpanded}>
-        <Button
-          type="button"
-          variant={'ghost'}
-          onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
-        >
-          {ui.state.isExpanded
-            ? t('calendar.createTile.buttons.collapse')
-            : t('calendar.createTile.buttons.expand')}
-        </Button>
-        <Button type="button" variant={'ghost'} onClick={resetForm}>
-          {t('calendar.createTile.buttons.reset')}
-        </Button>
-        <Button variant="brand" type="submit" disabled={!isValidSubmission}>
-          {t('calendar.createTile.buttons.submit')}
-        </Button>
-      </ButtonContainer>
-    </StyledCalendarCreateEvent>
-  );
+			{/* Tile Actions */}
+			{ui.state.isExpanded && (
+				<>
+					<Section $isexpanded={ui.state.isExpanded}>
+						<CreateTileOptions formHandler={formHandler} />
+					</Section>
+					<Spacer />
+					<CreateTileSummary formData={formData} />
+				</>
+			)}
+			<ButtonContainer $isexpanded={ui.state.isExpanded}>
+				<Button
+					type="button"
+					variant={'ghost'}
+					onClick={ui.state.isExpanded ? ui.actions.collapse : ui.actions.expand}
+				>
+					{ui.state.isExpanded
+						? t('calendar.createTile.buttons.collapse')
+						: t('calendar.createTile.buttons.expand')}
+				</Button>
+				<Button type="button" variant={'ghost'} onClick={resetForm}>
+					{t('calendar.createTile.buttons.reset')}
+				</Button>
+				<Button variant="brand" type="submit" disabled={!isValidSubmission}>
+					{t('calendar.createTile.buttons.submit')}
+				</Button>
+			</ButtonContainer>
+		</StyledCalendarCreateEvent>
+	);
 };
 
 const Spacer = styled.div`
@@ -393,9 +396,9 @@ const Section = styled.section<{ $isexpanded: boolean }>`
 const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
 	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
 	${(props) =>
-    props.$isexpanded
-      ? `border-top: 1px solid ${props.theme.colors.border.strong};`
-      : `border: 1px solid ${props.theme.colors.border.strong};`}
+		props.$isexpanded
+			? `border-top: 1px solid ${props.theme.colors.border.strong};`
+			: `border: 1px solid ${props.theme.colors.border.strong};`}
 	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
 		${(props) => props.theme.borderRadius.xLarge};
 	display: flex;
@@ -472,15 +475,15 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 	isolation: isolate;
 
 	${(props) =>
-    props.$isexpanded
-      ? `
+		props.$isexpanded
+			? `
 			position: fixed;
 			inset: 0;
 			z-index: 1001;
 			overflow-y: scroll;
 			overflow-x: hidden;
 		`
-      : `
+			: `
 			border-radius: ${props.theme.borderRadius.xLarge};
 		`};
 
@@ -491,9 +494,9 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 		top: 0;
 
 		${(props) =>
-    props.$isexpanded
-      ? `border-bottom: 1px solid ${props.theme.colors.border.strong};`
-      : `border: 1px solid ${props.theme.colors.border.strong};`}
+			props.$isexpanded
+				? `border-bottom: 1px solid ${props.theme.colors.border.strong};`
+				: `border: 1px solid ${props.theme.colors.border.strong};`}
 		background-color: ${(props) => props.theme.colors.background.card};
 		display: flex;
 		align-items: center;
@@ -501,7 +504,7 @@ const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 		gap: 0.5rem;
 		padding: 8px 16px;
 		border-radius: ${(props) =>
-    `${props.theme.borderRadius.xLarge} ${props.theme.borderRadius.xLarge} 0 0`};
+			`${props.theme.borderRadius.xLarge} ${props.theme.borderRadius.xLarge} 0 0`};
 
 		> button {
 			height: 28px;

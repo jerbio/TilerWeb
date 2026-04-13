@@ -71,9 +71,10 @@ const Calendar = ({
 	const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
 	const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
 
-	const [styledLongDurationEvents, setStyledLongDurationEvents] = useState<Array<StyledEvent>>([]);
+	const [styledLongDurationEvents, setStyledLongDurationEvents] = useState<Array<StyledEvent>>(
+		[]
+	);
 	const [showLongDurationEvents, setShowLongDurationEvents] = useState<dayjs.Dayjs | null>(null);
-
 
 	// Ref holding all styled events (populated by CalendarEvents)
 	const styledEventsRef = useRef<StyledEvent[]>([]);
@@ -296,7 +297,11 @@ const Calendar = ({
 		setHasAutoScrolled(false);
 	}, [viewOptions.startDay]);
 
-	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number; maxHeight: number }>({
+	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{
+		x: number;
+		y: number;
+		maxHeight: number;
+	}>({
 		x: 100,
 		y: 100,
 		maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
@@ -544,14 +549,19 @@ const Calendar = ({
 										<ShowNonViableEventsButtonWrapper>
 											<ShowNonViableEventsButton
 												$active={
-													showLongDurationEvents?.isSame(day, 'day') ?? false
+													showLongDurationEvents?.isSame(day, 'day') ??
+													false
 												}
 												title={t('calendar.longDuration.title')}
 												onClick={() => {
 													const isClosing =
-														showLongDurationEvents?.isSame(day, 'day') ??
-														false;
-													setShowLongDurationEvents(isClosing ? null : day);
+														showLongDurationEvents?.isSame(
+															day,
+															'day'
+														) ?? false;
+													setShowLongDurationEvents(
+														isClosing ? null : day
+													);
 													if (!isClosing) {
 														setSelectedEventInfo(null);
 														setSelectedEvent(null);

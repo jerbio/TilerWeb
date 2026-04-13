@@ -43,7 +43,11 @@ describe('useFormHandler', () => {
 
 	it('preserves class instances with methods', () => {
 		class Color {
-			constructor(public r: number, public g: number, public b: number) {}
+			constructor(
+				public r: number,
+				public g: number,
+				public b: number
+			) {}
 			toHex() {
 				return `#${this.r.toString(16)}${this.g.toString(16)}${this.b.toString(16)}`;
 			}

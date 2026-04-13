@@ -152,7 +152,7 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 	color: ${({ theme }) => theme.colors.text.primary};
-	padding: 0.75rem 2.5rem 0.75rem .75rem;
+	padding: 0.75rem 2.5rem 0.75rem 0.75rem;
 	font-size: 13px;
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	cursor: pointer;

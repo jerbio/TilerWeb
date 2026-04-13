@@ -123,11 +123,7 @@ describe('computeStaggerLayout', () => {
 
 	describe('non-overlapping events', () => {
 		it('all events at stagger level 0 with full width', () => {
-			const events = [
-				makeEvent('A', 9, 10),
-				makeEvent('B', 11, 12),
-				makeEvent('C', 14, 15),
-			];
+			const events = [makeEvent('A', 9, 10), makeEvent('B', 11, 12), makeEvent('C', 14, 15)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			expect(result).toHaveLength(3);
@@ -143,10 +139,7 @@ describe('computeStaggerLayout', () => {
 
 	describe('two overlapping events', () => {
 		it('assigns stagger levels 0 and 1', () => {
-			const events = [
-				makeEvent('A', 9, 11),
-				makeEvent('B', 10, 12),
-			];
+			const events = [makeEvent('A', 9, 11), makeEvent('B', 10, 12)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			expect(result).toHaveLength(2);
@@ -158,10 +151,7 @@ describe('computeStaggerLayout', () => {
 		});
 
 		it('offsets x by stagger increment for level 1', () => {
-			const events = [
-				makeEvent('A', 9, 11),
-				makeEvent('B', 10, 12),
-			];
+			const events = [makeEvent('A', 9, 11), makeEvent('B', 10, 12)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			const a = result.find((r) => r.id === 'A')!;
@@ -172,10 +162,7 @@ describe('computeStaggerLayout', () => {
 		});
 
 		it('reduces width by stagger offset', () => {
-			const events = [
-				makeEvent('A', 9, 11),
-				makeEvent('B', 10, 12),
-			];
+			const events = [makeEvent('A', 9, 11), makeEvent('B', 10, 12)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			const b = result.find((r) => r.id === 'B')!;
@@ -187,10 +174,7 @@ describe('computeStaggerLayout', () => {
 
 	describe('z-index ordering', () => {
 		it('later start time gets higher z-index', () => {
-			const events = [
-				makeEvent('A', 9, 11),
-				makeEvent('B', 10, 12),
-			];
+			const events = [makeEvent('A', 9, 11), makeEvent('B', 10, 12)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			const a = result.find((r) => r.id === 'A')!;
@@ -213,10 +197,7 @@ describe('computeStaggerLayout', () => {
 		});
 
 		it('same start, same duration: stable z-index order', () => {
-			const events = [
-				makeEvent('A', 9, 10),
-				makeEvent('B', 9, 10),
-			];
+			const events = [makeEvent('A', 9, 10), makeEvent('B', 9, 10)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			const a = result.find((r) => r.id === 'A')!;
@@ -368,10 +349,7 @@ describe('computeStaggerLayout', () => {
 
 	describe('events on different day columns', () => {
 		it('events on different days do not affect each other stagger', () => {
-			const events = [
-				makeEvent('MON', 9, 11, { x: 0 }),
-				makeEvent('TUE', 9, 11, { x: 300 }),
-			];
+			const events = [makeEvent('MON', 9, 11, { x: 0 }), makeEvent('TUE', 9, 11, { x: 300 })];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			const mon = result.find((r) => r.id === 'MON')!;
@@ -406,10 +384,7 @@ describe('computeStaggerLayout', () => {
 		});
 
 		it('width = fullWidth - x for each event', () => {
-			const events = [
-				makeEvent('A', 9, 12),
-				makeEvent('B', 10, 12),
-			];
+			const events = [makeEvent('A', 9, 12), makeEvent('B', 10, 12)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
 			for (const r of result) {
@@ -424,14 +399,10 @@ describe('computeStaggerLayout', () => {
 		it('handles 100+ events without throwing', () => {
 			const events: LayoutEvent[] = [];
 			for (let i = 0; i < 150; i++) {
-				events.push(
-					makeEvent(`E${i}`, 8 + (i % 10) * 0.1, 9 + (i % 10) * 0.1)
-				);
+				events.push(makeEvent(`E${i}`, 8 + (i % 10) * 0.1, 9 + (i % 10) * 0.1));
 			}
 
-			expect(() =>
-				computeStaggerLayout(events, DEFAULT_OPTIONS)
-			).not.toThrow();
+			expect(() => computeStaggerLayout(events, DEFAULT_OPTIONS)).not.toThrow();
 
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 			expect(result).toHaveLength(150);
@@ -455,11 +426,7 @@ describe('computeStaggerLayout', () => {
 		});
 
 		it('returns same number of results as input events', () => {
-			const events = [
-				makeEvent('A', 9, 10),
-				makeEvent('B', 10, 11),
-				makeEvent('C', 11, 12),
-			];
+			const events = [makeEvent('A', 9, 10), makeEvent('B', 10, 11), makeEvent('C', 11, 12)];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 			expect(result).toHaveLength(events.length);
 		});
@@ -533,8 +500,8 @@ describe('computeStaggerLayout', () => {
 			// "Get some Vit.d" 30min = 48px, inflated to 60px by MIN_CELL_HEIGHT.
 			// Next event starts right after — should NOT be considered overlapping.
 			const events = [
-				makeEvent('VitD', 9, 9.5),      // 30min = 48px, inflated to 60px
-				makeEvent('Fix', 9.5, 10.5),     // starts exactly when VitD ends
+				makeEvent('VitD', 9, 9.5), // 30min = 48px, inflated to 60px
+				makeEvent('Fix', 9.5, 10.5), // starts exactly when VitD ends
 			];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 
@@ -549,8 +516,8 @@ describe('computeStaggerLayout', () => {
 		it('does NOT stagger events with a small gap between them', () => {
 			// 15-minute event (24px, inflated to 44px) followed by event 15min later
 			const events = [
-				makeEvent('Short', 9, 9.25),     // 15min
-				makeEvent('Next', 9.5, 10.5),    // starts 15min after Short ends
+				makeEvent('Short', 9, 9.25), // 15min
+				makeEvent('Next', 9.5, 10.5), // starts 15min after Short ends
 			];
 			const result = computeStaggerLayout(events, DEFAULT_OPTIONS);
 

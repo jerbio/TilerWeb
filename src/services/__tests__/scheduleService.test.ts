@@ -401,9 +401,7 @@ describe('ScheduleService', () => {
 				new Error('Network error')
 			);
 
-			await expect(
-				service.procrastinateScheduleEvent(procrastinateParams)
-			).rejects.toThrow();
+			await expect(service.procrastinateScheduleEvent(procrastinateParams)).rejects.toThrow();
 		});
 	});
 
