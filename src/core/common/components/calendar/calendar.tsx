@@ -632,7 +632,7 @@ const Calendar = ({
       <CalendarModal
         open={createSelection.state.isOpen}
         onBackdropClick={createSelection.actions.close}
-        width={270}
+        width={320}
       >
         <CalendarCreateSelection />
       </CalendarModal>

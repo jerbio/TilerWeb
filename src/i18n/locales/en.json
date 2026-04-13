@@ -379,6 +379,16 @@
 				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
 			}
 		},
+		"createSelection": {
+			"tile": {
+				"label": "Create Tile",
+				"description": "A flexible task that can move based on your availability."
+			},
+			"block": {
+				"label": "Create Block",
+				"description": "A fixed task that stays exactly where you place it."
+			}
+		},
 		"mobileChatInput": {
 			"placeholder": "Ask tiler anything..."
 		}
