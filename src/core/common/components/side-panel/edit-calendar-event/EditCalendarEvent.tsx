@@ -1142,7 +1142,13 @@ const DateTimeRow = styled.div`
 	gap: 0.5rem;
 	align-items: center;
 
+	> button {
+		flex-shrink: 0;
+		width: auto;
+	}
+
 	> select {
+		flex-shrink: 0;
 		height: 36px;
 		padding-top: 0;
 		padding-bottom: 0;
@@ -1188,6 +1194,9 @@ const DateTrigger = styled.button`
 	cursor: pointer;
 	transition: border-color 0.15s ease;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 
 	&:hover {
 		border-color: ${({ theme }) => theme.colors.input.borderHover};
