@@ -19,15 +19,12 @@ import {
 	ScheduleRepeatWeekday,
 } from '../../../types/schedule';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
-import {
-	CalendarEntityType,
-	CalendarRequestResult,
-	CalendarRequestStatus,
-	CalendarRequestType,
-} from '../calendarRequestContext';
-import { Actions } from '@/core/constants/enums';
 import { useCalendarUI } from '../calendar-ui.provider';
-import { StyledCalendarCreateEvent, StyledCalendarCreateEventActions } from '../create_tile';
+import {
+	StyledCalendarCreateEvent,
+	StyledCalendarCreateEventActions,
+	viewCreatedEvent,
+} from '../create_tile';
 import CreateBlockInfo from './info';
 import { toast } from 'sonner';
 import { scheduleService } from '@/services';
@@ -156,33 +153,6 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 		ui.actions.collapse();
 	}
 
-	function viewCreatedEvent() {
-		const successBlock = ui.state.success.block;
-		if (!successBlock || successBlock.calendarEvent.id === null) return;
-		calendarDispatch(
-			{
-				type: CalendarRequestType.FocusEvent,
-				entityId: successBlock.calendarEvent.id,
-				entityType: CalendarEntityType.CalendarEvent,
-				actionType: Actions.Add_New_Task,
-			},
-			(result: CalendarRequestResult) => {
-				if (result.status === CalendarRequestStatus.Navigating) {
-					ui.actions.navigateToBlock();
-				} else {
-					ui.actions.navigateToBlockComplete();
-					ui.actions.hideSuccess();
-					if (result.status === CalendarRequestStatus.NotFound) {
-						console.warn(
-							'[CreateBlock] Calendar could not find entity:',
-							successBlock.calendarEvent.id
-						);
-					}
-				}
-			}
-		);
-	}
-
 	return (
 		<StyledCalendarCreateEvent
 			onSubmit={(e) => {
@@ -211,7 +181,13 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 				actions={[
 					{
 						text: t('calendar.createBlock.buttons.viewInTimeline'),
-						onClick: viewCreatedEvent,
+						onClick: () => {
+							viewCreatedEvent(ui.state.success.block!, calendarDispatch, {
+								navigateToEvent: ui.actions.navigateToBlock,
+								navigateToEventComplete: ui.actions.navigateToBlockComplete,
+								hideSuccess: ui.actions.hideSuccess,
+							});
+						},
 						disabled: ui.state.success.isNavigatingToBlock,
 					},
 				]}

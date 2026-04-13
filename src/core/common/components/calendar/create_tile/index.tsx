@@ -43,7 +43,6 @@ dayjs.extend(advancedFormat);
 
 export function viewCreatedEvent(
 	event: ScheduleCreateEventResponse['Content'],
-
 	calendarDispatch: ReturnType<typeof useCalendarDispatch>,
 	actions: {
 		navigateToEvent: () => void;
@@ -237,33 +236,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		}
 	}, [isValidSubmission, formData, ui, refetchEvents, resetForm, calendarDispatch, t, theme]);
 
-	function viewCreatedEvent() {
-		const successTile = ui.state.success.tile;
-		if (!successTile || successTile.calendarEvent.id === null) return;
-		calendarDispatch(
-			{
-				type: CalendarRequestType.FocusEvent,
-				entityId: successTile.calendarEvent.id,
-				entityType: CalendarEntityType.CalendarEvent,
-				actionType: Actions.Add_New_Task,
-			},
-			(result: CalendarRequestResult) => {
-				if (result.status === CalendarRequestStatus.Navigating) {
-					ui.actions.navigateToTile();
-				} else {
-					ui.actions.navigateToTileComplete();
-					ui.actions.hideSuccess();
-					if (result.status === CalendarRequestStatus.NotFound) {
-						console.warn(
-							'[CreateTile] Calendar could not find entity:',
-							successTile.calendarEvent.id
-						);
-					}
-				}
-			}
-		);
-	}
-
 	async function getUserRestrictionProfiles() {
 		try {
 			ui.actions.loadRestrictionProfiles();
@@ -329,7 +301,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				actions={[
 					{
 						text: t('calendar.createTile.buttons.viewInTimeline'),
-						onClick: viewCreatedEvent,
+						onClick: () => {
+							viewCreatedEvent(ui.state.success.tile!, calendarDispatch, {
+								navigateToEvent: ui.actions.navigateToTile,
+								navigateToEventComplete: ui.actions.navigateToTileComplete,
+								hideSuccess: ui.actions.hideSuccess,
+							});
+						},
 						disabled: ui.state.success.isNavigatingToTile,
 					},
 				]}
