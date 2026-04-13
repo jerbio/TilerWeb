@@ -149,6 +149,7 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 	cursor: pointer;
 	position: relative;
 	transition: border-color 0.2s ease;
+	height: 40px;
 	white-space: nowrap;
 
 	&:hover:not(:disabled) {

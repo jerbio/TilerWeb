@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Input from '../../input';
 import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import TimeDropdown from '../../TimeDropdown';
 import { useCalendarUI } from '../calendar-ui.provider';
 import calendarConfig from '@/core/constants/calendar_config';
@@ -96,7 +96,7 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 	return (
 		<Grid $isexpanded={ui.state.isExpanded}>
 			<Input
-				containerStyle={{ gridColumn: 'span 2' }}
+				containerClass="name"
 				label={t('calendar.createBlock.info.name.label')}
 				required
 				name="name"
@@ -106,89 +106,114 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 			/>
 			<InputContainer>
 				<label>{t('calendar.createBlock.info.start.label')}</label>
-				<DatePicker
-					value={dayjs(formData.start).format('YYYY-MM-DD')}
-					placeholder={t('calendar.createBlock.info.start.placeholder')}
-					onChange={(date) =>
-						handleFormInputChange('start', {
-							mode: 'static',
-						})(dayjs(date))
-					}
-				/>
-			</InputContainer>
-			<InputContainer>
-				<label>{t('calendar.createBlock.info.startTime.label')}</label>
-				<TimeDropdown
-					interval={calendarConfig.CREATE_EVENT_MINUTE_INTERVAL}
-					value={formData.startTime}
-					onChange={handleFormInputChange('startTime', { mode: 'static' })}
-					placeholder={t('calendar.createBlock.info.startTime.placeholder')}
-				/>
+				<TimeGridContainer>
+					<TimeDropdown
+						interval={calendarConfig.CREATE_EVENT_MINUTE_INTERVAL}
+						value={formData.startTime}
+						onChange={handleFormInputChange('startTime', { mode: 'static' })}
+						placeholder={t('calendar.createBlock.info.startTime.placeholder')}
+					/>
+					<DatePicker
+						value={dayjs(formData.start).format('YYYY-MM-DD')}
+						placeholder={t('calendar.createBlock.info.start.placeholder')}
+						onChange={(date) =>
+							handleFormInputChange('start', {
+								mode: 'static',
+							})(dayjs(date))
+						}
+					/>
+				</TimeGridContainer>
 			</InputContainer>
 			<InputContainer>
 				<label>{t('calendar.createBlock.info.end.label')}</label>
-				<DatePicker
-					value={dayjs(formData.end).format('YYYY-MM-DD')}
-					placeholder={t('calendar.createBlock.info.end.placeholder')}
-					onChange={(date) =>
-						handleFormInputChange('end', {
-							mode: 'static',
-						})(dayjs(date))
-					}
-				/>
-			</InputContainer>
-			<InputContainer>
-				<label>{t('calendar.createBlock.info.endTime.label')}</label>
-				<TimeDropdown
-					interval={calendarConfig.CREATE_EVENT_MINUTE_INTERVAL}
-					value={formData.endTime}
-					onChange={handleFormInputChange('endTime', { mode: 'static' })}
-					placeholder={t('calendar.createBlock.info.endTime.placeholder')}
-				/>
+				<TimeGridContainer>
+					<TimeDropdown
+						interval={calendarConfig.CREATE_EVENT_MINUTE_INTERVAL}
+						value={formData.endTime}
+						onChange={handleFormInputChange('endTime', { mode: 'static' })}
+						placeholder={t('calendar.createBlock.info.endTime.placeholder')}
+					/>
+					<DatePicker
+						value={dayjs(formData.end).format('YYYY-MM-DD')}
+						placeholder={t('calendar.createBlock.info.end.placeholder')}
+						onChange={(date) =>
+							handleFormInputChange('end', {
+								mode: 'static',
+							})(dayjs(date))
+						}
+					/>
+				</TimeGridContainer>
 			</InputContainer>
 			<DurationContainer>
 				{durationInMins > 0 ? (
-					<>
-						Duration <span>~</span>{' '}
-						<div>{TimeUtil.minutesDuration(durationInMins)}</div>
-					</>
+					<Trans
+						i18nKey="calendar.createBlock.info.duration.valid"
+						components={{
+							mute: <span />,
+							highlight: <div />,
+						}}
+						values={{
+							duration: TimeUtil.minutesDuration(durationInMins),
+						}}
+					/>
 				) : (
-					<>Invalid Duration</>
+					<Trans
+						i18nKey="calendar.createBlock.info.duration.invalid"
+						components={{ highlight: <div /> }}
+					/>
 				)}
 			</DurationContainer>
 			<LocationInput
 				controller={locationController}
-				containerStyle={{ gridColumn: 'span 2' }}
 				label={t('calendar.createBlock.info.location.label')}
 				placeholder={t('calendar.createBlock.info.location.placeholder')}
+			/>
+			<Input
+				label={t('calendar.createBlock.info.locationTag.label')}
+				name="locationTag"
+				placeholder={t('calendar.createBlock.info.locationTag.placeholder')}
+				value={formData.locationTag}
+				onChange={handleFormInputChange('locationTag')}
 			/>
 		</Grid>
 	);
 };
 
+const TimeGridContainer = styled.div`
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 0.5rem;
+
+	& > :last-child {
+		grid-column: span 2;
+		height: 100%;
+	}
+`;
+
 const DurationContainer = styled.div`
-	grid-column: span 2;
 	display: flex;
 	gap: 0.5ch;
 	justify-content: center;
-	text-align: center;
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	font-size: ${({ theme }) => theme.typography.fontSize.base};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-	color: ${({ theme }) => theme.colors.brand[400]};
-	margin-block: -0.5rem;
+	color: ${({ theme }) => theme.colors.text.primary};
 
 	span {
 		color: ${({ theme }) => theme.colors.text.muted};
 	}
 	div {
-		color: ${({ theme }) => theme.colors.text.primary};
+		color: ${({ theme }) => theme.colors.brand[400]};
+	}
+
+	@media (min-width: ${({ theme }) => theme.screens.md}) {
+		grid-column: span 2;
 	}
 `;
 
 const Grid = styled.div<{ $isexpanded: boolean }>`
 	display: grid;
-	gap: 1rem;
+	gap: 1.25rem;
 	margin-block: ${({ $isexpanded }) => ($isexpanded ? '2rem' : '0')};
 
 	label,
@@ -201,6 +226,10 @@ const Grid = styled.div<{ $isexpanded: boolean }>`
 
 	@media (min-width: ${({ theme }) => theme.screens.md}) {
 		grid-template-columns: repeat(2, 1fr);
+
+		.name {
+			grid-column: span 2;
+		}
 	}
 `;
 
@@ -208,6 +237,10 @@ const InputContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+
+	@media (min-width: ${({ theme }) => theme.screens.sm}) {
+		grid-column: span 1;
+	}
 `;
 
 export default CreateBlockInfo;
