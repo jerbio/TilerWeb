@@ -6,8 +6,8 @@ import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
 import { HOURS_IN_DAY, MINUTES_IN_DAY } from '@/core/common/utils/timeUtils';
 import {
-  CalendarBackgroundClickInfo,
-  StyledEvent,
+	CalendarBackgroundClickInfo,
+	StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
 import { ScheduleRepeatWeekday, SubCalendarEvent } from '@/core/common/types/schedule';
 import Loader from '../loader';
@@ -21,9 +21,9 @@ import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
 import {
-  createCalendarRequestHandler,
-  retryPendingFocus,
-  PendingFocus,
+	createCalendarRequestHandler,
+	retryPendingFocus,
+	PendingFocus,
 } from './calendarRequestHandler';
 import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react';
 import CalendarContentDummy from './calendar_content_dummy';
@@ -53,325 +53,326 @@ type CalendarProps = {
 };
 
 const Calendar = ({
-  events,
-  eventsLoading,
-  viewRef,
-  viewOptions,
-  setViewOptions,
-  refetchEvents,
-  allowEventLookup = true,
+	events,
+	eventsLoading,
+	viewRef,
+	viewOptions,
+	setViewOptions,
+	refetchEvents,
+	allowEventLookup = true,
 }: CalendarProps) => {
-  const { t } = useTranslation();
-  const viableEvents = events.filter((event) => event.isViable);
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-  const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
-  const theme = useTheme();
-  const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
+	const { t } = useTranslation();
+	const viableEvents = events.filter((event) => event.isViable);
+	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
+	const theme = useTheme();
+	const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
 
-  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
-  const contentContainerRef = useRef<HTMLDivElement>(null);
+	const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+	const contentContainerRef = useRef<HTMLDivElement>(null);
 
-  // Ref holding all styled events (populated by CalendarEvents)
-  const styledEventsRef = useRef<StyledEvent[]>([]);
+	// Ref holding all styled events (populated by CalendarEvents)
+	const styledEventsRef = useRef<StyledEvent[]>([]);
 
-  const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
-  const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
+	const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
+	const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
 
-	const [styledLongDurationEvents, setStyledLongDurationEvents] = useState<Array<StyledEvent>>([]);
+	const [styledLongDurationEvents, setStyledLongDurationEvents] = useState<Array<StyledEvent>>(
+		[]
+	);
 	const [showLongDurationEvents, setShowLongDurationEvents] = useState<dayjs.Dayjs | null>(null);
 
-  // Focused event state — drives the pulse animation, auto-clears after timeout
-  const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
-  const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	// Focused event state — drives the pulse animation, auto-clears after timeout
+	const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
+	const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Phase 4: Pending focus after navigation ───────────────────
-  // Stores the request to retry once events finish reloading after a date navigation
-  const pendingFocusRef = useRef<PendingFocus | null>(null);
+	// ── Phase 4: Pending focus after navigation ───────────────────
+	// Stores the request to retry once events finish reloading after a date navigation
+	const pendingFocusRef = useRef<PendingFocus | null>(null);
 
-  // ── Calendar Request Listener ──────────────────────────────────
-  const handleCalendarRequest = useCallback(
-    createCalendarRequestHandler({
-      styledEventsRef,
-      pendingFocusRef,
-      contentContainerRef,
-      focusTimeoutRef,
-      events,
-      allowEventLookup,
-      setShowNonViableEvents,
-      setSelectedEventInfo,
-      setSelectedEvent,
-      setViewOptions,
-      setFocusedEventId,
-    }),
-    []
-  );
+	// ── Calendar Request Listener ──────────────────────────────────
+	const handleCalendarRequest = useCallback(
+		createCalendarRequestHandler({
+			styledEventsRef,
+			pendingFocusRef,
+			contentContainerRef,
+			focusTimeoutRef,
+			events,
+			allowEventLookup,
+			setShowNonViableEvents,
+			setSelectedEventInfo,
+			setSelectedEvent,
+			setViewOptions,
+			setFocusedEventId,
+		}),
+		[]
+	);
 
-  useCalendarRequestListener(handleCalendarRequest);
+	useCalendarRequestListener(handleCalendarRequest);
 
-  // ── Phase 4: Retry pending focus after events reload ──────────
-  useEffect(() => {
-    if (eventsLoading || !pendingFocusRef.current) return;
+	// ── Phase 4: Retry pending focus after events reload ──────────
+	useEffect(() => {
+		if (eventsLoading || !pendingFocusRef.current) return;
 
-    // Give styled events a tick to render after new data arrives
-    const retryTimer = setTimeout(() => {
-      retryPendingFocus({
-        styledEventsRef,
-        pendingFocusRef,
-        contentContainerRef,
-        focusTimeoutRef,
-        setShowNonViableEvents,
-        setSelectedEventInfo,
-        setSelectedEvent,
-        setFocusedEventId,
-      });
-    }, 150);
+		// Give styled events a tick to render after new data arrives
+		const retryTimer = setTimeout(() => {
+			retryPendingFocus({
+				styledEventsRef,
+				pendingFocusRef,
+				contentContainerRef,
+				focusTimeoutRef,
+				setShowNonViableEvents,
+				setSelectedEventInfo,
+				setSelectedEvent,
+				setFocusedEventId,
+			});
+		}, 150);
 
-    return () => clearTimeout(retryTimer);
-  }, [eventsLoading, events]);
+		return () => clearTimeout(retryTimer);
+	}, [eventsLoading, events]);
 
-  // Track calendar view mount
-  useEffect(() => {
-    analytics.trackCalendarEvent('View Loaded', {
-      daysInView: viewOptions.daysInView,
-      startDate: viewOptions.startDay.format('YYYY-MM-DD'),
-    });
-  }, []); // Only on mount
+	// Track calendar view mount
+	useEffect(() => {
+		analytics.trackCalendarEvent('View Loaded', {
+			daysInView: viewOptions.daysInView,
+			startDate: viewOptions.startDay.format('YYYY-MM-DD'),
+		});
+	}, []); // Only on mount
 
-  useEffect(() => {
-    // EVENTS_RELOADED — reset selection & event info (data may be stale)
-    setSelectedEvent(null);
-    setSelectedEventInfo(null);
-  }, [events]);
+	useEffect(() => {
+		// EVENTS_RELOADED — reset selection & event info (data may be stale)
+		setSelectedEvent(null);
+		setSelectedEventInfo(null);
+	}, [events]);
 
-  const contentMounted = viewOptions.width > 0;
+	const contentMounted = viewOptions.width > 0;
 
-  function changeDayView(dir: 'left' | 'right') {
-    const changeAmount = dir === 'left' ? -1 : 1;
-    // DAY_NAVIGATED — dismiss all overlays
-    setShowNonViableEvents(null);
-    setShowLongDurationEvents(null);
-    setSelectedEventInfo(null);
-    setSelectedEvent(null);
+	function changeDayView(dir: 'left' | 'right') {
+		const changeAmount = dir === 'left' ? -1 : 1;
+		// DAY_NAVIGATED — dismiss all overlays
+		setShowNonViableEvents(null);
+		setShowLongDurationEvents(null);
+		setSelectedEventInfo(null);
+		setSelectedEvent(null);
 
-    setViewOptions((prev) => {
-      const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
-      // Track navigation
-      analytics.trackCalendarEvent('Navigate Days', {
-        direction: dir,
-        daysChanged: changeAmount * prev.daysInView,
-        newStartDate: newStartDay.format('YYYY-MM-DD'),
-      });
-      return {
-        ...prev,
-        startDay: newStartDay,
-      };
-    });
-  }
+		setViewOptions((prev) => {
+			const newStartDay = prev.startDay.add(changeAmount * prev.daysInView, 'day');
+			// Track navigation
+			analytics.trackCalendarEvent('Navigate Days', {
+				direction: dir,
+				daysChanged: changeAmount * prev.daysInView,
+				newStartDate: newStartDay.format('YYYY-MM-DD'),
+			});
+			return {
+				...prev,
+				startDay: newStartDay,
+			};
+		});
+	}
 
+	const calendarGridCanvasRef = useRef<HTMLCanvasElement>(null);
+	const calendarGridPrevCanvasRef = useRef<HTMLCanvasElement>(null);
+	const calendarGridNextCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const calendarGridCanvasRef = useRef<HTMLCanvasElement>(null);
-  const calendarGridPrevCanvasRef = useRef<HTMLCanvasElement>(null);
-  const calendarGridNextCanvasRef = useRef<HTMLCanvasElement>(null);
+	function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
+		canvas.width = width;
+		canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY;
+	}
+	function drawCalendarGrid(
+		canvas: HTMLCanvasElement,
+		ctx: CanvasRenderingContext2D,
+		width: number,
+		daysInView: number,
+		cellHeight: number
+	) {
+		// Clear the canvas before redrawing
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  function resizeCanvas(canvas: HTMLCanvasElement, width: number) {
-    canvas.width = width;
-    canvas.height = parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY;
-  }
-  function drawCalendarGrid(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    daysInView: number,
-    cellHeight: number
-  ) {
-    // Clear the canvas before redrawing
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+		const cellWidth = width / daysInView;
+		const gridColor = theme.colors.calendar.grid;
+		const dashLength = 4;
+		const dashGap = 8;
+		const thickness = 0.5;
 
-    const cellWidth = width / daysInView;
-    const gridColor = theme.colors.calendar.grid;
-    const dashLength = 4;
-    const dashGap = 8;
-    const thickness = 0.5;
+		// Draw solid vertical lines
+		ctx.beginPath();
+		ctx.strokeStyle = gridColor;
+		ctx.lineWidth = thickness;
+		for (let x = cellWidth; x < canvas.width; x += cellWidth) {
+			ctx.moveTo(x, 0);
+			ctx.lineTo(x, canvas.height);
+		}
+		ctx.stroke();
 
-    // Draw solid vertical lines
-    ctx.beginPath();
-    ctx.strokeStyle = gridColor;
-    ctx.lineWidth = thickness;
-    for (let x = cellWidth; x < canvas.width; x += cellWidth) {
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-    }
-    ctx.stroke();
+		// Draw dashed horizontal lines
+		ctx.beginPath();
+		ctx.strokeStyle = gridColor;
+		ctx.lineWidth = thickness;
+		ctx.setLineDash([dashLength, dashGap]);
+		for (let y = cellHeight; y < canvas.height; y += cellHeight) {
+			ctx.moveTo(0, y);
+			ctx.lineTo(canvas.width, y);
+		}
+		ctx.stroke();
+		// Reset the line dash to solid for any future drawing
+		ctx.setLineDash([]);
+	}
 
-    // Draw dashed horizontal lines
-    ctx.beginPath();
-    ctx.strokeStyle = gridColor;
-    ctx.lineWidth = thickness;
-    ctx.setLineDash([dashLength, dashGap]);
-    for (let y = cellHeight; y < canvas.height; y += cellHeight) {
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-    }
-    ctx.stroke();
-    // Reset the line dash to solid for any future drawing
-    ctx.setLineDash([]);
-  }
+	useEffect(() => {
+		[calendarGridCanvasRef, calendarGridPrevCanvasRef, calendarGridNextCanvasRef].forEach(
+			(ref) => {
+				if (ref.current) {
+					const canvas = ref.current;
+					const ctx = canvas.getContext('2d');
+					if (ctx) {
+						resizeCanvas(canvas, viewOptions.width);
+						drawCalendarGrid(
+							canvas,
+							ctx,
+							viewOptions.width,
+							viewOptions.daysInView,
+							parseInt(calendarConfig.CELL_HEIGHT)
+						);
+					}
+				}
+			}
+		);
+	}, [viewOptions.width, theme]);
 
-  useEffect(() => {
-    [calendarGridCanvasRef, calendarGridPrevCanvasRef, calendarGridNextCanvasRef].forEach(
-      (ref) => {
-        if (ref.current) {
-          const canvas = ref.current;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            resizeCanvas(canvas, viewOptions.width);
-            drawCalendarGrid(
-              canvas,
-              ctx,
-              viewOptions.width,
-              viewOptions.daysInView,
-              parseInt(calendarConfig.CELL_HEIGHT)
-            );
-          }
-        }
-      }
-    );
-  }, [viewOptions.width, theme]);
+	// Auto-scroll to first event or current time on initial load
+	useEffect(() => {
+		if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
+			return;
+		}
 
-  // Auto-scroll to first event or current time on initial load
-  useEffect(() => {
-    if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
-      return;
-    }
+		const scrollToPosition = (scrollTop: number) => {
+			if (contentContainerRef.current) {
+				contentContainerRef.current.scrollTop = scrollTop;
+				setHasAutoScrolled(true);
+			}
+		};
 
-    const scrollToPosition = (scrollTop: number) => {
-      if (contentContainerRef.current) {
-        contentContainerRef.current.scrollTop = scrollTop;
-        setHasAutoScrolled(true);
-      }
-    };
+		// Find the earliest event in the current view
+		const viewStart = viewOptions.startDay.startOf('day');
+		const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
 
-    // Find the earliest event in the current view
-    const viewStart = viewOptions.startDay.startOf('day');
-    const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
+		const eventsInView = viableEvents.filter((event) => {
+			const eventStart = dayjs(event.start);
+			const eventEnd = dayjs(event.end);
+			return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
+		});
 
-    const eventsInView = viableEvents.filter((event) => {
-      const eventStart = dayjs(event.start);
-      const eventEnd = dayjs(event.end);
-      return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
-    });
+		if (eventsInView.length > 0) {
+			// Find the earliest event
+			const earliestEvent = eventsInView.reduce((earliest, current) => {
+				return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
+			});
 
-    if (eventsInView.length > 0) {
-      // Find the earliest event
-      const earliestEvent = eventsInView.reduce((earliest, current) => {
-        return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
-      });
+			const eventStart = dayjs(earliestEvent.start);
+			const hourFraction =
+				eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 
-      const eventStart = dayjs(earliestEvent.start);
-      const hourFraction =
-        eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-      const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+			// Scroll to 1 hour before the first event (or to the event if it's in the first hour)
+			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+			scrollToPosition(scrollTop);
+		} else {
+			// No events in view, scroll to current time
+			const now = TimeUtil.nowDayjs();
+			const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
+			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 
-      // Scroll to 1 hour before the first event (or to the event if it's in the first hour)
-      const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-      scrollToPosition(scrollTop);
-    } else {
-      // No events in view, scroll to current time
-      const now = TimeUtil.nowDayjs();
-      const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
-      const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+			// Scroll to 1 hour before current time (or to current time if in first hour)
+			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+			scrollToPosition(scrollTop);
+		}
+	}, [
+		contentMounted,
+		hasAutoScrolled,
+		eventsLoading,
+		viableEvents,
+		viewOptions.startDay,
+		viewOptions.daysInView,
+	]);
 
-      // Scroll to 1 hour before current time (or to current time if in first hour)
-      const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-      scrollToPosition(scrollTop);
-    }
-  }, [
-    contentMounted,
-    hasAutoScrolled,
-    eventsLoading,
-    viableEvents,
-    viewOptions.startDay,
-    viewOptions.daysInView,
-  ]);
+	// Reset auto-scroll flag when view changes (date navigation)
+	useEffect(() => {
+		setHasAutoScrolled(false);
+	}, [viewOptions.startDay]);
 
-  // Reset auto-scroll flag when view changes (date navigation)
-  useEffect(() => {
-    setHasAutoScrolled(false);
-  }, [viewOptions.startDay]);
+	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{
+		x: number;
+		y: number;
+		maxHeight: number;
+	}>({
+		x: 100,
+		y: 100,
+		maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
+	});
 
-  const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{
-    x: number;
-    y: number;
-    maxHeight: number;
-  }>({
-    x: 100,
-    y: 100,
-    maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
-  });
+	const demoMode = useCalendarUI((state) => state.demoMode);
 
-  const demoMode = useCalendarUI((state) => state.demoMode);
+	const calendarEventInfo = [
+		{
+			key: 'info',
+			container: CalendarEventInfoModalContainer,
+			content: (
+				<CalendarEventInfo
+					event={selectedEventInfo}
+					onClose={() => {
+						setSelectedEventInfo(null);
+						setSelectedEvent(null);
+					}}
+					onEventAction={() => {
+						refetchEvents();
+					}}
+					maxHeight={calendarEventInfoPos.maxHeight}
+					readOnly={demoMode}
+				/>
+			),
+		},
+	];
 
-  const calendarEventInfo = [
-    {
-      key: 'info',
-      container: CalendarEventInfoModalContainer,
-      content: (
-        <CalendarEventInfo
-          event={selectedEventInfo}
-          onClose={() => {
-            setSelectedEventInfo(null);
-            setSelectedEvent(null);
-          }}
-          onEventAction={() => {
-            refetchEvents();
-          }}
-          maxHeight={calendarEventInfoPos.maxHeight}
-          readOnly={demoMode}
-        />
-      ),
-    },
-  ];
+	const calculateEventInfoCoordinates = (event: StyledEvent) => {
+		const INFO_MODAL_HEIGHT = parseInt(calendarConfig.INFO_MODAL_HEIGHT);
+		const INFO_MODAL_WIDTH = parseInt(calendarConfig.INFO_MODAL_WIDTH);
+		const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
 
-  const calculateEventInfoCoordinates = (event: StyledEvent) => {
-    const INFO_MODAL_HEIGHT = parseInt(calendarConfig.INFO_MODAL_HEIGHT);
-    const INFO_MODAL_WIDTH = parseInt(calendarConfig.INFO_MODAL_WIDTH);
-    const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
+		const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
+		const totalHeaderHeight = parseInt(calendarConfig.HEADER_HEIGHT);
+		const innerAbsoluteX = event.springStyles.x + parseInt(calendarConfig.TIMELINE_WIDTH);
+		const innerAbsoluteY = event.springStyles.y + totalHeaderHeight;
+		const innerAbsoluteWidth = event.springStyles.width;
 
-    const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
-    const totalHeaderHeight = parseInt(calendarConfig.HEADER_HEIGHT);
-    const innerAbsoluteX = event.springStyles.x + parseInt(calendarConfig.TIMELINE_WIDTH);
-    const innerAbsoluteY = event.springStyles.y + totalHeaderHeight;
-    const innerAbsoluteWidth = event.springStyles.width;
+		const containerRect = contentContainerRef.current?.getBoundingClientRect();
+		const containerWidth = containerRect?.width || 0;
+		const containerHeight = containerRect?.height || 0;
 
-    const containerRect = contentContainerRef.current?.getBoundingClientRect();
-    const containerWidth = containerRect?.width || 0;
-    const containerHeight = containerRect?.height || 0;
+		// Position to the right of the event by default
+		// If not enough space, position to the left
+		let calculatedX = innerAbsoluteX + innerAbsoluteWidth + INFO_MODAL_GAP;
+		if (calculatedX + INFO_MODAL_WIDTH > containerWidth) {
+			// Not enough space on the right, position to the left
+			calculatedX = innerAbsoluteX - INFO_MODAL_WIDTH - INFO_MODAL_GAP; // 12px gap
+			if (calculatedX < 0) {
+				// Still not enough space, clamp to left edge
+				calculatedX = 0;
+			}
+		}
 
-    // Position to the right of the event by default
-    // If not enough space, position to the left
-    let calculatedX = innerAbsoluteX + innerAbsoluteWidth + INFO_MODAL_GAP;
-    if (calculatedX + INFO_MODAL_WIDTH > containerWidth) {
-      // Not enough space on the right, position to the left
-      calculatedX = innerAbsoluteX - INFO_MODAL_WIDTH - INFO_MODAL_GAP; // 12px gap
-      if (calculatedX < 0) {
-        // Still not enough space, clamp to left edge
-        calculatedX = 0;
-      }
-    }
-
-    // Position vertically aligned to the top of the event by default
-    // If not enough space at the bottom, adjust upwards
-    let calculatedY = innerAbsoluteY - vScrollOffset;
-    if (event.isViable === false) {
-      calculatedY = 71;
-      // calculate the index of the event in the non-viable events list for that day
-      const dayStart = dayjs(event.start).startOf('day');
-      const eventsForTheDay = styledNonViableEvents.filter((e) =>
-        dayjs(e.start).isSame(dayStart, 'day')
-      );
-      const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
-      calculatedY += eventIndex * 66;
-    } else if (isLongDurationEvent(event)) {
+		// Position vertically aligned to the top of the event by default
+		// If not enough space at the bottom, adjust upwards
+		let calculatedY = innerAbsoluteY - vScrollOffset;
+		if (event.isViable === false) {
+			calculatedY = 71;
+			// calculate the index of the event in the non-viable events list for that day
+			const dayStart = dayjs(event.start).startOf('day');
+			const eventsForTheDay = styledNonViableEvents.filter((e) =>
+				dayjs(e.start).isSame(dayStart, 'day')
+			);
+			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
+			calculatedY += eventIndex * 66;
+		} else if (isLongDurationEvent(event)) {
 			calculatedY = 71;
 			const dayStart = dayjs(event.start).startOf('day');
 			const eventsForTheDay = styledLongDurationEvents.filter((e) =>
@@ -380,199 +381,204 @@ const Calendar = ({
 			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
 			calculatedY += eventIndex * 66;
 		}
-    // Total height of CalendarContainer = content area + header
-    const calendarContainerHeight = containerHeight + totalHeaderHeight;
+		// Total height of CalendarContainer = content area + header
+		const calendarContainerHeight = containerHeight + totalHeaderHeight;
 
-    if (calculatedY + INFO_MODAL_HEIGHT > calendarContainerHeight) {
-      // Not enough space at the bottom, adjust upwards
-      calculatedY = calendarContainerHeight - INFO_MODAL_HEIGHT;
-    }
-    if (calculatedY < totalHeaderHeight + INFO_MODAL_GAP) {
-      // Still not enough space, clamp to top edge
-      calculatedY = totalHeaderHeight + INFO_MODAL_GAP;
-    }
+		if (calculatedY + INFO_MODAL_HEIGHT > calendarContainerHeight) {
+			// Not enough space at the bottom, adjust upwards
+			calculatedY = calendarContainerHeight - INFO_MODAL_HEIGHT;
+		}
+		if (calculatedY < totalHeaderHeight + INFO_MODAL_GAP) {
+			// Still not enough space, clamp to top edge
+			calculatedY = totalHeaderHeight + INFO_MODAL_GAP;
+		}
 
-    // Cap modal height to available vertical space
-    const maxHeight = Math.min(INFO_MODAL_HEIGHT, calendarContainerHeight - calculatedY);
+		// Cap modal height to available vertical space
+		const maxHeight = Math.min(INFO_MODAL_HEIGHT, calendarContainerHeight - calculatedY);
 
-    setCalendarEventInfoPos({ x: calculatedX, y: calculatedY, maxHeight });
-  };
+		setCalendarEventInfoPos({ x: calculatedX, y: calculatedY, maxHeight });
+	};
 
-  useEffect(() => {
-    if (selectedEventInfo) {
-      calculateEventInfoCoordinates(selectedEventInfo!);
-      contentContainerRef.current?.addEventListener('scroll', () => {
-        setSelectedEventInfo((prev) => {
-          if (prev) {
-            // Return a new object to trigger re-render
-            return { ...prev };
-          }
-          return null;
-        });
-      });
-    }
-  }, [selectedEventInfo]);
-  const calendarEventInfoTransRef = useSpringRef();
-  const calendarEventInfoTrans = useTransition(selectedEventInfo ? calendarEventInfo : [], {
-    keys: (item) => `${item.key}-${calendarEventInfoPos.x}-${calendarEventInfoPos.y}`,
-    ref: calendarEventInfoTransRef,
-    from: {
-      x: calendarEventInfoPos.x - 12,
-      y: calendarEventInfoPos.y,
-      opacity: 0,
-    },
-    enter: {
-      x: calendarEventInfoPos.x,
-      y: calendarEventInfoPos.y,
-      opacity: 1,
-      delay: 100,
-    },
-    leave: { opacity: 0, pointerEvents: 'none' },
-    config: { tension: 300, friction: 30, duration: 150 },
-  });
+	useEffect(() => {
+		if (selectedEventInfo) {
+			calculateEventInfoCoordinates(selectedEventInfo!);
+			contentContainerRef.current?.addEventListener('scroll', () => {
+				setSelectedEventInfo((prev) => {
+					if (prev) {
+						// Return a new object to trigger re-render
+						return { ...prev };
+					}
+					return null;
+				});
+			});
+		}
+	}, [selectedEventInfo]);
+	const calendarEventInfoTransRef = useSpringRef();
+	const calendarEventInfoTrans = useTransition(selectedEventInfo ? calendarEventInfo : [], {
+		keys: (item) => `${item.key}-${calendarEventInfoPos.x}-${calendarEventInfoPos.y}`,
+		ref: calendarEventInfoTransRef,
+		from: {
+			x: calendarEventInfoPos.x - 12,
+			y: calendarEventInfoPos.y,
+			opacity: 0,
+		},
+		enter: {
+			x: calendarEventInfoPos.x,
+			y: calendarEventInfoPos.y,
+			opacity: 1,
+			delay: 100,
+		},
+		leave: { opacity: 0, pointerEvents: 'none' },
+		config: { tension: 300, friction: 30, duration: 150 },
+	});
 
-  useChain([calendarEventInfoTransRef], [0], 0);
+	useChain([calendarEventInfoTransRef], [0], 0);
 
-  // Swiping logic
-  const swiperRef = useRef<SwiperRef | null>(null);
-  const isSwiperResetting = useRef(false);
-  const isMobile = useIsMobile();
+	// Swiping logic
+	const swiperRef = useRef<SwiperRef | null>(null);
+	const isSwiperResetting = useRef(false);
+	const isMobile = useIsMobile();
 
-  useEffect(() => {
-    if (swiperRef.current) {
-      if (!isMobile) {
-        swiperRef.current.swiper.disable();
-      } else {
-        swiperRef.current.swiper.enable();
-      }
-    }
-  }, [isMobile]);
+	useEffect(() => {
+		if (swiperRef.current) {
+			if (!isMobile) {
+				swiperRef.current.swiper.disable();
+			} else {
+				swiperRef.current.swiper.enable();
+			}
+		}
+	}, [isMobile]);
 
-  // Create Block Form State
-  const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
-  const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
-  const createBlockModalPortalTarget = createBlock.state.isExpanded
-    ? document.body
-    : createBlockModalContainerRef.current;
+	// Create Block Form State
+	const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
+	const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
+	const createBlockModalPortalTarget = createBlock.state.isExpanded
+		? document.body
+		: createBlockModalContainerRef.current;
 
-  // Create Tile Form State
-  const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-  const createTileModalContainerRef = useRef<HTMLDivElement>(null);
-  const createTileModalPortalTarget = createTile.state.isExpanded
-    ? document.body
-    : createTileModalContainerRef.current;
+	// Create Tile Form State
+	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
+	const createTileModalContainerRef = useRef<HTMLDivElement>(null);
+	const createTileModalPortalTarget = createTile.state.isExpanded
+		? document.body
+		: createTileModalContainerRef.current;
 
-  function onBackgroundClick(info: CalendarBackgroundClickInfo) {
-    // CONTENT_CLICK_OUTSIDE
-    if (!selectedEvent) {
-      const clickedDay = dayjs(info.day);
-      const clickedDayValue = clickedDay.day();
-      const clickedHour = info.hour;
-      // Round minutes
-      const clickedMinute =
-        Math.round(info.minute / calendarConfig.CREATE_EVENT_MINUTE_INTERVAL) *
-        calendarConfig.CREATE_EVENT_MINUTE_INTERVAL;
+	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
+		// CONTENT_CLICK_OUTSIDE
+		if (!selectedEvent) {
+			const clickedDay = dayjs(info.day);
+			const clickedDayValue = clickedDay.day();
+			const clickedHour = info.hour;
+			// Round minutes
+			const clickedMinute =
+				Math.round(info.minute / calendarConfig.CREATE_EVENT_MINUTE_INTERVAL) *
+				calendarConfig.CREATE_EVENT_MINUTE_INTERVAL;
 
-      // Set Create Block From Based on day and time clicked
-      const { formData: createBlockForm, setFormData: setCreateBlockForm } =
-        createBlockFormHandler;
-      const maxStartTimeMinutes =
-        MINUTES_IN_DAY - calendarConfig.CREATE_EVENT_DEFAULT_DURATION;
-      const startTimeMinutes = Math.min(
-        clickedHour * 60 + clickedMinute,
-        maxStartTimeMinutes
-      );
+			// Set Create Block From Based on day and time clicked
+			const { formData: createBlockForm, setFormData: setCreateBlockForm } =
+				createBlockFormHandler;
+			const maxStartTimeMinutes =
+				MINUTES_IN_DAY - calendarConfig.CREATE_EVENT_DEFAULT_DURATION;
+			const startTimeMinutes = Math.min(
+				clickedHour * 60 + clickedMinute,
+				maxStartTimeMinutes
+			);
 
-      setCreateBlockForm({
-        ...createBlockForm,
-        start: clickedDay,
-        startTime: TimeUtil.minsToMeridian(startTimeMinutes),
-      });
+			setCreateBlockForm({
+				...createBlockForm,
+				start: clickedDay,
+				startTime: TimeUtil.minsToMeridian(startTimeMinutes),
+			});
 
-      // Set Create Tile Form Based on day clicked
-      const { formData: createTileForm, setFormData: setCreateTileForm } =
-        createTileFormHandler;
-      let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
+			// Set Create Tile Form Based on day clicked
+			const { formData: createTileForm, setFormData: setCreateTileForm } =
+				createTileFormHandler;
+			let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
 
-      if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
-      else if (clickedDayValue === 2)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Tuesday;
-      else if (clickedDayValue === 3)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Wednesday;
-      else if (clickedDayValue === 4)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Thursday;
-      else if (clickedDayValue === 5)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Friday;
-      else if (clickedDayValue === 6)
-        recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
-      else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
+			if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
+			else if (clickedDayValue === 2)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Tuesday;
+			else if (clickedDayValue === 3)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Wednesday;
+			else if (clickedDayValue === 4)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Thursday;
+			else if (clickedDayValue === 5)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Friday;
+			else if (clickedDayValue === 6)
+				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
+			else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
 
-      setCreateTileForm({
-        ...createTileForm,
-        start: clickedDay,
-        deadline: clickedDay,
-        recurrenceStartDate: clickedDay,
-        recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
-      });
-      createSelection.actions.open();
-    } else {
-      setSelectedEvent(null);
-      setSelectedEventInfo(null);
-    }
-    setShowNonViableEvents(null);
-    setShowLongDurationEvents(null);
-  }
+			setCreateTileForm({
+				...createTileForm,
+				start: clickedDay,
+				deadline: clickedDay,
+				recurrenceStartDate: clickedDay,
+				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
+			});
+			createSelection.actions.open();
+		} else {
+			setSelectedEvent(null);
+			setSelectedEventInfo(null);
+		}
+		setShowNonViableEvents(null);
+		setShowLongDurationEvents(null);
+	}
 
-  return (
-    <CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>
-      <CalendarHeaderWrapper>
-        <CalendarHeader>
-          <CalendarHeaderActions>
-            <ChangeViewButton
-              disabled={eventsLoading}
-              onClick={() => changeDayView('left')}
-            >
-              <ChevronLeftIcon size={16} />
-            </ChangeViewButton>
-            <ChangeViewButton
-              disabled={eventsLoading}
-              onClick={() => changeDayView('right')}
-            >
-              <ChevronRightIcon size={16} />
-            </ChangeViewButton>
-          </CalendarHeaderActions>
-          <CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
-            {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
-              const day = viewOptions.startDay.add(index, 'day');
-              const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
-                dayjs(event.start).isSame(day, 'day')
-              );
-              const todaysLongDurationEvents = styledLongDurationEvents.filter(
+	return (
+		<CalendarContainer id="calendar-grid-container" $isMounted={contentMounted}>
+			<CalendarHeaderWrapper>
+				<CalendarHeader>
+					<CalendarHeaderActions>
+						<ChangeViewButton
+							disabled={eventsLoading}
+							onClick={() => changeDayView('left')}
+						>
+							<ChevronLeftIcon size={16} />
+						</ChangeViewButton>
+						<ChangeViewButton
+							disabled={eventsLoading}
+							onClick={() => changeDayView('right')}
+						>
+							<ChevronRightIcon size={16} />
+						</ChangeViewButton>
+					</CalendarHeaderActions>
+					<CalendarHeaderDateList ref={viewRef} data-onboarding-calendar-header>
+						{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
+							const day = viewOptions.startDay.add(index, 'day');
+							const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
+								dayjs(event.start).isSame(day, 'day')
+							);
+							const todaysLongDurationEvents = styledLongDurationEvents.filter(
 								(event) => dayjs(event.start).isSame(day, 'day')
 							);
-              return (
-                <CalendarHeaderDateItem
-                  key={index}
-                  $isToday={day.isSame(dayjs(), 'day')}
-                >
-                  {/* 3 letter day */}
-                  <h3>{day.format('ddd')}</h3>
-                  {/* 2 number date */}
-                  <span>{day.format('DD')}</span>
-                  <ShowNonViableEventsButtonContainer
+							return (
+								<CalendarHeaderDateItem
+									key={index}
+									$isToday={day.isSame(dayjs(), 'day')}
+								>
+									{/* 3 letter day */}
+									<h3>{day.format('ddd')}</h3>
+									{/* 2 number date */}
+									<span>{day.format('DD')}</span>
+									<ShowNonViableEventsButtonContainer
 										$visible={todaysLongDurationEvents.length > 0}
 									>
 										<ShowNonViableEventsButtonWrapper>
 											<ShowNonViableEventsButton
 												$active={
-													showLongDurationEvents?.isSame(day, 'day') ?? false
+													showLongDurationEvents?.isSame(day, 'day') ??
+													false
 												}
 												title={t('calendar.longDuration.title')}
 												onClick={() => {
 													const isClosing =
-														showLongDurationEvents?.isSame(day, 'day') ??
-														false;
-													setShowLongDurationEvents(isClosing ? null : day);
+														showLongDurationEvents?.isSame(
+															day,
+															'day'
+														) ?? false;
+													setShowLongDurationEvents(
+														isClosing ? null : day
+													);
 													if (!isClosing) {
 														setSelectedEventInfo(null);
 														setSelectedEvent(null);
@@ -589,82 +595,82 @@ const Calendar = ({
 											</NonViableEventsCount>
 										</ShowNonViableEventsButtonWrapper>
 									</ShowNonViableEventsButtonContainer>
-                  <ShowNonViableEventsButtonContainer
-                    $visible={todaysNonViableEvents.length > 0}
-                  >
-                    <ShowNonViableEventsButtonWrapper>
-                      <ShowNonViableEventsButton
-                        $active={
-                          showNonViableEvents?.isSame(day, 'day') ?? false
-                        }
-                        title="Show Non-Viable Events"
-                        onClick={() => {
-                          const isClosing =
-                            showNonViableEvents?.isSame(day, 'day') ??
-                            false;
-                          setShowNonViableEvents(isClosing ? null : day);
-                          // TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
-                          if (!isClosing) {
-                            setSelectedEventInfo(null);
-                            setSelectedEvent(null);
-                          }
-                        }}
-                      >
-                        <TriangleAlert
-                          size={18}
-                          color={theme.colors.brand[400]}
-                        />
-                      </ShowNonViableEventsButton>
-                      <NonViableEventsCount>
-                        {todaysNonViableEvents.length}
-                      </NonViableEventsCount>
-                    </ShowNonViableEventsButtonWrapper>
-                  </ShowNonViableEventsButtonContainer>
-                </CalendarHeaderDateItem>
-              );
-            })}
-          </CalendarHeaderDateList>
-        </CalendarHeader>
-      </CalendarHeaderWrapper>
-      {/* Non-Viable Events Overlays */}
-      {Array.from({ length: viewOptions.daysInView }).map((_, index) => {
-        const day = viewOptions.startDay.add(index, 'day');
-        const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
-          dayjs(event.start).isSame(day, 'day')
-        );
-        return todaysNonViableEvents.length > 0 &&
-          showNonViableEvents?.isSame(day, 'day') ? (
-          <NonViableEventsContainer
-            key={index}
-            $index={index}
-            $visible={showNonViableEvents?.isSame(day, 'day') ?? false}
-            $cellwidth={viewOptions.width / viewOptions.daysInView}
-          >
-            <header>
-              <h2>{t('calendar.nonViable.title')}</h2>
-              <Tooltip
-                text={t('calendar.nonViable.infoTooltip')}
-                maxWidth={150}
-                position="left"
-              >
-                <Info size={18} color={theme.colors.text.secondary} />
-              </Tooltip>
-            </header>
-            {todaysNonViableEvents.map((event) => (
-              <CalendarEvent
-                event={event}
-                key={event.id}
-                selectedEvent={selectedEvent}
-                setSelectedEvent={setSelectedEvent}
-                setSelectedEventInfo={setSelectedEventInfo}
-                focused={focusedEventId === event.id}
-              />
-            ))}
-          </NonViableEventsContainer>
-        ) : null;
-      })}
+									<ShowNonViableEventsButtonContainer
+										$visible={todaysNonViableEvents.length > 0}
+									>
+										<ShowNonViableEventsButtonWrapper>
+											<ShowNonViableEventsButton
+												$active={
+													showNonViableEvents?.isSame(day, 'day') ?? false
+												}
+												title="Show Non-Viable Events"
+												onClick={() => {
+													const isClosing =
+														showNonViableEvents?.isSame(day, 'day') ??
+														false;
+													setShowNonViableEvents(isClosing ? null : day);
+													// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
+													if (!isClosing) {
+														setSelectedEventInfo(null);
+														setSelectedEvent(null);
+													}
+												}}
+											>
+												<TriangleAlert
+													size={18}
+													color={theme.colors.brand[400]}
+												/>
+											</ShowNonViableEventsButton>
+											<NonViableEventsCount>
+												{todaysNonViableEvents.length}
+											</NonViableEventsCount>
+										</ShowNonViableEventsButtonWrapper>
+									</ShowNonViableEventsButtonContainer>
+								</CalendarHeaderDateItem>
+							);
+						})}
+					</CalendarHeaderDateList>
+				</CalendarHeader>
+			</CalendarHeaderWrapper>
+			{/* Non-Viable Events Overlays */}
+			{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
+				const day = viewOptions.startDay.add(index, 'day');
+				const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
+					dayjs(event.start).isSame(day, 'day')
+				);
+				return todaysNonViableEvents.length > 0 &&
+					showNonViableEvents?.isSame(day, 'day') ? (
+					<NonViableEventsContainer
+						key={index}
+						$index={index}
+						$visible={showNonViableEvents?.isSame(day, 'day') ?? false}
+						$cellwidth={viewOptions.width / viewOptions.daysInView}
+					>
+						<header>
+							<h2>{t('calendar.nonViable.title')}</h2>
+							<Tooltip
+								text={t('calendar.nonViable.infoTooltip')}
+								maxWidth={150}
+								position="left"
+							>
+								<Info size={18} color={theme.colors.text.secondary} />
+							</Tooltip>
+						</header>
+						{todaysNonViableEvents.map((event) => (
+							<CalendarEvent
+								event={event}
+								key={event.id}
+								selectedEvent={selectedEvent}
+								setSelectedEvent={setSelectedEvent}
+								setSelectedEventInfo={setSelectedEventInfo}
+								focused={focusedEventId === event.id}
+							/>
+						))}
+					</NonViableEventsContainer>
+				) : null;
+			})}
 
-      {/* Long Duration Events Overlays (>15h, non-procrastinate) */}
+			{/* Long Duration Events Overlays (>15h, non-procrastinate) */}
 			{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
 				const day = viewOptions.startDay.add(index, 'day');
 				const todaysLongDurationEvents = styledLongDurationEvents.filter((event) =>
@@ -702,131 +708,131 @@ const Calendar = ({
 				) : null;
 			})}
 
-      {/* Loading Overlay */}
-      <LoadingContainer $loading={eventsLoading}>
-        <Loader />
-      </LoadingContainer>
+			{/* Loading Overlay */}
+			<LoadingContainer $loading={eventsLoading}>
+				<Loader />
+			</LoadingContainer>
 
-      {/* Info Modal Overlay */}
-      {calendarEventInfoTrans((style, item) => (
-        <item.container style={style} key={item.key}>
-          {item.content}
-        </item.container>
-      ))}
+			{/* Info Modal Overlay */}
+			{calendarEventInfoTrans((style, item) => (
+				<item.container style={style} key={item.key}>
+					{item.content}
+				</item.container>
+			))}
 
-      {/* TODO: Create Type Modal Overlay */}
-      <CalendarModal
-        open={createSelection.state.isOpen}
-        onBackdropClick={createSelection.actions.close}
-        width={320}
-      >
-        <CalendarCreateSelection />
-      </CalendarModal>
+			{/* TODO: Create Type Modal Overlay */}
+			<CalendarModal
+				open={createSelection.state.isOpen}
+				onBackdropClick={createSelection.actions.close}
+				width={320}
+			>
+				<CalendarCreateSelection />
+			</CalendarModal>
 
-      {/* Create Block Modal Overlay */}
-      <CalendarModal
-        open={createBlock.state.isOpen}
-        onBackdropClick={createBlock.actions.close}
-        containerRef={createBlockModalContainerRef}
-        width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
-      />
-      {createBlockModalPortalTarget &&
-        createPortal(
-          <CalendarCreateBlock
-            refetchEvents={refetchEvents}
-            formHandler={createBlockFormHandler}
-          />,
-          createBlockModalPortalTarget
-        )}
+			{/* Create Block Modal Overlay */}
+			<CalendarModal
+				open={createBlock.state.isOpen}
+				onBackdropClick={createBlock.actions.close}
+				containerRef={createBlockModalContainerRef}
+				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
+			/>
+			{createBlockModalPortalTarget &&
+				createPortal(
+					<CalendarCreateBlock
+						refetchEvents={refetchEvents}
+						formHandler={createBlockFormHandler}
+					/>,
+					createBlockModalPortalTarget
+				)}
 
-      {/* Create Tile Modal Overlay */}
-      <CalendarModal
-        open={createTile.state.isOpen}
-        onBackdropClick={createTile.actions.close}
-        containerRef={createTileModalContainerRef}
-        width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
-      />
-      {createTileModalPortalTarget &&
-        createPortal(
-          <CalendarCreateTile
-            refetchEvents={refetchEvents}
-            formHandler={createTileFormHandler}
-          />,
-          createTileModalPortalTarget
-        )}
+			{/* Create Tile Modal Overlay */}
+			<CalendarModal
+				open={createTile.state.isOpen}
+				onBackdropClick={createTile.actions.close}
+				containerRef={createTileModalContainerRef}
+				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
+			/>
+			{createTileModalPortalTarget &&
+				createPortal(
+					<CalendarCreateTile
+						refetchEvents={refetchEvents}
+						formHandler={createTileFormHandler}
+					/>,
+					createTileModalPortalTarget
+				)}
 
-      {/* Calendar Content */}
-      <CalendarContentContainer
-        id="calendar-content-container"
-        ref={contentContainerRef}
-        data-onboarding-calendar-view
-      >
-        <Swiper
-          loop={false}
-          ref={swiperRef}
-          initialSlide={1}
-          onSlideNextTransitionStart={() => {
-            if (isSwiperResetting.current || !swiperRef.current) return;
-            changeDayView('right');
+			{/* Calendar Content */}
+			<CalendarContentContainer
+				id="calendar-content-container"
+				ref={contentContainerRef}
+				data-onboarding-calendar-view
+			>
+				<Swiper
+					loop={false}
+					ref={swiperRef}
+					initialSlide={1}
+					onSlideNextTransitionStart={() => {
+						if (isSwiperResetting.current || !swiperRef.current) return;
+						changeDayView('right');
 
-            isSwiperResetting.current = true;
-            setTimeout(() => {
-              swiperRef.current?.swiper.slideTo(1, 0, false);
-              setTimeout(() => (isSwiperResetting.current = false), 0);
-            }, 300);
-          }}
-          onSlidePrevTransitionStart={() => {
-            if (isSwiperResetting.current || !swiperRef.current) return;
-            changeDayView('left');
-            isSwiperResetting.current = true;
-            setTimeout(() => {
-              swiperRef.current?.swiper.slideTo(1, 0, false);
-              setTimeout(() => (isSwiperResetting.current = false), 0);
-            }, 300);
-          }}
-          allowTouchMove={true}
-          slidesPerView={1}
-          speed={300}
-          resistanceRatio={0.1}
-          threshold={10}
-        >
-          <SwiperSlide>
-            <CalendarContentDummy
-              viewOptions={viewOptions}
-              calendarGridCanvasRef={calendarGridPrevCanvasRef}
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <CalendarContent
-              events={events}
-              viewOptions={viewOptions}
-              styledEventsRef={styledEventsRef}
-              selectedEvent={selectedEvent}
-              setSelectedEvent={setSelectedEvent}
-              setSelectedEventInfo={setSelectedEventInfo}
-              calendarGridCanvasRef={calendarGridCanvasRef}
-              setStyledNonViableEvents={setStyledNonViableEvents}
-              setStyledLongDurationEvents={setStyledLongDurationEvents}
-              onBackgroundClick={(info) => {
-                onBackgroundClick(info);
-              }}
-              focusedEventId={focusedEventId}
-              onViableEventClicked={() => {
-                setShowNonViableEvents(null);
-                setShowLongDurationEvents(null);
-              }}
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <CalendarContentDummy
-              viewOptions={viewOptions}
-              calendarGridCanvasRef={calendarGridNextCanvasRef}
-            />
-          </SwiperSlide>
-        </Swiper>
-      </CalendarContentContainer>
-    </CalendarContainer>
-  );
+						isSwiperResetting.current = true;
+						setTimeout(() => {
+							swiperRef.current?.swiper.slideTo(1, 0, false);
+							setTimeout(() => (isSwiperResetting.current = false), 0);
+						}, 300);
+					}}
+					onSlidePrevTransitionStart={() => {
+						if (isSwiperResetting.current || !swiperRef.current) return;
+						changeDayView('left');
+						isSwiperResetting.current = true;
+						setTimeout(() => {
+							swiperRef.current?.swiper.slideTo(1, 0, false);
+							setTimeout(() => (isSwiperResetting.current = false), 0);
+						}, 300);
+					}}
+					allowTouchMove={true}
+					slidesPerView={1}
+					speed={300}
+					resistanceRatio={0.1}
+					threshold={10}
+				>
+					<SwiperSlide>
+						<CalendarContentDummy
+							viewOptions={viewOptions}
+							calendarGridCanvasRef={calendarGridPrevCanvasRef}
+						/>
+					</SwiperSlide>
+					<SwiperSlide>
+						<CalendarContent
+							events={events}
+							viewOptions={viewOptions}
+							styledEventsRef={styledEventsRef}
+							selectedEvent={selectedEvent}
+							setSelectedEvent={setSelectedEvent}
+							setSelectedEventInfo={setSelectedEventInfo}
+							calendarGridCanvasRef={calendarGridCanvasRef}
+							setStyledNonViableEvents={setStyledNonViableEvents}
+							setStyledLongDurationEvents={setStyledLongDurationEvents}
+							onBackgroundClick={(info) => {
+								onBackgroundClick(info);
+							}}
+							focusedEventId={focusedEventId}
+							onViableEventClicked={() => {
+								setShowNonViableEvents(null);
+								setShowLongDurationEvents(null);
+							}}
+						/>
+					</SwiperSlide>
+					<SwiperSlide>
+						<CalendarContentDummy
+							viewOptions={viewOptions}
+							calendarGridCanvasRef={calendarGridNextCanvasRef}
+						/>
+					</SwiperSlide>
+				</Swiper>
+			</CalendarContentContainer>
+		</CalendarContainer>
+	);
 };
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
@@ -907,7 +913,7 @@ const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	font-size: ${({ theme }) => theme.typography.fontSize.lg};
 	text-transform: uppercase;
 	color: ${({ $isToday, theme }) =>
-    $isToday ? theme.colors.calendar.headerDayTodayText : theme.colors.calendar.headerDayText};
+		$isToday ? theme.colors.calendar.headerDayTodayText : theme.colors.calendar.headerDayText};
 
 	border-bottom: 1px solid ${({ theme }) => theme.colors.calendar.border};
 
@@ -916,7 +922,7 @@ const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	}
 
 	background-color: ${({ $isToday, theme }) =>
-    $isToday ? theme.colors.calendar.headerTodayBg : theme.colors.calendar.headerBg};
+		$isToday ? theme.colors.calendar.headerTodayBg : theme.colors.calendar.headerBg};
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -924,9 +930,9 @@ const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 
 	span {
 		color: ${({ $isToday, theme }) =>
-    $isToday
-      ? theme.colors.calendar.headerDateTodayText
-      : theme.colors.calendar.headerDateText};
+			$isToday
+				? theme.colors.calendar.headerDateTodayText
+				: theme.colors.calendar.headerDateText};
 	}
 `;
 
@@ -1005,14 +1011,14 @@ const ShowNonViableEventsButton = styled.button<{ $active: boolean }>`
 `;
 
 const NonViableEventsContainer = styled.div<{
-  $visible: boolean;
-  $index: number;
-  $cellwidth: number;
+	$visible: boolean;
+	$index: number;
+	$cellwidth: number;
 }>`
 	position: absolute;
 	top: ${calendarConfig.HEADER_HEIGHT};
 	left: ${({ $cellwidth, $index }) =>
-    `${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
+		`${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
 	pacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
 
