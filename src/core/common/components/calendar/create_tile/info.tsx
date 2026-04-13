@@ -7,9 +7,6 @@ import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
-import { Bookmark, MapPin, X, Loader2, CheckCircle2 } from 'lucide-react';
-import { scheduleService } from '@/services';
-import { EventLocation } from '@/core/common/types/schedule';
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;

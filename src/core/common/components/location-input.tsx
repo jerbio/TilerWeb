@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Input from './input';
-import { ScheduleSubCalendarEventLocation } from '../types/schedule';
+import { EventLocation, LocationSource } from '@/core/common/types/schedule';
 import { useEffect, useRef, useState } from 'react';
 import { scheduleService } from '@/services';
 import { Bookmark, CheckCircle2, Loader2, MapPin, X } from 'lucide-react';
@@ -11,7 +11,7 @@ export type LocationInputController = {
   location: string;
   setLocation: (value: string) => void;
   clearLocation: () => void;
-  setFromSelection: (loc: ScheduleSubCalendarEventLocation) => void;
+  setFromSelection: (loc: EventLocation) => void;
 };
 
 type LocationInputProps = {
@@ -30,11 +30,11 @@ const LocationInput: React.FC<LocationInputProps> = ({
   const { t } = useTranslation();
   const { location, isVerified } = controller;
   const userEditedLocationRef = useRef(false);
-  const [locationResults, setLocationResults] = useState<ScheduleSubCalendarEventLocation[]>([]);
+  const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  function selectLocation(loc: ScheduleSubCalendarEventLocation) {
+  function selectLocation(loc: EventLocation) {
     controller.setFromSelection(loc);
     setLocationResults([]);
     setShowLocationDropdown(false);
@@ -85,6 +85,9 @@ const LocationInput: React.FC<LocationInputProps> = ({
         onFocus={() => {
           if (locationResults.length > 0) setShowLocationDropdown(true);
         }}
+        onBlur={() => {
+          setTimeout(() => setShowLocationDropdown(false), 150);
+        }}
       />
       {location && (
         <ClearButton type="button" onClick={clearLocation}>
@@ -112,8 +115,8 @@ const LocationInput: React.FC<LocationInputProps> = ({
         {!isSearching && showLocationDropdown && locationResults.length > 0 && (
           <Dropdown>
             {(() => {
-              const saved = locationResults.filter((l) => l.source !== 'google');
-              const google = locationResults.filter((l) => l.source === 'google');
+              const saved = locationResults.filter((l) => l.source !== LocationSource.Google);
+              const google = locationResults.filter((l) => l.source === LocationSource.Google);
               return (
                 <>
                   {saved.map((loc) => (

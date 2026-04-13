@@ -1,6 +1,10 @@
 import { ApiResponse } from './api';
 
 // ── Shared extracted types ──────────────────────────────────────
+export enum LocationSource {
+	Google = 'google'
+};
+
 export type EventColor = {
   colorSelection: number;
   r: number;

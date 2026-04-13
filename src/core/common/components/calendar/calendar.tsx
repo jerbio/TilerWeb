@@ -71,9 +71,11 @@ const Calendar = ({
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
+  // Ref holding all styled events (populated by CalendarEvents)
+  const styledEventsRef = useRef<StyledEvent[]>([]);
+
   const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
   const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
-
 
 	const [styledLongDurationEvents, setStyledLongDurationEvents] = useState<Array<StyledEvent>>([]);
 	const [showLongDurationEvents, setShowLongDurationEvents] = useState<dayjs.Dayjs | null>(null);
@@ -804,6 +806,7 @@ const Calendar = ({
               setSelectedEventInfo={setSelectedEventInfo}
               calendarGridCanvasRef={calendarGridCanvasRef}
               setStyledNonViableEvents={setStyledNonViableEvents}
+              setStyledLongDurationEvents={setStyledLongDurationEvents}
               onBackgroundClick={(info) => {
                 onBackgroundClick(info);
               }}
