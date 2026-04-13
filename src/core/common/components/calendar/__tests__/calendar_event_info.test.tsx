@@ -21,9 +21,7 @@ vi.mock('@/services', () => ({
 import { scheduleService } from '@/services';
 
 // Minimal mock event that satisfies the component's usage
-const createMockEvent = (
-	overrides: Partial<SubCalendarEvent> = {}
-): SubCalendarEvent =>
+const createMockEvent = (overrides: Partial<SubCalendarEvent> = {}): SubCalendarEvent =>
 	({
 		id: 'sub-event-id-123',
 		name: 'Test Event',
@@ -76,10 +74,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 	it('renders Complete, Now, and Defer action buttons when event is provided', () => {
 		renderWithProviders(
-			<CalendarEventInfo
-				event={createMockEvent()}
-				onEventAction={mockOnEventAction}
-			/>
+			<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 		);
 
 		expect(screen.getByTitle('Complete')).toBeInTheDocument();
@@ -88,9 +83,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	});
 
 	it('does not render action buttons when event is null', () => {
-		renderWithProviders(
-			<CalendarEventInfo event={null} onEventAction={mockOnEventAction} />
-		);
+		renderWithProviders(<CalendarEventInfo event={null} onEventAction={mockOnEventAction} />);
 
 		expect(screen.queryByTitle('Complete')).not.toBeInTheDocument();
 		expect(screen.queryByTitle('Now')).not.toBeInTheDocument();
@@ -104,10 +97,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -125,10 +115,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -144,10 +131,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			);
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -166,10 +150,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Now'));
@@ -187,10 +168,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Now'));
@@ -204,10 +182,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	describe('Defer action', () => {
 		it('shows duration picker when Defer button is clicked', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Defer'));
@@ -220,10 +195,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('hides action buttons and shows picker inputs when Defer is clicked', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Buttons visible initially
@@ -238,10 +210,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('hides duration picker when cancel is clicked', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Open picker
@@ -258,10 +227,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('confirm button is disabled when all durations are zero', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Defer'));
@@ -276,10 +242,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Open picker
@@ -316,10 +279,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Defer'));
@@ -336,10 +296,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('resets duration fields when picker is reopened', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Open picker and set values
@@ -365,14 +322,14 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			let resolveComplete: (value: any) => void;
 			vi.mocked(scheduleService.completeScheduleEvent).mockImplementation(
-				() => new Promise((resolve) => { resolveComplete = resolve; })
+				() =>
+					new Promise((resolve) => {
+						resolveComplete = resolve;
+					})
 			);
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -573,7 +530,11 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('calls deleteScheduleEvent with third-party fields when Delete is clicked', async () => {
 			vi.mocked(scheduleService.deleteScheduleEvent).mockResolvedValueOnce(
-				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<infer T> ? T : never
+				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<
+					infer T
+				>
+					? T
+					: never
 			);
 
 			renderWithProviders(

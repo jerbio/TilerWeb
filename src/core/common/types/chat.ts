@@ -72,7 +72,7 @@ export type ChatMessagesResponse = ApiResponse<{
 }>;
 
 export interface ChatMessagesParams extends PaginationParams {
-  anonymousUserId?: string;
+	anonymousUserId?: string;
 }
 
 export type ChatMessageBody = {

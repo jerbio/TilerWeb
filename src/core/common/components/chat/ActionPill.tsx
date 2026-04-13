@@ -130,20 +130,14 @@ const ActionPill: React.FC<ActionPillProps> = ({ action }) => {
 					setIsNavigating(false);
 					setIsDemoLimited(false);
 					showOverlay(
-						t(
-							'home.expanded.chat.tileCompleted',
-							'This event has been completed'
-						),
+						t('home.expanded.chat.tileCompleted', 'This event has been completed'),
 						'info'
 					);
 				} else if (result.status === CalendarRequestStatus.Deleted) {
 					setIsNavigating(false);
 					setIsDemoLimited(false);
 					showOverlay(
-						t(
-							'home.expanded.chat.tileDeleted',
-							'This event has been deleted'
-						),
+						t('home.expanded.chat.tileDeleted', 'This event has been deleted'),
 						'warning'
 					);
 				} else {

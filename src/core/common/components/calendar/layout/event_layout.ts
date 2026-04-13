@@ -22,7 +22,7 @@ export function computeStaggerLayout(
 		const startDiff = a.start - b.start;
 		if (startDiff !== 0) return startDiff;
 		// Same start: longer duration first (gets lower stagger level / behind)
-		return (b.end - b.start) - (a.end - a.start);
+		return b.end - b.start - (a.end - a.start);
 	});
 
 	// Track active events (events whose time range hasn't ended yet)
@@ -45,9 +45,7 @@ export function computeStaggerLayout(
 		}
 
 		// Only consider active events on the same day column (same x base)
-		const overlapping = active.filter(
-			(a) => a.x === event.x
-		);
+		const overlapping = active.filter((a) => a.x === event.x);
 
 		// Find the lowest available stagger level
 		const usedLevels = new Set(overlapping.map((a) => a.staggerLevel));

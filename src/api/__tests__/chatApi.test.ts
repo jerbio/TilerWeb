@@ -29,7 +29,7 @@ describe('ChatApi', () => {
 
 	it('builds base getMessages URL with SessionId', async () => {
 		fetchSpy.mockResolvedValueOnce(
-			new Response(JSON.stringify(mockMessagesResponse), { status: 200 }),
+			new Response(JSON.stringify(mockMessagesResponse), { status: 200 })
 		);
 
 		await api.getMessages('session id with spaces');
@@ -47,7 +47,7 @@ describe('ChatApi', () => {
 
 	it('appends pagination params for getMessages', async () => {
 		fetchSpy.mockResolvedValueOnce(
-			new Response(JSON.stringify(mockMessagesResponse), { status: 200 }),
+			new Response(JSON.stringify(mockMessagesResponse), { status: 200 })
 		);
 
 		await api.getMessages('session-1', {
@@ -70,7 +70,7 @@ describe('ChatApi', () => {
 
 	it('includes index=0 and batchSize=0 when explicitly set', async () => {
 		fetchSpy.mockResolvedValueOnce(
-			new Response(JSON.stringify(mockMessagesResponse), { status: 200 }),
+			new Response(JSON.stringify(mockMessagesResponse), { status: 200 })
 		);
 
 		await api.getMessages('session-1', {
@@ -88,10 +88,9 @@ describe('ChatApi', () => {
 
 	it('throws on non-200 response', async () => {
 		fetchSpy.mockResolvedValueOnce(
-			new Response(JSON.stringify({ error: 'Server error' }), { status: 500 }),
+			new Response(JSON.stringify({ error: 'Server error' }), { status: 500 })
 		);
 
 		await expect(api.getMessages('session-1')).rejects.toThrow();
 	});
 });
-

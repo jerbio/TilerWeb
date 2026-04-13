@@ -41,13 +41,18 @@ describe('FeedbackApi', () => {
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const [urlArg, options] = fetchSpy.mock.calls[0];
 			const urlStr =
-				urlArg instanceof Request ? urlArg.url : typeof urlArg === 'string' ? urlArg : String(urlArg);
+				urlArg instanceof Request
+					? urlArg.url
+					: typeof urlArg === 'string'
+						? urlArg
+						: String(urlArg);
 			expect(urlStr).toContain('api/User/Feedback');
 
 			const method = urlArg instanceof Request ? urlArg.method : options?.method;
 			expect(method).toBe('POST');
 
-			const bodyStr = urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
+			const bodyStr =
+				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
 			const body = JSON.parse(bodyStr);
 			expect(body).toEqual({
 				Category: 'Bug',

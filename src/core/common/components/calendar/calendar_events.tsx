@@ -12,7 +12,11 @@ import colorUtil, { RGB } from '@/core/util/colors';
 import calendarConfig from '@/core/constants/calendar_config';
 import { computeStaggerLayout } from './layout/event_layout';
 import { LayoutEvent } from './layout/event_layout.types';
-import { getStaggerIncrement, getMinEventHeight, MAX_STAGGER_RATIO } from './layout/event_layout.constants';
+import {
+	getStaggerIncrement,
+	getMinEventHeight,
+	MAX_STAGGER_RATIO,
+} from './layout/event_layout.constants';
 import { ScheduleLookupTravelDetail, SubCalendarEvent } from '@/core/common/types/schedule';
 import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
@@ -423,11 +427,16 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventPositioner = styled(animated.div)<{ $selected: boolean; $focused: boolean; $zIndex: number }>`
+const EventPositioner = styled(animated.div)<{
+	$selected: boolean;
+	$focused: boolean;
+	$zIndex: number;
+}>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: ${({ $selected, $focused, $zIndex }) => ($selected || $focused ? 999 : $zIndex || 'auto')};
+	z-index: ${({ $selected, $focused, $zIndex }) =>
+		$selected || $focused ? 999 : $zIndex || 'auto'};
 	display: flex;
 
 	&:hover {

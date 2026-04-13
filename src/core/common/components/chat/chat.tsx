@@ -27,35 +27,36 @@ import ActionPill from '@/core/common/components/chat/ActionPill';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
-  const [hasUnexecuted, setHasUnexecuted] = useState(false);
+	const [hasUnexecuted, setHasUnexecuted] = useState(false);
 
-  useEffect(() => {
-    const checkActions = async () => {
-      if (!requestId) {
-        setHasUnexecuted(false);
-        return;
-      }
+	useEffect(() => {
+		const checkActions = async () => {
+			if (!requestId) {
+				setHasUnexecuted(false);
+				return;
+			}
 
-      try {
-        const response = await chatService.getVibeRequest(requestId);
-        const isClosed = response?.Content?.vibeRequest?.isClosed;
-        setHasUnexecuted(isClosed !== true);
-      } catch (error) {
-        console.error('Error checking vibe request status:', error);
-        // Fallback to original logic if API fails
-        const fallback = messages.some((msg) =>
-          msg.actions?.some(
-            (action) => action.status !== Status.Executed && action.status !== Status.Exited
-          )
-        );
-        setHasUnexecuted(fallback);
-      }
-    };
+			try {
+				const response = await chatService.getVibeRequest(requestId);
+				const isClosed = response?.Content?.vibeRequest?.isClosed;
+				setHasUnexecuted(isClosed !== true);
+			} catch (error) {
+				console.error('Error checking vibe request status:', error);
+				// Fallback to original logic if API fails
+				const fallback = messages.some((msg) =>
+					msg.actions?.some(
+						(action) =>
+							action.status !== Status.Executed && action.status !== Status.Exited
+					)
+				);
+				setHasUnexecuted(fallback);
+			}
+		};
 
-    checkActions();
-  }, [requestId, messages]); // Re-check when requestId or messages change
+		checkActions();
+	}, [requestId, messages]); // Re-check when requestId or messages change
 
-  return hasUnexecuted;
+	return hasUnexecuted;
 };
 
 const ChatWrapper = styled.section`
@@ -240,8 +241,10 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 	margin: 0.5rem 0;
 
 	.message-content {
-		background-color: ${({ $isUser, theme }) => ($isUser ? theme.colors.background.card2 : theme.colors.brand[500])};
-		color: ${({ $isUser, theme }) => ($isUser ? theme.colors.text.primary : theme.colors.white)};
+		background-color: ${({ $isUser, theme }) =>
+			$isUser ? theme.colors.background.card2 : theme.colors.brand[500]};
+		color: ${({ $isUser, theme }) =>
+			$isUser ? theme.colors.text.primary : theme.colors.white};
 		padding: 0.75rem 1rem;
 		border-radius: 1rem;
 		max-width: 70%;
@@ -250,7 +253,7 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 `;
 
 type ChatProps = {
-  onClose?: () => void;
+	onClose?: () => void;
 };
 
 const MESSAGE_BATCH_SIZE = 10;
@@ -258,824 +261,854 @@ const ACTION_BATCH_SIZE = 10;
 const SCROLL_TOP_THRESHOLD = 40;
 
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-
-  // Get the active persona session - single source of truth
-  const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
-  const updateActivePersonaSession = useAppStore((state) => state.updateActivePersonaSession);
-  const setScheduleId = useAppStore((state) => state.setScheduleId);
-  const activePersonaSession = getActivePersonaSession();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesListRef = useRef<HTMLDivElement>(null);
-  const webSocketCommunication = useRef<SignalRService | null>(null);
-  const actionsByIdRef = useRef<Record<string, VibeAction>>({});
-  const nextMessageIndexRef = useRef(0);
-  const shouldPreserveScrollPositionRef = useRef(false);
-  const shouldAutoScrollToBottomRef = useRef(false);
-  const previousScrollHeightRef = useRef(0);
-  const previousScrollTopRef = useRef(0);
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<PromptWithActions[]>([]);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isBatchLoading, setIsBatchLoading] = useState(false);
-  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
-  const [hasMoreMessages, setHasMoreMessages] = useState(false);
-  const [requestId, setRequestId] = useState<string | null>(null);
-  const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
-  const [wsStatusKey, setWsStatusKey] = useState<string | null>(null);
-  const [showErrorPopup, setShowErrorPopup] = useState(false);
-  const [errorPopupMessage, setErrorPopupMessage] = useState('');
-  const [showSessionHistory, setShowSessionHistory] = useState(false);
-  const [currentSessionTitle, setCurrentSessionTitle] = useState<string | null>(null);
-  
-  // Track chat component mount
-  useEffect(() => {
-    analytics.trackChatEvent('Chat Opened', {
-      personaId: selectedPersonaId,
-      hasExistingSession: !!sessionId,
-    });
-  }, []); // Only on mount
-  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
-  const [submittedEmail, setSubmittedEmail] = useState('');
-
-  // Extract values from active persona session
-  const chatContext = activePersonaSession?.chatContext || [];
-  const scheduleId = activePersonaSession?.scheduleId;
-  const selectedPersonaId = activePersonaSession?.personaId;
-  const anonymousUserId = activePersonaSession?.userInfo?.id ?? activePersonaSession?.userId ?? '';
-  const entityId = chatContext.length > 0 ? chatContext[0].EntityId : '';
-  
-  const handleSetScheduleId = (id: string) => {
-    setScheduleId(id);
-  };
-
-  // Sync chat session ID with the active persona session
-  useEffect(() => {
-    if (sessionId && activePersonaSession && activePersonaSession.chatSessionId !== sessionId) {
-      updateActivePersonaSession({ chatSessionId: sessionId });
-    }
-  }, [sessionId, activePersonaSession, updateActivePersonaSession]);
-
-  // No need to sync userInfo.id when selectedPersonaId changes anymore,
-  // as the persona session is set by PersonaCardExpanded component
-  // This prevents duplicate logic and ensures single source of truth
-
-  // Format WebSocket status for display (internationalized)
-  const formatWebSocketStatus = (status: string): string => {
-    const statusMap: Record<string, string[]> = {
-      'action_initialization_start': [
-        t('home.expanded.chat.wsStatus.actionInitStart1'),
-        t('home.expanded.chat.wsStatus.actionInitStart2'),
-        t('home.expanded.chat.wsStatus.actionInitStart3'),
-        t('home.expanded.chat.wsStatus.actionInitStart4'),
-      ],
-      'process_action_start': [
-        t('home.expanded.chat.wsStatus.processActionStart1'),
-        t('home.expanded.chat.wsStatus.processActionStart2'),
-        t('home.expanded.chat.wsStatus.processActionStart3'),
-        t('home.expanded.chat.wsStatus.processActionStart4'),
-      ],
-      'process_action_end': [
-        t('home.expanded.chat.wsStatus.processActionEnd1'),
-        t('home.expanded.chat.wsStatus.processActionEnd2'),
-        t('home.expanded.chat.wsStatus.processActionEnd3'),
-        t('home.expanded.chat.wsStatus.processActionEnd4'),
-      ],
-      'summary_action_start': [
-        t('home.expanded.chat.wsStatus.summaryStart1'),
-        t('home.expanded.chat.wsStatus.summaryStart2'),
-        t('home.expanded.chat.wsStatus.summaryStart3'),
-        t('home.expanded.chat.wsStatus.summaryStart4'),
-      ],
-      'summary_action_end': [
-        t('home.expanded.chat.wsStatus.summaryEnd1'),
-        t('home.expanded.chat.wsStatus.summaryEnd2'),
-        t('home.expanded.chat.wsStatus.summaryEnd3'),
-        t('home.expanded.chat.wsStatus.summaryEnd4'),
-      ],
-      'schedule_load': [
-        t('home.expanded.chat.wsStatus.scheduleLoad1'),
-        t('home.expanded.chat.wsStatus.scheduleLoad2'),
-        t('home.expanded.chat.wsStatus.scheduleLoad3'),
-        t('home.expanded.chat.wsStatus.scheduleLoad4'),
-      ],
-      'schedule_process_start': [
-        t('home.expanded.chat.wsStatus.scheduleProcessStart1'),
-        t('home.expanded.chat.wsStatus.scheduleProcessStart2'),
-        t('home.expanded.chat.wsStatus.scheduleProcessStart3'),
-        t('home.expanded.chat.wsStatus.scheduleProcessStart4'),
-      ],
-      'schedule_process_end': [
-        t('home.expanded.chat.wsStatus.scheduleProcessEnd1'),
-        t('home.expanded.chat.wsStatus.scheduleProcessEnd2'),
-        t('home.expanded.chat.wsStatus.scheduleProcessEnd3'),
-        t('home.expanded.chat.wsStatus.scheduleProcessEnd4'),
-      ],
-    };
-
-    const messages = statusMap[status];
-    if (messages && messages.length > 0) {
-      const randomIndex = Math.floor(Math.random() * messages.length);
-      return messages[randomIndex];
-    }
-
-    // Fallback for unmapped statuses
-    return status.replace(/_/g, ' ').toLowerCase();
-  };
-
-  useEffect(() => {
-    if (!anonymousUserId) return;
-
-    webSocketCommunication.current = new SignalRService(anonymousUserId);
-    webSocketCommunication.current.createConnection();
-    webSocketCommunication.current.subscribeToSocketDataReceipt((data: unknown) => {
-      // Type guard and extract vibe data from WebSocket
-      if (
-        data &&
-        typeof data === 'object' &&
-        'data' in data &&
-        data.data &&
-        typeof data.data === 'object' &&
-        'vibe' in data.data &&
-        data.data.vibe &&
-        typeof data.data.vibe === 'object' &&
-        'status' in data.data.vibe &&
-        typeof data.data.vibe.status === 'string'
-      ) {
-        const rawStatus = data.data.vibe.status;
-        const formattedStatus = formatWebSocketStatus(rawStatus);
-        setWsStatusKey(rawStatus);
-        setWebSocketStatus(formattedStatus);
-      }
-    });
-
-    return () => {
-      if (webSocketCommunication.current) {
-        webSocketCommunication.current = null;
-      }
-    };
-  }, [anonymousUserId]);
-
-  // Fetch sessions and set latest sessionId on component mount or when persona changes
-  useEffect(() => {
-    const fetchAndSetLatestSession = async () => {
-      try {
-        const personaUserId = activePersonaSession?.userId;
-
-        if (personaUserId) {
-          const sessionsResponse = await chatService.getVibeSessions(undefined, personaUserId);
-          const sessions = sessionsResponse.Content.vibeSessions;
-
-          if (sessions && sessions.length > 0) {
-            // Sort sessions by creation time (newest first) and get the latest one
-            const latestSession = sessions.sort((a, b) => b.creationTimeInMs - a.creationTimeInMs)[0];
-            setSessionId(latestSession.id);
-            setCurrentSessionTitle(latestSession.title || null);
-          } else {
-            // No sessions found, clear sessionId
-            setSessionId('');
-            setCurrentSessionTitle(null);
-          }
-        } else {
-          // No persona selected, clear sessionId
-          setSessionId('');
-        }
-      } catch (error) {
-        console.warn('Failed to fetch sessions:', error);
-        // Clear sessionId on error
-        setSessionId('');
-      }
-    };
-
-    fetchAndSetLatestSession();
-  }, [activePersonaSession?.userId, activePersonaSession?.personaId]);
-
-  const extractTimestamp = useCallback((id: string): number => {
-    const match = id.match(/(\d{18})/);
-    return match ? parseInt(match[1], 10) : 0;
-  }, []);
-
-  const sortMessagesChronologically = useCallback(
-    (sourceMessages: PromptWithActions[]) =>
-      [...sourceMessages].sort((a, b) => extractTimestamp(a.id) - extractTimestamp(b.id)),
-    [extractTimestamp]
-  );
-
-  const mergeMessages = useCallback(
-    (existingMessages: PromptWithActions[], incomingMessages: PromptWithActions[]) => {
-      const merged = new Map(existingMessages.map((entry) => [entry.id, entry]));
-
-      incomingMessages.forEach((incoming) => {
-        const previous = merged.get(incoming.id);
-        if (previous) {
-          merged.set(incoming.id, {
-            ...previous,
-            ...incoming,
-            actions: incoming.actions.length > 0 ? incoming.actions : previous.actions,
-            actionIds: incoming.actionIds ?? previous.actionIds,
-          });
-        } else {
-          merged.set(incoming.id, incoming);
-        }
-      });
-
-      return sortMessagesChronologically(Array.from(merged.values()));
-    },
-    [sortMessagesChronologically]
-  );
-
-  const mapMessagesWithActions = useCallback((rawMessages: PromptWithActions[]) => {
-    return rawMessages.map((entry) => {
-      const actionIds = entry.actionIds ?? [];
-      const resolvedActions = actionIds
-        .map((id) => actionsByIdRef.current[id])
-        .filter((action): action is VibeAction => Boolean(action));
-
-      return {
-        id: entry.id,
-        origin: entry.origin,
-        content: entry.content,
-        actionId: entry.actionId,
-        requestId: entry.requestId,
-        sessionId: entry.sessionId,
-        actionIds,
-        actions: resolvedActions,
-      };
-    });
-  }, []);
-
-  const fetchActionsForMessages = useCallback(async (rawMessages: PromptWithActions[]) => {
-    const uniqueActionIds = Array.from(
-      new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
-    );
-    const missingActionIds = uniqueActionIds.filter((id) => !actionsByIdRef.current[id]);
-
-    if (!missingActionIds.length) return;
-
-    setIsBatchLoading(true);
-    try {
-      for (let i = 0; i < missingActionIds.length; i += ACTION_BATCH_SIZE) {
-        const batch = missingActionIds.slice(i, i + ACTION_BATCH_SIZE);
-        try {
-          const fetchedActions = await chatService.getActions(batch);
-          fetchedActions.forEach((action) => {
-            actionsByIdRef.current[action.id] = action;
-          });
-        } catch (error) {
-          console.error('Error fetching action batch:', error);
-        }
-      }
-    } finally {
-      setIsBatchLoading(false);
-    }
-  }, []);
-
-  const loadInitialChatMessages = useCallback(
-    async (sid?: string) => {
-      setIsLoading(true);
-      setError(null);
-      setMessages([]);
-      setRequestId(null);
-      setHasMoreMessages(false);
-      nextMessageIndexRef.current = 0;
-      actionsByIdRef.current = {};
-      shouldPreserveScrollPositionRef.current = false;
-      shouldAutoScrollToBottomRef.current = false;
-
-      try {
-        const devUserIdOverride = useAppStore.getState().devUserIdOverride;
-        const isDevMode = !!devUserIdOverride;
-
-        if (!isDevMode && isDemoMode()) {
-          const { chatMessages } = getDemoData();
-          setMessages(sortMessagesChronologically(chatMessages));
-          setRequestId(chatMessages[chatMessages.length - 1]?.requestId || 'request-demo-001');
-          setHasMoreMessages(false);
-          shouldAutoScrollToBottomRef.current = true;
-          return;
-        }
-
-        if (!sid) return;
-
-        const data = await chatService.getMessages(sid, {
-          index: 0,
-          batchSize: MESSAGE_BATCH_SIZE,
-          order: 'desc',
-          anonymousUserId: anonymousUserId || undefined,
-        });
-
-        const rawMessages = data.Content.chats || [];
-        if (!rawMessages.length) {
-          setHasMoreMessages(false);
-          return;
-        }
-
-        setIsLoading(false);
-        await fetchActionsForMessages(rawMessages);
-        const hydratedMessages = mapMessagesWithActions(rawMessages);
-        const sortedMessages = sortMessagesChronologically(hydratedMessages);
-
-        setMessages(sortedMessages);
-        setRequestId(sortedMessages[sortedMessages.length - 1]?.requestId || null);
-        setHasMoreMessages(rawMessages.length === MESSAGE_BATCH_SIZE);
-        nextMessageIndexRef.current = rawMessages.length;
-        shouldAutoScrollToBottomRef.current = true;
-      } catch (err) {
-        if (err instanceof Error) setError(err.message);
-        else setError(t('home.expanded.chat.errorLoadMessages'));
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [anonymousUserId, fetchActionsForMessages, mapMessagesWithActions, sortMessagesChronologically, t]
-  );
-
-  const loadOlderMessages = useCallback(async () => {
-    if (!sessionId || isLoading || isLoadingOlderMessages || !hasMoreMessages) return;
-
-    const messagesList = messagesListRef.current;
-    if (messagesList) {
-      previousScrollHeightRef.current = messagesList.scrollHeight;
-      previousScrollTopRef.current = messagesList.scrollTop;
-      shouldPreserveScrollPositionRef.current = true;
-    }
-
-    setIsLoadingOlderMessages(true);
-    try {
-      const data = await chatService.getMessages(sessionId, {
-        index: nextMessageIndexRef.current,
-        batchSize: MESSAGE_BATCH_SIZE,
-        order: 'desc',
-        anonymousUserId: anonymousUserId || undefined,
-      });
-
-      const rawMessages = data.Content.chats || [];
-      if (!rawMessages.length) {
-        setHasMoreMessages(false);
-        shouldPreserveScrollPositionRef.current = false;
-        return;
-      }
-
-      await fetchActionsForMessages(rawMessages);
-      const hydratedMessages = mapMessagesWithActions(rawMessages);
-
-      setMessages((prevMessages) => mergeMessages(prevMessages, hydratedMessages));
-      nextMessageIndexRef.current += rawMessages.length;
-      setHasMoreMessages(rawMessages.length === MESSAGE_BATCH_SIZE);
-    } catch (err) {
-      shouldPreserveScrollPositionRef.current = false;
-      if (err instanceof Error) setError(err.message);
-      else setError(t('home.expanded.chat.errorLoadMessages'));
-    } finally {
-      setIsLoadingOlderMessages(false);
-    }
-  }, [
-    anonymousUserId,
-    fetchActionsForMessages,
-    hasMoreMessages,
-    isLoading,
-    isLoadingOlderMessages,
-    mapMessagesWithActions,
-    mergeMessages,
-    sessionId,
-    t,
-  ]);
-
-  // Load chat messages when relevant dependencies change
-  useEffect(() => {
-    loadInitialChatMessages(sessionId);
-  }, [loadInitialChatMessages, scheduleId, selectedPersonaId, sessionId]);
-
-  useEffect(() => {
-    const messagesList = messagesListRef.current;
-    if (!messagesList) return;
-
-    const handleScroll = () => {
-      if (messagesList.scrollTop <= SCROLL_TOP_THRESHOLD) {
-        loadOlderMessages();
-      }
-    };
-
-    messagesList.addEventListener('scroll', handleScroll);
-    return () => messagesList.removeEventListener('scroll', handleScroll);
-  }, [loadOlderMessages]);
-
-  useLayoutEffect(() => {
-    const messagesList = messagesListRef.current;
-    if (!messagesList || messages.length === 0) return;
-
-    if (shouldPreserveScrollPositionRef.current) {
-      const scrollDelta = messagesList.scrollHeight - previousScrollHeightRef.current;
-      messagesList.scrollTop = previousScrollTopRef.current + scrollDelta;
-      shouldPreserveScrollPositionRef.current = false;
-      return;
-    }
-
-    if (shouldAutoScrollToBottomRef.current) {
-      messagesList.scrollTop = messagesList.scrollHeight;
-      shouldAutoScrollToBottomRef.current = false;
-    }
-  }, [messages]);
-
-  const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || isSending) return;
-
-    // Track message send
-    analytics.trackChatEvent('Message Sent', {
-      messageLength: message.length,
-      hasContext: chatContext.length > 0,
-      personaId: selectedPersonaId,
-    });
-
-    try {
-      setIsSending(true);
-      setError(null);
-      setWebSocketStatus(null); // Reset status to prepare for new updates
-      setWsStatusKey(null);
-
-      // Get current location data
-      const locationData = await locationService.getCurrentLocation();
-      const locationApiData = locationService.toApiFormat(locationData);
-
-      const response = await chatService.sendMessage(
-        message,
-        entityId,
-        sessionId,
-        anonymousUserId,
-        locationApiData.userLongitude,
-        locationApiData.userLatitude,
-        locationApiData.userLocationVerified
-      );
-      if (
-        response?.Content?.vibeResponse?.tilerUser &&
-        response.Content.vibeResponse.tilerUser?.id !==
-        activePersonaSession?.userInfo?.id
-      ) {
-        updateActivePersonaSession({ userInfo: response.Content.vibeResponse.tilerUser });
-      }
-      const promptMap = response?.Content?.vibeResponse?.prompts || {};
-
-      // Convert the prompt map to PromptWithActions[]
-      const newMessages: PromptWithActions[] = Object.values(promptMap).map(
-        (entry: PromptWithActions) => ({
-          id: entry.id,
-          origin: entry.origin,
-          content: entry.content,
-          actionId: entry.actionId,
-          requestId: entry.requestId,
-          sessionId: entry.sessionId,
-          actions: (entry.actions ?? []).map((action: VibeAction) => ({
-            id: action.id,
-            descriptions: action.descriptions,
-            type: action.type,
-            creationTimeInMs: action.creationTimeInMs,
-            status: action.status,
-            entityId: action.entityId,
-            entityType: action.entityType,
-            beforeScheduleId: action.beforeScheduleId,
-            afterScheduleId: action.afterScheduleId,
-            prompts: action.prompts ?? [],
-            vibeRequest: action.vibeRequest
-              ? {
-                id: action.vibeRequest.id,
-                creationTimeInMs: action.vibeRequest.creationTimeInMs,
-                activeAction: action.vibeRequest.activeAction,
-                isClosed: action.vibeRequest.isClosed ?? false,
-                beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
-                afterScheduleId: action.vibeRequest.afterScheduleId || null,
-                actions: action.vibeRequest.actions || [],
-                previews: action.vibeRequest.previews || [],
-              }
-              : null,
-          })),
-        })
-      );
-
-      newMessages.forEach((newMessage) => {
-        (newMessage.actions || []).forEach((action) => {
-          actionsByIdRef.current[action.id] = action;
-        });
-      });
-
-      shouldAutoScrollToBottomRef.current = true;
-      setMessages((prevMessages) => mergeMessages(prevMessages, newMessages));
-      setRequestId(newMessages[newMessages.length - 1]?.requestId || null);
-      nextMessageIndexRef.current += newMessages.length;
-
-      // Update session ID from the first prompt
-      const sessionIdFromResponse = newMessages[0]?.sessionId;
-      if (sessionIdFromResponse) {
-        setSessionId(sessionIdFromResponse);
-      }
-
-      setMessage('');
-    } catch (err) {
-      if (err instanceof ChatLimitError) {
-        analytics.trackError('Chat Limit Reached', { personaId: selectedPersonaId });
-        setErrorPopupMessage(err.message);
-        setShowErrorPopup(true);
-      } else if (err instanceof Error) {
-        analytics.trackError('Chat Message Send Failed', {
-          errorMessage: err.message,
-          personaId: selectedPersonaId,
-        });
-        setError(err.message);
-      } else {
-        setError(t('home.expanded.chat.errorSendMessage'));
-      }
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const acceptAllChanges = async () => {
-    // Track accept changes action
-    analytics.trackChatEvent('Accept Changes', {
-      requestId: requestId || undefined,
-      personaId: selectedPersonaId,
-    });
-
-    try {
-      setIsSending(true);
-      setError(null);
-      setWebSocketStatus(null); // Reset status to prepare for new updates
-      setWsStatusKey(null);
-      // Get current location data
-      const locationData = await locationService.getCurrentLocation();
-      const locationApiData = locationService.toApiFormat(locationData);
-
-      const executedChanges = await chatService.sendChatAcceptChanges(
-        requestId,
-        anonymousUserId,
-        locationApiData.userLongitude,
-        locationApiData.userLatitude,
-        locationApiData.userLocationVerified
-      );
-      const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
-      if (newScheduleId) {
-        handleSetScheduleId(newScheduleId);
-        // useEffect will automatically reload messages when scheduleId changes
-      }
-    } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError(t('home.expanded.chat.errorAcceptChanges'));
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const handleNewChat = () => {
-    analytics.trackChatEvent('New Chat Started', {
-      personaId: selectedPersonaId,
-      previousSessionId: sessionId,
-    });
-
-    setSessionId('');
-    setError(null);
-    setMessage('');
-    setMessages([]);
-    setRequestId(null);
-    setCurrentSessionTitle(null);
-    handleSetScheduleId('');
-    // Clear chat context when starting a new chat
-    if (activePersonaSession) {
-      updateActivePersonaSession({ 
-        chatContext: [],
-        chatSessionId: '' 
-      });
-    }
-  };
-
-  const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
-
-  const handleRemoveContext = (context: ChatContextType) => {
-    analytics.trackChatEvent('Context Removed', {
-      contextName: context.Name,
-      contextEntityId: context.EntityId,
-      personaId: selectedPersonaId,
-    });
-    removeChatContext(context); // Remove the clicked context
-  };
-
-  const handleEmailSubmitted = (email: string) => {
-    setSubmittedEmail(email);
-    setShowErrorPopup(false); // Close chat limit modal
-    setShowEmailConfirmation(true); // Show confirmation modal
-  };
-
-  const handlePromptClick = (prompt: string) => {
-    setMessage(prompt);
-    // Auto-submit by creating a synthetic form event
-    const syntheticEvent = {
-      preventDefault: () => {},
-    } as FormEvent;
-    // Set message first, then trigger submit on next tick
-    setTimeout(() => {
-      handleSubmit(syntheticEvent);
-    }, 0);
-  };
-
-  const handleSessionSelect = (session: VibeSession) => {
-    // Skip if selecting the already-active session
-    if (session.id === sessionId) return;
-
-    // Clear current state before loading new session
-    setMessages([]);
-    setError(null);
-    setMessage('');
-    setRequestId(null);
-    setCurrentSessionTitle(session.title || null);
-    setSessionId(session.id);
-    // loadChatMessages will be triggered by the sessionId useEffect
-  };
-
-  return (
-    <ChatWrapper>
-      <ChatContainer>
-        <ChatHeader>
-          <ChatHeaderLeft>
-            {onClose && (
-              <Button variant="ghost" height={32} onClick={onClose}>
-                <ChevronLeftIcon size={16} />
-                <span>{t('common.buttons.back')}</span>
-              </Button>
-            )}
-            <HistoryButton
-              onClick={() => setShowSessionHistory(true)}
-              title={t('home.expanded.chat.sessionHistory.title')}
-            >
-              <History size={18} />
-            </HistoryButton>
-          </ChatHeaderLeft>
-
-          <ChatHeaderCenter>
-            {currentSessionTitle && (
-              <SessionTitleDisplay title={currentSessionTitle}>
-                {currentSessionTitle}
-              </SessionTitleDisplay>
-            )}
-          </ChatHeaderCenter>
-
-          <ChatHeaderRight>
-            {chatContext.length > 0 && (
-              <ChatContextChips>
-                {chatContext.map((context, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.25rem 0.5rem',
-                      border: '1px solid currentColor',
-                      fontSize: theme.typography.fontSize.xs,
-                    }}
-                  >
-                    <span>{context.Name}</span>
-                    <span
-                      onClick={() => handleRemoveContext(context)}
-                      style={{
-                        marginLeft: '0.5rem',
-                        color: 'red',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      x
-                    </span>
-                  </Button>
-                ))}
-              </ChatContextChips>
-            )}
-            <NewChatHeaderButton
-              onClick={handleNewChat}
-              title={t('home.expanded.chat.newChat')}
-            >
-              <SquarePen size={18} />
-            </NewChatHeaderButton>
-          </ChatHeaderRight>
-        </ChatHeader>
-        <ChatContent>
-          {isLoading && (
-            <LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
-          )}
-          {isBatchLoading && (
-            <LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
-          )}
-
-          {error && (
-            <div className="chat-error">
-              {t('home.expanded.chat.error')}: {error}
-            </div>
-          )}
-
-          {!isLoading && !error && !messages.length && (
-            <EmptyChat>
-              <Logo size={48} />
-              <h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
-              <p>{t('home.expanded.chat.emptyStateDescription')}</p>
-            </EmptyChat>
-          )}
-
-          <div className="messages-list" ref={messagesListRef} data-onboarding-chat-messages>
-            {messages.map((message) => (
-              <MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-                <div className="message-content">
-                  <MarkdownRenderer content={message.content} />
-                </div>
-
-                {message.actions?.filter(action => action.type !== 'conversational_and_not_supported').map((action) => (
-                  <ActionPill key={action.id} action={action} />
-                ))}
-              </MessageBubble>
-            ))}
-          </div>
-
-          <div ref={messagesEndRef} />
-        </ChatContent>
-
-        {/* Render chatContext buttons */}
-        <div style={{ marginBottom: '0.25rem' }}></div>
-
-        <div>
-          {isSending && (
-            <LoadingIndicator
-              message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
-              wsStatus={wsStatusKey}
-            />
-          )}
-          {((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
-            <Button variant="primary" onClick={() => acceptAllChanges()} data-onboarding-accept-button>
-              {t('home.expanded.chat.acceptChanges')}
-            </Button>
-          )}
-        </div>
-
-        {/* Show prompt suggestions when input field is empty */}
-        {!message.trim() && (
-          <PromptSuggestions onPromptClick={handlePromptClick} />
-        )}
-
-        <ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
-          <Input.Textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              // Submit form on Enter key press without Shift key
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Prevent new line
-
-                // Use form.requestSubmit() instead of handleSubmit directly
-                // This triggers a single form submission through the standard form mechanism
-                const form = e.currentTarget.form;
-                if (form) form.requestSubmit();
-              }
-            }}
-            placeholder={t('home.expanded.chat.inputPlaceholder')}
-            disabled={isSending}
-            bordergradient={[theme.colors.brand[500]]}
-            height={50} // Set a fixed height for consistent alignment
-          />
-          <ChatButton type="submit" disabled={isSending || !message.trim()} data-onboarding-chat-button>
-            {isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
-          </ChatButton>
-        </ChatForm>
-        <UserLocation />
-      </ChatContainer>
-
-      {anonymousUserId && <ErrorPopup
-        isOpen={showErrorPopup}
-        message={errorPopupMessage}
-        title={t('home.expanded.chat.errorPopup.chatLimitReached')}
-        onClose={() => setShowErrorPopup(false)}
-        showWaitlistButton={true}
-        onEmailSubmitted={handleEmailSubmitted}
-        tilerUserId={anonymousUserId}
-      />}
-
-      <EmailConfirmationModal
-        isOpen={showEmailConfirmation}
-        email={submittedEmail}
-        onClose={() => setShowEmailConfirmation(false)}
-      />
-
-      <SessionHistory
-        isOpen={showSessionHistory}
-        onClose={() => setShowSessionHistory(false)}
-        currentSessionId={sessionId}
-        onSessionSelect={handleSessionSelect}
-        onNewChat={handleNewChat}
-        userId={activePersonaSession?.userId}
-      />
-    </ChatWrapper>
-  );
+	const { t } = useTranslation();
+	const theme = useTheme();
+
+	// Get the active persona session - single source of truth
+	const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
+	const updateActivePersonaSession = useAppStore((state) => state.updateActivePersonaSession);
+	const setScheduleId = useAppStore((state) => state.setScheduleId);
+	const activePersonaSession = getActivePersonaSession();
+	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const messagesListRef = useRef<HTMLDivElement>(null);
+	const webSocketCommunication = useRef<SignalRService | null>(null);
+	const actionsByIdRef = useRef<Record<string, VibeAction>>({});
+	const nextMessageIndexRef = useRef(0);
+	const shouldPreserveScrollPositionRef = useRef(false);
+	const shouldAutoScrollToBottomRef = useRef(false);
+	const previousScrollHeightRef = useRef(0);
+	const previousScrollTopRef = useRef(0);
+	const [message, setMessage] = useState('');
+	const [messages, setMessages] = useState<PromptWithActions[]>([]);
+	const [isSending, setIsSending] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [sessionId, setSessionId] = useState<string>('');
+	const [isLoading, setIsLoading] = useState(false);
+	const [isBatchLoading, setIsBatchLoading] = useState(false);
+	const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
+	const [hasMoreMessages, setHasMoreMessages] = useState(false);
+	const [requestId, setRequestId] = useState<string | null>(null);
+	const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
+	const [wsStatusKey, setWsStatusKey] = useState<string | null>(null);
+	const [showErrorPopup, setShowErrorPopup] = useState(false);
+	const [errorPopupMessage, setErrorPopupMessage] = useState('');
+	const [showSessionHistory, setShowSessionHistory] = useState(false);
+	const [currentSessionTitle, setCurrentSessionTitle] = useState<string | null>(null);
+
+	// Track chat component mount
+	useEffect(() => {
+		analytics.trackChatEvent('Chat Opened', {
+			personaId: selectedPersonaId,
+			hasExistingSession: !!sessionId,
+		});
+	}, []); // Only on mount
+	const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+	const [submittedEmail, setSubmittedEmail] = useState('');
+
+	// Extract values from active persona session
+	const chatContext = activePersonaSession?.chatContext || [];
+	const scheduleId = activePersonaSession?.scheduleId;
+	const selectedPersonaId = activePersonaSession?.personaId;
+	const anonymousUserId =
+		activePersonaSession?.userInfo?.id ?? activePersonaSession?.userId ?? '';
+	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : '';
+
+	const handleSetScheduleId = (id: string) => {
+		setScheduleId(id);
+	};
+
+	// Sync chat session ID with the active persona session
+	useEffect(() => {
+		if (sessionId && activePersonaSession && activePersonaSession.chatSessionId !== sessionId) {
+			updateActivePersonaSession({ chatSessionId: sessionId });
+		}
+	}, [sessionId, activePersonaSession, updateActivePersonaSession]);
+
+	// No need to sync userInfo.id when selectedPersonaId changes anymore,
+	// as the persona session is set by PersonaCardExpanded component
+	// This prevents duplicate logic and ensures single source of truth
+
+	// Format WebSocket status for display (internationalized)
+	const formatWebSocketStatus = (status: string): string => {
+		const statusMap: Record<string, string[]> = {
+			action_initialization_start: [
+				t('home.expanded.chat.wsStatus.actionInitStart1'),
+				t('home.expanded.chat.wsStatus.actionInitStart2'),
+				t('home.expanded.chat.wsStatus.actionInitStart3'),
+				t('home.expanded.chat.wsStatus.actionInitStart4'),
+			],
+			process_action_start: [
+				t('home.expanded.chat.wsStatus.processActionStart1'),
+				t('home.expanded.chat.wsStatus.processActionStart2'),
+				t('home.expanded.chat.wsStatus.processActionStart3'),
+				t('home.expanded.chat.wsStatus.processActionStart4'),
+			],
+			process_action_end: [
+				t('home.expanded.chat.wsStatus.processActionEnd1'),
+				t('home.expanded.chat.wsStatus.processActionEnd2'),
+				t('home.expanded.chat.wsStatus.processActionEnd3'),
+				t('home.expanded.chat.wsStatus.processActionEnd4'),
+			],
+			summary_action_start: [
+				t('home.expanded.chat.wsStatus.summaryStart1'),
+				t('home.expanded.chat.wsStatus.summaryStart2'),
+				t('home.expanded.chat.wsStatus.summaryStart3'),
+				t('home.expanded.chat.wsStatus.summaryStart4'),
+			],
+			summary_action_end: [
+				t('home.expanded.chat.wsStatus.summaryEnd1'),
+				t('home.expanded.chat.wsStatus.summaryEnd2'),
+				t('home.expanded.chat.wsStatus.summaryEnd3'),
+				t('home.expanded.chat.wsStatus.summaryEnd4'),
+			],
+			schedule_load: [
+				t('home.expanded.chat.wsStatus.scheduleLoad1'),
+				t('home.expanded.chat.wsStatus.scheduleLoad2'),
+				t('home.expanded.chat.wsStatus.scheduleLoad3'),
+				t('home.expanded.chat.wsStatus.scheduleLoad4'),
+			],
+			schedule_process_start: [
+				t('home.expanded.chat.wsStatus.scheduleProcessStart1'),
+				t('home.expanded.chat.wsStatus.scheduleProcessStart2'),
+				t('home.expanded.chat.wsStatus.scheduleProcessStart3'),
+				t('home.expanded.chat.wsStatus.scheduleProcessStart4'),
+			],
+			schedule_process_end: [
+				t('home.expanded.chat.wsStatus.scheduleProcessEnd1'),
+				t('home.expanded.chat.wsStatus.scheduleProcessEnd2'),
+				t('home.expanded.chat.wsStatus.scheduleProcessEnd3'),
+				t('home.expanded.chat.wsStatus.scheduleProcessEnd4'),
+			],
+		};
+
+		const messages = statusMap[status];
+		if (messages && messages.length > 0) {
+			const randomIndex = Math.floor(Math.random() * messages.length);
+			return messages[randomIndex];
+		}
+
+		// Fallback for unmapped statuses
+		return status.replace(/_/g, ' ').toLowerCase();
+	};
+
+	useEffect(() => {
+		if (!anonymousUserId) return;
+
+		webSocketCommunication.current = new SignalRService(anonymousUserId);
+		webSocketCommunication.current.createConnection();
+		webSocketCommunication.current.subscribeToSocketDataReceipt((data: unknown) => {
+			// Type guard and extract vibe data from WebSocket
+			if (
+				data &&
+				typeof data === 'object' &&
+				'data' in data &&
+				data.data &&
+				typeof data.data === 'object' &&
+				'vibe' in data.data &&
+				data.data.vibe &&
+				typeof data.data.vibe === 'object' &&
+				'status' in data.data.vibe &&
+				typeof data.data.vibe.status === 'string'
+			) {
+				const rawStatus = data.data.vibe.status;
+				const formattedStatus = formatWebSocketStatus(rawStatus);
+				setWsStatusKey(rawStatus);
+				setWebSocketStatus(formattedStatus);
+			}
+		});
+
+		return () => {
+			if (webSocketCommunication.current) {
+				webSocketCommunication.current = null;
+			}
+		};
+	}, [anonymousUserId]);
+
+	// Fetch sessions and set latest sessionId on component mount or when persona changes
+	useEffect(() => {
+		const fetchAndSetLatestSession = async () => {
+			try {
+				const personaUserId = activePersonaSession?.userId;
+
+				if (personaUserId) {
+					const sessionsResponse = await chatService.getVibeSessions(
+						undefined,
+						personaUserId
+					);
+					const sessions = sessionsResponse.Content.vibeSessions;
+
+					if (sessions && sessions.length > 0) {
+						// Sort sessions by creation time (newest first) and get the latest one
+						const latestSession = sessions.sort(
+							(a, b) => b.creationTimeInMs - a.creationTimeInMs
+						)[0];
+						setSessionId(latestSession.id);
+						setCurrentSessionTitle(latestSession.title || null);
+					} else {
+						// No sessions found, clear sessionId
+						setSessionId('');
+						setCurrentSessionTitle(null);
+					}
+				} else {
+					// No persona selected, clear sessionId
+					setSessionId('');
+				}
+			} catch (error) {
+				console.warn('Failed to fetch sessions:', error);
+				// Clear sessionId on error
+				setSessionId('');
+			}
+		};
+
+		fetchAndSetLatestSession();
+	}, [activePersonaSession?.userId, activePersonaSession?.personaId]);
+
+	const extractTimestamp = useCallback((id: string): number => {
+		const match = id.match(/(\d{18})/);
+		return match ? parseInt(match[1], 10) : 0;
+	}, []);
+
+	const sortMessagesChronologically = useCallback(
+		(sourceMessages: PromptWithActions[]) =>
+			[...sourceMessages].sort((a, b) => extractTimestamp(a.id) - extractTimestamp(b.id)),
+		[extractTimestamp]
+	);
+
+	const mergeMessages = useCallback(
+		(existingMessages: PromptWithActions[], incomingMessages: PromptWithActions[]) => {
+			const merged = new Map(existingMessages.map((entry) => [entry.id, entry]));
+
+			incomingMessages.forEach((incoming) => {
+				const previous = merged.get(incoming.id);
+				if (previous) {
+					merged.set(incoming.id, {
+						...previous,
+						...incoming,
+						actions: incoming.actions.length > 0 ? incoming.actions : previous.actions,
+						actionIds: incoming.actionIds ?? previous.actionIds,
+					});
+				} else {
+					merged.set(incoming.id, incoming);
+				}
+			});
+
+			return sortMessagesChronologically(Array.from(merged.values()));
+		},
+		[sortMessagesChronologically]
+	);
+
+	const mapMessagesWithActions = useCallback((rawMessages: PromptWithActions[]) => {
+		return rawMessages.map((entry) => {
+			const actionIds = entry.actionIds ?? [];
+			const resolvedActions = actionIds
+				.map((id) => actionsByIdRef.current[id])
+				.filter((action): action is VibeAction => Boolean(action));
+
+			return {
+				id: entry.id,
+				origin: entry.origin,
+				content: entry.content,
+				actionId: entry.actionId,
+				requestId: entry.requestId,
+				sessionId: entry.sessionId,
+				actionIds,
+				actions: resolvedActions,
+			};
+		});
+	}, []);
+
+	const fetchActionsForMessages = useCallback(async (rawMessages: PromptWithActions[]) => {
+		const uniqueActionIds = Array.from(
+			new Set(rawMessages.flatMap((entry) => entry.actionIds || []).filter(Boolean))
+		);
+		const missingActionIds = uniqueActionIds.filter((id) => !actionsByIdRef.current[id]);
+
+		if (!missingActionIds.length) return;
+
+		setIsBatchLoading(true);
+		try {
+			for (let i = 0; i < missingActionIds.length; i += ACTION_BATCH_SIZE) {
+				const batch = missingActionIds.slice(i, i + ACTION_BATCH_SIZE);
+				try {
+					const fetchedActions = await chatService.getActions(batch);
+					fetchedActions.forEach((action) => {
+						actionsByIdRef.current[action.id] = action;
+					});
+				} catch (error) {
+					console.error('Error fetching action batch:', error);
+				}
+			}
+		} finally {
+			setIsBatchLoading(false);
+		}
+	}, []);
+
+	const loadInitialChatMessages = useCallback(
+		async (sid?: string) => {
+			setIsLoading(true);
+			setError(null);
+			setMessages([]);
+			setRequestId(null);
+			setHasMoreMessages(false);
+			nextMessageIndexRef.current = 0;
+			actionsByIdRef.current = {};
+			shouldPreserveScrollPositionRef.current = false;
+			shouldAutoScrollToBottomRef.current = false;
+
+			try {
+				const devUserIdOverride = useAppStore.getState().devUserIdOverride;
+				const isDevMode = !!devUserIdOverride;
+
+				if (!isDevMode && isDemoMode()) {
+					const { chatMessages } = getDemoData();
+					setMessages(sortMessagesChronologically(chatMessages));
+					setRequestId(
+						chatMessages[chatMessages.length - 1]?.requestId || 'request-demo-001'
+					);
+					setHasMoreMessages(false);
+					shouldAutoScrollToBottomRef.current = true;
+					return;
+				}
+
+				if (!sid) return;
+
+				const data = await chatService.getMessages(sid, {
+					index: 0,
+					batchSize: MESSAGE_BATCH_SIZE,
+					order: 'desc',
+					anonymousUserId: anonymousUserId || undefined,
+				});
+
+				const rawMessages = data.Content.chats || [];
+				if (!rawMessages.length) {
+					setHasMoreMessages(false);
+					return;
+				}
+
+				setIsLoading(false);
+				await fetchActionsForMessages(rawMessages);
+				const hydratedMessages = mapMessagesWithActions(rawMessages);
+				const sortedMessages = sortMessagesChronologically(hydratedMessages);
+
+				setMessages(sortedMessages);
+				setRequestId(sortedMessages[sortedMessages.length - 1]?.requestId || null);
+				setHasMoreMessages(rawMessages.length === MESSAGE_BATCH_SIZE);
+				nextMessageIndexRef.current = rawMessages.length;
+				shouldAutoScrollToBottomRef.current = true;
+			} catch (err) {
+				if (err instanceof Error) setError(err.message);
+				else setError(t('home.expanded.chat.errorLoadMessages'));
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[
+			anonymousUserId,
+			fetchActionsForMessages,
+			mapMessagesWithActions,
+			sortMessagesChronologically,
+			t,
+		]
+	);
+
+	const loadOlderMessages = useCallback(async () => {
+		if (!sessionId || isLoading || isLoadingOlderMessages || !hasMoreMessages) return;
+
+		const messagesList = messagesListRef.current;
+		if (messagesList) {
+			previousScrollHeightRef.current = messagesList.scrollHeight;
+			previousScrollTopRef.current = messagesList.scrollTop;
+			shouldPreserveScrollPositionRef.current = true;
+		}
+
+		setIsLoadingOlderMessages(true);
+		try {
+			const data = await chatService.getMessages(sessionId, {
+				index: nextMessageIndexRef.current,
+				batchSize: MESSAGE_BATCH_SIZE,
+				order: 'desc',
+				anonymousUserId: anonymousUserId || undefined,
+			});
+
+			const rawMessages = data.Content.chats || [];
+			if (!rawMessages.length) {
+				setHasMoreMessages(false);
+				shouldPreserveScrollPositionRef.current = false;
+				return;
+			}
+
+			await fetchActionsForMessages(rawMessages);
+			const hydratedMessages = mapMessagesWithActions(rawMessages);
+
+			setMessages((prevMessages) => mergeMessages(prevMessages, hydratedMessages));
+			nextMessageIndexRef.current += rawMessages.length;
+			setHasMoreMessages(rawMessages.length === MESSAGE_BATCH_SIZE);
+		} catch (err) {
+			shouldPreserveScrollPositionRef.current = false;
+			if (err instanceof Error) setError(err.message);
+			else setError(t('home.expanded.chat.errorLoadMessages'));
+		} finally {
+			setIsLoadingOlderMessages(false);
+		}
+	}, [
+		anonymousUserId,
+		fetchActionsForMessages,
+		hasMoreMessages,
+		isLoading,
+		isLoadingOlderMessages,
+		mapMessagesWithActions,
+		mergeMessages,
+		sessionId,
+		t,
+	]);
+
+	// Load chat messages when relevant dependencies change
+	useEffect(() => {
+		loadInitialChatMessages(sessionId);
+	}, [loadInitialChatMessages, scheduleId, selectedPersonaId, sessionId]);
+
+	useEffect(() => {
+		const messagesList = messagesListRef.current;
+		if (!messagesList) return;
+
+		const handleScroll = () => {
+			if (messagesList.scrollTop <= SCROLL_TOP_THRESHOLD) {
+				loadOlderMessages();
+			}
+		};
+
+		messagesList.addEventListener('scroll', handleScroll);
+		return () => messagesList.removeEventListener('scroll', handleScroll);
+	}, [loadOlderMessages]);
+
+	useLayoutEffect(() => {
+		const messagesList = messagesListRef.current;
+		if (!messagesList || messages.length === 0) return;
+
+		if (shouldPreserveScrollPositionRef.current) {
+			const scrollDelta = messagesList.scrollHeight - previousScrollHeightRef.current;
+			messagesList.scrollTop = previousScrollTopRef.current + scrollDelta;
+			shouldPreserveScrollPositionRef.current = false;
+			return;
+		}
+
+		if (shouldAutoScrollToBottomRef.current) {
+			messagesList.scrollTop = messagesList.scrollHeight;
+			shouldAutoScrollToBottomRef.current = false;
+		}
+	}, [messages]);
+
+	const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
+
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+		if (!message.trim() || isSending) return;
+
+		// Track message send
+		analytics.trackChatEvent('Message Sent', {
+			messageLength: message.length,
+			hasContext: chatContext.length > 0,
+			personaId: selectedPersonaId,
+		});
+
+		try {
+			setIsSending(true);
+			setError(null);
+			setWebSocketStatus(null); // Reset status to prepare for new updates
+			setWsStatusKey(null);
+
+			// Get current location data
+			const locationData = await locationService.getCurrentLocation();
+			const locationApiData = locationService.toApiFormat(locationData);
+
+			const response = await chatService.sendMessage(
+				message,
+				entityId,
+				sessionId,
+				anonymousUserId,
+				locationApiData.userLongitude,
+				locationApiData.userLatitude,
+				locationApiData.userLocationVerified
+			);
+			if (
+				response?.Content?.vibeResponse?.tilerUser &&
+				response.Content.vibeResponse.tilerUser?.id !== activePersonaSession?.userInfo?.id
+			) {
+				updateActivePersonaSession({ userInfo: response.Content.vibeResponse.tilerUser });
+			}
+			const promptMap = response?.Content?.vibeResponse?.prompts || {};
+
+			// Convert the prompt map to PromptWithActions[]
+			const newMessages: PromptWithActions[] = Object.values(promptMap).map(
+				(entry: PromptWithActions) => ({
+					id: entry.id,
+					origin: entry.origin,
+					content: entry.content,
+					actionId: entry.actionId,
+					requestId: entry.requestId,
+					sessionId: entry.sessionId,
+					actions: (entry.actions ?? []).map((action: VibeAction) => ({
+						id: action.id,
+						descriptions: action.descriptions,
+						type: action.type,
+						creationTimeInMs: action.creationTimeInMs,
+						status: action.status,
+						entityId: action.entityId,
+						entityType: action.entityType,
+						beforeScheduleId: action.beforeScheduleId,
+						afterScheduleId: action.afterScheduleId,
+						prompts: action.prompts ?? [],
+						vibeRequest: action.vibeRequest
+							? {
+									id: action.vibeRequest.id,
+									creationTimeInMs: action.vibeRequest.creationTimeInMs,
+									activeAction: action.vibeRequest.activeAction,
+									isClosed: action.vibeRequest.isClosed ?? false,
+									beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
+									afterScheduleId: action.vibeRequest.afterScheduleId || null,
+									actions: action.vibeRequest.actions || [],
+									previews: action.vibeRequest.previews || [],
+								}
+							: null,
+					})),
+				})
+			);
+
+			newMessages.forEach((newMessage) => {
+				(newMessage.actions || []).forEach((action) => {
+					actionsByIdRef.current[action.id] = action;
+				});
+			});
+
+			shouldAutoScrollToBottomRef.current = true;
+			setMessages((prevMessages) => mergeMessages(prevMessages, newMessages));
+			setRequestId(newMessages[newMessages.length - 1]?.requestId || null);
+			nextMessageIndexRef.current += newMessages.length;
+
+			// Update session ID from the first prompt
+			const sessionIdFromResponse = newMessages[0]?.sessionId;
+			if (sessionIdFromResponse) {
+				setSessionId(sessionIdFromResponse);
+			}
+
+			setMessage('');
+		} catch (err) {
+			if (err instanceof ChatLimitError) {
+				analytics.trackError('Chat Limit Reached', { personaId: selectedPersonaId });
+				setErrorPopupMessage(err.message);
+				setShowErrorPopup(true);
+			} else if (err instanceof Error) {
+				analytics.trackError('Chat Message Send Failed', {
+					errorMessage: err.message,
+					personaId: selectedPersonaId,
+				});
+				setError(err.message);
+			} else {
+				setError(t('home.expanded.chat.errorSendMessage'));
+			}
+		} finally {
+			setIsSending(false);
+		}
+	};
+
+	const acceptAllChanges = async () => {
+		// Track accept changes action
+		analytics.trackChatEvent('Accept Changes', {
+			requestId: requestId || undefined,
+			personaId: selectedPersonaId,
+		});
+
+		try {
+			setIsSending(true);
+			setError(null);
+			setWebSocketStatus(null); // Reset status to prepare for new updates
+			setWsStatusKey(null);
+			// Get current location data
+			const locationData = await locationService.getCurrentLocation();
+			const locationApiData = locationService.toApiFormat(locationData);
+
+			const executedChanges = await chatService.sendChatAcceptChanges(
+				requestId,
+				anonymousUserId,
+				locationApiData.userLongitude,
+				locationApiData.userLatitude,
+				locationApiData.userLocationVerified
+			);
+			const newScheduleId = executedChanges?.Content?.vibeRequest?.afterScheduleId || null;
+			if (newScheduleId) {
+				handleSetScheduleId(newScheduleId);
+				// useEffect will automatically reload messages when scheduleId changes
+			}
+		} catch (err) {
+			if (err instanceof Error) setError(err.message);
+			else setError(t('home.expanded.chat.errorAcceptChanges'));
+		} finally {
+			setIsSending(false);
+		}
+	};
+
+	const handleNewChat = () => {
+		analytics.trackChatEvent('New Chat Started', {
+			personaId: selectedPersonaId,
+			previousSessionId: sessionId,
+		});
+
+		setSessionId('');
+		setError(null);
+		setMessage('');
+		setMessages([]);
+		setRequestId(null);
+		setCurrentSessionTitle(null);
+		handleSetScheduleId('');
+		// Clear chat context when starting a new chat
+		if (activePersonaSession) {
+			updateActivePersonaSession({
+				chatContext: [],
+				chatSessionId: '',
+			});
+		}
+	};
+
+	const removeChatContext = useAppStore((state) => state.removeChatContext); // Action to remove context
+
+	const handleRemoveContext = (context: ChatContextType) => {
+		analytics.trackChatEvent('Context Removed', {
+			contextName: context.Name,
+			contextEntityId: context.EntityId,
+			personaId: selectedPersonaId,
+		});
+		removeChatContext(context); // Remove the clicked context
+	};
+
+	const handleEmailSubmitted = (email: string) => {
+		setSubmittedEmail(email);
+		setShowErrorPopup(false); // Close chat limit modal
+		setShowEmailConfirmation(true); // Show confirmation modal
+	};
+
+	const handlePromptClick = (prompt: string) => {
+		setMessage(prompt);
+		// Auto-submit by creating a synthetic form event
+		const syntheticEvent = {
+			preventDefault: () => {},
+		} as FormEvent;
+		// Set message first, then trigger submit on next tick
+		setTimeout(() => {
+			handleSubmit(syntheticEvent);
+		}, 0);
+	};
+
+	const handleSessionSelect = (session: VibeSession) => {
+		// Skip if selecting the already-active session
+		if (session.id === sessionId) return;
+
+		// Clear current state before loading new session
+		setMessages([]);
+		setError(null);
+		setMessage('');
+		setRequestId(null);
+		setCurrentSessionTitle(session.title || null);
+		setSessionId(session.id);
+		// loadChatMessages will be triggered by the sessionId useEffect
+	};
+
+	return (
+		<ChatWrapper>
+			<ChatContainer>
+				<ChatHeader>
+					<ChatHeaderLeft>
+						{onClose && (
+							<Button variant="ghost" height={32} onClick={onClose}>
+								<ChevronLeftIcon size={16} />
+								<span>{t('common.buttons.back')}</span>
+							</Button>
+						)}
+						<HistoryButton
+							onClick={() => setShowSessionHistory(true)}
+							title={t('home.expanded.chat.sessionHistory.title')}
+						>
+							<History size={18} />
+						</HistoryButton>
+					</ChatHeaderLeft>
+
+					<ChatHeaderCenter>
+						{currentSessionTitle && (
+							<SessionTitleDisplay title={currentSessionTitle}>
+								{currentSessionTitle}
+							</SessionTitleDisplay>
+						)}
+					</ChatHeaderCenter>
+
+					<ChatHeaderRight>
+						{chatContext.length > 0 && (
+							<ChatContextChips>
+								{chatContext.map((context, index) => (
+									<Button
+										key={index}
+										variant="outline"
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											padding: '0.25rem 0.5rem',
+											border: '1px solid currentColor',
+											fontSize: theme.typography.fontSize.xs,
+										}}
+									>
+										<span>{context.Name}</span>
+										<span
+											onClick={() => handleRemoveContext(context)}
+											style={{
+												marginLeft: '0.5rem',
+												color: 'red',
+												cursor: 'pointer',
+											}}
+										>
+											x
+										</span>
+									</Button>
+								))}
+							</ChatContextChips>
+						)}
+						<NewChatHeaderButton
+							onClick={handleNewChat}
+							title={t('home.expanded.chat.newChat')}
+						>
+							<SquarePen size={18} />
+						</NewChatHeaderButton>
+					</ChatHeaderRight>
+				</ChatHeader>
+				<ChatContent>
+					{isLoading && (
+						<LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
+					)}
+					{isBatchLoading && (
+						<LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
+					)}
+
+					{error && (
+						<div className="chat-error">
+							{t('home.expanded.chat.error')}: {error}
+						</div>
+					)}
+
+					{!isLoading && !error && !messages.length && (
+						<EmptyChat>
+							<Logo size={48} />
+							<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+							<p>{t('home.expanded.chat.emptyStateDescription')}</p>
+						</EmptyChat>
+					)}
+
+					<div
+						className="messages-list"
+						ref={messagesListRef}
+						data-onboarding-chat-messages
+					>
+						{messages.map((message) => (
+							<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
+								<div className="message-content">
+									<MarkdownRenderer content={message.content} />
+								</div>
+
+								{message.actions
+									?.filter(
+										(action) =>
+											action.type !== 'conversational_and_not_supported'
+									)
+									.map((action) => (
+										<ActionPill key={action.id} action={action} />
+									))}
+							</MessageBubble>
+						))}
+					</div>
+
+					<div ref={messagesEndRef} />
+				</ChatContent>
+
+				{/* Render chatContext buttons */}
+				<div style={{ marginBottom: '0.25rem' }}></div>
+
+				<div>
+					{isSending && (
+						<LoadingIndicator
+							message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
+							wsStatus={wsStatusKey}
+						/>
+					)}
+					{((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
+						<Button
+							variant="primary"
+							onClick={() => acceptAllChanges()}
+							data-onboarding-accept-button
+						>
+							{t('home.expanded.chat.acceptChanges')}
+						</Button>
+					)}
+				</div>
+
+				{/* Show prompt suggestions when input field is empty */}
+				{!message.trim() && <PromptSuggestions onPromptClick={handlePromptClick} />}
+
+				<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
+					<Input.Textarea
+						value={message}
+						onChange={(e) => setMessage(e.target.value)}
+						onKeyDown={(e) => {
+							// Submit form on Enter key press without Shift key
+							if (e.key === 'Enter' && !e.shiftKey) {
+								e.preventDefault(); // Prevent new line
+
+								// Use form.requestSubmit() instead of handleSubmit directly
+								// This triggers a single form submission through the standard form mechanism
+								const form = e.currentTarget.form;
+								if (form) form.requestSubmit();
+							}
+						}}
+						placeholder={t('home.expanded.chat.inputPlaceholder')}
+						disabled={isSending}
+						bordergradient={[theme.colors.brand[500]]}
+						height={50} // Set a fixed height for consistent alignment
+					/>
+					<ChatButton
+						type="submit"
+						disabled={isSending || !message.trim()}
+						data-onboarding-chat-button
+					>
+						{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
+					</ChatButton>
+				</ChatForm>
+				<UserLocation />
+			</ChatContainer>
+
+			{anonymousUserId && (
+				<ErrorPopup
+					isOpen={showErrorPopup}
+					message={errorPopupMessage}
+					title={t('home.expanded.chat.errorPopup.chatLimitReached')}
+					onClose={() => setShowErrorPopup(false)}
+					showWaitlistButton={true}
+					onEmailSubmitted={handleEmailSubmitted}
+					tilerUserId={anonymousUserId}
+				/>
+			)}
+
+			<EmailConfirmationModal
+				isOpen={showEmailConfirmation}
+				email={submittedEmail}
+				onClose={() => setShowEmailConfirmation(false)}
+			/>
+
+			<SessionHistory
+				isOpen={showSessionHistory}
+				onClose={() => setShowSessionHistory(false)}
+				currentSessionId={sessionId}
+				onSessionSelect={handleSessionSelect}
+				onNewChat={handleNewChat}
+				userId={activePersonaSession?.userId}
+			/>
+		</ChatWrapper>
+	);
 };
 
 export default Chat;

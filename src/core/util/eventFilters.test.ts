@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { isLongDurationEvent, LONG_DURATION_THRESHOLD_MS } from './eventFilters';
-import { ScheduleSubCalendarEvent, ThirdPartyType } from '../common/types/schedule';
+import { SubCalendarEvent, ThirdPartyType } from '../common/types/schedule';
 
 // Helper to create a minimal mock event
 function createMockEvent(
-	overrides: Partial<ScheduleSubCalendarEvent> & { start: number; end: number }
-): ScheduleSubCalendarEvent {
+	overrides: Partial<SubCalendarEvent> & { start: number; end: number }
+): SubCalendarEvent {
 	return {
 		id: 'test-event-123',
 		name: 'Test Event',

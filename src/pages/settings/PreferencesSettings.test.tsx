@@ -113,7 +113,10 @@ describe('PreferencesSettings', () => {
 		(userService.getSettings as Mock).mockResolvedValue(createMockSettings());
 		(userService.updateSettings as Mock).mockResolvedValue(createMockSettings());
 		(userService.getScheduleProfile as Mock).mockResolvedValue({
-			scheduleProfile: { personalHoursRestrictionProfile: null, workHoursRestrictionProfile: null },
+			scheduleProfile: {
+				personalHoursRestrictionProfile: null,
+				workHoursRestrictionProfile: null,
+			},
 		});
 		(userService.updateScheduleProfile as Mock).mockResolvedValue({});
 	});
@@ -615,9 +618,7 @@ describe('PreferencesSettings', () => {
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
 			await waitFor(() => {
-				expect(toast.error).toHaveBeenCalledWith(
-					expect.stringContaining('Monday'),
-				);
+				expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('Monday'));
 			});
 
 			expect(userService.updateScheduleProfile).not.toHaveBeenCalled();
@@ -641,9 +642,7 @@ describe('PreferencesSettings', () => {
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
 			await waitFor(() => {
-				expect(toast.error).toHaveBeenCalledWith(
-					expect.stringContaining('Wednesday'),
-				);
+				expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('Wednesday'));
 			});
 
 			expect(userService.updateScheduleProfile).not.toHaveBeenCalled();
@@ -661,13 +660,33 @@ describe('PreferencesSettings', () => {
 					timeZone: 'America/Denver',
 					daySelection: [
 						null,
-						{ id: 'mon', weekday: 1, restrictionTimeLine: { id: 'tl', start: 28800000, duration: 36000000, end: 64800000, timeZone: 'America/Denver' }, timeZone: 'America/Denver' },
-						null, null, null, null, null,
+						{
+							id: 'mon',
+							weekday: 1,
+							restrictionTimeLine: {
+								id: 'tl',
+								start: 28800000,
+								duration: 36000000,
+								end: 64800000,
+								timeZone: 'America/Denver',
+							},
+							timeZone: 'America/Denver',
+						},
+						null,
+						null,
+						null,
+						null,
+						null,
 					],
 				},
 			});
 			(userService.updateScheduleProfile as Mock).mockResolvedValue({
-				workHoursRestrictionProfile: { id: 'work-id', isEnabled: false, timeZone: 'America/Denver', daySelection: [null, null, null, null, null, null, null] },
+				workHoursRestrictionProfile: {
+					id: 'work-id',
+					isEnabled: false,
+					timeZone: 'America/Denver',
+					daySelection: [null, null, null, null, null, null, null],
+				},
 				personalHoursRestrictionProfile: null,
 			});
 
@@ -692,7 +711,7 @@ describe('PreferencesSettings', () => {
 								isEnabled: 'false',
 							}),
 						}),
-					}),
+					})
 				);
 			});
 		});

@@ -1,4 +1,4 @@
-import { ScheduleSubCalendarEvent } from '../common/types/schedule';
+import { SubCalendarEvent } from '../common/types/schedule';
 
 /** Threshold in milliseconds: 15 hours */
 export const LONG_DURATION_THRESHOLD_MS = 15 * 60 * 60 * 1000;
@@ -15,7 +15,7 @@ export const LONG_DURATION_THRESHOLD_MS = 15 * 60 * 60 * 1000;
  * Long-duration events that meet this criteria are rendered in a
  * compact list overlay rather than as a tall tile on the calendar grid.
  */
-export function isLongDurationEvent(event: ScheduleSubCalendarEvent): boolean {
+export function isLongDurationEvent(event: SubCalendarEvent): boolean {
 	const start = event.originalStart ?? event.start;
 	const end = event.originalEnd ?? event.end;
 	const duration = end - start;
