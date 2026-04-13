@@ -9,127 +9,127 @@ import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
 
 type InfoProps = {
-  formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
 const CreateTileInfo: React.FC<InfoProps> = ({
-  formHandler: { formData, handleFormInputChange, setFormData },
+	formHandler: { formData, handleFormInputChange, setFormData },
 }) => {
-  const { t } = useTranslation();
+	const { t } = useTranslation();
 
-  const locationController = useMemo<LocationInputController>(
-    () => ({
-      location: formData.location,
-      isVerified: formData.locationIsVerified,
-      setLocation: (value: string) => {
-        setFormData((prev) => ({
-          ...prev,
-          location: value,
-          locationId: null,
-          locationSource: '',
-          locationIsVerified: false,
-          locationTag: '',
-        }));
-      },
-      clearLocation: () => {
-        setFormData((prev) => ({
-          ...prev,
-          location: '',
-          locationId: null,
-          locationSource: '',
-          locationIsVerified: false,
-          locationTag: '',
-        }));
-      },
-      setFromSelection: (loc) => {
-        setFormData((prev) => ({
-          ...prev,
-          location: loc.address,
-          locationId: loc.source !== 'google' ? loc.id : null,
-          locationSource: loc.source,
-          locationIsVerified: loc.isVerified,
-          locationTag: loc.nickname || '',
-        }));
-      },
-    }),
-    [formData.location, formData.locationIsVerified, setFormData]
-  );
+	const locationController = useMemo<LocationInputController>(
+		() => ({
+			location: formData.location,
+			isVerified: formData.locationIsVerified,
+			setLocation: (value: string) => {
+				setFormData((prev) => ({
+					...prev,
+					location: value,
+					locationId: null,
+					locationSource: '',
+					locationIsVerified: false,
+					locationTag: '',
+				}));
+			},
+			clearLocation: () => {
+				setFormData((prev) => ({
+					...prev,
+					location: '',
+					locationId: null,
+					locationSource: '',
+					locationIsVerified: false,
+					locationTag: '',
+				}));
+			},
+			setFromSelection: (loc) => {
+				setFormData((prev) => ({
+					...prev,
+					location: loc.address,
+					locationId: loc.source !== 'google' ? loc.id : null,
+					locationSource: loc.source,
+					locationIsVerified: loc.isVerified,
+					locationTag: loc.nickname || '',
+				}));
+			},
+		}),
+		[formData.location, formData.locationIsVerified, setFormData]
+	);
 
-  return (
-    <Grid>
-      <Input
-        containerStyle={{ gridColumn: 'span 2' }}
-        label={t('calendar.createTile.info.action.label')}
-        required
-        name="action"
-        placeholder={t('calendar.createTile.info.action.placeholder')}
-        value={formData.action}
-        onChange={handleFormInputChange('action')}
-      />
-      <LocationInput
-        controller={locationController}
-        label={t('calendar.createTile.info.location.label')}
-        placeholder={t('calendar.createTile.info.location.placeholder')}
-      />
-      <Input
-        label={t('calendar.createTile.info.locationTag.label')}
-        name="locationTag"
-        placeholder={t('calendar.createTile.info.locationTag.placeholder')}
-        value={formData.locationTag}
-        onChange={handleFormInputChange('locationTag')}
-      />
-      <Input
-        label={t('calendar.createTile.info.hours.label')}
-        required
-        type="number"
-        name="durationHours"
-        placeholder={t('calendar.createTile.info.hours.placeholder')}
-        value={formData.durationHours}
-        onChange={handleFormInputChange('durationHours', {
-          restriction: 'integer',
-        })}
-      />
-      <Input
-        label={t('calendar.createTile.info.minutes.label')}
-        required
-        type="number"
-        name="durationMins"
-        step="5"
-        placeholder={t('calendar.createTile.info.minutes.placeholder')}
-        value={formData.durationMins}
-        onChange={handleFormInputChange('durationMins', {
-          restriction: 'integer',
-        })}
-      />
-      {!formData.isRecurring && (
-        <RangeContainer>
-          <h3>{t('calendar.createTile.info.range.label')}</h3>
-          <RangeDescription>
-            <p>{t('calendar.createTile.info.range.description')}</p>
-            <DatePicker
-              value={dayjs(formData.start).format('YYYY-MM-DD')}
-              maxDate={dayjs(formData.deadline).format('YYYY-MM-DD')}
-              onChange={(date) =>
-                handleFormInputChange('start', {
-                  mode: 'static',
-                })(dayjs(date))
-              }
-            />
-            <p>{t('calendar.createTile.info.range.conjunction')}</p>
-            <DatePicker
-              value={dayjs(formData.deadline).format('YYYY-MM-DD')}
-              minDate={dayjs(formData.start).format('YYYY-MM-DD')}
-              onChange={(date) =>
-                handleFormInputChange('deadline', {
-                  mode: 'static',
-                })(dayjs(date))
-              }
-            />
-          </RangeDescription>
-        </RangeContainer>
-      )}
-    </Grid>
-  );
+	return (
+		<Grid>
+			<Input
+				containerStyle={{ gridColumn: 'span 2' }}
+				label={t('calendar.createTile.info.action.label')}
+				required
+				name="action"
+				placeholder={t('calendar.createTile.info.action.placeholder')}
+				value={formData.action}
+				onChange={handleFormInputChange('action')}
+			/>
+			<LocationInput
+				controller={locationController}
+				label={t('calendar.createTile.info.location.label')}
+				placeholder={t('calendar.createTile.info.location.placeholder')}
+			/>
+			<Input
+				label={t('calendar.createTile.info.locationTag.label')}
+				name="locationTag"
+				placeholder={t('calendar.createTile.info.locationTag.placeholder')}
+				value={formData.locationTag}
+				onChange={handleFormInputChange('locationTag')}
+			/>
+			<Input
+				label={t('calendar.createTile.info.hours.label')}
+				required
+				type="number"
+				name="durationHours"
+				placeholder={t('calendar.createTile.info.hours.placeholder')}
+				value={formData.durationHours}
+				onChange={handleFormInputChange('durationHours', {
+					restriction: 'integer',
+				})}
+			/>
+			<Input
+				label={t('calendar.createTile.info.minutes.label')}
+				required
+				type="number"
+				name="durationMins"
+				step="5"
+				placeholder={t('calendar.createTile.info.minutes.placeholder')}
+				value={formData.durationMins}
+				onChange={handleFormInputChange('durationMins', {
+					restriction: 'integer',
+				})}
+			/>
+			{!formData.isRecurring && (
+				<RangeContainer>
+					<h3>{t('calendar.createTile.info.range.label')}</h3>
+					<RangeDescription>
+						<p>{t('calendar.createTile.info.range.description')}</p>
+						<DatePicker
+							value={dayjs(formData.start).format('YYYY-MM-DD')}
+							maxDate={dayjs(formData.deadline).format('YYYY-MM-DD')}
+							onChange={(date) =>
+								handleFormInputChange('start', {
+									mode: 'static',
+								})(dayjs(date))
+							}
+						/>
+						<p>{t('calendar.createTile.info.range.conjunction')}</p>
+						<DatePicker
+							value={dayjs(formData.deadline).format('YYYY-MM-DD')}
+							minDate={dayjs(formData.start).format('YYYY-MM-DD')}
+							onChange={(date) =>
+								handleFormInputChange('deadline', {
+									mode: 'static',
+								})(dayjs(date))
+							}
+						/>
+					</RangeDescription>
+				</RangeContainer>
+			)}
+		</Grid>
+	);
 };
 
 const Grid = styled.div`
