@@ -677,6 +677,28 @@
 			"settings": "Configuración"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Información de la cuenta",
+				"description": "Revisa tu cuenta y realiza cambios en tu información personal",
+				"fields": {
+					"fullName": "Nombre completo",
+					"username": "Nombre de usuario",
+					"email": "Correo electrónico",
+					"phoneNumber": "Número de teléfono",
+					"phoneNumberPlaceholder": "Agregar número de teléfono",
+					"countryCode": "Código de país",
+					"countryCodeSearch": "Buscar países...",
+					"countryCodeNoResults": "No se encontraron países",
+					"dateOfBirth": "Fecha de nacimiento",
+					"dateOfBirthPlaceholder": "DD/MM/AAAA"
+				},
+				"saveChanges": "Guardar cambios",
+				"saving": "Guardando...",
+				"deleteAccount": "Eliminar mi cuenta",
+				"saveSuccess": "Información de la cuenta actualizada correctamente",
+				"saveError": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+				"deleteNotImplemented": "La función de eliminar cuenta estará disponible próximamente"
+			},
 			"tilePreferences": {
 				"title": "Preferencias de Mosaico",
 				"description": "Define cómo te desplazas y ayuda a Tiler a entender tus patrones de tiempo diarios",

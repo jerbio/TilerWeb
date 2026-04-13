@@ -677,6 +677,28 @@
 			"settings": "Настройки"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Информация об аккаунте",
+				"description": "Просмотрите свой аккаунт и измените личную информацию",
+				"fields": {
+					"fullName": "Полное имя",
+					"username": "Имя пользователя",
+					"email": "Электронная почта",
+					"phoneNumber": "Номер телефона",
+					"phoneNumberPlaceholder": "Добавить номер телефона",
+					"countryCode": "Код страны",
+					"countryCodeSearch": "Поиск стран...",
+					"countryCodeNoResults": "Страны не найдены",
+					"dateOfBirth": "Дата рождения",
+					"dateOfBirthPlaceholder": "ДД.ММ.ГГГГ"
+				},
+				"saveChanges": "Сохранить изменения",
+				"saving": "Сохранение...",
+				"deleteAccount": "Удалить мой аккаунт",
+				"saveSuccess": "Информация об аккаунте успешно обновлена",
+				"saveError": "Не удалось сохранить изменения. Попробуйте ещё раз.",
+				"deleteNotImplemented": "Функция удаления аккаунта скоро будет доступна"
+			},
 			"tilePreferences": {
 				"title": "Настройки плиток",
 				"description": "Укажите, как вы передвигаетесь, и помогите Tiler понять ваши ежедневные временные паттерны",

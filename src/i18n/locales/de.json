@@ -677,6 +677,28 @@
 			"settings": "Einstellungen"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Kontoinformationen",
+				"description": "Überprüfen Sie Ihr Konto und ändern Sie Ihre persönlichen Daten",
+				"fields": {
+					"fullName": "Vollständiger Name",
+					"username": "Benutzername",
+					"email": "E-Mail-Adresse",
+					"phoneNumber": "Telefonnummer",
+					"phoneNumberPlaceholder": "Telefonnummer hinzufügen",
+					"countryCode": "Landesvorwahl",
+					"countryCodeSearch": "Länder suchen...",
+					"countryCodeNoResults": "Keine Länder gefunden",
+					"dateOfBirth": "Geburtsdatum",
+					"dateOfBirthPlaceholder": "TT.MM.JJJJ"
+				},
+				"saveChanges": "Änderungen speichern",
+				"saving": "Speichern...",
+				"deleteAccount": "Mein Konto löschen",
+				"saveSuccess": "Kontoinformationen erfolgreich aktualisiert",
+				"saveError": "Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+				"deleteNotImplemented": "Konto-Löschfunktion kommt bald"
+			},
 			"tilePreferences": {
 				"title": "Kachel-Einstellungen",
 				"description": "Definieren Sie, wie Sie sich fortbewegen, und helfen Sie Tiler, Ihre täglichen Zeitmuster zu verstehen",

@@ -13,19 +13,21 @@ import calendarConfig from '@/core/constants/calendar_config';
 import { computeStaggerLayout } from './layout/event_layout';
 import { LayoutEvent } from './layout/event_layout.types';
 import { getStaggerIncrement, getMinEventHeight, MAX_STAGGER_RATIO } from './layout/event_layout.constants';
-import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ScheduleLookupTravelDetail, SubCalendarEvent } from '@/core/common/types/schedule';
 import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
 import { splitEventByDay } from '@/core/util/eventSplitting';
+import { isLongDurationEvent } from '@/core/util/eventFilters';
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
-	events: Array<ScheduleSubCalendarEvent>;
+	events: Array<SubCalendarEvent>;
 	headerWidth: number;
 	selectedEvent: string | null;
 	setSelectedEvent: (id: string | null) => void;
 	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
 	onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
+	onLongDurationEventsChange?: (events: Array<StyledEvent>) => void;
 	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events so Calendar can look up by ID */
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
@@ -34,7 +36,7 @@ type CalendarEventsProps = {
 	/** Called when a viable event tile on the grid is clicked */
 	onViableEventClicked?: () => void;
 };
-type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
+type CurrentViewEvent = SubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
 	key: string;
 	colorRed: number;
@@ -81,6 +83,7 @@ const CalendarEvents = ({
 	selectedEvent,
 	setSelectedEvent,
 	onNonViableEventsChange,
+	onLongDurationEventsChange,
 	setSelectedEventInfo,
 	styledEventsRef,
 	focusedEventId,
@@ -253,6 +256,12 @@ const CalendarEvents = ({
 			const nonViableEvents = styledEvents.filter((event) => !event.isViable);
 			onNonViableEventsChange(nonViableEvents);
 		}
+		if (onLongDurationEventsChange) {
+			const longDurationEvents = styledEvents.filter(
+				(event) => event.isViable && isLongDurationEvent(event)
+			);
+			onLongDurationEventsChange(longDurationEvents);
+		}
 	}, [styledEvents]);
 
 	// Expose all styled events via ref for Calendar request handling
@@ -263,7 +272,7 @@ const CalendarEvents = ({
 	}, [styledEvents, styledEventsRef]);
 
 	const eventTransition = useTransition(
-		styledEvents.filter((event) => event.isViable),
+		styledEvents.filter((event) => event.isViable && !isLongDurationEvent(event)),
 		{
 			keys: (event) => event.key,
 			from: ({ springStyles }) => ({

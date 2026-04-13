@@ -177,7 +177,7 @@ export const DEMO_CHAT_MESSAGES: PromptWithActions[] = [
 ];
 
 // Demo Calendar Events (matching ScheduleSubCalendarEvent structure)
-import type { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import type { SubCalendarEvent } from '@/core/common/types/schedule';
 import { ThirdPartyType } from '@/core/common/types/schedule';
 
 // Helper to create a base event timestamp (tomorrow at various times)
@@ -190,7 +190,7 @@ const getTomorrowTimestamp = (hour: number, minute: number = 0): number => {
 };
 
 // Helper to create empty travel detail
-const getEmptyTravelDetail = (): ScheduleSubCalendarEvent['travelDetail'] => ({
+const getEmptyTravelDetail = (): SubCalendarEvent['travelDetail'] => ({
 	before: null,
 	after: {
 		start: 0,
@@ -209,7 +209,7 @@ const getEmptyTravelDetail = (): ScheduleSubCalendarEvent['travelDetail'] => ({
 	},
 });
 
-export const DEMO_CALENDAR_EVENTS: ScheduleSubCalendarEvent[] = [
+export const DEMO_CALENDAR_EVENTS: SubCalendarEvent[] = [
 	{
 		id: 'demo-event-001',
 		start: getTomorrowTimestamp(7, 0),

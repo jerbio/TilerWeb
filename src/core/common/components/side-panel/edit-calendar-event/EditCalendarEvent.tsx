@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import {
 	CalendarEvent,
 	CalendarEventUpdateParams,
-	ScheduleSubCalendarEventLocation,
+	EventLocation,
 } from '@/core/common/types/schedule';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
@@ -104,7 +104,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	});
 	const [isSaving, setIsSaving] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
-	const [locationResults, setLocationResults] = useState<ScheduleSubCalendarEventLocation[]>([]);
+	const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
 	const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
 	const [isLocationVerified, setIsLocationVerified] = useState(false);
@@ -252,7 +252,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		return () => clearTimeout(timer);
 	}, [address]);
 
-	const handleSelectLocation = (loc: ScheduleSubCalendarEventLocation) => {
+	const handleSelectLocation = (loc: EventLocation) => {
 		setAddress(loc.address);
 		setAddressDescription(loc.description);
 		setLocationId(loc.source !== 'google' ? loc.id : null);
@@ -1142,7 +1142,13 @@ const DateTimeRow = styled.div`
 	gap: 0.5rem;
 	align-items: center;
 
+	> button {
+		flex-shrink: 0;
+		width: auto;
+	}
+
 	> select {
+		flex-shrink: 0;
 		height: 36px;
 		padding-top: 0;
 		padding-bottom: 0;
@@ -1188,6 +1194,9 @@ const DateTrigger = styled.button`
 	cursor: pointer;
 	transition: border-color 0.15s ease;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 
 	&:hover {
 		border-color: ${({ theme }) => theme.colors.input.borderHover};

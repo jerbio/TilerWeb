@@ -381,6 +381,28 @@
 			"settings": "Paramètres"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Informations du compte",
+				"description": "Consultez votre compte et modifiez vos informations personnelles",
+				"fields": {
+					"fullName": "Nom complet",
+					"username": "Nom d'utilisateur",
+					"email": "Adresse e-mail",
+					"phoneNumber": "Numéro de téléphone",
+					"phoneNumberPlaceholder": "Ajouter un numéro de téléphone",
+					"countryCode": "Indicatif pays",
+					"countryCodeSearch": "Rechercher des pays...",
+					"countryCodeNoResults": "Aucun pays trouvé",
+					"dateOfBirth": "Date de naissance",
+					"dateOfBirthPlaceholder": "JJ/MM/AAAA"
+				},
+				"saveChanges": "Enregistrer les modifications",
+				"saving": "Enregistrement...",
+				"deleteAccount": "Supprimer mon compte",
+				"saveSuccess": "Informations du compte mises à jour avec succès",
+				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
+				"deleteNotImplemented": "La suppression de compte sera bientôt disponible"
+			},
 			"tilePreferences": {
 				"title": "Préférences de Tuile",
 				"description": "Définissez vos modes de déplacement et aidez Tiler à comprendre vos habitudes quotidiennes",

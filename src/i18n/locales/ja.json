@@ -677,6 +677,28 @@
 			"settings": "設定"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "アカウント情報",
+				"description": "アカウントを確認し、個人情報を変更してください",
+				"fields": {
+					"fullName": "氏名",
+					"username": "ユーザー名",
+					"email": "メールアドレス",
+					"phoneNumber": "電話番号",
+					"phoneNumberPlaceholder": "電話番号を追加",
+					"countryCode": "国番号",
+					"countryCodeSearch": "国を検索...",
+					"countryCodeNoResults": "国が見つかりません",
+					"dateOfBirth": "生年月日",
+					"dateOfBirthPlaceholder": "年/月/日"
+				},
+				"saveChanges": "変更を保存",
+				"saving": "保存中...",
+				"deleteAccount": "アカウントを削除",
+				"saveSuccess": "アカウント情報が正常に更新されました",
+				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
+				"deleteNotImplemented": "アカウント削除機能は近日公開予定です"
+			},
 			"tilePreferences": {
 				"title": "タイル設定",
 				"description": "移動手段を定義し、Tilerが日々の時間パターンを理解するのを助けましょう",

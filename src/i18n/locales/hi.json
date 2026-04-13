@@ -677,6 +677,28 @@
 			"settings": "सेटिंग्स"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "खाता जानकारी",
+				"description": "अपने खाते की समीक्षा करें और अपनी व्यक्तिगत जानकारी में बदलाव करें",
+				"fields": {
+					"fullName": "पूरा नाम",
+					"username": "उपयोगकर्ता नाम",
+					"email": "ईमेल पता",
+					"phoneNumber": "फ़ोन नंबर",
+					"phoneNumberPlaceholder": "फ़ोन नंबर जोड़ें",
+					"countryCode": "देश कोड",
+					"countryCodeSearch": "देश खोजें...",
+					"countryCodeNoResults": "कोई देश नहीं मिला",
+					"dateOfBirth": "जन्म तिथि",
+					"dateOfBirthPlaceholder": "दिन/माह/वर्ष"
+				},
+				"saveChanges": "परिवर्तन सहेजें",
+				"saving": "सहेज रहा है...",
+				"deleteAccount": "मेरा खाता हटाएं",
+				"saveSuccess": "खाता जानकारी सफलतापूर्वक अपडेट की गई",
+				"saveError": "परिवर्तन सहेजने में विफल। कृपया पुनः प्रयास करें।",
+				"deleteNotImplemented": "खाता हटाने की सुविधा जल्द उपलब्ध होगी"
+			},
 			"tilePreferences": {
 				"title": "टाइल प्राथमिकताएँ",
 				"description": "परिभाषित करें कि आप कैसे घूमते हैं और Tiler को आपके दैनिक समय पैटर्न समझने में मदद करें",
