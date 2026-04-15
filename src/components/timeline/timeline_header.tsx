@@ -23,7 +23,7 @@ const TimelineHeader: React.FC = () => {
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLDivElement>(null);
-	const openCreateTile = useCalendarUI((state) => state.createTile.actions.open);
+	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const viewInfo = useCalendarUI((state) => state.viewInfo);
 	const dispatch = useCalendarDispatch();
 
@@ -91,7 +91,7 @@ const TimelineHeader: React.FC = () => {
 					disabled={isScheduleActionLoading}
 					onLoadingChange={setIsScheduleActionLoading}
 				/>
-				<CreateEventButton onClick={openCreateTile}>
+				<CreateEventButton onClick={openCreateSelection}>
 					<Plus size={16} />
 				</CreateEventButton>
 				{Env.isDevelopment() && (

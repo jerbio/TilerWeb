@@ -15,6 +15,7 @@ import {
 	DaySchedule,
 	ScheduleBooleanString,
 	ScheduleCreateEventParams,
+	ScheduleCreateEventResponse,
 	ScheduleRepeatEndType,
 	ScheduleRepeatFrequency,
 	ScheduleRepeatStartType,
@@ -39,6 +40,40 @@ import CreateTileInfo from './info';
 import { CreateTileRestrictionType } from '../data';
 
 dayjs.extend(advancedFormat);
+
+export function viewCreatedEvent(
+	event: ScheduleCreateEventResponse['Content'],
+	calendarDispatch: ReturnType<typeof useCalendarDispatch>,
+	actions: {
+		navigateToEvent: () => void;
+		navigateToEventComplete: () => void;
+		hideSuccess: () => void;
+	}
+) {
+	if (!event || event.calendarEvent.id === null) return;
+	calendarDispatch(
+		{
+			type: CalendarRequestType.FocusEvent,
+			entityId: event.calendarEvent.id,
+			entityType: CalendarEntityType.CalendarEvent,
+			actionType: Actions.Add_New_Task,
+		},
+		(result: CalendarRequestResult) => {
+			if (result.status === CalendarRequestStatus.Navigating) {
+				actions.navigateToEvent();
+			} else {
+				actions.navigateToEventComplete();
+				actions.hideSuccess();
+				if (result.status === CalendarRequestStatus.NotFound) {
+					console.warn(
+						'[CreateTile] Calendar could not find entity:',
+						event.calendarEvent.id
+					);
+				}
+			}
+		}
+	);
+}
 
 export type InitialCreateTileFormState = {
 	start: dayjs.Dayjs;
@@ -79,6 +114,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 	const { formData, resetForm } = formHandler;
 	const theme = useStyledTheme();
 	const { t } = useTranslation();
+	const calendarDispatch = useCalendarDispatch();
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.action.trim().length === 0) return false;
@@ -86,7 +122,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		if (duration === 0) return false;
 		return true;
 	}, [formData]);
-	const calendarDispatch = useCalendarDispatch();
 
 	function closeModal() {
 		resetForm();
@@ -201,33 +236,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		}
 	}, [isValidSubmission, formData, ui, refetchEvents, resetForm, calendarDispatch, t, theme]);
 
-	function viewCreatedEvent() {
-		const successTile = ui.state.success.tile;
-		if (!successTile || successTile.calendarEvent.id === null) return;
-		calendarDispatch(
-			{
-				type: CalendarRequestType.FocusEvent,
-				entityId: successTile.calendarEvent.id,
-				entityType: CalendarEntityType.CalendarEvent,
-				actionType: Actions.Add_New_Task,
-			},
-			(result: CalendarRequestResult) => {
-				if (result.status === CalendarRequestStatus.Navigating) {
-					ui.actions.navigateToTile();
-				} else {
-					ui.actions.navigateToTileComplete();
-					ui.actions.hideSuccess();
-					if (result.status === CalendarRequestStatus.NotFound) {
-						console.warn(
-							'[CreateTile] Calendar could not find entity:',
-							successTile.calendarEvent.id
-						);
-					}
-				}
-			}
-		);
-	}
-
 	async function getUserRestrictionProfiles() {
 		try {
 			ui.actions.loadRestrictionProfiles();
@@ -293,7 +301,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				actions={[
 					{
 						text: t('calendar.createTile.buttons.viewInTimeline'),
-						onClick: viewCreatedEvent,
+						onClick: () => {
+							viewCreatedEvent(ui.state.success.tile!, calendarDispatch, {
+								navigateToEvent: ui.actions.navigateToTile,
+								navigateToEventComplete: ui.actions.navigateToTileComplete,
+								hideSuccess: ui.actions.hideSuccess,
+							});
+						},
 						disabled: ui.state.success.isNavigatingToTile,
 					},
 				]}
@@ -353,7 +367,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 					<CreateTileSummary formData={formData} />
 				</>
 			)}
-			<ButtonContainer $isexpanded={ui.state.isExpanded}>
+			<StyledCalendarCreateEventActions $isexpanded={ui.state.isExpanded}>
 				<Button
 					type="button"
 					variant={'ghost'}
@@ -369,7 +383,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				<Button variant="brand" type="submit" disabled={!isValidSubmission}>
 					{t('calendar.createTile.buttons.submit')}
 				</Button>
-			</ButtonContainer>
+			</StyledCalendarCreateEventActions>
 		</StyledCalendarCreateEvent>
 	);
 };
@@ -391,21 +405,6 @@ const Section = styled.section<{ $isexpanded: boolean }>`
 	margin-inline: auto;
 	border-inline: ${(props) => (props.$isexpanded ? '0px' : '1px')} solid
 		${(props) => props.theme.colors.border.strong};
-`;
-
-const ButtonContainer = styled.div<{ $isexpanded: boolean }>`
-	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
-	${(props) =>
-		props.$isexpanded
-			? `border-top: 1px solid ${props.theme.colors.border.strong};`
-			: `border: 1px solid ${props.theme.colors.border.strong};`}
-	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
-		${(props) => props.theme.borderRadius.xLarge};
-	display: flex;
-	justify-content: flex-end;
-	gap: 0.25rem;
-	padding: 0.5rem 1rem;
-	background-color: ${(props) => props.theme.colors.background.card};
 `;
 
 // -- INLINE FIELDS --
@@ -467,13 +466,26 @@ const TipContainer = styled.div`
 	}
 `;
 
-const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
+export const StyledCalendarCreateEventActions = styled.div<{ $isexpanded: boolean }>`
+	${(props) => (props.$isexpanded ? 'position: sticky; bottom: 0;' : '')}
+	${(props) =>
+		props.$isexpanded
+			? `border-top: 1px solid ${props.theme.colors.border.strong};`
+			: `border: 1px solid ${props.theme.colors.border.strong};`}
+	border-radius: 0 0 ${(props) => props.theme.borderRadius.xLarge}
+		${(props) => props.theme.borderRadius.xLarge};
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.25rem;
+	padding: 0.5rem 1rem;
+	background-color: ${(props) => props.theme.colors.background.card};
+`;
+
+export const StyledCalendarCreateEvent = styled.form<{ $isexpanded: boolean }>`
 	display: flex;
 	flex-direction: column;
 	background-color: ${(props) => props.theme.colors.background.card};
 	width: 100%;
-	isolation: isolate;
-
 	${(props) =>
 		props.$isexpanded
 			? `
