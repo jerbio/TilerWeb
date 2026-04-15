@@ -143,6 +143,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 };
 
 const Trigger = styled.button<{ $isDark: boolean }>`
+	width: 100%;
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -151,12 +152,13 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 	color: ${({ theme }) => theme.colors.text.primary};
-	padding: 0.75rem 2.5rem 0.75rem 1rem;
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+	font-size: 13px;
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	cursor: pointer;
 	position: relative;
 	transition: border-color 0.2s ease;
+	white-space: nowrap;
 
 	&:hover:not(:disabled) {
 		border-color: ${({ theme }) => theme.colors.gray[500]};
@@ -176,7 +178,7 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 
 const ChevronSvg = styled.svg`
 	position: absolute;
-	right: 0.75rem;
+	right: 0.5rem;
 	top: 50%;
 	transform: translateY(-50%);
 	opacity: 0.5;

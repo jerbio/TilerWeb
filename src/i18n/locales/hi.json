@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "इवेंट वर्तमान के रूप में सेट किया गया!",
 			"completing": "इवेंट पूरा हो रहा है...",
 			"completeSuccess": "इवेंट पूरा हुआ!",
+			"deferring": "इवेंट स्थगित हो रहा है...",
+			"deferSuccess": "इवेंट स्थगित किया गया!",
+			"updating": "परिवर्तन सहेजे जा रहे हैं...",
+			"updateSuccess": "परिवर्तन सहेजे गए!",
 			"deleting": "इवेंट हटाया जा रहा है...",
 			"deleteSuccess": "इवेंट हटाया गया!",
 			"actionFailed": "कार्रवाई विफल हुई। कृपया पुनः प्रयास करें।"
+		},
+		"edit": {
+			"title": "संपादित करें",
+			"titleBlock": "ब्लॉक संपादित करें",
+			"titleTile": "टाइल संपादित करें",
+			"nameSection": "नाम",
+			"timeSection": "समय और अवधि",
+			"repetitionSection": "दोहराव",
+			"locationSection": "स्थान",
+			"colorSection": "रंग",
+			"name": "नाम",
+			"start": "शुरू",
+			"end": "समाप्त",
+			"selectDate": "तारीख चुनें",
+			"duration": "अवधि",
+			"hours": "घंटे",
+			"minutes": "मिनट",
+			"durationHoursPreview": "{{count}}घं",
+			"durationMinutesPreview": "{{count}}मि",
+			"split": "विभाजन संख्या",
+			"splitPlaceholder": "जैसे 3",
+			"location": "पता",
+			"locationDescription": "विवरण",
+			"locationDescriptionPlaceholder": "अतिरिक्त स्थान विवरण...",
+			"color": "रंग",
+			"recurring": "दोहराव",
+			"selectFrequency": "आवृत्ति चुनें",
+			"daily": "दैनिक",
+			"weekly": "साप्ताहिक",
+			"monthly": "मासिक",
+			"yearly": "वार्षिक",
+			"forever": "हमेशा दोहराएं",
+			"repetitionStart": "दोहराव शुरू",
+			"repetitionEnd": "दोहराव समाप्त",
+			"sun": "रवि",
+			"mon": "सोम",
+			"tue": "मंगल",
+			"wed": "बुध",
+			"thu": "गुरु",
+			"fri": "शुक्र",
+			"sat": "शनि",
+			"save": "सहेजें",
+			"saving": "परिवर्तन सहेजे जा रहे हैं...",
+			"saveSuccess": "इवेंट अपडेट किया गया!",
+			"saveFailed": "सहेजने में विफल। कृपया पुनः प्रयास करें।",
+			"back": "वापस",
+			"loading": "विवरण लोड हो रहे हैं...",
+			"loadingBlock": "ब्लॉक विवरण लोड हो रहे हैं...",
+			"loadingTile": "टाइल विवरण लोड हो रहे हैं...",
+			"clearLocation": "स्थान हटाएं",
+			"locationMinChars": "खोजने के लिए कम से कम 3 अक्षर टाइप करें",
+			"locationSearchPlaceholder": "स्थान खोजें...",
+			"savedLocations": "सहेजे गए स्थान",
+			"googleResults": "गूगल मैप्स",
+			"poweredByGoogle": "Google द्वारा संचालित",
+			"noLocationResults": "कोई स्थान नहीं मिला"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "सेटिंग्स"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "खाता जानकारी",
+				"description": "अपने खाते की समीक्षा करें और अपनी व्यक्तिगत जानकारी में बदलाव करें",
+				"fields": {
+					"fullName": "पूरा नाम",
+					"username": "उपयोगकर्ता नाम",
+					"email": "ईमेल पता",
+					"phoneNumber": "फ़ोन नंबर",
+					"phoneNumberPlaceholder": "फ़ोन नंबर जोड़ें",
+					"countryCode": "देश कोड",
+					"countryCodeSearch": "देश खोजें...",
+					"countryCodeNoResults": "कोई देश नहीं मिला",
+					"dateOfBirth": "जन्म तिथि",
+					"dateOfBirthPlaceholder": "दिन/माह/वर्ष"
+				},
+				"saveChanges": "परिवर्तन सहेजें",
+				"saving": "सहेज रहा है...",
+				"deleteAccount": "मेरा खाता हटाएं",
+				"saveSuccess": "खाता जानकारी सफलतापूर्वक अपडेट की गई",
+				"saveError": "परिवर्तन सहेजने में विफल। कृपया पुनः प्रयास करें।",
+				"deleteNotImplemented": "खाता हटाने की सुविधा जल्द उपलब्ध होगी"
+			},
 			"tilePreferences": {
 				"title": "टाइल प्राथमिकताएँ",
 				"description": "परिभाषित करें कि आप कैसे घूमते हैं और Tiler को आपके दैनिक समय पैटर्न समझने में मदद करें",
@@ -664,5 +746,24 @@
 				"pm": "अपराह्न"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "प्रतिक्रिया भेजें",
+		"title": "प्रतिक्रिया भेजें",
+		"category": "श्रेणी",
+		"categories": {
+			"Bug": "बग",
+			"Feature Request": "सुविधा अनुरोध",
+			"Improvement": "सुधार",
+			"Other": "अन्य"
+		},
+		"titleLabel": "शीर्षक",
+		"titlePlaceholder": "अपनी प्रतिक्रिया का संक्षिप्त सारांश",
+		"descriptionLabel": "विवरण",
+		"descriptionPlaceholder": "अपनी प्रतिक्रिया के बारे में और बताएं...",
+		"submit": "जमा करें",
+		"submitting": "जमा हो रहा है...",
+		"submitSuccess": "आपकी प्रतिक्रिया के लिए धन्यवाद!",
+		"submitError": "प्रतिक्रिया जमा करने में विफल। कृपया पुनः प्रयास करें।"
 	}
 }

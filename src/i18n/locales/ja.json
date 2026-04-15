@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "イベントを現在に設定しました！",
 			"completing": "イベントを完了中...",
 			"completeSuccess": "イベントが完了しました！",
+			"deferring": "イベントを延期中...",
+			"deferSuccess": "イベントが延期されました！",
+			"updating": "変更を保存中...",
+			"updateSuccess": "変更が保存されました！",
 			"deleting": "イベントを削除中...",
 			"deleteSuccess": "イベントが削除されました！",
 			"actionFailed": "アクションに失敗しました。もう一度お試しください。"
+		},
+		"edit": {
+			"title": "編集",
+			"titleBlock": "ブロックを編集",
+			"titleTile": "タイルを編集",
+			"nameSection": "名前",
+			"timeSection": "時間と期間",
+			"repetitionSection": "繰り返し",
+			"locationSection": "場所",
+			"colorSection": "色",
+			"name": "名前",
+			"start": "開始",
+			"end": "終了",
+			"selectDate": "日付を選択",
+			"duration": "期間",
+			"hours": "時間",
+			"minutes": "分",
+			"durationHoursPreview": "{{count}}時間",
+			"durationMinutesPreview": "{{count}}分",
+			"split": "分割数",
+			"splitPlaceholder": "例: 3",
+			"location": "住所",
+			"locationDescription": "説明",
+			"locationDescriptionPlaceholder": "追加の場所の詳細...",
+			"color": "色",
+			"recurring": "繰り返し",
+			"selectFrequency": "頻度を選択",
+			"daily": "毎日",
+			"weekly": "毎週",
+			"monthly": "毎月",
+			"yearly": "毎年",
+			"forever": "永久に繰り返す",
+			"repetitionStart": "繰り返し開始",
+			"repetitionEnd": "繰り返し終了",
+			"sun": "日",
+			"mon": "月",
+			"tue": "火",
+			"wed": "水",
+			"thu": "木",
+			"fri": "金",
+			"sat": "土",
+			"save": "保存",
+			"saving": "変更を保存中...",
+			"saveSuccess": "イベントが更新されました！",
+			"saveFailed": "保存に失敗しました。もう一度お試しください。",
+			"back": "戻る",
+			"loading": "詳細を読み込み中...",
+			"loadingBlock": "ブロックの詳細を読み込み中...",
+			"loadingTile": "タイルの詳細を読み込み中...",
+			"clearLocation": "場所をクリア",
+			"locationMinChars": "検索するには3文字以上入力してください",
+			"locationSearchPlaceholder": "場所を検索...",
+			"savedLocations": "保存済みの場所",
+			"googleResults": "Googleマップ",
+			"poweredByGoogle": "Google提供",
+			"noLocationResults": "場所が見つかりません"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "設定"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "アカウント情報",
+				"description": "アカウントを確認し、個人情報を変更してください",
+				"fields": {
+					"fullName": "氏名",
+					"username": "ユーザー名",
+					"email": "メールアドレス",
+					"phoneNumber": "電話番号",
+					"phoneNumberPlaceholder": "電話番号を追加",
+					"countryCode": "国番号",
+					"countryCodeSearch": "国を検索...",
+					"countryCodeNoResults": "国が見つかりません",
+					"dateOfBirth": "生年月日",
+					"dateOfBirthPlaceholder": "年/月/日"
+				},
+				"saveChanges": "変更を保存",
+				"saving": "保存中...",
+				"deleteAccount": "アカウントを削除",
+				"saveSuccess": "アカウント情報が正常に更新されました",
+				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
+				"deleteNotImplemented": "アカウント削除機能は近日公開予定です"
+			},
 			"tilePreferences": {
 				"title": "タイル設定",
 				"description": "移動手段を定義し、Tilerが日々の時間パターンを理解するのを助けましょう",
@@ -664,5 +746,24 @@
 				"pm": "午後"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "フィードバックを送信",
+		"title": "フィードバックを送信",
+		"category": "カテゴリ",
+		"categories": {
+			"Bug": "バグ",
+			"Feature Request": "機能リクエスト",
+			"Improvement": "改善",
+			"Other": "その他"
+		},
+		"titleLabel": "タイトル",
+		"titlePlaceholder": "フィードバックの簡単な要約",
+		"descriptionLabel": "説明",
+		"descriptionPlaceholder": "フィードバックについて詳しく教えてください...",
+		"submit": "送信",
+		"submitting": "送信中...",
+		"submitSuccess": "フィードバックありがとうございます！",
+		"submitError": "フィードバックの送信に失敗しました。もう一度お試しください。"
 	}
 }

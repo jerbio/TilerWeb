@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserInfo } from '@/global_state';
 import { animated, useSpring } from '@react-spring/web';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, MessageSquarePlus, User } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import useAppStore from '@/global_state';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Button from './button';
+import FeedbackPopup from '@/components/feedback/FeedbackPopup';
 
 type ProfileSheetProps = {
 	user: UserInfo | null;
@@ -20,6 +21,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const theme = useTheme();
+	const [feedbackOpen, setFeedbackOpen] = useState(false);
 
 	const openSheetSpring = useSpring({
 		opacity: open ? 1 : 0,
@@ -64,10 +66,17 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 
 			<ProfileDivider />
 
+			<FeedbackButton variant="ghost" onClick={() => setFeedbackOpen(true)}>
+				<MessageSquarePlus size={16} />
+				{t('feedback.menuItem')}
+			</FeedbackButton>
+
 			<LogoutButton variant="ghost" onClick={handleLogout}>
 				<LogOut size={16} color={theme.colors.error[400]} />
 				{t('timeline.userMenu.logout')}
 			</LogoutButton>
+
+			<FeedbackPopup isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
 		</AnimatedProfileMenu>
 	);
 };
@@ -147,5 +156,7 @@ const ProfileDivider = styled.div`
 `;
 
 const LogoutButton = styled(Button)``;
+
+const FeedbackButton = styled(Button)``;
 
 export default ProfileSheet;

@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "Событие установлено как текущее!",
 			"completing": "Завершение события...",
 			"completeSuccess": "Событие завершено!",
+			"deferring": "Откладывание события...",
+			"deferSuccess": "Событие отложено!",
+			"updating": "Сохранение изменений...",
+			"updateSuccess": "Изменения сохранены!",
 			"deleting": "Удаление события...",
 			"deleteSuccess": "Событие удалено!",
 			"actionFailed": "Действие не выполнено. Попробуйте ещё раз."
+		},
+		"edit": {
+			"title": "Редактировать",
+			"titleBlock": "Редактировать блок",
+			"titleTile": "Редактировать плитку",
+			"nameSection": "Название",
+			"timeSection": "Время и продолжительность",
+			"repetitionSection": "Повторение",
+			"locationSection": "Местоположение",
+			"colorSection": "Цвет",
+			"name": "Название",
+			"start": "Начало",
+			"end": "Конец",
+			"selectDate": "Выбрать дату",
+			"duration": "Продолжительность",
+			"hours": "ч",
+			"minutes": "мин",
+			"durationHoursPreview": "{{count}}ч",
+			"durationMinutesPreview": "{{count}}м",
+			"split": "Количество разделений",
+			"splitPlaceholder": "напр. 3",
+			"location": "Адрес",
+			"locationDescription": "Описание",
+			"locationDescriptionPlaceholder": "Дополнительные сведения о местоположении...",
+			"color": "Цвет",
+			"recurring": "Повторяющееся",
+			"selectFrequency": "Выбрать частоту",
+			"daily": "Ежедневно",
+			"weekly": "Еженедельно",
+			"monthly": "Ежемесячно",
+			"yearly": "Ежегодно",
+			"forever": "Повторять всегда",
+			"repetitionStart": "Начало повторения",
+			"repetitionEnd": "Конец повторения",
+			"sun": "Вс",
+			"mon": "Пн",
+			"tue": "Вт",
+			"wed": "Ср",
+			"thu": "Чт",
+			"fri": "Пт",
+			"sat": "Сб",
+			"save": "Сохранить",
+			"saving": "Сохранение изменений...",
+			"saveSuccess": "Событие обновлено!",
+			"saveFailed": "Не удалось сохранить. Попробуйте ещё раз.",
+			"back": "Назад",
+			"loading": "Загрузка деталей...",
+			"loadingBlock": "Загрузка деталей блока...",
+			"loadingTile": "Загрузка деталей плитки...",
+			"clearLocation": "Очистить местоположение",
+			"locationMinChars": "Введите не менее 3 символов для поиска",
+			"locationSearchPlaceholder": "Поиск местоположения...",
+			"savedLocations": "Сохранённые места",
+			"googleResults": "Google Карты",
+			"poweredByGoogle": "На основе Google",
+			"noLocationResults": "Местоположения не найдены"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "Настройки"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Информация об аккаунте",
+				"description": "Просмотрите свой аккаунт и измените личную информацию",
+				"fields": {
+					"fullName": "Полное имя",
+					"username": "Имя пользователя",
+					"email": "Электронная почта",
+					"phoneNumber": "Номер телефона",
+					"phoneNumberPlaceholder": "Добавить номер телефона",
+					"countryCode": "Код страны",
+					"countryCodeSearch": "Поиск стран...",
+					"countryCodeNoResults": "Страны не найдены",
+					"dateOfBirth": "Дата рождения",
+					"dateOfBirthPlaceholder": "ДД.ММ.ГГГГ"
+				},
+				"saveChanges": "Сохранить изменения",
+				"saving": "Сохранение...",
+				"deleteAccount": "Удалить мой аккаунт",
+				"saveSuccess": "Информация об аккаунте успешно обновлена",
+				"saveError": "Не удалось сохранить изменения. Попробуйте ещё раз.",
+				"deleteNotImplemented": "Функция удаления аккаунта скоро будет доступна"
+			},
 			"tilePreferences": {
 				"title": "Настройки плиток",
 				"description": "Укажите, как вы передвигаетесь, и помогите Tiler понять ваши ежедневные временные паттерны",
@@ -664,5 +746,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Отправить отзыв",
+		"title": "Отправить отзыв",
+		"category": "Категория",
+		"categories": {
+			"Bug": "Ошибка",
+			"Feature Request": "Запрос функции",
+			"Improvement": "Улучшение",
+			"Other": "Другое"
+		},
+		"titleLabel": "Заголовок",
+		"titlePlaceholder": "Краткое описание вашего отзыва",
+		"descriptionLabel": "Описание",
+		"descriptionPlaceholder": "Расскажите подробнее о вашем отзыве...",
+		"submit": "Отправить",
+		"submitting": "Отправка...",
+		"submitSuccess": "Спасибо за ваш отзыв!",
+		"submitError": "Не удалось отправить отзыв. Пожалуйста, попробуйте снова."
 	}
 }

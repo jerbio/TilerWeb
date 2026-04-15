@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n/config';
 import CalendarEventInfo from '../calendar_event_info';
-import { ScheduleSubCalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
+import { SubCalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
 import { CalendarUIProvider } from '../calendar-ui.provider';
 
 // Mock services
@@ -21,9 +21,7 @@ vi.mock('@/services', () => ({
 import { scheduleService } from '@/services';
 
 // Minimal mock event that satisfies the component's usage
-const createMockEvent = (
-	overrides: Partial<ScheduleSubCalendarEvent> = {}
-): ScheduleSubCalendarEvent =>
+const createMockEvent = (overrides: Partial<SubCalendarEvent> = {}): SubCalendarEvent =>
 	({
 		id: 'sub-event-id-123',
 		name: 'Test Event',
@@ -56,7 +54,7 @@ const createMockEvent = (
 		split: 0,
 		thirdPartyType: ThirdPartyType.Tiler,
 		...overrides,
-	}) as ScheduleSubCalendarEvent;
+	}) as SubCalendarEvent;
 
 const renderWithProviders = (ui: React.ReactElement) =>
 	render(
@@ -76,10 +74,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 	it('renders Complete, Now, and Defer action buttons when event is provided', () => {
 		renderWithProviders(
-			<CalendarEventInfo
-				event={createMockEvent()}
-				onEventAction={mockOnEventAction}
-			/>
+			<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 		);
 
 		expect(screen.getByTitle('Complete')).toBeInTheDocument();
@@ -88,9 +83,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	});
 
 	it('does not render action buttons when event is null', () => {
-		renderWithProviders(
-			<CalendarEventInfo event={null} onEventAction={mockOnEventAction} />
-		);
+		renderWithProviders(<CalendarEventInfo event={null} onEventAction={mockOnEventAction} />);
 
 		expect(screen.queryByTitle('Complete')).not.toBeInTheDocument();
 		expect(screen.queryByTitle('Now')).not.toBeInTheDocument();
@@ -104,10 +97,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -125,10 +115,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -144,10 +131,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			);
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -166,10 +150,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Now'));
@@ -187,10 +168,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Now'));
@@ -204,10 +182,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	describe('Defer action', () => {
 		it('shows duration picker when Defer button is clicked', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Defer'));
@@ -220,10 +195,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('hides action buttons and shows picker inputs when Defer is clicked', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Buttons visible initially
@@ -238,10 +210,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('hides duration picker when cancel is clicked', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Open picker
@@ -258,10 +227,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('confirm button is disabled when all durations are zero', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Defer'));
@@ -276,10 +242,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Open picker
@@ -316,10 +279,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			});
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Defer'));
@@ -336,10 +296,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('resets duration fields when picker is reopened', () => {
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			// Open picker and set values
@@ -365,14 +322,14 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			let resolveComplete: (value: any) => void;
 			vi.mocked(scheduleService.completeScheduleEvent).mockImplementation(
-				() => new Promise((resolve) => { resolveComplete = resolve; })
+				() =>
+					new Promise((resolve) => {
+						resolveComplete = resolve;
+					})
 			);
 
 			renderWithProviders(
-				<CalendarEventInfo
-					event={createMockEvent()}
-					onEventAction={mockOnEventAction}
-				/>
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
 			);
 
 			fireEvent.click(screen.getByTitle('Complete'));
@@ -391,7 +348,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 	describe('Save (update) action', () => {
 		it('calls scheduleService.updateSubCalendarEvent with changed name', async () => {
 			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
-				createMockEvent() as ScheduleSubCalendarEvent
+				createMockEvent() as SubCalendarEvent
 			);
 
 			renderWithProviders(
@@ -425,7 +382,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('calls onEventAction after successful save', async () => {
 			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
-				createMockEvent() as ScheduleSubCalendarEvent
+				createMockEvent() as SubCalendarEvent
 			);
 
 			renderWithProviders(
@@ -480,7 +437,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 
 		it('does not include third-party fields when saving a Tiler event', async () => {
 			vi.mocked(scheduleService.updateSubCalendarEvent).mockResolvedValueOnce(
-				createMockEvent() as ScheduleSubCalendarEvent
+				createMockEvent() as SubCalendarEvent
 			);
 
 			renderWithProviders(
@@ -553,9 +510,31 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			expect(nameContainer?.querySelector('.edit-icon')).not.toBeInTheDocument();
 		});
 
+		it('still shows time edit pencil icons for third-party events', () => {
+			const { container } = renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+					isEditable={true}
+				/>
+			);
+
+			// Start/end time pencil icons should still be present for third-party events
+			const allEditIcons = container.querySelectorAll('.edit-icon');
+			expect(allEditIcons.length).toBe(2);
+		});
+
 		it('calls deleteScheduleEvent with third-party fields when Delete is clicked', async () => {
 			vi.mocked(scheduleService.deleteScheduleEvent).mockResolvedValueOnce(
-				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<infer T> ? T : never
+				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<
+					infer T
+				>
+					? T
+					: never
 			);
 
 			renderWithProviders(
@@ -579,6 +558,111 @@ describe('CalendarEventInfo – Action Buttons', () => {
 					'google-user-456'
 				);
 			});
+		});
+	});
+
+	describe('Read-only mode (readOnly prop)', () => {
+		it('hides Complete, Now, and Defer action buttons when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByTitle('Complete')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Now')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Defer')).not.toBeInTheDocument();
+		});
+
+		it('hides More Options row when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByText('More options')).not.toBeInTheDocument();
+		});
+
+		it('hides Delete button for third-party events when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByTitle('Delete')).not.toBeInTheDocument();
+		});
+
+		it('does not show edit pencil icon on event name when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+			const nameContainer = screen.getByText('Test Event').closest('div');
+			expect(nameContainer?.querySelector('.edit-icon')).not.toBeInTheDocument();
+		});
+
+		it('does not enter name editing mode on click when readOnly is true', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			fireEvent.click(screen.getByText('Test Event'));
+
+			// Should not show an input field
+			expect(screen.queryByDisplayValue('Test Event')).not.toBeInTheDocument();
+			// Name should still be a heading, not editable
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+		});
+
+		it('still displays event details (start, end, duration) in read-only mode', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			// Event name is visible
+			expect(screen.getByText('Test Event')).toBeInTheDocument();
+			// Time labels are visible
+			expect(screen.getByText('Starts:')).toBeInTheDocument();
+			expect(screen.getByText('Ends:')).toBeInTheDocument();
+			expect(screen.getByText('Duration:')).toBeInTheDocument();
+		});
+
+		it('does not show edit pencil icons on time fields when readOnly is true', () => {
+			const { container } = renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent()}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			const allEditIcons = container.querySelectorAll('.edit-icon');
+			expect(allEditIcons.length).toBe(0);
 		});
 	});
 });

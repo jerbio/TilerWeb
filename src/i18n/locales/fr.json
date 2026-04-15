@@ -307,9 +307,69 @@
 			"setAsNowSuccess": "Événement défini comme actuel !",
 			"completing": "Achèvement en cours...",
 			"completeSuccess": "Événement terminé !",
+			"deferring": "Report de l'événement...",
+			"deferSuccess": "Événement reporté !",
+			"updating": "Enregistrement des modifications...",
+			"updateSuccess": "Modifications enregistrées !",
 			"deleting": "Suppression en cours...",
 			"deleteSuccess": "Événement supprimé !",
 			"actionFailed": "L'action a échoué. Veuillez réessayer."
+		},
+		"edit": {
+			"title": "Modifier",
+			"titleBlock": "Modifier le bloc",
+			"titleTile": "Modifier la tuile",
+			"nameSection": "Nom",
+			"timeSection": "Heure et durée",
+			"repetitionSection": "Répétition",
+			"locationSection": "Lieu",
+			"colorSection": "Couleur",
+			"name": "Nom",
+			"start": "Début",
+			"end": "Fin",
+			"selectDate": "Sélectionner une date",
+			"duration": "Durée",
+			"hours": "h",
+			"minutes": "min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Nombre de divisions",
+			"splitPlaceholder": "ex. 3",
+			"location": "Adresse",
+			"locationDescription": "Description",
+			"locationDescriptionPlaceholder": "Détails supplémentaires sur le lieu...",
+			"color": "Couleur",
+			"recurring": "Récurrent",
+			"selectFrequency": "Sélectionner la fréquence",
+			"daily": "Quotidien",
+			"weekly": "Hebdomadaire",
+			"monthly": "Mensuel",
+			"yearly": "Annuel",
+			"forever": "Répéter indéfiniment",
+			"repetitionStart": "Début de la répétition",
+			"repetitionEnd": "Fin de la répétition",
+			"sun": "Dim",
+			"mon": "Lun",
+			"tue": "Mar",
+			"wed": "Mer",
+			"thu": "Jeu",
+			"fri": "Ven",
+			"sat": "Sam",
+			"save": "Enregistrer",
+			"saving": "Enregistrement des modifications...",
+			"saveSuccess": "Événement mis à jour !",
+			"saveFailed": "Échec de l'enregistrement. Veuillez réessayer.",
+			"back": "Retour",
+			"loading": "Chargement des détails...",
+			"loadingBlock": "Chargement des détails du bloc...",
+			"loadingTile": "Chargement des détails de la tuile...",
+			"clearLocation": "Effacer le lieu",
+			"locationMinChars": "Saisissez au moins 3 caractères pour rechercher",
+			"locationSearchPlaceholder": "Rechercher un lieu...",
+			"savedLocations": "Lieux enregistrés",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Fourni par Google",
+			"noLocationResults": "Aucun lieu trouvé"
 		}
 	},
 	"settings": {
@@ -321,6 +381,28 @@
 			"settings": "Paramètres"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Informations du compte",
+				"description": "Consultez votre compte et modifiez vos informations personnelles",
+				"fields": {
+					"fullName": "Nom complet",
+					"username": "Nom d'utilisateur",
+					"email": "Adresse e-mail",
+					"phoneNumber": "Numéro de téléphone",
+					"phoneNumberPlaceholder": "Ajouter un numéro de téléphone",
+					"countryCode": "Indicatif pays",
+					"countryCodeSearch": "Rechercher des pays...",
+					"countryCodeNoResults": "Aucun pays trouvé",
+					"dateOfBirth": "Date de naissance",
+					"dateOfBirthPlaceholder": "JJ/MM/AAAA"
+				},
+				"saveChanges": "Enregistrer les modifications",
+				"saving": "Enregistrement...",
+				"deleteAccount": "Supprimer mon compte",
+				"saveSuccess": "Informations du compte mises à jour avec succès",
+				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
+				"deleteNotImplemented": "La suppression de compte sera bientôt disponible"
+			},
 			"tilePreferences": {
 				"title": "Préférences de Tuile",
 				"description": "Définissez vos modes de déplacement et aidez Tiler à comprendre vos habitudes quotidiennes",
@@ -368,5 +450,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Envoyer un commentaire",
+		"title": "Envoyer un commentaire",
+		"category": "Catégorie",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Demande de fonctionnalité",
+			"Improvement": "Amélioration",
+			"Other": "Autre"
+		},
+		"titleLabel": "Titre",
+		"titlePlaceholder": "Résumé bref de votre commentaire",
+		"descriptionLabel": "Description",
+		"descriptionPlaceholder": "Dites-nous en plus sur votre commentaire...",
+		"submit": "Envoyer",
+		"submitting": "Envoi en cours...",
+		"submitSuccess": "Merci pour votre commentaire !",
+		"submitError": "Échec de l'envoi du commentaire. Veuillez réessayer."
 	}
 }

@@ -11,7 +11,7 @@ import {
 	ScheduleProcrastinateEventParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
-	ScheduleSubCalendarEvent,
+	SubCalendarEvent,
 	ThirdPartyType,
 } from '@/core/common/types/schedule';
 
@@ -401,9 +401,7 @@ describe('ScheduleService', () => {
 				new Error('Network error')
 			);
 
-			await expect(
-				service.procrastinateScheduleEvent(procrastinateParams)
-			).rejects.toThrow();
+			await expect(service.procrastinateScheduleEvent(procrastinateParams)).rejects.toThrow();
 		});
 	});
 
@@ -485,7 +483,7 @@ describe('ScheduleService', () => {
 			end: 1769929200000,
 			name: 'Test Event',
 			calendarEventEnd: 1770532200000,
-		} as unknown as ScheduleSubCalendarEvent;
+		} as unknown as SubCalendarEvent;
 
 		it('calls updateSubCalendarEvent on subCalendarEventApi with start and end times', async () => {
 			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({

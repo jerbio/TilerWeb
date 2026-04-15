@@ -63,7 +63,6 @@ export class AppApi {
 
 			return (await res.json()) as T;
 		} catch (error) {
-			console.error(error, 'from api req');
 			if (error instanceof ServerError) throw error;
 			// Check if it's a structured error response (not ServerError)
 			if (error && typeof error === 'object' && 'Error' in error) {

@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
 export default function useFormHandler<T extends { [field: string]: unknown }>(fields: T) {
-	const newFields: T = JSON.parse(JSON.stringify(fields));
-	const [formData, setFormData] = useState(newFields);
+	const [formData, setFormData] = useState({ ...fields });
 
 	const resetForm = () => {
-		setFormData(newFields);
+		setFormData({ ...fields });
 	};
 
 	const handleFormInputChange =
@@ -19,9 +18,9 @@ export default function useFormHandler<T extends { [field: string]: unknown }>(f
 				eventData = event.target.value;
 			}
 
-        if (options?.restriction === 'integer') {
-          eventData = Math.max(0, parseInt(eventData || '0', 10));
-        }
+			if (options?.restriction === 'integer') {
+				eventData = Math.max(0, parseInt(eventData || '0', 10));
+			}
 
 			setFormData((prev) => ({
 				...prev,

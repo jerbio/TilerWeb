@@ -19,6 +19,8 @@ export enum CalendarRequestStatus {
 	Navigating = 'navigating',
 	Stale = 'stale',
 	DemoMode = 'demo_mode',
+	Completed = 'completed',
+	Deleted = 'deleted',
 	Error = 'error',
 }
 
@@ -37,6 +39,8 @@ export type CalendarRequestResult =
 	| { status: CalendarRequestStatus.Navigating; entityId: string }
 	| { status: CalendarRequestStatus.Stale; entityId: string }
 	| { status: CalendarRequestStatus.DemoMode; entityId: string }
+	| { status: CalendarRequestStatus.Completed; entityId: string }
+	| { status: CalendarRequestStatus.Deleted; entityId: string }
 	| { status: CalendarRequestStatus.Error; message: string };
 
 /**

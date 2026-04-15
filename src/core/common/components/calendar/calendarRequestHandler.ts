@@ -8,7 +8,7 @@ import {
 	CalendarRequestResult,
 } from './calendarRequestContext';
 import { StyledEvent } from './calendar_events';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { SubCalendarEvent } from '@/core/common/types/schedule';
 import { CalendarViewOptions } from './calendar.types';
 import { resolveEntityToTileId } from '@/core/util/entityResolution';
 import { findEventDate } from '@/core/util/eventDateLookup';
@@ -30,7 +30,7 @@ export interface CalendarRequestHandlerDeps {
 	pendingFocusRef: React.MutableRefObject<PendingFocus | null>;
 	contentContainerRef: React.RefObject<HTMLDivElement>;
 	focusTimeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
-	events: ScheduleSubCalendarEvent[];
+	events: SubCalendarEvent[];
 	allowEventLookup: boolean;
 	setShowNonViableEvents: (val: dayjs.Dayjs | null) => void;
 	setSelectedEventInfo: (val: StyledEvent | null) => void;
@@ -154,12 +154,19 @@ export function createCalendarRequestHandler(
 				deps.setSelectedEvent(null);
 				onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
 
+				// Track completion / deletion state from within the lookup callbacks
+				let isEventComplete = false;
+				let isEventDeleted = false;
+
 				findEventDate({
 					entityId,
 					entityType,
 					lookupSubCalEvent: async (id) => {
 						try {
-							return await scheduleService.lookupSubCalendarEventById(id);
+							const event = await scheduleService.lookupSubCalendarEventById(id);
+							if (event.isEnabled === false) isEventDeleted = true;
+							if (event.isComplete) isEventComplete = true;
+							return event;
 						} catch {
 							return null;
 						}
@@ -171,6 +178,8 @@ export function createCalendarRequestHandler(
 								scheduleService.getSubEventsOfCalendar(id),
 							]);
 							if (!calEvent || calEvent.start == null) return null;
+							if (calEvent.isEnabled === false) isEventDeleted = true;
+							if (calEvent.isComplete) isEventComplete = true;
 							return {
 								start: calEvent.start,
 								subEvents: (subEvents ?? []).map((s) => ({
@@ -184,7 +193,17 @@ export function createCalendarRequestHandler(
 					},
 				}).then((startMs) => {
 					if (startMs == null) {
-						onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
+						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						return;
+					}
+
+					if (isEventDeleted) {
+						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						return;
+					}
+
+					if (isEventComplete) {
+						onResult?.({ status: CalendarRequestStatus.Completed, entityId });
 						return;
 					}
 

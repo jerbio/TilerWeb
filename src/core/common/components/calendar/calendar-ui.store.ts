@@ -1,10 +1,19 @@
 import { createStore } from 'zustand';
 import dayjs from 'dayjs';
-import { CalendarEvent, ScheduleCreateEventResponse } from '../../types/schedule';
+import {
+	CalendarEvent,
+	RestrictionProfile,
+	ScheduleCreateEventResponse,
+} from '../../types/schedule';
 
 type CreateTileState = {
 	isOpen: boolean;
 	isExpanded: boolean;
+	restrictionProfile: {
+		work: RestrictionProfile | null;
+		personal: RestrictionProfile | null;
+		loading: boolean;
+	};
 
 	loading: {
 		isActive: boolean;
@@ -32,6 +41,12 @@ type CreateTileActions = {
 
 	navigateToTile: () => void;
 	navigateToTileComplete: () => void;
+
+	loadRestrictionProfiles: () => void;
+	loadRestrictionProfilesComplete: (
+		work: RestrictionProfile | null,
+		personal: RestrictionProfile | null
+	) => void;
 };
 
 type EditTileState = {
@@ -50,6 +65,7 @@ type ViewInfo = {
 };
 
 export type CalendarUIStore = {
+	demoMode: boolean;
 	createTile: {
 		state: CreateTileState;
 		actions: CreateTileActions;
@@ -73,10 +89,17 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 		}
 
 		return {
+			demoMode,
 			createTile: {
 				state: {
 					isOpen: false,
 					isExpanded: false,
+
+					restrictionProfile: {
+						work: null,
+						personal: null,
+						loading: false,
+					},
 
 					loading: {
 						isActive: false,
@@ -215,6 +238,38 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 								state: {
 									...state.createTile.state,
 									success: { isOpen: false, isNavigatingToTile: false },
+								},
+							},
+						}))
+					),
+
+					loadRestrictionProfiles: guarded(() =>
+						set((state) => ({
+							createTile: {
+								...state.createTile,
+								state: {
+									...state.createTile.state,
+									restrictionProfile: {
+										loading: true,
+										work: null,
+										personal: null,
+									},
+								},
+							},
+						}))
+					),
+
+					loadRestrictionProfilesComplete: guarded((work, personal) =>
+						set((state) => ({
+							createTile: {
+								...state.createTile,
+								state: {
+									...state.createTile.state,
+									restrictionProfile: {
+										loading: false,
+										work,
+										personal,
+									},
 								},
 							},
 						}))

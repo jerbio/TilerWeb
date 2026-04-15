@@ -105,6 +105,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 								{copiedTimes ? (
 									copiedTimes.dayIndex === index ? (
 										<IconButton
+											type="button"
 											$size={size}
 											$active
 											onClick={() => setCopiedTimes(null)}
@@ -117,6 +118,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 										</IconButton>
 									) : (
 										<IconButton
+											type="button"
 											$size={size}
 											onClick={() => handlePaste(index)}
 											data-testid={`paste-btn-${index}`}
@@ -127,6 +129,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 									)
 								) : day.startTime && day.endTime ? (
 									<IconButton
+										type="button"
 										$size={size}
 										onClick={() =>
 											handleCopy(index, day.startTime, day.endTime)
@@ -174,7 +177,8 @@ const sizeConfig = {
 // ── Styled Components ──────────────────────────────────────────
 
 const Container = styled.div<{ $size: WeeklyScheduleSize }>`
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
 	gap: ${({ $size }) =>
 		$size === WeeklyScheduleSize.Sm
 			? '0.25rem'
@@ -183,6 +187,10 @@ const Container = styled.div<{ $size: WeeklyScheduleSize }>`
 				: '0.75rem'};
 	align-items: flex-start;
 	${({ $size }) => $size === WeeklyScheduleSize.Sm && 'width: 100%;'}
+
+	@media (max-width: ${({ theme }) => theme.screens.md}) {
+		grid-template-columns: repeat(4, 1fr);
+	}
 `;
 
 const DayColumn = styled.div<{ $size: WeeklyScheduleSize }>`
@@ -238,6 +246,7 @@ const TimeRow = styled.div<{ $size: WeeklyScheduleSize }>`
 	flex-direction: column;
 	align-items: center;
 	gap: 2px;
+	width: 100%;
 
 	select {
 		padding: ${({ $size }) =>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { initialCreateTileFormState } from '../../data';
+import { CreateTileRestrictionType, initialCreateTileFormState } from '../../data';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
-import { scheduleService } from '@/services';
+import { scheduleService, userService } from '@/services';
 import { CalendarUIProvider } from '../../calendar-ui.provider';
 
 // Mock dependencies
@@ -23,14 +23,16 @@ vi.mock('react-i18next', () => ({
 		</span>
 	),
 }));
-vi.mock('@/services', () => ({ scheduleService: { createEvent: vi.fn() } }));
+vi.mock('@/services', () => ({
+	scheduleService: { createEvent: vi.fn() },
+	userService: { getScheduleProfile: vi.fn() },
+}));
 vi.mock('@/core/common/components/calendar/CalendarRequestProvider', () => ({
 	useCalendarDispatch: () => vi.fn(),
 }));
 
 import CalendarCreateTile from '..';
 import {
-	ScheduleCreateEventResponse,
 	ScheduleRepeatEndType,
 	ScheduleRepeatFrequency,
 	ScheduleRepeatStartType,
@@ -69,7 +71,11 @@ const mockCreateTileResponse = {
 	calendarEvent: {
 		id: '123',
 	},
-} as ScheduleCreateEventResponse['Content'];
+} as Awaited<ReturnType<typeof scheduleService.createEvent>>;
+const mockGetScheduleProfileResponse = {
+	workHoursRestrictionProfile: { id: 'work-123' },
+	personalHoursRestrictionProfile: { id: 'personal-123' },
+} as Awaited<ReturnType<typeof userService.getScheduleProfile>>;
 
 describe('CalendarCreateTile UI', () => {
 	afterEach(() => {
@@ -206,88 +212,88 @@ describe('CalendarCreateTile UI', () => {
 		expect(payload.RepeatWeeklyData).toBeUndefined();
 	});
 
-  it('sets time window fields correctly when not recurring', async () => {
-    const createMock = vi
-      .spyOn(scheduleService, 'createEvent')
-      .mockResolvedValue(mockCreateTileResponse);
+	it('sets time window fields correctly when not recurring', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
 
-    const start = dayjs('2026-03-20');
-    const end = dayjs('2026-03-21');
+		const start = dayjs('2026-03-20');
+		const end = dayjs('2026-03-21');
 
-    await renderWithProviders(
-      <CalendarCreateTile
-        formHandler={getFormHandler({
-          ...mockValidFormState,
-          isRecurring: false,
-          start,
-          deadline: end,
-        })}
-        refetchEvents={vi.fn()}
-      />
-    );
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isRecurring: false,
+					start,
+					deadline: end,
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
 
-    const submitBtn = screen.getByRole('button', {
-      name: /calendar.createTile.buttons.submit/i,
-    });
+		const submitBtn = screen.getByRole('button', {
+			name: /calendar.createTile.buttons.submit/i,
+		});
 
-    await userEvent.click(submitBtn);
+		await userEvent.click(submitBtn);
 
-    await waitFor(() => {
-      expect(createMock).toHaveBeenCalled();
-    });
+		await waitFor(() => {
+			expect(createMock).toHaveBeenCalled();
+		});
 
-    const payload = createMock.mock.calls[0][0];
+		const payload = createMock.mock.calls[0][0];
 
-    expect(payload.StartYear).toBe('2026');
-    expect(payload.StartMonth).toBe('03');
-    expect(payload.StartDay).toBe('20');
+		expect(payload.StartYear).toBe('2026');
+		expect(payload.StartMonth).toBe('03');
+		expect(payload.StartDay).toBe('20');
 		expect(payload.StartHour).toBe('00');
-    expect(payload.StartMinute).toBe('00');
+		expect(payload.StartMinute).toBe('00');
 
-    expect(payload.EndYear).toBe('2026');
-    expect(payload.EndMonth).toBe('03');
-    expect(payload.EndDay).toBe('21');
+		expect(payload.EndYear).toBe('2026');
+		expect(payload.EndMonth).toBe('03');
+		expect(payload.EndDay).toBe('21');
 		expect(payload.EndHour).toBe('23');
-    expect(payload.EndMinute).toBe('59');
-  });
+		expect(payload.EndMinute).toBe('59');
+	});
 
-  it('does not include time window fields when recurring', async () => {
-    const createMock = vi
-      .spyOn(scheduleService, 'createEvent')
-      .mockResolvedValue(mockCreateTileResponse);
+	it('does not include time window fields when recurring', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
 
-    await renderWithProviders(
-      <CalendarCreateTile
-        formHandler={getFormHandler({
-          ...mockValidFormState,
-          isRecurring: true,
-          start: dayjs(),
-          deadline: dayjs().add(1, 'day'),
-        })}
-        refetchEvents={vi.fn()}
-      />
-    );
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isRecurring: true,
+					start: dayjs(),
+					deadline: dayjs().add(1, 'day'),
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
 
-    const submitBtn = screen.getByRole('button', {
-      name: /calendar.createTile.buttons.submit/i,
-    });
+		const submitBtn = screen.getByRole('button', {
+			name: /calendar.createTile.buttons.submit/i,
+		});
 
-    await userEvent.click(submitBtn);
+		await userEvent.click(submitBtn);
 
-    await waitFor(() => {
-      expect(createMock).toHaveBeenCalled();
-    });
+		await waitFor(() => {
+			expect(createMock).toHaveBeenCalled();
+		});
 
-    const payload = createMock.mock.calls[0][0];
+		const payload = createMock.mock.calls[0][0];
 
-    expect(payload.StartYear).toBeUndefined();
-    expect(payload.EndYear).toBeUndefined();
-  });
+		expect(payload.StartYear).toBeUndefined();
+		expect(payload.EndYear).toBeUndefined();
+	});
 
-  it('sets weekly recurrence fields correctly', async () => {
-    const createMock = vi
-      .spyOn(scheduleService, 'createEvent')
-      .mockResolvedValue(mockCreateTileResponse);
+	it('sets weekly recurrence fields correctly', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
 
 		await renderWithProviders(
 			<CalendarCreateTile
@@ -389,5 +395,158 @@ describe('CalendarCreateTile UI', () => {
 		expect(payload.RepeatStartDay).toBe('02');
 		expect(payload.RepeatStartMonth).toBe('01');
 		expect(payload.RepeatStartYear).toBe('2020');
+	});
+
+	it('sets isRestricted to False when restriction type is Anytime', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isTimeRestricted: true,
+					timeRestrictionType: CreateTileRestrictionType.Anytime,
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => expect(createMock).toHaveBeenCalled());
+
+		const payload = createMock.mock.calls[0][0];
+
+		expect(payload.isRestricted).toBe('false');
+	});
+
+	it('sets work restriction profile id', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
+		const getScheduleProfileMock = vi
+			.spyOn(userService, 'getScheduleProfile')
+			.mockResolvedValue(mockGetScheduleProfileResponse);
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isTimeRestricted: true,
+					timeRestrictionType: CreateTileRestrictionType.WorkHours,
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		// expand to trigger profile loading
+		await userEvent.click(screen.getByRole('button', { name: /expand/i }));
+
+		expect(getScheduleProfileMock).toHaveBeenCalled();
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => expect(createMock).toHaveBeenCalled());
+
+		const payload = createMock.mock.calls[0][0];
+
+		expect(payload.RestrictionProfileId).toBe(
+			mockGetScheduleProfileResponse.workHoursRestrictionProfile!.id
+		);
+	});
+
+	it('sets personal restriction profile id', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
+		const getScheduleProfileMock = vi
+			.spyOn(userService, 'getScheduleProfile')
+			.mockResolvedValue(mockGetScheduleProfileResponse);
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isTimeRestricted: true,
+					timeRestrictionType: CreateTileRestrictionType.PersonalHours,
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		// expand to trigger profile loading
+		await userEvent.click(screen.getByRole('button', { name: /expand/i }));
+
+		expect(getScheduleProfileMock).toHaveBeenCalled();
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => expect(createMock).toHaveBeenCalled());
+
+		const payload = createMock.mock.calls[0][0];
+
+		expect(payload.RestrictionProfileId).toBe(
+			mockGetScheduleProfileResponse.personalHoursRestrictionProfile!.id
+		);
+	});
+
+	it('throws error if restriction profile (id) is missing', async () => {
+		const createMock = vi.spyOn(scheduleService, 'createEvent');
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isTimeRestricted: true,
+					timeRestrictionType: CreateTileRestrictionType.WorkHours,
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => {
+			expect(createMock).not.toHaveBeenCalled();
+		});
+	});
+
+	it('sets custom restrictive week schedule', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
+
+		const customSchedule = [
+			{ dayIndex: 1, startTime: '08:00', endTime: '12:00' },
+			{ dayIndex: 3, startTime: '14:00', endTime: '18:00' },
+		];
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					isTimeRestricted: true,
+					timeRestrictionType: CreateTileRestrictionType.Custom,
+					customTimeRestrictionSchedule: customSchedule,
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => expect(createMock).toHaveBeenCalled());
+
+		const payload = createMock.mock.calls[0][0];
+
+		expect(payload.RestrictiveWeek).toEqual({
+			isEnabled: 'true',
+			WeekDayOption: [
+				{ Start: '08:00', End: '12:00', Index: '1' },
+				{ Start: '14:00', End: '18:00', Index: '3' },
+			],
+		});
 	});
 });

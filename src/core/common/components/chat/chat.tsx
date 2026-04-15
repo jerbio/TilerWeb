@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState, FormEvent, useRef } from 'react';
+﻿import React, { useCallback, useEffect, useLayoutEffect, useState, FormEvent, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ChevronLeftIcon, SendHorizontal, CircleStop, History, SquarePen } from 'lucide-react';
 import SessionHistory from '@/core/common/components/chat/session-history/SessionHistory';
@@ -29,35 +29,36 @@ import ClarificationPrompt from '@/core/common/components/chat/ClarificationProm
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
-  const [hasUnexecuted, setHasUnexecuted] = useState(false);
+	const [hasUnexecuted, setHasUnexecuted] = useState(false);
 
-  useEffect(() => {
-    const checkActions = async () => {
-      if (!requestId) {
-        setHasUnexecuted(false);
-        return;
-      }
+	useEffect(() => {
+		const checkActions = async () => {
+			if (!requestId) {
+				setHasUnexecuted(false);
+				return;
+			}
 
-      try {
-        const response = await chatService.getVibeRequest(requestId);
-        const isClosed = response?.Content?.vibeRequest?.isClosed;
-        setHasUnexecuted(isClosed !== true);
-      } catch (error) {
-        console.error('Error checking vibe request status:', error);
-        // Fallback to original logic if API fails
-        const fallback = messages.some((msg) =>
-          msg.actions?.some(
-            (action) => action.status !== Status.Executed && action.status !== Status.Exited
-          )
-        );
-        setHasUnexecuted(fallback);
-      }
-    };
+			try {
+				const response = await chatService.getVibeRequest(requestId);
+				const isClosed = response?.Content?.vibeRequest?.isClosed;
+				setHasUnexecuted(isClosed !== true);
+			} catch (error) {
+				console.error('Error checking vibe request status:', error);
+				// Fallback to original logic if API fails
+				const fallback = messages.some((msg) =>
+					msg.actions?.some(
+						(action) =>
+							action.status !== Status.Executed && action.status !== Status.Exited
+					)
+				);
+				setHasUnexecuted(fallback);
+			}
+		};
 
-    checkActions();
-  }, [requestId, messages]); // Re-check when requestId or messages change
+		checkActions();
+	}, [requestId, messages]); // Re-check when requestId or messages change
 
-  return hasUnexecuted;
+	return hasUnexecuted;
 };
 
 const ChatWrapper = styled.section`
@@ -242,8 +243,10 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 	margin: 0.5rem 0;
 
 	.message-content {
-		background-color: ${({ $isUser, theme }) => ($isUser ? theme.colors.background.card2 : theme.colors.brand[500])};
-		color: ${({ $isUser, theme }) => ($isUser ? theme.colors.text.primary : theme.colors.white)};
+		background-color: ${({ $isUser, theme }) =>
+			$isUser ? theme.colors.background.card2 : theme.colors.brand[500]};
+		color: ${({ $isUser, theme }) =>
+			$isUser ? theme.colors.text.primary : theme.colors.white};
 		padding: 0.75rem 1rem;
 		border-radius: 1rem;
 		max-width: 70%;
@@ -252,7 +255,7 @@ const MessageBubble = styled.div<{ $isUser: boolean }>`
 `;
 
 type ChatProps = {
-  onClose?: () => void;
+	onClose?: () => void;
 };
 
 const MESSAGE_BATCH_SIZE = 10;
@@ -260,8 +263,8 @@ const ACTION_BATCH_SIZE = 10;
 const SCROLL_TOP_THRESHOLD = 40;
 
 const Chat: React.FC<ChatProps> = ({ onClose }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
+	const { t } = useTranslation();
+	const theme = useTheme();
 
   // Get the active persona session - single source of truth
   const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);

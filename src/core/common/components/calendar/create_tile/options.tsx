@@ -13,14 +13,15 @@ import {
 import { InitialCreateTileFormState } from '.';
 import CreateTileColorOptions from './options.color';
 import CreateTileActionsOptions from './options.actions';
+import { CreateTileRestrictionType } from '../data';
 
 type OptionsProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
 const CreateTileOptions: React.FC<OptionsProps> = ({ formHandler }) => {
-  const { t } = useTranslation();
-  const { formData } = formHandler;
+	const { t } = useTranslation();
+	const { formData } = formHandler;
 
 	const recurrenceTypeOptions = [
 		{
@@ -105,38 +106,66 @@ const CreateTileOptions: React.FC<OptionsProps> = ({ formHandler }) => {
 		},
 	];
 
-  const tileOptions = [
-    {
-      title: t('calendar.createTile.sections.tileColor'),
-      content: <CreateTileColorOptions formHandler={formHandler} />,
-    },
-    {
-      title: t('calendar.createTile.sections.tileActions'),
-      content: (
-        <CreateTileActionsOptions
-          formHandler={formHandler}
-          recurrenceTypeOptions={recurrenceTypeOptions}
-          recurrenceEndTypeOptions={recurrenceEndTypeOptions}
-          recurrenceWeekdayOptions={recurrenceWeekdayOptions}
-          recurrenceStartTypeOptions={recurrenceStartTypeOptions}
-        />
-      ),
-    },
-  ];
+	const restrictionTypeOptions = [
+		{
+			label: t('calendar.createTile.sections.restrictionType.anytime'),
+			value: CreateTileRestrictionType.Anytime,
+		},
+		{
+			label: t('calendar.createTile.sections.restrictionType.work'),
+			value: CreateTileRestrictionType.WorkHours,
+		},
+		{
+			label: t('calendar.createTile.sections.restrictionType.personal'),
+			value: CreateTileRestrictionType.PersonalHours,
+		},
+		{
+			label: t('calendar.createTile.sections.restrictionType.custom'),
+			value: CreateTileRestrictionType.Custom,
+		},
+	];
+
+	const tileOptions = [
+		{
+			title: t('calendar.createTile.sections.tileColor'),
+			content: <CreateTileColorOptions formHandler={formHandler} />,
+		},
+		{
+			title: t('calendar.createTile.sections.tileActions'),
+			content: (
+				<CreateTileActionsOptions
+					formHandler={formHandler}
+					recurrenceTypeOptions={recurrenceTypeOptions}
+					recurrenceEndTypeOptions={recurrenceEndTypeOptions}
+					recurrenceWeekdayOptions={recurrenceWeekdayOptions}
+					recurrenceStartTypeOptions={recurrenceStartTypeOptions}
+					restrictionTypeOptions={restrictionTypeOptions}
+				/>
+			),
+		},
+	];
 
 	return (
 		<TileOptionsContainer>
-			{tileOptions.map((option) => (
-				<TileOption key={option.title}>
-					<TileOptionHeader>{option.title}</TileOptionHeader>
-					{option.content}
-				</TileOption>
+			{tileOptions.map((option, index) => (
+				<React.Fragment key={option.title}>
+					<TileOption>
+						<TileOptionHeader>{option.title}</TileOptionHeader>
+						{option.content}
+					</TileOption>
+					<Divider $visible={index !== tileOptions.length - 1} />
+				</React.Fragment>
 			))}
 		</TileOptionsContainer>
 	);
 };
 
 export default CreateTileOptions;
+
+const Divider = styled.hr<{ $visible: boolean }>`
+	opacity: ${(props) => (props.$visible ? 1 : 0)};
+	border: 1px solid ${(props) => props.theme.colors.border.strong};
+`;
 
 const TileOptionHeader = styled.header`
 	font-size: ${(props) => props.theme.typography.fontSize.lg};
@@ -156,5 +185,5 @@ const TileOption = styled.div`
 const TileOptionsContainer = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	gap: 0.25rem;
 `;

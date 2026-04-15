@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "Evento impostato come attuale!",
 			"completing": "Completamento evento...",
 			"completeSuccess": "Evento completato!",
+			"deferring": "Rinvio dell'evento...",
+			"deferSuccess": "Evento rinviato!",
+			"updating": "Salvataggio delle modifiche...",
+			"updateSuccess": "Modifiche salvate!",
 			"deleting": "Eliminazione evento...",
 			"deleteSuccess": "Evento eliminato!",
 			"actionFailed": "Azione fallita. Riprova."
+		},
+		"edit": {
+			"title": "Modifica",
+			"titleBlock": "Modifica blocco",
+			"titleTile": "Modifica riquadro",
+			"nameSection": "Nome",
+			"timeSection": "Ora e durata",
+			"repetitionSection": "Ripetizione",
+			"locationSection": "Posizione",
+			"colorSection": "Colore",
+			"name": "Nome",
+			"start": "Inizio",
+			"end": "Fine",
+			"selectDate": "Seleziona data",
+			"duration": "Durata",
+			"hours": "ore",
+			"minutes": "min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Numero di divisioni",
+			"splitPlaceholder": "es. 3",
+			"location": "Indirizzo",
+			"locationDescription": "Descrizione",
+			"locationDescriptionPlaceholder": "Dettagli aggiuntivi sulla posizione...",
+			"color": "Colore",
+			"recurring": "Ricorrente",
+			"selectFrequency": "Seleziona frequenza",
+			"daily": "Giornaliero",
+			"weekly": "Settimanale",
+			"monthly": "Mensile",
+			"yearly": "Annuale",
+			"forever": "Ripeti per sempre",
+			"repetitionStart": "Inizio ripetizione",
+			"repetitionEnd": "Fine ripetizione",
+			"sun": "Dom",
+			"mon": "Lun",
+			"tue": "Mar",
+			"wed": "Mer",
+			"thu": "Gio",
+			"fri": "Ven",
+			"sat": "Sab",
+			"save": "Salva",
+			"saving": "Salvataggio delle modifiche...",
+			"saveSuccess": "Evento aggiornato!",
+			"saveFailed": "Salvataggio fallito. Riprova.",
+			"back": "Indietro",
+			"loading": "Caricamento dettagli...",
+			"loadingBlock": "Caricamento dettagli del blocco...",
+			"loadingTile": "Caricamento dettagli del riquadro...",
+			"clearLocation": "Cancella posizione",
+			"locationMinChars": "Digita almeno 3 caratteri per cercare",
+			"locationSearchPlaceholder": "Cerca una posizione...",
+			"savedLocations": "Posizioni salvate",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Fornito da Google",
+			"noLocationResults": "Nessuna posizione trovata"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "Impostazioni"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Informazioni account",
+				"description": "Rivedi il tuo account e modifica le tue informazioni personali",
+				"fields": {
+					"fullName": "Nome completo",
+					"username": "Nome utente",
+					"email": "Indirizzo e-mail",
+					"phoneNumber": "Numero di telefono",
+					"phoneNumberPlaceholder": "Aggiungi numero di telefono",
+					"countryCode": "Prefisso internazionale",
+					"countryCodeSearch": "Cerca paesi...",
+					"countryCodeNoResults": "Nessun paese trovato",
+					"dateOfBirth": "Data di nascita",
+					"dateOfBirthPlaceholder": "GG/MM/AAAA"
+				},
+				"saveChanges": "Salva modifiche",
+				"saving": "Salvataggio...",
+				"deleteAccount": "Elimina il mio account",
+				"saveSuccess": "Informazioni account aggiornate con successo",
+				"saveError": "Impossibile salvare le modifiche. Riprova.",
+				"deleteNotImplemented": "La funzione di eliminazione account sarà disponibile a breve"
+			},
 			"tilePreferences": {
 				"title": "Preferenze Tile",
 				"description": "Definisci come ti sposti e aiuta Tiler a capire i tuoi schemi temporali quotidiani",
@@ -664,5 +746,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Invia feedback",
+		"title": "Invia feedback",
+		"category": "Categoria",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Richiesta di funzionalità",
+			"Improvement": "Miglioramento",
+			"Other": "Altro"
+		},
+		"titleLabel": "Titolo",
+		"titlePlaceholder": "Breve riepilogo del tuo feedback",
+		"descriptionLabel": "Descrizione",
+		"descriptionPlaceholder": "Dicci di più sul tuo feedback...",
+		"submit": "Invia",
+		"submitting": "Invio in corso...",
+		"submitSuccess": "Grazie per il tuo feedback!",
+		"submitError": "Invio del feedback non riuscito. Riprova."
 	}
 }

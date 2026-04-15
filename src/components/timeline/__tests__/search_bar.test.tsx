@@ -44,10 +44,12 @@ vi.mock('@/global_state', () => ({
 vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 	useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
 		const mockStore = {
+			demoMode: false,
 			createTile: {
 				state: {
 					isOpen: false,
 					isExpanded: false,
+					restrictionProfile: { work: null, personal: null, loading: false },
 					loading: { isActive: false },
 					success: { isOpen: false, isNavigatingToTile: false },
 				},
@@ -62,6 +64,8 @@ vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 					hideSuccess: vi.fn(),
 					navigateToTile: vi.fn(),
 					navigateToTileComplete: vi.fn(),
+					loadRestrictionProfiles: vi.fn(),
+					loadRestrictionProfilesComplete: vi.fn(),
 				},
 			},
 			editTile: {

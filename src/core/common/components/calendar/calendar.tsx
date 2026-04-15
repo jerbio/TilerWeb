@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, Info, TriangleAlert } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, Clock, Info, TriangleAlert } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
 import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
@@ -9,7 +9,7 @@ import {
 	CalendarBackgroundClickInfo,
 	StyledEvent,
 } from '@/core/common/components/calendar/calendar_events';
-import { ScheduleRepeatWeekday, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { ScheduleRepeatWeekday, SubCalendarEvent } from '@/core/common/types/schedule';
 import Loader from '../loader';
 import CalendarEvent from './calendar_event';
 import Tooltip from '../tooltip';
@@ -31,6 +31,7 @@ import useIsMobile from '../../hooks/useIsMobile';
 import CalendarCreateTile from './create_tile';
 import useFormHandler from '@/hooks/useFormHandler';
 import { createPortal } from 'react-dom';
+import { isLongDurationEvent } from '@/core/util/eventFilters';
 
 import { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './calendar-ui.provider';
@@ -38,7 +39,7 @@ import { initialCreateTileFormState } from './data';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
-	events: Array<ScheduleSubCalendarEvent>;
+	events: Array<SubCalendarEvent>;
 	eventsLoading: boolean;
 	viewRef: React.RefObject<HTMLUListElement>;
 	viewOptions: CalendarViewOptions;
@@ -70,6 +71,10 @@ const Calendar = ({
 	const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
 	const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
 
+	const [styledLongDurationEvents, setStyledLongDurationEvents] = useState<Array<StyledEvent>>(
+		[]
+	);
+	const [showLongDurationEvents, setShowLongDurationEvents] = useState<dayjs.Dayjs | null>(null);
 
 	// Ref holding all styled events (populated by CalendarEvents)
 	const styledEventsRef = useRef<StyledEvent[]>([]);
@@ -143,6 +148,7 @@ const Calendar = ({
 		const changeAmount = dir === 'left' ? -1 : 1;
 		// DAY_NAVIGATED — dismiss all overlays
 		setShowNonViableEvents(null);
+		setShowLongDurationEvents(null);
 		setSelectedEventInfo(null);
 		setSelectedEvent(null);
 
@@ -291,11 +297,17 @@ const Calendar = ({
 		setHasAutoScrolled(false);
 	}, [viewOptions.startDay]);
 
-	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{ x: number; y: number; maxHeight: number }>({
+	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{
+		x: number;
+		y: number;
+		maxHeight: number;
+	}>({
 		x: 100,
 		y: 100,
 		maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
 	});
+
+	const demoMode = useCalendarUI((state) => state.demoMode);
 
 	const calendarEventInfo = [
 		{
@@ -312,6 +324,7 @@ const Calendar = ({
 						refetchEvents();
 					}}
 					maxHeight={calendarEventInfoPos.maxHeight}
+					readOnly={demoMode}
 				/>
 			),
 		},
@@ -352,6 +365,14 @@ const Calendar = ({
 			// calculate the index of the event in the non-viable events list for that day
 			const dayStart = dayjs(event.start).startOf('day');
 			const eventsForTheDay = styledNonViableEvents.filter((e) =>
+				dayjs(e.start).isSame(dayStart, 'day')
+			);
+			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
+			calculatedY += eventIndex * 66;
+		} else if (isLongDurationEvent(event)) {
+			calculatedY = 71;
+			const dayStart = dayjs(event.start).startOf('day');
+			const eventsForTheDay = styledLongDurationEvents.filter((e) =>
 				dayjs(e.start).isSame(dayStart, 'day')
 			);
 			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
@@ -483,6 +504,7 @@ const Calendar = ({
 			setSelectedEventInfo(null);
 		}
 		setShowNonViableEvents(null);
+		setShowLongDurationEvents(null);
 	}
 
 	return (
@@ -509,6 +531,9 @@ const Calendar = ({
 							const todaysNonViableEvents = styledNonViableEvents.filter((event) =>
 								dayjs(event.start).isSame(day, 'day')
 							);
+							const todaysLongDurationEvents = styledLongDurationEvents.filter(
+								(event) => dayjs(event.start).isSame(day, 'day')
+							);
 							return (
 								<CalendarHeaderDateItem
 									key={index}
@@ -518,6 +543,41 @@ const Calendar = ({
 									<h3>{day.format('ddd')}</h3>
 									{/* 2 number date */}
 									<span>{day.format('DD')}</span>
+									<ShowNonViableEventsButtonContainer
+										$visible={todaysLongDurationEvents.length > 0}
+									>
+										<ShowNonViableEventsButtonWrapper>
+											<ShowNonViableEventsButton
+												$active={
+													showLongDurationEvents?.isSame(day, 'day') ??
+													false
+												}
+												title={t('calendar.longDuration.title')}
+												onClick={() => {
+													const isClosing =
+														showLongDurationEvents?.isSame(
+															day,
+															'day'
+														) ?? false;
+													setShowLongDurationEvents(
+														isClosing ? null : day
+													);
+													if (!isClosing) {
+														setSelectedEventInfo(null);
+														setSelectedEvent(null);
+													}
+												}}
+											>
+												<Clock
+													size={18}
+													color={theme.colors.text.secondary}
+												/>
+											</ShowNonViableEventsButton>
+											<NonViableEventsCount>
+												{todaysLongDurationEvents.length}
+											</NonViableEventsCount>
+										</ShowNonViableEventsButtonWrapper>
+									</ShowNonViableEventsButtonContainer>
 									<ShowNonViableEventsButtonContainer
 										$visible={todaysNonViableEvents.length > 0}
 									>
@@ -580,6 +640,44 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysNonViableEvents.map((event) => (
+							<CalendarEvent
+								event={event}
+								key={event.id}
+								selectedEvent={selectedEvent}
+								setSelectedEvent={setSelectedEvent}
+								setSelectedEventInfo={setSelectedEventInfo}
+								focused={focusedEventId === event.id}
+							/>
+						))}
+					</NonViableEventsContainer>
+				) : null;
+			})}
+
+			{/* Long Duration Events Overlays (>15h, non-procrastinate) */}
+			{Array.from({ length: viewOptions.daysInView }).map((_, index) => {
+				const day = viewOptions.startDay.add(index, 'day');
+				const todaysLongDurationEvents = styledLongDurationEvents.filter((event) =>
+					dayjs(event.start).isSame(day, 'day')
+				);
+				return todaysLongDurationEvents.length > 0 &&
+					showLongDurationEvents?.isSame(day, 'day') ? (
+					<NonViableEventsContainer
+						key={`long-${index}`}
+						$index={index}
+						$visible={showLongDurationEvents?.isSame(day, 'day') ?? false}
+						$cellwidth={viewOptions.width / viewOptions.daysInView}
+					>
+						<header>
+							<h2>{t('calendar.longDuration.title')}</h2>
+							<Tooltip
+								text={t('calendar.longDuration.infoTooltip')}
+								maxWidth={150}
+								position="left"
+							>
+								<Info size={18} color={theme.colors.text.secondary} />
+							</Tooltip>
+						</header>
+						{todaysLongDurationEvents.map((event) => (
 							<CalendarEvent
 								event={event}
 								key={event.id}
@@ -685,11 +783,15 @@ const Calendar = ({
 							setSelectedEventInfo={setSelectedEventInfo}
 							calendarGridCanvasRef={calendarGridCanvasRef}
 							setStyledNonViableEvents={setStyledNonViableEvents}
+							setStyledLongDurationEvents={setStyledLongDurationEvents}
 							onBackgroundClick={(info) => {
 								onBackgroundClick(info);
 							}}
 							focusedEventId={focusedEventId}
-							onViableEventClicked={() => setShowNonViableEvents(null)}
+							onViableEventClicked={() => {
+								setShowNonViableEvents(null);
+								setShowLongDurationEvents(null);
+							}}
 						/>
 					</SwiperSlide>
 					<SwiperSlide>

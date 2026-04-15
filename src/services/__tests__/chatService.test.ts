@@ -54,4 +54,3 @@ describe('ChatService', () => {
 		await expect(service.getMessages('session-789')).rejects.toThrow('Network error');
 	});
 });
-
