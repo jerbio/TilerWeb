@@ -4,7 +4,7 @@ import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../../button';
 import { RGBColor } from '@/core/util/colors';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
 import LoadingModal from '../../modals/loading-modal';
@@ -17,6 +17,7 @@ import {
 	ScheduleRepeatStartType,
 	ScheduleRepeatType,
 	ScheduleRepeatWeekday,
+    ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import { useCalendarUI } from '../calendar-ui.provider';
@@ -30,6 +31,7 @@ import { toast } from 'sonner';
 import { scheduleService } from '@/services';
 import TimeUtil from '@/core/util/time';
 import { MINUTES_IN_DAY } from '@/core/common/utils/timeUtils';
+import CreateTileOptions, { OptionsFormController } from '../create_tile/options';
 
 dayjs.extend(advancedFormat);
 
@@ -64,11 +66,15 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 	formHandler,
 	refetchEvents,
 }) => {
-	const { formData, resetForm } = formHandler;
+	const { formData, resetForm, handleFormInputChange } = formHandler;
 	const ui = useCalendarUI((state) => state.createBlock);
 	const theme = useStyledTheme();
 	const calendarDispatch = useCalendarDispatch();
 	const { t } = useTranslation();
+
+	useEffect(() => {
+		console.table(formData);
+	}, [formData]);
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.name.trim().length === 0) return false;
@@ -84,6 +90,28 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 		if (duration <= 0) return false;
 		return true;
 	}, [formData]);
+
+	const optionsController: OptionsFormController = {
+		start: formData.start,
+		color: formData.color,
+		setColor: handleFormInputChange('color', { mode: 'static' }),
+		recurring: formData.isRecurring,
+		setRecurring: handleFormInputChange('isRecurring', { mode: 'static' }),
+		recurrenceType: formData.recurrenceType,
+		setRecurrenceType: handleFormInputChange('recurrenceType', { mode: 'static' }),
+		recurrenceFrequency: formData.recurrenceFrequency,
+		setRecurrenceFrequency: handleFormInputChange('recurrenceFrequency', { mode: 'static' }),
+		recurrenceWeeklyDays: formData.recurrenceWeeklyDays,
+		setRecurrenceWeeklyDays: handleFormInputChange('recurrenceWeeklyDays', { mode: 'static' }),
+		recurrenceStartType: formData.recurrenceStartType,
+		setRecurrenceStartType: handleFormInputChange('recurrenceStartType', { mode: 'static' }),
+		recurrenceStartDate: formData.recurrenceStartDate,
+		setRecurrenceStartDate: handleFormInputChange('recurrenceStartDate', { mode: 'static' }),
+		recurrenceEndType: formData.recurrenceEndType,
+		setRecurrenceEndType: handleFormInputChange('recurrenceEndType', { mode: 'static' }),
+		recurrenceEndDate: formData.recurrenceEndDate,
+		setRecurrenceEndDate: handleFormInputChange('recurrenceEndDate', { mode: 'static' }),
+	};
 
 	async function submitForm() {
 		if (!isValidSubmission) return;
@@ -133,6 +161,34 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 				isRestricted: ScheduleBooleanString.False,
 				MobileApp: true,
 			};
+
+			// Repetition
+			if (formData.isRecurring) {
+				event.RepeatType = formData.recurrenceType;
+				event.RepeatFrequency = formData.recurrenceFrequency;
+				if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
+					if (formData.recurrenceWeeklyDays.length === 0) {
+						event.RepeatWeeklyData = '1';
+					}
+					event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
+						','
+					) as ScheduleRepeatWeeklyData;
+				}
+				if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
+					event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
+					event.RepeatEndMonth = dayjs(formData.recurrenceEndDate).format('MM');
+					event.RepeatEndYear = dayjs(formData.recurrenceEndDate).format('YYYY');
+				}
+				if (formData.recurrenceStartType === ScheduleRepeatStartType.Default) {
+					event.RepeatStartDay = dayjs(formData.start).format('DD');
+					event.RepeatStartMonth = dayjs(formData.start).format('MM');
+					event.RepeatStartYear = dayjs(formData.start).format('YYYY');
+				} else if (formData.recurrenceStartType === ScheduleRepeatStartType.On) {
+					event.RepeatStartDay = dayjs(formData.recurrenceStartDate).format('DD');
+					event.RepeatStartMonth = dayjs(formData.recurrenceStartDate).format('MM');
+					event.RepeatStartYear = dayjs(formData.recurrenceStartDate).format('YYYY');
+				}
+			}
 
 			const newEvent = await scheduleService.createEvent(event);
 			await refetchEvents();
@@ -215,6 +271,17 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 				<CreateBlockInfo formHandler={formHandler} />
 			</Section>
 
+			{/* Block Options */}
+			{ui.state.isExpanded && (
+				<>
+					<Section $isexpanded={ui.state.isExpanded}>
+						<CreateTileOptions controller={optionsController} />
+						<Spacer />
+					</Section>
+					{/* Event Options */}
+				</>
+			)}
+
 			<StyledCalendarCreateEventActions $isexpanded={ui.state.isExpanded}>
 				<Button
 					type="button"
@@ -235,6 +302,10 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 		</StyledCalendarCreateEvent>
 	);
 };
+
+const Spacer = styled.div`
+	flex: 1;
+`;
 
 const Section = styled.section<{ $isexpanded: boolean }>`
 	padding: 1rem 1.25rem;

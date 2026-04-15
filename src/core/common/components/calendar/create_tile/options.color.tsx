@@ -1,16 +1,13 @@
 import { RGBColor } from '@/core/util/colors';
 import styled from 'styled-components';
-import useFormHandler from '@/hooks/useFormHandler';
-import { InitialCreateTileFormState } from '.';
 import { eventColors } from '@/core/constants/calendar_options';
+import { OptionsFormController } from './options';
 
 type ColorOptionsProps = {
-	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	controller: OptionsFormController;
 };
 
-const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
-	formHandler: { formData, handleFormInputChange },
-}) => {
+const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({ controller }) => {
 	return (
 		<TileColorOptions>
 			{eventColors.map((color) => {
@@ -21,10 +18,8 @@ const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
 						type="button"
 						key={optionRGBColor.toHex()}
 						$hexColor={hexColor}
-						$selected={optionRGBColor.equals(formData.color)}
-						onClick={() => {
-							handleFormInputChange('color', { mode: 'static' })(optionRGBColor);
-						}}
+						$selected={optionRGBColor.equals(controller.color)}
+						onClick={() => controller.setColor(optionRGBColor)}
 					></TileColorOption>
 				);
 			})}
@@ -34,7 +29,7 @@ const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
 
 export default CreateTileColorOptions;
 
-const TileColorOptions = styled.div`
+export const TileColorOptions = styled.div`
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.75rem;
@@ -42,7 +37,7 @@ const TileColorOptions = styled.div`
 	padding: 0.5rem 0;
 `;
 
-const TileColorOption = styled.button<{ $hexColor: string; $selected: boolean }>`
+export const TileColorOption = styled.button<{ $hexColor: string; $selected: boolean }>`
 	background-color: ${({ $hexColor }) => $hexColor};
 	border-radius: 50%;
 	height: 2rem;

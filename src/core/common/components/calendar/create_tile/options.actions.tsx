@@ -1,4 +1,3 @@
-import useFormHandler from '@/hooks/useFormHandler';
 import { Calendar } from 'lucide-react';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
@@ -13,68 +12,150 @@ import {
 } from '../../../types/schedule';
 import DatePicker from '../../date_picker';
 import Toggle from '../../Toggle';
-import {
-	InlineControl,
-	InlineDatePickerContainer,
-	InlineDatePickerDisplay,
-	InitialCreateTileFormState,
-} from '.';
+import { InlineControl, InlineDatePickerContainer, InlineDatePickerDisplay } from '.';
 import Radio from '../../radio';
 import { CreateTileRestrictionType } from '../data';
 import { useCalendarUI } from '../calendar-ui.provider';
 import WeeklySchedule, { WeeklyScheduleSize } from '../../WeeklySchedule';
+import { OptionsFormController } from './options';
 
 type ActionsOptionsProps = {
-	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-	recurrenceTypeOptions: {
-		value: ScheduleRepeatType;
-		label: string;
-		frequency: ScheduleRepeatFrequency;
-	}[];
-	recurrenceWeekdayOptions: { value: ScheduleRepeatWeekday; label: string }[];
-	recurrenceStartTypeOptions: { value: ScheduleRepeatStartType; label: JSX.Element | string }[];
-	recurrenceEndTypeOptions: { value: ScheduleRepeatEndType; label: string }[];
-	restrictionTypeOptions: { value: CreateTileRestrictionType; label: string }[];
+	controller: OptionsFormController;
 };
 
-const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
-	formHandler: { formData, handleFormInputChange, setFormData },
-	recurrenceTypeOptions,
-	recurrenceWeekdayOptions,
-	recurrenceStartTypeOptions,
-	recurrenceEndTypeOptions,
-	restrictionTypeOptions,
-}) => {
+const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({ controller }) => {
 	const { t } = useTranslation();
 	const theme = useStyledTheme();
 	const ui = useCalendarUI((state) => state.createTile);
 
+	const recurrenceTypeOptions = [
+		{
+			label: t('calendar.createTile.sections.recurrenceType.daily'),
+			value: ScheduleRepeatType.Daily,
+			frequency: ScheduleRepeatFrequency.Daily,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceType.weekly'),
+			value: ScheduleRepeatType.Weekly,
+			frequency: ScheduleRepeatFrequency.Weekly,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceType.monthly'),
+			value: ScheduleRepeatType.Monthly,
+			frequency: ScheduleRepeatFrequency.Monthly,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceType.yearly'),
+			value: ScheduleRepeatType.Yearly,
+			frequency: ScheduleRepeatFrequency.Yearly,
+		},
+	];
+
+	const recurrenceWeekdayOptions = [
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.sunday'),
+			value: ScheduleRepeatWeekday.Sunday,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.monday'),
+			value: ScheduleRepeatWeekday.Monday,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.tuesday'),
+			value: ScheduleRepeatWeekday.Tuesday,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.wednesday'),
+			value: ScheduleRepeatWeekday.Wednesday,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.thursday'),
+			value: ScheduleRepeatWeekday.Thursday,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.friday'),
+			value: ScheduleRepeatWeekday.Friday,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceWeeklyDays.saturday'),
+			value: ScheduleRepeatWeekday.Saturday,
+		},
+	];
+
+	const recurrenceStartTypeOptions = [
+		{
+			label: (
+				<Trans
+					i18nKey="calendar.createTile.sections.recurrenceStartType.default"
+					components={{
+						date: <>{dayjs(controller.start).format('D MMM YYYY')}</>,
+					}}
+				/>
+			),
+			value: ScheduleRepeatStartType.Default,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceStartType.on'),
+			value: ScheduleRepeatStartType.On,
+		},
+	];
+
+	const recurrenceEndTypeOptions = [
+		{
+			label: t('calendar.createTile.sections.recurrenceEndType.never'),
+			value: ScheduleRepeatEndType.Never,
+		},
+		{
+			label: t('calendar.createTile.sections.recurrenceEndType.on'),
+			value: ScheduleRepeatEndType.On,
+		},
+	];
+
+	const restrictionTypeOptions = [
+		{
+			label: t('calendar.createTile.sections.restrictionType.anytime'),
+			value: CreateTileRestrictionType.Anytime,
+		},
+		{
+			label: t('calendar.createTile.sections.restrictionType.work'),
+			value: CreateTileRestrictionType.WorkHours,
+		},
+		{
+			label: t('calendar.createTile.sections.restrictionType.personal'),
+			value: CreateTileRestrictionType.PersonalHours,
+		},
+		{
+			label: t('calendar.createTile.sections.restrictionType.custom'),
+			value: CreateTileRestrictionType.Custom,
+		},
+	];
+
 	// If restriction profiles are loading, set the restriction type to Anytime
 	useEffect(() => {
-		if (ui.state.restrictionProfile.loading) {
-			handleFormInputChange('timeRestrictionType', {
-				mode: 'static',
-			})(CreateTileRestrictionType.Anytime);
+		if (controller.setTimeRestrictionType && ui.state.restrictionProfile.loading) {
+			controller.setTimeRestrictionType(CreateTileRestrictionType.Anytime);
 		}
 	}, [ui.state.restrictionProfile.loading]);
 
 	const handleCustomRestrictionScheduleChange = useCallback(
 		(dayIndex: number, field: 'startTime' | 'endTime', value: string) => {
-			setFormData((prev) => ({
-				...prev,
-				customTimeRestrictionSchedule: prev.customTimeRestrictionSchedule.map((day) =>
+			if (!controller.customTimeRestrictionSchedule) return;
+			if (!controller.setCustomTimeRestrictionSchedule) return;
+			controller.setCustomTimeRestrictionSchedule(
+				controller.customTimeRestrictionSchedule.map((day) =>
 					day.dayIndex === dayIndex ? { ...day, [field]: value } : day
-				),
-			}));
+				)
+			);
 		},
 		[]
 	);
 
 	const handleCustomRestrictionDayToggle = useCallback(
 		(dayIndex: number, selected: boolean) => {
-			setFormData((prev) => ({
-				...prev,
-				customTimeRestrictionSchedule: prev.customTimeRestrictionSchedule.map((day) =>
+			if (!controller.customTimeRestrictionSchedule) return;
+			if (!controller.setCustomTimeRestrictionSchedule) return;
+			controller.setCustomTimeRestrictionSchedule(
+				controller.customTimeRestrictionSchedule.map((day) =>
 					day.dayIndex === dayIndex
 						? {
 								...day,
@@ -86,8 +167,8 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 									: '',
 							}
 						: day
-				),
-			}));
+				)
+			);
 		},
 		[t]
 	);
@@ -96,11 +177,11 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 		<StyledActionsOptions>
 			<Toggle
 				label={t('calendar.createTile.actions.repeatTile')}
-				isOn={formData.isRecurring}
-				onChange={handleFormInputChange('isRecurring', { mode: 'static' })}
+				isOn={controller.recurring}
+				onChange={controller.setRecurring}
 				containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}
 			/>
-			{formData.isRecurring && (
+			{controller.recurring && (
 				<TileActionContainer>
 					{/* Recurrence Type Selection */}
 					<RecurrenceOptions>
@@ -108,24 +189,20 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 							<Radio
 								key={option.value}
 								label={option.label}
-								checked={option.value === formData.recurrenceType}
+								checked={option.value === controller.recurrenceType}
 								disabled={false}
 								name="recurrenceType"
 								onChange={(checked) => {
 									if (checked) {
-										handleFormInputChange('recurrenceType', {
-											mode: 'static',
-										})(option.value);
-										handleFormInputChange('recurrenceFrequency', {
-											mode: 'static',
-										})(option.frequency);
+										controller.setRecurrenceType(option.value);
+										controller.setRecurrenceFrequency(option.frequency);
 									}
 								}}
 							/>
 						))}
 					</RecurrenceOptions>
 					{/* Recurrence Weekly Days Selection */}
-					{formData.recurrenceType === ScheduleRepeatType.Weekly && (
+					{controller.recurrenceType === ScheduleRepeatType.Weekly && (
 						<>
 							<TileActionHeader>
 								{t('calendar.createTile.sections.recurrenceWeeklyDays.title')}
@@ -139,31 +216,27 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 										key={option.value}
 										onClick={() => {
 											const isSelected =
-												formData.recurrenceWeeklyDays.includes(
+												controller.recurrenceWeeklyDays.includes(
 													option.value
 												);
 											const allowUnselect =
-												formData.recurrenceWeeklyDays.length > 1;
+												controller.recurrenceWeeklyDays.length > 1;
 											if (isSelected && allowUnselect) {
-												handleFormInputChange('recurrenceWeeklyDays', {
-													mode: 'static',
-												})(
-													formData.recurrenceWeeklyDays.filter(
+												controller.setRecurrenceWeeklyDays(
+													controller.recurrenceWeeklyDays.filter(
 														(day) => day !== option.value
 													)
 												);
 											}
 											if (!isSelected) {
-												handleFormInputChange('recurrenceWeeklyDays', {
-													mode: 'static',
-												})(
-													formData.recurrenceWeeklyDays.concat(
+												controller.setRecurrenceWeeklyDays(
+													controller.recurrenceWeeklyDays.concat(
 														option.value
 													)
 												);
 											}
 										}}
-										$selected={formData.recurrenceWeeklyDays.includes(
+										$selected={controller.recurrenceWeeklyDays.includes(
 											option.value
 										)}
 									>
@@ -182,20 +255,18 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 							<Radio
 								key={option.value}
 								label={option.label}
-								checked={option.value === formData.recurrenceStartType}
+								checked={option.value === controller.recurrenceStartType}
 								disabled={false}
 								name="recurrenceStartType"
 								onChange={(checked) => {
 									if (checked) {
-										handleFormInputChange('recurrenceStartType', {
-											mode: 'static',
-										})(option.value);
+										controller.setRecurrenceStartType(option.value);
 									}
 								}}
 							/>
 						))}
 					</RecurrenceEndTypeOptions>
-					{formData.recurrenceStartType === ScheduleRepeatStartType.On && (
+					{controller.recurrenceStartType === ScheduleRepeatStartType.On && (
 						<InlineControl
 							style={{ border: `1px solid ${theme.colors.border.default}` }}
 						>
@@ -205,7 +276,7 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 									date: (
 										<InlineDatePickerContainer>
 											<InlineDatePickerDisplay>
-												{dayjs(formData.recurrenceStartDate)
+												{dayjs(controller.recurrenceStartDate)
 													.toDate()
 													.toLocaleDateString(undefined, {
 														year: 'numeric',
@@ -219,20 +290,18 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 											</InlineDatePickerDisplay>
 											<DatePicker
 												ghostInput
-												value={dayjs(formData.recurrenceStartDate).format(
+												value={dayjs(controller.recurrenceStartDate).format(
 													'YYYY-MM-DD'
 												)}
 												onChange={(date) =>
-													handleFormInputChange('recurrenceStartDate', {
-														mode: 'static',
-													})(dayjs(date))
+													controller.setRecurrenceStartDate(dayjs(date))
 												}
 												maxDate={
-													formData.recurrenceEndType ===
+													controller.recurrenceEndType ===
 													ScheduleRepeatEndType.On
-														? dayjs(formData.recurrenceEndDate).format(
-																'YYYY-MM-DD'
-															)
+														? dayjs(
+																controller.recurrenceEndDate
+															).format('YYYY-MM-DD')
 														: undefined
 												}
 											/>
@@ -251,20 +320,18 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 							<Radio
 								key={option.value}
 								label={option.label}
-								checked={option.value === formData.recurrenceEndType}
+								checked={option.value === controller.recurrenceEndType}
 								disabled={false}
 								name="recurrenceEndType"
 								onChange={(checked) => {
 									if (checked) {
-										handleFormInputChange('recurrenceEndType', {
-											mode: 'static',
-										})(option.value);
+										controller.setRecurrenceEndType(option.value);
 									}
 								}}
 							/>
 						))}
 					</RecurrenceEndTypeOptions>
-					{formData.recurrenceEndType === ScheduleRepeatEndType.On && (
+					{controller.recurrenceEndType === ScheduleRepeatEndType.On && (
 						<InlineControl
 							style={{ border: `1px solid ${theme.colors.border.default}` }}
 						>
@@ -274,7 +341,7 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 									date: (
 										<InlineDatePickerContainer>
 											<InlineDatePickerDisplay>
-												{dayjs(formData.recurrenceEndDate)
+												{dayjs(controller.recurrenceEndDate)
 													.toDate()
 													.toLocaleDateString(undefined, {
 														year: 'numeric',
@@ -288,19 +355,17 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 											</InlineDatePickerDisplay>
 											<DatePicker
 												ghostInput
-												value={dayjs(formData.recurrenceEndDate).format(
+												value={dayjs(controller.recurrenceEndDate).format(
 													'YYYY-MM-DD'
 												)}
 												onChange={(date) =>
-													handleFormInputChange('recurrenceEndDate', {
-														mode: 'static',
-													})(dayjs(date))
+													controller.setRecurrenceEndDate(dayjs(date))
 												}
 												minDate={dayjs(
-													formData.recurrenceStartType ===
+													controller.recurrenceStartType ===
 														ScheduleRepeatStartType.On
-														? formData.recurrenceStartDate
-														: formData.start
+														? controller.recurrenceStartDate
+														: controller.start
 												).format('YYYY-MM-DD')}
 											/>
 										</InlineDatePickerContainer>
@@ -311,51 +376,61 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 					)}
 				</TileActionContainer>
 			)}
-			<Toggle
-				label={t('calendar.createTile.actions.timeRestriction')}
-				isOn={formData.isTimeRestricted}
-				onChange={handleFormInputChange('isTimeRestricted', { mode: 'static' })}
-				containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}
-			/>
-			{formData.isTimeRestricted && (
-				<TileActionContainer>
-					{/* Restriction Type Selection */}
-					<RestrictionOptions>
-						{restrictionTypeOptions.map((option) => (
-							<Radio
-								key={option.value}
-								label={option.label}
-								checked={option.value === formData.timeRestrictionType}
-								disabled={
-									option.value === CreateTileRestrictionType.WorkHours
-										? !ui.state.restrictionProfile.work
-										: option.value === CreateTileRestrictionType.PersonalHours
-											? !ui.state.restrictionProfile.personal
-											: false
-								}
-								name="timeRestrictionType"
-								onChange={(checked) => {
-									if (checked) {
-										handleFormInputChange('timeRestrictionType', {
-											mode: 'static',
-										})(option.value);
-									}
-								}}
-							/>
-						))}
-					</RestrictionOptions>
-					{/* Custom Restriction Selection */}
-					{formData.timeRestrictionType === CreateTileRestrictionType.Custom && (
-						<WeeklySchedule
-							schedule={formData.customTimeRestrictionSchedule}
-							onChange={handleCustomRestrictionScheduleChange}
-							onDayToggle={handleCustomRestrictionDayToggle}
-							disabled={false}
-							size={WeeklyScheduleSize.Sm}
-						/>
+			{/* Time Restriction */}
+			{controller.timeRestricted !== undefined &&
+			controller.setTimeRestricted &&
+			controller.timeRestrictionType &&
+			controller.setTimeRestrictionType &&
+			controller.customTimeRestrictionSchedule &&
+			controller.setCustomTimeRestrictionSchedule ? (
+				<>
+					<Toggle
+						label={t('calendar.createTile.actions.timeRestriction')}
+						isOn={controller.timeRestricted}
+						onChange={controller.setTimeRestricted}
+						containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}
+					/>
+					{controller.timeRestricted && (
+						<TileActionContainer>
+							{/* Restriction Type Selection */}
+							<RestrictionOptions>
+								{restrictionTypeOptions.map((option) => (
+									<Radio
+										key={option.value}
+										label={option.label}
+										checked={option.value === controller.timeRestrictionType}
+										disabled={
+											option.value === CreateTileRestrictionType.WorkHours
+												? !ui.state.restrictionProfile.work
+												: option.value ===
+													  CreateTileRestrictionType.PersonalHours
+													? !ui.state.restrictionProfile.personal
+													: false
+										}
+										name="timeRestrictionType"
+										onChange={(checked) => {
+											if (checked) {
+												controller.setTimeRestrictionType?.(option.value);
+											}
+										}}
+									/>
+								))}
+							</RestrictionOptions>
+							{/* Custom Restriction Selection */}
+							{controller.timeRestrictionType ===
+								CreateTileRestrictionType.Custom && (
+								<WeeklySchedule
+									schedule={controller.customTimeRestrictionSchedule}
+									onChange={handleCustomRestrictionScheduleChange}
+									onDayToggle={handleCustomRestrictionDayToggle}
+									disabled={false}
+									size={WeeklyScheduleSize.Sm}
+								/>
+							)}
+						</TileActionContainer>
 					)}
-				</TileActionContainer>
-			)}
+				</>
+			) : null}
 		</StyledActionsOptions>
 	);
 };
