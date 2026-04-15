@@ -24,6 +24,8 @@ import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/
 import analytics from '@/core/util/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
 import ActionPill from '@/core/common/components/chat/ActionPill';
+import VariantSelector from '@/core/common/components/chat/VariantSelector';
+import ClarificationPrompt from '@/core/common/components/chat/ClarificationPrompt';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -287,6 +289,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
   const [requestId, setRequestId] = useState<string | null>(null);
   const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
   const [wsStatusKey, setWsStatusKey] = useState<string | null>(null);
+  const [researchProgress, setResearchProgress] = useState<{ completedSteps: number; totalSteps: number } | null>(null);
+  const [variantSelection, setVariantSelection] = useState<{ vibeRequestId: string } | null>(null);
+  const [clarificationSelection, setClarificationSelection] = useState<{
+    vibeRequestId: string;
+    clarification: { stepId: string; providerMessage: string; missingParameters: Array<{ parameterName: string; description: string; isRequired: boolean; suggestedValues?: string[] }> };
+  } | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
   const [showSessionHistory, setShowSessionHistory] = useState(false);
@@ -375,6 +383,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         t('home.expanded.chat.wsStatus.scheduleProcessEnd3'),
         t('home.expanded.chat.wsStatus.scheduleProcessEnd4'),
       ],
+      'research_plan_constructed': [t('home.expanded.chat.wsStatus.researchPlanConstructed')],
+      'research_step_starting': [t('home.expanded.chat.wsStatus.researchStepStarting')],
+      'research_step_completed': [t('home.expanded.chat.wsStatus.researchStepCompleted')],
+      'research_step_failed': [t('home.expanded.chat.wsStatus.researchStepFailed')],
+      'research_parallel_dispatch': [t('home.expanded.chat.wsStatus.researchParallelDispatch')],
+      'research_fork_start': [t('home.expanded.chat.wsStatus.researchForkStart')],
+      'research_fork_variant_ready': [t('home.expanded.chat.wsStatus.researchForkVariantReady')],
+      'research_fork_awaiting_selection': [t('home.expanded.chat.wsStatus.researchForkAwaitingSelection')],
+      'research_step_awaiting_clarification': [t('home.expanded.chat.wsStatus.researchAwaitingClarification', 'Waiting for your input...')],
+      'research_step_clarification_received': [t('home.expanded.chat.wsStatus.researchClarificationReceived', 'Resuming with your input...')],
+      'research_merge_complete': [t('home.expanded.chat.wsStatus.researchMergeComplete')],
+      'research_plan_completed': [t('home.expanded.chat.wsStatus.researchPlanCompleted')],
     };
 
     const messages = statusMap[status];
@@ -385,6 +405,22 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
     // Fallback for unmapped statuses
     return status.replace(/_/g, ' ').toLowerCase();
+  };
+
+  const formatResearchStatus = (rawStatus: string, research: Record<string, unknown>): string => {
+    const description = research.stepDescription as string | undefined;
+    const resultSummary = research.resultSummary as string | undefined;
+
+    if (rawStatus === 'research_step_starting' && description) {
+      return description;
+    }
+    if (rawStatus === 'research_step_completed' && resultSummary) {
+      return resultSummary;
+    }
+    if (rawStatus === 'research_step_failed' && description) {
+      return `⚠ ${description}${resultSummary ? ' — ' + resultSummary : ''}`;
+    }
+    return formatWebSocketStatus(rawStatus);
   };
 
   useEffect(() => {
@@ -407,9 +443,42 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         typeof data.data.vibe.status === 'string'
       ) {
         const rawStatus = data.data.vibe.status;
-        const formattedStatus = formatWebSocketStatus(rawStatus);
+        const vibeData = data.data.vibe as Record<string, unknown>;
+        const research = vibeData.research as Record<string, unknown> | undefined;
+
+        const formattedStatus = research
+          ? formatResearchStatus(rawStatus, research)
+          : formatWebSocketStatus(rawStatus);
+
         setWsStatusKey(rawStatus);
         setWebSocketStatus(formattedStatus);
+
+        if (research && typeof research.completedSteps === 'number' && typeof research.totalSteps === 'number') {
+          setResearchProgress({ completedSteps: research.completedSteps, totalSteps: research.totalSteps });
+        }
+
+        if (rawStatus === 'research_fork_awaiting_selection') {
+          const sessionId = vibeData.sessionId as string | undefined;
+          if (sessionId) {
+            setVariantSelection({ vibeRequestId: sessionId });
+          }
+        } else if (rawStatus === 'research_step_awaiting_clarification') {
+          const sessionId = vibeData.sessionId as string | undefined;
+          if (sessionId && research?.clarificationRequest) {
+            const cr = research.clarificationRequest as {
+              stepId: string;
+              providerMessage: string;
+              missingParameters: Array<{ parameterName: string; description: string; isRequired: boolean; suggestedValues?: string[] }>;
+            };
+            setClarificationSelection({ vibeRequestId: sessionId, clarification: cr });
+          }
+        } else if (rawStatus === 'research_step_clarification_received') {
+          setClarificationSelection(null);
+        } else if (rawStatus === 'research_plan_completed' || rawStatus === 'research_fork_resolved') {
+          setVariantSelection(null);
+          setClarificationSelection(null);
+          setResearchProgress(null);
+        }
       }
     });
 
@@ -1009,6 +1078,20 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             <LoadingIndicator
               message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
               wsStatus={wsStatusKey}
+              researchProgress={researchProgress}
+            />
+          )}
+          {variantSelection && (
+            <VariantSelector
+              vibeRequestId={variantSelection.vibeRequestId}
+              onResolved={() => setVariantSelection(null)}
+            />
+          )}
+          {clarificationSelection && (
+            <ClarificationPrompt
+              vibeRequestId={clarificationSelection.vibeRequestId}
+              clarification={clarificationSelection.clarification}
+              onResolved={() => setClarificationSelection(null)}
             />
           )}
           {((!isSending && shouldShowAcceptButton) || isDemoMode()) && (

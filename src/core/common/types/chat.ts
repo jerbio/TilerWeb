@@ -111,3 +111,17 @@ export type VibeSessionsResponse = ApiResponse<{
 }>;
 
 export type { PromptWithActions as Message };
+
+export interface VariantPreview {
+	id: string;
+	vibeRequestId: string;
+	tilerUserId: string;
+	creationTimeInMs: number;
+	previewActions?: {
+		action?: VibeAction;
+	}[];
+}
+
+export type VariantPreviewsResponse = ApiResponse<{
+	previews: VariantPreview[];
+}>;

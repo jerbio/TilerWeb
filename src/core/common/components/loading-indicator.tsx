@@ -188,13 +188,24 @@ export interface LoadingIndicatorProps {
 	message?: string;
 	/** Raw WebSocket status key — drives reveal mode when provided */
 	wsStatus?: string | null;
+	/** Research progress counter — shows "Step n of total" when present */
+	researchProgress?: { completedSteps: number; totalSteps: number } | null;
 	className?: string;
 	style?: React.CSSProperties;
 }
 
+const ProgressCounter = styled.div`
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	font-family: ${({ theme }) => theme.typography.fontFamily.inter};
+	color: ${({ theme }) => theme.colors.text.muted};
+	padding: 0.1rem 0.5rem;
+	opacity: 0.7;
+`;
+
 const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 	message = 'Loading...',
 	wsStatus,
+	researchProgress,
 	className,
 	style,
 }) => {
@@ -228,6 +239,13 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 					{!done && <Cursor />}
 				</ActiveLine>
 			</LinesContainer>
+
+			{/* Research progress counter */}
+			{researchProgress && researchProgress.totalSteps > 0 && (
+				<ProgressCounter>
+					Step {researchProgress.completedSteps} of {researchProgress.totalSteps}
+				</ProgressCounter>
+			)}
 
 			{/* Shimmer skeleton — preview of incoming response */}
 			<SkeletonContainer>

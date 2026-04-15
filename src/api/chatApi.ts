@@ -8,6 +8,7 @@ import {
 	ChatMessagesParams,
 	VibeSessionsResponse,
 	VibeSessionParams,
+	VariantPreviewsResponse,
 } from '@/core/common/types/chat';
 import { AppApi } from './appApi';
 
@@ -100,6 +101,38 @@ export class ChatApi extends AppApi {
 	public getVibeRequest(requestId: string) {
 		return this.apiRequest<ChatVibeRequestResponse>(
 			`api/Vibe/VibeRequest?RequestId=${encodeURIComponent(requestId)}`
+		);
+	}
+
+	public getVariantPreviews(vibeRequestId: string) {
+		return this.apiRequest<VariantPreviewsResponse>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/Preview`
+		);
+	}
+
+	public selectVariant(vibeRequestId: string, selectedStepId: string) {
+		return this.apiRequest<ChatExecuteActionResponse>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/SelectVariant`,
+			{
+				method: 'POST',
+				body: JSON.stringify({ SelectedStepId: selectedStepId }),
+			}
+		);
+	}
+
+	public supplyClarification(vibeRequestId: string, stepId: string, parameters: Record<string, string>) {
+		return this.apiRequest<ChatExecuteActionResponse>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/SupplyClarification`,
+			{
+				method: 'POST',
+				body: JSON.stringify({ StepId: stepId, Parameters: parameters }),
+			}
+		);
+	}
+
+	public getPlanHistory(actionId: string) {
+		return this.apiRequest<{ Content: { planHistory: unknown } }>(
+			`api/Vibe/Action/${encodeURIComponent(actionId)}/PlanHistory`
 		);
 	}
 

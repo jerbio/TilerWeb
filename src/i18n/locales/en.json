@@ -385,7 +385,26 @@
 					"scheduleProcessEnd1": "Schedule optimization complete",
 					"scheduleProcessEnd2": "Schedule updated!",
 					"scheduleProcessEnd3": "Timeline optimized",
-					"scheduleProcessEnd4": "All done!"
+					"scheduleProcessEnd4": "All done!",
+					"researchPlanConstructed": "Building research plan...",
+					"researchStepStarting": "Starting research step...",
+					"researchStepCompleted": "Research step completed",
+					"researchStepFailed": "Research step encountered an issue",
+					"researchParallelDispatch": "Running research steps in parallel...",
+					"researchForkStart": "Evaluating alternatives...",
+					"researchForkVariantReady": "Variant ready for review",
+					"researchForkAwaitingSelection": "Please select a variant",
+					"researchMergeComplete": "Research results merged",
+					"researchPlanCompleted": "Research complete"
+				},
+				"variantSelector": {
+					"apply": "Apply",
+					"applying": "Applying...",
+					"dismissAll": "Dismiss all",
+					"applied": "Variant applied successfully.",
+					"dismissed": "All variants dismissed.",
+					"loading": "Loading variants...",
+					"error": "Failed to load variants."
 				},
 				"userLocation": {
 					"anonymous": "Anonymous",

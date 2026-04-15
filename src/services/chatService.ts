@@ -154,6 +154,46 @@ class ChatService {
 			throw normalizeError(error);
 		}
 	}
+
+	async getVariantPreviews(vibeRequestId: string) {
+		try {
+			const response = await this.chatApi.getVariantPreviews(vibeRequestId);
+			return response.Content.previews;
+		} catch (error) {
+			console.error('Error fetching variant previews', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async selectVariant(vibeRequestId: string, selectedStepId: string) {
+		try {
+			const response = await this.chatApi.selectVariant(vibeRequestId, selectedStepId);
+			return response;
+		} catch (error) {
+			console.error('Error selecting variant', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async supplyClarification(vibeRequestId: string, stepId: string, parameters: Record<string, string>) {
+		try {
+			const response = await this.chatApi.supplyClarification(vibeRequestId, stepId, parameters);
+			return response;
+		} catch (error) {
+			console.error('Error supplying clarification', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getPlanHistory(actionId: string) {
+		try {
+			const response = await this.chatApi.getPlanHistory(actionId);
+			return response.Content.planHistory;
+		} catch (error) {
+			console.error('Error fetching plan history', error);
+			throw normalizeError(error);
+		}
+	}
 }
 
 export default ChatService;
