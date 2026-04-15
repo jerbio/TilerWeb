@@ -4,7 +4,7 @@ import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../../button';
 import { RGBColor } from '@/core/util/colors';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
 import LoadingModal from '../../modals/loading-modal';
@@ -71,10 +71,6 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 	const theme = useStyledTheme();
 	const calendarDispatch = useCalendarDispatch();
 	const { t } = useTranslation();
-
-	useEffect(() => {
-		console.table(formData);
-	}, [formData]);
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.name.trim().length === 0) return false;
