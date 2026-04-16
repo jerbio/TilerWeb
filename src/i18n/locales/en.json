@@ -199,6 +199,57 @@
 			},
 			"moreOptions": "More options"
 		},
+		"createBlock": {
+			"title": "Add a New Block",
+			"info": {
+				"name": {
+					"label": "Name",
+					"placeholder": "What is the name of this block?"
+				},
+				"start": {
+					"label": "Start Time",
+					"placeholder": "What day does this block start?"
+				},
+				"end": {
+					"label": "End Time",
+					"placeholder": "What day does this block end?"
+				},
+				"hours": {
+					"label": "Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+				"minutes": {
+					"label": "Duration (Minutes)",
+					"placeholder": "How many mins will it take?"
+				},
+				"location": {
+					"label": "Location",
+					"placeholder": "Where is this block held?"
+				},
+				"locationTag": {
+					"label": "Location Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
+				"duration": {
+					"valid": "Duration <mute>~</mute> <highlight>{{duration}}</highlight>",
+					"invalid": "<highlight>Invalid Duration</highlight>"
+				}
+			},
+			"errors": {
+				"invalidDuration": "Invalid duration. End time must be after start time."
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{name}}\" to your schedule"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Block",
+				"collapse": "Less Options",
+				"expand": "More Options",
+				"viewInTimeline": "View Block"
+			}
+		},
 		"createTile": {
 			"title": "Add a New Tile",
 			"info": {
@@ -330,6 +381,16 @@
 				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
 				"recurringStart": " from <b>{{recurrenceStart}}</b>",
 				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
+			}
+		},
+		"createSelection": {
+			"tile": {
+				"label": "Create Tile",
+				"description": "A flexible task that can move based on your availability."
+			},
+			"block": {
+				"label": "Create Block",
+				"description": "A fixed task that stays exactly where you place it."
 			}
 		},
 		"mobileChatInput": {
