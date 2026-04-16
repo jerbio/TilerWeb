@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Clock, Info, TriangleAlert } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
-import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
+import { HOURS_IN_DAY, MINUTES_IN_DAY } from '@/core/common/utils/timeUtils';
 import {
 	CalendarBackgroundClickInfo,
 	StyledEvent,
@@ -16,7 +16,7 @@ import Tooltip from '../tooltip';
 import analytics from '@/core/util/analytics';
 import TimeUtil from '@/core/util/time';
 import CalendarEventInfo from './calendar_event_info';
-import { a, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
+import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
@@ -35,7 +35,10 @@ import { isLongDurationEvent } from '@/core/util/eventFilters';
 
 import { CalendarViewOptions } from './calendar.types';
 import { useCalendarUI } from './calendar-ui.provider';
-import { initialCreateTileFormState } from './data';
+import { initialCreateBlockFormState, initialCreateTileFormState } from './data';
+import CalendarModal from './modals';
+import CalendarCreateSelection from './calendar_create_selection';
+import CalendarCreateBlock from './create_block';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -63,10 +66,13 @@ const Calendar = ({
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
 	const theme = useTheme();
-	const { createTile } = useCalendarUI((state) => state);
+	const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
 
 	const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
 	const contentContainerRef = useRef<HTMLDivElement>(null);
+
+	// Ref holding all styled events (populated by CalendarEvents)
+	const styledEventsRef = useRef<StyledEvent[]>([]);
 
 	const [styledNonViableEvents, setStyledNonViableEvents] = useState<Array<StyledEvent>>([]);
 	const [showNonViableEvents, setShowNonViableEvents] = useState<dayjs.Dayjs | null>(null);
@@ -75,9 +81,6 @@ const Calendar = ({
 		[]
 	);
 	const [showLongDurationEvents, setShowLongDurationEvents] = useState<dayjs.Dayjs | null>(null);
-
-	// Ref holding all styled events (populated by CalendarEvents)
-	const styledEventsRef = useRef<StyledEvent[]>([]);
 
 	// Focused event state — drives the pulse animation, auto-clears after timeout
 	const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
@@ -431,22 +434,6 @@ const Calendar = ({
 
 	useChain([calendarEventInfoTransRef], [0], 0);
 
-	const calendarCreateEventSpring = useSpring({
-		from: {
-			opacity: 0,
-			scale: 0.9,
-			y: 0,
-		},
-		to: {
-			opacity: createTile.state.isOpen ? 1 : 0,
-			scale: createTile.state.isOpen ? 1 : 0.9,
-			y: createTile.state.isOpen ? 0 : 100,
-		},
-		config: {
-			duration: 200,
-		},
-	});
-
 	// Swiping logic
 	const swiperRef = useRef<SwiperRef | null>(null);
 	const isSwiperResetting = useRef(false);
@@ -462,7 +449,14 @@ const Calendar = ({
 		}
 	}, [isMobile]);
 
-	// Create Tile State
+	// Create Block Form State
+	const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
+	const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
+	const createBlockModalPortalTarget = createBlock.state.isExpanded
+		? document.body
+		: createBlockModalContainerRef.current;
+
+	// Create Tile Form State
 	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
 	const createTileModalContainerRef = useRef<HTMLDivElement>(null);
 	const createTileModalPortalTarget = createTile.state.isExpanded
@@ -472,10 +466,33 @@ const Calendar = ({
 	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
 		// CONTENT_CLICK_OUTSIDE
 		if (!selectedEvent) {
-			const { formData, setFormData } = createTileFormHandler;
-			// Set Create Tile Form Based on day clicked
 			const clickedDay = dayjs(info.day);
 			const clickedDayValue = clickedDay.day();
+			const clickedHour = info.hour;
+			// Round minutes
+			const clickedMinute =
+				Math.round(info.minute / calendarConfig.CREATE_EVENT_MINUTE_INTERVAL) *
+				calendarConfig.CREATE_EVENT_MINUTE_INTERVAL;
+
+			// Set Create Block From Based on day and time clicked
+			const { formData: createBlockForm, setFormData: setCreateBlockForm } =
+				createBlockFormHandler;
+			const maxStartTimeMinutes =
+				MINUTES_IN_DAY - calendarConfig.CREATE_EVENT_DEFAULT_DURATION;
+			const startTimeMinutes = Math.min(
+				clickedHour * 60 + clickedMinute,
+				maxStartTimeMinutes
+			);
+
+			setCreateBlockForm({
+				...createBlockForm,
+				start: clickedDay,
+				startTime: TimeUtil.minsToMeridian(startTimeMinutes),
+			});
+
+			// Set Create Tile Form Based on day clicked
+			const { formData: createTileForm, setFormData: setCreateTileForm } =
+				createTileFormHandler;
 			let recurrenceDefaultWeeklyDay: ScheduleRepeatWeekday;
 
 			if (clickedDayValue === 1) recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Monday;
@@ -491,14 +508,14 @@ const Calendar = ({
 				recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Saturday;
 			else recurrenceDefaultWeeklyDay = ScheduleRepeatWeekday.Sunday;
 
-			setFormData({
-				...formData,
+			setCreateTileForm({
+				...createTileForm,
 				start: clickedDay,
 				deadline: clickedDay,
 				recurrenceStartDate: clickedDay,
 				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
 			});
-			createTile.actions.open();
+			createSelection.actions.open();
 		} else {
 			setSelectedEvent(null);
 			setSelectedEventInfo(null);
@@ -703,26 +720,38 @@ const Calendar = ({
 				</item.container>
 			))}
 
-			{/* Create Modal Overlay */}
-			<CalendarCreateEventModalBackdrop
-				$visible={createTile.state.isOpen}
-				onClick={createTile.actions.close}
+			{/* TODO: Create Type Modal Overlay */}
+			<CalendarModal
+				open={createSelection.state.isOpen}
+				onBackdropClick={createSelection.actions.close}
+				width={320}
 			>
-				<CalendarCreateEventModalWrapper>
-					<CalendarCreateEventModalContainer
-						ref={createTileModalContainerRef}
-						$expanded={createTile.state.isExpanded}
-						style={{
-							scale: calendarCreateEventSpring.scale,
-							opacity: calendarCreateEventSpring.opacity,
-							transform: calendarCreateEventSpring.y.to(
-								(y) => `translate(-50%, calc(${y}px - 50%))`
-							),
-						}}
-						onClick={(e) => e.stopPropagation()}
-					/>
-				</CalendarCreateEventModalWrapper>
-			</CalendarCreateEventModalBackdrop>
+				<CalendarCreateSelection />
+			</CalendarModal>
+
+			{/* Create Block Modal Overlay */}
+			<CalendarModal
+				open={createBlock.state.isOpen}
+				onBackdropClick={createBlock.actions.close}
+				containerRef={createBlockModalContainerRef}
+				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
+			/>
+			{createBlockModalPortalTarget &&
+				createPortal(
+					<CalendarCreateBlock
+						refetchEvents={refetchEvents}
+						formHandler={createBlockFormHandler}
+					/>,
+					createBlockModalPortalTarget
+				)}
+
+			{/* Create Tile Modal Overlay */}
+			<CalendarModal
+				open={createTile.state.isOpen}
+				onBackdropClick={createTile.actions.close}
+				containerRef={createTileModalContainerRef}
+				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
+			/>
 			{createTileModalPortalTarget &&
 				createPortal(
 					<CalendarCreateTile
@@ -1026,44 +1055,6 @@ const CalendarEventInfoModalContainer = styled(a.div)`
 	z-index: 1000;
 	width: ${calendarConfig.INFO_MODAL_WIDTH};
 	height: fit-content;
-`;
-
-const CalendarCreateEventModalBackdrop = styled.div<{ $visible: boolean }>`
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 2;
-	isolation: isolate;
-	width: 100%;
-	height: 100%;
-	background-color: ${({ theme }) => theme.colors.backdrop.glass};
-	backdrop-filter: blur(4px);
-	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
-	transition: opacity 0.3s ease-in-out;
-`;
-
-const CalendarCreateEventModalWrapper = styled.div`
-	position: relative;
-	width: 100%;
-	height: 100%;
-`;
-
-const CalendarCreateEventModalContainer = styled(a.div)<{ $expanded: boolean }>`
-	${(props) =>
-		props.$expanded
-			? `
-position: fixed;
-		top: -5rem;
-		`
-			: `
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	z-index: 1001;
-	width: calc(100% - 32px);
-	max-width: ${calendarConfig.CREATE_EVENT_MODAL_WIDTH};
-`}
 `;
 
 export default Calendar;
