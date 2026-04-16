@@ -17,7 +17,7 @@ import {
 	ScheduleRepeatStartType,
 	ScheduleRepeatType,
 	ScheduleRepeatWeekday,
-    ScheduleRepeatWeeklyData,
+	ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import { useCalendarUI } from '../calendar-ui.provider';
@@ -31,7 +31,8 @@ import { toast } from 'sonner';
 import { scheduleService } from '@/services';
 import TimeUtil from '@/core/util/time';
 import { MINUTES_IN_DAY } from '@/core/common/utils/timeUtils';
-import CreateTileOptions, { OptionsFormController } from '../create_tile/options';
+import CreateTileOptions, { OptionsFormController, TileOptionsMode } from '../create_tile/options';
+import CreateBlockSummary from './summary';
 
 dayjs.extend(advancedFormat);
 
@@ -271,10 +272,10 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 			{ui.state.isExpanded && (
 				<>
 					<Section $isexpanded={ui.state.isExpanded}>
-						<CreateTileOptions controller={optionsController} />
-						<Spacer />
+						<CreateTileOptions mode={TileOptionsMode.Block} controller={optionsController} />
 					</Section>
-					{/* Event Options */}
+					<Spacer />
+					<CreateBlockSummary formData={formData} />
 				</>
 			)}
 

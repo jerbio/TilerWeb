@@ -5,7 +5,14 @@ import CreateTileColorOptions from './options.color';
 import CreateTileActionsOptions from './options.actions';
 import { RGBColor } from '@/core/util/colors';
 import { CreateTileRestrictionType } from '../data';
-import { DaySchedule, ScheduleRepeatEndType, ScheduleRepeatFrequency, ScheduleRepeatStartType, ScheduleRepeatType, ScheduleRepeatWeekday } from '@/core/common/types/schedule';
+import {
+	DaySchedule,
+	ScheduleRepeatEndType,
+	ScheduleRepeatFrequency,
+	ScheduleRepeatStartType,
+	ScheduleRepeatType,
+	ScheduleRepeatWeekday,
+} from '@/core/common/types/schedule';
 import dayjs from 'dayjs';
 
 export type OptionsFormController = {
@@ -13,49 +20,57 @@ export type OptionsFormController = {
 	color: RGBColor;
 	setColor: (color: RGBColor) => void;
 	recurring: boolean;
-  setRecurring: (recurring: boolean) => void;
+	setRecurring: (recurring: boolean) => void;
 	recurrenceType: ScheduleRepeatType;
-  setRecurrenceType: (type: ScheduleRepeatType) => void;
+	setRecurrenceType: (type: ScheduleRepeatType) => void;
 	recurrenceFrequency: ScheduleRepeatFrequency;
-  setRecurrenceFrequency: (frequency: ScheduleRepeatFrequency) => void;
-  recurrenceWeeklyDays: ScheduleRepeatWeekday[];
-  setRecurrenceWeeklyDays: (days: ScheduleRepeatWeekday[]) => void;
-  recurrenceStartType: ScheduleRepeatStartType;
-  setRecurrenceStartType: (type: ScheduleRepeatStartType) => void;
-  recurrenceStartDate: dayjs.Dayjs;
-  setRecurrenceStartDate: (date: dayjs.Dayjs) => void;
-  recurrenceEndType: ScheduleRepeatEndType;
-  setRecurrenceEndType: (type: ScheduleRepeatEndType) => void;
-  recurrenceEndDate: dayjs.Dayjs;
-  setRecurrenceEndDate: (date: dayjs.Dayjs) => void;
+	setRecurrenceFrequency: (frequency: ScheduleRepeatFrequency) => void;
+	recurrenceWeeklyDays: ScheduleRepeatWeekday[];
+	setRecurrenceWeeklyDays: (days: ScheduleRepeatWeekday[]) => void;
+	recurrenceStartType: ScheduleRepeatStartType;
+	setRecurrenceStartType: (type: ScheduleRepeatStartType) => void;
+	recurrenceStartDate: dayjs.Dayjs;
+	setRecurrenceStartDate: (date: dayjs.Dayjs) => void;
+	recurrenceEndType: ScheduleRepeatEndType;
+	setRecurrenceEndType: (type: ScheduleRepeatEndType) => void;
+	recurrenceEndDate: dayjs.Dayjs;
+	setRecurrenceEndDate: (date: dayjs.Dayjs) => void;
 	// Restrictions only available for tiles
-  timeRestricted?: boolean;
-  setTimeRestricted?: (val: boolean) => void;
+	timeRestricted?: boolean;
+	setTimeRestricted?: (val: boolean) => void;
 	timeRestrictionType?: CreateTileRestrictionType;
 	setTimeRestrictionType?: (type: CreateTileRestrictionType) => void;
 	customTimeRestrictionSchedule?: DaySchedule[];
-  setCustomTimeRestrictionSchedule?: (schedule: DaySchedule[]) => void;
+	setCustomTimeRestrictionSchedule?: (schedule: DaySchedule[]) => void;
+};
+
+export enum TileOptionsMode {
+	Tile = 'tile',
+	Block = 'block',
 }
 
 type OptionsProps = {
+	mode?: TileOptionsMode;
 	controller: OptionsFormController;
 };
 
-const CreateTileOptions: React.FC<OptionsProps> = ({ controller }) => {
+const CreateTileOptions: React.FC<OptionsProps> = ({ controller, mode = TileOptionsMode.Tile }) => {
 	const { t } = useTranslation();
 
 	const tileOptions = [
 		{
-			title: t('calendar.createTile.sections.tileColor'),
+			title:
+				mode === TileOptionsMode.Tile
+					? t('calendar.createTile.sections.tileColor')
+					: t('calendar.createBlock.sections.blockColor'),
 			content: <CreateTileColorOptions controller={controller} />,
 		},
 		{
-			title: t('calendar.createTile.sections.tileActions'),
-			content: (
-				<CreateTileActionsOptions
-					controller={controller}
-				/>
-			),
+			title:
+				mode === TileOptionsMode.Tile
+					? t('calendar.createTile.sections.tileActions')
+					: t('calendar.createBlock.sections.blockActions'),
+			content: <CreateTileActionsOptions mode={mode} controller={controller} />,
 		},
 	];
 

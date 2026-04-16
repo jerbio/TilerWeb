@@ -17,13 +17,17 @@ import Radio from '../../radio';
 import { CreateTileRestrictionType } from '../data';
 import { useCalendarUI } from '../calendar-ui.provider';
 import WeeklySchedule, { WeeklyScheduleSize } from '../../WeeklySchedule';
-import { OptionsFormController } from './options';
+import { OptionsFormController, TileOptionsMode } from './options';
 
 type ActionsOptionsProps = {
+	mode?: TileOptionsMode;
 	controller: OptionsFormController;
 };
 
-const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({ controller }) => {
+const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
+	controller,
+	mode = TileOptionsMode.Tile,
+}) => {
 	const { t } = useTranslation();
 	const theme = useStyledTheme();
 	const ui = useCalendarUI((state) => state.createTile);
@@ -176,7 +180,11 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({ controller })
 	return (
 		<StyledActionsOptions>
 			<Toggle
-				label={t('calendar.createTile.actions.repeatTile')}
+				label={
+					mode === TileOptionsMode.Tile
+						? t('calendar.createBlock.actions.repeatTile')
+						: t('calendar.createBlock.actions.repeatBlock')
+				}
 				isOn={controller.recurring}
 				onChange={controller.setRecurring}
 				containerStyle={{ paddingBlock: '.5rem', borderBottom: 'none' }}

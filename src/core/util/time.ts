@@ -18,107 +18,125 @@ dayjs.extend(localizedFormat);
 
 type TimeUnit = 'w' | 'd' | 'h' | 'm';
 const _quantities: Record<TimeUnit, number> = {
-  w: 7 * 24 * 60 * 60 * 1000,
-  d: 24 * 60 * 60 * 1000,
-  h: 60 * 60 * 1000,
-  m: 60 * 1000,
+	w: 7 * 24 * 60 * 60 * 1000,
+	d: 24 * 60 * 60 * 1000,
+	h: 60 * 60 * 1000,
+	m: 60 * 1000,
 } as const;
 
 class TimeUtil {
-  static minsToMeridian(minutes: number): string {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    const displayMinutes = mins.toString().padStart(2, '0');
+	static getRangeInMins(
+		startTime: string,
+		endTime: string,
+		start: dayjs.Dayjs,
+		end: dayjs.Dayjs
+	): number {
+		const startInMinutes = this.meridianToMins(startTime);
+		const endInMinutes = this.meridianToMins(endTime);
+		start = dayjs(start)
+			.set('hour', Math.floor(startInMinutes / 60))
+			.set('minute', startInMinutes % 60);
+		end = dayjs(end)
+			.set('hour', Math.floor(endInMinutes / 60))
+			.set('minute', endInMinutes % 60);
+		const duration = end.diff(start, 'minutes');
+		return duration;
+	}
 
-    if (mins === 0) {
-      return `${displayHour}:00 ${period}`;
-    } else {
-      return `${displayHour}:${displayMinutes} ${period}`;
-    }
-  }
+	static minsToMeridian(minutes: number): string {
+		const hours = Math.floor(minutes / 60);
+		const mins = minutes % 60;
+		const period = hours >= 12 ? 'PM' : 'AM';
+		const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+		const displayMinutes = mins.toString().padStart(2, '0');
 
-  static meridianToMins(time: string): number {
-    const [timeStr, meridian] = time.split(' ');
-    const [hourStr, minuteStr] = timeStr.split(':');
-    let hour = parseInt(hourStr, 10);
-    const minute = parseInt(minuteStr, 10);
+		if (mins === 0) {
+			return `${displayHour}:00 ${period}`;
+		} else {
+			return `${displayHour}:${displayMinutes} ${period}`;
+		}
+	}
 
-    // Convert to 24-hour format
-    if (meridian === 'PM' && hour !== 12) {
-      hour += 12;
-    } else if (meridian === 'AM' && hour === 12) {
-      hour = 0;
-    }
-    return hour * 60 + minute;
-  }
+	static meridianToMins(time: string): number {
+		const [timeStr, meridian] = time.split(' ');
+		const [hourStr, minuteStr] = timeStr.split(':');
+		let hour = parseInt(hourStr, 10);
+		const minute = parseInt(minuteStr, 10);
 
-  static minutesDuration(minutes: number): string {
-    const quantitiesInMins = Object.entries(_quantities).map(
-      ([unit, quantity]) => [unit, quantity / (60 * 1000)] as [TimeUnit, number]
-    );
+		// Convert to 24-hour format
+		if (meridian === 'PM' && hour !== 12) {
+			hour += 12;
+		} else if (meridian === 'AM' && hour === 12) {
+			hour = 0;
+		}
+		return hour * 60 + minute;
+	}
 
-    const parts = quantitiesInMins
-      .map(([unit, divisor]) => {
-        const value = Math.floor(minutes / divisor);
-        if (value > 0) {
-          minutes -= value * divisor;
-          return `${value}${unit}`;
-        }
-        return '';
-      })
-      .filter(Boolean);
+	static minutesDuration(minutes: number): string {
+		const quantitiesInMins = Object.entries(_quantities).map(
+			([unit, quantity]) => [unit, quantity / (60 * 1000)] as [TimeUnit, number]
+		);
 
-    return parts.join(' ') || '0m';
-  }
+		const parts = quantitiesInMins
+			.map(([unit, divisor]) => {
+				const value = Math.floor(minutes / divisor);
+				if (value > 0) {
+					minutes -= value * divisor;
+					return `${value}${unit}`;
+				}
+				return '';
+			})
+			.filter(Boolean);
 
-  static rangeDuration(start: dayjs.Dayjs, end: dayjs.Dayjs): string {
-    const totalSeconds = end.diff(start, 'second');
-    const totalMinutes = Math.ceil(totalSeconds / 60);
+		return parts.join(' ') || '0m';
+	}
+
+	static rangeDuration(start: dayjs.Dayjs, end: dayjs.Dayjs): string {
+		const totalSeconds = end.diff(start, 'second');
+		const totalMinutes = Math.ceil(totalSeconds / 60);
 
 		return this.minutesDuration(totalMinutes);
-  }
+	}
 
-  static inMilliseconds(value: number, unit: TimeUnit): number {
-    if (!(unit in _quantities)) {
-      throw new Error(`Invalid time unit: ${unit}`);
-    }
-    return value * _quantities[unit];
-  }
+	static inMilliseconds(value: number, unit: TimeUnit): number {
+		if (!(unit in _quantities)) {
+			throw new Error(`Invalid time unit: ${unit}`);
+		}
+		return value * _quantities[unit];
+	}
 
-  static now(): number {
-    return Date.now();
-  }
+	static now(): number {
+		return Date.now();
+	}
 
-  static nowDayjs(): dayjs.Dayjs {
-    return dayjs();
-  }
+	static nowDayjs(): dayjs.Dayjs {
+		return dayjs();
+	}
 
-  static nowISO(): string {
-    return new Date(TimeUtil.now()).toISOString();
-  }
+	static nowISO(): string {
+		return new Date(TimeUtil.now()).toISOString();
+	}
 
-  static currentYear(): number {
-    return new Date(TimeUtil.now()).getFullYear();
-  }
+	static currentYear(): number {
+		return new Date(TimeUtil.now()).getFullYear();
+	}
 
-  /**
-   * Sets the dayjs locale to match the app's current language.
-   * Call this when the user changes language.
-   */
-  static setLocale(locale: string): void {
-    dayjs.locale(locale);
-  }
+	/**
+	 * Sets the dayjs locale to match the app's current language.
+	 * Call this when the user changes language.
+	 */
+	static setLocale(locale: string): void {
+		dayjs.locale(locale);
+	}
 
-  /**
-   * Formats a timestamp (in ms) as a localized relative time string.
-   * Uses dayjs relativeTime plugin — automatically handles i18n.
-   * e.g. "a few seconds ago", "5 minutes ago", "3 hours ago", "2 days ago"
-   */
-  static relativeTime(timestampMs: number): string {
-    return dayjs(timestampMs).fromNow();
-  }
+	/**
+	 * Formats a timestamp (in ms) as a localized relative time string.
+	 * Uses dayjs relativeTime plugin — automatically handles i18n.
+	 * e.g. "a few seconds ago", "5 minutes ago", "3 hours ago", "2 days ago"
+	 */
+	static relativeTime(timestampMs: number): string {
+		return dayjs(timestampMs).fromNow();
+	}
 }
 
 export default TimeUtil;

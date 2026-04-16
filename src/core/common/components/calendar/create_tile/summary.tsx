@@ -116,7 +116,7 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
 
 export default CreateTileSummary;
 
-const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
+export const SummaryContainer = styled.div<{ $darkmode: boolean; $color: RGB }>`
 	${({ theme, $darkmode, $color }) => {
 		const summaryColor = new RGBColor($color);
 		return `

@@ -25,18 +25,15 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 		calendarConfig.CREATE_EVENT_DEFAULT_DURATION
 	);
 
-
 	useEffect(() => {
-		const startInMinutes = TimeUtil.meridianToMins(formData.startTime);
-		const endInMinutes = TimeUtil.meridianToMins(formData.endTime);
-		const start = dayjs(formData.start)
-			.set('hour', Math.floor(startInMinutes / 60))
-			.set('minute', startInMinutes % 60);
-		const end = dayjs(formData.end)
-			.set('hour', Math.floor(endInMinutes / 60))
-			.set('minute', endInMinutes % 60);
-		const duration = end.diff(start, 'minutes');
-		setDurationInMins(duration);
+		setDurationInMins(
+			TimeUtil.getRangeInMins(
+				formData.startTime,
+				formData.endTime,
+				formData.start,
+				formData.end
+			)
+		);
 	}, [formData.end, formData.endTime]);
 
 	useEffect(() => {
