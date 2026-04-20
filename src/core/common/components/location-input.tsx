@@ -7,171 +7,178 @@ import { Bookmark, CheckCircle2, Loader2, MapPin, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export type LocationInputController = {
-  isVerified: boolean;
-  location: string;
-  setLocation: (value: string) => void;
-  clearLocation: () => void;
-  setFromSelection: (loc: EventLocation) => void;
+	isVerified: boolean;
+	location: string;
+	setLocation: (value: string) => void;
+	clearLocation: () => void;
+	setFromSelection: (loc: EventLocation) => void;
 };
 
 type LocationInputProps = {
-  label?: React.ReactNode;
-  placeholder?: string;
-  controller: LocationInputController;
-  containerStyle?: React.CSSProperties;
+	label?: React.ReactNode;
+	placeholder?: string;
+	controller: LocationInputController;
+	containerStyle?: React.CSSProperties;
 };
 
 const LocationInput: React.FC<LocationInputProps> = ({
-  label,
-  placeholder,
-  controller,
-  containerStyle,
+	label,
+	placeholder,
+	controller,
+	containerStyle,
 }) => {
-  const { t } = useTranslation();
-  const { location, isVerified } = controller;
-  const userEditedLocationRef = useRef(false);
-  const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+	const { t } = useTranslation();
+	const { location, isVerified } = controller;
+	const userEditedLocationRef = useRef(false);
+	const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
+	const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+	const [isSearching, setIsSearching] = useState(false);
 
-  function selectLocation(loc: EventLocation) {
-    controller.setFromSelection(loc);
-    setLocationResults([]);
-    setShowLocationDropdown(false);
-  }
+	const showHint = location.trim().length > 0 && location.trim().length < 3;
+	const isDropdownPopulated = showLocationDropdown && locationResults.length > 0;
 
-  function clearLocation() {
-    controller.clearLocation();
-    setLocationResults([]);
-    setShowLocationDropdown(false);
-  }
+	function selectLocation(loc: EventLocation) {
+		controller.setFromSelection(loc);
+		setLocationResults([]);
+		setShowLocationDropdown(false);
+	}
 
-  useEffect(() => {
-    if (!userEditedLocationRef.current) return;
-    userEditedLocationRef.current = false;
-    if (location.trim().length < 3) {
-      setLocationResults([]);
-      setShowLocationDropdown(false);
-      setIsSearching(false);
-      return;
-    }
-    setIsSearching(true);
-    const timer = setTimeout(async () => {
-      try {
-        const results = await scheduleService.searchLocations(location);
-        setLocationResults(results);
-        setShowLocationDropdown(results.length > 0);
-      } catch {
-        setLocationResults([]);
-        setShowLocationDropdown(false);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [location]);
+	function clearLocation() {
+		controller.clearLocation();
+		setLocationResults([]);
+		setShowLocationDropdown(false);
+	}
 
-  return (
-    <LocationFieldGroup style={containerStyle}>
-      <Input
-        label={label}
-        name="location"
-        placeholder={placeholder}
-        value={location}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          userEditedLocationRef.current = true;
-          controller.setLocation(e.target.value);
-        }}
-        onFocus={() => {
-          if (locationResults.length > 0) setShowLocationDropdown(true);
-        }}
-        onBlur={() => {
-          setTimeout(() => setShowLocationDropdown(false), 150);
-        }}
-      />
-      {location && (
-        <ClearButton type="button" onClick={clearLocation}>
-          <X size={14} />
-        </ClearButton>
-      )}
-      {isVerified && location && (
-        <VerifiedBadge
-          data-testid="location-verified-badge"
-          title={t('location.verified.tooltip')}
-        >
-          <CheckCircle2 size={12} />
-          {t('location.verified.label')}
-        </VerifiedBadge>
-      )}
-      <LocationOverlay>
-        {location.trim().length > 0 && location.trim().length < 3 && (
-          <HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>
-        )}
-        {isSearching && (
-          <SearchingIndicator role="status">
-            <Loader2 size={16} className="spin" />
-          </SearchingIndicator>
-        )}
-        {!isSearching && showLocationDropdown && locationResults.length > 0 && (
-          <Dropdown>
-            {(() => {
-              const saved = locationResults.filter((l) => l.source !== LocationSource.Google);
-              const google = locationResults.filter((l) => l.source === LocationSource.Google);
-              return (
-                <>
-                  {saved.map((loc) => (
-                    <DropdownItem
-                      key={loc.id}
-                      onClick={() => selectLocation(loc)}
-                    >
-                      <ItemIcon>
-                        <Bookmark size={14} />
-                      </ItemIcon>
-                      <DropdownItemText>
-                        <DropdownItemAddress>
-                          {loc.address}
-                        </DropdownItemAddress>
-                        {loc.description && loc.description !== loc.id && (
-                          <DropdownItemDesc>
-                            {loc.description}
-                          </DropdownItemDesc>
-                        )}
-                      </DropdownItemText>
-                    </DropdownItem>
-                  ))}
-                  {google.map((loc) => (
-                    <DropdownItem
-                      key={loc.id}
-                      onClick={() => selectLocation(loc)}
-                    >
-                      <ItemIcon>
-                        <MapPin size={14} />
-                      </ItemIcon>
-                      <DropdownItemText>
-                        <DropdownItemAddress>
-                          {loc.address}
-                        </DropdownItemAddress>
-                        {loc.description && (
-                          <DropdownItemDesc>
-                            {loc.description}
-                          </DropdownItemDesc>
-                        )}
-                      </DropdownItemText>
-                    </DropdownItem>
-                  ))}
-                  {google.length > 0 && (
-                    <PoweredByGoogle>
-                      {t('calendarEvent.edit.poweredByGoogle')}
-                    </PoweredByGoogle>
-                  )}
-                </>
-              );
-            })()}
-          </Dropdown>
-        )}
-      </LocationOverlay>
-    </LocationFieldGroup>
-  );
+	useEffect(() => {
+		if (!userEditedLocationRef.current) return;
+		userEditedLocationRef.current = false;
+		if (location.trim().length < 3) {
+			setLocationResults([]);
+			setShowLocationDropdown(false);
+			setIsSearching(false);
+			return;
+		}
+		setIsSearching(true);
+		const timer = setTimeout(async () => {
+			try {
+				const results = await scheduleService.searchLocations(location);
+				setLocationResults(results);
+				setShowLocationDropdown(results.length > 0);
+			} catch {
+				setLocationResults([]);
+				setShowLocationDropdown(false);
+			} finally {
+				setIsSearching(false);
+			}
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [location]);
+
+	return (
+		<LocationFieldGroup style={containerStyle}>
+			<Input
+				label={label}
+				name="location"
+				placeholder={placeholder}
+				value={location}
+				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+					userEditedLocationRef.current = true;
+					controller.setLocation(e.target.value);
+				}}
+				onFocus={() => {
+					if (locationResults.length > 0) setShowLocationDropdown(true);
+				}}
+				onBlur={() => {
+					setTimeout(() => setShowLocationDropdown(false), 150);
+				}}
+				append={
+					location && (
+						<ClearButton type="button" onClick={clearLocation}>
+							<X size={14} />
+						</ClearButton>
+					)
+				}
+			/>
+			{isVerified && location && (
+				<VerifiedBadge
+					data-testid="location-verified-badge"
+					title={t('location.verified.tooltip')}
+				>
+					<CheckCircle2 size={12} />
+					{t('location.verified.label')}
+				</VerifiedBadge>
+			)}
+			<LocationOverlay $show={showHint || isSearching || isDropdownPopulated}>
+				{showHint && <HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>}
+				{isSearching && (
+					<SearchingIndicator role="status">
+						<Loader2 size={16} className="spin" />
+					</SearchingIndicator>
+				)}
+				{isDropdownPopulated && (
+					<Dropdown>
+						{(() => {
+							const saved = locationResults.filter(
+								(l) => l.source !== LocationSource.Google
+							);
+							const google = locationResults.filter(
+								(l) => l.source === LocationSource.Google
+							);
+							return (
+								<>
+									{saved.map((loc) => (
+										<DropdownItem
+											key={loc.id}
+											onClick={() => selectLocation(loc)}
+										>
+											<ItemIcon>
+												<Bookmark size={14} />
+											</ItemIcon>
+											<DropdownItemText>
+												<DropdownItemAddress>
+													{loc.address}
+												</DropdownItemAddress>
+												{loc.description && loc.description !== loc.id && (
+													<DropdownItemDesc>
+														{loc.description}
+													</DropdownItemDesc>
+												)}
+											</DropdownItemText>
+										</DropdownItem>
+									))}
+									{google.map((loc) => (
+										<DropdownItem
+											key={loc.id}
+											onClick={() => selectLocation(loc)}
+										>
+											<ItemIcon>
+												<MapPin size={14} />
+											</ItemIcon>
+											<DropdownItemText>
+												<DropdownItemAddress>
+													{loc.address}
+												</DropdownItemAddress>
+												{loc.description && (
+													<DropdownItemDesc>
+														{loc.description}
+													</DropdownItemDesc>
+												)}
+											</DropdownItemText>
+										</DropdownItem>
+									))}
+									{google.length > 0 && (
+										<PoweredByGoogle>
+											{t('calendarEvent.edit.poweredByGoogle')}
+										</PoweredByGoogle>
+									)}
+								</>
+							);
+						})()}
+					</Dropdown>
+				)}
+			</LocationOverlay>
+		</LocationFieldGroup>
+	);
 };
 
 const LocationFieldGroup = styled.div`
@@ -181,19 +188,20 @@ const LocationFieldGroup = styled.div`
 	min-width: 0;
 `;
 
-const LocationOverlay = styled.div`
+const LocationOverlay = styled.div<{ $show: boolean }>`
+	display: ${(props) => (props.$show ? 'block' : 'none')};
 	position: absolute;
-	top: 100%;
+	top: calc(100% + 0.5rem);
 	left: 0;
 	right: 0;
 	z-index: 10;
+	min-height: 40px;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: ${({ theme }) => theme.colors.background.card};
 `;
 
 const ClearButton = styled.button`
-	position: absolute;
-	right: 6px;
-	top: 50%;
-	transform: translateY(-50%);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -215,9 +223,8 @@ const ClearButton = styled.button`
 const HintText = styled.p`
 	margin: 0.25rem 0 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
-	color: ${({ theme }) => theme.colors.text.muted};
-	padding: 0.25rem 0.5rem;
-	background: ${({ theme }) => theme.colors.background.card};
+	color: ${({ theme }) => theme.colors.text.secondary};
+	padding: 0.5rem 1rem;
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 `;
 
@@ -225,9 +232,7 @@ const SearchingIndicator = styled.div`
 	display: flex;
 	justify-content: center;
 	padding: 0.5rem;
-	color: ${({ theme }) => theme.colors.text.muted};
-	background: ${({ theme }) => theme.colors.background.card};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	color: ${({ theme }) => theme.colors.brand[500]};
 
 	.spin {
 		animation: spin 1s linear infinite;
@@ -243,9 +248,6 @@ const SearchingIndicator = styled.div`
 const Dropdown = styled.div`
 	max-height: 240px;
 	overflow-y: auto;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background: ${({ theme }) => theme.colors.background.card};
 	margin-top: 4px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
@@ -266,7 +268,7 @@ const DropdownItem = styled.button`
 	}
 
 	&:not(:last-child) {
-		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border.strong};
 	}
 `;
 
