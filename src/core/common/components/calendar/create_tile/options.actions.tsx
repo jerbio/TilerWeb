@@ -182,7 +182,7 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 			<Toggle
 				label={
 					mode === TileOptionsMode.Tile
-						? t('calendar.createBlock.actions.repeatTile')
+						? t('calendar.createTile.actions.repeatTile')
 						: t('calendar.createBlock.actions.repeatBlock')
 				}
 				isOn={controller.recurring}
