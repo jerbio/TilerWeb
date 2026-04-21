@@ -23,6 +23,7 @@ export const eventColorOptions: Array<RGB> = [
 export const initialCreateTileFormState: InitialCreateTileFormState = {
 	start: dayjs(),
 	action: '',
+	count: '0',
 	location: '',
 	durationHours: 0,
 	durationMins: 0,

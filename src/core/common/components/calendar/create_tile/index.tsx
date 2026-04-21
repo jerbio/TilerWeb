@@ -40,6 +40,7 @@ dayjs.extend(advancedFormat);
 export type InitialCreateTileFormState = {
 	start: dayjs.Dayjs;
 	action: string;
+	count: string;
 	location: string;
 	durationHours: number;
 	durationMins: number;
@@ -96,6 +97,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
         GColor: formData.color.g.toString(),
         BColor: formData.color.b.toString(),
         LocationAddress: formData.location,
+        Count: formData.count,
         DurationDays: '0',
         DurationHours: formData.durationHours.toString(),
         DurationMinute: formData.durationMins.toString(),

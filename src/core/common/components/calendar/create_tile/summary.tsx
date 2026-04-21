@@ -29,6 +29,13 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
 		return t('calendar.createTile.summary.recurrenceFrequency.daily');
 	}, [formData.recurrenceFrequency, t]);
 
+	const splitInfo = React.useMemo(() => {
+		const count = parseInt(formData.count, 10) || 0;
+		if (count === 0) return { key: 'calendar.createTile.summary.split.once', count: 1 };
+		if (count === 1) return { key: 'calendar.createTile.summary.split.twice', count: 2 };
+		return { key: 'calendar.createTile.summary.split.times', count: count + 1 };
+	}, [formData.count]);
+
   return (
     <SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
       <header>{t('calendar.createTile.summary.title')}</header>
@@ -50,6 +57,16 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
             }),
           }}
         />
+        {!formData.isRecurring && (
+          <>
+            ,{' '}
+            <Trans
+              i18nKey={splitInfo.key}
+              components={{ b: <b /> }}
+              values={{ count: splitInfo.count }}
+            />
+          </>
+        )}
         {!formData.isRecurring && (
           <Trans
             components={{ b: <b /> }}

@@ -27,6 +27,13 @@ const CreateTileInfo: React.FC<InfoProps> = ({
         onChange={handleFormInputChange('action')}
       />
       <Input
+        label={t('calendar.createTile.info.tileSplit.label')}
+        name="count"
+        placeholder={t('calendar.createTile.info.tileSplit.placeholder')}
+        value={formData.count}
+        onChange={handleFormInputChange('count')}
+      />
+      <Input
         label={t('calendar.createTile.info.location.label')}
         name="location"
         placeholder={t('calendar.createTile.info.location.placeholder')}
