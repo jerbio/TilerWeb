@@ -27,7 +27,7 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 
 	useEffect(() => {
 		setDurationInMins(
-			TimeUtil.getRangeInMins(
+			TimeUtil.minutesBetweenMeridians(
 				formData.startTime,
 				formData.endTime,
 				formData.start,
@@ -37,7 +37,7 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 	}, [formData.end, formData.endTime]);
 
 	useEffect(() => {
-		const startInMinutes = TimeUtil.meridianToMins(formData.startTime);
+		const startInMinutes = TimeUtil.meridianToMinutesFromStartOfDay(formData.startTime);
 		const start = dayjs(formData.start)
 			.set('hour', Math.floor(startInMinutes / 60))
 			.set('minute', startInMinutes % 60);
@@ -49,7 +49,7 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 		setFormData((prev) => ({
 			...prev,
 			end,
-			endTime: TimeUtil.minsToMeridian(endInMinutes),
+			endTime: TimeUtil.minutesFromStartOfDayToMeridian(endInMinutes),
 		}));
 	}, [formData.start, formData.startTime]);
 
@@ -151,7 +151,7 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 							highlight: <div />,
 						}}
 						values={{
-							duration: TimeUtil.minutesDuration(durationInMins),
+							duration: TimeUtil.minutesToDuration(durationInMins),
 						}}
 					/>
 				) : (

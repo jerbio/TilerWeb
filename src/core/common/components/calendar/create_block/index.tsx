@@ -75,15 +75,12 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.name.trim().length === 0) return false;
-		const startInMinutes = TimeUtil.meridianToMins(formData.startTime);
-		const endInMinutes = TimeUtil.meridianToMins(formData.endTime);
-		const start = dayjs(formData.start)
-			.set('hour', Math.floor(startInMinutes / 60))
-			.set('minute', startInMinutes % 60);
-		const end = dayjs(formData.end)
-			.set('hour', Math.floor(endInMinutes / 60))
-			.set('minute', endInMinutes % 60);
-		const duration = end.diff(start, 'minutes');
+		const duration = TimeUtil.minutesBetweenMeridians(
+      formData.startTime,
+      formData.endTime,
+      formData.start,
+      formData.end
+		)
 		if (duration <= 0) return false;
 		return true;
 	}, [formData]);
@@ -115,8 +112,8 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 		ui.actions.startLoading(formData.name);
 
 		try {
-			const startInMinutes = TimeUtil.meridianToMins(formData.startTime);
-			const endInMinutes = TimeUtil.meridianToMins(formData.endTime);
+			const startInMinutes = TimeUtil.meridianToMinutesFromStartOfDay(formData.startTime);
+			const endInMinutes = TimeUtil.meridianToMinutesFromStartOfDay(formData.endTime);
 			const start = dayjs(formData.start)
 				.set('hour', Math.floor(startInMinutes / 60))
 				.set('minute', startInMinutes % 60);

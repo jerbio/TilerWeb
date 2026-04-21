@@ -487,7 +487,7 @@ const Calendar = ({
 			setCreateBlockForm({
 				...createBlockForm,
 				start: clickedDay,
-				startTime: TimeUtil.minsToMeridian(startTimeMinutes),
+				startTime: TimeUtil.minutesFromStartOfDayToMeridian(startTimeMinutes),
 			});
 
 			// Set Create Tile Form Based on day clicked
@@ -1019,7 +1019,7 @@ const NonViableEventsContainer = styled.div<{
 	top: ${calendarConfig.HEADER_HEIGHT};
 	left: ${({ $cellwidth, $index }) =>
 		`${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
-	pacity: ${({ $visible }) => ($visible ? 1 : 0)};
+	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
 
 	height: calc(100% - ${calendarConfig.HEADER_HEIGHT});

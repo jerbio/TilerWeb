@@ -25,25 +25,44 @@ const _quantities: Record<TimeUnit, number> = {
 } as const;
 
 class TimeUtil {
-	static getRangeInMins(
+	/**
+	 * Calculates the duration (in minutes) between two 12-hour time strings
+	 * on given Dayjs dates.
+	 *
+	 * Internally converts both times to minutes since midnight and applies them
+	 * to the provided dates before computing the difference.
+	 *
+	 * @param startTime - Start time in 12-hour format (e.g. "10:30 AM")
+	 * @param endTime - End time in 12-hour format (e.g. "2:15 PM")
+	 * @param start - Base start date
+	 * @param end - Base end date
+	 * @returns Duration in minutes (can be negative if end < start)
+	 */
+	static minutesBetweenMeridians(
 		startTime: string,
 		endTime: string,
-		start: dayjs.Dayjs,
-		end: dayjs.Dayjs
+		startDay: dayjs.Dayjs,
+		endDay: dayjs.Dayjs
 	): number {
-		const startInMinutes = this.meridianToMins(startTime);
-		const endInMinutes = this.meridianToMins(endTime);
-		start = dayjs(start)
+		const startInMinutes = this.meridianToMinutesFromStartOfDay(startTime);
+		const endInMinutes = this.meridianToMinutesFromStartOfDay(endTime);
+		startDay = dayjs(startDay)
 			.set('hour', Math.floor(startInMinutes / 60))
 			.set('minute', startInMinutes % 60);
-		end = dayjs(end)
+		endDay = dayjs(endDay)
 			.set('hour', Math.floor(endInMinutes / 60))
 			.set('minute', endInMinutes % 60);
-		const duration = end.diff(start, 'minutes');
+		const duration = endDay.diff(startDay, 'minutes');
 		return duration;
 	}
 
-	static minsToMeridian(minutes: number): string {
+	/**
+	 * Converts minutes since midnight into a 12-hour time string (AM/PM).
+	 *
+	 * @param minutes - Minutes since midnight (0 = 12:00 AM, 720 = 12:00 PM)
+	 * @returns Formatted time string (e.g. "3:05 PM")
+	 */
+	static minutesFromStartOfDayToMeridian(minutes: number): string {
 		const hours = Math.floor(minutes / 60);
 		const mins = minutes % 60;
 		const period = hours >= 12 ? 'PM' : 'AM';
@@ -57,13 +76,17 @@ class TimeUtil {
 		}
 	}
 
-	static meridianToMins(time: string): number {
+	/**
+	 * Converts a 12-hour time string (AM/PM) into minutes since midnight.
+	 * @param time - Time string in 12-hour format (e.g. "3:05 PM")
+	 * @returns Total minutes since midnight
+	 */
+	static meridianToMinutesFromStartOfDay(time: string): number {
 		const [timeStr, meridian] = time.split(' ');
 		const [hourStr, minuteStr] = timeStr.split(':');
 		let hour = parseInt(hourStr, 10);
 		const minute = parseInt(minuteStr, 10);
 
-		// Convert to 24-hour format
 		if (meridian === 'PM' && hour !== 12) {
 			hour += 12;
 		} else if (meridian === 'AM' && hour === 12) {
@@ -72,7 +95,16 @@ class TimeUtil {
 		return hour * 60 + minute;
 	}
 
-	static minutesDuration(minutes: number): string {
+	/**
+	 * Formats a duration in minutes into a human-readable string
+	 * using weeks, days, hours, and minutes.
+	 *
+	 * Example: 1500 → "1d 1h"
+	 *
+	 * @param minutes - Duration in minutes
+	 * @returns Formatted duration string (e.g. "2h 30m", "1w 2d")
+	 */
+	static minutesToDuration(minutes: number): string {
 		const quantitiesInMins = Object.entries(_quantities).map(
 			([unit, quantity]) => [unit, quantity / (60 * 1000)] as [TimeUnit, number]
 		);
@@ -95,7 +127,7 @@ class TimeUtil {
 		const totalSeconds = end.diff(start, 'second');
 		const totalMinutes = Math.ceil(totalSeconds / 60);
 
-		return this.minutesDuration(totalMinutes);
+		return this.minutesToDuration(totalMinutes);
 	}
 
 	static inMilliseconds(value: number, unit: TimeUnit): number {

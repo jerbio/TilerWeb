@@ -40,8 +40,8 @@ const CreateBlockSummary: React.FC<SummaryProps> = ({ formData }) => {
 					}}
 					values={{
 						name: formData.name,
-						duration: TimeUtil.minutesDuration(
-							TimeUtil.getRangeInMins(
+						duration: TimeUtil.minutesToDuration(
+							TimeUtil.minutesBetweenMeridians(
 								formData.startTime,
 								formData.endTime,
 								formData.start,

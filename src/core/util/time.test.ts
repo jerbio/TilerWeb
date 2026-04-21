@@ -1,8 +1,86 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import dayjs from 'dayjs';
 import TimeUtil from './time';
+import { MINUTES_IN_HOUR } from '../common/utils/timeUtils';
 
 describe('TimeUtil', () => {
+	describe('minutesBetweenMeridians', () => {
+		it('calculates simple same-day range correctly', () => {
+			const start = dayjs('2024-01-01');
+			const end = dayjs('2024-01-01');
+			expect(TimeUtil.minutesBetweenMeridians('10:00 AM', '11:30 AM', start, end)).toBe(90);
+		});
+		it('handles midnight correctly (12 AM)', () => {
+			const start = dayjs('2024-01-01');
+			const end = dayjs('2024-01-01');
+			expect(TimeUtil.minutesBetweenMeridians('12:00 AM', '1:00 AM', start, end)).toBe(60);
+		});
+		it('handles noon correctly (12 PM)', () => {
+			const start = dayjs('2024-01-01');
+			const end = dayjs('2024-01-01');
+			expect(TimeUtil.minutesBetweenMeridians('12:00 PM', '1:00 PM', start, end)).toBe(60);
+		});
+		it('returns negative duration if end is before start', () => {
+			const start = dayjs('2024-01-01');
+			const end = dayjs('2024-01-01');
+			expect(TimeUtil.minutesBetweenMeridians('2:00 PM', '1:00 PM', start, end)).toBe(-60);
+		});
+	});
+
+	describe('minutesFromStartOfDayToMeridian', () => {
+		it('converts 0 minutes to 12:00 AM', () => {
+			expect(TimeUtil.minutesFromStartOfDayToMeridian(0)).toBe('12:00 AM');
+		});
+		it('converts noon correctly', () => {
+			expect(TimeUtil.minutesFromStartOfDayToMeridian(12 * MINUTES_IN_HOUR)).toBe('12:00 PM');
+		});
+		it('formats minutes with leading zero', () => {
+			expect(TimeUtil.minutesFromStartOfDayToMeridian(9 * MINUTES_IN_HOUR + 5)).toBe(
+				'9:05 AM'
+			);
+		});
+		it('converts afternoon time correctly', () => {
+			expect(TimeUtil.minutesFromStartOfDayToMeridian(15 * MINUTES_IN_HOUR + 30)).toBe(
+				'3:30 PM'
+			);
+		});
+	});
+
+	describe('meridianToMinutesFromStartOfDay', () => {
+		it('converts AM time correctly', () => {
+			expect(TimeUtil.meridianToMinutesFromStartOfDay('9:30 AM')).toBe(
+				9 * MINUTES_IN_HOUR + 30
+			);
+		});
+		it('converts PM time correctly', () => {
+			expect(TimeUtil.meridianToMinutesFromStartOfDay('3:45 PM')).toBe(
+				15 * MINUTES_IN_HOUR + 45
+			);
+		});
+		it('handles 12 AM as 0 hours', () => {
+			expect(TimeUtil.meridianToMinutesFromStartOfDay('12:00 AM')).toBe(0);
+		});
+		it('handles 12 PM as 12 hours', () => {
+			expect(TimeUtil.meridianToMinutesFromStartOfDay('12:00 PM')).toBe(12 * MINUTES_IN_HOUR);
+		});
+	});
+
+	describe('minutesToDuration', () => {
+		it('returns "0m" for zero minutes', () => {
+			expect(TimeUtil.minutesToDuration(0)).toBe('0m');
+		});
+		it('returns minutes only when under 1 hour', () => {
+			expect(TimeUtil.minutesToDuration(45)).toBe('45m');
+		});
+		it('returns hours and minutes correctly', () => {
+			expect(TimeUtil.minutesToDuration(2 * MINUTES_IN_HOUR + 30)).toBe('2h 30m');
+		});
+		it('returns multi-unit duration (days, hours, minutes)', () => {
+			const mins = 2 * 24 * 60 + 3 * 60 + 15;
+			expect(TimeUtil.minutesToDuration(mins)).toBe('2d 3h 15m');
+		});
+	});
+
 	describe('rangeDuration', () => {
 		it('returns "0m" for zero duration', () => {
 			const time = dayjs('2024-01-01T10:00:00');
