@@ -4,6 +4,8 @@ import palette from '@/core/theme/palette';
 import { Asterisk } from 'lucide-react';
 
 type InputProps = {
+	containerClass?: string;
+	containerStyle?: React.CSSProperties;
 	label?: React.ReactNode;
 	disabled?: boolean;
 	variant?: 'default' | 'brand';
@@ -29,18 +31,20 @@ type StyledInputProps = {
 
 export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
 const BaseInput: React.FC<BaseInputProps> = ({
-  disabled = false,
-  variant = 'default',
-  sized = 'medium',
-  required,
-  height,
-  bordergradient,
-  label,
-  prepend,
-  append,
-  searchList,
-  onSearchSelect,
-  ...props
+	containerClass,
+	containerStyle,
+	disabled = false,
+	variant = 'default',
+	sized = 'medium',
+	required,
+	height,
+	bordergradient,
+	label,
+	prepend,
+	append,
+	searchList,
+	onSearchSelect,
+	...props
 }) => {
 	const styledProps = {
 		$disabled: disabled,
@@ -63,7 +67,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
 	}
 
 	const styledInput = (
-		<StyledInputWrapper {...styledProps}>
+		<StyledInputWrapper {...styledProps} className={containerClass} style={containerStyle}>
 			{prepend && <StyledInputPrepend>{prepend}</StyledInputPrepend>}
 			{searchList && (
 				<datalist id={listId}>
@@ -84,16 +88,21 @@ const BaseInput: React.FC<BaseInputProps> = ({
 		</StyledInputWrapper>
 	);
 
-  return label ? (
-    <div>
-      <StyledLabel htmlFor={id} {...styledProps}>
-        {label} {required && <StyledLabelRequired><Asterisk size={12} /></StyledLabelRequired>}
-      </StyledLabel>
-      {styledInput}
-    </div>
-  ) : (
-    styledInput
-  );
+	return label ? (
+		<div style={containerStyle} className={containerClass}>
+			<StyledLabel htmlFor={id} {...styledProps}>
+				{label}{' '}
+				{required && (
+					<StyledLabelRequired>
+						<Asterisk size={12} />
+					</StyledLabelRequired>
+				)}
+			</StyledLabel>
+			{styledInput}
+		</div>
+	) : (
+		styledInput
+	);
 };
 
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
@@ -128,7 +137,7 @@ const StyledLabelRequired = styled.span`
 
 const StyledLabel = styled.label<StyledInputProps>`
 	display: flex;
-	gap: .25rem;
+	gap: 0.25rem;
 	margin-bottom: 6px;
 	font-size: ${(props) =>
 		props.$sized === 'small'

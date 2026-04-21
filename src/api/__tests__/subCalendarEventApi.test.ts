@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SubCalendarEventApi } from '../subCalendarEventApi';
 import {
-	ScheduleSubCalendarEvent,
+	SubCalendarEvent,
 	SubCalendarEventLookupResponse,
 	ThirdPartyType,
 } from '@/core/common/types/schedule';
@@ -13,13 +13,29 @@ vi.mock('@/config/config_getter', () => ({
 	},
 }));
 
+// Mock locationService so updateSubCalendarEvent's getLocationData() resolves consistently
+const mockLocation = vi.hoisted(() => ({
+	location: 'Empire State Building, New York, NY',
+	longitude: -73.9857,
+	latitude: 40.7484,
+	verified: true,
+}));
+
+// Mock locationService so updateSubCalendarEvent's getLocationData() resolves consistently
+vi.mock('@/services/locationService', () => ({
+	__esModule: true,
+	default: {
+		getCurrentLocation: vi.fn().mockResolvedValue(mockLocation),
+	},
+}));
+
 // Spy on global fetch
 const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
 describe('SubCalendarEventApi', () => {
 	let api: SubCalendarEventApi;
 
-	const mockSubCalendarEvent: ScheduleSubCalendarEvent = {
+	const mockSubCalendarEvent: SubCalendarEvent = {
 		id: 'sub-event-123',
 		start: 1769925600000,
 		end: 1769929200000,
@@ -179,6 +195,9 @@ describe('SubCalendarEventApi', () => {
 				SubCalendarEventStart: 1769930000000,
 				SubCalendarEventEnd: 1769933600000,
 				TimeZone: 'America/New_York',
+				Longitude: mockLocation.longitude,
+				Latitude: mockLocation.latitude,
+				LocationVerified: mockLocation.verified,
 			});
 		});
 

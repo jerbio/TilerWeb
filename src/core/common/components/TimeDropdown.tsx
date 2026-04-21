@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import TimeUtil from '@/core/util/time';
 
 interface TimeDropdownProps {
 	value: string;
@@ -18,17 +19,7 @@ const generateTimeOptions = (interval: 15 | 30 | 60 = 30): string[] => {
 	const minutesInDay = 24 * 60;
 
 	for (let minutes = 0; minutes < minutesInDay; minutes += interval) {
-		const hours = Math.floor(minutes / 60);
-		const mins = minutes % 60;
-		const period = hours >= 12 ? 'PM' : 'AM';
-		const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-		const displayMinutes = mins.toString().padStart(2, '0');
-
-		if (mins === 0) {
-			options.push(`${displayHour}:00 ${period}`);
-		} else {
-			options.push(`${displayHour}:${displayMinutes} ${period}`);
-		}
+		options.push(TimeUtil.minsToMeridian(minutes));
 	}
 
 	return options;
@@ -143,6 +134,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 };
 
 const Trigger = styled.button<{ $isDark: boolean }>`
+	width: 100%;
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -151,12 +143,14 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 	color: ${({ theme }) => theme.colors.text.primary};
-	padding: 0.75rem 2.5rem 0.75rem 1rem;
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+	font-size: 13px;
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	cursor: pointer;
 	position: relative;
 	transition: border-color 0.2s ease;
+	height: 40px;
+	white-space: nowrap;
 
 	&:hover:not(:disabled) {
 		border-color: ${({ theme }) => theme.colors.gray[500]};
@@ -176,7 +170,7 @@ const Trigger = styled.button<{ $isDark: boolean }>`
 
 const ChevronSvg = styled.svg`
 	position: absolute;
-	right: 0.75rem;
+	right: 0.5rem;
 	top: 50%;
 	transform: translateY(-50%);
 	opacity: 0.5;

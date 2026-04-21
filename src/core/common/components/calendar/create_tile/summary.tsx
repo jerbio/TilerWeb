@@ -16,8 +16,8 @@ type SummaryProps = {
 };
 
 const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
-  const { t } = useTranslation();
-  const { isDarkMode } = useTheme();
+	const { t } = useTranslation();
+	const { isDarkMode } = useTheme();
 
 	const frequencyDescription = React.useMemo(() => {
 		if (formData.recurrenceFrequency === ScheduleRepeatFrequency.Yearly)
@@ -36,99 +36,99 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
 		return { key: 'calendar.createTile.summary.split.times', count: count + 1 };
 	}, [formData.count]);
 
-  return (
-    <SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
-      <header>{t('calendar.createTile.summary.title')}</header>
-      <p>
-        <Trans
-          i18nKey="calendar.createTile.summary.description"
-          components={{
-            b: <b />,
-          }}
-          values={{
-            action: formData.action,
-            location: formData.location,
-            hours: formData.durationHours,
-            minutes: formData.durationMins,
-            deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }),
-          }}
-        />
-        {!formData.isRecurring && (
-          <>
-            ,{' '}
-            <Trans
-              i18nKey={splitInfo.key}
-              components={{ b: <b /> }}
-              values={{ count: splitInfo.count }}
-            />
-          </>
-        )}
-        {!formData.isRecurring && (
-          <Trans
-            components={{ b: <b /> }}
-            i18nKey="calendar.createTile.summary.range"
-            values={{
-              start: dayjs(formData.start).toDate().toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }),
-              end: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }),
-            }}
-          />
-        )}
-        {formData.isRecurring && (
-          <>
-            <Trans
-              components={{ b: <b /> }}
-              i18nKey="calendar.createTile.summary.recurring"
-              values={{ recurrenceFrequency: frequencyDescription }}
-            />
-            <Trans
-              components={{ b: <b /> }}
-              i18nKey="calendar.createTile.summary.recurringStart"
-              values={{
-                recurrenceStart: dayjs(
-                  formData.recurrenceStartType === ScheduleRepeatStartType.Default
-                    ? formData.start
-                    : formData.recurrenceStartDate
-                )
-                  .toDate()
-                  .toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                  }),
-              }}
-            />
-            {formData.recurrenceEndType === ScheduleRepeatEndType.On && (
-              <Trans
-                components={{ b: <b /> }}
-                i18nKey="calendar.createTile.summary.recurringEnd"
-                values={{
-                  recurrenceEnd: dayjs(formData.recurrenceEndDate)
-                    .toDate()
-                    .toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                    }),
-                }}
-              />
-            )}
-          </>
-        )}
-      </p>
-    </SummaryContainer>
-  );
+	return (
+		<SummaryContainer $darkmode={isDarkMode} $color={formData.color}>
+			<header>{t('calendar.createTile.summary.title')}</header>
+			<p>
+				<Trans
+					i18nKey="calendar.createTile.summary.description"
+					components={{
+						b: <b />,
+					}}
+					values={{
+						action: formData.action,
+						location: formData.location,
+						hours: formData.durationHours,
+						minutes: formData.durationMins,
+						deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+							year: 'numeric',
+							month: '2-digit',
+							day: '2-digit',
+						}),
+					}}
+				/>
+				{!formData.isRecurring && (
+					<>
+						,{' '}
+						<Trans
+							i18nKey={splitInfo.key}
+							components={{ b: <b /> }}
+							values={{ count: splitInfo.count }}
+						/>
+					</>
+				)}
+				{!formData.isRecurring && (
+					<Trans
+						components={{ b: <b /> }}
+						i18nKey="calendar.createTile.summary.range"
+						values={{
+							start: dayjs(formData.start).toDate().toLocaleDateString(undefined, {
+								year: 'numeric',
+								month: '2-digit',
+								day: '2-digit',
+							}),
+							end: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
+								year: 'numeric',
+								month: '2-digit',
+								day: '2-digit',
+							}),
+						}}
+					/>
+				)}
+				{formData.isRecurring && (
+					<>
+						<Trans
+							components={{ b: <b /> }}
+							i18nKey="calendar.createTile.summary.recurring"
+							values={{ recurrenceFrequency: frequencyDescription }}
+						/>
+						<Trans
+							components={{ b: <b /> }}
+							i18nKey="calendar.createTile.summary.recurringStart"
+							values={{
+								recurrenceStart: dayjs(
+									formData.recurrenceStartType === ScheduleRepeatStartType.Default
+										? formData.start
+										: formData.recurrenceStartDate
+								)
+									.toDate()
+									.toLocaleDateString(undefined, {
+										year: 'numeric',
+										month: '2-digit',
+										day: '2-digit',
+									}),
+							}}
+						/>
+						{formData.recurrenceEndType === ScheduleRepeatEndType.On && (
+							<Trans
+								components={{ b: <b /> }}
+								i18nKey="calendar.createTile.summary.recurringEnd"
+								values={{
+									recurrenceEnd: dayjs(formData.recurrenceEndDate)
+										.toDate()
+										.toLocaleDateString(undefined, {
+											year: 'numeric',
+											month: '2-digit',
+											day: '2-digit',
+										}),
+								}}
+							/>
+						)}
+					</>
+				)}
+			</p>
+		</SummaryContainer>
+	);
 };
 
 export default CreateTileSummary;
@@ -171,7 +171,7 @@ line-height: 1.5;
 				padding: 0.25rem 0.75rem !important;
 				border-radius: ${theme.borderRadius.large} !important;
 				margin-bottom: 0.5rem;
-        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+				transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 			}
 		`;
 	}}

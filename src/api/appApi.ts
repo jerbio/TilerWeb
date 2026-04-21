@@ -1,5 +1,6 @@
 import ServerError from '@/core/error/server';
 import { Env } from '../config/config_getter';
+import locationService from '../services/locationService';
 
 type RequestOptions = RequestInit & {
 	headers?: Headers;
@@ -62,7 +63,6 @@ export class AppApi {
 
 			return (await res.json()) as T;
 		} catch (error) {
-			console.error(error, 'from api req');
 			if (error instanceof ServerError) throw error;
 			// Check if it's a structured error response (not ServerError)
 			if (error && typeof error === 'object' && 'Error' in error) {
@@ -127,5 +127,13 @@ export class AppApi {
 
 	get defaultDomain(): string {
 		return this.#baseUrl;
+	}
+
+	/**
+	 * Fetch the current user location for injection into schedule-mutating requests.
+	 * Subclasses call this rather than depending on locationService directly.
+	 */
+	protected getLocationData() {
+		return locationService.getCurrentLocation();
 	}
 }

@@ -31,11 +31,19 @@ export class SubCalendarEventApi extends AppApi {
 	/**
 	 * Update a SubCalendarEvent's start and/or end time.
 	 * `POST /api/SubCalendarEvent`
+	 * Automatically enriches the payload with the device's current location.
 	 */
-	public updateSubCalendarEvent(payload: UpdateSubCalendarEventPayload) {
+	public async updateSubCalendarEvent(payload: UpdateSubCalendarEventPayload) {
+		const loc = await this.getLocationData();
+		const enrichedPayload: UpdateSubCalendarEventPayload = {
+			...payload,
+			Longitude: payload.Longitude ?? loc.longitude,
+			Latitude: payload.Latitude ?? loc.latitude,
+			LocationVerified: payload.LocationVerified ?? loc.verified,
+		};
 		return this.apiRequest<SubCalendarEventLookupResponse>('api/SubCalendarEvent', {
 			method: 'POST',
-			body: JSON.stringify(payload),
+			body: JSON.stringify(enrichedPayload),
 		});
 	}
 }

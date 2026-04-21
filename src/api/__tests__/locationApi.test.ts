@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LocationApi } from '../locationApi';
 import {
-	ScheduleSubCalendarEventLocation,
+	EventLocation,
 	LocationResponse,
 	LocationSearchResponse,
 } from '@/core/common/types/schedule';
@@ -19,7 +19,7 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 describe('LocationApi', () => {
 	let api: LocationApi;
 
-	const mockLocation: ScheduleSubCalendarEventLocation = {
+	const mockLocation: EventLocation = {
 		id: '7147101b-b226-4bf0-95f5-b9a6959c4689',
 		description: 'Downtown Office',
 		address: '123 Main St, New York, NY 10001',

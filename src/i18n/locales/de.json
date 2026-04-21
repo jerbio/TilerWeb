@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "Ereignis als aktuell festgelegt!",
 			"completing": "Ereignis wird abgeschlossen...",
 			"completeSuccess": "Ereignis abgeschlossen!",
+			"deferring": "Ereignis wird verschoben...",
+			"deferSuccess": "Ereignis verschoben!",
+			"updating": "Änderungen werden gespeichert...",
+			"updateSuccess": "Änderungen gespeichert!",
 			"deleting": "Ereignis wird gelöscht...",
 			"deleteSuccess": "Ereignis gelöscht!",
 			"actionFailed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+		},
+		"edit": {
+			"title": "Bearbeiten",
+			"titleBlock": "Block bearbeiten",
+			"titleTile": "Kachel bearbeiten",
+			"nameSection": "Name",
+			"timeSection": "Zeit und Dauer",
+			"repetitionSection": "Wiederholung",
+			"locationSection": "Standort",
+			"colorSection": "Farbe",
+			"name": "Name",
+			"start": "Start",
+			"end": "Ende",
+			"selectDate": "Datum auswählen",
+			"duration": "Dauer",
+			"hours": "Std",
+			"minutes": "Min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Anzahl der Teilungen",
+			"splitPlaceholder": "z.B. 3",
+			"location": "Adresse",
+			"locationDescription": "Beschreibung",
+			"locationDescriptionPlaceholder": "Zusätzliche Standortdetails...",
+			"color": "Farbe",
+			"recurring": "Wiederkehrend",
+			"selectFrequency": "Häufigkeit auswählen",
+			"daily": "Täglich",
+			"weekly": "Wöchentlich",
+			"monthly": "Monatlich",
+			"yearly": "Jährlich",
+			"forever": "Für immer wiederholen",
+			"repetitionStart": "Wiederholungsbeginn",
+			"repetitionEnd": "Wiederholungsende",
+			"sun": "So",
+			"mon": "Mo",
+			"tue": "Di",
+			"wed": "Mi",
+			"thu": "Do",
+			"fri": "Fr",
+			"sat": "Sa",
+			"save": "Speichern",
+			"saving": "Änderungen werden gespeichert...",
+			"saveSuccess": "Ereignis aktualisiert!",
+			"saveFailed": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
+			"back": "Zurück",
+			"loading": "Details werden geladen...",
+			"loadingBlock": "Blockdetails werden geladen...",
+			"loadingTile": "Kacheldetails werden geladen...",
+			"clearLocation": "Standort löschen",
+			"locationMinChars": "Geben Sie mindestens 3 Zeichen ein, um zu suchen",
+			"locationSearchPlaceholder": "Standort suchen...",
+			"savedLocations": "Gespeicherte Standorte",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Bereitgestellt von Google",
+			"noLocationResults": "Keine Standorte gefunden"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "Einstellungen"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Kontoinformationen",
+				"description": "Überprüfen Sie Ihr Konto und ändern Sie Ihre persönlichen Daten",
+				"fields": {
+					"fullName": "Vollständiger Name",
+					"username": "Benutzername",
+					"email": "E-Mail-Adresse",
+					"phoneNumber": "Telefonnummer",
+					"phoneNumberPlaceholder": "Telefonnummer hinzufügen",
+					"countryCode": "Landesvorwahl",
+					"countryCodeSearch": "Länder suchen...",
+					"countryCodeNoResults": "Keine Länder gefunden",
+					"dateOfBirth": "Geburtsdatum",
+					"dateOfBirthPlaceholder": "TT.MM.JJJJ"
+				},
+				"saveChanges": "Änderungen speichern",
+				"saving": "Speichern...",
+				"deleteAccount": "Mein Konto löschen",
+				"saveSuccess": "Kontoinformationen erfolgreich aktualisiert",
+				"saveError": "Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+				"deleteNotImplemented": "Konto-Löschfunktion kommt bald"
+			},
 			"tilePreferences": {
 				"title": "Kachel-Einstellungen",
 				"description": "Definieren Sie, wie Sie sich fortbewegen, und helfen Sie Tiler, Ihre täglichen Zeitmuster zu verstehen",
@@ -664,5 +746,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Feedback senden",
+		"title": "Feedback senden",
+		"category": "Kategorie",
+		"categories": {
+			"Bug": "Fehler",
+			"Feature Request": "Funktionsanfrage",
+			"Improvement": "Verbesserung",
+			"Other": "Sonstiges"
+		},
+		"titleLabel": "Titel",
+		"titlePlaceholder": "Kurze Zusammenfassung Ihres Feedbacks",
+		"descriptionLabel": "Beschreibung",
+		"descriptionPlaceholder": "Erzählen Sie uns mehr über Ihr Feedback...",
+		"submit": "Absenden",
+		"submitting": "Wird gesendet...",
+		"submitSuccess": "Vielen Dank für Ihr Feedback!",
+		"submitError": "Feedback konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
 	}
 }

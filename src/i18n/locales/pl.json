@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "Wydarzenie ustawione jako bieżące!",
 			"completing": "Kończenie wydarzenia...",
 			"completeSuccess": "Wydarzenie ukończone!",
+			"deferring": "Odraczanie wydarzenia...",
+			"deferSuccess": "Wydarzenie odroczone!",
+			"updating": "Zapisywanie zmian...",
+			"updateSuccess": "Zmiany zapisane!",
 			"deleting": "Usuwanie wydarzenia...",
 			"deleteSuccess": "Wydarzenie usunięte!",
 			"actionFailed": "Akcja nie powiodła się. Spróbuj ponownie."
+		},
+		"edit": {
+			"title": "Edytuj",
+			"titleBlock": "Edytuj blok",
+			"titleTile": "Edytuj kafelek",
+			"nameSection": "Nazwa",
+			"timeSection": "Czas i czas trwania",
+			"repetitionSection": "Powtarzanie",
+			"locationSection": "Lokalizacja",
+			"colorSection": "Kolor",
+			"name": "Nazwa",
+			"start": "Początek",
+			"end": "Koniec",
+			"selectDate": "Wybierz datę",
+			"duration": "Czas trwania",
+			"hours": "godz",
+			"minutes": "min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Liczba podziałów",
+			"splitPlaceholder": "np. 3",
+			"location": "Adres",
+			"locationDescription": "Opis",
+			"locationDescriptionPlaceholder": "Dodatkowe szczegóły lokalizacji...",
+			"color": "Kolor",
+			"recurring": "Powtarzające się",
+			"selectFrequency": "Wybierz częstotliwość",
+			"daily": "Codziennie",
+			"weekly": "Co tydzień",
+			"monthly": "Co miesiąc",
+			"yearly": "Co rok",
+			"forever": "Powtarzaj na zawsze",
+			"repetitionStart": "Początek powtarzania",
+			"repetitionEnd": "Koniec powtarzania",
+			"sun": "Nd",
+			"mon": "Pn",
+			"tue": "Wt",
+			"wed": "Śr",
+			"thu": "Czw",
+			"fri": "Pt",
+			"sat": "Sb",
+			"save": "Zapisz",
+			"saving": "Zapisywanie zmian...",
+			"saveSuccess": "Wydarzenie zaktualizowane!",
+			"saveFailed": "Nie udało się zapisać. Spróbuj ponownie.",
+			"back": "Wstecz",
+			"loading": "Ładowanie szczegółów...",
+			"loadingBlock": "Ładowanie szczegółów bloku...",
+			"loadingTile": "Ładowanie szczegółów kafelka...",
+			"clearLocation": "Wyczyść lokalizację",
+			"locationMinChars": "Wpisz co najmniej 3 znaki, aby wyszukać",
+			"locationSearchPlaceholder": "Szukaj lokalizacji...",
+			"savedLocations": "Zapisane lokalizacje",
+			"googleResults": "Mapy Google",
+			"poweredByGoogle": "Obsługiwane przez Google",
+			"noLocationResults": "Nie znaleziono lokalizacji"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "Ustawienia"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Informacje o koncie",
+				"description": "Przeglądaj swoje konto i zmieniaj dane osobowe",
+				"fields": {
+					"fullName": "Imię i nazwisko",
+					"username": "Nazwa użytkownika",
+					"email": "Adres e-mail",
+					"phoneNumber": "Numer telefonu",
+					"phoneNumberPlaceholder": "Dodaj numer telefonu",
+					"countryCode": "Numer kierunkowy kraju",
+					"countryCodeSearch": "Szukaj krajów...",
+					"countryCodeNoResults": "Nie znaleziono krajów",
+					"dateOfBirth": "Data urodzenia",
+					"dateOfBirthPlaceholder": "DD.MM.RRRR"
+				},
+				"saveChanges": "Zapisz zmiany",
+				"saving": "Zapisywanie...",
+				"deleteAccount": "Usuń moje konto",
+				"saveSuccess": "Informacje o koncie zostały pomyślnie zaktualizowane",
+				"saveError": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+				"deleteNotImplemented": "Funkcja usuwania konta będzie wkrótce dostępna"
+			},
 			"tilePreferences": {
 				"title": "Preferencje kafelków",
 				"description": "Określ, jak się przemieszczasz i pomóż Tiler zrozumieć Twoje codzienne wzorce czasowe",
@@ -664,5 +746,24 @@
 				"pm": "PM"
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Wyślij opinię",
+		"title": "Wyślij opinię",
+		"category": "Kategoria",
+		"categories": {
+			"Bug": "Błąd",
+			"Feature Request": "Prośba o funkcję",
+			"Improvement": "Ulepszenie",
+			"Other": "Inne"
+		},
+		"titleLabel": "Tytuł",
+		"titlePlaceholder": "Krótkie podsumowanie opinii",
+		"descriptionLabel": "Opis",
+		"descriptionPlaceholder": "Powiedz nam więcej o swojej opinii...",
+		"submit": "Wyślij",
+		"submitting": "Wysyłanie...",
+		"submitSuccess": "Dziękujemy za opinię!",
+		"submitError": "Nie udało się wysłać opinii. Spróbuj ponownie."
 	}
 }

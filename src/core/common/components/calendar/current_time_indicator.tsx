@@ -45,7 +45,7 @@ const Indicator = styled.div<{ $top: number; $left: number; $width: number }>`
 	top: ${({ $top }) => $top}px;
 	left: ${({ $left }) => $left}px;
 	width: ${({ $width }) => $width}px;
-	z-index: 10;
+	z-index: 997;
 	pointer-events: none;
 	display: flex;
 	align-items: center;

@@ -13,17 +13,6 @@ vi.mock('@/services', () => ({
 	},
 }));
 
-// Mock the locationService
-const mockGetCurrentLocation = vi.fn();
-const mockToApiFormat = vi.fn();
-vi.mock('@/services/locationService', () => ({
-	__esModule: true,
-	default: {
-		getCurrentLocation: (...args: unknown[]) => mockGetCurrentLocation(...args),
-		toApiFormat: (...args: unknown[]) => mockToApiFormat(...args),
-	},
-}));
-
 // Mock the global state
 vi.mock('@/global_state', () => ({
 	__esModule: true,
@@ -152,17 +141,6 @@ const openAndConfirm = async (
 describe('ProcrastinateAllButton', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockGetCurrentLocation.mockResolvedValue({
-			location: 'Empire State Building, New York, NY',
-			longitude: -73.9857,
-			latitude: 40.7484,
-			verified: true,
-		});
-		mockToApiFormat.mockReturnValue({
-			userLongitude: '-73.9857',
-			userLatitude: '40.7484',
-			userLocationVerified: 'true',
-		});
 	});
 
 	it('renders a defer-all button with correct aria-label', () => {
@@ -249,9 +227,6 @@ describe('ProcrastinateAllButton', () => {
 
 		await waitFor(() => {
 			expect(mockProcrastinateAllSchedule).toHaveBeenCalledWith({
-				UserLongitude: '-73.9857',
-				UserLatitude: '40.7484',
-				UserLocationVerified: 'true',
 				Version: 'v2',
 				TimeZone: 'America/New_York',
 				DurationDays: 1,
@@ -270,19 +245,6 @@ describe('ProcrastinateAllButton', () => {
 
 		const confirmBtn = screen.getByRole('button', { name: 'Confirm' });
 		expect(confirmBtn).toBeDisabled();
-	});
-
-	it('fetches location before deferring', async () => {
-		mockProcrastinateAllSchedule.mockResolvedValueOnce({ subCalendarEvents: [] });
-		const user = setupUser();
-
-		renderProcrastinateAllButton();
-		await openAndConfirm(user, { hours: 1 });
-
-		await waitFor(() => {
-			expect(mockGetCurrentLocation).toHaveBeenCalledTimes(1);
-			expect(mockToApiFormat).toHaveBeenCalledTimes(1);
-		});
 	});
 
 	it('is disabled when disabled prop is true', () => {

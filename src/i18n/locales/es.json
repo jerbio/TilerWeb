@@ -603,9 +603,69 @@
 			"setAsNowSuccess": "¡Evento configurado como actual!",
 			"completing": "Completando evento...",
 			"completeSuccess": "¡Evento completado!",
+			"deferring": "Aplazando evento...",
+			"deferSuccess": "¡Evento aplazado!",
+			"updating": "Guardando cambios...",
+			"updateSuccess": "¡Cambios guardados!",
 			"deleting": "Eliminando evento...",
 			"deleteSuccess": "¡Evento eliminado!",
 			"actionFailed": "La acción falló. Inténtalo de nuevo."
+		},
+		"edit": {
+			"title": "Editar",
+			"titleBlock": "Editar bloque",
+			"titleTile": "Editar mosaico",
+			"nameSection": "Nombre",
+			"timeSection": "Hora y duración",
+			"repetitionSection": "Repetición",
+			"locationSection": "Ubicación",
+			"colorSection": "Color",
+			"name": "Nombre",
+			"start": "Inicio",
+			"end": "Fin",
+			"selectDate": "Seleccionar fecha",
+			"duration": "Duración",
+			"hours": "hrs",
+			"minutes": "min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Número de divisiones",
+			"splitPlaceholder": "ej. 3",
+			"location": "Dirección",
+			"locationDescription": "Descripción",
+			"locationDescriptionPlaceholder": "Detalles adicionales de la ubicación...",
+			"color": "Color",
+			"recurring": "Recurrente",
+			"selectFrequency": "Seleccionar frecuencia",
+			"daily": "Diario",
+			"weekly": "Semanal",
+			"monthly": "Mensual",
+			"yearly": "Anual",
+			"forever": "Repetir para siempre",
+			"repetitionStart": "Inicio de la repetición",
+			"repetitionEnd": "Fin de la repetición",
+			"sun": "Dom",
+			"mon": "Lun",
+			"tue": "Mar",
+			"wed": "Mié",
+			"thu": "Jue",
+			"fri": "Vie",
+			"sat": "Sáb",
+			"save": "Guardar",
+			"saving": "Guardando cambios...",
+			"saveSuccess": "¡Evento actualizado!",
+			"saveFailed": "Error al guardar. Inténtalo de nuevo.",
+			"back": "Atrás",
+			"loading": "Cargando detalles...",
+			"loadingBlock": "Cargando detalles del bloque...",
+			"loadingTile": "Cargando detalles del mosaico...",
+			"clearLocation": "Borrar ubicación",
+			"locationMinChars": "Escribe al menos 3 caracteres para buscar",
+			"locationSearchPlaceholder": "Buscar una ubicación...",
+			"savedLocations": "Ubicaciones guardadas",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Desarrollado por Google",
+			"noLocationResults": "No se encontraron ubicaciones"
 		}
 	},
 	"settings": {
@@ -617,6 +677,28 @@
 			"settings": "Configuración"
 		},
 		"sections": {
+			"accountInfo": {
+				"title": "Información de la cuenta",
+				"description": "Revisa tu cuenta y realiza cambios en tu información personal",
+				"fields": {
+					"fullName": "Nombre completo",
+					"username": "Nombre de usuario",
+					"email": "Correo electrónico",
+					"phoneNumber": "Número de teléfono",
+					"phoneNumberPlaceholder": "Agregar número de teléfono",
+					"countryCode": "Código de país",
+					"countryCodeSearch": "Buscar países...",
+					"countryCodeNoResults": "No se encontraron países",
+					"dateOfBirth": "Fecha de nacimiento",
+					"dateOfBirthPlaceholder": "DD/MM/AAAA"
+				},
+				"saveChanges": "Guardar cambios",
+				"saving": "Guardando...",
+				"deleteAccount": "Eliminar mi cuenta",
+				"saveSuccess": "Información de la cuenta actualizada correctamente",
+				"saveError": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+				"deleteNotImplemented": "La función de eliminar cuenta estará disponible próximamente"
+			},
 			"tilePreferences": {
 				"title": "Preferencias de Mosaico",
 				"description": "Define cómo te desplazas y ayuda a Tiler a entender tus patrones de tiempo diarios",
@@ -664,5 +746,24 @@
 				"pm": "p.m."
 			}
 		}
+	},
+	"feedback": {
+		"menuItem": "Enviar comentario",
+		"title": "Enviar comentario",
+		"category": "Categoría",
+		"categories": {
+			"Bug": "Error",
+			"Feature Request": "Solicitud de función",
+			"Improvement": "Mejora",
+			"Other": "Otro"
+		},
+		"titleLabel": "Título",
+		"titlePlaceholder": "Resumen breve de su comentario",
+		"descriptionLabel": "Descripción",
+		"descriptionPlaceholder": "Cuéntenos más sobre su comentario...",
+		"submit": "Enviar",
+		"submitting": "Enviando...",
+		"submitSuccess": "¡Gracias por su comentario!",
+		"submitError": "No se pudo enviar el comentario. Por favor, inténtelo de nuevo."
 	}
 }

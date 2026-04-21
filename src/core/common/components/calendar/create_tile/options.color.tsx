@@ -1,25 +1,26 @@
 import { RGBColor } from '@/core/util/colors';
-import { eventColorOptions } from '@/core/common/components/calendar/data';
 import styled from 'styled-components';
 import useFormHandler from '@/hooks/useFormHandler';
 import { InitialCreateTileFormState } from '.';
+import { eventColors } from '@/core/constants/calendar_options';
 
 type ColorOptionsProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 };
 
 const CreateTileColorOptions: React.FC<ColorOptionsProps> = ({
-  formHandler: { formData, handleFormInputChange },
+	formHandler: { formData, handleFormInputChange },
 }) => {
 	return (
 		<TileColorOptions>
-			{eventColorOptions.map((color) => {
+			{eventColors.map((color) => {
 				const optionRGBColor = new RGBColor(color);
+				const hexColor = optionRGBColor.setLightness(0.6).toHex();
 				return (
 					<TileColorOption
 						type="button"
 						key={optionRGBColor.toHex()}
-						$color={optionRGBColor}
+						$hexColor={hexColor}
 						$selected={optionRGBColor.equals(formData.color)}
 						onClick={() => {
 							handleFormInputChange('color', { mode: 'static' })(optionRGBColor);
@@ -41,8 +42,8 @@ const TileColorOptions = styled.div`
 	padding: 0.5rem 0;
 `;
 
-const TileColorOption = styled.button<{ $color: RGBColor; $selected: boolean }>`
-	background-color: ${({ $color }) => $color.setLightness(0.6).toHex()};
+const TileColorOption = styled.button<{ $hexColor: string; $selected: boolean }>`
+	background-color: ${({ $hexColor }) => $hexColor};
 	border-radius: 50%;
 	height: 2rem;
 	aspect-ratio: 1 / 1;

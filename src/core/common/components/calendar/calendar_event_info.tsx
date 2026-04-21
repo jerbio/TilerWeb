@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { CalendarEvent, ScheduleSubCalendarEvent, ThirdPartyType } from '../../types/schedule';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { CalendarEvent, SubCalendarEvent, ThirdPartyType } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
 	CalendarArrowDown,
@@ -43,10 +43,12 @@ import calendarConfig from '@/core/constants/calendar_config';
 import CyclingEmoji from './cycling_emoji';
 
 type CalendarEventInfoProps = {
-	event: ScheduleSubCalendarEvent | null;
+	event: SubCalendarEvent | null;
 	onClose?: () => void;
 	onEventAction?: () => void;
 	isEditable?: boolean;
+	readOnly?: boolean;
+	maxHeight?: number;
 };
 
 const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
@@ -54,6 +56,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	onClose,
 	onEventAction,
 	isEditable = true,
+	readOnly = false,
+	maxHeight,
 }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
@@ -61,7 +65,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
 	const isThirdPartyEvent = event?.thirdPartyType !== ThirdPartyType.Tiler;
 	// Third-party events (e.g. Google Calendar) are never editable
-	const effectiveEditable = isEditable && !isThirdPartyEvent;
+	// readOnly mode also disables all editing
+	const effectiveEditable = isEditable && !isThirdPartyEvent && !readOnly;
 
 	// Edit mode flags
 	const [isEditingName, setIsEditingName] = useState(false);
@@ -84,7 +89,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const [validationError, setValidationError] = useState<string | null>(null);
 
 	// Action loading state
-	const [actionLoading, setActionLoading] = useState<'complete' | 'now' | 'defer' | 'delete' | null>(null);
+	const [actionLoading, setActionLoading] = useState<
+		'complete' | 'now' | 'defer' | 'delete' | null
+	>(null);
 
 	// Defer duration picker state
 	const [showDeferPicker, setShowDeferPicker] = useState(false);
@@ -118,6 +125,33 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			setIsEditingDeadline(false);
 		}
 	}, [event, eventStart, eventEnd]);
+
+	// Close on Escape key, or exit edit mode if an input field is active
+	const isEditingAnyRef = useRef(false);
+	isEditingAnyRef.current = isEditingName || isEditingStart || isEditingEnd || isEditingDeadline;
+
+	const onCloseRef = useRef(onClose);
+	onCloseRef.current = onClose;
+
+	useEffect(() => {
+		if (!event) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				e.stopImmediatePropagation();
+				if (isEditingAnyRef.current) {
+					setIsEditingName(false);
+					setIsEditingStart(false);
+					setIsEditingEnd(false);
+					setIsEditingDeadline(false);
+					(document.activeElement as HTMLElement)?.blur();
+				} else {
+					onCloseRef.current?.();
+				}
+			}
+		};
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [event]);
 
 	const handleCancel = () => {
 		if (event) {
@@ -154,7 +188,15 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		const deadlineTime = dayjs(event.calendarEventEnd).format('h:mm A');
 		const newCalendarEnd = dateTimeToUnix(editedDeadline, deadlineTime);
 
-		const updates: { name?: string; start?: number; end?: number; calendarEnd?: number; thirdPartyEventId?: string; thirdPartyUserId?: string; calendarType?: string } = {};
+		const updates: {
+			name?: string;
+			start?: number;
+			end?: number;
+			calendarEnd?: number;
+			thirdPartyEventId?: string;
+			thirdPartyUserId?: string;
+			calendarType?: string;
+		} = {};
 
 		if (editedName !== event.name) {
 			updates.name = editedName;
@@ -202,7 +244,22 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		} finally {
 			setActionLoading(null);
 		}
-	}, [event, actionLoading, editedName, editedStartDate, editedStartTime, editedEndDate, editedEndTime, editedDeadline, eventStart, eventEnd, showNotification, updateNotification, t, onEventAction]);
+	}, [
+		event,
+		actionLoading,
+		editedName,
+		editedStartDate,
+		editedStartTime,
+		editedEndDate,
+		editedEndTime,
+		editedDeadline,
+		eventStart,
+		eventEnd,
+		showNotification,
+		updateNotification,
+		t,
+		onEventAction,
+	]);
 
 	const handleComplete = useCallback(async () => {
 		if (!event || actionLoading) return;
@@ -279,7 +336,18 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			setDeferHours(0);
 			setDeferMinutes(0);
 		}
-	}, [event, actionLoading, isDeferDurationZero, deferDays, deferHours, deferMinutes, showNotification, updateNotification, t, onEventAction]);
+	}, [
+		event,
+		actionLoading,
+		isDeferDurationZero,
+		deferDays,
+		deferHours,
+		deferMinutes,
+		showNotification,
+		updateNotification,
+		t,
+		onEventAction,
+	]);
 
 	const handleDelete = useCallback(async () => {
 		if (!event || actionLoading) return;
@@ -324,7 +392,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	};
 
 	return event ? (
-		<StyledCalendarEventInfo $color={eventColor} $darkmode={isDarkMode}>
+		<StyledCalendarEventInfo
+			$color={eventColor}
+			$darkmode={isDarkMode}
+			style={maxHeight ? { maxHeight } : undefined}
+		>
 			<CalendarEventInfoHeader>
 				<div className="icon">
 					{event.emojis ? (
@@ -353,6 +425,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 											setHasChanges(true);
 										}
 									} else if (e.key === 'Escape') {
+										e.stopPropagation();
 										setEditedName(event.name);
 										setIsEditingName(false);
 									}
@@ -449,8 +522,10 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={isEditable}
-										onClick={() => isEditable && setIsEditingStart(true)}
+										$isEditable={isEditable && !readOnly}
+										onClick={() =>
+											isEditable && !readOnly && setIsEditingStart(true)
+										}
 									>
 										<span>
 											{hasChanges
@@ -461,7 +536,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedStartDate).format('D MMM')
 												: dayjs(eventStart).format('D MMM')}
 										</span>
-										{isEditable && <Pencil size={12} className="edit-icon" />}
+										{isEditable && !readOnly && (
+											<Pencil size={12} className="edit-icon" />
+										)}
 									</EditableValue>
 								)}
 							</div>
@@ -502,8 +579,10 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									</>
 								) : (
 									<EditableValue
-										$isEditable={isEditable}
-										onClick={() => isEditable && setIsEditingEnd(true)}
+										$isEditable={isEditable && !readOnly}
+										onClick={() =>
+											isEditable && !readOnly && setIsEditingEnd(true)
+										}
 									>
 										<span>
 											{hasChanges
@@ -514,7 +593,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 												? dayjs(editedEndDate).format('D MMM')
 												: dayjs(eventEnd).format('D MMM')}
 										</span>
-										{isEditable && <Pencil size={12} className="edit-icon" />}
+										{isEditable && !readOnly && (
+											<Pencil size={12} className="edit-icon" />
+										)}
 									</EditableValue>
 								)}
 							</div>
@@ -546,16 +627,22 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									) : (
 										<EditableValue
 											$isEditable={effectiveEditable}
-											onClick={() => effectiveEditable && setIsEditingDeadline(true)}
+											onClick={() =>
+												effectiveEditable && setIsEditingDeadline(true)
+											}
 										>
 											<span>
 												{hasChanges
-													? dayjs(editedDeadline).format('ddd, D MMMM, YYYY')
+													? dayjs(editedDeadline).format(
+															'ddd, D MMMM, YYYY'
+														)
 													: dayjs(event.calendarEventEnd).format(
 															'ddd, D MMMM, YYYY'
 														)}
 											</span>
-											{effectiveEditable && <Pencil size={12} className="edit-icon" />}
+											{effectiveEditable && (
+												<Pencil size={12} className="edit-icon" />
+											)}
 										</EditableValue>
 									)}
 								</div>
@@ -615,7 +702,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			</ScrollableBody>
 
 			{/* More Options Row */}
-			{!hasChanges && !isThirdPartyEvent && (
+			{!hasChanges && !isThirdPartyEvent && !readOnly && (
 				<MoreOptionsRow
 					onClick={() => {
 						if (!event) return;
@@ -632,7 +719,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			)}
 
 			{/* Action Buttons / Defer Duration Picker */}
-			{!hasChanges && !isThirdPartyEvent && (
+			{!hasChanges && !isThirdPartyEvent && !readOnly && (
 				<EventActionBar>
 					{showDeferPicker ? (
 						<>
@@ -643,10 +730,14 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									min={0}
 									max={365}
 									value={deferDays}
-									onChange={(e) => setDeferDays(Math.max(0, parseInt(e.target.value) || 0))}
+									onChange={(e) =>
+										setDeferDays(Math.max(0, parseInt(e.target.value) || 0))
+									}
 									aria-label={t('timeline.procrastinateAll.days')}
 								/>
-								<DeferUnitLabel>{t('timeline.procrastinateAll.daysShort')}</DeferUnitLabel>
+								<DeferUnitLabel>
+									{t('timeline.procrastinateAll.daysShort')}
+								</DeferUnitLabel>
 							</DeferDurationField>
 							<DeferDurationField>
 								<DeferDurationInput
@@ -655,10 +746,16 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									min={0}
 									max={23}
 									value={deferHours}
-									onChange={(e) => setDeferHours(Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))}
+									onChange={(e) =>
+										setDeferHours(
+											Math.max(0, Math.min(23, parseInt(e.target.value) || 0))
+										)
+									}
 									aria-label={t('timeline.procrastinateAll.hours')}
 								/>
-								<DeferUnitLabel>{t('timeline.procrastinateAll.hoursShort')}</DeferUnitLabel>
+								<DeferUnitLabel>
+									{t('timeline.procrastinateAll.hoursShort')}
+								</DeferUnitLabel>
 							</DeferDurationField>
 							<DeferDurationField>
 								<DeferDurationInput
@@ -667,17 +764,27 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 									min={0}
 									max={59}
 									value={deferMinutes}
-									onChange={(e) => setDeferMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+									onChange={(e) =>
+										setDeferMinutes(
+											Math.max(0, Math.min(59, parseInt(e.target.value) || 0))
+										)
+									}
 									aria-label={t('timeline.procrastinateAll.minutes')}
 								/>
-								<DeferUnitLabel>{t('timeline.procrastinateAll.minutesShort')}</DeferUnitLabel>
+								<DeferUnitLabel>
+									{t('timeline.procrastinateAll.minutesShort')}
+								</DeferUnitLabel>
 							</DeferDurationField>
 							<DeferPickerIconButton
 								onClick={handleConfirmDefer}
 								disabled={isDeferDurationZero}
 								aria-label={t('timeline.procrastinateAll.confirm')}
 							>
-								{actionLoading === 'defer' ? <ActionSpinner /> : <Check size={16} />}
+								{actionLoading === 'defer' ? (
+									<ActionSpinner />
+								) : (
+									<Check size={16} />
+								)}
 							</DeferPickerIconButton>
 							<DeferPickerIconButton
 								onClick={handleCancelDefer}
@@ -738,7 +845,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			)}
 
 			{/* Delete button for third-party events */}
-			{!hasChanges && isThirdPartyEvent && (
+			{!hasChanges && isThirdPartyEvent && !readOnly && (
 				<EventActionBar>
 					<EventActionButton
 						onClick={handleDelete}
@@ -748,11 +855,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 						$darkmode={isDarkMode}
 					>
 						<div className="action-icon">
-							{actionLoading === 'delete' ? (
-								<ActionSpinner />
-							) : (
-								<Trash2 size={20} />
-							)}
+							{actionLoading === 'delete' ? <ActionSpinner /> : <Trash2 size={20} />}
 						</div>
 						<span>{t('timeline.markDeleted')}</span>
 					</EventActionButton>
@@ -960,7 +1063,8 @@ const EventActionButton = styled.button<{ $color: RGBColor; $darkmode: boolean }
 		height: 44px;
 		border-radius: 50%;
 		background: transparent;
-		border: 1px solid ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.7).toHex()};
+		border: 1px solid
+			${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.7).toHex()};
 		transition: background-color 0.2s ease;
 	}
 
@@ -972,7 +1076,8 @@ const EventActionButton = styled.button<{ $color: RGBColor; $darkmode: boolean }
 	}
 
 	&:hover:not(:disabled) .action-icon {
-		background: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.2 : 0.85).toHex()};
+		background: ${({ $color, $darkmode }) =>
+			$color.setLightness($darkmode ? 0.2 : 0.85).toHex()};
 	}
 
 	&:disabled {
@@ -1092,7 +1197,7 @@ const IconButton = styled.button<{ $primary?: boolean }>`
   `}
 `;
 
-const CalendarEventInfoHeader = styled.header``;
+const CalendarEventInfoHeader = styled.header`\n\tflex-shrink: 0;\n`;
 
 const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
 	position: relative;

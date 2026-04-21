@@ -9,12 +9,10 @@ const splitEmojis = (str: string): string[] => {
 			locale: string,
 			opts: { granularity: string }
 		) => { segment(input: string): Iterable<SegmentData> };
-		return [...new Seg('en', { granularity: 'grapheme' }).segment(str)].map(
-			(s) => s.segment
-		);
+		return [...new Seg('en', { granularity: 'grapheme' }).segment(str)].map((s) => s.segment);
 	}
 	// Fallback: split on unicode extended grapheme clusters via regex
-	return [...str.match(/\p{Extended_Pictographic}(\u200d\p{Extended_Pictographic})*/gu) ?? str];
+	return [...(str.match(/\p{Extended_Pictographic}(\u200d\p{Extended_Pictographic})*/gu) ?? str)];
 };
 
 const EMOJI_CYCLE_MS = 2000;
@@ -58,7 +56,9 @@ const EmojiCycleWrapper = styled.span`
 	.emoji {
 		position: absolute;
 		opacity: 0;
-		transition: opacity 0.4s ease, transform 0.4s ease;
+		transition:
+			opacity 0.4s ease,
+			transform 0.4s ease;
 		transform: scale(0.7);
 
 		&.active {

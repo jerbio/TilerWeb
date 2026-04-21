@@ -133,7 +133,15 @@ class ScheduleService {
 	 */
 	async updateSubCalendarEvent(
 		eventId: string,
-		updates: { name?: string; start?: number; end?: number; calendarEnd?: number; thirdPartyEventId?: string; thirdPartyUserId?: string, calendarType?: string }
+		updates: {
+			name?: string;
+			start?: number;
+			end?: number;
+			calendarEnd?: number;
+			thirdPartyEventId?: string;
+			thirdPartyUserId?: string;
+			calendarType?: string;
+		}
 	) {
 		try {
 			const response = await this.subCalendarEventApi.updateSubCalendarEvent({
@@ -226,7 +234,12 @@ class ScheduleService {
 	 * Delete a schedule event (third-party aware).
 	 * `DELETE /api/Schedule/Event`
 	 */
-	async deleteScheduleEvent(eventId: string, thirdPartyType: string, thirdPartyEventId: string, thirdPartyUserId: string) {
+	async deleteScheduleEvent(
+		eventId: string,
+		thirdPartyType: string,
+		thirdPartyEventId: string,
+		thirdPartyUserId: string
+	) {
 		try {
 			const response = await this.scheduleApi.deleteEvent({
 				EventID: eventId,

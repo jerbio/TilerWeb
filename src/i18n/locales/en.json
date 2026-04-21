@@ -169,6 +169,10 @@
 			"title": "Non-Viable Events",
 			"infoTooltip": "These events could not be scheduled due to timing conflicts or constraints."
 		},
+		"longDuration": {
+			"title": "Long Duration Events",
+			"infoTooltip": "These events span more than 15 hours and are shown here for readability."
+		},
 		"event": {
 			"dueIn": "Due in {{time}}",
 			"dateLabel": "Date:",
@@ -195,6 +199,57 @@
 			},
 			"moreOptions": "More options"
 		},
+		"createBlock": {
+			"title": "Add a New Block",
+			"info": {
+				"name": {
+					"label": "Name",
+					"placeholder": "What is the name of this block?"
+				},
+				"start": {
+					"label": "Start Time",
+					"placeholder": "What day does this block start?"
+				},
+				"end": {
+					"label": "End Time",
+					"placeholder": "What day does this block end?"
+				},
+				"hours": {
+					"label": "Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+				"minutes": {
+					"label": "Duration (Minutes)",
+					"placeholder": "How many mins will it take?"
+				},
+				"location": {
+					"label": "Location",
+					"placeholder": "Where is this block held?"
+				},
+				"locationTag": {
+					"label": "Location Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
+				"duration": {
+					"valid": "Duration <mute>~</mute> <highlight>{{duration}}</highlight>",
+					"invalid": "<highlight>Invalid Duration</highlight>"
+				}
+			},
+			"errors": {
+				"invalidDuration": "Invalid duration. End time must be after start time."
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{name}}\" to your schedule"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Block",
+				"collapse": "Less Options",
+				"expand": "More Options",
+				"viewInTimeline": "View Block"
+			}
+		},
 		"createTile": {
 			"title": "Add a New Tile",
 			"info": {
@@ -211,14 +266,18 @@
 					"label": "Tile Location",
 					"placeholder": "Where is this tile held?"
 				},
+				"locationTag": {
+					"label": "Location Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
 				"hours": {
 					"label": "Tile Duration (Hours)",
 					"placeholder": "How many hrs will it take?"
 				},
-        "minutes": {
-          "label": "Tile Duration (Minutes)",
-          "placeholder": "How many mins will it take?"
-        },
+				"minutes": {
+					"label": "Tile Duration (Minutes)",
+					"placeholder": "How many mins will it take?"
+				},
 				"range": {
 					"label": "Time Range",
 					"description": "Schedule between",
@@ -261,6 +320,12 @@
 					"friday": "Friday",
 					"saturday": "Saturday",
 					"sunday": "Sunday"
+				},
+				"restrictionType": {
+					"anytime": "Anytime",
+					"work": "Work Hours",
+					"personal": "Personal Hours",
+					"custom": "Custom"
 				}
 			},
 			"tip": {
@@ -276,8 +341,14 @@
 			},
 			"actions": {
 				"repeatTile": "Repeat the Tile",
-				"addTimeRestriction": "Add time restrictions",
+				"timeRestriction": "Time Restrictions",
 				"addLocationNickname": "Add location nickname"
+			},
+			"errors": {
+				"couldNotCreate": "Could not create tile. Please try again.",
+				"scheduleProfile": "Failed to load Personal/Work Hours",
+				"workProfileNotFound": "Work hours restriction profile not found",
+				"personalProfileNotFound": "Personal hours restriction profile not found"
 			},
 			"recurrence": {
 				"description": "I need to do this <repetition/> per <period/>",
@@ -319,6 +390,16 @@
 				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
 				"recurringStart": " from <b>{{recurrenceStart}}</b>",
 				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
+			}
+		},
+		"createSelection": {
+			"tile": {
+				"label": "Create Tile",
+				"description": "A flexible task that can move based on your availability."
+			},
+			"block": {
+				"label": "Create Block",
+				"description": "A fixed task that stays exactly where you place it."
 			}
 		},
 		"mobileChatInput": {
@@ -830,6 +911,9 @@
 					"email": "Email Address",
 					"phoneNumber": "Phone Number",
 					"phoneNumberPlaceholder": "Add phone number",
+					"countryCode": "Country Code",
+					"countryCodeSearch": "Search countries...",
+					"countryCodeNoResults": "No countries found",
 					"dateOfBirth": "Date of Birth",
 					"dateOfBirthPlaceholder": "MM/DD/YYYY"
 				},
@@ -1073,6 +1157,7 @@
 			"name": "Name",
 			"start": "Start",
 			"end": "End",
+			"selectDate": "Select date",
 			"duration": "Duration",
 			"hours": "hrs",
 			"minutes": "min",
@@ -1359,6 +1444,31 @@
 					"badge": "Collaboration"
 				}
 			}
+		}
+	},
+	"feedback": {
+		"menuItem": "Send Feedback",
+		"title": "Send Feedback",
+		"category": "Category",
+		"categories": {
+			"Bug": "Bug",
+			"Feature Request": "Feature Request",
+			"Improvement": "Improvement",
+			"Other": "Other"
+		},
+		"titleLabel": "Title",
+		"titlePlaceholder": "Brief summary of your feedback",
+		"descriptionLabel": "Description",
+		"descriptionPlaceholder": "Tell us more about your feedback...",
+		"submit": "Submit",
+		"submitting": "Submitting...",
+		"submitSuccess": "Thank you for your feedback!",
+		"submitError": "Failed to submit feedback. Please try again."
+	},
+	"location": {
+		"verified": {
+			"label": "Verified",
+			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
 		}
 	}
 }

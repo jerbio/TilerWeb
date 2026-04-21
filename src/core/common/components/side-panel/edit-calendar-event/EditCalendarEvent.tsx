@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import dayjs from 'dayjs';
 import {
@@ -10,12 +10,13 @@ import {
 	MapPin,
 	Calendar,
 	X,
+	CheckCircle2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	CalendarEvent,
 	CalendarEventUpdateParams,
-	ScheduleSubCalendarEventLocation,
+	EventLocation,
 } from '@/core/common/types/schedule';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
@@ -103,9 +104,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	});
 	const [isSaving, setIsSaving] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
-	const [locationResults, setLocationResults] = useState<ScheduleSubCalendarEventLocation[]>([]);
+	const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
 	const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
+	const [isLocationVerified, setIsLocationVerified] = useState(false);
 	const userEditedAddressRef = useRef(false);
 
 	// Snapshot of form values after loading, used to detect changes
@@ -250,11 +252,12 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		return () => clearTimeout(timer);
 	}, [address]);
 
-	const handleSelectLocation = (loc: ScheduleSubCalendarEventLocation) => {
+	const handleSelectLocation = (loc: EventLocation) => {
 		setAddress(loc.address);
 		setAddressDescription(loc.description);
 		setLocationId(loc.source !== 'google' ? loc.id : null);
 		setIsLocationCleared(false);
+		setIsLocationVerified(loc.isVerified);
 		setShowLocationDropdown(false);
 		setLocationResults([]);
 	};
@@ -264,6 +267,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setAddressDescription('');
 		setLocationId(null);
 		setIsLocationCleared(true);
+		setIsLocationVerified(false);
 		setLocationResults([]);
 		setShowLocationDropdown(false);
 	};
@@ -285,6 +289,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 						if (!cancelled) {
 							setAddress(location.address ?? '');
 							setAddressDescription(location.description ?? '');
+							setIsLocationVerified(location.isVerified ?? false);
 						}
 					} catch (locErr) {
 						console.error('Fetch location failed:', locErr);
@@ -790,6 +795,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 														userEditedAddressRef.current = true;
 														setLocationId(null);
 														setIsLocationCleared(false);
+														setIsLocationVerified(false);
 														setAddress(e.target.value);
 													}}
 													placeholder={t(
@@ -798,6 +804,12 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 													onFocus={() => {
 														if (locationResults.length > 0)
 															setShowLocationDropdown(true);
+													}}
+													onBlur={() => {
+														setTimeout(
+															() => setShowLocationDropdown(false),
+															150
+														);
 													}}
 												/>
 												{(address || addressDescription) && (
@@ -812,6 +824,15 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 													</ClearButton>
 												)}
 											</InputWithClear>
+											{isLocationVerified && address && (
+												<VerifiedBadge
+													data-testid="location-verified-badge"
+													title={t('location.verified.tooltip')}
+												>
+													<CheckCircle2 size={12} />
+													{t('location.verified.label')}
+												</VerifiedBadge>
+											)}
 											{address.trim().length > 0 &&
 												address.trim().length < 3 && (
 													<HintText>
@@ -1124,7 +1145,13 @@ const DateTimeRow = styled.div`
 	gap: 0.5rem;
 	align-items: center;
 
+	> button {
+		flex-shrink: 0;
+		width: auto;
+	}
+
 	> select {
+		flex-shrink: 0;
 		height: 36px;
 		padding-top: 0;
 		padding-bottom: 0;
@@ -1170,6 +1197,9 @@ const DateTrigger = styled.button`
 	cursor: pointer;
 	transition: border-color 0.15s ease;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 
 	&:hover {
 		border-color: ${({ theme }) => theme.colors.input.borderHover};
@@ -1476,5 +1506,20 @@ const SaveButton = styled.button`
 		to {
 			transform: rotate(360deg);
 		}
+	}
+`;
+
+const VerifiedBadge = styled.span`
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.success[600]};
+	font-weight: 500;
+	margin-top: 0.25rem;
+	cursor: default;
+
+	svg {
+		flex-shrink: 0;
 	}
 `;

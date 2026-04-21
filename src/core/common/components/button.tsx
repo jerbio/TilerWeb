@@ -180,10 +180,10 @@ const StyledButton = styled.button<StyledButtonProps>`
 	${(props) =>
 		props.$variant === 'pill' &&
 		css`
-			background-color: ${(props) => props.theme.colors.background.card2};
+			background-color: #2a2a2a;
 			margin-top: 0.25rem;
 			margin-right: 0.25rem;
-			color: ${(props) => props.theme.colors.text.primary};
+			color: ${(props) => props.theme.colors.text};
 			font-size: 0.875rem;
 			padding: 0.25rem 0.5rem;
 			border-radius: 999px;

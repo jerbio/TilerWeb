@@ -40,28 +40,22 @@ vi.mock('@/global_state', () => ({
 	),
 }));
 
-// Mock zustand Calendar UI store
+// Mock zustand Calendar UI store (for types used in SearchBar)
+type SearchBarCalendarUIStore = Pick<
+	CalendarUIStore,
+	'demoMode' | 'createSelection' | 'editTile' | 'viewInfo' | 'setViewInfo'
+>;
 vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
-	useCalendarUI: (selector: (state: CalendarUIStore) => unknown) => {
-		const mockStore = {
-			createTile: {
+	useCalendarUI: (selector: (state: SearchBarCalendarUIStore) => unknown) => {
+		const mockStore: SearchBarCalendarUIStore = {
+			demoMode: false,
+			createSelection: {
 				state: {
 					isOpen: false,
-					isExpanded: false,
-					loading: { isActive: false },
-					success: { isOpen: false, isNavigatingToTile: false },
 				},
 				actions: {
 					open: vi.fn(),
 					close: vi.fn(),
-					expand: vi.fn(),
-					collapse: vi.fn(),
-					startLoading: vi.fn(),
-					endLoading: vi.fn(),
-					showSuccess: vi.fn(),
-					hideSuccess: vi.fn(),
-					navigateToTile: vi.fn(),
-					navigateToTileComplete: vi.fn(),
 				},
 			},
 			editTile: {

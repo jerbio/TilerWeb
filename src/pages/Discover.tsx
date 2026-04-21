@@ -42,7 +42,6 @@ const Discover: React.FC = () => {
 			</Section>
 		</>
 	);
-
 };
 
 export default Discover;

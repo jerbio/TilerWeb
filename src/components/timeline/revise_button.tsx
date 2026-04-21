@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
-import locationService from '@/services/locationService';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import type { ScheduleReviseParams } from '@/core/common/types/schedule';
 
@@ -30,15 +29,10 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 		showNotification(nId, t('timeline.revise.revising'), 'loading');
 
 		try {
-			const locationData = await locationService.getCurrentLocation();
-			const locationApi = locationService.toApiFormat(locationData);
 			const session = getActivePersonaSession();
 			const userInfo = session?.userInfo;
 
 			const params: ScheduleReviseParams = {
-				UserLongitude: locationApi.userLongitude,
-				UserLatitude: locationApi.userLatitude,
-				UserLocationVerified: locationApi.userLocationVerified,
 				MobileApp: true,
 				SocketId: true,
 				TimeZoneOffset: userInfo?.timeZoneDifference ?? 0,
