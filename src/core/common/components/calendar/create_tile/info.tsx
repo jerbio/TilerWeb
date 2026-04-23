@@ -83,7 +83,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				onChange={handleFormInputChange('locationTag')}
 			/>
 			<LocationInput
-				containerStyle={{ gridColumn: 'span 2' }}
 				controller={locationController}
 				label={t('calendar.createTile.info.location.label')}
 				placeholder={t('calendar.createTile.info.location.placeholder')}
