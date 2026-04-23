@@ -31,9 +31,8 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
 
 	const splitInfo = React.useMemo(() => {
 		const count = parseInt(formData.count, 10) || 0;
-		if (count === 0) return { key: 'calendar.createTile.summary.split.once', count: 1 };
-		if (count === 1) return { key: 'calendar.createTile.summary.split.twice', count: 2 };
-		return { key: 'calendar.createTile.summary.split.times', count: count + 1 };
+		if (count === 0) return { key: 'calendar.createTile.summary.split.atOnce', count: 1 };
+		return { key: 'calendar.createTile.summary.split.ways', count: count + 1 };
 	}, [formData.count]);
 
 	return (
@@ -57,16 +56,12 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
 						}),
 					}}
 				/>
-				{!formData.isRecurring && (
-					<>
-						,{' '}
-						<Trans
-							i18nKey={splitInfo.key}
-							components={{ b: <b /> }}
-							values={{ count: splitInfo.count }}
-						/>
-					</>
-				)}
+				,{' '}
+				<Trans
+					i18nKey={splitInfo.key}
+					components={{ b: <b /> }}
+					values={{ count: splitInfo.count }}
+				/>
 				{!formData.isRecurring && (
 					<Trans
 						components={{ b: <b /> }}

@@ -376,9 +376,8 @@
 				"title": "Summary",
 				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
 				"split": {
-					"once": "<b>once</b>",
-					"twice": "<b>twice</b>",
-					"times": "<b>{{count}} times</b>"
+					"atOnce": "<b>at once</b>",
+					"ways": "<b>split {{count}} ways</b>"
 				},
 				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
