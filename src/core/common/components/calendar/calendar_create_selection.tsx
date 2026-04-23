@@ -64,13 +64,13 @@ const Selection = styled.button`
 	display: flex;
 	gap: 0.75rem;
 	padding: 10px;
-	
+
 	p {
-    font-size: ${({ theme }) => theme.typography.fontSize.sm};
-    font-family: ${({ theme }) => theme.typography.fontFamily.inter};
-    color: ${({ theme }) => theme.colors.text.muted};
+		font-size: ${({ theme }) => theme.typography.fontSize.sm};
+		font-family: ${({ theme }) => theme.typography.fontFamily.inter};
+		color: ${({ theme }) => theme.colors.text.muted};
 		text-align: left;
-  }
+	}
 
 	&:hover {
 		background-color: ${({ theme }) => `${theme.colors.brand[300]}05`};

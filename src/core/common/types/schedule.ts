@@ -84,6 +84,7 @@ export type TravelDetail = {
 export enum ThirdPartyType {
 	Tiler = 'tiler',
 	Google = 'google',
+	Unknown = 'unknown',
 }
 
 export type SubCalendarEvent = {
@@ -93,57 +94,57 @@ export type SubCalendarEvent = {
 	// Original start/end times preserved before visual splitting
 	originalStart?: number;
 	originalEnd?: number;
-	isSleep: boolean;
-	sleepDay: number;
-	isWake: boolean;
-	wakeDay: number;
-	isPaused: boolean;
-	isRigid: boolean;
-	isComplete: boolean;
-	isEnabled: boolean;
-	isTardy: boolean;
-	isViable: boolean;
-	isScheduleAble: boolean;
-	isProcrastinateEvent: boolean;
-	travelTimeBefore: number;
-	travelTimeAfter: number;
-	travelTimeBeforeDetail: string;
-	travelTimeAfterDetail: string;
-	locationId: null;
-	locationValidationId: string;
-	isCompleteAfterElapsedEnabled: boolean;
-	thirdPartyType: ThirdPartyType | string;
-	thirdPartyUserId: string | null;
-	thirdPartyId: string;
-	priority: number;
-	tileShareDesignatedId: null;
-	projectionType: ['SimpleObject'];
-	name: string;
-	address: string;
-	addressDescription: string;
-	location: EventLocation;
-	description: string;
-	searchdDescription: string;
-	rangeStart: number;
-	rangeEnd: number;
-	colorOpacity: number;
-	colorRed: number;
-	colorGreen: number;
-	colorBlue: number;
-	isRecurring: boolean;
-	emojis: string | null;
-	isReadOnly: boolean;
-	restrictionProfile: null;
-	isWhatIf: boolean;
-	jsonProjectionType: string;
-	blob: NotesBlob;
-	styleProperties: StyleProperties;
-	split: number;
-	calendarEventStart: number;
-	calendarEventEnd: number;
-	SubCalCalEventStart: number;
-	SubCalCalEventEnd: number;
-	travelDetail: TravelDetail;
+	isSleep?: boolean;
+	sleepDay?: number;
+	isWake?: boolean;
+	wakeDay?: number;
+	isPaused?: boolean;
+	isRigid?: boolean;
+	isComplete?: boolean;
+	isEnabled?: boolean;
+	isTardy?: boolean;
+	isViable?: boolean;
+	isScheduleAble?: boolean;
+	isProcrastinateEvent?: boolean;
+	travelTimeBefore?: number;
+	travelTimeAfter?: number;
+	travelTimeBeforeDetail?: string;
+	travelTimeAfterDetail?: string;
+	locationId?: null;
+	locationValidationId?: string;
+	isCompleteAfterElapsedEnabled?: boolean;
+	thirdPartyType?: ThirdPartyType | string;
+	thirdPartyUserId?: string | null;
+	thirdPartyId?: string;
+	priority?: number;
+	tileShareDesignatedId?: null;
+	projectionType?: ['SimpleObject'];
+	name?: string;
+	address?: string;
+	addressDescription?: string;
+	location?: EventLocation;
+	description?: string;
+	searchdDescription?: string;
+	rangeStart?: number;
+	rangeEnd?: number;
+	colorOpacity?: number;
+	colorRed?: number;
+	colorGreen?: number;
+	colorBlue?: number;
+	isRecurring?: boolean;
+	emojis?: string | null;
+	isReadOnly?: boolean;
+	restrictionProfile?: null;
+	isWhatIf?: boolean;
+	jsonProjectionType?: string;
+	blob?: NotesBlob;
+	styleProperties?: StyleProperties;
+	split?: number;
+	calendarEventStart?: number;
+	calendarEventEnd?: number;
+	SubCalCalEventStart?: number;
+	SubCalCalEventEnd?: number;
+	travelDetail?: TravelDetail;
 };
 
 export type ScheduleLookupTravelDetail = TravelPath | null;
