@@ -10,7 +10,8 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"format": "npx prettier --write .",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
 		"test": "vitest",
 		"test:run": "vitest run",
 		"test:coverage": "vitest run --coverage"
@@ -56,6 +57,7 @@
 		"globals": "^15.14.0",
 		"husky": "^9.1.7",
 		"jsdom": "^28.0.0",
+		"lint-staged": "^16.4.0",
 		"msw": "^2.12.7",
 		"prettier": "^3.5.0",
 		"react-router-dom": "^7.13.1",
@@ -64,5 +66,8 @@
 		"vite": "^6.0.5",
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^4.1.0"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx,css,json,md,html}": "prettier --write"
 	}
 }
