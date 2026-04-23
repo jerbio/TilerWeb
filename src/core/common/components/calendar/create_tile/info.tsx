@@ -58,7 +58,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 	return (
 		<Grid>
 			<Input
-				containerStyle={{ gridColumn: 'span 2' }}
 				label={t('calendar.createTile.info.action.label')}
 				required
 				name="action"
