@@ -144,7 +144,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				DurationDays: '0',
 				DurationHours: formData.durationHours.toString(),
 				DurationMinute: formData.durationMins.toString(),
-				isRestricted: 'false',
+				isRestricted: ScheduleBooleanString.False,
 				MobileApp: true,
 			};
 

@@ -42,7 +42,7 @@ function makeFormData(
 ): InitialCreateTileFormState {
 	return {
 		action: 'Test Action',
-		count: '0',
+		count: '1',
 		location: 'Test Location',
 		locationId: null,
 		locationSource: '',
@@ -83,48 +83,47 @@ function renderSummary(overrides: Partial<InitialCreateTileFormState> = {}) {
 }
 
 describe('CreateTileSummary – split display', () => {
-	it('displays "at once" when count is 0', () => {
-		renderSummary({ count: '0', isRecurring: false });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.atOnce');
-		expect(splitTrans).toBeInTheDocument();
-	});
-
-	it('displays "split 2 ways" when count is 1', () => {
+	it('displays "once" when count is 1', () => {
 		renderSummary({ count: '1', isRecurring: false });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.ways');
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.once');
 		expect(splitTrans).toBeInTheDocument();
-		expect(splitTrans.textContent).toContain('"count":2');
 	});
 
-	it('displays "split 3 ways" when count is 2', () => {
+	it('displays "twice" when count is 2', () => {
 		renderSummary({ count: '2', isRecurring: false });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.ways');
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.twice');
+		expect(splitTrans).toBeInTheDocument();
+	});
+
+	it('displays "3 times" when count is 3', () => {
+		renderSummary({ count: '3', isRecurring: false });
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.times');
 		expect(splitTrans).toBeInTheDocument();
 		expect(splitTrans.textContent).toContain('"count":3');
 	});
 
-	it('displays "split 5 ways" when count is 4', () => {
-		renderSummary({ count: '4', isRecurring: false });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.ways');
+	it('displays "5 times" when count is 5', () => {
+		renderSummary({ count: '5', isRecurring: false });
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.times');
 		expect(splitTrans).toBeInTheDocument();
 		expect(splitTrans.textContent).toContain('"count":5');
 	});
 
-	it('handles empty string count as 0 (at once)', () => {
+	it('handles empty string count as 1 (once)', () => {
 		renderSummary({ count: '', isRecurring: false });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.atOnce');
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.once');
 		expect(splitTrans).toBeInTheDocument();
 	});
 
-	it('handles invalid count string as 0 (at once)', () => {
+	it('handles invalid count string as 1 (once)', () => {
 		renderSummary({ count: 'invalid', isRecurring: false });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.atOnce');
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.once');
 		expect(splitTrans).toBeInTheDocument();
 	});
 
 	it('displays split info when recurring', () => {
-		renderSummary({ count: '2', isRecurring: true });
-		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.ways');
+		renderSummary({ count: '3', isRecurring: true });
+		const splitTrans = screen.getByTestId('trans-calendar.createTile.summary.split.times');
 		expect(splitTrans).toBeInTheDocument();
 		expect(splitTrans.textContent).toContain('"count":3');
 	});

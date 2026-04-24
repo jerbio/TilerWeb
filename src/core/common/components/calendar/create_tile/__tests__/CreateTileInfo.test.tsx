@@ -21,7 +21,7 @@ vi.mock('@/services', () => ({
 function makeFormHandler(overrides: Partial<InitialCreateTileFormState> = {}) {
 	const formData = {
 		action: '',
-		count: '0',
+		count: '1',
 		location: '',
 		locationId: null,
 		locationSource: '',
@@ -91,12 +91,12 @@ describe('CreateTileInfo – Tile Split input', () => {
 	});
 
 	it('renders Tile Split input with correct label', () => {
-		renderInfo({ count: '0' });
+		renderInfo({ count: '1' });
 		expect(screen.getByText('calendar.createTile.info.tileSplit.label')).toBeInTheDocument();
 	});
 
 	it('renders Tile Split input with correct placeholder', () => {
-		renderInfo({ count: '0' });
+		renderInfo({ count: '1' });
 		const input = screen.getByPlaceholderText('calendar.createTile.info.tileSplit.placeholder');
 		expect(input).toBeInTheDocument();
 	});
@@ -107,9 +107,9 @@ describe('CreateTileInfo – Tile Split input', () => {
 		expect(input).toHaveValue(5);
 	});
 
-	it('displays default count value of 0', () => {
-		renderInfo({ count: '0' });
+	it('displays default count value of 1', () => {
+		renderInfo({ count: '1' });
 		const input = screen.getByPlaceholderText('calendar.createTile.info.tileSplit.placeholder');
-		expect(input).toHaveValue(0);
+		expect(input).toHaveValue(1);
 	});
 });

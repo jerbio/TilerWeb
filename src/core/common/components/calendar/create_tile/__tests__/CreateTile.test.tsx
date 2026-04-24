@@ -560,7 +560,7 @@ describe('CalendarCreateTile UI', () => {
 			<CalendarCreateTile
 				formHandler={getFormHandler({
 					...mockValidFormState,
-					count: '0',
+					count: '1',
 				})}
 				refetchEvents={vi.fn()}
 			/>
@@ -571,7 +571,7 @@ describe('CalendarCreateTile UI', () => {
 		await waitFor(() => expect(createMock).toHaveBeenCalled());
 
 		const payload = createMock.mock.calls[0][0];
-		expect(payload.Count).toBe('0');
+		expect(payload.Count).toBe('1');
 	});
 
 	it('includes Count field in API payload with custom value', async () => {

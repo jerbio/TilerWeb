@@ -259,8 +259,8 @@
 					"placeholder": "What is the name of this tile?"
 				},
 				"tileSplit": {
-					"label": "Tile Split",
-					"placeholder": "How many times should this tile be split?"
+					"label": "How many times should this happen?",
+					"placeholder": "e.g. 1, 2, 3..."
 				},
 				"location": {
 					"label": "Tile Location",
@@ -376,8 +376,9 @@
 				"title": "Summary",
 				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
 				"split": {
-					"atOnce": "<b>at once</b>",
-					"ways": "<b>split {{count}} ways</b>"
+					"once": "<b>once</b>",
+					"twice": "<b>twice</b>",
+					"times": "<b>{{count}} times</b>"
 				},
 				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
