@@ -47,45 +47,73 @@ const CreateTileSummary: React.FC<SummaryProps> = ({ formData }) => {
 					}}
 					values={{
 						action: formData.action,
-						location: formData.location,
-						hours: formData.durationHours,
-						minutes: formData.durationMins,
-						deadline: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-							year: 'numeric',
-							month: '2-digit',
-							day: '2-digit',
-						}),
 					}}
 				/>
-				,{' '}
-				<Trans
-					i18nKey={splitInfo.key}
-					components={{ b: <b /> }}
-					values={{ count: splitInfo.count }}
-				/>
-				{!formData.isRecurring && (
+				{formData.location && (
 					<Trans
-						components={{ b: <b /> }}
-						i18nKey="calendar.createTile.summary.range"
+						i18nKey="calendar.createTile.summary.descriptionLocation"
+						components={{
+							b: <b />,
+						}}
 						values={{
-							start: dayjs(formData.start).toDate().toLocaleDateString(undefined, {
-								year: 'numeric',
-								month: '2-digit',
-								day: '2-digit',
-							}),
-							end: dayjs(formData.deadline).toDate().toLocaleDateString(undefined, {
-								year: 'numeric',
-								month: '2-digit',
-								day: '2-digit',
-							}),
+							location: formData.location,
 						}}
 					/>
+				)}
+				<Trans
+					i18nKey="calendar.createTile.summary.descriptionDuration"
+					components={{
+						b: <b />,
+					}}
+					values={{
+						hours: formData.durationHours,
+						minutes: formData.durationMins,
+					}}
+				/>
+				{!formData.isRecurring && (
+					<>
+						,{' '}
+						<Trans
+							i18nKey={splitInfo.key}
+							components={{ b: <b /> }}
+							values={{ count: splitInfo.count }}
+						/>
+						<Trans
+							components={{ b: <b /> }}
+							i18nKey="calendar.createTile.summary.range"
+							values={{
+								start: dayjs(formData.start)
+									.toDate()
+									.toLocaleDateString(undefined, {
+										year: 'numeric',
+										month: '2-digit',
+										day: '2-digit',
+									}),
+								end: dayjs(formData.deadline)
+									.toDate()
+									.toLocaleDateString(undefined, {
+										year: 'numeric',
+										month: '2-digit',
+										day: '2-digit',
+									}),
+							}}
+						/>
+					</>
 				)}
 				{formData.isRecurring && (
 					<>
 						<Trans
 							components={{ b: <b /> }}
 							i18nKey="calendar.createTile.summary.recurring"
+						/>{' '}
+						<Trans
+							i18nKey={splitInfo.key}
+							components={{ b: <b /> }}
+							values={{ count: splitInfo.count }}
+						/>
+						<Trans
+							components={{ b: <b /> }}
+							i18nKey="calendar.createTile.summary.recurringFrequency"
 							values={{ recurrenceFrequency: frequencyDescription }}
 						/>
 						<Trans
