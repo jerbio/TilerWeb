@@ -135,12 +135,28 @@ describe('CreateTileSummary – basic rendering', () => {
 		expect(screen.getByText('calendar.createTile.summary.title')).toBeInTheDocument();
 	});
 
-	it('renders the description with action and location', () => {
+	it('renders the description with action', () => {
 		renderSummary({ action: 'Run Marathon', location: 'Central Park' });
 		const descTrans = screen.getByTestId('trans-calendar.createTile.summary.description');
 		expect(descTrans).toBeInTheDocument();
 		expect(descTrans.textContent).toContain('"action":"Run Marathon"');
-		expect(descTrans.textContent).toContain('"location":"Central Park"');
+	});
+
+	it('renders location separately when provided', () => {
+		renderSummary({ action: 'Run Marathon', location: 'Central Park' });
+		const locationTrans = screen.getByTestId(
+			'trans-calendar.createTile.summary.descriptionLocation'
+		);
+		expect(locationTrans).toBeInTheDocument();
+		expect(locationTrans.textContent).toContain('"location":"Central Park"');
+	});
+
+	it('does not render location when empty', () => {
+		renderSummary({ action: 'Run Marathon', location: '' });
+		const locationTrans = screen.queryByTestId(
+			'trans-calendar.createTile.summary.descriptionLocation'
+		);
+		expect(locationTrans).not.toBeInTheDocument();
 	});
 
 	it('renders range when not recurring', () => {
