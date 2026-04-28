@@ -3,56 +3,56 @@ import React from 'react';
 import styled from 'styled-components';
 
 type CalendarModalProps = {
-  open: boolean;
-  onBackdropClick?: () => void;
-  containerRef?: React.RefObject<HTMLDivElement>;
-  children?: React.ReactNode;
-	width?: number
+	open: boolean;
+	onBackdropClick?: () => void;
+	containerRef?: React.RefObject<HTMLDivElement>;
+	children?: React.ReactNode;
+	width?: number;
 };
 
 const CalendarModal: React.FC<CalendarModalProps> = ({
-  children,
-  containerRef,
-  onBackdropClick,
-  open,
-  width
+	children,
+	containerRef,
+	onBackdropClick,
+	open,
+	width,
 }) => {
-  const modalPopooutAnimation = useSpring({
-    from: {
-      opacity: 0,
-      scale: 0.9,
-      y: 0,
-    },
-    to: {
-      opacity: open ? 1 : 0,
-      scale: open ? 1 : 0.9,
-      y: open ? 0 : 100,
-    },
-    config: {
-      duration: 200,
-    },
-  });
+	const modalPopooutAnimation = useSpring({
+		from: {
+			opacity: 0,
+			scale: 0.9,
+			y: 0,
+		},
+		to: {
+			opacity: open ? 1 : 0,
+			scale: open ? 1 : 0.9,
+			y: open ? 0 : 100,
+		},
+		config: {
+			duration: 200,
+		},
+	});
 
-  return (
-    <ModalBackdrop $visible={open} onClick={onBackdropClick}>
-      <ModalWrapper>
-        <ModalContainer
+	return (
+		<ModalBackdrop $visible={open} onClick={onBackdropClick}>
+			<ModalWrapper>
+				<ModalContainer
 					$width={width}
-          ref={containerRef}
-          style={{
-            scale: modalPopooutAnimation.scale,
-            opacity: modalPopooutAnimation.opacity,
-            transform: modalPopooutAnimation.y.to(
-              (y) => `translate(-50%, calc(${y}px - 50%))`
-            ),
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {children}
-        </ModalContainer>
-      </ModalWrapper>
-    </ModalBackdrop>
-  );
+					ref={containerRef}
+					style={{
+						scale: modalPopooutAnimation.scale,
+						opacity: modalPopooutAnimation.opacity,
+						transform: modalPopooutAnimation.y.to(
+							(y) => `translate(-50%, calc(${y}px - 50%))`
+						),
+					}}
+					onClick={(e) => e.stopPropagation()}
+				>
+					{children}
+				</ModalContainer>
+			</ModalWrapper>
+		</ModalBackdrop>
+	);
 };
 
 const ModalBackdrop = styled.div<{ $visible: boolean }>`
@@ -82,7 +82,7 @@ const ModalContainer = styled(a.div)<{ $width?: number }>`
 	left: 50%;
 	z-index: 1001;
 	width: calc(100% - 32px);
-	max-width: ${({ $width }) => $width ? `${$width}px` : '600px'};
+	max-width: ${({ $width }) => ($width ? `${$width}px` : '600px')};
 `;
 
 export default CalendarModal;

@@ -41,6 +41,7 @@ import { useCalendarUI } from './calendar-ui.provider';
 import { getCalendarEventId } from '@/core/util/entityResolution';
 import calendarConfig from '@/core/constants/calendar_config';
 import CyclingEmoji from './cycling_emoji';
+import { TypeDefaults } from '../../types/typeDefaults';
 
 type CalendarEventInfoProps = {
 	event: SubCalendarEvent | null;
@@ -111,12 +112,14 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	// Initialize state from event
 	useEffect(() => {
 		if (event) {
-			setEditedName(event.name);
+			setEditedName(event.name ?? '');
 			setEditedStartDate(timeToDate(eventStart));
 			setEditedStartTime(unixToTimeString(eventStart));
 			setEditedEndDate(timeToDate(eventEnd));
 			setEditedEndTime(unixToTimeString(eventEnd));
-			setEditedDeadline(timeToDate(event.calendarEventEnd));
+			if (event.calendarEventEnd) {
+				setEditedDeadline(timeToDate(event.calendarEventEnd));
+			}
 			setHasChanges(false);
 			setValidationError(null);
 			setIsEditingName(false);
@@ -155,12 +158,14 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
 	const handleCancel = () => {
 		if (event) {
-			setEditedName(event.name);
+			setEditedName(event.name ?? '');
 			setEditedStartDate(timeToDate(eventStart));
 			setEditedStartTime(unixToTimeString(eventStart));
 			setEditedEndDate(timeToDate(eventEnd));
 			setEditedEndTime(unixToTimeString(eventEnd));
-			setEditedDeadline(timeToDate(event.calendarEventEnd));
+			if (event.calendarEventEnd) {
+				setEditedDeadline(timeToDate(event.calendarEventEnd));
+			}
 		}
 		setHasChanges(false);
 		setValidationError(null);
@@ -358,8 +363,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		try {
 			await scheduleService.deleteScheduleEvent(
 				calendarEventId,
-				event.thirdPartyType,
-				event.thirdPartyId,
+				event.thirdPartyType ?? ThirdPartyType.Unknown,
+				event.thirdPartyId ?? '',
 				event.thirdPartyUserId ?? ''
 			);
 			updateNotification(nId, t('calendarEvent.notifications.deleteSuccess'), 'success');
@@ -373,9 +378,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	}, [event, actionLoading, showNotification, updateNotification, t, onEventAction]);
 
 	const eventColor = new RGBColor({
-		r: event ? event.colorRed : 128,
-		g: event ? event.colorGreen : 128,
-		b: event ? event.colorBlue : 128,
+		r: event ? (event.colorRed ?? TypeDefaults.RGBColor.red) : TypeDefaults.RGBColor.red,
+		g: event ? (event.colorGreen ?? TypeDefaults.RGBColor.green) : TypeDefaults.RGBColor.green,
+		b: event ? (event.colorBlue ?? TypeDefaults.RGBColor.blue) : TypeDefaults.RGBColor.blue,
 	});
 
 	// Compute duration display
@@ -426,7 +431,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 										}
 									} else if (e.key === 'Escape') {
 										e.stopPropagation();
-										setEditedName(event.name);
+										setEditedName(event.name ?? '');
 										setIsEditingName(false);
 									}
 								}}
@@ -679,7 +684,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 					</CalendarEventInfoArticleContainer>
 				</CalendarEventInfoSection>
 
-				{event.location.address && (
+				{event.location && event.location.address && (
 					<>
 						<hr />
 						<CalendarEventInfoSection>

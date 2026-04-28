@@ -22,6 +22,7 @@ import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
 import { splitEventByDay } from '@/core/util/eventSplitting';
 import { isLongDurationEvent } from '@/core/util/eventFilters';
+import { TypeDefaults } from '../../types/typeDefaults';
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
@@ -143,7 +144,7 @@ const CalendarEvents = ({
 
 		// Process travel details of all events in the current view
 		for (const event of currentViewEvents) {
-			const travelDetails = event.travelDetail;
+			const travelDetails = event.travelDetail ?? [];
 			for (const detail of Object.values(travelDetails)) {
 				if (!detail) continue;
 				if (detail.end - detail.start <= 0) continue;
@@ -156,10 +157,10 @@ const CalendarEvents = ({
 				currentViewTravelDetails.push({
 					...detail,
 					key: v4(),
-					colorRed: event.colorRed,
-					colorGreen: event.colorGreen,
-					colorBlue: event.colorBlue,
-					isViable: event.isViable,
+					colorRed: event.colorRed ?? TypeDefaults.RGBColor.red,
+					colorGreen: event.colorGreen ?? TypeDefaults.RGBColor.green,
+					colorBlue: event.colorBlue ?? TypeDefaults.RGBColor.blue,
+					isViable: event.isViable ?? true,
 				});
 			}
 		}
