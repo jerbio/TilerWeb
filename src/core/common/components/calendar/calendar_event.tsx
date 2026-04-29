@@ -8,6 +8,7 @@ import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import { TypeDefaults } from '../../types/typeDefaults';
 
 type CalendarEventProps = {
 	event: StyledEvent;
@@ -38,15 +39,19 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 			$darkmode={isDarkMode}
 			$selected={selectedEvent === event.id}
 			$focused={focused}
-			$colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
+			$colors={{
+				r: event.colorRed ?? TypeDefaults.RGBColor.red,
+				g: event.colorGreen ?? TypeDefaults.RGBColor.green,
+				b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
+			}}
 		>
 			<EventContent
 				height={event.springStyles.height}
 				$darkmode={isDarkMode}
 				$colors={{
-					r: event.colorRed,
-					g: event.colorGreen,
-					b: event.colorBlue,
+					r: event.colorRed ?? TypeDefaults.RGBColor.red,
+					g: event.colorGreen ?? TypeDefaults.RGBColor.green,
+					b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
 				}}
 				onClick={() => {
 					setSelectedEvent(event.id);
