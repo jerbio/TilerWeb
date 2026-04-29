@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 
 const MarkdownContainer = styled.div`
@@ -149,7 +150,7 @@ interface MarkdownRendererProps {
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
 	return (
 		<MarkdownContainer>
-			<ReactMarkdown>{content}</ReactMarkdown>
+			<ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
 		</MarkdownContainer>
 	);
 };
