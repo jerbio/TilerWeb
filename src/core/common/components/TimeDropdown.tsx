@@ -19,7 +19,7 @@ const generateTimeOptions = (interval: 15 | 30 | 60 = 30): string[] => {
 	const minutesInDay = 24 * 60;
 
 	for (let minutes = 0; minutes < minutesInDay; minutes += interval) {
-		options.push(TimeUtil.minsToMeridian(minutes));
+		options.push(TimeUtil.minutesFromStartOfDayToMeridian(minutes));
 	}
 
 	return options;

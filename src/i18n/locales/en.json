@@ -248,6 +248,27 @@
 				"collapse": "Less Options",
 				"expand": "More Options",
 				"viewInTimeline": "View Block"
+			},
+			"summary": {
+				"title": "Summary",
+				"description": "I have a <b>{{duration}}</b> event called <b>{{name}}</b>",
+				"locationDescription": ", at <b>{{location}}</b>",
+				"recurrenceFrequency": {
+					"daily": "day",
+					"weekly": "week",
+					"monthly": "month",
+					"yearly": "year"
+				},
+				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
+				"recurringStart": " from <b>{{recurrenceStart}}</b>",
+				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
+			},
+			"actions": {
+				"repeatBlock": "Repeat the Block"
+			},
+			"sections": {
+				"blockColor": "Select Block Color",
+				"blockActions": "Block Actions"
 			}
 		},
 		"createTile": {

@@ -34,6 +34,9 @@ const LocationInput: React.FC<LocationInputProps> = ({
 	const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
 
+	const showHint = location.trim().length > 0 && location.trim().length < 3;
+	const isDropdownPopulated = showLocationDropdown && locationResults.length > 0;
+
 	function selectLocation(loc: EventLocation) {
 		controller.setFromSelection(loc);
 		setLocationResults([]);
@@ -88,12 +91,14 @@ const LocationInput: React.FC<LocationInputProps> = ({
 				onBlur={() => {
 					setTimeout(() => setShowLocationDropdown(false), 150);
 				}}
+				append={
+					location && (
+						<ClearButton type="button" onClick={clearLocation}>
+							<X size={14} />
+						</ClearButton>
+					)
+				}
 			/>
-			{location && (
-				<ClearButton type="button" onClick={clearLocation}>
-					<X size={14} />
-				</ClearButton>
-			)}
 			{isVerified && location && (
 				<VerifiedBadge
 					data-testid="location-verified-badge"
@@ -103,16 +108,14 @@ const LocationInput: React.FC<LocationInputProps> = ({
 					{t('location.verified.label')}
 				</VerifiedBadge>
 			)}
-			<LocationOverlay>
-				{location.trim().length > 0 && location.trim().length < 3 && (
-					<HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>
-				)}
+			<LocationOverlay $show={showHint || isSearching || isDropdownPopulated}>
+				{showHint && <HintText>{t('calendarEvent.edit.locationMinChars')}</HintText>}
 				{isSearching && (
 					<SearchingIndicator role="status">
 						<Loader2 size={16} className="spin" />
 					</SearchingIndicator>
 				)}
-				{!isSearching && showLocationDropdown && locationResults.length > 0 && (
+				{isDropdownPopulated && (
 					<Dropdown>
 						{(() => {
 							const saved = locationResults.filter(
@@ -185,19 +188,20 @@ const LocationFieldGroup = styled.div`
 	min-width: 0;
 `;
 
-const LocationOverlay = styled.div`
+const LocationOverlay = styled.div<{ $show: boolean }>`
+	display: ${(props) => (props.$show ? 'block' : 'none')};
 	position: absolute;
-	top: 100%;
+	top: calc(100% + 0.5rem);
 	left: 0;
 	right: 0;
 	z-index: 10;
+	min-height: 40px;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: ${({ theme }) => theme.colors.background.card};
 `;
 
 const ClearButton = styled.button`
-	position: absolute;
-	right: 6px;
-	top: 50%;
-	transform: translateY(-50%);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -219,9 +223,8 @@ const ClearButton = styled.button`
 const HintText = styled.p`
 	margin: 0.25rem 0 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
-	color: ${({ theme }) => theme.colors.text.muted};
-	padding: 0.25rem 0.5rem;
-	background: ${({ theme }) => theme.colors.background.card};
+	color: ${({ theme }) => theme.colors.text.secondary};
+	padding: 0.5rem 1rem;
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 `;
 
@@ -229,9 +232,7 @@ const SearchingIndicator = styled.div`
 	display: flex;
 	justify-content: center;
 	padding: 0.5rem;
-	color: ${({ theme }) => theme.colors.text.muted};
-	background: ${({ theme }) => theme.colors.background.card};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	color: ${({ theme }) => theme.colors.brand[500]};
 
 	.spin {
 		animation: spin 1s linear infinite;
@@ -247,9 +248,6 @@ const SearchingIndicator = styled.div`
 const Dropdown = styled.div`
 	max-height: 240px;
 	overflow-y: auto;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background: ${({ theme }) => theme.colors.background.card};
 	margin-top: 4px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
@@ -270,7 +268,7 @@ const DropdownItem = styled.button`
 	}
 
 	&:not(:last-child) {
-		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border.strong};
 	}
 `;
 
