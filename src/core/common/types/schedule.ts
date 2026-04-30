@@ -544,3 +544,28 @@ export type UpdateScheduleProfileParams = ScheduleUpdateParams & {
 	TimeZoneOffset?: number;
 	IsTimeZoneAdjusted?: string;
 };
+
+// ── Tile Prediction types ──────────────────────────────────────
+
+export type TilePredictionTimeOfDay = {
+	daySections: string[];
+	restrictionProfile?: {
+		id: string;
+		WeekDayOption: { Start: string; End: string; Index: string }[];
+	} | null;
+};
+
+export type TilePredictionLocation = EventLocation & {
+	isAdHoc?: boolean;
+};
+
+export type TilePredictionResponse = {
+	timeOfDay?: TilePredictionTimeOfDay | null;
+	duration?: number[] | null;
+	location?: TilePredictionLocation[] | null;
+	physicalStatus?: string | null;
+	emotionalStatus?: string | null;
+	weatherAffected?: string | null;
+};
+
+export type TilePredictionApiResponse = ApiResponse<TilePredictionResponse>;

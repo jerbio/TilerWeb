@@ -8,6 +8,7 @@ import {
 	ScheduleProcrastinateEventParams,
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
+	TilePredictionApiResponse,
 } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
@@ -140,5 +141,23 @@ export class ScheduleApi extends AppApi {
 	 */
 	public deleteEvent(params: ScheduleDeleteEventParams) {
 		return this.scheduleRequest<ScheduleLookupResponse>('DELETE', 'api/Schedule/Event', params);
+	}
+
+	/**
+	 * Fetch AI-generated tile suggestions based on the tile name.
+	 * `GET /api/Schedule/NewTilePrediction?Name=...`
+	 */
+	public async getNewTilePrediction(name: string) {
+		const loc = await this.getLocationData();
+		const urlParams = new URLSearchParams({
+			Name: name,
+			MobileApp: 'true',
+			UserLongitude: loc.longitude?.toString() ?? '',
+			UserLatitude: loc.latitude?.toString() ?? '',
+			UserLocationVerified: loc.verified ? 'true' : 'false',
+		}).toString();
+		return this.apiRequest<TilePredictionApiResponse>(
+			`api/Schedule/NewTilePrediction?${urlParams}`
+		);
 	}
 }

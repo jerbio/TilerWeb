@@ -1,10 +1,11 @@
 import useFormHandler from '@/hooks/useFormHandler';
+import useDebounce from '@/hooks/useDebounce';
 import { Keyboard, X } from 'lucide-react';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../../button';
 import { RGBColor } from '@/core/util/colors';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AutosizeInput from '../../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
@@ -22,7 +23,10 @@ import {
 	ScheduleRepeatType,
 	ScheduleRepeatWeekday,
 	ScheduleRepeatWeeklyData,
+	TilePredictionResponse,
 } from '../../../types/schedule';
+import SmartSuggestions from './smart-suggestions';
+import { CreateTileRestrictionType } from '../data';
 import { toast } from 'sonner';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import {
@@ -37,7 +41,6 @@ import CreateTileSummary from './summary';
 import CreateTileOptions, { OptionsFormController } from './options';
 import CreateTileInfoInline from './info_inline';
 import CreateTileInfo from './info';
-import { CreateTileRestrictionType } from '../data';
 
 dayjs.extend(advancedFormat);
 
@@ -112,10 +115,86 @@ type CalendarCreateTileProps = {
 
 const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
 	const ui = useCalendarUI((state) => state.createTile);
-	const { formData, resetForm, handleFormInputChange } = formHandler;
+	const { formData, resetForm, handleFormInputChange, setFormData } = formHandler;
 	const theme = useStyledTheme();
 	const { t } = useTranslation();
 	const calendarDispatch = useCalendarDispatch();
+
+	// ── Smart Suggestions ──────────────────────────────────────
+	const [prediction, setPrediction] = useState<TilePredictionResponse | null>(null);
+	const [isPredicting, setIsPredicting] = useState(false);
+	const predictionAbortRef = useRef<AbortController | null>(null);
+	const debouncedAction = useDebounce(formData.action, 500);
+
+	useEffect(() => {
+		const name = debouncedAction.trim();
+		if (name.length < 3) {
+			setPrediction(null);
+			setIsPredicting(false);
+			return;
+		}
+		predictionAbortRef.current?.abort();
+		predictionAbortRef.current = new AbortController();
+		setIsPredicting(true);
+		scheduleService.getNewTilePrediction(name).then((result) => {
+			setPrediction(result);
+			setIsPredicting(false);
+		});
+	}, [debouncedAction]);
+
+	const handlePredictionDuration = useCallback(
+		(hours: number, mins: number) => {
+			setFormData((prev) => ({ ...prev, durationHours: hours, durationMins: mins }));
+		},
+		[setFormData]
+	);
+
+	const handlePredictionLocation = useCallback(
+		(location: NonNullable<TilePredictionResponse['location']>[number]) => {
+			setFormData((prev) => ({
+				...prev,
+				location: location.address,
+				locationId: location.source !== 'google' && !location.isAdHoc ? location.id : null,
+				locationSource: location.source,
+				locationIsVerified: location.isVerified,
+				locationTag: location.nickname || '',
+			}));
+		},
+		[setFormData]
+	);
+
+	const handlePredictionTimeSection = useCallback(
+		(_section: string) => {
+			setFormData((prev) => ({
+				...prev,
+				isTimeRestricted: true,
+				timeRestrictionType: CreateTileRestrictionType.Custom,
+			}));
+		},
+		[setFormData]
+	);
+
+	const handleApplyRestrictionProfile = useCallback(
+		(
+			profile: NonNullable<
+				NonNullable<TilePredictionResponse['timeOfDay']>['restrictionProfile']
+			>
+		) => {
+			const schedule: DaySchedule[] = profile.WeekDayOption.map((opt) => ({
+				dayIndex: parseInt(opt.Index, 10),
+				startTime: opt.Start,
+				endTime: opt.End,
+			}));
+			setFormData((prev) => ({
+				...prev,
+				isTimeRestricted: true,
+				timeRestrictionType: CreateTileRestrictionType.Custom,
+				customTimeRestrictionSchedule: schedule,
+			}));
+		},
+		[setFormData]
+	);
+	// ──────────────────────────────────────────────────────────
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.action.trim().length === 0) return false;
@@ -376,6 +455,16 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 					<CreateTileInfoInline formHandler={formHandler} />
 				</Section>
 			)}
+
+			<SmartSuggestions
+				prediction={prediction}
+				isLoading={isPredicting}
+				isExpanded={ui.state.isExpanded}
+				onDurationSelect={handlePredictionDuration}
+				onLocationSelect={handlePredictionLocation}
+				onTimeSectionSelect={handlePredictionTimeSection}
+				onApplyRestrictionProfile={handleApplyRestrictionProfile}
+			/>
 
 			<Seperator />
 			<TipContainer>
