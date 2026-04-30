@@ -167,7 +167,6 @@ const StyledInputAppend = styled.div<StyledInputProps>`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	pointer-events: none;
 	padding-right: ${(props) => (props.$sized === 'small' ? '8px' : '12px')};
 `;
 
