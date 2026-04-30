@@ -11,8 +11,12 @@ export type SmartSuggestionsProps = {
 	prediction: TilePredictionResponse | null;
 	isLoading: boolean;
 	isExpanded: boolean;
-	onDurationSelect: (hours: number, mins: number) => void;
-	onLocationSelect: (loc: TilePredictionLocation) => void;
+	appliedDurationMs: number | null;
+	appliedLocationId: string | null;
+	appliedTimeSection: string | null;
+	restrictionProfileApplied: boolean;
+	onDurationSelect: (hours: number, mins: number, ms: number) => void;
+	onLocationSelect: (location: TilePredictionLocation) => void;
 	onTimeSectionSelect: (section: string) => void;
 	onApplyRestrictionProfile: (
 		profile: NonNullable<NonNullable<TilePredictionResponse['timeOfDay']>['restrictionProfile']>
@@ -35,6 +39,10 @@ const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 	prediction,
 	isLoading,
 	isExpanded,
+	appliedDurationMs,
+	appliedLocationId,
+	appliedTimeSection,
+	restrictionProfileApplied,
 	onDurationSelect,
 	onLocationSelect,
 	onTimeSectionSelect,
@@ -76,11 +84,13 @@ const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 					<ChipGroup>
 						{prediction!.duration!.map((ms) => {
 							const { hours, mins } = msToHoursAndMins(ms);
+							const isSelected = appliedDurationMs === ms;
 							return (
 								<Chip
 									key={ms}
 									type="button"
-									onClick={() => onDurationSelect(hours, mins)}
+									$selected={isSelected}
+									onClick={() => onDurationSelect(hours, mins, ms)}
 								>
 									{formatDuration(ms)}
 								</Chip>
@@ -98,6 +108,7 @@ const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 							<Chip
 								key={section}
 								type="button"
+								$selected={appliedTimeSection === section}
 								onClick={() => onTimeSectionSelect(section)}
 							>
 								{section}
@@ -111,16 +122,19 @@ const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 				<Row>
 					<RowLabel>Suggested Location</RowLabel>
 					<ChipGroup>
-						{prediction!.location!.map((loc) => {
-							const isSaved = loc.source !== LocationSource.Google && !loc.isAdHoc;
+						{prediction!.location!.map((location) => {
+							const isSaved =
+								location.source !== LocationSource.Google && !location.isAdHoc;
+							const isSelected = appliedLocationId === location.id;
 							return (
 								<LocationChip
-									key={loc.id}
+									key={location.id}
 									type="button"
-									onClick={() => onLocationSelect(loc)}
+									$selected={isSelected}
+									onClick={() => onLocationSelect(location)}
 								>
 									{isSaved ? <Bookmark size={11} /> : <MapPin size={11} />}
-									{loc.nickname || loc.address}
+									{location.nickname || location.address}
 								</LocationChip>
 							);
 						})}
@@ -130,14 +144,20 @@ const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 
 			{!isLoading && hasRestrictionProfile && (
 				<Row>
-					<ApplyButton
-						type="button"
-						onClick={() =>
-							onApplyRestrictionProfile(prediction!.timeOfDay!.restrictionProfile!)
-						}
-					>
-						Apply Suggested Schedule Window
-					</ApplyButton>
+					<RowLabel>Suggested Schedule Window</RowLabel>
+					<ChipGroup>
+						<Chip
+							type="button"
+							$selected={restrictionProfileApplied}
+							onClick={() =>
+								onApplyRestrictionProfile(
+									prediction!.timeOfDay!.restrictionProfile!
+								)
+							}
+						>
+							Apply Suggested Schedule Window
+						</Chip>
+					</ChipGroup>
 				</Row>
 			)}
 
@@ -176,9 +196,7 @@ const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	padding: 0.75rem 1.25rem;
 	animation: ${fadeIn} 0.2s ease-out;
-	border-bottom: 1px solid ${({ theme }) => theme.colors.border.strong};
 `;
 
 const Header = styled.div`
@@ -212,58 +230,50 @@ const ChipGroup = styled.div`
 	gap: 0.375rem;
 `;
 
-const Chip = styled.button`
+const Chip = styled.button<{ $selected: boolean }>`
 	display: inline-flex;
 	align-items: center;
 	padding: 0.2rem 0.6rem;
 	border-radius: 999px;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	background: ${({ theme }) => theme.colors.background.card2};
-	color: ${({ theme }) => theme.colors.text.primary};
+	border: 1px solid
+		${({ theme, $selected }) =>
+			$selected ? theme.colors.datepicker.dateSelectedBg : theme.colors.border.default};
+	background: ${({ theme, $selected }) =>
+		$selected ? theme.colors.datepicker.dateSelectedBg : theme.colors.background.card2};
+	color: ${({ theme, $selected }) =>
+		$selected ? theme.colors.datepicker.dateSelectedText : theme.colors.text.primary};
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	cursor: pointer;
 	transition:
 		background-color 0.15s,
-		border-color 0.15s;
+		border-color 0.15s,
+		color 0.15s;
 
 	&:hover {
-		background: ${({ theme }) => theme.colors.brand[100]};
-		border-color: ${({ theme }) => theme.colors.brand[400]};
-		color: ${({ theme }) => theme.colors.brand[700]};
+		background: ${({ theme, $selected }) =>
+			$selected
+				? theme.colors.datepicker.dateSelectedBg
+				: theme.colors.datepicker.dateHoverBg};
+		border-color: ${({ theme, $selected }) =>
+			$selected
+				? theme.colors.datepicker.dateSelectedBg
+				: theme.colors.datepicker.dateHoverBg};
+		color: ${({ theme, $selected }) =>
+			$selected
+				? theme.colors.datepicker.dateSelectedText
+				: theme.colors.datepicker.dateHoverText};
 	}
 `;
 
 const LocationChip = styled(Chip)`
 	gap: 0.3rem;
-	color: ${({ theme }) => theme.colors.text.secondary};
 
 	svg {
 		flex-shrink: 0;
-		color: ${({ theme }) => theme.colors.text.muted};
-	}
-
-	&:hover svg {
-		color: ${({ theme }) => theme.colors.brand[500]};
-	}
-`;
-
-const ApplyButton = styled.button`
-	align-self: flex-start;
-	padding: 0.25rem 0.75rem;
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	border: 1px dashed ${({ theme }) => theme.colors.brand[400]};
-	background: transparent;
-	color: ${({ theme }) => theme.colors.brand[600]};
-	font-size: ${({ theme }) => theme.typography.fontSize.xs};
-	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-	cursor: pointer;
-	transition: background-color 0.15s;
-
-	&:hover {
-		background: ${({ theme }) => theme.colors.brand[50]};
+		color: ${({ theme, $selected }) =>
+			$selected ? theme.colors.datepicker.dateSelectedText : theme.colors.text.muted};
 	}
 `;
 
