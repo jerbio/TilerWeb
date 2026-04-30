@@ -4,7 +4,7 @@
 	"compilerOptions": {
 		"plugins": [
 			{
-				"name": "@styled/typescript-styled-plugin",
+				"name": "@styled/typescript-styled-plugin"
 			}
 		]
 	}

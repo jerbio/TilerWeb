@@ -21,6 +21,7 @@ export enum CreateTileRestrictionType {
 export const initialCreateTileFormState: InitialCreateTileFormState = {
 	start: dayjs(),
 	action: '',
+	count: '1',
 	location: '',
 	locationId: null,
 	locationSource: '',

@@ -7,6 +7,7 @@ import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
+import { ScheduleRepeatWeekday } from '@/core/common/types/schedule';
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
@@ -58,7 +59,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 	return (
 		<Grid>
 			<Input
-				containerStyle={{ gridColumn: 'span 2' }}
 				label={t('calendar.createTile.info.action.label')}
 				required
 				name="action"
@@ -66,10 +66,22 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				value={formData.action}
 				onChange={handleFormInputChange('action')}
 			/>
-			<LocationInput
-				controller={locationController}
-				label={t('calendar.createTile.info.location.label')}
-				placeholder={t('calendar.createTile.info.location.placeholder')}
+			<Input
+				label={t('calendar.createTile.info.tileSplit.label')}
+				name="count"
+				type="number"
+				min={1}
+				placeholder={t('calendar.createTile.info.tileSplit.placeholder')}
+				value={formData.count}
+				onChange={(e) => {
+					const value = Math.max(1, parseInt(e.target.value, 10) || 1).toString();
+					const clickedWeekday = String(formData.start.day()) as ScheduleRepeatWeekday;
+					setFormData((prev) => ({
+						...prev,
+						count: value,
+						recurrenceWeeklyDays: parseInt(value, 10) > 1 ? [] : [clickedWeekday],
+					}));
+				}}
 			/>
 			<Input
 				label={t('calendar.createTile.info.locationTag.label')}
@@ -77,6 +89,11 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				placeholder={t('calendar.createTile.info.locationTag.placeholder')}
 				value={formData.locationTag}
 				onChange={handleFormInputChange('locationTag')}
+			/>
+			<LocationInput
+				controller={locationController}
+				label={t('calendar.createTile.info.location.label')}
+				placeholder={t('calendar.createTile.info.location.placeholder')}
 			/>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}

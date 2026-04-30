@@ -8,7 +8,10 @@ export default function useFormHandler<T extends { [field: string]: unknown }>(f
 	};
 
 	const handleFormInputChange =
-		(name: keyof typeof formData, options?: { mode?: 'static'; restriction?: 'integer' }) =>
+		(
+			name: keyof typeof formData,
+			options?: { mode?: 'static'; restriction?: 'integer'; min?: number }
+		) =>
 		// eslint-disable-next-line
 		(event: any) => {
 			let eventData;
@@ -19,7 +22,8 @@ export default function useFormHandler<T extends { [field: string]: unknown }>(f
 			}
 
 			if (options?.restriction === 'integer') {
-				eventData = Math.max(0, parseInt(eventData || '0', 10));
+				const minValue = options?.min ?? 0;
+				eventData = Math.max(minValue, parseInt(eventData || String(minValue), 10));
 			}
 
 			setFormData((prev) => ({

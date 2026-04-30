@@ -279,6 +279,10 @@
 					"label": "Tile Name",
 					"placeholder": "What is the name of this tile?"
 				},
+				"tileSplit": {
+					"label": "How many times should this happen?",
+					"placeholder": "e.g. 1, 2, 3..."
+				},
 				"location": {
 					"label": "Tile Location",
 					"placeholder": "Where is this tile held?"
@@ -391,7 +395,14 @@
 			},
 			"summary": {
 				"title": "Summary",
-				"description": "I need to <b>{{action}}</b> at <b>{{location}}</b>. It will take me <b>{{hours}} hr {{minutes}} min</b>",
+				"description": "I need to <b>{{action}}</b>",
+				"descriptionLocation": " at <b>{{location}}</b>",
+				"descriptionDuration": ". It will take me <b>{{hours}} hr {{minutes}} min</b>",
+				"split": {
+					"once": "<b>once</b>",
+					"twice": "<b>twice</b>",
+					"times": "<b>{{count}} times</b>"
+				},
 				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
 				"recurrenceFrequency": {
 					"daily": "day",
@@ -399,7 +410,8 @@
 					"monthly": "month",
 					"yearly": "year"
 				},
-				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
+				"recurring": ". It will repeat,",
+				"recurringFrequency": " <b>every {{recurrenceFrequency}}</b>",
 				"recurringStart": " from <b>{{recurrenceStart}}</b>",
 				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
 			}

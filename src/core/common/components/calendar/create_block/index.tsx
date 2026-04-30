@@ -76,11 +76,11 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 	const isValidSubmission = useMemo(() => {
 		if (formData.name.trim().length === 0) return false;
 		const duration = TimeUtil.minutesBetweenMeridians(
-      formData.startTime,
-      formData.endTime,
-      formData.start,
-      formData.end
-		)
+			formData.startTime,
+			formData.endTime,
+			formData.start,
+			formData.end
+		);
 		if (duration <= 0) return false;
 		return true;
 	}, [formData]);
@@ -269,7 +269,10 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 			{ui.state.isExpanded && (
 				<>
 					<Section $isexpanded={ui.state.isExpanded}>
-						<CreateTileOptions mode={TileOptionsMode.Block} controller={optionsController} />
+						<CreateTileOptions
+							mode={TileOptionsMode.Block}
+							controller={optionsController}
+						/>
 					</Section>
 					<Spacer />
 					<CreateBlockSummary formData={formData} />
