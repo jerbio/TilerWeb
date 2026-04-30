@@ -204,12 +204,14 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				event.RepeatType = formData.recurrenceType;
 				event.RepeatFrequency = formData.recurrenceFrequency;
 				if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
-					if (formData.recurrenceWeeklyDays.length === 0) {
+					const count = parseInt(formData.count, 10) || 1;
+					if (formData.recurrenceWeeklyDays.length === 0 && count <= 1) {
 						event.RepeatWeeklyData = '1';
+					} else if (formData.recurrenceWeeklyDays.length > 0) {
+						event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
+							','
+						) as ScheduleRepeatWeeklyData;
 					}
-					event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
-						','
-					) as ScheduleRepeatWeeklyData;
 				}
 				if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
 					event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
