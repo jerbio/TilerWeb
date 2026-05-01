@@ -124,38 +124,38 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					/>
 				)}
 			</LocationFieldGroup>
-			<DurationFieldGroup>
-				<Input
-					label={t('calendar.createTile.info.hours.label')}
-					required
-					type="number"
-					name="durationHours"
-					placeholder={t('calendar.createTile.info.hours.placeholder')}
-					value={formData.durationHours}
-					onChange={handleFormInputChange('durationHours', {
-						restriction: 'integer',
-					})}
-				/>
-				<Input
-					label={t('calendar.createTile.info.minutes.label')}
-					required
-					type="number"
-					name="durationMins"
-					step="5"
-					placeholder={t('calendar.createTile.info.minutes.placeholder')}
-					value={formData.durationMins}
-					onChange={handleFormInputChange('durationMins', {
-						restriction: 'integer',
-					})}
-				/>
-				{durations.length > 0 && (
+			<Input
+				label={t('calendar.createTile.info.hours.label')}
+				required
+				type="number"
+				name="durationHours"
+				placeholder={t('calendar.createTile.info.hours.placeholder')}
+				value={formData.durationHours}
+				onChange={handleFormInputChange('durationHours', {
+					restriction: 'integer',
+				})}
+			/>
+			<Input
+				label={t('calendar.createTile.info.minutes.label')}
+				required
+				type="number"
+				name="durationMins"
+				step="5"
+				placeholder={t('calendar.createTile.info.minutes.placeholder')}
+				value={formData.durationMins}
+				onChange={handleFormInputChange('durationMins', {
+					restriction: 'integer',
+				})}
+			/>
+			{durations.length > 0 && (
+				<FullWidthRow>
 					<DurationChipRow
 						durations={durations}
 						appliedMs={suggestions.appliedDurationMs}
 						onSelect={suggestions.onDurationSelect}
 					/>
-				)}
-			</DurationFieldGroup>
+				</FullWidthRow>
+			)}
 			{!formData.isRecurring && (
 				<RangeContainer>
 					<h3>{t('calendar.createTile.info.range.label')}</h3>
@@ -199,8 +199,8 @@ const LocationFieldGroup = styled.div`
 	flex-direction: column;
 `;
 
-const DurationFieldGroup = styled.div`
-	display: contents;
+const FullWidthRow = styled.div`
+	grid-column: 1 / -1;
 `;
 
 const Grid = styled.div`
