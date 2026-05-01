@@ -78,6 +78,7 @@ export function viewCreatedEvent(
 export type InitialCreateTileFormState = {
 	start: dayjs.Dayjs;
 	action: string;
+	count: string;
 	location: string;
 	locationId: string | null;
 	locationSource: string;
@@ -174,6 +175,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				LocationId: formData.locationId || undefined,
 				LocationSource: formData.locationSource || undefined,
 				LocationTag: formData.locationTag || undefined,
+				Count: formData.count,
 				DurationDays: '0',
 				DurationHours: formData.durationHours.toString(),
 				DurationMinute: formData.durationMins.toString(),
@@ -202,12 +204,14 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				event.RepeatType = formData.recurrenceType;
 				event.RepeatFrequency = formData.recurrenceFrequency;
 				if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
-					if (formData.recurrenceWeeklyDays.length === 0) {
+					const count = parseInt(formData.count, 10) || 1;
+					if (formData.recurrenceWeeklyDays.length === 0 && count <= 1) {
 						event.RepeatWeeklyData = '1';
+					} else if (formData.recurrenceWeeklyDays.length > 0) {
+						event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
+							','
+						) as ScheduleRepeatWeeklyData;
 					}
-					event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
-						','
-					) as ScheduleRepeatWeeklyData;
 				}
 				if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
 					event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');

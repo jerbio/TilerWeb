@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import CreateTileInfo from '../info';
@@ -20,6 +21,7 @@ vi.mock('@/services', () => ({
 function makeFormHandler(overrides: Partial<InitialCreateTileFormState> = {}) {
 	const formData = {
 		action: '',
+		count: '1',
 		location: '',
 		locationId: null,
 		locationSource: '',
@@ -79,5 +81,35 @@ describe('CreateTileInfo – location verified badge', () => {
 		renderInfo({ locationIsVerified: true, location: '123 Main St' });
 		const badge = screen.getByTestId('location-verified-badge');
 		expect(badge).toHaveAttribute('title', 'location.verified.tooltip');
+	});
+});
+
+describe('CreateTileInfo – Tile Split input', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mockSearchLocations.mockResolvedValue([]);
+	});
+
+	it('renders Tile Split input with correct label', () => {
+		renderInfo({ count: '1' });
+		expect(screen.getByText('calendar.createTile.info.tileSplit.label')).toBeInTheDocument();
+	});
+
+	it('renders Tile Split input with correct placeholder', () => {
+		renderInfo({ count: '1' });
+		const input = screen.getByPlaceholderText('calendar.createTile.info.tileSplit.placeholder');
+		expect(input).toBeInTheDocument();
+	});
+
+	it('displays the count value in the input', () => {
+		renderInfo({ count: '5' });
+		const input = screen.getByPlaceholderText('calendar.createTile.info.tileSplit.placeholder');
+		expect(input).toHaveValue(5);
+	});
+
+	it('displays default count value of 1', () => {
+		renderInfo({ count: '1' });
+		const input = screen.getByPlaceholderText('calendar.createTile.info.tileSplit.placeholder');
+		expect(input).toHaveValue(1);
 	});
 });

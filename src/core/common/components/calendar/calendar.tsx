@@ -513,7 +513,8 @@ const Calendar = ({
 				start: clickedDay,
 				deadline: clickedDay,
 				recurrenceStartDate: clickedDay,
-				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
+				recurrenceWeeklyDays:
+					parseInt(createTileForm.count, 10) > 1 ? [] : [recurrenceDefaultWeeklyDay],
 			});
 			createSelection.actions.open();
 		} else {
