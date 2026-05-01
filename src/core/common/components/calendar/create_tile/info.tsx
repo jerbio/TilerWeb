@@ -7,10 +7,26 @@ import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
-import { ScheduleRepeatWeekday } from '@/core/common/types/schedule';
+import {
+	ScheduleRepeatWeekday,
+	TilePredictionLocation,
+	TilePredictionResponse,
+} from '@/core/common/types/schedule';
+import { DurationChipRow, LocationChipRow, TimeSectionChipRow } from './suggestion-chip-row';
+
+type SuggestionProps = {
+	prediction: TilePredictionResponse | null;
+	appliedDurationMs: number | null;
+	appliedLocationId: string | null;
+	appliedTimeSection: string | null;
+	onDurationSelect: (hours: number, mins: number, ms: number) => void;
+	onLocationSelect: (location: TilePredictionLocation) => void;
+	onTimeSectionSelect: (section: string) => void;
+};
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	suggestions: SuggestionProps;
 };
 
 const CreateTileInfo: React.FC<InfoProps> = ({
