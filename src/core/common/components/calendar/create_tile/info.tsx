@@ -31,8 +31,12 @@ type InfoProps = {
 
 const CreateTileInfo: React.FC<InfoProps> = ({
 	formHandler: { formData, handleFormInputChange, setFormData },
+	suggestions,
 }) => {
 	const { t } = useTranslation();
+	const durations = suggestions.prediction?.duration ?? [];
+	const locations = suggestions.prediction?.location ?? [];
+	const timeSections = suggestions.prediction?.timeOfDay?.daySections ?? [];
 
 	const locationController = useMemo<LocationInputController>(
 		() => ({
@@ -106,34 +110,52 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				value={formData.locationTag}
 				onChange={handleFormInputChange('locationTag')}
 			/>
-			<LocationInput
-				controller={locationController}
-				label={t('calendar.createTile.info.location.label')}
-				placeholder={t('calendar.createTile.info.location.placeholder')}
-			/>
-			<Input
-				label={t('calendar.createTile.info.hours.label')}
-				required
-				type="number"
-				name="durationHours"
-				placeholder={t('calendar.createTile.info.hours.placeholder')}
-				value={formData.durationHours}
-				onChange={handleFormInputChange('durationHours', {
-					restriction: 'integer',
-				})}
-			/>
-			<Input
-				label={t('calendar.createTile.info.minutes.label')}
-				required
-				type="number"
-				name="durationMins"
-				step="5"
-				placeholder={t('calendar.createTile.info.minutes.placeholder')}
-				value={formData.durationMins}
-				onChange={handleFormInputChange('durationMins', {
-					restriction: 'integer',
-				})}
-			/>
+			<LocationFieldGroup>
+				<LocationInput
+					controller={locationController}
+					label={t('calendar.createTile.info.location.label')}
+					placeholder={t('calendar.createTile.info.location.placeholder')}
+				/>
+				{locations.length > 0 && (
+					<LocationChipRow
+						locations={locations}
+						appliedId={suggestions.appliedLocationId}
+						onSelect={suggestions.onLocationSelect}
+					/>
+				)}
+			</LocationFieldGroup>
+			<DurationFieldGroup>
+				<Input
+					label={t('calendar.createTile.info.hours.label')}
+					required
+					type="number"
+					name="durationHours"
+					placeholder={t('calendar.createTile.info.hours.placeholder')}
+					value={formData.durationHours}
+					onChange={handleFormInputChange('durationHours', {
+						restriction: 'integer',
+					})}
+				/>
+				<Input
+					label={t('calendar.createTile.info.minutes.label')}
+					required
+					type="number"
+					name="durationMins"
+					step="5"
+					placeholder={t('calendar.createTile.info.minutes.placeholder')}
+					value={formData.durationMins}
+					onChange={handleFormInputChange('durationMins', {
+						restriction: 'integer',
+					})}
+				/>
+				{durations.length > 0 && (
+					<DurationChipRow
+						durations={durations}
+						appliedMs={suggestions.appliedDurationMs}
+						onSelect={suggestions.onDurationSelect}
+					/>
+				)}
+			</DurationFieldGroup>
 			{!formData.isRecurring && (
 				<RangeContainer>
 					<h3>{t('calendar.createTile.info.range.label')}</h3>
@@ -159,11 +181,27 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 							}
 						/>
 					</RangeDescription>
+					{timeSections.length > 0 && (
+						<TimeSectionChipRow
+							sections={timeSections}
+							appliedSection={suggestions.appliedTimeSection}
+							onSelect={suggestions.onTimeSectionSelect}
+						/>
+					)}
 				</RangeContainer>
 			)}
 		</Grid>
 	);
 };
+
+const LocationFieldGroup = styled.div`
+	display: flex;
+	flex-direction: column;
+`;
+
+const DurationFieldGroup = styled.div`
+	display: contents;
+`;
 
 const Grid = styled.div`
 	display: grid;
