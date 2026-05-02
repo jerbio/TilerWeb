@@ -151,7 +151,7 @@ describe('LocationChipRow – interaction', () => {
 describe('LocationChipRow – saved vs ad-hoc icon', () => {
 	it('renders a Bookmark icon for saved (non-Google, non-adHoc) locations', () => {
 		const loc = makeLoc({
-			source: LocationSource.Tiler,
+			source: 'tiler' as TilePredictionLocation['source'],
 			isAdHoc: false,
 		});
 		const { container } = wrap(
