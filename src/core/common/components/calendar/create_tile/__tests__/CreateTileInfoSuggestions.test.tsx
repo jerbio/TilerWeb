@@ -93,11 +93,12 @@ function renderInfo(
 	formOverrides: Partial<InitialCreateTileFormState> = {},
 	suggestions = noSuggestions
 ) {
-	const handler = makeFormHandler(formOverrides);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handler = makeFormHandler(formOverrides) as Parameters<
+		typeof CreateTileInfo
+	>[0]['formHandler'];
 	const result = render(
 		<ThemeProvider theme={lightTheme}>
-			<CreateTileInfo formHandler={handler as any} suggestions={suggestions} />
+			<CreateTileInfo formHandler={handler} suggestions={suggestions} />
 		</ThemeProvider>
 	);
 	return { handler, suggestions, ...result };

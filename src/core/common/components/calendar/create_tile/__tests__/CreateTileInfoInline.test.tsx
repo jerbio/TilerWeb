@@ -105,11 +105,12 @@ function renderInline(
 	formOverrides: Partial<InitialCreateTileFormState> = {},
 	nudgePill: NudgePillProps = makeNudgePill()
 ) {
-	const handler = makeFormHandler(formOverrides);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handler = makeFormHandler(formOverrides) as Parameters<
+		typeof CreateTileInfoInline
+	>[0]['formHandler'];
 	const result = render(
 		<ThemeProvider defaultTheme="dark">
-			<CreateTileInfoInline formHandler={handler as any} nudgePill={nudgePill} />
+			<CreateTileInfoInline formHandler={handler} nudgePill={nudgePill} />
 		</ThemeProvider>
 	);
 	return { handler, ...result };
