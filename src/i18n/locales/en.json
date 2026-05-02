@@ -386,6 +386,15 @@
 				"workHours": "Work Hours",
 				"custom": "Custom"
 			},
+			"suggestions": {
+				"count_one": "{{count}} smart suggestion",
+				"count_other": "{{count}} smart suggestions",
+				"duration": {
+					"mins": "{{mins}} min",
+					"hrs": "{{hours}} hr",
+					"hrsAndMins": "{{hours}} hr {{mins}} min"
+				}
+			},
 			"buttons": {
 				"reset": "Reset",
 				"submit": "Create Tile",

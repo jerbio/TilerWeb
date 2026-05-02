@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { TilePredictionLocation, TilePredictionResponse } from '@/core/common/types/schedule';
 import { DurationChipRow, LocationChipRow } from './suggestion-chip-row';
 
@@ -15,15 +16,6 @@ export type NudgePillProps = {
 	onTimeSectionSelect: (section: string) => void;
 };
 
-function msToLabel(ms: number): string {
-	const totalMins = Math.round(ms / 60000);
-	const hours = Math.floor(totalMins / 60);
-	const mins = totalMins % 60;
-	if (hours === 0) return `${mins} min`;
-	if (mins === 0) return `${hours} hr`;
-	return `${hours} hr ${mins} min`;
-}
-
 const NudgePill: React.FC<NudgePillProps> = ({
 	prediction,
 	isLoading,
@@ -32,7 +24,17 @@ const NudgePill: React.FC<NudgePillProps> = ({
 	onDurationSelect,
 	onLocationSelect,
 }) => {
+	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
+
+	const msToLabel = (ms: number): string => {
+		const totalMins = Math.round(ms / 60000);
+		const hours = Math.floor(totalMins / 60);
+		const mins = totalMins % 60;
+		if (hours === 0) return t('calendar.createTile.suggestions.duration.mins', { mins });
+		if (mins === 0) return t('calendar.createTile.suggestions.duration.hrs', { hours });
+		return t('calendar.createTile.suggestions.duration.hrsAndMins', { hours, mins });
+	};
 
 	const durations = prediction?.duration ?? [];
 	const locations = prediction?.location ?? [];
@@ -62,7 +64,7 @@ const NudgePill: React.FC<NudgePillProps> = ({
 			<PillBar $expanded={expanded} onClick={() => setExpanded((e) => !e)}>
 				<Sparkles size={12} />
 				<PillSummary>
-					{totalCount} smart suggestion{totalCount !== 1 ? 's' : ''}
+					{t('calendar.createTile.suggestions.count', { count: totalCount })}
 				</PillSummary>
 				{!expanded && previewLabels.length > 0 && (
 					<PreviewChips>

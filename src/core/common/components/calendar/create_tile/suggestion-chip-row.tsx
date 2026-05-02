@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Bookmark, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { TilePredictionLocation, LocationSource } from '@/core/common/types/schedule';
 
 export type DurationChipRowProps = {
@@ -26,35 +27,37 @@ function msToHoursAndMins(ms: number) {
 	return { hours: Math.floor(totalMins / 60), mins: totalMins % 60 };
 }
 
-function formatDuration(ms: number): string {
-	const { hours, mins } = msToHoursAndMins(ms);
-	if (hours === 0) return `${mins} min`;
-	if (mins === 0) return `${hours} hr`;
-	return `${hours} hr ${mins} min`;
-}
-
 export const DurationChipRow: React.FC<DurationChipRowProps> = ({
 	durations,
 	appliedMs,
 	onSelect,
-}) => (
-	<ChipRow>
-		<SuggestLabel>✦</SuggestLabel>
-		{durations.map((ms) => {
-			const { hours, mins } = msToHoursAndMins(ms);
-			return (
-				<Chip
-					key={ms}
-					type="button"
-					$selected={appliedMs === ms}
-					onClick={() => onSelect(hours, mins, ms)}
-				>
-					{formatDuration(ms)}
-				</Chip>
-			);
-		})}
-	</ChipRow>
-);
+}) => {
+	const { t } = useTranslation();
+	const formatDuration = (ms: number): string => {
+		const { hours, mins } = msToHoursAndMins(ms);
+		if (hours === 0) return t('calendar.createTile.suggestions.duration.mins', { mins });
+		if (mins === 0) return t('calendar.createTile.suggestions.duration.hrs', { hours });
+		return t('calendar.createTile.suggestions.duration.hrsAndMins', { hours, mins });
+	};
+	return (
+		<ChipRow>
+			<SuggestLabel>✦</SuggestLabel>
+			{durations.map((ms) => {
+				const { hours, mins } = msToHoursAndMins(ms);
+				return (
+					<Chip
+						key={ms}
+						type="button"
+						$selected={appliedMs === ms}
+						onClick={() => onSelect(hours, mins, ms)}
+					>
+						{formatDuration(ms)}
+					</Chip>
+				);
+			})}
+		</ChipRow>
+	);
+};
 
 export const LocationChipRow: React.FC<LocationChipRowProps> = ({
 	locations,
