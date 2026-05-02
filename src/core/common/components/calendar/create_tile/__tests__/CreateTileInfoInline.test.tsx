@@ -9,6 +9,14 @@ import { TilePredictionLocation, TilePredictionResponse } from '@/core/common/ty
 import { NudgePillProps } from '../nudge-pill';
 import dayjs from 'dayjs';
 
+vi.mock('@/services', () => ({
+	scheduleService: {
+		searchLocations: vi.fn(() => Promise.resolve([])),
+		getNewTilePrediction: vi.fn(() => Promise.resolve(null)),
+	},
+	userService: { getScheduleProfile: vi.fn(() => Promise.resolve(null)) },
+}));
+
 vi.mock('react-i18next', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('react-i18next')>();
 	return {
