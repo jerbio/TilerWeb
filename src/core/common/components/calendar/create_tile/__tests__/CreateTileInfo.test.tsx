@@ -45,12 +45,23 @@ function makeFormHandler(overrides: Partial<InitialCreateTileFormState> = {}) {
 	};
 }
 
+const noSuggestions = {
+	prediction: null,
+	isLoading: false,
+	appliedDurationMs: null,
+	appliedLocationId: null,
+	appliedTimeSection: null,
+	onDurationSelect: vi.fn(),
+	onLocationSelect: vi.fn(),
+	onTimeSectionSelect: vi.fn(),
+};
+
 function renderInfo(overrides: Partial<InitialCreateTileFormState> = {}) {
 	const handler = makeFormHandler(overrides);
 	render(
 		<ThemeProvider theme={lightTheme}>
 			{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-			<CreateTileInfo formHandler={handler as any} />
+			<CreateTileInfo formHandler={handler as any} suggestions={noSuggestions} />
 		</ThemeProvider>
 	);
 	return handler;
