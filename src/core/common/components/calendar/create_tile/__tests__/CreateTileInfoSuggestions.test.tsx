@@ -10,7 +10,15 @@ import { TilePredictionLocation, TilePredictionResponse } from '@/core/common/ty
 import dayjs from 'dayjs';
 
 vi.mock('react-i18next', () => ({
-	useTranslation: () => ({ t: (key: string) => key }),
+	useTranslation: () => ({
+		t: (key: string, vars?: Record<string, unknown>) => {
+			if (key === 'calendar.createTile.suggestions.duration.mins') return `${vars?.mins} min`;
+			if (key === 'calendar.createTile.suggestions.duration.hrs') return `${vars?.hours} hr`;
+			if (key === 'calendar.createTile.suggestions.duration.hrsAndMins')
+				return `${vars?.hours} hr ${vars?.mins} min`;
+			return key;
+		},
+	}),
 }));
 
 const mockSearchLocations = vi.fn();

@@ -13,7 +13,19 @@ vi.mock('react-i18next', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('react-i18next')>();
 	return {
 		...actual,
-		useTranslation: () => ({ t: (key: string) => key }),
+		useTranslation: () => ({
+			t: (key: string, vars?: Record<string, unknown>) => {
+				if (key === 'calendar.createTile.suggestions.duration.mins')
+					return `${vars?.mins} min`;
+				if (key === 'calendar.createTile.suggestions.duration.hrs')
+					return `${vars?.hours} hr`;
+				if (key === 'calendar.createTile.suggestions.duration.hrsAndMins')
+					return `${vars?.hours} hr ${vars?.mins} min`;
+				if (key === 'calendar.createTile.suggestions.count')
+					return `${vars?.count} smart suggestion${Number(vars?.count) !== 1 ? 's' : ''}`;
+				return key;
+			},
+		}),
 		Trans: ({
 			i18nKey,
 			components,

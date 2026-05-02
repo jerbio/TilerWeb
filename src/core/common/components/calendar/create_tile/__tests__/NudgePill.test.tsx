@@ -7,6 +7,20 @@ import { lightTheme } from '@/core/theme/light';
 import NudgePill, { NudgePillProps } from '../nudge-pill';
 import { TilePredictionResponse } from '@/core/common/types/schedule';
 
+vi.mock('react-i18next', () => ({
+	useTranslation: () => ({
+		t: (key: string, vars?: Record<string, unknown>) => {
+			if (key === 'calendar.createTile.suggestions.duration.mins') return `${vars?.mins} min`;
+			if (key === 'calendar.createTile.suggestions.duration.hrs') return `${vars?.hours} hr`;
+			if (key === 'calendar.createTile.suggestions.duration.hrsAndMins')
+				return `${vars?.hours} hr ${vars?.mins} min`;
+			if (key === 'calendar.createTile.suggestions.count')
+				return `${vars?.count} smart suggestion${Number(vars?.count) !== 1 ? 's' : ''}`;
+			return key;
+		},
+	}),
+}));
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function wrap(ui: React.ReactElement) {

@@ -7,6 +7,18 @@ import { lightTheme } from '@/core/theme/light';
 import { DurationChipRow, LocationChipRow, SuggestionsLoadingBar } from '../suggestion-chip-row';
 import { LocationSource, TilePredictionLocation } from '@/core/common/types/schedule';
 
+vi.mock('react-i18next', () => ({
+	useTranslation: () => ({
+		t: (key: string, vars?: Record<string, unknown>) => {
+			if (key === 'calendar.createTile.suggestions.duration.mins') return `${vars?.mins} min`;
+			if (key === 'calendar.createTile.suggestions.duration.hrs') return `${vars?.hours} hr`;
+			if (key === 'calendar.createTile.suggestions.duration.hrsAndMins')
+				return `${vars?.hours} hr ${vars?.mins} min`;
+			return key;
+		},
+	}),
+}));
+
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function wrap(ui: React.ReactElement) {
