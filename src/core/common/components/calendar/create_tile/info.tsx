@@ -12,10 +12,11 @@ import {
 	TilePredictionLocation,
 	TilePredictionResponse,
 } from '@/core/common/types/schedule';
-import { DurationChipRow, LocationChipRow, TimeSectionChipRow } from './suggestion-chip-row';
+import { DurationChipRow, LocationChipRow, SuggestionsLoadingBar } from './suggestion-chip-row';
 
 type SuggestionProps = {
 	prediction: TilePredictionResponse | null;
+	isLoading: boolean;
 	appliedDurationMs: number | null;
 	appliedLocationId: string | null;
 	appliedTimeSection: string | null;
@@ -34,9 +35,10 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 	suggestions,
 }) => {
 	const { t } = useTranslation();
+	const { isLoading } = suggestions;
 	const durations = suggestions.prediction?.duration ?? [];
 	const locations = suggestions.prediction?.location ?? [];
-	const timeSections = suggestions.prediction?.timeOfDay?.daySections ?? [];
+	// const timeSections = suggestions.prediction?.timeOfDay?.daySections ?? [];
 
 	const locationController = useMemo<LocationInputController>(
 		() => ({
@@ -116,13 +118,15 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					label={t('calendar.createTile.info.location.label')}
 					placeholder={t('calendar.createTile.info.location.placeholder')}
 				/>
-				{locations.length > 0 && (
+				{isLoading ? (
+					<SuggestionsLoadingBar />
+				) : locations.length > 0 ? (
 					<LocationChipRow
 						locations={locations}
 						appliedId={suggestions.appliedLocationId}
 						onSelect={suggestions.onLocationSelect}
 					/>
-				)}
+				) : null}
 			</LocationFieldGroup>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}
@@ -147,13 +151,17 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					restriction: 'integer',
 				})}
 			/>
-			{durations.length > 0 && (
+			{(isLoading || durations.length > 0) && (
 				<FullWidthRow>
-					<DurationChipRow
-						durations={durations}
-						appliedMs={suggestions.appliedDurationMs}
-						onSelect={suggestions.onDurationSelect}
-					/>
+					{isLoading ? (
+						<SuggestionsLoadingBar />
+					) : (
+						<DurationChipRow
+							durations={durations}
+							appliedMs={suggestions.appliedDurationMs}
+							onSelect={suggestions.onDurationSelect}
+						/>
+					)}
 				</FullWidthRow>
 			)}
 			{!formData.isRecurring && (
@@ -181,13 +189,13 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 							}
 						/>
 					</RangeDescription>
-					{timeSections.length > 0 && (
+					{/* {timeSections.length > 0 && (
 						<TimeSectionChipRow
 							sections={timeSections}
 							appliedSection={suggestions.appliedTimeSection}
 							onSelect={suggestions.onTimeSectionSelect}
 						/>
-					)}
+					)} */}
 				</RangeContainer>
 			)}
 		</Grid>

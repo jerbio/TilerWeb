@@ -25,7 +25,6 @@ import {
 	ScheduleRepeatWeeklyData,
 	TilePredictionResponse,
 } from '../../../types/schedule';
-import SmartSuggestions from './smart-suggestions';
 import { CreateTileRestrictionType } from '../data';
 import { toast } from 'sonner';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
@@ -126,7 +125,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 	const [appliedDurationMs, setAppliedDurationMs] = useState<number | null>(null);
 	const [appliedLocationId, setAppliedLocationId] = useState<string | null>(null);
 	const [appliedTimeSection, setAppliedTimeSection] = useState<string | null>(null);
-	const [restrictionProfileApplied, setRestrictionProfileApplied] = useState(false);
 	const predictionAbortRef = useRef<AbortController | null>(null);
 	const debouncedAction = useDebounce(formData.action, 500);
 
@@ -134,7 +132,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		durationMs: null as number | null,
 		locationId: null as string | null,
 		timeSection: null as string | null,
-		restrictionProfile: false,
 	});
 
 	const clearAppliedSuggestions = useCallback(() => {
@@ -143,14 +140,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 			const needsDurationClear = applied.durationMs !== null;
 			const needsLocationClear = applied.locationId !== null;
 			const needsTimeClear = applied.timeSection !== null;
-			const needsRestrictionClear = applied.restrictionProfile;
-			if (
-				!needsDurationClear &&
-				!needsLocationClear &&
-				!needsTimeClear &&
-				!needsRestrictionClear
-			)
-				return prev;
+			if (!needsDurationClear && !needsLocationClear && !needsTimeClear) return prev;
 			return {
 				...prev,
 				...(needsDurationClear && { durationHours: 0, durationMins: 0 }),
@@ -161,28 +151,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 					locationIsVerified: false,
 					locationTag: '',
 				}),
-				...((needsTimeClear || needsRestrictionClear) && {
-					isTimeRestricted: false,
-					...(needsRestrictionClear && {
-						customTimeRestrictionSchedule: Array.from({ length: 7 }, (_, i) => ({
-							dayIndex: i,
-							startTime: '',
-							endTime: '',
-						})),
-					}),
-				}),
+				...(needsTimeClear && { isTimeRestricted: false }),
 			};
 		});
-		appliedStateRef.current = {
-			durationMs: null,
-			locationId: null,
-			timeSection: null,
-			restrictionProfile: false,
-		};
+		appliedStateRef.current = { durationMs: null, locationId: null, timeSection: null };
 		setAppliedDurationMs(null);
 		setAppliedLocationId(null);
 		setAppliedTimeSection(null);
-		setRestrictionProfileApplied(false);
 	}, [setFormData]);
 
 	useEffect(() => {
@@ -267,42 +242,6 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		[setFormData]
 	);
 
-	const handleApplyRestrictionProfile = useCallback(
-		(
-			profile: NonNullable<
-				NonNullable<TilePredictionResponse['timeOfDay']>['restrictionProfile']
-			>
-		) => {
-			if (appliedStateRef.current.restrictionProfile) {
-				setFormData((prev) => ({
-					...prev,
-					isTimeRestricted: false,
-					customTimeRestrictionSchedule: Array.from({ length: 7 }, (_, i) => ({
-						dayIndex: i,
-						startTime: '',
-						endTime: '',
-					})),
-				}));
-				appliedStateRef.current.restrictionProfile = false;
-				setRestrictionProfileApplied(false);
-			} else {
-				const schedule: DaySchedule[] = profile.WeekDayOption.map((opt) => ({
-					dayIndex: parseInt(opt.Index, 10),
-					startTime: opt.Start,
-					endTime: opt.End,
-				}));
-				setFormData((prev) => ({
-					...prev,
-					isTimeRestricted: true,
-					timeRestrictionType: CreateTileRestrictionType.Custom,
-					customTimeRestrictionSchedule: schedule,
-				}));
-				appliedStateRef.current.restrictionProfile = true;
-				setRestrictionProfileApplied(true);
-			}
-		},
-		[setFormData]
-	);
 	// ──────────────────────────────────────────────────────────
 
 	const isValidSubmission = useMemo(() => {
@@ -556,30 +495,38 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 			{ui.state.isExpanded ? (
 				/* Tile Info (Classic) */
 				<Section $isexpanded={ui.state.isExpanded}>
-					<CreateTileInfo formHandler={formHandler} />
+					<CreateTileInfo
+						formHandler={formHandler}
+						suggestions={{
+							prediction,
+							isLoading: isPredicting,
+							appliedDurationMs,
+							appliedLocationId,
+							appliedTimeSection,
+							onDurationSelect: handlePredictionDuration,
+							onLocationSelect: handlePredictionLocation,
+							onTimeSectionSelect: handlePredictionTimeSection,
+						}}
+					/>
 				</Section>
 			) : (
 				/* Tile Info (Inline) */
 				<Section $isexpanded={ui.state.isExpanded}>
-					<CreateTileInfoInline formHandler={formHandler} />
+					<CreateTileInfoInline
+						formHandler={formHandler}
+						nudgePill={{
+							prediction,
+							isLoading: isPredicting,
+							appliedDurationMs,
+							appliedLocationId,
+							appliedTimeSection,
+							onDurationSelect: handlePredictionDuration,
+							onLocationSelect: handlePredictionLocation,
+							onTimeSectionSelect: handlePredictionTimeSection,
+						}}
+					/>
 				</Section>
 			)}
-
-			<Section $isexpanded={ui.state.isExpanded}>
-				<SmartSuggestions
-					prediction={prediction}
-					isLoading={isPredicting}
-					isExpanded={ui.state.isExpanded}
-					appliedDurationMs={appliedDurationMs}
-					appliedLocationId={appliedLocationId}
-					appliedTimeSection={appliedTimeSection}
-					restrictionProfileApplied={restrictionProfileApplied}
-					onDurationSelect={handlePredictionDuration}
-					onLocationSelect={handlePredictionLocation}
-					onTimeSectionSelect={handlePredictionTimeSection}
-					onApplyRestrictionProfile={handleApplyRestrictionProfile}
-				/>
-			</Section>
 
 			<Seperator />
 			<TipContainer>

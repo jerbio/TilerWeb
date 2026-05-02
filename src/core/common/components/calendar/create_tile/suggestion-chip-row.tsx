@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Bookmark, MapPin } from 'lucide-react';
 import { TilePredictionLocation, LocationSource } from '@/core/common/types/schedule';
 
@@ -80,25 +80,25 @@ export const LocationChipRow: React.FC<LocationChipRowProps> = ({
 	</ChipRow>
 );
 
-export const TimeSectionChipRow: React.FC<TimeSectionChipRowProps> = ({
-	sections,
-	appliedSection,
-	onSelect,
-}) => (
-	<ChipRow>
-		<SuggestLabel>✦</SuggestLabel>
-		{sections.map((section) => (
-			<Chip
-				key={section}
-				type="button"
-				$selected={appliedSection === section}
-				onClick={() => onSelect(section)}
-			>
-				{section}
-			</Chip>
-		))}
-	</ChipRow>
-);
+// export const TimeSectionChipRow: React.FC<TimeSectionChipRowProps> = ({
+// 	sections,
+// 	appliedSection,
+// 	onSelect,
+// }) => (
+// 	<ChipRow>
+// 		<SuggestLabel>✦</SuggestLabel>
+// 		{sections.map((section) => (
+// 			<Chip
+// 				key={section}
+// 				type="button"
+// 				$selected={appliedSection === section}
+// 				onClick={() => onSelect(section)}
+// 			>
+// 				{section}
+// 			</Chip>
+// 		))}
+// 	</ChipRow>
+// );
 
 const ChipRow = styled.div`
 	display: flex;
@@ -110,7 +110,7 @@ const ChipRow = styled.div`
 
 const SuggestLabel = styled.span`
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
-	color: ${({ theme }) => theme.colors.text.muted};
+	color: ${({ theme }) => theme.colors.datepicker.dateSelectedBg};
 	flex-shrink: 0;
 `;
 
@@ -121,9 +121,11 @@ export const Chip = styled.button<{ $selected: boolean }>`
 	border-radius: 999px;
 	border: 1px solid
 		${({ theme, $selected }) =>
-			$selected ? theme.colors.datepicker.dateSelectedBg : theme.colors.border.default};
+			$selected
+				? theme.colors.datepicker.dateSelectedBg
+				: theme.colors.datepicker.dateSelectedBg + '55'};
 	background: ${({ theme, $selected }) =>
-		$selected ? theme.colors.datepicker.dateSelectedBg : theme.colors.background.card2};
+		$selected ? theme.colors.datepicker.dateSelectedBg : 'transparent'};
 	color: ${({ theme, $selected }) =>
 		$selected ? theme.colors.datepicker.dateSelectedText : theme.colors.text.primary};
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
@@ -139,15 +141,10 @@ export const Chip = styled.button<{ $selected: boolean }>`
 		background: ${({ theme, $selected }) =>
 			$selected
 				? theme.colors.datepicker.dateSelectedBg
-				: theme.colors.datepicker.dateHoverBg};
-		border-color: ${({ theme, $selected }) =>
-			$selected
-				? theme.colors.datepicker.dateSelectedBg
-				: theme.colors.datepicker.dateHoverBg};
+				: theme.colors.datepicker.dateSelectedBg + '22'};
+		border-color: ${({ theme }) => theme.colors.datepicker.dateSelectedBg};
 		color: ${({ theme, $selected }) =>
-			$selected
-				? theme.colors.datepicker.dateSelectedText
-				: theme.colors.datepicker.dateHoverText};
+			$selected ? theme.colors.datepicker.dateSelectedText : theme.colors.text.primary};
 	}
 `;
 
@@ -157,6 +154,35 @@ const LocationChip = styled(Chip)`
 	svg {
 		flex-shrink: 0;
 		color: ${({ theme, $selected }) =>
-			$selected ? theme.colors.datepicker.dateSelectedText : theme.colors.text.muted};
+			$selected
+				? theme.colors.datepicker.dateSelectedText
+				: theme.colors.datepicker.dateSelectedBg};
 	}
 `;
+
+const sweep = keyframes`
+	0%   { transform: translateX(-100%); }
+	100% { transform: translateX(400%); }
+`;
+
+const BarTrack = styled.div`
+	height: 2px;
+	border-radius: 999px;
+	background: ${({ theme }) => theme.colors.border.default};
+	overflow: hidden;
+	margin-top: 0.375rem;
+`;
+
+const BarFill = styled.div`
+	width: 25%;
+	height: 100%;
+	border-radius: 999px;
+	background: ${({ theme }) => theme.colors.datepicker.dateSelectedBg};
+	animation: ${sweep} 1.4s ease-in-out infinite;
+`;
+
+export const SuggestionsLoadingBar: React.FC = () => (
+	<BarTrack>
+		<BarFill />
+	</BarTrack>
+);
