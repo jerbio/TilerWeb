@@ -7,7 +7,7 @@ import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
-import Timeline from './pages/Timeline';
+import Timeline from './pages/app/Timeline';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 import { HelmetProvider } from 'react-helmet-async';
@@ -24,6 +24,8 @@ import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import NotificationToast from './core/ui/NotificationToast';
+import AppLayout from './pages/app/AppLayout';
+import TileShare from './pages/app/TileShare';
 // import useAppStore from './global_state';
 
 // Component to track page views on route changes
@@ -102,7 +104,10 @@ const App: React.FC = () => {
 
 								{/* Protected Routes - redirect to /signin if not authenticated */}
 								<Route element={<ProtectedRoute />}>
-									<Route path="/timeline" element={<Timeline />} />
+									<Route element={<AppLayout />}>
+										<Route path="/timeline" element={<Timeline />} />
+										<Route path="/tileshare" element={<TileShare />} />
+									</Route>
 									<Route path="/settings" element={<SettingsLayout />}>
 										<Route
 											index

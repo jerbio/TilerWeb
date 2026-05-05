@@ -1,0 +1,25 @@
+import { Calendar, ListTodo, Settings } from 'lucide-react';
+
+const appRoutes: Array<{
+	path: string;
+	name: string;
+	icon: React.ReactNode;
+}> = [
+	{
+		path: '/timeline',
+		name: 'Home',
+		icon: <Calendar size={20} />,
+	},
+	{
+		path: '/tileshare',
+		name: 'Tileshare',
+		icon: <ListTodo size={20} />,
+	},
+	{
+		path: '/settings',
+		name: 'Settings',
+		icon: <Settings size={20} />,
+	},
+];
+
+export default appRoutes;

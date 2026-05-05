@@ -1,12 +1,7 @@
-import Logo from '@/core/common/components/icons/logo';
-import { Calendar as CalendarIcon, Moon, Plus, Sun, User } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
-import useAppStore from '@/global_state';
-import ProfileSheet from '@/core/common/components/profile_sheet';
-import { useTheme } from '@/core/theme/ThemeProvider';
-import { Env } from '@/config/config_getter';
 import SearchBar from './search_bar';
 import ShuffleButton from './shuffle_button';
 import ReviseButton from './revise_button';
@@ -15,12 +10,12 @@ import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.pro
 import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
 import { CalendarRequestType } from '@/core/common/components/calendar/calendarRequestContext';
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
+import appLayoutConfig from '@/core/constants/app_layout_config';
 
 const TimelineHeader: React.FC = () => {
 	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
 	const [isScheduleActionLoading, setIsScheduleActionLoading] = React.useState(false);
 	const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLDivElement>(null);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
@@ -49,13 +44,8 @@ const TimelineHeader: React.FC = () => {
 		};
 	}, [profileSheetOpen]);
 
-	const { isDarkMode, toggleTheme } = useTheme();
-
 	return (
 		<Header>
-			<HeaderLeft>
-				<Logo size={30} />
-			</HeaderLeft>
 			<SearchBar />
 			<HeaderRight>
 				<DateNavGroup>
@@ -94,24 +84,27 @@ const TimelineHeader: React.FC = () => {
 				<CreateEventButton onClick={openCreateSelection}>
 					<Plus size={16} />
 				</CreateEventButton>
-				{Env.isDevelopment() && (
-					<ThemeToggle onClick={toggleTheme}>
-						{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-					</ThemeToggle>
-				)}
-				<ProfileTrigger
-					ref={triggerRef}
-					onClick={() => setProfileSheetOpen(!profileSheetOpen)}
-				>
-					<ProfileContainer>
-						<User size={18} />
-					</ProfileContainer>
-					<ProfileSheet open={profileSheetOpen} ref={menuRef} user={authenticatedUser} />
-				</ProfileTrigger>
 			</HeaderRight>
 		</Header>
 	);
 };
+
+const Header = styled.header`
+	z-index: 2;
+	height: ${appLayoutConfig.SUBNAV_HEIGHT}px;
+	width: 100vw;
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+	align-items: center;
+	padding-inline: 2rem;
+`;
+
+const HeaderRight = styled.div`
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+`;
 
 const CreateEventButton = styled.button`
 	height: 36px;
@@ -123,63 +116,6 @@ const CreateEventButton = styled.button`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-`;
-
-const ThemeToggle = styled.button`
-	height: 36px;
-	width: 36px;
-	overflow: hidden;
-	color: ${(props) => props.theme.colors.button.primary.text};
-	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-`;
-
-const ProfileTrigger = styled.div`
-	position: relative;
-	background: none;
-	border: none;
-	cursor: pointer;
-	padding: 0;
-`;
-
-const ProfileContainer = styled.div`
-	height: 36px;
-	width: 36px;
-	overflow: hidden;
-	background-color: ${(props) => props.theme.colors.button.primary.bg};
-	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
-	color: ${(props) => props.theme.colors.button.primary.text};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-`;
-
-const Header = styled.header`
-	height: 64px;
-	display: flex;
-	gap: 1rem;
-	justify-content: space-between;
-	align-items: center;
-	background-color: ${(props) => props.theme.colors.background.header};
-	border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
-	padding-inline: 2rem;
-`;
-
-const HeaderLeft = styled.div`
-	display: flex;
-	gap: 1rem;
-	align-items: center;
-`;
-
-const HeaderRight = styled.div`
-	display: flex;
-	gap: 1rem;
-	align-items: center;
 `;
 
 const DateNavGroup = styled.div`
