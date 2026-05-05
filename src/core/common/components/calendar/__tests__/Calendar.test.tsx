@@ -75,6 +75,13 @@ vi.mock('../calendar_create_selection', async () => {
 	};
 });
 
+vi.mock('../calendar_event_info', async () => {
+	const React = await import('react');
+	return {
+		default: () => React.createElement('div', { 'data-testid': 'mock-calendar-event-info' }),
+	};
+});
+
 vi.mock('../create_block', async () => {
 	const React = await import('react');
 	return {
