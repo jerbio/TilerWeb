@@ -100,6 +100,8 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 				onClick={openDropdown}
 				disabled={disabled}
 				type="button"
+				aria-haspopup="listbox"
+				aria-expanded={isOpen}
 			>
 				{displayValue}
 				<ChevronSvg width="12" height="12" viewBox="0 0 12 12">
@@ -111,12 +113,15 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 					<DropdownList
 						ref={listRef}
 						$isDark={isDarkMode}
+						role="listbox"
 						style={{ top: dropdownPos.top, left: dropdownPos.left }}
 					>
 						{timeOptions.map((time) => (
 							<DropdownItem
 								key={time}
 								$selected={time === value}
+								role="option"
+								aria-selected={time === value}
 								data-selected={time === value}
 								onClick={() => {
 									onChange(time);
