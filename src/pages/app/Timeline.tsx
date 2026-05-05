@@ -225,7 +225,6 @@ const SidePanelContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
-	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
 	display: ${(props) => (props.$sidepanelexpanded ? 'none' : 'block')};
 	overflow: hidden;
 
