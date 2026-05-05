@@ -82,6 +82,11 @@ vi.mock('../calendar_event_info', async () => {
 	};
 });
 
+vi.mock('../calendarRequestHandler', () => ({
+	createCalendarRequestHandler: () => vi.fn(),
+	retryPendingFocus: vi.fn(),
+}));
+
 vi.mock('../create_block', async () => {
 	const React = await import('react');
 	return {
