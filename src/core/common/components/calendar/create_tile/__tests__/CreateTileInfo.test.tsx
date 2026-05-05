@@ -54,6 +54,8 @@ const noSuggestions = {
 	onDurationSelect: vi.fn(),
 	onLocationSelect: vi.fn(),
 	onTimeSectionSelect: vi.fn(),
+	onAcceptAll: vi.fn(),
+	onClearAll: vi.fn(),
 };
 
 function renderInfo(overrides: Partial<InitialCreateTileFormState> = {}) {

@@ -451,17 +451,19 @@ const Calendar = ({
 
 	// Create Block Form State
 	const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
-	const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
-	const createBlockModalPortalTarget = createBlock.state.isExpanded
-		? document.body
-		: createBlockModalContainerRef.current;
+	const [createBlockModalPortalTarget, setCreateBlockModalPortalTarget] =
+		useState<HTMLDivElement | null>(null);
+	const createBlockModalContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setCreateBlockModalPortalTarget(node);
+	}, []);
 
 	// Create Tile Form State
 	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-	const createTileModalContainerRef = useRef<HTMLDivElement>(null);
-	const createTileModalPortalTarget = createTile.state.isExpanded
-		? document.body
-		: createTileModalContainerRef.current;
+	const [createTileModalPortalTarget, setCreateTileModalPortalTarget] =
+		useState<HTMLDivElement | null>(null);
+	const createTileModalContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setCreateTileModalPortalTarget(node);
+	}, []);
 
 	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
 		// CONTENT_CLICK_OUTSIDE
@@ -735,6 +737,7 @@ const Calendar = ({
 				open={createBlock.state.isOpen}
 				onBackdropClick={createBlock.actions.close}
 				containerRef={createBlockModalContainerRef}
+				expanded={createBlock.state.isExpanded}
 				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
 			/>
 			{createBlockModalPortalTarget &&
@@ -751,6 +754,7 @@ const Calendar = ({
 				open={createTile.state.isOpen}
 				onBackdropClick={createTile.actions.close}
 				containerRef={createTileModalContainerRef}
+				expanded={createTile.state.isExpanded}
 				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
 			/>
 			{createTileModalPortalTarget &&

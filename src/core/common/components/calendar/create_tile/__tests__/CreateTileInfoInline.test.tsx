@@ -31,6 +31,10 @@ vi.mock('react-i18next', async (importOriginal) => {
 					return `${vars?.hours} hr ${vars?.mins} min`;
 				if (key === 'calendar.createTile.suggestions.count')
 					return `${vars?.count} smart suggestion${Number(vars?.count) !== 1 ? 's' : ''}`;
+				if (key === 'calendar.createTile.suggestions.acceptAll')
+					return 'Accept all suggestions';
+				if (key === 'calendar.createTile.suggestions.clearAll')
+					return 'Clear all suggestions';
 				return key;
 			},
 		}),
@@ -117,6 +121,8 @@ function makeNudgePill(
 		onDurationSelect: vi.fn(),
 		onLocationSelect: vi.fn(),
 		onTimeSectionSelect: vi.fn(),
+		onAcceptAll: vi.fn(),
+		onClearAll: vi.fn(),
 		...overrides,
 	};
 }
@@ -218,8 +224,8 @@ describe('CreateTileInfoInline – nudge pill with prediction', () => {
 	it('expands to show clickable duration chips when the pill is clicked', async () => {
 		const user = userEvent.setup();
 		renderInline({}, makeNudgePill(prediction));
-		// Click the pill toggle button (first and only button while collapsed)
-		await user.click(screen.getByRole('button'));
+		// Click the pill toggle button (first button while collapsed)
+		await user.click(screen.getAllByRole('button')[0]);
 		expect(screen.getByRole('button', { name: '30 min' })).toBeInTheDocument();
 		expect(screen.getByRole('button', { name: '1 hr' })).toBeInTheDocument();
 	});
@@ -228,7 +234,7 @@ describe('CreateTileInfoInline – nudge pill with prediction', () => {
 		const user = userEvent.setup();
 		const onDurationSelect = vi.fn();
 		renderInline({}, makeNudgePill(prediction, false, { onDurationSelect }));
-		await user.click(screen.getByRole('button')); // expand
+		await user.click(screen.getAllByRole('button')[0]); // expand
 		await user.click(screen.getByRole('button', { name: '30 min' }));
 		expect(onDurationSelect).toHaveBeenCalledOnce();
 		expect(onDurationSelect).toHaveBeenCalledWith(0, 30, 1800000);
@@ -238,7 +244,7 @@ describe('CreateTileInfoInline – nudge pill with prediction', () => {
 		const user = userEvent.setup();
 		const onLocationSelect = vi.fn();
 		renderInline({}, makeNudgePill(prediction, false, { onLocationSelect }));
-		await user.click(screen.getByRole('button')); // expand
+		await user.click(screen.getAllByRole('button')[0]); // expand
 		await user.click(screen.getByRole('button', { name: /Office/i }));
 		expect(onLocationSelect).toHaveBeenCalledOnce();
 		expect(onLocationSelect).toHaveBeenCalledWith(prediction.location![0]);

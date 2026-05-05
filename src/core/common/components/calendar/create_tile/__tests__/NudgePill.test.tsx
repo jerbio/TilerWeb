@@ -16,6 +16,9 @@ vi.mock('react-i18next', () => ({
 				return `${vars?.hours} hr ${vars?.mins} min`;
 			if (key === 'calendar.createTile.suggestions.count')
 				return `${vars?.count} smart suggestion${Number(vars?.count) !== 1 ? 's' : ''}`;
+			if (key === 'calendar.createTile.suggestions.acceptAll')
+				return 'Accept all suggestions';
+			if (key === 'calendar.createTile.suggestions.clearAll') return 'Clear all suggestions';
 			return key;
 		},
 	}),
@@ -59,6 +62,8 @@ function makeProps(overrides: Partial<NudgePillProps> = {}): NudgePillProps {
 		onDurationSelect: vi.fn(),
 		onLocationSelect: vi.fn(),
 		onTimeSectionSelect: vi.fn(),
+		onAcceptAll: vi.fn(),
+		onClearAll: vi.fn(),
 		...overrides,
 	};
 }
@@ -111,13 +116,15 @@ describe('NudgePill – collapsed state', () => {
 
 	it('does not show clickable chips while collapsed', () => {
 		wrap(<NudgePill {...makeProps()} />);
-		// Clickable chips inside PillBody are only rendered when expanded
-		expect(screen.queryAllByRole('button').length).toBe(1); // only the bar toggle
+		// PillBody chip buttons only appear when expanded
+		expect(screen.queryByRole('button', { name: /^30 min$/ })).not.toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: /^1 hr$/ })).not.toBeInTheDocument();
+		expect(screen.getByText('Accept all suggestions')).toBeInTheDocument();
 	});
 
 	it('uses plural label for multiple suggestions', () => {
 		wrap(<NudgePill {...makeProps()} />);
-		expect(screen.getByText(/suggestions/i)).toBeInTheDocument();
+		expect(screen.getByText(/3 smart suggestions/i)).toBeInTheDocument();
 	});
 
 	it('uses singular label for one suggestion', () => {
@@ -142,15 +149,15 @@ describe('NudgePill – expand / collapse', () => {
 	it('expands when the bar is clicked', async () => {
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps()} />);
-		await user.click(screen.getByRole('button'));
+		await user.click(screen.getAllByRole('button')[0]); // bar toggle
 		// Duration chips should now be visible
-		expect(screen.getAllByRole('button').length).toBeGreaterThan(1);
+		expect(screen.getByRole('button', { name: '30 min' })).toBeInTheDocument();
 	});
 
 	it('shows duration chips after expanding', async () => {
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps()} />);
-		await user.click(screen.getByRole('button'));
+		await user.click(screen.getAllByRole('button')[0]);
 		expect(screen.getByRole('button', { name: '30 min' })).toBeInTheDocument();
 		expect(screen.getByRole('button', { name: '1 hr' })).toBeInTheDocument();
 	});
@@ -158,17 +165,15 @@ describe('NudgePill – expand / collapse', () => {
 	it('shows location chips after expanding', async () => {
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps()} />);
-		await user.click(screen.getByRole('button'));
+		await user.click(screen.getAllByRole('button')[0]);
 		expect(screen.getByRole('button', { name: /Office/i })).toBeInTheDocument();
 	});
 
 	it('collapses again on second click', async () => {
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps()} />);
-		const toggle = screen.getByRole('button');
-		await user.click(toggle);
-		await user.click(screen.getAllByRole('button')[0]); // first button is still the toggle
-		// After collapsing, named chips are gone
+		await user.click(screen.getAllByRole('button')[0]); // expand
+		await user.click(screen.getAllByRole('button')[0]); // collapse
 		expect(screen.queryByRole('button', { name: '30 min' })).not.toBeInTheDocument();
 	});
 });
@@ -184,7 +189,7 @@ describe('NudgePill – chip callbacks', () => {
 		const onDurationSelect = vi.fn();
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps({ onDurationSelect })} />);
-		await user.click(screen.getByRole('button')); // expand
+		await user.click(screen.getAllByRole('button')[0]); // expand
 		await user.click(screen.getByRole('button', { name: '30 min' }));
 		expect(onDurationSelect).toHaveBeenCalledOnce();
 		expect(onDurationSelect).toHaveBeenCalledWith(0, 30, 1800000);
@@ -194,7 +199,7 @@ describe('NudgePill – chip callbacks', () => {
 		const onLocationSelect = vi.fn();
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps({ onLocationSelect })} />);
-		await user.click(screen.getByRole('button')); // expand
+		await user.click(screen.getAllByRole('button')[0]); // expand
 		await user.click(screen.getByRole('button', { name: /Office/i }));
 		expect(onLocationSelect).toHaveBeenCalledOnce();
 		expect(onLocationSelect).toHaveBeenCalledWith(basePrediction.location![0]);
@@ -207,7 +212,7 @@ describe('NudgePill – applied state', () => {
 	it('shows applied duration chip as selected when expanded', async () => {
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps({ appliedDurationMs: 1800000 })} />);
-		await user.click(screen.getByRole('button')); // expand
+		await user.click(screen.getAllByRole('button')[0]); // expand
 		// The chip renders with $selected=true; we can't inspect the styled prop directly
 		// but we can assert the chip is present and the row renders correctly.
 		expect(screen.getByRole('button', { name: '30 min' })).toBeInTheDocument();
@@ -216,7 +221,7 @@ describe('NudgePill – applied state', () => {
 	it('shows applied location chip as selected when expanded', async () => {
 		const user = userEvent.setup();
 		wrap(<NudgePill {...makeProps({ appliedLocationId: 'loc-1' })} />);
-		await user.click(screen.getByRole('button')); // expand
+		await user.click(screen.getAllByRole('button')[0]); // expand
 		expect(screen.getByRole('button', { name: /Office/i })).toBeInTheDocument();
 	});
 });

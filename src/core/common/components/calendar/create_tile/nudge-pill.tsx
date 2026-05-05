@@ -14,6 +14,8 @@ export type NudgePillProps = {
 	onDurationSelect: (hours: number, mins: number, ms: number) => void;
 	onLocationSelect: (location: TilePredictionLocation) => void;
 	onTimeSectionSelect: (section: string) => void;
+	onAcceptAll: () => void;
+	onClearAll: () => void;
 };
 
 const NudgePill: React.FC<NudgePillProps> = ({
@@ -23,6 +25,8 @@ const NudgePill: React.FC<NudgePillProps> = ({
 	appliedLocationId,
 	onDurationSelect,
 	onLocationSelect,
+	onAcceptAll,
+	onClearAll,
 }) => {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
@@ -39,12 +43,45 @@ const NudgePill: React.FC<NudgePillProps> = ({
 	const durations = prediction?.duration ?? [];
 	const locations = prediction?.location ?? [];
 
-	const previewLabels = [
-		...locations.slice(0, 1).map((l) => l.nickname || l.address),
-		...durations.slice(0, 1).map(msToLabel),
+	const previewLocation =
+		(appliedLocationId !== null && locations.find((l) => l.id === appliedLocationId)) ||
+		locations[0] ||
+		null;
+	const previewDurationMs =
+		(appliedDurationMs !== null && durations.includes(appliedDurationMs)
+			? appliedDurationMs
+			: null) ??
+		durations[0] ??
+		null;
+
+	const previewItems: { label: string; applied: boolean }[] = [
+		...(previewLocation
+			? [
+					{
+						label: previewLocation.nickname || previewLocation.address,
+						applied:
+							appliedLocationId !== null && previewLocation.id === appliedLocationId,
+					},
+				]
+			: []),
+		...(previewDurationMs !== null
+			? [
+					{
+						label: msToLabel(previewDurationMs),
+						applied:
+							appliedDurationMs !== null && previewDurationMs === appliedDurationMs,
+					},
+				]
+			: []),
 	];
 
 	const totalCount = durations.length + locations.length;
+
+	const allAccepted =
+		(durations.length === 0 ||
+			(appliedDurationMs !== null && durations.includes(appliedDurationMs))) &&
+		(locations.length === 0 ||
+			(appliedLocationId !== null && locations.some((l) => l.id === appliedLocationId)));
 
 	if (isLoading) {
 		return (
@@ -61,19 +98,35 @@ const NudgePill: React.FC<NudgePillProps> = ({
 
 	return (
 		<PillShell>
-			<PillBar $expanded={expanded} onClick={() => setExpanded((e) => !e)}>
+			<PillBar type="button" $expanded={expanded} onClick={() => setExpanded((e) => !e)}>
 				<Sparkles size={12} />
 				<PillSummary>
 					{t('calendar.createTile.suggestions.count', { count: totalCount })}
 				</PillSummary>
-				{!expanded && previewLabels.length > 0 && (
+				{!expanded && previewItems.length > 0 && (
 					<PreviewChips>
-						{previewLabels.map((label) => (
-							<MiniChip key={label}>{label}</MiniChip>
+						{previewItems.map(({ label, applied }) => (
+							<MiniChip key={label} $applied={applied}>
+								{label}
+							</MiniChip>
 						))}
 					</PreviewChips>
 				)}
 				{expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+				{!expanded && (
+					<AcceptAllButton
+						as="span"
+						$accepted={allAccepted}
+						onClick={(e: React.MouseEvent) => {
+							e.stopPropagation();
+							allAccepted ? onClearAll() : onAcceptAll();
+						}}
+					>
+						{allAccepted
+							? t('calendar.createTile.suggestions.clearAll')
+							: t('calendar.createTile.suggestions.acceptAll')}
+					</AcceptAllButton>
+				)}
 			</PillBar>
 
 			{expanded && (
@@ -157,18 +210,42 @@ const PreviewChips = styled.div`
 	overflow: hidden;
 `;
 
-const MiniChip = styled.span`
+const MiniChip = styled.span<{ $applied: boolean }>`
 	padding: 0.1rem 0.45rem;
 	border-radius: 999px;
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-	background: ${({ theme }) => theme.colors.background.card};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	color: ${({ theme }) => theme.colors.text.secondary};
+	background: ${({ theme, $applied }) =>
+		$applied ? theme.colors.datepicker.dateSelectedBg + '22' : theme.colors.background.card};
+	border: 1px solid
+		${({ theme, $applied }) =>
+			$applied ? theme.colors.datepicker.dateSelectedBg : theme.colors.border.default};
+	color: ${({ theme, $applied }) =>
+		$applied ? theme.colors.datepicker.dateSelectedBg : theme.colors.text.secondary};
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	max-width: 80px;
+`;
+
+const AcceptAllButton = styled.button<{ $accepted: boolean }>`
+	flex-shrink: 0;
+	background: none;
+	border: none;
+	padding: 0.1rem 0.35rem;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+	color: ${({ theme, $accepted }) =>
+		$accepted ? theme.colors.text.muted : theme.colors.datepicker.dateSelectedBg};
+	white-space: nowrap;
+	transition: opacity 0.15s;
+
+	&:hover {
+		opacity: 0.75;
+	}
 `;
 
 const PillBody = styled.div`

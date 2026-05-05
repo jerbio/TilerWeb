@@ -65,6 +65,8 @@ const noSuggestions = {
 	onDurationSelect: vi.fn(),
 	onLocationSelect: vi.fn(),
 	onTimeSectionSelect: vi.fn(),
+	onAcceptAll: vi.fn(),
+	onClearAll: vi.fn(),
 };
 
 function makeSuggestions(prediction: TilePredictionResponse | null, isLoading = false) {
@@ -75,6 +77,8 @@ function makeSuggestions(prediction: TilePredictionResponse | null, isLoading = 
 		onDurationSelect: vi.fn(),
 		onLocationSelect: vi.fn(),
 		onTimeSectionSelect: vi.fn(),
+		onAcceptAll: vi.fn(),
+		onClearAll: vi.fn(),
 	};
 }
 

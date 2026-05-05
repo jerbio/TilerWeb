@@ -244,6 +244,42 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 
 	// ──────────────────────────────────────────────────────────
 
+	const handleAcceptAllPredictions = useCallback(() => {
+		if (!prediction) return;
+
+		const durationMs = prediction.duration?.[0] ?? null;
+		const location = prediction.location?.[0] ?? null;
+
+		setFormData((prev) => {
+			const next = { ...prev };
+
+			if (durationMs !== null) {
+				const totalMins = Math.round(durationMs / 60000);
+				next.durationHours = Math.floor(totalMins / 60);
+				next.durationMins = totalMins % 60;
+			}
+
+			if (location) {
+				next.location = location.address;
+				next.locationId =
+					location.source !== 'google' && !location.isAdHoc ? location.id : null;
+				next.locationSource = location.source;
+				next.locationIsVerified = location.isVerified;
+				next.locationTag = location.nickname || '';
+			}
+
+			return next;
+		});
+
+		appliedStateRef.current = {
+			...appliedStateRef.current,
+			durationMs,
+			locationId: location?.id ?? null,
+		};
+		setAppliedDurationMs(durationMs);
+		setAppliedLocationId(location?.id ?? null);
+	}, [prediction, setFormData]);
+
 	const isValidSubmission = useMemo(() => {
 		if (formData.action.trim().length === 0) return false;
 		const duration = formData.durationHours * 60 + formData.durationMins;
@@ -523,6 +559,8 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 							onDurationSelect: handlePredictionDuration,
 							onLocationSelect: handlePredictionLocation,
 							onTimeSectionSelect: handlePredictionTimeSection,
+							onAcceptAll: handleAcceptAllPredictions,
+							onClearAll: clearAppliedSuggestions,
 						}}
 					/>
 				</Section>

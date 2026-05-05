@@ -389,6 +389,8 @@
 			"suggestions": {
 				"count_one": "{{count}} smart suggestion",
 				"count_other": "{{count}} smart suggestions",
+				"acceptAll": "Accept all suggestions",
+				"clearAll": "Clear all suggestions",
 				"duration": {
 					"mins": "{{mins}} min",
 					"hrs": "{{hours}} hr",
