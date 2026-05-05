@@ -119,7 +119,11 @@ const NudgePill: React.FC<NudgePillProps> = ({
 						$accepted={allAccepted}
 						onClick={(e: React.MouseEvent) => {
 							e.stopPropagation();
-							allAccepted ? onClearAll() : onAcceptAll();
+							if (allAccepted) {
+								onClearAll();
+							} else {
+								onAcceptAll();
+							}
 						}}
 					>
 						{allAccepted

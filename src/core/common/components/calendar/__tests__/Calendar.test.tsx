@@ -45,6 +45,7 @@ vi.mock('swiper/react', async () => {
 
 		return React.createElement('div', { 'data-testid': 'mock-swiper' }, children);
 	});
+	Swiper.displayName = 'MockSwiper';
 
 	return {
 		Swiper,
