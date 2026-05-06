@@ -145,6 +145,27 @@ class ChatService {
 		}
 	}
 
+	async getSimulationForRequest(vibeRequestId: string, anonymousUserId?: string) {
+		try {
+			return await this.chatApi.getSimulationForRequest(vibeRequestId, anonymousUserId);
+		} catch (error) {
+			console.error('Error fetching simulation for request', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getSimulationResult(
+		previewId: string,
+		params?: Parameters<ChatApi['getSimulationResult']>[1]
+	) {
+		try {
+			return await this.chatApi.getSimulationResult(previewId, params);
+		} catch (error) {
+			console.error('Error fetching simulation result', error);
+			throw normalizeError(error);
+		}
+	}
+
 	async transcribeAudio(audioFile: Blob): Promise<string> {
 		try {
 			const response = await this.chatApi.transcribeAudio(audioFile);

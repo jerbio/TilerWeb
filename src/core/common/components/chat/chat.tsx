@@ -24,6 +24,27 @@ import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/
 import analytics from '@/core/util/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
 import ActionPill from '@/core/common/components/chat/ActionPill';
+import SimulationStatusStrip from '@/core/common/components/chat/SimulationStatusStrip';
+import SimulationReviewPanel from '@/core/common/components/chat/SimulationReviewPanel';
+import useSimulationPolling from '@/hooks/useSimulationPolling';
+import {
+	SimulationDto,
+	SimulationScheduleResult,
+	VibeRequest as VibeRequestType,
+	PreviewReadyPayload,
+} from '@/core/common/types/chat';
+import {
+	buildSimulationActionLookups,
+	primeSimulationFromRequest,
+	isRequestTerminal,
+	isSimulationTerminal,
+} from '@/core/util/simulationSelectors';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
+import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
+import {
+	CalendarEntityType,
+	CalendarRequestType,
+} from '@/core/common/components/calendar/calendarRequestContext';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -295,6 +316,255 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const [showSessionHistory, setShowSessionHistory] = useState(false);
 	const [currentSessionTitle, setCurrentSessionTitle] = useState<string | null>(null);
 
+	// --- Simulated Schedule Experience (Phase 3.1) ----------------------------
+	// Tracks the simulation row + parent VibeRequest for the *active* request.
+	// Per-message simulation lookup can be layered on later by keying these by
+	// requestId.
+	const [simulation, setSimulation] = useState<SimulationDto | null>(null);
+	const [vibeRequest, setVibeRequest] = useState<VibeRequestType | null>(null);
+	// Selection is the single source of truth shared with the calendar overlay
+	// (plan §5.3.1) — both chip clicks here and tile clicks in
+	// `CalendarWrapper` write through the store.
+	const selectedActionId = useSimulationOverlayStore((s) => s.selectedActionId);
+	const setSelectedActionId = useSimulationOverlayStore((s) => s.setSelectedActionId);
+	const requestIdRef = useRef<string | null>(null);
+	requestIdRef.current = requestId;
+	// Plan §6.2 — the previewReady SignalR handler is bound once on mount
+	// against `anonymousUserId`; it cannot close over the latest VibeRequest
+	// without a ref. The ref lets the handler bail when a late `previewReady`
+	// arrives for a request that has since become terminal (Applied / Closed),
+	// avoiding a stale UI flip back to "Ready".
+	const vibeRequestRef = useRef<VibeRequestType | null>(null);
+	vibeRequestRef.current = vibeRequest;
+	// Plan §6.5.2 — cache of VibeRequest payloads embedded in chat-history
+	// responses (`getMessages` → `Content.vibeRequests`). When the active
+	// requestId changes, the requestId effect consults this cache first
+	// and skips the per-request `getVibeRequest` round-trip if a hydrated
+	// entry (with `preview` / `previews`) is available. Single-fetch
+	// session bootstrap, AC "Initial chat render needs no extra simulation
+	// fetch" and AC "Refresh restores active simulation status".
+	const vibeRequestCacheRef = useRef<Record<string, VibeRequestType>>({});
+
+	// Phase 4.2 — lazy-fetched simulation result for the review panel.
+	// Cached per `simulation.id`; re-entries do NOT re-fetch unless the id
+	// changes (see `simulationResultIdRef` invalidation below).
+	const [simulationResult, setSimulationResult] = useState<SimulationScheduleResult | null>(null);
+	// `inReview` is owned by the cross-cut overlay store so the calendar
+	// banner's Exit-review button (and any future surface) stays in sync
+	// with the chat panel. Local writes go through the store API only.
+	const inReview = useSimulationOverlayStore((s) => s.inReview);
+	const [isLoadingSimulationResult, setIsLoadingSimulationResult] = useState(false);
+	const [simulationResultError, setSimulationResultError] = useState<string | null>(null);
+	const simulationResultIdRef = useRef<string | null>(null);
+
+	// Plan §5.3.2 / §5.3.4 / §5.3.5 — when a simulation chip is selected (or
+	// a tile is clicked, since both write through the same store) ask the
+	// calendar to scroll to & pulse the matching tile. Debounced ~150ms so
+	// rapid stepper presses (Previous/Next held down) only dispatch the
+	// final selection — visuals (tier border, hue) update instantly because
+	// they are pure derived state, but scroll/navigation is debounced.
+	const calendarDispatch = useCalendarDispatch();
+	const focusDispatchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(() => {
+		if (!inReview || !simulation || !selectedActionId) return;
+		const action = buildSimulationActionLookups(simulation).byActionId[selectedActionId];
+		if (!action || !action.entityId || !action.entityType) return;
+		if (focusDispatchTimerRef.current) {
+			clearTimeout(focusDispatchTimerRef.current);
+		}
+		focusDispatchTimerRef.current = setTimeout(() => {
+			calendarDispatch({
+				type: CalendarRequestType.FocusEvent,
+				entityId: action.entityId!,
+				entityType: action.entityType as CalendarEntityType,
+				actionType: action.action?.type ?? 'none',
+			});
+			focusDispatchTimerRef.current = null;
+		}, 150);
+		return () => {
+			if (focusDispatchTimerRef.current) {
+				clearTimeout(focusDispatchTimerRef.current);
+				focusDispatchTimerRef.current = null;
+			}
+		};
+	}, [inReview, simulation, selectedActionId, calendarDispatch]);
+
+	// Drop the cached simulation result whenever the active simulation id changes
+	// so the next review entry re-fetches against the new preview.
+	useEffect(() => {
+		const currentSimId = simulation?.id ?? null;
+		if (simulationResultIdRef.current && simulationResultIdRef.current !== currentSimId) {
+			setSimulationResult(null);
+			simulationResultIdRef.current = null;
+		}
+	}, [simulation?.id]);
+
+	const enterReview = useCallback(async () => {
+		if (!simulation) return;
+		if (simulationResult != null && simulationResultIdRef.current === simulation.id) {
+			// Cached — publish to overlay store (sets inReview=true) and skip re-fetch.
+			if (vibeRequest) {
+				useSimulationOverlayStore
+					.getState()
+					.enterReview({ simulation, simulationResult, vibeRequest });
+			}
+			return;
+		}
+		setIsLoadingSimulationResult(true);
+		setSimulationResultError(null);
+		try {
+			const resp = await chatService.getSimulationResult(simulation.id);
+			const content = (resp?.Content ?? null) as SimulationScheduleResult | null;
+			if (content) {
+				setSimulationResult(content);
+				simulationResultIdRef.current = simulation.id;
+				if (vibeRequest) {
+					useSimulationOverlayStore
+						.getState()
+						.enterReview({ simulation, simulationResult: content, vibeRequest });
+				}
+			} else {
+				// Plan §5.5 — empty/null body counts as a fetch failure.
+				setSimulationResultError('empty');
+			}
+		} catch (err) {
+			console.error('Failed to fetch simulation result', err);
+			// Plan §5.5 — surface "Simulation unavailable" with Retry. Review
+			// mode is NOT entered, satisfying the auto-exit requirement.
+			setSimulationResultError(err instanceof Error ? err.message : 'fetch_failed');
+		} finally {
+			setIsLoadingSimulationResult(false);
+		}
+	}, [simulation, simulationResult, vibeRequest]);
+
+	const exitReview = useCallback(() => {
+		useSimulationOverlayStore.getState().exitReview();
+	}, []);
+
+	// Plan §5.3.6 / §5.4 — Escape from anywhere exits review mode. Bound once
+	// at the chat container level rather than per-component.
+	useEffect(() => {
+		if (!inReview) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				exitReview();
+			}
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, [inReview, exitReview]);
+
+	// Plan §5.4 — stale overlay guard. If the active request changes (user
+	// sent a new message during review, or a non-chat origin started a fresh
+	// simulation) discard the overlay and exit review mode. The overlay store
+	// is keyed on the original vibeRequestId; mismatch means the on-screen
+	// overlay no longer matches the user's intent.
+	useEffect(() => {
+		if (!inReview) return;
+		const overlay = useSimulationOverlayStore.getState();
+		if (overlay.vibeRequest && overlay.vibeRequest.id !== requestId) {
+			useSimulationOverlayStore.getState().exitReview();
+		}
+	}, [inReview, requestId]);
+
+	// Pull the latest VibeRequest whenever the active requestId changes so the
+	// simulation polling loop has terminal-state context, and so any embedded
+	// `previews` payload can prime the local simulation cache.
+	useEffect(() => {
+		if (!requestId) {
+			setVibeRequest(null);
+			setSimulation(null);
+			return;
+		}
+		// Plan §6.3 — supersession. When the active requestId changes (user
+		// sends a follow-up message, or session bootstrap swaps requests),
+		// drop the old simulation/result snapshot synchronously so polling
+		// halts and the UI doesn't briefly attribute the previous request's
+		// state to the new one. Review mode is exited too — the old preview
+		// is no longer relevant and the calendar overlay must clear.
+		setSimulation(null);
+		setSimulationResult(null);
+		simulationResultIdRef.current = null;
+		setSimulationResultError(null);
+		useSimulationOverlayStore.getState().exitReview();
+		let cancelled = false;
+		(async () => {
+			try {
+				// Plan §6.5.2 — prefer the cache populated from getMessages
+				// responses; only fall back to a dedicated getVibeRequest
+				// round-trip when the chat-history payload didn't carry the
+				// embedded request (older sessions, follow-up `sendMessage`
+				// before the next `getMessages`, or refresh into a request
+				// that wasn't in the most recent batch).
+				const cached = vibeRequestCacheRef.current[requestId] ?? null;
+				let vr: VibeRequestType | null = cached;
+				if (!vr) {
+					const resp = await chatService.getVibeRequest(requestId);
+					if (cancelled) return;
+					vr = (resp?.Content?.vibeRequest ?? null) as VibeRequestType | null;
+					if (vr) vibeRequestCacheRef.current[requestId] = vr;
+				}
+				setVibeRequest(vr);
+				const primed = primeSimulationFromRequest(vr);
+				if (primed) setSimulation(primed);
+				// The embedded `vibeRequest.preview` payload omits
+				// `previewActions` (VibePreview.PreviewActions is [NotMapped]
+				// server-side, so EF won't auto-load it via .Include). Fetch
+				// the dedicated preview endpoint to hydrate the chip<->preview
+				// wiring (halos, navigatable affordances) on first paint.
+				try {
+					const previewResp = await chatService.getSimulationForRequest(requestId);
+					if (cancelled) return;
+					// `OkResponse("preview", ...)` server-side wraps the payload
+					// as `{ preview: SimulationDto }`. The declared type lies;
+					// unwrap defensively (and fall back to Content itself for
+					// any future endpoint refactor that drops the wrapper).
+					const rawContent = previewResp?.Content as
+						| { preview?: SimulationDto }
+						| SimulationDto
+						| null
+						| undefined;
+					const sim =
+						(rawContent && 'preview' in rawContent
+							? (rawContent.preview ?? null)
+							: (rawContent as SimulationDto | null)) ?? null;
+					if (sim && sim.id) setSimulation(sim);
+				} catch (previewErr) {
+					if (!cancelled) {
+						console.error('Failed to fetch simulation preview for request', previewErr);
+					}
+				}
+			} catch (err) {
+				if (!cancelled) console.error('Failed to fetch vibe request for simulation', err);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [requestId]);
+
+	// Polls the backend for the active simulation; ramps from 2s → 10s after 30s.
+	useSimulationPolling(
+		vibeRequest,
+		simulation,
+		(sim) => {
+			setSimulation((prev) => {
+				// Ignore stale `previewReady` for terminal requests (invariant).
+				if (prev && isSimulationTerminal(prev) && prev.id === sim.id) return prev;
+				return sim;
+			});
+		},
+		// Plan §6.6.5 — anonymous-user threading. Without this, the polling
+		// fetch returns 401 / NotFound for anonymous sessions on refresh.
+		// Derived inline to dodge a forward-reference: the canonical
+		// `anonymousUserId` const is declared further down in the
+		// component for legacy ordering reasons.
+		{
+			anonymousUserId:
+				activePersonaSession?.userInfo?.id ?? activePersonaSession?.userId ?? undefined,
+		}
+	);
+
 	// Track chat component mount
 	useEffect(() => {
 		analytics.trackChatEvent('Chat Opened', {
@@ -415,6 +685,31 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				setWsStatusKey(rawStatus);
 				setWebSocketStatus(formattedStatus);
 			}
+		});
+
+		// Phase 3.1: react to backend-pushed previewReady events.
+		webSocketCommunication.current.subscribeToPreviewReady((data: unknown) => {
+			const payload = data as PreviewReadyPayload | null;
+			if (!payload || payload.type !== 'requestPreviewReady') return;
+			const activeRequestId = requestIdRef.current;
+			if (!activeRequestId || payload.vibeRequestId !== activeRequestId) return;
+			// Plan §6.2 — ignore late notifications for a request that has
+			// already been applied/closed. Without this guard a `previewReady`
+			// arriving after Apply would re-populate `simulation` and reopen
+			// the status strip on a request the user has already moved past.
+			if (isRequestTerminal(vibeRequestRef.current)) return;
+			(async () => {
+				try {
+					const resp = await chatService.getSimulationForRequest(
+						payload.vibeRequestId,
+						anonymousUserId || undefined
+					);
+					const sim = (resp?.Content ?? null) as SimulationDto | null;
+					if (sim) setSimulation(sim);
+				} catch (err) {
+					console.error('Failed to refetch simulation after previewReady', err);
+				}
+			})();
 		});
 
 		return () => {
@@ -580,6 +875,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				});
 
 				const rawMessages = data.Content.chats || [];
+				// Plan §6.5.2 — hydrate the per-request cache from the
+				// embedded `vibeRequests` payload before any state setter
+				// fires; that way the requestId effect (triggered by the
+				// imminent setRequestId below) finds the entry on first read.
+				const embeddedRequests = data.Content.vibeRequests ?? [];
+				for (const r of embeddedRequests) {
+					if (r && r.id) vibeRequestCacheRef.current[r.id] = r as VibeRequestType;
+				}
 				if (!rawMessages.length) {
 					setHasMoreMessages(false);
 					return;
@@ -631,6 +934,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			});
 
 			const rawMessages = data.Content.chats || [];
+			// Plan §6.5.2 — also fold older-batch embedded requests into
+			// the cache so historical request rows can prime simulation if
+			// the user scrolls back and re-selects them.
+			const embeddedRequests = data.Content.vibeRequests ?? [];
+			for (const r of embeddedRequests) {
+				if (r && r.id) vibeRequestCacheRef.current[r.id] = r as VibeRequestType;
+			}
 			if (!rawMessages.length) {
 				setHasMoreMessages(false);
 				shouldPreserveScrollPositionRef.current = false;
@@ -839,9 +1149,20 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				handleSetScheduleId(newScheduleId);
 				// useEffect will automatically reload messages when scheduleId changes
 			}
+			// Plan §6.1 — on Apply success, drop simulation state so the
+			// status strip / review CTA disappear for the now-terminal
+			// request and any subsequent late `previewReady` is ignored
+			// (handled in tandem with the §6.2 terminal-guard).
+			useSimulationOverlayStore.getState().exitReview();
+			setSimulation(null);
+			setSimulationResult(null);
+			simulationResultIdRef.current = null;
+			setSimulationResultError(null);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
 			else setError(t('home.expanded.chat.errorAcceptChanges'));
+			// Plan §6.1 — on failure, preserve simulation state so the user
+			// can retry Apply or fall back to Review without losing context.
 		} finally {
 			setIsSending(false);
 		}
@@ -1016,9 +1337,31 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 										(action) =>
 											action.type !== 'conversational_and_not_supported'
 									)
-									.map((action) => (
-										<ActionPill key={action.id} action={action} />
-									))}
+									.map((action) => {
+										const sim = simulation;
+										const simAction = sim
+											? buildSimulationActionLookups(sim).byActionId[
+													action.id
+												]
+											: undefined;
+										return (
+											<ActionPill
+												key={action.id}
+												action={action}
+												simulation={sim}
+												request={vibeRequest}
+												simulationAction={simAction}
+												onSelect={(a, sa) => {
+													// Prefer wire `actionId`; fall back to the
+													// embedded VibeAction.id and finally the source
+													// action.id so older payloads still wire up.
+													const id =
+														sa?.actionId ?? sa?.action?.id ?? a.id;
+													if (id) setSelectedActionId(id);
+												}}
+											/>
+										);
+									})}
 							</MessageBubble>
 						))}
 					</div>
@@ -1036,6 +1379,42 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 							wsStatus={wsStatusKey}
 						/>
 					)}
+					<SimulationStatusStrip
+						// Plan §6.6.3 supersession is now centralized in
+						// `isRequestTerminal` (selector check inside the strip),
+						// so we can pass the live simulation through and let
+						// the strip's hide-when-terminal branch take over.
+						simulation={simulation}
+						request={vibeRequest}
+						onReview={enterReview}
+						fetchError={simulationResultError}
+						onRetry={simulationResultError ? enterReview : undefined}
+					/>
+					{inReview &&
+						simulation &&
+						vibeRequest &&
+						(simulationResult ? (
+							<SimulationReviewPanel
+								request={vibeRequest}
+								simulation={simulation}
+								result={simulationResult}
+								selectedActionId={selectedActionId}
+								onSelect={setSelectedActionId}
+								onApply={() => acceptAllChanges()}
+								onExitReview={exitReview}
+							/>
+						) : (
+							<div
+								role="status"
+								aria-busy={isLoadingSimulationResult}
+								data-testid="simulation-review-skeleton"
+							>
+								{t(
+									'home.expanded.chat.simulationGenerating',
+									'Loading simulation…'
+								)}
+							</div>
+						))}
 					{((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
 						<Button
 							variant="primary"

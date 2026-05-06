@@ -39,6 +39,8 @@ import { initialCreateBlockFormState, initialCreateTileFormState } from './data'
 import CalendarModal from './modals';
 import CalendarCreateSelection from './calendar_create_selection';
 import CalendarCreateBlock from './create_block';
+import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
+import type { CalendarEntityType } from './calendarRequestContext';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -50,6 +52,12 @@ type CalendarProps = {
 	refetchEvents: () => Promise<void>;
 	/** When false, skip REST-based event lookup (Phase 4) and fall back to cached-event search only. Defaults to true. */
 	allowEventLookup?: boolean;
+	/** Plan §5.2 — per-tile simulation classification (composite-key map). */
+	simulationClassification?: Record<string, SimulatedTileClassification>;
+	/** Plan §5.3.2 — invoked when a simulation tile is clicked. */
+	onSimulatedTileClick?: (entityId: string, entityType: CalendarEntityType) => void;
+	/** Plan §5.2.7 — composite entity key of the currently selected action. */
+	selectedSimulationKey?: string | null;
 };
 
 const Calendar = ({
@@ -60,6 +68,9 @@ const Calendar = ({
 	setViewOptions,
 	refetchEvents,
 	allowEventLookup = true,
+	simulationClassification,
+	onSimulatedTileClick,
+	selectedSimulationKey,
 }: CalendarProps) => {
 	const { t } = useTranslation();
 	const viableEvents = events.filter((event) => event.isViable);
@@ -822,6 +833,9 @@ const Calendar = ({
 								setShowNonViableEvents(null);
 								setShowLongDurationEvents(null);
 							}}
+							simulationClassification={simulationClassification}
+							onSimulatedTileClick={onSimulatedTileClick}
+							selectedSimulationKey={selectedSimulationKey}
 						/>
 					</SwiperSlide>
 					<SwiperSlide>

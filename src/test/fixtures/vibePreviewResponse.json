@@ -1,0 +1,36 @@
+{
+	"_comment": "Captured shape of GET api/Vibe/Preview?previewId=... after ApiResponse unwrap. Mirrors VibeController.buildScheduleResponse + GetPreview metadata. Drift here means the client and server are out of sync.",
+	"preview": {
+		"subCalendarEvents": [
+			{
+				"id": "sub-evt-001",
+				"name": "Morning standup",
+				"start": 1714809600000,
+				"end": 1714813200000,
+				"originalStart": 1714809600000,
+				"originalEnd": 1714813200000,
+				"isViable": true,
+				"isComplete": false,
+				"isEnabled": true
+			},
+			{
+				"id": "sub-evt-002",
+				"name": "Deep work",
+				"start": 1714816800000,
+				"end": 1714824000000,
+				"originalStart": 1714816800000,
+				"originalEnd": 1714824000000,
+				"isViable": true,
+				"isComplete": false,
+				"isEnabled": true
+			}
+		],
+		"calendarEvents": [],
+		"pauseData": null,
+		"sleepTimeline": null,
+		"previewId": "preview-fixture-id",
+		"vibeRequestId": "vibe-request-fixture-id",
+		"createdAt": 1714800000000,
+		"previewActions": []
+	}
+}

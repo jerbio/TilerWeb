@@ -23,6 +23,9 @@ import analytics from '@/core/util/analytics';
 import { splitEventByDay } from '@/core/util/eventSplitting';
 import { isLongDurationEvent } from '@/core/util/eventFilters';
 import { TypeDefaults } from '../../types/typeDefaults';
+import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
+import { entityKey } from '@/core/util/simulationDiff';
+import { CalendarEntityType } from './calendarRequestContext';
 
 type CalendarEventsProps = {
 	viewOptions: CalendarViewOptions;
@@ -40,6 +43,16 @@ type CalendarEventsProps = {
 	focusedEventId?: string | null;
 	/** Called when a viable event tile on the grid is clicked */
 	onViableEventClicked?: () => void;
+	/**
+	 * Plan §5.2 — per-tile simulation classification keyed by composite
+	 * `${entityType}:${entityId}` (see `simulationDiff.entityKey`). When set,
+	 * tiles render in simulation mode (read-only + tier styling).
+	 */
+	simulationClassification?: Record<string, SimulatedTileClassification>;
+	/** Plan §5.3.2 — invoked when a simulation tile is clicked. */
+	onSimulatedTileClick?: (entityId: string, entityType: CalendarEntityType) => void;
+	/** Plan §5.2.7 — composite entity key of the currently selected action. */
+	selectedSimulationKey?: string | null;
 };
 type CurrentViewEvent = SubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
@@ -94,6 +107,9 @@ const CalendarEvents = ({
 	focusedEventId,
 	onViableEventClicked,
 	onBackgroundClick,
+	simulationClassification,
+	onSimulatedTileClick,
+	selectedSimulationKey,
 }: CalendarEventsProps) => {
 	const handleEventClick = (event: StyledEvent) => {
 		// Track event selection
@@ -352,24 +368,40 @@ const CalendarEvents = ({
 			}}
 		>
 			<Wrapper>
-				{eventTransition((style, event) => (
-					<EventPositioner
-						key={event.key}
-						style={style}
-						$selected={selectedEvent === event.id}
-						$focused={focusedEventId === event.id}
-						$zIndex={event._staggerZIndex ?? 0}
-					>
-						<CalendarEvent
-							event={event}
-							selectedEvent={selectedEvent}
-							setSelectedEvent={setSelectedEvent}
-							setSelectedEventInfo={setSelectedEventInfo}
-							onClick={() => handleEventClick(event)}
-							focused={focusedEventId === event.id}
-						/>
-					</EventPositioner>
-				))}
+				{eventTransition((style, event) => {
+					const eKey = entityKey(CalendarEntityType.SubcalendarEvent, event.id);
+					const classification = simulationClassification?.[eKey];
+					const isSimSelected = !!classification && selectedSimulationKey === eKey;
+					return (
+						<EventPositioner
+							key={event.key}
+							style={style}
+							$selected={selectedEvent === event.id}
+							$focused={focusedEventId === event.id}
+							$zIndex={event._staggerZIndex ?? 0}
+						>
+							<CalendarEvent
+								event={event}
+								selectedEvent={selectedEvent}
+								setSelectedEvent={setSelectedEvent}
+								setSelectedEventInfo={setSelectedEventInfo}
+								onClick={() => handleEventClick(event)}
+								focused={focusedEventId === event.id}
+								simulation={classification}
+								simulationSelected={isSimSelected}
+								onSimulatedClick={
+									classification && onSimulatedTileClick
+										? () =>
+												onSimulatedTileClick(
+													event.id,
+													CalendarEntityType.SubcalendarEvent
+												)
+										: undefined
+								}
+							/>
+						</EventPositioner>
+					);
+				})}
 				{travelTransition((style, detail) => {
 					const travelMediumIconMap: Record<string, React.ReactNode> = {
 						driving: <CarFront size={16} />,

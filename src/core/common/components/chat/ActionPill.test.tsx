@@ -539,4 +539,175 @@ describe('ActionPill schedule consistency', () => {
 			expect(button.style.cursor).toBe('pointer');
 		});
 	});
+
+	describe('simulation-aware behavior (Phase 3.4)', () => {
+		const renderWithSim = (
+			action: VibeAction,
+			sim: import('@/core/common/types/chat').SimulationDto | null,
+			extra: {
+				simulationAction?: import('@/core/common/types/chat').SimulationActionDto;
+				request?: import('@/core/common/types/chat').VibeRequest | null;
+				onSelect?: (
+					a: VibeAction,
+					sa?: import('@/core/common/types/chat').SimulationActionDto
+				) => void;
+			} = {}
+		) =>
+			render(
+				<ThemeProvider>
+					<CalendarRequestProvider>
+						<ActionPill
+							action={action}
+							simulation={sim}
+							simulationAction={extra.simulationAction}
+							request={extra.request}
+							onSelect={extra.onSelect}
+						/>
+					</CalendarRequestProvider>
+				</ThemeProvider>
+			);
+
+		const pendingAction = () =>
+			createAction({
+				status: Status.Pending,
+				afterScheduleId: null,
+				beforeScheduleId: 'schedule-v2',
+			});
+
+		const baseRequest = (
+			overrides: Partial<import('@/core/common/types/chat').VibeRequest> = {}
+		): import('@/core/common/types/chat').VibeRequest => ({
+			id: 'r1',
+			creationTimeInMs: 1,
+			activeAction: null,
+			isClosed: false,
+			beforeScheduleId: null,
+			afterScheduleId: null,
+			actions: [],
+			...overrides,
+		});
+
+		const baseSim = (
+			state: import('@/core/common/types/chat').SimulationState
+		): import('@/core/common/types/chat').SimulationDto => ({
+			id: 'p1',
+			vibeRequestId: 'r1',
+			tilerUserId: 'u',
+			creationTimeInMs: 1,
+			state,
+			previewActions: [],
+		});
+
+		it('Ready + simulationAction → calls onSelect, no toast', async () => {
+			const user = setupUser();
+			const onSelect = vi.fn();
+			const simAction = {
+				actionId: 'action-1',
+				entityId: 'sim-entity',
+				entityType: 'SubCalendarEvent',
+				vibePreviewId: 'p1',
+			};
+			renderWithSim(pendingAction(), baseSim('Ready'), {
+				simulationAction: simAction,
+				request: baseRequest(),
+				onSelect,
+			});
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(onSelect).toHaveBeenCalledTimes(1);
+			expect(onSelect).toHaveBeenCalledWith(
+				expect.objectContaining({ id: 'action-1' }),
+				simAction
+			);
+			expect(screen.queryByText('Accept changes to see this tile')).not.toBeInTheDocument();
+		});
+
+		it('Processing → toast "still being simulated", no onSelect', async () => {
+			const user = setupUser();
+			const onSelect = vi.fn();
+			renderWithSim(pendingAction(), baseSim('Processing'), {
+				request: baseRequest(),
+				onSelect,
+			});
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(screen.getByText(/still being simulated/i)).toBeInTheDocument();
+			expect(onSelect).not.toHaveBeenCalled();
+		});
+
+		it('Queued → toast "still being simulated"', async () => {
+			const user = setupUser();
+			renderWithSim(pendingAction(), baseSim('Queued'), { request: baseRequest() });
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(screen.getByText(/still being simulated/i)).toBeInTheDocument();
+		});
+
+		it('null sim + non-terminal request → toast "Simulation starting…"', async () => {
+			const user = setupUser();
+			renderWithSim(pendingAction(), null, { request: baseRequest() });
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(screen.getByText(/simulation starting/i)).toBeInTheDocument();
+			// And NOT the legacy copy.
+			expect(screen.queryByText('Accept changes to see this tile')).not.toBeInTheDocument();
+		});
+
+		it('Failed → toast "Simulation unavailable"', async () => {
+			const user = setupUser();
+			renderWithSim(pendingAction(), baseSim('Failed'), { request: baseRequest() });
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(screen.getByText(/simulation unavailable/i)).toBeInTheDocument();
+		});
+
+		it('Invalidated → toast "Simulation is out of date"', async () => {
+			const user = setupUser();
+			renderWithSim(pendingAction(), baseSim('Invalidated'), { request: baseRequest() });
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(screen.getByText(/out of date/i)).toBeInTheDocument();
+		});
+
+		it('terminal request + no simulation → falls through to legacy copy', async () => {
+			const user = setupUser();
+			renderWithSim(pendingAction(), null, {
+				request: baseRequest({ isClosed: true }),
+			});
+			await act(async () => {
+				await user.click(screen.getByRole('button'));
+			});
+			expect(screen.getByText('Accept changes to see this tile')).toBeInTheDocument();
+		});
+
+		it('executed action with current entityId still routes to existing focus path even when sim is Ready', async () => {
+			const user = setupUser();
+			const onSelect = vi.fn();
+			// Action is on current schedule and executed → branch 1 wins.
+			const action = createAction({ afterScheduleId: 'schedule-v2' });
+			renderWithSim(action, baseSim('Ready'), {
+				simulationAction: {
+					actionId: 'action-1',
+					entityId: 'sim-entity',
+					entityType: 'SubCalendarEvent',
+					vibePreviewId: 'p1',
+				},
+				request: baseRequest(),
+				onSelect,
+			});
+			const button = screen.getByRole('button');
+			expect(button.style.cursor).toBe('pointer');
+			await act(async () => {
+				await user.click(button);
+			});
+			// Existing path dispatches FocusEvent — not onSelect.
+			expect(onSelect).not.toHaveBeenCalled();
+		});
+	});
 });

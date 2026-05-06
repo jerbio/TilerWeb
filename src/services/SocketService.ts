@@ -58,6 +58,7 @@ export class SignalRService {
 	private readonly baseUrl = Env.get('BASE_URL');
 	private callBackFunc: { [key: string]: (data: unknown) => void } = {};
 	private scheduleChangeCallbacks: { [key: string]: (data: unknown) => void } = {};
+	private previewReadyCallbacks: { [key: string]: (data: unknown) => void } = {};
 
 	constructor(private userId: string) {}
 
@@ -104,9 +105,35 @@ export class SignalRService {
 		});
 	}
 
+	/**
+	 * Subscribe to `previewReady` events broadcast by the backend
+	 * VibeUpdateHub when a simulation row finishes generating.
+	 * Returns a callback id usable with `unsubscribeFromPreviewReady`.
+	 */
+	public subscribeToPreviewReady(callback: (data: unknown) => void): string {
+		const callbackId = this.generateCallbackId();
+		this.previewReadyCallbacks[callbackId] = callback;
+		return callbackId;
+	}
+
+	public unsubscribeFromPreviewReady(callbackId: string): void {
+		delete this.previewReadyCallbacks[callbackId];
+	}
+
+	private onPreviewReadyReceipt(data: unknown): void {
+		Object.values(this.previewReadyCallbacks).forEach((callback) => {
+			try {
+				callback(data);
+			} catch (err) {
+				console.error('previewReady subscriber threw:', err);
+			}
+		});
+	}
+
 	public unsubscribeAll(): void {
 		this.callBackFunc = {};
 		this.scheduleChangeCallbacks = {};
+		this.previewReadyCallbacks = {};
 	}
 	public dispose(): void {
 		this.unsubscribeAll();
@@ -134,6 +161,7 @@ export class SignalRService {
 		const chat = window.$.connection.vibeUpdateHub;
 		if (chat) {
 			chat.client.refreshDataFromSockets = this.onSocketDataReceipt.bind(this);
+			chat.client.previewReady = this.onPreviewReadyReceipt.bind(this);
 		} else {
 			console.error('vibeUpdateHub proxy is not available');
 		}
