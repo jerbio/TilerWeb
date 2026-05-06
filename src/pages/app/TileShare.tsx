@@ -6,7 +6,7 @@ const TileShare: React.FC = () => {
 	return (
 		<Container>
 			<CalendarUIProvider>
-				<div>TileShare</div>
+				<div></div>
 			</CalendarUIProvider>
 		</Container>
 	);
