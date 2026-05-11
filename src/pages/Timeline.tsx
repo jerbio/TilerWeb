@@ -13,11 +13,13 @@ import { SidePanel, useSidePanelStack } from '@/core/common/components/side-pane
 import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
 import EditCalendarEvent from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEvent';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { useTranslation } from 'react-i18next';
 import {
 	CalendarUIProvider,
 	useCalendarUI,
 } from '@/core/common/components/calendar/calendar-ui.provider';
+import { getMobileReviewSheetSizingCss } from '@/pages/reviewSheetSizing';
 
 const Timeline: React.FC = () => {
 	const navigate = useNavigate();
@@ -60,6 +62,13 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
+	// When the user is reviewing a tilecast on a small viewport we shrink
+	// the side panel to a bottom sheet so the calendar grid becomes visible
+	// in the top portion of the screen. The mobile chat input pill is also
+	// hidden so it doesn't compete with the review panel for vertical space.
+	const inReview = useSimulationOverlayStore((s) => s.inReview);
+	const reviewStop = useSimulationOverlayStore((s) => s.reviewStop);
+	const mobileReview = !isDesktop && inReview;
 	const contentRef = useRef<HTMLDivElement>(null);
 	const [expandedWidth, setExpandedWidth] = useState(0);
 	const [sidePanelExpanded, setSidePanelExpanded] = useState(false);
@@ -116,16 +125,18 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 						width={expandedWidth}
 					/>
 					<CalendarContainerActionButtons>
-						<MobileChatInputWrapper>
-							<MessageCircleIcon>
-								<MessageCircle size={18} />
-							</MessageCircleIcon>
-							<MobileChatInput
-								onClick={() => setMobileChatVisible(!mobileChatVisible)}
-								placeholder={t('calendar.mobileChatInput.placeholder')}
-								readOnly
-							/>
-						</MobileChatInputWrapper>
+						{!mobileReview && (
+							<MobileChatInputWrapper>
+								<MessageCircleIcon>
+									<MessageCircle size={18} />
+								</MessageCircleIcon>
+								<MobileChatInput
+									onClick={() => setMobileChatVisible(!mobileChatVisible)}
+									placeholder={t('calendar.mobileChatInput.placeholder')}
+									readOnly
+								/>
+							</MobileChatInputWrapper>
+						)}
 					</CalendarContainerActionButtons>
 					{isDesktop && (
 						<SidePanelExpandToggle
@@ -171,6 +182,8 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 									style={style}
 									key={item.key}
 									$sidepanelexpanded={sidePanelExpanded}
+									$mobilereview={mobileReview}
+									$reviewstop={reviewStop}
 								>
 									{item.content}
 								</item.container>
@@ -236,7 +249,11 @@ const CalendarContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>`
 	}
 `;
 
-const SidePanelContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>`
+const SidePanelContainer = styled(animated.div)<{
+	$sidepanelexpanded: boolean;
+	$mobilereview?: boolean;
+	$reviewstop?: 'hidden' | 'peek' | 'mid' | 'full';
+}>`
 	position: absolute;
 	z-index: 3;
 	inset: -2px;
@@ -247,12 +264,42 @@ const SidePanelContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>
 	display: ${(props) => (props.$sidepanelexpanded ? 'none' : 'block')};
 	overflow: hidden;
 
+	${(props) => {
+		if (!props.$mobilereview) return '';
+		// Three discrete vertical stops for the mobile review bottom sheet.
+		// Sized in dvh so address-bar collapse on iOS Safari doesn't change
+		// the apparent ratio between sheet and visible calendar grid.
+		const stop = props.$reviewstop ?? 'full';
+		const sizing = getMobileReviewSheetSizingCss(stop);
+		return `
+			top: auto;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			${sizing}
+			border-radius: ${props.theme.borderRadius.xxLarge} ${props.theme.borderRadius.xxLarge} 0 0;
+			border-left: none;
+			border-right: none;
+			border-bottom: none;
+			box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.55);
+			transition: height 0.22s ease, max-height 0.22s ease;
+		`;
+	}}
+
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		position: static;
 		background: transparent;
 		grid-column: span ${(props) => (props.$sidepanelexpanded ? 0 : 4)};
 		border: none;
 		min-height: 0;
+		top: auto;
+		left: auto;
+		right: auto;
+		bottom: auto;
+		height: auto;
+		max-height: none;
+		border-radius: 0;
+		box-shadow: none;
 	}
 	@media screen and (min-width: ${(props) => props.theme.screens.xl}) {
 		grid-column: span ${(props) => (props.$sidepanelexpanded ? 0 : 3)};

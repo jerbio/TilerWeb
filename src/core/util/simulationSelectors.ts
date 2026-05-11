@@ -73,18 +73,22 @@ export function isRequestTerminal(request: VibeRequest | null | undefined): bool
 export function isSimulationReviewable(
 	sim: SimulationDto | null | undefined
 ): sim is SimulationDto {
-	return !!sim && sim.state === 'Ready';
+	return !!sim && sim.state === SimulationState.Ready;
 }
 
 export function isSimulationInProgress(sim: SimulationDto | null | undefined): boolean {
 	if (!sim) return false;
-	return sim.state === 'Queued' || sim.state === 'Processing';
+	return sim.state === SimulationState.Queued || sim.state === SimulationState.Processing;
 }
 
 export function isSimulationTerminal(sim: SimulationDto | null | undefined): boolean {
 	if (!sim) return false;
 	const s: SimulationState = sim.state;
-	return s === 'Ready' || s === 'Failed' || s === 'Invalidated';
+	return (
+		s === SimulationState.Ready ||
+		s === SimulationState.Failed ||
+		s === SimulationState.Invalidated
+	);
 }
 
 /**

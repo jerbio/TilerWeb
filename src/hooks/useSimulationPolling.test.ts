@@ -68,7 +68,9 @@ describe('useSimulationPolling', () => {
 	});
 
 	it('does not poll when current simulation is terminal (Ready)', async () => {
-		renderHook(() => useSimulationPolling(makeRequest(), makeSim('Ready'), vi.fn()));
+		renderHook(() =>
+			useSimulationPolling(makeRequest(), makeSim(SimulationState.Ready), vi.fn())
+		);
 		await act(async () => {
 			await vi.advanceTimersByTimeAsync(5000);
 		});
@@ -76,7 +78,7 @@ describe('useSimulationPolling', () => {
 	});
 
 	it('polls immediately on mount and at the initial interval thereafter', async () => {
-		mockedGet.mockResolvedValue(envelope(makeSim('Processing')));
+		mockedGet.mockResolvedValue(envelope(makeSim(SimulationState.Processing)));
 		const onSim = vi.fn();
 		renderHook(() => useSimulationPolling(makeRequest(), null, onSim));
 		await act(async () => {
@@ -87,11 +89,13 @@ describe('useSimulationPolling', () => {
 			await vi.advanceTimersByTimeAsync(2000);
 		});
 		expect(mockedGet).toHaveBeenCalledTimes(2);
-		expect(onSim).toHaveBeenCalledWith(expect.objectContaining({ state: 'Processing' }));
+		expect(onSim).toHaveBeenCalledWith(
+			expect.objectContaining({ state: SimulationState.Processing })
+		);
 	});
 
 	it('ramps from initial to capped interval after the ramp window', async () => {
-		mockedGet.mockResolvedValue(envelope(makeSim('Processing')));
+		mockedGet.mockResolvedValue(envelope(makeSim(SimulationState.Processing)));
 		renderHook(() =>
 			useSimulationPolling(makeRequest(), null, vi.fn(), {
 				initialIntervalMs: 1000,
@@ -123,8 +127,8 @@ describe('useSimulationPolling', () => {
 	});
 
 	it('stops polling once the simulation transitions to Ready', async () => {
-		mockedGet.mockResolvedValueOnce(envelope(makeSim('Processing')));
-		mockedGet.mockResolvedValueOnce(envelope(makeSim('Ready')));
+		mockedGet.mockResolvedValueOnce(envelope(makeSim(SimulationState.Processing)));
+		mockedGet.mockResolvedValueOnce(envelope(makeSim(SimulationState.Ready)));
 		const onSim = vi.fn();
 		const { rerender } = renderHook(
 			(props: { sim: SimulationDto | null }) =>
@@ -143,7 +147,7 @@ describe('useSimulationPolling', () => {
 		});
 		expect(mockedGet).toHaveBeenCalledTimes(2);
 		// Caller now passes the Ready sim back in.
-		rerender({ sim: makeSim('Ready') });
+		rerender({ sim: makeSim(SimulationState.Ready) });
 		await act(async () => {
 			await vi.advanceTimersByTimeAsync(5000);
 		});
@@ -169,12 +173,12 @@ describe('useSimulationPolling', () => {
 		});
 		expect(mockedGet).toHaveBeenCalledTimes(1);
 		await act(async () => {
-			resolve(envelope(makeSim('Processing')));
+			resolve(envelope(makeSim(SimulationState.Processing)));
 		});
 	});
 
 	it('stops polling on unmount', async () => {
-		mockedGet.mockResolvedValue(envelope(makeSim('Processing')));
+		mockedGet.mockResolvedValue(envelope(makeSim(SimulationState.Processing)));
 		const { unmount } = renderHook(() =>
 			useSimulationPolling(makeRequest(), null, vi.fn(), {
 				initialIntervalMs: 100,
@@ -199,7 +203,7 @@ describe('useSimulationPolling', () => {
 	// would reject (NotFound / 401) the read on a refresh-rehydrated
 	// anonymous session.
 	it('threads `anonymousUserId` through to the default fetcher', async () => {
-		mockedGet.mockResolvedValue(envelope(makeSim('Processing')));
+		mockedGet.mockResolvedValue(envelope(makeSim(SimulationState.Processing)));
 		renderHook(() =>
 			useSimulationPolling(makeRequest(), null, vi.fn(), {
 				anonymousUserId: 'anon-user-42',

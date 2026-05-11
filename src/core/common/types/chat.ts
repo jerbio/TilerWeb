@@ -59,7 +59,13 @@ export interface VibeRequest {
 // "preview"). See SIMULATED_SCHEDULE_EXPERIENCE_EXECUTION_PLAN.md Phase 1.1.
 // ---------------------------------------------------------------------------
 
-export type SimulationState = 'Queued' | 'Processing' | 'Ready' | 'Invalidated' | 'Failed';
+export enum SimulationState {
+	Queued = 'Queued',
+	Processing = 'Processing',
+	Ready = 'Ready',
+	Invalidated = 'Invalidated',
+	Failed = 'Failed',
+}
 
 export interface SimulationActionDto {
 	actionId: string;

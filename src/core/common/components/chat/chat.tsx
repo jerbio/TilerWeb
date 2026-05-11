@@ -23,6 +23,7 @@ import EmailConfirmationModal from '@/core/common/components/email-confirmation/
 import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
+import useIsMobile from '@/core/common/hooks/useIsMobile';
 import ActionPill from '@/core/common/components/chat/ActionPill';
 import SimulationStatusStrip from '@/core/common/components/chat/SimulationStatusStrip';
 import SimulationReviewPanel from '@/core/common/components/chat/SimulationReviewPanel';
@@ -30,6 +31,7 @@ import useSimulationPolling from '@/hooks/useSimulationPolling';
 import {
 	SimulationDto,
 	SimulationScheduleResult,
+	SimulationState,
 	VibeRequest as VibeRequestType,
 	PreviewReadyPayload,
 } from '@/core/common/types/chat';
@@ -83,17 +85,25 @@ const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithA
 const ChatWrapper = styled.section`
 	height: 100%;
 	position: relative;
-`;
-
-const ChatContainer = styled.section`
-	position: absolute;
-	inset: 0;
-	height: 100%;
 	display: flex;
 	flex-direction: column;
-	padding: 1.5rem;
+`;
+
+const ChatContainer = styled.section<{ $mobilereview?: boolean }>`
+	position: ${(props) => (props.$mobilereview ? 'relative' : 'absolute')};
+	inset: ${(props) => (props.$mobilereview ? 'auto' : '0')};
+	flex: ${(props) => (props.$mobilereview ? '1 1 auto' : '0 0 auto')};
+	height: ${(props) => (props.$mobilereview ? 'auto' : '100%')};
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: ${(props) => (props.$mobilereview ? '8px 12px 12px' : '1.5rem')};
 
 	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
+		position: absolute;
+		inset: 0;
+		height: 100%;
+		flex: 0 0 auto;
 		padding: 0;
 	}
 `;
@@ -353,9 +363,24 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	// banner's Exit-review button (and any future surface) stays in sync
 	// with the chat panel. Local writes go through the store API only.
 	const inReview = useSimulationOverlayStore((s) => s.inReview);
+	// Mobile review takeover: when reviewing a tilecast on a small viewport,
+	// hide the chat header, message input, and location card so the review
+	// panel dominates the side panel and the calendar grid (rendered
+	// underneath the absolute-positioned side panel on mobile) becomes
+	// visible above. The Apply / Exit footer inside the review panel
+	// remains the only commit/cancel surface during this state.
+	const isMobileViewport = useIsMobile(parseInt(theme.screens.lg, 10));
+	const isMobileReview = isMobileViewport && inReview;
 	const [isLoadingSimulationResult, setIsLoadingSimulationResult] = useState(false);
 	const [simulationResultError, setSimulationResultError] = useState<string | null>(null);
 	const simulationResultIdRef = useRef<string | null>(null);
+	// Tracks an in-flight prefetch (or click-driven fetch) for a given
+	// simulation id so concurrent calls to `enterReview` reuse the same
+	// promise instead of issuing a duplicate `api/Vibe/Preview` request.
+	const simulationResultPromiseRef = useRef<{
+		id: string;
+		promise: Promise<SimulationScheduleResult | null>;
+	} | null>(null);
 
 	// Plan §5.3.2 / §5.3.4 / §5.3.5 — when a simulation chip is selected (or
 	// a tile is clicked, since both write through the same store) ask the
@@ -397,7 +422,66 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			setSimulationResult(null);
 			simulationResultIdRef.current = null;
 		}
+		// A new simulation invalidates any in-flight prefetch promise too.
+		if (
+			simulationResultPromiseRef.current &&
+			simulationResultPromiseRef.current.id !== currentSimId
+		) {
+			simulationResultPromiseRef.current = null;
+		}
 	}, [simulation?.id]);
+
+	// Shared fetch helper — kicks off (or returns the existing) GET
+	// api/Vibe/Preview request for `simulation.id` and caches the result so
+	// both the background prefetch and the click-driven `enterReview` flow
+	// observe a single round-trip.
+	const ensureSimulationResult = useCallback(
+		(sim: SimulationDto): Promise<SimulationScheduleResult | null> => {
+			if (simulationResult != null && simulationResultIdRef.current === sim.id) {
+				return Promise.resolve(simulationResult);
+			}
+			if (
+				simulationResultPromiseRef.current &&
+				simulationResultPromiseRef.current.id === sim.id
+			) {
+				return simulationResultPromiseRef.current.promise;
+			}
+			const promise = (async () => {
+				try {
+					const resp = await chatService.getSimulationResult(sim.id);
+					const content = (resp?.Content ?? null) as SimulationScheduleResult | null;
+					if (content) {
+						setSimulationResult(content);
+						simulationResultIdRef.current = sim.id;
+					}
+					return content;
+				} finally {
+					if (
+						simulationResultPromiseRef.current &&
+						simulationResultPromiseRef.current.id === sim.id
+					) {
+						simulationResultPromiseRef.current = null;
+					}
+				}
+			})();
+			simulationResultPromiseRef.current = { id: sim.id, promise };
+			return promise;
+		},
+		[simulationResult]
+	);
+
+	// Background prefetch — as soon as we know the simulation is Ready we
+	// fire the `api/Vibe/Preview` GET so that clicking "Review Simulation"
+	// resolves instantly. Errors are swallowed here; if the user clicks
+	// Review and the preview still isn't cached, `enterReview` will retry
+	// and surface the failure through the existing error path.
+	useEffect(() => {
+		if (!simulation || simulation.state !== SimulationState.Ready) return;
+		if (simulationResultIdRef.current === simulation.id) return;
+		void ensureSimulationResult(simulation).catch((err) => {
+			console.warn('Simulation result prefetch failed', err);
+		});
+	}, [simulation, ensureSimulationResult]);
 
 	const enterReview = useCallback(async () => {
 		if (!simulation) return;
@@ -413,11 +497,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		setIsLoadingSimulationResult(true);
 		setSimulationResultError(null);
 		try {
-			const resp = await chatService.getSimulationResult(simulation.id);
-			const content = (resp?.Content ?? null) as SimulationScheduleResult | null;
+			const content = await ensureSimulationResult(simulation);
 			if (content) {
-				setSimulationResult(content);
-				simulationResultIdRef.current = simulation.id;
 				if (vibeRequest) {
 					useSimulationOverlayStore
 						.getState()
@@ -435,7 +516,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		} finally {
 			setIsLoadingSimulationResult(false);
 		}
-	}, [simulation, simulationResult, vibeRequest]);
+	}, [simulation, simulationResult, vibeRequest, ensureSimulationResult]);
 
 	const exitReview = useCallback(() => {
 		useSimulationOverlayStore.getState().exitReview();
@@ -485,6 +566,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		setSimulation(null);
 		setSimulationResult(null);
 		simulationResultIdRef.current = null;
+		simulationResultPromiseRef.current = null;
 		setSimulationResultError(null);
 		useSimulationOverlayStore.getState().exitReview();
 		let cancelled = false;
@@ -1157,6 +1239,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			setSimulation(null);
 			setSimulationResult(null);
 			simulationResultIdRef.current = null;
+			simulationResultPromiseRef.current = null;
 			setSimulationResultError(null);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
@@ -1235,161 +1318,168 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 	return (
 		<ChatWrapper>
-			<ChatContainer>
-				<ChatHeader>
-					<ChatHeaderLeft>
-						{onClose && (
-							<Button variant="ghost" height={32} onClick={onClose}>
-								<ChevronLeftIcon size={16} />
-								<span>{t('common.buttons.back')}</span>
-							</Button>
-						)}
-						<HistoryButton
-							onClick={() => setShowSessionHistory(true)}
-							title={t('home.expanded.chat.sessionHistory.title')}
-						>
-							<History size={18} />
-						</HistoryButton>
-					</ChatHeaderLeft>
+			<ChatContainer $mobilereview={isMobileReview}>
+				{!isMobileReview && (
+					<ChatHeader>
+						<ChatHeaderLeft>
+							{onClose && (
+								<Button variant="ghost" height={32} onClick={onClose}>
+									<ChevronLeftIcon size={16} />
+									<span>{t('common.buttons.back')}</span>
+								</Button>
+							)}
+							<HistoryButton
+								onClick={() => setShowSessionHistory(true)}
+								title={t('home.expanded.chat.sessionHistory.title')}
+							>
+								<History size={18} />
+							</HistoryButton>
+						</ChatHeaderLeft>
 
-					<ChatHeaderCenter>
-						{currentSessionTitle && (
-							<SessionTitleDisplay title={currentSessionTitle}>
-								{currentSessionTitle}
-							</SessionTitleDisplay>
-						)}
-					</ChatHeaderCenter>
+						<ChatHeaderCenter>
+							{currentSessionTitle && (
+								<SessionTitleDisplay title={currentSessionTitle}>
+									{currentSessionTitle}
+								</SessionTitleDisplay>
+							)}
+						</ChatHeaderCenter>
 
-					<ChatHeaderRight>
-						{chatContext.length > 0 && (
-							<ChatContextChips>
-								{chatContext.map((context, index) => (
-									<Button
-										key={index}
-										variant="outline"
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'space-between',
-											padding: '0.25rem 0.5rem',
-											border: '1px solid currentColor',
-											fontSize: theme.typography.fontSize.xs,
-										}}
-									>
-										<span>{context.Name}</span>
-										<span
-											onClick={() => handleRemoveContext(context)}
+						<ChatHeaderRight>
+							{chatContext.length > 0 && (
+								<ChatContextChips>
+									{chatContext.map((context, index) => (
+										<Button
+											key={index}
+											variant="outline"
 											style={{
-												marginLeft: '0.5rem',
-												color: 'red',
-												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'space-between',
+												padding: '0.25rem 0.5rem',
+												border: '1px solid currentColor',
+												fontSize: theme.typography.fontSize.xs,
 											}}
 										>
-											x
-										</span>
-									</Button>
-								))}
-							</ChatContextChips>
-						)}
-						<NewChatHeaderButton
-							onClick={handleNewChat}
-							title={t('home.expanded.chat.newChat')}
-						>
-							<SquarePen size={18} />
-						</NewChatHeaderButton>
-					</ChatHeaderRight>
-				</ChatHeader>
-				<ChatContent>
-					{isLoading && (
-						<LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
-					)}
-					{isBatchLoading && (
-						<LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
-					)}
-
-					{error && (
-						<div className="chat-error">
-							{t('home.expanded.chat.error')}: {error}
-						</div>
-					)}
-
-					{!isLoading && !error && !messages.length && (
-						<EmptyChat>
-							<Logo size={48} />
-							<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
-							<p>{t('home.expanded.chat.emptyStateDescription')}</p>
-						</EmptyChat>
-					)}
-
-					<div
-						className="messages-list"
-						ref={messagesListRef}
-						data-onboarding-chat-messages
-					>
-						{messages.map((message) => (
-							<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-								<div className="message-content">
-									<MarkdownRenderer content={message.content} />
-								</div>
-
-								{message.actions
-									?.filter(
-										(action) =>
-											action.type !== 'conversational_and_not_supported'
-									)
-									.map((action) => {
-										const sim = simulation;
-										const simAction = sim
-											? buildSimulationActionLookups(sim).byActionId[
-													action.id
-												]
-											: undefined;
-										return (
-											<ActionPill
-												key={action.id}
-												action={action}
-												simulation={sim}
-												request={vibeRequest}
-												simulationAction={simAction}
-												onSelect={(a, sa) => {
-													// Prefer wire `actionId`; fall back to the
-													// embedded VibeAction.id and finally the source
-													// action.id so older payloads still wire up.
-													const id =
-														sa?.actionId ?? sa?.action?.id ?? a.id;
-													if (id) setSelectedActionId(id);
+											<span>{context.Name}</span>
+											<span
+												onClick={() => handleRemoveContext(context)}
+												style={{
+													marginLeft: '0.5rem',
+													color: 'red',
+													cursor: 'pointer',
 												}}
-											/>
-										);
-									})}
-							</MessageBubble>
-						))}
-					</div>
+											>
+												x
+											</span>
+										</Button>
+									))}
+								</ChatContextChips>
+							)}
+							<NewChatHeaderButton
+								onClick={handleNewChat}
+								title={t('home.expanded.chat.newChat')}
+							>
+								<SquarePen size={18} />
+							</NewChatHeaderButton>
+						</ChatHeaderRight>
+					</ChatHeader>
+				)}
+				{!inReview && (
+					<ChatContent>
+						{isLoading && (
+							<LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
+						)}
+						{isBatchLoading && (
+							<LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
+						)}
 
-					<div ref={messagesEndRef} />
-				</ChatContent>
+						{error && (
+							<div className="chat-error">
+								{t('home.expanded.chat.error')}: {error}
+							</div>
+						)}
+
+						{!isLoading && !error && !messages.length && (
+							<EmptyChat>
+								<Logo size={48} />
+								<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+								<p>{t('home.expanded.chat.emptyStateDescription')}</p>
+							</EmptyChat>
+						)}
+
+						<div
+							className="messages-list"
+							ref={messagesListRef}
+							data-onboarding-chat-messages
+						>
+							{messages.map((message) => (
+								<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
+									<div className="message-content">
+										<MarkdownRenderer content={message.content} />
+									</div>
+
+									{message.actions
+										?.filter(
+											(action) =>
+												action.type !== 'conversational_and_not_supported'
+										)
+										.map((action) => {
+											const sim = simulation;
+											const simAction = sim
+												? buildSimulationActionLookups(sim).byActionId[
+														action.id
+													]
+												: undefined;
+											return (
+												<ActionPill
+													key={action.id}
+													action={action}
+													simulation={sim}
+													request={vibeRequest}
+													simulationAction={simAction}
+													onSelect={(a, sa) => {
+														// Prefer wire `actionId`; fall back to the
+														// embedded VibeAction.id and finally the source
+														// action.id so older payloads still wire up.
+														const id =
+															sa?.actionId ?? sa?.action?.id ?? a.id;
+														if (id) setSelectedActionId(id);
+													}}
+												/>
+											);
+										})}
+								</MessageBubble>
+							))}
+						</div>
+
+						<div ref={messagesEndRef} />
+					</ChatContent>
+				)}
 
 				{/* Render chatContext buttons */}
 				<div style={{ marginBottom: '0.25rem' }}></div>
 
 				<div>
-					{isSending && (
+					{!inReview && isSending && (
 						<LoadingIndicator
 							message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
 							wsStatus={wsStatusKey}
 						/>
 					)}
-					<SimulationStatusStrip
-						// Plan §6.6.3 supersession is now centralized in
-						// `isRequestTerminal` (selector check inside the strip),
-						// so we can pass the live simulation through and let
-						// the strip's hide-when-terminal branch take over.
-						simulation={simulation}
-						request={vibeRequest}
-						onReview={enterReview}
-						fetchError={simulationResultError}
-						onRetry={simulationResultError ? enterReview : undefined}
-					/>
+					{!inReview && (
+						<SimulationStatusStrip
+							// Plan §6.6.3 supersession is now centralized in
+							// `isRequestTerminal` (selector check inside the strip),
+							// so we can pass the live simulation through and let
+							// the strip's hide-when-terminal branch take over.
+							simulation={simulation}
+							request={vibeRequest}
+							onReview={enterReview}
+							fetchError={simulationResultError}
+							onRetry={simulationResultError ? enterReview : undefined}
+							isLoadingReview={isLoadingSimulationResult}
+						/>
+					)}
 					{inReview &&
 						simulation &&
 						vibeRequest &&
@@ -1415,7 +1505,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 								)}
 							</div>
 						))}
-					{((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
+					{!inReview && ((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
 						<Button
 							variant="primary"
 							onClick={() => acceptAllChanges()}
@@ -1427,37 +1517,47 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				</div>
 
 				{/* Show prompt suggestions when input field is empty */}
-				{!message.trim() && <PromptSuggestions onPromptClick={handlePromptClick} />}
+				{!inReview && !message.trim() && (
+					<PromptSuggestions onPromptClick={handlePromptClick} />
+				)}
 
-				<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
-					<Input.Textarea
-						value={message}
-						onChange={(e) => setMessage(e.target.value)}
-						onKeyDown={(e) => {
-							// Submit form on Enter key press without Shift key
-							if (e.key === 'Enter' && !e.shiftKey) {
-								e.preventDefault(); // Prevent new line
+				{!isMobileReview && (
+					<>
+						<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
+							<Input.Textarea
+								value={message}
+								onChange={(e) => setMessage(e.target.value)}
+								onKeyDown={(e) => {
+									// Submit form on Enter key press without Shift key
+									if (e.key === 'Enter' && !e.shiftKey) {
+										e.preventDefault(); // Prevent new line
 
-								// Use form.requestSubmit() instead of handleSubmit directly
-								// This triggers a single form submission through the standard form mechanism
-								const form = e.currentTarget.form;
-								if (form) form.requestSubmit();
-							}
-						}}
-						placeholder={t('home.expanded.chat.inputPlaceholder')}
-						disabled={isSending}
-						bordergradient={[theme.colors.brand[500]]}
-						height={50} // Set a fixed height for consistent alignment
-					/>
-					<ChatButton
-						type="submit"
-						disabled={isSending || !message.trim()}
-						data-onboarding-chat-button
-					>
-						{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
-					</ChatButton>
-				</ChatForm>
-				<UserLocation />
+										// Use form.requestSubmit() instead of handleSubmit directly
+										// This triggers a single form submission through the standard form mechanism
+										const form = e.currentTarget.form;
+										if (form) form.requestSubmit();
+									}
+								}}
+								placeholder={t('home.expanded.chat.inputPlaceholder')}
+								disabled={isSending}
+								bordergradient={[theme.colors.brand[500]]}
+								height={50} // Set a fixed height for consistent alignment
+							/>
+							<ChatButton
+								type="submit"
+								disabled={isSending || !message.trim()}
+								data-onboarding-chat-button
+							>
+								{isSending ? (
+									<CircleStop size={20} />
+								) : (
+									<SendHorizontal size={20} />
+								)}
+							</ChatButton>
+						</ChatForm>
+						<UserLocation />
+					</>
+				)}
 			</ChatContainer>
 
 			{anonymousUserId && (

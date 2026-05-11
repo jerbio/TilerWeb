@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import { ChatApi } from '../chatApi';
 import type { ChatMessagesResponse } from '@/core/common/types/chat';
+import { SimulationState } from '@/core/common/types/chat';
 
 vi.mock('@/config/config_getter', () => ({
 	Env: {
@@ -118,7 +119,7 @@ describe('ChatApi', () => {
 							vibeRequestId: 'req-1',
 							tilerUserId: 'u',
 							creationTimeInMs: 100,
-							state: 'Ready',
+							state: SimulationState.Ready,
 							previewActions: [],
 						},
 					},
@@ -135,7 +136,7 @@ describe('ChatApi', () => {
 		expect(result.Content.vibeRequests).toBeDefined();
 		expect(result.Content.vibeRequests).toHaveLength(1);
 		expect(result.Content.vibeRequests?.[0].id).toBe('req-1');
-		expect(result.Content.vibeRequests?.[0].preview?.state).toBe('Ready');
+		expect(result.Content.vibeRequests?.[0].preview?.state).toBe(SimulationState.Ready);
 	});
 
 	// Plan §6.6.5 / §7.3 — anonymous-user threading on the per-request

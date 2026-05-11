@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { setupUser } from '@/test/test-utils';
 import ActionPill from './ActionPill';
-import { VibeAction } from '@/core/common/types/chat';
+import { VibeAction, SimulationState, SimulationDto } from '@/core/common/types/chat';
 import { Actions, Status } from '@/core/constants/enums';
 import {
 	CalendarRequestProvider,
@@ -587,9 +587,7 @@ describe('ActionPill schedule consistency', () => {
 			...overrides,
 		});
 
-		const baseSim = (
-			state: import('@/core/common/types/chat').SimulationState
-		): import('@/core/common/types/chat').SimulationDto => ({
+		const baseSim = (state: SimulationState): SimulationDto => ({
 			id: 'p1',
 			vibeRequestId: 'r1',
 			tilerUserId: 'u',
@@ -607,7 +605,7 @@ describe('ActionPill schedule consistency', () => {
 				entityType: 'SubCalendarEvent',
 				vibePreviewId: 'p1',
 			};
-			renderWithSim(pendingAction(), baseSim('Ready'), {
+			renderWithSim(pendingAction(), baseSim(SimulationState.Ready), {
 				simulationAction: simAction,
 				request: baseRequest(),
 				onSelect,
@@ -626,7 +624,7 @@ describe('ActionPill schedule consistency', () => {
 		it('Processing → toast "still being simulated", no onSelect', async () => {
 			const user = setupUser();
 			const onSelect = vi.fn();
-			renderWithSim(pendingAction(), baseSim('Processing'), {
+			renderWithSim(pendingAction(), baseSim(SimulationState.Processing), {
 				request: baseRequest(),
 				onSelect,
 			});
@@ -639,7 +637,9 @@ describe('ActionPill schedule consistency', () => {
 
 		it('Queued → toast "still being simulated"', async () => {
 			const user = setupUser();
-			renderWithSim(pendingAction(), baseSim('Queued'), { request: baseRequest() });
+			renderWithSim(pendingAction(), baseSim(SimulationState.Queued), {
+				request: baseRequest(),
+			});
 			await act(async () => {
 				await user.click(screen.getByRole('button'));
 			});
@@ -659,7 +659,9 @@ describe('ActionPill schedule consistency', () => {
 
 		it('Failed → toast "Simulation unavailable"', async () => {
 			const user = setupUser();
-			renderWithSim(pendingAction(), baseSim('Failed'), { request: baseRequest() });
+			renderWithSim(pendingAction(), baseSim(SimulationState.Failed), {
+				request: baseRequest(),
+			});
 			await act(async () => {
 				await user.click(screen.getByRole('button'));
 			});
@@ -668,7 +670,9 @@ describe('ActionPill schedule consistency', () => {
 
 		it('Invalidated → toast "Simulation is out of date"', async () => {
 			const user = setupUser();
-			renderWithSim(pendingAction(), baseSim('Invalidated'), { request: baseRequest() });
+			renderWithSim(pendingAction(), baseSim(SimulationState.Invalidated), {
+				request: baseRequest(),
+			});
 			await act(async () => {
 				await user.click(screen.getByRole('button'));
 			});
@@ -691,7 +695,7 @@ describe('ActionPill schedule consistency', () => {
 			const onSelect = vi.fn();
 			// Action is on current schedule and executed → branch 1 wins.
 			const action = createAction({ afterScheduleId: 'schedule-v2' });
-			renderWithSim(action, baseSim('Ready'), {
+			renderWithSim(action, baseSim(SimulationState.Ready), {
 				simulationAction: {
 					actionId: 'action-1',
 					entityId: 'sim-entity',

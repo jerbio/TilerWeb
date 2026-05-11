@@ -9,7 +9,8 @@ import { buildSimulationDiff, entityKey } from '@/core/util/simulationDiff';
 import { buildSimulationActionLookups } from '@/core/util/simulationSelectors';
 import SimulationModeBanner from './SimulationModeBanner';
 import { SubCalendarEvent } from '@/core/common/types/schedule';
-import { CalendarEntityType } from './calendarRequestContext';
+import { CalendarEntityType, CalendarRequestType } from './calendarRequestContext';
+import { useCalendarDispatch } from './CalendarRequestProvider';
 
 export function CalendarWrapper({
 	chatExpanded,
@@ -94,6 +95,7 @@ export function CalendarWrapper({
 		[simulation]
 	);
 
+	const calendarDispatch = useCalendarDispatch();
 	const onSimulatedTileClick = useCallback(
 		(entityId: string, entityType: CalendarEntityType) => {
 			if (!lookups) return;
@@ -103,8 +105,18 @@ export function CalendarWrapper({
 			// the embedded `action.id` so the chip↔tile round-trip still works.
 			const aid = action.actionId ?? action.action?.id ?? null;
 			if (aid) setSelectedActionId(aid);
+			// Always dispatch FocusEvent for the direct user gesture so the
+			// preview popout opens even when this id is already the current
+			// `selectedActionId` (in which case the store-driven debounced
+			// effect in chat.tsx would short-circuit on equality).
+			calendarDispatch({
+				type: CalendarRequestType.FocusEvent,
+				entityId,
+				entityType,
+				actionType: action.action?.type ?? 'none',
+			});
 		},
-		[lookups, setSelectedActionId]
+		[lookups, setSelectedActionId, calendarDispatch]
 	);
 
 	const selectedSimulationKey = useMemo(() => {

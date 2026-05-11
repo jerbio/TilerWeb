@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import ChatService from '../chatService';
 import type { ChatApi } from '@/api/chatApi';
 import type { ChatMessagesResponse, SimulationDto, VibeRequest } from '@/core/common/types/chat';
+import { SimulationState } from '@/core/common/types/chat';
 import {
 	primeSimulationFromRequest,
 	isRequestTerminal,
@@ -83,7 +84,10 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 				Content: {
 					chats: [],
 					vibeRequests: [
-						makeRequest({ id: 'req-A', preview: makeSim('Ready', 'p-A', 'req-A') }),
+						makeRequest({
+							id: 'req-A',
+							preview: makeSim(SimulationState.Ready, 'p-A', 'req-A'),
+						}),
 					],
 				},
 				ServerStatus: null,
@@ -102,7 +106,7 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 
 		const result = await rehydrateRequest('req-A', cache, service);
 		expect(result.cacheHit).toBe(true);
-		expect(result.primedSimulation?.state).toBe('Ready');
+		expect(result.primedSimulation?.state).toBe(SimulationState.Ready);
 		expect(chatApiMock.getVibeRequest).not.toHaveBeenCalled();
 		expect(chatApiMock.getSimulationForRequest).not.toHaveBeenCalled();
 	});
@@ -119,7 +123,7 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 					vibeRequests: [
 						makeRequest({
 							id: 'req-P',
-							preview: makeSim('Processing', 'p-P', 'req-P'),
+							preview: makeSim(SimulationState.Processing, 'p-P', 'req-P'),
 						}),
 					],
 				},
@@ -139,7 +143,7 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 		// Polling should keep ticking — neither request nor sim is terminal.
 		expect(isRequestTerminal(result.request)).toBe(false);
 		expect(isSimulationTerminal(result.primedSimulation)).toBe(false);
-		expect(result.primedSimulation?.state).toBe('Processing');
+		expect(result.primedSimulation?.state).toBe(SimulationState.Processing);
 	});
 
 	// Plan §7.3 scenario 8 — refresh after applying a request: history
@@ -155,7 +159,7 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 							id: 'req-X',
 							isClosed: true,
 							state: 'Executed',
-							preview: makeSim('Ready', 'p-X', 'req-X'),
+							preview: makeSim(SimulationState.Ready, 'p-X', 'req-X'),
 						}),
 					],
 				},
@@ -185,7 +189,7 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 			'req-S': makeRequest({
 				id: 'req-S',
 				supersededByRequestId: 'req-T',
-				preview: makeSim('Ready', 'p-S', 'req-S'),
+				preview: makeSim(SimulationState.Ready, 'p-S', 'req-S'),
 			}),
 		};
 		const chatApiMock = {
@@ -204,7 +208,10 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 	// refresh into a request not in the most recent batch), fall back to
 	// a single getVibeRequest round-trip and seed the cache for next time.
 	it('falls back to getVibeRequest on cache miss and stores result for next lookup', async () => {
-		const fetched = makeRequest({ id: 'req-M', preview: makeSim('Ready', 'p-M', 'req-M') });
+		const fetched = makeRequest({
+			id: 'req-M',
+			preview: makeSim(SimulationState.Ready, 'p-M', 'req-M'),
+		});
 		const chatApiMock = {
 			getVibeRequest: vi.fn().mockResolvedValue({
 				Error: { Code: '0', Message: 'SUCCESS' },
@@ -217,7 +224,7 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 
 		const first = await rehydrateRequest('req-M', cache, service);
 		expect(first.cacheHit).toBe(false);
-		expect(first.primedSimulation?.state).toBe('Ready');
+		expect(first.primedSimulation?.state).toBe(SimulationState.Ready);
 		expect(chatApiMock.getVibeRequest).toHaveBeenCalledTimes(1);
 
 		const second = await rehydrateRequest('req-M', cache, service);
@@ -228,13 +235,11 @@ describe('Phase 7.3 — chat rehydration integration', () => {
 	// Plan §6.6.5 — anonymous user threading on the polling fetch.
 	it('threads anonymousUserId through getSimulationForRequest at the service layer', async () => {
 		const chatApiMock = {
-			getSimulationForRequest: vi
-				.fn()
-				.mockResolvedValue({
-					Error: null,
-					Content: makeSim('Processing'),
-					ServerStatus: null,
-				}),
+			getSimulationForRequest: vi.fn().mockResolvedValue({
+				Error: null,
+				Content: makeSim(SimulationState.Processing),
+				ServerStatus: null,
+			}),
 		} as unknown as ChatApi;
 		const service = new ChatService(chatApiMock);
 

@@ -8,6 +8,7 @@ import StatusOverlay, { StatusOverlayVariant } from '@/core/common/components/ch
 import {
 	SimulationActionDto,
 	SimulationDto,
+	SimulationState,
 	VibeAction,
 	VibeRequest,
 } from '@/core/common/types/chat';
@@ -172,13 +173,16 @@ const ActionPill: React.FC<ActionPillProps> = ({
 			}
 
 			// Branch 2 — Ready simulation with a resolved preview action.
-			if (simulation?.state === 'Ready' && simulationAction && onSelect) {
+			if (simulation?.state === SimulationState.Ready && simulationAction && onSelect) {
 				onSelect(action, simulationAction);
 				return;
 			}
 
 			// Branch 3 — simulation in progress.
-			if (simulation?.state === 'Queued' || simulation?.state === 'Processing') {
+			if (
+				simulation?.state === SimulationState.Queued ||
+				simulation?.state === SimulationState.Processing
+			) {
 				showOverlay(
 					t(
 						'home.expanded.chat.simulationInProgress',
@@ -199,7 +203,7 @@ const ActionPill: React.FC<ActionPillProps> = ({
 			}
 
 			// Branch 5 — simulation failed.
-			if (simulation?.state === 'Failed') {
+			if (simulation?.state === SimulationState.Failed) {
 				showOverlay(
 					t('home.expanded.chat.simulationFailed', 'Simulation unavailable'),
 					'warning'
@@ -208,7 +212,7 @@ const ActionPill: React.FC<ActionPillProps> = ({
 			}
 
 			// Branch 6 — simulation invalidated by a newer request.
-			if (simulation?.state === 'Invalidated') {
+			if (simulation?.state === SimulationState.Invalidated) {
 				showOverlay(
 					t('home.expanded.chat.simulationStale', 'Simulation is out of date'),
 					'warning'

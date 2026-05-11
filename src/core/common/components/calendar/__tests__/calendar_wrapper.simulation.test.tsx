@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { render } from '@/test/test-utils';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { CalendarUIProvider } from '../calendar-ui.provider';
+import { CalendarRequestProvider } from '../CalendarRequestProvider';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import fixture from '@/test/fixtures/vibePreviewResponse.json';
 import type {
@@ -11,6 +12,7 @@ import type {
 	SimulationScheduleResult,
 	VibeRequest,
 } from '@/core/common/types/chat';
+import { SimulationState } from '@/core/common/types/chat';
 
 // ---------------------------------------------------------------------------
 // Mock heavy dependencies — we only care that <Calendar /> receives the
@@ -58,9 +60,11 @@ import { CalendarWrapper } from '../calendar_wrapper';
 const renderWrapper = () =>
 	render(
 		<ThemeProvider>
-			<CalendarUIProvider>
-				<CalendarWrapper userId="user-1" width={1024} />
-			</CalendarUIProvider>
+			<CalendarRequestProvider>
+				<CalendarUIProvider>
+					<CalendarWrapper userId="user-1" width={1024} />
+				</CalendarUIProvider>
+			</CalendarRequestProvider>
 		</ThemeProvider>
 	);
 
@@ -96,7 +100,7 @@ describe('CalendarWrapper — simulation overlay wire contract', () => {
 			vibeRequestId: 'vibe-request-fixture-id',
 			tilerUserId: 'user-1',
 			creationTimeInMs: 1714800000000,
-			state: 'Ready',
+			state: SimulationState.Ready,
 			previewActions: [],
 		};
 		const vibeRequest: VibeRequest = {
@@ -143,7 +147,7 @@ describe('CalendarWrapper — simulation overlay wire contract', () => {
 			vibeRequestId: 'vibe-request-fixture-id',
 			tilerUserId: 'user-1',
 			creationTimeInMs: 1714800000000,
-			state: 'Ready',
+			state: SimulationState.Ready,
 			previewActions,
 		};
 		const vibeRequest: VibeRequest = {
@@ -222,7 +226,7 @@ describe('CalendarWrapper — simulation overlay wire contract', () => {
 			vibeRequestId: 'v',
 			tilerUserId: 'user-1',
 			creationTimeInMs: 1714800000000,
-			state: 'Ready',
+			state: SimulationState.Ready,
 			previewActions: [],
 		};
 		const vibeRequest: VibeRequest = {

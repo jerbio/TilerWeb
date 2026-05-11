@@ -31,7 +31,7 @@ function makeSimulation(overrides: Partial<SimulationDto> = {}): SimulationDto {
 		vibeRequestId: 'r1',
 		tilerUserId: 'u1',
 		creationTimeInMs: 1,
-		state: 'Ready' as SimulationState,
+		state: SimulationState.Ready,
 		previewActions: [],
 		...overrides,
 	};
@@ -124,22 +124,32 @@ describe('isRequestTerminal', () => {
 
 describe('isSimulationReviewable / InProgress / Terminal', () => {
 	it('reviewable only when state === Ready', () => {
-		expect(isSimulationReviewable(makeSimulation({ state: 'Ready' }))).toBe(true);
-		expect(isSimulationReviewable(makeSimulation({ state: 'Processing' }))).toBe(false);
+		expect(isSimulationReviewable(makeSimulation({ state: SimulationState.Ready }))).toBe(true);
+		expect(isSimulationReviewable(makeSimulation({ state: SimulationState.Processing }))).toBe(
+			false
+		);
 		expect(isSimulationReviewable(null)).toBe(false);
 	});
 
 	it('inProgress for Queued/Processing only', () => {
-		expect(isSimulationInProgress(makeSimulation({ state: 'Queued' }))).toBe(true);
-		expect(isSimulationInProgress(makeSimulation({ state: 'Processing' }))).toBe(true);
-		expect(isSimulationInProgress(makeSimulation({ state: 'Ready' }))).toBe(false);
+		expect(isSimulationInProgress(makeSimulation({ state: SimulationState.Queued }))).toBe(
+			true
+		);
+		expect(isSimulationInProgress(makeSimulation({ state: SimulationState.Processing }))).toBe(
+			true
+		);
+		expect(isSimulationInProgress(makeSimulation({ state: SimulationState.Ready }))).toBe(
+			false
+		);
 	});
 
 	it('terminal for Ready/Failed/Invalidated', () => {
-		expect(isSimulationTerminal(makeSimulation({ state: 'Ready' }))).toBe(true);
-		expect(isSimulationTerminal(makeSimulation({ state: 'Failed' }))).toBe(true);
-		expect(isSimulationTerminal(makeSimulation({ state: 'Invalidated' }))).toBe(true);
-		expect(isSimulationTerminal(makeSimulation({ state: 'Queued' }))).toBe(false);
+		expect(isSimulationTerminal(makeSimulation({ state: SimulationState.Ready }))).toBe(true);
+		expect(isSimulationTerminal(makeSimulation({ state: SimulationState.Failed }))).toBe(true);
+		expect(isSimulationTerminal(makeSimulation({ state: SimulationState.Invalidated }))).toBe(
+			true
+		);
+		expect(isSimulationTerminal(makeSimulation({ state: SimulationState.Queued }))).toBe(false);
 	});
 });
 
@@ -151,15 +161,15 @@ describe('primeSimulationFromRequest', () => {
 	});
 
 	it('falls back to first non-invalidated entry in previews[]', () => {
-		const inv = makeSimulation({ id: 'pInv', state: 'Invalidated' });
-		const ready = makeSimulation({ id: 'pReady', state: 'Ready' });
+		const inv = makeSimulation({ id: 'pInv', state: SimulationState.Invalidated });
+		const ready = makeSimulation({ id: 'pReady', state: SimulationState.Ready });
 		const req = makeRequest({ previews: [inv, ready] });
 		expect(primeSimulationFromRequest(req)?.id).toBe('pReady');
 	});
 
 	it('returns first entry if all are invalidated', () => {
-		const inv1 = makeSimulation({ id: 'p1', state: 'Invalidated' });
-		const inv2 = makeSimulation({ id: 'p2', state: 'Invalidated' });
+		const inv1 = makeSimulation({ id: 'p1', state: SimulationState.Invalidated });
+		const inv2 = makeSimulation({ id: 'p2', state: SimulationState.Invalidated });
 		const req = makeRequest({ previews: [inv1, inv2] });
 		expect(primeSimulationFromRequest(req)?.id).toBe('p1');
 	});

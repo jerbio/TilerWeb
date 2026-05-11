@@ -64,9 +64,22 @@ describe('SimulationStatusStrip', () => {
 		expect(container).toBeEmptyDOMElement();
 	});
 
+	// Regression: home-page first paint with no chat session loaded yet
+	// passed `simulation=null, request=null` and the strip used to fall
+	// through to "Simulation starting…". It must stay hidden until there
+	// is an actual in-flight request.
+	it('renders nothing when there is no simulation AND no request (initial home load)', () => {
+		const { container } = renderStrip({
+			simulation: null,
+			request: null,
+			onReview: vi.fn(),
+		});
+		expect(container).toBeEmptyDOMElement();
+	});
+
 	it('renders nothing when simulation is Invalidated', () => {
 		const { container } = renderStrip({
-			simulation: makeSim('Invalidated'),
+			simulation: makeSim(SimulationState.Invalidated),
 			request: makeRequest(),
 			onReview: vi.fn(),
 		});
@@ -75,7 +88,7 @@ describe('SimulationStatusStrip', () => {
 
 	it('shows queued copy with spinner', () => {
 		renderStrip({
-			simulation: makeSim('Queued'),
+			simulation: makeSim(SimulationState.Queued),
 			request: makeRequest(),
 			onReview: vi.fn(),
 		});
@@ -85,7 +98,7 @@ describe('SimulationStatusStrip', () => {
 
 	it('shows generating copy when Processing', () => {
 		renderStrip({
-			simulation: makeSim('Processing'),
+			simulation: makeSim(SimulationState.Processing),
 			request: makeRequest(),
 			onReview: vi.fn(),
 		});
@@ -93,7 +106,7 @@ describe('SimulationStatusStrip', () => {
 	});
 
 	it('shows ready copy with action count and Review button', () => {
-		const sim = makeSim('Ready', {
+		const sim = makeSim(SimulationState.Ready, {
 			previewActions: [
 				{ actionId: 'a', vibePreviewId: 'p1' },
 				{ actionId: 'b', vibePreviewId: 'p1' },
@@ -106,24 +119,24 @@ describe('SimulationStatusStrip', () => {
 			onReview: vi.fn(),
 		});
 		expect(screen.getByText(/3 changes/i)).toBeInTheDocument();
-		expect(screen.getByRole('button', { name: /review simulation/i })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /review tilecast/i })).toBeInTheDocument();
 	});
 
 	it('fires onReview when Review button clicked', () => {
 		const onReview = vi.fn();
 		renderStrip({
-			simulation: makeSim('Ready'),
+			simulation: makeSim(SimulationState.Ready),
 			request: makeRequest(),
 			onReview,
 		});
-		fireEvent.click(screen.getByRole('button', { name: /review simulation/i }));
+		fireEvent.click(screen.getByRole('button', { name: /review tilecast/i }));
 		expect(onReview).toHaveBeenCalledTimes(1);
 	});
 
 	it('shows failed copy with Retry button when onRetry provided', () => {
 		const onRetry = vi.fn();
 		renderStrip({
-			simulation: makeSim('Failed'),
+			simulation: makeSim(SimulationState.Failed),
 			request: makeRequest(),
 			onReview: vi.fn(),
 			onRetry,
@@ -135,7 +148,7 @@ describe('SimulationStatusStrip', () => {
 
 	it('hides Retry when onRetry not provided', () => {
 		renderStrip({
-			simulation: makeSim('Failed'),
+			simulation: makeSim(SimulationState.Failed),
 			request: makeRequest(),
 			onReview: vi.fn(),
 		});
@@ -147,7 +160,7 @@ describe('SimulationStatusStrip', () => {
 	// stale embedded preview, even when its state is `Ready`.
 	it('renders nothing when the request is superseded (even with a Ready simulation)', () => {
 		const { container } = renderStrip({
-			simulation: makeSim('Ready', {
+			simulation: makeSim(SimulationState.Ready, {
 				previewActions: [{ actionId: 'a', vibePreviewId: 'p1' }],
 			}),
 			request: makeRequest({ supersededByRequestId: 'r2' }),
