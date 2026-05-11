@@ -6,9 +6,6 @@ import { AdminRoute } from '@/core/auth/AdminRoute';
 import useAppStore from '@/global_state';
 import { createMockUserInfo } from '@/test/store-utils';
 
-// Sentinel content rendered when AdminRoute allows access
-const ProtectedContent = () => <div>Admin Content</div>;
-
 beforeEach(() => {
 	act(() => {
 		useAppStore.setState({
