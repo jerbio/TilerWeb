@@ -1,175 +1,217 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/mocks/server';
 import { FeatureFlagApi } from '@/api/featureFlagApi';
+
+const envState = vi.hoisted(() => ({
+	baseUrl: 'http://localhost',
+}));
 
 vi.mock('@/config/config_getter', () => ({
 	Env: {
-		get: () => '/',
+		get: () => envState.baseUrl,
 		isDevelopment: () => false,
 		isProduction: () => true,
 	},
 }));
 
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
-
-const okJson = (body: unknown) =>
-	Promise.resolve(
-		new Response(JSON.stringify(body), {
-			status: 200,
-			headers: { 'Content-Type': 'application/json' },
-		})
-	);
-
-const errorResponse = (status: number) =>
-	Promise.resolve(
-		new Response(JSON.stringify({ Error: { Code: '1', Message: 'Error' } }), { status })
+const ok = (Content: unknown) => HttpResponse.json({ Content, Error: null, ServerStatus: 0 });
+const forbidden = () =>
+	HttpResponse.json(
+		{ Content: null, Error: { Code: 'Forbidden', Message: 'Nope' }, ServerStatus: 1 },
+		{ status: 403 }
 	);
 
 describe('FeatureFlagApi', () => {
 	let api: FeatureFlagApi;
 
 	beforeEach(() => {
+		envState.baseUrl = 'http://localhost';
 		api = new FeatureFlagApi();
-		mockFetch.mockReset();
 	});
 
 	describe('getFlags', () => {
-		it('calls GET /api/FeatureFlag', async () => {
-			mockFetch.mockReturnValueOnce(
-				okJson({
-					Content: { flags: { 'chat-suggestions': true } },
-					Error: null,
-					ServerStatus: 0,
+		it('requests user flags from the feature flag endpoint', async () => {
+			let request: Request | undefined;
+
+			server.use(
+				http.get('http://localhost/api/FeatureFlag', ({ request: req }) => {
+					request = req;
+					return ok({ flags: { 'chat-suggestions': true } });
 				})
 			);
 
 			await api.getFlags();
 
-			expect(mockFetch).toHaveBeenCalledOnce();
-			const [url] = mockFetch.mock.calls[0];
-			expect(url).toContain('api/FeatureFlag');
-			expect(mockFetch.mock.calls[0][1].method).toBe('GET');
+			expect(request).toBeDefined();
+			expect(request!.method).toBe('GET');
+			expect(new URL(request!.url).pathname).toBe('/api/FeatureFlag');
 		});
 
-		it('returns parsed flags from the response', async () => {
-			const flags = { 'chat-suggestions': true, 'new-calendar-view': false };
-			mockFetch.mockReturnValueOnce(
-				okJson({ Content: { flags }, Error: null, ServerStatus: 0 })
+		it('returns the backend flag map unchanged', async () => {
+			const flags = {
+				'chat-suggestions': true,
+				'new-calendar-view': false,
+			};
+
+			server.use(http.get('http://localhost/api/FeatureFlag', () => ok({ flags })));
+
+			await expect(api.getFlags()).resolves.toMatchObject({
+				Content: { flags },
+				Error: null,
+			});
+		});
+
+		it('uses the current BASE_URL value when the request is made', async () => {
+			envState.baseUrl = 'http://feature-flags.test';
+			let matched = false;
+
+			server.use(
+				http.get('http://feature-flags.test/api/FeatureFlag', () => {
+					matched = true;
+					return ok({ flags: {} });
+				})
 			);
 
-			const result = await api.getFlags();
-			expect(result.Content.flags).toEqual(flags);
+			await api.getFlags();
+
+			expect(matched).toBe(true);
 		});
 
-		it('throws on non-200 response', async () => {
-			mockFetch.mockReturnValueOnce(errorResponse(403));
-			await expect(api.getFlags()).rejects.toBeDefined();
+		it('throws the structured backend error for non-OK responses', async () => {
+			server.use(http.get('http://localhost/api/FeatureFlag', forbidden));
+
+			await expect(api.getFlags()).rejects.toMatchObject({
+				Error: { Code: 'Forbidden', Message: 'Nope' },
+			});
 		});
 	});
 
 	describe('adminGetAllFlags', () => {
-		it('calls GET /api/admin/FeatureFlag', async () => {
-			mockFetch.mockReturnValueOnce(
-				okJson({ Content: { flags: [] }, Error: null, ServerStatus: 0 })
+		it('requests the admin flag list from the admin endpoint', async () => {
+			let request: Request | undefined;
+
+			server.use(
+				http.get('http://localhost/api/admin/FeatureFlag', ({ request: req }) => {
+					request = req;
+					return ok({ flags: [] });
+				})
 			);
 
 			await api.adminGetAllFlags();
 
-			const [url] = mockFetch.mock.calls[0];
-			expect(url).toContain('api/admin/FeatureFlag');
-			expect(mockFetch.mock.calls[0][1].method).toBe('GET');
+			expect(request).toBeDefined();
+			expect(request!.method).toBe('GET');
+			expect(new URL(request!.url).pathname).toBe('/api/admin/FeatureFlag');
 		});
 
-		it('returns flag list from the response', async () => {
+		it('returns admin flag metadata unchanged', async () => {
 			const flags = [
 				{ name: 'chat-suggestions', isEnabledGlobal: true, rolloutPercent: null },
+				{ name: 'smart-scheduling', isEnabledGlobal: false, rolloutPercent: 25 },
 			];
-			mockFetch.mockReturnValueOnce(
-				okJson({ Content: { flags }, Error: null, ServerStatus: 0 })
-			);
 
-			const result = await api.adminGetAllFlags();
-			expect(result.Content.flags).toEqual(flags);
+			server.use(http.get('http://localhost/api/admin/FeatureFlag', () => ok({ flags })));
+
+			await expect(api.adminGetAllFlags()).resolves.toMatchObject({
+				Content: { flags },
+				Error: null,
+			});
 		});
 
-		it('throws on non-200 response', async () => {
-			mockFetch.mockReturnValueOnce(errorResponse(403));
-			await expect(api.adminGetAllFlags()).rejects.toBeDefined();
+		it('throws the structured backend error for non-OK responses', async () => {
+			server.use(http.get('http://localhost/api/admin/FeatureFlag', forbidden));
+
+			await expect(api.adminGetAllFlags()).rejects.toMatchObject({
+				Error: { Code: 'Forbidden', Message: 'Nope' },
+			});
 		});
 	});
 
 	describe('adminUpdateFlag', () => {
-		it('calls PUT /api/admin/FeatureFlag/{name}', async () => {
-			mockFetch.mockReturnValueOnce(
-				okJson({
-					Content: {
-						flag: {
-							name: 'chat-suggestions',
-							isEnabledGlobal: true,
-							rolloutPercent: null,
-						},
-					},
-					Error: null,
-					ServerStatus: 0,
-				})
-			);
+		it('sends the flipped enabled value and rollout percent in the PUT body', async () => {
+			let request: Request | undefined;
+			let body: unknown;
 
-			await api.adminUpdateFlag('chat-suggestions', true, null);
-
-			const [url, options] = mockFetch.mock.calls[0];
-			expect(url).toContain('api/admin/FeatureFlag/chat-suggestions');
-			expect(options.method).toBe('PUT');
-			expect(JSON.parse(options.body)).toEqual({
-				isEnabledGlobal: true,
-				rolloutPercent: null,
-			});
-		});
-
-		it('URL-encodes flag names with special characters', async () => {
-			mockFetch.mockReturnValueOnce(
-				okJson({
-					Content: {
-						flag: {
-							name: 'flag/with/slashes',
-							isEnabledGlobal: false,
-							rolloutPercent: null,
-						},
-					},
-					Error: null,
-					ServerStatus: 0,
-				})
-			);
-
-			await api.adminUpdateFlag('flag/with/slashes', false, null);
-
-			const [url] = mockFetch.mock.calls[0];
-			expect(url).toContain(encodeURIComponent('flag/with/slashes'));
-		});
-
-		it('sends rolloutPercent when provided', async () => {
-			mockFetch.mockReturnValueOnce(
-				okJson({
-					Content: {
-						flag: {
-							name: 'chat-suggestions',
-							isEnabledGlobal: true,
-							rolloutPercent: 50,
-						},
-					},
-					Error: null,
-					ServerStatus: 0,
-				})
+			server.use(
+				http.put(
+					'http://localhost/api/admin/FeatureFlag/:name',
+					async ({ request: req }) => {
+						request = req;
+						body = await req.json();
+						return ok({
+							flag: {
+								name: 'chat-suggestions',
+								isEnabledGlobal: true,
+								rolloutPercent: 50,
+							},
+						});
+					}
+				)
 			);
 
 			await api.adminUpdateFlag('chat-suggestions', true, 50);
 
-			const [, options] = mockFetch.mock.calls[0];
-			expect(JSON.parse(options.body)).toEqual({ isEnabledGlobal: true, rolloutPercent: 50 });
+			expect(request).toBeDefined();
+			expect(request!.method).toBe('PUT');
+			expect(new URL(request!.url).pathname).toBe('/api/admin/FeatureFlag/chat-suggestions');
+			expect(body).toEqual({ isEnabledGlobal: true, rolloutPercent: 50 });
 		});
 
-		it('throws on non-200 response', async () => {
-			mockFetch.mockReturnValueOnce(errorResponse(403));
-			await expect(api.adminUpdateFlag('chat-suggestions', true, null)).rejects.toBeDefined();
+		it('keeps null rolloutPercent in the request body', async () => {
+			let body: unknown;
+
+			server.use(
+				http.put('http://localhost/api/admin/FeatureFlag/:name', async ({ request }) => {
+					body = await request.json();
+					return ok({
+						flag: {
+							name: 'chat-suggestions',
+							isEnabledGlobal: false,
+							rolloutPercent: null,
+						},
+					});
+				})
+			);
+
+			await api.adminUpdateFlag('chat-suggestions', false, null);
+
+			expect(body).toEqual({ isEnabledGlobal: false, rolloutPercent: null });
+		});
+
+		it('URL-encodes flag names before sending the request', async () => {
+			const flagName = 'flag/with/slashes';
+			let requestUrl = '';
+
+			server.use(
+				http.put(
+					`http://localhost/api/admin/FeatureFlag/${encodeURIComponent(flagName)}`,
+					({ request }) => {
+						requestUrl = request.url;
+						return ok({
+							flag: {
+								name: flagName,
+								isEnabledGlobal: true,
+								rolloutPercent: null,
+							},
+						});
+					}
+				)
+			);
+
+			await api.adminUpdateFlag(flagName, true, null);
+
+			expect(requestUrl).toContain('/api/admin/FeatureFlag/flag%2Fwith%2Fslashes');
+		});
+
+		it('throws the structured backend error for non-OK responses', async () => {
+			server.use(http.put('http://localhost/api/admin/FeatureFlag/:name', forbidden));
+
+			await expect(api.adminUpdateFlag('chat-suggestions', true, null)).rejects.toMatchObject(
+				{
+					Error: { Code: 'Forbidden', Message: 'Nope' },
+				}
+			);
 		});
 	});
 });

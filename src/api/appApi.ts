@@ -9,7 +9,9 @@ type RequestOptions = RequestInit & {
 
 export class AppApi {
 	getUri(path: string): string {
-		return this.defaultDomain + path;
+		const domain = this.defaultDomain.replace(/\/+$/, '');
+		const normalizedPath = path.replace(/^\/+/, '');
+		return `${domain}/${normalizedPath}`;
 	}
 
 	async apiRequest<T>(endpoint: string, options?: RequestOptions): Promise<T> {

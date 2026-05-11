@@ -1,77 +1,62 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { act } from 'react';
 import useAppStore from '@/global_state';
 import { useFlag } from '@/hooks/useFlag';
 
-beforeEach(() => {
-	act(() => {
-		useAppStore.setState({ featureFlags: {} });
-	});
-});
-
 describe('useFlag', () => {
-	describe('when flag is not in store', () => {
-		it('returns false by default', () => {
-			const { result } = renderHook(() => useFlag('some-unknown-flag'));
-			expect(result.current).toBe(false);
+	beforeEach(() => {
+		act(() => {
+			useAppStore.setState({ featureFlags: {} });
 		});
 	});
 
-	describe('when flag is in store', () => {
-		it('returns true when flag is enabled', () => {
-			act(() => {
-				useAppStore.setState({ featureFlags: { 'chat-suggestions': true } });
-			});
+	it('defaults unknown flags to false', () => {
+		const { result } = renderHook(() => useFlag('missing-flag'));
 
-			const { result } = renderHook(() => useFlag('chat-suggestions'));
-			expect(result.current).toBe(true);
-		});
-
-		it('returns false when flag is explicitly disabled', () => {
-			act(() => {
-				useAppStore.setState({ featureFlags: { 'chat-suggestions': false } });
-			});
-
-			const { result } = renderHook(() => useFlag('chat-suggestions'));
-			expect(result.current).toBe(false);
-		});
-
-		it('returns false for an unrelated flag when others are set', () => {
-			act(() => {
-				useAppStore.setState({ featureFlags: { 'new-calendar-view': true } });
-			});
-
-			const { result } = renderHook(() => useFlag('chat-suggestions'));
-			expect(result.current).toBe(false);
-		});
+		expect(result.current).toBe(false);
 	});
 
-	describe('reactivity', () => {
-		it('updates when the flag value changes in the store', () => {
-			const { result } = renderHook(() => useFlag('smart-scheduling'));
-			expect(result.current).toBe(false);
-
-			act(() => {
-				useAppStore.setState({ featureFlags: { 'smart-scheduling': true } });
+	it('returns the stored value for enabled and disabled flags', () => {
+		act(() => {
+			useAppStore.getState().setFeatureFlags({
+				'chat-suggestions': true,
+				'smart-scheduling': false,
 			});
-
-			expect(result.current).toBe(true);
 		});
 
-		it('updates when flags are cleared', () => {
-			act(() => {
-				useAppStore.setState({ featureFlags: { 'smart-scheduling': true } });
-			});
+		const enabled = renderHook(() => useFlag('chat-suggestions'));
+		const disabled = renderHook(() => useFlag('smart-scheduling'));
 
-			const { result } = renderHook(() => useFlag('smart-scheduling'));
-			expect(result.current).toBe(true);
+		expect(enabled.result.current).toBe(true);
+		expect(disabled.result.current).toBe(false);
+	});
 
-			act(() => {
-				useAppStore.setState({ featureFlags: {} });
-			});
-
-			expect(result.current).toBe(false);
+	it('ignores unrelated enabled flags', () => {
+		act(() => {
+			useAppStore.getState().setFeatureFlags({ 'new-calendar-view': true });
 		});
+
+		const { result } = renderHook(() => useFlag('chat-suggestions'));
+
+		expect(result.current).toBe(false);
+	});
+
+	it('reacts when feature flags are replaced', () => {
+		const { result } = renderHook(() => useFlag('autofill-tile-details'));
+
+		expect(result.current).toBe(false);
+
+		act(() => {
+			useAppStore.getState().setFeatureFlags({ 'autofill-tile-details': true });
+		});
+
+		expect(result.current).toBe(true);
+
+		act(() => {
+			useAppStore.getState().setFeatureFlags({});
+		});
+
+		expect(result.current).toBe(false);
 	});
 });

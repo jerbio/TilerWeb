@@ -1,145 +1,193 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from '@/test/test-utils';
 import FeatureFlagsAdmin from '@/pages/admin/feature-flags/FeatureFlagsAdmin';
+import { DEV_ADMIN_FLAGS } from '@/config/dev_overrides';
 import type { AdminFlagEntry } from '@/api/featureFlagApi';
 
+const mocks = vi.hoisted(() => ({
+	adminGetAllFlags: vi.fn(),
+	adminUpdateFlag: vi.fn(),
+	navigate: vi.fn(),
+	toastError: vi.fn(),
+	toastSuccess: vi.fn(),
+	env: {
+		isDevelopment: false,
+	},
+}));
+
 vi.mock('@/hooks/useNavigateHome', () => ({
-	default: () => vi.fn(),
+	default: () => mocks.navigate,
 }));
 
 vi.mock('@/config/config_getter', () => ({
 	Env: {
 		get: () => '/',
-		isDevelopment: () => false,
-		isProduction: () => true,
+		isDevelopment: () => mocks.env.isDevelopment,
+		isProduction: () => !mocks.env.isDevelopment,
 	},
 }));
 
-const mockAdminGetAllFlags = vi.fn();
-const mockAdminUpdateFlag = vi.fn();
+vi.mock('sonner', () => ({
+	Toaster: () => null,
+	toast: {
+		error: mocks.toastError,
+		success: mocks.toastSuccess,
+	},
+}));
 
 vi.mock('@/api/featureFlagApi', () => ({
 	featureFlagApi: {
 		getFlags: vi.fn(),
-		adminGetAllFlags: () => mockAdminGetAllFlags(),
-		adminUpdateFlag: (...args: unknown[]) => mockAdminUpdateFlag(...args),
+		adminGetAllFlags: mocks.adminGetAllFlags,
+		adminUpdateFlag: mocks.adminUpdateFlag,
 	},
 }));
 
-const MOCK_FLAGS: AdminFlagEntry[] = [
+const FLAGS: AdminFlagEntry[] = [
 	{ name: 'autofill-tile-details', isEnabledGlobal: true, rolloutPercent: null },
-	{ name: 'new-calendar-view', isEnabledGlobal: true, rolloutPercent: null },
 	{ name: 'chat-suggestions', isEnabledGlobal: false, rolloutPercent: null },
 	{ name: 'smart-scheduling', isEnabledGlobal: true, rolloutPercent: 50 },
 ];
 
-const okFlags = () =>
-	Promise.resolve({ Content: { flags: MOCK_FLAGS }, Error: null, ServerStatus: 0 });
+const responseWithFlags = (flags: AdminFlagEntry[]) =>
+	Promise.resolve({ Content: { flags }, Error: null, ServerStatus: 0 });
 
-const okUpdate = (flag: AdminFlagEntry) =>
-	Promise.resolve({ Content: { flag }, Error: null, ServerStatus: 0 });
-
-beforeEach(() => {
-	mockAdminGetAllFlags.mockReset();
-	mockAdminUpdateFlag.mockReset();
-	mockAdminGetAllFlags.mockReturnValue(okFlags());
-	mockAdminUpdateFlag.mockImplementation(
-		(name: string, isEnabledGlobal: boolean, rolloutPercent: number | null) =>
-			okUpdate({ name, isEnabledGlobal, rolloutPercent })
-	);
-});
+const getSwitch = async (name: string) => screen.findByRole('switch', { name: `Toggle ${name}` });
 
 describe('FeatureFlagsAdmin', () => {
-	describe('rendering', () => {
-		it('shows the page title', async () => {
-			render(<FeatureFlagsAdmin />);
-			expect(await screen.findByText('Feature Flags')).toBeInTheDocument();
-		});
+	beforeEach(() => {
+		mocks.env.isDevelopment = false;
+		mocks.adminGetAllFlags.mockReset();
+		mocks.adminUpdateFlag.mockReset();
+		mocks.navigate.mockReset();
+		mocks.toastError.mockReset();
+		mocks.toastSuccess.mockReset();
+		mocks.adminGetAllFlags.mockReturnValue(responseWithFlags(FLAGS));
+		mocks.adminUpdateFlag.mockImplementation(
+			(name: string, isEnabledGlobal: boolean, rolloutPercent: number | null) =>
+				Promise.resolve({
+					Content: { flag: { name, isEnabledGlobal, rolloutPercent } },
+					Error: null,
+					ServerStatus: 0,
+				})
+		);
+	});
 
-		it('renders a row for each flag returned by the API', async () => {
-			render(<FeatureFlagsAdmin />);
-			for (const flag of MOCK_FLAGS) {
-				expect(await screen.findByText(flag.name)).toBeInTheDocument();
-			}
-		});
+	it('loads admin flags from the API in production mode', async () => {
+		render(<FeatureFlagsAdmin />);
 
-		it('renders toggles with correct initial aria-checked state', async () => {
-			render(<FeatureFlagsAdmin />);
-			const switches = await screen.findAllByRole('switch');
-			expect(switches).toHaveLength(MOCK_FLAGS.length);
-			MOCK_FLAGS.forEach((flag, i) => {
-				expect(switches[i]).toHaveAttribute('aria-checked', String(flag.isEnabledGlobal));
-			});
-		});
+		expect(screen.getByText('Loading...')).toBeInTheDocument();
+		expect(await screen.findByText('Feature Flags')).toBeInTheDocument();
 
-		it('shows rollout pill for flags with a rolloutPercent', async () => {
-			render(<FeatureFlagsAdmin />);
-			expect(await screen.findByText('50% rollout')).toBeInTheDocument();
-		});
+		for (const flag of FLAGS) {
+			expect(await screen.findByText(flag.name)).toBeInTheDocument();
+		}
 
-		it('does not show rollout pill for flags with null rolloutPercent', async () => {
-			render(<FeatureFlagsAdmin />);
-			await screen.findAllByRole('switch');
-			// Only one flag has a rollout percent, so only one pill should appear
-			expect(screen.getAllByText(/% rollout/)).toHaveLength(1);
-		});
+		expect(mocks.adminGetAllFlags).toHaveBeenCalledTimes(1);
+	});
 
-		it('shows empty state when API returns no flags', async () => {
-			mockAdminGetAllFlags.mockReturnValue(
-				Promise.resolve({ Content: { flags: [] }, Error: null, ServerStatus: 0 })
-			);
-			render(<FeatureFlagsAdmin />);
-			expect(await screen.findByText('No flags registered.')).toBeInTheDocument();
+	it('renders switch state and rollout metadata from the loaded flags', async () => {
+		render(<FeatureFlagsAdmin />);
+
+		expect(await getSwitch('autofill-tile-details')).toHaveAttribute('aria-checked', 'true');
+		expect(await getSwitch('chat-suggestions')).toHaveAttribute('aria-checked', 'false');
+		expect(await getSwitch('smart-scheduling')).toHaveAttribute('aria-checked', 'true');
+		expect(await screen.findByText('50% rollout')).toBeInTheDocument();
+	});
+
+	it('shows an empty state when no flags are registered', async () => {
+		mocks.adminGetAllFlags.mockReturnValue(responseWithFlags([]));
+
+		render(<FeatureFlagsAdmin />);
+
+		expect(await screen.findByText('No flags registered.')).toBeInTheDocument();
+	});
+
+	it('shows an error toast when loading flags fails', async () => {
+		mocks.adminGetAllFlags.mockRejectedValue(new Error('boom'));
+
+		render(<FeatureFlagsAdmin />);
+
+		await waitFor(() => {
+			expect(mocks.toastError).toHaveBeenCalledWith('Failed to load feature flags');
+		});
+		expect(await screen.findByText('No flags registered.')).toBeInTheDocument();
+	});
+
+	it('navigates back to the admin page when the back row is clicked', async () => {
+		render(<FeatureFlagsAdmin />);
+
+		fireEvent.click(await screen.findByRole('button', { name: /admin/i }));
+
+		expect(mocks.navigate).toHaveBeenCalledWith('/admin');
+	});
+
+	it('optimistically toggles a flag and saves the new value', async () => {
+		render(<FeatureFlagsAdmin />);
+
+		const chatSuggestions = await getSwitch('chat-suggestions');
+		expect(chatSuggestions).toHaveAttribute('aria-checked', 'false');
+
+		fireEvent.click(chatSuggestions);
+
+		expect(chatSuggestions).toHaveAttribute('aria-checked', 'true');
+		await waitFor(() => {
+			expect(mocks.adminUpdateFlag).toHaveBeenCalledWith('chat-suggestions', true, null);
+		});
+		expect(mocks.toastSuccess).toHaveBeenCalledWith('"chat-suggestions" turned on');
+	});
+
+	it('passes the existing rollout percent when saving a flag', async () => {
+		render(<FeatureFlagsAdmin />);
+
+		fireEvent.click(await getSwitch('smart-scheduling'));
+
+		await waitFor(() => {
+			expect(mocks.adminUpdateFlag).toHaveBeenCalledWith('smart-scheduling', false, 50);
 		});
 	});
 
-	describe('toggling', () => {
-		it('calls adminUpdateFlag with the flipped value on click', async () => {
-			render(<FeatureFlagsAdmin />);
-			const switches = await screen.findAllByRole('switch');
+	it('reverts the optimistic state and shows an error toast when saving fails', async () => {
+		mocks.adminUpdateFlag.mockRejectedValue(new Error('save failed'));
 
-			// First flag is enabled (true) — clicking should call with false
-			fireEvent.click(switches[0]);
+		render(<FeatureFlagsAdmin />);
 
-			await waitFor(() => {
-				expect(mockAdminUpdateFlag).toHaveBeenCalledWith(
-					MOCK_FLAGS[0].name,
-					false,
-					MOCK_FLAGS[0].rolloutPercent
-				);
-			});
+		const autofill = await getSwitch('autofill-tile-details');
+		expect(autofill).toHaveAttribute('aria-checked', 'true');
+
+		fireEvent.click(autofill);
+		expect(autofill).toHaveAttribute('aria-checked', 'false');
+
+		await waitFor(() => {
+			expect(autofill).toHaveAttribute('aria-checked', 'true');
 		});
+		expect(mocks.toastError).toHaveBeenCalledWith('Failed to update "autofill-tile-details"');
+	});
 
-		it('optimistically flips aria-checked before API resolves', async () => {
-			// Delay the API response so we can observe optimistic state
-			mockAdminUpdateFlag.mockReturnValue(new Promise(() => {}));
+	it('uses local development flags without calling the API in development mode', async () => {
+		mocks.env.isDevelopment = true;
 
-			render(<FeatureFlagsAdmin />);
-			const switches = await screen.findAllByRole('switch');
-			const firstSwitch = switches[0];
+		render(<FeatureFlagsAdmin />);
 
-			expect(firstSwitch).toHaveAttribute('aria-checked', 'true');
-			fireEvent.click(firstSwitch);
+		for (const flag of DEV_ADMIN_FLAGS) {
+			expect(await screen.findByText(flag.name)).toBeInTheDocument();
+		}
 
-			await waitFor(() => {
-				expect(firstSwitch).toHaveAttribute('aria-checked', 'false');
-			});
-		});
+		expect(mocks.adminGetAllFlags).not.toHaveBeenCalled();
+	});
 
-		it('reverts aria-checked when the API call fails', async () => {
-			mockAdminUpdateFlag.mockReturnValue(Promise.reject(new Error('Network error')));
+	it('toggles development flags locally without saving to the API', async () => {
+		mocks.env.isDevelopment = true;
 
-			render(<FeatureFlagsAdmin />);
-			const switches = await screen.findAllByRole('switch');
-			const firstSwitch = switches[0];
+		render(<FeatureFlagsAdmin />);
 
-			expect(firstSwitch).toHaveAttribute('aria-checked', 'true');
-			fireEvent.click(firstSwitch);
+		const chatSuggestions = await getSwitch('chat-suggestions');
+		expect(chatSuggestions).toHaveAttribute('aria-checked', 'false');
 
-			await waitFor(() => {
-				expect(firstSwitch).toHaveAttribute('aria-checked', 'true');
-			});
-		});
+		fireEvent.click(chatSuggestions);
+
+		expect(chatSuggestions).toHaveAttribute('aria-checked', 'true');
+		expect(mocks.adminUpdateFlag).not.toHaveBeenCalled();
 	});
 });
