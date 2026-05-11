@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { personaSessionManager } from '@/services/personaSessionManager';
 import { PersonaId } from '@/core/constants/persona';
+import { featureFlagApi } from '@/api/featureFlagApi';
+import { Env } from '@/config/config_getter';
+import { applyDevUserOverrides, applyDevFlagOverrides } from '@/config/dev_overrides';
 
 export enum SessionType {
 	AUTHENTICATED = 'authenticated',
@@ -31,6 +34,7 @@ export interface UserInfo {
 	lastName: string; // ""
 	countryCode: string | null; // "1"
 	dateOfBirth: string | null; // ""
+	isAdmin: boolean;
 }
 
 // Grouped persona session that includes user, schedule, and chat session
@@ -90,6 +94,10 @@ interface AppState {
 	isAuthenticated: boolean;
 	isAuthLoading: boolean;
 	authenticatedUser: UserInfo | null;
+
+	// Feature flags — populated from backend after auth, defaults to empty (all flags off)
+	featureFlags: Record<string, boolean>;
+	setFeatureFlags: (flags: Record<string, boolean>) => void;
 
 	// Authentication actions
 	checkAuth: () => Promise<void>;
@@ -283,6 +291,10 @@ const useAppStore = create<AppState>()((set, get) => {
 		isAuthLoading: true,
 		authenticatedUser: null,
 
+		// Feature flags
+		featureFlags: {},
+		setFeatureFlags: (flags) => set({ featureFlags: flags }),
+
 		// Method to switch between authenticated and anonymous sessions
 		switchSessionType: (type: SessionType) => set({ activeSessionType: type }),
 
@@ -296,9 +308,28 @@ const useAppStore = create<AppState>()((set, get) => {
 				if (response && response.isAuthenticated) {
 					// Fetch full user info
 					const { userService } = await import('./services');
-					const user = await userService.getCurrentUser();
+					let user = await userService.getCurrentUser();
+					if (Env.isDevelopment()) {
+						user = applyDevUserOverrides(user);
+					}
 					// Re-create the authenticated persona session so Chat/Calendar work after reload
 					get().setAuthenticated(user);
+
+					// Fetch feature flags — fire-and-forget, failure leaves flags at defaults (all off)
+					if (Env.isDevelopment()) {
+						// In dev, seed flags immediately from dev_overrides without waiting on the backend
+						get().setFeatureFlags(applyDevFlagOverrides({}));
+					} else {
+						featureFlagApi
+							.getFlags()
+							.then((res) => {
+								if (res?.Content?.flags) {
+									get().setFeatureFlags(res.Content.flags);
+								}
+							})
+							.catch(() => {});
+					}
+
 					set({ isAuthLoading: false });
 				} else {
 					set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
@@ -313,7 +344,7 @@ const useAppStore = create<AppState>()((set, get) => {
 			try {
 				const { authService } = await import('./services');
 				await authService.logout();
-				set({ isAuthenticated: false, authenticatedUser: null });
+				set({ isAuthenticated: false, authenticatedUser: null, featureFlags: {} });
 			} catch (error) {
 				console.error('Logout failed:', error);
 				throw error;
