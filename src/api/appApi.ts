@@ -8,7 +8,6 @@ type RequestOptions = RequestInit & {
 };
 
 export class AppApi {
-	#baseUrl = Env.get('BASE_URL');
 	getUri(path: string): string {
 		return this.defaultDomain + path;
 	}
@@ -126,7 +125,7 @@ export class AppApi {
 	}
 
 	get defaultDomain(): string {
-		return this.#baseUrl;
+		return Env.get('BASE_URL');
 	}
 
 	/**

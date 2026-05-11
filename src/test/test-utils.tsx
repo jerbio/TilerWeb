@@ -3,13 +3,16 @@ import { ReactElement, ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import userEvent from '@testing-library/user-event';
+import { ThemeProvider } from '@/core/theme/ThemeProvider';
 
 // Wrap components with providers for testing
 function AllTheProviders({ children }: { children: ReactNode }) {
 	return (
 		<BrowserRouter>
-			{children}
-			<Toaster />
+			<ThemeProvider>
+				{children}
+				<Toaster />
+			</ThemeProvider>
 		</BrowserRouter>
 	);
 }
