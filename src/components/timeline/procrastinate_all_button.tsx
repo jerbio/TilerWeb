@@ -273,6 +273,7 @@ const DurationInput = styled.input`
 
 	/* Hide number spinners */
 	-moz-appearance: textfield;
+	appearance: textfield;
 	&::-webkit-outer-spin-button,
 	&::-webkit-inner-spin-button {
 		-webkit-appearance: none;

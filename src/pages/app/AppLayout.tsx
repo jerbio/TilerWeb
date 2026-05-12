@@ -5,9 +5,9 @@ import appRoutes from '@/core/common/data/appRoutes';
 import appLayoutConfig from '@/core/constants/app_layout_config';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import useAppStore from '@/global_state';
-import { Loader, Moon, Sun, User } from 'lucide-react';
+import { Moon, Sun, User } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router';
+import { Link, Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
 
 const AppLayout: React.FC = () => {
@@ -39,30 +39,7 @@ const AppLayout: React.FC = () => {
 	}, [profileSheetOpen]);
 
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-	const isAuthLoading = useAppStore((state) => state.isAuthLoading);
-	const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-	const navigate = useNavigate();
 	const { pathname } = useLocation();
-
-	useEffect(() => {
-		if (!isAuthLoading && !isAuthenticated) {
-			navigate('/signin');
-		}
-	}, [isAuthLoading, isAuthenticated, navigate]);
-
-	if (isAuthLoading) {
-		return (
-			<Container>
-				<LoadingContainer>
-					<Loader />
-				</LoadingContainer>
-			</Container>
-		);
-	}
-
-	if (!authenticatedUser || !isAuthenticated) {
-		return null; // Will redirect to signin
-	}
 
 	return (
 		<Container>
@@ -217,14 +194,6 @@ const HeaderRight = styled.div`
 	display: flex;
 	gap: 1rem;
 	align-items: center;
-`;
-
-const LoadingContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	min-height: 60vh;
 `;
 
 export default AppLayout;

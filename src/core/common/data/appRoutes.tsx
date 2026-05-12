@@ -1,4 +1,4 @@
-import { Calendar, ListTodo, Settings } from 'lucide-react';
+import { Calendar, ListTodo } from 'lucide-react';
 
 const appRoutes: Array<{
 	path: string;

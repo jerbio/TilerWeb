@@ -156,8 +156,8 @@ const ProfileEmail = styled.div`
 
 const ProfileDivider = styled.div`
 	height: 1px;
-	background-color: ${(props) => props.theme.colors.border.default};
-	margin: ${(props) => props.theme.space.medium} 0;
+	background-color: ${(props) => props.theme.colors.border.strong};
+	margin: ${(props) => props.theme.space.small} 0;
 `;
 
 const LogoutButton = styled(Button)`

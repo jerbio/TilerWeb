@@ -107,21 +107,21 @@ const App: React.FC = () => {
 									<Route element={<AppLayout />}>
 										<Route path="/timeline" element={<Timeline />} />
 										<Route path="/tileshare" element={<TileShare />} />
-									</Route>
-									<Route path="/settings" element={<SettingsLayout />}>
-										<Route
-											index
-											element={<Navigate to="/settings" replace />}
-										/>
-										<Route path="account" element={<AccountSettings />} />
-										<Route
-											path="preferences"
-											element={<PreferencesSettings />}
-										/>
-										<Route
-											path="notifications"
-											element={<NotificationPreferencesSettings />}
-										/>
+										<Route path="/settings" element={<SettingsLayout />}>
+											<Route
+												index
+												element={<Navigate to="/settings" replace />}
+											/>
+											<Route path="account" element={<AccountSettings />} />
+											<Route
+												path="preferences"
+												element={<PreferencesSettings />}
+											/>
+											<Route
+												path="notifications"
+												element={<NotificationPreferencesSettings />}
+											/>
+										</Route>
 									</Route>
 								</Route>
 							</Routes>
