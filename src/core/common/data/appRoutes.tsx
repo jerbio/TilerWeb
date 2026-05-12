@@ -15,11 +15,6 @@ const appRoutes: Array<{
 		name: 'Tileshare',
 		icon: <ListTodo size={20} />,
 	},
-	{
-		path: '/settings',
-		name: 'Settings',
-		icon: <Settings size={20} />,
-	},
 ];
 
 export default appRoutes;
