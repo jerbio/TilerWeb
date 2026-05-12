@@ -206,7 +206,7 @@ const ProcrastinateAllIconButton = styled.button`
 	color: ${({ theme }) => theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
 	border-radius: ${({ theme }) => theme.borderRadius.large};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border: 1px solid ${(props) => props.theme.colors.button.primary.border};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -293,7 +293,7 @@ const OverlayIconButton = styled.button`
 	justify-content: center;
 	color: ${({ theme }) => theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border: 1px solid ${({ theme }) => theme.colors.button.primary.border};
 	border-radius: ${({ theme }) => theme.borderRadius.small};
 	cursor: pointer;
 	padding: 0;

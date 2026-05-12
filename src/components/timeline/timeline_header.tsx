@@ -136,7 +136,7 @@ const TodayButton = styled.button`
 	line-height: 1.1;
 	color: ${({ theme }) => theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border: 1px solid ${({ theme }) => theme.colors.button.primary.border};
 	border-radius: ${({ theme }) => theme.borderRadius.large} 0 0
 		${({ theme }) => theme.borderRadius.large};
 	cursor: pointer;
@@ -157,7 +157,7 @@ const DatePickerTrigger = styled.button`
 	justify-content: center;
 	color: ${({ theme }) => theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border: 1px solid ${({ theme }) => theme.colors.button.primary.border};
 	border-left: none;
 	border-radius: 0 ${({ theme }) => theme.borderRadius.large}
 		${({ theme }) => theme.borderRadius.large} 0;
