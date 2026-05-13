@@ -1495,5 +1495,29 @@
 			"label": "Verified",
 			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
 		}
+	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "Tileshare",
+			"nav": {
+				"inbox": "Inbox Link",
+				"outbox": "Outbox Link"
+			}
+		},
+		"inbox": {
+			"title": "Inbox"
+		},
+		"outbox": {
+			"title": "Outbox"
+		},
+		"tileshareDetail": {
+			"title": "Tileshare Detail"
+		},
+		"tiletteDetail": {
+			"title": "Tilette Detail"
+		},
+		"invite": {
+			"title": "Invite"
+		}
 	}
 }
