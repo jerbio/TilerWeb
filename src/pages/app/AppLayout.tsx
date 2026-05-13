@@ -50,22 +50,15 @@ const AppLayout: React.FC = () => {
 				<HeaderRight>
 					<Navigation>
 						{appRoutes.map((route, index) => (
-							<>
-								<Link
-									key={route.name}
-									to={route.path}
-									style={{ textDecoration: 'none' }}
-								>
-									<NavigationLink
-										key={route.name}
-										active={pathname.startsWith(route.path)}
-									>
+							<React.Fragment key={route.name}>
+								<Link to={route.path} style={{ textDecoration: 'none' }}>
+									<NavigationLink active={pathname.startsWith(route.path)}>
 										{route.name}
 										{route.icon}
 									</NavigationLink>
 								</Link>
 								{index === appRoutes.length - 1 ? null : <Separator />}
-							</>
+							</React.Fragment>
 						))}
 					</Navigation>
 					{Env.isDevelopment() && (

@@ -1,15 +1,15 @@
 import React from 'react';
 import { vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { RouterProvider } from 'react-router';
 import { createMemoryRouter } from 'react-router';
 import useAppStore from '@/global_state';
+import type { UserInfo } from '@/global_state';
 import appRoutes from '@/core/common/data/appRoutes';
 
-// Mock dependencies
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string) => key }),
 	Trans: ({ i18nKey, components }: { i18nKey: string; components?: Array<React.ReactNode> }) => (
@@ -26,23 +26,6 @@ vi.mock('@/config/config_getter', () => ({
 	},
 }));
 
-vi.mock('@/services', () => ({
-	authService: {
-		checkAuth: vi.fn(),
-		logout: vi.fn(),
-	},
-	userService: {
-		getCurrentUser: vi.fn(),
-	},
-}));
-
-vi.mock('@/services/personaSessionManager', () => ({
-	personaSessionManager: {
-		initialize: vi.fn(),
-		createSession: vi.fn(),
-	},
-}));
-
 vi.mock('@/core/common/components/icons/logo', () => ({
 	default: ({ size }: { size: number }) => (
 		<div data-testid="logo" style={{ width: size, height: size }} />
@@ -50,10 +33,18 @@ vi.mock('@/core/common/components/icons/logo', () => ({
 }));
 
 vi.mock('@/core/common/components/profile_sheet', () => ({
-	default: ({ open, user }: { open: boolean; user: any }) => (
-		<div data-testid="profile-sheet" style={{ display: open ? 'block' : 'none' }}>
-			{user?.username}
-		</div>
+	default: React.forwardRef<HTMLDivElement, { open: boolean; user: UserInfo | null }>(
+		function MockProfileSheet({ open, user }, ref) {
+			return (
+				<div
+					ref={ref}
+					data-testid="profile-sheet"
+					style={{ display: open ? 'block' : 'none' }}
+				>
+					{user?.username}
+				</div>
+			);
+		}
 	),
 }));
 
@@ -74,162 +65,125 @@ function renderWithProviders(ui: React.ReactElement, initialEntries = ['/timelin
 		{ initialEntries }
 	);
 
-	return render(
+	const view = render(
 		<ThemeProvider defaultTheme="dark">
 			<RouterProvider router={router} />
 		</ThemeProvider>
 	);
+
+	return { router, ...view };
 }
 
-// Helper function to setup auth state
-function setupAuthState(
-	overrides: {
-		isAuthenticated?: boolean;
-		isAuthLoading?: boolean;
-		authenticatedUser?: any;
-	} = {}
-) {
-	const store = useAppStore.getState();
-	const defaults = {
-		isAuthenticated: true,
-		isAuthLoading: false,
-		authenticatedUser: {
-			id: 'test-user-id',
-			username: 'testuser',
-			email: 'test@example.com',
-			timeZone: 'UTC',
-			timeZoneDifference: 0,
-			fullName: 'Test User',
-			firstName: 'Test',
-			lastName: 'User',
-		},
-	};
+const defaultLayoutUser: UserInfo = {
+	id: 'test-user-id',
+	username: 'testuser',
+	email: 'test@example.com',
+	timeZone: 'UTC',
+	timeZoneDifference: 0,
+	endOfDay: null,
+	phoneNumber: null,
+	fullName: 'Test User',
+	firstName: 'Test',
+	lastName: 'User',
+	countryCode: null,
+	dateOfBirth: null,
+};
 
-	const authState = { ...defaults, ...overrides };
-	store.setAuthenticated(authState.authenticatedUser);
-
-	// Update the store state using Zustand's setState method
+/** AppLayout reads `authenticatedUser` for the profile menu; auth gating lives in `ProtectedRoute`, not here. */
+function seedLayoutUser(overrides: Partial<UserInfo> = {}) {
 	useAppStore.setState({
-		isAuthLoading: authState.isAuthLoading,
-		isAuthenticated: authState.isAuthenticated,
+		authenticatedUser: { ...defaultLayoutUser, ...overrides },
+		isAuthenticated: true,
 	});
-
-	return authState;
 }
 
 describe('AppLayout', () => {
 	afterEach(() => {
 		vi.resetAllMocks();
-	});
-
-	it('shows loading state when auth is loading', () => {
-		setupAuthState({ isAuthLoading: true, isAuthenticated: false, authenticatedUser: null });
-
-		renderWithProviders(<AppLayout />);
-
-		// In loading state, only the loader icon should be present
-		const loader = document.querySelector('.lucide-loader');
-		expect(loader).toBeInTheDocument();
-	});
-
-	it('redirects to signin when not authenticated', async () => {
-		setupAuthState({ isAuthenticated: false, isAuthLoading: false, authenticatedUser: null });
-
-		const router = createMemoryRouter(
-			[
-				{
-					path: '*',
-					element: <AppLayout />,
-				},
-			],
-			{ initialEntries: ['/timeline'] }
-		);
-
-		render(
-			<ThemeProvider defaultTheme="dark">
-				<RouterProvider router={router} />
-			</ThemeProvider>
-		);
-
-		await waitFor(() => {
-			expect(router.state.location.pathname).toBe('/signin');
+		useAppStore.setState({
+			authenticatedUser: null,
+			isAuthenticated: false,
 		});
 	});
 
-	it('renders navigation when authenticated', () => {
-		setupAuthState();
+	it('renders header with logo and nav links', () => {
+		seedLayoutUser();
 
 		renderWithProviders(<AppLayout />);
 
+		expect(screen.getByRole('banner')).toBeInTheDocument();
 		expect(screen.getByTestId('logo')).toBeInTheDocument();
-		expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
-		expect(screen.getByRole('link', { name: /tileshare/i })).toBeInTheDocument();
-	});
-
-	it('navigates to different routes when clicking nav links', async () => {
-		const user = userEvent.setup();
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
-
-		const settingsLink = screen.getByRole('link', { name: /settings/i });
-		await user.click(settingsLink);
-
-		expect(screen.getByTestId('route-settings')).toBeInTheDocument();
-	});
-
-	it('shows theme toggle in development mode', () => {
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
-
-		// Find the theme toggle by looking for the moon icon
-		const moonIcon = document.querySelector('.lucide-moon');
-		expect(moonIcon).toBeInTheDocument();
-	});
-
-	it('toggles theme when clicking theme toggle', async () => {
-		const user = userEvent.setup();
-
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
-
-		// Find the theme toggle button by its moon icon
-		const moonIcon = document.querySelector('.lucide-moon');
-		const themeToggle = moonIcon?.closest('button');
-		if (themeToggle) {
-			await user.click(themeToggle);
-			expect(themeToggle).toBeInTheDocument();
-		}
-	});
-
-	it('opens profile sheet when clicking profile trigger', async () => {
-		const user = userEvent.setup();
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
-
-		// Find the profile trigger by the user icon
-		const userIcon = document.querySelector('.lucide-user');
-		const profileTrigger = userIcon?.closest('div');
-		if (profileTrigger) {
-			await user.click(profileTrigger);
-
-			expect(screen.getByTestId('profile-sheet')).toBeInTheDocument();
-			expect(screen.getByText('testuser')).toBeInTheDocument();
-		}
-	});
-
-	it('renders all navigation routes with correct paths', () => {
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
 
 		appRoutes.forEach((route) => {
 			const link = screen.getByRole('link', { name: new RegExp(route.name, 'i') });
-			expect(link).toBeInTheDocument();
 			expect(link).toHaveAttribute('href', route.path);
+		});
+	});
+
+	it('nav links go to the correct page', async () => {
+		const user = userEvent.setup();
+		seedLayoutUser();
+
+		const { router } = renderWithProviders(<AppLayout />);
+
+		for (const route of appRoutes) {
+			const link = screen.getByRole('link', { name: new RegExp(route.name, 'i') });
+			await user.click(link);
+
+			const outletTestId = `route-${route.path.slice(1)}`;
+			expect(screen.getByTestId(outletTestId)).toBeInTheDocument();
+			expect(router.state.location.pathname).toBe(route.path);
+		}
+	});
+
+	it('theme toggle switches dark and light icon', async () => {
+		const user = userEvent.setup();
+		seedLayoutUser();
+
+		renderWithProviders(<AppLayout />);
+
+		expect(document.querySelector('.lucide-moon')).toBeInTheDocument();
+		expect(document.querySelector('.lucide-sun')).not.toBeInTheDocument();
+
+		const themeToggle = document.querySelector('.lucide-moon')?.closest('button');
+		expect(themeToggle).toBeTruthy();
+		await user.click(themeToggle!);
+
+		expect(document.querySelector('.lucide-sun')).toBeInTheDocument();
+	});
+
+	it('opens profile menu when avatar is clicked', async () => {
+		const user = userEvent.setup();
+		seedLayoutUser();
+
+		renderWithProviders(<AppLayout />);
+
+		const userIcon = document.querySelector('.lucide-user');
+		expect(userIcon).toBeTruthy();
+		await user.click(userIcon!.parentElement!);
+
+		const sheet = screen.getByTestId('profile-sheet');
+		expect(sheet).toHaveStyle({ display: 'block' });
+		expect(screen.getByText('testuser')).toBeInTheDocument();
+	});
+
+	it('closes profile menu on outside click', async () => {
+		const user = userEvent.setup();
+		seedLayoutUser();
+
+		renderWithProviders(<AppLayout />);
+
+		const userIcon = document.querySelector('.lucide-user');
+		expect(userIcon).toBeTruthy();
+		await user.click(userIcon!.parentElement!);
+
+		const sheet = screen.getByTestId('profile-sheet');
+		expect(sheet).toHaveStyle({ display: 'block' });
+
+		fireEvent.mouseDown(document.body);
+
+		await waitFor(() => {
+			expect(sheet).toHaveStyle({ display: 'none' });
 		});
 	});
 });
