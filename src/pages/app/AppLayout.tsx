@@ -58,7 +58,7 @@ const AppLayout: React.FC = () => {
 								>
 									<NavigationLink
 										key={route.name}
-										active={pathname === route.path}
+										active={pathname.startsWith(route.path)}
 									>
 										{route.name}
 										{route.icon}

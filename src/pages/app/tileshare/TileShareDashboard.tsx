@@ -1,12 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
+import { NavLink, Outlet } from 'react-router';
 
-const TileShare: React.FC = () => {
+const TileshareDashboardPage: React.FC = () => {
 	return (
 		<Container>
 			<CalendarUIProvider>
-				<div></div>
+				<div>Tileshare</div>
+				<header>
+					<NavLink to="inbox">Inbox Link</NavLink>{' '}
+					<NavLink to="outbox">Outbox Link</NavLink>
+				</header>
+				<main>
+					<Outlet />
+				</main>
 			</CalendarUIProvider>
 		</Container>
 	);
@@ -20,4 +28,4 @@ const Container = styled.div`
 	isolation: isolate;
 `;
 
-export default TileShare;
+export default TileshareDashboardPage;

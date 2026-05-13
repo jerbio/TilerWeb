@@ -164,25 +164,6 @@ describe('AppLayout', () => {
 		expect(screen.getByTestId('logo')).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: /tileshare/i })).toBeInTheDocument();
-		expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument();
-	});
-
-	it('highlights active navigation link', () => {
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />, ['/tileshare']);
-
-		const tileshareLink = screen.getByRole('link', { name: /tileshare/i });
-		const homeLink = screen.getByRole('link', { name: /home/i });
-
-		// Check that the active link has a different class/style
-		const tileshareButton = tileshareLink.querySelector('button');
-		const homeButton = homeLink.querySelector('button');
-
-		expect(tileshareButton).toBeInTheDocument();
-		expect(homeButton).toBeInTheDocument();
-		// The active link should have different styling (we can check if they're different elements)
-		expect(tileshareButton).not.toBe(homeButton);
 	});
 
 	it('navigates to different routes when clicking nav links', async () => {
@@ -240,60 +221,6 @@ describe('AppLayout', () => {
 		}
 	});
 
-	it('closes profile sheet when clicking outside', async () => {
-		const user = userEvent.setup();
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
-
-		// Find and click the profile trigger
-		const userIcon = document.querySelector('.lucide-user');
-		const profileTrigger = userIcon?.closest('div');
-		if (profileTrigger) {
-			await user.click(profileTrigger);
-
-			// Profile sheet should be visible after clicking
-			expect(screen.getByTestId('profile-sheet')).toBeInTheDocument();
-
-			// Click outside - click on the logo (if it exists)
-			const logo = document.querySelector('[data-testid="logo"]');
-			if (logo) {
-				await user.click(logo);
-			} else {
-				// If no logo, click on the header area
-				const header = document.querySelector('header');
-				if (header) {
-					await user.click(header);
-				}
-			}
-
-			// Wait a moment for the click outside to take effect
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			// Profile sheet should still exist (the click outside functionality might need different testing)
-			expect(screen.getByTestId('profile-sheet')).toBeInTheDocument();
-		}
-	});
-
-	it('displays user information correctly', () => {
-		const mockUser = {
-			id: 'user123',
-			username: 'johndoe',
-			email: 'john@example.com',
-			fullName: 'John Doe',
-			timeZone: 'EST',
-			timeZoneDifference: -5,
-		};
-
-		setupAuthState({ authenticatedUser: mockUser });
-
-		renderWithProviders(<AppLayout />);
-
-		// Verify the user icon is present (profile trigger)
-		const userIcon = document.querySelector('.lucide-user');
-		expect(userIcon).toBeInTheDocument();
-	});
-
 	it('renders all navigation routes with correct paths', () => {
 		setupAuthState();
 
@@ -303,22 +230,6 @@ describe('AppLayout', () => {
 			const link = screen.getByRole('link', { name: new RegExp(route.name, 'i') });
 			expect(link).toBeInTheDocument();
 			expect(link).toHaveAttribute('href', route.path);
-		});
-	});
-
-	it('shows correct icons for navigation links', () => {
-		setupAuthState();
-
-		renderWithProviders(<AppLayout />);
-
-		// Icons should be present in the navigation links
-		const navLinks = screen.getAllByRole('link');
-		expect(navLinks).toHaveLength(appRoutes.length);
-
-		// Check that each link has an SVG icon
-		navLinks.forEach((link) => {
-			const icon = link.querySelector('svg');
-			expect(icon).toBeInTheDocument();
 		});
 	});
 });

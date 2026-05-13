@@ -25,8 +25,12 @@ import NotificationPreferencesSettings from './pages/settings/NotificationPrefer
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
-import TileShare from './pages/app/TileShare';
-// import useAppStore from './global_state';
+import TileshareDetailPage from './pages/app/tileshare/TileShareDetailPage';
+import TileshareInbox from './pages/app/tileshare/TileShareInbox';
+import TileshareInvitePage from './pages/app/tileshare/TileShareInvitePage';
+import TileshareOutbox from './pages/app/tileshare/TileShareOutbox';
+import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
+import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
@@ -102,11 +106,37 @@ const App: React.FC = () => {
 									/>
 								</Route>
 
+								{/* Extranet Routes - perform operations without needing to sign in */}
+								<Route
+									path="/tileshare/invite/:designatedTemplateId"
+									element={<TileshareInvitePage />}
+								/>
+
 								{/* Protected Routes - redirect to /signin if not authenticated */}
 								<Route element={<ProtectedRoute />}>
 									<Route element={<AppLayout />}>
 										<Route path="/timeline" element={<Timeline />} />
-										<Route path="/tileshare" element={<TileShare />} />
+										<Route
+											path="/tileshare"
+											element={<TileshareDashboardPage />}
+										>
+											<Route
+												index
+												element={<Navigate to="inbox" replace />}
+											/>
+											<Route path="inbox" element={<TileshareInbox />} />
+
+											<Route path="outbox" element={<TileshareOutbox />} />
+										</Route>
+										<Route
+											path="/tileshare/:id"
+											element={<TileshareDetailPage />}
+										/>
+
+										<Route
+											path="/tileshare/:id/tilette/:tiletteId"
+											element={<TiletteDetailPage />}
+										/>
 										<Route path="/settings" element={<SettingsLayout />}>
 											<Route
 												index
