@@ -7,7 +7,7 @@ import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
-import Timeline from './pages/Timeline';
+import Timeline from './pages/app/Timeline';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 import { HelmetProvider } from 'react-helmet-async';
@@ -24,7 +24,13 @@ import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import NotificationToast from './core/ui/NotificationToast';
-// import useAppStore from './global_state';
+import AppLayout from './pages/app/AppLayout';
+import TileshareDetailPage from './pages/app/tileshare/TileShareDetailPage';
+import TileshareInbox from './pages/app/tileshare/TileShareInbox';
+import TileshareInvitePage from './pages/app/tileshare/TileShareInvitePage';
+import TileshareOutbox from './pages/app/tileshare/TileShareOutbox';
+import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
+import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
@@ -100,23 +106,52 @@ const App: React.FC = () => {
 									/>
 								</Route>
 
+								{/* Extranet Routes - perform operations without needing to sign in */}
+								<Route
+									path="/tileshare/invite/:designatedTemplateId"
+									element={<TileshareInvitePage />}
+								/>
+
 								{/* Protected Routes - redirect to /signin if not authenticated */}
 								<Route element={<ProtectedRoute />}>
-									<Route path="/timeline" element={<Timeline />} />
-									<Route path="/settings" element={<SettingsLayout />}>
+									<Route element={<AppLayout />}>
+										<Route path="/timeline" element={<Timeline />} />
 										<Route
-											index
-											element={<Navigate to="/settings" replace />}
-										/>
-										<Route path="account" element={<AccountSettings />} />
+											path="/tileshare"
+											element={<TileshareDashboardPage />}
+										>
+											<Route
+												index
+												element={<Navigate to="inbox" replace />}
+											/>
+											<Route path="inbox" element={<TileshareInbox />} />
+
+											<Route path="outbox" element={<TileshareOutbox />} />
+										</Route>
 										<Route
-											path="preferences"
-											element={<PreferencesSettings />}
+											path="/tileshare/:id"
+											element={<TileshareDetailPage />}
 										/>
+
 										<Route
-											path="notifications"
-											element={<NotificationPreferencesSettings />}
+											path="/tileshare/:id/tilette/:tiletteId"
+											element={<TiletteDetailPage />}
 										/>
+										<Route path="/settings" element={<SettingsLayout />}>
+											<Route
+												index
+												element={<Navigate to="/settings" replace />}
+											/>
+											<Route path="account" element={<AccountSettings />} />
+											<Route
+												path="preferences"
+												element={<PreferencesSettings />}
+											/>
+											<Route
+												path="notifications"
+												element={<NotificationPreferencesSettings />}
+											/>
+										</Route>
 									</Route>
 								</Route>
 							</Routes>

@@ -79,7 +79,7 @@ const ShuffleIconButton = styled.button`
 	color: ${(props) => props.theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
 	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
+	border: 1px solid ${(props) => props.theme.colors.button.primary.border};
 	display: flex;
 	align-items: center;
 	justify-content: center;
