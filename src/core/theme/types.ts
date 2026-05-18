@@ -70,6 +70,14 @@ export type AppTheme = {
 			circle: string;
 			circleChecked: string;
 		};
+		// Tabs colors
+		tabs: {
+			border: string;
+			bg: string;
+			indicator: string;
+			text: string;
+			textActive: string;
+		};
 		// Radio Colors
 		radio: {
 			border: string;

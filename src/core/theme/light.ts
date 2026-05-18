@@ -59,6 +59,14 @@ export const lightTheme: AppTheme = {
 			circle: palette.colors.white,
 			circleChecked: palette.colors.white,
 		},
+		// Tabs colors
+		tabs: {
+			border: palette.colors.gray[200],
+			bg: 'transparent',
+			indicator: palette.colors.gray[100],
+			text: palette.colors.gray[500],
+			textActive: palette.colors.gray[900],
+		},
 		// Radio Colors
 		radio: {
 			border: palette.colors.gray[300],

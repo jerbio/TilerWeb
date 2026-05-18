@@ -59,6 +59,14 @@ export const darkTheme: AppTheme = {
 			circle: palette.colors.gray[400],
 			circleChecked: palette.colors.white,
 		},
+		// Tabs colors
+		tabs: {
+			border: palette.colors.gray[700],
+			bg: 'transparent',
+			indicator: palette.colors.gray[800],
+			text: palette.colors.gray[400],
+			textActive: palette.colors.white,
+		},
 		// Radio Colors
 		radio: {
 			border: palette.colors.gray[600],
