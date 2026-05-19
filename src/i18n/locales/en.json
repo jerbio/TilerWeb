@@ -1500,8 +1500,8 @@
 		"dashboard": {
 			"title": "Tileshare",
 			"nav": {
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"inbox": "Inbound ({{count}})",
+				"outbox": "Outbound ({{count}})"
 			}
 		},
 		"inbox": {

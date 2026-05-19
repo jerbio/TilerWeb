@@ -25,10 +25,10 @@ import NotificationPreferencesSettings from './pages/settings/NotificationPrefer
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
-import TileshareDetailPage from './pages/app/tileshare/TileShareDetailPage';
-import TileshareInbox from './pages/app/tileshare/TileShareInbox';
-import TileshareInvitePage from './pages/app/tileshare/TileShareInvitePage';
-import TileshareOutbox from './pages/app/tileshare/TileShareOutbox';
+import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
+import TileshareInbox from './pages/app/tileshare/TileshareInbox';
+import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
+import TileshareOutbox from './pages/app/tileshare/TileshareOutbox';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
 

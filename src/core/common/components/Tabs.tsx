@@ -5,6 +5,7 @@ import styled from 'styled-components';
 export type TabItem = {
 	id: string;
 	label: string;
+	icon?: React.ReactNode;
 };
 
 export type TabsProps = {
@@ -109,6 +110,7 @@ const Tabs: React.FC<TabsProps> = ({
 							onClick={() => handleTabClick(tab.id)}
 						>
 							{tab.label}
+							{isActive && tab.icon && <TabIcon>{tab.icon}</TabIcon>}
 						</TabButton>
 					);
 				})}
@@ -143,7 +145,15 @@ const TabList = styled.div`
 	gap: 2px;
 `;
 
+const TabIcon = styled.span`
+	display: inline-flex;
+	align-items: center;
+	margin-left: 6px;
+`;
+
 const TabButton = styled.button<{ $active: boolean; $disabled: boolean }>`
+	display: inline-flex;
+	align-items: center;
 	border: none;
 	background: transparent;
 	padding: 8px 12px;
