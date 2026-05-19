@@ -1502,7 +1502,18 @@
 			"nav": {
 				"inbox": "Inbound ({{count}})",
 				"outbox": "Outbound ({{count}})"
+			},
+			"filter": {
+				"all": "All",
+				"inProgress": "In Progress"
 			}
+		},
+		"card": {
+			"progress": "Progress",
+			"dueOn": "Due on:",
+			"dueBy": "Due by:",
+			"multiTileshare": "Multi tileshare",
+			"tileshare": "Tileshare"
 		},
 		"inbox": {
 			"title": "Inbox"

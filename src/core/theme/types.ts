@@ -153,6 +153,18 @@ export type AppTheme = {
 			focusRing: string;
 			gradientNeutral: string;
 		};
+		// Pagination colors
+		pagination: {
+			bg: string;
+			bgHover: string;
+			bgActive: string;
+			border: string;
+			borderActive: string;
+			text: string;
+			textActive: string;
+			textDisabled: string;
+			ellipsis: string;
+		};
 		// Utility colors
 		white: string;
 		black: string;

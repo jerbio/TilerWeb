@@ -124,6 +124,18 @@ export const darkTheme: AppTheme = {
 			focusRing: palette.colors.gray[900],
 			gradientNeutral: palette.colors.gray[700],
 		},
+		// Pagination colors
+		pagination: {
+			bg: palette.colors.gray[900],
+			bgHover: palette.colors.gray[800],
+			bgActive: palette.colors.brand[500],
+			border: palette.colors.gray[700],
+			borderActive: palette.colors.brand[500],
+			text: palette.colors.gray[400],
+			textActive: palette.colors.gray[100],
+			textDisabled: palette.colors.gray[700],
+			ellipsis: palette.colors.gray[600],
+		},
 		// hues
 		brand: palette.colors.brand,
 		gray: palette.colors.gray,

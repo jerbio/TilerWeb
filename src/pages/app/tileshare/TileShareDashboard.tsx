@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 import Tabs from '@/core/common/components/Tabs';
+import Select, { type SelectOption } from '@/core/common/components/select';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { tileshareService } from '@/services';
 import { DesignatedTile, TileShareCluster } from '@/core/common/types/tileshare';
@@ -55,7 +56,7 @@ const dummyInboxItem: DesignatedTile = {
 		phoneNumber: null,
 		countryCode: 'US',
 	},
-	completionPercent: 0,
+	completionPercent: 10,
 	tilerEvent: null,
 	clusterOwner: {
 		id: 'creator-1',
@@ -100,9 +101,15 @@ const dummyOutboxItem: TileShareCluster = {
 	truncatedUser: null,
 };
 
+export enum TileshareFilter {
+	All = 'all',
+	InProgress = 'inProgress',
+}
+
 export type TileshareDashboardOutletContext = {
 	tiles: DesignatedTile[];
 	clusters: TileShareCluster[];
+	filter: TileshareFilter;
 };
 
 const TileshareDashboardPage: React.FC = () => {
@@ -110,7 +117,15 @@ const TileshareDashboardPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const [tiles, setTiles] = useState<DesignatedTile[]>([dummyInboxItem]);
-	const [clusters, setClusters] = useState<TileShareCluster[]>([dummyOutboxItem]);
+	const [clusters, setClusters] = useState<TileShareCluster[]>([
+		dummyOutboxItem,
+		dummyOutboxItem,
+		dummyOutboxItem,
+		dummyOutboxItem,
+		dummyOutboxItem,
+		dummyOutboxItem,
+	]);
+	const [filter, setFilter] = useState<TileshareFilter>(TileshareFilter.All);
 
 	const activeTab = pathname.endsWith('/outbox') ? 'outbox' : 'inbox';
 	useEffect(() => {
@@ -159,10 +174,20 @@ const TileshareDashboardPage: React.FC = () => {
 		navigate(id);
 	};
 
+	const filterOptions = useMemo<SelectOption<TileshareFilter>[]>(
+		() => [
+			{ value: TileshareFilter.All, label: t('tilesharedemo.dashboard.filter.all') },
+			{
+				value: TileshareFilter.InProgress,
+				label: t('tilesharedemo.dashboard.filter.inProgress'),
+			},
+		],
+		[t]
+	);
+
 	return (
 		<Container>
 			<CalendarUIProvider>
-				<Title>{t('tilesharedemo.dashboard.title')}</Title>
 				<Header>
 					<Tabs
 						tabs={tabs}
@@ -170,10 +195,19 @@ const TileshareDashboardPage: React.FC = () => {
 						onChange={handleTabChange}
 						aria-label={t('tilesharedemo.dashboard.title')}
 					/>
+					<Select
+						value={filter}
+						onChange={setFilter}
+						options={filterOptions}
+						align="right"
+						aria-label={t('tilesharedemo.dashboard.filter.all')}
+					/>
 				</Header>
 				<Main>
 					<Outlet
-						context={{ tiles, clusters } satisfies TileshareDashboardOutletContext}
+						context={
+							{ tiles, clusters, filter } satisfies TileshareDashboardOutletContext
+						}
 					/>
 				</Main>
 			</CalendarUIProvider>
@@ -185,7 +219,7 @@ const Container = styled.div`
 	position: relative;
 	height: 100%;
 	background-color: ${(props) => props.theme.colors.background.page};
-	overflow: hidden;
+	overflow-y: scroll;
 	isolation: isolate;
 `;
 
@@ -198,6 +232,7 @@ const Title = styled.div`
 const Header = styled.header`
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	padding: 1rem 1.5rem;
 `;
 
