@@ -14,8 +14,7 @@ export type TileShareCardProps = {
 	title: string | null;
 	subtitle?: string | null;
 	progress: number | null;
-	dueOn: number | null;
-	dueBy: number | null;
+	due: number | null;
 	avatarUsers: AvatarUser[];
 	commentCount?: number | null;
 	linkCount?: number | null;
@@ -25,8 +24,7 @@ const TileShareCard: React.FC<TileShareCardProps> = ({
 	title,
 	subtitle,
 	progress,
-	dueOn,
-	dueBy,
+	due,
 	avatarUsers,
 	commentCount,
 	linkCount,
@@ -34,8 +32,8 @@ const TileShareCard: React.FC<TileShareCardProps> = ({
 	const theme = useTheme();
 	const { t } = useTranslation();
 
-	const formattedDueOn = dueOn ? dayjs(dueOn).format('ddd, D MMM, YYYY') : '—';
-	const formattedDueBy = dueBy ? unixToTimeString(dueBy) : '—';
+	const formattedDueOn = due ? dayjs(due).format('ddd, D MMM, YYYY') : '—';
+	const formattedDueBy = due ? unixToTimeString(due) : '—';
 
 	return (
 		<CardGrid>
@@ -286,8 +284,9 @@ const MetaItem = styled.div`
 `;
 
 const MetaCount = styled.span`
-	font-size: ${({ theme }) => theme.typography.fontSize.xs};
-	color: ${({ theme }) => theme.colors.text.secondary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 export default TileShareCard;

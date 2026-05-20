@@ -29,7 +29,30 @@ const dummyInboxItem: DesignatedTile = {
 			phoneNumber: null,
 			countryCode: 'US',
 		},
-		designatedUsers: [],
+		designatedUsers: [
+			{
+				displayedIdentifier: 'gbembio2002@yahoo.com',
+				userId: '6bc6992f-3222-4fd8-9e2b-b94eba2fb717',
+				designatedTileTemplateId:
+					'DesignatedTileTemplate+01KHEQ7RXB7KNGDRYA4CMRH9Y8+01KHEQ7RXBPRYWB19XXDR8MFGC',
+				userProfile: {
+					id: '6bc6992f-3222-4fd8-9e2b-b94eba2fb717',
+					username: 'jerbio',
+					timeZoneDifference: 360000,
+					timeZone: 'America/Denver',
+					email: 'gbembio2002@yahoo.com',
+					endfOfDay: '2026-05-20T04:30:00+00:00',
+					endOfDay: '2026-05-20T04:30:00+00:00',
+					phoneNumber: '3478500836',
+					fullName: 'Jerome',
+					firstName: 'Jerome',
+					lastName: '',
+					countryCode: '1',
+				},
+				rsvpStatus: 'accepted',
+				completionPct: 100,
+			},
+		],
 		clusterId: 'cluster-1',
 		duration: 3600000,
 		start: Date.now(),
@@ -98,7 +121,8 @@ const dummyOutboxItem: TileShareCluster = {
 		countryCode: 'US',
 	},
 	tileShareTemplates: [],
-	truncatedUser: null,
+	truncatedUser:
+		'demo@tiler.app,gbembio2002@yahoo.com,odiksglory@gmail.com,jeromebiotidara@gmail.com',
 };
 
 export enum TileshareFilter {
@@ -117,14 +141,7 @@ const TileshareDashboardPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const [tiles, setTiles] = useState<DesignatedTile[]>([dummyInboxItem]);
-	const [clusters, setClusters] = useState<TileShareCluster[]>([
-		dummyOutboxItem,
-		dummyOutboxItem,
-		dummyOutboxItem,
-		dummyOutboxItem,
-		dummyOutboxItem,
-		dummyOutboxItem,
-	]);
+	const [clusters, setClusters] = useState<TileShareCluster[]>([dummyOutboxItem]);
 	const [filter, setFilter] = useState<TileshareFilter>(TileshareFilter.All);
 
 	const activeTab = pathname.endsWith('/outbox') ? 'outbox' : 'inbox';
@@ -221,12 +238,6 @@ const Container = styled.div`
 	background-color: ${(props) => props.theme.colors.background.page};
 	overflow-y: scroll;
 	isolation: isolate;
-`;
-
-const Title = styled.div`
-	font-size: ${({ theme }) => theme.typography.fontSize.lg};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const Header = styled.header`
