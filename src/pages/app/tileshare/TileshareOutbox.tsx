@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useOutletContext } from 'react-router';
@@ -7,17 +7,11 @@ import TileShareCard, { type AvatarUser } from '@/components/tileshare/TileShare
 import Pagination from '@/core/common/components/Pagination';
 import EmptyState from '@/core/common/components/EmptyState';
 import { SendHorizonal } from 'lucide-react';
-
-const PAGE_SIZE = 5;
+import usePagination from '@/hooks/usePagination';
 
 const TileshareOutbox: React.FC = () => {
 	const { t } = useTranslation();
 	const { clusters, filter } = useOutletContext<TileshareDashboardOutletContext>();
-	const [page, setPage] = useState(1);
-
-	useEffect(() => {
-		setPage(1);
-	}, [filter]);
 
 	const filteredClusters = useMemo(
 		() =>
@@ -27,12 +21,12 @@ const TileshareOutbox: React.FC = () => {
 		[clusters, filter]
 	);
 
-	const totalPages = Math.ceil(filteredClusters.length / PAGE_SIZE);
-	const pagedClusters = filteredClusters.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-	const handlePageChange = (next: number) => {
-		setPage(next);
-	};
+	const {
+		page,
+		totalPages,
+		pagedItems: pagedClusters,
+		setPage,
+	} = usePagination(filteredClusters, 5, [filter]);
 
 	const emptyText =
 		filter === TileshareFilter.InProgress
@@ -69,7 +63,7 @@ const TileshareOutbox: React.FC = () => {
 							);
 						})}
 					</List>
-					<Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+					<Pagination page={page} totalPages={totalPages} onChange={setPage} />
 				</>
 			)}
 		</Container>
