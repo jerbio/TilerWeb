@@ -5,6 +5,8 @@ import { useOutletContext } from 'react-router';
 import { TileshareDashboardOutletContext, TileshareFilter } from './TileShareDashboard';
 import TileShareCard, { type AvatarUser } from '@/components/tileshare/TileShareCard';
 import Pagination from '@/core/common/components/Pagination';
+import EmptyState from '@/core/common/components/EmptyState';
+import { SendHorizonal } from 'lucide-react';
 
 const PAGE_SIZE = 5;
 
@@ -32,32 +34,44 @@ const TileshareOutbox: React.FC = () => {
 		setPage(next);
 	};
 
+	const emptyText =
+		filter === TileshareFilter.InProgress
+			? t('tilesharedemo.outbox.emptyFiltered')
+			: t('tilesharedemo.outbox.empty');
+
 	return (
 		<Container>
-			<List>
-				{pagedClusters.map((cluster) => {
-					const avatarUsers: AvatarUser[] = cluster.creator
-						? [{ name: cluster.creator.fullName ?? null }]
-						: [];
+			{filteredClusters.length === 0 ? (
+				<EmptyState icon={SendHorizonal} text={emptyText} />
+			) : (
+				<>
+					<List>
+						{pagedClusters.map((cluster) => {
+							const avatarUsers: AvatarUser[] = cluster.truncatedUser
+								? cluster.truncatedUser.split(',').map((user) => ({ name: user }))
+								: [];
 
-					return (
-						<TileShareCard
-							key={cluster.id}
-							title={cluster.name}
-							subtitle={
-								cluster.isMultiTilette
-									? t('tilesharedemo.card.multiTileshare')
-									: t('tilesharedemo.card.tileshare')
-							}
-							progress={0}
-							dueOn={cluster.start}
-							dueBy={cluster.end}
-							avatarUsers={avatarUsers}
-						/>
-					);
-				})}
-			</List>
-			<Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+							return (
+								<TileShareCard
+									key={cluster.id}
+									title={cluster.name}
+									subtitle={
+										cluster.isMultiTilette
+											? t('tilesharedemo.card.multiTileshare')
+											: t('tilesharedemo.card.tileshare')
+									}
+									progress={0}
+									due={cluster.end}
+									avatarUsers={avatarUsers}
+									linkCount={avatarUsers.length}
+									commentCount={null}
+								/>
+							);
+						})}
+					</List>
+					<Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+				</>
+			)}
 		</Container>
 	);
 };

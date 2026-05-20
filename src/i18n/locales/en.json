@@ -46,6 +46,9 @@
 			"discover": "Discover",
 			"waitlist": "Waitlist"
 		},
+		"emptyState": {
+			"defaultText": "Nothing here yet"
+		},
 		"voiceInput": {
 			"listening": "Listening...",
 			"transcribing": "Transcribing...",
@@ -1516,10 +1519,14 @@
 			"tileshare": "Tileshare"
 		},
 		"inbox": {
-			"title": "Inbox"
+			"title": "Inbox",
+			"empty": "Your inbox is empty",
+			"emptyFiltered": "No in-progress items in your inbox"
 		},
 		"outbox": {
-			"title": "Outbox"
+			"title": "Outbox",
+			"empty": "Your outbox is empty",
+			"emptyFiltered": "No in-progress items in your outbox"
 		},
 		"tileshareDetail": {
 			"title": "Tileshare Detail"

@@ -124,6 +124,11 @@ export const lightTheme: AppTheme = {
 			focusRing: palette.colors.gray[200],
 			gradientNeutral: palette.colors.gray[300],
 		},
+		// Empty state colors
+		emptyState: {
+			icon: palette.colors.gray[400],
+			text: palette.colors.gray[500],
+		},
 		// Pagination colors
 		pagination: {
 			bg: palette.colors.white,

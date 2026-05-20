@@ -5,6 +5,8 @@ import { useOutletContext } from 'react-router';
 import { TileshareDashboardOutletContext, TileshareFilter } from './TileShareDashboard';
 import TileShareCard, { type AvatarUser } from '@/components/tileshare/TileShareCard';
 import Pagination from '@/core/common/components/Pagination';
+import EmptyState from '@/core/common/components/EmptyState';
+import { Inbox } from 'lucide-react';
 
 const PAGE_SIZE = 5;
 
@@ -20,12 +22,7 @@ const TileshareInbox: React.FC = () => {
 	const filteredTiles = useMemo(() => {
 		const result =
 			filter === TileshareFilter.InProgress
-				? tiles.filter(
-						(tile) =>
-							tile.status !== null &&
-							tile.status !== 'Pending' &&
-							tile.status !== 'Executed'
-					)
+				? tiles.filter((tile) => tile.completionPercent !== 100)
 				: tiles;
 		return result;
 	}, [tiles, filter]);
@@ -37,29 +34,41 @@ const TileshareInbox: React.FC = () => {
 		setPage(next);
 	};
 
+	const emptyText =
+		filter === TileshareFilter.InProgress
+			? t('tilesharedemo.inbox.emptyFiltered')
+			: t('tilesharedemo.inbox.empty');
+
 	return (
 		<Container>
-			<List>
-				{pagedTiles.map((tile) => {
-					const avatarUsers: AvatarUser[] =
-						tile.template?.designatedUsers?.map((u) => ({
-							name: u.userProfile?.fullName ?? null,
-						})) ?? [];
+			{filteredTiles.length === 0 ? (
+				<EmptyState icon={Inbox} text={emptyText} />
+			) : (
+				<>
+					<List>
+						{pagedTiles.map((tile) => {
+							const avatarUsers: AvatarUser[] =
+								tile.template?.designatedUsers?.map((u) => ({
+									name: u.userProfile?.fullName ?? null,
+								})) ?? [];
 
-					return (
-						<TileShareCard
-							key={tile.id}
-							title={tile.name}
-							subtitle={t('tilesharedemo.card.multiTileshare')}
-							progress={tile.completionPercent}
-							dueOn={tile.template?.start ?? null}
-							dueBy={tile.template?.end ?? null}
-							avatarUsers={avatarUsers}
-						/>
-					);
-				})}
-			</List>
-			<Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+							return (
+								<TileShareCard
+									key={tile.id}
+									title={tile.name}
+									subtitle={t('tilesharedemo.card.tileshare')}
+									progress={tile.completionPercent}
+									due={tile.template?.end ?? null}
+									avatarUsers={avatarUsers}
+									linkCount={avatarUsers.length}
+									commentCount={null}
+								/>
+							);
+						})}
+					</List>
+					<Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+				</>
+			)}
 		</Container>
 	);
 };

@@ -124,6 +124,11 @@ export const darkTheme: AppTheme = {
 			focusRing: palette.colors.gray[900],
 			gradientNeutral: palette.colors.gray[700],
 		},
+		// Empty state colors
+		emptyState: {
+			icon: palette.colors.gray[600],
+			text: palette.colors.gray[500],
+		},
 		// Pagination colors
 		pagination: {
 			bg: palette.colors.gray[900],

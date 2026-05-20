@@ -153,6 +153,11 @@ export type AppTheme = {
 			focusRing: string;
 			gradientNeutral: string;
 		};
+		// Empty state colors
+		emptyState: {
+			icon: string;
+			text: string;
+		};
 		// Pagination colors
 		pagination: {
 			bg: string;
