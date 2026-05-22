@@ -324,7 +324,7 @@ export type CalendarEvent = {
 	uiConfig: StyleProperties | null;
 	repetition: RepetitionConfig | null;
 	eachTileDuration: number | null;
-	restrictionProfile: null;
+	restrictionProfile: null | RestrictionProfile;
 	emojis: string | null;
 	isWhatIf: boolean | null;
 	entityName: string | null;

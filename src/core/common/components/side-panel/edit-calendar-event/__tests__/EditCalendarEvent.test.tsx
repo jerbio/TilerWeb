@@ -11,12 +11,16 @@ const mockUpdateCalendarEvent = vi.fn();
 const mockLookupCalendarEventById = vi.fn();
 const mockLookupLocationById = vi.fn();
 const mockSearchLocations = vi.fn();
+const mockGetScheduleProfile = vi.fn();
 vi.mock('@/services', () => ({
 	scheduleService: {
 		updateCalendarEvent: (...args: unknown[]) => mockUpdateCalendarEvent(...args),
 		lookupCalendarEventById: (...args: unknown[]) => mockLookupCalendarEventById(...args),
 		lookupLocationById: (...args: unknown[]) => mockLookupLocationById(...args),
 		searchLocations: (...args: unknown[]) => mockSearchLocations(...args),
+	},
+	userService: {
+		getScheduleProfile: (...args: unknown[]) => mockGetScheduleProfile(...args),
 	},
 }));
 
@@ -135,6 +139,17 @@ describe('EditCalendarEvent', () => {
 			description: 'Near the park',
 		});
 		mockSearchLocations.mockResolvedValue([]);
+		mockGetScheduleProfile.mockResolvedValue({
+			travelMedium: null,
+			pinPreference: null,
+			endTimeOfDay: null,
+			sleepDuration: null,
+			endOfDay: null,
+			timeZone: null,
+			timeZoneDifference: null,
+			personalHoursRestrictionProfile: null,
+			workHoursRestrictionProfile: null,
+		});
 	});
 
 	it('renders header with back button and title', () => {
@@ -1339,6 +1354,348 @@ describe('EditCalendarEvent', () => {
 
 			const badge = screen.getByTestId('location-verified-badge');
 			expect(badge).toHaveAttribute('title', 'location.verified.tooltip');
+		});
+	});
+
+	describe('restriction profile section', () => {
+		const workProfileId = 'work-profile-id';
+		const personalProfileId = 'personal-profile-id';
+
+		const mockScheduleProfile = {
+			travelMedium: null,
+			pinPreference: null,
+			endTimeOfDay: null,
+			sleepDuration: null,
+			endOfDay: null,
+			timeZone: null,
+			timeZoneDifference: null,
+			personalHoursRestrictionProfile: {
+				id: personalProfileId,
+				isEnabled: true,
+				timeZone: null,
+				daySelection: null,
+			},
+			workHoursRestrictionProfile: {
+				id: workProfileId,
+				isEnabled: true,
+				timeZone: null,
+				daySelection: null,
+			},
+		};
+
+		// Monday 09:00–17:00, Friday 10:00–18:00
+		const mockEventWithCustomRestriction: CalendarEvent = {
+			...mockEvent,
+			restrictionProfile: {
+				id: 'custom-rp-1',
+				isEnabled: true,
+				timeZone: 'UTC',
+				daySelection: [
+					null, // Sun
+					{
+						id: 'ds-1',
+						weekday: 1,
+						restrictionTimeLine: {
+							id: 'rt-1',
+							start: 32400000, // 09:00 UTC
+							end: 61200000, // 17:00 UTC
+							duration: 28800000,
+							timeZone: 'UTC',
+						},
+						timeZone: 'UTC',
+					},
+					null, // Tue
+					null, // Wed
+					null, // Thu
+					{
+						id: 'ds-5',
+						weekday: 5,
+						restrictionTimeLine: {
+							id: 'rt-5',
+							start: 36000000, // 10:00 UTC
+							end: 64800000, // 18:00 UTC
+							duration: 28800000,
+							timeZone: 'UTC',
+						},
+						timeZone: 'UTC',
+					},
+					null, // Sat
+				],
+			},
+		};
+
+		const mockEventWithWorkRestriction: CalendarEvent = {
+			...mockEvent,
+			restrictionProfile: {
+				id: workProfileId,
+				isEnabled: true,
+				timeZone: null,
+				daySelection: null,
+			},
+		};
+
+		const mockEventWithPersonalRestriction: CalendarEvent = {
+			...mockEvent,
+			restrictionProfile: {
+				id: personalProfileId,
+				isEnabled: true,
+				timeZone: null,
+				daySelection: null,
+			},
+		};
+
+		const openRestrictionSection = async (user: ReturnType<typeof setupUser>) => {
+			await user.click(screen.getByText('calendarEvent.edit.restrictionSection'));
+		};
+
+		it('renders restriction section header after loading', async () => {
+			renderComponent();
+			await waitForLoaded();
+			expect(screen.getByText('calendarEvent.edit.restrictionSection')).toBeInTheDocument();
+		});
+
+		it('restriction section starts collapsed', async () => {
+			renderComponent();
+			await waitForLoaded();
+			expect(
+				screen.queryByLabelText('calendarEvent.edit.restrictionEnabled')
+			).not.toBeInTheDocument();
+		});
+
+		it('expands restriction section on click', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			expect(
+				screen.getByLabelText('calendarEvent.edit.restrictionEnabled')
+			).toBeInTheDocument();
+		});
+
+		it('enable toggle is off by default when event has no restriction profile', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			const toggle = screen.getByLabelText(
+				'calendarEvent.edit.restrictionEnabled'
+			) as HTMLInputElement;
+			expect(toggle.checked).toBe(false);
+		});
+
+		it('enable toggle is on when event has an active restriction profile', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			const toggle = screen.getByLabelText(
+				'calendarEvent.edit.restrictionEnabled'
+			) as HTMLInputElement;
+			expect(toggle.checked).toBe(true);
+		});
+
+		it('shows restriction type radios when toggle is enabled', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			expect(
+				screen.getByLabelText('calendarEvent.edit.restrictionTypeWork')
+			).toBeInTheDocument();
+			expect(
+				screen.getByLabelText('calendarEvent.edit.restrictionTypePersonal')
+			).toBeInTheDocument();
+			expect(
+				screen.getByLabelText('calendarEvent.edit.restrictionTypeCustom')
+			).toBeInTheDocument();
+		});
+
+		it('hides restriction type radios when toggle is off', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			expect(
+				screen.queryByLabelText('calendarEvent.edit.restrictionTypeWork')
+			).not.toBeInTheDocument();
+		});
+
+		it('shows custom day schedule when toggle is enabled (Custom is default)', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			// Custom is the default type — day schedule shows immediately
+			expect(screen.getByTestId('restriction-day-schedule')).toBeInTheDocument();
+		});
+
+		it('hides day schedule when Work type is selected', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionTypeWork'));
+			expect(screen.queryByTestId('restriction-day-schedule')).not.toBeInTheDocument();
+		});
+
+		it('shows settings info link when Work hours is selected', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionTypeWork'));
+			expect(
+				screen.getByText('calendarEvent.edit.restrictionGoToPreferences')
+			).toBeInTheDocument();
+		});
+
+		it('shows settings info link when Personal hours is selected', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionTypePersonal'));
+			expect(
+				screen.getByText('calendarEvent.edit.restrictionGoToPreferences')
+			).toBeInTheDocument();
+		});
+
+		it('deselecting a Custom day clears its times', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			// Monday (index 1) is selected — click its toggle to deselect
+			const monToggle = screen.getByTestId('restriction-day-toggle-1');
+			expect(monToggle).toHaveAttribute('data-selected', 'true');
+			await user.click(monToggle);
+			expect(monToggle).toHaveAttribute('data-selected', 'false');
+		});
+
+		it('selecting a deselected Custom day sets default times', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			// Sunday (index 0) is deselected
+			const sunToggle = screen.getByTestId('restriction-day-toggle-0');
+			expect(sunToggle).toHaveAttribute('data-selected', 'false');
+			await user.click(sunToggle);
+			expect(sunToggle).toHaveAttribute('data-selected', 'true');
+		});
+
+		it('save sends isRestricted false when toggle is off', async () => {
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			// Make form dirty by changing name
+			const nameInput = screen.getByDisplayValue('work out');
+			await user.type(nameInput, '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.isRestricted).toBe('false');
+		});
+
+		it('save sends RestrictionProfileId when Work hours is selected', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionTypeWork'));
+			const nameInput = screen.getByDisplayValue('work out');
+			await user.type(nameInput, '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.isRestricted).toBe('true');
+			expect(params.RestrictionProfileId).toBe(workProfileId);
+		});
+
+		it('save sends RestrictionProfileId when Personal hours is selected', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
+			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionTypePersonal'));
+			const nameInput = screen.getByDisplayValue('work out');
+			await user.type(nameInput, '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.isRestricted).toBe('true');
+			expect(params.RestrictionProfileId).toBe(personalProfileId);
+		});
+
+		it('save sends RestrictiveWeek when Custom type has selected days', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			const nameInput = screen.getByDisplayValue('work out');
+			await user.type(nameInput, '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.isRestricted).toBe('true');
+			expect(params.RestrictiveWeek).toBeDefined();
+			expect(params.RestrictiveWeek.WeekDayOption).toHaveLength(2); // Mon + Fri
+		});
+
+		it('populates Work type when event restriction matches work profile id', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithWorkRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithWorkRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			const workRadio = screen.getByLabelText(
+				'calendarEvent.edit.restrictionTypeWork'
+			) as HTMLInputElement;
+			expect(workRadio.checked).toBe(true);
+		});
+
+		it('populates Personal type when event restriction matches personal profile id', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithPersonalRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithPersonalRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			const personalRadio = screen.getByLabelText(
+				'calendarEvent.edit.restrictionTypePersonal'
+			) as HTMLInputElement;
+			expect(personalRadio.checked).toBe(true);
+		});
+
+		it('shows restriction preview text when collapsed', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			expect(
+				screen.getByText('calendarEvent.edit.restrictionPreviewCustom')
+			).toBeInTheDocument();
 		});
 	});
 });

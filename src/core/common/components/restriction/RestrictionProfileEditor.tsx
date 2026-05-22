@@ -1,0 +1,279 @@
+import React from 'react';
+import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import type { DaySchedule } from '@/core/common/types/schedule';
+import TimeDropdown from '@/core/common/components/TimeDropdown';
+
+export type RestrictionType = 'work' | 'personal' | 'custom';
+
+export interface RestrictionProfileEditorProps {
+	/** Whether time restrictions are currently enabled. */
+	isRestricted: boolean;
+	onIsRestrictedChange: (value: boolean) => void;
+	/** Which restriction type is selected (only relevant when isRestricted is true). */
+	restrictionType: RestrictionType;
+	onRestrictionTypeChange: (value: RestrictionType) => void;
+	/** The custom day schedule (only shown when restrictionType === 'custom'). */
+	customSchedule: DaySchedule[];
+	onCustomScheduleChange: (value: DaySchedule[]) => void;
+	/** Profile IDs are needed to link Work / Personal radio options to the correct profile. */
+	workProfileId?: string | null;
+	personalProfileId?: string | null;
+}
+
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+
+const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
+	isRestricted,
+	onIsRestrictedChange,
+	restrictionType,
+	onRestrictionTypeChange,
+	customSchedule,
+	onCustomScheduleChange,
+	workProfileId,
+	personalProfileId,
+}) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
+
+	const handleDayToggle = (dayIndex: number, currentlySelected: boolean) => {
+		onCustomScheduleChange(
+			customSchedule.map((d) =>
+				d.dayIndex === dayIndex
+					? currentlySelected
+						? { ...d, startTime: '', endTime: '' }
+						: { ...d, startTime: '09:00', endTime: '17:00' }
+					: d
+			)
+		);
+	};
+
+	const handleStartTimeChange = (dayIndex: number, val: string) => {
+		onCustomScheduleChange(
+			customSchedule.map((d) => (d.dayIndex === dayIndex ? { ...d, startTime: val } : d))
+		);
+	};
+
+	const handleEndTimeChange = (dayIndex: number, val: string) => {
+		onCustomScheduleChange(
+			customSchedule.map((d) => (d.dayIndex === dayIndex ? { ...d, endTime: val } : d))
+		);
+	};
+
+	const capitalize = (s: RestrictionType) => s.charAt(0).toUpperCase() + s.slice(1);
+
+	return (
+		<>
+			<ToggleRow>
+				<CheckboxInput
+					type="checkbox"
+					id="restriction-enabled"
+					checked={isRestricted}
+					onChange={(e) => onIsRestrictedChange(e.target.checked)}
+					aria-label={t('calendarEvent.edit.restrictionEnabled')}
+				/>
+				<ToggleLabel htmlFor="restriction-enabled">
+					{t('calendarEvent.edit.restrictionEnabled')}
+				</ToggleLabel>
+			</ToggleRow>
+
+			{isRestricted && (
+				<TypeGroup>
+					{(['work', 'personal', 'custom'] as const).map((type) => (
+						<TypeOption key={type}>
+							<input
+								type="radio"
+								id={`restriction-type-${type}`}
+								name="restriction-type"
+								value={type}
+								checked={restrictionType === type}
+								onChange={() => onRestrictionTypeChange(type)}
+								aria-label={t(
+									`calendarEvent.edit.restrictionType${capitalize(type)}`
+								)}
+							/>
+							<label htmlFor={`restriction-type-${type}`}>
+								{t(`calendarEvent.edit.restrictionType${capitalize(type)}`)}
+							</label>
+						</TypeOption>
+					))}
+
+					{(restrictionType === 'work' || restrictionType === 'personal') && (
+						<InfoBanner>
+							<span>
+								{t(
+									restrictionType === 'work'
+										? 'calendarEvent.edit.restrictionWorkInfo'
+										: 'calendarEvent.edit.restrictionPersonalInfo'
+								)}
+							</span>
+							<PrefsLink
+								type="button"
+								onClick={() => navigate('/settings/preferences')}
+							>
+								{t('calendarEvent.edit.restrictionGoToPreferences')}
+							</PrefsLink>
+						</InfoBanner>
+					)}
+
+					{restrictionType === 'custom' && (
+						<DayScheduleList data-testid="restriction-day-schedule">
+							{customSchedule.map((day) => {
+								const isSelected = !!(day.startTime || day.endTime);
+								const dayKey = DAY_KEYS[day.dayIndex];
+								return (
+									<DayRow key={day.dayIndex}>
+										<DayToggle
+											type="button"
+											$selected={isSelected}
+											data-selected={String(isSelected)}
+											data-testid={`restriction-day-toggle-${day.dayIndex}`}
+											onClick={() =>
+												handleDayToggle(day.dayIndex, isSelected)
+											}
+										>
+											{t(
+												`settings.sections.tilePreferences.dayLabels.${dayKey}`
+											)}
+										</DayToggle>
+										{isSelected && (
+											<>
+												<TimeDropdown
+													value={day.startTime}
+													onChange={(val) =>
+														handleStartTimeChange(day.dayIndex, val)
+													}
+													interval={60}
+												/>
+												<TimeDropdown
+													value={day.endTime}
+													onChange={(val) =>
+														handleEndTimeChange(day.dayIndex, val)
+													}
+													interval={60}
+												/>
+											</>
+										)}
+									</DayRow>
+								);
+							})}
+						</DayScheduleList>
+					)}
+				</TypeGroup>
+			)}
+		</>
+	);
+};
+
+export default RestrictionProfileEditor;
+
+/* ── Styled Components ── */
+
+const ToggleRow = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+`;
+
+const ToggleLabel = styled.label`
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-weight: 500;
+	cursor: pointer;
+`;
+
+const CheckboxInput = styled.input`
+	width: 16px;
+	height: 16px;
+	accent-color: ${({ theme }) => theme.colors.brand[500]};
+	cursor: pointer;
+`;
+
+const TypeGroup = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+`;
+
+const TypeOption = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	label {
+		font-size: ${({ theme }) => theme.typography.fontSize.sm};
+		color: ${({ theme }) => theme.colors.text.primary};
+		cursor: pointer;
+	}
+`;
+
+const InfoBanner = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.625rem 0.75rem;
+	background: ${({ theme }) => theme.colors.background.card2};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.text.muted};
+	margin-top: 0.25rem;
+`;
+
+const PrefsLink = styled.button`
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	color: ${({ theme }) => theme.colors.brand[500]};
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	text-align: left;
+	font-weight: 500;
+
+	&:hover {
+		text-decoration: underline;
+	}
+`;
+
+const DayScheduleList = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+`;
+
+const DayRow = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	> select {
+		flex: 1;
+		height: 32px;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+`;
+
+const DayToggle = styled.button<{ $selected: boolean }>`
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: 2px solid
+		${({ $selected, theme }) =>
+			$selected ? theme.colors.brand[500] : theme.colors.border.default};
+	background: ${({ $selected, theme }) => ($selected ? theme.colors.brand[500] : 'transparent')};
+	color: ${({ $selected, theme }) => ($selected ? '#ffffff' : theme.colors.text.muted)};
+	font-size: 0.625rem;
+	font-weight: 600;
+	cursor: pointer;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition:
+		background 0.15s ease,
+		border-color 0.15s ease;
+`;
