@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render, screen, setupUser, waitFor } from '@/test/test-utils';
+import { act, render, screen, setupUser, waitFor, within } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import EditCalendarEvent from '../EditCalendarEvent';
@@ -1607,6 +1607,7 @@ describe('EditCalendarEvent', () => {
 			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
 			const params = mockUpdateCalendarEvent.mock.calls[0][0];
 			expect(params.isRestricted).toBe('false');
+			expect(params.RestrictiveWeek).toEqual({ isEnabled: 'false' });
 		});
 
 		it('save sends RestrictionProfileId when Work hours is selected', async () => {
@@ -1696,6 +1697,64 @@ describe('EditCalendarEvent', () => {
 			expect(
 				screen.getByText('calendarEvent.edit.restrictionPreviewCustom')
 			).toBeInTheDocument();
+		});
+
+		it('shows "Off" label for each disabled day in Custom mode', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			// Sun=0, Tue=2, Wed=3, Thu=4, Sat=6 are disabled → 5 "Off" labels
+			const offLabels = screen.getAllByText('calendarEvent.edit.restrictionDayOff');
+			expect(offLabels).toHaveLength(5);
+		});
+
+		it('does not show "Off" label for enabled days in Custom mode', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			// Mon (1) and Fri (5) are enabled — their rows must not contain the "Off" label
+			const monRow = screen.getByTestId('restriction-day-row-1');
+			const friRow = screen.getByTestId('restriction-day-row-5');
+			expect(
+				within(monRow).queryByText('calendarEvent.edit.restrictionDayOff')
+			).not.toBeInTheDocument();
+			expect(
+				within(friRow).queryByText('calendarEvent.edit.restrictionDayOff')
+			).not.toBeInTheDocument();
+		});
+
+		it('renders two disabled time dropdowns for each disabled day in Custom mode', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			// Sunday (0) is disabled — its row should have 2 disabled dropdown trigger buttons
+			const sunRow = screen.getByTestId('restriction-day-row-0');
+			const allButtons = within(sunRow).getAllByRole('button');
+			const disabledButtons = allButtons.filter((b) => b.hasAttribute('disabled'));
+			expect(disabledButtons).toHaveLength(2);
+		});
+
+		it('renders two enabled time dropdowns for each selected day in Custom mode', async () => {
+			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
+			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
+			const user = setupUser();
+			renderComponent(mockEventWithCustomRestriction);
+			await waitForLoaded();
+			await openRestrictionSection(user);
+			// Monday (1) is enabled — none of its buttons should be disabled
+			const monRow = screen.getByTestId('restriction-day-row-1');
+			const allButtons = within(monRow).getAllByRole('button');
+			const disabledButtons = allButtons.filter((b) => b.hasAttribute('disabled'));
+			expect(disabledButtons).toHaveLength(0);
 		});
 	});
 });

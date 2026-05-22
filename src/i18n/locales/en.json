@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1187,6 +1187,7 @@
 			"restrictionWorkInfo": "Work hours are managed in your Tile Preferences.",
 			"restrictionPersonalInfo": "Personal hours are managed in your Tile Preferences.",
 			"restrictionGoToPreferences": "Go to Tile Preferences",
+			"restrictionDayOff": "Off",
 			"restrictionPreviewAnytime": "Anytime",
 			"restrictionPreviewCustom": "Custom",
 			"name": "Name",

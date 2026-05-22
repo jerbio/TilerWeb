@@ -1,9 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { DaySchedule } from '@/core/common/types/schedule';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
+import TimeUtil from '@/core/util/time';
 
 export type RestrictionType = 'work' | 'personal' | 'custom';
 
@@ -17,12 +18,12 @@ export interface RestrictionProfileEditorProps {
 	/** The custom day schedule (only shown when restrictionType === 'custom'). */
 	customSchedule: DaySchedule[];
 	onCustomScheduleChange: (value: DaySchedule[]) => void;
-	/** Profile IDs are needed to link Work / Personal radio options to the correct profile. */
-	workProfileId?: string | null;
-	personalProfileId?: string | null;
 }
 
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+
+const DEFAULT_START_TIME = TimeUtil.minutesFromStartOfDayToMeridian(9 * 60); // '9:00 AM'
+const DEFAULT_END_TIME = TimeUtil.minutesFromStartOfDayToMeridian(17 * 60); // '5:00 PM'
 
 const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 	isRestricted,
@@ -31,8 +32,6 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 	onRestrictionTypeChange,
 	customSchedule,
 	onCustomScheduleChange,
-	workProfileId,
-	personalProfileId,
 }) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
@@ -43,7 +42,7 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 				d.dayIndex === dayIndex
 					? currentlySelected
 						? { ...d, startTime: '', endTime: '' }
-						: { ...d, startTime: '09:00', endTime: '17:00' }
+						: { ...d, startTime: DEFAULT_START_TIME, endTime: DEFAULT_END_TIME }
 					: d
 			)
 		);
@@ -123,7 +122,10 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 								const isSelected = !!(day.startTime || day.endTime);
 								const dayKey = DAY_KEYS[day.dayIndex];
 								return (
-									<DayRow key={day.dayIndex}>
+									<DayRow
+										key={day.dayIndex}
+										data-testid={`restriction-day-row-${day.dayIndex}`}
+									>
 										<DayToggle
 											type="button"
 											$selected={isSelected}
@@ -137,24 +139,29 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 												`settings.sections.tilePreferences.dayLabels.${dayKey}`
 											)}
 										</DayToggle>
-										{isSelected && (
-											<>
-												<TimeDropdown
-													value={day.startTime}
-													onChange={(val) =>
-														handleStartTimeChange(day.dayIndex, val)
-													}
-													interval={60}
-												/>
-												<TimeDropdown
-													value={day.endTime}
-													onChange={(val) =>
-														handleEndTimeChange(day.dayIndex, val)
-													}
-													interval={60}
-												/>
-											</>
+										{!isSelected && (
+											<OffLabel>
+												{t('calendarEvent.edit.restrictionDayOff')}
+											</OffLabel>
 										)}
+										<TimeDropdown
+											value={day.startTime}
+											onChange={(val) =>
+												handleStartTimeChange(day.dayIndex, val)
+											}
+											interval={60}
+											disabled={!isSelected}
+											placeholder="—"
+										/>
+										<TimeDropdown
+											value={day.endTime}
+											onChange={(val) =>
+												handleEndTimeChange(day.dayIndex, val)
+											}
+											interval={60}
+											disabled={!isSelected}
+											placeholder="—"
+										/>
 									</DayRow>
 								);
 							})}
@@ -255,6 +262,16 @@ const DayRow = styled.div`
 		padding-top: 0;
 		padding-bottom: 0;
 	}
+`;
+
+const OffLabel = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	font-weight: 600;
+	color: ${({ theme }) => theme.colors.text.muted};
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	flex-shrink: 0;
+	width: 22px;
 `;
 
 const DayToggle = styled.button<{ $selected: boolean }>`

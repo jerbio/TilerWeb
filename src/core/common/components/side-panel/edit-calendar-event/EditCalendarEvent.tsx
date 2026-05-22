@@ -423,6 +423,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 
 		if (!isRestricted) {
 			params.isRestricted = 'false';
+			params.RestrictiveWeek = { isEnabled: 'false' };
 		} else if (restrictionType === 'work' && workProfileId) {
 			params.isRestricted = 'true';
 			params.RestrictionProfileId = workProfileId;
@@ -1047,8 +1048,6 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 										onRestrictionTypeChange={setRestrictionType}
 										customSchedule={customSchedule}
 										onCustomScheduleChange={setCustomSchedule}
-										workProfileId={workProfileId}
-										personalProfileId={personalProfileId}
 									/>
 								</SectionBody>
 							)}
