@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1207,6 +1207,18 @@
 			"repetitionSection": "Repetition",
 			"locationSection": "Location",
 			"colorSection": "Color",
+			"restrictionSection": "Time Restrictions",
+			"restrictionEnabled": "Enable time restrictions",
+			"restrictionTypeAnytime": "Anytime",
+			"restrictionTypeWork": "Work hours",
+			"restrictionTypePersonal": "Personal hours",
+			"restrictionTypeCustom": "Custom",
+			"restrictionWorkInfo": "Work hours are managed in your Tile Preferences.",
+			"restrictionPersonalInfo": "Personal hours are managed in your Tile Preferences.",
+			"restrictionGoToPreferences": "Go to Tile Preferences",
+			"restrictionDayOff": "Off",
+			"restrictionPreviewAnytime": "Anytime",
+			"restrictionPreviewCustom": "Custom",
 			"name": "Name",
 			"start": "Start",
 			"end": "End",
