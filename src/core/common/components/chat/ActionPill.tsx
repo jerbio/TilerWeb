@@ -290,10 +290,10 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					setIsDemoLimited(false);
 					dismissOverlay();
 					if (result.status === CalendarRequestStatus.NotFound) {
-						console.warn(
-							'[ActionPill] Calendar could not find entity:',
-							action.entityId
-						);
+						// console.warn(
+						// 	'[ActionPill] Calendar could not find entity:',
+						// 	action.entityId
+						// );
 					}
 				}
 			}
@@ -304,35 +304,6 @@ const ActionPill: React.FC<ActionPillProps> = ({
 	const isSelectedChip =
 		!!selectedActionId &&
 		(selectedActionId === simulationAction?.actionId || selectedActionId === action.id);
-
-	// Diagnostic logging — fires whenever any of the review-mode signals
-	// flip. Lets us trace the side-panel → store → chip pipeline live in
-	// the browser console without a debugger.
-	useEffect(() => {
-		if (!import.meta.env.DEV) return;
-		// eslint-disable-next-line no-console
-		console.debug('[ActionPill]', action.id, {
-			inReview,
-			selectedActionId,
-			simulationProvided: !!simulation,
-			simulationState: simulation?.state ?? null,
-			previewActionsCount: simulation?.previewActions?.length ?? 0,
-			simulationActionProvided: !!simulationAction,
-			simulationActionId: simulationAction?.actionId ?? null,
-			isReviewable,
-			isSelectedChip,
-			isClickable,
-		});
-	}, [
-		action.id,
-		inReview,
-		selectedActionId,
-		simulation,
-		simulationAction,
-		isReviewable,
-		isSelectedChip,
-		isClickable,
-	]);
 
 	return (
 		<>

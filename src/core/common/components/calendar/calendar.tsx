@@ -23,6 +23,7 @@ import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
+import { useInitialScrollToNow } from './calendar_auto_scroll';
 import {
 	createCalendarRequestHandler,
 	retryPendingFocus,
@@ -76,13 +77,11 @@ const Calendar = ({
 	selectedSimulationKey,
 }: CalendarProps) => {
 	const { t } = useTranslation();
-	const viableEvents = events.filter((event) => event.isViable);
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
 	const theme = useTheme();
 	const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
 
-	const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
 	const contentContainerRef = useRef<HTMLDivElement>(null);
 
 	// Ref holding all styled events (populated by CalendarEvents)
@@ -275,66 +274,14 @@ const Calendar = ({
 		);
 	}, [viewOptions.width, theme]);
 
-	// Auto-scroll to first event or current time on initial load
-	useEffect(() => {
-		if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
-			return;
-		}
-
-		const scrollToPosition = (scrollTop: number) => {
-			if (contentContainerRef.current) {
-				contentContainerRef.current.scrollTop = scrollTop;
-				setHasAutoScrolled(true);
-			}
-		};
-
-		// Find the earliest event in the current view
-		const viewStart = viewOptions.startDay.startOf('day');
-		const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
-
-		const eventsInView = viableEvents.filter((event) => {
-			const eventStart = dayjs(event.start);
-			const eventEnd = dayjs(event.end);
-			return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
-		});
-
-		if (eventsInView.length > 0) {
-			// Find the earliest event
-			const earliestEvent = eventsInView.reduce((earliest, current) => {
-				return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
-			});
-
-			const eventStart = dayjs(earliestEvent.start);
-			const hourFraction =
-				eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before the first event (or to the event if it's in the first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		} else {
-			// No events in view, scroll to current time
-			const now = TimeUtil.nowDayjs();
-			const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before current time (or to current time if in first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		}
-	}, [
-		contentMounted,
-		hasAutoScrolled,
-		eventsLoading,
-		viableEvents,
-		viewOptions.startDay,
-		viewOptions.daysInView,
-	]);
-
-	// Reset auto-scroll flag when view changes (date navigation)
-	useEffect(() => {
-		setHasAutoScrolled(false);
-	}, [viewOptions.startDay]);
+	// Auto-scroll to current time on initial mount only.
+	// Subsequent week/day navigation preserves the user's scroll
+	// position so they can compare the same hour-row across weeks.
+	useInitialScrollToNow(
+		contentContainerRef,
+		parseInt(calendarConfig.CELL_HEIGHT),
+		contentMounted
+	);
 
 	const isMobile = useIsMobile();
 	// Timeline switches to the mobile bottom-sheet review layout at the
