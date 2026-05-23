@@ -17,8 +17,18 @@ import {
 	CalendarEvent,
 	CalendarEventUpdateParams,
 	EventLocation,
+	DaySchedule,
+	RestrictionProfile,
 } from '@/core/common/types/schedule';
-import { scheduleService } from '@/services';
+import { scheduleService, userService } from '@/services';
+import {
+	restrictionProfileToSchedule,
+	scheduleToWeekDayOptions,
+} from '@/core/common/utils/restrictionUtils';
+import RestrictionProfileEditor, {
+	RestrictionType,
+	RESTRICTION_TYPE_KEYS,
+} from '@/core/common/components/restriction/RestrictionProfileEditor';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
@@ -113,11 +123,21 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	// Snapshot of form values after loading, used to detect changes
 	const initialFormRef = useRef<Record<string, string> | null>(null);
 
+	// Restriction profile state
+	const [isRestricted, setIsRestricted] = useState(false);
+	const [restrictionType, setRestrictionType] = useState<RestrictionType>(RestrictionType.Custom);
+	const [customSchedule, setCustomSchedule] = useState<DaySchedule[]>(
+		Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
+	);
+	const [workProfileId, setWorkProfileId] = useState<string | null>(null);
+	const [personalProfileId, setPersonalProfileId] = useState<string | null>(null);
+
 	// Section collapsed states — all start collapsed
 	const [timeOpen, setTimeOpen] = useState(false);
 	const [repetitionOpen, setRepetitionOpen] = useState(false);
 	const [locationOpen, setLocationOpen] = useState(false);
 	const [colorOpen, setColorOpen] = useState(false);
+	const [restrictionOpen, setRestrictionOpen] = useState(false);
 
 	// Date picker open states
 	const [startPickerOpen, setStartPickerOpen] = useState(false);
@@ -130,6 +150,31 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setEndPickerOpen(false);
 		setRepStartPickerOpen(false);
 		setRepEndPickerOpen(false);
+	};
+
+	/** Populate restriction profile state from a fetched profile. */
+	const populateRestriction = (
+		profile: RestrictionProfile | null | undefined,
+		workId: string | null,
+		personalId: string | null
+	) => {
+		if (!profile || profile.isEnabled === false) {
+			setIsRestricted(false);
+			setRestrictionType(RestrictionType.Custom);
+			setCustomSchedule(
+				Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
+			);
+			return;
+		}
+		setIsRestricted(true);
+		if (profile.id && workId && profile.id === workId) {
+			setRestrictionType(RestrictionType.Work);
+		} else if (profile.id && personalId && profile.id === personalId) {
+			setRestrictionType(RestrictionType.Personal);
+		} else {
+			setRestrictionType(RestrictionType.Custom);
+			setCustomSchedule(restrictionProfileToSchedule(profile));
+		}
 	};
 
 	/** Populate all form fields from a CalendarEvent. */
@@ -194,6 +239,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			repEndDate: repEndDate?.valueOf()?.toString() ?? '',
 			repEndTime,
 			weekDays: Array.from(weekDays).sort().join(','),
+			isRestricted: String(isRestricted),
+			restrictionType,
+			customSchedule: JSON.stringify(customSchedule),
 		};
 	};
 
@@ -222,6 +270,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			repEndDate: repEndDate?.valueOf()?.toString() ?? '',
 			repEndTime,
 			weekDays: Array.from(weekDays).sort().join(','),
+			isRestricted: String(isRestricted),
+			restrictionType,
+			customSchedule: JSON.stringify(customSchedule),
 		};
 		return Object.keys(init).some((k) => init[k] !== current[k]);
 	})();
@@ -277,11 +328,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		let cancelled = false;
 		setIsLoading(true);
 		if (!event.id) return;
-		scheduleService
-			.lookupCalendarEventById(event.id)
-			.then(async (full) => {
+		Promise.all([
+			scheduleService.lookupCalendarEventById(event.id),
+			userService.getScheduleProfile().catch(() => null),
+		])
+			.then(async ([full, scheduleProfile]) => {
 				if (cancelled) return;
+				const workId = scheduleProfile?.workHoursRestrictionProfile?.id ?? null;
+				const personalId = scheduleProfile?.personalHoursRestrictionProfile?.id ?? null;
+				setWorkProfileId(workId);
+				setPersonalProfileId(personalId);
 				populateForm(full);
+				populateRestriction(full.restrictionProfile, workId, personalId);
 				// Fetch full location details if the event has a locationId
 				if (full.locationId) {
 					try {
@@ -299,7 +357,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			.catch((err) => {
 				console.error('Fetch event failed:', err);
 				// Fall back to prop data on failure
-				if (!cancelled) populateForm(event);
+				if (!cancelled) {
+					populateForm(event);
+					populateRestriction(event.restrictionProfile, null, null);
+				}
 			})
 			.finally(() => {
 				if (!cancelled) setIsLoading(false);
@@ -358,6 +419,23 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 				RepetitionStart: combineDateAndTimeString(repStartDate, repStartTime) ?? undefined,
 				RepetitionEnd: combineDateAndTimeString(repEndDate, repEndTime) ?? undefined,
 				DayOfWeekRepetitions: frequency === 'weekly' ? Array.from(weekDays) : undefined,
+			};
+		}
+
+		if (!isRestricted) {
+			params.isRestricted = 'false';
+			params.RestrictiveWeek = { isEnabled: 'false' };
+		} else if (restrictionType === RestrictionType.Work && workProfileId) {
+			params.isRestricted = 'true';
+			params.RestrictionProfileId = workProfileId;
+		} else if (restrictionType === RestrictionType.Personal && personalProfileId) {
+			params.isRestricted = 'true';
+			params.RestrictionProfileId = personalProfileId;
+		} else if (restrictionType === RestrictionType.Custom) {
+			params.isRestricted = 'true';
+			params.RestrictiveWeek = {
+				isEnabled: 'true',
+				WeekDayOption: scheduleToWeekDayOptions(customSchedule),
 			};
 		}
 
@@ -937,6 +1015,39 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 											)}
 										/>
 									</FieldGroup>
+								</SectionBody>
+							)}
+						</Section>
+
+						{/* Restriction Profile Section */}
+						<Section>
+							<SectionHeader onClick={() => setRestrictionOpen((v) => !v)}>
+								<SectionTitle>
+									{t('calendarEvent.edit.restrictionSection')}
+								</SectionTitle>
+								<Chevron $open={restrictionOpen}>
+									<ChevronRight size={16} />
+								</Chevron>
+								{!restrictionOpen && (
+									<PreviewText>
+										{!isRestricted
+											? t('calendarEvent.edit.restrictionPreviewAnytime')
+											: restrictionType === RestrictionType.Custom
+												? t('calendarEvent.edit.restrictionPreviewCustom')
+												: t(RESTRICTION_TYPE_KEYS[restrictionType])}
+									</PreviewText>
+								)}
+							</SectionHeader>
+							{restrictionOpen && (
+								<SectionBody>
+									<RestrictionProfileEditor
+										isRestricted={isRestricted}
+										onIsRestrictedChange={setIsRestricted}
+										restrictionType={restrictionType}
+										onRestrictionTypeChange={setRestrictionType}
+										customSchedule={customSchedule}
+										onCustomScheduleChange={setCustomSchedule}
+									/>
 								</SectionBody>
 							)}
 						</Section>
