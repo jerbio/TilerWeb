@@ -25,7 +25,10 @@ import {
 	restrictionProfileToSchedule,
 	scheduleToWeekDayOptions,
 } from '@/core/common/utils/restrictionUtils';
-import RestrictionProfileEditor from '@/core/common/components/restriction/RestrictionProfileEditor';
+import RestrictionProfileEditor, {
+	RestrictionType,
+	RESTRICTION_TYPE_KEYS,
+} from '@/core/common/components/restriction/RestrictionProfileEditor';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
@@ -122,9 +125,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 
 	// Restriction profile state
 	const [isRestricted, setIsRestricted] = useState(false);
-	const [restrictionType, setRestrictionType] = useState<'work' | 'personal' | 'custom'>(
-		'custom'
-	);
+	const [restrictionType, setRestrictionType] = useState<RestrictionType>(RestrictionType.Custom);
 	const [customSchedule, setCustomSchedule] = useState<DaySchedule[]>(
 		Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
 	);
@@ -159,7 +160,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	) => {
 		if (!profile || profile.isEnabled === false) {
 			setIsRestricted(false);
-			setRestrictionType('custom');
+			setRestrictionType(RestrictionType.Custom);
 			setCustomSchedule(
 				Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
 			);
@@ -167,11 +168,11 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		}
 		setIsRestricted(true);
 		if (profile.id && workId && profile.id === workId) {
-			setRestrictionType('work');
+			setRestrictionType(RestrictionType.Work);
 		} else if (profile.id && personalId && profile.id === personalId) {
-			setRestrictionType('personal');
+			setRestrictionType(RestrictionType.Personal);
 		} else {
-			setRestrictionType('custom');
+			setRestrictionType(RestrictionType.Custom);
 			setCustomSchedule(restrictionProfileToSchedule(profile));
 		}
 	};
@@ -424,13 +425,13 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		if (!isRestricted) {
 			params.isRestricted = 'false';
 			params.RestrictiveWeek = { isEnabled: 'false' };
-		} else if (restrictionType === 'work' && workProfileId) {
+		} else if (restrictionType === RestrictionType.Work && workProfileId) {
 			params.isRestricted = 'true';
 			params.RestrictionProfileId = workProfileId;
-		} else if (restrictionType === 'personal' && personalProfileId) {
+		} else if (restrictionType === RestrictionType.Personal && personalProfileId) {
 			params.isRestricted = 'true';
 			params.RestrictionProfileId = personalProfileId;
-		} else if (restrictionType === 'custom') {
+		} else if (restrictionType === RestrictionType.Custom) {
 			params.isRestricted = 'true';
 			params.RestrictiveWeek = {
 				isEnabled: 'true',
@@ -1031,11 +1032,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 									<PreviewText>
 										{!isRestricted
 											? t('calendarEvent.edit.restrictionPreviewAnytime')
-											: restrictionType === 'custom'
+											: restrictionType === RestrictionType.Custom
 												? t('calendarEvent.edit.restrictionPreviewCustom')
-												: t(
-														`calendarEvent.edit.restrictionType${restrictionType.charAt(0).toUpperCase() + restrictionType.slice(1)}`
-													)}
+												: t(RESTRICTION_TYPE_KEYS[restrictionType])}
 									</PreviewText>
 								)}
 							</SectionHeader>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +6,11 @@ import type { DaySchedule } from '@/core/common/types/schedule';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
 import TimeUtil from '@/core/util/time';
 
-export type RestrictionType = 'work' | 'personal' | 'custom';
+export enum RestrictionType {
+	Work = 'work',
+	Personal = 'personal',
+	Custom = 'custom',
+}
 
 export interface RestrictionProfileEditorProps {
 	/** Whether time restrictions are currently enabled. */
@@ -15,12 +19,39 @@ export interface RestrictionProfileEditorProps {
 	/** Which restriction type is selected (only relevant when isRestricted is true). */
 	restrictionType: RestrictionType;
 	onRestrictionTypeChange: (value: RestrictionType) => void;
-	/** The custom day schedule (only shown when restrictionType === 'custom'). */
+	/** The custom day schedule (only shown when restrictionType === RestrictionType.Custom). */
 	customSchedule: DaySchedule[];
 	onCustomScheduleChange: (value: DaySchedule[]) => void;
 }
 
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+
+export const RESTRICTION_TYPE_KEYS: Record<RestrictionType, string> = {
+	[RestrictionType.Work]: 'calendarEvent.edit.restrictionTypeWork',
+	[RestrictionType.Personal]: 'calendarEvent.edit.restrictionTypePersonal',
+	[RestrictionType.Custom]: 'calendarEvent.edit.restrictionTypeCustom',
+};
+
+const DAY_LABEL_KEYS: Record<(typeof DAY_KEYS)[number], string> = {
+	sun: 'settings.sections.tilePreferences.dayLabels.sun',
+	mon: 'settings.sections.tilePreferences.dayLabels.mon',
+	tue: 'settings.sections.tilePreferences.dayLabels.tue',
+	wed: 'settings.sections.tilePreferences.dayLabels.wed',
+	thu: 'settings.sections.tilePreferences.dayLabels.thu',
+	fri: 'settings.sections.tilePreferences.dayLabels.fri',
+	sat: 'settings.sections.tilePreferences.dayLabels.sat',
+};
+
+const KEYS = {
+	restrictionEnabled: 'calendarEvent.edit.restrictionEnabled',
+	restrictionWorkInfo: 'calendarEvent.edit.restrictionWorkInfo',
+	restrictionPersonalInfo: 'calendarEvent.edit.restrictionPersonalInfo',
+	restrictionGoToPreferences: 'calendarEvent.edit.restrictionGoToPreferences',
+	restrictionDayOff: 'calendarEvent.edit.restrictionDayOff',
+} as const;
+
+const PREFERENCES_ROUTE = '/settings/preferences';
+const DISABLED_TIME_PLACEHOLDER = '—';
 
 const DEFAULT_START_TIME = TimeUtil.minutesFromStartOfDayToMeridian(9 * 60); // '9:00 AM'
 const DEFAULT_END_TIME = TimeUtil.minutesFromStartOfDayToMeridian(17 * 60); // '5:00 PM'
@@ -60,8 +91,6 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 		);
 	};
 
-	const capitalize = (s: RestrictionType) => s.charAt(0).toUpperCase() + s.slice(1);
-
 	return (
 		<>
 			<ToggleRow>
@@ -70,16 +99,16 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 					id="restriction-enabled"
 					checked={isRestricted}
 					onChange={(e) => onIsRestrictedChange(e.target.checked)}
-					aria-label={t('calendarEvent.edit.restrictionEnabled')}
+					aria-label={t(KEYS.restrictionEnabled)}
 				/>
 				<ToggleLabel htmlFor="restriction-enabled">
-					{t('calendarEvent.edit.restrictionEnabled')}
+					{t(KEYS.restrictionEnabled)}
 				</ToggleLabel>
 			</ToggleRow>
 
 			{isRestricted && (
 				<TypeGroup>
-					{(['work', 'personal', 'custom'] as const).map((type) => (
+					{Object.values(RestrictionType).map((type) => (
 						<TypeOption key={type}>
 							<input
 								type="radio"
@@ -88,35 +117,31 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 								value={type}
 								checked={restrictionType === type}
 								onChange={() => onRestrictionTypeChange(type)}
-								aria-label={t(
-									`calendarEvent.edit.restrictionType${capitalize(type)}`
-								)}
+								aria-label={t(RESTRICTION_TYPE_KEYS[type])}
 							/>
 							<label htmlFor={`restriction-type-${type}`}>
-								{t(`calendarEvent.edit.restrictionType${capitalize(type)}`)}
+								{t(RESTRICTION_TYPE_KEYS[type])}
 							</label>
 						</TypeOption>
 					))}
 
-					{(restrictionType === 'work' || restrictionType === 'personal') && (
+					{(restrictionType === RestrictionType.Work ||
+						restrictionType === RestrictionType.Personal) && (
 						<InfoBanner>
 							<span>
 								{t(
-									restrictionType === 'work'
-										? 'calendarEvent.edit.restrictionWorkInfo'
-										: 'calendarEvent.edit.restrictionPersonalInfo'
+									restrictionType === RestrictionType.Work
+										? KEYS.restrictionWorkInfo
+										: KEYS.restrictionPersonalInfo
 								)}
 							</span>
-							<PrefsLink
-								type="button"
-								onClick={() => navigate('/settings/preferences')}
-							>
-								{t('calendarEvent.edit.restrictionGoToPreferences')}
+							<PrefsLink type="button" onClick={() => navigate(PREFERENCES_ROUTE)}>
+								{t(KEYS.restrictionGoToPreferences)}
 							</PrefsLink>
 						</InfoBanner>
 					)}
 
-					{restrictionType === 'custom' && (
+					{restrictionType === RestrictionType.Custom && (
 						<DayScheduleList data-testid="restriction-day-schedule">
 							{customSchedule.map((day) => {
 								const isSelected = !!(day.startTime || day.endTime);
@@ -135,14 +160,10 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 												handleDayToggle(day.dayIndex, isSelected)
 											}
 										>
-											{t(
-												`settings.sections.tilePreferences.dayLabels.${dayKey}`
-											)}
+											{t(DAY_LABEL_KEYS[dayKey])}
 										</DayToggle>
 										{!isSelected && (
-											<OffLabel>
-												{t('calendarEvent.edit.restrictionDayOff')}
-											</OffLabel>
+											<OffLabel>{t(KEYS.restrictionDayOff)}</OffLabel>
 										)}
 										<TimeDropdown
 											value={day.startTime}
@@ -151,7 +172,7 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 											}
 											interval={60}
 											disabled={!isSelected}
-											placeholder="—"
+											placeholder={DISABLED_TIME_PLACEHOLDER}
 										/>
 										<TimeDropdown
 											value={day.endTime}
@@ -160,7 +181,7 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 											}
 											interval={60}
 											disabled={!isSelected}
-											placeholder="—"
+											placeholder={DISABLED_TIME_PLACEHOLDER}
 										/>
 									</DayRow>
 								);
