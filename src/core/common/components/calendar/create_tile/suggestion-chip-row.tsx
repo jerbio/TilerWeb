@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { Bookmark, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TilePredictionLocation, LocationSource } from '@/core/common/types/schedule';
+import { MINUTES_IN_HOUR, MS_PER_MINUTE } from '@/core/common/utils/timeUtils';
 
 export type DurationChipRowProps = {
 	durations: number[];
@@ -23,8 +24,8 @@ export type TimeSectionChipRowProps = {
 };
 
 function msToHoursAndMins(ms: number) {
-	const totalMins = Math.round(ms / 60000);
-	return { hours: Math.floor(totalMins / 60), mins: totalMins % 60 };
+	const totalMins = Math.round(ms / MS_PER_MINUTE);
+	return { hours: Math.floor(totalMins / MINUTES_IN_HOUR), mins: totalMins % MINUTES_IN_HOUR };
 }
 
 export const DurationChipRow: React.FC<DurationChipRowProps> = ({
