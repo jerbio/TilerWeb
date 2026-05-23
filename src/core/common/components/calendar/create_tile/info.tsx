@@ -189,13 +189,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 							}
 						/>
 					</RangeDescription>
-					{/* {timeSections.length > 0 && (
-						<TimeSectionChipRow
-							sections={timeSections}
-							appliedSection={suggestions.appliedTimeSection}
-							onSelect={suggestions.onTimeSectionSelect}
-						/>
-					)} */}
 				</RangeContainer>
 			)}
 		</Grid>

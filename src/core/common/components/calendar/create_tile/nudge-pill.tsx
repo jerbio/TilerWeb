@@ -149,13 +149,6 @@ const NudgePill: React.FC<NudgePillProps> = ({
 							onSelect={onLocationSelect}
 						/>
 					)}
-					{/* {timeSections.length > 0 && (
-						<TimeSectionChipRow
-							sections={timeSections}
-							appliedSection={appliedTimeSection}
-							onSelect={onTimeSectionSelect}
-						/>
-					)} */}
 				</PillBody>
 			)}
 		</PillShell>

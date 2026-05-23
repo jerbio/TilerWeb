@@ -83,26 +83,6 @@ export const LocationChipRow: React.FC<LocationChipRowProps> = ({
 	</ChipRow>
 );
 
-// export const TimeSectionChipRow: React.FC<TimeSectionChipRowProps> = ({
-// 	sections,
-// 	appliedSection,
-// 	onSelect,
-// }) => (
-// 	<ChipRow>
-// 		<SuggestLabel>✦</SuggestLabel>
-// 		{sections.map((section) => (
-// 			<Chip
-// 				key={section}
-// 				type="button"
-// 				$selected={appliedSection === section}
-// 				onClick={() => onSelect(section)}
-// 			>
-// 				{section}
-// 			</Chip>
-// 		))}
-// 	</ChipRow>
-// );
-
 const ChipRow = styled.div`
 	display: flex;
 	flex-wrap: wrap;
