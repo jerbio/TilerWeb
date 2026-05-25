@@ -244,6 +244,5 @@ export const createMockUserInfo = (overrides: Partial<UserInfo> = {}): UserInfo 
 	lastName: 'User',
 	countryCode: null,
 	dateOfBirth: null,
-	isAdmin: false,
 	...overrides,
 });

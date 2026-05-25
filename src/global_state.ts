@@ -32,7 +32,6 @@ export interface UserInfo {
 	lastName: string; // ""
 	countryCode: string | null; // "1"
 	dateOfBirth: string | null; // ""
-	isAdmin: boolean;
 }
 
 // Grouped persona session that includes user, schedule, and chat session

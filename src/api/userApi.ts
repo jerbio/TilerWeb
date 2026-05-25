@@ -21,7 +21,6 @@ export interface UserResponse {
 			lastName: string;
 			countryCode: string | null;
 			dateOfBirth: string | null;
-			isAdmin: boolean;
 		};
 	};
 	ServerStatus: null;
