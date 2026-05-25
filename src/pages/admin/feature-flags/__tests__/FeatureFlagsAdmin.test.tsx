@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from '@/test/test-utils';
 import FeatureFlagsAdmin from '@/pages/admin/feature-flags/FeatureFlagsAdmin';
-import type { AdminFlagEntry } from '@/api/featureFlagApi';
+import type { AdminFlagEntry } from '@/core/common/types/featureFlag';
 
 const mocks = vi.hoisted(() => ({
 	adminGetAllFlags: vi.fn(),

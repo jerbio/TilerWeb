@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { featureFlagApi, AdminFlagEntry } from '@/api/featureFlagApi';
+import { featureFlagApi } from '@/api/featureFlagApi';
+import type { AdminFlagEntry } from '@/core/common/types/featureFlag';
 import useAuthNavigate from '@/hooks/useNavigateHome';
 
 const FeatureFlagsAdmin: React.FC = () => {
