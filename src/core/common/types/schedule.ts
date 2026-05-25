@@ -40,6 +40,46 @@ export type NotesBlob = {
 	type: number;
 	note: string;
 	id: string;
+	/** Server-authored note content (markdown). Distinct from user-authored `note`. */
+	agentNote?: string | null;
+	/** Last author bucket: 'user' | 'agent' | null. */
+	source?: string | null;
+	/** Opaque concurrency token from MiscData.RowVersion (base64). */
+	etag?: string | null;
+	/** UserId of the last human author, if known. */
+	authorUserId?: string | null;
+	/** UTC ISO timestamp when AgentNote was last written. */
+	agentNoteUpdatedAt?: string | null;
+	/** UTC ISO timestamp when the blob row was last saved. */
+	updatedAt?: string | null;
+};
+
+/** Scope selector for /api/CalendarEvent/Notes. */
+export type NotesScope = 'auto' | 'calendar' | 'subevent';
+
+/** Payload shape returned by /api/CalendarEvent/Notes. */
+export type NotesPayload = {
+	EventId: string;
+	Scope: string;
+	UserNote: string | null;
+	AgentNote: string | null;
+	Source: string | null;
+	AuthorUserId: string | null;
+	AgentNoteUpdatedAt: string | null;
+	Etag: string;
+	/** Set by server when ApplyUpdate rejected the etag. */
+	concurrencyConflict?: boolean;
+	/** Set by server when input was clipped to MaxUserNoteChars. */
+	truncated?: boolean;
+};
+
+export type NotesResponse = ApiResponse<NotesPayload>;
+
+export type NotesUpdateRequest = {
+	EventID: string;
+	Scope?: NotesScope;
+	UserNote: string;
+	Etag: string;
 };
 
 export type EventTimeline = {

@@ -620,6 +620,7 @@
 			"repetitionSection": "Повторение",
 			"locationSection": "Местоположение",
 			"colorSection": "Цвет",
+			"notesSection": "Заметки",
 			"name": "Название",
 			"start": "Начало",
 			"end": "Конец",
