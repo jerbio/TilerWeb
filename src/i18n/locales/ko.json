@@ -620,6 +620,7 @@
 			"repetitionSection": "반복",
 			"locationSection": "위치",
 			"colorSection": "색상",
+			"notesSection": "메모",
 			"name": "이름",
 			"start": "시작",
 			"end": "종료",

@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1178,6 +1178,19 @@
 			"repetitionSection": "Repetition",
 			"locationSection": "Location",
 			"colorSection": "Color",
+			"notesSection": "Notes",
+			"restrictionSection": "Time Restrictions",
+			"restrictionEnabled": "Enable time restrictions",
+			"restrictionTypeAnytime": "Anytime",
+			"restrictionTypeWork": "Work hours",
+			"restrictionTypePersonal": "Personal hours",
+			"restrictionTypeCustom": "Custom",
+			"restrictionWorkInfo": "Work hours are managed in your Tile Preferences.",
+			"restrictionPersonalInfo": "Personal hours are managed in your Tile Preferences.",
+			"restrictionGoToPreferences": "Go to Tile Preferences",
+			"restrictionDayOff": "Off",
+			"restrictionPreviewAnytime": "Anytime",
+			"restrictionPreviewCustom": "Custom",
 			"name": "Name",
 			"start": "Start",
 			"end": "End",
@@ -1493,6 +1506,47 @@
 		"verified": {
 			"label": "Verified",
 			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
+		}
+	},
+	"tile": {
+		"noteButtonAria": "Open notes for this tile"
+	},
+	"notesEditor": {
+		"placeholder": "Start writing. Use the toolbar above to format, or type \"/\" style markdown shortcuts…",
+		"surfaceAria": "Note editor",
+		"back": "Back",
+		"close": "Close",
+		"eyebrow": "Notes",
+		"loading": "Loading notes…",
+		"errorLoad": "Couldn't load notes.",
+		"saving": "Saving…",
+		"saved": "Saved",
+		"errorSave": "Not saved",
+		"unsaved": "Editing…",
+		"save": "Save",
+		"saveNow": "Save now",
+		"linkPrompt": "URL",
+		"conflict": {
+			"title": "Someone else updated this note.",
+			"discard": "Discard mine",
+			"keep": "Keep editing"
+		},
+		"tool": {
+			"bold": "Bold",
+			"italic": "Italic",
+			"underline": "Underline",
+			"strike": "Strikethrough",
+			"code": "Inline code",
+			"h1": "Heading 1",
+			"h2": "Heading 2",
+			"h3": "Heading 3",
+			"bullet": "Bullet list",
+			"ordered": "Numbered list",
+			"task": "Checklist",
+			"quote": "Quote",
+			"link": "Link",
+			"undo": "Undo",
+			"redo": "Redo"
 		}
 	}
 }
