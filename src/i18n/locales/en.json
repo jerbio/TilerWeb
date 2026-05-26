@@ -1548,5 +1548,120 @@
 			"undo": "Undo",
 			"redo": "Redo"
 		}
+	},
+	"getStarted": {
+		"seo": {
+			"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
+			"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
+			"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+		},
+		"hero": {
+			"badge": "Product Update",
+			"title": "Your First Five Minutes with Tiler",
+			"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there."
+		},
+		"intro": {
+			"lede": "Most scheduling tools ask you to start from scratch — dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
+			"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+		},
+		"steps": {
+			"heading": "Six Steps to Your First Timeline",
+			"step1": {
+				"title": "Sign In & Create Your Profile",
+				"body": "Everything starts with your Tiler account. Sign in and the app immediately begins building your profile memory — the contextual layer that the engine uses to understand how you work, when you're available, and what matters to you.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step2": {
+				"title": "Set Your Wake-Up Time",
+				"body": "The first question is deceptively simple: when does your day begin? This single data point establishes the earliest boundary the engine will schedule around. Night owl or early riser, Tiler starts from your reality — not an arbitrary 9 AM default.",
+				"calloutStrong": "Why this matters:",
+				"callout": "Every constraint in Tiler flows from your boundaries. Wake time, work hours, and location form the hard edges that the solver respects before optimizing anything else."
+			},
+			"step3": {
+				"title": "Pin Your Location",
+				"body": "Where are you most of the day? Tiler integrates with Google Maps so travel time between tasks is real — calculated by driving, transit, or walking — not a vague guess. This is the piece most planning tools skip entirely, and it's why their schedules crumble when you actually try to live them. The autocomplete pulls from Google's Places API, so you can enter anything from a corporate headquarters to a co-working space to a job site.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step4": {
+				"title": "Define Your Work Hours",
+				"body": "Not every day looks the same. Tiler lets you set work hours per day of the week — toggle days on and off, shift start and end times, and copy a schedule across multiple days. This creates the temporal fence that separates work blocks from personal time. The engine treats these as soft constraints — strong enough to shape your default schedule, flexible enough to bend when a deadline or travel commitment demands it.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step5": {
+				"title": "Seed Your Tiles",
+				"body": "This is where Tiler begins to feel different. Based on your professional profile, the engine suggests recurring activity tiles — blocks of work it thinks you'll need. Client calls. Deep work. Business development. Weekly reflection. You select the ones that match, delete the ones that don't, and set each to daily or weekly cadence.",
+				"calloutStrong": "AI-seeded, human-curated.",
+				"callout": "The suggestions come from the LLM analyzing your professional context. You stay in control of what gets scheduled — the engine handles when and where."
+			},
+			"step6": {
+				"title": "Your Timeline, Built",
+				"body": "With your constraints loaded, the solver runs. What appears isn't a blank calendar waiting to be filled — it's an optimized timeline with your tiles placed where they fit, travel time accounted for, and work hours respected. Each tile is color-coded and linked to a location, with expandable action menus for quick edits. Add new tasks through natural language, run what-if scenarios to test alternatives, or share tiles with your team. The onboarding planted the seeds — the engine grows the schedule from here.",
+				"calloutStrong": "",
+				"callout": ""
+			}
+		},
+		"pillars": {
+			"heading": "Three Pillars. One Perfect Timeline.",
+			"goals": {
+				"icon": "🎯",
+				"title": "Goals",
+				"body": "The tasks and ambitions that need time carved out for them."
+			},
+			"appointments": {
+				"icon": "📅",
+				"title": "Appointments",
+				"body": "Meetings, flights, and commitments already locked in."
+			},
+			"location": {
+				"icon": "📍",
+				"title": "Location",
+				"body": "Where you actually are — so travel time is real, not guessed."
+			}
+		},
+		"cta": {
+			"heading": "Ready to build your timeline?",
+			"body": "Five minutes of setup. A schedule that actually works.",
+			"button": "Get Started Free →",
+			"sub": "Available on iOS and Android. Free to start."
+		}
+	},
+	"articles": {
+		"minRead": "min read",
+		"readArticle": "Read article",
+		"breadcrumbs": {
+			"home": "Home",
+			"articles": "Articles"
+		},
+		"index": {
+			"seo": {
+				"title": "Articles | Tiler — Guides, Product Updates & Productivity Insights",
+				"description": "Explore Tiler's library of guides, product updates, and deep dives on AI scheduling, agentic calendars, and adaptive productivity. Learn how to make your time work for you.",
+				"keywords": "Tiler articles, AI scheduling blog, smart calendar guides, productivity articles, agentic calendar, time management insights, AI productivity blog"
+			},
+			"hero": {
+				"badge": "Articles",
+				"title": "Insights for a Better Schedule",
+				"subtitle": "Guides, product updates, and ideas on how AI can reshape the way you plan your day."
+			}
+		},
+		"posts": {
+			"gettingStarted": {
+				"title": "Your First Five Minutes with Tiler",
+				"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there.",
+				"excerpt": "Most scheduling tools start from an empty grid. Tiler learns the shape of your day first — then builds a constraint-aware, location-anchored timeline that actually fits your life.",
+				"seo": {
+					"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
+					"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
+					"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+				},
+				"intro": {
+					"lede": "Most scheduling tools ask you to start from scratch — dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
+					"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+				}
+			}
+		}
 	}
 }
