@@ -11,7 +11,9 @@ import { CalendarRequestProvider } from '@/core/common/components/calendar/Calen
 import Chat from '@/core/common/components/chat/chat';
 import { SidePanel, useSidePanelStack } from '@/core/common/components/side-panel';
 import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
+import { useEditNotesPanelSync } from '@/core/common/components/side-panel/useEditNotesPanelSync';
 import EditCalendarEvent from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEvent';
+import EditNotes from '@/core/common/components/side-panel/edit-notes/EditNotes';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
 import {
@@ -88,6 +90,26 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 			}),
 		popPanel,
 		closeEditTile,
+		setSidePanelExpanded,
+		setMobileChatVisible,
+	});
+
+	// React to editNotes store changes and push/pop the rich-text notes editor
+	const editNotesIsOpen = useCalendarUI((s) => s.editNotes.state.isOpen);
+	const editNotesEvent = useCalendarUI((s) => s.editNotes.state.event);
+	const closeEditNotes = useCalendarUI((s) => s.editNotes.actions.close);
+
+	const { closePanelAndStore: closeNotesPanelAndStore } = useEditNotesPanelSync({
+		editNotesIsOpen,
+		editNotesEvent,
+		pushPanel: () =>
+			pushPanel({
+				content: (
+					<EditNotes event={editNotesEvent!} onClose={() => closeNotesPanelAndStore()} />
+				),
+			}),
+		popPanel,
+		closeEditNotes,
 		setSidePanelExpanded,
 		setMobileChatVisible,
 	});

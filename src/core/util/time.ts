@@ -63,17 +63,15 @@ class TimeUtil {
 	 * @returns Formatted time string (e.g. "3:05 PM")
 	 */
 	static minutesFromStartOfDayToMeridian(minutes: number): string {
-		const hours = Math.floor(minutes / 60);
-		const mins = minutes % 60;
-		const period = hours >= 12 ? 'PM' : 'AM';
-		const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-		const displayMinutes = mins.toString().padStart(2, '0');
-
-		if (mins === 0) {
-			return `${displayHour}:00 ${period}`;
-		} else {
-			return `${displayHour}:${displayMinutes} ${period}`;
-		}
+		// dayjs is used for time arithmetic only. AM/PM and 12h conversion are
+		// computed explicitly so the canonical format is not locale-sensitive.
+		// Display-layer localization lives in TimeDropdown.localizeTime.
+		const time = dayjs().startOf('day').add(minutes, 'minute');
+		const hour24 = time.hour();
+		const min = time.minute();
+		const period = hour24 >= 12 ? 'PM' : 'AM';
+		const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
+		return `${hour12}:${String(min).padStart(2, '0')} ${period}`;
 	}
 
 	/**

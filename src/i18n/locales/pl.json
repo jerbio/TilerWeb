@@ -620,6 +620,7 @@
 			"repetitionSection": "Powtarzanie",
 			"locationSection": "Lokalizacja",
 			"colorSection": "Kolor",
+			"notesSection": "Notatki",
 			"name": "Nazwa",
 			"start": "Początek",
 			"end": "Koniec",
