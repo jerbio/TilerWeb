@@ -45,6 +45,18 @@ const AnalyticsTracker: React.FC = () => {
 	return null;
 };
 
+// Reset scroll position to the top on every route change (unless the URL has a hash)
+const ScrollToTop: React.FC = () => {
+	const { pathname, hash } = useLocation();
+
+	useEffect(() => {
+		if (hash) return;
+		window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+	}, [pathname, hash]);
+
+	return null;
+};
+
 const App: React.FC = () => {
 	// Dev tools for testing
 	const { isOverlayVisible, closeOverlay } = useDevTools();
@@ -65,6 +77,7 @@ const App: React.FC = () => {
 					<AuthProvider>
 						<BrowserRouter>
 							<AnalyticsTracker />
+							<ScrollToTop />
 							<Routes>
 								<Route path="/" element={<Layout />}>
 									<Route index element={<Home />} />
