@@ -924,7 +924,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				<ChatHeader>
 					<ChatHeaderLeft>
 						{onClose && (
-							<BackButtonWrapper>
+							<BackButtonWrapper data-testid="chat-back-button-wrapper">
 								<Button variant="ghost" height={32} onClick={onClose}>
 									<ChevronLeftIcon size={16} />
 									<span>{t('common.buttons.back')}</span>

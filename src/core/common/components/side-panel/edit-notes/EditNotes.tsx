@@ -23,6 +23,7 @@ import {
 	AlertTriangle,
 } from 'lucide-react';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import { EditorState } from '@tiptap/pm/state';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
@@ -110,6 +111,7 @@ export const EditNotes: React.FC<EditNotesProps> = ({
 				return;
 			}
 			lastSavedMarkdownRef.current = result.UserNote ?? '';
+			lastLoadedNoteRef.current = result.UserNote ?? '';
 			setStatus(result.concurrencyConflict ? 'error' : 'saved');
 		},
 		[save]
@@ -146,6 +148,14 @@ export const EditNotes: React.FC<EditNotesProps> = ({
 		lastLoadedNoteRef.current = note;
 		lastSavedMarkdownRef.current = note;
 		editor.commands.setContent(note, false);
+		// Reset the ProseMirror state to clear the undo/redo history so the
+		// initial server load cannot be undone by the user.
+		const freshState = EditorState.create({
+			schema: editor.state.schema,
+			doc: editor.state.doc,
+			plugins: editor.state.plugins,
+		});
+		editor.view.updateState(freshState);
 		setStatus('idle');
 	}, [editor, payload?.UserNote]);
 
