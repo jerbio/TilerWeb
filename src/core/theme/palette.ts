@@ -1,9 +1,8 @@
 const palette = {
 	colors: {
-		primary: '#3498db',
+		primary: '#ED123B',
 		secondary: '#2ecc71',
 		background: '#ecf0f1',
-		backgroundRed: '#ED123B',
 		text: '#A1A1A1',
 		textGrey: '#808080',
 		textRed: '#F793A6',

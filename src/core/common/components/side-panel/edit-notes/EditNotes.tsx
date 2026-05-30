@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import {
-	ArrowLeft,
 	X,
 	Bold,
 	Italic,
@@ -174,13 +173,6 @@ export const EditNotes: React.FC<EditNotesProps> = ({
 	return (
 		<Root data-testid="edit-notes-panel">
 			<Header>
-				<IconButton
-					type="button"
-					onClick={onClose}
-					aria-label={t('notesEditor.back', 'Back')}
-				>
-					<ArrowLeft size={18} />
-				</IconButton>
 				<TitleBlock>
 					<Eyebrow>{t('notesEditor.eyebrow', 'Notes')}</Eyebrow>
 					<Title title={event.name ?? ''}>{event.name}</Title>
@@ -546,7 +538,11 @@ const Status = styled.span<{ 'data-status': SaveStatus }>`
 	font-size: 12px;
 	min-width: 56px;
 	color: ${({ 'data-status': s }) =>
-		s === 'error' ? '#b91c1c' : s === 'saved' ? '#15803d' : palette.colors.textGrey};
+		s === 'error'
+			? palette.colors.error[600]
+			: s === 'saved'
+				? palette.colors.success[600]
+				: palette.colors.textGrey};
 
 	.spin {
 		animation: notes-spin 1s linear infinite;
