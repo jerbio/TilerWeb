@@ -131,6 +131,12 @@ const SessionTitleDisplay = styled.span`
 	max-width: 200px;
 `;
 
+const BackButtonWrapper = styled.div`
+	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
+		display: none;
+	}
+`;
+
 const HistoryButton = styled.button`
 	display: grid;
 	place-items: center;
@@ -918,10 +924,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				<ChatHeader>
 					<ChatHeaderLeft>
 						{onClose && (
-							<Button variant="ghost" height={32} onClick={onClose}>
-								<ChevronLeftIcon size={16} />
-								<span>{t('common.buttons.back')}</span>
-							</Button>
+							<BackButtonWrapper data-testid="chat-back-button-wrapper">
+								<Button variant="ghost" height={32} onClick={onClose}>
+									<ChevronLeftIcon size={16} />
+									<span>{t('common.buttons.back')}</span>
+								</Button>
+							</BackButtonWrapper>
 						)}
 						<HistoryButton
 							onClick={() => setShowSessionHistory(true)}
