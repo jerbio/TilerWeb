@@ -75,12 +75,10 @@ vi.mock('@/services/locationService', () => ({
 }));
 
 vi.mock('@/services/SocketService', () => ({
-	SignalRService: vi.fn().mockImplementation(function () {
-		return {
-			createConnection: vi.fn(),
-			subscribeToSocketDataReceipt: vi.fn(),
-		};
-	}),
+	SignalRService: class {
+		createConnection = vi.fn();
+		subscribeToSocketDataReceipt = vi.fn();
+	},
 }));
 
 vi.mock('@/core/util/analytics', () => ({
