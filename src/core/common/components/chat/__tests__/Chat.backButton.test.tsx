@@ -43,6 +43,9 @@ vi.mock('@/global_state', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+	// Minimal i18next plugin shim — i18n.use(initReactI18next) must not throw.
+	// i18next checks `plugin.type` and calls `plugin.init(services)` at startup.
+	initReactI18next: { type: '3rdParty', init: vi.fn() },
 	useTranslation: () => ({
 		t: (_key: string, fallback?: string) => fallback ?? _key,
 		i18n: { language: 'en' },
@@ -72,10 +75,12 @@ vi.mock('@/services/locationService', () => ({
 }));
 
 vi.mock('@/services/SocketService', () => ({
-	SignalRService: vi.fn().mockImplementation(() => ({
-		createConnection: vi.fn(),
-		subscribeToSocketDataReceipt: vi.fn(),
-	})),
+	SignalRService: vi.fn().mockImplementation(function () {
+		return {
+			createConnection: vi.fn(),
+			subscribeToSocketDataReceipt: vi.fn(),
+		};
+	}),
 }));
 
 vi.mock('@/core/util/analytics', () => ({
