@@ -2,10 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { featureFlagApi, AdminFlagEntry } from '@/api/featureFlagApi';
+import { featureFlagApi } from '@/api/featureFlagApi';
+import type { AdminFlagEntry } from '@/core/common/types/featureFlag';
 import useAuthNavigate from '@/hooks/useNavigateHome';
-import { Env } from '@/config/config_getter';
-import { DEV_ADMIN_FLAGS } from '@/config/dev_overrides';
 
 const FeatureFlagsAdmin: React.FC = () => {
 	const navigate = useAuthNavigate();
@@ -14,12 +13,6 @@ const FeatureFlagsAdmin: React.FC = () => {
 	const [saving, setSaving] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (Env.isDevelopment()) {
-			setFlags(DEV_ADMIN_FLAGS);
-			setLoading(false);
-			return;
-		}
-
 		featureFlagApi
 			.adminGetAllFlags()
 			.then((res) => {
@@ -39,11 +32,6 @@ const FeatureFlagsAdmin: React.FC = () => {
 		setFlags((prev) =>
 			prev.map((f) => (f.name === flag.name ? { ...f, isEnabledGlobal: next } : f))
 		);
-
-		if (Env.isDevelopment()) {
-			setSaving(null);
-			return;
-		}
 
 		try {
 			await featureFlagApi.adminUpdateFlag(flag.name, next, flag.rolloutPercent);

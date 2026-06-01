@@ -1,28 +1,9 @@
+import type {
+	AdminFeatureFlagResponse,
+	AdminUpdateFlagResponse,
+	FeatureFlagResponse,
+} from '@/core/common/types/featureFlag';
 import { AppApi } from './appApi';
-
-interface FeatureFlagResponse {
-	Error: { Code: string; Message: string } | null;
-	Content: { flags: Record<string, boolean> };
-	ServerStatus: number;
-}
-
-export interface AdminFlagEntry {
-	name: string;
-	isEnabledGlobal: boolean;
-	rolloutPercent: number | null;
-}
-
-interface AdminFeatureFlagResponse {
-	Error: { Code: string; Message: string } | null;
-	Content: { flags: AdminFlagEntry[] };
-	ServerStatus: number;
-}
-
-interface AdminUpdateFlagResponse {
-	Error: { Code: string; Message: string } | null;
-	Content: { flag: AdminFlagEntry };
-	ServerStatus: number;
-}
 
 export class FeatureFlagApi extends AppApi {
 	getFlags() {

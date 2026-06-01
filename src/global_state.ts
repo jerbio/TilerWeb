@@ -2,8 +2,6 @@ import { create } from 'zustand';
 import { personaSessionManager } from '@/services/personaSessionManager';
 import { PersonaId } from '@/core/constants/persona';
 import { featureFlagApi } from '@/api/featureFlagApi';
-import { Env } from '@/config/config_getter';
-import { applyDevUserOverrides, applyDevFlagOverrides } from '@/config/dev_overrides';
 
 export enum SessionType {
 	AUTHENTICATED = 'authenticated',
@@ -34,7 +32,6 @@ export interface UserInfo {
 	lastName: string; // ""
 	countryCode: string | null; // "1"
 	dateOfBirth: string | null; // ""
-	isAdmin: boolean;
 }
 
 // Grouped persona session that includes user, schedule, and chat session
@@ -308,27 +305,19 @@ const useAppStore = create<AppState>()((set, get) => {
 				if (response && response.isAuthenticated) {
 					// Fetch full user info
 					const { userService } = await import('./services');
-					let user = await userService.getCurrentUser();
-					if (Env.isDevelopment()) {
-						user = applyDevUserOverrides(user);
-					}
+					const user = await userService.getCurrentUser();
 					// Re-create the authenticated persona session so Chat/Calendar work after reload
 					get().setAuthenticated(user);
 
 					// Fetch feature flags — fire-and-forget, failure leaves flags at defaults (all off)
-					if (Env.isDevelopment()) {
-						// In dev, seed flags immediately from dev_overrides without waiting on the backend
-						get().setFeatureFlags(applyDevFlagOverrides({}));
-					} else {
-						featureFlagApi
-							.getFlags()
-							.then((res) => {
-								if (res?.Content?.flags) {
-									get().setFeatureFlags(res.Content.flags);
-								}
-							})
-							.catch(() => {});
-					}
+					featureFlagApi
+						.getFlags()
+						.then((res) => {
+							if (res?.Content?.flags) {
+								get().setFeatureFlags(res.Content.flags);
+							}
+						})
+						.catch(() => {});
 
 					set({ isAuthLoading: false });
 				} else {

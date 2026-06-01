@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { act } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router';
@@ -6,7 +6,27 @@ import { ThemeProvider } from 'styled-components';
 import { AdminRoute } from '@/core/auth/AdminRoute';
 import useAppStore from '@/global_state';
 import { darkTheme } from '@/core/theme/dark';
-import { createMockUserInfo } from '@/test/store-utils';
+
+const mocks = vi.hoisted(() => ({
+	getRoles: vi.fn(),
+}));
+
+vi.mock('@/api/adminApi', () => ({
+	adminApi: {
+		getRoles: mocks.getRoles,
+	},
+}));
+
+const rolesResponse = (roles: string[]) => ({
+	Error: {
+		Code: '0',
+		Message: 'SUCCESS',
+	},
+	Content: {
+		roles,
+	},
+	ServerStatus: null,
+});
 
 const renderAdminRoute = () =>
 	render(
@@ -24,6 +44,9 @@ const renderAdminRoute = () =>
 	);
 
 beforeEach(() => {
+	mocks.getRoles.mockReset();
+	mocks.getRoles.mockResolvedValue(rolesResponse([]));
+
 	act(() => {
 		useAppStore.setState({
 			isAuthenticated: false,
@@ -63,7 +86,6 @@ describe('AdminRoute', () => {
 				useAppStore.setState({
 					isAuthenticated: true,
 					isAuthLoading: false,
-					authenticatedUser: createMockUserInfo({ isAdmin: false }),
 				});
 			});
 
@@ -71,22 +93,43 @@ describe('AdminRoute', () => {
 
 			expect(await screen.findByText('Timeline Page')).toBeInTheDocument();
 			expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
+			expect(mocks.getRoles).toHaveBeenCalledTimes(1);
 		});
 	});
 
 	describe('when user is authenticated and is admin', () => {
-		it('renders the outlet protected content', () => {
+		it('renders the outlet protected content', async () => {
+			mocks.getRoles.mockResolvedValue(rolesResponse(['Admin']));
+
 			act(() => {
 				useAppStore.setState({
 					isAuthenticated: true,
 					isAuthLoading: false,
-					authenticatedUser: createMockUserInfo({ isAdmin: true }),
 				});
 			});
 
 			renderAdminRoute();
 
-			expect(screen.getByText('Admin Content')).toBeInTheDocument();
+			expect(await screen.findByText('Admin Content')).toBeInTheDocument();
+			expect(mocks.getRoles).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe('when the admin role check fails', () => {
+		it('redirects away from admin content', async () => {
+			mocks.getRoles.mockRejectedValue(new Error('forbidden'));
+
+			act(() => {
+				useAppStore.setState({
+					isAuthenticated: true,
+					isAuthLoading: false,
+				});
+			});
+
+			renderAdminRoute();
+
+			expect(await screen.findByText('Timeline Page')).toBeInTheDocument();
+			expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
 		});
 	});
 });

@@ -1,17 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router';
 import useAppStore from '@/global_state';
 import Loader from '@/core/common/components/loader';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
+import { adminApi } from '@/api/adminApi';
 
 export const AdminRoute: React.FC = () => {
 	const isAuthenticated = useAppStore((state) => state.isAuthenticated);
 	const isAuthLoading = useAppStore((state) => state.isAuthLoading);
-	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const [isAdminLoading, setIsAdminLoading] = useState(false);
+	const [hasAdminAccess, setHasAdminAccess] = useState<boolean | null>(null);
 	const location = useLocation();
 
-	if (isAuthLoading) {
+	useEffect(() => {
+		let isMounted = true;
+
+		if (isAuthLoading || !isAuthenticated) {
+			setIsAdminLoading(false);
+			setHasAdminAccess(null);
+			return;
+		}
+
+		setIsAdminLoading(true);
+		setHasAdminAccess(null);
+
+		adminApi
+			.getRoles()
+			.then((response) => {
+				if (!isMounted) return;
+
+				const roles = response.Error.Code === '0' ? response.Content.roles : [];
+				setHasAdminAccess(roles.includes('Admin'));
+			})
+			.catch(() => {
+				if (!isMounted) return;
+
+				setHasAdminAccess(false);
+			})
+			.finally(() => {
+				if (!isMounted) return;
+
+				setIsAdminLoading(false);
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [isAuthLoading, isAuthenticated]);
+
+	if (isAuthLoading || isAdminLoading || (isAuthenticated && hasAdminAccess === null)) {
 		return (
 			<LoadingContainer>
 				<Loader />
@@ -23,7 +61,7 @@ export const AdminRoute: React.FC = () => {
 		return <Navigate to="/signin" state={{ from: location }} replace />;
 	}
 
-	if (!authenticatedUser?.isAdmin) {
+	if (!hasAdminAccess) {
 		return <Navigate to="/timeline" replace />;
 	}
 

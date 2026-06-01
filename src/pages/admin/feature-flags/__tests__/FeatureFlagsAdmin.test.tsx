@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from '@/test/test-utils';
 import FeatureFlagsAdmin from '@/pages/admin/feature-flags/FeatureFlagsAdmin';
-import { DEV_ADMIN_FLAGS } from '@/config/dev_overrides';
-import type { AdminFlagEntry } from '@/api/featureFlagApi';
+import type { AdminFlagEntry } from '@/core/common/types/featureFlag';
 
 const mocks = vi.hoisted(() => ({
 	adminGetAllFlags: vi.fn(),
@@ -11,21 +10,10 @@ const mocks = vi.hoisted(() => ({
 	navigate: vi.fn(),
 	toastError: vi.fn(),
 	toastSuccess: vi.fn(),
-	env: {
-		isDevelopment: false,
-	},
 }));
 
 vi.mock('@/hooks/useNavigateHome', () => ({
 	default: () => mocks.navigate,
-}));
-
-vi.mock('@/config/config_getter', () => ({
-	Env: {
-		get: () => '/',
-		isDevelopment: () => mocks.env.isDevelopment,
-		isProduction: () => !mocks.env.isDevelopment,
-	},
 }));
 
 vi.mock('sonner', () => ({
@@ -57,7 +45,6 @@ const getSwitch = async (name: string) => screen.findByRole('switch', { name: `T
 
 describe('FeatureFlagsAdmin', () => {
 	beforeEach(() => {
-		mocks.env.isDevelopment = false;
 		mocks.adminGetAllFlags.mockReset();
 		mocks.adminUpdateFlag.mockReset();
 		mocks.navigate.mockReset();
@@ -163,31 +150,5 @@ describe('FeatureFlagsAdmin', () => {
 			expect(autofill).toHaveAttribute('aria-checked', 'true');
 		});
 		expect(mocks.toastError).toHaveBeenCalledWith('Failed to update "autofill-tile-details"');
-	});
-
-	it('uses local development flags without calling the API in development mode', async () => {
-		mocks.env.isDevelopment = true;
-
-		render(<FeatureFlagsAdmin />);
-
-		for (const flag of DEV_ADMIN_FLAGS) {
-			expect(await screen.findByText(flag.name)).toBeInTheDocument();
-		}
-
-		expect(mocks.adminGetAllFlags).not.toHaveBeenCalled();
-	});
-
-	it('toggles development flags locally without saving to the API', async () => {
-		mocks.env.isDevelopment = true;
-
-		render(<FeatureFlagsAdmin />);
-
-		const chatSuggestions = await getSwitch('chat-suggestions');
-		expect(chatSuggestions).toHaveAttribute('aria-checked', 'false');
-
-		fireEvent.click(chatSuggestions);
-
-		expect(chatSuggestions).toHaveAttribute('aria-checked', 'true');
-		expect(mocks.adminUpdateFlag).not.toHaveBeenCalled();
 	});
 });
