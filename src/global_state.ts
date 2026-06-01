@@ -95,6 +95,8 @@ interface AppState {
 	// Feature flags — populated from backend after auth, defaults to empty (all flags off)
 	featureFlags: Record<string, boolean>;
 	setFeatureFlags: (flags: Record<string, boolean>) => void;
+	// Optimistically flips a single flag, calls PUT /api/FeatureFlag/{id}/self, reverts on failure.
+	selfToggleFlag: (flagId: string, flagName: string, enabled: boolean) => Promise<void>;
 
 	// Authentication actions
 	checkAuth: () => Promise<void>;
@@ -291,6 +293,16 @@ const useAppStore = create<AppState>()((set, get) => {
 		// Feature flags
 		featureFlags: {},
 		setFeatureFlags: (flags) => set({ featureFlags: flags }),
+		selfToggleFlag: async (flagId, flagName, enabled) => {
+			// Optimistic update
+			set((state) => ({ featureFlags: { ...state.featureFlags, [flagName]: enabled } }));
+			try {
+				await featureFlagApi.selfToggle(flagId, enabled);
+			} catch {
+				// Revert
+				set((state) => ({ featureFlags: { ...state.featureFlags, [flagName]: !enabled } }));
+			}
+		},
 
 		// Method to switch between authenticated and anonymous sessions
 		switchSessionType: (type: SessionType) => set({ activeSessionType: type }),

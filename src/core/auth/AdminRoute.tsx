@@ -31,7 +31,9 @@ export const AdminRoute: React.FC = () => {
 				if (!isMounted) return;
 
 				const roles = response.Error.Code === '0' ? response.Content.roles : [];
-				setHasAdminAccess(roles.includes('Admin'));
+				// Server only returns roles from the admin-tier allow-list ('Admin', 'god.user'),
+				// so any non-empty array means the caller is allowed.
+				setHasAdminAccess(roles.length > 0);
 			})
 			.catch(() => {
 				if (!isMounted) return;
