@@ -45,12 +45,16 @@ function makeFormHandler(overrides: Partial<InitialCreateTileFormState> = {}) {
 	};
 }
 
-function renderInfo(overrides: Partial<InitialCreateTileFormState> = {}) {
-	const handler = makeFormHandler(overrides);
+function renderInfo(
+	overrides: Partial<InitialCreateTileFormState> = {},
+	predictionFeedback?: Parameters<typeof CreateTileInfo>[0]['predictionFeedback']
+) {
+	const handler = makeFormHandler(overrides) as Parameters<
+		typeof CreateTileInfo
+	>[0]['formHandler'];
 	render(
 		<ThemeProvider theme={lightTheme}>
-			{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-			<CreateTileInfo formHandler={handler as any} />
+			<CreateTileInfo formHandler={handler} predictionFeedback={predictionFeedback} />
 		</ThemeProvider>
 	);
 	return handler;
@@ -81,6 +85,18 @@ describe('CreateTileInfo – location verified badge', () => {
 		renderInfo({ locationIsVerified: true, location: '123 Main St' });
 		const badge = screen.getByTestId('location-verified-badge');
 		expect(badge).toHaveAttribute('title', 'location.verified.tooltip');
+	});
+
+	it('renders prediction loading bars around location and duration while fetching', () => {
+		renderInfo(
+			{},
+			{
+				isPredicting: true,
+				highlightedFields: { duration: false, location: false },
+			}
+		);
+
+		expect(screen.getAllByTestId('prediction-loading-bar')).toHaveLength(2);
 	});
 });
 

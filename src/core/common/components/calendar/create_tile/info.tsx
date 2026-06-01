@@ -8,13 +8,20 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
 import { ScheduleRepeatWeekday } from '@/core/common/types/schedule';
+import {
+	EMPTY_PREDICTION_FEEDBACK,
+	PredictionLoadingBar,
+	type TilePredictionAutofillFeedback,
+} from './prediction-feedback';
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+	predictionFeedback?: TilePredictionAutofillFeedback;
 };
 
 const CreateTileInfo: React.FC<InfoProps> = ({
 	formHandler: { formData, handleFormInputChange, setFormData },
+	predictionFeedback = EMPTY_PREDICTION_FEEDBACK,
 }) => {
 	const { t } = useTranslation();
 
@@ -90,11 +97,15 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				value={formData.locationTag}
 				onChange={handleFormInputChange('locationTag')}
 			/>
-			<LocationInput
-				controller={locationController}
-				label={t('calendar.createTile.info.location.label')}
-				placeholder={t('calendar.createTile.info.location.placeholder')}
-			/>
+			<LocationFieldGroup>
+				<LocationInput
+					controller={locationController}
+					label={t('calendar.createTile.info.location.label')}
+					placeholder={t('calendar.createTile.info.location.placeholder')}
+					highlighted={predictionFeedback.highlightedFields.location}
+				/>
+				{predictionFeedback.isPredicting && <PredictionLoadingBar />}
+			</LocationFieldGroup>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}
 				required
@@ -102,6 +113,7 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				name="durationHours"
 				placeholder={t('calendar.createTile.info.hours.placeholder')}
 				value={formData.durationHours}
+				highlighted={predictionFeedback.highlightedFields.duration}
 				onChange={handleFormInputChange('durationHours', {
 					restriction: 'integer',
 				})}
@@ -114,10 +126,16 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				step="5"
 				placeholder={t('calendar.createTile.info.minutes.placeholder')}
 				value={formData.durationMins}
+				highlighted={predictionFeedback.highlightedFields.duration}
 				onChange={handleFormInputChange('durationMins', {
 					restriction: 'integer',
 				})}
 			/>
+			{predictionFeedback.isPredicting && (
+				<FullWidthRow>
+					<PredictionLoadingBar />
+				</FullWidthRow>
+			)}
 			{!formData.isRecurring && (
 				<RangeContainer>
 					<h3>{t('calendar.createTile.info.range.label')}</h3>
@@ -148,6 +166,15 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 		</Grid>
 	);
 };
+
+const LocationFieldGroup = styled.div`
+	display: flex;
+	flex-direction: column;
+`;
+
+const FullWidthRow = styled.div`
+	grid-column: 1 / -1;
+`;
 
 const Grid = styled.div`
 	display: grid;

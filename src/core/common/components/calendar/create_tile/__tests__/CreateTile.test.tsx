@@ -24,7 +24,10 @@ vi.mock('react-i18next', () => ({
 	),
 }));
 vi.mock('@/services', () => ({
-	scheduleService: { createEvent: vi.fn() },
+	scheduleService: {
+		createEvent: vi.fn(),
+		getNewTilePrediction: vi.fn(() => Promise.resolve(null)),
+	},
 	userService: { getScheduleProfile: vi.fn() },
 }));
 vi.mock('@/core/common/components/calendar/CalendarRequestProvider', () => ({
