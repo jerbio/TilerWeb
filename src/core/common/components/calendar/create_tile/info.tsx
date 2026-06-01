@@ -7,38 +7,23 @@ import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
+import { ScheduleRepeatWeekday } from '@/core/common/types/schedule';
 import {
-	ScheduleRepeatWeekday,
-	TilePredictionLocation,
-	TilePredictionResponse,
-} from '@/core/common/types/schedule';
-import { DurationChipRow, LocationChipRow, SuggestionsLoadingBar } from './suggestion-chip-row';
-
-type SuggestionProps = {
-	prediction: TilePredictionResponse | null;
-	isLoading: boolean;
-	appliedDurationMs: number | null;
-	appliedLocationId: string | null;
-	appliedTimeSection: string | null;
-	onDurationSelect: (hours: number, mins: number, ms: number) => void;
-	onLocationSelect: (location: TilePredictionLocation) => void;
-	onTimeSectionSelect: (section: string) => void;
-};
+	EMPTY_PREDICTION_FEEDBACK,
+	PredictionLoadingBar,
+	type TilePredictionAutofillFeedback,
+} from './prediction-feedback';
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-	suggestions: SuggestionProps;
+	predictionFeedback?: TilePredictionAutofillFeedback;
 };
 
 const CreateTileInfo: React.FC<InfoProps> = ({
 	formHandler: { formData, handleFormInputChange, setFormData },
-	suggestions,
+	predictionFeedback = EMPTY_PREDICTION_FEEDBACK,
 }) => {
 	const { t } = useTranslation();
-	const { isLoading } = suggestions;
-	const durations = suggestions.prediction?.duration ?? [];
-	const locations = suggestions.prediction?.location ?? [];
-	// const timeSections = suggestions.prediction?.timeOfDay?.daySections ?? [];
 
 	const locationController = useMemo<LocationInputController>(
 		() => ({
@@ -117,16 +102,9 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					controller={locationController}
 					label={t('calendar.createTile.info.location.label')}
 					placeholder={t('calendar.createTile.info.location.placeholder')}
+					highlighted={predictionFeedback.highlightedFields.location}
 				/>
-				{isLoading ? (
-					<SuggestionsLoadingBar />
-				) : locations.length > 0 ? (
-					<LocationChipRow
-						locations={locations}
-						appliedId={suggestions.appliedLocationId}
-						onSelect={suggestions.onLocationSelect}
-					/>
-				) : null}
+				{predictionFeedback.isPredicting && <PredictionLoadingBar />}
 			</LocationFieldGroup>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}
@@ -135,6 +113,7 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				name="durationHours"
 				placeholder={t('calendar.createTile.info.hours.placeholder')}
 				value={formData.durationHours}
+				highlighted={predictionFeedback.highlightedFields.duration}
 				onChange={handleFormInputChange('durationHours', {
 					restriction: 'integer',
 				})}
@@ -147,21 +126,14 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				step="5"
 				placeholder={t('calendar.createTile.info.minutes.placeholder')}
 				value={formData.durationMins}
+				highlighted={predictionFeedback.highlightedFields.duration}
 				onChange={handleFormInputChange('durationMins', {
 					restriction: 'integer',
 				})}
 			/>
-			{(isLoading || durations.length > 0) && (
+			{predictionFeedback.isPredicting && (
 				<FullWidthRow>
-					{isLoading ? (
-						<SuggestionsLoadingBar />
-					) : (
-						<DurationChipRow
-							durations={durations}
-							appliedMs={suggestions.appliedDurationMs}
-							onSelect={suggestions.onDurationSelect}
-						/>
-					)}
+					<PredictionLoadingBar />
 				</FullWidthRow>
 			)}
 			{!formData.isRecurring && (

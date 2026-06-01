@@ -28,6 +28,15 @@ vi.mock('@/core/common/hooks/useIsMobile', () => ({
 	default: () => false,
 }));
 
+vi.mock('@/services', () => ({
+	scheduleService: {
+		getNewTilePrediction: vi.fn(() => Promise.resolve(null)),
+	},
+	userService: {
+		getScheduleProfile: vi.fn(() => Promise.resolve(null)),
+	},
+}));
+
 vi.mock('swiper/react', async () => {
 	const React = await import('react');
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import useFormHandler from '@/hooks/useFormHandler';
 import { Calendar } from 'lucide-react';
-import { useTheme as useStyledTheme } from 'styled-components';
+import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import { Trans } from 'react-i18next';
 import {
@@ -12,22 +12,36 @@ import {
 	InitialCreateTileFormState,
 } from '.';
 import DatePicker from '../../date_picker';
-import NudgePill, { NudgePillProps } from './nudge-pill';
+import {
+	EMPTY_PREDICTION_FEEDBACK,
+	PredictionLoadingBar,
+	type TilePredictionAutofillFeedback,
+} from './prediction-feedback';
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
-	nudgePill: NudgePillProps;
+	predictionFeedback?: TilePredictionAutofillFeedback;
 };
 
 const CreateTileInfoInline: React.FC<InfoProps> = ({
 	formHandler: { formData, handleFormInputChange },
-	nudgePill,
+	predictionFeedback = EMPTY_PREDICTION_FEEDBACK,
 }) => {
 	const theme = useStyledTheme();
+	const feedbackInputStyle = (highlighted: boolean): React.CSSProperties => ({
+		borderRadius: 4,
+		backgroundColor: highlighted ? theme.colors.datepicker.dateSelectedBg + '16' : undefined,
+		boxShadow: highlighted ? `0 0 0 1px ${theme.colors.datepicker.dateSelectedBg}` : undefined,
+		transition: 'background-color 0.45s ease, box-shadow 0.45s ease',
+	});
 
 	return (
 		<>
-			<NudgePill {...nudgePill} />
+			{predictionFeedback.isPredicting && (
+				<InlinePredictionLoading>
+					<PredictionLoadingBar />
+				</InlinePredictionLoading>
+			)}
 			<InlineControl>
 				<Trans
 					i18nKey="calendar.createTile.info.description"
@@ -47,6 +61,9 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
 								onChange={handleFormInputChange('location')}
 								minWidth={50}
 								maxWidth={250}
+								style={feedbackInputStyle(
+									predictionFeedback.highlightedFields.location
+								)}
 							/>
 						),
 						hours: (
@@ -59,6 +76,9 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
 								minWidth={50}
 								maxWidth={50}
 								type="number"
+								style={feedbackInputStyle(
+									predictionFeedback.highlightedFields.duration
+								)}
 							/>
 						),
 						minutes: (
@@ -72,6 +92,9 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
 								minWidth={50}
 								maxWidth={50}
 								type="number"
+								style={feedbackInputStyle(
+									predictionFeedback.highlightedFields.duration
+								)}
 							/>
 						),
 						date: (
@@ -104,5 +127,9 @@ const CreateTileInfoInline: React.FC<InfoProps> = ({
 		</>
 	);
 };
+
+const InlinePredictionLoading = styled.div`
+	margin-bottom: 0.5rem;
+`;
 
 export default CreateTileInfoInline;

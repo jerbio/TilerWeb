@@ -39,6 +39,7 @@ import { initialCreateBlockFormState, initialCreateTileFormState } from './data'
 import CalendarModal from './modals';
 import CalendarCreateSelection from './calendar_create_selection';
 import CalendarCreateBlock from './create_block';
+import { useTilePredictionAutofill } from './create_tile/useTilePredictionAutofill';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -459,6 +460,10 @@ const Calendar = ({
 
 	// Create Tile Form State
 	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
+	const createTilePredictionFeedback = useTilePredictionAutofill(
+		createTileFormHandler,
+		createTile.state.isOpen
+	);
 	const [createTileModalPortalTarget, setCreateTileModalPortalTarget] =
 		useState<HTMLDivElement | null>(null);
 	const createTileModalContainerRef = useCallback((node: HTMLDivElement | null) => {
@@ -762,6 +767,7 @@ const Calendar = ({
 					<CalendarCreateTile
 						refetchEvents={refetchEvents}
 						formHandler={createTileFormHandler}
+						predictionFeedback={createTilePredictionFeedback}
 					/>,
 					createTileModalPortalTarget
 				)}

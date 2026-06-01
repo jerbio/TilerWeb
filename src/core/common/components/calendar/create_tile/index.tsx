@@ -1,11 +1,10 @@
 import useFormHandler from '@/hooks/useFormHandler';
-import useDebounce from '@/hooks/useDebounce';
 import { Keyboard, X } from 'lucide-react';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 import dayjs from 'dayjs';
 import Button from '../../button';
 import { RGBColor } from '@/core/util/colors';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import AutosizeInput from '../../auto-size-input';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { Trans, useTranslation } from 'react-i18next';
@@ -23,7 +22,6 @@ import {
 	ScheduleRepeatType,
 	ScheduleRepeatWeekday,
 	ScheduleRepeatWeeklyData,
-	TilePredictionResponse,
 } from '../../../types/schedule';
 import { CreateTileRestrictionType } from '../data';
 import { toast } from 'sonner';
@@ -40,6 +38,10 @@ import CreateTileSummary from './summary';
 import CreateTileOptions, { OptionsFormController } from './options';
 import CreateTileInfoInline from './info_inline';
 import CreateTileInfo from './info';
+import {
+	EMPTY_PREDICTION_FEEDBACK,
+	type TilePredictionAutofillFeedback,
+} from './prediction-feedback';
 
 dayjs.extend(advancedFormat);
 
@@ -110,175 +112,19 @@ export type InitialCreateTileFormState = {
 type CalendarCreateTileProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 	refetchEvents: () => Promise<void>;
+	predictionFeedback?: TilePredictionAutofillFeedback;
 };
 
-const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
+const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
+	formHandler,
+	refetchEvents,
+	predictionFeedback = EMPTY_PREDICTION_FEEDBACK,
+}) => {
 	const ui = useCalendarUI((state) => state.createTile);
-	const { formData, resetForm, handleFormInputChange, setFormData } = formHandler;
+	const { formData, resetForm, handleFormInputChange } = formHandler;
 	const theme = useStyledTheme();
 	const { t } = useTranslation();
 	const calendarDispatch = useCalendarDispatch();
-
-	// ── Smart Suggestions ──────────────────────────────────────
-	const [prediction, setPrediction] = useState<TilePredictionResponse | null>(null);
-	const [isPredicting, setIsPredicting] = useState(false);
-	const [appliedDurationMs, setAppliedDurationMs] = useState<number | null>(null);
-	const [appliedLocationId, setAppliedLocationId] = useState<string | null>(null);
-	const [appliedTimeSection, setAppliedTimeSection] = useState<string | null>(null);
-	const predictionAbortRef = useRef<AbortController | null>(null);
-	const debouncedAction = useDebounce(formData.action, 500);
-
-	const appliedStateRef = useRef({
-		durationMs: null as number | null,
-		locationId: null as string | null,
-		timeSection: null as string | null,
-	});
-
-	const clearAppliedSuggestions = useCallback(() => {
-		const applied = appliedStateRef.current;
-		setFormData((prev) => {
-			const needsDurationClear = applied.durationMs !== null;
-			const needsLocationClear = applied.locationId !== null;
-			const needsTimeClear = applied.timeSection !== null;
-			if (!needsDurationClear && !needsLocationClear && !needsTimeClear) return prev;
-			return {
-				...prev,
-				...(needsDurationClear && { durationHours: 0, durationMins: 0 }),
-				...(needsLocationClear && {
-					location: '',
-					locationId: null,
-					locationSource: '',
-					locationIsVerified: false,
-					locationTag: '',
-				}),
-				...(needsTimeClear && { isTimeRestricted: false }),
-			};
-		});
-		appliedStateRef.current = { durationMs: null, locationId: null, timeSection: null };
-		setAppliedDurationMs(null);
-		setAppliedLocationId(null);
-		setAppliedTimeSection(null);
-	}, [setFormData]);
-
-	useEffect(() => {
-		const name = debouncedAction.trim();
-		if (name.length < 3) {
-			setPrediction(null);
-			setIsPredicting(false);
-			clearAppliedSuggestions();
-			return;
-		}
-		predictionAbortRef.current?.abort();
-		predictionAbortRef.current = new AbortController();
-		setIsPredicting(true);
-		clearAppliedSuggestions();
-		scheduleService.getNewTilePrediction(name).then((result) => {
-			setPrediction(result);
-			setIsPredicting(false);
-		});
-	}, [debouncedAction]);
-
-	const handlePredictionDuration = useCallback(
-		(hours: number, mins: number, ms: number) => {
-			if (appliedStateRef.current.durationMs === ms) {
-				setFormData((prev) => ({ ...prev, durationHours: 0, durationMins: 0 }));
-				appliedStateRef.current.durationMs = null;
-				setAppliedDurationMs(null);
-			} else {
-				setFormData((prev) => ({ ...prev, durationHours: hours, durationMins: mins }));
-				appliedStateRef.current.durationMs = ms;
-				setAppliedDurationMs(ms);
-			}
-		},
-		[setFormData]
-	);
-
-	const handlePredictionLocation = useCallback(
-		(location: NonNullable<TilePredictionResponse['location']>[number]) => {
-			if (appliedStateRef.current.locationId === location.id) {
-				setFormData((prev) => ({
-					...prev,
-					location: '',
-					locationId: null,
-					locationSource: '',
-					locationIsVerified: false,
-					locationTag: '',
-				}));
-				appliedStateRef.current.locationId = null;
-				setAppliedLocationId(null);
-			} else {
-				setFormData((prev) => ({
-					...prev,
-					location: location.address,
-					locationId:
-						location.source !== 'google' && !location.isAdHoc ? location.id : null,
-					locationSource: location.source,
-					locationIsVerified: location.isVerified,
-					locationTag: location.nickname || '',
-				}));
-				appliedStateRef.current.locationId = location.id;
-				setAppliedLocationId(location.id);
-			}
-		},
-		[setFormData]
-	);
-
-	const handlePredictionTimeSection = useCallback(
-		(section: string) => {
-			if (appliedStateRef.current.timeSection === section) {
-				setFormData((prev) => ({ ...prev, isTimeRestricted: false }));
-				appliedStateRef.current.timeSection = null;
-				setAppliedTimeSection(null);
-			} else {
-				setFormData((prev) => ({
-					...prev,
-					isTimeRestricted: true,
-					timeRestrictionType: CreateTileRestrictionType.Custom,
-				}));
-				appliedStateRef.current.timeSection = section;
-				setAppliedTimeSection(section);
-			}
-		},
-		[setFormData]
-	);
-
-	// ──────────────────────────────────────────────────────────
-
-	const handleAcceptAllPredictions = useCallback(() => {
-		if (!prediction) return;
-
-		const durationMs = prediction.duration?.[0] ?? null;
-		const location = prediction.location?.[0] ?? null;
-
-		setFormData((prev) => {
-			const next = { ...prev };
-
-			if (durationMs !== null) {
-				const totalMins = Math.round(durationMs / 60000);
-				next.durationHours = Math.floor(totalMins / 60);
-				next.durationMins = totalMins % 60;
-			}
-
-			if (location) {
-				next.location = location.address;
-				next.locationId =
-					location.source !== 'google' && !location.isAdHoc ? location.id : null;
-				next.locationSource = location.source;
-				next.locationIsVerified = location.isVerified;
-				next.locationTag = location.nickname || '';
-			}
-
-			return next;
-		});
-
-		appliedStateRef.current = {
-			...appliedStateRef.current,
-			durationMs,
-			locationId: location?.id ?? null,
-		};
-		setAppliedDurationMs(durationMs);
-		setAppliedLocationId(location?.id ?? null);
-	}, [prediction, setFormData]);
 
 	const isValidSubmission = useMemo(() => {
 		if (formData.action.trim().length === 0) return false;
@@ -533,16 +379,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				<Section $isexpanded={ui.state.isExpanded}>
 					<CreateTileInfo
 						formHandler={formHandler}
-						suggestions={{
-							prediction,
-							isLoading: isPredicting,
-							appliedDurationMs,
-							appliedLocationId,
-							appliedTimeSection,
-							onDurationSelect: handlePredictionDuration,
-							onLocationSelect: handlePredictionLocation,
-							onTimeSectionSelect: handlePredictionTimeSection,
-						}}
+						predictionFeedback={predictionFeedback}
 					/>
 				</Section>
 			) : (
@@ -550,18 +387,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				<Section $isexpanded={ui.state.isExpanded}>
 					<CreateTileInfoInline
 						formHandler={formHandler}
-						nudgePill={{
-							prediction,
-							isLoading: isPredicting,
-							appliedDurationMs,
-							appliedLocationId,
-							appliedTimeSection,
-							onDurationSelect: handlePredictionDuration,
-							onLocationSelect: handlePredictionLocation,
-							onTimeSectionSelect: handlePredictionTimeSection,
-							onAcceptAll: handleAcceptAllPredictions,
-							onClearAll: clearAppliedSuggestions,
-						}}
+						predictionFeedback={predictionFeedback}
 					/>
 				</Section>
 			)}
