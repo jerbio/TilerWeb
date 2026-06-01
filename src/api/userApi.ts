@@ -13,14 +13,14 @@ export interface UserResponse {
 			username: string;
 			timeZoneDifference: number;
 			timeZone: string;
-			email: string;
-			endOfDay: string;
-			phoneNumber: string;
+			email: string | null;
+			endOfDay: string | null;
+			phoneNumber: string | null;
 			fullName: string;
 			firstName: string;
 			lastName: string;
 			countryCode: string | null;
-			dateOfBirth: string;
+			dateOfBirth: string | null;
 		};
 	};
 	ServerStatus: null;

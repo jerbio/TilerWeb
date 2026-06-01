@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { personaSessionManager } from '@/services/personaSessionManager';
 import { PersonaId } from '@/core/constants/persona';
+import { featureFlagApi } from '@/api/featureFlagApi';
 
 export enum SessionType {
 	AUTHENTICATED = 'authenticated',
@@ -90,6 +91,10 @@ interface AppState {
 	isAuthenticated: boolean;
 	isAuthLoading: boolean;
 	authenticatedUser: UserInfo | null;
+
+	// Feature flags — populated from backend after auth, defaults to empty (all flags off)
+	featureFlags: Record<string, boolean>;
+	setFeatureFlags: (flags: Record<string, boolean>) => void;
 
 	// Authentication actions
 	checkAuth: () => Promise<void>;
@@ -283,6 +288,10 @@ const useAppStore = create<AppState>()((set, get) => {
 		isAuthLoading: true,
 		authenticatedUser: null,
 
+		// Feature flags
+		featureFlags: {},
+		setFeatureFlags: (flags) => set({ featureFlags: flags }),
+
 		// Method to switch between authenticated and anonymous sessions
 		switchSessionType: (type: SessionType) => set({ activeSessionType: type }),
 
@@ -299,6 +308,17 @@ const useAppStore = create<AppState>()((set, get) => {
 					const user = await userService.getCurrentUser();
 					// Re-create the authenticated persona session so Chat/Calendar work after reload
 					get().setAuthenticated(user);
+
+					// Fetch feature flags — fire-and-forget, failure leaves flags at defaults (all off)
+					featureFlagApi
+						.getFlags()
+						.then((res) => {
+							if (res?.Content?.flags) {
+								get().setFeatureFlags(res.Content.flags);
+							}
+						})
+						.catch(() => {});
+
 					set({ isAuthLoading: false });
 				} else {
 					set({ isAuthenticated: false, authenticatedUser: null, isAuthLoading: false });
@@ -313,7 +333,7 @@ const useAppStore = create<AppState>()((set, get) => {
 			try {
 				const { authService } = await import('./services');
 				await authService.logout();
-				set({ isAuthenticated: false, authenticatedUser: null });
+				set({ isAuthenticated: false, authenticatedUser: null, featureFlags: {} });
 			} catch (error) {
 				console.error('Logout failed:', error);
 				throw error;
