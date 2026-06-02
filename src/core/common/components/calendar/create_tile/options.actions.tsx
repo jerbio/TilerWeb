@@ -151,7 +151,7 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 				)
 			);
 		},
-		[]
+		[controller.customTimeRestrictionSchedule, controller.setCustomTimeRestrictionSchedule]
 	);
 
 	const handleCustomRestrictionDayToggle = useCallback(
@@ -174,7 +174,7 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 				)
 			);
 		},
-		[t]
+		[t, controller.customTimeRestrictionSchedule, controller.setCustomTimeRestrictionSchedule]
 	);
 
 	return (

@@ -83,17 +83,17 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					}));
 				}}
 			/>
+			<LocationInput
+				controller={locationController}
+				label={t('calendar.createTile.info.location.label')}
+				placeholder={t('calendar.createTile.info.location.placeholder')}
+			/>
 			<Input
 				label={t('calendar.createTile.info.locationTag.label')}
 				name="locationTag"
 				placeholder={t('calendar.createTile.info.locationTag.placeholder')}
 				value={formData.locationTag}
 				onChange={handleFormInputChange('locationTag')}
-			/>
-			<LocationInput
-				controller={locationController}
-				label={t('calendar.createTile.info.location.label')}
-				placeholder={t('calendar.createTile.info.location.placeholder')}
 			/>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}
