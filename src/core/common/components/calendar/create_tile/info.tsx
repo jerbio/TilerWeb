@@ -90,13 +90,6 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					}));
 				}}
 			/>
-			<Input
-				label={t('calendar.createTile.info.locationTag.label')}
-				name="locationTag"
-				placeholder={t('calendar.createTile.info.locationTag.placeholder')}
-				value={formData.locationTag}
-				onChange={handleFormInputChange('locationTag')}
-			/>
 			<LocationFieldGroup>
 				<LocationInput
 					controller={locationController}
@@ -106,6 +99,13 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				/>
 				{predictionFeedback.isPredicting && <PredictionLoadingBar />}
 			</LocationFieldGroup>
+			<Input
+				label={t('calendar.createTile.info.locationTag.label')}
+				name="locationTag"
+				placeholder={t('calendar.createTile.info.locationTag.placeholder')}
+				value={formData.locationTag}
+				onChange={handleFormInputChange('locationTag')}
+			/>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}
 				required

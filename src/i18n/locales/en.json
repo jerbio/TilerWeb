@@ -223,11 +223,11 @@
 					"placeholder": "How many mins will it take?"
 				},
 				"location": {
-					"label": "Location",
+					"label": "Address",
 					"placeholder": "Where is this block held?"
 				},
 				"locationTag": {
-					"label": "Location Nickname",
+					"label": "Address Nickname",
 					"placeholder": "e.g. Home, Office, Gym"
 				},
 				"duration": {
@@ -284,11 +284,11 @@
 					"placeholder": "e.g. 1, 2, 3..."
 				},
 				"location": {
-					"label": "Tile Location",
+					"label": "Address",
 					"placeholder": "Where is this tile held?"
 				},
 				"locationTag": {
-					"label": "Location Nickname",
+					"label": "Address Nickname",
 					"placeholder": "e.g. Home, Office, Gym"
 				},
 				"hours": {

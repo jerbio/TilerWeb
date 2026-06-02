@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Check, Copy, ClipboardPaste } from 'lucide-react';
 import type { DaySchedule } from '@/core/common/types/schedule';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
 import TimeUtil from '@/core/util/time';
+import { Routes } from '@/core/constants/routes';
 
 export enum RestrictionType {
 	Work = 'work',
@@ -48,9 +49,11 @@ const KEYS = {
 	restrictionPersonalInfo: 'calendarEvent.edit.restrictionPersonalInfo',
 	restrictionGoToPreferences: 'calendarEvent.edit.restrictionGoToPreferences',
 	restrictionDayOff: 'calendarEvent.edit.restrictionDayOff',
+	copyTimes: 'settings.sections.tilePreferences.copyTimes',
+	pasteTimes: 'settings.sections.tilePreferences.paste',
+	cancelCopy: 'settings.sections.tilePreferences.cancelCopy',
 } as const;
 
-const PREFERENCES_ROUTE = '/settings/preferences';
 const DISABLED_TIME_PLACEHOLDER = '—';
 
 const DEFAULT_START_TIME = TimeUtil.minutesFromStartOfDayToMeridian(9 * 60); // '9:00 AM'
@@ -65,7 +68,30 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 	onCustomScheduleChange,
 }) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const [copiedTimes, setCopiedTimes] = useState<{
+		startTime: string;
+		endTime: string;
+		dayIndex: number;
+	} | null>(null);
+
+	const handleCopy = (dayIndex: number, startTime: string, endTime: string) => {
+		setCopiedTimes({ dayIndex, startTime, endTime });
+	};
+
+	const handlePaste = (dayIndex: number) => {
+		if (!copiedTimes) return;
+		onCustomScheduleChange(
+			customSchedule.map((d) =>
+				d.dayIndex === dayIndex
+					? {
+							...d,
+							startTime: copiedTimes.startTime,
+							endTime: copiedTimes.endTime,
+						}
+					: d
+			)
+		);
+	};
 
 	const handleDayToggle = (dayIndex: number, currentlySelected: boolean) => {
 		onCustomScheduleChange(
@@ -135,7 +161,11 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 										: KEYS.restrictionPersonalInfo
 								)}
 							</span>
-							<PrefsLink type="button" onClick={() => navigate(PREFERENCES_ROUTE)}>
+							<PrefsLink
+								href={Routes.SettingsPreferences}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								{t(KEYS.restrictionGoToPreferences)}
 							</PrefsLink>
 						</InfoBanner>
@@ -183,6 +213,50 @@ const RestrictionProfileEditor: React.FC<RestrictionProfileEditorProps> = ({
 											disabled={!isSelected}
 											placeholder={DISABLED_TIME_PLACEHOLDER}
 										/>
+										<CopyPasteAction>
+											{copiedTimes ? (
+												copiedTimes.dayIndex === day.dayIndex ? (
+													<IconButton
+														type="button"
+														$active
+														onClick={() => setCopiedTimes(null)}
+														title={t(KEYS.cancelCopy)}
+														aria-label={t(KEYS.cancelCopy)}
+														data-testid={`restriction-copy-active-${day.dayIndex}`}
+													>
+														<Check size={16} />
+													</IconButton>
+												) : (
+													<IconButton
+														type="button"
+														onClick={() => handlePaste(day.dayIndex)}
+														title={t(KEYS.pasteTimes)}
+														aria-label={t(KEYS.pasteTimes)}
+														data-testid={`restriction-paste-btn-${day.dayIndex}`}
+													>
+														<ClipboardPaste size={16} />
+													</IconButton>
+												)
+											) : isSelected && day.startTime && day.endTime ? (
+												<IconButton
+													type="button"
+													onClick={() =>
+														handleCopy(
+															day.dayIndex,
+															day.startTime,
+															day.endTime
+														)
+													}
+													title={t(KEYS.copyTimes)}
+													aria-label={t(KEYS.copyTimes)}
+													data-testid={`restriction-copy-btn-${day.dayIndex}`}
+												>
+													<Copy size={16} />
+												</IconButton>
+											) : (
+												<IconPlaceholder />
+											)}
+										</CopyPasteAction>
 									</DayRow>
 								);
 							})}
@@ -250,7 +324,7 @@ const InfoBanner = styled.div`
 	margin-top: 0.25rem;
 `;
 
-const PrefsLink = styled.button`
+const PrefsLink = styled.a`
 	background: none;
 	border: none;
 	padding: 0;
@@ -259,6 +333,8 @@ const PrefsLink = styled.button`
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	text-align: left;
 	font-weight: 500;
+	text-decoration: none;
+	align-self: flex-start;
 
 	&:hover {
 		text-decoration: underline;
@@ -293,6 +369,41 @@ const OffLabel = styled.span`
 	letter-spacing: 0.04em;
 	flex-shrink: 0;
 	width: 22px;
+`;
+
+const CopyPasteAction = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	flex-shrink: 0;
+`;
+
+const IconButton = styled.button<{ $active?: boolean }>`
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	color: ${({ $active, theme }) =>
+		$active ? theme.colors.brand[500] : theme.colors.text.secondary};
+	opacity: 0.7;
+	transition:
+		opacity 0.15s ease,
+		color 0.15s ease;
+
+	&:hover {
+		opacity: 1;
+		color: ${({ theme }) => theme.colors.brand[400]};
+	}
+`;
+
+const IconPlaceholder = styled.div`
+	width: 16px;
+	height: 16px;
 `;
 
 const DayToggle = styled.button<{ $selected: boolean }>`
