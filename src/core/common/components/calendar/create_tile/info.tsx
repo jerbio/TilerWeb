@@ -7,7 +7,6 @@ import DatePicker from '../../date_picker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import LocationInput, { LocationInputController } from '../../location-input';
-import { ScheduleRepeatWeekday } from '@/core/common/types/schedule';
 
 type InfoProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
@@ -75,11 +74,9 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				value={formData.count}
 				onChange={(e) => {
 					const value = Math.max(1, parseInt(e.target.value, 10) || 1).toString();
-					const clickedWeekday = String(formData.start.day()) as ScheduleRepeatWeekday;
 					setFormData((prev) => ({
 						...prev,
 						count: value,
-						recurrenceWeeklyDays: parseInt(value, 10) > 1 ? [] : [clickedWeekday],
 					}));
 				}}
 			/>

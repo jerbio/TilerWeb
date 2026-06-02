@@ -9,12 +9,13 @@ import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { CalendarUIProvider } from '../../calendar-ui.provider';
 import CreateTileActionsOptions from '../options.actions';
 import type { OptionsFormController } from '../options';
-import { CreateTileRestrictionType } from '../../data';
+import { CreateTileRestrictionType, initialCreateTileFormState } from '../../data';
 import {
 	ScheduleRepeatEndType,
 	ScheduleRepeatFrequency,
 	ScheduleRepeatStartType,
 	ScheduleRepeatType,
+	ScheduleRepeatWeekday,
 	type DaySchedule,
 } from '@/core/common/types/schedule';
 import { RGBColor } from '@/core/util/colors';
@@ -153,5 +154,128 @@ describe('CreateTileActionsOptions - custom restriction day selection', () => {
 		expect(snapshot[1].endTime).toBe('');
 		expect(snapshot[3].startTime).not.toBe('');
 		expect(snapshot[3].endTime).not.toBe('');
+	});
+});
+
+// ── Weekly recurrence day selection ───────────────────────────────────────────
+
+/**
+ * Harness for the weekly-days picker.
+ * Mirrors how CalendarCreateTile wires setRecurrenceWeeklyDays through
+ * useFormHandler — a plain value setter, not a functional updater.
+ */
+const WeeklyHarness: React.FC<{
+	initialDays?: ScheduleRepeatWeekday[];
+	onDaysChange?: (days: ScheduleRepeatWeekday[]) => void;
+}> = ({ initialDays = [], onDaysChange }) => {
+	const [days, setDays] = useState<ScheduleRepeatWeekday[]>(initialDays);
+
+	const controller: OptionsFormController = {
+		start: dayjs(),
+		color: new RGBColor(0, 0, 0),
+		setColor: () => {},
+		recurring: true,
+		setRecurring: () => {},
+		recurrenceType: ScheduleRepeatType.Weekly,
+		setRecurrenceType: () => {},
+		recurrenceFrequency: ScheduleRepeatFrequency.Weekly,
+		setRecurrenceFrequency: () => {},
+		recurrenceWeeklyDays: days,
+		setRecurrenceWeeklyDays: (next) => {
+			setDays(next);
+			onDaysChange?.(next);
+		},
+		recurrenceStartType: ScheduleRepeatStartType.Default,
+		setRecurrenceStartType: () => {},
+		recurrenceStartDate: dayjs(),
+		setRecurrenceStartDate: () => {},
+		recurrenceEndType: ScheduleRepeatEndType.Never,
+		setRecurrenceEndType: () => {},
+		recurrenceEndDate: dayjs().add(1, 'week'),
+		setRecurrenceEndDate: () => {},
+	};
+
+	return (
+		<>
+			<CreateTileActionsOptions controller={controller} />
+			<div data-testid="days-snapshot">{JSON.stringify(days)}</div>
+		</>
+	);
+};
+
+function renderWeeklyHarness(props: React.ComponentProps<typeof WeeklyHarness> = {}) {
+	return render(
+		<ThemeProvider defaultTheme="dark">
+			<CalendarUIProvider demoMode={false}>
+				<WeeklyHarness {...props} />
+			</CalendarUIProvider>
+		</ThemeProvider>
+	);
+}
+
+function readDays(): ScheduleRepeatWeekday[] {
+	return JSON.parse(screen.getByTestId('days-snapshot').textContent || '[]');
+}
+
+// The weekday buttons carry a `title` attribute equal to the translated label.
+// With `t: (key) => key` the label key for Monday is the full i18n key; we
+// match on the suffix via regex.
+const dayTitle = (suffix: string) => new RegExp(`recurrenceWeeklyDays\\.${suffix}$`);
+
+describe('initialCreateTileFormState', () => {
+	it('starts with no pre-selected recurrence weekdays', () => {
+		expect(initialCreateTileFormState.recurrenceWeeklyDays).toEqual([]);
+	});
+});
+
+describe('CreateTileActionsOptions - recurrence weekly days', () => {
+	it('renders no day as pre-selected when weeklyDays is empty', async () => {
+		renderWeeklyHarness({ initialDays: [] });
+		expect(readDays()).toEqual([]);
+	});
+
+	it('user can select a weekday', async () => {
+		const user = userEvent.setup();
+		renderWeeklyHarness({ initialDays: [] });
+
+		await user.click(screen.getByTitle(dayTitle('monday')));
+
+		expect(readDays()).toContain(ScheduleRepeatWeekday.Monday);
+	});
+
+	it('user can select multiple weekdays independently', async () => {
+		const user = userEvent.setup();
+		renderWeeklyHarness({ initialDays: [] });
+
+		await user.click(screen.getByTitle(dayTitle('monday')));
+		await user.click(screen.getByTitle(dayTitle('wednesday')));
+		await user.click(screen.getByTitle(dayTitle('friday')));
+
+		const days = readDays();
+		expect(days).toContain(ScheduleRepeatWeekday.Monday);
+		expect(days).toContain(ScheduleRepeatWeekday.Wednesday);
+		expect(days).toContain(ScheduleRepeatWeekday.Friday);
+	});
+
+	it('user can deselect a day when multiple are selected', async () => {
+		const user = userEvent.setup();
+		renderWeeklyHarness({
+			initialDays: [ScheduleRepeatWeekday.Monday, ScheduleRepeatWeekday.Wednesday],
+		});
+
+		await user.click(screen.getByTitle(dayTitle('monday')));
+
+		const days = readDays();
+		expect(days).not.toContain(ScheduleRepeatWeekday.Monday);
+		expect(days).toContain(ScheduleRepeatWeekday.Wednesday);
+	});
+
+	it('user can deselect the last remaining selected day (array becomes empty)', async () => {
+		const user = userEvent.setup();
+		renderWeeklyHarness({ initialDays: [ScheduleRepeatWeekday.Monday] });
+
+		await user.click(screen.getByTitle(dayTitle('monday')));
+
+		expect(readDays()).toEqual([]);
 	});
 });
