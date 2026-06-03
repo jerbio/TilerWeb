@@ -73,17 +73,19 @@ const Avatar = styled.div<{ $colors: RGB; $darkmode: boolean; $size: number; $in
 	height: ${({ $size }) => $size}px;
 	border-radius: 50%;
 	background-color: ${({ $colors, $darkmode }) => {
-		if ($darkmode) return `rgba(${$colors.r}, ${$colors.g}, ${$colors.b}, 0.12)`;
-		const c = colorUtil.setLightness($colors, 0.9);
+		const c = colorUtil.setLightness($colors, $darkmode ? 0.25 : 0.9);
 		return `rgb(${c.r}, ${c.g}, ${c.b})`;
 	}};
 	color: ${({ $colors, $darkmode }) => {
-		const c = colorUtil.setLightness($colors, $darkmode ? 0.75 : 0.28);
+		const c = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.28);
 		return `rgb(${c.r}, ${c.g}, ${c.b})`;
 	}};
 	border: 2px solid
 		${({ $colors, $darkmode, theme }) => {
-			if ($darkmode) return `rgba(${$colors.r}, ${$colors.g}, ${$colors.b}, 0.45)`;
+			if ($darkmode) {
+				const c = colorUtil.setLightness($colors, 0.45);
+				return `rgb(${c.r}, ${c.g}, ${c.b})`;
+			}
 			return theme.colors.background.card;
 		}};
 	display: flex;
