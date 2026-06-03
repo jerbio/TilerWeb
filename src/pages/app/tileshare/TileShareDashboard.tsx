@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, CalendarCheck2 } from 'lucide-react';
@@ -6,10 +6,10 @@ import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-u
 import Tabs, { TabItem } from '@/core/common/components/Tabs';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { tileshareService } from '@/services';
-import { DesignatedTile, TileShareCluster } from '@/core/common/types/tileshare';
+import { TileShareCluster } from '@/core/common/types/tileshare';
 import ROUTES from '@/core/constants/routes';
+import { throttle } from '@/core/util/throttle';
 
-import dummyTiles from './data/designatedtiles.json';
 import dummyClusters from './data/clusters.json';
 
 export enum TileshareTab {
@@ -18,16 +18,16 @@ export enum TileshareTab {
 }
 
 export type TileshareDashboardOutletContext = {
-	tiles: DesignatedTile[];
-	clusters: TileShareCluster[];
+	inboxClusters: TileShareCluster[];
+	outboxClusters: TileShareCluster[];
 };
 
 const TileshareDashboardPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
-	const [tiles, setTiles] = useState<DesignatedTile[]>(dummyTiles);
-	const [clusters, setClusters] = useState<TileShareCluster[]>(dummyClusters);
+	const [inboxClusters, setInboxClusters] = useState<TileShareCluster[]>(dummyClusters);
+	const [outboxClusters, setOutboxClusters] = useState<TileShareCluster[]>(dummyClusters);
 	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
 
 	useEffect(() => {
@@ -38,46 +38,46 @@ const TileshareDashboardPage: React.FC = () => {
 		}
 	}, [pathname]);
 
-	useEffect(() => {
-		const fetchActive = async () => {
-			try {
-				const data = await tileshareService.getDesignatedTiles();
-				if (data && data.length > 0) setTiles(data);
-			} catch (error) {
-				console.error('Error fetching tileshare active', error);
-			}
-		};
-
-		const fetchSent = async () => {
-			try {
-				const data = await tileshareService.getOutboxClusters();
-				if (data && data.length > 0) setClusters(data);
-			} catch (error) {
-				console.error('Error fetching tileshare sent', error);
-			}
-		};
-
-		if (activeTab === TileshareTab.Active) {
-			fetchActive();
-		} else if (activeTab === TileshareTab.Sent) {
-			fetchSent();
+	const fetchActive = async () => {
+		try {
+			const data = await tileshareService.getInboxClusters();
+			if (data && data.length > 0) setInboxClusters(data);
+		} catch (error) {
+			console.error('Error fetching tileshare inbox', error);
 		}
+	};
+
+	const fetchSent = async () => {
+		try {
+			const data = await tileshareService.getOutboxClusters();
+			if (data && data.length > 0) setOutboxClusters(data);
+		} catch (error) {
+			console.error('Error fetching tileshare sent', error);
+		}
+	};
+
+	const throttledFetchActive = useRef(throttle(fetchActive, 2000));
+	const throttledFetchSent = useRef(throttle(fetchSent, 2000));
+
+	useEffect(() => {
+		if (activeTab === TileshareTab.Active) throttledFetchActive.current();
+		else if (activeTab === TileshareTab.Sent) throttledFetchSent.current();
 	}, [activeTab]);
 
 	const tabs = useMemo<TabItem[]>(
 		() => [
 			{
 				id: TileshareTab.Active,
-				label: t('tilesharedemo.dashboard.nav.active', { count: tiles.length }),
+				label: t('tilesharedemo.dashboard.nav.active', { count: inboxClusters.length }),
 				icon: <CalendarCheck2 size={16} />,
 			},
 			{
 				id: TileshareTab.Sent,
-				label: t('tilesharedemo.dashboard.nav.sent', { count: clusters.length }),
+				label: t('tilesharedemo.dashboard.nav.sent', { count: outboxClusters.length }),
 				icon: <ArrowUpRight size={16} />,
 			},
 		],
-		[t, tiles.length, clusters.length]
+		[t, inboxClusters.length, outboxClusters.length]
 	);
 
 	const tabRoutes: Record<string, string> = {
@@ -105,8 +105,8 @@ const TileshareDashboardPage: React.FC = () => {
 					<Outlet
 						context={
 							{
-								tiles,
-								clusters,
+								inboxClusters,
+								outboxClusters,
 							} satisfies TileshareDashboardOutletContext
 						}
 					/>

@@ -92,7 +92,7 @@ describe('TileshareService', () => {
 
 			expect(result).toEqual([mockCluster]);
 			expect(apiMock.getClusters).toHaveBeenCalledOnce();
-			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsOutbox: false });
+			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsInbox: true });
 		});
 
 		it('propagates network errors', async () => {

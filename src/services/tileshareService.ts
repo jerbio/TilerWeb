@@ -21,7 +21,7 @@ class TileshareService {
 
 	async getInboxClusters() {
 		try {
-			const res = await this.api.getClusters({ IsOutbox: false });
+			const res = await this.api.getClusters({ IsInbox: true });
 			return res.Content.clusters;
 		} catch (error) {
 			console.error('Error fetching tileshare inbox clusters', error);

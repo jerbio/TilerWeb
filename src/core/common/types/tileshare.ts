@@ -97,6 +97,7 @@ export type DeleteTileShareClusterResponse = ApiResponse<unknown>;
 
 export type GetClustersParams = {
 	IsOutbox?: boolean;
+	IsInbox?: boolean;
 };
 
 export enum InvitationStatus {
