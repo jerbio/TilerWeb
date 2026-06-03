@@ -31,6 +31,7 @@ import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
 import TileshareSent from './pages/app/tileshare/TileshareSent';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
+import ROUTES from './core/constants/routes';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
@@ -108,16 +109,16 @@ const App: React.FC = () => {
 
 								{/* Extranet Routes - perform operations without needing to sign in */}
 								<Route
-									path="/tileshare/invite/:designatedTemplateId"
+									path={ROUTES.tileshare.patterns.invite}
 									element={<TileshareInvitePage />}
 								/>
 
 								{/* Protected Routes - redirect to /signin if not authenticated */}
 								<Route element={<ProtectedRoute />}>
 									<Route element={<AppLayout />}>
-										<Route path="/timeline" element={<Timeline />} />
+										<Route path={ROUTES.timeline} element={<Timeline />} />
 										<Route
-											path="/tileshare"
+											path={ROUTES.tileshare.root}
 											element={<TileshareDashboardPage />}
 										>
 											<Route
@@ -128,12 +129,12 @@ const App: React.FC = () => {
 											<Route path="sent" element={<TileshareSent />} />
 										</Route>
 										<Route
-											path="/tileshare/:id"
+											path={ROUTES.tileshare.patterns.detail}
 											element={<TileshareDetailPage />}
 										/>
 
 										<Route
-											path="/tileshare/:id/tilette/:tiletteId"
+											path={ROUTES.tileshare.patterns.tilette}
 											element={<TiletteDetailPage />}
 										/>
 										<Route path="/settings" element={<SettingsLayout />}>

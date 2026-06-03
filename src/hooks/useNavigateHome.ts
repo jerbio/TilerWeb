@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate, type NavigateOptions, type To } from 'react-router';
 import useAppStore from '@/global_state';
+import ROUTES from '@/core/constants/routes';
 
 /**
  * Auth-aware navigation hook. Drop-in replacement for useNavigate().
@@ -24,7 +25,7 @@ const useAuthNavigate = () => {
 			const path = typeof to === 'string' ? to : (to.pathname ?? '');
 
 			if (path === 'home') {
-				routerNavigate(isAuthenticated ? '/timeline' : '/', options);
+				routerNavigate(isAuthenticated ? ROUTES.timeline : '/', options);
 			} else {
 				routerNavigate(to, options);
 			}
