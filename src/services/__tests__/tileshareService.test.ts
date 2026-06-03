@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import TileshareService from '../tileshareService';
 import type { TileshareApi } from '@/api/tileshareApi';
+import { InvitationStatus } from '@/core/common/types/tileshare';
 
 const mockCreator = {
 	id: 'user-1',
@@ -49,9 +50,9 @@ const mockDesignatedTile = {
 
 describe('TileshareService', () => {
 	describe('getOutbox', () => {
-		it('returns unwrapped clusters array', async () => {
+		it('returns unwrapped clusters array and passes IsOutbox param', async () => {
 			const apiMock = {
-				getOutbox: vi.fn().mockResolvedValue({
+				getClusters: vi.fn().mockResolvedValue({
 					Error: { Code: '0', Message: 'SUCCESS' },
 					Content: { clusters: [mockCluster] },
 					ServerStatus: null,
@@ -59,26 +60,55 @@ describe('TileshareService', () => {
 			} as unknown as TileshareApi;
 
 			const service = new TileshareService(apiMock);
-			const result = await service.getOutbox();
+			const result = await service.getOutboxClusters();
 
 			expect(result).toEqual([mockCluster]);
-			expect(apiMock.getOutbox).toHaveBeenCalledOnce();
+			expect(apiMock.getClusters).toHaveBeenCalledOnce();
+			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsOutbox: true });
 		});
 
 		it('propagates network errors', async () => {
 			const apiMock = {
-				getOutbox: vi.fn().mockRejectedValue(new Error('Network error')),
+				getClusters: vi.fn().mockRejectedValue(new Error('Network error')),
 			} as unknown as TileshareApi;
 
 			const service = new TileshareService(apiMock);
-			await expect(service.getOutbox()).rejects.toThrow();
+			await expect(service.getOutboxClusters()).rejects.toThrow();
+		});
+	});
+
+	describe('getInboxClusters', () => {
+		it('returns unwrapped clusters array and passes IsOutbox false', async () => {
+			const apiMock = {
+				getClusters: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { clusters: [mockCluster] },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.getInboxClusters();
+
+			expect(result).toEqual([mockCluster]);
+			expect(apiMock.getClusters).toHaveBeenCalledOnce();
+			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsOutbox: false });
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				getClusters: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(service.getInboxClusters()).rejects.toThrow();
 		});
 	});
 
 	describe('getInbox', () => {
-		it('returns unwrapped designatedTiles array', async () => {
+		it('returns unwrapped designatedTiles array and passes InvitationStatus param', async () => {
 			const apiMock = {
-				getInbox: vi.fn().mockResolvedValue({
+				getDesignatedTiles: vi.fn().mockResolvedValue({
 					Error: { Code: '0', Message: 'SUCCESS' },
 					Content: { designatedTiles: [mockDesignatedTile] },
 					ServerStatus: null,
@@ -86,19 +116,22 @@ describe('TileshareService', () => {
 			} as unknown as TileshareApi;
 
 			const service = new TileshareService(apiMock);
-			const result = await service.getInbox();
+			const result = await service.getDesignatedTiles();
 
 			expect(result).toEqual([mockDesignatedTile]);
-			expect(apiMock.getInbox).toHaveBeenCalledOnce();
+			expect(apiMock.getDesignatedTiles).toHaveBeenCalledOnce();
+			expect(apiMock.getDesignatedTiles).toHaveBeenCalledWith({
+				InvitationStatus: InvitationStatus.Accepted,
+			});
 		});
 
 		it('propagates network errors', async () => {
 			const apiMock = {
-				getInbox: vi.fn().mockRejectedValue(new Error('Network error')),
+				getDesignatedTiles: vi.fn().mockRejectedValue(new Error('Network error')),
 			} as unknown as TileshareApi;
 
 			const service = new TileshareService(apiMock);
-			await expect(service.getInbox()).rejects.toThrow();
+			await expect(service.getDesignatedTiles()).rejects.toThrow();
 		});
 	});
 

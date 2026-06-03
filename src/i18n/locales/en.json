@@ -1503,8 +1503,9 @@
 		"dashboard": {
 			"title": "Tileshare",
 			"nav": {
-				"inbox": "Inbound ({{count}})",
-				"outbox": "Outbound ({{count}})"
+				"active": "Active ({{count}})",
+				"sent": "Sent ({{count}})",
+				"received": "Received ({{count}})"
 			},
 			"filter": {
 				"all": "All",
@@ -1518,15 +1519,20 @@
 			"multiTileshare": "Multi tileshare",
 			"tileshare": "Tileshare"
 		},
-		"inbox": {
-			"title": "Inbox",
-			"empty": "Your inbox is empty",
-			"emptyFiltered": "No in-progress items in your inbox"
+		"active": {
+			"title": "Active",
+			"empty": "No active tileshares",
+			"emptyFiltered": "No in-progress items in your active tileshares"
 		},
-		"outbox": {
-			"title": "Outbox",
-			"empty": "Your outbox is empty",
-			"emptyFiltered": "No in-progress items in your outbox"
+		"sent": {
+			"title": "Sent",
+			"empty": "You haven't sent any tileshares yet",
+			"emptyFiltered": "No in-progress items in your sent tileshares"
+		},
+		"received": {
+			"title": "Received",
+			"empty": "You haven't received any tileshares yet",
+			"emptyFiltered": "No in-progress items in your received tileshares"
 		},
 		"tileshareDetail": {
 			"title": "Tileshare Detail"

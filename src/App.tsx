@@ -26,9 +26,9 @@ import { ThemeProvider } from './core/theme/ThemeProvider';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
 import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
-import TileshareInbox from './pages/app/tileshare/TileshareInbox';
+import TileshareActive from './pages/app/tileshare/TileshareActive';
 import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
-import TileshareOutbox from './pages/app/tileshare/TileshareOutbox';
+import TileshareSent from './pages/app/tileshare/TileshareSent';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
 
@@ -122,11 +122,10 @@ const App: React.FC = () => {
 										>
 											<Route
 												index
-												element={<Navigate to="inbox" replace />}
+												element={<Navigate to="active" replace />}
 											/>
-											<Route path="inbox" element={<TileshareInbox />} />
-
-											<Route path="outbox" element={<TileshareOutbox />} />
+											<Route path="active" element={<TileshareActive />} />
+											<Route path="sent" element={<TileshareSent />} />
 										</Route>
 										<Route
 											path="/tileshare/:id"

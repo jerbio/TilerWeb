@@ -13,6 +13,7 @@ export type TabsProps = {
 	value: string;
 	onChange: (id: string) => void;
 	disabled?: boolean;
+	stretch?: boolean;
 	className?: string;
 	'aria-label'?: string;
 };
@@ -30,6 +31,7 @@ const Tabs: React.FC<TabsProps> = ({
 	value,
 	onChange,
 	disabled = false,
+	stretch = false,
 	className,
 	'aria-label': ariaLabel,
 }) => {
@@ -91,9 +93,14 @@ const Tabs: React.FC<TabsProps> = ({
 	};
 
 	return (
-		<TabsContainer className={className} role="tablist" aria-label={ariaLabel}>
+		<TabsContainer
+			$stretch={stretch}
+			className={className}
+			role="tablist"
+			aria-label={ariaLabel}
+		>
 			<AnimatedIndicator style={indicatorSpring} />
-			<TabList ref={tabListRef}>
+			<TabList $stretch={stretch} ref={tabListRef}>
 				{tabs.map((tab) => {
 					const isActive = tab.id === value;
 					return (
@@ -106,6 +113,7 @@ const Tabs: React.FC<TabsProps> = ({
 							tabIndex={isActive ? 0 : -1}
 							$active={isActive}
 							$disabled={disabled}
+							$stretch={stretch}
 							disabled={disabled}
 							onClick={() => handleTabClick(tab.id)}
 						>
@@ -119,9 +127,10 @@ const Tabs: React.FC<TabsProps> = ({
 	);
 };
 
-const TabsContainer = styled.div`
+const TabsContainer = styled.div<{ $stretch: boolean }>`
 	position: relative;
-	display: inline-flex;
+	display: ${({ $stretch }) => ($stretch ? 'flex' : 'inline-flex')};
+	width: ${({ $stretch }) => ($stretch ? '100%' : 'auto')};
 	padding: ${CONTAINER_PADDING}px;
 	border: 1px solid ${({ theme }) => theme.colors.tabs.border};
 	background: ${({ theme }) => theme.colors.tabs.bg};
@@ -138,11 +147,12 @@ const AnimatedIndicator = styled(animated.div)`
 	pointer-events: none;
 `;
 
-const TabList = styled.div`
+const TabList = styled.div<{ $stretch: boolean }>`
 	position: relative;
 	z-index: 1;
 	display: flex;
 	gap: 2px;
+	width: ${({ $stretch }) => ($stretch ? '100%' : 'auto')};
 `;
 
 const TabIcon = styled.span`
@@ -151,9 +161,11 @@ const TabIcon = styled.span`
 	margin-left: 6px;
 `;
 
-const TabButton = styled.button<{ $active: boolean; $disabled: boolean }>`
+const TabButton = styled.button<{ $active: boolean; $disabled: boolean; $stretch: boolean }>`
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	flex: ${({ $stretch }) => ($stretch ? 1 : 'none')};
 	border: none;
 	background: transparent;
 	padding: 8px 12px;

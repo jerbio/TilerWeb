@@ -61,7 +61,7 @@ export const darkTheme: AppTheme = {
 		},
 		// Tabs colors
 		tabs: {
-			border: palette.colors.gray[700],
+			border: palette.colors.gray[800],
 			bg: 'transparent',
 			indicator: palette.colors.gray[800],
 			text: palette.colors.gray[400],

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TileshareApi } from '../tileshareApi';
+import { InvitationStatus } from '@/core/common/types/tileshare';
 
 vi.mock('@/config/config_getter', () => ({
 	Env: {
@@ -61,7 +62,7 @@ describe('TileshareApi', () => {
 	});
 
 	describe('getOutbox', () => {
-		it('sends GET request to api/TileShareCluster?IsOutbox=true', async () => {
+		it('appends provided params as query string', async () => {
 			fetchSpy.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
@@ -73,7 +74,7 @@ describe('TileshareApi', () => {
 				)
 			);
 
-			const result = await api.getOutbox();
+			const result = await api.getClusters({ IsOutbox: true });
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const [urlArg, options] = fetchSpy.mock.calls[0];
@@ -90,14 +91,38 @@ describe('TileshareApi', () => {
 			expect(result.Content.clusters).toHaveLength(1);
 		});
 
+		it('omits query string when no params given', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({
+						Error: { Code: '0', Message: 'SUCCESS' },
+						Content: { clusters: [] },
+						ServerStatus: null,
+					}),
+					{ status: 200, headers: { 'Content-Type': 'application/json' } }
+				)
+			);
+
+			await api.getClusters();
+
+			const [urlArg] = fetchSpy.mock.calls[0];
+			const urlStr =
+				urlArg instanceof Request
+					? urlArg.url
+					: typeof urlArg === 'string'
+						? urlArg
+						: String(urlArg);
+			expect(urlStr).not.toContain('?');
+		});
+
 		it('throws on network error', async () => {
 			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
-			await expect(api.getOutbox()).rejects.toThrow();
+			await expect(api.getClusters({ IsOutbox: true })).rejects.toThrow();
 		});
 	});
 
 	describe('getInbox', () => {
-		it('sends GET request to api/DesignatedTile/designated?InvitationStatus=accepted', async () => {
+		it('appends provided params as query string', async () => {
 			fetchSpy.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
@@ -109,7 +134,9 @@ describe('TileshareApi', () => {
 				)
 			);
 
-			const result = await api.getInbox();
+			const result = await api.getDesignatedTiles({
+				InvitationStatus: InvitationStatus.Accepted,
+			});
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const [urlArg] = fetchSpy.mock.calls[0];
@@ -124,9 +151,35 @@ describe('TileshareApi', () => {
 			expect(result.Content.designatedTiles).toHaveLength(1);
 		});
 
+		it('omits query string when no params given', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({
+						Error: { Code: '0', Message: 'SUCCESS' },
+						Content: { designatedTiles: [] },
+						ServerStatus: null,
+					}),
+					{ status: 200, headers: { 'Content-Type': 'application/json' } }
+				)
+			);
+
+			await api.getDesignatedTiles();
+
+			const [urlArg] = fetchSpy.mock.calls[0];
+			const urlStr =
+				urlArg instanceof Request
+					? urlArg.url
+					: typeof urlArg === 'string'
+						? urlArg
+						: String(urlArg);
+			expect(urlStr).not.toContain('?');
+		});
+
 		it('throws on network error', async () => {
 			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
-			await expect(api.getInbox()).rejects.toThrow();
+			await expect(
+				api.getDesignatedTiles({ InvitationStatus: InvitationStatus.Accepted })
+			).rejects.toThrow();
 		});
 	});
 

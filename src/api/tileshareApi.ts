@@ -3,18 +3,34 @@ import {
 	DeleteTileShareClusterParams,
 	DeleteTileShareClusterResponse,
 	DesignatedTileListResponse,
+	GetClustersParams,
+	GetDesignatedTilesParams,
 	TileShareClusterListResponse,
 } from '@/core/common/types/tileshare';
 
 export class TileshareApi extends AppApi {
-	getOutbox() {
-		return this.apiRequest<TileShareClusterListResponse>('api/TileShareCluster?IsOutbox=true');
+	getClusters(params?: GetClustersParams) {
+		const qs = params
+			? '?' +
+				new URLSearchParams(
+					Object.entries(params)
+						.filter(([, v]) => v !== undefined)
+						.map(([k, v]) => [k, String(v)])
+				).toString()
+			: '';
+		return this.apiRequest<TileShareClusterListResponse>(`api/TileShareCluster${qs}`);
 	}
 
-	getInbox() {
-		return this.apiRequest<DesignatedTileListResponse>(
-			'api/DesignatedTile/designated?InvitationStatus=accepted'
-		);
+	getDesignatedTiles(params?: GetDesignatedTilesParams) {
+		const qs = params
+			? '?' +
+				new URLSearchParams(
+					Object.entries(params)
+						.filter(([, v]) => v !== undefined)
+						.map(([k, v]) => [k, String(v)])
+				).toString()
+			: '';
+		return this.apiRequest<DesignatedTileListResponse>(`api/DesignatedTile/designated${qs}`);
 	}
 
 	async deleteCluster(

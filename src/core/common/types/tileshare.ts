@@ -94,3 +94,17 @@ export type DeleteTileShareClusterParams = {
 };
 
 export type DeleteTileShareClusterResponse = ApiResponse<unknown>;
+
+export type GetClustersParams = {
+	IsOutbox?: boolean;
+};
+
+export enum InvitationStatus {
+	Accepted = 'accepted',
+	Pending = 'pending',
+	Declined = 'declined',
+}
+
+export type GetDesignatedTilesParams = {
+	InvitationStatus?: InvitationStatus;
+};

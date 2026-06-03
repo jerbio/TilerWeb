@@ -1,42 +1,24 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useOutletContext } from 'react-router';
-import { TileshareDashboardOutletContext, TileshareFilter } from './TileShareDashboard';
+import { TileshareDashboardOutletContext } from './TileShareDashboard';
 import TileShareCard, { type AvatarUser } from '@/components/tileshare/TileShareCard';
 import Pagination from '@/core/common/components/Pagination';
 import EmptyState from '@/core/common/components/EmptyState';
-import { Inbox } from 'lucide-react';
+import { CalendarCheck2 } from 'lucide-react';
 import usePagination from '@/hooks/usePagination';
 
-const TileshareInbox: React.FC = () => {
+const TileshareActive: React.FC = () => {
 	const { t } = useTranslation();
-	const { tiles, filter } = useOutletContext<TileshareDashboardOutletContext>();
+	const { tiles } = useOutletContext<TileshareDashboardOutletContext>();
 
-	const filteredTiles = useMemo(() => {
-		const result =
-			filter === TileshareFilter.InProgress
-				? tiles.filter((tile) => tile.completionPercent !== 100)
-				: tiles;
-		return result;
-	}, [tiles, filter]);
-
-	const {
-		page,
-		totalPages,
-		pagedItems: pagedTiles,
-		setPage,
-	} = usePagination(filteredTiles, 5, [filter]);
-
-	const emptyText =
-		filter === TileshareFilter.InProgress
-			? t('tilesharedemo.inbox.emptyFiltered')
-			: t('tilesharedemo.inbox.empty');
+	const { page, totalPages, pagedItems: pagedTiles, setPage } = usePagination(tiles, 5, []);
 
 	return (
 		<Container>
-			{filteredTiles.length === 0 ? (
-				<EmptyState icon={Inbox} text={emptyText} />
+			{tiles.length === 0 ? (
+				<EmptyState icon={CalendarCheck2} text={t('tilesharedemo.active.empty')} />
 			) : (
 				<>
 					<List>
@@ -81,4 +63,4 @@ const List = styled.div`
 	width: 100%;
 `;
 
-export default TileshareInbox;
+export default TileshareActive;

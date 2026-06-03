@@ -94,6 +94,28 @@ describe('Tabs', () => {
 		});
 	});
 
+	describe('Stretch', () => {
+		it('should apply flex:1 to each tab button when stretch is true', () => {
+			const onChange = vi.fn();
+			renderWithTheme(<Tabs tabs={tabs} value="overview" onChange={onChange} stretch />);
+
+			const tabButtons = screen.getAllByRole('tab');
+			tabButtons.forEach((btn) => {
+				expect(btn).toHaveStyle({ flex: '1' });
+			});
+		});
+
+		it('should not apply flex:1 to tab buttons by default', () => {
+			const onChange = vi.fn();
+			renderWithTheme(<Tabs tabs={tabs} value="overview" onChange={onChange} />);
+
+			const tabButtons = screen.getAllByRole('tab');
+			tabButtons.forEach((btn) => {
+				expect(btn).not.toHaveStyle({ flex: '1' });
+			});
+		});
+	});
+
 	describe('Disabled State', () => {
 		it('should not call onChange when disabled', () => {
 			const onChange = vi.fn();

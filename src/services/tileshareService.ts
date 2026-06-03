@@ -1,5 +1,5 @@
 import { TileshareApi } from '@/api/tileshareApi';
-import { DeleteTileShareClusterParams } from '@/core/common/types/tileshare';
+import { DeleteTileShareClusterParams, InvitationStatus } from '@/core/common/types/tileshare';
 import { normalizeError } from '@/core/error';
 
 class TileshareService {
@@ -9,9 +9,9 @@ class TileshareService {
 		this.api = api;
 	}
 
-	async getOutbox() {
+	async getOutboxClusters() {
 		try {
-			const res = await this.api.getOutbox();
+			const res = await this.api.getClusters({ IsOutbox: true });
 			return res.Content.clusters;
 		} catch (error) {
 			console.error('Error fetching tileshare outbox', error);
@@ -19,9 +19,21 @@ class TileshareService {
 		}
 	}
 
-	async getInbox() {
+	async getInboxClusters() {
 		try {
-			const res = await this.api.getInbox();
+			const res = await this.api.getClusters({ IsOutbox: false });
+			return res.Content.clusters;
+		} catch (error) {
+			console.error('Error fetching tileshare inbox clusters', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getDesignatedTiles() {
+		try {
+			const res = await this.api.getDesignatedTiles({
+				InvitationStatus: InvitationStatus.Accepted,
+			});
 			return res.Content.designatedTiles;
 		} catch (error) {
 			console.error('Error fetching tileshare inbox', error);
