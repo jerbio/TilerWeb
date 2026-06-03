@@ -42,15 +42,26 @@ vi.mock('@/global_state', () => ({
 	),
 }));
 
-vi.mock('react-i18next', () => ({
-	// Minimal i18next plugin shim — i18n.use(initReactI18next) must not throw.
-	// i18next checks `plugin.type` and calls `plugin.init(services)` at startup.
-	initReactI18next: { type: '3rdParty', init: vi.fn() },
-	useTranslation: () => ({
-		t: (_key: string, fallback?: string) => fallback ?? _key,
-		i18n: { language: 'en' },
-	}),
-}));
+vi.mock('react-i18next', () => {
+	// Define `t` once in the factory scope so every `useTranslation()` call
+	// returns the SAME function reference. An unstable `t` propagates into
+	// `useCallback` deps (e.g. `loadInitialChatMessages`) and causes those
+	// callbacks to be recreated on every render, which re-fires their
+	// `useEffect` and triggers an infinite update loop in jsdom tests.
+	const translations: Record<string, string> = {
+		'common.buttons.back': 'Back',
+	};
+	const t = (_key: string, fallback?: string) => translations[_key] ?? fallback ?? _key;
+	return {
+		// Minimal i18next plugin shim — i18n.use(initReactI18next) must not throw.
+		// i18next checks `plugin.type` and calls `plugin.init(services)` at startup.
+		initReactI18next: { type: '3rdParty', init: vi.fn() },
+		useTranslation: () => ({
+			t,
+			i18n: { language: 'en' },
+		}),
+	};
+});
 
 vi.mock('@/services', () => ({
 	chatService: {
