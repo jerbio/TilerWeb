@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 
+vi.mock('@/core/theme/ThemeProvider', () => ({
+	useTheme: () => ({ isDarkMode: false, toggleTheme: vi.fn() }),
+}));
+
 vi.mock('react-router', async () => {
 	const actual = await vi.importActual<typeof import('react-router')>('react-router');
 	return {

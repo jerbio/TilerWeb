@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, CalendarDays, Clock, Layers, Link2, MessageSquare } from 'lucide-react';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
-import ProgressBar from '@/core/common/components/ProgressBar';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
 import Button from '@/core/common/components/button';
 import { TileShareCluster } from '@/core/common/types/tileshare';
@@ -35,13 +34,23 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 
 	return (
 		<CardGrid>
-			<LeftTop>
+			<Left>
 				<IconBox>
 					{cluster.isMultiTilette ? <Layers size={18} /> : <MessageSquare size={18} />}
 				</IconBox>
 				<TitleBlock>
 					<Title>{cluster.name ?? '—'}</Title>
-					<Subtitle>{subtitle}</Subtitle>
+					<SubHeader>
+						<Subtitle>{subtitle}</Subtitle>
+						{cluster.creator && (
+							<>
+								<span>|</span>
+								<Subtitle>
+									{cluster.creator.username ?? cluster.creator.firstName}
+								</Subtitle>
+							</>
+						)}
+					</SubHeader>
 				</TitleBlock>
 				<Link to={ROUTES.tileshare.detail(cluster.id ?? '')}>
 					<Button
@@ -57,9 +66,9 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 						<ArrowRight size={20} />
 					</Button>
 				</Link>
-			</LeftTop>
+			</Left>
 
-			<RightTop>
+			<Right>
 				<DueWrapper>
 					<DueItem>
 						<DueIcon>
@@ -81,31 +90,27 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 						</DueContent>
 					</DueItem>
 				</DueWrapper>
-			</RightTop>
 
-			<LeftBottom>
-				<ProgressBar label={t('tilesharedemo.card.progress')} percentage={0} />
-			</LeftBottom>
-
-			<RightBottom>
-				<AvatarCluster
-					users={avatarUsers}
-					renderWrapper={(user, i, avatar) => (
-						<Tooltip key={i} text={user.email ?? user.name ?? ''} position="top">
-							{avatar}
-						</Tooltip>
-					)}
-				/>
-				<MetaGroup>
-					<MetaItem>
-						<MessageSquare size={16} />
-					</MetaItem>
-					<MetaItem>
-						<Link2 size={16} />
-						<MetaCount>{avatarUsers.length}</MetaCount>
-					</MetaItem>
-				</MetaGroup>
-			</RightBottom>
+				<AvatarRow>
+					<AvatarCluster
+						users={avatarUsers}
+						renderWrapper={(user, i, avatar) => (
+							<Tooltip key={i} text={user.email ?? user.name ?? ''} position="top">
+								{avatar}
+							</Tooltip>
+						)}
+					/>
+					<MetaGroup>
+						<MetaItem>
+							<MessageSquare size={16} />
+						</MetaItem>
+						<MetaItem>
+							<Link2 size={16} />
+							<MetaCount>{avatarUsers.length}</MetaCount>
+						</MetaItem>
+					</MetaGroup>
+				</AvatarRow>
+			</Right>
 		</CardGrid>
 	);
 };
@@ -113,7 +118,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 const CardGrid = styled.div`
 	display: grid;
 	grid-template-columns: 7fr 1px 5fr;
-	grid-template-rows: auto 1px auto;
+	grid-template-rows: auto;
 	background-color: ${({ theme }) => theme.colors.border.default};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
@@ -121,18 +126,13 @@ const CardGrid = styled.div`
 
 	@media (max-width: 640px) {
 		grid-template-columns: 1fr;
-		grid-template-rows: auto 1px auto 1px auto 1px auto;
+		grid-template-rows: auto 1px auto;
 	}
 `;
 
-const cellBase = `
-	background-color: var(--cell-bg);
-	padding: 1rem 1.25rem;
-`;
-
-const LeftTop = styled.div`
-	${cellBase}
+const Left = styled.div`
 	background-color: ${({ theme }) => theme.colors.background.card};
+	padding: 1rem 1.25rem;
 	grid-column: 1;
 	grid-row: 1;
 	display: flex;
@@ -145,46 +145,19 @@ const LeftTop = styled.div`
 	}
 `;
 
-const RightTop = styled.div`
-	${cellBase}
+const Right = styled.div`
 	background-color: ${({ theme }) => theme.colors.background.card};
+	padding: 1rem 1.25rem;
 	grid-column: 3;
 	grid-row: 1;
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.75rem;
 
 	@media (max-width: 640px) {
 		grid-column: 1;
 		grid-row: 3;
-	}
-`;
-
-const LeftBottom = styled.div`
-	${cellBase}
-	background-color: ${({ theme }) => theme.colors.background.card};
-	grid-column: 1;
-	grid-row: 3;
-	display: flex;
-	align-items: center;
-
-	@media (max-width: 640px) {
-		grid-column: 1;
-		grid-row: 5;
-	}
-`;
-
-const RightBottom = styled.div`
-	${cellBase}
-	background-color: ${({ theme }) => theme.colors.background.card};
-	grid-column: 3;
-	grid-row: 3;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-
-	@media (max-width: 640px) {
-		grid-column: 1;
-		grid-row: 7;
 	}
 `;
 
@@ -215,19 +188,25 @@ const Title = styled.p`
 	text-overflow: ellipsis;
 `;
 
+const SubHeader = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	span {
+		color: ${({ theme }) => theme.colors.text.muted};
+	}
+`;
+
 const Subtitle = styled.p`
-	margin: 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
 `;
-
-const DUE_WRAPPER_PADDING = '0.75rem';
 
 const DueWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	padding: ${DUE_WRAPPER_PADDING};
+	padding: 0.75rem;
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.large};
 	width: 100%;
@@ -251,7 +230,6 @@ const DueIcon = styled.div`
 	color: ${({ theme }) => theme.colors.text.secondary};
 	margin-top: 2px;
 	flex-shrink: 0;
-	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 `;
 
 const DueContent = styled.div`
@@ -274,6 +252,12 @@ const DueValue = styled.span`
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
 	white-space: nowrap;
+`;
+
+const AvatarRow = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 `;
 
 const MetaGroup = styled.div`
