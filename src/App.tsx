@@ -25,12 +25,13 @@ import NotificationPreferencesSettings from './pages/settings/NotificationPrefer
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
-import TileshareDetailPage from './pages/app/tileshare/TileShareDetailPage';
-import TileshareInbox from './pages/app/tileshare/TileShareInbox';
-import TileshareInvitePage from './pages/app/tileshare/TileShareInvitePage';
-import TileshareOutbox from './pages/app/tileshare/TileShareOutbox';
+import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
+import TileshareActive from './pages/app/tileshare/TileshareActive';
+import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
+import TileshareSent from './pages/app/tileshare/TileshareSent';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
+import ROUTES from './core/constants/routes';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
@@ -108,33 +109,43 @@ const App: React.FC = () => {
 
 								{/* Extranet Routes - perform operations without needing to sign in */}
 								<Route
-									path="/tileshare/invite/:designatedTemplateId"
+									path={ROUTES.tileshare.patterns.invite}
 									element={<TileshareInvitePage />}
 								/>
 
 								{/* Protected Routes - redirect to /signin if not authenticated */}
 								<Route element={<ProtectedRoute />}>
 									<Route element={<AppLayout />}>
-										<Route path="/timeline" element={<Timeline />} />
+										<Route path={ROUTES.timeline} element={<Timeline />} />
 										<Route
-											path="/tileshare"
+											path={ROUTES.tileshare.root}
 											element={<TileshareDashboardPage />}
 										>
 											<Route
 												index
-												element={<Navigate to="inbox" replace />}
+												element={
+													<Navigate
+														to={ROUTES.tileshare.active}
+														replace
+													/>
+												}
 											/>
-											<Route path="inbox" element={<TileshareInbox />} />
-
-											<Route path="outbox" element={<TileshareOutbox />} />
+											<Route
+												path={ROUTES.tileshare.active}
+												element={<TileshareActive />}
+											/>
+											<Route
+												path={ROUTES.tileshare.sent}
+												element={<TileshareSent />}
+											/>
 										</Route>
 										<Route
-											path="/tileshare/:id"
+											path={ROUTES.tileshare.patterns.detail}
 											element={<TileshareDetailPage />}
 										/>
 
 										<Route
-											path="/tileshare/:id/tilette/:tiletteId"
+											path={ROUTES.tileshare.patterns.tilette}
 											element={<TiletteDetailPage />}
 										/>
 										<Route path="/settings" element={<SettingsLayout />}>

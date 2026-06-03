@@ -59,6 +59,14 @@ export const lightTheme: AppTheme = {
 			circle: palette.colors.white,
 			circleChecked: palette.colors.white,
 		},
+		// Tabs colors
+		tabs: {
+			border: palette.colors.gray[200],
+			bg: palette.colors.white,
+			indicator: palette.colors.gray[100],
+			text: palette.colors.gray[500],
+			textActive: palette.colors.gray[900],
+		},
 		// Radio Colors
 		radio: {
 			border: palette.colors.gray[300],
@@ -115,6 +123,23 @@ export const lightTheme: AppTheme = {
 			borderHover: palette.colors.gray[300],
 			focusRing: palette.colors.gray[200],
 			gradientNeutral: palette.colors.gray[300],
+		},
+		// Empty state colors
+		emptyState: {
+			icon: palette.colors.gray[400],
+			text: palette.colors.gray[500],
+		},
+		// Pagination colors
+		pagination: {
+			bg: palette.colors.white,
+			bgHover: palette.colors.gray[100],
+			bgActive: palette.colors.brand[500],
+			border: palette.colors.gray[200],
+			borderActive: palette.colors.brand[500],
+			text: palette.colors.gray[600],
+			textActive: palette.colors.white,
+			textDisabled: palette.colors.gray[300],
+			ellipsis: palette.colors.gray[400],
 		},
 		// hues
 		brand: palette.colors.brand,

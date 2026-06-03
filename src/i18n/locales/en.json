@@ -46,6 +46,9 @@
 			"discover": "Discover",
 			"waitlist": "Waitlist"
 		},
+		"emptyState": {
+			"defaultText": "Nothing here yet"
+		},
 		"voiceInput": {
 			"listening": "Listening...",
 			"transcribing": "Transcribing...",
@@ -1500,15 +1503,36 @@
 		"dashboard": {
 			"title": "Tileshare",
 			"nav": {
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"active": "Active ({{count}})",
+				"sent": "Sent ({{count}})",
+				"received": "Received ({{count}})"
+			},
+			"filter": {
+				"all": "All",
+				"inProgress": "In Progress"
 			}
 		},
-		"inbox": {
-			"title": "Inbox"
+		"card": {
+			"progress": "Progress",
+			"dueOn": "Due on:",
+			"dueBy": "Due by:",
+			"multiTileshare": "Multi tileshare",
+			"tileshare": "Tileshare"
 		},
-		"outbox": {
-			"title": "Outbox"
+		"active": {
+			"title": "Active",
+			"empty": "No active tileshares",
+			"emptyFiltered": "No in-progress items in your active tileshares"
+		},
+		"sent": {
+			"title": "Sent",
+			"empty": "You haven't sent any tileshares yet",
+			"emptyFiltered": "No in-progress items in your sent tileshares"
+		},
+		"received": {
+			"title": "Received",
+			"empty": "You haven't received any tileshares yet",
+			"emptyFiltered": "No in-progress items in your received tileshares"
 		},
 		"tileshareDetail": {
 			"title": "Tileshare Detail"

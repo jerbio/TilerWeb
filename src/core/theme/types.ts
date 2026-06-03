@@ -70,6 +70,14 @@ export type AppTheme = {
 			circle: string;
 			circleChecked: string;
 		};
+		// Tabs colors
+		tabs: {
+			border: string;
+			bg: string;
+			indicator: string;
+			text: string;
+			textActive: string;
+		};
 		// Radio Colors
 		radio: {
 			border: string;
@@ -144,6 +152,23 @@ export type AppTheme = {
 			borderHover: string;
 			focusRing: string;
 			gradientNeutral: string;
+		};
+		// Empty state colors
+		emptyState: {
+			icon: string;
+			text: string;
+		};
+		// Pagination colors
+		pagination: {
+			bg: string;
+			bgHover: string;
+			bgActive: string;
+			border: string;
+			borderActive: string;
+			text: string;
+			textActive: string;
+			textDisabled: string;
+			ellipsis: string;
 		};
 		// Utility colors
 		white: string;
