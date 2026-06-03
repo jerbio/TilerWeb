@@ -13,6 +13,9 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
+		env: {
+			VITE_BASE_URL: 'http://localhost',
+		},
 		include: ['src/**/*.{test,spec}.{ts,tsx}'],
 		setupFiles: ['./src/test/setup.ts'],
 		coverage: {

@@ -8,7 +8,6 @@ type RequestOptions = RequestInit & {
 };
 
 export class AppApi {
-	#baseUrl = Env.get('BASE_URL');
 	getUri(path: string): string {
 		const domain = this.defaultDomain.replace(/\/+$/, '');
 		const normalizedPath = path.replace(/^\/+/, '');
@@ -128,7 +127,7 @@ export class AppApi {
 	}
 
 	get defaultDomain(): string {
-		return this.#baseUrl;
+		return Env.get('BASE_URL');
 	}
 
 	/**
