@@ -8,6 +8,8 @@ import ProgressBar from '@/core/common/components/ProgressBar';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
 import Button from '@/core/common/components/button';
 import { TileShareCluster } from '@/core/common/types/tileshare';
+import { Link } from 'react-router';
+import ROUTES from '@/core/constants/routes';
 
 type TileShareClusterCardProps = {
 	cluster: TileShareCluster;
@@ -38,18 +40,20 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 					<Title>{cluster.name ?? '—'}</Title>
 					<Subtitle>{subtitle}</Subtitle>
 				</TitleBlock>
-				<Button
-					height={40}
-					style={{
-						color: theme.colors.brand[300],
-						border: `1px solid ${theme.colors.border.default}`,
-					}}
-					variant={'ghost'}
-					size="small"
-					aria-label="View"
-				>
-					<ArrowRight size={20} />
-				</Button>
+				<Link to={ROUTES.tileshare.detail(cluster.id ?? '')}>
+					<Button
+						height={40}
+						style={{
+							color: theme.colors.brand[300],
+							border: `1px solid ${theme.colors.border.default}`,
+						}}
+						variant={'ghost'}
+						size="small"
+						aria-label="View"
+					>
+						<ArrowRight size={20} />
+					</Button>
+				</Link>
 			</LeftTop>
 
 			<RightTop>

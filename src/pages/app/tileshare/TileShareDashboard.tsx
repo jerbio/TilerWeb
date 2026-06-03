@@ -27,7 +27,7 @@ const TileshareDashboardPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const [inboxClusters, setInboxClusters] = useState<TileShareCluster[]>(dummyClusters);
-	const [outboxClusters, setOutboxClusters] = useState<TileShareCluster[]>(dummyClusters);
+	const [outboxClusters, setOutboxClusters] = useState<TileShareCluster[]>([]);
 	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
 
 	useEffect(() => {

@@ -23,7 +23,7 @@ const TileshareSent: React.FC = () => {
 	return (
 		<Container>
 			{outboxClusters.length === 0 ? (
-				<EmptyState icon={SendHorizonal} text={t('tilesharedemo.active.empty')} />
+				<EmptyState icon={SendHorizonal} text={t('tilesharedemo.sent.empty')} />
 			) : (
 				<>
 					<List>
