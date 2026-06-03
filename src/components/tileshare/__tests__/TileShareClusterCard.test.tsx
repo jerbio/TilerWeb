@@ -108,13 +108,15 @@ describe('TileShareClusterCard', () => {
 		expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(2);
 	});
 
-	it('renders avatar count from truncatedUser', () => {
+	it('renders initials for each user in truncatedUser', () => {
 		renderCard(mockCluster);
-		expect(screen.getByText('2')).toBeInTheDocument();
+		expect(screen.getByText('B')).toBeInTheDocument();
+		expect(screen.getByText('C')).toBeInTheDocument();
 	});
 
-	it('renders zero link count when truncatedUser is null', () => {
+	it('renders no avatars when truncatedUser is null', () => {
 		renderCard({ ...mockCluster, truncatedUser: null });
-		expect(screen.getByText('0')).toBeInTheDocument();
+		expect(screen.queryByText('B')).not.toBeInTheDocument();
+		expect(screen.queryByText('C')).not.toBeInTheDocument();
 	});
 });

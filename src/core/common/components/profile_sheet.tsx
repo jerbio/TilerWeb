@@ -171,4 +171,6 @@ const SettingsButton = styled(Button)`
 	height: 42px;
 `;
 
+ProfileSheet.displayName = 'ProfileSheet';
+
 export default ProfileSheet;

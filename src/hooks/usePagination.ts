@@ -5,7 +5,6 @@ function usePagination<T>(items: T[], pageSize: number, resetDeps: unknown[]) {
 
 	useEffect(() => {
 		setPage(1);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, resetDeps);
 
 	const totalPages = Math.ceil(items.length / pageSize);
