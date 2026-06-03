@@ -10,6 +10,7 @@ import Button from '@/core/common/components/button';
 import { TileShareCluster } from '@/core/common/types/tileshare';
 import { Link } from 'react-router';
 import ROUTES from '@/core/constants/routes';
+import Tooltip from '@/core/common/components/tooltip';
 
 type TileShareClusterCardProps = {
 	cluster: TileShareCluster;
@@ -20,7 +21,9 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	const { t } = useTranslation();
 
 	const avatarUsers: AvatarUser[] = cluster.truncatedUser
-		? cluster.truncatedUser.split(',').map((name) => ({ name: name.trim() }))
+		? cluster.truncatedUser
+				.split(',')
+				.map((email) => ({ name: email.trim(), email: email.trim() }))
 		: [];
 
 	const subtitle = cluster.isMultiTilette
@@ -34,7 +37,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 		<CardGrid>
 			<LeftTop>
 				<IconBox>
-					<Layers size={18} />
+					{cluster.isMultiTilette ? <Layers size={18} /> : <MessageSquare size={18} />}
 				</IconBox>
 				<TitleBlock>
 					<Title>{cluster.name ?? '—'}</Title>
@@ -85,7 +88,14 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 			</LeftBottom>
 
 			<RightBottom>
-				<AvatarCluster users={avatarUsers} />
+				<AvatarCluster
+					users={avatarUsers}
+					renderWrapper={(user, i, avatar) => (
+						<Tooltip key={i} text={user.email ?? user.name ?? ''} position="top">
+							{avatar}
+						</Tooltip>
+					)}
+				/>
 				<MetaGroup>
 					<MetaItem>
 						<MessageSquare size={16} />
@@ -182,7 +192,7 @@ const IconBox = styled.div`
 	width: 40px;
 	height: 40px;
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background-color: ${({ theme }) => theme.colors.orange[800]};
+	background-color: ${({ theme }) => theme.colors.brand[500]};
 	display: flex;
 	align-items: center;
 	justify-content: center;

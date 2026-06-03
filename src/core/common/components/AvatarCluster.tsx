@@ -5,6 +5,7 @@ import type { AppTheme } from '@/core/theme/types';
 
 export type AvatarUser = {
 	name: string | null;
+	email?: string | null;
 };
 
 type AvatarClusterProps = {
@@ -12,6 +13,7 @@ type AvatarClusterProps = {
 	max?: number;
 	size?: number;
 	className?: string;
+	renderWrapper?: (user: AvatarUser, index: number, avatar: React.ReactNode) => React.ReactNode;
 };
 
 function getInitials(name: string | null): string {
@@ -21,7 +23,13 @@ function getInitials(name: string | null): string {
 	return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-const AvatarCluster: React.FC<AvatarClusterProps> = ({ users, max = 3, size = 32, className }) => {
+const AvatarCluster: React.FC<AvatarClusterProps> = ({
+	users,
+	max = 3,
+	size = 32,
+	className,
+	renderWrapper,
+}) => {
 	const theme = useTheme() as AppTheme;
 	const COLORS = [
 		theme.colors.brand[500],
@@ -35,11 +43,14 @@ const AvatarCluster: React.FC<AvatarClusterProps> = ({ users, max = 3, size = 32
 
 	return (
 		<Cluster className={className}>
-			{visible.map((user, i) => (
-				<Avatar key={i} $bg={COLORS[i % COLORS.length]} $size={size} $index={i}>
-					{getInitials(user.name)}
-				</Avatar>
-			))}
+			{visible.map((user, i) => {
+				const avatar = (
+					<Avatar key={i} $bg={COLORS[i % COLORS.length]} $size={size} $index={i}>
+						{getInitials(user.name)}
+					</Avatar>
+				);
+				return renderWrapper ? renderWrapper(user, i, avatar) : avatar;
+			})}
 			{overflow > 0 && <OverflowBadge $size={size}>+{overflow}</OverflowBadge>}
 		</Cluster>
 	);

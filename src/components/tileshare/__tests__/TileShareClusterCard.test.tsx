@@ -1,5 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
+
+vi.mock('react-router', async () => {
+	const actual = await vi.importActual<typeof import('react-router')>('react-router');
+	return {
+		...actual,
+		Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+			<a href={to}>{children}</a>
+		),
+	};
+});
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import TileShareClusterCard from '../TileShareClusterCard';
