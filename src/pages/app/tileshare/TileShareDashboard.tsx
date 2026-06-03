@@ -10,8 +10,6 @@ import { TileShareCluster } from '@/core/common/types/tileshare';
 import ROUTES from '@/core/constants/routes';
 import { throttle } from '@/core/util/throttle';
 
-import dummyClusters from './data/clusters.json';
-
 export enum TileshareTab {
 	Active = 'active',
 	Sent = 'sent',
@@ -26,7 +24,7 @@ const TileshareDashboardPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
-	const [inboxClusters, setInboxClusters] = useState<TileShareCluster[]>(dummyClusters);
+	const [inboxClusters, setInboxClusters] = useState<TileShareCluster[]>([]);
 	const [outboxClusters, setOutboxClusters] = useState<TileShareCluster[]>([]);
 	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
 

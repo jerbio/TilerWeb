@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, CalendarDays, Clock, Layers, Link2, MessageSquare } from 'lucide-react';
+import { ArrowRight, CalendarDays, Clock, Layers, MessageSquare } from 'lucide-react';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
@@ -100,15 +100,6 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 							</Tooltip>
 						)}
 					/>
-					<MetaGroup>
-						<MetaItem>
-							<MessageSquare size={16} />
-						</MetaItem>
-						<MetaItem>
-							<Link2 size={16} />
-							<MetaCount>{avatarUsers.length}</MetaCount>
-						</MetaItem>
-					</MetaGroup>
 				</AvatarRow>
 			</Right>
 		</CardGrid>
@@ -258,25 +249,6 @@ const AvatarRow = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-`;
-
-const MetaGroup = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-`;
-
-const MetaItem = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 0.375rem;
-	color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const MetaCount = styled.span`
-	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 export default TileShareClusterCard;

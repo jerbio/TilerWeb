@@ -25,9 +25,8 @@ function getInitials(name: string | null): string {
 
 const COLORS: RGB[] = [
 	{ r: 124, g: 212, b: 253 }, // bluelight[300] — sky blue
-	{ r: 189, g: 180, b: 254 }, // purple[300]    — lavender
-	{ r: 110, g: 237, b: 231 }, // teal[200]      — seafoam
 	{ r: 250, g: 167, b: 224 }, // pink[300]      — soft pink
+	{ r: 110, g: 237, b: 231 }, // teal[200]      — seafoam
 ];
 
 const AvatarCluster: React.FC<AvatarClusterProps> = ({
@@ -73,21 +72,14 @@ const Avatar = styled.div<{ $colors: RGB; $darkmode: boolean; $size: number; $in
 	height: ${({ $size }) => $size}px;
 	border-radius: 50%;
 	background-color: ${({ $colors, $darkmode }) => {
-		const c = colorUtil.setLightness($colors, $darkmode ? 0.25 : 0.9);
+		const c = colorUtil.setLightness($colors, $darkmode ? 0.3 : 0.9);
 		return `rgb(${c.r}, ${c.g}, ${c.b})`;
 	}};
 	color: ${({ $colors, $darkmode }) => {
 		const c = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.28);
 		return `rgb(${c.r}, ${c.g}, ${c.b})`;
 	}};
-	border: 2px solid
-		${({ $colors, $darkmode, theme }) => {
-			if ($darkmode) {
-				const c = colorUtil.setLightness($colors, 0.45);
-				return `rgb(${c.r}, ${c.g}, ${c.b})`;
-			}
-			return theme.colors.background.card;
-		}};
+	border: 2px solid ${({ theme }) => theme.colors.background.card};
 	display: flex;
 	align-items: center;
 	justify-content: center;
