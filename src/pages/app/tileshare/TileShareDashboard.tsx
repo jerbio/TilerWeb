@@ -3,23 +3,23 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, CalendarCheck2 } from 'lucide-react';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
-import Tabs from '@/core/common/components/Tabs';
+import Tabs, { TabItem } from '@/core/common/components/Tabs';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { tileshareService } from '@/services';
 import { DesignatedTile, TileShareCluster } from '@/core/common/types/tileshare';
+import ROUTES from '@/core/constants/routes';
 
 import dummyTiles from './data/designatedtiles.json';
 import dummyClusters from './data/clusters.json';
 
-export enum TileshareFilter {
-	All = 'all',
-	InProgress = 'inProgress',
+export enum TileshareTab {
+	Active = 'active',
+	Sent = 'sent',
 }
 
 export type TileshareDashboardOutletContext = {
 	tiles: DesignatedTile[];
 	clusters: TileShareCluster[];
-	receivedClusters: TileShareCluster[];
 };
 
 const TileshareDashboardPage: React.FC = () => {
@@ -28,9 +28,15 @@ const TileshareDashboardPage: React.FC = () => {
 	const { pathname } = useLocation();
 	const [tiles, setTiles] = useState<DesignatedTile[]>(dummyTiles);
 	const [clusters, setClusters] = useState<TileShareCluster[]>(dummyClusters);
-	const [receivedClusters, setReceivedClusters] = useState<TileShareCluster[]>([]);
+	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
 
-	const activeTab = pathname.endsWith('/sent') ? 'sent' : 'active';
+	useEffect(() => {
+		if (pathname.endsWith(ROUTES.tileshare.active)) {
+			setActiveTab(TileshareTab.Active);
+		} else if (pathname.endsWith(ROUTES.tileshare.sent)) {
+			setActiveTab(TileshareTab.Sent);
+		}
+	}, [pathname]);
 
 	useEffect(() => {
 		const fetchActive = async () => {
@@ -51,42 +57,36 @@ const TileshareDashboardPage: React.FC = () => {
 			}
 		};
 
-		const fetchReceived = async () => {
-			try {
-				const data = await tileshareService.getInboxClusters();
-				setReceivedClusters(data ?? []);
-			} catch (error) {
-				console.error('Error fetching tileshare received', error);
-			}
-		};
-
-		if (activeTab === 'active') {
+		if (activeTab === TileshareTab.Active) {
 			fetchActive();
-		} else if (activeTab === 'sent') {
+		} else if (activeTab === TileshareTab.Sent) {
 			fetchSent();
-		} else if (activeTab === 'received') {
-			fetchReceived();
 		}
 	}, [activeTab]);
 
-	const tabs = useMemo(
+	const tabs = useMemo<TabItem[]>(
 		() => [
 			{
-				id: 'active',
+				id: TileshareTab.Active,
 				label: t('tilesharedemo.dashboard.nav.active', { count: tiles.length }),
 				icon: <CalendarCheck2 size={16} />,
 			},
 			{
-				id: 'sent',
+				id: TileshareTab.Sent,
 				label: t('tilesharedemo.dashboard.nav.sent', { count: clusters.length }),
 				icon: <ArrowUpRight size={16} />,
 			},
 		],
-		[t, tiles.length, clusters.length, receivedClusters.length]
+		[t, tiles.length, clusters.length]
 	);
 
+	const tabRoutes: Record<string, string> = {
+		active: ROUTES.tileshare.active,
+		sent: ROUTES.tileshare.sent,
+	};
+
 	const handleTabChange = (id: string) => {
-		navigate(id);
+		if (tabRoutes[id]) navigate(tabRoutes[id]);
 	};
 
 	return (
@@ -107,7 +107,6 @@ const TileshareDashboardPage: React.FC = () => {
 							{
 								tiles,
 								clusters,
-								receivedClusters,
 							} satisfies TileshareDashboardOutletContext
 						}
 					/>

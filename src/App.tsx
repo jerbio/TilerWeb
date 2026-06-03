@@ -123,10 +123,21 @@ const App: React.FC = () => {
 										>
 											<Route
 												index
-												element={<Navigate to="active" replace />}
+												element={
+													<Navigate
+														to={ROUTES.tileshare.active}
+														replace
+													/>
+												}
 											/>
-											<Route path="active" element={<TileshareActive />} />
-											<Route path="sent" element={<TileshareSent />} />
+											<Route
+												path={ROUTES.tileshare.active}
+												element={<TileshareActive />}
+											/>
+											<Route
+												path={ROUTES.tileshare.sent}
+												element={<TileshareSent />}
+											/>
 										</Route>
 										<Route
 											path={ROUTES.tileshare.patterns.detail}

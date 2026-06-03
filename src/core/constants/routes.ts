@@ -2,8 +2,8 @@ const ROUTES = {
 	timeline: '/timeline',
 	tileshare: {
 		root: '/tileshare',
-		active: '/tileshare/active',
-		sent: '/tileshare/sent',
+		active: '/tileshare/inbox',
+		sent: '/tileshare/outbox',
 		// Builder functions — use for navigate() and Link to=
 		detail: (id: string) => `/tileshare/${id}`,
 		tilette: (id: string, tiletteId: string) => `/tileshare/${id}/tilette/${tiletteId}`,
@@ -15,6 +15,6 @@ const ROUTES = {
 			invite: '/tileshare/invite/:designatedTemplateId',
 		},
 	},
-};
+} as const;
 
 export default ROUTES;
