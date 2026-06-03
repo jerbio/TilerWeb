@@ -227,16 +227,13 @@ const CreateTileActionsOptions: React.FC<ActionsOptionsProps> = ({
 												controller.recurrenceWeeklyDays.includes(
 													option.value
 												);
-											const allowUnselect =
-												controller.recurrenceWeeklyDays.length > 1;
-											if (isSelected && allowUnselect) {
+											if (isSelected) {
 												controller.setRecurrenceWeeklyDays(
 													controller.recurrenceWeeklyDays.filter(
 														(day) => day !== option.value
 													)
 												);
-											}
-											if (!isSelected) {
+											} else {
 												controller.setRecurrenceWeeklyDays(
 													controller.recurrenceWeeklyDays.concat(
 														option.value
