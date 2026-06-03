@@ -13,10 +13,12 @@ import FeedbackPopup from '@/components/feedback/FeedbackPopup';
 type ProfileSheetProps = {
 	user: UserInfo | null;
 	open: boolean;
-	ref: React.RefObject<HTMLDivElement>;
 };
 
-const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
+const ProfileSheet = React.forwardRef<HTMLDivElement, ProfileSheetProps>(function ProfileSheet(
+	{ open, user },
+	ref
+) {
 	const logout = useAppStore((state) => state.logout);
 	const navigate = useNavigate();
 	const { t } = useTranslation();
@@ -79,7 +81,9 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 			<FeedbackPopup isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
 		</AnimatedProfileMenu>
 	);
-};
+});
+
+ProfileSheet.displayName = 'ProfileSheet';
 
 const AnimatedProfileMenu = styled(animated.div)`
 	padding: ${(props) => props.theme.space.small} 0;
