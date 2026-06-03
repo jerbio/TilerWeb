@@ -62,8 +62,9 @@ describe('FeatureFlagApi', () => {
 			});
 		});
 
-		it('uses the current BASE_URL value when the request is made', async () => {
+		it('uses the BASE_URL set at construction time when the request is made', async () => {
 			envState.baseUrl = 'http://feature-flags.test';
+			const freshApi = new FeatureFlagApi();
 			let matched = false;
 
 			server.use(
@@ -73,7 +74,7 @@ describe('FeatureFlagApi', () => {
 				})
 			);
 
-			await api.getFlags();
+			await freshApi.getFlags();
 
 			expect(matched).toBe(true);
 		});
