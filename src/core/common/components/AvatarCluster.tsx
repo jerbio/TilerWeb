@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useTheme } from 'styled-components';
-import type { AppTheme } from '@/core/theme/types';
+import { useTheme } from '@/core/theme/ThemeProvider';
+import colorUtil, { RGB } from '@/core/util/colors';
 
 export type AvatarUser = {
 	name: string | null;
@@ -23,6 +23,13 @@ function getInitials(name: string | null): string {
 	return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+const COLORS: RGB[] = [
+	{ r: 124, g: 212, b: 253 }, // bluelight[300] — sky blue
+	{ r: 189, g: 180, b: 254 }, // purple[300]    — lavender
+	{ r: 110, g: 237, b: 231 }, // teal[200]      — seafoam
+	{ r: 250, g: 167, b: 224 }, // pink[300]      — soft pink
+];
+
 const AvatarCluster: React.FC<AvatarClusterProps> = ({
 	users,
 	max = 3,
@@ -30,13 +37,7 @@ const AvatarCluster: React.FC<AvatarClusterProps> = ({
 	className,
 	renderWrapper,
 }) => {
-	const theme = useTheme() as AppTheme;
-	const COLORS = [
-		theme.colors.brand[500],
-		theme.colors.purple[500],
-		theme.colors.teal[500],
-		theme.colors.indigo[500],
-	];
+	const { isDarkMode } = useTheme();
 
 	const visible = users.slice(0, max);
 	const overflow = users.length - max;
@@ -45,7 +46,13 @@ const AvatarCluster: React.FC<AvatarClusterProps> = ({
 		<Cluster className={className}>
 			{visible.map((user, i) => {
 				const avatar = (
-					<Avatar key={i} $bg={COLORS[i % COLORS.length]} $size={size} $index={i}>
+					<Avatar
+						key={i}
+						$colors={COLORS[i % COLORS.length]}
+						$darkmode={isDarkMode}
+						$size={size}
+						$index={i}
+					>
 						{getInitials(user.name)}
 					</Avatar>
 				);
@@ -61,19 +68,30 @@ const Cluster = styled.div`
 	align-items: center;
 `;
 
-const Avatar = styled.div<{ $bg: string; $size: number; $index: number }>`
+const Avatar = styled.div<{ $colors: RGB; $darkmode: boolean; $size: number; $index: number }>`
 	width: ${({ $size }) => $size}px;
 	height: ${({ $size }) => $size}px;
 	border-radius: 50%;
-	background-color: ${({ $bg }) => $bg};
+	background-color: ${({ $colors, $darkmode }) => {
+		if ($darkmode) return `rgba(${$colors.r}, ${$colors.g}, ${$colors.b}, 0.12)`;
+		const c = colorUtil.setLightness($colors, 0.9);
+		return `rgb(${c.r}, ${c.g}, ${c.b})`;
+	}};
+	color: ${({ $colors, $darkmode }) => {
+		const c = colorUtil.setLightness($colors, $darkmode ? 0.75 : 0.28);
+		return `rgb(${c.r}, ${c.g}, ${c.b})`;
+	}};
+	border: 2px solid
+		${({ $colors, $darkmode, theme }) => {
+			if ($darkmode) return `rgba(${$colors.r}, ${$colors.g}, ${$colors.b}, 0.45)`;
+			return theme.colors.background.card;
+		}};
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-	color: ${({ theme }) => theme.colors.white};
 	margin-left: ${({ $index, $size }) => ($index === 0 ? 0 : -Math.floor($size / 3))}px;
-	border: 2px solid ${({ theme }) => theme.colors.background.card};
 	flex-shrink: 0;
 `;
 
