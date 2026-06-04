@@ -490,13 +490,23 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	}, [simulation, ensureSimulationResult]);
 
 	const enterReview = useCallback(async () => {
+		// Read vibeRequest from the cache first (always up-to-date, populated
+		// before the requestId effect can set simulation), then fall back to the
+		// committed-render ref. React 18 can batch setVibeRequest together with
+		// setSimulation in a way that leaves vibeRequestRef.current null in the
+		// render that makes the Review button visible.
+		const rid = requestIdRef.current;
+		const currentVibeRequest =
+			(rid ? (vibeRequestCacheRef.current[rid] ?? null) : null) ??
+			vibeRequestRef.current ??
+			null;
 		if (!simulation) return;
 		if (simulationResult != null && simulationResultIdRef.current === simulation.id) {
 			// Cached — publish to overlay store (sets inReview=true) and skip re-fetch.
-			if (vibeRequest) {
+			if (currentVibeRequest) {
 				useSimulationOverlayStore
 					.getState()
-					.enterReview({ simulation, simulationResult, vibeRequest });
+					.enterReview({ simulation, simulationResult, vibeRequest: currentVibeRequest });
 			}
 			return;
 		}
@@ -505,10 +515,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		try {
 			const content = await ensureSimulationResult(simulation);
 			if (content) {
-				if (vibeRequest) {
+				if (currentVibeRequest) {
 					useSimulationOverlayStore
 						.getState()
-						.enterReview({ simulation, simulationResult: content, vibeRequest });
+						.enterReview({
+							simulation,
+							simulationResult: content,
+							vibeRequest: currentVibeRequest,
+						});
 				}
 			} else {
 				// Plan §5.5 — empty/null body counts as a fetch failure.
@@ -522,7 +536,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		} finally {
 			setIsLoadingSimulationResult(false);
 		}
-	}, [simulation, simulationResult, vibeRequest, ensureSimulationResult]);
+	}, [simulation, simulationResult, ensureSimulationResult]);
 
 	const exitReview = useCallback(() => {
 		useSimulationOverlayStore.getState().exitReview();
@@ -1109,6 +1123,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			personaId: selectedPersonaId,
 		});
 
+		// If the user sends a new message while in review, exit review
+		// synchronously — before any await — so the chat view is restored
+		// immediately while the API call completes in the background.
+		if (inReview) {
+			exitReview();
+			setSimulation(null);
+			setSimulationResult(null);
+			simulationResultIdRef.current = null;
+			simulationResultPromiseRef.current = null;
+			setSimulationResultError(null);
+		}
+
 		try {
 			setIsSending(true);
 			setError(null);
@@ -1216,6 +1242,17 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			personaId: selectedPersonaId,
 		});
 
+		// EXIT REVIEW SYNCHRONOUSLY - before any await so the user immediately
+		// returns to the chat view with the WebSocket LoadingIndicator showing.
+		// The simulation state is cleared here regardless of whether the API
+		// call succeeds or fails.
+		useSimulationOverlayStore.getState().exitReview();
+		setSimulation(null);
+		setSimulationResult(null);
+		simulationResultIdRef.current = null;
+		simulationResultPromiseRef.current = null;
+		setSimulationResultError(null);
+
 		try {
 			setIsSending(true);
 			setError(null);
@@ -1237,21 +1274,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				handleSetScheduleId(newScheduleId);
 				// useEffect will automatically reload messages when scheduleId changes
 			}
-			// Plan §6.1 — on Apply success, drop simulation state so the
-			// status strip / review CTA disappear for the now-terminal
-			// request and any subsequent late `previewReady` is ignored
-			// (handled in tandem with the §6.2 terminal-guard).
-			useSimulationOverlayStore.getState().exitReview();
-			setSimulation(null);
-			setSimulationResult(null);
-			simulationResultIdRef.current = null;
-			simulationResultPromiseRef.current = null;
-			setSimulationResultError(null);
 		} catch (err) {
 			if (err instanceof Error) setError(err.message);
 			else setError(t('home.expanded.chat.errorAcceptChanges'));
-			// Plan §6.1 — on failure, preserve simulation state so the user
-			// can retry Apply or fall back to Review without losing context.
 		} finally {
 			setIsSending(false);
 		}
