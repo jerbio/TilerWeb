@@ -162,6 +162,12 @@ const SessionTitleDisplay = styled.span`
 	max-width: 200px;
 `;
 
+const BackButtonWrapper = styled.div`
+	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
+		display: none;
+	}
+`;
+
 const HistoryButton = styled.button`
 	display: grid;
 	place-items: center;
@@ -1318,72 +1324,72 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 	return (
 		<ChatWrapper>
-			<ChatContainer $mobilereview={isMobileReview}>
-				{!isMobileReview && (
-					<ChatHeader>
-						<ChatHeaderLeft>
-							{onClose && (
+			<ChatContainer>
+				<ChatHeader>
+					<ChatHeaderLeft>
+						{onClose && (
+							<BackButtonWrapper data-testid="chat-back-button-wrapper">
 								<Button variant="ghost" height={32} onClick={onClose}>
 									<ChevronLeftIcon size={16} />
 									<span>{t('common.buttons.back')}</span>
 								</Button>
-							)}
-							<HistoryButton
-								onClick={() => setShowSessionHistory(true)}
-								title={t('home.expanded.chat.sessionHistory.title')}
-							>
-								<History size={18} />
-							</HistoryButton>
-						</ChatHeaderLeft>
+							</BackButtonWrapper>
+						)}
+						<HistoryButton
+							onClick={() => setShowSessionHistory(true)}
+							title={t('home.expanded.chat.sessionHistory.title')}
+						>
+							<History size={18} />
+						</HistoryButton>
+					</ChatHeaderLeft>
 
-						<ChatHeaderCenter>
-							{currentSessionTitle && (
-								<SessionTitleDisplay title={currentSessionTitle}>
-									{currentSessionTitle}
-								</SessionTitleDisplay>
-							)}
-						</ChatHeaderCenter>
+					<ChatHeaderCenter>
+						{currentSessionTitle && (
+							<SessionTitleDisplay title={currentSessionTitle}>
+								{currentSessionTitle}
+							</SessionTitleDisplay>
+						)}
+					</ChatHeaderCenter>
 
-						<ChatHeaderRight>
-							{chatContext.length > 0 && (
-								<ChatContextChips>
-									{chatContext.map((context, index) => (
-										<Button
-											key={index}
-											variant="outline"
+					<ChatHeaderRight>
+						{chatContext.length > 0 && (
+							<ChatContextChips>
+								{chatContext.map((context, index) => (
+									<Button
+										key={index}
+										variant="outline"
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											padding: '0.25rem 0.5rem',
+											border: '1px solid currentColor',
+											fontSize: theme.typography.fontSize.xs,
+										}}
+									>
+										<span>{context.Name}</span>
+										<span
+											onClick={() => handleRemoveContext(context)}
 											style={{
-												display: 'flex',
-												alignItems: 'center',
-												justifyContent: 'space-between',
-												padding: '0.25rem 0.5rem',
-												border: '1px solid currentColor',
-												fontSize: theme.typography.fontSize.xs,
+												marginLeft: '0.5rem',
+												color: 'red',
+												cursor: 'pointer',
 											}}
 										>
-											<span>{context.Name}</span>
-											<span
-												onClick={() => handleRemoveContext(context)}
-												style={{
-													marginLeft: '0.5rem',
-													color: 'red',
-													cursor: 'pointer',
-												}}
-											>
-												x
-											</span>
-										</Button>
-									))}
-								</ChatContextChips>
-							)}
-							<NewChatHeaderButton
-								onClick={handleNewChat}
-								title={t('home.expanded.chat.newChat')}
-							>
-								<SquarePen size={18} />
-							</NewChatHeaderButton>
-						</ChatHeaderRight>
-					</ChatHeader>
-				)}
+											x
+										</span>
+									</Button>
+								))}
+							</ChatContextChips>
+						)}
+						<NewChatHeaderButton
+							onClick={handleNewChat}
+							title={t('home.expanded.chat.newChat')}
+						>
+							<SquarePen size={18} />
+						</NewChatHeaderButton>
+					</ChatHeaderRight>
+				</ChatHeader>
 				{!inReview && (
 					<ChatContent>
 						{isLoading && (

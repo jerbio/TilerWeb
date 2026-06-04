@@ -620,6 +620,7 @@
 			"repetitionSection": "繰り返し",
 			"locationSection": "場所",
 			"colorSection": "色",
+			"notesSection": "メモ",
 			"name": "名前",
 			"start": "開始",
 			"end": "終了",
