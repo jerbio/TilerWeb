@@ -56,7 +56,7 @@ const Harness: React.FC<{
 
 	const controller: OptionsFormController = {
 		start: dayjs(),
-		color: new RGBColor(0, 0, 0),
+		color: new RGBColor({ r: 0, g: 0, b: 0 }),
 		setColor: () => {},
 		recurring: false,
 		setRecurring: () => {},
@@ -172,7 +172,7 @@ const WeeklyHarness: React.FC<{
 
 	const controller: OptionsFormController = {
 		start: dayjs(),
-		color: new RGBColor(0, 0, 0),
+		color: new RGBColor({ r: 0, g: 0, b: 0 }),
 		setColor: () => {},
 		recurring: true,
 		setRecurring: () => {},
