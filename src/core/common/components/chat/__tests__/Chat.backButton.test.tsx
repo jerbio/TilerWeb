@@ -88,7 +88,20 @@ vi.mock('@/services/locationService', () => ({
 vi.mock('@/services/SocketService', () => ({
 	SignalRService: class {
 		createConnection = vi.fn();
-		subscribeToSocketDataReceipt = vi.fn();
+		subscribe = vi.fn();
+		unsubscribe = vi.fn();
+		dispose = vi.fn();
+	},
+	Hubs: {
+		VibeUpdate: {
+			name: 'vibeUpdateHub',
+			events: { RefreshData: 'refreshDataFromSockets' },
+			server: { JoinUserGroup: 'joinUserGroup' },
+		},
+		ScheduleChange: {
+			name: 'scheduleChange',
+			events: { RefreshData: 'refereshDataFromSockets' },
+		},
 	},
 }));
 
