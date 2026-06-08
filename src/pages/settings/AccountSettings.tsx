@@ -10,12 +10,14 @@ import Button from '@/core/common/components/button';
 import DatePicker from '@/core/common/components/date_picker';
 import useAppStore from '@/global_state';
 import { userService } from '@/services';
+import { useTheme, ThemeMode } from '@/core/theme/ThemeProvider';
 import { COUNTRY_CODES, type CountryCode } from '@/core/constants/countryCodes';
 
 const AccountSettings: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useAuthNavigate();
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
+	const { themeMode: currentThemeMode, setThemeMode } = useTheme();
 
 	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
@@ -30,6 +32,10 @@ const AccountSettings: React.FC = () => {
 	const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
 	const [dateOfBirth, setDateOfBirth] = useState(''); // YYYY-MM-DD format for native date picker
 	const [isSaving, setIsSaving] = useState(false);
+
+	// Theme mode (desktop)
+	const [selectedThemeMode, setSelectedThemeMode] = useState<ThemeMode>(currentThemeMode);
+	const [originalThemeMode, setOriginalThemeMode] = useState<ThemeMode>(currentThemeMode);
 
 	const filteredCountryCodes = countrySearch
 		? COUNTRY_CODES.filter(
@@ -146,6 +152,15 @@ const AccountSettings: React.FC = () => {
 				DateOfBirthUtcEpoch: dateOfBirthUtcEpoch,
 				EndOfDay: authenticatedUser?.endOfDay || '',
 			});
+
+			// Save theme if changed
+			if (selectedThemeMode !== originalThemeMode) {
+				await userService.updateSettings({
+					DesktopUiScheme: { ThemeMode: selectedThemeMode },
+				});
+				setThemeMode(selectedThemeMode);
+				setOriginalThemeMode(selectedThemeMode);
+			}
 
 			toast.success(t('settings.sections.accountInfo.saveSuccess'));
 		} catch (error) {
@@ -299,14 +314,57 @@ const AccountSettings: React.FC = () => {
 							)}
 						/>
 					</FormGroup>
-					<FormGroup $alignEnd>
-						<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving}>
-							{isSaving
-								? t('settings.sections.accountInfo.saving')
-								: t('settings.sections.accountInfo.saveChanges')}
-						</Button>
-					</FormGroup>
 				</FormRow>
+
+				<Section>
+					<SectionTitle>{t('settings.sections.tilePreferences.themeMode')}</SectionTitle>
+					<RadioGroup>
+						<RadioOption>
+							<RadioInput
+								type="radio"
+								name="themeMode"
+								checked={selectedThemeMode === ThemeMode.Light}
+								onChange={() => setSelectedThemeMode(ThemeMode.Light)}
+								disabled={isSaving}
+							/>
+							<RadioLabel>
+								{t('settings.sections.tilePreferences.themeModeLight')}
+							</RadioLabel>
+						</RadioOption>
+						<RadioOption>
+							<RadioInput
+								type="radio"
+								name="themeMode"
+								checked={selectedThemeMode === ThemeMode.Dark}
+								onChange={() => setSelectedThemeMode(ThemeMode.Dark)}
+								disabled={isSaving}
+							/>
+							<RadioLabel>
+								{t('settings.sections.tilePreferences.themeModeDark')}
+							</RadioLabel>
+						</RadioOption>
+						<RadioOption>
+							<RadioInput
+								type="radio"
+								name="themeMode"
+								checked={selectedThemeMode === ThemeMode.System}
+								onChange={() => setSelectedThemeMode(ThemeMode.System)}
+								disabled={isSaving}
+							/>
+							<RadioLabel>
+								{t('settings.sections.tilePreferences.themeModeSystem')}
+							</RadioLabel>
+						</RadioOption>
+					</RadioGroup>
+				</Section>
+
+				<SaveButtonRow>
+					<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving}>
+						{isSaving
+							? t('settings.sections.accountInfo.saving')
+							: t('settings.sections.accountInfo.saveChanges')}
+					</Button>
+				</SaveButtonRow>
 			</Form>
 		</Container>
 	);
@@ -519,6 +577,78 @@ const CountryNoResults = styled.div`
 	text-align: center;
 	color: ${({ theme }) => theme.colors.text.secondary};
 	font-size: ${palette.typography.fontSize.sm};
+`;
+
+const Section = styled.div`
+	margin-bottom: 1.5rem;
+`;
+
+const SaveButtonRow = styled.div`
+	display: flex;
+	justify-content: flex-end;
+`;
+
+const SectionTitle = styled.h3`
+	font-size: ${palette.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-weight: ${palette.typography.fontWeight.medium};
+	margin: 0 0 6px 0;
+`;
+
+const RadioGroup = styled.div`
+	display: flex;
+	gap: 2rem;
+	align-items: center;
+`;
+
+const RadioOption = styled.label`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+`;
+
+const RadioInput = styled.input`
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border: 2px solid ${({ theme }) => theme.colors.gray[400]};
+	border-radius: 50%;
+	background-color: transparent;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	position: relative;
+
+	&:checked {
+		border-color: ${({ theme }) => theme.colors.brand[500]};
+	}
+
+	&:checked::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background-color: ${({ theme }) => theme.colors.brand[500]};
+	}
+
+	&:hover:not(:disabled) {
+		border-color: ${({ theme }) => theme.colors.brand[400]};
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+`;
+
+const RadioLabel = styled.span`
+	font-size: ${palette.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${palette.typography.fontWeight.medium};
 `;
 
 export default AccountSettings;

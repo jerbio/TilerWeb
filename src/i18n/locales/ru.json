@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "Редактировать блок",
 			"titleTile": "Редактировать плитку",
 			"nameSection": "Название",
+			"occurrenceSection": "?????????",
 			"timeSection": "Время и продолжительность",
+			"recurringToggle": "Повторять событие",
 			"repetitionSection": "Повторение",
 			"locationSection": "Местоположение",
 			"colorSection": "Цвет",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Дополнительные сведения о местоположении...",
 			"color": "Цвет",
 			"recurring": "Повторяющееся",
+			"repetitionDisabled": "Отключено",
 			"selectFrequency": "Выбрать частоту",
 			"daily": "Ежедневно",
 			"weekly": "Еженедельно",

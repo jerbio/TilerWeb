@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "Επεξεργασία μπλοκ",
 			"titleTile": "Επεξεργασία πλακιδίου",
 			"nameSection": "Όνομα",
+			"occurrenceSection": "?�f???s?",
 			"timeSection": "Ώρα και διάρκεια",
+			"recurringToggle": "Επανάληψη γεγονότος",
 			"repetitionSection": "Επανάληψη",
 			"locationSection": "Τοποθεσία",
 			"colorSection": "Χρώμα",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Πρόσθετες λεπτομέρειες τοποθεσίας...",
 			"color": "Χρώμα",
 			"recurring": "Επαναλαμβανόμενο",
+			"repetitionDisabled": "Απενεργοποιημένο",
 			"selectFrequency": "Επιλογή συχνότητας",
 			"daily": "Καθημερινά",
 			"weekly": "Εβδομαδιαία",

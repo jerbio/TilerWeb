@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "Edytuj blok",
 			"titleTile": "Edytuj kafelek",
 			"nameSection": "Nazwa",
+			"occurrenceSection": "Wystapienie",
 			"timeSection": "Czas i czas trwania",
+			"recurringToggle": "Powtarzaj zdarzenie",
 			"repetitionSection": "Powtarzanie",
 			"locationSection": "Lokalizacja",
 			"colorSection": "Kolor",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Dodatkowe szczegóły lokalizacji...",
 			"color": "Kolor",
 			"recurring": "Powtarzające się",
+			"repetitionDisabled": "Wyłączone",
 			"selectFrequency": "Wybierz częstotliwość",
 			"daily": "Codziennie",
 			"weekly": "Co tydzień",

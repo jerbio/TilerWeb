@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "编辑区块",
 			"titleTile": "编辑磁贴",
 			"nameSection": "名称",
+			"occurrenceSection": "????",
 			"timeSection": "时间和时长",
+			"recurringToggle": "重复事件",
 			"repetitionSection": "重复",
 			"locationSection": "位置",
 			"colorSection": "颜色",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "其他位置详情...",
 			"color": "颜色",
 			"recurring": "重复",
+			"repetitionDisabled": "禁用",
 			"selectFrequency": "选择频率",
 			"daily": "每天",
 			"weekly": "每周",
