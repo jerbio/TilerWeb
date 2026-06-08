@@ -2,6 +2,10 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { ChevronFirst, ChevronLast, ChevronLeft, ChevronRight } from 'lucide-react';
 import palette from '@/core/theme/palette';
+import Select from '@/core/common/components/select';
+
+export const ITEMS_PER_PAGE_OPTIONS = [5, 10, 15, 20] as const;
+export type ItemsPerPage = (typeof ITEMS_PER_PAGE_OPTIONS)[number];
 
 export type PaginationProps = {
 	page: number;
@@ -11,6 +15,8 @@ export type PaginationProps = {
 	showFirstLast?: boolean;
 	size?: 'small' | 'medium' | 'large';
 	disabled?: boolean;
+	pageSize?: ItemsPerPage;
+	onPageSizeChange?: (size: ItemsPerPage) => void;
 	className?: string;
 };
 
@@ -57,6 +63,8 @@ const Pagination: React.FC<PaginationProps> = ({
 	showFirstLast = true,
 	size = 'medium',
 	disabled = false,
+	pageSize,
+	onPageSizeChange,
 	className,
 }) => {
 	const pages = useMemo(
@@ -64,77 +72,97 @@ const Pagination: React.FC<PaginationProps> = ({
 		[page, totalPages, siblingCount]
 	);
 
-	if (totalPages <= 1) return null;
+	const showNav = totalPages > 1;
+	const showPageSize = pageSize !== undefined && onPageSizeChange !== undefined;
+
+	if (!showNav && !showPageSize) return null;
 
 	const isFirst = page === 1;
 	const isLast = page === totalPages;
 
 	return (
-		<Nav aria-label="Pagination" className={className}>
-			{showFirstLast && (
-				<PageButton
-					$size={size}
-					$active={false}
-					disabled={disabled || isFirst}
-					onClick={() => onChange(1)}
-					aria-label="First page"
-				>
-					<ChevronFirst size={iconSize(size)} />
-				</PageButton>
+		<Wrapper className={className}>
+			{showPageSize && (
+				<Select
+					value={String(pageSize)}
+					onChange={(value) => onPageSizeChange(Number(value) as ItemsPerPage)}
+					options={ITEMS_PER_PAGE_OPTIONS.map((count) => ({
+						value: String(count),
+						label: `${count} / page`,
+					}))}
+					sized={size}
+					disabled={disabled}
+					aria-label="Items per page"
+				/>
 			)}
+			{showNav && (
+				<Nav aria-label="Pagination">
+					{showFirstLast && (
+						<PageButton
+							$size={size}
+							$active={false}
+							disabled={disabled || isFirst}
+							onClick={() => onChange(1)}
+							aria-label="First page"
+						>
+							<ChevronFirst size={iconSize(size)} />
+						</PageButton>
+					)}
 
-			<PageButton
-				$size={size}
-				$active={false}
-				disabled={disabled || isFirst}
-				onClick={() => onChange(page - 1)}
-				aria-label="Previous page"
-			>
-				<ChevronLeft size={iconSize(size)} />
-			</PageButton>
-
-			{pages.map((p, i) =>
-				p === ELLIPSIS ? (
-					<Ellipsis key={`ellipsis-${i}`} $size={size}>
-						{ELLIPSIS}
-					</Ellipsis>
-				) : (
 					<PageButton
-						key={p}
 						$size={size}
-						$active={p === page}
-						disabled={disabled}
-						onClick={() => p !== page && onChange(p as number)}
-						aria-label={`Page ${p}`}
-						aria-current={p === page ? 'page' : undefined}
+						$active={false}
+						disabled={disabled || isFirst}
+						onClick={() => onChange(page - 1)}
+						aria-label="Previous page"
 					>
-						{p}
+						<ChevronLeft size={iconSize(size)} />
 					</PageButton>
-				)
-			)}
 
-			<PageButton
-				$size={size}
-				$active={false}
-				disabled={disabled || isLast}
-				onClick={() => onChange(page + 1)}
-				aria-label="Next page"
-			>
-				<ChevronRight size={iconSize(size)} />
-			</PageButton>
+					{pages.map((p, i) =>
+						p === ELLIPSIS ? (
+							<Ellipsis key={`ellipsis-${i}`} $size={size}>
+								{ELLIPSIS}
+							</Ellipsis>
+						) : (
+							<PageButton
+								key={p}
+								$size={size}
+								$active={p === page}
+								disabled={disabled}
+								onClick={() => p !== page && onChange(p as number)}
+								aria-label={`Page ${p}`}
+								aria-current={p === page ? 'page' : undefined}
+							>
+								{p}
+							</PageButton>
+						)
+					)}
 
-			{showFirstLast && (
-				<PageButton
-					$size={size}
-					$active={false}
-					disabled={disabled || isLast}
-					onClick={() => onChange(totalPages)}
-					aria-label="Last page"
-				>
-					<ChevronLast size={iconSize(size)} />
-				</PageButton>
+					<PageButton
+						$size={size}
+						$active={false}
+						disabled={disabled || isLast}
+						onClick={() => onChange(page + 1)}
+						aria-label="Next page"
+					>
+						<ChevronRight size={iconSize(size)} />
+					</PageButton>
+
+					{showFirstLast && (
+						<PageButton
+							$size={size}
+							$active={false}
+							disabled={disabled || isLast}
+							onClick={() => onChange(totalPages)}
+							aria-label="Last page"
+						>
+							<ChevronLast size={iconSize(size)} />
+						</PageButton>
+					)}
+				</Nav>
 			)}
-		</Nav>
+		</Wrapper>
 	);
 };
 
@@ -143,6 +171,14 @@ const iconSize = (size: PaginationProps['size']) =>
 
 const buttonDimension = (size: PaginationProps['size']) =>
 	size === 'small' ? '28px' : size === 'large' ? '40px' : '32px';
+
+const Wrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	width: 100%;
+`;
 
 const Nav = styled.nav`
 	display: inline-flex;

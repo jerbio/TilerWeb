@@ -18,7 +18,9 @@ const TileshareActive: React.FC = () => {
 		totalPages,
 		pagedItems: pagedClusters,
 		setPage,
-	} = usePagination(inboxClusters, 5, []);
+		pageSize,
+		setPageSize,
+	} = usePagination(inboxClusters, 20, []);
 
 	return (
 		<Container>
@@ -31,7 +33,13 @@ const TileshareActive: React.FC = () => {
 							<TileShareClusterCard key={cluster.id} cluster={cluster} />
 						))}
 					</List>
-					<Pagination page={page} totalPages={totalPages} onChange={setPage} />
+					<Pagination
+						page={page}
+						totalPages={totalPages}
+						onChange={setPage}
+						pageSize={pageSize}
+						onPageSizeChange={setPageSize}
+					/>
 				</>
 			)}
 		</Container>

@@ -43,11 +43,26 @@ describe('usePagination', () => {
 		expect(result.current.pagedItems).toEqual([]);
 	});
 
-	test('respects custom page size', () => {
-		const items = makeItems(10);
-		const { result } = renderHook(() => usePagination(items, 3, []));
+	test('respects the default page size', () => {
+		const items = makeItems(25);
+		const { result } = renderHook(() => usePagination(items, 10, []));
 
-		expect(result.current.totalPages).toBe(4);
-		expect(result.current.pagedItems).toEqual([1, 2, 3]);
+		expect(result.current.pageSize).toBe(10);
+		expect(result.current.totalPages).toBe(3);
+		expect(result.current.pagedItems).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+	});
+
+	test('changing page size re-pages and resets to page 1', () => {
+		const items = makeItems(20);
+		const { result } = renderHook(() => usePagination(items, 5, []));
+
+		act(() => result.current.setPage(3));
+		expect(result.current.page).toBe(3);
+
+		act(() => result.current.setPageSize(10));
+		expect(result.current.page).toBe(1);
+		expect(result.current.pageSize).toBe(10);
+		expect(result.current.totalPages).toBe(2);
+		expect(result.current.pagedItems).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 	});
 });

@@ -47,6 +47,52 @@ describe('Pagination', () => {
 			expect(container).toBeEmptyDOMElement();
 		});
 
+		it('renders the items-per-page selector when pageSize props are provided', () => {
+			renderWithTheme(
+				<Pagination
+					page={1}
+					totalPages={5}
+					onChange={vi.fn()}
+					pageSize={10}
+					onPageSizeChange={vi.fn()}
+				/>
+			);
+			expect(screen.getByLabelText('Items per page')).toBeInTheDocument();
+			expect(screen.getByText('10 / page')).toBeInTheDocument();
+		});
+
+		it('renders the selector even when there is only one page', () => {
+			renderWithTheme(
+				<Pagination
+					page={1}
+					totalPages={1}
+					onChange={vi.fn()}
+					pageSize={5}
+					onPageSizeChange={vi.fn()}
+				/>
+			);
+			expect(screen.getByLabelText('Items per page')).toBeInTheDocument();
+			expect(
+				screen.queryByRole('navigation', { name: 'Pagination' })
+			).not.toBeInTheDocument();
+		});
+
+		it('calls onPageSizeChange with the selected size', () => {
+			const onPageSizeChange = vi.fn();
+			renderWithTheme(
+				<Pagination
+					page={1}
+					totalPages={5}
+					onChange={vi.fn()}
+					pageSize={5}
+					onPageSizeChange={onPageSizeChange}
+				/>
+			);
+			fireEvent.click(screen.getByLabelText('Items per page'));
+			fireEvent.mouseDown(screen.getByText('15 / page'));
+			expect(onPageSizeChange).toHaveBeenCalledWith(15);
+		});
+
 		it('marks the current page with aria-current="page"', () => {
 			renderWithTheme(<Pagination page={3} totalPages={5} onChange={vi.fn()} />);
 			expect(screen.getByRole('button', { name: 'Page 3' })).toHaveAttribute(
