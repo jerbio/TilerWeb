@@ -41,18 +41,20 @@ if (!Element.prototype.scrollIntoView) {
 }
 
 // JSDOM does not implement matchMedia; ThemeProvider uses it for system colour scheme.
-// Individual tests that need to control the return value can override window.matchMedia.
+// Use a plain function (not vi.fn()) so vi.clearAllMocks() cannot reset the return value.
+// Individual tests that need to control the return value can override window.matchMedia
+// with their own Object.defineProperty call.
 if (!window.matchMedia) {
 	Object.defineProperty(window, 'matchMedia', {
 		writable: true,
-		value: vi.fn().mockImplementation((query: string) => ({
+		value: (query: string) => ({
 			matches: false,
 			media: query,
 			onchange: null,
-			addEventListener: vi.fn(),
-			removeEventListener: vi.fn(),
-			dispatchEvent: vi.fn(),
-		})),
+			addEventListener: () => {},
+			removeEventListener: () => {},
+			dispatchEvent: () => false,
+		}),
 	});
 }
 

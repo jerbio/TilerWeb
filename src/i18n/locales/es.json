@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "Editar bloque",
 			"titleTile": "Editar mosaico",
 			"nameSection": "Nombre",
+			"occurrenceSection": "Ocurrencia",
 			"timeSection": "Hora y duración",
+			"recurringToggle": "Repetir evento",
 			"repetitionSection": "Repetición",
 			"locationSection": "Ubicación",
 			"colorSection": "Color",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Detalles adicionales de la ubicación...",
 			"color": "Color",
 			"recurring": "Recurrente",
+			"repetitionDisabled": "Desactivado",
 			"selectFrequency": "Seleccionar frecuencia",
 			"daily": "Diario",
 			"weekly": "Semanal",

@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "블록 편집",
 			"titleTile": "타일 편집",
 			"nameSection": "이름",
+			"occurrenceSection": "??",
 			"timeSection": "시간 및 기간",
+			"recurringToggle": "이벤트 반복",
 			"repetitionSection": "반복",
 			"locationSection": "위치",
 			"colorSection": "색상",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "추가 위치 정보...",
 			"color": "색상",
 			"recurring": "반복",
+			"repetitionDisabled": "비활성화",
 			"selectFrequency": "빈도 선택",
 			"daily": "매일",
 			"weekly": "매주",

@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "Block bearbeiten",
 			"titleTile": "Kachel bearbeiten",
 			"nameSection": "Name",
+			"occurrenceSection": "Vorkommen",
 			"timeSection": "Zeit und Dauer",
+			"recurringToggle": "Ereignis wiederholen",
 			"repetitionSection": "Wiederholung",
 			"locationSection": "Standort",
 			"colorSection": "Farbe",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Zusätzliche Standortdetails...",
 			"color": "Farbe",
 			"recurring": "Wiederkehrend",
+			"repetitionDisabled": "Deaktiviert",
 			"selectFrequency": "Häufigkeit auswählen",
 			"daily": "Täglich",
 			"weekly": "Wöchentlich",
