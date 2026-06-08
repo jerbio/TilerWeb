@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { SignalRService } from '@/services/SocketService';
+import { SignalRService, Hubs, type SubscriptionHandle } from '@/services/SocketService';
 import useAppStore from '@/global_state';
 
 /**
@@ -13,7 +13,7 @@ import useAppStore from '@/global_state';
  */
 export function useScheduleSocket(onScheduleChange: () => void) {
 	const socketRef = useRef<SignalRService | null>(null);
-	const callbackIdRef = useRef<string | null>(null);
+	const handleRef = useRef<SubscriptionHandle | null>(null);
 
 	// Get userId from the active persona session
 	const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
@@ -37,21 +37,25 @@ export function useScheduleSocket(onScheduleChange: () => void) {
 		service.createConnection();
 
 		// Subscribe to schedule change events
-		const cbId = service.subscribeToScheduleChange(handleScheduleChange);
+		const handle = service.subscribe(
+			Hubs.ScheduleChange.name,
+			Hubs.ScheduleChange.events.RefreshData,
+			handleScheduleChange
+		);
 
 		socketRef.current = service;
-		callbackIdRef.current = cbId;
+		handleRef.current = handle;
 
 		return () => {
 			// Cleanup: unsubscribe and dispose the connection
-			if (socketRef.current && callbackIdRef.current) {
-				socketRef.current.unsubscribeFromScheduleChange(callbackIdRef.current);
+			if (socketRef.current && handleRef.current) {
+				socketRef.current.unsubscribe(handleRef.current);
 			}
 			if (socketRef.current) {
 				socketRef.current.dispose();
 				socketRef.current = null;
 			}
-			callbackIdRef.current = null;
+			handleRef.current = null;
 		};
 	}, [userId, handleScheduleChange]);
 }

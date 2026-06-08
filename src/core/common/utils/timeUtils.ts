@@ -10,9 +10,9 @@ export const MINUTES_IN_HOUR = 60;
 /**
  * Milliseconds in common time units
  */
-const MS_PER_MINUTE = 60 * 1000;
-const MS_PER_HOUR = 60 * MS_PER_MINUTE;
-const MS_PER_DAY = HOURS_IN_DAY * MS_PER_HOUR;
+export const MS_PER_MINUTE = 60 * 1000;
+export const MS_PER_HOUR = 60 * MS_PER_MINUTE;
+export const MS_PER_DAY = HOURS_IN_DAY * MS_PER_HOUR;
 
 /**
  * Converts a time string to milliseconds since midnight

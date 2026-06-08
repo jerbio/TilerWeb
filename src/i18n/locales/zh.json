@@ -620,6 +620,7 @@
 			"repetitionSection": "重复",
 			"locationSection": "位置",
 			"colorSection": "颜色",
+			"notesSection": "备注",
 			"name": "名称",
 			"start": "开始",
 			"end": "结束",

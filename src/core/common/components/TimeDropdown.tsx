@@ -100,6 +100,8 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 				onClick={openDropdown}
 				disabled={disabled}
 				type="button"
+				aria-haspopup="listbox"
+				aria-expanded={isOpen}
 			>
 				{displayValue}
 				<ChevronSvg width="12" height="12" viewBox="0 0 12 12">
@@ -111,12 +113,15 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({
 					<DropdownList
 						ref={listRef}
 						$isDark={isDarkMode}
+						role="listbox"
 						style={{ top: dropdownPos.top, left: dropdownPos.left }}
 					>
 						{timeOptions.map((time) => (
 							<DropdownItem
 								key={time}
 								$selected={time === value}
+								role="option"
+								aria-selected={time === value}
 								data-selected={time === value}
 								onClick={() => {
 									onChange(time);
@@ -185,11 +190,11 @@ const DropdownList = styled.div<{ $isDark: boolean }>`
 	background-color: ${({ theme }) => theme.colors.background.card};
 	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 8px 24px ${({ $isDark }) => ($isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.12)')};
 	padding: 4px 0;
 
 	scrollbar-width: thin;
-	scrollbar-color: ${({ theme }) => theme.colors.gray[600]} transparent;
+	scrollbar-color: ${({ theme }) => theme.colors.border.default} transparent;
 `;
 
 const DropdownItem = styled.div<{ $selected: boolean }>`
@@ -197,14 +202,14 @@ const DropdownItem = styled.div<{ $selected: boolean }>`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
 	color: ${({ $selected, theme }) =>
-		$selected ? theme.colors.brand[400] : theme.colors.text.primary};
+		$selected ? theme.colors.brand[500] : theme.colors.text.primary};
 	background-color: ${({ $selected, theme }) =>
-		$selected ? theme.colors.gray[800] : 'transparent'};
+		$selected ? `${theme.colors.brand[500]}18` : 'transparent'};
 	cursor: pointer;
 	transition: background-color 0.15s ease;
 
 	&:hover {
-		background-color: ${({ theme }) => theme.colors.gray[700]};
+		background-color: ${({ theme }) => theme.colors.background.card2};
 	}
 `;
 

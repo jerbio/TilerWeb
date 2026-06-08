@@ -1,53 +1,178 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { featureFlagApi } from '@/api/featureFlagApi';
-import type { AdminFlagEntry } from '@/core/common/types/featureFlag';
+import type { AdminUserFlagRow, AdminUserSummary } from '@/core/common/types/featureFlag';
 import useAuthNavigate from '@/hooks/useNavigateHome';
 
 const FeatureFlagsAdmin: React.FC = () => {
 	const navigate = useAuthNavigate();
-	const [flags, setFlags] = useState<AdminFlagEntry[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [saving, setSaving] = useState<string | null>(null);
 
+	// User selection / search
+	const [query, setQuery] = useState('');
+	const [searchResults, setSearchResults] = useState<AdminUserSummary[]>([]);
+	const [searching, setSearching] = useState(false);
+	const [selectedUser, setSelectedUser] = useState<AdminUserSummary | null>(null);
+
+	// Flags for selected user
+	const [flags, setFlags] = useState<AdminUserFlagRow[]>([]);
+	const [loadingFlags, setLoadingFlags] = useState(false);
+	const [mutatingFlagId, setMutatingFlagId] = useState<string | null>(null);
+
+	// Debounced search
+	const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	useEffect(() => {
+		if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+		if (!query.trim() || selectedUser) {
+			setSearchResults([]);
+			return;
+		}
+		setSearching(true);
+		searchTimerRef.current = setTimeout(() => {
+			featureFlagApi
+				.adminSearchUsers(query.trim())
+				.then((res) => {
+					if (res?.Error?.Code === '0' && res.Content?.users) {
+						setSearchResults(res.Content.users);
+					} else {
+						setSearchResults([]);
+					}
+				})
+				.catch(() => toast.error('User search failed'))
+				.finally(() => setSearching(false));
+		}, 250);
+		return () => {
+			if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+		};
+	}, [query, selectedUser]);
+
+	// Load flags whenever a user is picked
+	useEffect(() => {
+		if (!selectedUser) {
+			setFlags([]);
+			return;
+		}
+		setLoadingFlags(true);
 		featureFlagApi
-			.adminGetAllFlags()
+			.adminGetFlagsForUser(selectedUser.id)
 			.then((res) => {
-				if (res?.Content?.flags) {
-					setFlags(res.Content.flags);
+				if (res?.Error?.Code === '0' && res.Content?.flagsForUser?.flags) {
+					setFlags(res.Content.flagsForUser.flags);
+				} else {
+					setFlags([]);
+					toast.error('Failed to load flags for user');
 				}
 			})
-			.catch(() => toast.error('Failed to load feature flags'))
-			.finally(() => setLoading(false));
+			.catch(() => toast.error('Failed to load flags for user'))
+			.finally(() => setLoadingFlags(false));
+	}, [selectedUser]);
+
+	const handlePickUser = useCallback((user: AdminUserSummary) => {
+		setSelectedUser(user);
+		setQuery('');
+		setSearchResults([]);
 	}, []);
 
-	const handleToggle = useCallback(async (flag: AdminFlagEntry) => {
-		const next = !flag.isEnabledGlobal;
-		setSaving(flag.name);
+	const handleClearUser = useCallback(() => {
+		setSelectedUser(null);
+		setFlags([]);
+	}, []);
 
-		// Optimistic update
-		setFlags((prev) =>
-			prev.map((f) => (f.name === flag.name ? { ...f, isEnabledGlobal: next } : f))
-		);
+	const applyLocal = useCallback(
+		(flagId: string, mut: (row: AdminUserFlagRow) => AdminUserFlagRow) => {
+			setFlags((prev) => prev.map((f) => (f.flagId === flagId ? mut(f) : f)));
+		},
+		[]
+	);
 
-		try {
-			await featureFlagApi.adminUpdateFlag(flag.name, next, flag.rolloutPercent);
-			toast.success(`"${flag.name}" turned ${next ? 'on' : 'off'}`);
-		} catch {
-			// Revert on failure
-			setFlags((prev) =>
-				prev.map((f) =>
-					f.name === flag.name ? { ...f, isEnabledGlobal: flag.isEnabledGlobal } : f
-				)
+	const handleToggleOverride = useCallback(
+		async (row: AdminUserFlagRow) => {
+			if (!selectedUser || mutatingFlagId) return;
+			const next = !row.resolvedEnabled;
+			const prev = { resolvedEnabled: row.resolvedEnabled, override: row.override };
+
+			setMutatingFlagId(row.flagId);
+			// Optimistic
+			applyLocal(row.flagId, (f) => ({
+				...f,
+				resolvedEnabled: next,
+				override: {
+					isEnabled: next,
+					createdBySource: 'PPS',
+					createdUtc: new Date().toISOString(),
+					updatedUtc: new Date().toISOString(),
+					expiresAtUtc: null,
+				},
+			}));
+
+			try {
+				await featureFlagApi.adminSetOverride(row.flagId, selectedUser.id, next);
+				toast.success(`"${row.name}" ${next ? 'on' : 'off'} for ${selectedUser.userName}`);
+			} catch {
+				applyLocal(row.flagId, (f) => ({ ...f, ...prev }));
+				toast.error(`Failed to update "${row.name}"`);
+			} finally {
+				setMutatingFlagId(null);
+			}
+		},
+		[selectedUser, mutatingFlagId, applyLocal]
+	);
+
+	const handleClearOverride = useCallback(
+		async (row: AdminUserFlagRow) => {
+			if (!selectedUser || mutatingFlagId || !row.override) return;
+			const prev = { resolvedEnabled: row.resolvedEnabled, override: row.override };
+
+			setMutatingFlagId(row.flagId);
+			// Optimistic: revert to rollout default. We don't know the exact bucket result,
+			// so fall back to isEnabledGlobal && (rolloutPercent === null || rolloutPercent > 0)
+			// just to give the UI an instant value; the server response will refresh below.
+			const optimistic = row.isEnabledGlobal && (row.rolloutPercent ?? 100) > 0;
+			applyLocal(row.flagId, (f) => ({ ...f, override: null, resolvedEnabled: optimistic }));
+
+			try {
+				await featureFlagApi.adminClearOverride(row.flagId, selectedUser.id);
+				// Re-fetch to get the authoritative resolved value.
+				const res = await featureFlagApi.adminGetFlagsForUser(selectedUser.id);
+				if (res?.Error?.Code === '0' && res.Content?.flagsForUser?.flags) {
+					setFlags(res.Content.flagsForUser.flags);
+				}
+				toast.success(`Override cleared for "${row.name}"`);
+			} catch {
+				applyLocal(row.flagId, (f) => ({ ...f, ...prev }));
+				toast.error(`Failed to clear override for "${row.name}"`);
+			} finally {
+				setMutatingFlagId(null);
+			}
+		},
+		[selectedUser, mutatingFlagId, applyLocal]
+	);
+
+	const headerBody = useMemo(() => {
+		if (!selectedUser) {
+			return (
+				<>
+					<Title>Feature Flags</Title>
+					<Subtitle>Search for a user to view and toggle their feature flags.</Subtitle>
+				</>
 			);
-			toast.error(`Failed to update "${flag.name}"`);
-		} finally {
-			setSaving(null);
 		}
-	}, []);
+		return (
+			<>
+				<Title>Feature Flags</Title>
+				<SelectedUser>
+					<SelectedUserText>
+						<UserName>{selectedUser.userName}</UserName>
+						{selectedUser.email && <UserEmail>{selectedUser.email}</UserEmail>}
+					</SelectedUserText>
+					<ClearButton onClick={handleClearUser} aria-label="Change user">
+						<X size={14} /> Change user
+					</ClearButton>
+				</SelectedUser>
+			</>
+		);
+	}, [selectedUser, handleClearUser]);
 
 	return (
 		<Container>
@@ -56,33 +181,92 @@ const FeatureFlagsAdmin: React.FC = () => {
 				Admin
 			</BackRow>
 
-			<Title>Feature Flags</Title>
-			<Subtitle>Changes take effect for users on their next page load.</Subtitle>
+			{headerBody}
 
-			{loading ? (
-				<EmptyState>Loading...</EmptyState>
-			) : flags.length === 0 ? (
+			{!selectedUser && (
+				<>
+					<SearchBox>
+						<Search size={16} />
+						<SearchInput
+							type="text"
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+							placeholder="Search by username or email"
+							autoFocus
+						/>
+					</SearchBox>
+
+					{searching && <EmptyState>Searching…</EmptyState>}
+
+					{!searching && query.trim() && searchResults.length === 0 && (
+						<EmptyState>No users match &ldquo;{query}&rdquo;.</EmptyState>
+					)}
+
+					{searchResults.length > 0 && (
+						<UserList>
+							{searchResults.map((u) => (
+								<UserRow key={u.id} onClick={() => handlePickUser(u)}>
+									<UserRowText>
+										<UserName>{u.userName}</UserName>
+										{u.email && <UserEmail>{u.email}</UserEmail>}
+									</UserRowText>
+								</UserRow>
+							))}
+						</UserList>
+					)}
+				</>
+			)}
+
+			{selectedUser && loadingFlags && <EmptyState>Loading flags…</EmptyState>}
+
+			{selectedUser && !loadingFlags && flags.length === 0 && (
 				<EmptyState>No flags registered.</EmptyState>
-			) : (
+			)}
+
+			{selectedUser && !loadingFlags && flags.length > 0 && (
 				<FlagList>
 					{flags.map((flag) => (
-						<FlagRow key={flag.name}>
+						<FlagRow key={flag.flagId}>
 							<FlagInfo>
 								<FlagName>{flag.name}</FlagName>
-								{flag.rolloutPercent !== null && (
-									<RolloutPill>{flag.rolloutPercent}% rollout</RolloutPill>
-								)}
+								<PillRow>
+									{flag.rolloutPercent !== null && (
+										<RolloutPill>{flag.rolloutPercent}% rollout</RolloutPill>
+									)}
+									{flag.override ? (
+										<OverridePill $on={flag.override.isEnabled}>
+											Override: {flag.override.isEnabled ? 'on' : 'off'}
+											{flag.override.createdBySource === 'TilerFront_Self' &&
+												' (self)'}
+										</OverridePill>
+									) : (
+										<DefaultPill>Default</DefaultPill>
+									)}
+								</PillRow>
 							</FlagInfo>
-							<Toggle
-								$enabled={flag.isEnabledGlobal}
-								$saving={saving === flag.name}
-								onClick={() => saving === null && handleToggle(flag)}
-								aria-label={`Toggle ${flag.name}`}
-								role="switch"
-								aria-checked={flag.isEnabledGlobal}
-							>
-								<ToggleThumb $enabled={flag.isEnabledGlobal} />
-							</Toggle>
+							<FlagActions>
+								{flag.override && (
+									<ClearOverrideBtn
+										onClick={() => handleClearOverride(flag)}
+										disabled={mutatingFlagId !== null}
+										title="Revert to rollout default"
+									>
+										Clear
+									</ClearOverrideBtn>
+								)}
+								<Toggle
+									$enabled={flag.resolvedEnabled}
+									$saving={mutatingFlagId === flag.flagId}
+									onClick={() =>
+										mutatingFlagId === null && handleToggleOverride(flag)
+									}
+									aria-label={`Toggle ${flag.name}`}
+									role="switch"
+									aria-checked={flag.resolvedEnabled}
+								>
+									<ToggleThumb $enabled={flag.resolvedEnabled} />
+								</Toggle>
+							</FlagActions>
 						</FlagRow>
 					))}
 				</FlagList>
@@ -92,7 +276,7 @@ const FeatureFlagsAdmin: React.FC = () => {
 };
 
 const Container = styled.div`
-	max-width: 600px;
+	max-width: 720px;
 	margin: 0 auto;
 	padding: 2rem;
 `;
@@ -125,7 +309,102 @@ const Title = styled.h1`
 const Subtitle = styled.p`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
-	margin: 0 0 3rem 0;
+	margin: 0 0 2rem 0;
+`;
+
+const SelectedUser = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	border-radius: 8px;
+	padding: 0.75rem 1rem;
+	margin: 0.5rem 0 2rem 0;
+`;
+
+const SelectedUserText = styled.div`
+	display: flex;
+	flex-direction: column;
+`;
+
+const ClearButton = styled.button`
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	background: none;
+	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	border-radius: 6px;
+	padding: 0.25rem 0.75rem;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	cursor: pointer;
+	&:hover {
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+`;
+
+const SearchBox = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	border-radius: 8px;
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+	color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const SearchInput = styled.input`
+	flex: 1;
+	background: none;
+	border: none;
+	outline: none;
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+`;
+
+const UserList = styled.div`
+	display: flex;
+	flex-direction: column;
+	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	border-radius: 8px;
+	overflow: hidden;
+`;
+
+const UserRow = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem 1rem;
+	background: none;
+	border: none;
+	border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	cursor: pointer;
+	text-align: left;
+	&:last-child {
+		border-bottom: none;
+	}
+	&:hover {
+		background: ${({ theme }) => theme.colors.background.card};
+	}
+`;
+
+const UserRowText = styled.div`
+	display: flex;
+	flex-direction: column;
+`;
+
+const UserName = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+`;
+
+const UserEmail = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const FlagList = styled.div`
@@ -139,6 +418,7 @@ const FlagRow = styled.div`
 	justify-content: space-between;
 	padding: 1.25rem 0;
 	border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	gap: 1rem;
 	&:last-child {
 		border-bottom: none;
 	}
@@ -146,8 +426,9 @@ const FlagRow = styled.div`
 
 const FlagInfo = styled.div`
 	display: flex;
-	align-items: center;
-	gap: 0.75rem;
+	flex-direction: column;
+	gap: 0.4rem;
+	min-width: 0;
 `;
 
 const FlagName = styled.span`
@@ -156,12 +437,56 @@ const FlagName = styled.span`
 	font-family: monospace;
 `;
 
-const RolloutPill = styled.span`
+const PillRow = styled.div`
+	display: flex;
+	gap: 0.4rem;
+	flex-wrap: wrap;
+`;
+
+const Pill = styled.span`
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
-	color: ${({ theme }) => theme.colors.brand[400]};
-	border: 1px solid ${({ theme }) => theme.colors.brand[400]};
 	border-radius: 999px;
 	padding: 1px 8px;
+	border: 1px solid;
+`;
+
+const RolloutPill = styled(Pill)`
+	color: ${({ theme }) => theme.colors.brand[400]};
+	border-color: ${({ theme }) => theme.colors.brand[400]};
+`;
+
+const DefaultPill = styled(Pill)`
+	color: ${({ theme }) => theme.colors.text.secondary};
+	border-color: ${({ theme }) => theme.colors.border.subtle};
+`;
+
+const OverridePill = styled(Pill)<{ $on: boolean }>`
+	color: ${({ $on, theme }) => ($on ? theme.colors.brand[400] : theme.colors.gray[400])};
+	border-color: ${({ $on, theme }) => ($on ? theme.colors.brand[400] : theme.colors.gray[400])};
+`;
+
+const FlagActions = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-shrink: 0;
+`;
+
+const ClearOverrideBtn = styled.button`
+	background: none;
+	border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	border-radius: 6px;
+	padding: 0.25rem 0.6rem;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	cursor: pointer;
+	&:hover:not(:disabled) {
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 `;
 
 const Toggle = styled.button<{ $enabled: boolean; $saving: boolean }>`

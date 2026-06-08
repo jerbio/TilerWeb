@@ -3,6 +3,8 @@ import './App.css';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
+import Articles from './pages/Articles';
+import GettingStartedArticle from './pages/articles/GettingStartedArticle';
 import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
@@ -46,6 +48,18 @@ const AnalyticsTracker: React.FC = () => {
 	return null;
 };
 
+// Reset scroll position to the top on every route change (unless the URL has a hash)
+const ScrollToTop: React.FC = () => {
+	const { pathname, hash } = useLocation();
+
+	useEffect(() => {
+		if (hash) return;
+		window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+	}, [pathname, hash]);
+
+	return null;
+};
+
 const App: React.FC = () => {
 	// Dev tools for testing
 	const { isOverlayVisible, closeOverlay } = useDevTools();
@@ -66,10 +80,26 @@ const App: React.FC = () => {
 					<AuthProvider>
 						<BrowserRouter>
 							<AnalyticsTracker />
+							<ScrollToTop />
 							<Routes>
 								<Route path="/" element={<Layout />}>
 									<Route index element={<Home />} />
 									<Route path="/discover" element={<Discover />} />
+									<Route path="/articles" element={<Articles />} />
+									<Route
+										path="/articles/getting-started-with-tiler"
+										element={<GettingStartedArticle />}
+									/>
+									{/* Legacy URL — keep redirect for SEO + backlinks */}
+									<Route
+										path="/get-started"
+										element={
+											<Navigate
+												to="/articles/getting-started-with-tiler"
+												replace
+											/>
+										}
+									/>
 								</Route>
 								<Route
 									path="/waitlist"
