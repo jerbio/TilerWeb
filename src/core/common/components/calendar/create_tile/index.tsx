@@ -23,6 +23,7 @@ import {
 	ScheduleRepeatWeekday,
 	ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
+import { CreateTileRestrictionType } from '../data';
 import { toast } from 'sonner';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import {
@@ -37,7 +38,10 @@ import CreateTileSummary from './summary';
 import CreateTileOptions, { OptionsFormController } from './options';
 import CreateTileInfoInline from './info_inline';
 import CreateTileInfo from './info';
-import { CreateTileRestrictionType } from '../data';
+import {
+	EMPTY_PREDICTION_FEEDBACK,
+	type TilePredictionAutofillFeedback,
+} from './prediction-feedback';
 
 dayjs.extend(advancedFormat);
 
@@ -108,9 +112,14 @@ export type InitialCreateTileFormState = {
 type CalendarCreateTileProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 	refetchEvents: () => Promise<void>;
+	predictionFeedback?: TilePredictionAutofillFeedback;
 };
 
-const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
+const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
+	formHandler,
+	refetchEvents,
+	predictionFeedback = EMPTY_PREDICTION_FEEDBACK,
+}) => {
 	const ui = useCalendarUI((state) => state.createTile);
 	const { formData, resetForm, handleFormInputChange } = formHandler;
 	const theme = useStyledTheme();
@@ -368,12 +377,18 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 			{ui.state.isExpanded ? (
 				/* Tile Info (Classic) */
 				<Section $isexpanded={ui.state.isExpanded}>
-					<CreateTileInfo formHandler={formHandler} />
+					<CreateTileInfo
+						formHandler={formHandler}
+						predictionFeedback={predictionFeedback}
+					/>
 				</Section>
 			) : (
 				/* Tile Info (Inline) */
 				<Section $isexpanded={ui.state.isExpanded}>
-					<CreateTileInfoInline formHandler={formHandler} />
+					<CreateTileInfoInline
+						formHandler={formHandler}
+						predictionFeedback={predictionFeedback}
+					/>
 				</Section>
 			)}
 

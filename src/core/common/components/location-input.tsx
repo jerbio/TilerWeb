@@ -19,6 +19,7 @@ type LocationInputProps = {
 	placeholder?: string;
 	controller: LocationInputController;
 	containerStyle?: React.CSSProperties;
+	highlighted?: boolean;
 };
 
 const LocationInput: React.FC<LocationInputProps> = ({
@@ -26,6 +27,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
 	placeholder,
 	controller,
 	containerStyle,
+	highlighted = false,
 }) => {
 	const { t } = useTranslation();
 	const { location, isVerified } = controller;
@@ -81,6 +83,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
 				name="location"
 				placeholder={placeholder}
 				value={location}
+				highlighted={highlighted}
 				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 					userEditedLocationRef.current = true;
 					controller.setLocation(e.target.value);

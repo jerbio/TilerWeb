@@ -27,7 +27,7 @@ interface StatusOverlayProps {
 const VARIANT_COLORS: Record<StatusOverlayVariant, string> = {
 	info: palette.colors.tileBackgroundTertiary,
 	warning: palette.colors.brand[400],
-	error: palette.colors.backgroundRed,
+	error: palette.colors.primary,
 };
 
 /**
