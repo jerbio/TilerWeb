@@ -1,44 +1,48 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useOutletContext } from 'react-router';
-import { TileshareDashboardOutletContext } from './TileShareDashboard';
 import TileShareClusterCard from '@/components/tileshare/TileShareClusterCard';
 import Pagination from '@/core/common/components/Pagination';
 import EmptyState from '@/core/common/components/EmptyState';
 import { SendHorizonal } from 'lucide-react';
-import usePagination from '@/hooks/usePagination';
+import useServerPagination from '@/hooks/useServerPagination';
+import { tileshareService } from '@/services';
 
 const TileshareSent: React.FC = () => {
 	const { t } = useTranslation();
-	const { outboxClusters } = useOutletContext<TileshareDashboardOutletContext>();
 
 	const {
+		items: clusters,
 		page,
-		totalPages,
-		pagedItems: pagedClusters,
 		setPage,
 		pageSize,
 		setPageSize,
-	} = usePagination(outboxClusters, 20, []);
+		hasNext,
+		loading,
+	} = useServerPagination(
+		({ page, pageSize }) => tileshareService.getOutboxClusters({ page, pageSize }),
+		20
+	);
 
 	return (
 		<Container>
-			{outboxClusters.length === 0 ? (
+			{!loading && clusters.length === 0 ? (
 				<EmptyState icon={SendHorizonal} text={t('tilesharedemo.sent.empty')} />
 			) : (
 				<>
 					<List>
-						{pagedClusters.map((cluster) => (
+						{clusters.map((cluster) => (
 							<TileShareClusterCard key={cluster.id} cluster={cluster} />
 						))}
 					</List>
 					<Pagination
+						mode="simple"
 						page={page}
-						totalPages={totalPages}
 						onChange={setPage}
+						hasNext={hasNext}
 						pageSize={pageSize}
 						onPageSizeChange={setPageSize}
+						disabled={loading}
 					/>
 				</>
 			)}

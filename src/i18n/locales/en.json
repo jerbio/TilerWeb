@@ -1506,8 +1506,8 @@
 		"dashboard": {
 			"title": "Tileshare",
 			"nav": {
-				"active": "Active ({{count}})",
-				"sent": "Sent ({{count}})",
+				"active": "Active",
+				"sent": "Sent",
 				"received": "Received ({{count}})"
 			},
 			"filter": {
