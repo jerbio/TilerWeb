@@ -1,12 +1,10 @@
 import Logo from '@/core/common/components/icons/logo';
-import { Calendar as CalendarIcon, Moon, Plus, Sun, User } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, User } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import useAppStore from '@/global_state';
 import ProfileSheet from '@/core/common/components/profile_sheet';
-import { useTheme } from '@/core/theme/ThemeProvider';
-import { Env } from '@/config/config_getter';
 import SearchBar from './search_bar';
 import ShuffleButton from './shuffle_button';
 import ReviseButton from './revise_button';
@@ -48,8 +46,6 @@ const TimelineHeader: React.FC = () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
 	}, [profileSheetOpen]);
-
-	const { isDarkMode, toggleTheme } = useTheme();
 
 	return (
 		<Header>
@@ -94,11 +90,6 @@ const TimelineHeader: React.FC = () => {
 				<CreateEventButton onClick={openCreateSelection}>
 					<Plus size={16} />
 				</CreateEventButton>
-				{Env.isDevelopment() && (
-					<ThemeToggle onClick={toggleTheme}>
-						{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-					</ThemeToggle>
-				)}
 				<ProfileTrigger
 					ref={triggerRef}
 					onClick={() => setProfileSheetOpen(!profileSheetOpen)}
@@ -120,19 +111,6 @@ const CreateEventButton = styled.button`
 	color: ${(props) => props.theme.colors.button.brand.text};
 	background-color: ${({ theme }) => theme.colors.button.brand.bg};
 	border-radius: ${(props) => props.theme.borderRadius.large};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-`;
-
-const ThemeToggle = styled.button`
-	height: 36px;
-	width: 36px;
-	overflow: hidden;
-	color: ${(props) => props.theme.colors.button.primary.text};
-	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
 	display: flex;
 	align-items: center;
 	justify-content: center;

@@ -130,6 +130,9 @@ export interface UpdateSettingsRequest {
 		SleepDuration: number;
 		EndTimeOfDay: string;
 	}>;
+	DesktopUiScheme?: Partial<{
+		ThemeMode: string;
+	}>;
 }
 
 export interface UpdateSettingsResponse {

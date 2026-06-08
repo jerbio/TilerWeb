@@ -40,6 +40,22 @@ if (!Element.prototype.scrollIntoView) {
 	Element.prototype.scrollIntoView = vi.fn();
 }
 
+// JSDOM does not implement matchMedia; ThemeProvider uses it for system colour scheme.
+// Individual tests that need to control the return value can override window.matchMedia.
+if (!window.matchMedia) {
+	Object.defineProperty(window, 'matchMedia', {
+		writable: true,
+		value: vi.fn().mockImplementation((query: string) => ({
+			matches: false,
+			media: query,
+			onchange: null,
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
+			dispatchEvent: vi.fn(),
+		})),
+	});
+}
+
 // Mock static assets with unique identifiers to allow verification
 vi.mock('@/assets/add_block.svg', () => ({ default: 'mock:add_block.svg' }));
 vi.mock('@/assets/add_new_tile.svg', () => ({ default: 'mock:add_new_tile.svg' }));
