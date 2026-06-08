@@ -95,9 +95,34 @@ export type DeleteTileShareClusterParams = {
 
 export type DeleteTileShareClusterResponse = ApiResponse<unknown>;
 
+export type SortOrder = 'asc' | 'desc';
+
+/** Default server page size (ServerContants.batchPageSize). */
+export const DEFAULT_CLUSTER_PAGE_SIZE = 50;
+
 export type GetClustersParams = {
 	IsOutbox?: boolean;
 	IsInbox?: boolean;
+	/** Record offset passed to .Skip() — NOT a page number. */
+	Index?: number;
+	/** Number of records to .Take(). Defaults to 50 server-side. */
+	PageSize?: number;
+	/** "asc" / "desc" on creation time. Case-insensitive. */
+	SortOrder?: SortOrder;
+	/** When non-empty, also hydrates TileShareTemplates per cluster. */
+	DataFormat?: string;
+	/** When set, returns a single cluster (pagination ignored). */
+	ClusterId?: string;
+};
+
+/**
+ * Page-based params for the cluster service. `page` is 1-based and is
+ * converted to the server's record `Index` offset before the request.
+ */
+export type ClusterPageParams = {
+	page?: number;
+	pageSize?: number;
+	sortOrder?: SortOrder;
 };
 
 export enum InvitationStatus {
