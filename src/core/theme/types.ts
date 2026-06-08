@@ -170,6 +170,11 @@ export type AppTheme = {
 			textDisabled: string;
 			ellipsis: string;
 		};
+		// Skeleton colors
+		skeleton: {
+			base: string;
+			highlight: string;
+		};
 		// Utility colors
 		white: string;
 		black: string;

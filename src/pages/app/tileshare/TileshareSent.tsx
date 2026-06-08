@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import TileShareClusterCard from '@/components/tileshare/TileShareClusterCard';
+import TileShareClusterCardSkeleton from '@/components/tileshare/TileShareClusterCardSkeleton';
 import Pagination from '@/core/common/components/Pagination';
 import EmptyState from '@/core/common/components/EmptyState';
 import { SendHorizonal } from 'lucide-react';
@@ -31,9 +32,13 @@ const TileshareSent: React.FC = () => {
 			) : (
 				<>
 					<List>
-						{clusters.map((cluster) => (
-							<TileShareClusterCard key={cluster.id} cluster={cluster} />
-						))}
+						{loading
+							? Array.from({ length: pageSize }, (_, i) => (
+									<TileShareClusterCardSkeleton key={i} />
+								))
+							: clusters.map((cluster) => (
+									<TileShareClusterCard key={cluster.id} cluster={cluster} />
+								))}
 					</List>
 					<Pagination
 						mode="simple"

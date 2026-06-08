@@ -141,6 +141,11 @@ export const darkTheme: AppTheme = {
 			textDisabled: palette.colors.gray[700],
 			ellipsis: palette.colors.gray[600],
 		},
+		// Skeleton colors
+		skeleton: {
+			base: palette.colors.gray[800],
+			highlight: palette.colors.gray[600],
+		},
 		// hues
 		brand: palette.colors.brand,
 		gray: palette.colors.gray,
