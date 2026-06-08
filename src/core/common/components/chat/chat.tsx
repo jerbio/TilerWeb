@@ -16,7 +16,7 @@ import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
 import { locationService } from '@/services/locationService';
-import { SignalRService } from '@/services/SocketService';
+import { SignalRService, Hubs } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
 import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
 import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
@@ -129,6 +129,12 @@ const SessionTitleDisplay = styled.span`
 	overflow: hidden;
 	text-overflow: ellipsis;
 	max-width: 200px;
+`;
+
+const BackButtonWrapper = styled.div`
+	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
+		display: none;
+	}
 `;
 
 const HistoryButton = styled.button`
@@ -394,31 +400,37 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	useEffect(() => {
 		if (!anonymousUserId) return;
 
-		webSocketCommunication.current = new SignalRService(anonymousUserId);
-		webSocketCommunication.current.createConnection();
-		webSocketCommunication.current.subscribeToSocketDataReceipt((data: unknown) => {
-			// Type guard and extract vibe data from WebSocket
-			if (
-				data &&
-				typeof data === 'object' &&
-				'data' in data &&
-				data.data &&
-				typeof data.data === 'object' &&
-				'vibe' in data.data &&
-				data.data.vibe &&
-				typeof data.data.vibe === 'object' &&
-				'status' in data.data.vibe &&
-				typeof data.data.vibe.status === 'string'
-			) {
-				const rawStatus = data.data.vibe.status;
-				const formattedStatus = formatWebSocketStatus(rawStatus);
-				setWsStatusKey(rawStatus);
-				setWebSocketStatus(formattedStatus);
+		const service = new SignalRService(anonymousUserId);
+		webSocketCommunication.current = service;
+		service.createConnection();
+		service.subscribe(
+			Hubs.VibeUpdate.name,
+			Hubs.VibeUpdate.events.RefreshData,
+			(data: unknown) => {
+				// Type guard and extract vibe data from WebSocket
+				if (
+					data &&
+					typeof data === 'object' &&
+					'data' in data &&
+					data.data &&
+					typeof data.data === 'object' &&
+					'vibe' in data.data &&
+					data.data.vibe &&
+					typeof data.data.vibe === 'object' &&
+					'status' in data.data.vibe &&
+					typeof data.data.vibe.status === 'string'
+				) {
+					const rawStatus = data.data.vibe.status;
+					const formattedStatus = formatWebSocketStatus(rawStatus);
+					setWsStatusKey(rawStatus);
+					setWebSocketStatus(formattedStatus);
+				}
 			}
-		});
+		);
 
 		return () => {
 			if (webSocketCommunication.current) {
+				webSocketCommunication.current.dispose();
 				webSocketCommunication.current = null;
 			}
 		};
@@ -918,10 +930,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				<ChatHeader>
 					<ChatHeaderLeft>
 						{onClose && (
-							<Button variant="ghost" height={32} onClick={onClose}>
-								<ChevronLeftIcon size={16} />
-								<span>{t('common.buttons.back')}</span>
-							</Button>
+							<BackButtonWrapper data-testid="chat-back-button-wrapper">
+								<Button variant="ghost" height={32} onClick={onClose}>
+									<ChevronLeftIcon size={16} />
+									<span>{t('common.buttons.back')}</span>
+								</Button>
+							</BackButtonWrapper>
 						)}
 						<HistoryButton
 							onClick={() => setShowSessionHistory(true)}
