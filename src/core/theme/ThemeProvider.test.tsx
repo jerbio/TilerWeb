@@ -56,18 +56,20 @@ const setupMatchMedia = (initialMatches: boolean) => {
 describe('ThemeProvider', () => {
 	beforeEach(() => {
 		setupMatchMedia(false); // default: OS is light
+		localStorage.clear();
 	});
 
 	// -- defaultTheme prop ---------------------------------------------------
 	describe('defaultTheme initialisation', () => {
-		it('defaults to dark mode when no defaultTheme is supplied', () => {
+		it('defaults to system mode when no defaultTheme is supplied and localStorage is empty', () => {
 			render(
 				<ThemeProvider>
 					<ThemeConsumer />
 				</ThemeProvider>
 			);
-			expect(screen.getByTestId('themeMode').textContent).toBe('dark');
-			expect(screen.getByTestId('isDarkMode').textContent).toBe('true');
+			expect(screen.getByTestId('themeMode').textContent).toBe('system');
+			// OS is light (setupMatchMedia(false)), so isDarkMode should be false
+			expect(screen.getByTestId('isDarkMode').textContent).toBe('false');
 		});
 
 		it('initialises to light when defaultTheme=Light', () => {
@@ -236,6 +238,94 @@ describe('ThemeProvider', () => {
 				'useTheme must be used within a ThemeProvider'
 			);
 			consoleError.mockRestore();
+		});
+	});
+
+	// -- localStorage persistence --------------------------------------------
+	describe('localStorage persistence', () => {
+		it('reads a stored light theme on mount and ignores defaultTheme', () => {
+			localStorage.setItem('tiler-theme-mode', 'light');
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Dark}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			expect(screen.getByTestId('themeMode').textContent).toBe('light');
+			expect(screen.getByTestId('isDarkMode').textContent).toBe('false');
+		});
+
+		it('reads a stored dark theme on mount', () => {
+			localStorage.setItem('tiler-theme-mode', 'dark');
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Light}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			expect(screen.getByTestId('themeMode').textContent).toBe('dark');
+			expect(screen.getByTestId('isDarkMode').textContent).toBe('true');
+		});
+
+		it('reads a stored system theme on mount', () => {
+			setupMatchMedia(true); // OS is dark
+			localStorage.setItem('tiler-theme-mode', 'system');
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Light}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			expect(screen.getByTestId('themeMode').textContent).toBe('system');
+			expect(screen.getByTestId('isDarkMode').textContent).toBe('true');
+		});
+
+		it('falls back to defaultTheme when localStorage is empty', () => {
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Dark}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			expect(screen.getByTestId('themeMode').textContent).toBe('dark');
+		});
+
+		it('falls back to defaultTheme when localStorage contains an invalid value', () => {
+			localStorage.setItem('tiler-theme-mode', 'invalid-value');
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Dark}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			expect(screen.getByTestId('themeMode').textContent).toBe('dark');
+		});
+
+		it('writes to localStorage when setThemeMode is called', () => {
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Dark}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			fireEvent.click(screen.getByText('set-light'));
+			expect(localStorage.getItem('tiler-theme-mode')).toBe('light');
+		});
+
+		it('writes to localStorage when toggleTheme is called', () => {
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Dark}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			fireEvent.click(screen.getByText('toggle'));
+			expect(localStorage.getItem('tiler-theme-mode')).toBe('light');
+		});
+
+		it('updates localStorage on each setThemeMode call', () => {
+			render(
+				<ThemeProvider defaultTheme={ThemeMode.Light}>
+					<ThemeConsumer />
+				</ThemeProvider>
+			);
+			fireEvent.click(screen.getByText('set-dark'));
+			expect(localStorage.getItem('tiler-theme-mode')).toBe('dark');
+			fireEvent.click(screen.getByText('set-system'));
+			expect(localStorage.getItem('tiler-theme-mode')).toBe('system');
 		});
 	});
 });

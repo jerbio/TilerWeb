@@ -10,6 +10,30 @@ export const ThemeMode = {
 	System: 'system' as const,
 };
 
+const THEME_STORAGE_KEY = 'tiler-theme-mode';
+
+const VALID_MODES: readonly ThemeMode[] = [ThemeMode.Light, ThemeMode.Dark, ThemeMode.System];
+
+function readStoredTheme(): ThemeMode | null {
+	try {
+		const stored = localStorage.getItem(THEME_STORAGE_KEY);
+		if (stored && (VALID_MODES as string[]).includes(stored)) {
+			return stored as ThemeMode;
+		}
+	} catch {
+		// localStorage unavailable (private browsing, SSR, etc.)
+	}
+	return null;
+}
+
+function writeStoredTheme(mode: ThemeMode): void {
+	try {
+		localStorage.setItem(THEME_STORAGE_KEY, mode);
+	} catch {
+		// ignore write errors
+	}
+}
+
 type ThemeContextType = {
 	isDarkMode: boolean;
 	themeMode: ThemeMode;
@@ -30,9 +54,11 @@ function getSystemIsDark(): boolean {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 	children,
-	defaultTheme = ThemeMode.Dark,
+	defaultTheme = ThemeMode.System,
 }) => {
-	const [themeMode, setThemeMode] = useState<ThemeMode>(defaultTheme);
+	const [themeMode, setThemeModeState] = useState<ThemeMode>(
+		() => readStoredTheme() ?? defaultTheme
+	);
 	const [systemIsDark, setSystemIsDark] = useState<boolean>(getSystemIsDark);
 
 	// Track OS-level theme changes when mode is 'system'
@@ -46,9 +72,18 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 	const isDarkMode =
 		themeMode === ThemeMode.Dark || (themeMode === ThemeMode.System && systemIsDark);
 
+	const setThemeMode = (mode: ThemeMode) => {
+		writeStoredTheme(mode);
+		setThemeModeState(mode);
+	};
+
 	// toggleTheme cycles between light and dark (ignores system)
 	const toggleTheme = () => {
-		setThemeMode((prev) => (prev === ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light));
+		setThemeModeState((prev) => {
+			const next = prev === ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light;
+			writeStoredTheme(next);
+			return next;
+		});
 	};
 
 	const themeObject = isDarkMode ? darkTheme : lightTheme;
