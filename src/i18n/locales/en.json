@@ -49,6 +49,9 @@
 		"emptyState": {
 			"defaultText": "Nothing here yet"
 		},
+		"pagination": {
+			"page": "Page {{page}}"
+		},
 		"voiceInput": {
 			"listening": "Listening...",
 			"transcribing": "Transcribing...",

@@ -3,6 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import Pagination from '@/core/common/components/Pagination';
 
+vi.mock('react-i18next', () => ({
+	useTranslation: () => ({
+		t: (key: string, opts?: { page?: number }) =>
+			key === 'common.pagination.page' ? `Page ${opts?.page}` : key,
+	}),
+}));
+
 const renderWithTheme = (ui: React.ReactElement) =>
 	render(<ThemeProvider defaultTheme="dark">{ui}</ThemeProvider>);
 
@@ -91,6 +98,36 @@ describe('Pagination', () => {
 			fireEvent.click(screen.getByLabelText('Items per page'));
 			fireEvent.mouseDown(screen.getByText('15 / page'));
 			expect(onPageSizeChange).toHaveBeenCalledWith(15);
+		});
+
+		it('renders only prev/next and a page indicator in simple mode', () => {
+			renderWithTheme(<Pagination page={3} mode="simple" hasNext onChange={vi.fn()} />);
+			expect(screen.getByRole('button', { name: 'Previous page' })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Next page' })).toBeInTheDocument();
+			expect(screen.getByText('Page 3')).toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: 'First page' })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: 'Page 3' })).not.toBeInTheDocument();
+		});
+
+		it('disables Previous on the first page in simple mode', () => {
+			renderWithTheme(<Pagination page={1} mode="simple" hasNext onChange={vi.fn()} />);
+			expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+		});
+
+		it('disables Next when hasNext is false in simple mode', () => {
+			renderWithTheme(
+				<Pagination page={2} mode="simple" hasNext={false} onChange={vi.fn()} />
+			);
+			expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+		});
+
+		it('calls onChange with adjacent pages in simple mode', () => {
+			const onChange = vi.fn();
+			renderWithTheme(<Pagination page={2} mode="simple" hasNext onChange={onChange} />);
+			fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+			expect(onChange).toHaveBeenCalledWith(3);
+			fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+			expect(onChange).toHaveBeenCalledWith(1);
 		});
 
 		it('marks the current page with aria-current="page"', () => {

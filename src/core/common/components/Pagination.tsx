@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { ChevronFirst, ChevronLast, ChevronLeft, ChevronRight } from 'lucide-react';
 import palette from '@/core/theme/palette';
 import Select from '@/core/common/components/select';
@@ -9,7 +10,7 @@ export type ItemsPerPage = (typeof ITEMS_PER_PAGE_OPTIONS)[number];
 
 export type PaginationProps = {
 	page: number;
-	totalPages: number;
+	totalPages?: number;
 	onChange: (page: number) => void;
 	siblingCount?: number;
 	showFirstLast?: boolean;
@@ -17,6 +18,14 @@ export type PaginationProps = {
 	disabled?: boolean;
 	pageSize?: ItemsPerPage;
 	onPageSizeChange?: (size: ItemsPerPage) => void;
+	/**
+	 * 'numbered' (default) renders first/last + numbered page buttons and needs
+	 * `totalPages`. 'simple' renders only Prev / page indicator / Next and relies
+	 * on `hasNext` — for server-side paging where no total count is available.
+	 */
+	mode?: 'numbered' | 'simple';
+	/** Simple mode: whether another page is available after the current one. */
+	hasNext?: boolean;
 	className?: string;
 };
 
@@ -57,7 +66,7 @@ function buildPageRange(page: number, totalPages: number, siblingCount: number):
 
 const Pagination: React.FC<PaginationProps> = ({
 	page,
-	totalPages,
+	totalPages = 0,
 	onChange,
 	siblingCount = 1,
 	showFirstLast = true,
@@ -65,14 +74,19 @@ const Pagination: React.FC<PaginationProps> = ({
 	disabled = false,
 	pageSize,
 	onPageSizeChange,
+	mode = 'numbered',
+	hasNext = false,
 	className,
 }) => {
+	const { t } = useTranslation();
+
 	const pages = useMemo(
 		() => buildPageRange(page, totalPages, siblingCount),
 		[page, totalPages, siblingCount]
 	);
 
-	const showNav = totalPages > 1;
+	const isSimple = mode === 'simple';
+	const showNav = isSimple ? true : totalPages > 1;
 	const showPageSize = pageSize !== undefined && onPageSizeChange !== undefined;
 
 	if (!showNav && !showPageSize) return null;
@@ -95,7 +109,34 @@ const Pagination: React.FC<PaginationProps> = ({
 					aria-label="Items per page"
 				/>
 			)}
-			{showNav && (
+			{showNav && isSimple && (
+				<Nav aria-label="Pagination">
+					<PageButton
+						$size={size}
+						$active={false}
+						disabled={disabled || isFirst}
+						onClick={() => onChange(page - 1)}
+						aria-label="Previous page"
+					>
+						<ChevronLeft size={iconSize(size)} />
+					</PageButton>
+
+					<PageIndicator $size={size}>
+						{t('common.pagination.page', { page })}
+					</PageIndicator>
+
+					<PageButton
+						$size={size}
+						$active={false}
+						disabled={disabled || !hasNext}
+						onClick={() => onChange(page + 1)}
+						aria-label="Next page"
+					>
+						<ChevronRight size={iconSize(size)} />
+					</PageButton>
+				</Nav>
+			)}
+			{showNav && !isSimple && (
 				<Nav aria-label="Pagination">
 					{showFirstLast && (
 						<PageButton
@@ -241,6 +282,20 @@ const Ellipsis = styled.span<{ $size: PaginationProps['size'] }>`
 	font-size: ${({ $size }) =>
 		$size === 'small' ? palette.typography.fontSize.xs : palette.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.pagination.ellipsis};
+	user-select: none;
+`;
+
+const PageIndicator = styled.span<{ $size: PaginationProps['size'] }>`
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: ${({ $size }) => buttonDimension($size)};
+	padding-inline: ${palette.space.small};
+	font-size: ${({ $size }) =>
+		$size === 'small' ? palette.typography.fontSize.xs : palette.typography.fontSize.sm};
+	font-weight: ${palette.typography.fontWeight.medium};
+	color: ${({ theme }) => theme.colors.pagination.text};
+	white-space: nowrap;
 	user-select: none;
 `;
 
