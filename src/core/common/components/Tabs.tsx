@@ -118,7 +118,7 @@ const Tabs: React.FC<TabsProps> = ({
 							onClick={() => handleTabClick(tab.id)}
 						>
 							{tab.label}
-							{isActive && tab.icon && <TabIcon>{tab.icon}</TabIcon>}
+							{tab.icon && <TabIcon>{tab.icon}</TabIcon>}
 						</TabButton>
 					);
 				})}
