@@ -33,7 +33,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	const formattedDueBy = cluster.end ? unixToTimeString(cluster.end) : '—';
 
 	return (
-		<CardGrid>
+		<CardGrid to={ROUTES.tileshare.detail(cluster.id ?? '')}>
 			<Left>
 				<IconBox>
 					{cluster.isMultiTilette ? <Layers size={18} /> : <MessageSquare size={18} />}
@@ -52,20 +52,18 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 						)}
 					</SubHeader>
 				</TitleBlock>
-				<Link to={ROUTES.tileshare.detail(cluster.id ?? '')}>
-					<Button
-						height={40}
-						style={{
-							color: theme.colors.brand[300],
-							border: `1px solid ${theme.colors.border.default}`,
-						}}
-						variant={'ghost'}
-						size="small"
-						aria-label="View"
-					>
-						<ArrowRight size={20} />
-					</Button>
-				</Link>
+				<Button
+					height={40}
+					style={{
+						color: theme.colors.brand[300],
+						border: `1px solid ${theme.colors.border.default}`,
+					}}
+					variant={'ghost'}
+					size="small"
+					aria-label="View"
+				>
+					<ArrowRight size={20} />
+				</Button>
 			</Left>
 
 			<Right>
@@ -106,7 +104,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	);
 };
 
-const CardGrid = styled.div`
+const CardGrid = styled(Link)`
 	display: grid;
 	grid-template-columns: 7fr 1px 5fr;
 	grid-template-rows: auto;
@@ -114,6 +112,8 @@ const CardGrid = styled.div`
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
 
 	@media (max-width: 640px) {
 		grid-template-columns: 1fr;
