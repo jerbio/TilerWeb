@@ -153,10 +153,11 @@ export const calculateBedTimeEnd = (bedTimeStart: string, sleepDurationMs: numbe
 
 /**
  * Extracts the date portion (start of day) from a millisecond epoch timestamp.
- * Returns a dayjs object set to midnight of that date, or null if input is null/undefined.
+ * Returns a dayjs object set to midnight of that date, or null if input is null/undefined/0
+ * (the server sends 0 as a sentinel for "no date").
  */
 export const epochToDate = (ms: number | null): dayjs.Dayjs | null => {
-	if (ms == null) return null;
+	if (ms == null || ms === 0) return null;
 	return dayjs(ms).startOf('day');
 };
 

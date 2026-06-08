@@ -325,6 +325,10 @@ describe('timeUtils', () => {
 			expect(epochToDate(null)).toBeNull();
 		});
 
+		it('should return null for 0 (server sentinel for no date)', () => {
+			expect(epochToDate(0)).toBeNull();
+		});
+
 		it('should return start of day for a midday timestamp', () => {
 			// 2026-03-15 14:30:00 UTC
 			const ts = new Date(2026, 2, 15, 14, 30, 0).getTime();

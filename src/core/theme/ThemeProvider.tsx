@@ -3,11 +3,12 @@ import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { darkTheme } from './dark';
 import { lightTheme } from './light';
 
-export enum ThemeMode {
-	Light = 'light',
-	Dark = 'dark',
-	System = 'system',
-}
+export type ThemeMode = 'light' | 'dark' | 'system';
+export const ThemeMode = {
+	Light: 'light' as const,
+	Dark: 'dark' as const,
+	System: 'system' as const,
+};
 
 type ThemeContextType = {
 	isDarkMode: boolean;
