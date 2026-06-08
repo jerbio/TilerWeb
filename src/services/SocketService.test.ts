@@ -61,6 +61,7 @@ function installMockSignalR(): MockSignalR {
 		url: '',
 		logging: false,
 		state: CONNECTION_STATE.disconnected,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		start: vi.fn((_opts?: unknown) => {
 			ctx.startCount++;
 			// Snapshot which client method names exist on each hub proxy at
@@ -74,6 +75,7 @@ function installMockSignalR(): MockSignalR {
 			return {
 				done(cb: () => void) {
 					cb();
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
 					return { fail(_failCb: (e: Error) => void) {} };
 				},
 			};
