@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import React from 'react';
 import { BrowserRouter } from 'react-router';
 import { I18nextProvider } from 'react-i18next';
 import { ThemeProvider, ThemeMode } from '@/core/theme/ThemeProvider';

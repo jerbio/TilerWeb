@@ -1,9 +1,70 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import dayjs from 'dayjs';
 import { act, render, screen, setupUser, waitFor, within } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
-import EditCalendarEvent from '../EditCalendarEvent';
+import EditCalendarEvent, { isRepetitionConfigValid } from '../EditCalendarEvent';
 import { CalendarEvent, ThirdPartyType } from '@/core/common/types/schedule';
+
+// ── isRepetitionConfigValid unit tests ──────────────────────────────────────
+describe('isRepetitionConfigValid', () => {
+	const d = dayjs();
+
+	it('returns true when frequency is empty (disabled)', () => {
+		expect(
+			isRepetitionConfigValid({
+				frequency: '',
+				isForever: false,
+				repStartDate: null,
+				repEndDate: null,
+			})
+		).toBe(true);
+	});
+
+	it('returns false when frequency set, not forever, missing start date', () => {
+		expect(
+			isRepetitionConfigValid({
+				frequency: 'weekly',
+				isForever: false,
+				repStartDate: null,
+				repEndDate: d,
+			})
+		).toBe(false);
+	});
+
+	it('returns false when frequency set, not forever, missing end date', () => {
+		expect(
+			isRepetitionConfigValid({
+				frequency: 'weekly',
+				isForever: false,
+				repStartDate: d,
+				repEndDate: null,
+			})
+		).toBe(false);
+	});
+
+	it('returns true when frequency set and isForever (no dates needed)', () => {
+		expect(
+			isRepetitionConfigValid({
+				frequency: 'daily',
+				isForever: true,
+				repStartDate: null,
+				repEndDate: null,
+			})
+		).toBe(true);
+	});
+
+	it('returns true when frequency set, not forever, and both dates set', () => {
+		expect(
+			isRepetitionConfigValid({
+				frequency: 'weekly',
+				isForever: false,
+				repStartDate: d,
+				repEndDate: d,
+			})
+		).toBe(true);
+	});
+});
 
 // ── Mocks ──
 
@@ -175,7 +236,8 @@ describe('EditCalendarEvent', () => {
 	it('renders all collapsible section headers after loading', async () => {
 		renderComponent();
 		await waitForLoaded();
-		expect(screen.getByText('calendarEvent.edit.timeSection')).toBeInTheDocument();
+		// mockEvent is recurring, so the time section is labelled "Occurrence"
+		expect(screen.getByText('calendarEvent.edit.occurrenceSection')).toBeInTheDocument();
 		expect(screen.getByText('calendarEvent.edit.repetitionSection')).toBeInTheDocument();
 		expect(screen.getByText('calendarEvent.edit.locationSection')).toBeInTheDocument();
 		expect(screen.getByText('calendarEvent.edit.colorSection')).toBeInTheDocument();
@@ -189,14 +251,16 @@ describe('EditCalendarEvent', () => {
 		expect(screen.queryByText('calendarEvent.edit.duration')).not.toBeInTheDocument();
 	});
 
-	it('expands time section on click', async () => {
+	it('expands occurrence section on click (recurring event shows duration + split only)', async () => {
 		const user = setupUser();
 		renderComponent();
 		await waitForLoaded();
-		await user.click(screen.getByText('calendarEvent.edit.timeSection'));
-		expect(screen.getByText('calendarEvent.edit.start')).toBeInTheDocument();
-		expect(screen.getByText('calendarEvent.edit.end')).toBeInTheDocument();
+		await user.click(screen.getByText('calendarEvent.edit.occurrenceSection'));
+		// Start and End are hidden for recurring events
+		expect(screen.queryByText('calendarEvent.edit.start')).not.toBeInTheDocument();
+		expect(screen.queryByText('calendarEvent.edit.end')).not.toBeInTheDocument();
 		expect(screen.getByText('calendarEvent.edit.duration')).toBeInTheDocument();
+		expect(screen.getByText('calendarEvent.edit.split')).toBeInTheDocument();
 	});
 
 	it('expands location section and shows address + description', async () => {
@@ -219,7 +283,7 @@ describe('EditCalendarEvent', () => {
 	it('shows repetition frequency preview when collapsed', async () => {
 		renderComponent();
 		await waitForLoaded();
-		expect(screen.getByText('weekly')).toBeInTheDocument();
+		expect(screen.getByText('calendarEvent.edit.weekly')).toBeInTheDocument();
 	});
 
 	it('expands color section and shows swatches', async () => {
@@ -241,15 +305,17 @@ describe('EditCalendarEvent', () => {
 		expect(swatch5).toBeInTheDocument();
 	});
 
-	it('expands repetition section and shows toggle + frequency', async () => {
+	it('expands repetition section and shows frequency dropdown with Disabled option', async () => {
 		const user = setupUser();
 		renderComponent();
 		await waitForLoaded();
+		// Expand the body to see the frequency select
 		await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
-		expect(screen.getByText('calendarEvent.edit.recurring')).toBeInTheDocument();
-		const selects = screen.getAllByRole('combobox');
-		const frequencySelect = selects.find((s) => (s as HTMLSelectElement).value === 'weekly');
+		const frequencySelect = screen.getByRole('combobox') as HTMLSelectElement;
 		expect(frequencySelect).toBeDefined();
+		expect(frequencySelect.value).toBe('weekly');
+		// Disabled is the first option
+		expect(frequencySelect.options[0].value).toBe('');
 	});
 
 	it('disables save button when name is empty', async () => {
@@ -402,8 +468,12 @@ describe('EditCalendarEvent', () => {
 			IsEnabled: true,
 			Frequency: 'weekly',
 			IsForever: false,
-			RepetitionStart: 1769925600000,
-			RepetitionEnd: 1779999960000,
+			RepetitionStart: dayjs(mockEvent.repetition!.repetitionTimeline!.start!)
+				.startOf('day')
+				.valueOf(),
+			RepetitionEnd: dayjs(mockEvent.repetition!.repetitionTimeline!.end!)
+				.startOf('day')
+				.valueOf(),
 			DayOfWeekRepetitions: ['1', '3', '5'],
 		});
 	});
@@ -651,7 +721,8 @@ describe('EditCalendarEvent', () => {
 
 			// Now form should be visible with fetched data
 			expect(screen.getByDisplayValue('Fetched Name')).toBeInTheDocument();
-			expect(screen.getByText('calendarEvent.edit.timeSection')).toBeInTheDocument();
+			// fetchedEvent is recurring, so the label is "Occurrence"
+			expect(screen.getByText('calendarEvent.edit.occurrenceSection')).toBeInTheDocument();
 		});
 
 		it('shows form with prop data after fetch fails', async () => {
@@ -692,7 +763,7 @@ describe('EditCalendarEvent', () => {
 			renderComponent();
 
 			await waitFor(() => {
-				expect(screen.getByText('daily')).toBeInTheDocument();
+				expect(screen.getByText('calendarEvent.edit.daily')).toBeInTheDocument();
 			});
 		});
 
@@ -1755,6 +1826,317 @@ describe('EditCalendarEvent', () => {
 			const allButtons = within(monRow).getAllByRole('button');
 			const disabledButtons = allButtons.filter((b) => b.hasAttribute('disabled'));
 			expect(disabledButtons).toHaveLength(0);
+		});
+	});
+
+	describe('adaptive time section label and fields (Phase 1)', () => {
+		const nonRecurringEvent: CalendarEvent = {
+			...mockEvent,
+			repetition: null,
+			isRecurring: false,
+		};
+
+		it('shows "Occurrence" section label when event is recurring', async () => {
+			renderComponent(mockEvent);
+			await waitForLoaded();
+			expect(screen.getByText('calendarEvent.edit.occurrenceSection')).toBeInTheDocument();
+			expect(screen.queryByText('calendarEvent.edit.timeSection')).not.toBeInTheDocument();
+		});
+
+		it('shows "Time & Duration" section label when event is not recurring', async () => {
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			expect(screen.getByText('calendarEvent.edit.timeSection')).toBeInTheDocument();
+			expect(
+				screen.queryByText('calendarEvent.edit.occurrenceSection')
+			).not.toBeInTheDocument();
+		});
+
+		it('hides Start and End fields when recurring and section is expanded', async () => {
+			const user = setupUser();
+			renderComponent(mockEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.occurrenceSection'));
+			expect(screen.queryByText('calendarEvent.edit.start')).not.toBeInTheDocument();
+			expect(screen.queryByText('calendarEvent.edit.end')).not.toBeInTheDocument();
+		});
+
+		it('shows Start and End fields when not recurring and section is expanded', async () => {
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			const user = setupUser();
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.timeSection'));
+			expect(screen.getByText('calendarEvent.edit.start')).toBeInTheDocument();
+			expect(screen.getByText('calendarEvent.edit.end')).toBeInTheDocument();
+		});
+
+		it('still shows Duration and Split when recurring and section is expanded', async () => {
+			const user = setupUser();
+			renderComponent(mockEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.occurrenceSection'));
+			expect(screen.getByText('calendarEvent.edit.duration')).toBeInTheDocument();
+			expect(screen.getByText('calendarEvent.edit.split')).toBeInTheDocument();
+		});
+
+		it('sends Start and End as undefined when recurring on save', async () => {
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser();
+			renderComponent(mockEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.Start).toBeUndefined();
+			expect(params.End).toBeUndefined();
+		});
+
+		it('sends Start and End values when not recurring on save', async () => {
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			mockUpdateCalendarEvent.mockResolvedValueOnce(nonRecurringEvent);
+			const user = setupUser();
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.Start).toBeDefined();
+			expect(params.End).toBeDefined();
+		});
+	});
+
+	describe('Phase 3: date-only repetition range', () => {
+		it('rep date range shows no time-picker buttons', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// No TimeDropdown (aria-haspopup="listbox") buttons should exist in the rep range section
+			const timePickers = document.querySelectorAll('[aria-haspopup="listbox"]');
+			expect(timePickers).toHaveLength(0);
+		});
+
+		it('RepetitionStart is sent as start-of-day timestamp', async () => {
+			const user = setupUser();
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			renderComponent();
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			const repStart = mockEvent.repetition!.repetitionTimeline!.start!;
+			expect(params.RepetitionConfig.RepetitionStart).toBe(
+				dayjs(repStart).startOf('day').valueOf()
+			);
+		});
+
+		it('RepetitionEnd is sent as start-of-day timestamp', async () => {
+			const user = setupUser();
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			renderComponent();
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+			await waitFor(() => expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce());
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			const repEnd = mockEvent.repetition!.repetitionTimeline!.end!;
+			expect(params.RepetitionConfig.RepetitionEnd).toBe(
+				dayjs(repEnd).startOf('day').valueOf()
+			);
+		});
+	});
+
+	describe('repetition save validation', () => {
+		it('enables save when frequency is empty (disabled) regardless of rep fields', async () => {
+			const user = setupUser();
+			const noFreqEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(noFreqEvent);
+			renderComponent(noFreqEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			const saveBtn = screen.getByText('calendarEvent.edit.save').closest('button');
+			expect(saveBtn).not.toBeDisabled();
+		});
+
+		it('disables save when recurring, has frequency, not forever, and no start date', async () => {
+			const user = setupUser();
+			const noStartEvent = {
+				...mockEvent,
+				repetition: {
+					...mockEvent.repetition!,
+					isForever: false,
+					repetitionTimeline: {
+						...mockEvent.repetition!.repetitionTimeline!,
+						start: null as unknown as number,
+					},
+				},
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(noStartEvent);
+			renderComponent(noStartEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			const saveBtn = screen.getByText('calendarEvent.edit.save').closest('button');
+			expect(saveBtn).toBeDisabled();
+		});
+
+		it('disables save when recurring, has frequency, not forever, and no end date', async () => {
+			const user = setupUser();
+			const noEndEvent = {
+				...mockEvent,
+				repetition: {
+					...mockEvent.repetition!,
+					isForever: false,
+					repetitionTimeline: {
+						...mockEvent.repetition!.repetitionTimeline!,
+						end: null as unknown as number,
+					},
+				},
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(noEndEvent);
+			renderComponent(noEndEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			const saveBtn = screen.getByText('calendarEvent.edit.save').closest('button');
+			expect(saveBtn).toBeDisabled();
+		});
+
+		it('enables save when recurring with frequency and isForever (no dates needed)', async () => {
+			const user = setupUser();
+			const foreverEvent = {
+				...mockEvent,
+				repetition: { ...mockEvent.repetition!, isForever: true },
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(foreverEvent);
+			renderComponent(foreverEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			const saveBtn = screen.getByText('calendarEvent.edit.save').closest('button');
+			expect(saveBtn).not.toBeDisabled();
+		});
+
+		it('enables save when not recurring regardless of repetition fields', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.type(screen.getByDisplayValue('work out'), '!');
+			const saveBtn = screen.getByText('calendarEvent.edit.save').closest('button');
+			expect(saveBtn).not.toBeDisabled();
+		});
+	});
+
+	describe('repetition section redesign', () => {
+		it('frequency dropdown includes Disabled as first option', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			const select = screen.getByRole('combobox') as HTMLSelectElement;
+			expect(select.options[0].value).toBe('');
+			expect(select.options[0].text).toBe('calendarEvent.edit.repetitionDisabled');
+		});
+
+		it('header shows Disabled preview when no frequency', async () => {
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			expect(screen.getByText('calendarEvent.edit.repetitionDisabled')).toBeInTheDocument();
+		});
+
+		it('header shows translated frequency in preview when recurring', async () => {
+			renderComponent();
+			await waitForLoaded();
+			expect(screen.getByText('calendarEvent.edit.weekly')).toBeInTheDocument();
+		});
+
+		it('selecting a frequency shows the forever checkbox', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// Forever checkbox should not be visible initially (frequency = '')
+			expect(screen.queryByLabelText('calendarEvent.edit.forever')).not.toBeInTheDocument();
+			// Select weekly
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+			// Forever checkbox now visible
+			expect(screen.getByLabelText('calendarEvent.edit.forever')).toBeInTheDocument();
+		});
+
+		it('selecting Disabled hides the forever checkbox and date range', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// Currently weekly — forever checkbox is visible
+			expect(screen.getByLabelText('calendarEvent.edit.forever')).toBeInTheDocument();
+			// Switch to Disabled
+			await user.selectOptions(screen.getByRole('combobox'), '');
+			expect(screen.queryByLabelText('calendarEvent.edit.forever')).not.toBeInTheDocument();
+		});
+
+		it('selecting daily sets default end date 4 weeks out when no existing dates', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'daily');
+			const expectedEnd = dayjs().add(4, 'week').startOf('day');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('selecting yearly sets default end date 10 years out when no existing dates', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'yearly');
+			const expectedEnd = dayjs().add(10, 'year').startOf('day');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('existing rep dates are preserved when frequency is changed', async () => {
+			const user = setupUser();
+			renderComponent(); // mockEvent has repetition with dates
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			const originalEndTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			const originalEndText = originalEndTrigger.textContent;
+			// Change frequency from weekly to monthly — should NOT change dates
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				originalEndText
+			);
+		});
+
+		it('clicking section header opens and closes the body', async () => {
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			// Open
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			expect(screen.getByRole('combobox')).toBeInTheDocument();
+			// Close
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
 		});
 	});
 });

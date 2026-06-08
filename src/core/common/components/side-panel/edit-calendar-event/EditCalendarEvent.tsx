@@ -58,6 +58,31 @@ interface EditCalendarEventProps {
 	onClose: () => void;
 }
 
+export function isRepetitionConfigValid({
+	frequency,
+	isForever,
+	repStartDate,
+	repEndDate,
+}: {
+	frequency: string;
+	isForever: boolean;
+	repStartDate: dayjs.Dayjs | null;
+	repEndDate: dayjs.Dayjs | null;
+}): boolean {
+	if (!frequency) return true; // disabled
+	if (!isForever && (!repStartDate || !repEndDate)) return false;
+	return true;
+}
+
+function formatDuration(totalMinutes: number): string {
+	const h = Math.floor(totalMinutes / 60);
+	const m = totalMinutes % 60;
+	const parts: string[] = [];
+	if (h > 0) parts.push(`${h} hr${h !== 1 ? 's' : ''}`);
+	if (m > 0) parts.push(`${m} min`);
+	return parts.join(' ') || '0 min';
+}
+
 const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose }) => {
 	const { t } = useTranslation();
 	const showNotification = useUiStore((s) => s.notification.show);
@@ -93,20 +118,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		return COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
 	});
 	const activeColor = selectedColor >= 0 ? COLOR_SWATCHES[selectedColor] : customColor;
-	const [isRecurring, setIsRecurring] = useState(event.repetition?.isEnabled ?? false);
-	const [frequency, setFrequency] = useState((event.repetition?.frequency ?? '').toLowerCase());
+	const [frequency, setFrequency] = useState(
+		event.repetition?.isEnabled ? (event.repetition?.frequency ?? '').toLowerCase() : ''
+	);
+	const isRecurring = frequency !== '';
+	const tileMins = Number(durationHours || 0) * 60 + Number(durationMinutes || 0);
+	const splitNum = Number(splitCount || 0);
 	const [isForever, setIsForever] = useState(event.repetition?.isForever ?? false);
 	const [repStartDate, setRepStartDate] = useState<dayjs.Dayjs | null>(
 		epochToDate(event.repetition?.repetitionTimeline?.start ?? null)
 	);
-	const [repStartTime, setRepStartTime] = useState(
-		epochToTimeString(event.repetition?.repetitionTimeline?.start ?? null)
-	);
 	const [repEndDate, setRepEndDate] = useState<dayjs.Dayjs | null>(
 		epochToDate(event.repetition?.repetitionTimeline?.end ?? null)
-	);
-	const [repEndTime, setRepEndTime] = useState(
-		epochToTimeString(event.repetition?.repetitionTimeline?.end ?? null)
 	);
 	const [weekDays, setWeekDays] = useState<Set<string>>(() => {
 		const wd = event.repetition?.weekDays;
@@ -205,13 +228,12 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setCustomColor({ r, g, b });
 		const match = COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
 		setSelectedColor(match);
-		setIsRecurring(ev.repetition?.isEnabled ?? false);
-		setFrequency((ev.repetition?.frequency ?? '').toLowerCase());
+		setFrequency(
+			ev.repetition?.isEnabled ? (ev.repetition?.frequency ?? '').toLowerCase() : ''
+		);
 		setIsForever(ev.repetition?.isForever ?? false);
 		setRepStartDate(epochToDate(ev.repetition?.repetitionTimeline?.start ?? null));
-		setRepStartTime(epochToTimeString(ev.repetition?.repetitionTimeline?.start ?? null));
 		setRepEndDate(epochToDate(ev.repetition?.repetitionTimeline?.end ?? null));
-		setRepEndTime(epochToTimeString(ev.repetition?.repetitionTimeline?.end ?? null));
 		const wd = ev.repetition?.weekDays;
 		setWeekDays(wd ? new Set(wd.split(',').map((s) => s.trim())) : new Set<string>());
 	};
@@ -231,13 +253,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			locationId: locationId ?? '',
 			isLocationCleared: String(isLocationCleared),
 			selectedColor: String(selectedColor),
-			isRecurring: String(isRecurring),
 			frequency,
 			isForever: String(isForever),
 			repStartDate: repStartDate?.valueOf()?.toString() ?? '',
-			repStartTime,
 			repEndDate: repEndDate?.valueOf()?.toString() ?? '',
-			repEndTime,
 			weekDays: Array.from(weekDays).sort().join(','),
 			isRestricted: String(isRestricted),
 			restrictionType,
@@ -262,13 +281,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			locationId: locationId ?? '',
 			isLocationCleared: String(isLocationCleared),
 			selectedColor: String(selectedColor),
-			isRecurring: String(isRecurring),
 			frequency,
 			isForever: String(isForever),
 			repStartDate: repStartDate?.valueOf()?.toString() ?? '',
-			repStartTime,
 			repEndDate: repEndDate?.valueOf()?.toString() ?? '',
-			repEndTime,
 			weekDays: Array.from(weekDays).sort().join(','),
 			isRestricted: String(isRestricted),
 			restrictionType,
@@ -377,6 +393,20 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		}
 	});
 
+	const handleFrequencyChange = (newFreq: string) => {
+		setFrequency(newFreq);
+		if (newFreq) {
+			if (!repStartDate) setRepStartDate(dayjs().startOf('day'));
+			if (!repEndDate) {
+				setRepEndDate(
+					newFreq === 'yearly'
+						? dayjs().add(10, 'year').startOf('day')
+						: dayjs().add(4, 'week').startOf('day')
+				);
+			}
+		}
+	};
+
 	const handleSave = async () => {
 		if (!event.id) return;
 		setIsSaving(true);
@@ -388,8 +418,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		const params: CalendarEventUpdateParams = {
 			EventID: event.id,
 			EventName: name,
-			Start: startMs ?? undefined,
-			End: endMs ?? undefined,
+			Start: frequency ? undefined : (startMs ?? undefined),
+			End: frequency ? undefined : (endMs ?? undefined),
 			Duration:
 				durationHours || durationMinutes
 					? Number(durationHours || 0) * 3600000 + Number(durationMinutes || 0) * 60000
@@ -411,13 +441,13 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			Version: 'v2',
 		};
 
-		if (isRecurring && frequency) {
+		if (frequency) {
 			params.RepetitionConfig = {
 				IsEnabled: true,
 				Frequency: frequency,
 				IsForever: isForever,
-				RepetitionStart: combineDateAndTimeString(repStartDate, repStartTime) ?? undefined,
-				RepetitionEnd: combineDateAndTimeString(repEndDate, repEndTime) ?? undefined,
+				RepetitionStart: repStartDate?.startOf('day').valueOf() ?? undefined,
+				RepetitionEnd: repEndDate?.startOf('day').valueOf() ?? undefined,
 				DayOfWeekRepetitions: frequency === 'weekly' ? Array.from(weekDays) : undefined,
 			};
 		}
@@ -498,108 +528,142 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 						{/* Time & Duration Section */}
 						<Section>
 							<SectionHeader onClick={() => setTimeOpen((v) => !v)}>
-								<SectionTitle>{t('calendarEvent.edit.timeSection')}</SectionTitle>
+								<SectionTitle>
+									{t(
+										isRecurring
+											? 'calendarEvent.edit.occurrenceSection'
+											: 'calendarEvent.edit.timeSection'
+									)}
+								</SectionTitle>
 								<Chevron $open={timeOpen}>
 									<ChevronRight size={16} />
 								</Chevron>
 								{!timeOpen &&
-									(startDate || endDate || durationHours || durationMinutes) && (
+									(isRecurring && tileMins > 0 && splitNum > 0 ? (
 										<PreviewText>
-											{[
-												startDate &&
-													`${startDate.format('MMM D')} ${startTime}`,
-												endDate && `${endDate.format('MMM D')} ${endTime}`,
-												(durationHours || durationMinutes) &&
-													[
-														durationHours &&
-															Number(durationHours) > 0 &&
-															t(
-																'calendarEvent.edit.durationHoursPreview',
-																{ count: Number(durationHours) }
-															),
-														durationMinutes &&
-															Number(durationMinutes) > 0 &&
-															t(
-																'calendarEvent.edit.durationMinutesPreview',
-																{ count: Number(durationMinutes) }
-															),
-													]
-														.filter(Boolean)
-														.join(' '),
-											]
-												.filter(Boolean)
-												.join(' \u00b7 ')}
+											{formatDuration(tileMins * splitNum)}
+											{' – '}
+											{formatDuration(tileMins)}
+											{' × '}
+											{splitNum}
 										</PreviewText>
-									)}
+									) : (
+										(startDate ||
+											endDate ||
+											durationHours ||
+											durationMinutes) && (
+											<PreviewText>
+												{[
+													startDate &&
+														`${startDate.format('MMM D')} ${startTime}`,
+													endDate &&
+														`${endDate.format('MMM D')} ${endTime}`,
+													(durationHours || durationMinutes) &&
+														[
+															durationHours &&
+																Number(durationHours) > 0 &&
+																t(
+																	'calendarEvent.edit.durationHoursPreview',
+																	{ count: Number(durationHours) }
+																),
+															durationMinutes &&
+																Number(durationMinutes) > 0 &&
+																t(
+																	'calendarEvent.edit.durationMinutesPreview',
+																	{
+																		count: Number(
+																			durationMinutes
+																		),
+																	}
+																),
+														]
+															.filter(Boolean)
+															.join(' '),
+												]
+													.filter(Boolean)
+													.join(' · ')}
+											</PreviewText>
+										)
+									))}
 							</SectionHeader>
 							{timeOpen && (
 								<SectionBody>
-									<FieldGroup>
-										<Label>{t('calendarEvent.edit.start')}</Label>
-										<DateTimeRow>
-											<DatePickerWrapper>
-												<DateTrigger
-													onClick={() => {
-														closeAllPickers();
-														setStartPickerOpen((v) => !v);
-													}}
-													type="button"
-												>
-													<Calendar size={14} />
-													{startDate
-														? startDate.format('MMM D, YYYY')
-														: t('calendarEvent.edit.selectDate')}
-												</DateTrigger>
-												<CalendarDatePicker
-													isOpen={startPickerOpen}
-													onClose={() => setStartPickerOpen(false)}
-													onDateSelect={(d) => {
-														setStartDate(d);
-														setStartPickerOpen(false);
-													}}
-													selectedDate={startDate ?? undefined}
-												/>
-											</DatePickerWrapper>
-											<TimeDropdown
-												value={startTime}
-												onChange={setStartTime}
-												interval={15}
-											/>
-										</DateTimeRow>
-									</FieldGroup>
-									<FieldGroup>
-										<Label>{t('calendarEvent.edit.end')}</Label>
-										<DateTimeRow>
-											<DatePickerWrapper>
-												<DateTrigger
-													onClick={() => {
-														closeAllPickers();
-														setEndPickerOpen((v) => !v);
-													}}
-													type="button"
-												>
-													<Calendar size={14} />
-													{endDate
-														? endDate.format('MMM D, YYYY')
-														: t('calendarEvent.edit.selectDate')}
-												</DateTrigger>
-												<CalendarDatePicker
-													isOpen={endPickerOpen}
-													onClose={() => setEndPickerOpen(false)}
-													onDateSelect={(d) => {
-														setEndDate(d);
-														setEndPickerOpen(false);
-													}}
-													selectedDate={endDate ?? undefined}
-												/>
-											</DatePickerWrapper>
-											<TimeDropdown
-												value={endTime}
-												onChange={setEndTime}
-												interval={15}
-											/>
-										</DateTimeRow>
-									</FieldGroup>
+									{!isRecurring && (
+										<>
+											<FieldGroup>
+												<Label>{t('calendarEvent.edit.start')}</Label>
+												<DateTimeRow>
+													<DatePickerWrapper>
+														<DateTrigger
+															onClick={() => {
+																closeAllPickers();
+																setStartPickerOpen((v) => !v);
+															}}
+															type="button"
+														>
+															<Calendar size={14} />
+															{startDate
+																? startDate.format('MMM D, YYYY')
+																: t(
+																		'calendarEvent.edit.selectDate'
+																	)}
+														</DateTrigger>
+														<CalendarDatePicker
+															isOpen={startPickerOpen}
+															onClose={() =>
+																setStartPickerOpen(false)
+															}
+															onDateSelect={(d) => {
+																setStartDate(d);
+																setStartPickerOpen(false);
+															}}
+															selectedDate={startDate ?? undefined}
+														/>
+													</DatePickerWrapper>
+													<TimeDropdown
+														value={startTime}
+														onChange={setStartTime}
+														interval={15}
+													/>
+												</DateTimeRow>
+											</FieldGroup>
+											<FieldGroup>
+												<Label>{t('calendarEvent.edit.end')}</Label>
+												<DateTimeRow>
+													<DatePickerWrapper>
+														<DateTrigger
+															onClick={() => {
+																closeAllPickers();
+																setEndPickerOpen((v) => !v);
+															}}
+															type="button"
+														>
+															<Calendar size={14} />
+															{endDate
+																? endDate.format('MMM D, YYYY')
+																: t(
+																		'calendarEvent.edit.selectDate'
+																	)}
+														</DateTrigger>
+														<CalendarDatePicker
+															isOpen={endPickerOpen}
+															onClose={() => setEndPickerOpen(false)}
+															onDateSelect={(d) => {
+																setEndDate(d);
+																setEndPickerOpen(false);
+															}}
+															selectedDate={endDate ?? undefined}
+														/>
+													</DatePickerWrapper>
+													<TimeDropdown
+														value={endTime}
+														onChange={setEndTime}
+														interval={15}
+													/>
+												</DateTimeRow>
+											</FieldGroup>
+										</>
+									)}
 									<FieldGroup>
 										<Label>{t('calendarEvent.edit.duration')}</Label>
 										<DurationRow>
@@ -657,47 +721,39 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 								<Chevron $open={repetitionOpen}>
 									<ChevronRight size={16} />
 								</Chevron>
-								{!repetitionOpen && isRecurring && frequency && (
-									<PreviewText>{frequency}</PreviewText>
+								{!repetitionOpen && (
+									<PreviewText>
+										{frequency
+											? t(`calendarEvent.edit.${frequency}`)
+											: t('calendarEvent.edit.repetitionDisabled')}
+									</PreviewText>
 								)}
 							</SectionHeader>
 							{repetitionOpen && (
 								<SectionBody>
 									<FieldGroup>
-										<RecurrenceToggle>
-											<CheckboxInput
-												type="checkbox"
-												checked={isRecurring}
-												onChange={(e) => setIsRecurring(e.target.checked)}
-											/>
-											<Label as="span">
-												{t('calendarEvent.edit.recurring')}
-											</Label>
-										</RecurrenceToggle>
-										{isRecurring && (
-											<Select
-												value={frequency}
-												onChange={(e) => setFrequency(e.target.value)}
-											>
-												<option value="">
-													{t('calendarEvent.edit.selectFrequency')}
-												</option>
-												<option value="daily">
-													{t('calendarEvent.edit.daily')}
-												</option>
-												<option value="weekly">
-													{t('calendarEvent.edit.weekly')}
-												</option>
-												<option value="monthly">
-													{t('calendarEvent.edit.monthly')}
-												</option>
-												<option value="yearly">
-													{t('calendarEvent.edit.yearly')}
-												</option>
-											</Select>
-										)}
+										<Select
+											value={frequency}
+											onChange={(e) => handleFrequencyChange(e.target.value)}
+										>
+											<option value="">
+												{t('calendarEvent.edit.repetitionDisabled')}
+											</option>
+											<option value="daily">
+												{t('calendarEvent.edit.daily')}
+											</option>
+											<option value="weekly">
+												{t('calendarEvent.edit.weekly')}
+											</option>
+											<option value="monthly">
+												{t('calendarEvent.edit.monthly')}
+											</option>
+											<option value="yearly">
+												{t('calendarEvent.edit.yearly')}
+											</option>
+										</Select>
 									</FieldGroup>
-									{isRecurring && (
+									{frequency && (
 										<FieldGroup>
 											<RecurrenceToggle>
 												<CheckboxInput
@@ -713,7 +769,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 											</RecurrenceToggle>
 										</FieldGroup>
 									)}
-									{isRecurring && !isForever && (
+									{frequency && !isForever && (
 										<>
 											<FieldGroup>
 												<Label>
@@ -750,11 +806,6 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															selectedDate={repStartDate ?? undefined}
 														/>
 													</DatePickerWrapper>
-													<TimeDropdown
-														value={repStartTime}
-														onChange={setRepStartTime}
-														interval={15}
-													/>
 												</DateTimeRow>
 											</FieldGroup>
 											<FieldGroup>
@@ -792,16 +843,11 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															selectedDate={repEndDate ?? undefined}
 														/>
 													</DatePickerWrapper>
-													<TimeDropdown
-														value={repEndTime}
-														onChange={setRepEndTime}
-														interval={15}
-													/>
 												</DateTimeRow>
 											</FieldGroup>
 										</>
 									)}
-									{isRecurring && frequency === 'weekly' && (
+									{frequency === 'weekly' && (
 										<WeekDayRow>
 											{(['0', '1', '2', '3', '4', '5', '6'] as const).map(
 												(dayIdx) => {
@@ -1086,7 +1132,19 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 					</Form>
 					{isDirty && (
 						<SaveFooter>
-							<SaveButton onClick={handleSave} disabled={isSaving || !name.trim()}>
+							<SaveButton
+								onClick={handleSave}
+								disabled={
+									isSaving ||
+									!name.trim() ||
+									!isRepetitionConfigValid({
+										frequency,
+										isForever,
+										repStartDate,
+										repEndDate,
+									})
+								}
+							>
 								{isSaving ? (
 									<Loader2 size={16} className="spin" />
 								) : (

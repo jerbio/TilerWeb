@@ -25,6 +25,7 @@ import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
+import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
 import { AdminRoute } from './core/auth/AdminRoute';
 import AdminLayout from './pages/admin/AdminLayout';
@@ -79,6 +80,7 @@ const App: React.FC = () => {
 				<ConsentProvider>
 					<AuthProvider>
 						<BrowserRouter>
+							<ThemeInitializer />
 							<AnalyticsTracker />
 							<ScrollToTop />
 							<Routes>
