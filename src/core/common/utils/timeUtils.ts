@@ -10,9 +10,9 @@ export const MINUTES_IN_HOUR = 60;
 /**
  * Milliseconds in common time units
  */
-const MS_PER_MINUTE = 60 * 1000;
-const MS_PER_HOUR = 60 * MS_PER_MINUTE;
-const MS_PER_DAY = HOURS_IN_DAY * MS_PER_HOUR;
+export const MS_PER_MINUTE = 60 * 1000;
+export const MS_PER_HOUR = 60 * MS_PER_MINUTE;
+export const MS_PER_DAY = HOURS_IN_DAY * MS_PER_HOUR;
 
 /**
  * Converts a time string to milliseconds since midnight
@@ -153,10 +153,11 @@ export const calculateBedTimeEnd = (bedTimeStart: string, sleepDurationMs: numbe
 
 /**
  * Extracts the date portion (start of day) from a millisecond epoch timestamp.
- * Returns a dayjs object set to midnight of that date, or null if input is null/undefined.
+ * Returns a dayjs object set to midnight of that date, or null if input is null/undefined/0
+ * (the server sends 0 as a sentinel for "no date").
  */
 export const epochToDate = (ms: number | null): dayjs.Dayjs | null => {
-	if (ms == null) return null;
+	if (ms == null || ms === 0) return null;
 	return dayjs(ms).startOf('day');
 };
 

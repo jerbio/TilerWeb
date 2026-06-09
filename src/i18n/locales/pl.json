@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,10 +616,13 @@
 			"titleBlock": "Edytuj blok",
 			"titleTile": "Edytuj kafelek",
 			"nameSection": "Nazwa",
+			"occurrenceSection": "Wystapienie",
 			"timeSection": "Czas i czas trwania",
+			"recurringToggle": "Powtarzaj zdarzenie",
 			"repetitionSection": "Powtarzanie",
 			"locationSection": "Lokalizacja",
 			"colorSection": "Kolor",
+			"notesSection": "Notatki",
 			"name": "Nazwa",
 			"start": "Początek",
 			"end": "Koniec",
@@ -636,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Dodatkowe szczegóły lokalizacji...",
 			"color": "Kolor",
 			"recurring": "Powtarzające się",
+			"repetitionDisabled": "Wyłączone",
 			"selectFrequency": "Wybierz częstotliwość",
 			"daily": "Codziennie",
 			"weekly": "Co tydzień",
@@ -660,6 +664,7 @@
 			"loadingBlock": "Ładowanie szczegółów bloku...",
 			"loadingTile": "Ładowanie szczegółów kafelka...",
 			"clearLocation": "Wyczyść lokalizację",
+			"copyAddressOnly": "Kopiuj tylko adres",
 			"locationMinChars": "Wpisz co najmniej 3 znaki, aby wyszukać",
 			"locationSearchPlaceholder": "Szukaj lokalizacji...",
 			"savedLocations": "Zapisane lokalizacje",

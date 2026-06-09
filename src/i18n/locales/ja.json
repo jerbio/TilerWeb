@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,10 +616,13 @@
 			"titleBlock": "ブロックを編集",
 			"titleTile": "タイルを編集",
 			"nameSection": "名前",
+			"occurrenceSection": "??",
 			"timeSection": "時間と期間",
+			"recurringToggle": "イベントを繰り返す",
 			"repetitionSection": "繰り返し",
 			"locationSection": "場所",
 			"colorSection": "色",
+			"notesSection": "メモ",
 			"name": "名前",
 			"start": "開始",
 			"end": "終了",
@@ -636,6 +639,7 @@
 			"locationDescriptionPlaceholder": "追加の場所の詳細...",
 			"color": "色",
 			"recurring": "繰り返し",
+			"repetitionDisabled": "無効",
 			"selectFrequency": "頻度を選択",
 			"daily": "毎日",
 			"weekly": "毎週",
@@ -660,6 +664,7 @@
 			"loadingBlock": "ブロックの詳細を読み込み中...",
 			"loadingTile": "タイルの詳細を読み込み中...",
 			"clearLocation": "場所をクリア",
+			"copyAddressOnly": "住所のみコピー",
 			"locationMinChars": "検索するには3文字以上入力してください",
 			"locationSearchPlaceholder": "場所を検索...",
 			"savedLocations": "保存済みの場所",

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+﻿import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Clock, Info, TriangleAlert } from 'lucide-react';
@@ -39,6 +39,7 @@ import { initialCreateBlockFormState, initialCreateTileFormState } from './data'
 import CalendarModal from './modals';
 import CalendarCreateSelection from './calendar_create_selection';
 import CalendarCreateBlock from './create_block';
+import { useTilePredictionAutofill } from './create_tile/useTilePredictionAutofill';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -62,7 +63,6 @@ const Calendar = ({
 	allowEventLookup = true,
 }: CalendarProps) => {
 	const { t } = useTranslation();
-	const viableEvents = events.filter((event) => event.isViable);
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
 	const theme = useTheme();
@@ -239,61 +239,21 @@ const Calendar = ({
 		);
 	}, [viewOptions.width, theme]);
 
-	// Auto-scroll to first event or current time on initial load
+	// Auto-scroll to current time on initial load
 	useEffect(() => {
 		if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
 			return;
 		}
 
-		const scrollToPosition = (scrollTop: number) => {
-			if (contentContainerRef.current) {
-				contentContainerRef.current.scrollTop = scrollTop;
-				setHasAutoScrolled(true);
-			}
-		};
+		const now = TimeUtil.nowDayjs();
+		const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
+		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 
-		// Find the earliest event in the current view
-		const viewStart = viewOptions.startDay.startOf('day');
-		const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
-
-		const eventsInView = viableEvents.filter((event) => {
-			const eventStart = dayjs(event.start);
-			const eventEnd = dayjs(event.end);
-			return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
-		});
-
-		if (eventsInView.length > 0) {
-			// Find the earliest event
-			const earliestEvent = eventsInView.reduce((earliest, current) => {
-				return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
-			});
-
-			const eventStart = dayjs(earliestEvent.start);
-			const hourFraction =
-				eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before the first event (or to the event if it's in the first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		} else {
-			// No events in view, scroll to current time
-			const now = TimeUtil.nowDayjs();
-			const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before current time (or to current time if in first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		}
-	}, [
-		contentMounted,
-		hasAutoScrolled,
-		eventsLoading,
-		viableEvents,
-		viewOptions.startDay,
-		viewOptions.daysInView,
-	]);
+		// Scroll to 1 hour before current time so the indicator sits near the top
+		const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+		contentContainerRef.current.scrollTop = scrollTop;
+		setHasAutoScrolled(true);
+	}, [contentMounted, hasAutoScrolled, eventsLoading]);
 
 	// Reset auto-scroll flag when view changes (date navigation)
 	useEffect(() => {
@@ -451,17 +411,23 @@ const Calendar = ({
 
 	// Create Block Form State
 	const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
-	const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
-	const createBlockModalPortalTarget = createBlock.state.isExpanded
-		? document.body
-		: createBlockModalContainerRef.current;
+	const [createBlockModalPortalTarget, setCreateBlockModalPortalTarget] =
+		useState<HTMLDivElement | null>(null);
+	const createBlockModalContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setCreateBlockModalPortalTarget(node);
+	}, []);
 
 	// Create Tile Form State
 	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-	const createTileModalContainerRef = useRef<HTMLDivElement>(null);
-	const createTileModalPortalTarget = createTile.state.isExpanded
-		? document.body
-		: createTileModalContainerRef.current;
+	const createTilePredictionFeedback = useTilePredictionAutofill(
+		createTileFormHandler,
+		createTile.state.isOpen
+	);
+	const [createTileModalPortalTarget, setCreateTileModalPortalTarget] =
+		useState<HTMLDivElement | null>(null);
+	const createTileModalContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setCreateTileModalPortalTarget(node);
+	}, []);
 
 	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
 		// CONTENT_CLICK_OUTSIDE
@@ -580,6 +546,8 @@ const Calendar = ({
 													setShowLongDurationEvents(
 														isClosing ? null : day
 													);
+													// Collapse the other overlay
+													setShowNonViableEvents(null);
 													if (!isClosing) {
 														setSelectedEventInfo(null);
 														setSelectedEvent(null);
@@ -610,6 +578,8 @@ const Calendar = ({
 														showNonViableEvents?.isSame(day, 'day') ??
 														false;
 													setShowNonViableEvents(isClosing ? null : day);
+													// Collapse the other overlay
+													setShowLongDurationEvents(null);
 													// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
 													if (!isClosing) {
 														setSelectedEventInfo(null);
@@ -658,14 +628,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysNonViableEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -696,14 +670,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysLongDurationEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -735,6 +713,7 @@ const Calendar = ({
 				open={createBlock.state.isOpen}
 				onBackdropClick={createBlock.actions.close}
 				containerRef={createBlockModalContainerRef}
+				expanded={createBlock.state.isExpanded}
 				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
 			/>
 			{createBlockModalPortalTarget &&
@@ -751,6 +730,7 @@ const Calendar = ({
 				open={createTile.state.isOpen}
 				onBackdropClick={createTile.actions.close}
 				containerRef={createTileModalContainerRef}
+				expanded={createTile.state.isExpanded}
 				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
 			/>
 			{createTileModalPortalTarget &&
@@ -758,6 +738,7 @@ const Calendar = ({
 					<CalendarCreateTile
 						refetchEvents={refetchEvents}
 						formHandler={createTileFormHandler}
+						predictionFeedback={createTilePredictionFeedback}
 					/>,
 					createTileModalPortalTarget
 				)}
@@ -1047,6 +1028,15 @@ const NonViableEventsContainer = styled.div<{
 	}
 
 	transition: opacity 0.2s ease-in-out;
+`;
+
+const OverlayEventItem = styled.div`
+	height: 64px;
+	min-height: 64px;
+	max-height: 64px;
+	width: 100%;
+	margin-bottom: 0.375rem;
+	overflow: hidden;
 `;
 
 const CalendarEventInfoModalContainer = styled(a.div)`

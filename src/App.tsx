@@ -3,6 +3,8 @@ import './App.css';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
+import Articles from './pages/Articles';
+import GettingStartedArticle from './pages/articles/GettingStartedArticle';
 import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
@@ -23,14 +25,18 @@ import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
+import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
-import TileshareDetailPage from './pages/app/tileshare/TileShareDetailPage';
-import TileshareInbox from './pages/app/tileshare/TileShareInbox';
-import TileshareInvitePage from './pages/app/tileshare/TileShareInvitePage';
-import TileshareOutbox from './pages/app/tileshare/TileShareOutbox';
+import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
+import TileshareInbox from './pages/app/tileshare/TileshareInbox';
+import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
+import TileshareOutbox from './pages/app/tileshare/TileshareOutbox';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
+import { AdminRoute } from './core/auth/AdminRoute';
+import AdminLayout from './pages/admin/AdminLayout';
+import FeatureFlagsAdmin from './pages/admin/feature-flags/FeatureFlagsAdmin';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
@@ -45,6 +51,18 @@ const AnalyticsTracker: React.FC = () => {
 			referrer: document.referrer,
 		});
 	}, [location]);
+
+	return null;
+};
+
+// Reset scroll position to the top on every route change (unless the URL has a hash)
+const ScrollToTop: React.FC = () => {
+	const { pathname, hash } = useLocation();
+
+	useEffect(() => {
+		if (hash) return;
+		window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+	}, [pathname, hash]);
 
 	return null;
 };
@@ -68,11 +86,28 @@ const App: React.FC = () => {
 				<ConsentProvider>
 					<AuthProvider>
 						<BrowserRouter>
+							<ThemeInitializer />
 							<AnalyticsTracker />
+							<ScrollToTop />
 							<Routes>
 								<Route path="/" element={<Layout />}>
 									<Route index element={<Home />} />
 									<Route path="/discover" element={<Discover />} />
+									<Route path="/articles" element={<Articles />} />
+									<Route
+										path="/articles/getting-started-with-tiler"
+										element={<GettingStartedArticle />}
+									/>
+									{/* Legacy URL — keep redirect for SEO + backlinks */}
+									<Route
+										path="/get-started"
+										element={
+											<Navigate
+												to="/articles/getting-started-with-tiler"
+												replace
+											/>
+										}
+									/>
 								</Route>
 								<Route
 									path="/waitlist"
@@ -132,7 +167,6 @@ const App: React.FC = () => {
 											path="/tileshare/:id"
 											element={<TileshareDetailPage />}
 										/>
-
 										<Route
 											path="/tileshare/:id/tilette/:tiletteId"
 											element={<TiletteDetailPage />}
@@ -152,6 +186,17 @@ const App: React.FC = () => {
 												element={<NotificationPreferencesSettings />}
 											/>
 										</Route>
+									</Route>
+								</Route>
+
+								{/* Admin Routes - redirect to /timeline if not admin */}
+								<Route element={<AdminRoute />}>
+									<Route path="/admin" element={<AdminLayout />}>
+										<Route index element={<Navigate to="/admin" replace />} />
+										<Route
+											path="feature-flags"
+											element={<FeatureFlagsAdmin />}
+										/>
 									</Route>
 								</Route>
 							</Routes>

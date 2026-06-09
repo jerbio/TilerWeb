@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import PreferencesSettings from './PreferencesSettings';
@@ -95,15 +94,11 @@ const renderWithProviders = (ui: React.ReactElement) => {
 const getTimeDropdownButtons = (container: HTMLElement) =>
 	within(container).getAllByRole('button').slice(0, 2);
 
-const selectTimeValue = async (
-	user: ReturnType<typeof userEvent.setup>,
-	container: HTMLElement,
-	dropdownIndex: 0 | 1,
-	value: string
-) => {
+const selectTimeValue = async (container: HTMLElement, dropdownIndex: 0 | 1, value: string) => {
 	const buttons = getTimeDropdownButtons(container);
-	await user.click(buttons[dropdownIndex]);
-	await user.click(await screen.findByText(value, { selector: 'div' }));
+	fireEvent.click(buttons[dropdownIndex]);
+	const listbox = await screen.findByRole('listbox');
+	fireEvent.click(within(listbox).getByRole('option', { name: value }));
 };
 
 describe('PreferencesSettings', () => {
@@ -203,7 +198,6 @@ describe('PreferencesSettings', () => {
 	describe('Bed Time Validation', () => {
 		it('should show error when start time is set but end time is not', async () => {
 			const { toast } = await import('sonner');
-			const user = userEvent.setup();
 
 			// Start with no bed time set
 			(userService.getSettings as Mock).mockResolvedValue(
@@ -221,7 +215,7 @@ describe('PreferencesSettings', () => {
 
 			// Find bed time dropdowns (scoped to bed-time section)
 			const bedTimeSection = screen.getByTestId('bed-time-section');
-			await selectTimeValue(user, bedTimeSection, 0, '10:00 PM');
+			await selectTimeValue(bedTimeSection, 0, '10:00 PM');
 
 			// Click save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -236,7 +230,6 @@ describe('PreferencesSettings', () => {
 
 		it('should show error when end time is set but start time is not', async () => {
 			const { toast } = await import('sonner');
-			const user = userEvent.setup();
 
 			// Start with no bed time set
 			(userService.getSettings as Mock).mockResolvedValue(
@@ -254,7 +247,7 @@ describe('PreferencesSettings', () => {
 
 			// Find bed time dropdowns (scoped to bed-time section)
 			const bedTimeSection = screen.getByTestId('bed-time-section');
-			await selectTimeValue(user, bedTimeSection, 1, '6:00 AM');
+			await selectTimeValue(bedTimeSection, 1, '6:00 AM');
 
 			// Click save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -269,7 +262,6 @@ describe('PreferencesSettings', () => {
 
 		it('should allow saving when both start and end times are set', async () => {
 			const { toast } = await import('sonner');
-			const user = userEvent.setup();
 
 			// Start with no bed time set
 			(userService.getSettings as Mock).mockResolvedValue(
@@ -287,8 +279,8 @@ describe('PreferencesSettings', () => {
 
 			// Find bed time dropdowns (scoped to bed-time section)
 			const bedTimeSection = screen.getByTestId('bed-time-section');
-			await selectTimeValue(user, bedTimeSection, 0, '10:00 PM');
-			await selectTimeValue(user, bedTimeSection, 1, '6:00 AM');
+			await selectTimeValue(bedTimeSection, 0, '10:00 PM');
+			await selectTimeValue(bedTimeSection, 1, '6:00 AM');
 
 			// Click save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -331,7 +323,6 @@ describe('PreferencesSettings', () => {
 
 	describe('Sleep Duration Calculation', () => {
 		it('should calculate correct sleep duration for overnight sleep (10 PM to 6 AM = 8 hours)', async () => {
-			const user = userEvent.setup();
 			// Start with no bed time set
 			(userService.getSettings as Mock).mockResolvedValue(
 				createMockSettings({
@@ -347,8 +338,8 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection1 = screen.getByTestId('bed-time-section');
-			await selectTimeValue(user, bedTimeSection1, 0, '10:00 PM');
-			await selectTimeValue(user, bedTimeSection1, 1, '6:00 AM');
+			await selectTimeValue(bedTimeSection1, 0, '10:00 PM');
+			await selectTimeValue(bedTimeSection1, 1, '6:00 AM');
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -363,7 +354,6 @@ describe('PreferencesSettings', () => {
 		});
 
 		it('should calculate correct sleep duration for after-midnight start (2 AM to 10 AM = 8 hours)', async () => {
-			const user = userEvent.setup();
 			// Start with no bed time set
 			(userService.getSettings as Mock).mockResolvedValue(
 				createMockSettings({
@@ -379,8 +369,8 @@ describe('PreferencesSettings', () => {
 			});
 
 			const bedTimeSection2 = screen.getByTestId('bed-time-section');
-			await selectTimeValue(user, bedTimeSection2, 0, '2:00 AM');
-			await selectTimeValue(user, bedTimeSection2, 1, '10:00 AM');
+			await selectTimeValue(bedTimeSection2, 0, '2:00 AM');
+			await selectTimeValue(bedTimeSection2, 1, '10:00 AM');
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -457,7 +447,6 @@ describe('PreferencesSettings', () => {
 
 	describe('Bed Time Independence', () => {
 		it('should NOT shift end time when start time is changed', async () => {
-			const user = userEvent.setup();
 			// Initial: 10 PM to 4 AM (6 hours sleep)
 			(userService.getSettings as Mock).mockResolvedValue(
 				createMockSettings({
@@ -480,14 +469,13 @@ describe('PreferencesSettings', () => {
 			expect(endTimeSelect).toHaveTextContent('4:00 AM');
 
 			// User changes start time from 10 PM to 11 PM
-			await selectTimeValue(user, bedTimeSection3, 0, '11:00 PM');
+			await selectTimeValue(bedTimeSection3, 0, '11:00 PM');
 
 			// End time should remain at 4:00 AM (NOT shift to 5:00 AM)
 			expect(endTimeSelect).toHaveTextContent('4:00 AM');
 		});
 
 		it('should NOT shift start time when end time is changed', async () => {
-			const user = userEvent.setup();
 			// Initial: 10 PM to 6 AM (8 hours sleep)
 			(userService.getSettings as Mock).mockResolvedValue(
 				createMockSettings({
@@ -510,14 +498,13 @@ describe('PreferencesSettings', () => {
 			expect(endTimeSelect).toHaveTextContent('6:00 AM');
 
 			// User changes end time from 6 AM to 7 AM
-			await selectTimeValue(user, bedTimeSection4, 1, '7:00 AM');
+			await selectTimeValue(bedTimeSection4, 1, '7:00 AM');
 
 			// Start time should remain at 10:00 PM
 			expect(startTimeSelect).toHaveTextContent('10:00 PM');
 		});
 
 		it('should calculate new sleep duration based on user-selected times (not shift end time)', async () => {
-			const user = userEvent.setup();
 			// Initial: 10 PM to 4 AM (6 hours sleep)
 			(userService.getSettings as Mock).mockResolvedValue(
 				createMockSettings({
@@ -534,7 +521,7 @@ describe('PreferencesSettings', () => {
 
 			const bedTimeSection5 = screen.getByTestId('bed-time-section');
 			// New sleep duration should be 5 hours (11 PM to 4 AM)
-			await selectTimeValue(user, bedTimeSection5, 0, '11:00 PM');
+			await selectTimeValue(bedTimeSection5, 0, '11:00 PM');
 
 			// Save
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
@@ -603,7 +590,6 @@ describe('PreferencesSettings', () => {
 	describe('Schedule Profile Validation', () => {
 		it('should show error when a work hour day has start but no end', async () => {
 			const { toast } = await import('sonner');
-			const user = userEvent.setup();
 
 			renderWithProviders(<PreferencesSettings />);
 
@@ -613,7 +599,7 @@ describe('PreferencesSettings', () => {
 
 			// Set only a start time on Monday (day-column-1) via work hours schedule
 			const workSection = screen.getAllByTestId('day-column-1')[0];
-			await selectTimeValue(user, workSection, 0, '9:00 AM');
+			await selectTimeValue(workSection, 0, '9:00 AM');
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -626,7 +612,6 @@ describe('PreferencesSettings', () => {
 
 		it('should show error when a personal hour day has end but no start', async () => {
 			const { toast } = await import('sonner');
-			const user = userEvent.setup();
 
 			renderWithProviders(<PreferencesSettings />);
 
@@ -637,7 +622,7 @@ describe('PreferencesSettings', () => {
 			// Set only an end time on Wednesday (day-column-3) via personal hours schedule (second instance)
 			const personalWedColumns = screen.getAllByTestId('day-column-3');
 			const personalColumn = personalWedColumns[1];
-			await selectTimeValue(user, personalColumn, 1, '5:00 PM');
+			await selectTimeValue(personalColumn, 1, '5:00 PM');
 
 			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 

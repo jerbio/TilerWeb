@@ -1,14 +1,20 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { animated } from '@react-spring/web';
-import { Clock, LockKeyhole, MapPin } from 'lucide-react';
+import { Clock, LockKeyhole, MapPin, StickyNote } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import TimeUtil from '@/core/util/time';
 import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import { useCalendarUI } from './calendar-ui.provider';
 import { TypeDefaults } from '../../types/typeDefaults';
+import {
+	ThirdPartyType,
+	type CalendarEvent as CalendarEventType,
+} from '@/core/common/types/schedule';
 
 type CalendarEventProps = {
 	event: StyledEvent;
@@ -29,6 +35,12 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 	focused = false,
 }) => {
 	const { isDarkMode } = useTheme();
+	const { t } = useTranslation();
+	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
+	const isThirdPartyEvent =
+		!!event.thirdPartyType &&
+		event.thirdPartyType !== ThirdPartyType.Tiler &&
+		event.thirdPartyType !== 'tiler';
 	return (
 		<EventContainer
 			onClick={(e) => {
@@ -62,6 +74,22 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 			>
 				<header>
 					<h3>{event.name}</h3>
+					{!isThirdPartyEvent && (
+						<NoteButton
+							type="button"
+							className="note-button"
+							data-testid={`tile-note-button-${event.id}`}
+							aria-label={t('tile.noteButtonAria', 'Open notes for this tile')}
+							title={t('tile.noteButtonAria', 'Open notes for this tile')}
+							onClick={(e) => {
+								e.stopPropagation();
+								e.preventDefault();
+								openNotes(event as unknown as CalendarEventType);
+							}}
+						>
+							<StickyNote size={12} />
+						</NoteButton>
+					)}
 					<EventLockIcon className="lock-icon" size={14} />
 				</header>
 				<footer>
@@ -170,6 +198,38 @@ const EventLockIcon = styled(LockKeyhole)`
 	min-width: 14px;
 `;
 
+const NoteButton = styled.button`
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	margin-top: 1px;
+	margin-left: 4px;
+	padding: 0;
+	border: none;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.04);
+	color: inherit;
+	cursor: pointer;
+	opacity: 0;
+	transform: translateY(-1px);
+	transition:
+		opacity 0.12s ease,
+		background-color 0.12s ease;
+	flex: 0 0 auto;
+
+	&:hover {
+		background: rgba(0, 0, 0, 0.12);
+	}
+
+	&:focus-visible {
+		opacity: 1;
+		outline: 2px solid rgba(99, 102, 241, 0.6);
+		outline-offset: 1px;
+	}
+`;
+
 const EventContent = styled.div<{
 	$colors: RGB;
 	$darkmode: boolean;
@@ -222,6 +282,11 @@ const EventContent = styled.div<{
 		${EventLockIcon} {
 			display: ${({ $variant }) => ($variant === 'block' ? 'block' : 'none')};
 		}
+	}
+
+	&:hover .note-button,
+	&:focus-within .note-button {
+		opacity: 1;
 	}
 
 	footer {

@@ -87,6 +87,15 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 					locationTag: loc.nickname || '',
 				}));
 			},
+			copyAddressOnly: (loc) => {
+				setFormData((prev) => ({
+					...prev,
+					location: loc.address,
+					locationId: null,
+					locationSource: '',
+					locationIsVerified: false,
+				}));
+			},
 		}),
 		[formData.location, formData.locationIsVerified, setFormData]
 	);
@@ -171,7 +180,15 @@ const CreateBlockInfo: React.FC<InfoProps> = ({ formHandler }) => {
 				name="locationTag"
 				placeholder={t('calendar.createBlock.info.locationTag.placeholder')}
 				value={formData.locationTag}
-				onChange={handleFormInputChange('locationTag')}
+				onChange={(e) =>
+					setFormData((prev) => ({
+						...prev,
+						locationTag: e.target.value,
+						locationId: null,
+						locationSource: '',
+						locationIsVerified: false,
+					}))
+				}
 			/>
 		</Grid>
 	);
