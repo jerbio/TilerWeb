@@ -116,6 +116,12 @@ vi.mock('@/core/theme/ThemeProvider', () => ({
 	useTheme: () => ({ isDarkMode: false, toggleTheme: vi.fn() }),
 }));
 
+vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
+	useCalendarUI: vi.fn((selector: (s: any) => any) =>
+		selector({ editNotes: { actions: { open: vi.fn() } } })
+	),
+}));
+
 // ── Test Data ──
 
 const mockEvent: CalendarEvent = {

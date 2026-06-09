@@ -240,61 +240,21 @@ const Calendar = ({
 		);
 	}, [viewOptions.width, theme]);
 
-	// Auto-scroll to first event or current time on initial load
+	// Auto-scroll to current time on initial load
 	useEffect(() => {
 		if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
 			return;
 		}
 
-		const scrollToPosition = (scrollTop: number) => {
-			if (contentContainerRef.current) {
-				contentContainerRef.current.scrollTop = scrollTop;
-				setHasAutoScrolled(true);
-			}
-		};
+		const now = TimeUtil.nowDayjs();
+		const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
+		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 
-		// Find the earliest event in the current view
-		const viewStart = viewOptions.startDay.startOf('day');
-		const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
-
-		const eventsInView = viableEvents.filter((event) => {
-			const eventStart = dayjs(event.start);
-			const eventEnd = dayjs(event.end);
-			return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
-		});
-
-		if (eventsInView.length > 0) {
-			// Find the earliest event
-			const earliestEvent = eventsInView.reduce((earliest, current) => {
-				return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
-			});
-
-			const eventStart = dayjs(earliestEvent.start);
-			const hourFraction =
-				eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before the first event (or to the event if it's in the first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		} else {
-			// No events in view, scroll to current time
-			const now = TimeUtil.nowDayjs();
-			const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before current time (or to current time if in first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		}
-	}, [
-		contentMounted,
-		hasAutoScrolled,
-		eventsLoading,
-		viableEvents,
-		viewOptions.startDay,
-		viewOptions.daysInView,
-	]);
+		// Scroll to 1 hour before current time so the indicator sits near the top
+		const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+		contentContainerRef.current.scrollTop = scrollTop;
+		setHasAutoScrolled(true);
+	}, [contentMounted, hasAutoScrolled, eventsLoading]);
 
 	// Reset auto-scroll flag when view changes (date navigation)
 	useEffect(() => {
