@@ -4,11 +4,13 @@ import ProfileSheet from '@/core/common/components/profile_sheet';
 import appRoutes from '@/core/common/data/appRoutes';
 import appLayoutConfig from '@/core/constants/app_layout_config';
 import { useTheme } from '@/core/theme/ThemeProvider';
+import { useFlag } from '@/hooks/useFlag';
 import useAppStore from '@/global_state';
 import { Moon, Sun, User } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
+import { featureFlags } from '@/core/constants/featureFlags';
 
 const AppLayout: React.FC = () => {
 	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -40,6 +42,7 @@ const AppLayout: React.FC = () => {
 
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const { pathname } = useLocation();
+	const tileshareEnabled = useFlag(featureFlags.TILESHARE_TAB);
 
 	return (
 		<Container>
@@ -48,19 +51,21 @@ const AppLayout: React.FC = () => {
 					<Logo size={30} />
 				</HeaderLeft>
 				<HeaderRight>
-					<Navigation>
-						{appRoutes.map((route, index) => (
-							<React.Fragment key={route.name}>
-								<Link to={route.path} style={{ textDecoration: 'none' }}>
-									<NavigationLink active={pathname.startsWith(route.path)}>
-										{route.name}
-										{route.icon}
-									</NavigationLink>
-								</Link>
-								{index === appRoutes.length - 1 ? null : <Separator />}
-							</React.Fragment>
-						))}
-					</Navigation>
+					{tileshareEnabled && (
+						<Navigation>
+							{appRoutes.map((route, index) => (
+								<React.Fragment key={route.name}>
+									<Link to={route.path} style={{ textDecoration: 'none' }}>
+										<NavigationLink active={pathname.startsWith(route.path)}>
+											{route.name}
+											{route.icon}
+										</NavigationLink>
+									</Link>
+									{index === appRoutes.length - 1 ? null : <Separator />}
+								</React.Fragment>
+							))}
+						</Navigation>
+					)}
 					{Env.isDevelopment() && (
 						<ThemeToggle onClick={toggleTheme}>
 							{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}

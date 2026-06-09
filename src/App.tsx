@@ -34,6 +34,8 @@ import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
 import TileshareOutbox from './pages/app/tileshare/TileshareOutbox';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
+import { FlaggedRoute } from './core/auth/FlaggedRoute';
+import { featureFlags } from './core/constants/featureFlags';
 import { AdminRoute } from './core/auth/AdminRoute';
 import AdminLayout from './pages/admin/AdminLayout';
 import FeatureFlagsAdmin from './pages/admin/feature-flags/FeatureFlagsAdmin';
@@ -152,25 +154,33 @@ const App: React.FC = () => {
 									<Route element={<AppLayout />}>
 										<Route path="/timeline" element={<Timeline />} />
 										<Route
-											path="/tileshare"
-											element={<TileshareDashboardPage />}
+											element={
+												<FlaggedRoute flag={featureFlags.TILESHARE_TAB} />
+											}
 										>
 											<Route
-												index
-												element={<Navigate to="inbox" replace />}
+												path="/tileshare"
+												element={<TileshareDashboardPage />}
+											>
+												<Route
+													index
+													element={<Navigate to="inbox" replace />}
+												/>
+												<Route path="inbox" element={<TileshareInbox />} />
+												<Route
+													path="outbox"
+													element={<TileshareOutbox />}
+												/>
+											</Route>
+											<Route
+												path="/tileshare/:id"
+												element={<TileshareDetailPage />}
 											/>
-											<Route path="inbox" element={<TileshareInbox />} />
-
-											<Route path="outbox" element={<TileshareOutbox />} />
+											<Route
+												path="/tileshare/:id/tilette/:tiletteId"
+												element={<TiletteDetailPage />}
+											/>
 										</Route>
-										<Route
-											path="/tileshare/:id"
-											element={<TileshareDetailPage />}
-										/>
-										<Route
-											path="/tileshare/:id/tilette/:tiletteId"
-											element={<TiletteDetailPage />}
-										/>
 										<Route path="/settings" element={<SettingsLayout />}>
 											<Route
 												index
