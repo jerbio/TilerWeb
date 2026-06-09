@@ -154,7 +154,7 @@ const mockEvent: CalendarEvent = {
 		id: 'rep-1',
 		isEnabled: true,
 		frequency: 'weekly',
-		weekDays: '1,3,5',
+		weekDays: 'Monday,Wednesday,Friday',
 		isForever: false,
 		tileTimeline: {
 			start: 1769925600000,
@@ -480,7 +480,7 @@ describe('EditCalendarEvent', () => {
 			RepetitionEnd: dayjs(mockEvent.repetition!.repetitionTimeline!.end!)
 				.startOf('day')
 				.valueOf(),
-			DayOfWeekRepetitions: ['1', '3', '5'],
+			DayOfWeekRepetitions: ['Monday', 'Wednesday', 'Friday'],
 		});
 	});
 
@@ -588,7 +588,7 @@ describe('EditCalendarEvent', () => {
 
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
 
-			// mockEvent has weekDays: '1,3,5' = Mon, Wed, Fri
+			// mockEvent has weekDays: 'Monday,Wednesday,Friday'
 			const mon = screen.getByLabelText('calendarEvent.edit.mon');
 			const wed = screen.getByLabelText('calendarEvent.edit.wed');
 			const fri = screen.getByLabelText('calendarEvent.edit.fri');
@@ -622,7 +622,7 @@ describe('EditCalendarEvent', () => {
 					...mockEvent.repetition!,
 					frequency: 'weekly',
 					isForever: false,
-					weekDays: '2,4',
+					weekDays: 'Tuesday,Thursday',
 					repetitionTimeline: {
 						start: 1770000000000,
 						end: 1785000000000,
@@ -690,7 +690,7 @@ describe('EditCalendarEvent', () => {
 			renderComponent();
 
 			await waitFor(() => {
-				expect(mockLookupCalendarEventById).toHaveBeenCalledWith('evt-1');
+				expect(mockLookupCalendarEventById).toHaveBeenCalledWith('evt-1_7_0_0');
 			});
 		});
 
