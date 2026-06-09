@@ -11,6 +11,7 @@ import {
 	Calendar,
 	X,
 	CheckCircle2,
+	FileText,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -37,6 +38,7 @@ import {
 	epochToTimeString,
 	combineDateAndTimeString,
 } from '@/core/common/utils/timeUtils';
+import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 
 const COLOR_SWATCHES: { r: number; g: number; b: number }[] = [
 	{ r: 237, g: 18, b: 59 }, // brand red
@@ -87,6 +89,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	const { t } = useTranslation();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
+	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
 
 	const [name, setName] = useState(event.name ?? '');
 	const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(epochToDate(event.start));
@@ -499,6 +502,13 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 								: 'calendarEvent.edit.title'
 					)}
 				</Title>
+				<NotesButton
+					onClick={() => openNotes(event)}
+					aria-label={t('calendarEvent.edit.openNotes', 'Open notes')}
+					title={t('calendarEvent.edit.openNotes', 'Open notes')}
+				>
+					<FileText size={18} />
+				</NotesButton>
 			</Header>
 
 			{isLoading && (
@@ -1230,6 +1240,27 @@ const Title = styled.h2`
 	font-weight: 600;
 	color: ${({ theme }) => theme.colors.text.primary};
 	margin: 0;
+	flex: 1;
+`;
+
+const NotesButton = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: none;
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	cursor: pointer;
+	transition: background 0.15s ease;
+	flex-shrink: 0;
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.background.card2};
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
 `;
 
 const Form = styled.div`

@@ -1243,7 +1243,8 @@
 			"savedLocations": "Saved Locations",
 			"googleResults": "Google Maps",
 			"poweredByGoogle": "Powered by Google",
-			"noLocationResults": "No locations found"
+			"noLocationResults": "No locations found",
+			"openNotes": "Open notes"
 		}
 	},
 	"discover": {
