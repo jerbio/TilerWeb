@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "ब्लॉक संपादित करें",
 			"titleTile": "टाइल संपादित करें",
 			"nameSection": "नाम",
+			"occurrenceSection": "????",
 			"timeSection": "समय और अवधि",
+			"recurringToggle": "घटना दोहराएं",
 			"repetitionSection": "दोहराव",
 			"locationSection": "स्थान",
 			"colorSection": "रंग",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "अतिरिक्त स्थान विवरण...",
 			"color": "रंग",
 			"recurring": "दोहराव",
+			"repetitionDisabled": "अक्षम",
 			"selectFrequency": "आवृत्ति चुनें",
 			"daily": "दैनिक",
 			"weekly": "साप्ताहिक",
@@ -661,6 +664,7 @@
 			"loadingBlock": "ब्लॉक विवरण लोड हो रहे हैं...",
 			"loadingTile": "टाइल विवरण लोड हो रहे हैं...",
 			"clearLocation": "स्थान हटाएं",
+			"copyAddressOnly": "केवल पता कॉपी करें",
 			"locationMinChars": "खोजने के लिए कम से कम 3 अक्षर टाइप करें",
 			"locationSearchPlaceholder": "स्थान खोजें...",
 			"savedLocations": "सहेजे गए स्थान",

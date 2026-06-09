@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"buttons": {
 			"back": "Retour",
@@ -320,7 +320,9 @@
 			"titleBlock": "Modifier le bloc",
 			"titleTile": "Modifier la tuile",
 			"nameSection": "Nom",
+			"occurrenceSection": "Occurrence",
 			"timeSection": "Heure et durée",
+			"recurringToggle": "Répéter l'événement",
 			"repetitionSection": "Répétition",
 			"locationSection": "Lieu",
 			"colorSection": "Couleur",
@@ -341,6 +343,7 @@
 			"locationDescriptionPlaceholder": "Détails supplémentaires sur le lieu...",
 			"color": "Couleur",
 			"recurring": "Récurrent",
+			"repetitionDisabled": "Désactivé",
 			"selectFrequency": "Sélectionner la fréquence",
 			"daily": "Quotidien",
 			"weekly": "Hebdomadaire",
@@ -365,6 +368,7 @@
 			"loadingBlock": "Chargement des détails du bloc...",
 			"loadingTile": "Chargement des détails de la tuile...",
 			"clearLocation": "Effacer le lieu",
+			"copyAddressOnly": "Copier uniquement l'adresse",
 			"locationMinChars": "Saisissez au moins 3 caractères pour rechercher",
 			"locationSearchPlaceholder": "Rechercher un lieu...",
 			"savedLocations": "Lieux enregistrés",

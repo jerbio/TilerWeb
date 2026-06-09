@@ -16,7 +16,7 @@ const sweep = keyframes`
 	100% { transform: translateX(400%); }
 `;
 
-export const PredictionLoadingBar = styled.div.attrs({
+export const PredictionLoadingBar = styled.div.attrs<{ 'data-testid'?: string }>({
 	'data-testid': 'prediction-loading-bar',
 })`
 	position: relative;

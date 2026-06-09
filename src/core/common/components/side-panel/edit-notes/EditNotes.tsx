@@ -180,6 +180,16 @@ export const EditNotes: React.FC<EditNotesProps> = ({
 		void flushSave(md);
 	}, [editor, flushSave]);
 
+	const handleEditorClick = useCallback((clickEvent: React.MouseEvent<HTMLDivElement>) => {
+		if (clickEvent.button !== 0 || !(clickEvent.target instanceof Element)) return;
+
+		const link = clickEvent.target.closest<HTMLAnchorElement>('a[href]');
+		if (!link || !clickEvent.currentTarget.contains(link)) return;
+
+		clickEvent.preventDefault();
+		window.open(link.href, link.target || '_blank');
+	}, []);
+
 	return (
 		<Root data-testid="edit-notes-panel">
 			<Header>
@@ -213,7 +223,7 @@ export const EditNotes: React.FC<EditNotesProps> = ({
 				</Centered>
 			) : (
 				<EditorScroll>
-					<EditorSurface>
+					<EditorSurface onClick={handleEditorClick}>
 						<EditorContent editor={editor} />
 					</EditorSurface>
 				</EditorScroll>
@@ -685,6 +695,34 @@ const EditorSurface = styled.div`
 		margin: 0.4em 0;
 	}
 
+	ul:not([data-type='taskList']) {
+		list-style-type: disc;
+	}
+
+	ul:not([data-type='taskList']) ul:not([data-type='taskList']) {
+		list-style-type: circle;
+	}
+
+	ul:not([data-type='taskList']) ul:not([data-type='taskList']) ul:not([data-type='taskList']) {
+		list-style-type: square;
+	}
+
+	ol {
+		list-style-type: decimal;
+	}
+
+	ol ol {
+		list-style-type: lower-alpha;
+	}
+
+	ol ol ol {
+		list-style-type: lower-roman;
+	}
+
+	li {
+		padding-left: 0.15em;
+	}
+
 	ul[data-type='taskList'] {
 		list-style: none;
 		padding: 0;
@@ -737,6 +775,7 @@ const EditorSurface = styled.div`
 	a {
 		color: ${palette.colors.primary};
 		text-decoration: underline;
+		cursor: pointer;
 	}
 `;
 

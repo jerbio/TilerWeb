@@ -25,7 +25,11 @@ import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
+import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
+import { AdminRoute } from './core/auth/AdminRoute';
+import AdminLayout from './pages/admin/AdminLayout';
+import FeatureFlagsAdmin from './pages/admin/feature-flags/FeatureFlagsAdmin';
 // import useAppStore from './global_state';
 
 // Component to track page views on route changes
@@ -76,6 +80,7 @@ const App: React.FC = () => {
 				<ConsentProvider>
 					<AuthProvider>
 						<BrowserRouter>
+							<ThemeInitializer />
 							<AnalyticsTracker />
 							<ScrollToTop />
 							<Routes>
@@ -146,6 +151,17 @@ const App: React.FC = () => {
 										<Route
 											path="notifications"
 											element={<NotificationPreferencesSettings />}
+										/>
+									</Route>
+								</Route>
+
+								{/* Admin Routes - redirect to /timeline if not admin */}
+								<Route element={<AdminRoute />}>
+									<Route path="/admin" element={<AdminLayout />}>
+										<Route index element={<Navigate to="/admin" replace />} />
+										<Route
+											path="feature-flags"
+											element={<FeatureFlagsAdmin />}
 										/>
 									</Route>
 								</Route>

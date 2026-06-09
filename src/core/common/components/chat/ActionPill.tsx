@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { keyframes, css } from 'styled-components';
 import { ChevronRight } from 'lucide-react';

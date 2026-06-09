@@ -192,13 +192,14 @@ const CalendarEvents = ({
 			return { event, box, s, e };
 		});
 
-		// Build layout inputs for viable events
+		// Build layout inputs for viable events — exclude long-duration events because
+		// they are rendered in a separate overlay and must not affect grid width computation.
 		const layoutEvents: LayoutEvent[] = [];
 		const layoutIndexMap = new Map<string, number>(); // event.key -> index in eventBoxes
 
 		for (let i = 0; i < eventBoxes.length; i++) {
 			const { event, box } = eventBoxes[i];
-			if (event.isViable) {
+			if (event.isViable && !isLongDurationEvent(event)) {
 				layoutEvents.push({
 					id: event.key,
 					start: event.start,

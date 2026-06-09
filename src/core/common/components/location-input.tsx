@@ -3,7 +3,7 @@ import Input from './input';
 import { EventLocation, LocationSource } from '@/core/common/types/schedule';
 import { useEffect, useRef, useState } from 'react';
 import { scheduleService } from '@/services';
-import { Bookmark, CheckCircle2, Loader2, MapPin, X } from 'lucide-react';
+import { Bookmark, CheckCircle2, Copy, Loader2, MapPin, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export type LocationInputController = {
@@ -12,6 +12,11 @@ export type LocationInputController = {
 	setLocation: (value: string) => void;
 	clearLocation: () => void;
 	setFromSelection: (loc: EventLocation) => void;
+	/**
+	 * Copy over only the address from a search result, keeping the current
+	 * nickname. Optional: when provided, a copy button is shown on each result.
+	 */
+	copyAddressOnly?: (loc: EventLocation) => void;
 };
 
 type LocationInputProps = {
@@ -41,6 +46,12 @@ const LocationInput: React.FC<LocationInputProps> = ({
 
 	function selectLocation(loc: EventLocation) {
 		controller.setFromSelection(loc);
+		setLocationResults([]);
+		setShowLocationDropdown(false);
+	}
+
+	function copyAddressOnly(loc: EventLocation) {
+		controller.copyAddressOnly?.(loc);
 		setLocationResults([]);
 		setShowLocationDropdown(false);
 	}
@@ -130,43 +141,72 @@ const LocationInput: React.FC<LocationInputProps> = ({
 							return (
 								<>
 									{saved.map((loc) => (
-										<DropdownItem
-											key={loc.id}
-											onClick={() => selectLocation(loc)}
-										>
-											<ItemIcon>
-												<Bookmark size={14} />
-											</ItemIcon>
-											<DropdownItemText>
-												<DropdownItemAddress>
-													{loc.address}
-												</DropdownItemAddress>
-												{loc.description && loc.description !== loc.id && (
-													<DropdownItemDesc>
-														{loc.description}
-													</DropdownItemDesc>
-												)}
-											</DropdownItemText>
+										<DropdownItem key={loc.id}>
+											<DropdownItemMain
+												type="button"
+												onClick={() => selectLocation(loc)}
+											>
+												<ItemIcon>
+													<Bookmark size={14} />
+												</ItemIcon>
+												<DropdownItemText>
+													<DropdownItemAddress>
+														{loc.address}
+													</DropdownItemAddress>
+													{loc.description &&
+														loc.description !== loc.id && (
+															<DropdownItemDesc>
+																{loc.description}
+															</DropdownItemDesc>
+														)}
+												</DropdownItemText>
+											</DropdownItemMain>
+											{controller.copyAddressOnly && (
+												<CopyAddressButton
+													type="button"
+													aria-label={t(
+														'calendarEvent.edit.copyAddressOnly'
+													)}
+													title={t('calendarEvent.edit.copyAddressOnly')}
+													onClick={() => copyAddressOnly(loc)}
+												>
+													<Copy size={14} />
+												</CopyAddressButton>
+											)}
 										</DropdownItem>
 									))}
 									{google.map((loc) => (
-										<DropdownItem
-											key={loc.id}
-											onClick={() => selectLocation(loc)}
-										>
-											<ItemIcon>
-												<MapPin size={14} />
-											</ItemIcon>
-											<DropdownItemText>
-												<DropdownItemAddress>
-													{loc.address}
-												</DropdownItemAddress>
-												{loc.description && (
-													<DropdownItemDesc>
-														{loc.description}
-													</DropdownItemDesc>
-												)}
-											</DropdownItemText>
+										<DropdownItem key={loc.id}>
+											<DropdownItemMain
+												type="button"
+												onClick={() => selectLocation(loc)}
+											>
+												<ItemIcon>
+													<MapPin size={14} />
+												</ItemIcon>
+												<DropdownItemText>
+													<DropdownItemAddress>
+														{loc.address}
+													</DropdownItemAddress>
+													{loc.description && (
+														<DropdownItemDesc>
+															{loc.description}
+														</DropdownItemDesc>
+													)}
+												</DropdownItemText>
+											</DropdownItemMain>
+											{controller.copyAddressOnly && (
+												<CopyAddressButton
+													type="button"
+													aria-label={t(
+														'calendarEvent.edit.copyAddressOnly'
+													)}
+													title={t('calendarEvent.edit.copyAddressOnly')}
+													onClick={() => copyAddressOnly(loc)}
+												>
+													<Copy size={14} />
+												</CopyAddressButton>
+											)}
 										</DropdownItem>
 									))}
 									{google.length > 0 && (
@@ -255,10 +295,21 @@ const Dropdown = styled.div`
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
 
-const DropdownItem = styled.button`
+const DropdownItem = styled.div`
+	display: flex;
+	align-items: stretch;
+	width: 100%;
+
+	&:not(:last-child) {
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border.strong};
+	}
+`;
+
+const DropdownItemMain = styled.button`
 	display: flex;
 	align-items: flex-start;
-	width: 100%;
+	flex: 1;
+	min-width: 0;
 	padding: 0.5rem 0.75rem;
 	border: none;
 	background: transparent;
@@ -269,9 +320,23 @@ const DropdownItem = styled.button`
 	&:hover {
 		background: ${({ theme }) => theme.colors.background.card2};
 	}
+`;
 
-	&:not(:last-child) {
-		border-bottom: 1px solid ${({ theme }) => theme.colors.border.strong};
+const CopyAddressButton = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 36px;
+	border: none;
+	border-left: 1px solid ${({ theme }) => theme.colors.border.strong};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.muted};
+	cursor: pointer;
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.background.card2};
+		color: ${({ theme }) => theme.colors.text.primary};
 	}
 `;
 

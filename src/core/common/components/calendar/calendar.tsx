@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+﻿import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Clock, Info, TriangleAlert } from 'lucide-react';
@@ -23,7 +23,6 @@ import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
 import { useCalendarRequestListener } from './CalendarRequestProvider';
-import { useInitialScrollToNow } from './calendar_auto_scroll';
 import {
 	createCalendarRequestHandler,
 	retryPendingFocus,
@@ -82,6 +81,8 @@ const Calendar = ({
 	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
 	const theme = useTheme();
 	const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
+
+	const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
 
 	const contentContainerRef = useRef<HTMLDivElement>(null);
 
@@ -275,14 +276,26 @@ const Calendar = ({
 		);
 	}, [viewOptions.width, theme]);
 
-	// Auto-scroll to current time on initial mount only.
-	// Subsequent week/day navigation preserves the user's scroll
-	// position so they can compare the same hour-row across weeks.
-	useInitialScrollToNow(
-		contentContainerRef,
-		parseInt(calendarConfig.CELL_HEIGHT),
-		contentMounted
-	);
+	// Auto-scroll to current time on initial load
+	useEffect(() => {
+		if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
+			return;
+		}
+
+		const now = TimeUtil.nowDayjs();
+		const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
+		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+
+		// Scroll to 1 hour before current time so the indicator sits near the top
+		const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+		contentContainerRef.current.scrollTop = scrollTop;
+		setHasAutoScrolled(true);
+	}, [contentMounted, hasAutoScrolled, eventsLoading]);
+
+	// Reset auto-scroll flag when view changes (date navigation)
+	useEffect(() => {
+		setHasAutoScrolled(false);
+	}, [viewOptions.startDay]);
 
 	const isMobile = useIsMobile();
 	// Timeline switches to the mobile bottom-sheet review layout at the
@@ -649,6 +662,8 @@ const Calendar = ({
 													setShowLongDurationEvents(
 														isClosing ? null : day
 													);
+													// Collapse the other overlay
+													setShowNonViableEvents(null);
 													if (!isClosing) {
 														setSelectedEventInfo(null);
 														setSelectedEvent(null);
@@ -679,6 +694,8 @@ const Calendar = ({
 														showNonViableEvents?.isSame(day, 'day') ??
 														false;
 													setShowNonViableEvents(isClosing ? null : day);
+													// Collapse the other overlay
+													setShowLongDurationEvents(null);
 													// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
 													if (!isClosing) {
 														setSelectedEventInfo(null);
@@ -727,14 +744,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysNonViableEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -765,14 +786,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysLongDurationEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -1125,6 +1150,15 @@ const NonViableEventsContainer = styled.div<{
 	}
 
 	transition: opacity 0.2s ease-in-out;
+`;
+
+const OverlayEventItem = styled.div`
+	height: 64px;
+	min-height: 64px;
+	max-height: 64px;
+	width: 100%;
+	margin-bottom: 0.375rem;
+	overflow: hidden;
 `;
 
 const CalendarEventInfoModalContainer = styled(a.div)`

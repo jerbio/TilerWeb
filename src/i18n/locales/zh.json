@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,7 +616,9 @@
 			"titleBlock": "编辑区块",
 			"titleTile": "编辑磁贴",
 			"nameSection": "名称",
+			"occurrenceSection": "????",
 			"timeSection": "时间和时长",
+			"recurringToggle": "重复事件",
 			"repetitionSection": "重复",
 			"locationSection": "位置",
 			"colorSection": "颜色",
@@ -637,6 +639,7 @@
 			"locationDescriptionPlaceholder": "其他位置详情...",
 			"color": "颜色",
 			"recurring": "重复",
+			"repetitionDisabled": "禁用",
 			"selectFrequency": "选择频率",
 			"daily": "每天",
 			"weekly": "每周",
@@ -661,6 +664,7 @@
 			"loadingBlock": "正在加载区块详情...",
 			"loadingTile": "正在加载磁贴详情...",
 			"clearLocation": "清除位置",
+			"copyAddressOnly": "仅复制地址",
 			"locationMinChars": "请输入至少3个字符进行搜索",
 			"locationSearchPlaceholder": "搜索位置...",
 			"savedLocations": "已保存的位置",

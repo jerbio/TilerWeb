@@ -178,8 +178,19 @@ vi.mock('@/services/SocketService', () => ({
 	// Must be a class (not an arrow function) so `new SignalRService()` works.
 	SignalRService: class {
 		createConnection = vi.fn();
-		subscribeToSocketDataReceipt = vi.fn();
-		subscribeToPreviewReady = vi.fn();
+		subscribe = vi.fn();
+		dispose = vi.fn();
+	},
+	Hubs: {
+		VibeUpdate: {
+			name: 'vibeUpdateHub',
+			events: { RefreshData: 'refreshDataFromSockets', PreviewReady: 'previewReady' },
+			server: { JoinUserGroup: 'joinUserGroup' },
+		},
+		ScheduleChange: {
+			name: 'scheduleChange',
+			events: { RefreshData: 'refereshDataFromSockets' },
+		},
 	},
 }));
 
