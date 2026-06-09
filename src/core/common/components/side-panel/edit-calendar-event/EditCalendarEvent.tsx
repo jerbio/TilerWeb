@@ -359,8 +359,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		let cancelled = false;
 		setIsLoading(true);
 		if (!event.id) return;
+		const rootId = event.id.split('_')[0] + '_7_0_0'; // strip repetition suffix if present
 		Promise.all([
-			scheduleService.lookupCalendarEventById(event.id),
+			scheduleService.lookupCalendarEventById(rootId),
 			userService.getScheduleProfile().catch(() => null),
 		])
 			.then(async ([full, scheduleProfile]) => {
@@ -871,41 +872,35 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 									)}
 									{frequency === 'weekly' && (
 										<WeekDayRow>
-											{(['0', '1', '2', '3', '4', '5', '6'] as const).map(
-												(dayIdx) => {
-													const dayKey = [
-														'sun',
-														'mon',
-														'tue',
-														'wed',
-														'thu',
-														'fri',
-														'sat',
-													][Number(dayIdx)];
-													return (
-														<WeekDayChip
-															key={dayIdx}
-															$selected={weekDays.has(dayIdx)}
-															onClick={() => {
-																setWeekDays((prev) => {
-																	const next = new Set(prev);
-																	if (next.has(dayIdx))
-																		next.delete(dayIdx);
-																	else next.add(dayIdx);
-																	return next;
-																});
-															}}
-															aria-label={t(
-																`calendarEvent.edit.${dayKey}`
-															)}
-															role="checkbox"
-															aria-checked={weekDays.has(dayIdx)}
-														>
-															{t(`calendarEvent.edit.${dayKey}`)}
-														</WeekDayChip>
-													);
-												}
-											)}
+											{(
+												[
+													{ name: 'Sunday', key: 'sun' },
+													{ name: 'Monday', key: 'mon' },
+													{ name: 'Tuesday', key: 'tue' },
+													{ name: 'Wednesday', key: 'wed' },
+													{ name: 'Thursday', key: 'thu' },
+													{ name: 'Friday', key: 'fri' },
+													{ name: 'Saturday', key: 'sat' },
+												] as const
+											).map(({ name, key }) => (
+												<WeekDayChip
+													key={name}
+													$selected={weekDays.has(name)}
+													onClick={() => {
+														setWeekDays((prev) => {
+															const next = new Set(prev);
+															if (next.has(name)) next.delete(name);
+															else next.add(name);
+															return next;
+														});
+													}}
+													aria-label={t(`calendarEvent.edit.${key}`)}
+													role="checkbox"
+													aria-checked={weekDays.has(name)}
+												>
+													{t(`calendarEvent.edit.${key}`)}
+												</WeekDayChip>
+											))}
 										</WeekDayRow>
 									)}
 								</SectionBody>
