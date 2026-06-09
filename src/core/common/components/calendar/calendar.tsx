@@ -63,7 +63,6 @@ const Calendar = ({
 	allowEventLookup = true,
 }: CalendarProps) => {
 	const { t } = useTranslation();
-	const viableEvents = events.filter((event) => event.isViable);
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
 	const theme = useTheme();
