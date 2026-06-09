@@ -9,6 +9,7 @@ import { createMemoryRouter } from 'react-router';
 import useAppStore from '@/global_state';
 import type { UserInfo } from '@/global_state';
 import appRoutes from '@/core/common/data/appRoutes';
+import { featureFlags } from '@/core/constants/featureFlags';
 
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string) => key }),
@@ -23,6 +24,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('@/config/config_getter', () => ({
 	Env: {
 		isDevelopment: () => true,
+		get: () => '',
 	},
 }));
 
@@ -94,6 +96,7 @@ function seedLayoutUser(overrides: Partial<UserInfo> = {}) {
 	useAppStore.setState({
 		authenticatedUser: { ...defaultLayoutUser, ...overrides },
 		isAuthenticated: true,
+		featureFlags: { [featureFlags.TILESHARE_TAB]: true },
 	});
 }
 
@@ -103,6 +106,7 @@ describe('AppLayout', () => {
 		useAppStore.setState({
 			authenticatedUser: null,
 			isAuthenticated: false,
+			featureFlags: {},
 		});
 	});
 
