@@ -664,6 +664,7 @@
 			"loadingBlock": "ブロックの詳細を読み込み中...",
 			"loadingTile": "タイルの詳細を読み込み中...",
 			"clearLocation": "場所をクリア",
+			"copyAddressOnly": "住所のみコピー",
 			"locationMinChars": "検索するには3文字以上入力してください",
 			"locationSearchPlaceholder": "場所を検索...",
 			"savedLocations": "保存済みの場所",

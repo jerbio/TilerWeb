@@ -664,6 +664,7 @@
 			"loadingBlock": "Загрузка деталей блока...",
 			"loadingTile": "Загрузка деталей плитки...",
 			"clearLocation": "Очистить местоположение",
+			"copyAddressOnly": "Копировать только адрес",
 			"locationMinChars": "Введите не менее 3 символов для поиска",
 			"locationSearchPlaceholder": "Поиск местоположения...",
 			"savedLocations": "Сохранённые места",

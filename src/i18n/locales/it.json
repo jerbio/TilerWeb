@@ -664,6 +664,7 @@
 			"loadingBlock": "Caricamento dettagli del blocco...",
 			"loadingTile": "Caricamento dettagli del riquadro...",
 			"clearLocation": "Cancella posizione",
+			"copyAddressOnly": "Copia solo l'indirizzo",
 			"locationMinChars": "Digita almeno 3 caratteri per cercare",
 			"locationSearchPlaceholder": "Cerca una posizione...",
 			"savedLocations": "Posizioni salvate",

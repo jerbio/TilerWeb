@@ -1318,6 +1318,144 @@ describe('EditCalendarEvent', () => {
 			expect(addressInput).toHaveValue('');
 			expect(screen.queryByDisplayValue('Near the park')).not.toBeInTheDocument();
 		});
+
+		it('copies only the address and keeps the existing nickname', async () => {
+			vi.useFakeTimers({ shouldAdvanceTime: true });
+			mockSearchLocations.mockResolvedValue([savedLocation]);
+			const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			const addressInput = screen.getByPlaceholderText(
+				'calendarEvent.edit.locationSearchPlaceholder'
+			);
+			await user.clear(addressInput);
+			await user.type(addressInput, 'office');
+			await vi.advanceTimersByTimeAsync(400);
+
+			await waitFor(() => {
+				expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+			});
+
+			await user.click(screen.getByLabelText('calendarEvent.edit.copyAddressOnly'));
+
+			// Address is copied over; the existing nickname is preserved.
+			expect(addressInput).toHaveValue('100 Office Blvd');
+			expect(screen.getByDisplayValue('Near the park')).toBeInTheDocument();
+			vi.useRealTimers();
+		});
+
+		it('omits LocationId and sends address + nickname after copy address only', async () => {
+			vi.useFakeTimers({ shouldAdvanceTime: true });
+			mockSearchLocations.mockResolvedValue([savedLocation]);
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			const addressInput = screen.getByPlaceholderText(
+				'calendarEvent.edit.locationSearchPlaceholder'
+			);
+			await user.clear(addressInput);
+			await user.type(addressInput, 'office');
+			await vi.advanceTimersByTimeAsync(400);
+
+			await waitFor(() => {
+				expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
+			});
+
+			await user.click(screen.getByLabelText('calendarEvent.edit.copyAddressOnly'));
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+
+			await waitFor(() => {
+				expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+			});
+
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.LocationId).toBeUndefined();
+			expect(params.CalAddress).toBe('100 Office Blvd');
+			expect(params.CalAddressDescription).toBe('Near the park');
+			vi.useRealTimers();
+		});
+
+		it('does not include the nickname when copying address only from a Google result', async () => {
+			vi.useFakeTimers({ shouldAdvanceTime: true });
+			mockSearchLocations.mockResolvedValue([googleLocation]);
+			const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			const addressInput = screen.getByPlaceholderText(
+				'calendarEvent.edit.locationSearchPlaceholder'
+			);
+			await user.clear(addressInput);
+			await user.type(addressInput, 'walmart');
+			await vi.advanceTimersByTimeAsync(400);
+
+			await waitFor(() => {
+				expect(
+					screen.getByText('Walmart Supercenter 745 us-287, lafayette, co 80026, usa')
+				).toBeInTheDocument();
+			});
+
+			await user.click(screen.getByLabelText('calendarEvent.edit.copyAddressOnly'));
+
+			// Address copied over, but the Google result's description is not applied.
+			expect(addressInput).toHaveValue(
+				'Walmart Supercenter 745 us-287, lafayette, co 80026, usa'
+			);
+			expect(screen.getByDisplayValue('Near the park')).toBeInTheDocument();
+			expect(screen.queryByDisplayValue('Walmart Supercenter')).not.toBeInTheDocument();
+			vi.useRealTimers();
+		});
+
+		it('omits LocationId and sends address + nickname when the nickname is edited', async () => {
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
+
+			const descInput = screen.getByPlaceholderText(
+				'calendarEvent.edit.locationDescriptionPlaceholder'
+			);
+			await user.clear(descInput);
+			await user.type(descInput, 'Home base');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+
+			await waitFor(() => {
+				expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+			});
+
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.LocationId).toBeUndefined();
+			expect(params.CalAddress).toBe('123 Main St');
+			expect(params.CalAddressDescription).toBe('Home base');
+		});
+
+		it('keeps LocationId and omits address fields when the nickname is unchanged', async () => {
+			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+			const user = setupUser();
+			renderComponent();
+			await waitForLoaded();
+
+			const nameInput = screen.getByDisplayValue('work out');
+			await user.clear(nameInput);
+			await user.type(nameInput, 'morning run');
+			await user.click(screen.getByText('calendarEvent.edit.save'));
+
+			await waitFor(() => {
+				expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+			});
+
+			const params = mockUpdateCalendarEvent.mock.calls[0][0];
+			expect(params.LocationId).toBe('loc-1');
+			expect(params.CalAddress).toBeUndefined();
+			expect(params.CalAddressDescription).toBeUndefined();
+		});
 	});
 
 	describe('location verified badge', () => {

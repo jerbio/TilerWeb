@@ -664,6 +664,7 @@
 			"loadingBlock": "Cargando detalles del bloque...",
 			"loadingTile": "Cargando detalles del mosaico...",
 			"clearLocation": "Borrar ubicación",
+			"copyAddressOnly": "Copiar solo la dirección",
 			"locationMinChars": "Escribe al menos 3 caracteres para buscar",
 			"locationSearchPlaceholder": "Buscar una ubicación...",
 			"savedLocations": "Ubicaciones guardadas",

@@ -332,6 +332,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setLocationResults([]);
 	};
 
+	// Copy over only the address from a search result, keeping the current
+	// nickname. Since the nickname is unique per user, the result's locationId
+	// no longer applies, so it is cleared.
+	const handleCopyAddressOnly = (loc: EventLocation) => {
+		setAddress(loc.address);
+		setLocationId(null);
+		setIsLocationCleared(false);
+		setIsLocationVerified(false);
+		setShowLocationDropdown(false);
+		setLocationResults([]);
+	};
+
 	const handleClearLocation = () => {
 		setAddress('');
 		setAddressDescription('');
@@ -430,9 +442,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			Split: splitCount ? Number(splitCount) : undefined,
 			LocationId: locationId || undefined,
 			IsLocationCleared: isLocationCleared ? 'true' : undefined,
-			CalAddress: !locationId && (address || addressDescription) ? address : undefined,
+			CalAddress: !locationId && address ? address : undefined,
 			CalAddressDescription:
-				!locationId && (address || addressDescription) ? addressDescription : undefined,
+				!locationId && addressDescription ? addressDescription : undefined,
 			ColorConfig: {
 				IsEnabled: true,
 				Red: String(swatch.r),
@@ -992,59 +1004,99 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															return (
 																<>
 																	{saved.map((loc) => (
-																		<DropdownItem
-																			key={loc.id}
-																			onClick={() =>
-																				handleSelectLocation(
-																					loc
-																				)
-																			}
-																		>
-																			<ItemIcon aria-label="saved">
-																				<Bookmark
-																					size={14}
-																				/>
-																			</ItemIcon>
-																			<DropdownItemText>
-																				<DropdownItemAddress>
-																					{loc.address}
-																				</DropdownItemAddress>
-																				{loc.description &&
-																					loc.description !==
-																						loc.id && (
+																		<DropdownItem key={loc.id}>
+																			<DropdownItemMain
+																				onClick={() =>
+																					handleSelectLocation(
+																						loc
+																					)
+																				}
+																			>
+																				<ItemIcon aria-label="saved">
+																					<Bookmark
+																						size={14}
+																					/>
+																				</ItemIcon>
+																				<DropdownItemText>
+																					<DropdownItemAddress>
+																						{
+																							loc.address
+																						}
+																					</DropdownItemAddress>
+																					{loc.description &&
+																						loc.description !==
+																							loc.id && (
+																							<DropdownItemDesc>
+																								{
+																									loc.description
+																								}
+																							</DropdownItemDesc>
+																						)}
+																				</DropdownItemText>
+																			</DropdownItemMain>
+																			<CopyAddressButton
+																				type="button"
+																				onClick={() =>
+																					handleCopyAddressOnly(
+																						loc
+																					)
+																				}
+																				aria-label={t(
+																					'calendarEvent.edit.copyAddressOnly'
+																				)}
+																				title={t(
+																					'calendarEvent.edit.copyAddressOnly'
+																				)}
+																			>
+																				<MapPin size={14} />
+																			</CopyAddressButton>
+																		</DropdownItem>
+																	))}
+																	{google.map((loc) => (
+																		<DropdownItem key={loc.id}>
+																			<DropdownItemMain
+																				onClick={() =>
+																					handleSelectLocation(
+																						loc
+																					)
+																				}
+																			>
+																				<ItemIcon aria-label="google">
+																					<MapPin
+																						size={14}
+																					/>
+																				</ItemIcon>
+																				<DropdownItemText>
+																					<DropdownItemAddress>
+																						{
+																							loc.address
+																						}
+																					</DropdownItemAddress>
+																					{loc.description && (
 																						<DropdownItemDesc>
 																							{
 																								loc.description
 																							}
 																						</DropdownItemDesc>
 																					)}
-																			</DropdownItemText>
-																		</DropdownItem>
-																	))}
-																	{google.map((loc) => (
-																		<DropdownItem
-																			key={loc.id}
-																			onClick={() =>
-																				handleSelectLocation(
-																					loc
-																				)
-																			}
-																		>
-																			<ItemIcon aria-label="google">
-																				<MapPin size={14} />
-																			</ItemIcon>
-																			<DropdownItemText>
-																				<DropdownItemAddress>
-																					{loc.address}
-																				</DropdownItemAddress>
-																				{loc.description && (
-																					<DropdownItemDesc>
-																						{
-																							loc.description
-																						}
-																					</DropdownItemDesc>
+																				</DropdownItemText>
+																			</DropdownItemMain>
+																			<CopyAddressButton
+																				type="button"
+																				onClick={() =>
+																					handleCopyAddressOnly(
+																						loc
+																					)
+																				}
+																				aria-label={t(
+																					'calendarEvent.edit.copyAddressOnly'
 																				)}
-																			</DropdownItemText>
+																				title={t(
+																					'calendarEvent.edit.copyAddressOnly'
+																				)}
+																			>
+																				<MapPin size={14} />
+																			</CopyAddressButton>
 																		</DropdownItem>
 																	))}
 																	{google.length > 0 && (
@@ -1065,7 +1117,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 										<Label>{t('calendarEvent.edit.locationDescription')}</Label>
 										<Input
 											value={addressDescription}
-											onChange={(e) => setAddressDescription(e.target.value)}
+											onChange={(e) => {
+												// The nickname is unique per user, so editing it
+												// invalidates the saved location mapping. Clear the
+												// locationId so the address + new nickname are sent.
+												setLocationId(null);
+												setIsLocationCleared(false);
+												setAddressDescription(e.target.value);
+											}}
 											placeholder={t(
 												'calendarEvent.edit.locationDescriptionPlaceholder'
 											)}
@@ -1579,16 +1638,9 @@ const Dropdown = styled.div`
 	margin-top: 4px;
 `;
 
-const DropdownItem = styled.button`
+const DropdownItem = styled.div`
 	display: flex;
-	align-items: flex-start;
-	width: 100%;
-	padding: 0.5rem 0.75rem;
-	border: none;
-	background: transparent;
-	text-align: left;
-	cursor: pointer;
-	gap: 0.5rem;
+	align-items: stretch;
 
 	&:hover {
 		background: ${({ theme }) => theme.colors.background.card2};
@@ -1596,6 +1648,37 @@ const DropdownItem = styled.button`
 
 	&:not(:last-child) {
 		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	}
+`;
+
+const DropdownItemMain = styled.button`
+	display: flex;
+	align-items: flex-start;
+	flex: 1;
+	min-width: 0;
+	padding: 0.5rem 0.75rem;
+	border: none;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+	gap: 0.5rem;
+`;
+
+const CopyAddressButton = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 36px;
+	border: none;
+	border-left: 1px solid ${({ theme }) => theme.colors.border.default};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.muted};
+	cursor: pointer;
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.background.card};
+		color: ${({ theme }) => theme.colors.text.primary};
 	}
 `;
 

@@ -664,6 +664,7 @@
 			"loadingBlock": "블록 상세 정보 불러오는 중...",
 			"loadingTile": "타일 상세 정보 불러오는 중...",
 			"clearLocation": "위치 지우기",
+			"copyAddressOnly": "주소만 복사",
 			"locationMinChars": "검색하려면 3자 이상 입력하세요",
 			"locationSearchPlaceholder": "위치 검색...",
 			"savedLocations": "저장된 위치",

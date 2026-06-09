@@ -664,6 +664,7 @@
 			"loadingBlock": "ब्लॉक विवरण लोड हो रहे हैं...",
 			"loadingTile": "टाइल विवरण लोड हो रहे हैं...",
 			"clearLocation": "स्थान हटाएं",
+			"copyAddressOnly": "केवल पता कॉपी करें",
 			"locationMinChars": "खोजने के लिए कम से कम 3 अक्षर टाइप करें",
 			"locationSearchPlaceholder": "स्थान खोजें...",
 			"savedLocations": "सहेजे गए स्थान",

@@ -664,6 +664,7 @@
 			"loadingBlock": "Blockdetails werden geladen...",
 			"loadingTile": "Kacheldetails werden geladen...",
 			"clearLocation": "Standort löschen",
+			"copyAddressOnly": "Nur Adresse übernehmen",
 			"locationMinChars": "Geben Sie mindestens 3 Zeichen ein, um zu suchen",
 			"locationSearchPlaceholder": "Standort suchen...",
 			"savedLocations": "Gespeicherte Standorte",

@@ -58,6 +58,15 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 					locationTag: loc.nickname || '',
 				}));
 			},
+			copyAddressOnly: (loc) => {
+				setFormData((prev) => ({
+					...prev,
+					location: loc.address,
+					locationId: null,
+					locationSource: '',
+					locationIsVerified: false,
+				}));
+			},
 		}),
 		[formData.location, formData.locationIsVerified, setFormData]
 	);
@@ -101,7 +110,15 @@ const CreateTileInfo: React.FC<InfoProps> = ({
 				name="locationTag"
 				placeholder={t('calendar.createTile.info.locationTag.placeholder')}
 				value={formData.locationTag}
-				onChange={handleFormInputChange('locationTag')}
+				onChange={(e) =>
+					setFormData((prev) => ({
+						...prev,
+						locationTag: e.target.value,
+						locationId: null,
+						locationSource: '',
+						locationIsVerified: false,
+					}))
+				}
 			/>
 			<Input
 				label={t('calendar.createTile.info.hours.label')}

@@ -664,6 +664,7 @@
 			"loadingBlock": "正在加载区块详情...",
 			"loadingTile": "正在加载磁贴详情...",
 			"clearLocation": "清除位置",
+			"copyAddressOnly": "仅复制地址",
 			"locationMinChars": "请输入至少3个字符进行搜索",
 			"locationSearchPlaceholder": "搜索位置...",
 			"savedLocations": "已保存的位置",

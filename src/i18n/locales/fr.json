@@ -368,6 +368,7 @@
 			"loadingBlock": "Chargement des détails du bloc...",
 			"loadingTile": "Chargement des détails de la tuile...",
 			"clearLocation": "Effacer le lieu",
+			"copyAddressOnly": "Copier uniquement l'adresse",
 			"locationMinChars": "Saisissez au moins 3 caractères pour rechercher",
 			"locationSearchPlaceholder": "Rechercher un lieu...",
 			"savedLocations": "Lieux enregistrés",

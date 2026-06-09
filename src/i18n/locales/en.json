@@ -182,6 +182,10 @@
 			"repetitionLabel": "Repeats:",
 			"deadlineLabel": "Deadline:",
 			"locationLabel": "View directions on map",
+			"locationLinkLabel": "Link",
+			"videoLinkLabel": "Video call",
+			"copyLink": "Copy link",
+			"openLink": "Open link",
 			"secondaryActionsLabel": "Secondary Tile Actions:",
 			"secondaryActions": {
 				"editLabel": "Edit",
@@ -1238,6 +1242,7 @@
 			"loadingBlock": "Loading block details...",
 			"loadingTile": "Loading tile details...",
 			"clearLocation": "Clear location",
+			"copyAddressOnly": "Copy address only",
 			"locationMinChars": "Type at least 3 characters to search",
 			"locationSearchPlaceholder": "Search for a location...",
 			"savedLocations": "Saved Locations",
