@@ -117,7 +117,7 @@ vi.mock('@/core/theme/ThemeProvider', () => ({
 }));
 
 vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
-	useCalendarUI: vi.fn((selector: (s: any) => any) =>
+	useCalendarUI: vi.fn((selector: (s: unknown) => unknown) =>
 		selector({ editNotes: { actions: { open: vi.fn() } } })
 	),
 }));

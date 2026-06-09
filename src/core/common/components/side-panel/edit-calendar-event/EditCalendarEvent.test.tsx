@@ -2,8 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import EditCalendarEvent, { isRepetitionConfigValid } from './EditCalendarEvent';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
+import type { CalendarUIStore } from '@/core/common/components/calendar/calendar-ui.store';
 import { useUiStore } from '@/core/ui';
+import type { UiState } from '@/core/ui/uiStore';
 import type { CalendarEvent } from '@/core/common/types/schedule';
+import type { Dayjs } from 'dayjs';
 import { ThemeProvider, ThemeMode } from '@/core/theme/ThemeProvider';
 
 // ── Module mocks ──────────────────────────────────────────────────────────────
@@ -79,11 +82,13 @@ function renderComponent(event: CalendarEvent = mockEvent, onClose = vi.fn()) {
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
-	vi.mocked(useCalendarUI).mockImplementation((selector: any) =>
-		selector({ editNotes: { actions: { open: mockOpenNotes } } })
+	vi.mocked(useCalendarUI).mockImplementation((selector: (state: CalendarUIStore) => unknown) =>
+		selector({ editNotes: { actions: { open: mockOpenNotes } } } as unknown as CalendarUIStore)
 	);
-	vi.mocked(useUiStore).mockImplementation((selector: any) =>
-		selector({ notification: { show: mockShowNotification, update: mockUpdateNotification } })
+	vi.mocked(useUiStore).mockImplementation((selector: (state: UiState) => unknown) =>
+		selector({
+			notification: { show: mockShowNotification, update: mockUpdateNotification },
+		} as unknown as UiState)
 	);
 	mockOpenNotes.mockClear();
 	mockShowNotification.mockClear();
@@ -116,7 +121,7 @@ describe('isRepetitionConfigValid', () => {
 	});
 
 	it('returns true when frequency is set and both date bounds are provided', () => {
-		const d = {} as any; // non-null date object
+		const d = {} as Dayjs; // non-null date object
 		expect(
 			isRepetitionConfigValid({
 				frequency: 'weekly',
@@ -132,7 +137,7 @@ describe('isRepetitionConfigValid', () => {
 			isRepetitionConfigValid({
 				frequency: 'weekly',
 				isForever: false,
-				repStartDate: {} as any,
+				repStartDate: {} as Dayjs,
 				repEndDate: null,
 			})
 		).toBe(false);
@@ -144,7 +149,7 @@ describe('isRepetitionConfigValid', () => {
 				frequency: 'monthly',
 				isForever: false,
 				repStartDate: null,
-				repEndDate: {} as any,
+				repEndDate: {} as Dayjs,
 			})
 		).toBe(false);
 	});
