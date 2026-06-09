@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+﻿import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Clock, Info, TriangleAlert } from 'lucide-react';
@@ -587,6 +587,8 @@ const Calendar = ({
 													setShowLongDurationEvents(
 														isClosing ? null : day
 													);
+													// Collapse the other overlay
+													setShowNonViableEvents(null);
 													if (!isClosing) {
 														setSelectedEventInfo(null);
 														setSelectedEvent(null);
@@ -617,6 +619,8 @@ const Calendar = ({
 														showNonViableEvents?.isSame(day, 'day') ??
 														false;
 													setShowNonViableEvents(isClosing ? null : day);
+													// Collapse the other overlay
+													setShowLongDurationEvents(null);
 													// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
 													if (!isClosing) {
 														setSelectedEventInfo(null);
@@ -665,14 +669,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysNonViableEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -703,14 +711,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysLongDurationEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -1057,6 +1069,15 @@ const NonViableEventsContainer = styled.div<{
 	}
 
 	transition: opacity 0.2s ease-in-out;
+`;
+
+const OverlayEventItem = styled.div`
+	height: 64px;
+	min-height: 64px;
+	max-height: 64px;
+	width: 100%;
+	margin-bottom: 0.375rem;
+	overflow: hidden;
 `;
 
 const CalendarEventInfoModalContainer = styled(a.div)`
