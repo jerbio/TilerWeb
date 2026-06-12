@@ -18,7 +18,7 @@ export const darkTheme: AppTheme = {
 		},
 		// Background colors
 		background: {
-			page: palette.colors.gray[900],
+			page: palette.colors.black,
 			header: palette.colors.gray[900],
 			card: palette.colors.gray[900],
 			card2: palette.colors.gray[800],

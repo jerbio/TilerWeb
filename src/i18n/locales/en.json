@@ -1,4 +1,4 @@
-﻿{
+{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -227,11 +227,11 @@
 					"placeholder": "How many mins will it take?"
 				},
 				"location": {
-					"label": "Address",
+					"label": "Location",
 					"placeholder": "Where is this block held?"
 				},
 				"locationTag": {
-					"label": "Address Nickname",
+					"label": "Location Nickname",
 					"placeholder": "e.g. Home, Office, Gym"
 				},
 				"duration": {
@@ -288,11 +288,11 @@
 					"placeholder": "e.g. 1, 2, 3..."
 				},
 				"location": {
-					"label": "Address",
+					"label": "Tile Location",
 					"placeholder": "Where is this tile held?"
 				},
 				"locationTag": {
-					"label": "Address Nickname",
+					"label": "Location Nickname",
 					"placeholder": "e.g. Home, Office, Gym"
 				},
 				"hours": {
@@ -437,7 +437,7 @@
 	"home": {
 		"demoExplainer": {
 			"title": "See Tiler in Action",
-			"subtitle": "Try it now, no signup required. Choose a persona below to experience how Tiler turns natural conversation into a smart, adaptive schedule.",
+			"subtitle": "Try it now — no signup required. Choose a persona below to experience how Tiler turns natural conversation into a smart, adaptive schedule.",
 			"badge": "Interactive Demo"
 		},
 		"persona": {
@@ -536,7 +536,7 @@
 					"submitEmail": "Submit Email",
 					"joinWaitlist": "Join The Waitlist",
 					"submitting": "Submitting...",
-					"subtext": "Spots are limited. Save yours now.",
+					"subtext": "Spots are limited – Save yours now.",
 					"close": "Close",
 					"errors": {
 						"emailRequired": "Email is required",
@@ -628,7 +628,7 @@
 						"userRequest": "Lunch with Sarah at noon downtown",
 						"aiResponse1": "Scheduling for 12:00 PM downtown. Add 25 min travel?",
 						"userConfirm": "Yes",
-						"aiConfirm": "Done! Travel + lunch added. ?"
+						"aiConfirm": "Done! Travel + lunch added. ✓"
 					},
 					"tiles": {
 						"travel": "Travel to Downtown",
@@ -642,7 +642,7 @@
 						"userRequest": "Groceries and gym after 5 PM",
 						"aiResponse1": "I can fit both. Groceries at 5:00 PM, gym at 6:00 PM?",
 						"userConfirm": "Perfect",
-						"aiConfirm": "Scheduled! ?"
+						"aiConfirm": "Scheduled! ✓"
 					},
 					"tiles": {
 						"groceries": "Grocery Shopping",
@@ -657,7 +657,7 @@
 						"userRequest": "Meeting with John Monday 2 PM at his office",
 						"aiResponse1": "35 min drive from here. Block travel time?",
 						"userConfirm": "Yes please",
-						"aiConfirm": "Added! ?"
+						"aiConfirm": "Added! ✓"
 					},
 					"tiles": {
 						"travel": "Travel to Client Office",
@@ -671,7 +671,7 @@
 						"userRequest": "Dentist at 9 AM, then work from home",
 						"aiResponse1": "15 min return travel. Add deep work block after?",
 						"userConfirm": "Yes, 3 hours",
-						"aiConfirm": "Perfect! ?"
+						"aiConfirm": "Perfect! ✓"
 					},
 					"tiles": {
 						"dentist": "Dentist Appointment",
@@ -686,7 +686,7 @@
 						"userRequest": "Coffee with Mike at Starbucks on 5th Ave at 10 AM",
 						"aiResponse1": "18 min from your location. Leave at 9:40 AM?",
 						"userConfirm": "Sounds good",
-						"aiConfirm": "Scheduled! ?"
+						"aiConfirm": "Scheduled! ✓"
 					},
 					"tiles": {
 						"travel": "Travel to Starbucks",
@@ -700,7 +700,7 @@
 						"userRequest": "Flight at 3 PM, need to be at airport by 1 PM",
 						"aiResponse1": "45 min to airport. Leave at 12:10 PM with buffer?",
 						"userConfirm": "Yes",
-						"aiConfirm": "Travel time added! ?"
+						"aiConfirm": "Travel time added! ✓"
 					},
 					"tiles": {
 						"travel": "Travel to Airport",
@@ -715,7 +715,7 @@
 						"userRequest": "Pick up kids from school at 3:30 PM",
 						"aiResponse1": "20 min drive. Leave at 3:10 PM?",
 						"userConfirm": "Perfect",
-						"aiConfirm": "Added to calendar! ?"
+						"aiConfirm": "Added to calendar! ✓"
 					},
 					"tiles": {
 						"travel": "Travel to School",
@@ -729,7 +729,7 @@
 						"userRequest": "Doctor appointment downtown at 2:30 PM",
 						"aiResponse1": "28 min from office. Leave at 2:00 PM?",
 						"userConfirm": "Yes",
-						"aiConfirm": "Scheduled! ?"
+						"aiConfirm": "Scheduled! ✓"
 					},
 					"tiles": {
 						"travel": "Travel to Clinic",
@@ -743,7 +743,7 @@
 						"userRequest": "Haircut at salon near home at 4 PM",
 						"aiResponse1": "8 min walk. Leave at 3:50 PM?",
 						"userConfirm": "Yes",
-						"aiConfirm": "Done! ?"
+						"aiConfirm": "Done! ✓"
 					},
 					"tiles": {
 						"travel": "Walk to Salon",
@@ -757,7 +757,7 @@
 						"userRequest": "Dinner reservation at 7 PM at Italian place",
 						"aiResponse1": "32 min drive. Leave at 6:25 PM?",
 						"userConfirm": "Perfect",
-						"aiConfirm": "Added! ?"
+						"aiConfirm": "Added! ✓"
 					},
 					"tiles": {
 						"travel": "Travel to Restaurant",
@@ -812,17 +812,17 @@
 			"conversation": {
 				"subtitle": "JUST TALK TO IT",
 				"title": "Natural-Language Scheduling",
-				"description": "Tell Tiler what you need to do in plain English. The AI asks follow-up questions, proposes smart schedules, and waits for your confirmation. No drag-and-drop required."
+				"description": "Tell Tiler what you need to do in plain English. The AI asks follow-up questions, proposes smart schedules, and waits for your confirmation—no drag-and-drop required."
 			},
 			"transit": {
 				"subtitle": "OPTIMIZE YOUR DAY",
 				"title": "Smart Travel Time",
-				"description": "Tiler automatically inserts realistic travel durations between locations and adjusts your timeline when things change, so you're never late."
+				"description": "Tiler automatically inserts realistic travel durations between locations and adjusts your timeline when things change—so you're never late."
 			},
 			"adaptive": {
 				"subtitle": "STAYS IN SYNC",
 				"title": "Adaptive Intelligence",
-				"description": "When life throws a curveball, Tiler reschedules conflicting tasks and finds the next best time, automatically."
+				"description": "When life throws a curveball, Tiler reschedules conflicting tasks and finds the next best time—automatically."
 			},
 			"location": {
 				"subtitle": "PRIVACY-FIRST",
@@ -838,11 +838,11 @@
 				},
 				"differentFromCalendar": {
 					"question": "How is Tiler different from Google Calendar or other calendar apps?",
-					"answer": "Unlike static calendars, Tiler is your AI scheduling assistant. Just tell it what you need to do in plain English; it asks clarifying questions, calculates travel time between locations, and proposes a complete schedule. When life changes, Tiler adapts your timeline automatically. You confirm changes before they're made, so you stay in control."
+					"answer": "Unlike static calendars, Tiler is your AI scheduling assistant. Just tell it what you need to do in plain English—it asks clarifying questions, calculates travel time between locations, and proposes a complete schedule. When life changes, Tiler adapts your timeline automatically. You confirm changes before they're made, so you stay in control."
 				},
 				"aiAccuracy": {
 					"question": "Can I trust the AI to schedule my tasks correctly?",
-					"answer": "Tiler uses a confirmation-first approach: it proposes schedules and waits for your approval before making changes. The AI learns your patterns over time and gets smarter about durations, locations, and preferences. You can always undo or adjust any suggestion."
+					"answer": "Tiler uses a confirmation-first approach—it proposes schedules and waits for your approval before making changes. The AI learns your patterns over time and gets smarter about durations, locations, and preferences. You can always undo or adjust any suggestion."
 				},
 				"locationPrivacy": {
 					"question": "Is my location data private? How does Tiler use it?",
@@ -850,7 +850,7 @@
 				},
 				"calendarIntegration": {
 					"question": "Why do I need to integrate my calendar?",
-					"answer": "Integrating your calendar with Tiler lets you see all your tasks, events, and schedules in one place. No more juggling multiple apps or risking double bookings. Tiler automatically syncs everything and optimizes your day for maximum productivity."
+					"answer": "Integrating your calendar with Tiler lets you see all your tasks, events, and schedules in one place. No more juggling multiple apps or risking double bookings—Tiler automatically syncs everything and optimizes your day for maximum productivity."
 				},
 				"multipleCalendars": {
 					"question": "Can I integrate multiple calendars to my Tiler account?",
@@ -858,11 +858,11 @@
 				},
 				"tileVsBlock": {
 					"question": "What's the difference between a Tile and a Block?",
-					"answer": "Tiles are flexible tasks that Tiler automatically schedules and adjusts based on your availability. Blocks are fixed tasks that stay exactly where you set them, perfect for meetings or tasks that can't be moved."
+					"answer": "Tiles are flexible tasks that Tiler automatically schedules and adjusts based on your availability. Blocks are fixed tasks that stay exactly where you set them—perfect for meetings or tasks that can't be moved."
 				},
 				"tileShare": {
 					"question": "How does TileShare work?",
-					"answer": "TileShare lets you share tasks with others (friends, family, teammates) so everyone knows what needs to be done and who's handling it. Assign tasks, track progress, and sync schedules effortlessly."
+					"answer": "TileShare lets you share tasks with others—friends, family, teammates—so everyone knows what needs to be done and who's handling it. Assign tasks, track progress, and sync schedules effortlessly."
 				},
 				"missedTask": {
 					"question": "What if I miss a task or need to reschedule?",
@@ -874,7 +874,7 @@
 				},
 				"transitFeature": {
 					"question": "How can I use the Transit feature?",
-					"answer": "The transit feature goes beyond just calculating travel time: it acts as your navigation assistant. It helps you plan routes, suggests the best modes of transportation, and provides real-time directions for seamless transitions between tasks and locations. Just tap the travel icon to get instant navigation, ensuring you're always on time and on track."
+					"answer": "The transit feature goes beyond just calculating travel time — it acts as your navigation assistant. It helps you plan routes, suggests the best modes of transportation, and provides real-time directions for seamless transitions between tasks and locations. Just tap the travel icon to get instant navigation, ensuring you're always on time and on track."
 				}
 			}
 		}
@@ -1108,7 +1108,7 @@
 		"searchAriaLabel": "Search for a tile or block",
 		"clearSearch": "Clear search",
 		"loadMore": "Load more",
-		"loading": "Loading...",
+		"loading": "Loading…",
 		"notFoundMessage": "Oops, we couldn't find '{{query}}'. Would you like to create a Tile from this title?",
 		"notFoundDismiss": "No thanks",
 		"notFoundCreate": "Create",
@@ -1151,6 +1151,7 @@
 			"cancel": "Cancel"
 		},
 		"userMenu": {
+			"settings": "Settings",
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",
 			"signOutError": "Failed to sign out. Please try again.",
@@ -1185,7 +1186,6 @@
 			"occurrenceSection": "Occurrence",
 			"timeSection": "Time & Duration",
 			"repetitionSection": "Repetition",
-			"recurringToggle": "Repeat event",
 			"locationSection": "Location",
 			"colorSection": "Color",
 			"notesSection": "Notes",
@@ -1217,6 +1217,7 @@
 			"locationDescriptionPlaceholder": "Additional location details...",
 			"color": "Color",
 			"recurring": "Recurring",
+			"recurringToggle": "Repeat event",
 			"repetitionDisabled": "Disabled",
 			"selectFrequency": "Select frequency",
 			"daily": "Daily",
@@ -1519,6 +1520,30 @@
 		"verified": {
 			"label": "Verified",
 			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
+		}
+	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "Tileshare",
+			"nav": {
+				"inbox": "Inbox Link",
+				"outbox": "Outbox Link"
+			}
+		},
+		"inbox": {
+			"title": "Inbox"
+		},
+		"outbox": {
+			"title": "Outbox"
+		},
+		"tileshareDetail": {
+			"title": "Tileshare Detail"
+		},
+		"tiletteDetail": {
+			"title": "Tilette Detail"
+		},
+		"invite": {
+			"title": "Invite"
 		}
 	},
 	"tile": {
