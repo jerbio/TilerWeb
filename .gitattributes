@@ -1,7 +1,7 @@
-# Enforce CRLF line endings for all text files
+# Normalize line endings: store LF in git, checkout as CRLF
 * text=auto eol=crlf
 
-# Explicitly binary - no line ending conversion
+# Binary files - no conversion
 *.png binary
 *.jpg binary
 *.jpeg binary
