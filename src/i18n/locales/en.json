@@ -817,17 +817,17 @@
 			"transit": {
 				"subtitle": "TRAVEL + LOCATION",
 				"title": "Smart Travel & Location",
-				"description": "Tiler automatically inserts realistic travel durations between locations and keeps your schedule accurate as things change. Use privacy-first labels like \"home\" or \"work\"—Tiler calculates travel time without oversharing your personal data."
+				"description": "Tiler inserts travel time between locations automatically. Use labels like \"home\" or \"work\"—no exact address needed."
 			},
 			"adaptive": {
 				"subtitle": "PREVIEW BEFORE YOU COMMIT",
 				"title": "Tilecast",
-				"description": "Tilecast lets you see exactly how a change will ripple across your schedule before you accept it. Preview rescheduled tasks on the grid, explore alternatives, and commit only when you're happy with the result."
+				"description": "Preview how any change ripples across your schedule before committing. Explore alternatives and confirm only when it looks right."
 			},
 			"location": {
 				"subtitle": "SHARE YOUR SCHEDULE",
 				"title": "Tileshare",
-				"description": "Tileshare lets you send adaptive tiles directly to another person's schedule. The tile lands in their Tiler and fits itself around their existing commitments—no back-and-forth, no copy-pasting."
+				"description": "Send a tile directly into someone else's schedule. It fits around their commitments automatically—no back-and-forth needed."
 			}
 		},
 		"faq": {
