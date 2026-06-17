@@ -48,6 +48,7 @@ const Home: React.FC = () => {
 				structuredData={structuredData}
 			/>
 			<HeroSection />
+			<AppDownloadSection />
 			<VideoIframeSection
 				src="https://www.youtube.com/embed/87RGNntLBRY"
 				title={t('home.video.title')}
@@ -63,8 +64,9 @@ const Home: React.FC = () => {
 			<TileCardSection />
 			<CalendarIntegrationSection />
 			<FAQ />
-			<Waitlist />
-			<AppDownloadSection />
+			<div style={{ paddingBottom: '4rem' }}>
+				<Waitlist />
+			</div>
 		</>
 	);
 };
