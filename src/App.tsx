@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Discover from './pages/Discover';
 import Articles from './pages/Articles';
 import GettingStartedArticle from './pages/articles/GettingStartedArticle';
+import ArticlePage from './pages/ArticlePage';
 import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
@@ -100,6 +101,7 @@ const App: React.FC = () => {
 										path="/articles/getting-started-with-tiler"
 										element={<GettingStartedArticle />}
 									/>
+									<Route path="/articles/:slug" element={<ArticlePage />} />
 									{/* Legacy URL — keep redirect for SEO + backlinks */}
 									<Route
 										path="/get-started"
