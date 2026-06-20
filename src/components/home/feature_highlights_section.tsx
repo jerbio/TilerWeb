@@ -582,11 +582,11 @@ const FeatureHighlightsSection: React.FC = () => {
 
 	const highlights: Highlight[] = [
 		{
-			subHeader: t('home.features.conversation.subtitle'),
-			header: t('home.features.conversation.title'),
-			body: t('home.features.conversation.description'),
-			backgroundImage: TilesBackground,
-			slug: 'natural-language-scheduling',
+			subHeader: t('home.features.adaptive.subtitle'),
+			header: t('home.features.adaptive.title'),
+			body: t('home.features.adaptive.description'),
+			backgroundImage: FitnessBackground,
+			slug: 'tilecast',
 		},
 		{
 			subHeader: t('home.features.transit.subtitle'),
@@ -596,11 +596,11 @@ const FeatureHighlightsSection: React.FC = () => {
 			slug: 'smart-travel-and-location',
 		},
 		{
-			subHeader: t('home.features.adaptive.subtitle'),
-			header: t('home.features.adaptive.title'),
-			body: t('home.features.adaptive.description'),
-			backgroundImage: FitnessBackground,
-			slug: 'tilecast',
+			subHeader: t('home.features.conversation.subtitle'),
+			header: t('home.features.conversation.title'),
+			body: t('home.features.conversation.description'),
+			backgroundImage: TilesBackground,
+			slug: 'natural-language-scheduling',
 		},
 		{
 			subHeader: t('home.features.location.subtitle'),
