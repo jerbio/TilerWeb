@@ -55,10 +55,7 @@ export type OverlayAction =
 
 // ── Reducer ────────────────────────────────────────────────────
 
-export function overlayReducer(
-	state: OverlayState,
-	action: OverlayAction,
-): OverlayState {
+export function overlayReducer(state: OverlayState, action: OverlayAction): OverlayState {
 	switch (action.type) {
 		// ── Grid interactions ──────────────────────────────────
 
@@ -100,8 +97,7 @@ export function overlayReducer(
 		// ── Non-viable toggle button ─────────────────────────
 
 		case OverlayActionType.TOGGLE_NON_VIABLE_OVERLAY: {
-			const isClosing =
-				state.nonViableDay !== null && state.nonViableDay === action.day;
+			const isClosing = state.nonViableDay !== null && state.nonViableDay === action.day;
 
 			if (isClosing) {
 				// Closing — keep event info as-is

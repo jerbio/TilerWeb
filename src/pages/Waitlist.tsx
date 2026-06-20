@@ -15,12 +15,13 @@ const Waitlist: React.FC = () => {
 		'@context': 'https://schema.org',
 		'@type': 'WebPage',
 		name: 'Join Tiler Waitlist - Early Access to Smart Calendar',
-		description: 'Join the Tiler waitlist and be among the first to experience intelligent calendar and task management.',
+		description:
+			'Join the Tiler waitlist and be among the first to experience intelligent calendar and task management.',
 		url: 'https://tiler.app/waitlist',
 	};
 
-  return (
-    <>
+	return (
+		<>
 			<SEO
 				title="Waitlist - Join Tiler Early Access"
 				description="Join the Tiler waitlist and be among the first to experience intelligent calendar and task management. Get early access to smart scheduling features."
@@ -28,26 +29,24 @@ const Waitlist: React.FC = () => {
 				canonicalUrl="/waitlist"
 				structuredData={structuredData}
 			/>
-      <Section paddingBlock={128}>
-        <WaitlistContainer>
-          <Logo size={48} />
-          <WaitlistContent>
-            <WaitlistTitle>
+			<Section paddingBlock={128}>
+				<WaitlistContainer>
+					<Logo size={48} />
+					<WaitlistContent>
+						<WaitlistTitle>
 							{t('waitlist.title.part1')} <span>{t('waitlist.title.part2')}</span>
-              <br /> {t('waitlist.title.part3')}.
-            </WaitlistTitle>
-            <WaitlistSubtitle>
-							{t('waitlist.subtitle')}
-            </WaitlistSubtitle>
-          </WaitlistContent>
-		  <WBGraphicContainer>
-            <img src={WAITLIST_BG_IMAGE} alt="Background" width={602} height={548} />
-          </WBGraphicContainer>
-          <WaitlistForm />
-        </WaitlistContainer>
-      </Section>
-    </>
-  );
+							<br /> {t('waitlist.title.part3')}.
+						</WaitlistTitle>
+						<WaitlistSubtitle>{t('waitlist.subtitle')}</WaitlistSubtitle>
+					</WaitlistContent>
+					<WBGraphicContainer>
+						<img src={WAITLIST_BG_IMAGE} alt="Background" width={602} height={548} />
+					</WBGraphicContainer>
+					<WaitlistForm />
+				</WaitlistContainer>
+			</Section>
+		</>
+	);
 };
 
 const WaitlistTitle = styled.h1`

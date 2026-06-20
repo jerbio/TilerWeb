@@ -37,29 +37,29 @@ const DownloadLinkLabel = styled.span`
 `;
 
 const AppDownloadSection: React.FC = () => {
-  const { t } = useTranslation();
+	const { t } = useTranslation();
 
-  return (
-    <Section paddingBlock={36}>
-      <FlexWrapper>
-        {apps.map((app) => (
-          <DownloadLink
-            key={app.i18Platform}
-            href={app.link}
-            title={t(app.i18Platform)}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <img src={app.icons.logo} alt={t(app.i18CTA)} width={56} height={56} />
-            <DownloadLinkLabel>
-              <span>{t(app.i18CTA)}</span>
-              <ArrowOut size={12} />
-            </DownloadLinkLabel>
-          </DownloadLink>
-        ))}
-      </FlexWrapper>
-    </Section>
-  );
+	return (
+		<Section paddingBlock={36}>
+			<FlexWrapper>
+				{apps.map((app) => (
+					<DownloadLink
+						key={app.i18Platform}
+						href={app.link}
+						title={t(app.i18Platform)}
+						rel="noopener noreferrer"
+						target="_blank"
+					>
+						<img src={app.icons.logo} alt={t(app.i18CTA)} width={56} height={56} />
+						<DownloadLinkLabel>
+							<span>{t(app.i18CTA)}</span>
+							<ArrowOut size={12} />
+						</DownloadLinkLabel>
+					</DownloadLink>
+				))}
+			</FlexWrapper>
+		</Section>
+	);
 };
 
 export default AppDownloadSection;

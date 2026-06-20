@@ -1,4 +1,5 @@
 import { ApiCodeResponse } from '@/core/common/types/api';
+import { ScheduleProfileResponse, UpdateScheduleProfileParams } from '@/core/common/types/schedule';
 import { AppApi } from './appApi';
 
 export interface UserResponse {
@@ -12,14 +13,14 @@ export interface UserResponse {
 			username: string;
 			timeZoneDifference: number;
 			timeZone: string;
-			email: string;
-			endOfDay: string;
-			phoneNumber: string;
+			email: string | null;
+			endOfDay: string | null;
+			phoneNumber: string | null;
 			fullName: string;
 			firstName: string;
 			lastName: string;
 			countryCode: string | null;
-			dateOfBirth: string;
+			dateOfBirth: string | null;
 		};
 	};
 	ServerStatus: null;
@@ -129,6 +130,9 @@ export interface UpdateSettingsRequest {
 		SleepDuration: number;
 		EndTimeOfDay: string;
 	}>;
+	DesktopUiScheme?: Partial<{
+		ThemeMode: string;
+	}>;
 }
 
 export interface UpdateSettingsResponse {
@@ -163,6 +167,19 @@ export class UserApi extends AppApi {
 		return this.apiRequest<UpdateSettingsResponse>('api/User/Settings', {
 			method: 'POST',
 			body: JSON.stringify(settings),
+		});
+	}
+
+	public getScheduleProfile() {
+		return this.apiRequest<ScheduleProfileResponse>('api/User/ScheduleProfile?version=v2', {
+			method: 'GET',
+		});
+	}
+
+	public updateScheduleProfile(params: UpdateScheduleProfileParams) {
+		return this.apiRequest<ScheduleProfileResponse>('api/User/ScheduleProfile', {
+			method: 'POST',
+			body: JSON.stringify(params),
 		});
 	}
 

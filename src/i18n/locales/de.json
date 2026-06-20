@@ -1,5 +1,5 @@
-{
-		"common": {
+﻿{
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "Überspringen",
@@ -43,9 +43,8 @@
 		},
 		"navigation": {
 			"home": "Startseite",
-			"features": "Funktionen",
 			"waitlist": "Warteliste",
-			"newsletter": "Discover"
+			"discover": "Funktionen"
 		},
 		"voiceInput": {
 			"listening": "Hören...",
@@ -496,16 +495,46 @@
 					"label": "Welche Integrationen verwenden Sie?",
 					"placeholder": "z.B. Google Kalender, Outlook, Apple Kalender",
 					"options": [
-						{ "value": "google", "label": "Google Kalender" },
-						{ "value": "outlook", "label": "Microsoft Outlook Kalender" },
-						{ "value": "apple", "label": "Apple Kalender" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google Kalender"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook Kalender"
+						},
+						{
+							"value": "apple",
+							"label": "Apple Kalender"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {
@@ -517,8 +546,229 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Nach einer Kachel/Block suchen...",
+		"searchAriaLabel": "Nach einer Kachel oder einem Block suchen",
+		"clearSearch": "Suche löschen",
+		"loadMore": "Mehr laden",
+		"loading": "Laden…",
+		"notFoundMessage": "Hoppla, wir konnten '{{query}}' nicht finden. Möchten Sie eine Kachel mit diesem Titel erstellen?",
+		"notFoundDismiss": "Nein danke",
+		"notFoundCreate": "Erstellen",
+		"setAsNow": "Jetzt setzen",
+		"markComplete": "Abschließen",
+		"markDeleted": "Löschen",
+		"confirmCompleteTitle": "Dieses Ereignis abschließen?",
+		"confirmDeleteTitle": "Dieses Ereignis löschen?",
+		"confirmAction": "Bestätigen",
+		"cancelAction": "Abbrechen",
+		"shuffle": {
+			"tooltip": "Zeitplan mischen",
+			"ariaLabel": "Zeitplan mischen",
+			"shuffling": "Zeitplan wird gemischt...",
+			"success": "Zeitplan gemischt!",
+			"error": "Mischen fehlgeschlagen. Bitte erneut versuchen."
+		},
+		"revise": {
+			"tooltip": "Zeitplan überarbeiten",
+			"ariaLabel": "Zeitplan überarbeiten",
+			"revising": "Zeitplan wird überarbeitet...",
+			"success": "Zeitplan überarbeitet!",
+			"error": "Überarbeitung fehlgeschlagen. Bitte erneut versuchen."
+		},
+		"procrastinateAll": {
+			"tooltip": "Alle Ereignisse verschieben",
+			"ariaLabel": "Alle Ereignisse verschieben",
+			"deferring": "Alle Ereignisse werden verschoben...",
+			"success": "Alle Ereignisse verschoben!",
+			"error": "Verschieben fehlgeschlagen. Bitte erneut versuchen.",
+			"pickerTitle": "Verschiebungsdauer",
+			"days": "Tage",
+			"hours": "Stunden",
+			"minutes": "Minuten",
+			"daysShort": "Tag",
+			"hoursShort": "Std",
+			"minutesShort": "Min",
+			"confirm": "Bestätigen",
+			"cancel": "Abbrechen"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Chat-Limit erreicht. Bitte versuchen Sie es später erneut.",
 		"usernameAlreadyExists": "Benutzername existiert bereits"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Wird als aktuell festgelegt...",
+			"setAsNowSuccess": "Ereignis als aktuell festgelegt!",
+			"completing": "Ereignis wird abgeschlossen...",
+			"completeSuccess": "Ereignis abgeschlossen!",
+			"deferring": "Ereignis wird verschoben...",
+			"deferSuccess": "Ereignis verschoben!",
+			"updating": "Änderungen werden gespeichert...",
+			"updateSuccess": "Änderungen gespeichert!",
+			"deleting": "Ereignis wird gelöscht...",
+			"deleteSuccess": "Ereignis gelöscht!",
+			"actionFailed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+		},
+		"edit": {
+			"title": "Bearbeiten",
+			"titleBlock": "Block bearbeiten",
+			"titleTile": "Kachel bearbeiten",
+			"nameSection": "Name",
+			"occurrenceSection": "Vorkommen",
+			"timeSection": "Zeit und Dauer",
+			"recurringToggle": "Ereignis wiederholen",
+			"repetitionSection": "Wiederholung",
+			"locationSection": "Standort",
+			"colorSection": "Farbe",
+			"notesSection": "Notizen",
+			"name": "Name",
+			"start": "Start",
+			"end": "Ende",
+			"selectDate": "Datum auswählen",
+			"duration": "Dauer",
+			"hours": "Std",
+			"minutes": "Min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Anzahl der Teilungen",
+			"splitPlaceholder": "z.B. 3",
+			"location": "Adresse",
+			"locationDescription": "Beschreibung",
+			"locationDescriptionPlaceholder": "Zusätzliche Standortdetails...",
+			"color": "Farbe",
+			"recurring": "Wiederkehrend",
+			"repetitionDisabled": "Deaktiviert",
+			"selectFrequency": "Häufigkeit auswählen",
+			"daily": "Täglich",
+			"weekly": "Wöchentlich",
+			"monthly": "Monatlich",
+			"yearly": "Jährlich",
+			"forever": "Für immer wiederholen",
+			"repetitionStart": "Wiederholungsbeginn",
+			"repetitionEnd": "Wiederholungsende",
+			"sun": "So",
+			"mon": "Mo",
+			"tue": "Di",
+			"wed": "Mi",
+			"thu": "Do",
+			"fri": "Fr",
+			"sat": "Sa",
+			"save": "Speichern",
+			"saving": "Änderungen werden gespeichert...",
+			"saveSuccess": "Ereignis aktualisiert!",
+			"saveFailed": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
+			"back": "Zurück",
+			"loading": "Details werden geladen...",
+			"loadingBlock": "Blockdetails werden geladen...",
+			"loadingTile": "Kacheldetails werden geladen...",
+			"clearLocation": "Standort löschen",
+			"copyAddressOnly": "Nur Adresse übernehmen",
+			"locationMinChars": "Geben Sie mindestens 3 Zeichen ein, um zu suchen",
+			"locationSearchPlaceholder": "Standort suchen...",
+			"savedLocations": "Gespeicherte Standorte",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Bereitgestellt von Google",
+			"noLocationResults": "Keine Standorte gefunden"
+		}
+	},
+	"settings": {
+		"title": "Einstellungen",
+		"back": "Zurück",
+		"logout": "Abmelden",
+		"breadcrumb": {
+			"home": "Startseite",
+			"settings": "Einstellungen"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "Kontoinformationen",
+				"description": "Überprüfen Sie Ihr Konto und ändern Sie Ihre persönlichen Daten",
+				"fields": {
+					"fullName": "Vollständiger Name",
+					"username": "Benutzername",
+					"email": "E-Mail-Adresse",
+					"phoneNumber": "Telefonnummer",
+					"phoneNumberPlaceholder": "Telefonnummer hinzufügen",
+					"countryCode": "Landesvorwahl",
+					"countryCodeSearch": "Länder suchen...",
+					"countryCodeNoResults": "Keine Länder gefunden",
+					"dateOfBirth": "Geburtsdatum",
+					"dateOfBirthPlaceholder": "TT.MM.JJJJ"
+				},
+				"saveChanges": "Änderungen speichern",
+				"saving": "Speichern...",
+				"deleteAccount": "Mein Konto löschen",
+				"saveSuccess": "Kontoinformationen erfolgreich aktualisiert",
+				"saveError": "Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+				"deleteNotImplemented": "Konto-Löschfunktion kommt bald"
+			},
+			"tilePreferences": {
+				"title": "Kachel-Einstellungen",
+				"description": "Definieren Sie, wie Sie sich fortbewegen, und helfen Sie Tiler, Ihre täglichen Zeitmuster zu verstehen",
+				"howMoveAround": "Wie bewegen Sie sich fort?",
+				"cycling": "Radfahren",
+				"driving": "Autofahren",
+				"transit": "ÖPNV",
+				"defineTimeRestrictions": "Definieren Sie Ihre Zeitbeschränkungen",
+				"myWorkHours": "Meine Arbeitszeiten",
+				"myPersonalHours": "Meine persönlichen Stunden",
+				"setBlockOutHours": "Blockzeiten festlegen",
+				"bedTime": "Schlafenszeit",
+				"startsAt": "Beginnt um",
+				"endsAt": "Endet um",
+				"saveChanges": "Änderungen speichern",
+				"saving": "Speichern...",
+				"saveSuccess": "Kachel-Einstellungen erfolgreich aktualisiert",
+				"saveError": "Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+				"bedTimeStartRequired": "Bitte wählen Sie eine Schlafenszeit-Startzeit",
+				"bedTimeEndRequired": "Bitte wählen Sie eine Schlafenszeit-Endzeit",
+				"scheduleIncompleteDay": "{{label}}: Bitte legen Sie Start- und Endzeiten für {{day}} fest",
+				"dayLabels": {
+					"sun": "S",
+					"mon": "M",
+					"tue": "D",
+					"wed": "M",
+					"thu": "D",
+					"fri": "F",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Sonntag",
+					"mon": "Montag",
+					"tue": "Dienstag",
+					"wed": "Mittwoch",
+					"thu": "Donnerstag",
+					"fri": "Freitag",
+					"sat": "Samstag"
+				},
+				"start": "Start",
+				"end": "Ende",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
+			}
+		}
+	},
+	"feedback": {
+		"menuItem": "Feedback senden",
+		"title": "Feedback senden",
+		"category": "Kategorie",
+		"categories": {
+			"Bug": "Fehler",
+			"Feature Request": "Funktionsanfrage",
+			"Improvement": "Verbesserung",
+			"Other": "Sonstiges"
+		},
+		"titleLabel": "Titel",
+		"titlePlaceholder": "Kurze Zusammenfassung Ihres Feedbacks",
+		"descriptionLabel": "Beschreibung",
+		"descriptionPlaceholder": "Erzählen Sie uns mehr über Ihr Feedback...",
+		"submit": "Absenden",
+		"submitting": "Wird gesendet...",
+		"submitSuccess": "Vielen Dank für Ihr Feedback!",
+		"submitError": "Feedback konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
 	}
 }

@@ -2,10 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
 import CalendarUtil from './calendar';
 import { CalendarViewOptions } from '@/core/common/components/calendar/calendar.types';
-import {
-	ScheduleSubCalendarEvent,
-	ScheduleLookupTravelDetail,
-} from '@/core/common/types/schedule';
+import { SubCalendarEvent, ScheduleLookupTravelDetail } from '@/core/common/types/schedule';
 
 // Mock calendar config
 vi.mock('@/core/constants/calendar_config', () => ({
@@ -197,7 +194,7 @@ describe('CalendarUtil', () => {
 		it('returns Google Maps search URL when location has address', () => {
 			const event = {
 				location: { address: '123 Main St, City' },
-			} as ScheduleSubCalendarEvent;
+			} as SubCalendarEvent;
 
 			expect(CalendarUtil.getEventLocationLink(event)).toBe(
 				'https://www.google.com/maps/search/?api=1&query=123%20Main%20St%2C%20City'
@@ -205,7 +202,7 @@ describe('CalendarUtil', () => {
 		});
 
 		it('returns "#" when location is missing', () => {
-			const event = {} as ScheduleSubCalendarEvent;
+			const event = {} as SubCalendarEvent;
 
 			expect(CalendarUtil.getEventLocationLink(event)).toBe('#');
 		});
@@ -213,7 +210,7 @@ describe('CalendarUtil', () => {
 		it('returns "#" when location object exists but address is falsy', () => {
 			const event = {
 				location: { address: '' },
-			} as unknown as ScheduleSubCalendarEvent;
+			} as unknown as SubCalendarEvent;
 
 			expect(CalendarUtil.getEventLocationLink(event)).toBe('#');
 		});
@@ -221,7 +218,7 @@ describe('CalendarUtil', () => {
 		it('properly encodes special characters in address', () => {
 			const event = {
 				location: { address: 'Café & Restaurant, 5th Ave #200' },
-			} as ScheduleSubCalendarEvent;
+			} as SubCalendarEvent;
 
 			const result = CalendarUtil.getEventLocationLink(event);
 			expect(result).toContain(encodeURIComponent('Café & Restaurant, 5th Ave #200'));
@@ -230,7 +227,7 @@ describe('CalendarUtil', () => {
 		it('encodes unicode characters correctly', () => {
 			const event = {
 				location: { address: '東京都渋谷区' },
-			} as ScheduleSubCalendarEvent;
+			} as SubCalendarEvent;
 
 			const result = CalendarUtil.getEventLocationLink(event);
 			expect(result).toContain(encodeURIComponent('東京都渋谷区'));

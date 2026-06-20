@@ -43,7 +43,7 @@ const SpotlightRectangle = styled.div<{ $x: number; $y: number; $width: number; 
 	height: ${({ $height }) => $height}px;
 	border-radius: ${palette.borderRadius.medium};
 	border: 3px solid ${palette.colors.brand[400]};
-	box-shadow: 
+	box-shadow:
 		0 0 0 4px ${palette.colors.brand[400]}40,
 		0 0 0 8px ${palette.colors.brand[400]}20,
 		0 0 40px ${palette.colors.brand[400]}60,
@@ -53,7 +53,11 @@ const SpotlightRectangle = styled.div<{ $x: number; $y: number; $width: number; 
 	z-index: 10002;
 `;
 
-const TooltipCard = styled.div<{ $x: number; $y: number; $position: 'top' | 'bottom' | 'left' | 'right' }>`
+const TooltipCard = styled.div<{
+	$x: number;
+	$y: number;
+	$position: 'top' | 'bottom' | 'left' | 'right';
+}>`
 	position: fixed;
 	left: ${({ $x }) => $x}px;
 	top: ${({ $y }) => $y}px;
@@ -62,7 +66,7 @@ const TooltipCard = styled.div<{ $x: number; $y: number; $position: 'top' | 'bot
 	border: 1px solid ${palette.colors.brand[500]}60;
 	border-radius: ${palette.borderRadius.xLarge};
 	padding: 1.25rem;
-	box-shadow: 
+	box-shadow:
 		0 0 0 1px ${palette.colors.brand[400]}20,
 		0 10px 40px rgba(0, 0, 0, 0.6);
 	animation: ${fadeIn} 0.3s ease-out;
@@ -80,7 +84,7 @@ const TooltipCard = styled.div<{ $x: number; $y: number; $position: 'top' | 'bot
 		width: 0;
 		height: 0;
 		border: 8px solid transparent;
-		
+
 		${({ $position }) => {
 			switch ($position) {
 				case 'top':
@@ -210,9 +214,10 @@ const StepDot = styled.div<{ $active: boolean }>`
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background: ${({ $active }) => ($active ? palette.colors.brand[500] : palette.colors.gray[700])};
+	background: ${({ $active }) =>
+		$active ? palette.colors.brand[500] : palette.colors.gray[700]};
 	transition: all 0.3s ease;
-	
+
 	${({ $active }) =>
 		$active &&
 		`
@@ -266,7 +271,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 	// Define step configurations based on viewport
 	const stepConfigs = useMemo((): StepConfig[] => {
 		const isMobile = window.innerWidth < 768;
-		
+
 		// Mobile-specific steps
 		if (isMobile) {
 			return [
@@ -309,7 +314,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 				},
 			];
 		}
-		
+
 		// Desktop steps
 		return [
 			{
@@ -348,8 +353,8 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 	// Filter out optional steps whose elements don't exist
 	const availableSteps = useMemo(() => {
 		if (!isReady) return stepConfigs;
-		
-		return stepConfigs.filter(config => {
+
+		return stepConfigs.filter((config) => {
 			if (!config.optional) return true;
 			const element = document.querySelector(config.targetSelector);
 			return !!element;
@@ -367,7 +372,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 		if (!element) return null;
 
 		const rect = element.getBoundingClientRect();
-		
+
 		// Tooltip dimensions (estimate based on max-width and padding)
 		const isMobile = window.innerWidth < 768;
 		const tooltipWidth = isMobile ? 280 : 320;
@@ -379,8 +384,8 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 		const spotlightPadding = 8; // Extra padding around element
 		const spotlightX = rect.left - spotlightPadding;
 		const spotlightY = rect.top - spotlightPadding;
-		const spotlightWidth = rect.width + (spotlightPadding * 2);
-		const spotlightHeight = rect.height + (spotlightPadding * 2);
+		const spotlightWidth = rect.width + spotlightPadding * 2;
+		const spotlightHeight = rect.height + spotlightPadding * 2;
 
 		// Viewport bounds
 		const viewportWidth = window.innerWidth;
@@ -388,69 +393,81 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 
 		// Helper function to check if two rectangles overlap
 		const rectanglesOverlap = (
-			x1: number, y1: number, w1: number, h1: number,
-			x2: number, y2: number, w2: number, h2: number
+			x1: number,
+			y1: number,
+			w1: number,
+			h1: number,
+			x2: number,
+			y2: number,
+			w2: number,
+			h2: number
 		): boolean => {
 			return !(x1 + w1 < x2 || x2 + w2 < x1 || y1 + h1 < y2 || y2 + h2 < y1);
 		};
 
 		// Helper function to check if tooltip is within viewport
 		const isWithinViewport = (x: number, y: number): boolean => {
-			return x >= padding && 
-				   y >= padding && 
-				   x + tooltipWidth <= viewportWidth - padding && 
-				   y + tooltipHeight <= viewportHeight - padding;
+			return (
+				x >= padding &&
+				y >= padding &&
+				x + tooltipWidth <= viewportWidth - padding &&
+				y + tooltipHeight <= viewportHeight - padding
+			);
 		};
 
 		// Define 8 positions around the spotlight (in priority order)
-		const positions: Array<{ x: number; y: number; position: 'top' | 'bottom' | 'left' | 'right' }> = [
+		const positions: Array<{
+			x: number;
+			y: number;
+			position: 'top' | 'bottom' | 'left' | 'right';
+		}> = [
 			// Top middle
 			{
-				x: spotlightX + (spotlightWidth / 2) - (tooltipWidth / 2),
+				x: spotlightX + spotlightWidth / 2 - tooltipWidth / 2,
 				y: spotlightY - tooltipHeight - gap,
-				position: 'top'
+				position: 'top',
 			},
 			// Bottom middle
 			{
-				x: spotlightX + (spotlightWidth / 2) - (tooltipWidth / 2),
+				x: spotlightX + spotlightWidth / 2 - tooltipWidth / 2,
 				y: spotlightY + spotlightHeight + gap,
-				position: 'bottom'
+				position: 'bottom',
 			},
 			// Right middle
 			{
 				x: spotlightX + spotlightWidth + gap,
-				y: spotlightY + (spotlightHeight / 2) - (tooltipHeight / 2),
-				position: 'right'
+				y: spotlightY + spotlightHeight / 2 - tooltipHeight / 2,
+				position: 'right',
 			},
 			// Left middle
 			{
 				x: spotlightX - tooltipWidth - gap,
-				y: spotlightY + (spotlightHeight / 2) - (tooltipHeight / 2),
-				position: 'left'
+				y: spotlightY + spotlightHeight / 2 - tooltipHeight / 2,
+				position: 'left',
 			},
 			// Top right
 			{
 				x: spotlightX + spotlightWidth + gap,
 				y: spotlightY - tooltipHeight - gap,
-				position: 'top'
+				position: 'top',
 			},
 			// Top left
 			{
 				x: spotlightX - tooltipWidth - gap,
 				y: spotlightY - tooltipHeight - gap,
-				position: 'top'
+				position: 'top',
 			},
 			// Bottom right
 			{
 				x: spotlightX + spotlightWidth + gap,
 				y: spotlightY + spotlightHeight + gap,
-				position: 'bottom'
+				position: 'bottom',
 			},
 			// Bottom left
 			{
 				x: spotlightX - tooltipWidth - gap,
 				y: spotlightY + spotlightHeight + gap,
-				position: 'bottom'
+				position: 'bottom',
 			},
 		];
 
@@ -462,8 +479,14 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 
 		for (const pos of positions) {
 			const noOverlap = !rectanglesOverlap(
-				pos.x, pos.y, tooltipWidth, tooltipHeight,
-				spotlightX, spotlightY, spotlightWidth, spotlightHeight
+				pos.x,
+				pos.y,
+				tooltipWidth,
+				tooltipHeight,
+				spotlightX,
+				spotlightY,
+				spotlightWidth,
+				spotlightHeight
 			);
 			const inViewport = isWithinViewport(pos.x, pos.y);
 
@@ -478,13 +501,19 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 
 		// If no valid position found, center tooltip on screen
 		if (!foundValidPosition) {
-			tooltipX = (viewportWidth / 2) - (tooltipWidth / 2);
-			tooltipY = (viewportHeight / 2) - (tooltipHeight / 2);
+			tooltipX = viewportWidth / 2 - tooltipWidth / 2;
+			tooltipY = viewportHeight / 2 - tooltipHeight / 2;
 			tooltipPosition = 'bottom'; // Default arrow position
-			
+
 			// Ensure centered position is still within viewport
-			tooltipX = Math.max(padding, Math.min(tooltipX, viewportWidth - tooltipWidth - padding));
-			tooltipY = Math.max(padding, Math.min(tooltipY, viewportHeight - tooltipHeight - padding));
+			tooltipX = Math.max(
+				padding,
+				Math.min(tooltipX, viewportWidth - tooltipWidth - padding)
+			);
+			tooltipY = Math.max(
+				padding,
+				Math.min(tooltipY, viewportHeight - tooltipHeight - padding)
+			);
 		}
 
 		return {
@@ -516,7 +545,8 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 			const mobileChatInput = document.querySelector('[data-onboarding-mobile-chat-input]');
 			const calendarView = document.querySelector('[data-onboarding-calendar-view]');
 			const calendarEventsContainer = document.querySelector('#calendar-events-container');
-			const hasCalendarEvents = calendarEventsContainer && calendarEventsContainer.children.length > 0;
+			const hasCalendarEvents =
+				calendarEventsContainer && calendarEventsContainer.children.length > 0;
 
 			// For mobile, we need mobileChatInput first (before opening chat)
 			// For desktop, we need chatInput (it's always visible)
@@ -540,11 +570,11 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 
 		// Listen for resize, scroll, and demo data events
 		const handleResize = () => {
-			setForceUpdate(prev => prev + 1);
+			setForceUpdate((prev) => prev + 1);
 		};
 
 		const handleScroll = () => {
-			setForceUpdate(prev => prev + 1);
+			setForceUpdate((prev) => prev + 1);
 		};
 
 		const handleDemoDataEvent = () => {
@@ -562,7 +592,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 
 		if (calendarEventsContainer) {
 			observer = new MutationObserver((mutations) => {
-				const hasAddedNodes = mutations.some(m => m.addedNodes.length > 0);
+				const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
 				if (hasAddedNodes) {
 					retryCount = 0;
 					setTimeout(checkReady, 100);
@@ -576,7 +606,10 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 			clearTimeout(initialTimer);
 			window.removeEventListener('resize', handleResize);
 			window.removeEventListener('scroll', handleScroll, true);
-			window.removeEventListener(ONBOARDING_DEMO_DATA_EVENT, handleDemoDataEvent as EventListener);
+			window.removeEventListener(
+				ONBOARDING_DEMO_DATA_EVENT,
+				handleDemoDataEvent as EventListener
+			);
 			if (observer) observer.disconnect();
 		};
 	}, [isVisible]);
@@ -584,7 +617,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 	const handleNext = () => {
 		const isMobile = window.innerWidth < 768;
 		const nextStepConfig = availableSteps[currentStep + 1];
-		
+
 		// If on mobile and we're on the mobile-open-chat step, trigger the mobile chat to open
 		if (isMobile && currentStepConfig.id === 'mobile-open-chat') {
 			// Dispatch event to open mobile chat
@@ -595,7 +628,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 			}, 300);
 			return;
 		}
-		
+
 		// If on mobile and moving to calendar step, close the chat view first
 		if (isMobile && nextStepConfig && nextStepConfig.id === 'calendar') {
 			// Dispatch event to close mobile chat
@@ -606,7 +639,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 			}, 300);
 			return;
 		}
-		
+
 		if (currentStep < availableSteps.length - 1) {
 			setCurrentStep(currentStep + 1);
 		} else {
@@ -650,20 +683,24 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ isVisible, onComplete
 				<CloseButton onClick={handleSkipAll} aria-label="Close guide">
 					<X size={20} />
 				</CloseButton>
-				
+
 				<StepIndicator>
 					{availableSteps.map((_, index) => (
 						<StepDot key={index} $active={index === currentStep} />
 					))}
 				</StepIndicator>
 
-				<TooltipTitle>{t(`common.onboarding.guide.steps.${currentStepConfig.id}.title`)}</TooltipTitle>
+				<TooltipTitle>
+					{t(`common.onboarding.guide.steps.${currentStepConfig.id}.title`)}
+				</TooltipTitle>
 				<TooltipDescription>
 					{t(`common.onboarding.guide.steps.${currentStepConfig.id}.description`)}
 				</TooltipDescription>
 
 				<ButtonGroup>
-					<SkipButton onClick={handleSkipAll}>{t('common.onboarding.guide.skip')}</SkipButton>
+					<SkipButton onClick={handleSkipAll}>
+						{t('common.onboarding.guide.skip')}
+					</SkipButton>
 					<NavButtons>
 						{currentStep > 0 && (
 							<NavButton onClick={handlePrev}>
@@ -706,13 +743,13 @@ export const useOnboardingGuide = () => {
 	// Start onboarding demo - injects demo data and triggers onboarding
 	const startOnboardingDemo = async () => {
 		const { activateOnboardingDemo } = await import('@/config/demo_config');
-		
+
 		// Activate demo mode temporarily
 		activateOnboardingDemo('current-persona');
-		
+
 		// Reset and show onboarding
 		localStorage.removeItem(LOCALSTORAGE_KEY);
-		await new Promise(resolve => setTimeout(resolve, 1000));
+		await new Promise((resolve) => setTimeout(resolve, 1000));
 		setShouldShow(true);
 	};
 

@@ -2,9 +2,9 @@ export type RGB = { r: number; g: number; b: number };
 export type HSL = { h: number; s: number; l: number };
 
 export class RGBColor {
-	r: number;
-	g: number;
-	b: number;
+	declare r: number;
+	declare g: number;
+	declare b: number;
 
 	constructor(rgb: RGB) {
 		this.r = rgb.r;
@@ -22,6 +22,10 @@ export class RGBColor {
 		const rgb = hslToRgb(hsl);
 		return new RGBColor(rgb);
 	}
+
+	equals(other: RGBColor): boolean {
+		return this.r === other.r && this.g === other.g && this.b === other.b;
+	}
 }
 
 function rgbToHex({ r, g, b }: RGB): string {
@@ -29,8 +33,9 @@ function rgbToHex({ r, g, b }: RGB): string {
 }
 
 function rgbToHsl({ r, g, b }: RGB): HSL {
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	((r /= 255), (g /= 255), (b /= 255));
+	r /= 255;
+	g /= 255;
+	b /= 255;
 	const vmax = Math.max(r, g, b),
 		vmin = Math.min(r, g, b);
 	let h = (vmax + vmin) / 2;

@@ -1,5 +1,5 @@
-import { WaitlistApi } from "@/api/waitlistApi";
-import { normalizeError } from "@/core/error";
+import { WaitlistApi } from '@/api/waitlistApi';
+import { normalizeError } from '@/core/error';
 
 export class WaitlistService {
 	private waitlistApi: WaitlistApi;
@@ -12,9 +12,8 @@ export class WaitlistService {
 			const response = await this.waitlistApi.joinWaitlist(email);
 			return response;
 		} catch (error) {
-			console.error("Error joining waitlist", error);
+			console.error('Error joining waitlist', error);
 			throw normalizeError(error);
 		}
 	}
 }
-

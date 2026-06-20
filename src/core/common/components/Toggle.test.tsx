@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
-import Toggle from './Toggle';
+import Toggle from '@/core/common/components/Toggle';
 
 // Helper to render component with ThemeProvider
 const renderWithTheme = (ui: React.ReactElement) => {
@@ -93,7 +93,9 @@ describe('Toggle', () => {
 	describe('Disabled State', () => {
 		it('should not call onChange when disabled', () => {
 			const onChange = vi.fn();
-			renderWithTheme(<Toggle label="Test Label" isOn={false} onChange={onChange} disabled />);
+			renderWithTheme(
+				<Toggle label="Test Label" isOn={false} onChange={onChange} disabled />
+			);
 
 			const toggleSwitch = screen.getByRole('button');
 			fireEvent.click(toggleSwitch);
@@ -103,7 +105,9 @@ describe('Toggle', () => {
 
 		it('should have reduced opacity when disabled', () => {
 			const onChange = vi.fn();
-			renderWithTheme(<Toggle label="Test Label" isOn={false} onChange={onChange} disabled />);
+			renderWithTheme(
+				<Toggle label="Test Label" isOn={false} onChange={onChange} disabled />
+			);
 
 			const toggleSwitch = screen.getByRole('button');
 			expect(toggleSwitch).toHaveStyle({ opacity: '0.5' });
@@ -111,7 +115,9 @@ describe('Toggle', () => {
 
 		it('should have not-allowed cursor when disabled', () => {
 			const onChange = vi.fn();
-			renderWithTheme(<Toggle label="Test Label" isOn={false} onChange={onChange} disabled />);
+			renderWithTheme(
+				<Toggle label="Test Label" isOn={false} onChange={onChange} disabled />
+			);
 
 			const toggleSwitch = screen.getByRole('button');
 			expect(toggleSwitch).toHaveStyle({ cursor: 'not-allowed' });

@@ -10,18 +10,30 @@ import palette from '@/core/theme/palette';
 import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import calendarConfig from '@/core/constants/calendar_config';
-import { ScheduleLookupTravelDetail, ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { computeStaggerLayout } from './layout/event_layout';
+import { LayoutEvent } from './layout/event_layout.types';
+import {
+	getStaggerIncrement,
+	getMinEventHeight,
+	MAX_STAGGER_RATIO,
+} from './layout/event_layout.constants';
+import { ScheduleLookupTravelDetail, SubCalendarEvent } from '@/core/common/types/schedule';
 import CalendarEvent from './calendar_event';
 import analytics from '@/core/util/analytics';
+import { splitEventByDay } from '@/core/util/eventSplitting';
+import { isLongDurationEvent } from '@/core/util/eventFilters';
+import { TypeDefaults } from '../../types/typeDefaults';
 
 type CalendarEventsProps = {
-  viewOptions: CalendarViewOptions;
-  events: Array<ScheduleSubCalendarEvent>;
-  headerWidth: number;
-  selectedEvent: string | null;
-  setSelectedEvent: (id: string | null) => void;
+	viewOptions: CalendarViewOptions;
+	events: Array<SubCalendarEvent>;
+	headerWidth: number;
+	selectedEvent: string | null;
+	setSelectedEvent: (id: string | null) => void;
 	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
 	onNonViableEventsChange?: (events: Array<StyledEvent>) => void;
+	onLongDurationEventsChange?: (events: Array<StyledEvent>) => void;
+	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events so Calendar can look up by ID */
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (from chat action pill click) */
@@ -29,49 +41,59 @@ type CalendarEventsProps = {
 	/** Called when a viable event tile on the grid is clicked */
 	onViableEventClicked?: () => void;
 };
-type CurrentViewEvent = ScheduleSubCalendarEvent & { key: string };
+type CurrentViewEvent = SubCalendarEvent & { key: string };
 type CurrentViewTravelDetail = ScheduleLookupTravelDetail & {
-  key: string;
-  colorRed: number;
-  colorGreen: number;
-  colorBlue: number;
-  isViable: boolean;
+	key: string;
+	colorRed: number;
+	colorGreen: number;
+	colorBlue: number;
+	isViable: boolean;
 };
 export type StyledEvent = CurrentViewEvent & {
-  properties: {
-    eventChainKey: string;
-    eventChainIndex: number;
-    eventChainLength: number;
-    startHourFraction: number;
-    endHourFraction: number;
-  };
-  springStyles: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+	properties: {
+		eventChainKey: string;
+		eventChainIndex: number;
+		eventChainLength: number;
+		startHourFraction: number;
+		endHourFraction: number;
+	};
+	springStyles: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	};
+	/** Z-index computed by stagger layout engine */
+	_staggerZIndex?: number;
 };
 export type StyledTravelDetail = CurrentViewTravelDetail & {
-  springStyles: {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-  };
+	springStyles: {
+		left: number;
+		top: number;
+		width: number;
+		height: number;
+	};
+};
+export type CalendarBackgroundClickInfo = {
+	day: Date;
+	hour: number;
+	minute: number;
+	second: number;
 };
 
 const CalendarEvents = ({
-  events,
-  viewOptions,
-  headerWidth,
-  selectedEvent,
-  setSelectedEvent,
+	events,
+	viewOptions,
+	headerWidth,
+	selectedEvent,
+	setSelectedEvent,
 	onNonViableEventsChange,
+	onLongDurationEventsChange,
 	setSelectedEventInfo,
 	styledEventsRef,
 	focusedEventId,
 	onViableEventClicked,
+	onBackgroundClick,
 }: CalendarEventsProps) => {
 	const handleEventClick = (event: StyledEvent) => {
 		// Track event selection
@@ -84,7 +106,7 @@ const CalendarEvents = ({
 			duration: dayjs(event.end, 'unix').diff(dayjs(event.start, 'unix'), 'minute'),
 			startTime: dayjs(event.start, 'unix').format('HH:mm'),
 		});
-		
+
 		setSelectedEvent(event.id);
 		// VIABLE_EVENT_CLICKED — dismiss non-viable overlay
 		onViableEventClicked?.();
@@ -104,232 +126,147 @@ const CalendarEvents = ({
 		const currentViewEvents: Array<CurrentViewEvent> = [];
 		const currentViewTravelDetails: Array<CurrentViewTravelDetail> = [];
 
-    const viewStart = viewOptions.startDay;
-    const viewEnd = dayjs(viewOptions.startDay)
-      .add(viewOptions.daysInView - 1, 'day')
-      .endOf('day');
+		const viewStart = viewOptions.startDay;
+		const viewEnd = dayjs(viewOptions.startDay)
+			.add(viewOptions.daysInView - 1, 'day')
+			.endOf('day');
 
-    // Filter and process events to only include those in the current view
-    for (const event of events) {
-      const start = dayjs(event.start);
-      let end = dayjs(event.end);
-      if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
+		// Filter and process events to only include those in the current view
+		for (const event of events) {
+			const start = dayjs(event.start);
+			const end = dayjs(event.end);
+			if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
 
-      // 💡 Treat midnight as still part of previous day
-      if (end.hour() === 0 && end.minute() === 0 && end.second() === 0) {
-        end = end.subtract(1, 'millisecond');
-      }
-
-      // Split events that span multiple days
-      if (!start.isSame(end, 'day')) {
-        const days = end.endOf('day').diff(start.startOf('day'), 'day') + 1;
-        for (let i = 0; i < days; i++) {
-          const day = start.add(i, 'day');
-          currentViewEvents.push({
-            ...event,
-            key: `${event.id}-${i}`,
-            start: i === 0 ? start.unix() * 1000 : day.startOf('day').unix() * 1000,
-            end: i === days - 1 ? end.unix() * 1000 : day.endOf('day').unix() * 1000,
-          });
-        }
-      } else {
-        currentViewEvents.push({
-          ...event,
-          key: event.id,
-        });
-      }
-    }
-
-    // Process travel details of all events in the current view
-    for (const event of currentViewEvents) {
-      const travelDetails = event.travelDetail;
-      for (const detail of Object.values(travelDetails)) {
-        if (!detail) continue;
-        if (detail.end - detail.start <= 0) continue;
-
-        const start = dayjs(detail.start, 'unix');
-        const end = dayjs(detail.end, 'unix');
-
-        if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
-
-        currentViewTravelDetails.push({
-          ...detail,
-          key: v4(),
-          colorRed: event.colorRed,
-          colorGreen: event.colorGreen,
-          colorBlue: event.colorBlue,
-          isViable: event.isViable,
-        });
-      }
-    }
-    return { currentViewEvents, currentViewTravelDetails };
-  }, [events, viewOptions]);
-
-  const styledEvents = useMemo(() => {
-    const result = [] as Array<StyledEvent>;
-
-    // sort by start time
-    currentViewEvents.sort((a, b) => {
-      return dayjs(a.start, 'unix').diff(dayjs(b.start, 'unix'));
-    });
-
-		// Calculate chains of intersected events
-		for (let i = 0; i < currentViewEvents.length; i++) {
-			const event = currentViewEvents[i];
-
-      const s = dayjs(event.start, 'unix');
-      const e = dayjs(event.end, 'unix');
-      const eventBox = CalendarUtil.getBoundingBox(s, e, viewOptions, headerWidth);
-      const { x, y, width, height } = eventBox;
-      const eventStartInHours = s.hour() + s.minute() / 60; // 11:30PM -> 23.5
-      const eventEndInHours = e.hour() + e.minute() / 60; // 11:45AM -> 11.75
-
-      const prevEvent = result[result.length - 1] as StyledEvent | undefined;
-      const isEventSameDayAsPrev = dayjs(event.start, 'unix').isSame(
-        dayjs(prevEvent?.start, 'unix'),
-        'day'
-      );
-
-      const isIntersectingWithPrev =
-        prevEvent &&
-				prevEvent.isViable &&
-        isEventSameDayAsPrev &&
-        CalendarUtil.isInterseting(eventBox, prevEvent.springStyles);
-
-			let styledEvent: StyledEvent;
-			if (prevEvent && isIntersectingWithPrev && event.isViable) {
-				const eventChainKey = prevEvent.properties.eventChainKey;
-				const eventChainIndex = prevEvent.properties.eventChainIndex + 1;
-
-				// Update event chain length of previously chained events
-				for (let eci = 0; eci < eventChainIndex; eci++) {
-					const chainedEvent = result[result.length - 1 - eci];
-					chainedEvent.properties.eventChainLength++;
-				}
-
-				styledEvent = {
-					...event,
-					properties: {
-						startHourFraction: eventStartInHours,
-						endHourFraction: eventEndInHours,
-						eventChainKey,
-						eventChainIndex,
-						eventChainLength: eventChainIndex + 1,
-					},
-					springStyles: { x, y, width, height },
-				};
-			} else {
-				styledEvent = {
-					...event,
-					properties: {
-						startHourFraction: eventStartInHours,
-						endHourFraction: eventEndInHours,
-						eventChainKey: event.key,
-						eventChainIndex: 0,
-						eventChainLength: 1,
-					},
-					springStyles: { x, y, width, height },
-				};
-			}
-
-      result.push(styledEvent);
-    };
-
-		let currentChainKey = '';
-		let currentChainFirstEnd = 0;
-
-		// Break chains if they are too long
-    for (let i = 0; i < result.length; i++) {
-      const event = result[i];
-			const chainKey = event.properties.eventChainKey;
-      const chainLength = event.properties.eventChainLength;
-			const chainIndex = event.properties.eventChainIndex;
-
-			// Check new chain
-			if (chainKey !== currentChainKey) {
-        currentChainKey = chainKey;
-        currentChainFirstEnd = event.end;
-				continue;
-      }
-
-      if (chainLength > 2) {
-				// Skip if last event of chain
-				if (chainIndex === chainLength - 1) continue;
-				const breakingCondition = event.start > currentChainFirstEnd;
-				if (breakingCondition) {
-					const oldChainKey = currentChainKey;
-					currentChainKey = event.key;
-					currentChainFirstEnd = event.end;
-					let n = i;
-					let newChainLength = 0;
-					// Assign new chain keys
-					while (result[n].properties.eventChainKey === oldChainKey) {
-						result[n].properties.eventChainKey = event.key;
-						result[n].properties.eventChainIndex = n - i;
-						n++;
-						newChainLength++;
-					}
-					let l = i;
-					// Assign new chain lengths
-					while (result[l].properties.eventChainKey === event.key) {
-						result[l].properties.eventChainLength = newChainLength;
-						l++;
-					}
-					// Update old chain lengths
-					let o = i - 1;
-					while (result[o].properties.eventChainKey === oldChainKey) {
-						result[o].properties.eventChainLength -= newChainLength;
-						o--;
-					}
-				}
-			}
+			// Split multi-day events and preserve original times
+			const segments = splitEventByDay(event);
+			currentViewEvents.push(...segments);
 		}
 
-		// Divide width of chained events
-		for (let i = 0; i < result.length; i++) {
-			const event = result[i];
-			const chainIndex = event.properties.eventChainIndex;
-			const chainLength = event.properties.eventChainLength;
-      if (event.properties.eventChainLength > 1) {
-        const fullWidth = event.springStyles.width;
-        event.springStyles.x += chainIndex * (fullWidth / chainLength);
-        const lastChainEventWidth = fullWidth / chainLength;
-        const chainEventWidth = (lastChainEventWidth * 7) / 6;
-        event.springStyles.width =
-          chainIndex === chainLength - 1 ? lastChainEventWidth : chainEventWidth;
-      }
-    }
+		// Process travel details of all events in the current view
+		for (const event of currentViewEvents) {
+			const travelDetails = event.travelDetail ?? [];
+			for (const detail of Object.values(travelDetails)) {
+				if (!detail) continue;
+				if (detail.end - detail.start <= 0) continue;
 
-    return result;
-  }, [currentViewEvents]);
+				const start = dayjs(detail.start, 'unix');
+				const end = dayjs(detail.end, 'unix');
 
-  const styledTravelDetails = useMemo(() => {
-    const result = [] as Array<StyledTravelDetail>;
+				if (start.isAfter(viewEnd) || end.isBefore(viewStart)) continue;
 
-    currentViewTravelDetails.forEach((detail) => {
-      const s = dayjs(detail.start);
-      const e = dayjs(detail.end);
-      const { x, y, width, height } = CalendarUtil.getBoundingBox(
-        s,
-        e,
-        viewOptions,
-        headerWidth,
-        { minCellHeight: 18 }
-      );
+				currentViewTravelDetails.push({
+					...detail,
+					key: v4(),
+					colorRed: event.colorRed ?? TypeDefaults.RGBColor.red,
+					colorGreen: event.colorGreen ?? TypeDefaults.RGBColor.green,
+					colorBlue: event.colorBlue ?? TypeDefaults.RGBColor.blue,
+					isViable: event.isViable ?? true,
+				});
+			}
+		}
+		return { currentViewEvents, currentViewTravelDetails };
+	}, [events, viewOptions]);
 
-      result.push({
-        ...detail,
-        springStyles: { left: x, top: y, width, height },
-      });
-    });
+	const styledEvents = useMemo(() => {
+		// Compute bounding boxes for all events
+		const eventBoxes = currentViewEvents.map((event) => {
+			const s = dayjs(event.start, 'unix');
+			const e = dayjs(event.end, 'unix');
+			const box = CalendarUtil.getBoundingBox(s, e, viewOptions, headerWidth);
+			return { event, box, s, e };
+		});
 
-    return result;
-  }, [styledEvents]);
+		// Build layout inputs for viable events — exclude long-duration events because
+		// they are rendered in a separate overlay and must not affect grid width computation.
+		const layoutEvents: LayoutEvent[] = [];
+		const layoutIndexMap = new Map<string, number>(); // event.key -> index in eventBoxes
+
+		for (let i = 0; i < eventBoxes.length; i++) {
+			const { event, box } = eventBoxes[i];
+			if (event.isViable && !isLongDurationEvent(event)) {
+				layoutEvents.push({
+					id: event.key,
+					start: event.start,
+					end: event.end,
+					x: box.x,
+					y: box.y,
+					width: box.width,
+					height: box.height,
+				});
+			}
+			layoutIndexMap.set(event.key, i);
+		}
+
+		// Compute stagger layout
+		const viewportWidth = window.innerWidth;
+		const staggerResults = computeStaggerLayout(layoutEvents, {
+			staggerIncrement: getStaggerIncrement(viewportWidth),
+			maxStaggerRatio: MAX_STAGGER_RATIO,
+			minEventHeight: getMinEventHeight(viewportWidth),
+		});
+		const staggerMap = new Map(staggerResults.map((r) => [r.id, r]));
+
+		// Build StyledEvent array
+		const result: Array<StyledEvent> = eventBoxes.map(({ event, box, s, e }) => {
+			const eventStartInHours = s.hour() + s.minute() / 60;
+			const eventEndInHours = e.hour() + e.minute() / 60;
+			const stagger = staggerMap.get(event.key);
+
+			return {
+				...event,
+				properties: {
+					startHourFraction: eventStartInHours,
+					endHourFraction: eventEndInHours,
+					eventChainKey: event.key,
+					eventChainIndex: stagger?.staggerLevel ?? 0,
+					eventChainLength: 1,
+				},
+				springStyles: {
+					x: stagger?.x ?? box.x,
+					y: box.y,
+					width: stagger?.width ?? box.width,
+					height: stagger?.height ?? box.height,
+				},
+				_staggerZIndex: stagger?.zIndex ?? 0,
+			};
+		});
+
+		return result;
+	}, [currentViewEvents]);
+
+	const styledTravelDetails = useMemo(() => {
+		const result = [] as Array<StyledTravelDetail>;
+
+		currentViewTravelDetails.forEach((detail) => {
+			const s = dayjs(detail.start);
+			const e = dayjs(detail.end);
+			const { x, y, width, height } = CalendarUtil.getBoundingBox(
+				s,
+				e,
+				viewOptions,
+				headerWidth,
+				{ minCellHeight: 18 }
+			);
+
+			result.push({
+				...detail,
+				springStyles: { left: x, top: y, width, height },
+			});
+		});
+
+		return result;
+	}, [styledEvents]);
 
 	useEffect(() => {
 		if (onNonViableEventsChange) {
 			const nonViableEvents = styledEvents.filter((event) => !event.isViable);
 			onNonViableEventsChange(nonViableEvents);
+		}
+		if (onLongDurationEventsChange) {
+			const longDurationEvents = styledEvents.filter(
+				(event) => event.isViable && isLongDurationEvent(event)
+			);
+			onLongDurationEventsChange(longDurationEvents);
 		}
 	}, [styledEvents]);
 
@@ -340,100 +277,140 @@ const CalendarEvents = ({
 		}
 	}, [styledEvents, styledEventsRef]);
 
+	const eventTransition = useTransition(
+		styledEvents.filter((event) => event.isViable && !isLongDurationEvent(event)),
+		{
+			keys: (event) => event.key,
+			from: ({ springStyles }) => ({
+				opacity: 0,
+				scale: 0.9,
+				...springStyles,
+			}),
+			leave: ({ springStyles }) => ({
+				opacity: 0,
+				...springStyles,
+				config: { duration: 100 },
+			}),
+			enter: ({ springStyles }) => ({
+				opacity: 1,
+				scale: 1,
+				...springStyles,
+			}),
+			update: ({ springStyles }) => ({ ...springStyles }),
+			config: { tension: 500, friction: 40 },
+		}
+	);
 
-  const eventTransition = useTransition(
-    styledEvents.filter((event) => event.isViable),
-    {
-      keys: (event) => event.key,
-      from: ({ springStyles }) => ({
-        opacity: 0,
-        scale: 0.9,
-        ...springStyles,
-      }),
-      leave: ({ springStyles }) => ({
-        opacity: 0,
-        ...springStyles,
-        config: { duration: 100 },
-      }),
-      enter: ({ springStyles }) => ({
-        opacity: 1,
-        scale: 1,
-        ...springStyles,
-      }),
-      update: ({ springStyles }) => ({ ...springStyles }),
-      config: { tension: 500, friction: 40 },
-    }
-  );
+	const travelTransition = useTransition(
+		styledTravelDetails.filter((detail) => detail.isViable),
+		{
+			keys: (detail) => detail.key,
+			from: () => ({ opacity: 0, scale: 0.9 }),
+			leave: () => ({ opacity: 0, scale: 0.9, config: { duration: 100 } }),
+			enter: () => ({ opacity: 1, scale: 1 }),
+			config: { tension: 500, friction: 40 },
+		}
+	);
 
-  const travelTransition = useTransition(
-    styledTravelDetails.filter((detail) => detail.isViable),
-    {
-      keys: (detail) => detail.key,
-      from: () => ({ opacity: 0, scale: 0.9 }),
-      leave: () => ({ opacity: 0, scale: 0.9, config: { duration: 100 } }),
-      enter: () => ({ opacity: 1, scale: 1 }),
-      config: { tension: 500, friction: 40 },
-    }
-  );
+	const backgroundClickHandler = (
+		event: React.MouseEvent<HTMLDivElement>
+	): CalendarBackgroundClickInfo => {
+		const background = event.target as HTMLDivElement;
+		const dimensions = background.getBoundingClientRect();
+		const timelineHeight = dimensions.height;
+		const timelineWidth = dimensions.width;
 
-  return (
-    <Container id="calendar-events-container">
-      <Wrapper>
-        {eventTransition((style, event) => (
-          <EventPositioner
-            key={event.key}
-            style={style}
-            $selected={selectedEvent === event.id}
-            $focused={focusedEventId === event.id}
-          >
-            <CalendarEvent
-              event={event}
-              selectedEvent={selectedEvent}
-              setSelectedEvent={setSelectedEvent}
+		// click position relative to timeline
+		const clickX = event.clientX - dimensions.left;
+		const clickY = event.clientY - dimensions.top;
+
+		const dayClicked = viewOptions.startDay
+			.startOf('day')
+			.add(Math.floor((clickX / timelineWidth) * viewOptions.daysInView), 'day')
+			.toDate();
+		const ratio = clickY / timelineHeight;
+		const totalSeconds = Math.min(Math.floor(ratio * 86400), 86399);
+
+		const hourClicked = Math.floor(totalSeconds / 3600);
+		const minuteClicked = Math.floor((totalSeconds % 3600) / 60);
+		const secondClicked = totalSeconds % 60;
+
+		const info: CalendarBackgroundClickInfo = {
+			day: dayClicked,
+			hour: hourClicked,
+			minute: minuteClicked,
+			second: secondClicked,
+		};
+		return info;
+	};
+
+	return (
+		<Container
+			id="calendar-events-container"
+			onClick={(e) => {
+				const info = backgroundClickHandler(e);
+				onBackgroundClick?.(info);
+			}}
+		>
+			<Wrapper>
+				{eventTransition((style, event) => (
+					<EventPositioner
+						key={event.key}
+						style={style}
+						$selected={selectedEvent === event.id}
+						$focused={focusedEventId === event.id}
+						$zIndex={event._staggerZIndex ?? 0}
+					>
+						<CalendarEvent
+							event={event}
+							selectedEvent={selectedEvent}
+							setSelectedEvent={setSelectedEvent}
 							setSelectedEventInfo={setSelectedEventInfo}
-              onClick={() => handleEventClick(event)}
-              focused={focusedEventId === event.id}
-            />
-          </EventPositioner>
-        ))}
-        {travelTransition((style, detail) => {
-          const travelMediumIconMap: Record<string, React.ReactNode> = {
-            driving: <CarFront size={16} />,
-            biking: <Bike size={16} />,
-            transit: <Route size={16} />,
-          };
-          return (
-            <TravelDetailContent
-              href={CalendarUtil.getTravelDetailDirectionLink(detail)}
-              target="_blank"
-              rel="noopener noreferrer"
-              key={detail.key}
-              style={{
-                ...detail.springStyles,
-                ...style,
-              }}
-              $colors={{
-                r: detail.colorRed,
-                g: detail.colorGreen,
-                b: detail.colorBlue,
-              }}
-              onClick={() => handleTravelDetailClick(detail)}
-            >
-              <span>
-                {travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}
-                {detail.travelMedium}
-              </span>
-              {TimeUtil.rangeDuration(
-                dayjs(detail.start, 'unix'),
-                dayjs(detail.end, 'unix')
-              )}
-            </TravelDetailContent>
-          );
-        })}
-
-      </Wrapper>
-    </Container>
-  );
+							onClick={() => handleEventClick(event)}
+							focused={focusedEventId === event.id}
+						/>
+					</EventPositioner>
+				))}
+				{travelTransition((style, detail) => {
+					const travelMediumIconMap: Record<string, React.ReactNode> = {
+						driving: <CarFront size={16} />,
+						biking: <Bike size={16} />,
+						transit: <Route size={16} />,
+					};
+					return (
+						<TravelDetailContent
+							href={CalendarUtil.getTravelDetailDirectionLink(detail)}
+							target="_blank"
+							rel="noopener noreferrer"
+							key={detail.key}
+							style={{
+								...detail.springStyles,
+								...style,
+							}}
+							$colors={{
+								r: detail.colorRed,
+								g: detail.colorGreen,
+								b: detail.colorBlue,
+							}}
+							onClick={(e) => {
+								e.stopPropagation();
+								handleTravelDetailClick(detail);
+							}}
+						>
+							<span>
+								{travelMediumIconMap[detail.travelMedium] || <DotIcon size={16} />}
+								{detail.travelMedium}
+							</span>
+							{TimeUtil.rangeDuration(
+								dayjs(detail.start, 'unix'),
+								dayjs(detail.end, 'unix')
+							)}
+						</TravelDetailContent>
+					);
+				})}
+			</Wrapper>
+		</Container>
+	);
 };
 
 const Container = styled.div`
@@ -452,20 +429,25 @@ const Wrapper = styled.div`
 	border: 1px solid red inset;
 `;
 
-const EventPositioner = styled(animated.div) <{ $selected: boolean; $focused: boolean }>`
+const EventPositioner = styled(animated.div)<{
+	$selected: boolean;
+	$focused: boolean;
+	$zIndex: number;
+}>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: ${({ $selected, $focused }) => ($selected || $focused ? 999 : 'auto')};
+	z-index: ${({ $selected, $focused, $zIndex }) =>
+		$selected || $focused ? 999 : $zIndex || 'auto'};
 	display: flex;
 
 	&:hover {
-		z-index: 10;
+		z-index: 998;
 		pointer-events: auto;
 	}
 `;
 
-const TravelDetailContent = styled(animated.a) <{ $colors: RGB }>`
+const TravelDetailContent = styled(animated.a)<{ $colors: RGB }>`
 	position: absolute;
 	display: flex;
 	gap: 0.5ch;
@@ -473,19 +455,19 @@ const TravelDetailContent = styled(animated.a) <{ $colors: RGB }>`
 	justify-content: center;
 	cursor: pointer;
 	background: ${({ $colors }) => {
-    const newColor = colorUtil.setLightness($colors, 0.7);
-    return `repeating-linear-gradient(
+		const newColor = colorUtil.setLightness($colors, 0.7);
+		return `repeating-linear-gradient(
 			45deg,
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.1),
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.1) 8px,
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 8px,
 			rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.2) 9px
 )`;
-  }};
+	}};
 	color: ${({ $colors }) => {
-    const newColor = colorUtil.setLightness($colors, 0.5);
-    return `rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.75)`;
-  }};
+		const newColor = colorUtil.setLightness($colors, 0.5);
+		return `rgba(${newColor.r}, ${newColor.g}, ${newColor.b}, 0.75)`;
+	}};
 	font-size: ${palette.typography.fontSize.xs};
 	font-weight: ${palette.typography.fontWeight.semibold};
 

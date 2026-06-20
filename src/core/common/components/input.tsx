@@ -1,136 +1,158 @@
 import React from 'react';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
+import { Asterisk } from 'lucide-react';
 
 type InputProps = {
-  label?: React.ReactNode;
-  disabled?: boolean;
-  variant?: 'default' | 'brand';
-  sized?: 'small' | 'medium' | 'large';
-  height?: number;
-  bordergradient?: Array<string>;
-  prepend?: React.ReactNode;
-  append?: React.ReactNode;
-  searchList?: Array<string>;
-  onSearchSelect?: (value: string) => void;
+	containerClass?: string;
+	containerStyle?: React.CSSProperties;
+	label?: React.ReactNode;
+	disabled?: boolean;
+	variant?: 'default' | 'brand';
+	sized?: 'small' | 'medium' | 'large';
+	height?: number;
+	highlighted?: boolean;
+	bordergradient?: Array<string>;
+	prepend?: React.ReactNode;
+	append?: React.ReactNode;
+	searchList?: Array<string>;
+	onSearchSelect?: (value: string) => void;
 };
 
 type StyledInputProps = {
-  $label: InputProps['label'];
-  $disabled: InputProps['disabled'];
-  $variant: InputProps['variant'];
-  $sized: InputProps['sized'];
-  $height: InputProps['height'];
-  $bordergradient: InputProps['bordergradient'];
-  $prepend?: InputProps['prepend'];
-  $append?: InputProps['append'];
+	$label: InputProps['label'];
+	$disabled: InputProps['disabled'];
+	$variant: InputProps['variant'];
+	$sized: InputProps['sized'];
+	$height: InputProps['height'];
+	$highlighted: InputProps['highlighted'];
+	$bordergradient: InputProps['bordergradient'];
+	$prepend?: InputProps['prepend'];
+	$append?: InputProps['append'];
 };
 
 export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
 const BaseInput: React.FC<BaseInputProps> = ({
-  disabled = false,
-  variant = 'default',
-  sized = 'medium',
-  height,
-  bordergradient,
-  label,
-  prepend,
-  append,
-  searchList,
-  onSearchSelect,
-  ...props
+	containerClass,
+	containerStyle,
+	disabled = false,
+	variant = 'default',
+	sized = 'medium',
+	required,
+	height,
+	highlighted = false,
+	bordergradient,
+	label,
+	prepend,
+	append,
+	searchList,
+	onSearchSelect,
+	...props
 }) => {
-  const styledProps = {
-    $disabled: disabled,
-    $variant: variant,
-    $sized: sized,
-    $height: height,
-    $bordergradient: bordergradient,
-    $label: label,
-    $prepend: prepend,
-    $append: append,
-  };
-  const id = label ? `input-${Math.random().toString(36).substring(2, 9)}` : undefined;
-  const listId = searchList ? `${id}-list` : undefined;
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (onSearchSelect) {
-      if (searchList && searchList.includes(e.target.value)) {
-        onSearchSelect(e.target.value);
-      }
-    }
-  }
+	const styledProps = {
+		$disabled: disabled,
+		$variant: variant,
+		$sized: sized,
+		$height: height,
+		$highlighted: highlighted,
+		$bordergradient: bordergradient,
+		$label: label,
+		$prepend: prepend,
+		$append: append,
+	};
+	const id = label ? `input-${Math.random().toString(36).substring(2, 9)}` : undefined;
+	const listId = searchList ? `${id}-list` : undefined;
+	function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+		if (onSearchSelect) {
+			if (searchList && searchList.includes(e.target.value)) {
+				onSearchSelect(e.target.value);
+			}
+		}
+	}
 
-  const styledInput = (
-    <StyledInputWrapper {...styledProps}>
-      {prepend && <StyledInputPrepend>{prepend}</StyledInputPrepend>}
-      {searchList && (
-        <datalist id={listId}>
-          {searchList.map((item) => (
-            <option value={item} key={item} />
-          ))}
-        </datalist>
-      )}
-      <StyledInput
-        id={id}
-        list={listId}
-        disabled={disabled}
-        onInput={handleInputChange}
-        {...styledProps}
-        {...props}
-      />
-      {append && <StyledInputAppend {...styledProps}>{append}</StyledInputAppend>}
-    </StyledInputWrapper>
-  );
+	const styledInput = (
+		<StyledInputWrapper {...styledProps} className={containerClass} style={containerStyle}>
+			{prepend && <StyledInputPrepend>{prepend}</StyledInputPrepend>}
+			{searchList && (
+				<datalist id={listId}>
+					{searchList.map((item) => (
+						<option value={item} key={item} />
+					))}
+				</datalist>
+			)}
+			<StyledInput
+				id={id}
+				list={listId}
+				disabled={disabled}
+				onInput={handleInputChange}
+				{...styledProps}
+				{...props}
+			/>
+			{append && <StyledInputAppend {...styledProps}>{append}</StyledInputAppend>}
+		</StyledInputWrapper>
+	);
 
-  return label ? (
-    <div>
-      <StyledLabel htmlFor={id} {...styledProps}>
-        {label}
-      </StyledLabel>
-      {styledInput}
-    </div>
-  ) : (
-    styledInput
-  );
+	return label ? (
+		<div style={containerStyle} className={containerClass}>
+			<StyledLabel htmlFor={id} {...styledProps}>
+				{label}{' '}
+				{required && (
+					<StyledLabelRequired>
+						<Asterisk size={12} />
+					</StyledLabelRequired>
+				)}
+			</StyledLabel>
+			{styledInput}
+		</div>
+	) : (
+		styledInput
+	);
 };
 
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
-  Omit<InputProps, 'prepend' | 'searchList'>;
+	Omit<InputProps, 'prepend' | 'searchList'>;
 const Textarea: React.FC<TextareaProps> = ({
-  disabled = false,
-  variant = 'default',
-  sized = 'medium',
-  height,
-  bordergradient,
-  label,
-  ...props
+	disabled = false,
+	variant = 'default',
+	sized = 'medium',
+	height,
+	highlighted = false,
+	bordergradient,
+	label,
+	...props
 }) => {
-  const styledProps = {
-    $disabled: disabled,
-    $variant: variant,
-    $sized: sized,
-    $height: height,
-    $bordergradient: bordergradient,
-    $label: label,
-  };
-  return (
-    <StyledInputWrapper {...styledProps}>
-      <StyledTextarea disabled={disabled} {...styledProps} {...props} />
-    </StyledInputWrapper>
-  );
+	const styledProps = {
+		$disabled: disabled,
+		$variant: variant,
+		$sized: sized,
+		$height: height,
+		$highlighted: highlighted,
+		$bordergradient: bordergradient,
+		$label: label,
+	};
+	return (
+		<StyledInputWrapper {...styledProps}>
+			<StyledTextarea disabled={disabled} {...styledProps} {...props} />
+		</StyledInputWrapper>
+	);
 };
 
+const StyledLabelRequired = styled.span`
+	color: ${({ theme }) => theme.colors.error[400]};
+`;
+
 const StyledLabel = styled.label<StyledInputProps>`
-	display: block;
+	display: flex;
+	gap: 0.25rem;
 	margin-bottom: 6px;
 	font-size: ${(props) =>
-    props.$sized === 'small'
-      ? palette.typography.fontSize.xs
-      : props.$sized === 'medium'
-        ? palette.typography.fontSize.xs
-        : palette.typography.fontSize.sm};
+		props.$sized === 'small'
+			? palette.typography.fontSize.xs
+			: props.$sized === 'medium'
+				? palette.typography.fontSize.xs
+				: palette.typography.fontSize.sm};
 	font-weight: ${palette.typography.fontWeight.medium};
-	color: ${palette.colors.gray[400]};
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const StyledInputPrepend = styled.div`
@@ -151,7 +173,6 @@ const StyledInputAppend = styled.div<StyledInputProps>`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	pointer-events: none;
 	padding-right: ${(props) => (props.$sized === 'small' ? '8px' : '12px')};
 `;
 
@@ -162,17 +183,17 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 	isolation: isolate;
 	padding: 1px;
 	height: ${(props) =>
-    props.$height
-      ? `${props.$height}px`
-      : props.$sized === 'small'
-        ? palette.inputHeights.small
-        : props.$sized === 'medium'
-          ? palette.inputHeights.medium
-          : palette.inputHeights.large};
+		props.$height
+			? `${props.$height}px`
+			: props.$sized === 'small'
+				? palette.inputHeights.small
+				: props.$sized === 'medium'
+					? palette.inputHeights.medium
+					: palette.inputHeights.large};
 
 	${(props) =>
-    props.$bordergradient &&
-    `@property --rotation {
+		props.$bordergradient &&
+		`@property --rotation {
       inherits: false;
       initial-value: 0deg;
       syntax: '<angle>';
@@ -185,33 +206,41 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
     animation: rotate 3s linear infinite;`}
 
 	background: ${(props) =>
-    props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${palette.colors.gray[700]}, ${palette.colors.gray[700]}, ${props.$bordergradient[0]})`
-      : props.$variant === 'brand'
-        ? palette.colors.brand[400] + '99'
-        : palette.colors.gray[800]};
+		props.$highlighted
+			? props.theme.colors.datepicker.dateSelectedBg
+			: props.$bordergradient
+				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
+				: props.$variant === 'brand'
+					? palette.colors.brand[400] + '99'
+					: props.theme.colors.input.border};
 	border-radius: ${palette.borderRadius.little};
+	box-shadow: ${(props) =>
+		props.$highlighted
+			? `0 0 0 4px ${props.theme.colors.datepicker.dateSelectedBg + '22'}`
+			: 'none'};
 
 	${StyledInputPrepend}, ${StyledInputAppend} {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 		transition: color 0.2s ease-in-out;
 	}
 
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
-    props.$bordergradient
-      ? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${palette.colors.gray[700]}, ${palette.colors.gray[700]}, ${props.$bordergradient[0]})`
-      : props.$variant === 'brand'
-        ? palette.colors.brand[400] + 'CC'
-        : palette.colors.gray[700]};
+			props.$highlighted
+				? props.theme.colors.datepicker.dateSelectedBg
+				: props.$bordergradient
+					? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
+					: props.$variant === 'brand'
+						? palette.colors.brand[400] + 'CC'
+						: props.theme.colors.input.borderHover};
 	}
 
 	&:has(input:focus) {
 		box-shadow: 0 0 0 4px
 			${(props) =>
-    props.$variant === 'brand'
-      ? palette.colors.brand[400] + '33'
-      : palette.colors.gray[900]};
+				props.$variant === 'brand'
+					? palette.colors.brand[400] + '33'
+					: props.theme.colors.input.focusRing};
 
 		${StyledInputPrepend}, ${StyledInputAppend} {
 			color: ${palette.colors.brand[400]};
@@ -219,13 +248,13 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 	}
 
 	transition:
-		background-color 0.2s ease-in-out,
-		box-shadow 0.2s ease-in-out;
+		background 0.2s ease-in-out,
+		box-shadow 0.45s ease-in-out;
 `;
 
 const StyledInput = styled.input<StyledInputProps>`
 	/* Background color */
-	background-color: ${palette.colors.gray[900]};
+	background-color: ${({ theme }) => theme.colors.input.bg};
 	border: none;
 	outline: none;
 
@@ -233,7 +262,7 @@ const StyledInput = styled.input<StyledInputProps>`
 	border-radius: 5px;
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1;
-	color: ${palette.colors.white};
+	color: ${({ theme }) => theme.colors.input.text};
 	height: 100%;
 
 	padding-left: calc(
@@ -241,29 +270,29 @@ const StyledInput = styled.input<StyledInputProps>`
 			6px + ${(props) => (props.$prepend ? '20px' : '0px')}
 	);
 	padding-right: calc(
-		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px +
-			${(props) => (props.$append ? '32px' : '0px')}
+		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} -
+			6px + ${(props) => (props.$append ? '32px' : '0px')}
 	);
 	font-size: ${(props) =>
-    props.$sized === 'small'
-      ? palette.typography.fontSize.xs
-      : props.$sized === 'medium'
-        ? palette.typography.fontSize.sm
-        : palette.typography.fontSize.base};
+		props.$sized === 'small'
+			? palette.typography.fontSize.xs
+			: props.$sized === 'medium'
+				? palette.typography.fontSize.sm
+				: palette.typography.fontSize.base};
 
 	&::placeholder {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 	}
 
 	&:read-only {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 		cursor: not-allowed;
 	}
 `;
 
 const StyledTextarea = styled.textarea<StyledInputProps>`
 	/* Background color */
-	background-color: ${palette.colors.gray[900]};
+	background-color: ${({ theme }) => theme.colors.input.bg};
 	border: none;
 	outline: none;
 	resize: none; /* Prevent manual resizing */
@@ -272,29 +301,29 @@ const StyledTextarea = styled.textarea<StyledInputProps>`
 	border-radius: 5px;
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1.5;
-	color: ${palette.colors.white};
+	color: ${({ theme }) => theme.colors.input.text};
 	height: 100%;
 
 	/* Fix vertical alignment for the textarea */
 	padding: 0;
 	padding-top: ${(props) =>
-    props.$sized === 'small'
-      ? `calc(${palette.inputHeights.small} / 2 - 0.75rem)`
-      : props.$sized === 'medium'
-        ? `calc(${palette.inputHeights.medium} / 2 - 0.875rem)`
-        : `calc(${palette.inputHeights.large} / 2 - 1rem)`};
+		props.$sized === 'small'
+			? `calc(${palette.inputHeights.small} / 2 - 0.75rem)`
+			: props.$sized === 'medium'
+				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem)`
+				: `calc(${palette.inputHeights.large} / 2 - 1rem)`};
 	padding-inline: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px
 	);
 	font-size: ${(props) =>
-    props.$sized === 'small'
-      ? palette.typography.fontSize.xs
-      : props.$sized === 'medium'
-        ? palette.typography.fontSize.sm
-        : palette.typography.fontSize.base};
+		props.$sized === 'small'
+			? palette.typography.fontSize.xs
+			: props.$sized === 'medium'
+				? palette.typography.fontSize.sm
+				: palette.typography.fontSize.base};
 
 	&::placeholder {
-		color: ${palette.colors.gray[500]};
+		color: ${({ theme }) => theme.colors.input.placeholder};
 		/* Improve placeholder vertical alignment */
 		position: relative;
 		top: 0;

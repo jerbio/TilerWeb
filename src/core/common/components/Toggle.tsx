@@ -2,13 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ToggleProps {
-	label: string;
+	label?: string;
 	isOn: boolean;
 	onChange: (value: boolean) => void;
 	disabled?: boolean;
+	containerStyle?: React.CSSProperties;
 }
 
-const Toggle: React.FC<ToggleProps> = ({ label, isOn, onChange, disabled = false }) => {
+const Toggle: React.FC<ToggleProps> = ({
+	label,
+	isOn,
+	onChange,
+	disabled = false,
+	containerStyle,
+}) => {
 	const handleClick = () => {
 		if (!disabled) {
 			onChange(!isOn);
@@ -16,9 +23,9 @@ const Toggle: React.FC<ToggleProps> = ({ label, isOn, onChange, disabled = false
 	};
 
 	return (
-		<ToggleRow>
-			<ToggleLabel>{label}</ToggleLabel>
-			<ToggleSwitch $isOn={isOn} $disabled={disabled} onClick={handleClick}>
+		<ToggleRow style={containerStyle}>
+			{label && <ToggleLabel>{label}</ToggleLabel>}
+			<ToggleSwitch type="button" $isOn={isOn} $disabled={disabled} onClick={handleClick}>
 				<ToggleKnob $isOn={isOn} />
 			</ToggleSwitch>
 		</ToggleRow>
@@ -48,7 +55,7 @@ const ToggleSwitch = styled.button<{ $isOn: boolean; $disabled?: boolean }>`
 	width: 48px;
 	height: 28px;
 	background-color: ${({ $isOn, theme }) =>
-		$isOn ? theme.colors.brand[500] : theme.colors.gray[700]};
+		$isOn ? theme.colors.toggle.bgChecked : theme.colors.toggle.bg};
 	border: none;
 	border-radius: 14px;
 	cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
@@ -64,18 +71,19 @@ const ToggleSwitch = styled.button<{ $isOn: boolean; $disabled?: boolean }>`
 		background-color: ${({ $disabled, $isOn, theme }) =>
 			$disabled
 				? $isOn
-					? theme.colors.brand[500]
-					: theme.colors.gray[700]
+					? theme.colors.toggle.bgChecked
+					: theme.colors.toggle.bg
 				: $isOn
-					? theme.colors.brand[400]
-					: theme.colors.gray[600]};
+					? theme.colors.toggle.bgChecked
+					: theme.colors.toggle.bg};
 	}
 `;
 
 const ToggleKnob = styled.div<{ $isOn: boolean }>`
 	width: 22px;
 	height: 22px;
-	background-color: ${({ theme }) => theme.colors.background.card};
+	background-color: ${({ theme, $isOn }) =>
+		$isOn ? theme.colors.toggle.circleChecked : theme.colors.toggle.circle};
 	border-radius: 50%;
 	transition: margin-left 0.2s ease;
 	margin-left: ${({ $isOn }) => ($isOn ? '23px' : '3px')};

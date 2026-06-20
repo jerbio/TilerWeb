@@ -11,111 +11,111 @@ import TimeUtil from '@/core/util/time';
 import { useConsent } from '@/core/common/components/consent';
 
 const FooterSection: React.FC = () => {
-  const { t } = useTranslation();
-  const { openSettings } = useConsent();
+	const { t } = useTranslation();
+	const { openSettings } = useConsent();
 
-  return (
-    <StyledFooterSection>
-      <FooterContainer>
-        <FlexSpace>
-          <NavLink to="/">
-            <Logo size={36} />
-          </NavLink>
-          <CTALinks>
-            {apps.map((app) => (
-              <a
-                key={app.i18Platform}
-                href={app.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={app.icons.cta} alt={app.i18CTA} height={40} />
-              </a>
-            ))}
-          </CTALinks>
-        </FlexSpace>
-        <FooterDivider />
-        <FlexSpace>
-          <FooterLinksBlock
-            title="Legal"
-            links={[
-              {
-                href: '/TOS',
-                label: t('common.legal.terms'),
-              },
-              {
-                href: '/privacy',
-                label: t('common.legal.privacy'),
-              },
-            ]}
-          />
-          <FooterLinksBlock
-            title={t('common.legal.privacy')}
-            links={[
-              {
-                href: '#',
-                label: t('common.consent.footer.cookieSettings'),
-                onClick: (e: React.MouseEvent) => {
-                  e.preventDefault();
-                  openSettings();
-                },
-              },
-            ]}
-          />
-          <FooterSocialsSection>
-            <SocialsContainer>
-              {socials.map((social, index) => (
-                <React.Fragment key={social.link}>
-                  {index !== 0 && <SocialDivider />}
-                  <a href={social.link} rel="noopener noreferrer" target="_blank">
-                    <SocialLogo src={social.logo} />
-                  </a>
-                </React.Fragment>
-              ))}
-            </SocialsContainer>
-            <PartnerContainer>
-              <span>{t('common.partners.title')}</span>
-              <img
-                src={FounderUniversity}
-                alt={t('common.partners.founderUniversity')}
-                width={80}
-              />
-            </PartnerContainer>
-            <FooterCopyright>
-              {t('common.copyright', { year: TimeUtil.currentYear() })}
-            </FooterCopyright>
-          </FooterSocialsSection>
-        </FlexSpace>
-      </FooterContainer>
-    </StyledFooterSection>
-  );
+	return (
+		<StyledFooterSection>
+			<FooterContainer>
+				<FlexSpace>
+					<NavLink to="/">
+						<Logo size={36} />
+					</NavLink>
+					<CTALinks>
+						{apps.map((app) => (
+							<a
+								key={app.i18Platform}
+								href={app.link}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<img src={app.icons.cta} alt={app.i18CTA} height={40} />
+							</a>
+						))}
+					</CTALinks>
+				</FlexSpace>
+				<FooterDivider />
+				<FlexSpace>
+					<FooterLinksBlock
+						title="Legal"
+						links={[
+							{
+								href: '/TOS',
+								label: t('common.legal.terms'),
+							},
+							{
+								href: '/privacy',
+								label: t('common.legal.privacy'),
+							},
+						]}
+					/>
+					<FooterLinksBlock
+						title={t('common.legal.privacy')}
+						links={[
+							{
+								href: '#',
+								label: t('common.consent.footer.cookieSettings'),
+								onClick: (e: React.MouseEvent) => {
+									e.preventDefault();
+									openSettings();
+								},
+							},
+						]}
+					/>
+					<FooterSocialsSection>
+						<SocialsContainer>
+							{socials.map((social, index) => (
+								<React.Fragment key={social.link}>
+									{index !== 0 && <SocialDivider />}
+									<a href={social.link} rel="noopener noreferrer" target="_blank">
+										<SocialLogo src={social.logo} />
+									</a>
+								</React.Fragment>
+							))}
+						</SocialsContainer>
+						<PartnerContainer>
+							<span>{t('common.partners.title')}</span>
+							<img
+								src={FounderUniversity}
+								alt={t('common.partners.founderUniversity')}
+								width={80}
+							/>
+						</PartnerContainer>
+						<FooterCopyright>
+							{t('common.copyright', { year: TimeUtil.currentYear() })}
+						</FooterCopyright>
+					</FooterSocialsSection>
+				</FlexSpace>
+			</FooterContainer>
+		</StyledFooterSection>
+	);
 };
 
 type FooterLink = {
-  href: string;
-  label: string;
-  onClick?: (e: React.MouseEvent) => void;
+	href: string;
+	label: string;
+	onClick?: (e: React.MouseEvent) => void;
 };
 const FooterLinksBlock: React.FC<{ title: string; links: FooterLink[] }> = ({ title, links }) => {
-  return (
-    <FooterLinksContainer>
-      <FooterLinksTitle>{title}</FooterLinksTitle>
-      <FooterLinks>
-        {links.map((link) => (
-          <li key={link.href}>
-            <a 
-              href={link.href} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              onClick={link.onClick}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </FooterLinks>
-    </FooterLinksContainer>
-  );
+	return (
+		<FooterLinksContainer>
+			<FooterLinksTitle>{title}</FooterLinksTitle>
+			<FooterLinks>
+				{links.map((link) => (
+					<li key={link.href}>
+						<a
+							href={link.href}
+							target="_blank"
+							rel="noopener noreferrer"
+							onClick={link.onClick}
+						>
+							{link.label}
+						</a>
+					</li>
+				))}
+			</FooterLinks>
+		</FooterLinksContainer>
+	);
 };
 
 const StyledFooterSection = styled.div`

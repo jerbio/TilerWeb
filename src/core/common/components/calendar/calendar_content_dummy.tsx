@@ -1,8 +1,8 @@
 import calendarConfig from '@/core/constants/calendar_config';
+import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
 import React from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
-import palette from '@/core/theme/palette';
 import { CalendarViewOptions } from './calendar.types';
 
 type CalendarContentProps = {
@@ -14,25 +14,25 @@ const CalendarContentDummy: React.FC<CalendarContentProps> = ({
 	viewOptions,
 	calendarGridCanvasRef,
 }) => {
-  return (
-    <Container>
-      <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
-        {/* Background */}
-        <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
-        {/* Timeline */}
-        {Array.from({ length: 24 }).map((_, hourIndex) => {
-          return (
-            <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
-              <div>
-                {/* eg. "8 AM" */}
-                <span>{dayjs().hour(hourIndex).format('h A')}</span>
-              </div>
-            </CalendarCellTime>
-          );
-        })}
-      </StyledCalendarContent>
-    </Container>
-  );
+	return (
+		<Container>
+			<StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
+				{/* Background */}
+				<CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+				{/* Timeline */}
+				{Array.from({ length: HOURS_IN_DAY }).map((_, hourIndex) => {
+					return (
+						<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
+							<div>
+								{/* eg. "8 AM" */}
+								<span>{dayjs().hour(hourIndex).format('h A')}</span>
+							</div>
+						</CalendarCellTime>
+					);
+				})}
+			</StyledCalendarContent>
+		</Container>
+	);
 };
 
 const Container = styled.div`
@@ -44,7 +44,7 @@ const Container = styled.div`
 
 const StyledCalendarContent = styled.div<{ $cellwidth: number }>`
 	width: 100%;
-	height: ${parseInt(calendarConfig.CELL_HEIGHT) * 24}px; /* 24 hours */
+	height: ${parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY}px;
 	position: relative;
 	isolation: isolate;
 `;
@@ -66,9 +66,13 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 	height: ${calendarConfig.CELL_HEIGHT};
 	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
 
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-color: #1f1f1f;
-	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
+	border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	background-color: ${({ theme }) => theme.colors.calendar.sidebarBg};
+	background-image: linear-gradient(
+		to right,
+		${({ theme }) => theme.colors.calendar.grid} 33%,
+		rgba(255, 255, 255, 0) 0%
+	);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;
@@ -83,8 +87,8 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 			line-height: 1;
 			top: 4px;
 			right: 2px;
-			font-size: ${palette.typography.fontSize.xs};
-			color: ${palette.colors.gray[500]};
+			font-size: ${({ theme }) => theme.typography.fontSize.xs};
+			color: ${({ theme }) => theme.colors.gray[500]};
 		}
 	}
 `;

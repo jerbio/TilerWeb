@@ -198,6 +198,12 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 	className,
 	style,
 }) => {
+	/* ── Reveal mode hooks — must be called unconditionally ── */
+	const lines = useRevealedLines(message, wsStatus ?? null);
+	const currentLine = lines[lines.length - 1] ?? message;
+	const completedLines = lines.slice(0, -1);
+	const { displayed, done } = useTypewriter(currentLine, 28);
+
 	/* ── Simple mode — no wsStatus prop at all ── */
 	if (wsStatus === undefined) {
 		return (
@@ -209,10 +215,6 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 	}
 
 	/* ── Reveal mode — lines appear one at a time ── */
-	const lines = useRevealedLines(message, wsStatus);
-	const currentLine = lines[lines.length - 1] ?? message;
-	const completedLines = lines.slice(0, -1);
-	const { displayed, done } = useTypewriter(currentLine, 28);
 
 	return (
 		<Container className={className} style={style}>

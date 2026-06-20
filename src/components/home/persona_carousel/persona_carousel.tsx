@@ -16,7 +16,7 @@ import { personaService } from '@/services';
 import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
 import analytics from '@/core/util/analytics';
 
-const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
+const EdgeFadeSwiper = styled(Swiper)<{ $visible: boolean }>`
 	position: relative;
 	width: 100%;
 	height: 100%;
@@ -46,24 +46,24 @@ const EdgeFadeSwiper = styled(Swiper) <{ $visible: boolean }>`
 
 const PersonaCarousel: React.FC = () => {
 	const [personasLoaded, setPersonasLoaded] = useState(false);
-  const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
-  const { personaUsers, setPersonaUser } = usePersonaUsers();
-  const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
-  
-  // Use PersonaSessionManager for centralized session management
-  const { createSession } = usePersonaSessionManager();
-  
-  // Swiper refs and responsive state
-  const swiperRef = React.useRef<SwiperRef | null>(null);
-  const carouselSectionRef = useRef<HTMLElement>(null);
-  const hasTrackedView = useRef(false);
-  const isMobile = useIsMobile();
-  const isTablet = useIsMobile(1100);
-  const [slidesPerView, setSlidesPerView] = useState(1);
+	const [personas, setPersonas] = useState<Array<Persona & { key: number }>>([]);
+	const { personaUsers, setPersonaUser } = usePersonaUsers();
+	const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
 
-  async function getPersonas() {
-    try {
-      const data = await personaService.getPersonas();
+	// Use PersonaSessionManager for centralized session management
+	const { createSession } = usePersonaSessionManager();
+
+	// Swiper refs and responsive state
+	const swiperRef = React.useRef<SwiperRef | null>(null);
+	const carouselSectionRef = useRef<HTMLElement>(null);
+	const hasTrackedView = useRef(false);
+	const isMobile = useIsMobile();
+	const isTablet = useIsMobile(1100);
+	const [slidesPerView, setSlidesPerView] = useState(1);
+
+	async function getPersonas() {
+		try {
+			const data = await personaService.getPersonas();
 			const preceeding = ['healthcare-persona', 'custom-persona'];
 			data.personas.sort((a, b) => {
 				const aIndex = preceeding.indexOf(a.id);
@@ -78,45 +78,51 @@ const PersonaCarousel: React.FC = () => {
 				return 0;
 			});
 
-      const personasWithKeys = data.personas.map((persona, index) => ({
-        ...persona,
-        key: index,
-      }));
-      setPersonas(personasWithKeys);
+			const personasWithKeys = data.personas.map((persona, index) => ({
+				...persona,
+				key: index,
+			}));
+			setPersonas(personasWithKeys);
 			setPersonasLoaded(true);
-    } catch (error) {
-      console.error("Couldn't populate carousel: ", error);
-    }
-  }
+		} catch (error) {
+			console.error("Couldn't populate carousel: ", error);
+		}
+	}
 
 	// Track when carousel scrolls into view
-  useEffect(() => {
-    if (!carouselSectionRef.current || hasTrackedView.current) return;
+	useEffect(() => {
+		if (!carouselSectionRef.current || hasTrackedView.current) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasTrackedView.current) {
-            analytics.trackEvent('Carousel', 'Scrolled Into View', 'Persona Carousel', undefined, {
-              personasCount: personas.length,
-              personasLoaded,
-            });
-            hasTrackedView.current = true;
-          }
-        });
-      },
-      {
-        threshold: 0.3, // Trigger when 30% of the carousel is visible
-        rootMargin: '0px',
-      }
-    );
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting && !hasTrackedView.current) {
+						analytics.trackEvent(
+							'Carousel',
+							'Scrolled Into View',
+							'Persona Carousel',
+							undefined,
+							{
+								personasCount: personas.length,
+								personasLoaded,
+							}
+						);
+						hasTrackedView.current = true;
+					}
+				});
+			},
+			{
+				threshold: 0.3, // Trigger when 30% of the carousel is visible
+				rootMargin: '0px',
+			}
+		);
 
-    observer.observe(carouselSectionRef.current);
+		observer.observe(carouselSectionRef.current);
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [personas.length, personasLoaded]);
+		return () => {
+			observer.disconnect();
+		};
+	}, [personas.length, personasLoaded]);
 
 	useEffect(() => {
 		// Update persona names when personaUsers change
@@ -133,142 +139,147 @@ const PersonaCarousel: React.FC = () => {
 		}
 	}, [personaUsers, personasLoaded]);
 
-  useEffect(() => {
-    getPersonas();
-  }, []);
+	useEffect(() => {
+		getPersonas();
+	}, []);
 
-  // Listen for custom persona creation event from navigation
-  useEffect(() => {
-    function handleCreateCustomPersona(event: CustomEvent<{ 
-      persona: Partial<Persona>; 
-      anonymousUser?: {
-        id: string | null;
-        username: string | null;
-        timeZoneDifference: number | null;
-        timeZone: string | null;
-        email: null | null;
-        endOfDay: string | null;
-        phoneNumber: null | null;
-        fullName: string | null;
-        firstName: string | null;
-        lastName: string | null;
-        countryCode: string | null;
-      };
-    }>) {
-      const { persona, anonymousUser } = event.detail;
-      const customPersona = personas.find((p) => p.id === 'custom-persona');
-      if (customPersona) {
-        // If we have anonymous user data from the API, save it to avoid duplicate API call
-        if (anonymousUser?.id) {
-          setPersonaUser('custom-persona', {
-            userId: anonymousUser.id,
-            personaInfo: { name: persona.name || 'Custom' },
-          });
-          
-          // Initialize the persona session using PersonaSessionManager
-          // This automatically syncs to both localStorage and global state
-          createSession({
-            personaId: PersonaId.AnonymousPersonaId,
-            personaName: persona.name || 'Custom',
-            userId: anonymousUser.id,
-            scheduleId: null,
-            chatSessionId: '',
-            chatContext: [],
-            userInfo: {
-              id: anonymousUser.id,
-              username: anonymousUser.username || '',
-              timeZoneDifference: anonymousUser.timeZoneDifference || 0,
-              timeZone: anonymousUser.timeZone || 'UTC',
-              email: anonymousUser.email,
-              endOfDay: anonymousUser.endOfDay || '',
-              phoneNumber: anonymousUser.phoneNumber,
-              fullName: anonymousUser.fullName || '',
-              firstName: anonymousUser.firstName || '',
-              lastName: anonymousUser.lastName || '',
-              countryCode: anonymousUser.countryCode || '1',
-              dateOfBirth: null,
-            },
-            scheduleLastUpdatedBy: null,
-          });
-        }
-        
-        // Update the custom persona with the provided data
-        updateSelectedPersona(customPersona.key, {
-          id: customPersona.id,
-          ...persona,
-        });
-      }
-    }
+	// Listen for custom persona creation event from navigation
+	useEffect(() => {
+		function handleCreateCustomPersona(
+			event: CustomEvent<{
+				persona: Partial<Persona>;
+				anonymousUser?: {
+					id: string | null;
+					username: string | null;
+					timeZoneDifference: number | null;
+					timeZone: string | null;
+					email: null | null;
+					endOfDay: string | null;
+					phoneNumber: null | null;
+					fullName: string | null;
+					firstName: string | null;
+					lastName: string | null;
+					countryCode: string | null;
+				};
+			}>
+		) {
+			const { persona, anonymousUser } = event.detail;
+			const customPersona = personas.find((p) => p.id === 'custom-persona');
+			if (customPersona) {
+				// If we have anonymous user data from the API, save it to avoid duplicate API call
+				if (anonymousUser?.id) {
+					setPersonaUser('custom-persona', {
+						userId: anonymousUser.id,
+						personaInfo: { name: persona.name || 'Custom' },
+					});
 
-    window.addEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
-    return () => {
-      window.removeEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
-    };
-  }, [personas]);
+					// Initialize the persona session using PersonaSessionManager
+					// This automatically syncs to both localStorage and global state
+					createSession({
+						personaId: PersonaId.AnonymousPersonaId,
+						personaName: persona.name || 'Custom',
+						userId: anonymousUser.id,
+						scheduleId: null,
+						chatSessionId: '',
+						chatContext: [],
+						userInfo: {
+							id: anonymousUser.id,
+							username: anonymousUser.username || '',
+							timeZoneDifference: anonymousUser.timeZoneDifference || 0,
+							timeZone: anonymousUser.timeZone || 'UTC',
+							email: anonymousUser.email,
+							endOfDay: anonymousUser.endOfDay || '',
+							phoneNumber: anonymousUser.phoneNumber,
+							fullName: anonymousUser.fullName || '',
+							firstName: anonymousUser.firstName || '',
+							lastName: anonymousUser.lastName || '',
+							countryCode: anonymousUser.countryCode || '1',
+							dateOfBirth: null,
+						},
+						scheduleLastUpdatedBy: null,
+					});
+				}
 
-  // Check URL params for custom persona creation on mount
-  useEffect(() => {
-    if (personasLoaded) {
-      const params = new URLSearchParams(window.location.search);
-      const isCustomPersona = params.get('customPersona') === 'true';
-      const description = params.get('description');
-      
-      if (isCustomPersona && description) {
-        const customPersona = personas.find((p) => p.id === 'custom-persona');
-        if (customPersona) {
-          // Clear the URL params
-          window.history.replaceState({}, '', window.location.pathname);
-          // Update the custom persona with the provided data
-          updateSelectedPersona(customPersona.key, {
-            id: customPersona.id,
-            name: description,
-            description: description,
-          });
-        }
-      }
-    }
-  }, [personasLoaded, personas]);
+				// Update the custom persona with the provided data
+				updateSelectedPersona(customPersona.key, {
+					id: customPersona.id,
+					...persona,
+				});
+			}
+		}
 
-  // Listen for focus custom persona event (when modal opens)
-  useEffect(() => {
-    function handleFocusCustomPersona() {
-      if (swiperRef.current && personas.length) {
-        const customPersona = personas.find((p) => p.id === 'custom-persona');
-        if (customPersona) {
-          // Slide to the custom persona card
-          // Since loop is true, we need to use slideToLoop
-          // swiperRef.current.swiper.slideReset();
-          swiperRef.current.swiper.slideToLoop(customPersona.key, 500);
-          // Pause autoplay and disable swiper interaction when modal opens
-          setTimeout(() => {
-            swiperRef?.current?.swiper?.autoplay?.pause();
-            swiperRef?.current?.swiper?.disable();
-            }, 600); // Delay slightly to allow slide animation to finish
-        }
-      }
-    }
+		window.addEventListener('createCustomPersona', handleCreateCustomPersona as EventListener);
+		return () => {
+			window.removeEventListener(
+				'createCustomPersona',
+				handleCreateCustomPersona as EventListener
+			);
+		};
+	}, [personas]);
 
-    window.addEventListener('focusCustomPersona', handleFocusCustomPersona);
-    return () => {
-      window.removeEventListener('focusCustomPersona', handleFocusCustomPersona);
-    };
-  }, [personas]);
+	// Check URL params for custom persona creation on mount
+	useEffect(() => {
+		if (personasLoaded) {
+			const params = new URLSearchParams(window.location.search);
+			const isCustomPersona = params.get('customPersona') === 'true';
+			const description = params.get('description');
 
-  // Listen for modal dismissal to re-enable carousel
-  useEffect(() => {
-    function handleModalDismissed() {
-      if (swiperRef.current) {
-        // Re-enable swiper interaction and resume autoplay
-        swiperRef.current.swiper.enable();
-        swiperRef.current.swiper.autoplay.resume();
-      }
-    }
+			if (isCustomPersona && description) {
+				const customPersona = personas.find((p) => p.id === 'custom-persona');
+				if (customPersona) {
+					// Clear the URL params
+					window.history.replaceState({}, '', window.location.pathname);
+					// Update the custom persona with the provided data
+					updateSelectedPersona(customPersona.key, {
+						id: customPersona.id,
+						name: description,
+						description: description,
+					});
+				}
+			}
+		}
+	}, [personasLoaded, personas]);
 
-    window.addEventListener('customPersonaModalDismissed', handleModalDismissed);
-    return () => {
-      window.removeEventListener('customPersonaModalDismissed', handleModalDismissed);
-    };
-  }, []);
+	// Listen for focus custom persona event (when modal opens)
+	useEffect(() => {
+		function handleFocusCustomPersona() {
+			if (swiperRef.current && personas.length) {
+				const customPersona = personas.find((p) => p.id === 'custom-persona');
+				if (customPersona) {
+					// Slide to the custom persona card
+					// Since loop is true, we need to use slideToLoop
+					// swiperRef.current.swiper.slideReset();
+					swiperRef.current.swiper.slideToLoop(customPersona.key, 500);
+					// Pause autoplay and disable swiper interaction when modal opens
+					setTimeout(() => {
+						swiperRef?.current?.swiper?.autoplay?.pause();
+						swiperRef?.current?.swiper?.disable();
+					}, 600); // Delay slightly to allow slide animation to finish
+				}
+			}
+		}
+
+		window.addEventListener('focusCustomPersona', handleFocusCustomPersona);
+		return () => {
+			window.removeEventListener('focusCustomPersona', handleFocusCustomPersona);
+		};
+	}, [personas]);
+
+	// Listen for modal dismissal to re-enable carousel
+	useEffect(() => {
+		function handleModalDismissed() {
+			if (swiperRef.current) {
+				// Re-enable swiper interaction and resume autoplay
+				swiperRef.current.swiper.enable();
+				swiperRef.current.swiper.autoplay.resume();
+			}
+		}
+
+		window.addEventListener('customPersonaModalDismissed', handleModalDismissed);
+		return () => {
+			window.removeEventListener('customPersonaModalDismissed', handleModalDismissed);
+		};
+	}, []);
 
 	// Restart swiper autoplay when personas change
 	useEffect(() => {
@@ -278,97 +289,97 @@ const PersonaCarousel: React.FC = () => {
 		}
 	}, [personas]);
 
-  function updateSelectedPersona(personaKey: number | null, persona?: Partial<Persona>) {
-    if (persona?.id) {
-      setPersonas((prev) => {
-        return prev.map((prevPersona) => {
-          if (prevPersona.id === persona.id) {
-            return { ...prevPersona, ...persona };
-          }
-          return prevPersona;
-        });
-      });
-    }
-    requestAnimationFrame(() => {
-      setSelectedPersona(personaKey);
-      // Note: Persona session is now set in PersonaCardExpanded when a card is expanded
-    });
-  }
+	function updateSelectedPersona(personaKey: number | null, persona?: Partial<Persona>) {
+		if (persona?.id) {
+			setPersonas((prev) => {
+				return prev.map((prevPersona) => {
+					if (prevPersona.id === persona.id) {
+						return { ...prevPersona, ...persona };
+					}
+					return prevPersona;
+				});
+			});
+		}
+		requestAnimationFrame(() => {
+			setSelectedPersona(personaKey);
+			// Note: Persona session is now set in PersonaCardExpanded when a card is expanded
+		});
+	}
 
-  function handleUpdateSlides() {
-    if (isMobile) {
-      setSlidesPerView(1);
-    } else if (isTablet) {
-      setSlidesPerView(2);
-    } else {
-      setSlidesPerView(3);
-    }
-    setTimeout(() => {
-      if (swiperRef.current) {
-        swiperRef.current.swiper.autoplay.pause();
-        swiperRef.current.swiper.autoplay.resume();
-      }
-    }, 0);
-  }
-  useEffect(() => {
-    handleUpdateSlides();
-  }, [isMobile, isTablet]);
+	function handleUpdateSlides() {
+		if (isMobile) {
+			setSlidesPerView(1);
+		} else if (isTablet) {
+			setSlidesPerView(2);
+		} else {
+			setSlidesPerView(3);
+		}
+		setTimeout(() => {
+			if (swiperRef.current) {
+				swiperRef.current.swiper.autoplay.pause();
+				swiperRef.current.swiper.autoplay.resume();
+			}
+		}, 0);
+	}
+	useEffect(() => {
+		handleUpdateSlides();
+	}, [isMobile, isTablet]);
 
-  const swiperStyles: React.CSSProperties = {
-    position: 'relative',
-    height: 'calc(100svh - 100px)',
-    maxHeight: '680px',
-    minHeight: '500px',
-  };
+	const swiperStyles: React.CSSProperties = {
+		position: 'relative',
+		height: 'calc(100svh - 100px)',
+		maxHeight: '680px',
+		minHeight: '500px',
+	};
 
-  const slideContentStyles: React.CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    height: '100%',
-    transform: 'translateX(-50%)',
-    left: '50%',
-  };
+	const slideContentStyles: React.CSSProperties = {
+		position: 'absolute',
+		top: 0,
+		height: '100%',
+		transform: 'translateX(-50%)',
+		left: '50%',
+	};
 
-  return (
-    <Section id="persona-carousel" paddingBlock={0} width={2000} ref={carouselSectionRef}>
-      <EdgeFadeSwiper
-        ref={swiperRef}
-        modules={[Autoplay]}
-        centeredSlides={true}
-        slidesPerView={slidesPerView}
-        loop={true}
-        autoplay={{
-          delay: 2000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
-        $visible={selectedPersona === null}
-      >
-        {personas.length
-          ? personas.map((persona) => (
-            <SwiperSlide key={persona.key} style={swiperStyles}>
-              <div style={slideContentStyles}>
-                <PersonaCard
-                  persona={persona}
-                  isCustom={['custom-persona'].includes(persona.id)}
-                  selectedPersona={selectedPersona}
-                  setSelectedPersona={updateSelectedPersona}
-                  personaUsers={personaUsers}
-                  setPersonaUser={setPersonaUser}
-                />
-              </div>
-            </SwiperSlide>
-          ))
-          : Array.from({ length: 8 }).map((_, index) => (
-            <SwiperSlide key={index} style={swiperStyles}>
-              <div style={slideContentStyles}>
-                <PersonaCardTemplate />
-              </div>
-            </SwiperSlide>
-          ))}
-      </EdgeFadeSwiper>
-    </Section>
-  );
+	return (
+		<Section id="persona-carousel" paddingBlock={0} width={2000} ref={carouselSectionRef}>
+			<EdgeFadeSwiper
+				ref={swiperRef}
+				modules={[Autoplay]}
+				centeredSlides={true}
+				slidesPerView={slidesPerView}
+				loop={true}
+				autoplay={{
+					delay: 2000,
+					disableOnInteraction: false,
+					pauseOnMouseEnter: true,
+				}}
+				$visible={selectedPersona === null}
+			>
+				{personas.length
+					? personas.map((persona) => (
+							<SwiperSlide key={persona.key} style={swiperStyles}>
+								<div style={slideContentStyles}>
+									<PersonaCard
+										persona={persona}
+										isCustom={['custom-persona'].includes(persona.id)}
+										selectedPersona={selectedPersona}
+										setSelectedPersona={updateSelectedPersona}
+										personaUsers={personaUsers}
+										setPersonaUser={setPersonaUser}
+									/>
+								</div>
+							</SwiperSlide>
+						))
+					: Array.from({ length: 8 }).map((_, index) => (
+							<SwiperSlide key={index} style={swiperStyles}>
+								<div style={slideContentStyles}>
+									<PersonaCardTemplate />
+								</div>
+							</SwiperSlide>
+						))}
+			</EdgeFadeSwiper>
+		</Section>
+	);
 };
 
 export default PersonaCarousel;

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { UserApi } from '@/api/userApi';
 import { Tile } from '@/core/common/types/tile';
 import { scheduleService } from '@/services';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { SubCalendarEvent } from '@/core/common/types/schedule';
 
 function renderTileNames(tiles: Array<Tile>) {
 	if (tiles != null && tiles.length > 0) {
@@ -19,7 +19,7 @@ function renderTileNames(tiles: Array<Tile>) {
 }
 
 const TileFromApi: React.FC = () => {
-	const [tilesForTheNextWeek, setTiles] = useState<Array<ScheduleSubCalendarEvent>>([]);
+	const [tilesForTheNextWeek, setTiles] = useState<Array<SubCalendarEvent>>([]);
 
 	return (
 		<>

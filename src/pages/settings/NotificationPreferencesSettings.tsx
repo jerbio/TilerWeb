@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import { toast } from 'sonner';
 import Button from '@/core/common/components/button';
 import Toggle from '@/core/common/components/Toggle';
@@ -9,7 +9,7 @@ import { userService } from '@/services';
 
 const NotificationPreferencesSettings: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const navigate = useAuthNavigate();
 
 	const [tileReminders, setTileReminders] = useState(false);
 	const [emailNotifications, setEmailNotifications] = useState(false);
@@ -95,20 +95,20 @@ const NotificationPreferencesSettings: React.FC = () => {
 	return (
 		<Container>
 			<Breadcrumb>
-				<BreadcrumbLink onClick={() => navigate('/')}>
-					{t('settings.breadcrumb.home')}
-				</BreadcrumbLink>
-				<BreadcrumbSeparator>/</BreadcrumbSeparator>
 				<BreadcrumbLink onClick={() => navigate('/settings')}>
 					{t('settings.breadcrumb.settings')}
 				</BreadcrumbLink>
 				<BreadcrumbSeparator>/</BreadcrumbSeparator>
-				<BreadcrumbCurrent>{t('settings.sections.notificationPreferences.title')}</BreadcrumbCurrent>
+				<BreadcrumbCurrent>
+					{t('settings.sections.notificationPreferences.title')}
+				</BreadcrumbCurrent>
 			</Breadcrumb>
 
 			<Header>
 				<Title>{t('settings.sections.notificationPreferences.title')}</Title>
-				<Description>{t('settings.sections.notificationPreferences.description')}</Description>
+				<Description>
+					{t('settings.sections.notificationPreferences.description')}
+				</Description>
 			</Header>
 
 			<Section>
@@ -133,7 +133,11 @@ const NotificationPreferencesSettings: React.FC = () => {
 			</Section>
 
 			<SaveButtonContainer>
-				<Button variant="brand" onClick={handleSaveChanges} disabled={isSaving || isLoading}>
+				<Button
+					variant="brand"
+					onClick={handleSaveChanges}
+					disabled={isSaving || isLoading}
+				>
 					{isSaving
 						? t('settings.sections.notificationPreferences.saving')
 						: t('settings.sections.notificationPreferences.saveChanges')}

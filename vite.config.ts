@@ -5,7 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // Base configuration shared across all environments
 const baseConfig: UserConfig = {
-	plugins: [react(), basicSsl(), tsconfigPaths()],
+	plugins: [react(), ...(process.env.NO_SSL ? [] : [basicSsl()]), tsconfigPaths()],
 };
 
 // Development configuration
@@ -13,7 +13,7 @@ const developmentConfig = (baseUrl: string): UserConfig => ({
 	...baseConfig,
 	server: {
 		host: true,
-		https: false,
+		// https: false,
 		// Proxy API requests to backend in development
 		// This enables same-origin cookie handling
 		proxy: {
@@ -34,6 +34,13 @@ const developmentConfig = (baseUrl: string): UserConfig => ({
 				changeOrigin: true,
 				secure: false,
 				cookieDomainRewrite: 'localhost',
+			},
+			'/signalr': {
+				target: baseUrl,
+				changeOrigin: true,
+				secure: false,
+				cookieDomainRewrite: 'localhost',
+				ws: true,
 			},
 		},
 	},
