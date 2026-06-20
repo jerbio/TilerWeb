@@ -5,6 +5,7 @@ import {
 	RestrictionProfile,
 	ScheduleCreateEventResponse,
 } from '../../types/schedule';
+import { isScheduleReadOnly } from '@/hooks/useIsReadOnly';
 
 type CreateSelectionState = {
 	isOpen: boolean;
@@ -158,7 +159,8 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 					isOpen: false,
 				},
 				actions: {
-					open: guarded(() =>
+					open: guarded(() => {
+						if (isScheduleReadOnly()) return;
 						set((state) => {
 							// Don't open if one of the other create forms is selected
 							if (state.createTile.state.isOpen) return state;
@@ -169,8 +171,8 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 									state: { ...state.createSelection.state, isOpen: true },
 								},
 							};
-						})
-					),
+						});
+					}),
 					close: guarded(() =>
 						set((state) => ({
 							createSelection: {
@@ -203,14 +205,15 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 				},
 
 				actions: {
-					open: guarded(() =>
+					open: guarded(() => {
+						if (isScheduleReadOnly()) return;
 						set((state) => ({
 							createTile: {
 								...state.createTile,
 								state: { ...state.createTile.state, isOpen: true },
 							},
-						}))
-					),
+						}));
+					}),
 
 					close: guarded(() =>
 						set((state) => ({
@@ -383,14 +386,15 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 				},
 
 				actions: {
-					open: guarded(() =>
+					open: guarded(() => {
+						if (isScheduleReadOnly()) return;
 						set((state) => ({
 							createBlock: {
 								...state.createBlock,
 								state: { ...state.createBlock.state, isOpen: true },
 							},
-						}))
-					),
+						}));
+					}),
 
 					close: guarded(() =>
 						set((state) => ({

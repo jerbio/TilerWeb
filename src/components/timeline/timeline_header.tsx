@@ -10,6 +10,7 @@ import ShuffleButton from './shuffle_button';
 import ReviseButton from './revise_button';
 import ProcrastinateAllButton from './procrastinate_all_button';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
 import { CalendarRequestType } from '@/core/common/components/calendar/calendarRequestContext';
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
@@ -23,6 +24,7 @@ const TimelineHeader: React.FC = () => {
 	const triggerRef = useRef<HTMLDivElement>(null);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const viewInfo = useCalendarUI((state) => state.viewInfo);
+	const isReadOnly = useIsReadOnly();
 	const dispatch = useCalendarDispatch();
 
 	// Close menu when clicking outside
@@ -87,7 +89,7 @@ const TimelineHeader: React.FC = () => {
 					disabled={isScheduleActionLoading}
 					onLoadingChange={setIsScheduleActionLoading}
 				/>
-				<CreateEventButton onClick={openCreateSelection}>
+				<CreateEventButton onClick={openCreateSelection} disabled={isReadOnly}>
 					<Plus size={16} />
 				</CreateEventButton>
 				<ProfileTrigger
@@ -114,6 +116,11 @@ const CreateEventButton = styled.button`
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	&:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
 `;
 
 const ProfileTrigger = styled.div`
