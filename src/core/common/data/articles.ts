@@ -6,6 +6,9 @@ import ScheduleUndoStep1 from '@/assets/articles/schedule-undo-step1.svg';
 import ScheduleUndoStep2 from '@/assets/articles/schedule-undo-step2.svg';
 import ScheduleUndoStep3 from '@/assets/articles/schedule-undo-step3.svg';
 import ScheduleUndoHero from '@/assets/articles/schedule-undo-hero.svg';
+import TravelHero from '@/assets/articles/travel-hero.svg';
+import TravelInline1 from '@/assets/articles/travel-inline-1.svg';
+import TravelInline2 from '@/assets/articles/travel-inline-2.svg';
 
 export interface ArticleSection {
 	type: 'prose' | 'heading' | 'step' | 'callout' | 'image';
@@ -105,59 +108,63 @@ export const articles: Article[] = [
 		slug: 'smart-travel-and-location',
 		category: 'FEATURES',
 		title: 'Smart Travel & Location',
-		subtitle:
-			'Tiler automatically inserts travel time between your commitments and keeps your schedule honest as the day shifts.',
+		subtitle: "A schedule that ignores location isn't a schedule. It's a guess.",
 		excerpt:
-			'Tiler automatically inserts travel time between your commitments and keeps your schedule honest as the day shifts.',
-		readTime: '5 min read',
+			'Tiler calculates travel time between every commitment and builds it into your day — so your schedule reflects real life, not wishful thinking.',
+		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 8, 2026',
-		coverImage: MountainBackground,
+		coverImage: TravelHero,
 		sections: [
 			{
 				type: 'prose',
 				lead: true,
-				text: 'Back-to-back meetings look fine on paper until you remember one is downtown and the other is at the airport. Tiler sees the gap before you do — and fills it with realistic travel time automatically.',
+				text: "Most calendars assume that once one task ends, you're magically ready for the next one.",
 			},
 			{
 				type: 'prose',
-				text: 'You don\'t need to enter specific addresses. Use labels like "home", "work", or "gym" and Tiler handles the distance calculation behind the scenes, without storing or sharing your exact location.',
+				text: "Real life doesn't work that way. You have to drive there. Walk there. Catch a train. Leave early enough to actually arrive on time.",
+			},
+			{
+				type: 'prose',
+				text: "That's why every location in Tiler becomes part of the schedule. Add a meeting, an errand, a coffee catch-up, or a school pickup — Tiler automatically calculates how you'll get there and how long it will take.",
+			},
+			{
+				type: 'image',
+				src: TravelInline1,
+				caption:
+					'Travel time appears as its own block in your timeline — between every commitment that involves a location change.',
+			},
+			{
+				type: 'prose',
+				text: 'Travel appears directly in your timeline as part of the day. Not assumed. Planned.',
 			},
 			{
 				type: 'heading',
-				title: 'Travel Time, Done Right',
+				title: 'No addresses required',
 			},
 			{
-				type: 'step',
-				stepNumber: 1,
-				stepTitle: 'Use location labels, not addresses',
-				stepImage: MountainBackground,
-				stepBody:
-					'Tag tasks with places you already know — "client office", "home", "co-working space". Tiler maps these to travel durations without requiring precise coordinates.',
-				callout: {
-					label: 'Privacy-first',
-					text: 'Tiler calculates travel time using approximate zones, not GPS coordinates. Your personal address is never required.',
-				},
+				type: 'prose',
+				text: "Tiler is location-aware, but you don't need to enter exact addresses. Simply use labels:",
 			},
 			{
-				type: 'step',
-				stepNumber: 2,
-				stepTitle: 'Travel blocks added automatically',
-				stepImage: MountainBackground,
-				stepBody:
-					'When Tiler schedules a task at a new location, it inserts a travel tile before it. You see the full picture — task plus commute — not just the appointment.',
+				type: 'callout',
+				label: 'Location labels Tiler understands',
+				text: 'Home · Work · Downtown · Near the office · The gym',
 			},
 			{
-				type: 'step',
-				stepNumber: 3,
-				stepTitle: 'Schedule adjusts when things change',
-				stepImage: MountainBackground,
-				stepBody:
-					'If a meeting runs long or you add a new commitment, Tiler recalculates travel windows across your whole day — so you\'re never late because the app didn\'t account for the drive.',
-				callout: {
-					label: 'Adaptive by design',
-					text: 'Location and time are treated as a pair. Move one task and the travel buffers around it update automatically.',
-				},
+				type: 'image',
+				src: TravelInline2,
+				caption:
+					'Location labels appear directly on your tiles — Tiler uses them to calculate routes and group nearby tasks.',
+			},
+			{
+				type: 'prose',
+				text: "Tiler understands where you're going, builds realistic routes, groups nearby tasks together, and lets you know when you need to leave.",
+			},
+			{
+				type: 'prose',
+				text: "Because getting something done isn't just about finding the time. It's about being in the right place too.",
 			},
 		],
 	},
