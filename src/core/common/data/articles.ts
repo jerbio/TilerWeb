@@ -8,7 +8,14 @@ import ScheduleUndoStep3 from '@/assets/articles/schedule-undo-step3.svg';
 import ScheduleUndoHero from '@/assets/articles/schedule-undo-hero.svg';
 import TravelHero from '@/assets/articles/travel-hero.svg';
 import TravelInline1 from '@/assets/articles/travel-inline-1.svg';
-import TravelInline2 from '@/assets/articles/travel-inline-2.svg';
+import NLSHero from '@/assets/articles/nls-hero.svg';
+import NLSStep1 from '@/assets/articles/nls-step1.svg';
+import NLSStep2 from '@/assets/articles/nls-step2.svg';
+import NLSStep3 from '@/assets/articles/nls-step3.svg';
+import TileshareHero from '@/assets/articles/tileshare-hero.svg';
+import TileshareStep1 from '@/assets/articles/tileshare-step1.svg';
+import TileshareStep2 from '@/assets/articles/tileshare-step2.svg';
+import TileshareStep3 from '@/assets/articles/tileshare-step3.svg';
 
 export interface ArticleSection {
 	type: 'prose' | 'heading' | 'step' | 'callout' | 'image';
@@ -48,14 +55,13 @@ export const articles: Article[] = [
 		slug: 'natural-language-scheduling',
 		category: 'FEATURES',
 		title: 'Natural-Language Scheduling',
-		subtitle:
-			'Stop wrestling with drag-and-drop. Just tell Tiler what you need to do — in plain English — and watch a smart schedule appear.',
+		subtitle: 'Just tell Tiler what you need to do — in plain English — and watch a smart schedule appear.',
 		excerpt:
 			'Stop wrestling with drag-and-drop. Just tell Tiler what you need to do — in plain English — and watch a smart schedule appear.',
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 1, 2026',
-		coverImage: TilesBackground,
+		coverImage: NLSHero,
 		sections: [
 			{
 				type: 'prose',
@@ -64,29 +70,29 @@ export const articles: Article[] = [
 			},
 			{
 				type: 'prose',
-				text: 'Natural-language scheduling means you can type or say something like "Dentist at 9 AM Thursday, then coffee with Priya downtown around 11" and Tiler handles everything else — duration, travel time, buffer gaps, and confirmation.',
+				text: 'Type something like "Dentist at 9 AM Thursday, then coffee with Priya downtown around 11" and Tiler handles everything else — duration, travel time, buffer gaps, and confirmation.',
 			},
 			{
 				type: 'heading',
-				title: 'How It Works',
+				title: 'How it works',
 			},
 			{
 				type: 'step',
 				stepNumber: 1,
 				stepTitle: 'Describe the task',
-				stepImage: TilesBackground,
+				stepImage: NLSStep1,
 				stepBody:
 					'Type what you need to do in plain English. No special syntax, no dropdowns. "Gym session tomorrow morning for an hour" is enough.',
 				callout: {
-					label: 'Why this matters',
-					text: 'Tiler understands relative time ("tomorrow"), duration ("an hour"), and location cues ("downtown") without any extra setup.',
+					label: 'What Tiler understands',
+					text: 'Relative time ("tomorrow"), duration ("an hour"), and location cues ("downtown") — no extra setup needed.',
 				},
 			},
 			{
 				type: 'step',
 				stepNumber: 2,
-				stepTitle: 'Tiler asks follow-up questions',
-				stepImage: TilesBackground,
+				stepTitle: 'Tiler asks one follow-up',
+				stepImage: NLSStep2,
 				stepBody:
 					'If Tiler needs more context — a preferred time window, a specific location, or a deadline — it asks. One question at a time, never a form.',
 			},
@@ -94,12 +100,12 @@ export const articles: Article[] = [
 				type: 'step',
 				stepNumber: 3,
 				stepTitle: 'Review and confirm',
-				stepImage: TilesBackground,
+				stepImage: NLSStep3,
 				stepBody:
-					'Tiler shows you the proposed schedule. You confirm, adjust, or ask for alternatives. Nothing goes on your calendar without your say-so.',
+					'Tiler shows you the proposed schedule with full details — time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing goes on your calendar without your say-so.',
 				callout: {
 					label: 'Confirmation-first',
-					text: 'Tiler proposes — you decide. This keeps you in control even as the AI does the heavy lifting.',
+					text: 'Tiler proposes — you decide. You stay in control even as the AI does the heavy lifting.',
 				},
 			},
 		],
@@ -151,12 +157,6 @@ export const articles: Article[] = [
 				type: 'callout',
 				label: 'Location labels Tiler understands',
 				text: 'Home · Work · Downtown · Near the office · The gym',
-			},
-			{
-				type: 'image',
-				src: TravelInline2,
-				caption:
-					'Location labels appear directly on your tiles — Tiler uses them to calculate routes and group nearby tasks.',
 			},
 			{
 				type: 'prose',
@@ -256,51 +256,51 @@ export const articles: Article[] = [
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 22, 2026',
-		coverImage: LocationBackground,
+		coverImage: TileshareHero,
 		sections: [
 			{
 				type: 'prose',
 				lead: true,
-				text: 'Coordinating tasks across people usually means a thread of messages, a shared spreadsheet, or a calendar invite that lands at the wrong time. Tileshare replaces all of that with one action.',
+				text: 'Coordinating tasks across people usually means a thread of messages, a shared spreadsheet, or a calendar invite that lands at the wrong time. Tileshare replaces all of that with one tap.',
 			},
 			{
 				type: 'prose',
-				text: 'When you share a tile, it arrives in the recipient\'s Tiler as a live adaptive task. It finds a slot that works around their existing schedule — not just the first open gap, but the best one given their constraints.',
+				text: 'When you share a tile, it arrives in the recipient\'s Tiler as a live adaptive task — already scheduled around their day, no manual placement required.',
 			},
 			{
 				type: 'heading',
-				title: 'How Tileshare Works',
+				title: 'How Tileshare works',
 			},
 			{
 				type: 'step',
 				stepNumber: 1,
 				stepTitle: 'Share any tile',
-				stepImage: LocationBackground,
+				stepImage: TileshareStep1,
 				stepBody:
-					'From any task in your schedule, tap Share and select a Tiler contact. The tile — including its duration, deadline, and location context — is sent as-is.',
+					'From any task in your schedule, tap Share and select a Tiler contact. The tile — including its duration, deadline, and location — is sent as-is.',
 				callout: {
-					label: 'What gets shared',
-					text: 'The task details travel with the tile: name, estimated duration, deadline, and any location tags. The recipient\'s personal schedule stays private.',
+					label: 'What travels with the tile',
+					text: 'Task name, estimated duration, deadline, and location tags. The recipient\'s personal schedule stays completely private.',
 				},
 			},
 			{
 				type: 'step',
 				stepNumber: 2,
 				stepTitle: 'It lands in their schedule automatically',
-				stepImage: LocationBackground,
+				stepImage: TileshareStep2,
 				stepBody:
-					'The shared tile appears in the recipient\'s Tiler and is scheduled around their existing commitments. No manual placement required on their end.',
+					'The shared tile appears in the recipient\'s Tiler and finds the best open slot around their existing commitments. No back-and-forth, no manual placement.',
 			},
 			{
 				type: 'step',
 				stepNumber: 3,
 				stepTitle: 'Both sides stay in sync',
-				stepImage: LocationBackground,
+				stepImage: TileshareStep3,
 				stepBody:
-					'If the task is completed or rescheduled, the sender can see the status. No more "did you get to that?" follow-ups — Tileshare keeps everyone on the same page.',
+					'If the task is completed or rescheduled, the sender sees the status update. No more "did you get to that?" — Tileshare keeps everyone on the same page.',
 				callout: {
-					label: 'Great for teams and households',
-					text: 'Whether you\'re delegating work tasks or splitting household errands, Tileshare makes shared responsibility visible and manageable.',
+					label: 'Works for teams and households',
+					text: 'Delegating work tasks or splitting errands — Tileshare makes shared responsibility visible without any extra tools.',
 				},
 			},
 		],
