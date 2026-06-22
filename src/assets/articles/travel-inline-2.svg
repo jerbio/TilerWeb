@@ -1,64 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="860" height="320" viewBox="0 0 860 320">
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="280" viewBox="0 0 860 280">
   <defs>
     <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#0d0d0d"/>
       <stop offset="100%" stop-color="#0a0a0a"/>
     </linearGradient>
     <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1d1d1d"/>
-      <stop offset="100%" stop-color="#181818"/>
+      <stop offset="0%" stop-color="#1e1e1e"/>
+      <stop offset="100%" stop-color="#191919"/>
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="860" height="320" fill="url(#bg2)"/>
+  <rect width="860" height="280" fill="url(#bg2)"/>
 
-  <!-- Subtle section label -->
-  <text x="430" y="36" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#2d2d2d" text-anchor="middle" letter-spacing="1.5">LOCATION LABELS</text>
+  <!-- ── LEFT TILE: Gym session @ The gym ── -->
+  <rect x="60" y="60" width="340" height="160" rx="18" fill="url(#card)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <rect x="60" y="60" width="6" height="160" rx="3" fill="#05A39C"/>
+  <text x="86" y="138" font-family="Urbanist,Inter,sans-serif" font-size="24" font-weight="700" fill="#ffffff">Gym session</text>
+  <text x="86" y="168" font-family="Inter,sans-serif" font-size="14" fill="rgba(5,163,156,0.75)">📍 @ The gym</text>
 
-  <!-- ── TILE 1: Gym session @ The gym ── -->
-  <rect x="40" y="56" width="375" height="108" rx="14" fill="url(#card)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-  <rect x="40" y="56" width="5" height="108" rx="2.5" fill="#05A39C"/>
-  <!-- Pin icon area -->
-  <rect x="360" y="70" width="40" height="20" rx="10" fill="rgba(5,163,156,0.1)" stroke="rgba(5,163,156,0.2)" stroke-width="1"/>
-  <text x="380" y="83" font-family="Inter, sans-serif" font-size="9" fill="rgba(5,163,156,0.7)" text-anchor="middle">📍 gym</text>
-  <!-- Content -->
-  <text x="60" y="90" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Gym session</text>
-  <text x="60" y="110" font-family="Inter, sans-serif" font-size="12" fill="rgba(5,163,156,0.8)">@ The gym</text>
-  <line x1="60" y1="122" x2="400" y2="122" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-  <text x="60" y="140" font-family="Inter, sans-serif" font-size="10" fill="#525252">Mon · 6:00 PM · 60 min</text>
-  <text x="60" y="155" font-family="Inter, sans-serif" font-size="9" fill="#3a3a3a">🚗  Drive · 14 min calculated automatically</text>
-
-  <!-- ── TILE 2: Pick up kids @ School ── -->
-  <rect x="445" y="56" width="375" height="108" rx="14" fill="url(#card)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-  <rect x="445" y="56" width="5" height="108" rx="2.5" fill="#F59E0B"/>
-  <rect x="765" y="70" width="40" height="20" rx="10" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
-  <text x="785" y="83" font-family="Inter, sans-serif" font-size="9" fill="rgba(245,158,11,0.7)" text-anchor="middle">📍 school</text>
-  <text x="465" y="90" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Pick up kids</text>
-  <text x="465" y="110" font-family="Inter, sans-serif" font-size="12" fill="rgba(245,158,11,0.8)">@ School</text>
-  <line x1="465" y1="122" x2="805" y2="122" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-  <text x="465" y="140" font-family="Inter, sans-serif" font-size="10" fill="#525252">Fri · 3:15 PM · 20 min</text>
-  <text x="465" y="155" font-family="Inter, sans-serif" font-size="9" fill="#3a3a3a">🚗  Drive · 9 min calculated automatically</text>
-
-  <!-- ── TILE 3: Team standup @ Work ── -->
-  <rect x="40" y="188" width="375" height="108" rx="14" fill="url(#card)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-  <rect x="40" y="188" width="5" height="108" rx="2.5" fill="#0077FF"/>
-  <rect x="360" y="202" width="40" height="20" rx="10" fill="rgba(0,119,255,0.1)" stroke="rgba(0,119,255,0.2)" stroke-width="1"/>
-  <text x="380" y="215" font-family="Inter, sans-serif" font-size="9" fill="rgba(96,165,250,0.7)" text-anchor="middle">📍 work</text>
-  <text x="60" y="222" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Team standup</text>
-  <text x="60" y="242" font-family="Inter, sans-serif" font-size="12" fill="rgba(96,165,250,0.8)">@ Work</text>
-  <line x1="60" y1="254" x2="400" y2="254" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-  <text x="60" y="272" font-family="Inter, sans-serif" font-size="10" fill="#525252">Daily · 9:00 AM · 30 min</text>
-  <text x="60" y="287" font-family="Inter, sans-serif" font-size="9" fill="#3a3a3a">🚌  Commute · 28 min calculated automatically</text>
-
-  <!-- ── TILE 4: Grocery run @ Near the office ── -->
-  <rect x="445" y="188" width="375" height="108" rx="14" fill="url(#card)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-  <rect x="445" y="188" width="5" height="108" rx="2.5" fill="#8B5CF6"/>
-  <rect x="738" y="202" width="67" height="20" rx="10" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
-  <text x="771" y="215" font-family="Inter, sans-serif" font-size="9" fill="rgba(167,139,250,0.7)" text-anchor="middle">📍 near office</text>
-  <text x="465" y="222" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Grocery run</text>
-  <text x="465" y="242" font-family="Inter, sans-serif" font-size="12" fill="rgba(167,139,250,0.8)">@ Near the office</text>
-  <line x1="465" y1="254" x2="805" y2="254" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-  <text x="465" y="272" font-family="Inter, sans-serif" font-size="10" fill="#525252">Thu · 5:30 PM · 45 min</text>
-  <text x="465" y="287" font-family="Inter, sans-serif" font-size="9" fill="#3a3a3a">🚶  Walk · 4 min calculated automatically</text>
+  <!-- ── RIGHT TILE: Team standup @ Work ── -->
+  <rect x="460" y="60" width="340" height="160" rx="18" fill="url(#card)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <rect x="460" y="60" width="6" height="160" rx="3" fill="#0077FF"/>
+  <text x="486" y="138" font-family="Urbanist,Inter,sans-serif" font-size="24" font-weight="700" fill="#ffffff">Team standup</text>
+  <text x="486" y="168" font-family="Inter,sans-serif" font-size="14" fill="rgba(96,165,250,0.75)">📍 @ Work</text>
 </svg>
