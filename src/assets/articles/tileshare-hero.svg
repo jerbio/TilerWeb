@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="480" viewBox="0 0 860 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="panelLeft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#161616"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <linearGradient id="panelRight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#141414"/>
+      <stop offset="100%" stop-color="#111111"/>
+    </linearGradient>
+    <linearGradient id="sharedTile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(139,92,246,0.12)"/>
+      <stop offset="100%" stop-color="rgba(139,92,246,0.06)"/>
+    </linearGradient>
+    <linearGradient id="landingTile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(74,222,128,0.08)"/>
+      <stop offset="100%" stop-color="rgba(74,222,128,0.03)"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="purpleGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#8b5cf6" flood-opacity="0.25" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <filter id="greenGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#4ade80" flood-opacity="0.2" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <clipPath id="clip">
+      <rect width="860" height="480" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#clip)">
+    <rect width="860" height="480" fill="url(#bg)"/>
+
+    <!-- ── LEFT PANEL: Sender's schedule ── -->
+    <rect x="0" y="0" width="360" height="480" fill="url(#panelLeft)"/>
+    <rect x="0" y="0" width="360" height="50" fill="#1a1a1a"/>
+    <rect y="50" width="360" height="1" fill="rgba(255,255,255,0.06)"/>
+    <text x="180" y="31" font-family="Urbanist,Inter,sans-serif" font-size="13" font-weight="700" fill="#a3a3a3" text-anchor="middle">Alex's Schedule</text>
+    <text x="348" y="31" font-family="Urbanist,Inter,sans-serif" font-size="11" font-weight="800" fill="#ED123B" text-anchor="end">tiler</text>
+
+    <!-- Time col left -->
+    <rect x="0" y="50" width="40" height="430" fill="#111111"/>
+    <rect x="40" y="50" width="1" height="430" fill="rgba(255,255,255,0.04)"/>
+    <text x="20" y="115" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">9 AM</text>
+    <text x="20" y="195" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">10 AM</text>
+    <text x="20" y="275" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">11 AM</text>
+
+    <!-- Sender tiles -->
+    <rect x="48" y="90" width="300" height="40" rx="8" fill="#0077FF" fill-opacity="0.12" stroke="#0077FF" stroke-opacity="0.25" stroke-width="1"/>
+    <rect x="48" y="90" width="3.5" height="40" rx="1.5" fill="#0077FF" fill-opacity="0.7"/>
+    <text x="62" y="108" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="rgba(200,220,255,0.85)">Team standup</text>
+    <text x="62" y="122" font-family="Inter,sans-serif" font-size="9" fill="rgba(96,165,250,0.45)">@ Work · 9:00–9:45 AM</text>
+
+    <!-- SHARED TILE (highlighted, about to be shared) -->
+    <rect x="48" y="170" width="300" height="60" rx="10" fill="url(#sharedTile)" stroke="#8b5cf6" stroke-width="2" filter="url(#purpleGlow)"/>
+    <rect x="48" y="170" width="4" height="60" rx="2" fill="#8b5cf6"/>
+    <text x="62" y="194" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#ffffff">Design review</text>
+    <text x="62" y="212" font-family="Inter,sans-serif" font-size="10" fill="rgba(167,139,250,0.6)">@ Studio · 10:30 AM · 60 min</text>
+    <!-- Share badge -->
+    <rect x="262" y="177" width="78" height="18" rx="9" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.35)" stroke-width="1"/>
+    <text x="301" y="189" font-family="Inter,sans-serif" font-size="8" fill="#a78bfa" text-anchor="middle">↗ Sharing…</text>
+
+    <rect x="48" y="260" width="300" height="30" rx="7" fill="#171717" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <text x="62" y="279" font-family="Inter,sans-serif" font-size="10" fill="#3d3d3d">Lunch · 12:00 PM</text>
+
+    <!-- ── CENTER TRANSFER ── -->
+    <rect x="360" y="0" width="140" height="480" fill="url(#bg)"/>
+    <!-- Transfer icon -->
+    <circle cx="430" cy="220" r="28" fill="#1c1c1c" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+    <text x="430" y="228" font-family="Inter,sans-serif" font-size="22" text-anchor="middle">↗</text>
+    <!-- Motion dots -->
+    <circle cx="395" cy="220" r="3" fill="rgba(139,92,246,0.4)"/>
+    <circle cx="410" cy="220" r="3" fill="rgba(139,92,246,0.55)"/>
+    <circle cx="425" cy="220" r="3" fill="rgba(139,92,246,0.7)"/>
+    <text x="430" y="268" font-family="Inter,sans-serif" font-size="9" fill="#3a3a3a" text-anchor="middle">Tileshare</text>
+
+    <!-- ── RIGHT PANEL: Recipient's schedule ── -->
+    <rect x="500" y="0" width="360" height="480" fill="url(#panelRight)"/>
+    <rect x="500" y="0" width="360" height="50" fill="#181818"/>
+    <rect x="500" y="50" width="360" height="1" fill="rgba(255,255,255,0.06)"/>
+    <text x="680" y="31" font-family="Urbanist,Inter,sans-serif" font-size="13" font-weight="700" fill="#a3a3a3" text-anchor="middle">Jamie's Schedule</text>
+    <text x="848" y="31" font-family="Urbanist,Inter,sans-serif" font-size="11" font-weight="800" fill="#ED123B" text-anchor="end">tiler</text>
+
+    <!-- Time col right -->
+    <rect x="500" y="50" width="40" height="430" fill="#0f0f0f"/>
+    <rect x="540" y="50" width="1" height="430" fill="rgba(255,255,255,0.04)"/>
+    <text x="520" y="115" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">9 AM</text>
+    <text x="520" y="195" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">10 AM</text>
+    <text x="520" y="275" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">11 AM</text>
+
+    <!-- Recipient existing tiles -->
+    <rect x="548" y="90" width="300" height="40" rx="8" fill="#05A39C" fill-opacity="0.10" stroke="#05A39C" stroke-opacity="0.22" stroke-width="1"/>
+    <rect x="548" y="90" width="3.5" height="40" rx="1.5" fill="#05A39C" fill-opacity="0.6"/>
+    <text x="562" y="108" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="rgba(180,240,235,0.7)">Morning run</text>
+    <text x="562" y="122" font-family="Inter,sans-serif" font-size="9" fill="rgba(5,163,156,0.4)">@ Home · 9:00–9:30 AM</text>
+
+    <!-- INCOMING TILE (landing with green glow) -->
+    <rect x="548" y="170" width="300" height="60" rx="10" fill="url(#landingTile)" stroke="rgba(74,222,128,0.4)" stroke-width="1.5" stroke-dasharray="5,3" filter="url(#greenGlow)"/>
+    <rect x="548" y="170" width="4" height="60" rx="2" fill="#8b5cf6" fill-opacity="0.6"/>
+    <text x="562" y="194" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#ffffff">Design review</text>
+    <text x="562" y="212" font-family="Inter,sans-serif" font-size="10" fill="rgba(167,139,250,0.55)">@ Studio · scheduled for 10:30 AM</text>
+    <!-- New badge -->
+    <rect x="762" y="177" width="76" height="18" rx="9" fill="rgba(74,222,128,0.1)" stroke="rgba(74,222,128,0.3)" stroke-width="1"/>
+    <text x="800" y="189" font-family="Inter,sans-serif" font-size="8" fill="#4ade80" text-anchor="middle">● NEW</text>
+
+    <rect x="548" y="260" width="300" height="30" rx="7" fill="#171717" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <text x="562" y="279" font-family="Inter,sans-serif" font-size="10" fill="#3d3d3d">Stand-up call · 11:00 AM</text>
+
+    <!-- Bottom fade -->
+    <rect x="0" y="370" width="860" height="110" fill="url(#bottomFade)"/>
+  </g>
+</svg>

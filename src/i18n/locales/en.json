@@ -812,22 +812,22 @@
 			"conversation": {
 				"subtitle": "JUST TALK TO IT",
 				"title": "Natural-Language Scheduling",
-				"description": "Tell Tiler what you need to do in plain English. The AI asks follow-up questions, proposes smart schedules, and waits for your confirmation—no drag-and-drop required."
+				"description": "Tell Tiler what you need to do in plain English. The AI asks follow-up questions, proposes smart schedules, and waits for your confirmation, instantly."
 			},
 			"transit": {
-				"subtitle": "OPTIMIZE YOUR DAY",
-				"title": "Smart Travel Time",
-				"description": "Tiler automatically inserts realistic travel durations between locations and adjusts your timeline when things change—so you're never late."
+				"subtitle": "TRAVEL + LOCATION",
+				"title": "Smart Travel & Location",
+				"description": "Tiler inserts travel time between locations automatically. Use labels like \"home\" or \"work\"—no exact address needed."
 			},
 			"adaptive": {
-				"subtitle": "STAYS IN SYNC",
-				"title": "Adaptive Intelligence",
-				"description": "When life throws a curveball, Tiler reschedules conflicting tasks and finds the next best time—automatically."
+				"subtitle": "UNDO BEFORE YOU COMMIT",
+				"title": "Schedule Undo",
+				"description": "Preview how any change ripples across your schedule before committing. Not happy? Undo instantly and restore your original plan."
 			},
 			"location": {
-				"subtitle": "PRIVACY-FIRST",
-				"title": "Location Awareness",
-				"description": "Use generic labels like 'home' or 'work' instead of specific addresses. Tiler calculates travel time without oversharing your personal data."
+				"subtitle": "SHARE YOUR SCHEDULE",
+				"title": "Tileshare",
+				"description": "Send a tile directly into someone else's schedule. It fits around their commitments automatically—no back-and-forth needed."
 			}
 		},
 		"faq": {
@@ -1082,16 +1082,46 @@
 					"label": "Which integrations do you use?",
 					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
 					"options": [
-						{ "value": "google", "label": "Google Calendar" },
-						{ "value": "outlook", "label": "Microsoft Outlook Calendar" },
-						{ "value": "apple", "label": "Apple Calendar" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google Calendar"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook Calendar"
+						},
+						{
+							"value": "apple",
+							"label": "Apple Calendar"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {
@@ -1260,13 +1290,13 @@
 		},
 		"hero": {
 			"badge": "Navigate Tiler",
-			"title": "Here\u2019s Where Everything Lives",
+			"title": "Here’s Where Everything Lives",
 			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
 		},
 		"setUpTiler": {
 			"badge": "Set Up Tiler",
 			"title": "Ready in under 3 minutes.",
-			"summary": "Your calendar, your preferences, your constraints \u2014 four steps that give Tiler everything it needs to run Adaptive Scheduling from day one.",
+			"summary": "Your calendar, your preferences, your constraints — four steps that give Tiler everything it needs to run Adaptive Scheduling from day one.",
 			"visual": {
 				"step1": "Create Account",
 				"step2": "Connect Calendar",
@@ -1276,18 +1306,18 @@
 			"cards": {
 				"account": {
 					"title": "Create your account",
-					"subtext": "Sign up with your email \u2014 free to start, no credit card needed.",
+					"subtext": "Sign up with your email — free to start, no credit card needed.",
 					"btnIdle": "Create free account",
-					"btnCreating": "Creating account\u2026",
-					"btnDone": "\u2713 Account created!"
+					"btnCreating": "Creating account…",
+					"btnDone": "✓ Account created!"
 				},
 				"calendar": {
 					"title": "Connect your calendar",
-					"subtext": "Link Google or Outlook \u2014 Tiler reads your events and builds around them.",
+					"subtext": "Link Google or Outlook — Tiler reads your events and builds around them.",
 					"calName": "Google Calendar",
 					"statusIdle": "Tap to connect",
-					"statusConnecting": "Connecting\u2026",
-					"statusConnected": "\u2713 Connected"
+					"statusConnecting": "Connecting…",
+					"statusConnected": "✓ Connected"
 				},
 				"preferences": {
 					"title": "Set up your preferences",
@@ -1300,32 +1330,32 @@
 				},
 				"adaptive": {
 					"title": "Ready for Adaptive Scheduling",
-					"subtext": "Your schedule is live \u2014 Tiler adapts automatically as your day changes.",
+					"subtext": "Your schedule is live — Tiler adapts automatically as your day changes.",
 					"schedLabel": "Your schedule",
 					"meeting": "9am meeting",
-					"run": "Run \u00b7 30m",
+					"run": "Run · 30m",
 					"newTime": "New: 10am",
 					"urgentCall": "Urgent call",
-					"recalculating": "Recalculating\u2026",
-					"rebuilt": "\u2713 Schedule rebuilt"
+					"recalculating": "Recalculating…",
+					"rebuilt": "✓ Schedule rebuilt"
 				}
 			},
-			"supportNote": "Each step is an input to Tiler\u2019s scheduling engine \u2014 your calendar tells it what\u2019s fixed, your preferences tell it how you move, and your time limits tell it when you\u2019re free. Together, they give Tiler the full picture it needs to run Adaptive Scheduling: a schedule that adjusts itself when things change."
+			"supportNote": "Each step is an input to Tiler’s scheduling engine — your calendar tells it what’s fixed, your preferences tell it how you move, and your time limits tell it when you’re free. Together, they give Tiler the full picture it needs to run Adaptive Scheduling: a schedule that adjusts itself when things change."
 		},
 		"whatIsTiler": {
 			"badge": "What Is Tiler",
 			"title": "Not a calendar. An AI that runs your day",
-			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn\u2019t go to plan.",
+			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn’t go to plan.",
 			"visual": {
-				"tile1": "Gym \u00b7 45 min",
-				"tile2": "Travel \u00b7 12 min",
-				"tile3": "Client Call \u00b7 1 hr",
-				"tile4": "Groceries \u00b7 30 min"
+				"tile1": "Gym · 45 min",
+				"tile2": "Travel · 12 min",
+				"tile3": "Client Call · 1 hr",
+				"tile4": "Groceries · 30 min"
 			},
 			"subItems": {
 				"aiRunsDay": {
 					"title": "Tiler is an AI that runs your day.",
-					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn\u2019t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
+					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn’t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
 				},
 				"fourCoreBlocks": {
 					"title": "The Four Core Blocks of Tiler"
@@ -1338,7 +1368,7 @@
 				"tiles": {
 					"label": "AutoTile",
 					"title": "Tiles",
-					"desc": "Flexible tasks. Set a goal and duration \u2014 Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
+					"desc": "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
 				},
 				"blocks": {
 					"label": "Locked",
@@ -1353,7 +1383,7 @@
 				"tileShare": {
 					"label": "Team & Family",
 					"title": "TileShare",
-					"desc": "Assign tiles to teammates or family. Everyone\u2019s calendar adapts around shared commitments automatically. Context travels with the task."
+					"desc": "Assign tiles to teammates or family. Everyone’s calendar adapts around shared commitments automatically. Context travels with the task."
 				}
 			},
 			"comparison": {
@@ -1369,7 +1399,7 @@
 						"right": "Auto-calculates and adds travel buffers"
 					},
 					{
-						"left": "Static \u2014 won\u2019t adapt when things change",
+						"left": "Static — won’t adapt when things change",
 						"right": "Detects ripples and reschedules instantly"
 					},
 					{
@@ -1377,12 +1407,12 @@
 						"right": "Navigate your day tile-to-tile with real transit"
 					},
 					{
-						"left": "Shared calendars only \u2014 no task assignment",
+						"left": "Shared calendars only — no task assignment",
 						"right": "TileShare: assign and track tasks with anyone"
 					},
 					{
-						"left": "Nothing confirmed \u2014 events just appear",
-						"right": "Confirmation-first \u2014 you approve all changes"
+						"left": "Nothing confirmed — events just appear",
+						"right": "Confirmation-first — you approve all changes"
 					}
 				]
 			}
@@ -1403,19 +1433,19 @@
 				},
 				"createBlock": {
 					"title": "How to Create a Block",
-					"body": "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don\u2019t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable."
+					"body": "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don’t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable."
 				},
 				"flexibleTiles": {
 					"title": "Creating Flexible Tiles",
-					"body": "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline \u2014 Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions."
+					"body": "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline — Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions."
 				},
 				"updateTile": {
 					"title": "How to Update a Tile",
-					"body": "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don\u2019t need to move other tasks manually, the system handles the ripple effects."
+					"body": "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don’t need to move other tasks manually, the system handles the ripple effects."
 				},
 				"travelTime": {
 					"title": "Travel Time & Route",
-					"body": "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn\u2019t a gap \u2014 it\u2019s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn\u2019t just tell you what to do. It gets you there."
+					"body": "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn’t a gap — it’s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn’t just tell you what to do. It gets you there."
 				}
 			}
 		},
@@ -1426,12 +1456,12 @@
 			"items": {
 				"adaptiveTiles": {
 					"name": "Adaptive Tiles",
-					"desc": "The core unit of Tiler. Each tile is a task, event, or habit with a duration \u2014 Tiler schedules them intelligently and moves them when your day changes.",
+					"desc": "The core unit of Tiler. Each tile is a task, event, or habit with a duration — Tiler schedules them intelligently and moves them when your day changes.",
 					"badge": "Core feature"
 				},
 				"aiScheduling": {
 					"name": "AI scheduling assistant",
-					"desc": "Tiler asks clarifying questions, proposes the best available time, and builds a complete schedule including dependencies \u2014 always with your approval first.",
+					"desc": "Tiler asks clarifying questions, proposes the best available time, and builds a complete schedule including dependencies — always with your approval first.",
 					"badge": "Core feature"
 				},
 				"chatScheduling": {
@@ -1441,7 +1471,7 @@
 				},
 				"naturalLanguage": {
 					"name": "Natural language input",
-					"desc": "Describe tasks in plain English \u2014 no forms, no dropdowns. Tiler understands context, urgency, duration, and location from how you naturally talk.",
+					"desc": "Describe tasks in plain English — no forms, no dropdowns. Tiler understands context, urgency, duration, and location from how you naturally talk.",
 					"badge": "Core feature"
 				},
 				"autoTravel": {
@@ -1456,17 +1486,17 @@
 				},
 				"timeRestrictions": {
 					"name": "Time restrictions",
-					"desc": "Set the hours you\u2019re available and Tiler only schedules within those bounds. Your personal time stays yours \u2014 no task bleeds into off-hours unless you allow it.",
+					"desc": "Set the hours you’re available and Tiler only schedules within those bounds. Your personal time stays yours — no task bleeds into off-hours unless you allow it.",
 					"badge": "Preferences"
 				},
 				"adaptiveRescheduling": {
 					"name": "Adaptive rescheduling",
-					"desc": "When a meeting runs long or a task gets missed, Tiler detects the ripple across your whole day and proposes fixes \u2014 instantly, with your approval before changing anything.",
+					"desc": "When a meeting runs long or a task gets missed, Tiler detects the ripple across your whole day and proposes fixes — instantly, with your approval before changing anything.",
 					"badge": "Core feature"
 				},
 				"calendarIntegration": {
 					"name": "Calendar integration",
-					"desc": "Connect Google Calendar or Outlook. Tiler reads your existing events and schedules all new tiles around them \u2014 no double bookings, ever. Supports multiple calendars.",
+					"desc": "Connect Google Calendar or Outlook. Tiler reads your existing events and schedules all new tiles around them — no double bookings, ever. Supports multiple calendars.",
 					"badge": "Integration"
 				},
 				"crossPlatform": {
@@ -1476,22 +1506,22 @@
 				},
 				"habitScheduling": {
 					"name": "Habit scheduling",
-					"desc": "Add recurring habits and Tiler auto-fits them around your day \u2014 keeping you consistent with your routines without you having to think about it each morning.",
+					"desc": "Add recurring habits and Tiler auto-fits them around your day — keeping you consistent with your routines without you having to think about it each morning.",
 					"badge": "Wellness"
 				},
 				"deferReschedule": {
 					"name": "Defer & reschedule",
-					"desc": "Missed a tile? Tiler\u2019s Defer feature instantly finds the next best slot and reschedules with one tap. Never lose a task \u2014 just push it forward intelligently.",
+					"desc": "Missed a tile? Tiler’s Defer feature instantly finds the next best slot and reschedules with one tap. Never lose a task — just push it forward intelligently.",
 					"badge": "Core feature"
 				},
 				"smartNotifications": {
 					"name": "Smart notifications",
-					"desc": "Get alerted when it\u2019s time to leave for your next tile \u2014 with live transit updates if your route changes. Never miss a departure time because you lost track of the clock.",
+					"desc": "Get alerted when it’s time to leave for your next tile — with live transit updates if your route changes. Never miss a departure time because you lost track of the clock.",
 					"badge": "Real-time"
 				},
 				"tileShare": {
 					"name": "TileShare",
-					"desc": "Share tiles with family or teammates. Assign who handles what. Track completion. Everyone\u2019s calendar adapts around shared commitments automatically \u2014 no extra apps needed.",
+					"desc": "Share tiles with family or teammates. Assign who handles what. Track completion. Everyone’s calendar adapts around shared commitments automatically — no extra apps needed.",
 					"badge": "Collaboration"
 				}
 			}
