@@ -281,12 +281,12 @@ const TravelDot = styled.circle`
 	animation-delay: 0.6s;
 `;
 
-// stops: x position, label, time
+// stops: x position, label, time — time always above, label always below
 const STOPS = [
-	{ x: 22,  label: 'Home',   time: '8:00 AM', above: false },
-	{ x: 88,  label: 'Office', time: '9:15 AM', above: true  },
-	{ x: 155, label: 'Café',   time: '1:00 PM', above: false },
-	{ x: 240, label: 'Gym',    time: '5:30 PM', above: true  },
+	{ x: 22,  label: 'Home',   time: '8:00 AM' },
+	{ x: 88,  label: 'Office', time: '9:15 AM' },
+	{ x: 155, label: 'Café',   time: '1:00 PM' },
+	{ x: 240, label: 'Gym',    time: '5:30 PM' },
 ];
 
 function TravelAnimation() {
@@ -301,17 +301,10 @@ function TravelAnimation() {
 					<g key={s.label}>
 						<circle cx={s.x} cy={55} r={6} fill="rgba(96,165,250,0.15)" stroke="#60a5fa" strokeWidth="1.5"/>
 						<circle cx={s.x} cy={55} r={2.5} fill="#60a5fa"/>
-						{s.above ? (
-							<>
-								<text x={s.x} y={28} fontSize="7.5" fill="rgba(96,165,250,0.8)" textAnchor="middle" fontWeight="600">{s.time}</text>
-								<text x={s.x} y={40} fontSize="8" fill="rgba(255,255,255,0.55)" textAnchor="middle">{s.label}</text>
-							</>
-						) : (
-							<>
-								<text x={s.x} y={74} fontSize="8" fill="rgba(255,255,255,0.55)" textAnchor="middle">{s.label}</text>
-								<text x={s.x} y={84} fontSize="7.5" fill="rgba(96,165,250,0.8)" textAnchor="middle" fontWeight="600">{s.time}</text>
-							</>
-						)}
+						{/* Time above dot */}
+						<text x={s.x} y={40} fontSize="7.5" fill="rgba(96,165,250,0.85)" textAnchor="middle" fontWeight="600">{s.time}</text>
+						{/* Label below dot */}
+						<text x={s.x} y={74} fontSize="8" fill="rgba(255,255,255,0.55)" textAnchor="middle">{s.label}</text>
 					</g>
 				))}
 
