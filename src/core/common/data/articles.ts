@@ -2,6 +2,9 @@ import TilesBackground from '@/assets/highlights/tiles.jpg';
 import MountainBackground from '@/assets/highlights/mountain.jpg';
 import FitnessBackground from '@/assets/highlights/fitness.jpg';
 import LocationBackground from '@/assets/highlights/location.jpg';
+import ScheduleUndoStep1 from '@/assets/articles/schedule-undo-step1.svg';
+import ScheduleUndoStep2 from '@/assets/articles/schedule-undo-step2.svg';
+import ScheduleUndoStep3 from '@/assets/articles/schedule-undo-step3.svg';
 
 export interface ArticleSection {
 	type: 'prose' | 'heading' | 'step' | 'callout' | 'image';
@@ -187,7 +190,7 @@ export const articles: Article[] = [
 				type: 'step',
 				stepNumber: 1,
 				stepTitle: 'Propose or accept a change',
-				stepImage: FitnessBackground,
+				stepImage: ScheduleUndoStep1,
 				stepBody:
 					'Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into a preview state — shown with a dashed border and a PREVIEW label so you can\'t miss it.',
 				callout: {
@@ -199,7 +202,7 @@ export const articles: Article[] = [
 				type: 'step',
 				stepNumber: 2,
 				stepTitle: 'Review the proposed tile',
-				stepImage: FitnessBackground,
+				stepImage: ScheduleUndoStep2,
 				stepBody:
 					'The preview tile shows your updated name, location, time, and date side by side with what was there before. You can see exactly what changed at a glance — no need to mentally track it.',
 			},
@@ -207,7 +210,7 @@ export const articles: Article[] = [
 				type: 'step',
 				stepNumber: 3,
 				stepTitle: 'Tap Undo or Accept',
-				stepImage: FitnessBackground,
+				stepImage: ScheduleUndoStep3,
 				stepBody:
 					'Not happy with what you see? Tap Undo and your original schedule snaps back instantly — no undo history to dig through. Happy with the change? Tap Accept and it\'s locked in.',
 				callout: {
