@@ -5,6 +5,7 @@ import LocationBackground from '@/assets/highlights/location.jpg';
 import ScheduleUndoStep1 from '@/assets/articles/schedule-undo-step1.svg';
 import ScheduleUndoStep2 from '@/assets/articles/schedule-undo-step2.svg';
 import ScheduleUndoStep3 from '@/assets/articles/schedule-undo-step3.svg';
+import ScheduleUndoHero from '@/assets/articles/schedule-undo-hero.svg';
 
 export interface ArticleSection {
 	type: 'prose' | 'heading' | 'step' | 'callout' | 'image';
@@ -171,7 +172,7 @@ export const articles: Article[] = [
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'June 22, 2026',
-		coverImage: FitnessBackground,
+		coverImage: ScheduleUndoHero,
 		sections: [
 			{
 				type: 'prose',
