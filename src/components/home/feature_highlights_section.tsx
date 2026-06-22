@@ -281,12 +281,12 @@ const TravelDot = styled.circle`
 	animation-delay: 0.6s;
 `;
 
-// stops: x position, label
+// stops: x position, label, time
 const STOPS = [
-	{ x: 22,  label: 'Home',   above: false },
-	{ x: 88,  label: 'Gym',    above: true  },
-	{ x: 155, label: 'Café',   above: false },
-	{ x: 240, label: 'Office', above: true  },
+	{ x: 22,  label: 'Home',   time: '8:00 AM', above: false },
+	{ x: 88,  label: 'Office', time: '9:15 AM', above: true  },
+	{ x: 155, label: 'Café',   time: '1:00 PM', above: false },
+	{ x: 240, label: 'Gym',    time: '5:30 PM', above: true  },
 ];
 
 function TravelAnimation() {
@@ -301,11 +301,17 @@ function TravelAnimation() {
 					<g key={s.label}>
 						<circle cx={s.x} cy={55} r={6} fill="rgba(96,165,250,0.15)" stroke="#60a5fa" strokeWidth="1.5"/>
 						<circle cx={s.x} cy={55} r={2.5} fill="#60a5fa"/>
-						<text
-							x={s.x} y={s.above ? 40 : 74}
-							fontSize="8" fill="rgba(255,255,255,0.55)"
-							textAnchor="middle"
-						>{s.label}</text>
+						{s.above ? (
+							<>
+								<text x={s.x} y={28} fontSize="7.5" fill="rgba(96,165,250,0.8)" textAnchor="middle" fontWeight="600">{s.time}</text>
+								<text x={s.x} y={40} fontSize="8" fill="rgba(255,255,255,0.55)" textAnchor="middle">{s.label}</text>
+							</>
+						) : (
+							<>
+								<text x={s.x} y={74} fontSize="8" fill="rgba(255,255,255,0.55)" textAnchor="middle">{s.label}</text>
+								<text x={s.x} y={84} fontSize="7.5" fill="rgba(96,165,250,0.8)" textAnchor="middle" fontWeight="600">{s.time}</text>
+							</>
+						)}
 					</g>
 				))}
 
@@ -317,102 +323,143 @@ function TravelAnimation() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   CARD 3 — Tilecast
-   Mini schedule grid: ghost tile previews in empty slot,
-   "PREVIEW" label → snaps in, label changes to "CONFIRMED"
+   CARD 1 — Schedule Undo
+   Scene A: original tile · Scene B: preview with changed time
+   Scene C: Undo / Accept buttons
 ════════════════════════════════════════════════════════════════ */
 
-const ghostPulse = keyframes`
-	0%, 100%  { border-color: rgba(74,222,128,0.3); box-shadow: none; }
-	50%       { border-color: rgba(74,222,128,0.9); box-shadow: 0 0 12px rgba(74,222,128,0.3); }
+const undoSceneA = keyframes`
+	0%, 28%   { opacity: 1; }
+	33%, 100% { opacity: 0; }
 `;
 
-const ghostSnap = keyframes`
-	0%, 30%   { opacity: 0; background: transparent; }
-	40%, 70%  { opacity: 1; background: rgba(74,222,128,0.08); }
-	80%       { opacity: 1; background: rgba(74,222,128,0.25); box-shadow: 0 0 14px rgba(74,222,128,0.4); }
-	95%, 100% { opacity: 1; background: rgba(74,222,128,0.12); box-shadow: none; }
+const undoSceneB = keyframes`
+	0%, 33%   { opacity: 0; }
+	38%, 61%  { opacity: 1; }
+	66%, 100% { opacity: 0; }
 `;
 
-const labelSwap = keyframes`
-	0%, 30%   { content: 'PREVIEW'; color: rgba(74,222,128,0.6); }
-	79%       { opacity: 1; }
-	80%, 100% { opacity: 0; }
-`;
-
-const confirmedFade = keyframes`
-	0%, 79%   { opacity: 0; }
-	82%, 95%  { opacity: 1; }
+const undoSceneC = keyframes`
+	0%, 66%   { opacity: 0; }
+	71%, 95%  { opacity: 1; }
 	100%      { opacity: 0; }
 `;
 
-const TilecastScene = styled.div`
+const acceptPulse = keyframes`
+	0%, 80%   { box-shadow: none; }
+	90%       { box-shadow: 0 0 10px rgba(74,222,128,0.5); }
+	100%      { box-shadow: none; }
+`;
+
+const UndoSceneBase = styled.div`
 	position: absolute;
 	inset: 0;
 	display: flex;
 	flex-direction: column;
+	align-items: stretch;
 	justify-content: center;
-	gap: 7px;
-	padding: 10px 18px;
+	gap: 8px;
+	padding: 10px 16px;
 `;
 
-const ScheduleTile = styled.div`
+const UndoSceneA = styled(UndoSceneBase)`
+	animation: ${undoSceneA} 7.5s ease-in-out infinite;
+`;
+
+const UndoSceneB = styled(UndoSceneBase)`
+	animation: ${undoSceneB} 7.5s ease-in-out infinite;
+`;
+
+const UndoSceneC = styled(UndoSceneBase)`
+	animation: ${undoSceneC} 7.5s ease-in-out infinite;
+`;
+
+const UndoTileCard = styled.div<{ $ghost?: boolean }>`
 	width: 100%;
-	height: 24px;
-	border-radius: 6px;
-	background: rgba(255,255,255,0.07);
-	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 8px;
+	background: ${({ $ghost }) => $ghost ? 'rgba(74,222,128,0.05)' : 'rgba(255,255,255,0.07)'};
+	border: ${({ $ghost }) => $ghost ? '1.5px dashed rgba(74,222,128,0.5)' : '1px solid rgba(255,255,255,0.1)'};
+	padding: 6px 10px;
 	display: flex;
-	align-items: center;
-	padding: 0 8px;
+	flex-direction: column;
+	gap: 3px;
 `;
 
-const GhostTileAnimated = styled.div`
+const UndoTileName = styled.span`
+	font-size: 9px;
+	font-weight: 600;
+	color: rgba(255,255,255,0.9);
+`;
+
+const UndoTileMeta = styled.span`
+	font-size: 8px;
+	color: rgba(255,255,255,0.45);
+`;
+
+const UndoPreviewBadge = styled.span`
+	font-size: 7px;
+	color: rgba(74,222,128,0.9);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	margin-top: 1px;
+`;
+
+const UndoActionRow = styled.div`
+	display: flex;
+	gap: 8px;
 	width: 100%;
-	height: 24px;
+`;
+
+const UndoActionBtn = styled.button<{ $variant: 'undo' | 'accept' }>`
+	flex: 1;
+	border: none;
 	border-radius: 6px;
-	border: 1.5px dashed rgba(74,222,128,0.5);
-	display: flex;
-	align-items: center;
-	padding: 0 8px;
-	animation: ${ghostSnap} 5s ease-in-out infinite;
-	position: relative;
-`;
-
-const TileLabel = styled.span`
+	padding: 5px 0;
 	font-size: 8px;
-	color: rgba(255,255,255,0.35);
-	font-weight: 500;
-`;
-
-const PreviewLabel = styled.span`
-	font-size: 8px;
-	color: rgba(74,222,128,0.7);
-	font-weight: 600;
+	font-weight: 700;
 	letter-spacing: 0.05em;
-	animation: ${labelSwap} 5s ease-in-out infinite;
+	cursor: default;
+	background: ${({ $variant }) =>
+		$variant === 'accept' ? 'rgba(74,222,128,0.15)' : 'rgba(239,68,68,0.12)'};
+	color: ${({ $variant }) =>
+		$variant === 'accept' ? 'rgba(74,222,128,0.9)' : 'rgba(239,68,68,0.8)'};
+	border: 1px solid ${({ $variant }) =>
+		$variant === 'accept' ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.25)'};
+	animation: ${({ $variant }) => $variant === 'accept' ? acceptPulse : 'none'} 7.5s ease-in-out infinite;
 `;
 
-const ConfirmedLabel = styled.span`
-	font-size: 8px;
-	color: rgba(74,222,128,1);
-	font-weight: 600;
-	letter-spacing: 0.05em;
-	position: absolute;
-	animation: ${confirmedFade} 5s ease-in-out infinite;
-`;
-
-function TilecastAnimation() {
+function ScheduleUndoAnimation() {
 	return (
 		<AnimArea>
-			<TilecastScene>
-				<ScheduleTile><TileLabel>9:00 AM — Team standup</TileLabel></ScheduleTile>
-				<GhostTileAnimated>
-					<PreviewLabel>PREVIEW — Gym session</PreviewLabel>
-					<ConfirmedLabel>✓ CONFIRMED — Gym session</ConfirmedLabel>
-				</GhostTileAnimated>
-				<ScheduleTile><TileLabel>2:00 PM — Client call</TileLabel></ScheduleTile>
-			</TilecastScene>
+			{/* Scene A — original tile */}
+			<UndoSceneA>
+				<UndoTileCard>
+					<UndoTileName>Gym session</UndoTileName>
+					<UndoTileMeta>@ Home · Tue · 10:00 AM</UndoTileMeta>
+				</UndoTileCard>
+			</UndoSceneA>
+
+			{/* Scene B — preview with changed time */}
+			<UndoSceneB>
+				<UndoTileCard $ghost>
+					<UndoTileName>Gym session</UndoTileName>
+					<UndoTileMeta>@ Home · Wed · 2:00 PM</UndoTileMeta>
+					<UndoPreviewBadge>PREVIEW</UndoPreviewBadge>
+				</UndoTileCard>
+			</UndoSceneB>
+
+			{/* Scene C — Undo / Accept */}
+			<UndoSceneC>
+				<UndoTileCard $ghost>
+					<UndoTileName>Gym session</UndoTileName>
+					<UndoTileMeta>@ Home · Wed · 2:00 PM</UndoTileMeta>
+					<UndoPreviewBadge>PREVIEW</UndoPreviewBadge>
+				</UndoTileCard>
+				<UndoActionRow>
+					<UndoActionBtn $variant="undo">✕ Undo</UndoActionBtn>
+					<UndoActionBtn $variant="accept">✓ Accept</UndoActionBtn>
+				</UndoActionRow>
+			</UndoSceneC>
 		</AnimArea>
 	);
 }
@@ -569,9 +616,9 @@ function TileshareAnimation() {
 /* ─── Config map ─────────────────────────────────────────────── */
 
 const CARD_CONFIGS = [
-	{ bg: '#0d0505', Animation: NLSAnimation },
+	{ bg: '#050d05', Animation: ScheduleUndoAnimation },
 	{ bg: '#050810', Animation: TravelAnimation },
-	{ bg: '#050d05', Animation: TilecastAnimation },
+	{ bg: '#0d0505', Animation: NLSAnimation },
 	{ bg: '#080508', Animation: TileshareAnimation },
 ];
 
@@ -586,7 +633,7 @@ const FeatureHighlightsSection: React.FC = () => {
 			header: t('home.features.adaptive.title'),
 			body: t('home.features.adaptive.description'),
 			backgroundImage: FitnessBackground,
-			slug: 'tilecast',
+			slug: 'schedule-undo',
 		},
 		{
 			subHeader: t('home.features.transit.subtitle'),
