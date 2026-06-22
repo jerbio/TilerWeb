@@ -158,62 +158,79 @@ export const articles: Article[] = [
 		],
 	},
 	{
-		slug: 'tilecast',
+		slug: 'schedule-undo',
 		category: 'FEATURES',
-		title: 'Tilecast — Preview Before You Commit',
+		title: 'Schedule Undo — Change Your Mind Before It Counts',
 		subtitle:
-			'See exactly how a schedule change ripples across your day before you accept it. No surprises, no undoing.',
+			'Every schedule change shows you a live preview. Undo it instantly, or accept it with confidence. Your original plan is always one tap away.',
 		excerpt:
-			'See exactly how a schedule change ripples across your day before you accept it. No surprises, no undoing.',
+			'Preview any schedule change before it saves. Undo it instantly or accept it with confidence — your live schedule is never touched without your approval.',
 		readTime: '4 min read',
 		author: 'Tiler Team',
-		date: 'May 15, 2026',
+		date: 'June 22, 2026',
 		coverImage: FitnessBackground,
 		sections: [
 			{
 				type: 'prose',
 				lead: true,
-				text: 'Scheduling decisions have consequences you can\'t always see coming. Move one task and three others need to shift. Tilecast shows you the downstream effect before anything is saved.',
+				text: 'Changing your schedule feels risky. Move one task and you\'re not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment.',
 			},
 			{
 				type: 'prose',
-				text: 'Think of it as a live preview of your schedule. You propose a change — add a task, move a block, accept a new commitment — and Tilecast renders the updated grid for you to inspect. Commit only when you\'re happy.',
+				text: 'Every change in Tiler — whether you typed a request, accepted a suggestion, or dragged a tile — first appears as a preview. Your live schedule stays untouched until you say so.',
 			},
 			{
 				type: 'heading',
-				title: 'Preview, Explore, Commit',
+				title: 'How Schedule Undo Works',
 			},
 			{
 				type: 'step',
 				stepNumber: 1,
-				stepTitle: 'Propose a change',
+				stepTitle: 'Propose or accept a change',
 				stepImage: FitnessBackground,
 				stepBody:
-					'Tell Tiler what you want to do — add a task, move an existing one, or accept a suggestion. Instead of applying it immediately, Tiler shows you a preview.',
+					'Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into a preview state — shown with a dashed border and a PREVIEW label so you can\'t miss it.',
 				callout: {
-					label: 'No accidental saves',
-					text: 'Every change lives in preview mode until you explicitly confirm it. Your live schedule is never touched without your approval.',
+					label: 'Nothing saves automatically',
+					text: 'Your live schedule is frozen while you review. No partial saves, no accidental overwrites.',
 				},
 			},
 			{
 				type: 'step',
 				stepNumber: 2,
-				stepTitle: 'See the ripple on the grid',
+				stepTitle: 'Review the proposed tile',
 				stepImage: FitnessBackground,
 				stepBody:
-					'The Tilecast view renders your full schedule with the proposed change applied. Moved tasks, shifted buffers, and new travel windows are all visible at once.',
+					'The preview tile shows your updated name, location, time, and date side by side with what was there before. You can see exactly what changed at a glance — no need to mentally track it.',
 			},
 			{
 				type: 'step',
 				stepNumber: 3,
-				stepTitle: 'Accept or explore alternatives',
+				stepTitle: 'Tap Undo or Accept',
 				stepImage: FitnessBackground,
 				stepBody:
-					'Like what you see? Commit. Not quite right? Ask Tiler for an alternative arrangement and preview that instead. You can iterate until the schedule feels right.',
+					'Not happy with what you see? Tap Undo and your original schedule snaps back instantly — no undo history to dig through. Happy with the change? Tap Accept and it\'s locked in.',
 				callout: {
-					label: 'Confidence before commitment',
-					text: 'Tilecast gives you the information to make better scheduling decisions — not just faster ones.',
+					label: 'Undo is always instant',
+					text: 'It doesn\'t matter how complex the ripple was — Undo restores your exact original state in one tap.',
 				},
+			},
+			{
+				type: 'heading',
+				title: 'Why This Matters',
+			},
+			{
+				type: 'prose',
+				text: 'Most calendar apps apply changes immediately and ask you to undo after the fact — by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this: the default is preview, not save.',
+			},
+			{
+				type: 'callout',
+				label: 'Designed for busy schedules',
+				text: 'When your day is tightly packed, a wrong move can cascade. Schedule Undo gives you a moment to breathe and verify before any change ripples outward.',
+			},
+			{
+				type: 'prose',
+				text: 'Whether you\'re rescheduling a workout, shifting a meeting, or accepting a new task from a colleague — the preview step takes less than a second and can save you from a scheduling mistake you\'d regret.',
 			},
 		],
 	},
