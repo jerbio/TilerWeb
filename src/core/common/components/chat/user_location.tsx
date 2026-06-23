@@ -8,6 +8,7 @@ interface StyledProps {
 	$isLoading?: boolean; // Using $ prefix to avoid DOM attribute warnings
 	$isEditing?: boolean;
 	$useDefaultLocation?: boolean;
+	$shouldNudge?: boolean;
 }
 
 // Pulse animation loader component
@@ -52,6 +53,30 @@ const LocationContainer = styled.div<StyledProps>`
 	transition: all 0.2s ease-in-out;
 	position: relative;
 	overflow: visible;
+	${({ $shouldNudge, theme }) =>
+		$shouldNudge &&
+		`
+		animation: locationAttentionFlash 9s ease-in-out infinite;
+
+		@keyframes locationAttentionFlash {
+			0%, 76%, 100% {
+				border-color: ${theme.colors.brand[400]};
+				box-shadow: none;
+			}
+			84% {
+				border-color: ${theme.colors.brand[500]};
+				box-shadow: 0 0 0 1px rgba(237, 18, 59, 0.25), 0 0 12px rgba(237, 18, 59, 0.22);
+			}
+			92% {
+				border-color: ${theme.colors.brand[300]};
+				box-shadow: 0 0 0 1px rgba(237, 18, 59, 0.12), 0 0 7px rgba(237, 18, 59, 0.16);
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			animation: none;
+		}
+	`}
 
 	&:hover {
 		border-color: ${({ $isLoading, theme }) =>
@@ -279,7 +304,7 @@ const UserLocation: React.FC = () => {
 	const theme = useTheme();
 
 	const [locationData, setLocationData] = useState<LocationData>(
-		locationService.getDefaultLocation()
+		locationService.getUnavailableLocation()
 	);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error] = useState<string | null>(null);
@@ -305,9 +330,9 @@ const UserLocation: React.FC = () => {
 				setCustomLocation(currentLocation.location);
 			} catch (err) {
 				console.error('Unexpected error in location fetch:', err);
-				const defaultLocation = locationService.getDefaultLocation();
-				setLocationData(defaultLocation);
-				setCustomLocation(defaultLocation.location);
+				const unavailableLocation = locationService.getUnavailableLocation();
+				setLocationData(unavailableLocation);
+				setCustomLocation(unavailableLocation.location);
 			} finally {
 				setIsLoading(false);
 			}
@@ -386,13 +411,13 @@ const UserLocation: React.FC = () => {
 		e.preventDefault();
 		e.stopPropagation(); // Prevent event bubbling that might trigger blur
 
-		if (customLocation.trim()) {
+		const trimmedLocation = customLocation.trim();
+		if (trimmedLocation) {
 			setIsLocationFetching(true);
 
 			try {
-				const newLocationData = await locationService.getLocationFromAddress(
-					customLocation.trim()
-				);
+				const newLocationData =
+					await locationService.getLocationFromAddress(trimmedLocation);
 				setLocationData(newLocationData);
 				// Cache the manual location so it persists between re-renders
 				locationService.setManualLocation(newLocationData);
@@ -400,25 +425,31 @@ const UserLocation: React.FC = () => {
 				console.error('Error setting location:', err);
 				// Fallback to entered text if service fails
 				const fallbackLocation = {
-					location: customLocation.trim(),
+					location: trimmedLocation,
 					verified: false,
+					status: 'manual_unverified' as const,
 				};
 				setLocationData(fallbackLocation);
 				locationService.setManualLocation(fallbackLocation);
 			} finally {
 				setIsLocationFetching(false);
 			}
+		} else {
+			const unavailableLocation = locationService.getUnavailableLocation();
+			locationService.setCurrentLocation(unavailableLocation);
+			locationService.clearManualLocation();
+			setLocationData(unavailableLocation);
+			setCustomLocation('');
 		}
 		setIsEditing(false);
 	};
 
-	// Reset location to default
-	const resetToDefault = () => {
-		const defaultLocation = locationService.getDefaultLocation();
-		locationService.setCurrentLocation(defaultLocation);
-		setLocationData(defaultLocation);
-		setCustomLocation(defaultLocation.location);
-		// Clear the cached manual location
+	// Clear location so the backend can treat commute origin as unknown.
+	const clearLocation = () => {
+		const unavailableLocation = locationService.getUnavailableLocation();
+		locationService.setCurrentLocation(unavailableLocation);
+		setLocationData(unavailableLocation);
+		setCustomLocation(unavailableLocation.location);
 		locationService.clearManualLocation();
 	};
 
@@ -443,12 +474,30 @@ const UserLocation: React.FC = () => {
 
 	// Message explaining the benefits of setting a custom location
 	const locationBenefitMessage = t('home.expanded.chat.userLocation.locationBenefitMessage');
+	const isLocationVerified = locationData.status === 'verified';
+	const locationNeedsAttention = !isLocationVerified;
+	const locationStatusLabel =
+		locationData.status === 'permission_denied'
+			? t('home.expanded.chat.userLocation.permissionDenied', 'Location permission off')
+			: locationData.status === 'manual_unverified'
+				? t('home.expanded.chat.userLocation.unverifiedLocation', 'Location not verified')
+				: t('home.expanded.chat.userLocation.locationNotSet', 'Location not set');
+	const locationDisplayText = locationData.location || locationStatusLabel;
+	const locationBadgeText =
+		locationData.status === 'manual_unverified'
+			? t('home.expanded.chat.userLocation.unverified', 'Unverified')
+			: locationData.status === 'permission_denied'
+				? t('home.expanded.chat.userLocation.setAddress', 'Set address')
+				: t('home.expanded.chat.userLocation.notSet', 'Not set');
+	const shouldNudgeLocation =
+		!isLoading && !isEditing && locationData.status === 'permission_denied';
 
 	return (
 		<LocationContainer
 			$isLoading={isLoading}
 			$isEditing={isEditing}
-			$useDefaultLocation={!locationData.verified}
+			$useDefaultLocation={locationNeedsAttention}
+			$shouldNudge={shouldNudgeLocation}
 			onClick={handleEditClick}
 		>
 			<LocationIconWrapper>
@@ -459,7 +508,7 @@ const UserLocation: React.FC = () => {
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 					$isEditing={isEditing}
-					$useDefaultLocation={!locationData.verified}
+					$useDefaultLocation={locationNeedsAttention}
 					onClick={handleLocationIconClick}
 					style={{ cursor: isLocationFetching ? 'wait' : 'pointer' }}
 				>
@@ -479,9 +528,9 @@ const UserLocation: React.FC = () => {
 							t('home.expanded.chat.userLocation.gettingCurrentLocation')
 						) : isEditing ? (
 							t('home.expanded.chat.userLocation.enterLocation')
-						) : !locationData.verified ? (
+						) : locationNeedsAttention ? (
 							<>
-								{t('home.expanded.chat.userLocation.usingDefaultLocation')}
+								{locationStatusLabel}
 								<br />
 								<br />
 								{locationBenefitMessage}
@@ -515,18 +564,16 @@ const UserLocation: React.FC = () => {
 						autoComplete="off"
 					/>
 					<ButtonContainer onClick={(e) => e.stopPropagation()}>
-						{customLocation !== locationService.getDefaultLocation().location && (
+						{customLocation.trim().length > 0 && (
 							<DefaultButton
 								type="button"
 								onClick={(e) => {
 									e.stopPropagation();
 									e.preventDefault(); // Prevent form submission
-									setCustomLocation(
-										locationService.getDefaultLocation().location
-									);
+									setCustomLocation('');
 								}}
 							>
-								Default
+								{t('home.expanded.chat.userLocation.clear', 'Clear')}
 							</DefaultButton>
 						)}
 						<SubmitButton
@@ -541,7 +588,7 @@ const UserLocation: React.FC = () => {
 					</ButtonContainer>
 				</LocationForm>
 			) : (
-				<LocationText $useDefaultLocation={!locationData.verified}>
+				<LocationText $useDefaultLocation={locationNeedsAttention}>
 					{isLoading || isLocationFetching ? (
 						<>
 							{isLocationFetching
@@ -551,8 +598,8 @@ const UserLocation: React.FC = () => {
 						</>
 					) : (
 						<>
-							{locationData.location}
-							{!locationData.verified ? (
+							{locationDisplayText}
+							{locationNeedsAttention ? (
 								<DefaultBadgeContainer>
 									<DefaultBadge
 										onClick={(e) => {
@@ -562,7 +609,7 @@ const UserLocation: React.FC = () => {
 										onMouseOver={() => showTooltip('default-badge-tooltip')}
 										onMouseOut={() => hideTooltip('default-badge-tooltip')}
 									>
-										{t('home.expanded.chat.userLocation.default')}
+										{locationBadgeText}
 									</DefaultBadge>
 
 									{/* Fixed tooltip that always appears at the top center of the viewport */}
@@ -576,10 +623,10 @@ const UserLocation: React.FC = () => {
 								<ResetLink
 									onClick={(e) => {
 										e.stopPropagation();
-										resetToDefault();
+										clearLocation();
 									}}
 								>
-									{t('home.expanded.chat.userLocation.resetToDefault')}
+									{t('home.expanded.chat.userLocation.clear', 'Clear')}
 								</ResetLink>
 							)}
 						</>

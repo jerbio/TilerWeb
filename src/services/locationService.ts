@@ -3,7 +3,10 @@ export interface LocationData {
 	longitude?: number;
 	latitude?: number;
 	verified: boolean;
+	status: LocationStatus;
 }
+
+export type LocationStatus = 'verified' | 'unavailable' | 'permission_denied' | 'manual_unverified';
 
 export interface LocationCoordinates {
 	latitude: number;
@@ -12,22 +15,25 @@ export interface LocationCoordinates {
 }
 
 class LocationService {
-	// Default location: National Museum of African American History and Culture in DC
-	private readonly DEFAULT_LOCATION = 'Empire State Building, New York, NY';
-
-	// Cache for the current location data
-	private currentLocationData: LocationData | null = null;
-
 	// Cache for the locally set manual location
 	private cachedManualLocation: LocationData | null = null;
 
 	/**
 	 * Get the default location data
+	 * @deprecated Use getUnavailableLocation(). The app should not use a fake
+	 * location as the user's commute anchor.
 	 */
 	getDefaultLocation(): LocationData {
+		return this.getUnavailableLocation();
+	}
+
+	getUnavailableLocation(
+		status: Extract<LocationStatus, 'unavailable' | 'permission_denied'> = 'unavailable'
+	): LocationData {
 		return {
-			location: this.DEFAULT_LOCATION,
+			location: '',
 			verified: false,
+			status,
 		};
 	}
 
@@ -56,27 +62,44 @@ class LocationService {
 	 * Set the current location data (used when user manually enters an address)
 	 */
 	setCurrentLocation(locationData: LocationData): void {
-		this.currentLocationData = locationData;
+		if (locationData.status === 'verified' || locationData.status === 'manual_unverified') {
+			this.cachedManualLocation = locationData;
+		} else {
+			this.cachedManualLocation = null;
+		}
 	}
 
 	/**
 	 * Get the user's current location
-	 * Returns cached location if available, otherwise uses browser geolocation API
+	 * Returns a manually selected location when available. Otherwise, refreshes
+	 * browser geolocation so chat requests do not reuse an old commute origin.
 	 */
 	async getCurrentLocation(): Promise<LocationData> {
-		// If we have a cached location (manually set or previously fetched), return it
-		if (this.currentLocationData) {
-			return this.currentLocationData;
+		if (this.cachedManualLocation) {
+			return this.cachedManualLocation;
 		}
 
 		return this.fetchBrowserLocation();
 	}
 
 	/**
-	 * Force refresh location from browser geolocation API (ignores cache)
+	 * Try browser geolocation even when a manual address exists. If the browser
+	 * lookup fails, keep the manual address rather than replacing it with unknown.
 	 */
 	async refreshLocationFromBrowser(): Promise<LocationData> {
-		return this.fetchBrowserLocation();
+		const manualLocation = this.cachedManualLocation;
+		const location = await this.fetchBrowserLocation();
+
+		if (location.status === 'verified') {
+			this.cachedManualLocation = null;
+			return location;
+		}
+
+		if (manualLocation) {
+			return manualLocation;
+		}
+
+		return location;
 	}
 
 	/**
@@ -86,16 +109,14 @@ class LocationService {
 		try {
 			// Check if geolocation is supported by the browser
 			if (!navigator.geolocation) {
-				const defaultLocation = this.getDefaultLocation();
-				this.currentLocationData = defaultLocation;
-				return defaultLocation;
+				const unavailableLocation = this.getUnavailableLocation();
+				return unavailableLocation;
 			}
 
 			// Avoid unnecessary geolocation calls when browser permission is already denied.
 			if (await this.isGeolocationPermissionDenied()) {
-				const defaultLocation = this.getDefaultLocation();
-				this.currentLocationData = defaultLocation;
-				return defaultLocation;
+				const unavailableLocation = this.getUnavailableLocation('permission_denied');
+				return unavailableLocation;
 			}
 
 			// Get the current position with a timeout
@@ -117,9 +138,9 @@ class LocationService {
 					longitude,
 					latitude,
 					verified: true,
+					status: 'verified' as const,
 				};
 
-				this.currentLocationData = locationData;
 				return locationData;
 			} catch (err) {
 				// If reverse geocoding fails, just use coordinates
@@ -131,9 +152,9 @@ class LocationService {
 					longitude,
 					latitude,
 					verified: true,
+					status: 'verified' as const,
 				};
 
-				this.currentLocationData = locationData;
 				return locationData;
 			}
 		} catch (err) {
@@ -141,9 +162,10 @@ class LocationService {
 			if (!this.isPermissionDeniedError(geolocationError)) {
 				console.error('Geolocation error:', err);
 			}
-			const defaultLocation = this.getDefaultLocation();
-			this.currentLocationData = defaultLocation;
-			return defaultLocation;
+			const unavailableLocation = this.getUnavailableLocation(
+				this.isPermissionDeniedError(geolocationError) ? 'permission_denied' : 'unavailable'
+			);
+			return unavailableLocation;
 		}
 	}
 
@@ -220,13 +242,6 @@ class LocationService {
 	 * Get location data from a custom address input
 	 */
 	async getLocationFromAddress(address: string): Promise<LocationData> {
-		// Check if the entered location is the default
-		if (address.trim() === this.DEFAULT_LOCATION) {
-			const defaultLocation = this.getDefaultLocation();
-			this.currentLocationData = defaultLocation;
-			return defaultLocation;
-		}
-
 		try {
 			// Try to geocode the entered address to get coordinates
 			const geocodedResult = await this.geocodeAddress(address.trim());
@@ -237,19 +252,21 @@ class LocationService {
 					longitude: geocodedResult.longitude,
 					latitude: geocodedResult.latitude,
 					verified: true,
+					status: 'verified' as const,
 				};
 
 				// Cache the location data
-				this.currentLocationData = locationData;
+				this.cachedManualLocation = locationData;
 				return locationData;
 			} else {
 				// If geocoding fails, just use the entered text
 				const locationData = {
 					location: address.trim(),
 					verified: false,
+					status: 'manual_unverified' as const,
 				};
 
-				this.currentLocationData = locationData;
+				this.cachedManualLocation = locationData;
 				return locationData;
 			}
 		} catch (err) {
@@ -257,9 +274,10 @@ class LocationService {
 			const locationData = {
 				location: address.trim(),
 				verified: false,
+				status: 'manual_unverified' as const,
 			};
 
-			this.currentLocationData = locationData;
+			this.cachedManualLocation = locationData;
 			return locationData;
 		}
 	}
