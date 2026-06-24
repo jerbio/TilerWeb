@@ -131,7 +131,10 @@ const StyledButton = styled.button<StyledButtonProps>`
 					: props.$variant === 'ghost'
 						? props.theme.colors.button.ghost.text
 						: props.theme.colors.white};
-	border-radius: ${(props) => props.theme.borderRadius.little};
+	border-radius: ${(props) =>
+		props.$size === 'small'
+			? props.theme.borderRadius.little
+			: props.theme.borderRadius.medium};
 	font-weight: ${(props) => props.theme.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
