@@ -1,5 +1,5 @@
 import { Calendar, ListTodo } from 'lucide-react';
-import ROUTES from '@/core/constants/routes';
+import { Routes } from '@/core/constants/routes';
 
 const appRoutes: Array<{
 	path: string;
@@ -7,12 +7,12 @@ const appRoutes: Array<{
 	icon: React.ReactNode;
 }> = [
 	{
-		path: ROUTES.timeline,
+		path: Routes.Timeline,
 		name: 'Home',
 		icon: <Calendar size={20} />,
 	},
 	{
-		path: ROUTES.tileshare.root,
+		path: Routes.Tileshare.root,
 		name: 'Tileshare',
 		icon: <ListTodo size={20} />,
 	},

@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
+import { BrowserRouter, Route, Routes as BrowserRoutes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
+import Articles from './pages/Articles';
+import GettingStartedArticle from './pages/articles/GettingStartedArticle';
 import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
@@ -23,6 +25,7 @@ import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
+import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
 import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
@@ -31,7 +34,12 @@ import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
 import TileshareSent from './pages/app/tileshare/TileshareSent';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
-import ROUTES from './core/constants/routes';
+import { FlaggedRoute } from './core/auth/FlaggedRoute';
+import { featureFlags } from './core/constants/featureFlags';
+import { AdminRoute } from './core/auth/AdminRoute';
+import AdminLayout from './pages/admin/AdminLayout';
+import FeatureFlagsAdmin from './pages/admin/feature-flags/FeatureFlagsAdmin';
+import { Routes } from '@/core/constants/routes';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
@@ -46,6 +54,18 @@ const AnalyticsTracker: React.FC = () => {
 			referrer: document.referrer,
 		});
 	}, [location]);
+
+	return null;
+};
+
+// Reset scroll position to the top on every route change (unless the URL has a hash)
+const ScrollToTop: React.FC = () => {
+	const { pathname, hash } = useLocation();
+
+	useEffect(() => {
+		if (hash) return;
+		window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+	}, [pathname, hash]);
 
 	return null;
 };
@@ -69,14 +89,28 @@ const App: React.FC = () => {
 				<ConsentProvider>
 					<AuthProvider>
 						<BrowserRouter>
+							<ThemeInitializer />
 							<AnalyticsTracker />
-							<Routes>
-								<Route path="/" element={<Layout />}>
+							<ScrollToTop />
+							<BrowserRoutes>
+								<Route path={Routes.Home} element={<Layout />}>
 									<Route index element={<Home />} />
-									<Route path="/discover" element={<Discover />} />
+									<Route path={Routes.Discover} element={<Discover />} />
+									<Route path={Routes.Articles} element={<Articles />} />
+									<Route
+										path={Routes.ArticlesGettingStarted}
+										element={<GettingStartedArticle />}
+									/>
+									{/* Legacy URL — keep redirect for SEO + backlinks */}
+									<Route
+										path="/get-started"
+										element={
+											<Navigate to={Routes.ArticlesGettingStarted} replace />
+										}
+									/>
 								</Route>
 								<Route
-									path="/waitlist"
+									path={Routes.Waitlist}
 									element={
 										<>
 											<Waitlist />
@@ -88,7 +122,7 @@ const App: React.FC = () => {
 								{/* Public Routes - redirect to /timeline if already authenticated */}
 								<Route element={<PublicRoute />}>
 									<Route
-										path="/signup"
+										path={Routes.SignUp}
 										element={
 											<>
 												<UserAuthentication />
@@ -97,7 +131,7 @@ const App: React.FC = () => {
 										}
 									/>
 									<Route
-										path="/signin"
+										path={Routes.SignIn}
 										element={
 											<>
 												<UserAuthentication />
@@ -109,63 +143,78 @@ const App: React.FC = () => {
 
 								{/* Extranet Routes - perform operations without needing to sign in */}
 								<Route
-									path={ROUTES.tileshare.patterns.invite}
+									path={Routes.Tileshare.invite.pattern}
 									element={<TileshareInvitePage />}
 								/>
 
 								{/* Protected Routes - redirect to /signin if not authenticated */}
 								<Route element={<ProtectedRoute />}>
 									<Route element={<AppLayout />}>
-										<Route path={ROUTES.timeline} element={<Timeline />} />
+										<Route path={Routes.Timeline} element={<Timeline />} />
 										<Route
-											path={ROUTES.tileshare.root}
-											element={<TileshareDashboardPage />}
+											element={
+												<FlaggedRoute flag={featureFlags.TILESHARE_TAB} />
+											}
 										>
+											<Route
+												path={Routes.Tileshare.root}
+												element={<TileshareDashboardPage />}
+											>
+												<Route
+													index
+													element={<Navigate to="inbox" replace />}
+												/>
+												<Route path="inbox" element={<TileshareActive />} />
+												<Route path="outbox" element={<TileshareSent />} />
+											</Route>
+											<Route
+												path={Routes.Tileshare.detail.pattern}
+												element={<TileshareDetailPage />}
+											/>
+											<Route
+												path={Routes.Tileshare.tilette.pattern}
+												element={<TiletteDetailPage />}
+											/>
+										</Route>
+										<Route path={Routes.Settings} element={<SettingsLayout />}>
 											<Route
 												index
 												element={
-													<Navigate
-														to={ROUTES.tileshare.active}
-														replace
-													/>
+													<Navigate to={Routes.SettingsAccount} replace />
 												}
 											/>
 											<Route
-												path={ROUTES.tileshare.active}
-												element={<TileshareActive />}
+												path={Routes.SettingsAccount}
+												element={<AccountSettings />}
 											/>
 											<Route
-												path={ROUTES.tileshare.sent}
-												element={<TileshareSent />}
-											/>
-										</Route>
-										<Route
-											path={ROUTES.tileshare.patterns.detail}
-											element={<TileshareDetailPage />}
-										/>
-
-										<Route
-											path={ROUTES.tileshare.patterns.tilette}
-											element={<TiletteDetailPage />}
-										/>
-										<Route path="/settings" element={<SettingsLayout />}>
-											<Route
-												index
-												element={<Navigate to="/settings" replace />}
-											/>
-											<Route path="account" element={<AccountSettings />} />
-											<Route
-												path="preferences"
+												path={Routes.SettingsPreferences}
 												element={<PreferencesSettings />}
 											/>
 											<Route
-												path="notifications"
+												path={Routes.SettingsNotifications}
 												element={<NotificationPreferencesSettings />}
 											/>
 										</Route>
 									</Route>
 								</Route>
-							</Routes>
+
+								{/* Admin Routes - redirect to /timeline if not admin */}
+								<Route element={<AdminRoute />}>
+									<Route path={Routes.Admin.root} element={<AdminLayout />}>
+										<Route
+											index
+											element={
+												<Navigate to={Routes.Admin.featureFlags} replace />
+											}
+										/>
+										<Route
+											path={Routes.Admin.featureFlags}
+											element={<FeatureFlagsAdmin />}
+										/>
+									</Route>
+								</Route>
+							</BrowserRoutes>
 							<Toaster position="bottom-left" theme="system" />
 							<NotificationToast />
 						</BrowserRouter>

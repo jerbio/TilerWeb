@@ -23,33 +23,39 @@ const Modal: React.FC<ModalProps> = ({
 	closeTimeout,
 }) => {
 	const theme = useTheme();
-	const [intervalId, setIntervalId] = React.useState<number>();
+	const intervalRef = React.useRef<number | null>(null);
 	const [timeLeft, setTimeLeft] = React.useState<number>(closeTimeout ?? 0);
 	const timerExists = show && !!setShow && closeTimeout !== undefined;
 
-	function closeModal() {
+	const clearCloseTimer = React.useCallback(() => {
+		if (intervalRef.current === null) return;
+		window.clearInterval(intervalRef.current);
+		intervalRef.current = null;
+	}, []);
+
+	const closeModal = React.useCallback(() => {
 		setShow?.(false);
-		clearInterval(intervalId);
+		clearCloseTimer();
 		setTimeLeft(0);
-	}
+	}, [clearCloseTimer, setShow]);
 
 	useEffect(() => {
-		if (timerExists) {
-			setTimeLeft(closeTimeout);
-			const id = window.setInterval(() => {
-				setTimeLeft((prev) => prev - 1);
-			}, 1000);
-			setIntervalId(id);
-		}
+		clearCloseTimer();
+		if (!timerExists) return undefined;
 
-		return () => clearInterval(intervalId);
-	}, [show, setShow, closeTimeout]);
+		setTimeLeft(closeTimeout);
+		intervalRef.current = window.setInterval(() => {
+			setTimeLeft((prev) => prev - 1);
+		}, 1000);
+
+		return clearCloseTimer;
+	}, [clearCloseTimer, timerExists, closeTimeout]);
 
 	useEffect(() => {
-		if (timeLeft <= 0) {
+		if (timerExists && timeLeft <= 0) {
 			closeModal();
 		}
-	}, [timeLeft, setShow]);
+	}, [closeModal, timerExists, timeLeft]);
 
 	return createPortal(
 		<Overlay onClick={closeModal} $show={show}>

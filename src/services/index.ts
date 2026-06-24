@@ -19,9 +19,11 @@ import { UserApi } from '@/api/userApi';
 import { UserService } from './userService';
 import { FeedbackApi } from '@/api/feedbackApi';
 import { FeedbackService } from './feedbackService';
-import { personaUserService } from './personaUserService';
 import { TileshareApi } from '@/api/tileshareApi';
 import TileshareService from './tileshareService';
+import { NotesApi } from '@/api/notesApi';
+import { NotesService } from './notesService';
+import { personaUserService } from './personaUserService';
 
 // Init APIs
 const personaApi = new PersonaApi();
@@ -37,6 +39,7 @@ const locationApi = new LocationApi();
 const userApi = new UserApi();
 const feedbackApi = new FeedbackApi();
 const tileshareApi = new TileshareApi();
+const notesApi = new NotesApi();
 
 // Init Services
 export const personaService = new PersonaService(personaApi);
@@ -54,4 +57,5 @@ export const authService = new AuthService(authApi);
 export const userService = new UserService(userApi);
 export const feedbackService = new FeedbackService(feedbackApi);
 export const tileshareService = new TileshareService(tileshareApi);
+export const notesService = new NotesService(notesApi);
 export { personaUserService };

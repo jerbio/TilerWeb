@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router';
 import useAppStore from '@/global_state';
-import ROUTES from '@/core/constants/routes';
+import { Routes } from '@/core/constants/routes';
 import Loader from '@/core/common/components/loader';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
@@ -24,7 +24,7 @@ export const PublicRoute: React.FC = () => {
 
 	if (isAuthenticated) {
 		// If user is already authenticated, redirect to timeline
-		return <Navigate to={ROUTES.timeline} replace />;
+		return <Navigate to={Routes.Timeline} replace />;
 	}
 
 	// User is not authenticated, render the public page

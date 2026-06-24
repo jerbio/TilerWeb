@@ -10,6 +10,16 @@ interface SEOProps {
 	canonicalUrl?: string;
 	twitterCard?: 'summary' | 'summary_large_image' | 'app' | 'player';
 	structuredData?: object;
+	/** ISO 8601 timestamp — emits article:published_time. */
+	publishedTime?: string;
+	/** ISO 8601 timestamp — emits article:modified_time. */
+	modifiedTime?: string;
+	/** Author name(s) — emits one article:author tag per author. */
+	authors?: string[];
+	/** Article tags / keywords — emits one article:tag per tag. */
+	articleTags?: string[];
+	/** Article section / category — emits article:section. */
+	articleSection?: string;
 }
 
 const SEO: React.FC<SEOProps> = ({
@@ -21,6 +31,11 @@ const SEO: React.FC<SEOProps> = ({
 	canonicalUrl,
 	twitterCard = 'summary_large_image',
 	structuredData,
+	publishedTime,
+	modifiedTime,
+	authors,
+	articleTags,
+	articleSection,
 }) => {
 	const siteUrl = 'https://tiler.app';
 	const fullCanonicalUrl = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl;
@@ -41,6 +56,17 @@ const SEO: React.FC<SEOProps> = ({
 			<meta property="og:description" content={description} />
 			<meta property="og:image" content={ogImage} />
 			<meta property="og:site_name" content="Tiler" />
+
+			{/* Article-specific Open Graph */}
+			{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+			{modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+			{articleSection && <meta property="article:section" content={articleSection} />}
+			{authors?.map((author) => (
+				<meta key={`author-${author}`} property="article:author" content={author} />
+			))}
+			{articleTags?.map((tag) => (
+				<meta key={`tag-${tag}`} property="article:tag" content={tag} />
+			))}
 
 			{/* Twitter */}
 			<meta property="twitter:card" content={twitterCard} />

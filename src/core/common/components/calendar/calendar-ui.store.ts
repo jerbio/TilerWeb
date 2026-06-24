@@ -100,6 +100,16 @@ type EditTileActions = {
 	close: () => void;
 };
 
+type EditNotesState = {
+	isOpen: boolean;
+	event: CalendarEvent | null;
+};
+
+type EditNotesActions = {
+	open: (event: CalendarEvent) => void;
+	close: () => void;
+};
+
 type ViewInfo = {
 	startDay: dayjs.Dayjs;
 	daysInView: number;
@@ -122,6 +132,10 @@ export type CalendarUIStore = {
 	editTile: {
 		state: EditTileState;
 		actions: EditTileActions;
+	};
+	editNotes: {
+		state: EditNotesState;
+		actions: EditNotesActions;
 	};
 	viewInfo: ViewInfo;
 	setViewInfo: (info: ViewInfo) => void;
@@ -528,6 +542,33 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 						set((state) => ({
 							editTile: {
 								...state.editTile,
+								state: { isOpen: false, event: null },
+							},
+						}))
+					),
+				},
+			},
+
+			editNotes: {
+				state: {
+					isOpen: false,
+					event: null,
+				},
+
+				actions: {
+					open: guarded((event: CalendarEvent) =>
+						set((state) => ({
+							editNotes: {
+								...state.editNotes,
+								state: { isOpen: true, event },
+							},
+						}))
+					),
+
+					close: guarded(() =>
+						set((state) => ({
+							editNotes: {
+								...state.editNotes,
 								state: { isOpen: false, event: null },
 							},
 						}))

@@ -7,7 +7,9 @@ import {
 	Check,
 	ChevronRight,
 	Clock,
+	Copy,
 	ExternalLink,
+	Link,
 	Pencil,
 	Play,
 	Repeat2,
@@ -15,6 +17,7 @@ import {
 	Star,
 	Target,
 	Trash2,
+	Video,
 	X,
 } from 'lucide-react';
 import { RGBColor } from '@/core/util/colors';
@@ -39,6 +42,7 @@ import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useCalendarUI } from './calendar-ui.provider';
 import { getCalendarEventId } from '@/core/util/entityResolution';
+import { resolveLocationLink } from '@/core/util/locationLink';
 import calendarConfig from '@/core/constants/calendar_config';
 import CyclingEmoji from './cycling_emoji';
 import { TypeDefaults } from '../../types/typeDefaults';
@@ -100,6 +104,9 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const [deferHours, setDeferHours] = useState(0);
 	const [deferMinutes, setDeferMinutes] = useState(0);
 	const isDeferDurationZero = deferDays === 0 && deferHours === 0 && deferMinutes === 0;
+
+	// Tracks whether the location link URL was just copied to the clipboard
+	const [linkCopied, setLinkCopied] = useState(false);
 
 	// Notification helpers
 	const showNotification = useUiStore((s) => s.notification.show);
@@ -376,6 +383,16 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			setActionLoading(null);
 		}
 	}, [event, actionLoading, showNotification, updateNotification, t, onEventAction]);
+
+	const handleCopyLink = useCallback(async (url: string) => {
+		try {
+			await navigator.clipboard.writeText(url);
+			setLinkCopied(true);
+			setTimeout(() => setLinkCopied(false), 2000);
+		} catch (error) {
+			console.error('Copy link failed:', error);
+		}
+	}, []);
 
 	const eventColor = new RGBColor({
 		r: event ? (event.colorRed ?? TypeDefaults.RGBColor.red) : TypeDefaults.RGBColor.red,
@@ -688,19 +705,69 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 					<>
 						<hr />
 						<CalendarEventInfoSection>
-							<a
-								href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location.address)}`}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<CalendarEventInfoLocation $color={eventColor}>
-									<img src={LocationBG} alt="" width={16} />
-									<div>
-										<h3>{t('calendar.event.locationLabel')}</h3>
-										<ExternalLink size={16} />
-									</div>
-								</CalendarEventInfoLocation>
-							</a>
+							{(() => {
+								const { href, kind } = resolveLocationLink(event.location.address);
+								if (kind !== 'map') {
+									const isVideo = kind === 'video';
+									return (
+										<LocationLinkCard $color={eventColor}>
+											<div className="link-icon">
+												{isVideo ? <Video size={18} /> : <Link size={18} />}
+											</div>
+											<div className="link-body">
+												<h3>
+													{isVideo
+														? t('calendar.event.videoLinkLabel')
+														: t('calendar.event.locationLinkLabel')}
+												</h3>
+												<a
+													href={href}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="link-url"
+													title={href}
+												>
+													{href}
+												</a>
+											</div>
+											<div className="link-actions">
+												<button
+													type="button"
+													onClick={() => handleCopyLink(href)}
+													title={t('calendar.event.copyLink')}
+													aria-label={t('calendar.event.copyLink')}
+												>
+													{linkCopied ? (
+														<Check size={16} />
+													) : (
+														<Copy size={16} />
+													)}
+												</button>
+												<a
+													href={href}
+													target="_blank"
+													rel="noopener noreferrer"
+													title={t('calendar.event.openLink')}
+													aria-label={t('calendar.event.openLink')}
+												>
+													<ExternalLink size={16} />
+												</a>
+											</div>
+										</LocationLinkCard>
+									);
+								}
+								return (
+									<a href={href} target="_blank" rel="noopener noreferrer">
+										<CalendarEventInfoLocation $color={eventColor}>
+											<img src={LocationBG} alt="" width={16} />
+											<div>
+												<h3>{t('calendar.event.locationLabel')}</h3>
+												<ExternalLink size={16} />
+											</div>
+										</CalendarEventInfoLocation>
+									</a>
+								);
+							})()}
 						</CalendarEventInfoSection>
 					</>
 				)}
@@ -1252,6 +1319,84 @@ const CalendarEventInfoLocation = styled.div<{ $color: RGBColor }>`
 			font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
 			color: ${({ theme }) => theme.colors.white};
 			leading: 1;
+		}
+	}
+`;
+
+const LocationLinkCard = styled.div<{ $color: RGBColor }>`
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem;
+	border: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	border-radius: ${({ theme }) => theme.borderRadius.large};
+	background-color: ${({ theme }) => theme.colors.background.card2};
+
+	.link-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		flex-shrink: 0;
+		border-radius: ${({ theme }) => theme.borderRadius.medium};
+		color: ${({ $color }) => $color.setLightness(0.6).toHex()};
+		background-color: ${({ $color }) => `rgba(${$color.r}, ${$color.g}, ${$color.b}, 0.12)`};
+	}
+
+	.link-body {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+
+		h3 {
+			font-size: ${({ theme }) => theme.typography.fontSize.sm};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+			color: ${({ theme }) => theme.colors.text.muted};
+		}
+
+		.link-url {
+			display: block;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-size: ${({ theme }) => theme.typography.fontSize.sm};
+			font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+			color: ${({ $color }) => $color.setLightness(0.55).toHex()};
+			text-decoration: none;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	.link-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		flex-shrink: 0;
+
+		button,
+		a {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			border: none;
+			background: transparent;
+			border-radius: ${({ theme }) => theme.borderRadius.medium};
+			color: ${({ theme }) => theme.colors.text.secondary};
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+
+			&:hover {
+				background-color: ${({ theme }) => theme.colors.calendar.sidebarButtonHover};
+			}
 		}
 	}
 `;

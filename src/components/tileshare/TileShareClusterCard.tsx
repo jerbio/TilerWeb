@@ -8,7 +8,7 @@ import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarC
 import Button from '@/core/common/components/button';
 import { TileShareCluster } from '@/core/common/types/tileshare';
 import { Link } from 'react-router';
-import ROUTES from '@/core/constants/routes';
+import { Routes } from '@/core/constants/routes';
 import Tooltip from '@/core/common/components/tooltip';
 
 type TileShareClusterCardProps = {
@@ -33,7 +33,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	const formattedDueBy = cluster.end ? unixToTimeString(cluster.end) : '—';
 
 	return (
-		<CardGrid to={ROUTES.tileshare.detail(cluster.id ?? '')}>
+		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
 			<Left>
 				<IconBox>
 					{cluster.isMultiTilette ? <Layers size={18} /> : <MessageSquare size={18} />}

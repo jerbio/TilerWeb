@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -616,10 +616,13 @@
 			"titleBlock": "Επεξεργασία μπλοκ",
 			"titleTile": "Επεξεργασία πλακιδίου",
 			"nameSection": "Όνομα",
+			"occurrenceSection": "?�f???s?",
 			"timeSection": "Ώρα και διάρκεια",
+			"recurringToggle": "Επανάληψη γεγονότος",
 			"repetitionSection": "Επανάληψη",
 			"locationSection": "Τοποθεσία",
 			"colorSection": "Χρώμα",
+			"notesSection": "Σημειώσεις",
 			"name": "Όνομα",
 			"start": "Έναρξη",
 			"end": "Λήξη",
@@ -636,6 +639,7 @@
 			"locationDescriptionPlaceholder": "Πρόσθετες λεπτομέρειες τοποθεσίας...",
 			"color": "Χρώμα",
 			"recurring": "Επαναλαμβανόμενο",
+			"repetitionDisabled": "Απενεργοποιημένο",
 			"selectFrequency": "Επιλογή συχνότητας",
 			"daily": "Καθημερινά",
 			"weekly": "Εβδομαδιαία",
@@ -660,6 +664,7 @@
 			"loadingBlock": "Φόρτωση λεπτομερειών μπλοκ...",
 			"loadingTile": "Φόρτωση λεπτομερειών πλακιδίου...",
 			"clearLocation": "Εκκαθάριση τοποθεσίας",
+			"copyAddressOnly": "Αντιγραφή μόνο διεύθυνσης",
 			"locationMinChars": "Πληκτρολογήστε τουλάχιστον 3 χαρακτήρες για αναζήτηση",
 			"locationSearchPlaceholder": "Αναζήτηση τοποθεσίας...",
 			"savedLocations": "Αποθηκευμένες τοποθεσίες",

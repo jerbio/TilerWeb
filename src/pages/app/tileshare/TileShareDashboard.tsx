@@ -5,7 +5,7 @@ import { ArrowUpRight, CalendarCheck2 } from 'lucide-react';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 import Tabs, { TabItem } from '@/core/common/components/Tabs';
 import { Outlet, useLocation, useNavigate } from 'react-router';
-import ROUTES from '@/core/constants/routes';
+import { Routes } from '@/core/constants/routes';
 
 export enum TileshareTab {
 	Active = 'active',
@@ -19,9 +19,9 @@ const TileshareDashboardPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
 
 	useEffect(() => {
-		if (pathname.endsWith(ROUTES.tileshare.active)) {
+		if (pathname.endsWith(Routes.Tileshare.active)) {
 			setActiveTab(TileshareTab.Active);
-		} else if (pathname.endsWith(ROUTES.tileshare.sent)) {
+		} else if (pathname.endsWith(Routes.Tileshare.sent)) {
 			setActiveTab(TileshareTab.Sent);
 		}
 	}, [pathname]);
@@ -43,8 +43,8 @@ const TileshareDashboardPage: React.FC = () => {
 	);
 
 	const tabRoutes: Record<string, string> = {
-		active: ROUTES.tileshare.active,
-		sent: ROUTES.tileshare.sent,
+		active: Routes.Tileshare.active,
+		sent: Routes.Tileshare.sent,
 	};
 
 	const handleTabChange = (id: string) => {

@@ -11,14 +11,25 @@ import {
 	Calendar,
 	X,
 	CheckCircle2,
+	FileText,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	CalendarEvent,
 	CalendarEventUpdateParams,
 	EventLocation,
+	DaySchedule,
+	RestrictionProfile,
 } from '@/core/common/types/schedule';
-import { scheduleService } from '@/services';
+import { scheduleService, userService } from '@/services';
+import {
+	restrictionProfileToSchedule,
+	scheduleToWeekDayOptions,
+} from '@/core/common/utils/restrictionUtils';
+import RestrictionProfileEditor, {
+	RestrictionType,
+	RESTRICTION_TYPE_KEYS,
+} from '@/core/common/components/restriction/RestrictionProfileEditor';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
 import TimeDropdown from '@/core/common/components/TimeDropdown';
@@ -27,6 +38,7 @@ import {
 	epochToTimeString,
 	combineDateAndTimeString,
 } from '@/core/common/utils/timeUtils';
+import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 
 const COLOR_SWATCHES: { r: number; g: number; b: number }[] = [
 	{ r: 237, g: 18, b: 59 }, // brand red
@@ -48,10 +60,36 @@ interface EditCalendarEventProps {
 	onClose: () => void;
 }
 
+export function isRepetitionConfigValid({
+	frequency,
+	isForever,
+	repStartDate,
+	repEndDate,
+}: {
+	frequency: string;
+	isForever: boolean;
+	repStartDate: dayjs.Dayjs | null;
+	repEndDate: dayjs.Dayjs | null;
+}): boolean {
+	if (!frequency) return true; // disabled
+	if (!isForever && (!repStartDate || !repEndDate)) return false;
+	return true;
+}
+
+function formatDuration(totalMinutes: number): string {
+	const h = Math.floor(totalMinutes / 60);
+	const m = totalMinutes % 60;
+	const parts: string[] = [];
+	if (h > 0) parts.push(`${h} hr${h !== 1 ? 's' : ''}`);
+	if (m > 0) parts.push(`${m} min`);
+	return parts.join(' ') || '0 min';
+}
+
 const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose }) => {
 	const { t } = useTranslation();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
+	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
 
 	const [name, setName] = useState(event.name ?? '');
 	const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(epochToDate(event.start));
@@ -83,20 +121,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		return COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
 	});
 	const activeColor = selectedColor >= 0 ? COLOR_SWATCHES[selectedColor] : customColor;
-	const [isRecurring, setIsRecurring] = useState(event.repetition?.isEnabled ?? false);
-	const [frequency, setFrequency] = useState((event.repetition?.frequency ?? '').toLowerCase());
+	const [frequency, setFrequency] = useState(
+		event.repetition?.isEnabled ? (event.repetition?.frequency ?? '').toLowerCase() : ''
+	);
+	const isRecurring = frequency !== '';
+	const tileMins = Number(durationHours || 0) * 60 + Number(durationMinutes || 0);
+	const splitNum = Number(splitCount || 0);
 	const [isForever, setIsForever] = useState(event.repetition?.isForever ?? false);
 	const [repStartDate, setRepStartDate] = useState<dayjs.Dayjs | null>(
 		epochToDate(event.repetition?.repetitionTimeline?.start ?? null)
 	);
-	const [repStartTime, setRepStartTime] = useState(
-		epochToTimeString(event.repetition?.repetitionTimeline?.start ?? null)
-	);
 	const [repEndDate, setRepEndDate] = useState<dayjs.Dayjs | null>(
 		epochToDate(event.repetition?.repetitionTimeline?.end ?? null)
-	);
-	const [repEndTime, setRepEndTime] = useState(
-		epochToTimeString(event.repetition?.repetitionTimeline?.end ?? null)
 	);
 	const [weekDays, setWeekDays] = useState<Set<string>>(() => {
 		const wd = event.repetition?.weekDays;
@@ -113,11 +149,21 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	// Snapshot of form values after loading, used to detect changes
 	const initialFormRef = useRef<Record<string, string> | null>(null);
 
+	// Restriction profile state
+	const [isRestricted, setIsRestricted] = useState(false);
+	const [restrictionType, setRestrictionType] = useState<RestrictionType>(RestrictionType.Custom);
+	const [customSchedule, setCustomSchedule] = useState<DaySchedule[]>(
+		Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
+	);
+	const [workProfileId, setWorkProfileId] = useState<string | null>(null);
+	const [personalProfileId, setPersonalProfileId] = useState<string | null>(null);
+
 	// Section collapsed states — all start collapsed
 	const [timeOpen, setTimeOpen] = useState(false);
 	const [repetitionOpen, setRepetitionOpen] = useState(false);
 	const [locationOpen, setLocationOpen] = useState(false);
 	const [colorOpen, setColorOpen] = useState(false);
+	const [restrictionOpen, setRestrictionOpen] = useState(false);
 
 	// Date picker open states
 	const [startPickerOpen, setStartPickerOpen] = useState(false);
@@ -130,6 +176,31 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setEndPickerOpen(false);
 		setRepStartPickerOpen(false);
 		setRepEndPickerOpen(false);
+	};
+
+	/** Populate restriction profile state from a fetched profile. */
+	const populateRestriction = (
+		profile: RestrictionProfile | null | undefined,
+		workId: string | null,
+		personalId: string | null
+	) => {
+		if (!profile || profile.isEnabled === false) {
+			setIsRestricted(false);
+			setRestrictionType(RestrictionType.Custom);
+			setCustomSchedule(
+				Array.from({ length: 7 }, (_, i) => ({ dayIndex: i, startTime: '', endTime: '' }))
+			);
+			return;
+		}
+		setIsRestricted(true);
+		if (profile.id && workId && profile.id === workId) {
+			setRestrictionType(RestrictionType.Work);
+		} else if (profile.id && personalId && profile.id === personalId) {
+			setRestrictionType(RestrictionType.Personal);
+		} else {
+			setRestrictionType(RestrictionType.Custom);
+			setCustomSchedule(restrictionProfileToSchedule(profile));
+		}
 	};
 
 	/** Populate all form fields from a CalendarEvent. */
@@ -160,13 +231,12 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setCustomColor({ r, g, b });
 		const match = COLOR_SWATCHES.findIndex((s) => s.r === r && s.g === g && s.b === b);
 		setSelectedColor(match);
-		setIsRecurring(ev.repetition?.isEnabled ?? false);
-		setFrequency((ev.repetition?.frequency ?? '').toLowerCase());
+		setFrequency(
+			ev.repetition?.isEnabled ? (ev.repetition?.frequency ?? '').toLowerCase() : ''
+		);
 		setIsForever(ev.repetition?.isForever ?? false);
 		setRepStartDate(epochToDate(ev.repetition?.repetitionTimeline?.start ?? null));
-		setRepStartTime(epochToTimeString(ev.repetition?.repetitionTimeline?.start ?? null));
 		setRepEndDate(epochToDate(ev.repetition?.repetitionTimeline?.end ?? null));
-		setRepEndTime(epochToTimeString(ev.repetition?.repetitionTimeline?.end ?? null));
 		const wd = ev.repetition?.weekDays;
 		setWeekDays(wd ? new Set(wd.split(',').map((s) => s.trim())) : new Set<string>());
 	};
@@ -186,14 +256,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			locationId: locationId ?? '',
 			isLocationCleared: String(isLocationCleared),
 			selectedColor: String(selectedColor),
-			isRecurring: String(isRecurring),
 			frequency,
 			isForever: String(isForever),
 			repStartDate: repStartDate?.valueOf()?.toString() ?? '',
-			repStartTime,
 			repEndDate: repEndDate?.valueOf()?.toString() ?? '',
-			repEndTime,
 			weekDays: Array.from(weekDays).sort().join(','),
+			isRestricted: String(isRestricted),
+			restrictionType,
+			customSchedule: JSON.stringify(customSchedule),
 		};
 	};
 
@@ -214,14 +284,14 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			locationId: locationId ?? '',
 			isLocationCleared: String(isLocationCleared),
 			selectedColor: String(selectedColor),
-			isRecurring: String(isRecurring),
 			frequency,
 			isForever: String(isForever),
 			repStartDate: repStartDate?.valueOf()?.toString() ?? '',
-			repStartTime,
 			repEndDate: repEndDate?.valueOf()?.toString() ?? '',
-			repEndTime,
 			weekDays: Array.from(weekDays).sort().join(','),
+			isRestricted: String(isRestricted),
+			restrictionType,
+			customSchedule: JSON.stringify(customSchedule),
 		};
 		return Object.keys(init).some((k) => init[k] !== current[k]);
 	})();
@@ -262,6 +332,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setLocationResults([]);
 	};
 
+	// Copy over only the address from a search result, keeping the current
+	// nickname. Since the nickname is unique per user, the result's locationId
+	// no longer applies, so it is cleared.
+	const handleCopyAddressOnly = (loc: EventLocation) => {
+		setAddress(loc.address);
+		setLocationId(null);
+		setIsLocationCleared(false);
+		setIsLocationVerified(false);
+		setShowLocationDropdown(false);
+		setLocationResults([]);
+	};
+
 	const handleClearLocation = () => {
 		setAddress('');
 		setAddressDescription('');
@@ -277,11 +359,19 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		let cancelled = false;
 		setIsLoading(true);
 		if (!event.id) return;
-		scheduleService
-			.lookupCalendarEventById(event.id)
-			.then(async (full) => {
+		const rootId = event.id.split('_')[0] + '_7_0_0'; // strip repetition suffix if present
+		Promise.all([
+			scheduleService.lookupCalendarEventById(rootId),
+			userService.getScheduleProfile().catch(() => null),
+		])
+			.then(async ([full, scheduleProfile]) => {
 				if (cancelled) return;
+				const workId = scheduleProfile?.workHoursRestrictionProfile?.id ?? null;
+				const personalId = scheduleProfile?.personalHoursRestrictionProfile?.id ?? null;
+				setWorkProfileId(workId);
+				setPersonalProfileId(personalId);
 				populateForm(full);
+				populateRestriction(full.restrictionProfile, workId, personalId);
 				// Fetch full location details if the event has a locationId
 				if (full.locationId) {
 					try {
@@ -299,7 +389,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			.catch((err) => {
 				console.error('Fetch event failed:', err);
 				// Fall back to prop data on failure
-				if (!cancelled) populateForm(event);
+				if (!cancelled) {
+					populateForm(event);
+					populateRestriction(event.restrictionProfile, null, null);
+				}
 			})
 			.finally(() => {
 				if (!cancelled) setIsLoading(false);
@@ -316,6 +409,20 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		}
 	});
 
+	const handleFrequencyChange = (newFreq: string) => {
+		setFrequency(newFreq);
+		if (newFreq) {
+			if (!repStartDate) setRepStartDate(dayjs().startOf('day'));
+			if (!repEndDate) {
+				setRepEndDate(
+					newFreq === 'yearly'
+						? dayjs().add(10, 'year').startOf('day')
+						: dayjs().add(4, 'week').startOf('day')
+				);
+			}
+		}
+	};
+
 	const handleSave = async () => {
 		if (!event.id) return;
 		setIsSaving(true);
@@ -327,8 +434,8 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		const params: CalendarEventUpdateParams = {
 			EventID: event.id,
 			EventName: name,
-			Start: startMs ?? undefined,
-			End: endMs ?? undefined,
+			Start: frequency ? undefined : (startMs ?? undefined),
+			End: frequency ? undefined : (endMs ?? undefined),
 			Duration:
 				durationHours || durationMinutes
 					? Number(durationHours || 0) * 3600000 + Number(durationMinutes || 0) * 60000
@@ -336,9 +443,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			Split: splitCount ? Number(splitCount) : undefined,
 			LocationId: locationId || undefined,
 			IsLocationCleared: isLocationCleared ? 'true' : undefined,
-			CalAddress: !locationId && (address || addressDescription) ? address : undefined,
+			CalAddress: !locationId && address ? address : undefined,
 			CalAddressDescription:
-				!locationId && (address || addressDescription) ? addressDescription : undefined,
+				!locationId && addressDescription ? addressDescription : undefined,
 			ColorConfig: {
 				IsEnabled: true,
 				Red: String(swatch.r),
@@ -350,14 +457,31 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 			Version: 'v2',
 		};
 
-		if (isRecurring && frequency) {
+		if (frequency) {
 			params.RepetitionConfig = {
 				IsEnabled: true,
 				Frequency: frequency,
 				IsForever: isForever,
-				RepetitionStart: combineDateAndTimeString(repStartDate, repStartTime) ?? undefined,
-				RepetitionEnd: combineDateAndTimeString(repEndDate, repEndTime) ?? undefined,
+				RepetitionStart: repStartDate?.startOf('day').valueOf() ?? undefined,
+				RepetitionEnd: repEndDate?.startOf('day').valueOf() ?? undefined,
 				DayOfWeekRepetitions: frequency === 'weekly' ? Array.from(weekDays) : undefined,
+			};
+		}
+
+		if (!isRestricted) {
+			params.isRestricted = 'false';
+			params.RestrictiveWeek = { isEnabled: 'false' };
+		} else if (restrictionType === RestrictionType.Work && workProfileId) {
+			params.isRestricted = 'true';
+			params.RestrictionProfileId = workProfileId;
+		} else if (restrictionType === RestrictionType.Personal && personalProfileId) {
+			params.isRestricted = 'true';
+			params.RestrictionProfileId = personalProfileId;
+		} else if (restrictionType === RestrictionType.Custom) {
+			params.isRestricted = 'true';
+			params.RestrictiveWeek = {
+				isEnabled: 'true',
+				WeekDayOption: scheduleToWeekDayOptions(customSchedule),
 			};
 		}
 
@@ -391,6 +515,13 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 								: 'calendarEvent.edit.title'
 					)}
 				</Title>
+				<NotesButton
+					onClick={() => openNotes(event)}
+					aria-label={t('calendarEvent.edit.openNotes', 'Open notes')}
+					title={t('calendarEvent.edit.openNotes', 'Open notes')}
+				>
+					<FileText size={18} />
+				</NotesButton>
 			</Header>
 
 			{isLoading && (
@@ -420,108 +551,142 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 						{/* Time & Duration Section */}
 						<Section>
 							<SectionHeader onClick={() => setTimeOpen((v) => !v)}>
-								<SectionTitle>{t('calendarEvent.edit.timeSection')}</SectionTitle>
+								<SectionTitle>
+									{t(
+										isRecurring
+											? 'calendarEvent.edit.occurrenceSection'
+											: 'calendarEvent.edit.timeSection'
+									)}
+								</SectionTitle>
 								<Chevron $open={timeOpen}>
 									<ChevronRight size={16} />
 								</Chevron>
 								{!timeOpen &&
-									(startDate || endDate || durationHours || durationMinutes) && (
+									(isRecurring && tileMins > 0 && splitNum > 0 ? (
 										<PreviewText>
-											{[
-												startDate &&
-													`${startDate.format('MMM D')} ${startTime}`,
-												endDate && `${endDate.format('MMM D')} ${endTime}`,
-												(durationHours || durationMinutes) &&
-													[
-														durationHours &&
-															Number(durationHours) > 0 &&
-															t(
-																'calendarEvent.edit.durationHoursPreview',
-																{ count: Number(durationHours) }
-															),
-														durationMinutes &&
-															Number(durationMinutes) > 0 &&
-															t(
-																'calendarEvent.edit.durationMinutesPreview',
-																{ count: Number(durationMinutes) }
-															),
-													]
-														.filter(Boolean)
-														.join(' '),
-											]
-												.filter(Boolean)
-												.join(' \u00b7 ')}
+											{formatDuration(tileMins * splitNum)}
+											{' – '}
+											{formatDuration(tileMins)}
+											{' × '}
+											{splitNum}
 										</PreviewText>
-									)}
+									) : (
+										(startDate ||
+											endDate ||
+											durationHours ||
+											durationMinutes) && (
+											<PreviewText>
+												{[
+													startDate &&
+														`${startDate.format('MMM D')} ${startTime}`,
+													endDate &&
+														`${endDate.format('MMM D')} ${endTime}`,
+													(durationHours || durationMinutes) &&
+														[
+															durationHours &&
+																Number(durationHours) > 0 &&
+																t(
+																	'calendarEvent.edit.durationHoursPreview',
+																	{ count: Number(durationHours) }
+																),
+															durationMinutes &&
+																Number(durationMinutes) > 0 &&
+																t(
+																	'calendarEvent.edit.durationMinutesPreview',
+																	{
+																		count: Number(
+																			durationMinutes
+																		),
+																	}
+																),
+														]
+															.filter(Boolean)
+															.join(' '),
+												]
+													.filter(Boolean)
+													.join(' · ')}
+											</PreviewText>
+										)
+									))}
 							</SectionHeader>
 							{timeOpen && (
 								<SectionBody>
-									<FieldGroup>
-										<Label>{t('calendarEvent.edit.start')}</Label>
-										<DateTimeRow>
-											<DatePickerWrapper>
-												<DateTrigger
-													onClick={() => {
-														closeAllPickers();
-														setStartPickerOpen((v) => !v);
-													}}
-													type="button"
-												>
-													<Calendar size={14} />
-													{startDate
-														? startDate.format('MMM D, YYYY')
-														: t('calendarEvent.edit.selectDate')}
-												</DateTrigger>
-												<CalendarDatePicker
-													isOpen={startPickerOpen}
-													onClose={() => setStartPickerOpen(false)}
-													onDateSelect={(d) => {
-														setStartDate(d);
-														setStartPickerOpen(false);
-													}}
-													selectedDate={startDate ?? undefined}
-												/>
-											</DatePickerWrapper>
-											<TimeDropdown
-												value={startTime}
-												onChange={setStartTime}
-												interval={15}
-											/>
-										</DateTimeRow>
-									</FieldGroup>
-									<FieldGroup>
-										<Label>{t('calendarEvent.edit.end')}</Label>
-										<DateTimeRow>
-											<DatePickerWrapper>
-												<DateTrigger
-													onClick={() => {
-														closeAllPickers();
-														setEndPickerOpen((v) => !v);
-													}}
-													type="button"
-												>
-													<Calendar size={14} />
-													{endDate
-														? endDate.format('MMM D, YYYY')
-														: t('calendarEvent.edit.selectDate')}
-												</DateTrigger>
-												<CalendarDatePicker
-													isOpen={endPickerOpen}
-													onClose={() => setEndPickerOpen(false)}
-													onDateSelect={(d) => {
-														setEndDate(d);
-														setEndPickerOpen(false);
-													}}
-													selectedDate={endDate ?? undefined}
-												/>
-											</DatePickerWrapper>
-											<TimeDropdown
-												value={endTime}
-												onChange={setEndTime}
-												interval={15}
-											/>
-										</DateTimeRow>
-									</FieldGroup>
+									{!isRecurring && (
+										<>
+											<FieldGroup>
+												<Label>{t('calendarEvent.edit.start')}</Label>
+												<DateTimeRow>
+													<DatePickerWrapper>
+														<DateTrigger
+															onClick={() => {
+																closeAllPickers();
+																setStartPickerOpen((v) => !v);
+															}}
+															type="button"
+														>
+															<Calendar size={14} />
+															{startDate
+																? startDate.format('MMM D, YYYY')
+																: t(
+																		'calendarEvent.edit.selectDate'
+																	)}
+														</DateTrigger>
+														<CalendarDatePicker
+															isOpen={startPickerOpen}
+															onClose={() =>
+																setStartPickerOpen(false)
+															}
+															onDateSelect={(d) => {
+																setStartDate(d);
+																setStartPickerOpen(false);
+															}}
+															selectedDate={startDate ?? undefined}
+														/>
+													</DatePickerWrapper>
+													<TimeDropdown
+														value={startTime}
+														onChange={setStartTime}
+														interval={15}
+													/>
+												</DateTimeRow>
+											</FieldGroup>
+											<FieldGroup>
+												<Label>{t('calendarEvent.edit.end')}</Label>
+												<DateTimeRow>
+													<DatePickerWrapper>
+														<DateTrigger
+															onClick={() => {
+																closeAllPickers();
+																setEndPickerOpen((v) => !v);
+															}}
+															type="button"
+														>
+															<Calendar size={14} />
+															{endDate
+																? endDate.format('MMM D, YYYY')
+																: t(
+																		'calendarEvent.edit.selectDate'
+																	)}
+														</DateTrigger>
+														<CalendarDatePicker
+															isOpen={endPickerOpen}
+															onClose={() => setEndPickerOpen(false)}
+															onDateSelect={(d) => {
+																setEndDate(d);
+																setEndPickerOpen(false);
+															}}
+															selectedDate={endDate ?? undefined}
+														/>
+													</DatePickerWrapper>
+													<TimeDropdown
+														value={endTime}
+														onChange={setEndTime}
+														interval={15}
+													/>
+												</DateTimeRow>
+											</FieldGroup>
+										</>
+									)}
 									<FieldGroup>
 										<Label>{t('calendarEvent.edit.duration')}</Label>
 										<DurationRow>
@@ -579,47 +744,39 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 								<Chevron $open={repetitionOpen}>
 									<ChevronRight size={16} />
 								</Chevron>
-								{!repetitionOpen && isRecurring && frequency && (
-									<PreviewText>{frequency}</PreviewText>
+								{!repetitionOpen && (
+									<PreviewText>
+										{frequency
+											? t(`calendarEvent.edit.${frequency}`)
+											: t('calendarEvent.edit.repetitionDisabled')}
+									</PreviewText>
 								)}
 							</SectionHeader>
 							{repetitionOpen && (
 								<SectionBody>
 									<FieldGroup>
-										<RecurrenceToggle>
-											<CheckboxInput
-												type="checkbox"
-												checked={isRecurring}
-												onChange={(e) => setIsRecurring(e.target.checked)}
-											/>
-											<Label as="span">
-												{t('calendarEvent.edit.recurring')}
-											</Label>
-										</RecurrenceToggle>
-										{isRecurring && (
-											<Select
-												value={frequency}
-												onChange={(e) => setFrequency(e.target.value)}
-											>
-												<option value="">
-													{t('calendarEvent.edit.selectFrequency')}
-												</option>
-												<option value="daily">
-													{t('calendarEvent.edit.daily')}
-												</option>
-												<option value="weekly">
-													{t('calendarEvent.edit.weekly')}
-												</option>
-												<option value="monthly">
-													{t('calendarEvent.edit.monthly')}
-												</option>
-												<option value="yearly">
-													{t('calendarEvent.edit.yearly')}
-												</option>
-											</Select>
-										)}
+										<Select
+											value={frequency}
+											onChange={(e) => handleFrequencyChange(e.target.value)}
+										>
+											<option value="">
+												{t('calendarEvent.edit.repetitionDisabled')}
+											</option>
+											<option value="daily">
+												{t('calendarEvent.edit.daily')}
+											</option>
+											<option value="weekly">
+												{t('calendarEvent.edit.weekly')}
+											</option>
+											<option value="monthly">
+												{t('calendarEvent.edit.monthly')}
+											</option>
+											<option value="yearly">
+												{t('calendarEvent.edit.yearly')}
+											</option>
+										</Select>
 									</FieldGroup>
-									{isRecurring && (
+									{frequency && (
 										<FieldGroup>
 											<RecurrenceToggle>
 												<CheckboxInput
@@ -635,7 +792,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 											</RecurrenceToggle>
 										</FieldGroup>
 									)}
-									{isRecurring && !isForever && (
+									{frequency && !isForever && (
 										<>
 											<FieldGroup>
 												<Label>
@@ -672,11 +829,6 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															selectedDate={repStartDate ?? undefined}
 														/>
 													</DatePickerWrapper>
-													<TimeDropdown
-														value={repStartTime}
-														onChange={setRepStartTime}
-														interval={15}
-													/>
 												</DateTimeRow>
 											</FieldGroup>
 											<FieldGroup>
@@ -714,52 +866,41 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															selectedDate={repEndDate ?? undefined}
 														/>
 													</DatePickerWrapper>
-													<TimeDropdown
-														value={repEndTime}
-														onChange={setRepEndTime}
-														interval={15}
-													/>
 												</DateTimeRow>
 											</FieldGroup>
 										</>
 									)}
-									{isRecurring && frequency === 'weekly' && (
+									{frequency === 'weekly' && (
 										<WeekDayRow>
-											{(['0', '1', '2', '3', '4', '5', '6'] as const).map(
-												(dayIdx) => {
-													const dayKey = [
-														'sun',
-														'mon',
-														'tue',
-														'wed',
-														'thu',
-														'fri',
-														'sat',
-													][Number(dayIdx)];
-													return (
-														<WeekDayChip
-															key={dayIdx}
-															$selected={weekDays.has(dayIdx)}
-															onClick={() => {
-																setWeekDays((prev) => {
-																	const next = new Set(prev);
-																	if (next.has(dayIdx))
-																		next.delete(dayIdx);
-																	else next.add(dayIdx);
-																	return next;
-																});
-															}}
-															aria-label={t(
-																`calendarEvent.edit.${dayKey}`
-															)}
-															role="checkbox"
-															aria-checked={weekDays.has(dayIdx)}
-														>
-															{t(`calendarEvent.edit.${dayKey}`)}
-														</WeekDayChip>
-													);
-												}
-											)}
+											{(
+												[
+													{ name: 'Sunday', key: 'sun' },
+													{ name: 'Monday', key: 'mon' },
+													{ name: 'Tuesday', key: 'tue' },
+													{ name: 'Wednesday', key: 'wed' },
+													{ name: 'Thursday', key: 'thu' },
+													{ name: 'Friday', key: 'fri' },
+													{ name: 'Saturday', key: 'sat' },
+												] as const
+											).map(({ name, key }) => (
+												<WeekDayChip
+													key={name}
+													$selected={weekDays.has(name)}
+													onClick={() => {
+														setWeekDays((prev) => {
+															const next = new Set(prev);
+															if (next.has(name)) next.delete(name);
+															else next.add(name);
+															return next;
+														});
+													}}
+													aria-label={t(`calendarEvent.edit.${key}`)}
+													role="checkbox"
+													aria-checked={weekDays.has(name)}
+												>
+													{t(`calendarEvent.edit.${key}`)}
+												</WeekDayChip>
+											))}
 										</WeekDayRow>
 									)}
 								</SectionBody>
@@ -858,59 +999,99 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															return (
 																<>
 																	{saved.map((loc) => (
-																		<DropdownItem
-																			key={loc.id}
-																			onClick={() =>
-																				handleSelectLocation(
-																					loc
-																				)
-																			}
-																		>
-																			<ItemIcon aria-label="saved">
-																				<Bookmark
-																					size={14}
-																				/>
-																			</ItemIcon>
-																			<DropdownItemText>
-																				<DropdownItemAddress>
-																					{loc.address}
-																				</DropdownItemAddress>
-																				{loc.description &&
-																					loc.description !==
-																						loc.id && (
+																		<DropdownItem key={loc.id}>
+																			<DropdownItemMain
+																				onClick={() =>
+																					handleSelectLocation(
+																						loc
+																					)
+																				}
+																			>
+																				<ItemIcon aria-label="saved">
+																					<Bookmark
+																						size={14}
+																					/>
+																				</ItemIcon>
+																				<DropdownItemText>
+																					<DropdownItemAddress>
+																						{
+																							loc.address
+																						}
+																					</DropdownItemAddress>
+																					{loc.description &&
+																						loc.description !==
+																							loc.id && (
+																							<DropdownItemDesc>
+																								{
+																									loc.description
+																								}
+																							</DropdownItemDesc>
+																						)}
+																				</DropdownItemText>
+																			</DropdownItemMain>
+																			<CopyAddressButton
+																				type="button"
+																				onClick={() =>
+																					handleCopyAddressOnly(
+																						loc
+																					)
+																				}
+																				aria-label={t(
+																					'calendarEvent.edit.copyAddressOnly'
+																				)}
+																				title={t(
+																					'calendarEvent.edit.copyAddressOnly'
+																				)}
+																			>
+																				<MapPin size={14} />
+																			</CopyAddressButton>
+																		</DropdownItem>
+																	))}
+																	{google.map((loc) => (
+																		<DropdownItem key={loc.id}>
+																			<DropdownItemMain
+																				onClick={() =>
+																					handleSelectLocation(
+																						loc
+																					)
+																				}
+																			>
+																				<ItemIcon aria-label="google">
+																					<MapPin
+																						size={14}
+																					/>
+																				</ItemIcon>
+																				<DropdownItemText>
+																					<DropdownItemAddress>
+																						{
+																							loc.address
+																						}
+																					</DropdownItemAddress>
+																					{loc.description && (
 																						<DropdownItemDesc>
 																							{
 																								loc.description
 																							}
 																						</DropdownItemDesc>
 																					)}
-																			</DropdownItemText>
-																		</DropdownItem>
-																	))}
-																	{google.map((loc) => (
-																		<DropdownItem
-																			key={loc.id}
-																			onClick={() =>
-																				handleSelectLocation(
-																					loc
-																				)
-																			}
-																		>
-																			<ItemIcon aria-label="google">
-																				<MapPin size={14} />
-																			</ItemIcon>
-																			<DropdownItemText>
-																				<DropdownItemAddress>
-																					{loc.address}
-																				</DropdownItemAddress>
-																				{loc.description && (
-																					<DropdownItemDesc>
-																						{
-																							loc.description
-																						}
-																					</DropdownItemDesc>
+																				</DropdownItemText>
+																			</DropdownItemMain>
+																			<CopyAddressButton
+																				type="button"
+																				onClick={() =>
+																					handleCopyAddressOnly(
+																						loc
+																					)
+																				}
+																				aria-label={t(
+																					'calendarEvent.edit.copyAddressOnly'
 																				)}
-																			</DropdownItemText>
+																				title={t(
+																					'calendarEvent.edit.copyAddressOnly'
+																				)}
+																			>
+																				<MapPin size={14} />
+																			</CopyAddressButton>
 																		</DropdownItem>
 																	))}
 																	{google.length > 0 && (
@@ -931,12 +1112,52 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 										<Label>{t('calendarEvent.edit.locationDescription')}</Label>
 										<Input
 											value={addressDescription}
-											onChange={(e) => setAddressDescription(e.target.value)}
+											onChange={(e) => {
+												// The nickname is unique per user, so editing it
+												// invalidates the saved location mapping. Clear the
+												// locationId so the address + new nickname are sent.
+												setLocationId(null);
+												setIsLocationCleared(false);
+												setAddressDescription(e.target.value);
+											}}
 											placeholder={t(
 												'calendarEvent.edit.locationDescriptionPlaceholder'
 											)}
 										/>
 									</FieldGroup>
+								</SectionBody>
+							)}
+						</Section>
+
+						{/* Restriction Profile Section */}
+						<Section>
+							<SectionHeader onClick={() => setRestrictionOpen((v) => !v)}>
+								<SectionTitle>
+									{t('calendarEvent.edit.restrictionSection')}
+								</SectionTitle>
+								<Chevron $open={restrictionOpen}>
+									<ChevronRight size={16} />
+								</Chevron>
+								{!restrictionOpen && (
+									<PreviewText>
+										{!isRestricted
+											? t('calendarEvent.edit.restrictionPreviewAnytime')
+											: restrictionType === RestrictionType.Custom
+												? t('calendarEvent.edit.restrictionPreviewCustom')
+												: t(RESTRICTION_TYPE_KEYS[restrictionType])}
+									</PreviewText>
+								)}
+							</SectionHeader>
+							{restrictionOpen && (
+								<SectionBody>
+									<RestrictionProfileEditor
+										isRestricted={isRestricted}
+										onIsRestrictedChange={setIsRestricted}
+										restrictionType={restrictionType}
+										onRestrictionTypeChange={setRestrictionType}
+										customSchedule={customSchedule}
+										onCustomScheduleChange={setCustomSchedule}
+									/>
 								</SectionBody>
 							)}
 						</Section>
@@ -975,7 +1196,19 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 					</Form>
 					{isDirty && (
 						<SaveFooter>
-							<SaveButton onClick={handleSave} disabled={isSaving || !name.trim()}>
+							<SaveButton
+								onClick={handleSave}
+								disabled={
+									isSaving ||
+									!name.trim() ||
+									!isRepetitionConfigValid({
+										frequency,
+										isForever,
+										repStartDate,
+										repEndDate,
+									})
+								}
+							>
 								{isSaving ? (
 									<Loader2 size={16} className="spin" />
 								) : (
@@ -1061,6 +1294,27 @@ const Title = styled.h2`
 	font-weight: 600;
 	color: ${({ theme }) => theme.colors.text.primary};
 	margin: 0;
+	flex: 1;
+`;
+
+const NotesButton = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: none;
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	cursor: pointer;
+	transition: background 0.15s ease;
+	flex-shrink: 0;
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.background.card2};
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
 `;
 
 const Form = styled.div`
@@ -1379,16 +1633,9 @@ const Dropdown = styled.div`
 	margin-top: 4px;
 `;
 
-const DropdownItem = styled.button`
+const DropdownItem = styled.div`
 	display: flex;
-	align-items: flex-start;
-	width: 100%;
-	padding: 0.5rem 0.75rem;
-	border: none;
-	background: transparent;
-	text-align: left;
-	cursor: pointer;
-	gap: 0.5rem;
+	align-items: stretch;
 
 	&:hover {
 		background: ${({ theme }) => theme.colors.background.card2};
@@ -1396,6 +1643,37 @@ const DropdownItem = styled.button`
 
 	&:not(:last-child) {
 		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	}
+`;
+
+const DropdownItemMain = styled.button`
+	display: flex;
+	align-items: flex-start;
+	flex: 1;
+	min-width: 0;
+	padding: 0.5rem 0.75rem;
+	border: none;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+	gap: 0.5rem;
+`;
+
+const CopyAddressButton = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 36px;
+	border: none;
+	border-left: 1px solid ${({ theme }) => theme.colors.border.default};
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.muted};
+	cursor: pointer;
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.background.card};
+		color: ${({ theme }) => theme.colors.text.primary};
 	}
 `;
 
