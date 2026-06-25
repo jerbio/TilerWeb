@@ -59,6 +59,14 @@ export const darkTheme: AppTheme = {
 			circle: palette.colors.gray[400],
 			circleChecked: palette.colors.white,
 		},
+		// Tabs colors
+		tabs: {
+			border: palette.colors.gray[800],
+			bg: 'transparent',
+			indicator: palette.colors.gray[800],
+			text: palette.colors.gray[400],
+			textActive: palette.colors.white,
+		},
 		// Radio Colors
 		radio: {
 			border: palette.colors.gray[600],
@@ -115,6 +123,28 @@ export const darkTheme: AppTheme = {
 			borderHover: palette.colors.gray[700],
 			focusRing: palette.colors.gray[900],
 			gradientNeutral: palette.colors.gray[700],
+		},
+		// Empty state colors
+		emptyState: {
+			icon: palette.colors.gray[600],
+			text: palette.colors.gray[500],
+		},
+		// Pagination colors
+		pagination: {
+			bg: palette.colors.gray[900],
+			bgHover: palette.colors.gray[800],
+			bgActive: palette.colors.brand[500],
+			border: palette.colors.gray[700],
+			borderActive: palette.colors.brand[500],
+			text: palette.colors.gray[400],
+			textActive: palette.colors.gray[100],
+			textDisabled: palette.colors.gray[700],
+			ellipsis: palette.colors.gray[600],
+		},
+		// Skeleton colors
+		skeleton: {
+			base: palette.colors.gray[800],
+			highlight: palette.colors.gray[600],
 		},
 		// hues
 		brand: palette.colors.brand,
