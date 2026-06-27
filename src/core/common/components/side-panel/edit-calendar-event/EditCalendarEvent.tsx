@@ -40,6 +40,26 @@ import {
 } from '@/core/common/utils/timeUtils';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
 
+/**
+ * Default end-date offsets per recurrence frequency.
+ * Used only when seeding rep range on disabled → enabled transition
+ * and the current end date is missing or invalid.
+ */
+const DEFAULT_REP_END_BY_FREQ: Record<string, () => dayjs.Dayjs> = {
+	daily: () => dayjs().add(2, 'week').startOf('day'),
+	weekly: () => dayjs().add(8, 'week').startOf('day'),
+	monthly: () => dayjs().add(12, 'month').startOf('day'),
+	yearly: () => dayjs().add(10, 'year').startOf('day'),
+};
+
+/**
+ * The .NET backend serializes `DateTimeOffset.MinValue` (used for
+ * "no repetition range") as Unix ms -62135596800000 — i.e. year 0001.
+ * Any rep date earlier than 1971 is treated as the bogus sentinel
+ * and is eligible to be replaced with a sensible default.
+ */
+const isValidRepDate = (d: dayjs.Dayjs | null): d is dayjs.Dayjs => !!d && d.year() >= 1971;
+
 const COLOR_SWATCHES: { r: number; g: number; b: number }[] = [
 	{ r: 237, g: 18, b: 59 }, // brand red
 	{ r: 240, g: 61, b: 95 }, // brand light red
@@ -145,6 +165,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	const [isSearching, setIsSearching] = useState(false);
 	const [isLocationVerified, setIsLocationVerified] = useState(false);
 	const userEditedAddressRef = useRef(false);
+	// True once the user has explicitly picked an end date via the calendar picker.
+	// Prevents freq→freq switches from clobbering a user-chosen date.
+	const userPickedRepEndRef = useRef(false);
 
 	// Snapshot of form values after loading, used to detect changes
 	const initialFormRef = useRef<Record<string, string> | null>(null);
@@ -410,16 +433,18 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	});
 
 	const handleFrequencyChange = (newFreq: string) => {
+		const wasDisabled = frequency === '';
 		setFrequency(newFreq);
-		if (newFreq) {
-			if (!repStartDate) setRepStartDate(dayjs().startOf('day'));
-			if (!repEndDate) {
-				setRepEndDate(
-					newFreq === 'yearly'
-						? dayjs().add(10, 'year').startOf('day')
-						: dayjs().add(4, 'week').startOf('day')
-				);
-			}
+		if (!newFreq || isForever) return;
+		const makeEnd = DEFAULT_REP_END_BY_FREQ[newFreq];
+		if (wasDisabled) {
+			// disabled → enabled: seed only when current values are invalid
+			if (!isValidRepDate(repStartDate)) setRepStartDate(dayjs().startOf('day'));
+			if (!isValidRepDate(repEndDate) && makeEnd) setRepEndDate(makeEnd());
+		} else if (!userPickedRepEndRef.current && makeEnd) {
+			// freq → freq: update end to new frequency's default
+			// unless the user already picked a custom date via the picker
+			setRepEndDate(makeEnd());
 		}
 	};
 
@@ -860,6 +885,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 																setRepEndPickerOpen(false)
 															}
 															onDateSelect={(d) => {
+																userPickedRepEndRef.current = true;
 																setRepEndDate(d);
 																setRepEndPickerOpen(false);
 															}}

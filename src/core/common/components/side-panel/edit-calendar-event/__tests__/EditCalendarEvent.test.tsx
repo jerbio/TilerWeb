@@ -2231,7 +2231,7 @@ describe('EditCalendarEvent', () => {
 			expect(screen.queryByLabelText('calendarEvent.edit.forever')).not.toBeInTheDocument();
 		});
 
-		it('selecting daily sets default end date 4 weeks out when no existing dates', async () => {
+		it('selecting daily sets default end date 2 weeks out when no existing dates', async () => {
 			const user = setupUser();
 			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
 			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
@@ -2239,9 +2239,119 @@ describe('EditCalendarEvent', () => {
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
 			await user.selectOptions(screen.getByRole('combobox'), 'daily');
-			const expectedEnd = dayjs().add(4, 'week').startOf('day');
+			const expectedEnd = dayjs().add(2, 'week').startOf('day');
 			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
 			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('selecting weekly sets default end date 8 weeks out when no existing dates', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+			const expectedEnd = dayjs().add(8, 'week').startOf('day');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('selecting monthly sets default end date 12 months out when no existing dates', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			const expectedEnd = dayjs().add(12, 'month').startOf('day');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('replaces bogus DateTime.MinValue rep dates with frequency defaults when enabling', async () => {
+			const user = setupUser();
+			// Server returns repetition.isEnabled=false but the timeline carries
+			// DateTimeOffset.MinValue (Unix ms: -62135596800000) — the .NET sentinel.
+			const bogusEvent: CalendarEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: {
+					...mockEvent.repetition!,
+					isEnabled: false,
+					frequency: '',
+					repetitionTimeline: {
+						start: -62135596800000,
+						end: -62135596800000,
+						duration: 0,
+						occupiedSlots: null,
+					},
+				},
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(bogusEvent);
+			renderComponent(bogusEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+
+			const startTrigger = screen.getByLabelText('calendarEvent.edit.repetitionStart');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			const expectedStart = dayjs().startOf('day');
+			const expectedEnd = dayjs().add(8, 'week').startOf('day');
+			expect(startTrigger.textContent).toContain(expectedStart.format('MMM D, YYYY'));
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+			// Critically, it must NOT show the 0001-01-01 sentinel
+			expect(startTrigger.textContent).not.toContain('Jan 1, 0001');
+			expect(endTrigger.textContent).not.toContain('Jan 1, 0001');
+		});
+
+		it('preserves server-loaded valid rep dates through disable → re-enable cycle', async () => {
+			const user = setupUser();
+			renderComponent(); // mockEvent has weekly repetition with valid dates
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			const originalStart = screen.getByLabelText(
+				'calendarEvent.edit.repetitionStart'
+			).textContent;
+			const originalEnd = screen.getByLabelText(
+				'calendarEvent.edit.repetitionEnd'
+			).textContent;
+			// Disable
+			await user.selectOptions(screen.getByRole('combobox'), '');
+			// Re-enable a different frequency
+			await user.selectOptions(screen.getByRole('combobox'), 'daily');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionStart').textContent).toBe(
+				originalStart
+			);
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				originalEnd
+			);
+		});
+
+		it('preserves previously seeded rep dates through disable → re-enable cycle', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// First enable: seeds today / today+2w
+			await user.selectOptions(screen.getByRole('combobox'), 'daily');
+			const seededStart = screen.getByLabelText(
+				'calendarEvent.edit.repetitionStart'
+			).textContent;
+			const seededEnd = screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent;
+			// Disable
+			await user.selectOptions(screen.getByRole('combobox'), '');
+			// Re-enable with a different frequency — should NOT reseed end to monthly's +12m
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionStart').textContent).toBe(
+				seededStart
+			);
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				seededEnd
+			);
 		});
 
 		it('selecting yearly sets default end date 10 years out when no existing dates', async () => {
@@ -2257,15 +2367,63 @@ describe('EditCalendarEvent', () => {
 			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
 		});
 
-		it('existing rep dates are preserved when frequency is changed', async () => {
+		it('switching frequency while enabled updates end date to new frequency default', async () => {
 			const user = setupUser();
-			renderComponent(); // mockEvent has repetition with dates
+			// mockEvent has server-loaded weekly dates (never manually picked by user)
+			renderComponent();
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
-			const originalEndTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
-			const originalEndText = originalEndTrigger.textContent;
-			// Change frequency from weekly to monthly — should NOT change dates
+			// Switch weekly → monthly
 			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			const expectedEnd = dayjs().add(12, 'month').startOf('day');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toContain(
+				expectedEnd.format('MMM D, YYYY')
+			);
+		});
+
+		it('switching frequency preserves end date when user has manually picked it', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// Enable weekly — seeds end to today+8w
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+			// Open the rep end date picker and pick day 15 from the calendar
+			await user.click(screen.getByLabelText('calendarEvent.edit.repetitionEnd'));
+			await user.click(screen.getByRole('button', { name: '15' }));
+			// Capture what the user picked
+			const pickedDateText = screen.getByLabelText(
+				'calendarEvent.edit.repetitionEnd'
+			).textContent;
+			// Switch to monthly — user-picked date should be preserved, not replaced
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				pickedDateText
+			);
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).not.toBe(
+				dayjs().add(12, 'month').startOf('day').format('MMM D, YYYY')
+			);
+		});
+
+		it('switching frequency does NOT update end date when isForever is checked', async () => {
+			const user = setupUser();
+			// mockEvent has weekly with valid server-loaded dates
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// Record end date before toggling forever
+			const originalEndText = screen.getByLabelText(
+				'calendarEvent.edit.repetitionEnd'
+			).textContent;
+			// Check isForever (hides date pickers)
+			await user.click(screen.getByLabelText('calendarEvent.edit.forever'));
+			// Switch to monthly while forever is checked
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			// Uncheck forever to reveal pickers again
+			await user.click(screen.getByLabelText('calendarEvent.edit.forever'));
+			// End date should not have been clobbered
 			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
 				originalEndText
 			);

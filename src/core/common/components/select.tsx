@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ChevronDown } from 'lucide-react';
 import palette from '@/core/theme/palette';
