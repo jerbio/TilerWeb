@@ -9,7 +9,7 @@ import { CalendarRequestProvider } from '@/core/common/components/calendar/Calen
 import Chat from '@/core/common/components/chat/chat';
 import { SidePanel, useSidePanelStack } from '@/core/common/components/side-panel';
 import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
-import EditCalendarEvent from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEvent';
+import EditCalendarEventLoader from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEventLoader';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
 import {
@@ -60,7 +60,7 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 		pushPanel: () =>
 			pushPanel({
 				content: (
-					<EditCalendarEvent
+					<EditCalendarEventLoader
 						event={editTileEvent!}
 						onClose={() => closePanelAndStore()}
 					/>
