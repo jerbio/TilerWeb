@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import dayjs from 'dayjs';
 import {
@@ -54,7 +54,7 @@ const DEFAULT_REP_END_BY_FREQ: Record<string, () => dayjs.Dayjs> = {
 
 /**
  * The .NET backend serializes `DateTimeOffset.MinValue` (used for
- * "no repetition range") as Unix ms -62135596800000 � i.e. year 0001.
+ * "no repetition range") as Unix ms -62135596800000 - i.e. year 0001.
  * Any rep date earlier than 1971 is treated as the bogus sentinel
  * and is eligible to be replaced with a sensible default.
  */
@@ -192,7 +192,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	const [workProfileId, setWorkProfileId] = useState<string | null>(null);
 	const [personalProfileId, setPersonalProfileId] = useState<string | null>(null);
 
-	// Section collapsed states � all start collapsed
+	// Section collapsed states - all start collapsed
 	const [timeOpen, setTimeOpen] = useState(false);
 	const [repetitionOpen, setRepetitionOpen] = useState(false);
 	const [locationOpen, setLocationOpen] = useState(false);
@@ -328,7 +328,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		return Object.keys(init).some((k) => init[k] !== current[k]);
 	})();
 
-	// Debounced location search � only when the user types in the input
+	// Debounced location search - only when the user types in the input
 	useEffect(() => {
 		if (!userEditedAddressRef.current) return;
 		userEditedAddressRef.current = false;
@@ -599,9 +599,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 									(isRecurring && tileMins > 0 && splitNum > 0 ? (
 										<PreviewText>
 											{formatDuration(tileMins * splitNum)}
-											{' � '}
+											{' - '}
 											{formatDuration(tileMins)}
-											{' � '}
+											{' - '}
 											{splitNum}
 										</PreviewText>
 									) : (
@@ -638,7 +638,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															.join(' '),
 												]
 													.filter(Boolean)
-													.join(' � ')}
+													.join(' - ')}
 											</PreviewText>
 										)
 									))}
