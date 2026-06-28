@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserInfo } from '@/global_state';
 import { animated, useSpring } from '@react-spring/web';
-import { LogOut, MessageSquarePlus, Settings, User } from 'lucide-react';
+import { LogOut, MessageSquarePlus, User } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import useAppStore from '@/global_state';
@@ -64,11 +64,6 @@ const ProfileSheet = React.forwardRef<HTMLDivElement, ProfileSheetProps>(({ open
 			</ProfileHeader>
 
 			<ProfileDivider />
-
-			<SettingsButton variant="ghost" onClick={() => navigate('/settings')}>
-				<Settings size={16} />
-				{t('timeline.userMenu.settings')}
-			</SettingsButton>
 
 			<FeedbackButton variant="ghost" onClick={() => setFeedbackOpen(true)}>
 				<MessageSquarePlus size={16} />
@@ -164,10 +159,6 @@ const LogoutButton = styled(Button)`
 `;
 
 const FeedbackButton = styled(Button)`
-	height: 42px;
-`;
-
-const SettingsButton = styled(Button)`
 	height: 42px;
 `;
 

@@ -66,11 +66,6 @@ const AppLayout: React.FC = () => {
 							))}
 						</Navigation>
 					)}
-					{Env.isDevelopment() && (
-						<ThemeToggle onClick={toggleTheme}>
-							{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-						</ThemeToggle>
-					)}
 					<ProfileTrigger
 						ref={triggerRef}
 						onClick={() => setProfileSheetOpen(!profileSheetOpen)}
@@ -133,19 +128,6 @@ const Container = styled.div`
 	isolation: isolate;
 	display: flex;
 	flex-direction: column;
-`;
-
-const ThemeToggle = styled.button`
-	height: 44px;
-	width: 44px;
-	overflow: hidden;
-	color: ${(props) => props.theme.colors.button.primary.text};
-	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
-	display: flex;
-	align-items: center;
-	justify-content: center;
 `;
 
 const ProfileTrigger = styled.div`

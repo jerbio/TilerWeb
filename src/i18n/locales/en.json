@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1157,7 +1157,6 @@
 			"cancel": "Cancel"
 		},
 		"userMenu": {
-			"settings": "Settings",
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",
 			"signOutError": "Failed to sign out. Please try again.",
