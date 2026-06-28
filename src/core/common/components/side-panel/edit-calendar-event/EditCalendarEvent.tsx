@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import dayjs from 'dayjs';
 import {
@@ -42,7 +42,7 @@ import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.pro
 
 /**
  * Default end-date offsets per recurrence frequency.
- * Used only when seeding rep range on disabled → enabled transition
+ * Used only when seeding rep range on disabled ? enabled transition
  * and the current end date is missing or invalid.
  */
 const DEFAULT_REP_END_BY_FREQ: Record<string, () => dayjs.Dayjs> = {
@@ -54,11 +54,22 @@ const DEFAULT_REP_END_BY_FREQ: Record<string, () => dayjs.Dayjs> = {
 
 /**
  * The .NET backend serializes `DateTimeOffset.MinValue` (used for
- * "no repetition range") as Unix ms -62135596800000 — i.e. year 0001.
+ * "no repetition range") as Unix ms -62135596800000 � i.e. year 0001.
  * Any rep date earlier than 1971 is treated as the bogus sentinel
  * and is eligible to be replaced with a sensible default.
  */
 const isValidRepDate = (d: dayjs.Dayjs | null): d is dayjs.Dayjs => !!d && d.year() >= 1971;
+
+/**
+ * Returns the date portion of a millisecond epoch timestamp.
+ * Falls back to the last day of the current month when the value is
+ * null, 0 (server sentinel), or before 1971 (DateTimeOffset.MinValue).
+ */
+const defaultEventEndDate = (ms: number | null): dayjs.Dayjs => {
+	const d = epochToDate(ms);
+	if (!d || d.year() < 1971) return dayjs().endOf('month').startOf('day');
+	return d;
+};
 
 const COLOR_SWATCHES: { r: number; g: number; b: number }[] = [
 	{ r: 237, g: 18, b: 59 }, // brand red
@@ -114,7 +125,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	const [name, setName] = useState(event.name ?? '');
 	const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(epochToDate(event.start));
 	const [startTime, setStartTime] = useState(epochToTimeString(event.start));
-	const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(epochToDate(event.end));
+	const [endDate, setEndDate] = useState<dayjs.Dayjs>(defaultEventEndDate(event.end));
 	const [endTime, setEndTime] = useState(epochToTimeString(event.end));
 	const [durationHours, setDurationHours] = useState<string>(
 		event.eachTileDuration != null ? String(Math.floor(event.eachTileDuration / 3600000)) : ''
@@ -166,7 +177,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	const [isLocationVerified, setIsLocationVerified] = useState(false);
 	const userEditedAddressRef = useRef(false);
 	// True once the user has explicitly picked an end date via the calendar picker.
-	// Prevents freq→freq switches from clobbering a user-chosen date.
+	// Prevents freq?freq switches from clobbering a user-chosen date.
 	const userPickedRepEndRef = useRef(false);
 
 	// Snapshot of form values after loading, used to detect changes
@@ -181,7 +192,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 	const [workProfileId, setWorkProfileId] = useState<string | null>(null);
 	const [personalProfileId, setPersonalProfileId] = useState<string | null>(null);
 
-	// Section collapsed states — all start collapsed
+	// Section collapsed states � all start collapsed
 	const [timeOpen, setTimeOpen] = useState(false);
 	const [repetitionOpen, setRepetitionOpen] = useState(false);
 	const [locationOpen, setLocationOpen] = useState(false);
@@ -231,9 +242,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		setName(ev.name ?? '');
 		setStartDate(epochToDate(ev.start));
 		setStartTime(epochToTimeString(ev.start));
-		setEndDate(epochToDate(ev.end));
-		setEndTime(epochToTimeString(ev.end));
-		setEndDate(epochToDate(ev.end));
+		setEndDate(defaultEventEndDate(ev.end));
 		setEndTime(epochToTimeString(ev.end));
 		setDurationHours(
 			ev.eachTileDuration != null ? String(Math.floor(ev.eachTileDuration / 3600000)) : ''
@@ -319,7 +328,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		return Object.keys(init).some((k) => init[k] !== current[k]);
 	})();
 
-	// Debounced location search — only when the user types in the input
+	// Debounced location search � only when the user types in the input
 	useEffect(() => {
 		if (!userEditedAddressRef.current) return;
 		userEditedAddressRef.current = false;
@@ -438,11 +447,11 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 		if (!newFreq || isForever) return;
 		const makeEnd = DEFAULT_REP_END_BY_FREQ[newFreq];
 		if (wasDisabled) {
-			// disabled → enabled: seed only when current values are invalid
+			// disabled ? enabled: seed only when current values are invalid
 			if (!isValidRepDate(repStartDate)) setRepStartDate(dayjs().startOf('day'));
 			if (!isValidRepDate(repEndDate) && makeEnd) setRepEndDate(makeEnd());
 		} else if (!userPickedRepEndRef.current && makeEnd) {
-			// freq → freq: update end to new frequency's default
+			// freq ? freq: update end to new frequency's default
 			// unless the user already picked a custom date via the picker
 			setRepEndDate(makeEnd());
 		}
@@ -590,9 +599,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 									(isRecurring && tileMins > 0 && splitNum > 0 ? (
 										<PreviewText>
 											{formatDuration(tileMins * splitNum)}
-											{' – '}
+											{' � '}
 											{formatDuration(tileMins)}
-											{' × '}
+											{' � '}
 											{splitNum}
 										</PreviewText>
 									) : (
@@ -629,7 +638,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 															.join(' '),
 												]
 													.filter(Boolean)
-													.join(' · ')}
+													.join(' � ')}
 											</PreviewText>
 										)
 									))}
@@ -648,6 +657,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 																setStartPickerOpen((v) => !v);
 															}}
 															type="button"
+															aria-label={t(
+																'calendarEvent.edit.start'
+															)}
 														>
 															<Calendar size={14} />
 															{startDate
@@ -685,6 +697,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({ event, onClose })
 																setEndPickerOpen((v) => !v);
 															}}
 															type="button"
+															aria-label={t('calendarEvent.edit.end')}
 														>
 															<Calendar size={14} />
 															{endDate
@@ -1358,7 +1371,7 @@ const SaveFooter = styled.div`
 	padding: 0.75rem 1rem;
 `;
 
-/* ── Collapsible Section ── */
+/* -- Collapsible Section -- */
 
 const Section = styled.div`
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
@@ -1496,7 +1509,7 @@ const DateTrigger = styled.button`
 	}
 `;
 
-/* ── Form Primitives ── */
+/* -- Form Primitives -- */
 
 const FieldGroup = styled.div`
 	display: flex;
@@ -1596,7 +1609,7 @@ const WeekDayChip = styled.button<{ $selected: boolean }>`
 	transition: all 0.15s ease;
 `;
 
-/* ── Location Autocomplete ── */
+/* -- Location Autocomplete -- */
 
 const InputWithClear = styled.div`
 	position: relative;
@@ -1737,7 +1750,7 @@ const PoweredByGoogle = styled.div`
 	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
 `;
 
-/* ── Color Swatches ── */
+/* -- Color Swatches -- */
 
 const SwatchPreview = styled.div`
 	width: 14px;
@@ -1775,7 +1788,7 @@ const Swatch = styled.button<{ $selected: boolean }>`
 	}
 `;
 
-/* ── Save ── */
+/* -- Save -- */
 
 const SaveButton = styled.button`
 	display: flex;

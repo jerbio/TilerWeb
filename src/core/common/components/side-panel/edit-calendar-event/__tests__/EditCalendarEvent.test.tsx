@@ -2441,4 +2441,61 @@ describe('EditCalendarEvent', () => {
 			expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
 		});
 	});
+
+	describe('end date default', () => {
+		const expectedEndOfMonth = dayjs().endOf('month').startOf('day');
+
+		async function openTimeSection(user: ReturnType<typeof setupUser>) {
+			await user.click(screen.getByText('calendarEvent.edit.timeSection'));
+		}
+
+		it('defaults end date to end of current month when event.end is null', async () => {
+			const user = setupUser();
+			const noEndEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+				end: null,
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(noEndEvent);
+			renderComponent(noEndEvent);
+			await waitForLoaded();
+			await openTimeSection(user);
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.end');
+			expect(endTrigger.textContent).toContain(expectedEndOfMonth.format('MMM D, YYYY'));
+		});
+
+		it('defaults end date to end of current month when event.end is 0 (server sentinel)', async () => {
+			const user = setupUser();
+			const noEndEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+				end: 0,
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(noEndEvent);
+			renderComponent(noEndEvent);
+			await waitForLoaded();
+			await openTimeSection(user);
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.end');
+			expect(endTrigger.textContent).toContain(expectedEndOfMonth.format('MMM D, YYYY'));
+		});
+
+		it('shows actual end date when event.end is a valid timestamp', async () => {
+			const user = setupUser();
+			const specificEnd = dayjs('2026-09-20T18:00:00').valueOf();
+			const endEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+				end: specificEnd,
+			};
+			mockLookupCalendarEventById.mockResolvedValueOnce(endEvent);
+			renderComponent(endEvent);
+			await waitForLoaded();
+			await openTimeSection(user);
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.end');
+			expect(endTrigger.textContent).toContain('Sep 20, 2026');
+		});
+	});
 });
