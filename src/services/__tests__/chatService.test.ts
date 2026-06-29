@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import ChatService from '../chatService';
 import type { ChatApi } from '@/api/chatApi';
-import type { ChatMessagesResponse } from '@/core/common/types/chat';
+import type { ChatMessagesResponse, ChatSendMessageResponse } from '@/core/common/types/chat';
 
 describe('ChatService', () => {
 	const mockResponse: ChatMessagesResponse = {
@@ -52,5 +52,58 @@ describe('ChatService', () => {
 		const service = new ChatService(chatApiMock);
 
 		await expect(service.getMessages('session-789')).rejects.toThrow('Network error');
+	});
+
+	it('includes location fields when sending a message', async () => {
+		const sendResponse: ChatSendMessageResponse = {
+			Error: { Code: '0', Message: 'SUCCESS' },
+			Content: { vibeResponse: { prompts: {} } },
+			ServerStatus: null,
+		};
+		const chatApiMock = {
+			sendMessage: vi.fn().mockResolvedValue(sendResponse),
+		} as unknown as ChatApi;
+
+		const service = new ChatService(chatApiMock);
+
+		await service.sendMessage(
+			'Schedule lunch',
+			'entity-1',
+			'session-1',
+			'anon-1',
+			'',
+			'',
+			'false'
+		);
+
+		expect(chatApiMock.sendMessage).toHaveBeenCalledWith(
+			expect.objectContaining({
+				UserLongitude: '',
+				UserLatitude: '',
+				UserLocationVerified: 'false',
+			})
+		);
+	});
+
+	it('passes location fields when accepting changes', async () => {
+		const chatApiMock = {
+			executeActions: vi.fn().mockResolvedValue({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { vibeRequest: {} },
+				ServerStatus: null,
+			}),
+		} as unknown as ChatApi;
+
+		const service = new ChatService(chatApiMock);
+
+		await service.sendChatAcceptChanges('request-1', 'anon-1', '', '', 'false');
+
+		expect(chatApiMock.executeActions).toHaveBeenCalledWith(
+			'request-1',
+			'anon-1',
+			'',
+			'',
+			'false'
+		);
 	});
 });
