@@ -91,4 +91,23 @@ describe('locationService', () => {
 		await expect(locationService.getCurrentLocation()).resolves.toBe(manualLocation);
 		expect(getCurrentPosition).not.toHaveBeenCalled();
 	});
+
+	it('does not save a manual address that has no coordinates', () => {
+		locationService.setManualLocation({
+			location: 'Unknown place',
+			verified: false,
+			status: 'manual_unverified',
+		});
+
+		expect(locationService.hasManualLocation()).toBe(false);
+	});
+
+	it('rejects manual address lookup when geocoding cannot find coordinates', async () => {
+		vi.spyOn(locationService, 'geocodeAddress').mockResolvedValue(null);
+
+		await expect(locationService.getLocationFromAddress('Unknown place')).rejects.toThrow(
+			'Unable to find coordinates for address'
+		);
+		expect(locationService.hasManualLocation()).toBe(false);
+	});
 });

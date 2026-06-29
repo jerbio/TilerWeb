@@ -39,10 +39,6 @@ const LocationContainer = styled.div<StyledProps>`
 	padding: 8px 12px;
 	background-color: ${({ theme }) => theme.colors.background.card2};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-style: ${(props) =>
-		props.$useDefaultLocation && !props.$isEditing ? 'dashed' : 'solid'};
-	border-color: ${({ $useDefaultLocation, $isEditing, theme }) =>
-		$useDefaultLocation && !$isEditing ? theme.colors.brand[400] : theme.colors.border.default};
 	border-radius: 6px;
 	font-size: 0.75rem;
 	color: ${({ theme }) => theme.colors.text.secondary};
@@ -56,20 +52,18 @@ const LocationContainer = styled.div<StyledProps>`
 	${({ $shouldNudge, theme }) =>
 		$shouldNudge &&
 		`
-		animation: locationAttentionFlash 9s ease-in-out infinite;
+		animation: locationAttentionFlash 5s ease-in-out infinite;
 
 		@keyframes locationAttentionFlash {
-			0%, 76%, 100% {
-				border-color: ${theme.colors.brand[400]};
+			0%, 68%, 100% {
+				border-color: ${theme.colors.border.default};
 				box-shadow: none;
+				background-color: ${theme.colors.background.card2};
 			}
-			84% {
-				border-color: ${theme.colors.brand[500]};
-				box-shadow: 0 0 0 1px rgba(237, 18, 59, 0.25), 0 0 12px rgba(237, 18, 59, 0.22);
-			}
-			92% {
-				border-color: ${theme.colors.brand[300]};
-				box-shadow: 0 0 0 1px rgba(237, 18, 59, 0.12), 0 0 7px rgba(237, 18, 59, 0.16);
+			78% {
+				border-color: ${theme.colors.brand[400]};
+				box-shadow: 0 0 0 3px ${theme.colors.brand[500]}1c, 0 0 12px ${theme.colors.brand[500]}20;
+				background-color: ${theme.colors.brand[500]}10;
 			}
 		}
 
@@ -430,7 +424,7 @@ const UserLocation: React.FC = () => {
 					status: 'manual_unverified' as const,
 				};
 				setLocationData(fallbackLocation);
-				locationService.setManualLocation(fallbackLocation);
+				locationService.clearManualLocation();
 			} finally {
 				setIsLocationFetching(false);
 			}
@@ -490,7 +484,10 @@ const UserLocation: React.FC = () => {
 				? t('home.expanded.chat.userLocation.setAddress', 'Set address')
 				: t('home.expanded.chat.userLocation.notSet', 'Not set');
 	const shouldNudgeLocation =
-		!isLoading && !isEditing && locationData.status === 'permission_denied';
+		!isLoading &&
+		!isEditing &&
+		locationData.status !== 'verified' &&
+		locationData.location.trim().length === 0;
 
 	return (
 		<LocationContainer

@@ -41,7 +41,7 @@ class LocationService {
 	 * Set a manually entered location (persists until cleared)
 	 */
 	setManualLocation(location: LocationData): void {
-		this.cachedManualLocation = location;
+		this.setCurrentLocation(location);
 	}
 
 	/**
@@ -62,7 +62,11 @@ class LocationService {
 	 * Set the current location data (used when user manually enters an address)
 	 */
 	setCurrentLocation(locationData: LocationData): void {
-		if (locationData.status === 'verified' || locationData.status === 'manual_unverified') {
+		if (
+			locationData.status === 'verified' &&
+			locationData.latitude !== undefined &&
+			locationData.longitude !== undefined
+		) {
 			this.cachedManualLocation = locationData;
 		} else {
 			this.cachedManualLocation = null;
@@ -258,27 +262,13 @@ class LocationService {
 				// Cache the location data
 				this.cachedManualLocation = locationData;
 				return locationData;
-			} else {
-				// If geocoding fails, just use the entered text
-				const locationData = {
-					location: address.trim(),
-					verified: false,
-					status: 'manual_unverified' as const,
-				};
-
-				this.cachedManualLocation = locationData;
-				return locationData;
 			}
+
+			throw new Error('Unable to find coordinates for address');
 		} catch (err) {
 			console.error('Error processing address:', err);
-			const locationData = {
-				location: address.trim(),
-				verified: false,
-				status: 'manual_unverified' as const,
-			};
-
-			this.cachedManualLocation = locationData;
-			return locationData;
+			this.cachedManualLocation = null;
+			throw err;
 		}
 	}
 
