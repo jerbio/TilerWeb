@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { keyframes } from 'styled-components';
+import { Loader2 } from 'lucide-react';
 import { CalendarEvent } from '@/core/common/types/schedule';
 import { scheduleService, userService } from '@/services';
 import EditCalendarEvent from './EditCalendarEvent';
@@ -16,6 +19,7 @@ interface LoadedData {
 }
 
 const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event, onClose }) => {
+	const { t } = useTranslation();
 	const [isLoading, setIsLoading] = useState(true);
 	const [loadedData, setLoadedData] = useState<LoadedData | null>(null);
 
@@ -79,7 +83,12 @@ const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event
 	}, [event.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	if (isLoading) {
-		return <div data-testid="edit-event-loading" />;
+		return (
+			<LoadingContainer data-testid="edit-event-loading">
+				<Spinner size={24} />
+				<LoadingText>{t('calendarEvent.edit.loading')}</LoadingText>
+			</LoadingContainer>
+		);
 	}
 
 	const data = loadedData!;
@@ -95,3 +104,28 @@ const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event
 };
 
 export default EditCalendarEventLoader;
+
+const spin = keyframes`
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+`;
+
+const LoadingContainer = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	height: 100%;
+`;
+
+const Spinner = styled(Loader2)`
+	animation: ${spin} 1s linear infinite;
+	color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const LoadingText = styled.p`
+	text-align: center;
+	padding: 0.5rem 0 0;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	font-size: 0.875rem;
+`;
