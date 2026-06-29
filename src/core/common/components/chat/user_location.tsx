@@ -292,10 +292,16 @@ const ResetLink = styled.span`
 	text-decoration-style: dotted;
 `;
 
+type UserLocationProps = {
+	idPrefix?: string;
+};
+
 // UserLocation component - displays the user's location
-const UserLocation: React.FC = () => {
+const UserLocation: React.FC<UserLocationProps> = ({ idPrefix = 'chat-user-location' }) => {
 	const { t } = useTranslation();
 	const theme = useTheme();
+	const locationIconTooltipId = `${idPrefix}-location-icon-tooltip`;
+	const defaultBadgeTooltipId = `${idPrefix}-default-badge-tooltip`;
 
 	const [locationData, setLocationData] = useState<LocationData>(
 		locationService.getUnavailableLocation()
@@ -516,11 +522,11 @@ const UserLocation: React.FC = () => {
 				</LocationIcon>
 				{/* Tooltip is now handled with fixed positioning */}
 				<TooltipContainer
-					onMouseOver={() => showTooltip('location-icon-tooltip')}
-					onMouseOut={() => hideTooltip('location-icon-tooltip')}
+					onMouseOver={() => showTooltip(locationIconTooltipId)}
+					onMouseOut={() => hideTooltip(locationIconTooltipId)}
 				>
 					{/* Fixed tooltip that appears at the top of the viewport */}
-					<Tooltip id="location-icon-tooltip">
+					<Tooltip id={locationIconTooltipId}>
 						{isLocationFetching ? (
 							t('home.expanded.chat.userLocation.gettingCurrentLocation')
 						) : isEditing ? (
@@ -603,14 +609,14 @@ const UserLocation: React.FC = () => {
 											e.stopPropagation(); // Prevent triggering LocationContainer click
 											setIsEditing(true); // Start editing directly from badge click
 										}}
-										onMouseOver={() => showTooltip('default-badge-tooltip')}
-										onMouseOut={() => hideTooltip('default-badge-tooltip')}
+										onMouseOver={() => showTooltip(defaultBadgeTooltipId)}
+										onMouseOut={() => hideTooltip(defaultBadgeTooltipId)}
 									>
 										{locationBadgeText}
 									</DefaultBadge>
 
 									{/* Fixed tooltip that always appears at the top center of the viewport */}
-									<DefaultBadgeTooltip id="default-badge-tooltip">
+									<DefaultBadgeTooltip id={defaultBadgeTooltipId}>
 										{locationBenefitMessage}
 										{/* Arrow pointing to the Default badge */}
 										<DefaultBadgeTooltipArrow />
