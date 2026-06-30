@@ -15,10 +15,7 @@ type ProfileSheetProps = {
 	open: boolean;
 };
 
-const ProfileSheet = React.forwardRef<HTMLDivElement, ProfileSheetProps>(function ProfileSheet(
-	{ open, user },
-	ref
-) {
+const ProfileSheet = React.forwardRef<HTMLDivElement, ProfileSheetProps>(({ open, user }, ref) => {
 	const logout = useAppStore((state) => state.logout);
 	const navigate = useNavigate();
 	const { t } = useTranslation();
@@ -83,8 +80,6 @@ const ProfileSheet = React.forwardRef<HTMLDivElement, ProfileSheetProps>(functio
 	);
 });
 
-ProfileSheet.displayName = 'ProfileSheet';
-
 const AnimatedProfileMenu = styled(animated.div)`
 	padding: ${(props) => props.theme.space.small} 0;
 	position: absolute;
@@ -101,7 +96,6 @@ const AnimatedProfileMenu = styled(animated.div)`
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
-	gap: 0.5rem;
 `;
 
 const ProfileHeader = styled.div`
@@ -110,6 +104,7 @@ const ProfileHeader = styled.div`
 	gap: 1rem;
 	padding: 1.25rem;
 	cursor: pointer;
+	border-radius: ${(props) => props.theme.borderRadius.large};
 	transition: background-color 0.2s ease;
 
 	&:hover {
@@ -155,12 +150,18 @@ const ProfileEmail = styled.div`
 
 const ProfileDivider = styled.div`
 	height: 1px;
-	background-color: ${(props) => props.theme.colors.border.default};
+	background-color: ${(props) => props.theme.colors.border.strong};
 	margin: ${(props) => props.theme.space.small} 0;
 `;
 
-const LogoutButton = styled(Button)``;
+const LogoutButton = styled(Button)`
+	height: 42px;
+`;
 
-const FeedbackButton = styled(Button)``;
+const FeedbackButton = styled(Button)`
+	height: 42px;
+`;
+
+ProfileSheet.displayName = 'ProfileSheet';
 
 export default ProfileSheet;

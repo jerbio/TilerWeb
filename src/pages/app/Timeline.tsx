@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useNavigate } from 'react-router';
 import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
-import Loader from '@/core/common/components/loader';
 import TimelineHeader from '@/components/timeline/timeline_header';
 import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
@@ -12,40 +10,22 @@ import Chat from '@/core/common/components/chat/chat';
 import { SidePanel, useSidePanelStack } from '@/core/common/components/side-panel';
 import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
 import { useEditNotesPanelSync } from '@/core/common/components/side-panel/useEditNotesPanelSync';
-import EditCalendarEvent from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEvent';
+import EditCalendarEventLoader from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEventLoader';
 import EditNotes from '@/core/common/components/side-panel/edit-notes/EditNotes';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
-import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { useTranslation } from 'react-i18next';
 import {
 	CalendarUIProvider,
 	useCalendarUI,
 } from '@/core/common/components/calendar/calendar-ui.provider';
+import appLayoutConfig from '@/core/constants/app_layout_config';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { getMobileReviewSheetSizingCss } from '@/pages/reviewSheetSizing';
 
 const Timeline: React.FC = () => {
-	const navigate = useNavigate();
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
-	const isAuthLoading = useAppStore((state) => state.isAuthLoading);
-	const isAuthenticated = useAppStore((state) => state.isAuthenticated);
 
-	useEffect(() => {
-		if (!isAuthLoading && !isAuthenticated) {
-			navigate('/signin');
-		}
-	}, [isAuthLoading, isAuthenticated, navigate]);
-
-	if (isAuthLoading) {
-		return (
-			<Container>
-				<LoadingContainer>
-					<Loader />
-				</LoadingContainer>
-			</Container>
-		);
-	}
-
-	if (!authenticatedUser || !isAuthenticated) {
+	if (!authenticatedUser) {
 		return null; // Will redirect to signin
 	}
 
@@ -85,13 +65,18 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 	const editTileEvent = useCalendarUI((s) => s.editTile.state.event);
 	const closeEditTile = useCalendarUI((s) => s.editTile.actions.close);
 
+	// React to editNotes store changes and push/pop notes panel
+	const editNotesIsOpen = useCalendarUI((s) => s.editNotes.state.isOpen);
+	const editNotesEvent = useCalendarUI((s) => s.editNotes.state.event);
+	const closeEditNotes = useCalendarUI((s) => s.editNotes.actions.close);
+
 	const { closePanelAndStore } = useEditTilePanelSync({
 		editTileIsOpen,
 		editTileEvent,
 		pushPanel: () =>
 			pushPanel({
 				content: (
-					<EditCalendarEvent
+					<EditCalendarEventLoader
 						event={editTileEvent!}
 						onClose={() => closePanelAndStore()}
 					/>
@@ -102,11 +87,6 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 		setSidePanelExpanded,
 		setMobileChatVisible,
 	});
-
-	// React to editNotes store changes and push/pop the rich-text notes editor
-	const editNotesIsOpen = useCalendarUI((s) => s.editNotes.state.isOpen);
-	const editNotesEvent = useCalendarUI((s) => s.editNotes.state.event);
-	const closeEditNotes = useCalendarUI((s) => s.editNotes.actions.close);
 
 	const { closePanelAndStore: closeNotesPanelAndStore } = useEditNotesPanelSync({
 		editNotesIsOpen,
@@ -181,8 +161,9 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 			content: <SidePanel stack={panelStack} />,
 		},
 	];
+	const visibleContent = useMemo(() => (showChat ? content : [content[0]]), [showChat, content]);
 
-	const contentTransition = useTransition(showChat ? content : content.slice(0, 1), {
+	const contentTransition = useTransition(visibleContent, {
 		keys: (item) => item.key,
 		from: { opacity: 0, scale: 1.05 },
 		enter: { opacity: 1, scale: 1 },
@@ -204,8 +185,9 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 									style={style}
 									key={item.key}
 									$sidepanelexpanded={sidePanelExpanded}
-									$mobilereview={mobileReview}
-									$reviewstop={reviewStop}
+									{...(item.key === 'side-panel'
+										? { $mobilereview: mobileReview, $reviewstop: reviewStop }
+										: {})}
 								>
 									{item.content}
 								</item.container>
@@ -219,8 +201,8 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 };
 
 const TimelineContent = styled.main`
-	position: absolute;
-	inset: 1.5rem;
+	width: 100%;
+	height: 100%;
 	border-radius: ${(props) => props.theme.borderRadius.xLarge};
 	background: ${(props) =>
 		`linear-gradient(to right, ${props.theme.colors.plain}, ${props.theme.colors.background.card})`};
@@ -229,6 +211,7 @@ const TimelineContent = styled.main`
 	flex-direction: column;
 	gap: 1rem;
 	overflow: hidden;
+	z-index: 1;
 
 	@media screen and (min-width: ${(props) => props.theme.screens.lg}) {
 		padding-block: 1.5rem;
@@ -239,10 +222,10 @@ const TimelineContent = styled.main`
 
 const TimelineContentContainer = styled.div`
 	z-index: 1;
-	position: fixed;
+	display: flex;
+	height: calc(100% - ${appLayoutConfig.SUBNAV_HEIGHT}px);
 	width: 100vw;
-	height: calc(100vh - 64px);
-	top: 64px;
+	padding: 1rem;
 `;
 
 const CardContent = styled.div`
@@ -288,9 +271,6 @@ const SidePanelContainer = styled(animated.div)<{
 
 	${(props) => {
 		if (!props.$mobilereview) return '';
-		// Three discrete vertical stops for the mobile review bottom sheet.
-		// Sized in dvh so address-bar collapse on iOS Safari doesn't change
-		// the apparent ratio between sheet and visible calendar grid.
 		const stop = props.$reviewstop ?? 'full';
 		const sizing = getMobileReviewSheetSizingCss(stop);
 		return `
@@ -419,8 +399,8 @@ const MobileChatInput = styled.input`
 `;
 
 const Container = styled.div`
-	min-height: 100vh;
 	position: relative;
+	height: 100%;
 	background: ${(props) => `linear-gradient(
 		to bottom,
 		${props.theme.colors.background.page} 0%,
@@ -428,10 +408,11 @@ const Container = styled.div`
 		${props.theme.colors.brand[400]}80 100%
 	)`};
 	overflow: hidden;
+	isolation: isolate;
 
 	&::after {
 		content: '';
-		position: fixed;
+		position: absolute;
 		bottom: 0;
 		left: 0;
 		right: 0;
@@ -447,14 +428,6 @@ const Container = styled.div`
 		pointer-events: none;
 		z-index: 0;
 	}
-`;
-
-const LoadingContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	min-height: 60vh;
 `;
 
 export default Timeline;
