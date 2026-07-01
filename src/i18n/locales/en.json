@@ -1535,6 +1535,20 @@
 				"sent": "Sent",
 				"received": "Received ({{count}})"
 			},
+			"toolbar": {
+				"welcome": "Welcome to your Tileshare Dashboard",
+				"create": "Create tileshare"
+			},
+			"createSelection": {
+				"single": {
+					"label": "Single Tileshare",
+					"description": "A single task with your colleagues."
+				},
+				"multi": {
+					"label": "Multi Tileshare",
+					"description": "A variety of tasks in one project."
+				}
+			},
 			"filter": {
 				"all": "All",
 				"inProgress": "In Progress"

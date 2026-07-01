@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, CalendarCheck2 } from 'lucide-react';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 import Tabs, { TabItem } from '@/core/common/components/Tabs';
+import TileshareToolbar from '@/components/tileshare/TileshareToolbar';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Routes } from '@/core/constants/routes';
+import { useAuth } from '@/core/auth/useAuth';
 
 export enum TileshareTab {
 	Active = 'active',
@@ -16,6 +18,7 @@ const TileshareDashboardPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+	const { user } = useAuth();
 	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
 
 	useEffect(() => {
@@ -51,9 +54,17 @@ const TileshareDashboardPage: React.FC = () => {
 		if (tabRoutes[id]) navigate(tabRoutes[id]);
 	};
 
+	const handleSelectSingle = () => {};
+	const handleSelectMulti = () => {};
+
 	return (
 		<Container>
 			<CalendarUIProvider>
+				<StyledToolbar
+					user={{ name: user?.fullName ?? null, email: user?.email ?? null }}
+					onSelectSingle={handleSelectSingle}
+					onSelectMulti={handleSelectMulti}
+				/>
 				<Header>
 					<Tabs
 						tabs={tabs}
@@ -77,6 +88,10 @@ const Container = styled.div`
 	background-color: ${(props) => props.theme.colors.background.page};
 	overflow-y: scroll;
 	isolation: isolate;
+`;
+
+const StyledToolbar = styled(TileshareToolbar)`
+	padding: 1rem 1.5rem 0;
 `;
 
 const Header = styled.header`
