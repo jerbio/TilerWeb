@@ -2,13 +2,14 @@ import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
+import Discover from './pages/Discover';
+import Articles from './pages/Articles';
+import GettingStartedArticle from './pages/articles/GettingStartedArticle';
 import Layout from './pages/Layout';
-import Features from './pages/Features';
-import Newsletter from './pages/Newsletter';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
-import Timeline from './pages/Timeline';
+import Timeline from './pages/app/Timeline';
 import FooterSection from './components/footer_section';
 import { ConsentProvider } from './core/common/components/consent';
 import { HelmetProvider } from 'react-helmet-async';
@@ -24,114 +25,203 @@ import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
-// import useAppStore from './global_state';
+import ThemeInitializer from './core/theme/ThemeInitializer';
+import NotificationToast from './core/ui/NotificationToast';
+import AppLayout from './pages/app/AppLayout';
+import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
+import TileshareInbox from './pages/app/tileshare/TileshareInbox';
+import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
+import TileshareOutbox from './pages/app/tileshare/TileshareOutbox';
+import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
+import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
+import { FlaggedRoute } from './core/auth/FlaggedRoute';
+import { featureFlags } from './core/constants/featureFlags';
+import { AdminRoute } from './core/auth/AdminRoute';
+import AdminLayout from './pages/admin/AdminLayout';
+import FeatureFlagsAdmin from './pages/admin/feature-flags/FeatureFlagsAdmin';
 
 // Component to track page views on route changes
 const AnalyticsTracker: React.FC = () => {
-  const location = useLocation();
+	const location = useLocation();
 
-  useEffect(() => {
-    // Track page view on route change
-    const pageName = location.pathname === '/' ? 'Home' : location.pathname.slice(1);
-    analytics.trackPageView(pageName, {
-      path: location.pathname,
-      search: location.search,
-      referrer: document.referrer,
-    });
-  }, [location]);
+	useEffect(() => {
+		// Track page view on route change
+		const pageName = location.pathname === '/' ? 'Home' : location.pathname.slice(1);
+		analytics.trackPageView(pageName, {
+			path: location.pathname,
+			search: location.search,
+			referrer: document.referrer,
+		});
+	}, [location]);
 
-  return null;
+	return null;
+};
+
+// Reset scroll position to the top on every route change (unless the URL has a hash)
+const ScrollToTop: React.FC = () => {
+	const { pathname, hash } = useLocation();
+
+	useEffect(() => {
+		if (hash) return;
+		window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+	}, [pathname, hash]);
+
+	return null;
 };
 
 const App: React.FC = () => {
-  // Dev tools for testing
-  const { isOverlayVisible, closeOverlay } = useDevTools();
+	// Dev tools for testing
+	const { isOverlayVisible, closeOverlay } = useDevTools();
 
-  // Track app initialization
-  useEffect(() => {
-    analytics.trackEvent('App', 'Initialized', undefined, undefined, {
-      userAgent: navigator.userAgent,
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
-    });
-  }, []);
+	// Track app initialization
+	useEffect(() => {
+		analytics.trackEvent('App', 'Initialized', undefined, undefined, {
+			userAgent: navigator.userAgent,
+			screenWidth: window.innerWidth,
+			screenHeight: window.innerHeight,
+		});
+	}, []);
 
-  return (
-    <ThemeProvider defaultTheme='dark'>
-      <HelmetProvider>
-        <ConsentProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <AnalyticsTracker />
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="/features" element={<Features />} />
-                  <Route path="/newsletter" element={<Newsletter />} />
-                </Route>
-                <Route
-                  path="/waitlist"
-                  element={
-                    <>
-                      <Waitlist />
-                      <FooterSection />
-                    </>
-                  }
-                />
+	return (
+		<ThemeProvider defaultTheme="dark">
+			<HelmetProvider>
+				<ConsentProvider>
+					<AuthProvider>
+						<BrowserRouter>
+							<ThemeInitializer />
+							<AnalyticsTracker />
+							<ScrollToTop />
+							<Routes>
+								<Route path="/" element={<Layout />}>
+									<Route index element={<Home />} />
+									<Route path="/discover" element={<Discover />} />
+									<Route path="/articles" element={<Articles />} />
+									<Route
+										path="/articles/getting-started-with-tiler"
+										element={<GettingStartedArticle />}
+									/>
+									{/* Legacy URL — keep redirect for SEO + backlinks */}
+									<Route
+										path="/get-started"
+										element={
+											<Navigate
+												to="/articles/getting-started-with-tiler"
+												replace
+											/>
+										}
+									/>
+								</Route>
+								<Route
+									path="/waitlist"
+									element={
+										<>
+											<Waitlist />
+											<FooterSection />
+										</>
+									}
+								/>
 
-                {/* Public Routes - redirect to /timeline if already authenticated */}
-                <Route element={<PublicRoute />}>
-                  <Route
-                    path="/signup"
-                    element={
-                      <>
-                        <UserAuthentication />
-                        <FooterSection />
-                      </>
-                    }
-                  />
-                  <Route
-                    path="/signin"
-                    element={
-                      <>
-                        <UserAuthentication />
-                        <FooterSection />
-                      </>
-                    }
-                  />
-                </Route>
+								{/* Public Routes - redirect to /timeline if already authenticated */}
+								<Route element={<PublicRoute />}>
+									<Route
+										path="/signup"
+										element={
+											<>
+												<UserAuthentication />
+												<FooterSection />
+											</>
+										}
+									/>
+									<Route
+										path="/signin"
+										element={
+											<>
+												<UserAuthentication />
+												<FooterSection />
+											</>
+										}
+									/>
+								</Route>
 
-                {/* Protected Routes - redirect to /signin if not authenticated */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/timeline" element={<Timeline />} />
-                  <Route path="/settings" element={<SettingsLayout />}>
-                    <Route
-                      index
-                      element={<Navigate to="/settings" replace />}
-                    />
-                    <Route path="account" element={<AccountSettings />} />
-                    <Route
-                      path="preferences"
-                      element={<PreferencesSettings />}
-                    />
-                    <Route
-                      path="notifications"
-                      element={<NotificationPreferencesSettings />}
-                    />
-                  </Route>
-                </Route>
-              </Routes>
-              <Toaster position="bottom-left" theme="system" />
-            </BrowserRouter>
-          </AuthProvider>
+								{/* Extranet Routes - perform operations without needing to sign in */}
+								<Route
+									path="/tileshare/invite/:designatedTemplateId"
+									element={<TileshareInvitePage />}
+								/>
 
-          {/* Dev tools - only rendered in development mode */}
-          <DevUserIdOverlay isVisible={isOverlayVisible} onClose={closeOverlay} />
-          <DevModeBadge />
-        </ConsentProvider>
-      </HelmetProvider>
-    </ThemeProvider>
-  );
+								{/* Protected Routes - redirect to /signin if not authenticated */}
+								<Route element={<ProtectedRoute />}>
+									<Route element={<AppLayout />}>
+										<Route path="/timeline" element={<Timeline />} />
+										<Route
+											element={
+												<FlaggedRoute flag={featureFlags.TILESHARE_TAB} />
+											}
+										>
+											<Route
+												path="/tileshare"
+												element={<TileshareDashboardPage />}
+											>
+												<Route
+													index
+													element={<Navigate to="inbox" replace />}
+												/>
+												<Route path="inbox" element={<TileshareInbox />} />
+												<Route
+													path="outbox"
+													element={<TileshareOutbox />}
+												/>
+											</Route>
+											<Route
+												path="/tileshare/:id"
+												element={<TileshareDetailPage />}
+											/>
+											<Route
+												path="/tileshare/:id/tilette/:tiletteId"
+												element={<TiletteDetailPage />}
+											/>
+										</Route>
+										<Route path="/settings" element={<SettingsLayout />}>
+											<Route
+												index
+												element={<Navigate to="/settings" replace />}
+											/>
+											<Route path="account" element={<AccountSettings />} />
+											<Route
+												path="preferences"
+												element={<PreferencesSettings />}
+											/>
+											<Route
+												path="notifications"
+												element={<NotificationPreferencesSettings />}
+											/>
+										</Route>
+									</Route>
+								</Route>
+
+								{/* Admin Routes - redirect to /timeline if not admin */}
+								<Route element={<AdminRoute />}>
+									<Route path="/admin" element={<AdminLayout />}>
+										<Route index element={<Navigate to="/admin" replace />} />
+										<Route
+											path="feature-flags"
+											element={<FeatureFlagsAdmin />}
+										/>
+									</Route>
+								</Route>
+							</Routes>
+							<Toaster position="bottom-left" theme="system" />
+							<NotificationToast />
+						</BrowserRouter>
+					</AuthProvider>
+
+					{/* Dev tools - only rendered in development mode */}
+					<DevUserIdOverlay isVisible={isOverlayVisible} onClose={closeOverlay} />
+					<DevModeBadge />
+				</ConsentProvider>
+			</HelmetProvider>
+		</ThemeProvider>
+	);
 };
 
 export default App;

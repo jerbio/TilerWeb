@@ -1,5 +1,5 @@
-{
-		"common": {
+﻿{
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "건너뛰기",
@@ -43,9 +43,8 @@
 		},
 		"navigation": {
 			"home": "홈",
-			"features": "기능",
 			"waitlist": "대기자 명단",
-			"newsletter": "Discover"
+			"discover": "기능"
 		},
 		"voiceInput": {
 			"listening": "듣는 중...",
@@ -496,16 +495,46 @@
 					"label": "어떤 통합을 사용하시나요?",
 					"placeholder": "예: Google 캘린더, Outlook, Apple 캘린더",
 					"options": [
-						{ "value": "google", "label": "Google 캘린더" },
-						{ "value": "outlook", "label": "Microsoft Outlook 캘린더" },
-						{ "value": "apple", "label": "Apple 캘린더" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google 캘린더"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook 캘린더"
+						},
+						{
+							"value": "apple",
+							"label": "Apple 캘린더"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {
@@ -517,8 +546,229 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "타일/블록 검색...",
+		"searchAriaLabel": "타일 또는 블록 검색",
+		"clearSearch": "검색 지우기",
+		"loadMore": "더 불러오기",
+		"loading": "로딩 중…",
+		"notFoundMessage": "이런, '{{query}}'을(를) 찾을 수 없습니다. 이 제목으로 타일을 만드시겠습니까?",
+		"notFoundDismiss": "아니요",
+		"notFoundCreate": "만들기",
+		"setAsNow": "지금으로 설정",
+		"markComplete": "완료",
+		"markDeleted": "삭제",
+		"confirmCompleteTitle": "이 이벤트를 완료하시겠습니까?",
+		"confirmDeleteTitle": "이 이벤트를 삭제하시겠습니까?",
+		"confirmAction": "확인",
+		"cancelAction": "취소",
+		"shuffle": {
+			"tooltip": "일정 섞기",
+			"ariaLabel": "일정 섞기",
+			"shuffling": "일정을 섞는 중...",
+			"success": "일정이 섞였습니다!",
+			"error": "섞기 실패. 다시 시도해 주세요."
+		},
+		"revise": {
+			"tooltip": "일정 수정",
+			"ariaLabel": "일정 수정",
+			"revising": "일정을 수정하는 중...",
+			"success": "일정이 수정되었습니다!",
+			"error": "수정 실패. 다시 시도해 주세요."
+		},
+		"procrastinateAll": {
+			"tooltip": "모든 이벤트 연기",
+			"ariaLabel": "모든 이벤트 연기",
+			"deferring": "모든 이벤트를 연기하는 중...",
+			"success": "모든 이벤트가 연기되었습니다!",
+			"error": "연기 실패. 다시 시도해 주세요.",
+			"pickerTitle": "연기 기간",
+			"days": "일",
+			"hours": "시간",
+			"minutes": "분",
+			"daysShort": "일",
+			"hoursShort": "시간",
+			"minutesShort": "분",
+			"confirm": "확인",
+			"cancel": "취소"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "채팅 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
 		"usernameAlreadyExists": "사용자 이름이 이미 존재합니다"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "현재로 설정 중...",
+			"setAsNowSuccess": "이벤트가 현재로 설정되었습니다!",
+			"completing": "이벤트 완료 중...",
+			"completeSuccess": "이벤트가 완료되었습니다!",
+			"deferring": "이벤트 연기 중...",
+			"deferSuccess": "이벤트가 연기되었습니다!",
+			"updating": "변경 사항 저장 중...",
+			"updateSuccess": "변경 사항이 저장되었습니다!",
+			"deleting": "이벤트 삭제 중...",
+			"deleteSuccess": "이벤트가 삭제되었습니다!",
+			"actionFailed": "작업이 실패했습니다. 다시 시도해 주세요."
+		},
+		"edit": {
+			"title": "편집",
+			"titleBlock": "블록 편집",
+			"titleTile": "타일 편집",
+			"nameSection": "이름",
+			"occurrenceSection": "??",
+			"timeSection": "시간 및 기간",
+			"recurringToggle": "이벤트 반복",
+			"repetitionSection": "반복",
+			"locationSection": "위치",
+			"colorSection": "색상",
+			"notesSection": "메모",
+			"name": "이름",
+			"start": "시작",
+			"end": "종료",
+			"selectDate": "날짜 선택",
+			"duration": "기간",
+			"hours": "시간",
+			"minutes": "분",
+			"durationHoursPreview": "{{count}}시간",
+			"durationMinutesPreview": "{{count}}분",
+			"split": "분할 수",
+			"splitPlaceholder": "예: 3",
+			"location": "주소",
+			"locationDescription": "설명",
+			"locationDescriptionPlaceholder": "추가 위치 정보...",
+			"color": "색상",
+			"recurring": "반복",
+			"repetitionDisabled": "비활성화",
+			"selectFrequency": "빈도 선택",
+			"daily": "매일",
+			"weekly": "매주",
+			"monthly": "매월",
+			"yearly": "매년",
+			"forever": "영원히 반복",
+			"repetitionStart": "반복 시작",
+			"repetitionEnd": "반복 종료",
+			"sun": "일",
+			"mon": "월",
+			"tue": "화",
+			"wed": "수",
+			"thu": "목",
+			"fri": "금",
+			"sat": "토",
+			"save": "저장",
+			"saving": "변경 사항 저장 중...",
+			"saveSuccess": "이벤트가 업데이트되었습니다!",
+			"saveFailed": "저장에 실패했습니다. 다시 시도해 주세요.",
+			"back": "뒤로",
+			"loading": "상세 정보 불러오는 중...",
+			"loadingBlock": "블록 상세 정보 불러오는 중...",
+			"loadingTile": "타일 상세 정보 불러오는 중...",
+			"clearLocation": "위치 지우기",
+			"copyAddressOnly": "주소만 복사",
+			"locationMinChars": "검색하려면 3자 이상 입력하세요",
+			"locationSearchPlaceholder": "위치 검색...",
+			"savedLocations": "저장된 위치",
+			"googleResults": "구글 지도",
+			"poweredByGoogle": "Google 제공",
+			"noLocationResults": "위치를 찾을 수 없습니다"
+		}
+	},
+	"settings": {
+		"title": "설정",
+		"back": "뒤로",
+		"logout": "로그아웃",
+		"breadcrumb": {
+			"home": "홈",
+			"settings": "설정"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "계정 정보",
+				"description": "계정을 검토하고 개인 정보를 변경하세요",
+				"fields": {
+					"fullName": "전체 이름",
+					"username": "사용자 이름",
+					"email": "이메일 주소",
+					"phoneNumber": "전화번호",
+					"phoneNumberPlaceholder": "전화번호 추가",
+					"countryCode": "국가 코드",
+					"countryCodeSearch": "국가 검색...",
+					"countryCodeNoResults": "국가를 찾을 수 없습니다",
+					"dateOfBirth": "생년월일",
+					"dateOfBirthPlaceholder": "년/월/일"
+				},
+				"saveChanges": "변경사항 저장",
+				"saving": "저장 중...",
+				"deleteAccount": "내 계정 삭제",
+				"saveSuccess": "계정 정보가 성공적으로 업데이트되었습니다",
+				"saveError": "변경사항을 저장할 수 없습니다. 다시 시도해 주세요.",
+				"deleteNotImplemented": "계정 삭제 기능이 곧 제공됩니다"
+			},
+			"tilePreferences": {
+				"title": "타일 환경설정",
+				"description": "이동 수단을 정의하고 Tiler가 일일 시간 패턴을 이해하도록 도와주세요",
+				"howMoveAround": "어떻게 이동하시나요?",
+				"cycling": "자전거",
+				"driving": "운전",
+				"transit": "대중교통",
+				"defineTimeRestrictions": "시간 제한 정의",
+				"myWorkHours": "내 근무 시간",
+				"myPersonalHours": "내 개인 시간",
+				"setBlockOutHours": "차단 시간 설정",
+				"bedTime": "취침 시간",
+				"startsAt": "시작 시간",
+				"endsAt": "종료 시간",
+				"saveChanges": "변경 사항 저장",
+				"saving": "저장 중...",
+				"saveSuccess": "타일 환경설정이 성공적으로 업데이트되었습니다",
+				"saveError": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요.",
+				"bedTimeStartRequired": "취침 시작 시간을 선택해 주세요",
+				"bedTimeEndRequired": "기상 시간을 선택해 주세요",
+				"scheduleIncompleteDay": "{{label}}: {{day}}의 시작 시간과 종료 시간을 모두 설정해 주세요",
+				"dayLabels": {
+					"sun": "일",
+					"mon": "월",
+					"tue": "화",
+					"wed": "수",
+					"thu": "목",
+					"fri": "금",
+					"sat": "토"
+				},
+				"dayNames": {
+					"sun": "일요일",
+					"mon": "월요일",
+					"tue": "화요일",
+					"wed": "수요일",
+					"thu": "목요일",
+					"fri": "금요일",
+					"sat": "토요일"
+				},
+				"start": "시작",
+				"end": "종료",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "오전",
+				"pm": "오후"
+			}
+		}
+	},
+	"feedback": {
+		"menuItem": "피드백 보내기",
+		"title": "피드백 보내기",
+		"category": "카테고리",
+		"categories": {
+			"Bug": "버그",
+			"Feature Request": "기능 요청",
+			"Improvement": "개선",
+			"Other": "기타"
+		},
+		"titleLabel": "제목",
+		"titlePlaceholder": "피드백 간략 요약",
+		"descriptionLabel": "설명",
+		"descriptionPlaceholder": "피드백에 대해 자세히 알려주세요...",
+		"submit": "제출",
+		"submitting": "제출 중...",
+		"submitSuccess": "피드백 감사합니다!",
+		"submitError": "피드백 제출에 실패했습니다. 다시 시도해 주세요."
 	}
 }

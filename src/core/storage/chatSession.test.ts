@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	getStoredSessionId,
-	setStoredSessionId,
-	clearStoredSessionId,
-} from './chatSession';
+import { getStoredSessionId, setStoredSessionId, clearStoredSessionId } from './chatSession';
 
 describe('chatSession storage', () => {
 	// localStorage is cleared in setup.ts beforeEach hook

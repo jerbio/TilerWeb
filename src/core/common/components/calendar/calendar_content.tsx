@@ -1,15 +1,16 @@
 import calendarConfig from '@/core/constants/calendar_config';
+import { HOURS_IN_DAY } from '@/core/common/utils/timeUtils';
 import React from 'react';
 import styled from 'styled-components';
-import CalendarEvents, { StyledEvent } from './calendar_events';
+import CalendarEvents, { CalendarBackgroundClickInfo, StyledEvent } from './calendar_events';
 import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar.types';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
-import palette from '@/core/theme/palette';
+import { SubCalendarEvent } from '@/core/common/types/schedule';
+import CurrentTimeIndicator from './current_time_indicator';
 
 type CalendarContentProps = {
 	// Events to display in the calendar
-	events: ScheduleSubCalendarEvent[];
+	events: SubCalendarEvent[];
 	// View options for the calendar
 	viewOptions: CalendarViewOptions;
 	// Selected event state
@@ -20,6 +21,10 @@ type CalendarContentProps = {
 	calendarGridCanvasRef: React.RefObject<HTMLCanvasElement>;
 	// Function to set styled non-viable events
 	setStyledNonViableEvents: (events: StyledEvent[]) => void;
+	// Function to set styled long-duration events (>15h, non-procrastinate)
+	setStyledLongDurationEvents: (events: StyledEvent[]) => void;
+	// Function to provide background click info
+	onBackgroundClick?: (info: CalendarBackgroundClickInfo) => void;
 	/** Ref populated with all styled events for Calendar request handling */
 	styledEventsRef?: React.MutableRefObject<StyledEvent[]>;
 	/** Currently focused event ID (chat → calendar highlight) */
@@ -36,42 +41,48 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	setSelectedEventInfo,
 	calendarGridCanvasRef,
 	setStyledNonViableEvents,
+	setStyledLongDurationEvents,
+	onBackgroundClick,
 	styledEventsRef,
 	focusedEventId,
 	onViableEventClicked,
 }) => {
-  return (
-    <Container>
-      <StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
-        {/* Background */}
-        <CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
-        {/* Timeline */}
-        {Array.from({ length: 24 }).map((_, hourIndex) => {
-          return (
-            <CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
-              <div>
-                {/* eg. "8 AM" */}
-                <span>{dayjs().hour(hourIndex).format('h A')}</span>
-              </div>
-            </CalendarCellTime>
-          );
-        })}
-        {/* Events */}
-        <CalendarEvents
-          events={events}
-          viewOptions={viewOptions}
-          headerWidth={viewOptions.width}
-          selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEvent}
-          setSelectedEventInfo={setSelectedEventInfo}
-          onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
-          styledEventsRef={styledEventsRef}
-          focusedEventId={focusedEventId}
-          onViableEventClicked={onViableEventClicked}
-        />
-      </StyledCalendarContent>
-    </Container>
-  );
+	return (
+		<Container>
+			<StyledCalendarContent $cellwidth={viewOptions.width / viewOptions.daysInView}>
+				{/* Background */}
+				<CalendarBg ref={calendarGridCanvasRef} $width={viewOptions.width} />
+				{/* Timeline */}
+				{Array.from({ length: HOURS_IN_DAY }).map((_, hourIndex) => {
+					return (
+						<CalendarCellTime key={hourIndex} $hourindex={hourIndex}>
+							<div>
+								{/* eg. "8 AM" */}
+								<span>{dayjs().hour(hourIndex).format('h A')}</span>
+							</div>
+						</CalendarCellTime>
+					);
+				})}
+				{/* Current Time Indicator */}
+				<CurrentTimeIndicator viewOptions={viewOptions} />
+				{/* Events */}
+				<CalendarEvents
+					events={events}
+					viewOptions={viewOptions}
+					headerWidth={viewOptions.width}
+					selectedEvent={selectedEvent}
+					setSelectedEvent={setSelectedEvent}
+					setSelectedEventInfo={setSelectedEventInfo}
+					onNonViableEventsChange={(events) => setStyledNonViableEvents(events)}
+					onLongDurationEventsChange={(events) => setStyledLongDurationEvents(events)}
+					onBackgroundClick={onBackgroundClick}
+					styledEventsRef={styledEventsRef}
+					focusedEventId={focusedEventId}
+					onViableEventClicked={onViableEventClicked}
+				/>
+			</StyledCalendarContent>
+		</Container>
+	);
 };
 
 const Container = styled.div`
@@ -83,7 +94,7 @@ const Container = styled.div`
 
 const StyledCalendarContent = styled.div<{ $cellwidth: number }>`
 	width: 100%;
-	height: ${parseInt(calendarConfig.CELL_HEIGHT) * 24}px; /* 24 hours */
+	height: ${parseInt(calendarConfig.CELL_HEIGHT) * HOURS_IN_DAY}px;
 	position: relative;
 	isolation: isolate;
 `;
@@ -105,9 +116,13 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 	height: ${calendarConfig.CELL_HEIGHT};
 	transform: translateY(${({ $hourindex: h }) => h * parseInt(calendarConfig.CELL_HEIGHT)}px);
 
-	border-right: 1px solid ${calendarConfig.BORDER_COLOR};
-	background-color: #1f1f1f;
-	background-image: linear-gradient(to right, #2a2a2a 33%, rgba(255, 255, 255, 0) 0%);
+	border-right: 1px solid ${({ theme }) => theme.colors.calendar.border};
+	background-color: ${({ theme }) => theme.colors.calendar.sidebarBg};
+	background-image: linear-gradient(
+		to right,
+		${({ theme }) => theme.colors.calendar.grid} 33%,
+		rgba(255, 255, 255, 0) 0%
+	);
 	background-position: bottom;
 	background-size: 12px 1px;
 	background-repeat: repeat-x;
@@ -122,8 +137,8 @@ const CalendarCellTime = styled.div<{ $hourindex: number }>`
 			line-height: 1;
 			top: 4px;
 			right: 2px;
-			font-size: ${palette.typography.fontSize.xs};
-			color: ${palette.colors.gray[500]};
+			font-size: ${({ theme }) => theme.typography.fontSize.xs};
+			color: ${({ theme }) => theme.colors.gray[500]};
 		}
 	}
 `;

@@ -1,15 +1,15 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
-import { Outlet, useNavigate, useLocation } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { ChevronRight, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import Logo from '@/core/common/components/icons/logo';
+import useAuthNavigate from '@/hooks/useNavigateHome';
 import useAppStore from '@/global_state';
 import { toast } from 'sonner';
 
 const SettingsLayout: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const navigate = useAuthNavigate();
 	const location = useLocation();
 	const logout = useAppStore((state) => state.logout);
 	const theme = useTheme();
@@ -48,17 +48,9 @@ const SettingsLayout: React.FC = () => {
 
 	return (
 		<Container>
-			<Header>
-				<Logo size={48} />
-			</Header>
-
 			{!isDetailPage ? (
 				<Content>
 					<Breadcrumb>
-						<BreadcrumbLink onClick={() => navigate('/')}>
-							{t('settings.breadcrumb.home')}
-						</BreadcrumbLink>
-						<BreadcrumbSeparator>/</BreadcrumbSeparator>
 						<BreadcrumbCurrent>{t('settings.breadcrumb.settings')}</BreadcrumbCurrent>
 					</Breadcrumb>
 
@@ -69,7 +61,9 @@ const SettingsLayout: React.FC = () => {
 							<SettingsItem key={section.path} onClick={() => navigate(section.path)}>
 								<SettingsItemContent>
 									<SettingsItemTitle>{section.title}</SettingsItemTitle>
-									<SettingsItemDescription>{section.description}</SettingsItemDescription>
+									<SettingsItemDescription>
+										{section.description}
+									</SettingsItemDescription>
 								</SettingsItemContent>
 								<ChevronRight size={20} color={theme.colors.text.secondary} />
 							</SettingsItem>
@@ -89,15 +83,9 @@ const SettingsLayout: React.FC = () => {
 };
 
 const Container = styled.div`
-	min-height: 100vh;
 	background-color: ${({ theme }) => theme.colors.background.page};
 	padding: 2rem;
-`;
-
-const Header = styled.header`
-	display: flex;
-	align-items: center;
-	margin-bottom: 2rem;
+	height: 100%;
 `;
 
 const Content = styled.div`
@@ -106,25 +94,12 @@ const Content = styled.div`
 `;
 
 const Breadcrumb = styled.div`
+	opacity: 0;
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 	margin-bottom: 2rem;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-`;
-
-const BreadcrumbLink = styled.span`
-	color: ${({ theme }) => theme.colors.text.secondary};
-	cursor: pointer;
-	transition: color 0.2s ease;
-
-	&:hover {
-		color: ${({ theme }) => theme.colors.gray[400]};
-	}
-`;
-
-const BreadcrumbSeparator = styled.span`
-	color: ${({ theme }) => theme.colors.gray[600]};
 `;
 
 const BreadcrumbCurrent = styled.span`

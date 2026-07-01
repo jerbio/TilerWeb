@@ -1,5 +1,6 @@
 import ServerError from '@/core/error/server';
 import { Env } from '../config/config_getter';
+import locationService from '../services/locationService';
 
 type RequestOptions = RequestInit & {
 	headers?: Headers;
@@ -9,13 +10,12 @@ type RequestOptions = RequestInit & {
 export class AppApi {
 	#baseUrl = Env.get('BASE_URL');
 	getUri(path: string): string {
-		return this.defaultDomain + path;
+		const domain = this.defaultDomain.replace(/\/+$/, '');
+		const normalizedPath = path.replace(/^\/+/, '');
+		return `${domain}/${normalizedPath}`;
 	}
 
-	async apiRequest<T>(
-		endpoint: string,
-		options?: RequestOptions
-	): Promise<T> {
+	async apiRequest<T>(endpoint: string, options?: RequestOptions): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
 		const { responseType, ...fetchOptions } = options || {};
 		const requestOptions: RequestInit = {
@@ -39,26 +39,32 @@ export class AppApi {
 						throw errorBody;
 					}
 					// Otherwise, throw a ServerError with the parsed body as details
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint, errorBody);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						errorBody
+					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
-					if (jsonError instanceof ServerError || (jsonError && typeof jsonError === 'object' && 'Error' in jsonError)) {
+					if (
+						jsonError instanceof ServerError ||
+						(jsonError && typeof jsonError === 'object' && 'Error' in jsonError)
+					) {
 						throw jsonError;
 					}
 					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
 				}
 			}
-			
+
 			// Handle text responses if specified
 			const responseTypeToUse = responseType || 'json';
 			if (responseTypeToUse === 'text') {
 				const text = await res.text();
 				return text as T;
 			}
-			
+
 			return (await res.json()) as T;
 		} catch (error) {
-			console.log(error, 'from api req');
 			if (error instanceof ServerError) throw error;
 			// Check if it's a structured error response (not ServerError)
 			if (error && typeof error === 'object' && 'Error' in error) {
@@ -68,10 +74,7 @@ export class AppApi {
 		}
 	}
 
-	async apiRequestFormData<T>(
-		endpoint: string,
-		options?: RequestInit
-	): Promise<T> {
+	async apiRequestFormData<T>(endpoint: string, options?: RequestInit): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
 
 		// Destructure to exclude headers from the spread
@@ -97,10 +100,17 @@ export class AppApi {
 						throw errorBody;
 					}
 					// Otherwise, throw a ServerError with the parsed body as details
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint, errorBody);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						errorBody
+					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
-					if (jsonError instanceof ServerError || (jsonError && typeof jsonError === 'object' && 'Error' in jsonError)) {
+					if (
+						jsonError instanceof ServerError ||
+						(jsonError && typeof jsonError === 'object' && 'Error' in jsonError)
+					) {
 						throw jsonError;
 					}
 					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
@@ -119,5 +129,13 @@ export class AppApi {
 
 	get defaultDomain(): string {
 		return this.#baseUrl;
+	}
+
+	/**
+	 * Fetch the current user location for injection into schedule-mutating requests.
+	 * Subclasses call this rather than depending on locationService directly.
+	 */
+	protected getLocationData() {
+		return locationService.getCurrentLocation();
 	}
 }

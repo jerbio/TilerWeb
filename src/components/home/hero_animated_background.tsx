@@ -80,7 +80,21 @@ const floatDiagonal = keyframes`
 	}
 `;
 
-const BackgroundContainer = styled.div<{ $position: 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center' | 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' }>`
+const BackgroundContainer = styled.div<{
+	$position:
+		| 'left'
+		| 'right'
+		| 'top-left'
+		| 'top-right'
+		| 'bottom-left'
+		| 'bottom-right'
+		| 'top-center'
+		| 'bottom-center'
+		| 'left-top'
+		| 'left-bottom'
+		| 'right-top'
+		| 'right-bottom';
+}>`
 	position: absolute;
 	overflow: hidden;
 	pointer-events: none;
@@ -194,7 +208,12 @@ const BackgroundContainer = styled.div<{ $position: 'left' | 'right' | 'top-left
 
 	@media (max-width: ${palette.screens.lg}) {
 		opacity: 0.55;
-		${({ $position }) => ($position === 'top-left' || $position === 'top-right' || $position === 'bottom-left' || $position === 'bottom-right') && `
+		${({ $position }) =>
+			($position === 'top-left' ||
+				$position === 'top-right' ||
+				$position === 'bottom-left' ||
+				$position === 'bottom-right') &&
+			`
 			width: 46%;
 			height: 49%;
 		`}
@@ -203,7 +222,9 @@ const BackgroundContainer = styled.div<{ $position: 'left' | 'right' | 'top-left
 	@media (max-width: ${palette.screens.md}) {
 		/* Show only top-left on mobile */
 		${({ $position }) => $position !== 'top-left' && `display: none;`}
-		${({ $position }) => $position === 'top-left' && `
+		${({ $position }) =>
+			$position === 'top-left' &&
+			`
 			width: 90%;
 			height: 45%;
 			opacity: 0.5;
@@ -211,7 +232,22 @@ const BackgroundContainer = styled.div<{ $position: 'left' | 'right' | 'top-left
 	}
 `;
 
-const DemoWindow = styled.div<{ $position: 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center' | 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom'; $slideAnimation: ReturnType<typeof keyframes> }>`
+const DemoWindow = styled.div<{
+	$position:
+		| 'left'
+		| 'right'
+		| 'top-left'
+		| 'top-right'
+		| 'bottom-left'
+		| 'bottom-right'
+		| 'top-center'
+		| 'bottom-center'
+		| 'left-top'
+		| 'left-bottom'
+		| 'right-top'
+		| 'right-bottom';
+	$slideAnimation: ReturnType<typeof keyframes>;
+}>`
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -221,7 +257,9 @@ const DemoWindow = styled.div<{ $position: 'left' | 'right' | 'top-left' | 'top-
 	gap: 1.5rem;
 	opacity: 1;
 	transform-style: preserve-3d;
-	animation: ${({ $slideAnimation }) => $slideAnimation} 2s ease-out, ${floatDiagonal} 15s ease-in-out infinite 2s;
+	animation:
+		${({ $slideAnimation }) => $slideAnimation} 2s ease-out,
+		${floatDiagonal} 15s ease-in-out infinite 2s;
 
 	/* Uniform sizing for quadrant layout */
 	width: 480px;
@@ -312,8 +350,9 @@ const ChatMessage = styled.div<{ $isUser: boolean; $visible: boolean }>`
 	}
 	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	animation: ${({ $visible }) => ($visible ? fadeIn : 'none')} 0.4s ease-out;
-	border: 1px solid ${({ $isUser }) =>
-		$isUser ? palette.colors.brand[500] + '80' : palette.colors.gray[500] + '80'};
+	border: 1px solid
+		${({ $isUser }) =>
+			$isUser ? palette.colors.brand[500] + '80' : palette.colors.gray[500] + '80'};
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 `;
 
@@ -419,11 +458,26 @@ interface Scenario {
 }
 
 interface HeroAnimatedBackgroundProps {
-	position: 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center' | 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
+	position:
+		| 'left'
+		| 'right'
+		| 'top-left'
+		| 'top-right'
+		| 'bottom-left'
+		| 'bottom-right'
+		| 'top-center'
+		| 'bottom-center'
+		| 'left-top'
+		| 'left-bottom'
+		| 'right-top'
+		| 'right-bottom';
 	scenarioIndex?: number; // Optional: specify which scenario to show
 }
 
-const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ position, scenarioIndex }) => {
+const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({
+	position,
+	scenarioIndex,
+}) => {
 	const { t } = useTranslation();
 
 	// Pick a random slide-in animation
@@ -435,8 +489,8 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 	// Stagger animation start based on position to avoid simultaneous movements
 	const getAnimationDelay = (pos: typeof position): number => {
 		const delays = {
-			'left': 0,
-			'right': 2,
+			left: 0,
+			right: 2,
 			'top-left': 4,
 			'top-right': 6,
 			'bottom-left': 8,
@@ -461,8 +515,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.lunch.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '11:35 AM', title: t('home.hero.scenarios.lunch.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.lunch.tiles.travelTime') },
-				{ time: '12:00 PM', title: t('home.hero.scenarios.lunch.tiles.lunch'), color: palette.colors.brand[500] },
+				{
+					time: '11:35 AM',
+					title: t('home.hero.scenarios.lunch.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.lunch.tiles.travelTime'),
+				},
+				{
+					time: '12:00 PM',
+					title: t('home.hero.scenarios.lunch.tiles.lunch'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 		{
@@ -474,9 +537,22 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.errands.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '5:00 PM', title: t('home.hero.scenarios.errands.tiles.groceries'), color: palette.colors.brand[600] },
-				{ time: '5:30 PM', title: t('home.hero.scenarios.errands.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.errands.tiles.travelTime') },
-				{ time: '6:00 PM', title: t('home.hero.scenarios.errands.tiles.gym'), color: palette.colors.brand[700] },
+				{
+					time: '5:00 PM',
+					title: t('home.hero.scenarios.errands.tiles.groceries'),
+					color: palette.colors.brand[600],
+				},
+				{
+					time: '5:30 PM',
+					title: t('home.hero.scenarios.errands.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.errands.tiles.travelTime'),
+				},
+				{
+					time: '6:00 PM',
+					title: t('home.hero.scenarios.errands.tiles.gym'),
+					color: palette.colors.brand[700],
+				},
 			],
 		},
 		{
@@ -488,8 +564,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.client.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '1:25 PM', title: t('home.hero.scenarios.client.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.client.tiles.travelTime') },
-				{ time: '2:00 PM', title: t('home.hero.scenarios.client.tiles.meeting'), color: palette.colors.brand[500] },
+				{
+					time: '1:25 PM',
+					title: t('home.hero.scenarios.client.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.client.tiles.travelTime'),
+				},
+				{
+					time: '2:00 PM',
+					title: t('home.hero.scenarios.client.tiles.meeting'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 		{
@@ -501,9 +586,22 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.dentist.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '9:00 AM', title: t('home.hero.scenarios.dentist.tiles.dentist'), color: palette.colors.brand[600] },
-				{ time: '10:00 AM', title: t('home.hero.scenarios.dentist.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.dentist.tiles.travelTime') },
-				{ time: '10:15 AM', title: t('home.hero.scenarios.dentist.tiles.deepWork'), color: palette.colors.brand[700] },
+				{
+					time: '9:00 AM',
+					title: t('home.hero.scenarios.dentist.tiles.dentist'),
+					color: palette.colors.brand[600],
+				},
+				{
+					time: '10:00 AM',
+					title: t('home.hero.scenarios.dentist.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.dentist.tiles.travelTime'),
+				},
+				{
+					time: '10:15 AM',
+					title: t('home.hero.scenarios.dentist.tiles.deepWork'),
+					color: palette.colors.brand[700],
+				},
 			],
 		},
 		{
@@ -515,8 +613,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.coffee.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '9:40 AM', title: t('home.hero.scenarios.coffee.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.coffee.tiles.travelTime') },
-				{ time: '10:00 AM', title: t('home.hero.scenarios.coffee.tiles.coffee'), color: palette.colors.brand[500] },
+				{
+					time: '9:40 AM',
+					title: t('home.hero.scenarios.coffee.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.coffee.tiles.travelTime'),
+				},
+				{
+					time: '10:00 AM',
+					title: t('home.hero.scenarios.coffee.tiles.coffee'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 		{
@@ -528,9 +635,22 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.airport.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '12:10 PM', title: t('home.hero.scenarios.airport.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.airport.tiles.travelTime') },
-				{ time: '1:00 PM', title: t('home.hero.scenarios.airport.tiles.airport'), color: palette.colors.brand[500] },
-				{ time: '3:00 PM', title: t('home.hero.scenarios.airport.tiles.flight'), color: palette.colors.brand[600] },
+				{
+					time: '12:10 PM',
+					title: t('home.hero.scenarios.airport.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.airport.tiles.travelTime'),
+				},
+				{
+					time: '1:00 PM',
+					title: t('home.hero.scenarios.airport.tiles.airport'),
+					color: palette.colors.brand[500],
+				},
+				{
+					time: '3:00 PM',
+					title: t('home.hero.scenarios.airport.tiles.flight'),
+					color: palette.colors.brand[600],
+				},
 			],
 		},
 		{
@@ -542,8 +662,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.school.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '3:10 PM', title: t('home.hero.scenarios.school.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.school.tiles.travelTime') },
-				{ time: '3:30 PM', title: t('home.hero.scenarios.school.tiles.pickup'), color: palette.colors.brand[500] },
+				{
+					time: '3:10 PM',
+					title: t('home.hero.scenarios.school.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.school.tiles.travelTime'),
+				},
+				{
+					time: '3:30 PM',
+					title: t('home.hero.scenarios.school.tiles.pickup'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 		{
@@ -555,8 +684,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.doctor.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '2:00 PM', title: t('home.hero.scenarios.doctor.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.doctor.tiles.travelTime') },
-				{ time: '2:30 PM', title: t('home.hero.scenarios.doctor.tiles.doctor'), color: palette.colors.brand[500] },
+				{
+					time: '2:00 PM',
+					title: t('home.hero.scenarios.doctor.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.doctor.tiles.travelTime'),
+				},
+				{
+					time: '2:30 PM',
+					title: t('home.hero.scenarios.doctor.tiles.doctor'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 		{
@@ -568,8 +706,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.haircut.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '3:50 PM', title: t('home.hero.scenarios.haircut.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.haircut.tiles.travelTime') },
-				{ time: '4:00 PM', title: t('home.hero.scenarios.haircut.tiles.haircut'), color: palette.colors.brand[500] },
+				{
+					time: '3:50 PM',
+					title: t('home.hero.scenarios.haircut.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.haircut.tiles.travelTime'),
+				},
+				{
+					time: '4:00 PM',
+					title: t('home.hero.scenarios.haircut.tiles.haircut'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 		{
@@ -581,8 +728,17 @@ const HeroAnimatedBackground: React.FC<HeroAnimatedBackgroundProps> = ({ positio
 				{ text: t('home.hero.scenarios.restaurant.messages.aiConfirm'), isUser: false },
 			],
 			tiles: [
-				{ time: '6:25 PM', title: t('home.hero.scenarios.restaurant.tiles.travel'), color: palette.colors.brand[400], travel: t('home.hero.scenarios.restaurant.tiles.travelTime') },
-				{ time: '7:00 PM', title: t('home.hero.scenarios.restaurant.tiles.dinner'), color: palette.colors.brand[500] },
+				{
+					time: '6:25 PM',
+					title: t('home.hero.scenarios.restaurant.tiles.travel'),
+					color: palette.colors.brand[400],
+					travel: t('home.hero.scenarios.restaurant.tiles.travelTime'),
+				},
+				{
+					time: '7:00 PM',
+					title: t('home.hero.scenarios.restaurant.tiles.dinner'),
+					color: palette.colors.brand[500],
+				},
 			],
 		},
 	];

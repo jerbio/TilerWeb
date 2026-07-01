@@ -1,5 +1,5 @@
-import { BetaUserApi } from "@/api/betaUserApi";
-import { BetaUserBody } from "@/core/common/types/beta_user";
+import { BetaUserApi } from '@/api/betaUserApi';
+import { BetaUserBody } from '@/core/common/types/beta_user';
 
 export class BetaUserService {
 	private betaUserApi: BetaUserApi;
@@ -13,15 +13,15 @@ export class BetaUserService {
 		integrations,
 		useCases,
 	}: {
-		email: string,
-		profession: string,
-		integrations: string[],
-		useCases: string,
+		email: string;
+		profession: string;
+		integrations: string[];
+		useCases: string;
 	}) {
 		try {
 			const betaUser: BetaUserBody = {
 				Email: email,
-				FullName: "",
+				FullName: '',
 				Profession: profession,
 				Integrations: integrations,
 				UserCase: useCases,
@@ -29,7 +29,7 @@ export class BetaUserService {
 			const response = await this.betaUserApi.signUp(betaUser);
 			return response;
 		} catch (error) {
-			console.error("Error signing up for beta", error);
+			console.error('Error signing up for beta', error);
 			throw error;
 		}
 	}

@@ -39,7 +39,11 @@ const TestimonialCard = styled.div`
 		left: 0;
 		right: 0;
 		height: 3px;
-		background: linear-gradient(90deg, ${palette.colors.brand[500]}, ${palette.colors.brand[600]});
+		background: linear-gradient(
+			90deg,
+			${palette.colors.brand[500]},
+			${palette.colors.brand[600]}
+		);
 		opacity: 0;
 		transition: opacity 0.3s ease;
 	}
@@ -138,45 +142,45 @@ interface Testimonial {
 const TestimonialsSection: React.FC = () => {
 	const testimonials: Testimonial[] = [
 		{
-			quote: "Tiler completely changed how I manage my day. Instead of manually blocking time, I just tell it what I need to do and it figures out the rest—including travel time between job sites.",
-			author: "Marcus Chen",
-			role: "Contractor",
-			metric: "Saved 4+ hours/week",
+			quote: 'Tiler completely changed how I manage my day. Instead of manually blocking time, I just tell it what I need to do and it figures out the rest—including travel time between job sites.',
+			author: 'Marcus Chen',
+			role: 'Contractor',
+			metric: 'Saved 4+ hours/week',
 			avatarColor: palette.colors.brand[500],
 		},
 		{
 			quote: "As a parent juggling work, school pickups, and activities, Tiler is a lifesaver. It adapts when things run late and automatically reschedules everything. I'm never stressed about being late anymore.",
-			author: "Sarah Williams",
-			role: "Parent & Designer",
-			metric: "Never late to pickup",
+			author: 'Sarah Williams',
+			role: 'Parent & Designer',
+			metric: 'Never late to pickup',
 			avatarColor: palette.colors.brand[600],
 		},
 		{
-			quote: "The AI assistant approach is brilliant. I used to spend 20 minutes every morning rearranging my calendar. Now Tiler does it in seconds, and it learns my preferences over time.",
-			author: "David Park",
-			role: "Software Engineer",
-			metric: "20min → 30sec daily",
+			quote: 'The AI assistant approach is brilliant. I used to spend 20 minutes every morning rearranging my calendar. Now Tiler does it in seconds, and it learns my preferences over time.',
+			author: 'David Park',
+			role: 'Software Engineer',
+			metric: '20min → 30sec daily',
 			avatarColor: palette.colors.brand[400],
 		},
 		{
-			quote: "I love that Tiler asks clarifying questions instead of guessing. It feels like having a personal assistant who actually understands my schedule constraints and preferences.",
-			author: "Priya Sharma",
-			role: "Consultant",
-			metric: "100% scheduling accuracy",
+			quote: 'I love that Tiler asks clarifying questions instead of guessing. It feels like having a personal assistant who actually understands my schedule constraints and preferences.',
+			author: 'Priya Sharma',
+			role: 'Consultant',
+			metric: '100% scheduling accuracy',
 			avatarColor: palette.colors.brand[700],
 		},
 		{
 			quote: "The travel-time calculation is a game-changer for field service. Tiler accounts for realistic drive times, so I'm not constantly running behind or showing up way too early.",
-			author: "James Rodriguez",
-			role: "HVAC Technician",
-			metric: "Eliminated late arrivals",
+			author: 'James Rodriguez',
+			role: 'HVAC Technician',
+			metric: 'Eliminated late arrivals',
 			avatarColor: palette.colors.brand[500],
 		},
 		{
 			quote: "I was skeptical about AI scheduling, but the confirmation-first approach won me over. I stay in control while Tiler handles the tedious parts. It's the perfect balance.",
-			author: "Emily Thompson",
-			role: "Attorney",
-			metric: "Saved 3+ hours/week",
+			author: 'Emily Thompson',
+			role: 'Attorney',
+			metric: 'Saved 3+ hours/week',
 			avatarColor: palette.colors.brand[600],
 		},
 	];

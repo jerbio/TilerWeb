@@ -8,7 +8,7 @@ import {
 	CalendarRequestResult,
 } from './calendarRequestContext';
 import { StyledEvent } from './calendar_events';
-import { ScheduleSubCalendarEvent } from '@/core/common/types/schedule';
+import { SubCalendarEvent } from '@/core/common/types/schedule';
 import { CalendarViewOptions } from './calendar.types';
 import { resolveEntityToTileId } from '@/core/util/entityResolution';
 import { findEventDate } from '@/core/util/eventDateLookup';
@@ -30,7 +30,7 @@ export interface CalendarRequestHandlerDeps {
 	pendingFocusRef: React.MutableRefObject<PendingFocus | null>;
 	contentContainerRef: React.RefObject<HTMLDivElement>;
 	focusTimeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
-	events: ScheduleSubCalendarEvent[];
+	events: SubCalendarEvent[];
 	allowEventLookup: boolean;
 	setShowNonViableEvents: (val: dayjs.Dayjs | null) => void;
 	setSelectedEventInfo: (val: StyledEvent | null) => void;
@@ -44,13 +44,12 @@ export interface CalendarRequestHandlerDeps {
 /** Scroll the calendar content container so the given event is visible */
 function scrollToEvent(
 	styledEvent: StyledEvent,
-	contentContainerRef: React.RefObject<HTMLDivElement>,
+	contentContainerRef: React.RefObject<HTMLDivElement>
 ): void {
 	if (!contentContainerRef.current) return;
 	const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 	const eventStart = dayjs(styledEvent.start);
-	const hourFraction =
-		eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+	const hourFraction = eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
 	const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
 
 	contentContainerRef.current.scrollTo({
@@ -70,7 +69,7 @@ function focusOnStyledEvent(
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
 		| 'setFocusedEventId'
-	>,
+	>
 ): void {
 	if (styledEvent.isViable) {
 		deps.setShowNonViableEvents(null);
@@ -99,7 +98,7 @@ function focusOnStyledEvent(
  * Designed to be used inside a `useCallback` in the Calendar component.
  */
 export function createCalendarRequestHandler(
-	deps: CalendarRequestHandlerDeps,
+	deps: CalendarRequestHandlerDeps
 ): (envelope: CalendarRequestEnvelope) => void {
 	return (envelope) => {
 		const { request, onResult } = envelope;
@@ -111,7 +110,7 @@ export function createCalendarRequestHandler(
 			const resolvedTileId = resolveEntityToTileId(
 				entityId,
 				entityType,
-				deps.styledEventsRef.current,
+				deps.styledEventsRef.current
 			);
 
 			const styledEvent = resolvedTileId
@@ -155,12 +154,19 @@ export function createCalendarRequestHandler(
 				deps.setSelectedEvent(null);
 				onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
 
+				// Track completion / deletion state from within the lookup callbacks
+				let isEventComplete = false;
+				let isEventDeleted = false;
+
 				findEventDate({
 					entityId,
 					entityType,
 					lookupSubCalEvent: async (id) => {
 						try {
-							return await scheduleService.lookupSubCalendarEventById(id);
+							const event = await scheduleService.lookupSubCalendarEventById(id);
+							if (event.isEnabled === false) isEventDeleted = true;
+							if (event.isComplete) isEventComplete = true;
+							return event;
 						} catch {
 							return null;
 						}
@@ -172,9 +178,14 @@ export function createCalendarRequestHandler(
 								scheduleService.getSubEventsOfCalendar(id),
 							]);
 							if (!calEvent || calEvent.start == null) return null;
+							if (calEvent.isEnabled === false) isEventDeleted = true;
+							if (calEvent.isComplete) isEventComplete = true;
 							return {
 								start: calEvent.start,
-								subEvents: (subEvents ?? []).map((s) => ({ id: s.id, start: s.start })),
+								subEvents: (subEvents ?? []).map((s) => ({
+									id: s.id,
+									start: s.start,
+								})),
 							};
 						} catch {
 							return null;
@@ -182,7 +193,17 @@ export function createCalendarRequestHandler(
 					},
 				}).then((startMs) => {
 					if (startMs == null) {
-						onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
+						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						return;
+					}
+
+					if (isEventDeleted) {
+						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						return;
+					}
+
+					if (isEventComplete) {
+						onResult?.({ status: CalendarRequestStatus.Completed, entityId });
 						return;
 					}
 
@@ -203,6 +224,38 @@ export function createCalendarRequestHandler(
 			focusOnStyledEvent(styledEvent, deps);
 			onResult?.({ status: CalendarRequestStatus.Found, entityId });
 		}
+
+		if (request.type === CalendarRequestType.NavigateToDate) {
+			const targetDay = dayjs(request.date).startOf('day');
+			deps.setShowNonViableEvents(null);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setViewOptions((prev) => ({
+				...prev,
+				startDay: targetDay,
+			}));
+		}
+
+		if (request.type === CalendarRequestType.GoToToday) {
+			deps.setShowNonViableEvents(null);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setViewOptions((prev) => ({
+				...prev,
+				startDay: dayjs().startOf('day'),
+			}));
+		}
+
+		if (request.type === CalendarRequestType.NavigateWeek) {
+			const offset = request.direction === 'back' ? -7 : 7;
+			deps.setShowNonViableEvents(null);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setViewOptions((prev) => ({
+				...prev,
+				startDay: prev.startDay.add(offset, 'day'),
+			}));
+		}
 	};
 }
 
@@ -221,7 +274,7 @@ export function retryPendingFocus(
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
 		| 'setFocusedEventId'
-	>,
+	>
 ): void {
 	const { entityId, entityType, onResult } = deps.pendingFocusRef.current!;
 	deps.pendingFocusRef.current = null;
@@ -229,7 +282,7 @@ export function retryPendingFocus(
 	const resolvedTileId = resolveEntityToTileId(
 		entityId,
 		entityType,
-		deps.styledEventsRef.current,
+		deps.styledEventsRef.current
 	);
 
 	const styledEvent = resolvedTileId

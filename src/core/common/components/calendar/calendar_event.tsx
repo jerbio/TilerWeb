@@ -1,97 +1,137 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { animated } from '@react-spring/web';
-import { Clock, LockKeyhole, MapPin } from 'lucide-react';
+import { Clock, LockKeyhole, MapPin, StickyNote } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import TimeUtil from '@/core/util/time';
-import palette from '@/core/theme/palette';
 import CalendarUtil from '@/core/util/calendar';
 import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
+import { useTheme } from '@/core/theme/ThemeProvider';
+import { useCalendarUI } from './calendar-ui.provider';
+import { TypeDefaults } from '../../types/typeDefaults';
+import {
+	ThirdPartyType,
+	type CalendarEvent as CalendarEventType,
+} from '@/core/common/types/schedule';
 
 type CalendarEventProps = {
-  event: StyledEvent;
-  selectedEvent: string | null;
-  setSelectedEvent: (eventId: string | null) => void;
+	event: StyledEvent;
+	selectedEvent: string | null;
+	setSelectedEvent: (eventId: string | null) => void;
 	setSelectedEventInfo: React.Dispatch<React.SetStateAction<StyledEvent | null>>;
-  onClick?: () => void;
+	onClick?: () => void;
 	/** When true, shows a pulse-glow ring to draw attention */
 	focused?: boolean;
 };
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
-  event,
-  selectedEvent,
-  setSelectedEvent,
+	event,
+	selectedEvent,
+	setSelectedEvent,
 	setSelectedEventInfo,
-  onClick,
+	onClick,
 	focused = false,
 }) => {
-  return (
-    <EventContainer
-      key={event.id}
-      $selected={selectedEvent === event.id}
-      $focused={focused}
-      $colors={{ r: event.colorRed, g: event.colorGreen, b: event.colorBlue }}
-    >
-      <EventContent
-        height={event.springStyles.height}
-        $colors={{
-          r: event.colorRed,
-          g: event.colorGreen,
-          b: event.colorBlue,
-        }}
-        onClick={() => {
-          setSelectedEvent(event.id);
+	const { isDarkMode } = useTheme();
+	const { t } = useTranslation();
+	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
+	const isThirdPartyEvent =
+		!!event.thirdPartyType &&
+		event.thirdPartyType !== ThirdPartyType.Tiler &&
+		event.thirdPartyType !== 'tiler';
+	return (
+		<EventContainer
+			onClick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}
+			key={event.id}
+			$darkmode={isDarkMode}
+			$selected={selectedEvent === event.id}
+			$focused={focused}
+			$colors={{
+				r: event.colorRed ?? TypeDefaults.RGBColor.red,
+				g: event.colorGreen ?? TypeDefaults.RGBColor.green,
+				b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
+			}}
+		>
+			<EventContent
+				height={event.springStyles.height}
+				$darkmode={isDarkMode}
+				$colors={{
+					r: event.colorRed ?? TypeDefaults.RGBColor.red,
+					g: event.colorGreen ?? TypeDefaults.RGBColor.green,
+					b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
+				}}
+				onClick={() => {
+					setSelectedEvent(event.id);
 					setSelectedEventInfo(event);
-          onClick?.();
-        }}
-        variant={event.isRigid ? 'block' : 'tile'}
-      >
-        <header>
-          <h3>{event.name}</h3>
-          <EventLockIcon className="lock-icon" size={14} />
-        </header>
-        <footer>
-          <div className="duration">
-            <div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
-              <Clock size={14} style={{ minWidth: 18 }} />
-              {event.isTardy && <span>Late</span>}
-            </div>
-            <span>
-              {TimeUtil.rangeDuration(
-                dayjs(event.start, 'unix'),
-                dayjs(event.end, 'unix')
-              )}
-            </span>
-          </div>
-          {event.location?.address && (
-            <a
-              href={CalendarUtil.getEventLocationLink(event)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="location"
-            >
-              <MapPin size={14} style={{ minWidth: 16 }} />
-              <span>{event.location.description}</span>
-            </a>
-          )}
-        </footer>
-      </EventContent>
-      {/* Border SVG for styling */}
-      <svg viewBox="0 0 1 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <rect
-          x="0"
-          y="0"
-          rx="0.08"
-          ry="0.08"
-          width="1"
-          height="4"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-    </EventContainer>
-  );
+					onClick?.();
+				}}
+				$variant={event.isRigid ? 'block' : 'tile'}
+			>
+				<header>
+					<h3>{event.name}</h3>
+					{!isThirdPartyEvent && (
+						<NoteButton
+							type="button"
+							className="note-button"
+							data-testid={`tile-note-button-${event.id}`}
+							aria-label={t('tile.noteButtonAria', 'Open notes for this tile')}
+							title={t('tile.noteButtonAria', 'Open notes for this tile')}
+							onClick={(e) => {
+								e.stopPropagation();
+								e.preventDefault();
+								openNotes(event as unknown as CalendarEventType);
+							}}
+						>
+							<StickyNote size={12} />
+						</NoteButton>
+					)}
+					<EventLockIcon className="lock-icon" size={14} />
+				</header>
+				<footer>
+					<div className="duration">
+						<div className={`clock ${event.isTardy ? 'highlight' : ''}`}>
+							<Clock size={14} style={{ minWidth: 18 }} />
+							{event.isTardy && <span>Late</span>}
+						</div>
+						<span>
+							{TimeUtil.rangeDuration(
+								dayjs(event.start, 'unix'),
+								dayjs(event.end, 'unix')
+							)}
+						</span>
+					</div>
+					{event.location?.address && (
+						<a
+							href={CalendarUtil.getEventLocationLink(event)}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="location"
+						>
+							<MapPin size={14} style={{ minWidth: 16 }} />
+							<span>{event.location.description}</span>
+						</a>
+					)}
+				</footer>
+			</EventContent>
+			{/* Border SVG for styling */}
+			<svg viewBox="0 0 1 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+				<rect
+					x="0"
+					y="0"
+					rx="0.08"
+					ry="0.08"
+					width="1"
+					height="4"
+					vectorEffect="non-scaling-stroke"
+				/>
+			</svg>
+		</EventContainer>
+	);
 };
 
 const dashRotate = keyframes`
@@ -115,10 +155,11 @@ const focusPulse = keyframes`
   }
 `;
 
-const EventContainer = styled(animated.div) <{
-  $selected: boolean;
-  $focused: boolean;
-  $colors: RGB;
+const EventContainer = styled(animated.div)<{
+	$selected: boolean;
+	$focused: boolean;
+	$colors: RGB;
+	$darkmode: boolean;
 }>`
 	padding: 4px;
 	position: relative;
@@ -137,12 +178,12 @@ const EventContainer = styled(animated.div) <{
 		rect {
 			fill: transparent;
 			stroke-width: 2;
-			stroke: ${({ $colors, $selected }) => {
-    const newColor = colorUtil.setLightness($colors, 0.7);
-    return $selected
-      ? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
-      : 'transparent';
-  }};
+			stroke: ${({ $colors, $selected, $darkmode }) => {
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
+				return $selected
+					? `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`
+					: 'transparent';
+			}};
 			stroke-dasharray: 6, 6;
 			stroke-linecap: round;
 			transition: stroke 0.2s ease-in-out;
@@ -157,28 +198,61 @@ const EventLockIcon = styled(LockKeyhole)`
 	min-width: 14px;
 `;
 
+const NoteButton = styled.button`
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	margin-top: 1px;
+	margin-left: 4px;
+	padding: 0;
+	border: none;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.04);
+	color: inherit;
+	cursor: pointer;
+	opacity: 0;
+	transform: translateY(-1px);
+	transition:
+		opacity 0.12s ease,
+		background-color 0.12s ease;
+	flex: 0 0 auto;
+
+	&:hover {
+		background: rgba(0, 0, 0, 0.12);
+	}
+
+	&:focus-visible {
+		opacity: 1;
+		outline: 2px solid rgba(99, 102, 241, 0.6);
+		outline-offset: 1px;
+	}
+`;
+
 const EventContent = styled.div<{
-  $colors: RGB;
-  height: number;
-  variant: 'block' | 'tile';
+	$colors: RGB;
+	$darkmode: boolean;
+	height: number;
+	$variant: 'block' | 'tile';
 }>`
 	position: relative;
-	background-color: ${({ $colors }) => {
-    const newColor = colorUtil.setLightness($colors, 0.325);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
-	color: ${({ $colors }) => {
-    const newColor = colorUtil.setLightness($colors, 0.85);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
-	border: 1px solid
-		${({ $colors, variant }) => {
-    const blockColor = colorUtil.setLightness($colors, 0.6);
-    const tileColor = colorUtil.setLightness($colors, 0.1);
-    return variant === 'block'
-      ? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
-      : `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
-  }};
+	background-color: ${({ $colors, $darkmode }) => {
+		const newColor = colorUtil.setLightness($colors, $darkmode ? 0.325 : 0.9);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
+	color: ${({ $colors, $darkmode }) => {
+		const newColor = colorUtil.setLightness($colors, $darkmode ? 0.85 : 0.3);
+		return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+	}};
+	border: ${({ $variant }) => ($variant === 'block' ? 1.5 : 1)}px solid
+		${({ $colors, $variant, $darkmode }) => {
+			const blockColor = colorUtil.setLightness($colors, $darkmode ? 0.6 : 0.5);
+			const tileColor = colorUtil.setLightness($colors, $darkmode ? 0.1 : 0.8);
+			return $variant === 'block'
+				? `rgb(${blockColor.r}, ${blockColor.g}, ${blockColor.b})`
+				: `rgb(${tileColor.r}, ${tileColor.g}, ${tileColor.b})`;
+		}};
 	height: 100%;
 	padding: 7px 8px;
 	border-radius: 10px;
@@ -201,13 +275,18 @@ const EventContent = styled.div<{
 			max-height: calc(${({ height }) => height}px - 46px);
 			text-overflow: ellipsis;
 			overflow: hidden;
-			font-weight: ${palette.typography.fontWeight.medium};
+			font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 			font-size: 13px;
 		}
 
 		${EventLockIcon} {
-			display: ${({ variant }) => (variant === 'block' ? 'block' : 'none')};
+			display: ${({ $variant }) => ($variant === 'block' ? 'block' : 'none')};
 		}
+	}
+
+	&:hover .note-button,
+	&:focus-within .note-button {
+		opacity: 1;
 	}
 
 	footer {
@@ -220,14 +299,14 @@ const EventContent = styled.div<{
 	.location {
 		display: flex;
 		align-items: center;
-		font-size: ${palette.typography.fontSize.xs};
-		font-weight: ${palette.typography.fontWeight.semibold};
+		font-size: ${({ theme }) => theme.typography.fontSize.xs};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 		white-space: nowrap;
 
-		color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.7);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+		color: ${({ $colors, $darkmode }) => {
+			const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.4);
+			return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+		}};
 	}
 
 	.duration {
@@ -243,14 +322,14 @@ const EventContent = styled.div<{
 		.clock.highlight {
 			padding-inline: 4px;
 			margin-right: 0.5ch;
-			color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.2);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
-			background-color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.7);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+			color: ${({ $colors, $darkmode }) => {
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.2 : 0.7);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
+			background-color: ${({ $colors, $darkmode }) => {
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.7 : 0.3);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
 		}
 	}
 
@@ -258,13 +337,13 @@ const EventContent = styled.div<{
 		padding-inline: 2px;
 		min-width: 0;
 		&:hover {
-			background-color: ${({ $colors: colors }) => {
-    const newColor = colorUtil.setLightness(colors, 0.2);
-    return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-  }};
+			background-color: ${({ $colors, $darkmode }) => {
+				const newColor = colorUtil.setLightness($colors, $darkmode ? 0.2 : 0.75);
+				return `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+			}};
 		}
 
-		border-radius: ${palette.borderRadius.little};
+		border-radius: ${({ theme }) => theme.borderRadius.little};
 		transition: background-color 0.2s ease;
 
 		span {

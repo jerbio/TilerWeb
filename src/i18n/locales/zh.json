@@ -1,5 +1,5 @@
-{
-		"common": {
+﻿{
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "跳过",
@@ -43,9 +43,8 @@
 		},
 		"navigation": {
 			"home": "主页",
-			"features": "功能",
 			"waitlist": "等候名单",
-			"newsletter": "Discover"
+			"discover": "功能"
 		},
 		"voiceInput": {
 			"listening": "正在聆听...",
@@ -496,16 +495,46 @@
 					"label": "您使用哪些集成？",
 					"placeholder": "例如 Google日历、Outlook、Apple日历",
 					"options": [
-						{ "value": "google", "label": "Google日历" },
-						{ "value": "outlook", "label": "Microsoft Outlook日历" },
-						{ "value": "apple", "label": "Apple日历" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google日历"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook日历"
+						},
+						{
+							"value": "apple",
+							"label": "Apple日历"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {
@@ -517,8 +546,229 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "搜索磁贴/块...",
+		"searchAriaLabel": "搜索磁贴或块",
+		"clearSearch": "清除搜索",
+		"loadMore": "加载更多",
+		"loading": "加载中…",
+		"notFoundMessage": "哎呀，我们找不到'{{query}}'。您想用这个标题创建一个磁贴吗？",
+		"notFoundDismiss": "不用了",
+		"notFoundCreate": "创建",
+		"setAsNow": "设为当前",
+		"markComplete": "完成",
+		"markDeleted": "删除",
+		"confirmCompleteTitle": "完成此事件？",
+		"confirmDeleteTitle": "删除此事件？",
+		"confirmAction": "确认",
+		"cancelAction": "取消",
+		"shuffle": {
+			"tooltip": "打乱日程",
+			"ariaLabel": "打乱日程",
+			"shuffling": "正在打乱日程...",
+			"success": "日程已打乱！",
+			"error": "打乱失败，请重试。"
+		},
+		"revise": {
+			"tooltip": "修订日程",
+			"ariaLabel": "修订日程",
+			"revising": "正在修订日程...",
+			"success": "日程已修订！",
+			"error": "修订失败，请重试。"
+		},
+		"procrastinateAll": {
+			"tooltip": "推迟所有事件",
+			"ariaLabel": "推迟所有事件",
+			"deferring": "正在推迟所有事件...",
+			"success": "所有事件已推迟！",
+			"error": "推迟失败，请重试。",
+			"pickerTitle": "推迟时长",
+			"days": "天",
+			"hours": "小时",
+			"minutes": "分钟",
+			"daysShort": "天",
+			"hoursShort": "小时",
+			"minutesShort": "分钟",
+			"confirm": "确认",
+			"cancel": "取消"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",
 		"usernameAlreadyExists": "用户名已存在"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "正在设置为当前...",
+			"setAsNowSuccess": "事件已设为当前！",
+			"completing": "正在完成事件...",
+			"completeSuccess": "事件已完成！",
+			"deferring": "正在推迟事件...",
+			"deferSuccess": "事件已推迟！",
+			"updating": "正在保存更改...",
+			"updateSuccess": "更改已保存！",
+			"deleting": "正在删除事件...",
+			"deleteSuccess": "事件已删除！",
+			"actionFailed": "操作失败，请重试。"
+		},
+		"edit": {
+			"title": "编辑",
+			"titleBlock": "编辑区块",
+			"titleTile": "编辑磁贴",
+			"nameSection": "名称",
+			"occurrenceSection": "????",
+			"timeSection": "时间和时长",
+			"recurringToggle": "重复事件",
+			"repetitionSection": "重复",
+			"locationSection": "位置",
+			"colorSection": "颜色",
+			"notesSection": "备注",
+			"name": "名称",
+			"start": "开始",
+			"end": "结束",
+			"selectDate": "选择日期",
+			"duration": "时长",
+			"hours": "小时",
+			"minutes": "分钟",
+			"durationHoursPreview": "{{count}}时",
+			"durationMinutesPreview": "{{count}}分",
+			"split": "分割数量",
+			"splitPlaceholder": "例如 3",
+			"location": "地址",
+			"locationDescription": "描述",
+			"locationDescriptionPlaceholder": "其他位置详情...",
+			"color": "颜色",
+			"recurring": "重复",
+			"repetitionDisabled": "禁用",
+			"selectFrequency": "选择频率",
+			"daily": "每天",
+			"weekly": "每周",
+			"monthly": "每月",
+			"yearly": "每年",
+			"forever": "永远重复",
+			"repetitionStart": "重复开始",
+			"repetitionEnd": "重复结束",
+			"sun": "日",
+			"mon": "一",
+			"tue": "二",
+			"wed": "三",
+			"thu": "四",
+			"fri": "五",
+			"sat": "六",
+			"save": "保存",
+			"saving": "正在保存更改...",
+			"saveSuccess": "事件已更新！",
+			"saveFailed": "保存失败，请重试。",
+			"back": "返回",
+			"loading": "正在加载详情...",
+			"loadingBlock": "正在加载区块详情...",
+			"loadingTile": "正在加载磁贴详情...",
+			"clearLocation": "清除位置",
+			"copyAddressOnly": "仅复制地址",
+			"locationMinChars": "请输入至少3个字符进行搜索",
+			"locationSearchPlaceholder": "搜索位置...",
+			"savedLocations": "已保存的位置",
+			"googleResults": "谷歌地图",
+			"poweredByGoogle": "由 Google 提供支持",
+			"noLocationResults": "未找到位置"
+		}
+	},
+	"settings": {
+		"title": "设置",
+		"back": "返回",
+		"logout": "退出登录",
+		"breadcrumb": {
+			"home": "首页",
+			"settings": "设置"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "账户信息",
+				"description": "查看您的账户并修改个人信息",
+				"fields": {
+					"fullName": "全名",
+					"username": "用户名",
+					"email": "电子邮箱",
+					"phoneNumber": "电话号码",
+					"phoneNumberPlaceholder": "添加电话号码",
+					"countryCode": "国家区号",
+					"countryCodeSearch": "搜索国家...",
+					"countryCodeNoResults": "未找到国家",
+					"dateOfBirth": "出生日期",
+					"dateOfBirthPlaceholder": "年/月/日"
+				},
+				"saveChanges": "保存更改",
+				"saving": "保存中...",
+				"deleteAccount": "删除我的账户",
+				"saveSuccess": "账户信息更新成功",
+				"saveError": "保存更改失败，请重试。",
+				"deleteNotImplemented": "删除账户功能即将推出"
+			},
+			"tilePreferences": {
+				"title": "图块偏好",
+				"description": "定义您的出行方式，帮助Tiler理解您的日常时间模式",
+				"howMoveAround": "您如何出行？",
+				"cycling": "骑行",
+				"driving": "驾车",
+				"transit": "公共交通",
+				"defineTimeRestrictions": "定义您的时间限制",
+				"myWorkHours": "我的工作时间",
+				"myPersonalHours": "我的个人时间",
+				"setBlockOutHours": "设置屏蔽时间",
+				"bedTime": "就寝时间",
+				"startsAt": "开始于",
+				"endsAt": "结束于",
+				"saveChanges": "保存更改",
+				"saving": "保存中...",
+				"saveSuccess": "图块偏好已成功更新",
+				"saveError": "保存失败，请重试。",
+				"bedTimeStartRequired": "请选择就寝开始时间",
+				"bedTimeEndRequired": "请选择起床时间",
+				"scheduleIncompleteDay": "{{label}}：请为{{day}}设置开始和结束时间",
+				"dayLabels": {
+					"sun": "日",
+					"mon": "一",
+					"tue": "二",
+					"wed": "三",
+					"thu": "四",
+					"fri": "五",
+					"sat": "六"
+				},
+				"dayNames": {
+					"sun": "星期日",
+					"mon": "星期一",
+					"tue": "星期二",
+					"wed": "星期三",
+					"thu": "星期四",
+					"fri": "星期五",
+					"sat": "星期六"
+				},
+				"start": "开始",
+				"end": "结束",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "上午",
+				"pm": "下午"
+			}
+		}
+	},
+	"feedback": {
+		"menuItem": "发送反馈",
+		"title": "发送反馈",
+		"category": "类别",
+		"categories": {
+			"Bug": "错误",
+			"Feature Request": "功能请求",
+			"Improvement": "改进",
+			"Other": "其他"
+		},
+		"titleLabel": "标题",
+		"titlePlaceholder": "简要描述您的反馈",
+		"descriptionLabel": "描述",
+		"descriptionPlaceholder": "告诉我们更多关于您的反馈...",
+		"submit": "提交",
+		"submitting": "提交中...",
+		"submitSuccess": "感谢您的反馈！",
+		"submitError": "提交反馈失败，请重试。"
 	}
 }

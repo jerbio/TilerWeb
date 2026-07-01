@@ -1,0 +1,794 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import ScheduleService from '../scheduleService';
+import { ScheduleApi } from '@/api/scheduleApi';
+import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
+import { CalendarEventApi } from '@/api/calendarEventApi';
+import { LocationApi } from '@/api/locationApi';
+import {
+	CalendarEvent,
+	CalendarEventUpdateParams,
+	ScheduleProcrastinateAllParams,
+	ScheduleProcrastinateEventParams,
+	ScheduleReviseParams,
+	ScheduleShuffleParams,
+	SubCalendarEvent,
+	ThirdPartyType,
+} from '@/core/common/types/schedule';
+
+// Mock the API classes
+vi.mock('@/api/scheduleApi');
+vi.mock('@/api/subCalendarEventApi');
+vi.mock('@/api/calendarEventApi');
+vi.mock('@/api/locationApi');
+vi.mock('@/config/config_getter', () => ({
+	Env: { get: () => 'https://test.example.com/' },
+}));
+
+describe('ScheduleService', () => {
+	let service: ScheduleService;
+	let scheduleApi: ScheduleApi;
+	let subCalendarEventApi: SubCalendarEventApi;
+	let calendarEventApi: CalendarEventApi;
+	let locationApi: LocationApi;
+
+	const mockCalendarEvent: CalendarEvent = {
+		id: '30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0',
+		start: 1769925600000,
+		end: 1770532200000,
+		name: 'work out',
+		address: '',
+		addressDescription: '',
+		searchdDescription: '',
+		splitCount: 4,
+		completeCount: 0,
+		deletionCount: 0,
+		thirdpartyType: ThirdPartyType.Tiler,
+		thirdPartyId: null,
+		thirdPartyUserId: null,
+		colorOpacity: null,
+		colorRed: null,
+		colorGreen: null,
+		colorBlue: null,
+		isComplete: false,
+		isEnabled: true,
+		isRecurring: true,
+		locationId: '7147101b-b226-4bf0-95f5-b9a6959c4689',
+		isReadOnly: false,
+		isProcrastinateEvent: false,
+		isRigid: false,
+		uiConfig: { id: '9dc0da1f-f7f9-42db-aefd-f491352d0c64' } as CalendarEvent['uiConfig'],
+		repetition: null,
+		eachTileDuration: 5400000,
+		restrictionProfile: null,
+		emojis: null,
+		isWhatIf: false,
+		entityName: 'CalendarEvent',
+		blob: { type: 0, note: '', id: 'bb6b9d9e-1a33-4173-93a9-1f64cc7879e9' },
+		subEvents: null,
+	};
+
+	beforeEach(() => {
+		scheduleApi = new ScheduleApi();
+		subCalendarEventApi = new SubCalendarEventApi();
+		calendarEventApi = new CalendarEventApi();
+		locationApi = new LocationApi();
+		service = new ScheduleService(
+			scheduleApi,
+			subCalendarEventApi,
+			calendarEventApi,
+			locationApi
+		);
+	});
+
+	describe('searchCalendarEventsByName', () => {
+		it('returns calendar events matching the search query', async () => {
+			vi.mocked(calendarEventApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: [mockCalendarEvent],
+				ServerStatus: null,
+			});
+
+			const results = await service.searchCalendarEventsByName(
+				'work out',
+				'ashtondemo',
+				'user-id-123'
+			);
+
+			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
+				data: 'work out',
+				userName: 'ashtondemo',
+				userId: 'user-id-123',
+			});
+			expect(results).toHaveLength(1);
+			expect(results[0].id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(results[0].name).toBe('work out');
+			expect(results[0].start).toBe(1769925600000);
+			expect(results[0].isRecurring).toBe(true);
+			expect(results[0].locationId).toBe('7147101b-b226-4bf0-95f5-b9a6959c4689');
+		});
+
+		it('passes pagination params to the API when provided', async () => {
+			vi.mocked(calendarEventApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: [mockCalendarEvent],
+				ServerStatus: null,
+			});
+
+			await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123', {
+				batchSize: 10,
+				index: 1,
+			});
+
+			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
+				data: 'work out',
+				userName: 'ashtondemo',
+				userId: 'user-id-123',
+				batchSize: 10,
+				index: 1,
+			});
+		});
+
+		it('returns empty array when no results', async () => {
+			vi.mocked(calendarEventApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: [],
+				ServerStatus: null,
+			});
+
+			const results = await service.searchCalendarEventsByName(
+				'nonexistent',
+				'ashtondemo',
+				'user-id-123'
+			);
+
+			expect(results).toEqual([]);
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.searchByName).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(
+				service.searchCalendarEventsByName('drinks', 'ashtondemo', 'user-id-123')
+			).rejects.toThrow();
+		});
+	});
+
+	describe('setCalendarEventAsNow', () => {
+		it('calls setAsNow on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.setAsNow).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.setCalendarEventAsNow('event-id-123');
+
+			expect(calendarEventApi.setAsNow).toHaveBeenCalledWith('event-id-123');
+			expect(result.id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(result.name).toBe('work out');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.setAsNow).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.setCalendarEventAsNow('bad-id')).rejects.toThrow();
+		});
+	});
+
+	describe('markCalendarEventComplete', () => {
+		it('calls markAsComplete on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.markAsComplete).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.markCalendarEventComplete('event-id-456');
+
+			expect(calendarEventApi.markAsComplete).toHaveBeenCalledWith('event-id-456');
+			expect(result.id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(result.name).toBe('work out');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.markAsComplete).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(service.markCalendarEventComplete('bad-id')).rejects.toThrow();
+		});
+	});
+
+	describe('deleteCalendarEvent', () => {
+		it('calls deleteCalendarEvent on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.deleteCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.deleteCalendarEvent('event-id-789');
+
+			expect(calendarEventApi.deleteCalendarEvent).toHaveBeenCalledWith('event-id-789');
+			expect(result.id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
+			expect(result.name).toBe('work out');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.deleteCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(service.deleteCalendarEvent('bad-id')).rejects.toThrow();
+		});
+	});
+
+	describe('shuffleSchedule', () => {
+		const shuffleParams: ScheduleShuffleParams = {
+			UserLongitude: '-73.9857',
+			UserLatitude: '40.7484',
+			UserLocationVerified: 'true',
+			MobileApp: true,
+			SocketId: true,
+			TimeZoneOffset: 0,
+			Version: 'v2',
+			TimeZone: 'America/New_York',
+			IsTimeZoneAdjusted: 'true',
+		};
+
+		it('calls shuffle on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.shuffle).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.shuffleSchedule(shuffleParams);
+
+			expect(scheduleApi.shuffle).toHaveBeenCalledWith(shuffleParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.shuffle).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.shuffleSchedule(shuffleParams)).rejects.toThrow();
+		});
+	});
+
+	describe('reviseSchedule', () => {
+		const reviseParams: ScheduleReviseParams = {
+			UserLongitude: '-73.9857',
+			UserLatitude: '40.7484',
+			UserLocationVerified: 'true',
+			MobileApp: true,
+			SocketId: true,
+			TimeZoneOffset: 0,
+			Version: 'v2',
+			TimeZone: 'America/New_York',
+			IsTimeZoneAdjusted: 'true',
+		};
+
+		it('calls revise on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.revise).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.reviseSchedule(reviseParams);
+
+			expect(scheduleApi.revise).toHaveBeenCalledWith(reviseParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.revise).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.reviseSchedule(reviseParams)).rejects.toThrow();
+		});
+	});
+
+	describe('procrastinateAllSchedule', () => {
+		const procrastinateAllParams: ScheduleProcrastinateAllParams = {
+			UserLongitude: '-73.9857',
+			UserLatitude: '40.7484',
+			UserLocationVerified: 'true',
+			Version: 'v2',
+			TimeZone: 'America/New_York',
+			DurationDays: 0,
+			DurationHours: 0,
+			DurationMins: 0,
+			DurationInMs: 0,
+		};
+
+		it('calls procrastinateAll on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.procrastinateAll).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.procrastinateAllSchedule(procrastinateAllParams);
+
+			expect(scheduleApi.procrastinateAll).toHaveBeenCalledWith(procrastinateAllParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.procrastinateAll).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(
+				service.procrastinateAllSchedule(procrastinateAllParams)
+			).rejects.toThrow();
+		});
+	});
+
+	describe('completeScheduleEvent', () => {
+		const eventId = 'event-id-123';
+
+		it('calls completeEvent on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.completeEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.completeScheduleEvent(eventId);
+
+			expect(scheduleApi.completeEvent).toHaveBeenCalledWith(eventId);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.completeEvent).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.completeScheduleEvent(eventId)).rejects.toThrow();
+		});
+	});
+
+	describe('setScheduleEventAsNow', () => {
+		const eventId = 'event-id-123';
+
+		it('calls setEventAsNow on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.setEventAsNow).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.setScheduleEventAsNow(eventId);
+
+			expect(scheduleApi.setEventAsNow).toHaveBeenCalledWith(eventId);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.setEventAsNow).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.setScheduleEventAsNow(eventId)).rejects.toThrow();
+		});
+	});
+
+	describe('procrastinateScheduleEvent', () => {
+		const procrastinateParams: ScheduleProcrastinateEventParams = {
+			EventID: 'event-id-123',
+			DurationDays: 1,
+			DurationHours: 2,
+			DurationMins: 30,
+			DurationInMs: 95400000,
+		};
+
+		it('calls procrastinateEvent on scheduleApi and returns Content', async () => {
+			vi.mocked(scheduleApi.procrastinateEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			});
+
+			const result = await service.procrastinateScheduleEvent(procrastinateParams);
+
+			expect(scheduleApi.procrastinateEvent).toHaveBeenCalledWith(procrastinateParams);
+			expect(result).toEqual({ subCalendarEvents: [] });
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(scheduleApi.procrastinateEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(service.procrastinateScheduleEvent(procrastinateParams)).rejects.toThrow();
+		});
+	});
+
+	describe('updateCalendarEvent', () => {
+		const updateParams: CalendarEventUpdateParams = {
+			EventID: 'event-id-123',
+			EventName: 'Updated name',
+			Start: 1769925600000,
+			End: 1770532200000,
+			Duration: 3600000,
+			MobileApp: true,
+			Version: 'v2',
+		};
+
+		it('calls updateCalendarEvent on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.updateCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.updateCalendarEvent(updateParams);
+
+			expect(calendarEventApi.updateCalendarEvent).toHaveBeenCalledWith(updateParams);
+			expect(result).toEqual(mockCalendarEvent);
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.updateCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(service.updateCalendarEvent(updateParams)).rejects.toThrow();
+		});
+	});
+
+	describe('lookupCalendarEventById', () => {
+		it('calls getCalendarEvent on calendarEventApi and returns Content', async () => {
+			vi.mocked(calendarEventApi.getCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.lookupCalendarEventById('evt-1');
+
+			expect(calendarEventApi.getCalendarEvent).toHaveBeenCalledWith('evt-1', undefined);
+			expect(result).toEqual(mockCalendarEvent);
+		});
+
+		it('forwards pagination options', async () => {
+			vi.mocked(calendarEventApi.getCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.lookupCalendarEventById('evt-1', { batchSize: 5, index: 2 });
+
+			expect(calendarEventApi.getCalendarEvent).toHaveBeenCalledWith('evt-1', {
+				batchSize: 5,
+				index: 2,
+			});
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(calendarEventApi.getCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(service.lookupCalendarEventById('evt-1')).rejects.toThrow();
+		});
+	});
+
+	describe('updateSubCalendarEvent', () => {
+		const mockSubCalendarEvent = {
+			id: 'sub-event-123',
+			start: 1769925600000,
+			end: 1769929200000,
+			name: 'Test Event',
+			calendarEventEnd: 1770532200000,
+		} as unknown as SubCalendarEvent;
+
+		it('calls updateSubCalendarEvent on subCalendarEventApi with start and end times', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const updates = { start: 1769930000000, end: 1769933600000 };
+			const result = await service.updateSubCalendarEvent('sub-event-123', updates);
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+			expect(result).toEqual(mockSubCalendarEvent);
+		});
+
+		it('calls updateSubCalendarEvent with only start time when end is not provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const updates = { start: 1769930000000 };
+			await service.updateSubCalendarEvent('sub-event-123', updates);
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: undefined,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('calls updateSubCalendarEvent with calendarEnd when provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const updates = {
+				start: 1769930000000,
+				end: 1769933600000,
+				calendarEnd: 1770600000000,
+			};
+			await service.updateSubCalendarEvent('sub-event-123', updates);
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: 1770600000000,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('includes timezone in the payload', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 });
+
+			const calledWith = vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mock
+				.calls[0][0];
+			expect(calledWith.TimeZone).toBeDefined();
+			expect(typeof calledWith.TimeZone).toBe('string');
+		});
+
+		it('includes CalendarEventName when name is provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', { name: 'Updated Event Name' });
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				CalendarEventName: 'Updated Event Name',
+				SubCalendarEventStart: undefined,
+				SubCalendarEventEnd: undefined,
+				CalendarEventEnd: undefined,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('includes all fields when name, times, and deadline are provided together', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				name: 'Full Update',
+				start: 1769930000000,
+				end: 1769933600000,
+				calendarEnd: 1770600000000,
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith({
+				Id: 'sub-event-123',
+				CalendarEventName: 'Full Update',
+				SubCalendarEventStart: 1769930000000,
+				SubCalendarEventEnd: 1769933600000,
+				CalendarEventEnd: 1770600000000,
+				TimeZone: expect.any(String),
+			});
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(
+				service.updateSubCalendarEvent('sub-event-123', { start: 1769930000000 })
+			).rejects.toThrow();
+		});
+
+		it('includes ThirdPartyEventID and ThirdPartyUserID when provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				start: 1769930000000,
+				thirdPartyEventId: 'google-event-abc',
+				thirdPartyUserId: 'google-user-xyz',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					SubCalendarEventStart: 1769930000000,
+					ThirdPartyEventID: 'google-event-abc',
+					ThirdPartyUserID: 'google-user-xyz',
+					TimeZone: expect.any(String),
+				})
+			);
+		});
+
+		it('includes CalendarType when provided', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				start: 1769930000000,
+				calendarType: 'google',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					CalendarType: 'google',
+					TimeZone: expect.any(String),
+				})
+			);
+		});
+
+		it('includes all third-party fields together with name and times', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEvent('sub-event-123', {
+				name: 'Google Meeting',
+				start: 1769930000000,
+				end: 1769933600000,
+				thirdPartyEventId: 'google-event-abc',
+				thirdPartyUserId: 'google-user-xyz',
+				calendarType: 'google',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					CalendarEventName: 'Google Meeting',
+					SubCalendarEventStart: 1769930000000,
+					SubCalendarEventEnd: 1769933600000,
+					ThirdPartyEventID: 'google-event-abc',
+					ThirdPartyUserID: 'google-user-xyz',
+					CalendarType: 'google',
+					TimeZone: expect.any(String),
+				})
+			);
+		});
+	});
+
+	describe('lookupLocationById', () => {
+		it('calls getLocation on locationApi and returns Content', async () => {
+			const mockLocation = {
+				id: '7147101b-b226-4bf0-95f5-b9a6959c4689',
+				description: 'Office',
+				address: '123 Main St',
+				longitude: -73.9857,
+				latitude: 40.7484,
+				isVerified: true,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: null,
+				userId: 'user-123',
+				source: 'none',
+				nickname: 'My Office',
+			};
+
+			vi.mocked(locationApi.getLocation).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockLocation,
+				ServerStatus: null,
+			});
+
+			const result = await service.lookupLocationById('7147101b-b226-4bf0-95f5-b9a6959c4689');
+
+			expect(locationApi.getLocation).toHaveBeenCalledWith(
+				'7147101b-b226-4bf0-95f5-b9a6959c4689'
+			);
+			expect(result).toEqual(mockLocation);
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(locationApi.getLocation).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.lookupLocationById('bad-id')).rejects.toThrow();
+		});
+	});
+
+	describe('searchLocations', () => {
+		const mockLocations = [
+			{
+				id: 'saved-1',
+				description: 'Saved Place',
+				address: 'My Office',
+				longitude: 0,
+				latitude: 0,
+				isVerified: false,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: '',
+				userId: 'user-123',
+				source: 'none',
+				nickname: 'office',
+			},
+			{
+				id: 'ChIJ123',
+				description: 'Google Place',
+				address: 'Google Place 123 Main St',
+				longitude: -73.99,
+				latitude: 40.75,
+				isVerified: true,
+				isDefault: false,
+				isNull: false,
+				thirdPartyId: 'ChIJ123',
+				userId: null,
+				source: 'google',
+				nickname: 'google place',
+			},
+		];
+
+		it('calls searchByName on locationApi and returns Content', async () => {
+			vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockLocations,
+				ServerStatus: null,
+			});
+
+			const result = await service.searchLocations('office');
+
+			expect(locationApi.searchByName).toHaveBeenCalledWith('office');
+			expect(result).toEqual(mockLocations);
+		});
+
+		it('returns empty array when no results', async () => {
+			vi.mocked(locationApi.searchByName).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: [],
+				ServerStatus: null,
+			});
+
+			const result = await service.searchLocations('nonexistent');
+			expect(result).toEqual([]);
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(locationApi.searchByName).mockRejectedValueOnce(new Error('Network error'));
+
+			await expect(service.searchLocations('fail')).rejects.toThrow();
+		});
+	});
+});

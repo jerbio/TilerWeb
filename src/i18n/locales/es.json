@@ -1,5 +1,5 @@
-{
-		"common": {
+﻿{
+	"common": {
 		"onboarding": {
 			"guide": {
 				"skip": "Saltar",
@@ -43,9 +43,8 @@
 		},
 		"navigation": {
 			"home": "Inicio",
-			"features": "Características",
 			"waitlist": "Lista de espera",
-			"newsletter": "Discover"
+			"discover": "Características"
 		},
 		"voiceInput": {
 			"listening": "Escuchando...",
@@ -496,16 +495,46 @@
 					"label": "¿Qué integraciones usas?",
 					"placeholder": "ej. Google Calendar, Outlook, Apple Calendar",
 					"options": [
-						{ "value": "google", "label": "Google Calendar" },
-						{ "value": "outlook", "label": "Microsoft Outlook Calendar" },
-						{ "value": "apple", "label": "Apple Calendar" },
-						{ "value": "slack", "label": "Slack" },
-						{ "value": "monday", "label": "Monday.com" },
-						{ "value": "reclaim", "label": "Reclaim" },
-						{ "value": "notion", "label": "Notion" },
-						{ "value": "ticktick", "label": "TickTick" },
-						{ "value": "evernote", "label": "Evernote" },
-						{ "value": "oneNote", "label": "OneNote" }
+						{
+							"value": "google",
+							"label": "Google Calendar"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook Calendar"
+						},
+						{
+							"value": "apple",
+							"label": "Apple Calendar"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
 					]
 				},
 				"useCase": {
@@ -517,8 +546,229 @@
 			}
 		}
 	},
+	"timeline": {
+		"searchPlaceholder": "Buscar un mosaico/bloque...",
+		"searchAriaLabel": "Buscar un mosaico o bloque",
+		"clearSearch": "Borrar búsqueda",
+		"loadMore": "Cargar más",
+		"loading": "Cargando…",
+		"notFoundMessage": "Ups, no pudimos encontrar '{{query}}'. ¿Te gustaría crear un mosaico con este título?",
+		"notFoundDismiss": "No, gracias",
+		"notFoundCreate": "Crear",
+		"setAsNow": "Establecer como ahora",
+		"markComplete": "Completar",
+		"markDeleted": "Eliminar",
+		"confirmCompleteTitle": "¿Completar este evento?",
+		"confirmDeleteTitle": "¿Eliminar este evento?",
+		"confirmAction": "Confirmar",
+		"cancelAction": "Cancelar",
+		"shuffle": {
+			"tooltip": "Mezclar horario",
+			"ariaLabel": "Mezclar horario",
+			"shuffling": "Mezclando horario...",
+			"success": "¡Horario mezclado!",
+			"error": "Error al mezclar. Inténtalo de nuevo."
+		},
+		"revise": {
+			"tooltip": "Revisar horario",
+			"ariaLabel": "Revisar horario",
+			"revising": "Revisando horario...",
+			"success": "¡Horario revisado!",
+			"error": "Error al revisar. Inténtalo de nuevo."
+		},
+		"procrastinateAll": {
+			"tooltip": "Posponer todos los eventos",
+			"ariaLabel": "Posponer todos los eventos",
+			"deferring": "Posponiendo todos los eventos...",
+			"success": "¡Todos los eventos pospuestos!",
+			"error": "Error al posponer. Inténtalo de nuevo.",
+			"pickerTitle": "Duración del aplazamiento",
+			"days": "Días",
+			"hours": "Horas",
+			"minutes": "Minutos",
+			"daysShort": "Día",
+			"hoursShort": "H",
+			"minutesShort": "Min",
+			"confirm": "Confirmar",
+			"cancel": "Cancelar"
+		}
+	},
 	"errors": {
 		"chatLimitReached": "Límite de chat alcanzado. Por favor, inténtelo más tarde.",
 		"usernameAlreadyExists": "El nombre de usuario ya existe"
+	},
+	"calendarEvent": {
+		"notifications": {
+			"settingAsNow": "Configurando como actual...",
+			"setAsNowSuccess": "¡Evento configurado como actual!",
+			"completing": "Completando evento...",
+			"completeSuccess": "¡Evento completado!",
+			"deferring": "Aplazando evento...",
+			"deferSuccess": "¡Evento aplazado!",
+			"updating": "Guardando cambios...",
+			"updateSuccess": "¡Cambios guardados!",
+			"deleting": "Eliminando evento...",
+			"deleteSuccess": "¡Evento eliminado!",
+			"actionFailed": "La acción falló. Inténtalo de nuevo."
+		},
+		"edit": {
+			"title": "Editar",
+			"titleBlock": "Editar bloque",
+			"titleTile": "Editar mosaico",
+			"nameSection": "Nombre",
+			"occurrenceSection": "Ocurrencia",
+			"timeSection": "Hora y duración",
+			"recurringToggle": "Repetir evento",
+			"repetitionSection": "Repetición",
+			"locationSection": "Ubicación",
+			"colorSection": "Color",
+			"notesSection": "Notas",
+			"name": "Nombre",
+			"start": "Inicio",
+			"end": "Fin",
+			"selectDate": "Seleccionar fecha",
+			"duration": "Duración",
+			"hours": "hrs",
+			"minutes": "min",
+			"durationHoursPreview": "{{count}}h",
+			"durationMinutesPreview": "{{count}}m",
+			"split": "Número de divisiones",
+			"splitPlaceholder": "ej. 3",
+			"location": "Dirección",
+			"locationDescription": "Descripción",
+			"locationDescriptionPlaceholder": "Detalles adicionales de la ubicación...",
+			"color": "Color",
+			"recurring": "Recurrente",
+			"repetitionDisabled": "Desactivado",
+			"selectFrequency": "Seleccionar frecuencia",
+			"daily": "Diario",
+			"weekly": "Semanal",
+			"monthly": "Mensual",
+			"yearly": "Anual",
+			"forever": "Repetir para siempre",
+			"repetitionStart": "Inicio de la repetición",
+			"repetitionEnd": "Fin de la repetición",
+			"sun": "Dom",
+			"mon": "Lun",
+			"tue": "Mar",
+			"wed": "Mié",
+			"thu": "Jue",
+			"fri": "Vie",
+			"sat": "Sáb",
+			"save": "Guardar",
+			"saving": "Guardando cambios...",
+			"saveSuccess": "¡Evento actualizado!",
+			"saveFailed": "Error al guardar. Inténtalo de nuevo.",
+			"back": "Atrás",
+			"loading": "Cargando detalles...",
+			"loadingBlock": "Cargando detalles del bloque...",
+			"loadingTile": "Cargando detalles del mosaico...",
+			"clearLocation": "Borrar ubicación",
+			"copyAddressOnly": "Copiar solo la dirección",
+			"locationMinChars": "Escribe al menos 3 caracteres para buscar",
+			"locationSearchPlaceholder": "Buscar una ubicación...",
+			"savedLocations": "Ubicaciones guardadas",
+			"googleResults": "Google Maps",
+			"poweredByGoogle": "Desarrollado por Google",
+			"noLocationResults": "No se encontraron ubicaciones"
+		}
+	},
+	"settings": {
+		"title": "Configuración",
+		"back": "Atrás",
+		"logout": "Cerrar sesión",
+		"breadcrumb": {
+			"home": "Inicio",
+			"settings": "Configuración"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "Información de la cuenta",
+				"description": "Revisa tu cuenta y realiza cambios en tu información personal",
+				"fields": {
+					"fullName": "Nombre completo",
+					"username": "Nombre de usuario",
+					"email": "Correo electrónico",
+					"phoneNumber": "Número de teléfono",
+					"phoneNumberPlaceholder": "Agregar número de teléfono",
+					"countryCode": "Código de país",
+					"countryCodeSearch": "Buscar países...",
+					"countryCodeNoResults": "No se encontraron países",
+					"dateOfBirth": "Fecha de nacimiento",
+					"dateOfBirthPlaceholder": "DD/MM/AAAA"
+				},
+				"saveChanges": "Guardar cambios",
+				"saving": "Guardando...",
+				"deleteAccount": "Eliminar mi cuenta",
+				"saveSuccess": "Información de la cuenta actualizada correctamente",
+				"saveError": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+				"deleteNotImplemented": "La función de eliminar cuenta estará disponible próximamente"
+			},
+			"tilePreferences": {
+				"title": "Preferencias de Mosaico",
+				"description": "Define cómo te desplazas y ayuda a Tiler a entender tus patrones de tiempo diarios",
+				"howMoveAround": "¿Cómo te desplazas?",
+				"cycling": "Ciclismo",
+				"driving": "Conducción",
+				"transit": "Transporte público",
+				"defineTimeRestrictions": "Define tus restricciones de tiempo",
+				"myWorkHours": "Mis horas de trabajo",
+				"myPersonalHours": "Mis horas personales",
+				"setBlockOutHours": "Establecer horas bloqueadas",
+				"bedTime": "Hora de dormir",
+				"startsAt": "Comienza a las",
+				"endsAt": "Termina a las",
+				"saveChanges": "Guardar cambios",
+				"saving": "Guardando...",
+				"saveSuccess": "Preferencias de mosaico actualizadas correctamente",
+				"saveError": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+				"bedTimeStartRequired": "Por favor selecciona una hora de inicio para dormir",
+				"bedTimeEndRequired": "Por favor selecciona una hora de fin para dormir",
+				"scheduleIncompleteDay": "{{label}}: establece tanto la hora de inicio como la de fin para {{day}}",
+				"dayLabels": {
+					"sun": "D",
+					"mon": "L",
+					"tue": "M",
+					"wed": "X",
+					"thu": "J",
+					"fri": "V",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Domingo",
+					"mon": "Lunes",
+					"tue": "Martes",
+					"wed": "Miércoles",
+					"thu": "Jueves",
+					"fri": "Viernes",
+					"sat": "Sábado"
+				},
+				"start": "Inicio",
+				"end": "Fin",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "a.m.",
+				"pm": "p.m."
+			}
+		}
+	},
+	"feedback": {
+		"menuItem": "Enviar comentario",
+		"title": "Enviar comentario",
+		"category": "Categoría",
+		"categories": {
+			"Bug": "Error",
+			"Feature Request": "Solicitud de función",
+			"Improvement": "Mejora",
+			"Other": "Otro"
+		},
+		"titleLabel": "Título",
+		"titlePlaceholder": "Resumen breve de su comentario",
+		"descriptionLabel": "Descripción",
+		"descriptionPlaceholder": "Cuéntenos más sobre su comentario...",
+		"submit": "Enviar",
+		"submitting": "Enviando...",
+		"submitSuccess": "¡Gracias por su comentario!",
+		"submitError": "No se pudo enviar el comentario. Por favor, inténtelo de nuevo."
 	}
 }

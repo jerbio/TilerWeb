@@ -67,98 +67,101 @@ const TileFadeDivLeft = styled.div`
 const TileCardSection: React.FC = () => {
 	const { t } = useTranslation();
 
-	const tileGrid: Array<Array<TileCardProps>> = useMemo(() => [
-		[
-			{
-				heading: t('home.tileCardSection.tiles.meetingWithCharles'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '09:00 AM',
-				endTime: '10:00 AM',
-				background_color: palette.colors.tileBackgroundPrimary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.morningMeeting'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '10:00 AM',
-				endTime: '11:00 AM',
-				background_color: palette.colors.tileBackgroundSecondary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.clientCall'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '11:00 AM',
-				endTime: '12:00 PM',
-				background_color: palette.colors.tileBackgroundTertiary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.lunchBreak'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '12:00 PM',
-				endTime: '01:00 PM',
-				background_color: palette.colors.tileBackgroundSecondary,
-			},
+	const tileGrid: Array<Array<TileCardProps>> = useMemo(
+		() => [
+			[
+				{
+					heading: t('home.tileCardSection.tiles.meetingWithCharles'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '09:00 AM',
+					endTime: '10:00 AM',
+					background_color: palette.colors.tileBackgroundPrimary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.morningMeeting'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '10:00 AM',
+					endTime: '11:00 AM',
+					background_color: palette.colors.tileBackgroundSecondary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.clientCall'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '11:00 AM',
+					endTime: '12:00 PM',
+					background_color: palette.colors.tileBackgroundTertiary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.lunchBreak'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '12:00 PM',
+					endTime: '01:00 PM',
+					background_color: palette.colors.tileBackgroundSecondary,
+				},
+			],
+			[
+				{
+					heading: t('home.tileCardSection.tiles.meetingWithCharles'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '09:00 AM',
+					endTime: '10:00 AM',
+					background_color: palette.colors.tileBackgroundSecondary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.teamSync'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '10:00 AM',
+					endTime: '11:00 AM',
+					background_color: palette.colors.tileBackgroundTertiary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.projectReview'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '11:00 AM',
+					endTime: '12:00 PM',
+					background_color: palette.colors.tileBackgroundSecondary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.happyHour'),
+					location: t('home.tileCardSection.locations.conferenceRoomA'),
+					startTime: '12:00 PM',
+					endTime: '01:00 PM',
+					background_color: palette.colors.tileBackgroundPrimary,
+				},
+			],
+			[
+				{
+					heading: t('home.tileCardSection.tiles.breakfastWithFriends'),
+					location: t('home.tileCardSection.locations.restaurants'),
+					startTime: '09:00 AM',
+					endTime: '10:00 AM',
+					background_color: palette.colors.tileBackgroundPrimary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.groceryShopping'),
+					location: t('home.tileCardSection.locations.groceryStore'),
+					startTime: '10:00 AM',
+					endTime: '11:00 AM',
+					background_color: palette.colors.tileBackgroundSecondary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.gymWorkouts'),
+					location: t('home.tileCardSection.locations.gym'),
+					startTime: '11:00 AM',
+					endTime: '12:00 PM',
+					background_color: palette.colors.tileBackgroundTertiary,
+				},
+				{
+					heading: t('home.tileCardSection.tiles.meetingWithCharles'),
+					location: t('home.tileCardSection.locations.zoom'),
+					startTime: '12:00 PM',
+					endTime: '01:00 PM',
+					background_color: palette.colors.tileBackgroundSecondary,
+				},
+			],
 		],
-		[
-			{
-				heading: t('home.tileCardSection.tiles.meetingWithCharles'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '09:00 AM',
-				endTime: '10:00 AM',
-				background_color: palette.colors.tileBackgroundSecondary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.teamSync'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '10:00 AM',
-				endTime: '11:00 AM',
-				background_color: palette.colors.tileBackgroundTertiary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.projectReview'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '11:00 AM',
-				endTime: '12:00 PM',
-				background_color: palette.colors.tileBackgroundSecondary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.happyHour'),
-				location: t('home.tileCardSection.locations.conferenceRoomA'),
-				startTime: '12:00 PM',
-				endTime: '01:00 PM',
-				background_color: palette.colors.tileBackgroundPrimary,
-			},
-		],
-		[
-			{
-				heading: t('home.tileCardSection.tiles.breakfastWithFriends'),
-				location: t('home.tileCardSection.locations.restaurants'),
-				startTime: '09:00 AM',
-				endTime: '10:00 AM',
-				background_color: palette.colors.tileBackgroundPrimary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.groceryShopping'),
-				location: t('home.tileCardSection.locations.groceryStore'),
-				startTime: '10:00 AM',
-				endTime: '11:00 AM',
-				background_color: palette.colors.tileBackgroundSecondary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.gymWorkouts'),
-				location: t('home.tileCardSection.locations.gym'),
-				startTime: '11:00 AM',
-				endTime: '12:00 PM',
-				background_color: palette.colors.tileBackgroundTertiary,
-			},
-			{
-				heading: t('home.tileCardSection.tiles.meetingWithCharles'),
-				location: t('home.tileCardSection.locations.zoom'),
-				startTime: '12:00 PM',
-				endTime: '01:00 PM',
-				background_color: palette.colors.tileBackgroundSecondary,
-			},
-		],
-	], [t]);
+		[t]
+	);
 
 	return (
 		<Section>

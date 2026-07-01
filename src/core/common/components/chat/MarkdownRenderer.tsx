@@ -3,126 +3,153 @@ import ReactMarkdown from 'react-markdown';
 import styled from 'styled-components';
 
 const MarkdownContainer = styled.div`
-  font-family: inherit;
-  line-height: 1.5;
+	font-family: inherit;
+	line-height: 1.5;
 
-  // Headers
-  h1, h2, h3, h4, h5, h6 {
-    margin: 0.5em 0 0.3em 0;
-    font-weight: 600;
-    line-height: 1.3;
-  }
+	// Headers
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin: 0.5em 0 0.3em 0;
+		font-weight: 600;
+		line-height: 1.3;
+	}
 
-  h1 { font-size: 1.4em; }
-  h2 { font-size: 1.3em; }
-  h3 { font-size: 1.2em; }
-  h4 { font-size: 1.1em; }
-  h5 { font-size: 1em; }
-  h6 { font-size: 0.9em; }
+	h1 {
+		font-size: 1.4em;
+	}
+	h2 {
+		font-size: 1.3em;
+	}
+	h3 {
+		font-size: 1.2em;
+	}
+	h4 {
+		font-size: 1.1em;
+	}
+	h5 {
+		font-size: 1em;
+	}
+	h6 {
+		font-size: 0.9em;
+	}
 
-  // Paragraphs
-  p {
-    margin: 0.5em 0;
-    &:first-child { margin-top: 0; }
-    &:last-child { margin-bottom: 0; }
-  }
+	// Paragraphs
+	p {
+		margin: 0.5em 0;
+		&:first-child {
+			margin-top: 0;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 
-  // Lists
-  ul, ol {
-    margin: 0.5em 0;
-    padding-left: 1.5em;
-    &:first-child { margin-top: 0; }
-    &:last-child { margin-bottom: 0; }
-  }
+	// Lists
+	ul,
+	ol {
+		margin: 0.5em 0;
+		padding-left: 1.5em;
+		&:first-child {
+			margin-top: 0;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 
-  li {
-    margin: 0.2em 0;
-  }
+	li {
+		margin: 0.2em 0;
+	}
 
-  // Code
-  code {
-    background-color: ${({ theme }) => theme.colors.background.card2};
-    border-radius: 3px;
-    padding: 0.1em 0.3em;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.9em;
-  }
+	// Code
+	code {
+		background-color: ${({ theme }) => theme.colors.background.card2};
+		border-radius: 3px;
+		padding: 0.1em 0.3em;
+		font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+		font-size: 0.9em;
+	}
 
-  pre {
-    background-color: ${({ theme }) => theme.colors.background.card2};
-    border-radius: 5px;
-    padding: 1em;
-    margin: 0.5em 0;
-    overflow-x: auto;
+	pre {
+		background-color: ${({ theme }) => theme.colors.background.card2};
+		border-radius: 5px;
+		padding: 1em;
+		margin: 0.5em 0;
+		overflow-x: auto;
 
-    code {
-      background-color: transparent;
-      padding: 0;
-    }
-  }
+		code {
+			background-color: transparent;
+			padding: 0;
+		}
+	}
 
-  // Blockquotes
-  blockquote {
-    border-left: 3px solid ${({ theme }) => theme.colors.border.default};
-    margin: 0.5em 0;
-    padding-left: 1em;
-    font-style: italic;
-    opacity: 0.9;
-  }
+	// Blockquotes
+	blockquote {
+		border-left: 3px solid ${({ theme }) => theme.colors.border.default};
+		margin: 0.5em 0;
+		padding-left: 1em;
+		font-style: italic;
+		opacity: 0.9;
+	}
 
-  // Links
-  a {
-    color: ${({ theme }) => theme.colors.blue[500]};
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+	// Links
+	a {
+		color: ${({ theme }) => theme.colors.blue[500]};
+		text-decoration: none;
 
-  // Horizontal rules
-  hr {
-    border: none;
-    border-top: 1px solid ${({ theme }) => theme.colors.border.default};
-    margin: 1em 0;
-  }
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 
-  // Tables
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 0.5em 0;
-  }
+	// Horizontal rules
+	hr {
+		border: none;
+		border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+		margin: 1em 0;
+	}
 
-  th, td {
-    border: 1px solid ${({ theme }) => theme.colors.border.default};
-    padding: 0.5em;
-    text-align: left;
-  }
+	// Tables
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		margin: 0.5em 0;
+	}
 
-  th {
-    background-color: ${({ theme }) => theme.colors.background.card2};
-    font-weight: 600;
-  }
+	th,
+	td {
+		border: 1px solid ${({ theme }) => theme.colors.border.default};
+		padding: 0.5em;
+		text-align: left;
+	}
 
-  // Strong and emphasis
-  strong {
-    font-weight: 600;
-  }
+	th {
+		background-color: ${({ theme }) => theme.colors.background.card2};
+		font-weight: 600;
+	}
 
-  em {
-    font-style: italic;
-  }
+	// Strong and emphasis
+	strong {
+		font-weight: 600;
+	}
+
+	em {
+		font-style: italic;
+	}
 `;
 
 interface MarkdownRendererProps {
-  content: string;
+	content: string;
 }
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
-  return (
-    <MarkdownContainer>
-      <ReactMarkdown>{content}</ReactMarkdown>
-    </MarkdownContainer>
-  );
+	return (
+		<MarkdownContainer>
+			<ReactMarkdown>{content}</ReactMarkdown>
+		</MarkdownContainer>
+	);
 };

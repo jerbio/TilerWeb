@@ -1,0 +1,47 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import SEO from '@/core/common/components/SEO';
+import Section from '../components/layout/section';
+import {
+	PageWrapper,
+	Hero,
+	Badge,
+	HeroTitle,
+	HeroSubtitle,
+	BackgroundBlur,
+} from '../components/discover/shared';
+import WhatIsTilerSection from '../components/discover/WhatIsTilerSection';
+import SetUpTilerSection from '../components/discover/SetUpTilerSection';
+import HowToUseTilerSection from '../components/discover/HowToUseTilerSection';
+import FeaturesSection from '../components/discover/FeaturesSection';
+
+const Discover: React.FC = () => {
+	const { t } = useTranslation();
+
+	return (
+		<>
+			<SEO
+				title={t('discover.seo.title')}
+				description={t('discover.seo.description')}
+				canonicalUrl="/discover"
+			/>
+			<Section>
+				<BackgroundBlur />
+				<PageWrapper>
+					<Hero>
+						<Badge>{t('discover.hero.badge')}</Badge>
+						<HeroTitle>{t('discover.hero.title')}</HeroTitle>
+						<HeroSubtitle>{t('discover.hero.subtitle')}</HeroSubtitle>
+					</Hero>
+
+					<WhatIsTilerSection />
+					<SetUpTilerSection />
+					<HowToUseTilerSection />
+					<FeaturesSection />
+				</PageWrapper>
+			</Section>
+		</>
+	);
+};
+
+export default Discover;

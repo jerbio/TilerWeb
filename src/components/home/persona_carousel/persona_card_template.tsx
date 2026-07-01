@@ -25,6 +25,6 @@ const Template = styled.div`
 
 const PersonaCardTemplate: React.FC = () => {
 	return <Template />;
-}
+};
 
 export default PersonaCardTemplate;

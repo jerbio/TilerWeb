@@ -1,6 +1,6 @@
 /**
  * React Hook for Demo Mode
- * 
+ *
  * Provides easy access to demo mode functionality in React components
  */
 
@@ -19,7 +19,7 @@ import {
 
 export const useDemoMode = () => {
 	const demoData = useMemo(() => getDemoData(), []);
-	
+
 	return {
 		// Flags
 		isEnabled: isDemoMode(),
@@ -28,13 +28,13 @@ export const useDemoMode = () => {
 		shouldForceRenderCalendarEvents: shouldForceRenderCalendarEvents(),
 		shouldShowDemoBadge: shouldShowDemoBadge(),
 		shouldAutoTriggerOnboarding: shouldAutoTriggerOnboarding(),
-		
+
 		// Delays
 		onboardingDelay: getOnboardingDelay(),
-		
+
 		// Demo data
 		demoData,
-		
+
 		// Helper functions
 		getDataOrDemo,
 	};
@@ -43,16 +43,13 @@ export const useDemoMode = () => {
 // Hook specifically for chat components
 export const useDemoChatData = (realMessages: unknown[] = []) => {
 	const { shouldForceRenderChatMessages, demoData, getDataOrDemo } = useDemoMode();
-	
+
 	const messages = useMemo(() => {
-		return getDataOrDemo(
-			realMessages.length > 0 ? realMessages : null,
-			demoData.chatMessages
-		);
+		return getDataOrDemo(realMessages.length > 0 ? realMessages : null, demoData.chatMessages);
 	}, [realMessages, demoData.chatMessages, getDataOrDemo]);
-	
+
 	const hasMessages = messages && messages.length > 0;
-	
+
 	return {
 		messages: messages,
 		hasMessages,
@@ -63,16 +60,13 @@ export const useDemoChatData = (realMessages: unknown[] = []) => {
 // Hook specifically for calendar components
 export const useDemoCalendarData = (realEvents: unknown[] = []) => {
 	const { shouldForceRenderCalendarEvents, demoData, getDataOrDemo } = useDemoMode();
-	
+
 	const events = useMemo(() => {
-		return getDataOrDemo(
-			realEvents.length > 0 ? realEvents : null,
-			demoData.calendarEvents
-		);
+		return getDataOrDemo(realEvents.length > 0 ? realEvents : null, demoData.calendarEvents);
 	}, [realEvents, demoData.calendarEvents, getDataOrDemo]);
-	
+
 	const hasEvents = events && events.length > 0;
-	
+
 	return {
 		events: events,
 		hasEvents,
@@ -83,7 +77,7 @@ export const useDemoCalendarData = (realEvents: unknown[] = []) => {
 // Hook for components that need to check if they should render demo data
 export const useShouldRenderDemo = () => {
 	const { isEnabled } = useDemoMode();
-	
+
 	return {
 		shouldRenderDemoChat: isEnabled && shouldForceRenderChatMessages(),
 		shouldRenderDemoCalendar: isEnabled && shouldForceRenderCalendarEvents(),

@@ -45,9 +45,7 @@ export const CalendarRequestProvider: React.FC<{ children: React.ReactNode }> = 
 	const bus = useRef<CalendarRequestBus>({ dispatch, subscribe });
 
 	return (
-		<CalendarRequestCtx.Provider value={bus.current}>
-			{children}
-		</CalendarRequestCtx.Provider>
+		<CalendarRequestCtx.Provider value={bus.current}>{children}</CalendarRequestCtx.Provider>
 	);
 };
 
