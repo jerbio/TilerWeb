@@ -549,6 +549,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			);
 
 			fireEvent.click(screen.getByTitle('Delete'));
+			fireEvent.click(screen.getByLabelText('Confirm delete'));
 
 			await waitFor(() => {
 				expect(scheduleService.deleteScheduleEvent).toHaveBeenCalledWith(
