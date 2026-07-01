@@ -559,6 +559,87 @@ describe('CalendarEventInfo – Action Buttons', () => {
 				);
 			});
 		});
+
+		it('shows a confirmation overlay before deleting a third-party event', async () => {
+			vi.mocked(scheduleService.deleteScheduleEvent).mockResolvedValueOnce(
+				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<
+					infer T
+				>
+					? T
+					: never
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+			expect(
+				screen.getByText('This will also delete it from your connected calendar service.')
+			).toBeInTheDocument();
+
+			fireEvent.click(screen.getByLabelText('Confirm delete'));
+
+			await waitFor(() => {
+				expect(scheduleService.deleteScheduleEvent).toHaveBeenCalledWith(
+					expect.any(String),
+					ThirdPartyType.Google,
+					'google-event-123',
+					'google-user-456'
+				);
+			});
+		});
+
+		it('cancels the delete confirmation overlay when Cancel is clicked', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+
+			fireEvent.click(screen.getByText('Cancel'));
+
+			expect(screen.queryByText('Delete this event?')).not.toBeInTheDocument();
+			expect(screen.getByTitle('Delete')).toBeInTheDocument();
+		});
+
+		it('cancels the delete confirmation overlay when Escape is pressed', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+
+			fireEvent.keyDown(document, { key: 'Escape' });
+
+			expect(screen.queryByText('Delete this event?')).not.toBeInTheDocument();
+			expect(screen.getByTitle('Delete')).toBeInTheDocument();
+		});
 	});
 
 	describe('Read-only mode (readOnly prop)', () => {
