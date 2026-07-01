@@ -9,7 +9,9 @@ import { CalendarRequestProvider } from '@/core/common/components/calendar/Calen
 import Chat from '@/core/common/components/chat/chat';
 import { SidePanel, useSidePanelStack } from '@/core/common/components/side-panel';
 import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
-import EditCalendarEvent from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEvent';
+import { useEditNotesPanelSync } from '@/core/common/components/side-panel/useEditNotesPanelSync';
+import EditCalendarEventLoader from '@/core/common/components/side-panel/edit-calendar-event/EditCalendarEventLoader';
+import EditNotes from '@/core/common/components/side-panel/edit-notes/EditNotes';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
 import {
@@ -54,13 +56,18 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 	const editTileEvent = useCalendarUI((s) => s.editTile.state.event);
 	const closeEditTile = useCalendarUI((s) => s.editTile.actions.close);
 
+	// React to editNotes store changes and push/pop notes panel
+	const editNotesIsOpen = useCalendarUI((s) => s.editNotes.state.isOpen);
+	const editNotesEvent = useCalendarUI((s) => s.editNotes.state.event);
+	const closeEditNotes = useCalendarUI((s) => s.editNotes.actions.close);
+
 	const { closePanelAndStore } = useEditTilePanelSync({
 		editTileIsOpen,
 		editTileEvent,
 		pushPanel: () =>
 			pushPanel({
 				content: (
-					<EditCalendarEvent
+					<EditCalendarEventLoader
 						event={editTileEvent!}
 						onClose={() => closePanelAndStore()}
 					/>
@@ -68,6 +75,21 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 			}),
 		popPanel,
 		closeEditTile,
+		setSidePanelExpanded,
+		setMobileChatVisible,
+	});
+
+	const { closePanelAndStore: closeNotesPanelAndStore } = useEditNotesPanelSync({
+		editNotesIsOpen,
+		editNotesEvent,
+		pushPanel: () =>
+			pushPanel({
+				content: (
+					<EditNotes event={editNotesEvent!} onClose={() => closeNotesPanelAndStore()} />
+				),
+			}),
+		popPanel,
+		closeEditNotes,
 		setSidePanelExpanded,
 		setMobileChatVisible,
 	});

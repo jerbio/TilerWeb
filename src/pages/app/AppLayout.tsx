@@ -1,12 +1,10 @@
-import { Env } from '@/config/config_getter';
 import Logo from '@/core/common/components/icons/logo';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import appRoutes from '@/core/common/data/appRoutes';
 import appLayoutConfig from '@/core/constants/app_layout_config';
-import { useTheme } from '@/core/theme/ThemeProvider';
 import { useFlag } from '@/hooks/useFlag';
 import useAppStore from '@/global_state';
-import { Moon, Sun, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
@@ -16,7 +14,6 @@ const AppLayout: React.FC = () => {
 	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLDivElement>(null);
-	const { isDarkMode, toggleTheme } = useTheme();
 
 	// Close menu when clicking outside
 	useEffect(() => {
@@ -65,11 +62,6 @@ const AppLayout: React.FC = () => {
 								</React.Fragment>
 							))}
 						</Navigation>
-					)}
-					{Env.isDevelopment() && (
-						<ThemeToggle onClick={toggleTheme}>
-							{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-						</ThemeToggle>
 					)}
 					<ProfileTrigger
 						ref={triggerRef}
@@ -133,19 +125,6 @@ const Container = styled.div`
 	isolation: isolate;
 	display: flex;
 	flex-direction: column;
-`;
-
-const ThemeToggle = styled.button`
-	height: 44px;
-	width: 44px;
-	overflow: hidden;
-	color: ${(props) => props.theme.colors.button.primary.text};
-	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
-	display: flex;
-	align-items: center;
-	justify-content: center;
 `;
 
 const ProfileTrigger = styled.div`

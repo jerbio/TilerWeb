@@ -73,6 +73,7 @@ const mockLookupCalendarEventById = vi.fn();
 const mockLookupLocationById = vi.fn();
 const mockSearchLocations = vi.fn();
 const mockGetScheduleProfile = vi.fn();
+const mockOpenNotes = vi.fn();
 vi.mock('@/services', () => ({
 	scheduleService: {
 		updateCalendarEvent: (...args: unknown[]) => mockUpdateCalendarEvent(...args),
@@ -118,7 +119,7 @@ vi.mock('@/core/theme/ThemeProvider', () => ({
 
 vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 	useCalendarUI: vi.fn((selector: (s: unknown) => unknown) =>
-		selector({ editNotes: { actions: { open: vi.fn() } } })
+		selector({ editNotes: { actions: { open: mockOpenNotes } } })
 	),
 }));
 
@@ -180,10 +181,21 @@ const mockEvent: CalendarEvent = {
 
 const mockOnClose = vi.fn();
 
-function renderComponent(event = mockEvent) {
+function renderComponent(
+	event: CalendarEvent = mockEvent,
+	workProfileId: string | null = null,
+	personalProfileId: string | null = null,
+	isLocationVerified = false
+) {
 	return render(
 		<ThemeProvider theme={lightTheme}>
-			<EditCalendarEvent event={event} onClose={mockOnClose} />
+			<EditCalendarEvent
+				event={event}
+				workProfileId={workProfileId}
+				personalProfileId={personalProfileId}
+				isLocationVerified={isLocationVerified}
+				onClose={mockOnClose}
+			/>
 		</ThemeProvider>
 	);
 }
@@ -200,23 +212,7 @@ async function waitForLoaded() {
 describe('EditCalendarEvent', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockLookupCalendarEventById.mockResolvedValue(mockEvent);
-		mockLookupLocationById.mockResolvedValue({
-			address: '123 Main St',
-			description: 'Near the park',
-		});
 		mockSearchLocations.mockResolvedValue([]);
-		mockGetScheduleProfile.mockResolvedValue({
-			travelMedium: null,
-			pinPreference: null,
-			endTimeOfDay: null,
-			sleepDuration: null,
-			endOfDay: null,
-			timeZone: null,
-			timeZoneDifference: null,
-			personalHoursRestrictionProfile: null,
-			workHoursRestrictionProfile: null,
-		});
 	});
 
 	it('renders header with back button and title', () => {
@@ -230,6 +226,27 @@ describe('EditCalendarEvent', () => {
 		renderComponent();
 		await user.click(screen.getByLabelText('calendarEvent.edit.back'));
 		expect(mockOnClose).toHaveBeenCalledOnce();
+	});
+
+	describe('notes button', () => {
+		it('renders the open notes button', () => {
+			renderComponent();
+			expect(screen.getByLabelText('calendarEvent.edit.openNotes')).toBeInTheDocument();
+		});
+
+		it('calls openNotes with the event when clicked', () => {
+			renderComponent();
+			screen.getByLabelText('calendarEvent.edit.openNotes').click();
+			expect(mockOpenNotes).toHaveBeenCalledOnce();
+			expect(mockOpenNotes).toHaveBeenCalledWith(mockEvent);
+		});
+
+		it('passes a different event object through to openNotes', () => {
+			const other = { ...mockEvent, id: 'evt-2', name: 'yoga' };
+			renderComponent(other as CalendarEvent);
+			screen.getByLabelText('calendarEvent.edit.openNotes').click();
+			expect(mockOpenNotes).toHaveBeenCalledWith(other);
+		});
 	});
 
 	it('renders name field with event name after loading', async () => {
@@ -484,7 +501,7 @@ describe('EditCalendarEvent', () => {
 		});
 	});
 
-	it('omits RepetitionConfig when not recurring', async () => {
+	it('omits RepetitionConfig when event was never recurring', async () => {
 		const user = setupUser();
 		mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
 		const nonRecurringEvent = {
@@ -509,6 +526,35 @@ describe('EditCalendarEvent', () => {
 		expect(params.RepetitionConfig).toBeUndefined();
 	});
 
+	it('sends IsEnabled: false when user disables repetition on a previously recurring event', async () => {
+		const user = setupUser();
+		mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
+		renderComponent(); // mockEvent has repetition.isEnabled: true, frequency: 'weekly'
+		await waitForLoaded();
+
+		// Open repetition section to access the frequency dropdown
+		await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+
+		const frequencySelect = screen.getByRole('combobox') as HTMLSelectElement;
+		expect(frequencySelect.value).toBe('weekly');
+
+		// Disable repetition by selecting the empty option
+		await user.selectOptions(frequencySelect, '');
+		expect(frequencySelect.value).toBe('');
+
+		const nameInput = screen.getByDisplayValue('work out');
+		await user.type(nameInput, '!');
+
+		await user.click(screen.getByText('calendarEvent.edit.save'));
+
+		await waitFor(() => {
+			expect(mockUpdateCalendarEvent).toHaveBeenCalledOnce();
+		});
+
+		const params = mockUpdateCalendarEvent.mock.calls[0][0];
+		expect(params.RepetitionConfig).toEqual({ IsEnabled: false });
+	});
+
 	describe('repetition fields', () => {
 		it('shows forever checkbox when recurring is enabled', async () => {
 			const user = setupUser();
@@ -527,7 +573,6 @@ describe('EditCalendarEvent', () => {
 				...mockEvent,
 				repetition: { ...mockEvent.repetition!, isForever: true },
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(foreverEvent);
 			renderComponent(foreverEvent);
 			await waitForLoaded();
 
@@ -554,7 +599,6 @@ describe('EditCalendarEvent', () => {
 				...mockEvent,
 				repetition: { ...mockEvent.repetition!, isForever: true },
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(foreverEvent);
 			renderComponent(foreverEvent);
 			await waitForLoaded();
 
@@ -605,7 +649,6 @@ describe('EditCalendarEvent', () => {
 				...mockEvent,
 				repetition: { ...mockEvent.repetition!, frequency: 'daily' },
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(dailyEvent);
 			renderComponent(dailyEvent);
 			await waitForLoaded();
 
@@ -614,9 +657,9 @@ describe('EditCalendarEvent', () => {
 			expect(screen.queryByLabelText('calendarEvent.edit.sun')).not.toBeInTheDocument();
 		});
 
-		it('populates repetition fields from fetched event', async () => {
+		it('populates repetition fields from event prop', async () => {
 			const user = setupUser();
-			mockLookupCalendarEventById.mockResolvedValueOnce({
+			const tueThuEvent = {
 				...mockEvent,
 				repetition: {
 					...mockEvent.repetition!,
@@ -630,8 +673,8 @@ describe('EditCalendarEvent', () => {
 						occupiedSlots: null,
 					},
 				},
-			});
-			renderComponent();
+			};
+			renderComponent(tueThuEvent);
 			await waitForLoaded();
 
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
@@ -653,224 +696,6 @@ describe('EditCalendarEvent', () => {
 		await user.clear(nameInput);
 		await user.type(nameInput, 'gym session');
 		expect(screen.getByDisplayValue('gym session')).toBeInTheDocument();
-	});
-
-	describe('fetch on mount', () => {
-		const fetchedEvent: CalendarEvent = {
-			...mockEvent,
-			name: 'Fetched Name',
-			address: '456 Oak Ave',
-			addressDescription: 'By the lake',
-			colorRed: 46,
-			colorGreen: 204,
-			colorBlue: 113,
-			repetition: {
-				id: 'rep-fetched',
-				isEnabled: true,
-				frequency: 'daily',
-				weekDays: '0,6',
-				isForever: true,
-				tileTimeline: {
-					start: 1769900000000,
-					end: 1769903600000,
-					duration: 3600000,
-					occupiedSlots: null,
-				},
-				repetitionTimeline: {
-					start: 1769900000000,
-					end: 1800000000000,
-					duration: 100000000000,
-					occupiedSlots: null,
-				},
-			},
-		};
-
-		it('calls lookupCalendarEventById on mount with event id', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(fetchedEvent);
-			renderComponent();
-
-			await waitFor(() => {
-				expect(mockLookupCalendarEventById).toHaveBeenCalledWith('evt-1_7_0_0');
-			});
-		});
-
-		it('shows loading state while fetching', () => {
-			mockLookupCalendarEventById.mockReturnValueOnce(new Promise(() => {})); // never resolves
-			renderComponent();
-
-			expect(screen.getByTestId('edit-event-loading')).toBeInTheDocument();
-		});
-
-		it('hides form fields while loading', () => {
-			mockLookupCalendarEventById.mockReturnValueOnce(new Promise(() => {}));
-			renderComponent();
-
-			// Name input should not be in the document while loading
-			expect(screen.queryByDisplayValue('work out')).not.toBeInTheDocument();
-			// Section headers should not be visible
-			expect(screen.queryByText('calendarEvent.edit.timeSection')).not.toBeInTheDocument();
-			expect(
-				screen.queryByText('calendarEvent.edit.locationSection')
-			).not.toBeInTheDocument();
-			expect(screen.queryByText('calendarEvent.edit.colorSection')).not.toBeInTheDocument();
-			// Save button should not be visible
-			expect(screen.queryByText('calendarEvent.edit.save')).not.toBeInTheDocument();
-		});
-
-		it('shows form only after fetch completes', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(fetchedEvent);
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.queryByText('calendarEvent.edit.loading')).not.toBeInTheDocument();
-			});
-
-			// Now form should be visible with fetched data
-			expect(screen.getByDisplayValue('Fetched Name')).toBeInTheDocument();
-			// fetchedEvent is recurring, so the label is "Occurrence"
-			expect(screen.getByText('calendarEvent.edit.occurrenceSection')).toBeInTheDocument();
-		});
-
-		it('shows form with prop data after fetch fails', async () => {
-			mockLookupCalendarEventById.mockRejectedValueOnce(new Error('fail'));
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.queryByText('calendarEvent.edit.loading')).not.toBeInTheDocument();
-			});
-
-			expect(screen.getByDisplayValue('work out')).toBeInTheDocument();
-		});
-
-		it('populates form with fetched data', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(fetchedEvent);
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.getByDisplayValue('Fetched Name')).toBeInTheDocument();
-			});
-		});
-
-		it('shows fetched address in location preview when collapsed', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(fetchedEvent);
-			mockLookupLocationById.mockResolvedValueOnce({
-				address: '456 Oak Ave',
-				description: 'By the lake',
-			});
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.getByText('456 Oak Ave · By the lake')).toBeInTheDocument();
-			});
-		});
-
-		it('shows fetched repetition preview when collapsed', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(fetchedEvent);
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.getByText('calendarEvent.edit.daily')).toBeInTheDocument();
-			});
-		});
-
-		it('falls back to prop event on fetch failure', async () => {
-			mockLookupCalendarEventById.mockRejectedValueOnce(new Error('Network error'));
-			renderComponent();
-
-			// Should still render with the prop data
-			await waitFor(() => {
-				expect(screen.getByDisplayValue('work out')).toBeInTheDocument();
-			});
-		});
-
-		it('hides loading state after fetch completes', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(fetchedEvent);
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.queryByText('calendarEvent.edit.loading')).not.toBeInTheDocument();
-			});
-		});
-
-		it('hides loading state after fetch fails', async () => {
-			mockLookupCalendarEventById.mockRejectedValueOnce(new Error('fail'));
-			renderComponent();
-
-			await waitFor(() => {
-				expect(screen.queryByText('calendarEvent.edit.loading')).not.toBeInTheDocument();
-			});
-		});
-	});
-
-	describe('location fetch by locationId', () => {
-		it('fetches location when event has a locationId', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEvent);
-			mockLookupLocationById.mockResolvedValueOnce({
-				id: 'loc-1',
-				address: '789 Broadway',
-				description: 'Corner office',
-				longitude: -73.99,
-				latitude: 40.75,
-				isVerified: true,
-				isDefault: false,
-				isNull: false,
-				thirdPartyId: null,
-				userId: 'user-1',
-				source: 'none',
-				nickname: 'Office',
-			});
-			renderComponent();
-			await waitForLoaded();
-
-			expect(mockLookupLocationById).toHaveBeenCalledWith('loc-1');
-		});
-
-		it('populates address fields from fetched location', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEvent);
-			mockLookupLocationById.mockResolvedValueOnce({
-				id: 'loc-1',
-				address: '789 Broadway',
-				description: 'Corner office',
-				longitude: -73.99,
-				latitude: 40.75,
-				isVerified: true,
-				isDefault: false,
-				isNull: false,
-				thirdPartyId: null,
-				userId: 'user-1',
-				source: 'none',
-				nickname: 'Office',
-			});
-			const user = setupUser();
-			renderComponent();
-			await waitForLoaded();
-
-			// Expand Location section to see values
-			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
-			expect(screen.getByDisplayValue('789 Broadway')).toBeInTheDocument();
-			expect(screen.getByDisplayValue('Corner office')).toBeInTheDocument();
-		});
-
-		it('does not fetch location when locationId is null', async () => {
-			const eventWithoutLocation = { ...mockEvent, locationId: null };
-			mockLookupCalendarEventById.mockResolvedValueOnce(eventWithoutLocation);
-			renderComponent(eventWithoutLocation);
-			await waitForLoaded();
-
-			expect(mockLookupLocationById).not.toHaveBeenCalled();
-		});
-
-		it('keeps event address data when location fetch fails', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEvent);
-			mockLookupLocationById.mockRejectedValueOnce(new Error('Location not found'));
-			const user = setupUser();
-			renderComponent();
-			await waitForLoaded();
-
-			// Should still have the address from the event
-			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
-			expect(screen.getByDisplayValue('123 Main St')).toBeInTheDocument();
-		});
 	});
 
 	describe('location autocomplete', () => {
@@ -1060,59 +885,6 @@ describe('EditCalendarEvent', () => {
 			});
 
 			expect(screen.queryByRole('status')).not.toBeInTheDocument();
-			vi.useRealTimers();
-		});
-
-		it('does not search on initial load', async () => {
-			vi.useFakeTimers({ shouldAdvanceTime: true });
-			setupUser({ advanceTimers: vi.advanceTimersByTime });
-			renderComponent();
-			await waitForLoaded();
-
-			await vi.advanceTimersByTimeAsync(400);
-
-			expect(mockSearchLocations).not.toHaveBeenCalled();
-			vi.useRealTimers();
-		});
-
-		it('does not search when selecting a location result', async () => {
-			vi.useFakeTimers({ shouldAdvanceTime: true });
-			mockSearchLocations.mockResolvedValue([savedLocation]);
-			const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
-			renderComponent();
-			await waitForLoaded();
-			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
-
-			const addressInput = screen.getByPlaceholderText(
-				'calendarEvent.edit.locationSearchPlaceholder'
-			);
-			await user.clear(addressInput);
-			await user.type(addressInput, 'office');
-			await vi.advanceTimersByTimeAsync(400);
-
-			await waitFor(() => {
-				expect(screen.getByText('100 Office Blvd')).toBeInTheDocument();
-			});
-
-			mockSearchLocations.mockClear();
-			await user.click(screen.getByText('100 Office Blvd'));
-			await vi.advanceTimersByTimeAsync(400);
-
-			expect(mockSearchLocations).not.toHaveBeenCalled();
-			vi.useRealTimers();
-		});
-
-		it('does not search when expanding the location section', async () => {
-			vi.useFakeTimers({ shouldAdvanceTime: true });
-			const user = setupUser({ advanceTimers: vi.advanceTimersByTime });
-			renderComponent();
-			await waitForLoaded();
-
-			mockSearchLocations.mockClear();
-			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
-			await vi.advanceTimersByTimeAsync(400);
-
-			expect(mockSearchLocations).not.toHaveBeenCalled();
 			vi.useRealTimers();
 		});
 
@@ -1460,13 +1232,8 @@ describe('EditCalendarEvent', () => {
 
 	describe('location verified badge', () => {
 		it('shows verified badge when location is pre-loaded with isVerified=true', async () => {
-			mockLookupLocationById.mockResolvedValue({
-				address: '123 Main St',
-				description: 'Near the park',
-				isVerified: true,
-			});
 			const user = setupUser();
-			renderComponent();
+			renderComponent(mockEvent, null, null, true);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
 			expect(screen.getByTestId('location-verified-badge')).toBeInTheDocument();
@@ -1520,13 +1287,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('removes verified badge when user manually edits address', async () => {
-			mockLookupLocationById.mockResolvedValue({
-				address: '123 Main St',
-				description: 'Near the park',
-				isVerified: true,
-			});
 			const user = setupUser();
-			renderComponent();
+			renderComponent(mockEvent, null, null, true);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
 
@@ -1539,13 +1301,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('removes verified badge when location is cleared', async () => {
-			mockLookupLocationById.mockResolvedValue({
-				address: '123 Main St',
-				description: 'Near the park',
-				isVerified: true,
-			});
 			const user = setupUser();
-			renderComponent();
+			renderComponent(mockEvent, null, null, true);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
 
@@ -1557,13 +1314,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('verified badge has tooltip title attribute', async () => {
-			mockLookupLocationById.mockResolvedValue({
-				address: '123 Main St',
-				description: 'Near the park',
-				isVerified: true,
-			});
 			const user = setupUser();
-			renderComponent();
+			renderComponent(mockEvent, null, null, true);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.locationSection'));
 
@@ -1575,29 +1327,6 @@ describe('EditCalendarEvent', () => {
 	describe('restriction profile section', () => {
 		const workProfileId = 'work-profile-id';
 		const personalProfileId = 'personal-profile-id';
-
-		const mockScheduleProfile = {
-			travelMedium: null,
-			pinPreference: null,
-			endTimeOfDay: null,
-			sleepDuration: null,
-			endOfDay: null,
-			timeZone: null,
-			timeZoneDifference: null,
-			personalHoursRestrictionProfile: {
-				id: personalProfileId,
-				isEnabled: true,
-				timeZone: null,
-				daySelection: null,
-			},
-			workHoursRestrictionProfile: {
-				id: workProfileId,
-				isEnabled: true,
-				timeZone: null,
-				daySelection: null,
-			},
-		};
-
 		// Monday 09:00–17:00, Friday 10:00–18:00
 		const mockEventWithCustomRestriction: CalendarEvent = {
 			...mockEvent,
@@ -1699,10 +1428,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('enable toggle is on when event has an active restriction profile', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			const toggle = screen.getByLabelText(
@@ -1783,10 +1510,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('deselecting a Custom day clears its times', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			// Monday (index 1) is selected — click its toggle to deselect
@@ -1797,10 +1522,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('selecting a deselected Custom day sets default times', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			// Sunday (index 0) is deselected
@@ -1826,10 +1549,9 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('save sends RestrictionProfileId when Work hours is selected', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
 			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
 			const user = setupUser();
-			renderComponent();
+			renderComponent(mockEvent, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
@@ -1844,10 +1566,9 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('save sends RestrictionProfileId when Personal hours is selected', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
 			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEvent);
 			const user = setupUser();
-			renderComponent();
+			renderComponent(mockEvent, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			await user.click(screen.getByLabelText('calendarEvent.edit.restrictionEnabled'));
@@ -1862,11 +1583,9 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('save sends RestrictiveWeek when Custom type has selected days', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			mockUpdateCalendarEvent.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			const nameInput = screen.getByDisplayValue('work out');
 			await user.type(nameInput, '!');
@@ -1879,10 +1598,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('populates Work type when event restriction matches work profile id', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithWorkRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithWorkRestriction);
+			renderComponent(mockEventWithWorkRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			const workRadio = screen.getByLabelText(
@@ -1892,10 +1609,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('populates Personal type when event restriction matches personal profile id', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithPersonalRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithPersonalRestriction);
+			renderComponent(mockEventWithPersonalRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			const personalRadio = screen.getByLabelText(
@@ -1905,9 +1620,7 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('shows restriction preview text when collapsed', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			expect(
 				screen.getByText('calendarEvent.edit.restrictionPreviewCustom')
@@ -1915,10 +1628,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('shows "Off" label for each disabled day in Custom mode', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			// Sun=0, Tue=2, Wed=3, Thu=4, Sat=6 are disabled → 5 "Off" labels
@@ -1927,10 +1638,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('does not show "Off" label for enabled days in Custom mode', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			// Mon (1) and Fri (5) are enabled — their rows must not contain the "Off" label
@@ -1945,10 +1654,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('renders two disabled time dropdowns for each disabled day in Custom mode', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			// Sunday (0) is disabled — its row should have 2 disabled dropdown trigger buttons
@@ -1959,10 +1666,8 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('renders two enabled time dropdowns for each selected day in Custom mode', async () => {
-			mockGetScheduleProfile.mockResolvedValueOnce(mockScheduleProfile);
-			mockLookupCalendarEventById.mockResolvedValueOnce(mockEventWithCustomRestriction);
 			const user = setupUser();
-			renderComponent(mockEventWithCustomRestriction);
+			renderComponent(mockEventWithCustomRestriction, workProfileId, personalProfileId);
 			await waitForLoaded();
 			await openRestrictionSection(user);
 			// Monday (1) is enabled — none of its buttons should be disabled
@@ -1988,7 +1693,6 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('shows "Time & Duration" section label when event is not recurring', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
 			expect(screen.getByText('calendarEvent.edit.timeSection')).toBeInTheDocument();
@@ -2007,7 +1711,6 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('shows Start and End fields when not recurring and section is expanded', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			const user = setupUser();
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
@@ -2039,7 +1742,6 @@ describe('EditCalendarEvent', () => {
 		});
 
 		it('sends Start and End values when not recurring on save', async () => {
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			mockUpdateCalendarEvent.mockResolvedValueOnce(nonRecurringEvent);
 			const user = setupUser();
 			renderComponent(nonRecurringEvent);
@@ -2103,7 +1805,6 @@ describe('EditCalendarEvent', () => {
 				isRecurring: false,
 				repetition: null,
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(noFreqEvent);
 			renderComponent(noFreqEvent);
 			await waitForLoaded();
 			await user.type(screen.getByDisplayValue('work out'), '!');
@@ -2124,7 +1825,6 @@ describe('EditCalendarEvent', () => {
 					},
 				},
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(noStartEvent);
 			renderComponent(noStartEvent);
 			await waitForLoaded();
 			await user.type(screen.getByDisplayValue('work out'), '!');
@@ -2145,7 +1845,6 @@ describe('EditCalendarEvent', () => {
 					},
 				},
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(noEndEvent);
 			renderComponent(noEndEvent);
 			await waitForLoaded();
 			await user.type(screen.getByDisplayValue('work out'), '!');
@@ -2159,7 +1858,6 @@ describe('EditCalendarEvent', () => {
 				...mockEvent,
 				repetition: { ...mockEvent.repetition!, isForever: true },
 			};
-			mockLookupCalendarEventById.mockResolvedValueOnce(foreverEvent);
 			renderComponent(foreverEvent);
 			await waitForLoaded();
 			await user.type(screen.getByDisplayValue('work out'), '!');
@@ -2170,7 +1868,6 @@ describe('EditCalendarEvent', () => {
 		it('enables save when not recurring regardless of repetition fields', async () => {
 			const user = setupUser();
 			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
 			await user.type(screen.getByDisplayValue('work out'), '!');
@@ -2192,7 +1889,6 @@ describe('EditCalendarEvent', () => {
 
 		it('header shows Disabled preview when no frequency', async () => {
 			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
 			expect(screen.getByText('calendarEvent.edit.repetitionDisabled')).toBeInTheDocument();
@@ -2207,7 +1903,6 @@ describe('EditCalendarEvent', () => {
 		it('selecting a frequency shows the forever checkbox', async () => {
 			const user = setupUser();
 			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
@@ -2231,23 +1926,127 @@ describe('EditCalendarEvent', () => {
 			expect(screen.queryByLabelText('calendarEvent.edit.forever')).not.toBeInTheDocument();
 		});
 
-		it('selecting daily sets default end date 4 weeks out when no existing dates', async () => {
+		it('selecting daily sets default end date 2 weeks out when no existing dates', async () => {
 			const user = setupUser();
 			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
 			await user.selectOptions(screen.getByRole('combobox'), 'daily');
-			const expectedEnd = dayjs().add(4, 'week').startOf('day');
+			const expectedEnd = dayjs().add(2, 'week').startOf('day');
 			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
 			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('selecting weekly sets default end date 8 weeks out when no existing dates', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+			const expectedEnd = dayjs().add(8, 'week').startOf('day');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('selecting monthly sets default end date 12 months out when no existing dates', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			const expectedEnd = dayjs().add(12, 'month').startOf('day');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+		});
+
+		it('replaces bogus DateTime.MinValue rep dates with frequency defaults when enabling', async () => {
+			const user = setupUser();
+			// Server returns repetition.isEnabled=false but the timeline carries
+			// DateTimeOffset.MinValue (Unix ms: -62135596800000) — the .NET sentinel.
+			const bogusEvent: CalendarEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: {
+					...mockEvent.repetition!,
+					isEnabled: false,
+					frequency: '',
+					repetitionTimeline: {
+						start: -62135596800000,
+						end: -62135596800000,
+						duration: 0,
+						occupiedSlots: null,
+					},
+				},
+			};
+			renderComponent(bogusEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+
+			const startTrigger = screen.getByLabelText('calendarEvent.edit.repetitionStart');
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
+			const expectedStart = dayjs().startOf('day');
+			const expectedEnd = dayjs().add(8, 'week').startOf('day');
+			expect(startTrigger.textContent).toContain(expectedStart.format('MMM D, YYYY'));
+			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
+			// Critically, it must NOT show the 0001-01-01 sentinel
+			expect(startTrigger.textContent).not.toContain('Jan 1, 0001');
+			expect(endTrigger.textContent).not.toContain('Jan 1, 0001');
+		});
+
+		it('preserves server-loaded valid rep dates through disable → re-enable cycle', async () => {
+			const user = setupUser();
+			renderComponent(); // mockEvent has weekly repetition with valid dates
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			const originalStart = screen.getByLabelText(
+				'calendarEvent.edit.repetitionStart'
+			).textContent;
+			const originalEnd = screen.getByLabelText(
+				'calendarEvent.edit.repetitionEnd'
+			).textContent;
+			// Disable
+			await user.selectOptions(screen.getByRole('combobox'), '');
+			// Re-enable a different frequency
+			await user.selectOptions(screen.getByRole('combobox'), 'daily');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionStart').textContent).toBe(
+				originalStart
+			);
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				originalEnd
+			);
+		});
+
+		it('preserves previously seeded rep dates through disable → re-enable cycle', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// First enable: seeds today / today+2w
+			await user.selectOptions(screen.getByRole('combobox'), 'daily');
+			const seededStart = screen.getByLabelText(
+				'calendarEvent.edit.repetitionStart'
+			).textContent;
+			const seededEnd = screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent;
+			// Disable
+			await user.selectOptions(screen.getByRole('combobox'), '');
+			// Re-enable with a different frequency — should NOT reseed end to monthly's +12m
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionStart').textContent).toBe(
+				seededStart
+			);
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				seededEnd
+			);
 		});
 
 		it('selecting yearly sets default end date 10 years out when no existing dates', async () => {
 			const user = setupUser();
 			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
-			mockLookupCalendarEventById.mockResolvedValueOnce(nonRecurringEvent);
 			renderComponent(nonRecurringEvent);
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
@@ -2257,15 +2056,62 @@ describe('EditCalendarEvent', () => {
 			expect(endTrigger.textContent).toContain(expectedEnd.format('MMM D, YYYY'));
 		});
 
-		it('existing rep dates are preserved when frequency is changed', async () => {
+		it('switching frequency while enabled updates end date to new frequency default', async () => {
 			const user = setupUser();
-			renderComponent(); // mockEvent has repetition with dates
+			// mockEvent has server-loaded weekly dates (never manually picked by user)
+			renderComponent();
 			await waitForLoaded();
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
-			const originalEndTrigger = screen.getByLabelText('calendarEvent.edit.repetitionEnd');
-			const originalEndText = originalEndTrigger.textContent;
-			// Change frequency from weekly to monthly — should NOT change dates
+			// Switch weekly → monthly
 			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			const expectedEnd = dayjs().add(12, 'month').startOf('day');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toContain(
+				expectedEnd.format('MMM D, YYYY')
+			);
+		});
+
+		it('switching frequency preserves end date when user has manually picked it', async () => {
+			const user = setupUser();
+			const nonRecurringEvent = { ...mockEvent, isRecurring: false, repetition: null };
+			renderComponent(nonRecurringEvent);
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// Enable weekly — seeds end to today+8w
+			await user.selectOptions(screen.getByRole('combobox'), 'weekly');
+			// Open the rep end date picker and pick day 15 from the calendar
+			await user.click(screen.getByLabelText('calendarEvent.edit.repetitionEnd'));
+			await user.click(screen.getByRole('button', { name: '15' }));
+			// Capture what the user picked
+			const pickedDateText = screen.getByLabelText(
+				'calendarEvent.edit.repetitionEnd'
+			).textContent;
+			// Switch to monthly — user-picked date should be preserved, not replaced
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
+				pickedDateText
+			);
+			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).not.toBe(
+				dayjs().add(12, 'month').startOf('day').format('MMM D, YYYY')
+			);
+		});
+
+		it('switching frequency does NOT update end date when isForever is checked', async () => {
+			const user = setupUser();
+			// mockEvent has weekly with valid server-loaded dates
+			renderComponent();
+			await waitForLoaded();
+			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
+			// Record end date before toggling forever
+			const originalEndText = screen.getByLabelText(
+				'calendarEvent.edit.repetitionEnd'
+			).textContent;
+			// Check isForever (hides date pickers)
+			await user.click(screen.getByLabelText('calendarEvent.edit.forever'));
+			// Switch to monthly while forever is checked
+			await user.selectOptions(screen.getByRole('combobox'), 'monthly');
+			// Uncheck forever to reveal pickers again
+			await user.click(screen.getByLabelText('calendarEvent.edit.forever'));
+			// End date should not have been clobbered
 			expect(screen.getByLabelText('calendarEvent.edit.repetitionEnd').textContent).toBe(
 				originalEndText
 			);
@@ -2281,6 +2127,60 @@ describe('EditCalendarEvent', () => {
 			// Close
 			await user.click(screen.getByText('calendarEvent.edit.repetitionSection'));
 			expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('end date default', () => {
+		const expectedEndOfMonth = dayjs().endOf('month').startOf('day');
+
+		async function openTimeSection(user: ReturnType<typeof setupUser>) {
+			await user.click(screen.getByText('calendarEvent.edit.timeSection'));
+		}
+
+		it('defaults end date to end of current month when event.end is null', async () => {
+			const user = setupUser();
+			const noEndEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+				end: null,
+			};
+			renderComponent(noEndEvent);
+			await waitForLoaded();
+			await openTimeSection(user);
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.end');
+			expect(endTrigger.textContent).toContain(expectedEndOfMonth.format('MMM D, YYYY'));
+		});
+
+		it('defaults end date to end of current month when event.end is 0 (server sentinel)', async () => {
+			const user = setupUser();
+			const noEndEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+				end: 0,
+			};
+			renderComponent(noEndEvent);
+			await waitForLoaded();
+			await openTimeSection(user);
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.end');
+			expect(endTrigger.textContent).toContain(expectedEndOfMonth.format('MMM D, YYYY'));
+		});
+
+		it('shows actual end date when event.end is a valid timestamp', async () => {
+			const user = setupUser();
+			const specificEnd = dayjs('2026-09-20T18:00:00').valueOf();
+			const endEvent = {
+				...mockEvent,
+				isRecurring: false,
+				repetition: null,
+				end: specificEnd,
+			};
+			renderComponent(endEvent);
+			await waitForLoaded();
+			await openTimeSection(user);
+			const endTrigger = screen.getByLabelText('calendarEvent.edit.end');
+			expect(endTrigger.textContent).toContain('Sep 20, 2026');
 		});
 	});
 });

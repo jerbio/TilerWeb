@@ -98,6 +98,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const [actionLoading, setActionLoading] = useState<
 		'complete' | 'now' | 'defer' | 'delete' | null
 	>(null);
+	const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
 
 	// Defer duration picker state
 	const [showDeferPicker, setShowDeferPicker] = useState(false);
@@ -106,10 +107,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const [deferMinutes, setDeferMinutes] = useState(0);
 	const isDeferDurationZero = deferDays === 0 && deferHours === 0 && deferMinutes === 0;
 
-	// Tracks the href that was most recently copied to the clipboard, so the
-	// matching card can briefly show a confirmation icon. `null` when nothing
-	// was copied recently. Per-href so cards in the video-calls section don't
-	// all flip at once when one is copied.
+	// Tracks the href that was most recently copied to the clipboard.
 	const [copiedHref, setCopiedHref] = useState<string | null>(null);
 
 	// Notification helpers
@@ -137,12 +135,15 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			setIsEditingStart(false);
 			setIsEditingEnd(false);
 			setIsEditingDeadline(false);
+			setIsDeleteConfirming(false);
 		}
 	}, [event, eventStart, eventEnd]);
 
 	// Close on Escape key, or exit edit mode if an input field is active
 	const isEditingAnyRef = useRef(false);
 	isEditingAnyRef.current = isEditingName || isEditingStart || isEditingEnd || isEditingDeadline;
+	const isDeleteConfirmingRef = useRef(false);
+	isDeleteConfirmingRef.current = isDeleteConfirming;
 
 	const onCloseRef = useRef(onClose);
 	onCloseRef.current = onClose;
@@ -152,6 +153,10 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') {
 				e.stopImmediatePropagation();
+				if (isDeleteConfirmingRef.current) {
+					setIsDeleteConfirming(false);
+					return;
+				}
 				if (isEditingAnyRef.current) {
 					setIsEditingName(false);
 					setIsEditingStart(false);
@@ -184,6 +189,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		setIsEditingStart(false);
 		setIsEditingEnd(false);
 		setIsEditingDeadline(false);
+		setIsDeleteConfirming(false);
 	};
 
 	const handleSave = useCallback(async () => {
@@ -365,8 +371,18 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		onEventAction,
 	]);
 
-	const handleDelete = useCallback(async () => {
+	const handleOpenDeleteConfirm = useCallback(() => {
 		if (!event || actionLoading) return;
+		setIsDeleteConfirming(true);
+	}, [event, actionLoading]);
+
+	const handleCancelDeleteConfirm = useCallback(() => {
+		setIsDeleteConfirming(false);
+	}, []);
+
+	const handleConfirmDelete = useCallback(async () => {
+		if (!event || actionLoading) return;
+		setIsDeleteConfirming(false);
 		setActionLoading('delete');
 		const calendarEventId = getCalendarEventId(event.id);
 		const nId = notificationId(NotificationAction.Delete, calendarEventId);
@@ -403,11 +419,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		g: event ? (event.colorGreen ?? TypeDefaults.RGBColor.green) : TypeDefaults.RGBColor.green,
 		b: event ? (event.colorBlue ?? TypeDefaults.RGBColor.blue) : TypeDefaults.RGBColor.blue,
 	});
-
-	// Video/meeting URLs attached to the event via `otherData.videoUrls`.
-	// Already deduped against `location.address` so we never render the same
-	// URL twice across the two sections.
 	const videoLinks: VideoLink[] = event ? collectVideoLinks(event) : [];
+
 	const videoSourceLabel = (link: VideoLink): string =>
 		t(`calendar.event.videoSource.${link.source}`, {
 			defaultValue: t('calendar.event.videoLinkLabel'),
@@ -498,511 +511,572 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 					</HeaderActions>
 				)}
 			</CalendarEventInfoHeader>
-			<ScrollableBody>
-				{validationError && <ValidationError>{validationError}</ValidationError>}
-				<CalendarEventInfoSection>
-					<CalendarEventInfoArticleContainer>
-						{/* Start Time Field */}
-						<CalendarEventInfoArticle>
-							<CalendarArrowUp
-								size={16}
-								color={eventColor.setLightness(0.6).toHex()}
-								style={{ minWidth: 16, marginTop: '0.25rem' }}
-							/>
-							<div>
-								<h3>{t('calendar.event.startLabel')}</h3>
-								{isEditingStart ? (
-									<>
-										<EditableFieldWrapper>
-											<TimeDropdown
-												value={editedStartTime}
-												onChange={(time) => {
-													const adjusted = adjustEndDateTime(
-														editedStartDate,
-														editedStartTime,
-														editedStartDate,
-														time,
-														editedEndDate,
-														editedEndTime
-													);
-													setEditedStartTime(time);
-													setEditedEndDate(adjusted.endDate);
-													setEditedEndTime(adjusted.endTime);
-													setHasChanges(true);
-												}}
-												interval={15}
-											/>
-										</EditableFieldWrapper>
-										<EditableFieldWrapper>
-											<DatePicker
-												value={editedStartDate}
-												onChange={(date) => {
-													if (!date) return;
-													const adjusted = adjustEndDateTime(
-														editedStartDate,
-														editedStartTime,
-														date,
-														editedStartTime,
-														editedEndDate,
-														editedEndTime
-													);
-													setEditedStartDate(date);
-													setEditedEndDate(adjusted.endDate);
-													setEditedEndTime(adjusted.endTime);
-													setHasChanges(true);
-												}}
-												portalId="datepicker-portal"
-											/>
-										</EditableFieldWrapper>
-									</>
-								) : (
-									<EditableValue
-										$isEditable={isEditable && !readOnly}
-										onClick={() =>
-											isEditable && !readOnly && setIsEditingStart(true)
-										}
-									>
-										<span>
-											{hasChanges
-												? editedStartTime
-												: dayjs(eventStart).format('h:mm A')}
-											{' · '}
-											{hasChanges
-												? dayjs(editedStartDate).format('D MMM')
-												: dayjs(eventStart).format('D MMM')}
-										</span>
-										{isEditable && !readOnly && (
-											<Pencil size={12} className="edit-icon" />
-										)}
-									</EditableValue>
-								)}
-							</div>
-						</CalendarEventInfoArticle>
-
-						{/* End Time Field */}
-						<CalendarEventInfoArticle>
-							<CalendarArrowDown
-								size={16}
-								color={eventColor.setLightness(0.6).toHex()}
-								style={{ minWidth: 16, marginTop: '0.25rem' }}
-							/>
-							<div>
-								<h3>{t('calendar.event.endLabel')}</h3>
-								{isEditingEnd ? (
-									<>
-										<EditableFieldWrapper>
-											<TimeDropdown
-												value={editedEndTime}
-												onChange={(time) => {
-													setEditedEndTime(time);
-													setHasChanges(true);
-												}}
-												interval={15}
-											/>
-										</EditableFieldWrapper>
-										<EditableFieldWrapper>
-											<DatePicker
-												value={editedEndDate}
-												onChange={(date) => {
-													if (!date) return;
-													setEditedEndDate(date);
-													setHasChanges(true);
-												}}
-												portalId="datepicker-portal"
-											/>
-										</EditableFieldWrapper>
-									</>
-								) : (
-									<EditableValue
-										$isEditable={isEditable && !readOnly}
-										onClick={() =>
-											isEditable && !readOnly && setIsEditingEnd(true)
-										}
-									>
-										<span>
-											{hasChanges
-												? editedEndTime
-												: dayjs(eventEnd).format('h:mm A')}
-											{' · '}
-											{hasChanges
-												? dayjs(editedEndDate).format('D MMM')
-												: dayjs(eventEnd).format('D MMM')}
-										</span>
-										{isEditable && !readOnly && (
-											<Pencil size={12} className="edit-icon" />
-										)}
-									</EditableValue>
-								)}
-							</div>
-						</CalendarEventInfoArticle>
-
-						{/* Deadline Field (full width row) — Tiler events only */}
-						{!isThirdPartyEvent && (
-							<CalendarEventInfoArticle style={{ gridColumn: '1 / 3' }}>
-								<Target
-									size={16}
-									color={eventColor.setLightness(0.6).toHex()}
-									style={{ minWidth: 16, marginTop: '0.25rem' }}
-								/>
-								<div>
-									<h3>{t('calendar.event.deadlineLabel')}</h3>
-									{isEditingDeadline ? (
-										<EditableFieldWrapper>
-											<DatePicker
-												value={editedDeadline}
-												onChange={(date) => {
-													if (!date) return;
-													setEditedDeadline(date);
-													setHasChanges(true);
-													setIsEditingDeadline(false);
-												}}
-												portalId="datepicker-portal"
-											/>
-										</EditableFieldWrapper>
-									) : (
-										<EditableValue
-											$isEditable={effectiveEditable}
-											onClick={() =>
-												effectiveEditable && setIsEditingDeadline(true)
-											}
-										>
-											<span>
-												{hasChanges
-													? dayjs(editedDeadline).format(
-															'ddd, D MMMM, YYYY'
-														)
-													: dayjs(event.calendarEventEnd).format(
-															'ddd, D MMMM, YYYY'
-														)}
-											</span>
-											{effectiveEditable && (
-												<Pencil size={12} className="edit-icon" />
-											)}
-										</EditableValue>
-									)}
-								</div>
-							</CalendarEventInfoArticle>
-						)}
-
-						{/* Duration Field (read-only, auto-updates) */}
-						<CalendarEventInfoArticle>
-							<Clock
-								size={16}
-								color={eventColor.setLightness(0.6).toHex()}
-								style={{ minWidth: 16, marginTop: '0.25rem' }}
-							/>
-							<div>
-								<h3>{t('calendar.event.durationLabel')}</h3>
-								<p>{getDurationDisplay()}</p>
-							</div>
-						</CalendarEventInfoArticle>
-
-						{/* Repetition Field — Tiler events only */}
-						{!isThirdPartyEvent && (
-							<CalendarEventInfoArticle>
-								<Repeat2
-									size={16}
-									color={eventColor.setLightness(0.6).toHex()}
-									style={{ minWidth: 16, marginTop: '0.25rem' }}
-								/>
-								<div>
-									<h3>{t('calendar.event.repetitionLabel')}</h3>
-									<p>{event.isRecurring ? 'Yes' : 'No'}</p>
-								</div>
-							</CalendarEventInfoArticle>
-						)}
-					</CalendarEventInfoArticleContainer>
-				</CalendarEventInfoSection>
-
-				{videoLinks.length > 0 && (
-					<>
-						<hr />
+			{!isDeleteConfirming ? (
+				<>
+					<ScrollableBody>
+						{validationError && <ValidationError>{validationError}</ValidationError>}
 						<CalendarEventInfoSection>
-							<div
-								style={{
-									display: 'flex',
-									flexDirection: 'column',
-									gap: 8,
-								}}
-							>
-								{videoLinks.map((link) => (
-									<LocationLinkCard key={link.href} $color={eventColor}>
-										<div className="link-icon">
-											<Video size={18} />
-										</div>
-										<div className="link-body">
-											<h3>{videoSourceLabel(link)}</h3>
-											<a
-												href={link.href}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="link-url"
-												title={link.href}
+							<CalendarEventInfoArticleContainer>
+								{/* Start Time Field */}
+								<CalendarEventInfoArticle>
+									<CalendarArrowUp
+										size={16}
+										color={eventColor.setLightness(0.6).toHex()}
+										style={{ minWidth: 16, marginTop: '0.25rem' }}
+									/>
+									<div>
+										<h3>{t('calendar.event.startLabel')}</h3>
+										{isEditingStart ? (
+											<>
+												<EditableFieldWrapper>
+													<TimeDropdown
+														value={editedStartTime}
+														onChange={(time) => {
+															const adjusted = adjustEndDateTime(
+																editedStartDate,
+																editedStartTime,
+																editedStartDate,
+																time,
+																editedEndDate,
+																editedEndTime
+															);
+															setEditedStartTime(time);
+															setEditedEndDate(adjusted.endDate);
+															setEditedEndTime(adjusted.endTime);
+															setHasChanges(true);
+														}}
+														interval={15}
+													/>
+												</EditableFieldWrapper>
+												<EditableFieldWrapper>
+													<DatePicker
+														value={editedStartDate}
+														onChange={(date) => {
+															if (!date) return;
+															const adjusted = adjustEndDateTime(
+																editedStartDate,
+																editedStartTime,
+																date,
+																editedStartTime,
+																editedEndDate,
+																editedEndTime
+															);
+															setEditedStartDate(date);
+															setEditedEndDate(adjusted.endDate);
+															setEditedEndTime(adjusted.endTime);
+															setHasChanges(true);
+														}}
+														portalId="datepicker-portal"
+													/>
+												</EditableFieldWrapper>
+											</>
+										) : (
+											<EditableValue
+												$isEditable={isEditable && !readOnly}
+												onClick={() =>
+													isEditable &&
+													!readOnly &&
+													setIsEditingStart(true)
+												}
 											>
-												{link.href}
-											</a>
-										</div>
-										<div className="link-actions">
-											<button
-												type="button"
-												onClick={() => handleCopyLink(link.href)}
-												title={t('calendar.event.copyLink')}
-												aria-label={t('calendar.event.copyLink')}
-											>
-												{copiedHref === link.href ? (
-													<Check size={16} />
-												) : (
-													<Copy size={16} />
+												<span>
+													{hasChanges
+														? editedStartTime
+														: dayjs(eventStart).format('h:mm A')}
+													{' · '}
+													{hasChanges
+														? dayjs(editedStartDate).format('D MMM')
+														: dayjs(eventStart).format('D MMM')}
+												</span>
+												{isEditable && !readOnly && (
+													<Pencil size={12} className="edit-icon" />
 												)}
-											</button>
+											</EditableValue>
+										)}
+									</div>
+								</CalendarEventInfoArticle>
+
+								{/* End Time Field */}
+								<CalendarEventInfoArticle>
+									<CalendarArrowDown
+										size={16}
+										color={eventColor.setLightness(0.6).toHex()}
+										style={{ minWidth: 16, marginTop: '0.25rem' }}
+									/>
+									<div>
+										<h3>{t('calendar.event.endLabel')}</h3>
+										{isEditingEnd ? (
+											<>
+												<EditableFieldWrapper>
+													<TimeDropdown
+														value={editedEndTime}
+														onChange={(time) => {
+															setEditedEndTime(time);
+															setHasChanges(true);
+														}}
+														interval={15}
+													/>
+												</EditableFieldWrapper>
+												<EditableFieldWrapper>
+													<DatePicker
+														value={editedEndDate}
+														onChange={(date) => {
+															if (!date) return;
+															setEditedEndDate(date);
+															setHasChanges(true);
+														}}
+														portalId="datepicker-portal"
+													/>
+												</EditableFieldWrapper>
+											</>
+										) : (
+											<EditableValue
+												$isEditable={isEditable && !readOnly}
+												onClick={() =>
+													isEditable && !readOnly && setIsEditingEnd(true)
+												}
+											>
+												<span>
+													{hasChanges
+														? editedEndTime
+														: dayjs(eventEnd).format('h:mm A')}
+													{' · '}
+													{hasChanges
+														? dayjs(editedEndDate).format('D MMM')
+														: dayjs(eventEnd).format('D MMM')}
+												</span>
+												{isEditable && !readOnly && (
+													<Pencil size={12} className="edit-icon" />
+												)}
+											</EditableValue>
+										)}
+									</div>
+								</CalendarEventInfoArticle>
+
+								{/* Deadline Field (full width row) — Tiler events only */}
+								{!isThirdPartyEvent && (
+									<CalendarEventInfoArticle style={{ gridColumn: '1 / 3' }}>
+										<Target
+											size={16}
+											color={eventColor.setLightness(0.6).toHex()}
+											style={{ minWidth: 16, marginTop: '0.25rem' }}
+										/>
+										<div>
+											<h3>{t('calendar.event.deadlineLabel')}</h3>
+											{isEditingDeadline ? (
+												<EditableFieldWrapper>
+													<DatePicker
+														value={editedDeadline}
+														onChange={(date) => {
+															if (!date) return;
+															setEditedDeadline(date);
+															setHasChanges(true);
+															setIsEditingDeadline(false);
+														}}
+														portalId="datepicker-portal"
+													/>
+												</EditableFieldWrapper>
+											) : (
+												<EditableValue
+													$isEditable={effectiveEditable}
+													onClick={() =>
+														effectiveEditable &&
+														setIsEditingDeadline(true)
+													}
+												>
+													<span>
+														{hasChanges
+															? dayjs(editedDeadline).format(
+																	'ddd, D MMMM, YYYY'
+																)
+															: dayjs(event.calendarEventEnd).format(
+																	'ddd, D MMMM, YYYY'
+																)}
+													</span>
+													{effectiveEditable && (
+														<Pencil size={12} className="edit-icon" />
+													)}
+												</EditableValue>
+											)}
+										</div>
+									</CalendarEventInfoArticle>
+								)}
+
+								{/* Duration Field (read-only, auto-updates) */}
+								<CalendarEventInfoArticle>
+									<Clock
+										size={16}
+										color={eventColor.setLightness(0.6).toHex()}
+										style={{ minWidth: 16, marginTop: '0.25rem' }}
+									/>
+									<div>
+										<h3>{t('calendar.event.durationLabel')}</h3>
+										<p>{getDurationDisplay()}</p>
+									</div>
+								</CalendarEventInfoArticle>
+
+								{/* Repetition Field — Tiler events only */}
+								{!isThirdPartyEvent && (
+									<CalendarEventInfoArticle>
+										<Repeat2
+											size={16}
+											color={eventColor.setLightness(0.6).toHex()}
+											style={{ minWidth: 16, marginTop: '0.25rem' }}
+										/>
+										<div>
+											<h3>{t('calendar.event.repetitionLabel')}</h3>
+											<p>{event.isRecurring ? 'Yes' : 'No'}</p>
+										</div>
+									</CalendarEventInfoArticle>
+								)}
+							</CalendarEventInfoArticleContainer>
+						</CalendarEventInfoSection>
+
+						{videoLinks.length > 0 && (
+							<>
+								<hr />
+								<CalendarEventInfoSection>
+									<div
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											gap: 8,
+										}}
+									>
+										{videoLinks.map((link) => (
+											<LocationLinkCard key={link.href} $color={eventColor}>
+												<div className="link-icon">
+													<Video size={18} />
+												</div>
+												<div className="link-body">
+													<h3>{videoSourceLabel(link)}</h3>
+													<a
+														href={link.href}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="link-url"
+														title={link.href}
+													>
+														{link.href}
+													</a>
+												</div>
+												<div className="link-actions">
+													<button
+														type="button"
+														onClick={() => handleCopyLink(link.href)}
+														title={t('calendar.event.copyLink')}
+														aria-label={t('calendar.event.copyLink')}
+													>
+														{copiedHref === link.href ? (
+															<Check size={16} />
+														) : (
+															<Copy size={16} />
+														)}
+													</button>
+													<a
+														href={link.href}
+														target="_blank"
+														rel="noopener noreferrer"
+														title={t('calendar.event.openLink')}
+														aria-label={t('calendar.event.openLink')}
+													>
+														<ExternalLink size={16} />
+													</a>
+												</div>
+											</LocationLinkCard>
+										))}
+									</div>
+								</CalendarEventInfoSection>
+							</>
+						)}
+
+						{event.location && event.location.address && (
+							<>
+								<hr />
+								<CalendarEventInfoSection>
+									{(() => {
+										const { href, kind } = resolveLocationLink(
+											event.location.address
+										);
+										if (kind !== 'map') {
+											const isVideo = kind === 'video';
+											return (
+												<LocationLinkCard $color={eventColor}>
+													<div className="link-icon">
+														{isVideo ? (
+															<Video size={18} />
+														) : (
+															<Link size={18} />
+														)}
+													</div>
+													<div className="link-body">
+														<h3>
+															{isVideo
+																? t('calendar.event.videoLinkLabel')
+																: t(
+																		'calendar.event.locationLinkLabel'
+																	)}
+														</h3>
+														<a
+															href={href}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="link-url"
+															title={href}
+														>
+															{href}
+														</a>
+													</div>
+													<div className="link-actions">
+														<button
+															type="button"
+															onClick={() => handleCopyLink(href)}
+															title={t('calendar.event.copyLink')}
+															aria-label={t(
+																'calendar.event.copyLink'
+															)}
+														>
+															{copiedHref === href ? (
+																<Check size={16} />
+															) : (
+																<Copy size={16} />
+															)}
+														</button>
+														<a
+															href={href}
+															target="_blank"
+															rel="noopener noreferrer"
+															title={t('calendar.event.openLink')}
+															aria-label={t(
+																'calendar.event.openLink'
+															)}
+														>
+															<ExternalLink size={16} />
+														</a>
+													</div>
+												</LocationLinkCard>
+											);
+										}
+										return (
 											<a
-												href={link.href}
+												href={href}
 												target="_blank"
 												rel="noopener noreferrer"
-												title={t('calendar.event.openLink')}
-												aria-label={t('calendar.event.openLink')}
 											>
-												<ExternalLink size={16} />
+												<CalendarEventInfoLocation $color={eventColor}>
+													<img src={LocationBG} alt="" width={16} />
+													<div>
+														<h3>{t('calendar.event.locationLabel')}</h3>
+														<ExternalLink size={16} />
+													</div>
+												</CalendarEventInfoLocation>
 											</a>
-										</div>
-									</LocationLinkCard>
-								))}
-							</div>
-						</CalendarEventInfoSection>
-					</>
-				)}
+										);
+									})()}
+								</CalendarEventInfoSection>
+							</>
+						)}
+					</ScrollableBody>
 
-				{event.location && event.location.address && (
-					<>
-						<hr />
-						<CalendarEventInfoSection>
-							{(() => {
-								const { href, kind } = resolveLocationLink(event.location.address);
-								if (kind !== 'map') {
-									const isVideo = kind === 'video';
-									return (
-										<LocationLinkCard $color={eventColor}>
-											<div className="link-icon">
-												{isVideo ? <Video size={18} /> : <Link size={18} />}
-											</div>
-											<div className="link-body">
-												<h3>
-													{isVideo
-														? t('calendar.event.videoLinkLabel')
-														: t('calendar.event.locationLinkLabel')}
-												</h3>
-												<a
-													href={href}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="link-url"
-													title={href}
-												>
-													{href}
-												</a>
-											</div>
-											<div className="link-actions">
-												<button
-													type="button"
-													onClick={() => handleCopyLink(href)}
-													title={t('calendar.event.copyLink')}
-													aria-label={t('calendar.event.copyLink')}
-												>
-													{copiedHref === href ? (
-														<Check size={16} />
-													) : (
-														<Copy size={16} />
-													)}
-												</button>
-												<a
-													href={href}
-													target="_blank"
-													rel="noopener noreferrer"
-													title={t('calendar.event.openLink')}
-													aria-label={t('calendar.event.openLink')}
-												>
-													<ExternalLink size={16} />
-												</a>
-											</div>
-										</LocationLinkCard>
-									);
-								}
-								return (
-									<a href={href} target="_blank" rel="noopener noreferrer">
-										<CalendarEventInfoLocation $color={eventColor}>
-											<img src={LocationBG} alt="" width={16} />
-											<div>
-												<h3>{t('calendar.event.locationLabel')}</h3>
-												<ExternalLink size={16} />
-											</div>
-										</CalendarEventInfoLocation>
-									</a>
-								);
-							})()}
-						</CalendarEventInfoSection>
-					</>
-				)}
-			</ScrollableBody>
-
-			{/* More Options Row */}
-			{!hasChanges && !isThirdPartyEvent && !readOnly && (
-				<MoreOptionsRow
-					onClick={() => {
-						if (!event) return;
-						const calendarEventId = getCalendarEventId(event.id);
-						openEditTile({ id: calendarEventId } as CalendarEvent);
-						onClose?.();
-					}}
-					$color={eventColor}
-				>
-					<Settings size={16} />
-					<span>{t('calendar.event.moreOptions')}</span>
-					<ChevronRight size={16} />
-				</MoreOptionsRow>
-			)}
-
-			{/* Action Buttons / Defer Duration Picker */}
-			{!hasChanges && !isThirdPartyEvent && !readOnly && (
-				<EventActionBar>
-					{showDeferPicker ? (
-						<>
-							<DeferDurationField>
-								<DeferDurationInput
-									type="number"
-									inputMode="numeric"
-									min={0}
-									max={365}
-									value={deferDays}
-									onChange={(e) =>
-										setDeferDays(Math.max(0, parseInt(e.target.value) || 0))
-									}
-									aria-label={t('timeline.procrastinateAll.days')}
-								/>
-								<DeferUnitLabel>
-									{t('timeline.procrastinateAll.daysShort')}
-								</DeferUnitLabel>
-							</DeferDurationField>
-							<DeferDurationField>
-								<DeferDurationInput
-									type="number"
-									inputMode="numeric"
-									min={0}
-									max={23}
-									value={deferHours}
-									onChange={(e) =>
-										setDeferHours(
-											Math.max(0, Math.min(23, parseInt(e.target.value) || 0))
-										)
-									}
-									aria-label={t('timeline.procrastinateAll.hours')}
-								/>
-								<DeferUnitLabel>
-									{t('timeline.procrastinateAll.hoursShort')}
-								</DeferUnitLabel>
-							</DeferDurationField>
-							<DeferDurationField>
-								<DeferDurationInput
-									type="number"
-									inputMode="numeric"
-									min={0}
-									max={59}
-									value={deferMinutes}
-									onChange={(e) =>
-										setDeferMinutes(
-											Math.max(0, Math.min(59, parseInt(e.target.value) || 0))
-										)
-									}
-									aria-label={t('timeline.procrastinateAll.minutes')}
-								/>
-								<DeferUnitLabel>
-									{t('timeline.procrastinateAll.minutesShort')}
-								</DeferUnitLabel>
-							</DeferDurationField>
-							<DeferPickerIconButton
-								onClick={handleConfirmDefer}
-								disabled={isDeferDurationZero}
-								aria-label={t('timeline.procrastinateAll.confirm')}
-							>
-								{actionLoading === 'defer' ? (
-									<ActionSpinner />
-								) : (
-									<Check size={16} />
-								)}
-							</DeferPickerIconButton>
-							<DeferPickerIconButton
-								onClick={handleCancelDefer}
-								aria-label={t('timeline.procrastinateAll.cancel')}
-							>
-								<X size={16} />
-							</DeferPickerIconButton>
-						</>
-					) : (
-						<>
-							<EventActionButton
-								onClick={handleComplete}
-								disabled={!!actionLoading}
-								title={t('calendar.event.actions.complete')}
-								$color={eventColor}
-								$darkmode={isDarkMode}
-							>
-								<div className="action-icon">
-									{actionLoading === 'complete' ? (
-										<ActionSpinner />
-									) : (
-										<Check size={20} />
-									)}
-								</div>
-								<span>{t('calendar.event.actions.complete')}</span>
-							</EventActionButton>
-							<EventActionButton
-								onClick={handleSetAsNow}
-								disabled={!!actionLoading}
-								title={t('calendar.event.actions.now')}
-								$color={eventColor}
-								$darkmode={isDarkMode}
-							>
-								<div className="action-icon">
-									{actionLoading === 'now' ? (
-										<ActionSpinner />
-									) : (
-										<Play size={20} />
-									)}
-								</div>
-								<span>{t('calendar.event.actions.now')}</span>
-							</EventActionButton>
-							<EventActionButton
-								onClick={handleToggleDeferPicker}
-								disabled={!!actionLoading}
-								title={t('calendar.event.actions.defer')}
-								$color={eventColor}
-								$darkmode={isDarkMode}
-							>
-								<div className="action-icon">
-									<ChevronRight size={20} />
-								</div>
-								<span>{t('calendar.event.actions.defer')}</span>
-							</EventActionButton>
-						</>
+					{/* More Options Row */}
+					{!hasChanges && !isThirdPartyEvent && !readOnly && (
+						<MoreOptionsRow
+							onClick={() => {
+								if (!event) return;
+								const calendarEventId = getCalendarEventId(event.id);
+								openEditTile({ id: calendarEventId } as CalendarEvent);
+								onClose?.();
+							}}
+							$color={eventColor}
+						>
+							<Settings size={16} />
+							<span>{t('calendar.event.moreOptions')}</span>
+							<ChevronRight size={16} />
+						</MoreOptionsRow>
 					)}
-				</EventActionBar>
-			)}
 
-			{/* Delete button for third-party events */}
-			{!hasChanges && isThirdPartyEvent && !readOnly && (
-				<EventActionBar>
-					<EventActionButton
-						onClick={handleDelete}
-						disabled={!!actionLoading}
-						title={t('timeline.markDeleted')}
-						$color={eventColor}
-						$darkmode={isDarkMode}
-					>
-						<div className="action-icon">
-							{actionLoading === 'delete' ? <ActionSpinner /> : <Trash2 size={20} />}
-						</div>
-						<span>{t('timeline.markDeleted')}</span>
-					</EventActionButton>
-				</EventActionBar>
+					{/* Action Buttons / Defer Duration Picker */}
+					{!hasChanges && !isThirdPartyEvent && !readOnly && (
+						<EventActionBar>
+							{showDeferPicker ? (
+								<>
+									<DeferDurationField>
+										<DeferDurationInput
+											type="number"
+											inputMode="numeric"
+											min={0}
+											max={365}
+											value={deferDays}
+											onChange={(e) =>
+												setDeferDays(
+													Math.max(0, parseInt(e.target.value) || 0)
+												)
+											}
+											aria-label={t('timeline.procrastinateAll.days')}
+										/>
+										<DeferUnitLabel>
+											{t('timeline.procrastinateAll.daysShort')}
+										</DeferUnitLabel>
+									</DeferDurationField>
+									<DeferDurationField>
+										<DeferDurationInput
+											type="number"
+											inputMode="numeric"
+											min={0}
+											max={23}
+											value={deferHours}
+											onChange={(e) =>
+												setDeferHours(
+													Math.max(
+														0,
+														Math.min(23, parseInt(e.target.value) || 0)
+													)
+												)
+											}
+											aria-label={t('timeline.procrastinateAll.hours')}
+										/>
+										<DeferUnitLabel>
+											{t('timeline.procrastinateAll.hoursShort')}
+										</DeferUnitLabel>
+									</DeferDurationField>
+									<DeferDurationField>
+										<DeferDurationInput
+											type="number"
+											inputMode="numeric"
+											min={0}
+											max={59}
+											value={deferMinutes}
+											onChange={(e) =>
+												setDeferMinutes(
+													Math.max(
+														0,
+														Math.min(59, parseInt(e.target.value) || 0)
+													)
+												)
+											}
+											aria-label={t('timeline.procrastinateAll.minutes')}
+										/>
+										<DeferUnitLabel>
+											{t('timeline.procrastinateAll.minutesShort')}
+										</DeferUnitLabel>
+									</DeferDurationField>
+									<DeferPickerIconButton
+										onClick={handleConfirmDefer}
+										disabled={isDeferDurationZero}
+										aria-label={t('timeline.procrastinateAll.confirm')}
+									>
+										{actionLoading === 'defer' ? (
+											<ActionSpinner />
+										) : (
+											<Check size={16} />
+										)}
+									</DeferPickerIconButton>
+									<DeferPickerIconButton
+										onClick={handleCancelDefer}
+										aria-label={t('timeline.procrastinateAll.cancel')}
+									>
+										<X size={16} />
+									</DeferPickerIconButton>
+								</>
+							) : (
+								<>
+									<EventActionButton
+										onClick={handleComplete}
+										disabled={!!actionLoading}
+										title={t('calendar.event.actions.complete')}
+										$color={eventColor}
+										$darkmode={isDarkMode}
+									>
+										<div className="action-icon">
+											{actionLoading === 'complete' ? (
+												<ActionSpinner />
+											) : (
+												<Check size={20} />
+											)}
+										</div>
+										<span>{t('calendar.event.actions.complete')}</span>
+									</EventActionButton>
+									<EventActionButton
+										onClick={handleSetAsNow}
+										disabled={!!actionLoading}
+										title={t('calendar.event.actions.now')}
+										$color={eventColor}
+										$darkmode={isDarkMode}
+									>
+										<div className="action-icon">
+											{actionLoading === 'now' ? (
+												<ActionSpinner />
+											) : (
+												<Play size={20} />
+											)}
+										</div>
+										<span>{t('calendar.event.actions.now')}</span>
+									</EventActionButton>
+									<EventActionButton
+										onClick={handleToggleDeferPicker}
+										disabled={!!actionLoading}
+										title={t('calendar.event.actions.defer')}
+										$color={eventColor}
+										$darkmode={isDarkMode}
+									>
+										<div className="action-icon">
+											<ChevronRight size={20} />
+										</div>
+										<span>{t('calendar.event.actions.defer')}</span>
+									</EventActionButton>
+								</>
+							)}
+						</EventActionBar>
+					)}
+
+					{/* Delete button for third-party events */}
+					{!hasChanges && isThirdPartyEvent && !readOnly && (
+						<EventActionBar>
+							<EventActionButton
+								onClick={handleOpenDeleteConfirm}
+								disabled={!!actionLoading}
+								title={t('timeline.markDeleted')}
+								$color={eventColor}
+								$darkmode={isDarkMode}
+							>
+								<div className="action-icon">
+									{actionLoading === 'delete' ? (
+										<ActionSpinner />
+									) : (
+										<Trash2 size={20} />
+									)}
+								</div>
+								<span>{t('timeline.markDeleted')}</span>
+							</EventActionButton>
+						</EventActionBar>
+					)}
+				</>
+			) : (
+				<DeleteConfirmState>
+					<DeleteConfirmCopy>
+						<h3>{t('calendar.event.deleteConfirmTitle')}</h3>
+						<p>{t('calendar.event.deleteConfirmBody')}</p>
+						{isThirdPartyEvent && (
+							<p className="third-party-warning">
+								{t('calendar.event.deleteConfirmThirdPartyBody')}
+							</p>
+						)}
+					</DeleteConfirmCopy>
+					<DeleteConfirmActions>
+						<DeleteConfirmButton type="button" onClick={handleCancelDeleteConfirm}>
+							{t('calendar.event.cancel')}
+						</DeleteConfirmButton>
+						<DeleteConfirmButton
+							type="button"
+							$danger
+							onClick={handleConfirmDelete}
+							aria-label={t('calendar.event.deleteConfirmActionAria')}
+							title={t('calendar.event.deleteConfirmActionAria')}
+						>
+							{t('calendar.event.deleteConfirmAction')}
+						</DeleteConfirmButton>
+					</DeleteConfirmActions>
+				</DeleteConfirmState>
 			)}
 
 			{/* Loading Overlay */}
@@ -1304,9 +1378,79 @@ const LoadingOverlay = styled.div<{ $loading: boolean }>`
 	align-items: center;
 	justify-content: center;
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
+	z-index: 4;
 	opacity: ${({ $loading }) => ($loading ? 0.9 : 0)};
 	pointer-events: ${({ $loading }) => ($loading ? 'auto' : 'none')};
 	transition: opacity 0.2s ease;
+`;
+
+const DeleteConfirmState = styled.div`
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 16px;
+	background: ${({ theme }) => theme.colors.calendar.eventInfoModalBg};
+	border-top: 1px solid ${({ theme }) => theme.colors.calendar.border};
+`;
+
+const DeleteConfirmCopy = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding-top: 6px;
+
+	h3 {
+		font-size: ${({ theme }) => theme.typography.fontSize.lg};
+		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+
+	p {
+		font-size: ${({ theme }) => theme.typography.fontSize.sm};
+		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+		color: ${({ theme }) => theme.colors.text.secondary};
+		line-height: 1.4;
+	}
+
+	.third-party-warning {
+		color: ${({ theme }) => theme.colors.text.primary};
+		font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	}
+`;
+
+const DeleteConfirmActions = styled.div`
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	padding-top: 12px;
+	border-top: 1px solid ${({ theme }) => theme.colors.calendar.border};
+`;
+
+const DeleteConfirmButton = styled.button<{ $danger?: boolean }>`
+	min-width: 88px;
+	height: 32px;
+	padding: 0 12px;
+	border: 1px solid
+		${({ $danger, theme }) => ($danger ? theme.colors.error[500] : theme.colors.border.default)};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: ${({ $danger, theme }) =>
+		$danger ? theme.colors.error[500] : theme.colors.background.card2};
+	color: ${({ $danger, theme }) => ($danger ? theme.colors.white : theme.colors.text.secondary)};
+	cursor: pointer;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+	transition:
+		opacity 0.2s ease,
+		background-color 0.2s ease,
+		border-color 0.2s ease;
+
+	&:hover {
+		opacity: 0.92;
+	}
 `;
 
 const IconButton = styled.button<{ $primary?: boolean }>`

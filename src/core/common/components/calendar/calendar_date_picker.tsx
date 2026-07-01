@@ -1,7 +1,83 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+// ── Locale helpers ────────────────────────────────────────────────────────────
+
+/**
+ * Detects the user's locale date format (e.g. "MM/DD/YYYY" or "DD/MM/YYYY")
+ * by formatting a known date through Intl.DateTimeFormat and inspecting the
+ * component order.  Falls back to MM/DD/YYYY on any error.
+ */
+function getLocaleDateFormat(): string {
+	try {
+		const parts = new Intl.DateTimeFormat(undefined, {
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+		}).formatToParts(new Date(2013, 11, 15)); // Dec 15 2013 — unambiguous
+		return parts
+			.map((p) => {
+				if (p.type === 'month') return 'MM';
+				if (p.type === 'day') return 'DD';
+				if (p.type === 'year') return 'YYYY';
+				if (p.type === 'literal') return p.value;
+				return '';
+			})
+			.join('');
+	} catch {
+		return 'MM/DD/YYYY';
+	}
+}
+
+const LOCALE_DATE_FORMAT = getLocaleDateFormat();
+
+/**
+ * Parses a user-typed date string without requiring customParseFormat.
+ * Accepts ISO-8601 (YYYY-MM-DD) and the locale format detected above.
+ */
+function parseDateInput(str: string, localeFormat: string): dayjs.Dayjs | null {
+	const trimmed = str.trim();
+	if (!trimmed) return null;
+
+	// ISO 8601 fast-path
+	if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+		const d = dayjs(trimmed);
+		return d.isValid() ? d : null;
+	}
+
+	// Locale-format path
+	const sep = localeFormat.replace(/[MYYD]/g, '').charAt(0) || '/';
+	const fParts = localeFormat.split(sep);
+	const vParts = trimmed.split(sep);
+	if (fParts.length !== 3 || vParts.length !== 3) return null;
+
+	let year: number | null = null,
+		month: number | null = null,
+		day: number | null = null;
+
+	for (let i = 0; i < fParts.length; i++) {
+		const val = parseInt(vParts[i], 10);
+		if (isNaN(val)) return null;
+		if (fParts[i].includes('Y')) year = val;
+		else if (fParts[i].includes('M')) month = val;
+		else if (fParts[i].includes('D')) day = val;
+	}
+
+	if (year === null || month === null || day === null) return null;
+	if (year < 1 || year > 9999) return null;
+	if (month < 1 || month > 12) return null;
+	if (day < 1 || day > 31) return null;
+
+	const d = dayjs(new Date(year, month - 1, day));
+	return d.isValid() && d.date() === day ? d : null;
+}
+
+/** First year shown in a 12-year page, centred around the given year. */
+const yearPageBase = (year: number) => Math.max(1, year - 5);
+
+type PickerMode = 'calendar' | 'year';
 
 type CalendarDatePickerProps = {
 	isOpen: boolean;
@@ -21,17 +97,26 @@ const CalendarDatePicker = ({
 	selectedDate,
 }: CalendarDatePickerProps) => {
 	const [displayMonth, setDisplayMonth] = useState(dayjs().startOf('month'));
+	const [pickerMode, setPickerMode] = useState<PickerMode>('calendar');
+	const [yearBase, setYearBase] = useState(() => yearPageBase(dayjs().year()));
+	const [textInputValue, setTextInputValue] = useState('');
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const onCloseRef = useRef(onClose);
 	onCloseRef.current = onClose;
 
-	// Reset to current view month when opening
+	const localeFormat = useMemo(() => LOCALE_DATE_FORMAT, []);
+
+	// Reset all state when the picker opens
 	useEffect(() => {
 		if (isOpen) {
 			const anchor = selectedDate ?? startDay ?? dayjs();
 			setDisplayMonth(anchor.startOf('month'));
+			setPickerMode('calendar');
+			setYearBase(yearPageBase(anchor.year()));
+			setTextInputValue(anchor.format(localeFormat));
 		}
-	}, [isOpen]);
+	}, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// Close on outside click
 	useEffect(() => {
@@ -71,13 +156,29 @@ const CalendarDatePicker = ({
 		viewStart && daysInView ? viewStart.add(daysInView - 1, 'day').startOf('day') : undefined;
 	const selected = selectedDate?.startOf('day');
 
-	const prevMonth = useCallback(() => {
-		setDisplayMonth((m) => m.subtract(1, 'month'));
-	}, []);
+	// Nav buttons change meaning in year mode
+	const handlePrevNav = useCallback(() => {
+		if (pickerMode === 'calendar') setDisplayMonth((m) => m.subtract(1, 'month'));
+		else setYearBase((y) => Math.max(1, y - 12));
+	}, [pickerMode]);
 
-	const nextMonth = useCallback(() => {
-		setDisplayMonth((m) => m.add(1, 'month'));
-	}, []);
+	const handleNextNav = useCallback(() => {
+		if (pickerMode === 'calendar') setDisplayMonth((m) => m.add(1, 'month'));
+		else setYearBase((y) => y + 12);
+	}, [pickerMode]);
+
+	const handleYearSelect = (year: number) => {
+		setDisplayMonth((m) => m.year(year));
+		setPickerMode('calendar');
+	};
+
+	const handleTextCommit = (val: string) => {
+		const parsed = parseDateInput(val, localeFormat);
+		if (parsed) {
+			setDisplayMonth(parsed.startOf('month'));
+			onDateSelect(parsed);
+		}
+	};
 
 	const handleSelect = useCallback(
 		(date: dayjs.Dayjs) => {
@@ -110,60 +211,124 @@ const CalendarDatePicker = ({
 		rows.push(row);
 	}
 
+	const prevLabel = pickerMode === 'calendar' ? 'Previous month' : 'Previous years';
+	const nextLabel = pickerMode === 'calendar' ? 'Next month' : 'Next years';
+
 	return (
 		<PickerContainer ref={containerRef}>
+			{/* Manual date text input */}
+			<DateTextInput
+				type="text"
+				value={textInputValue}
+				onChange={(e) => setTextInputValue(e.target.value)}
+				onBlur={(e) => handleTextCommit(e.target.value)}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
+						handleTextCommit(e.currentTarget.value);
+						e.preventDefault();
+					}
+				}}
+				placeholder={localeFormat}
+				aria-label="Type a date"
+			/>
+
+			{/* Header */}
 			<PickerHeader>
-				<NavButton onClick={prevMonth}>
+				<NavButton onClick={handlePrevNav} aria-label={prevLabel}>
 					<ChevronLeft size={14} />
 				</NavButton>
-				<MonthLabel>{displayMonth.format('MMMM')}</MonthLabel>
-				<NavButton onClick={nextMonth}>
+
+				{pickerMode === 'calendar' ? (
+					<HeaderCenter>
+						<MonthSpan>{displayMonth.format('MMMM')}</MonthSpan>{' '}
+						<YearButton
+							onClick={() => {
+								setYearBase(yearPageBase(displayMonth.year()));
+								setPickerMode('year');
+							}}
+							aria-label={`${displayMonth.year()}, select year`}
+						>
+							{displayMonth.year()}
+						</YearButton>
+					</HeaderCenter>
+				) : (
+					<MonthLabel>
+						{yearBase} – {yearBase + 11}
+					</MonthLabel>
+				)}
+
+				<NavButton onClick={handleNextNav} aria-label={nextLabel}>
 					<ChevronRight size={14} />
 				</NavButton>
 			</PickerHeader>
-			<DayNamesRow>
-				{weekDayLabels.map((label, i) => (
-					<DayName key={i}>{label}</DayName>
-				))}
-			</DayNamesRow>
-			<DatesGrid>
-				{rows.map((row, rowIdx) => (
-					<WeekRow
-						key={rowIdx}
-						$isViewedWeek={
-							!!(viewStart && viewEnd) &&
-							row.some(
-								(d) =>
-									(d.isSame(viewStart, 'day') || d.isAfter(viewStart, 'day')) &&
-									(d.isSame(viewEnd, 'day') || d.isBefore(viewEnd, 'day'))
-							)
-						}
-					>
-						{row.map((date, colIdx) => {
-							const isToday = date.isSame(today, 'day');
-							const isOutsideMonth = !date.isSame(displayMonth, 'month');
-							const isSelected = !!selected && date.isSame(selected, 'day');
-							const isInViewedWeek =
-								!!(viewStart && viewEnd) &&
-								(date.isSame(viewStart, 'day') || date.isAfter(viewStart, 'day')) &&
-								(date.isSame(viewEnd, 'day') || date.isBefore(viewEnd, 'day'));
 
-							return (
-								<DateCell
-									key={colIdx}
-									$isToday={isToday}
-									$isOutsideMonth={isOutsideMonth}
-									$isInViewedWeek={isInViewedWeek}
-									$isSelected={isSelected}
-									onClick={() => handleSelect(date)}
-								>
-									{date.date()}
-								</DateCell>
-							);
-						})}
-					</WeekRow>
-				))}
-			</DatesGrid>
+			{/* Calendar grid */}
+			{pickerMode === 'calendar' && (
+				<>
+					<DayNamesRow>
+						{weekDayLabels.map((label, i) => (
+							<DayName key={i}>{label}</DayName>
+						))}
+					</DayNamesRow>
+					<DatesGrid>
+						{rows.map((row, rowIdx) => (
+							<WeekRow
+								key={rowIdx}
+								$isViewedWeek={
+									!!(viewStart && viewEnd) &&
+									row.some(
+										(d) =>
+											(d.isSame(viewStart, 'day') ||
+												d.isAfter(viewStart, 'day')) &&
+											(d.isSame(viewEnd, 'day') || d.isBefore(viewEnd, 'day'))
+									)
+								}
+							>
+								{row.map((date, colIdx) => {
+									const isToday = date.isSame(today, 'day');
+									const isOutsideMonth = !date.isSame(displayMonth, 'month');
+									const isSelected = !!selected && date.isSame(selected, 'day');
+									const isInViewedWeek =
+										!!(viewStart && viewEnd) &&
+										(date.isSame(viewStart, 'day') ||
+											date.isAfter(viewStart, 'day')) &&
+										(date.isSame(viewEnd, 'day') ||
+											date.isBefore(viewEnd, 'day'));
+
+									return (
+										<DateCell
+											key={colIdx}
+											$isToday={isToday}
+											$isOutsideMonth={isOutsideMonth}
+											$isInViewedWeek={isInViewedWeek}
+											$isSelected={isSelected}
+											onClick={() => handleSelect(date)}
+										>
+											{date.date()}
+										</DateCell>
+									);
+								})}
+							</WeekRow>
+						))}
+					</DatesGrid>
+				</>
+			)}
+
+			{/* Year grid */}
+			{pickerMode === 'year' && (
+				<YearGrid>
+					{Array.from({ length: 12 }, (_, i) => yearBase + i).map((year) => (
+						<YearCell
+							key={year}
+							$isSelected={year === displayMonth.year()}
+							$isCurrent={year === today.year()}
+							onClick={() => handleYearSelect(year)}
+						>
+							{year}
+						</YearCell>
+					))}
+				</YearGrid>
+			)}
 		</PickerContainer>
 	);
 };
@@ -183,6 +348,29 @@ const PickerContainer = styled.div`
 	user-select: none;
 `;
 
+const DateTextInput = styled.input`
+	width: 100%;
+	height: 28px;
+	padding: 0 0.5rem;
+	margin-bottom: 6px;
+	border: 1px solid ${({ theme }) => theme.colors.input.border};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background-color: ${({ theme }) => theme.colors.input.bg};
+	color: ${({ theme }) => theme.colors.input.text};
+	font-size: 0.6875rem;
+	outline: none;
+	box-sizing: border-box;
+
+	&::placeholder {
+		color: ${({ theme }) => theme.colors.input.placeholder};
+		font-style: italic;
+	}
+
+	&:focus {
+		border-color: ${({ theme }) => theme.colors.input.focusRing};
+	}
+`;
+
 const PickerHeader = styled.div`
 	display: flex;
 	align-items: center;
@@ -192,6 +380,32 @@ const PickerHeader = styled.div`
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 	padding-inline: 4px;
 	margin-bottom: 4px;
+`;
+
+const HeaderCenter = styled.span`
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: ${({ theme }) => theme.colors.datepicker.headerText};
+`;
+
+const MonthSpan = styled.span``;
+
+const YearButton = styled.button`
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: ${({ theme }) => theme.colors.datepicker.headerText};
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0 2px;
+	border-radius: ${({ theme }) => theme.borderRadius.small};
+	text-decoration: underline dotted;
+	text-underline-offset: 2px;
+
+	&:hover {
+		color: ${({ theme }) => theme.colors.datepicker.headerButtonHover};
+		background-color: ${({ theme }) => theme.colors.datepicker.dateHoverBg};
+	}
 `;
 
 const MonthLabel = styled.span`
@@ -286,6 +500,47 @@ const DateCell = styled.button<{
 			$isToday || $isSelected
 				? theme.colors.datepicker.dateSelectedText
 				: theme.colors.datepicker.dateHoverText};
+	}
+`;
+
+const YearGrid = styled.div`
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 4px;
+	padding: 4px 0;
+`;
+
+const YearCell = styled.button<{ $isSelected: boolean; $isCurrent: boolean }>`
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.75rem;
+	font-weight: 500;
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	cursor: pointer;
+	background-color: ${({ $isSelected, theme }) =>
+		$isSelected ? theme.colors.datepicker.dateSelectedBg : 'transparent'};
+	color: ${({ $isSelected, $isCurrent, theme }) => {
+		if ($isSelected) return theme.colors.datepicker.dateSelectedText;
+		if ($isCurrent) return theme.colors.datepicker.dateSelectedBg;
+		return theme.colors.datepicker.dateText;
+	}};
+	${({ $isCurrent, $isSelected, theme }) =>
+		$isCurrent &&
+		!$isSelected &&
+		css`
+			border: 1px solid ${theme.colors.datepicker.dateSelectedBg};
+		`}
+	transition:
+		background-color 0.15s ease,
+		color 0.15s ease;
+
+	&:hover {
+		background-color: ${({ $isSelected, theme }) =>
+			$isSelected
+				? theme.colors.datepicker.dateSelectedBg
+				: theme.colors.datepicker.dateHoverBg};
 	}
 `;
 

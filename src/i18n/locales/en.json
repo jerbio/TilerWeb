@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -45,6 +45,12 @@
 			"home": "Home",
 			"discover": "Discover",
 			"waitlist": "Waitlist"
+		},
+		"emptyState": {
+			"defaultText": "Nothing here yet"
+		},
+		"pagination": {
+			"page": "Page {{page}}"
 		},
 		"voiceInput": {
 			"listening": "Listening...",
@@ -207,7 +213,12 @@
 			"validation": {
 				"endAfterStart": "End time must be after start time"
 			},
-			"moreOptions": "More options"
+			"moreOptions": "More options",
+			"deleteConfirmTitle": "Delete this event?",
+			"deleteConfirmBody": "This will permanently remove it from your schedule.",
+			"deleteConfirmThirdPartyBody": "This will also delete it from your connected calendar service.",
+			"deleteConfirmAction": "Delete",
+			"deleteConfirmActionAria": "Confirm delete"
 		},
 		"createBlock": {
 			"title": "Add a New Block",
@@ -1157,7 +1168,6 @@
 			"cancel": "Cancel"
 		},
 		"userMenu": {
-			"settings": "Settings",
 			"logout": "Logout",
 			"signOutSuccess": "You have been successfully signed out",
 			"signOutError": "Failed to sign out. Please try again.",
@@ -1532,15 +1542,36 @@
 		"dashboard": {
 			"title": "Tileshare",
 			"nav": {
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"active": "Active",
+				"sent": "Sent",
+				"received": "Received ({{count}})"
+			},
+			"filter": {
+				"all": "All",
+				"inProgress": "In Progress"
 			}
 		},
-		"inbox": {
-			"title": "Inbox"
+		"card": {
+			"progress": "Progress",
+			"dueOn": "Due on:",
+			"dueBy": "Due by:",
+			"multiTileshare": "Multi tileshare",
+			"tileshare": "Tileshare"
 		},
-		"outbox": {
-			"title": "Outbox"
+		"active": {
+			"title": "Active",
+			"empty": "No active tileshares",
+			"emptyFiltered": "No in-progress items in your active tileshares"
+		},
+		"sent": {
+			"title": "Sent",
+			"empty": "You haven't sent any tileshares yet",
+			"emptyFiltered": "No in-progress items in your sent tileshares"
+		},
+		"received": {
+			"title": "Received",
+			"empty": "You haven't received any tileshares yet",
+			"emptyFiltered": "No in-progress items in your received tileshares"
 		},
 		"tileshareDetail": {
 			"title": "Tileshare Detail"
