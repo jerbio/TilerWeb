@@ -43,6 +43,7 @@ import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useCalendarUI } from './calendar-ui.provider';
 import { getCalendarEventId } from '@/core/util/entityResolution';
 import { resolveLocationLink } from '@/core/util/locationLink';
+import { collectVideoLinks, type VideoLink } from '@/core/util/videoLink';
 import calendarConfig from '@/core/constants/calendar_config';
 import CyclingEmoji from './cycling_emoji';
 import { TypeDefaults } from '../../types/typeDefaults';
@@ -106,8 +107,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const [deferMinutes, setDeferMinutes] = useState(0);
 	const isDeferDurationZero = deferDays === 0 && deferHours === 0 && deferMinutes === 0;
 
-	// Tracks whether the location link URL was just copied to the clipboard
-	const [linkCopied, setLinkCopied] = useState(false);
+	// Tracks the href that was most recently copied to the clipboard.
+	const [copiedHref, setCopiedHref] = useState<string | null>(null);
 
 	// Notification helpers
 	const showNotification = useUiStore((s) => s.notification.show);
@@ -406,8 +407,8 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 	const handleCopyLink = useCallback(async (url: string) => {
 		try {
 			await navigator.clipboard.writeText(url);
-			setLinkCopied(true);
-			setTimeout(() => setLinkCopied(false), 2000);
+			setCopiedHref(url);
+			setTimeout(() => setCopiedHref((current) => (current === url ? null : current)), 2000);
 		} catch (error) {
 			console.error('Copy link failed:', error);
 		}
@@ -418,6 +419,12 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		g: event ? (event.colorGreen ?? TypeDefaults.RGBColor.green) : TypeDefaults.RGBColor.green,
 		b: event ? (event.colorBlue ?? TypeDefaults.RGBColor.blue) : TypeDefaults.RGBColor.blue,
 	});
+	const videoLinks: VideoLink[] = event ? collectVideoLinks(event) : [];
+
+	const videoSourceLabel = (link: VideoLink): string =>
+		t(`calendar.event.videoSource.${link.source}`, {
+			defaultValue: t('calendar.event.videoLinkLabel'),
+		});
 
 	// Compute duration display
 	const getDurationDisplay = () => {
@@ -725,6 +732,64 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 							</CalendarEventInfoArticleContainer>
 						</CalendarEventInfoSection>
 
+						{videoLinks.length > 0 && (
+							<>
+								<hr />
+								<CalendarEventInfoSection>
+									<div
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											gap: 8,
+										}}
+									>
+										{videoLinks.map((link) => (
+											<LocationLinkCard key={link.href} $color={eventColor}>
+												<div className="link-icon">
+													<Video size={18} />
+												</div>
+												<div className="link-body">
+													<h3>{videoSourceLabel(link)}</h3>
+													<a
+														href={link.href}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="link-url"
+														title={link.href}
+													>
+														{link.href}
+													</a>
+												</div>
+												<div className="link-actions">
+													<button
+														type="button"
+														onClick={() => handleCopyLink(link.href)}
+														title={t('calendar.event.copyLink')}
+														aria-label={t('calendar.event.copyLink')}
+													>
+														{copiedHref === link.href ? (
+															<Check size={16} />
+														) : (
+															<Copy size={16} />
+														)}
+													</button>
+													<a
+														href={link.href}
+														target="_blank"
+														rel="noopener noreferrer"
+														title={t('calendar.event.openLink')}
+														aria-label={t('calendar.event.openLink')}
+													>
+														<ExternalLink size={16} />
+													</a>
+												</div>
+											</LocationLinkCard>
+										))}
+									</div>
+								</CalendarEventInfoSection>
+							</>
+						)}
+
 						{event.location && event.location.address && (
 							<>
 								<hr />
@@ -771,7 +836,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 																'calendar.event.copyLink'
 															)}
 														>
-															{linkCopied ? (
+															{copiedHref === href ? (
 																<Check size={16} />
 															) : (
 																<Copy size={16} />

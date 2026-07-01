@@ -190,6 +190,12 @@
 			"locationLabel": "View directions on map",
 			"locationLinkLabel": "Link",
 			"videoLinkLabel": "Video call",
+			"videoSource": {
+				"zoom": "Zoom",
+				"google": "Google Meet",
+				"outlook": "Microsoft Teams",
+				"other": "Video call"
+			},
 			"copyLink": "Copy link",
 			"openLink": "Open link",
 			"secondaryActionsLabel": "Secondary Tile Actions:",
