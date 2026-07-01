@@ -989,19 +989,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 			) : (
 				<DeleteConfirmState>
 					<DeleteConfirmCopy>
-						<h3>{t('calendar.event.deleteConfirmTitle', 'Delete this event?')}</h3>
-						<p>
-							{t(
-								'calendar.event.deleteConfirmBody',
-								'This will permanently remove it from your schedule.'
-							)}
-						</p>
+						<h3>{t('calendar.event.deleteConfirmTitle')}</h3>
+						<p>{t('calendar.event.deleteConfirmBody')}</p>
 						{isThirdPartyEvent && (
 							<p className="third-party-warning">
-								{t(
-									'calendar.event.deleteConfirmThirdPartyBody',
-									'This will also delete it from your connected calendar service.'
-								)}
+								{t('calendar.event.deleteConfirmThirdPartyBody')}
 							</p>
 						)}
 					</DeleteConfirmCopy>
@@ -1013,10 +1005,10 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 							type="button"
 							$danger
 							onClick={handleConfirmDelete}
-							aria-label={t('calendar.event.deleteConfirmAction', 'Confirm delete')}
-							title={t('calendar.event.deleteConfirmAction', 'Confirm delete')}
+							aria-label={t('calendar.event.deleteConfirmActionAria')}
+							title={t('calendar.event.deleteConfirmActionAria')}
 						>
-							{t('calendar.event.deleteConfirmAction', 'Delete')}
+							{t('calendar.event.deleteConfirmAction')}
 						</DeleteConfirmButton>
 					</DeleteConfirmActions>
 				</DeleteConfirmState>
