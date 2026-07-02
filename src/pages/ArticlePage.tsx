@@ -4,6 +4,7 @@ import { getArticleBySlug } from '@/core/common/data/articles';
 import ArticleHero from '@/components/articles/ArticleHero';
 import ArticleBody from '@/components/articles/ArticleBody';
 import ArticleCTA from '@/components/articles/ArticleCTA';
+import SEO from '@/core/common/components/SEO';
 
 const PageWrapper = styled.div`
 	background-color: black;
@@ -20,6 +21,16 @@ export default function ArticlePage() {
 
 	return (
 		<PageWrapper>
+			<SEO
+				title={`${article.title} | Tiler`}
+				description={article.excerpt}
+				canonicalUrl={`/articles/${article.slug}`}
+				ogType="article"
+				twitterCard="summary_large_image"
+				publishedTime={article.date}
+				authors={[article.author]}
+				articleSection={article.category}
+			/>
 			<ArticleHero article={article} />
 			<ArticleBody sections={article.sections} />
 			<ArticleCTA />

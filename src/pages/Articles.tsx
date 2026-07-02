@@ -2,6 +2,40 @@ import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import { articles } from '@/core/common/data/articles';
 import ArticleCard from '@/components/articles/ArticleCard';
+import SEO from '@/core/common/components/SEO';
+
+const SITE_URL = 'https://tiler.app';
+
+const buildStructuredData = () => ({
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'CollectionPage',
+			'@id': `${SITE_URL}/articles`,
+			url: `${SITE_URL}/articles`,
+			name: 'Articles | Tiler – Guides, Product Updates & Productivity Insights',
+			description:
+				"Explore Tiler's library of guides, product updates, and deep dives on AI scheduling and adaptive productivity.",
+			isPartOf: { '@type': 'WebSite', name: 'Tiler', url: SITE_URL },
+		},
+		{
+			'@type': 'ItemList',
+			itemListElement: articles.map((a, i) => ({
+				'@type': 'ListItem',
+				position: i + 1,
+				url: `${SITE_URL}/articles/${a.slug}`,
+				name: a.title,
+			})),
+		},
+		{
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+				{ '@type': 'ListItem', position: 2, name: 'Articles', item: `${SITE_URL}/articles` },
+			],
+		},
+	],
+});
 
 const PageWrapper = styled.div`
 	background-color: black;
@@ -68,6 +102,15 @@ const Grid = styled.div`
 export default function Articles() {
 	return (
 		<PageWrapper>
+			<SEO
+				title="Articles | Tiler – Guides, Product Updates & Productivity Insights"
+				description="Explore Tiler's library of guides, product updates, and deep dives on AI scheduling and adaptive productivity."
+				keywords="Tiler articles, AI scheduling, smart calendar guides, productivity, time management"
+				canonicalUrl="/articles"
+				ogType="website"
+				twitterCard="summary_large_image"
+				structuredData={buildStructuredData()}
+			/>
 			<Hero>
 				<CategoryPill>ARTICLES</CategoryPill>
 				<HeroTitle>Insights for a Better Schedule</HeroTitle>

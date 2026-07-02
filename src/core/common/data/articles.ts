@@ -1,3 +1,4 @@
+import GettingStartedHero from '@/assets/articles/hero.png';
 import TilesBackground from '@/assets/highlights/tiles.jpg';
 import MountainBackground from '@/assets/highlights/mountain.jpg';
 import FitnessBackground from '@/assets/highlights/fitness.jpg';
@@ -8,6 +9,7 @@ import ScheduleUndoStep3 from '@/assets/articles/schedule-undo-step3.svg';
 import ScheduleUndoHero from '@/assets/articles/schedule-undo-hero.svg';
 import TravelHero from '@/assets/articles/travel-hero.svg';
 import TravelInline1 from '@/assets/articles/travel-inline-1.svg';
+import TravelInline2 from '@/assets/articles/travel-inline-2.svg';
 import NLSHero from '@/assets/articles/nls-hero.svg';
 import NLSStep1 from '@/assets/articles/nls-step1.svg';
 import NLSStep2 from '@/assets/articles/nls-step2.svg';
@@ -18,7 +20,7 @@ import TileshareStep2 from '@/assets/articles/tileshare-step2.svg';
 import TileshareStep3 from '@/assets/articles/tileshare-step3.svg';
 
 export interface ArticleSection {
-	type: 'prose' | 'heading' | 'step' | 'callout' | 'image';
+	type: 'prose' | 'heading' | 'step' | 'callout' | 'image' | 'quote';
 	// prose
 	text?: string;
 	lead?: boolean;
@@ -35,6 +37,8 @@ export interface ArticleSection {
 	// image
 	src?: string;
 	caption?: string;
+	// quote
+	quote?: string;
 }
 
 export interface Article {
@@ -52,12 +56,26 @@ export interface Article {
 
 export const articles: Article[] = [
 	{
+		slug: 'getting-started-with-tiler',
+		category: 'GETTING STARTED',
+		title: 'Your First Five Minutes with Tiler',
+		subtitle:
+			'Tiler builds your perfect timeline from three things: your goals, your appointments, and your location.',
+		excerpt:
+			"Most scheduling tools start from an empty grid. Tiler learns the shape of your day first, then builds a constraint-aware, location-anchored timeline that actually fits your life.",
+		readTime: '6 min read',
+		author: 'Tiler Team',
+		date: 'May 1, 2026',
+		coverImage: GettingStartedHero,
+		sections: [],
+	},
+	{
 		slug: 'natural-language-scheduling',
 		category: 'FEATURES',
 		title: 'Natural-Language Scheduling',
-		subtitle: 'Just tell Tiler what you need to do — in plain English — and watch a smart schedule appear.',
+		subtitle: 'Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.',
 		excerpt:
-			'Stop wrestling with drag-and-drop. Just tell Tiler what you need to do — in plain English — and watch a smart schedule appear.',
+			'Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.',
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 1, 2026',
@@ -66,11 +84,11 @@ export const articles: Article[] = [
 			{
 				type: 'prose',
 				lead: true,
-				text: 'Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize — and then life changes and you start over. Tiler takes a different approach: you talk, it schedules.',
+				text: 'Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules.',
 			},
 			{
 				type: 'prose',
-				text: 'Type something like "Dentist at 9 AM Thursday, then coffee with Priya downtown around 11" and Tiler handles everything else — duration, travel time, buffer gaps, and confirmation.',
+				text: 'Type something like "Dentist at 9 AM Thursday, then coffee with Priya downtown around 11" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it.',
 			},
 			{
 				type: 'heading',
@@ -82,41 +100,49 @@ export const articles: Article[] = [
 				stepTitle: 'Describe the task',
 				stepImage: NLSStep1,
 				stepBody:
-					'Type what you need to do in plain English. No special syntax, no dropdowns. "Gym session tomorrow morning for an hour" is enough.',
+					'Type what you need to do in plain English. No special syntax, no dropdowns. "Gym session tomorrow morning for an hour" is enough to get started.',
 				callout: {
 					label: 'What Tiler understands',
-					text: 'Relative time ("tomorrow"), duration ("an hour"), and location cues ("downtown") — no extra setup needed.',
+					text: 'Relative time ("tomorrow"), duration ("an hour"), and location cues ("downtown"). No extra setup needed.',
 				},
 			},
 			{
 				type: 'step',
 				stepNumber: 2,
-				stepTitle: 'Tiler asks one follow-up',
+				stepTitle: 'The AI fills in the gaps',
 				stepImage: NLSStep2,
 				stepBody:
-					'If Tiler needs more context — a preferred time window, a specific location, or a deadline — it asks. One question at a time, never a form.',
+					'Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.',
+				callout: {
+					label: 'Reasoning, not guessing',
+					text: 'Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything.',
+				},
 			},
 			{
 				type: 'step',
 				stepNumber: 3,
-				stepTitle: 'Review and confirm',
+				stepTitle: 'Review, then confirm',
 				stepImage: NLSStep3,
 				stepBody:
-					'Tiler shows you the proposed schedule with full details — time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing goes on your calendar without your say-so.',
+					'Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.',
 				callout: {
 					label: 'Confirmation-first',
-					text: 'Tiler proposes — you decide. You stay in control even as the AI does the heavy lifting.',
+					text: 'Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting.',
 				},
+			},
+			{
+				type: 'quote',
+				quote: 'You live it. Tiler plans it.',
 			},
 		],
 	},
 	{
 		slug: 'smart-travel-and-location',
 		category: 'FEATURES',
-		title: 'Smart Travel & Location',
+		title: 'Smart Travel and Location',
 		subtitle: "A schedule that ignores location isn't a schedule. It's a guess.",
 		excerpt:
-			'Tiler calculates travel time between every commitment and builds it into your day — so your schedule reflects real life, not wishful thinking.',
+			'Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.',
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 8, 2026',
@@ -125,57 +151,66 @@ export const articles: Article[] = [
 			{
 				type: 'prose',
 				lead: true,
-				text: "Most calendars assume that once one task ends, you're magically ready for the next one.",
+				text: "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be.",
 			},
 			{
 				type: 'prose',
-				text: "Real life doesn't work that way. You have to drive there. Walk there. Catch a train. Leave early enough to actually arrive on time.",
-			},
-			{
-				type: 'prose',
-				text: "That's why every location in Tiler becomes part of the schedule. Add a meeting, an errand, a coffee catch-up, or a school pickup — Tiler automatically calculates how you'll get there and how long it will take.",
-			},
-			{
-				type: 'image',
-				src: TravelInline1,
-				caption:
-					'Travel time appears as its own block in your timeline — between every commitment that involves a location change.',
-			},
-			{
-				type: 'prose',
-				text: 'Travel appears directly in your timeline as part of the day. Not assumed. Planned.',
+				text: "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day.",
 			},
 			{
 				type: 'heading',
-				title: 'No addresses required',
+				title: 'How it works',
 			},
 			{
-				type: 'prose',
-				text: "Tiler is location-aware, but you don't need to enter exact addresses. Simply use labels:",
+				type: 'step',
+				stepNumber: 1,
+				stepTitle: 'Set your locations once',
+				stepImage: TravelInline1,
+				stepBody:
+					"You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+				callout: {
+					label: 'Location labels Tiler understands',
+					text: 'Home · Work · Downtown · The gym · Near the office',
+				},
 			},
 			{
-				type: 'callout',
-				label: 'Location labels Tiler understands',
-				text: 'Home · Work · Downtown · Near the office · The gym',
+				type: 'step',
+				stepNumber: 2,
+				stepTitle: 'Travel time slots into your timeline',
+				stepImage: TravelInline2,
+				stepBody:
+					'Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.',
+				callout: {
+					label: 'Real routes, not estimates',
+					text: 'Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around.',
+				},
 			},
 			{
-				type: 'prose',
-				text: "Tiler understands where you're going, builds realistic routes, groups nearby tasks together, and lets you know when you need to leave.",
+				type: 'step',
+				stepNumber: 3,
+				stepTitle: 'Nearby tasks get grouped automatically',
+				stepImage: TravelHero,
+				stepBody:
+					"When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+				callout: {
+					label: 'Less travel, more done',
+					text: 'Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should.',
+				},
 			},
 			{
-				type: 'prose',
-				text: "Because getting something done isn't just about finding the time. It's about being in the right place too.",
+				type: 'quote',
+				quote: "Getting something done isn't just about finding the time. It's about being in the right place.",
 			},
 		],
 	},
 	{
 		slug: 'schedule-undo',
 		category: 'FEATURES',
-		title: 'Schedule Undo — Change Your Mind Before It Counts',
+		title: 'Schedule Undo',
 		subtitle:
-			'Every schedule change shows you a live preview. Undo it instantly, or accept it with confidence. Your original plan is always one tap away.',
+			'Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.',
 		excerpt:
-			'Preview any schedule change before it saves. Undo it instantly or accept it with confidence — your live schedule is never touched without your approval.',
+			'Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.',
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'June 22, 2026',
@@ -184,23 +219,23 @@ export const articles: Article[] = [
 			{
 				type: 'prose',
 				lead: true,
-				text: 'Changing your schedule feels risky. Move one task and you\'re not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment.',
+				text: "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment.",
 			},
 			{
 				type: 'prose',
-				text: 'Every change in Tiler — whether you typed a request, accepted a suggestion, or dragged a tile — first appears as a preview. Your live schedule stays untouched until you say so.',
+				text: 'Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so.',
 			},
 			{
 				type: 'heading',
-				title: 'How Schedule Undo Works',
+				title: 'How Schedule Undo works',
 			},
 			{
 				type: 'step',
 				stepNumber: 1,
-				stepTitle: 'Propose or accept a change',
+				stepTitle: 'Make a change',
 				stepImage: ScheduleUndoStep1,
 				stepBody:
-					'Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into a preview state — shown with a dashed border and a PREVIEW label so you can\'t miss it.',
+					'Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.',
 				callout: {
 					label: 'Nothing saves automatically',
 					text: 'Your live schedule is frozen while you review. No partial saves, no accidental overwrites.',
@@ -209,10 +244,10 @@ export const articles: Article[] = [
 			{
 				type: 'step',
 				stepNumber: 2,
-				stepTitle: 'Review the proposed tile',
+				stepTitle: 'See exactly what changed',
 				stepImage: ScheduleUndoStep2,
 				stepBody:
-					'The preview tile shows your updated name, location, time, and date side by side with what was there before. You can see exactly what changed at a glance — no need to mentally track it.',
+					'The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved.',
 			},
 			{
 				type: 'step',
@@ -220,39 +255,43 @@ export const articles: Article[] = [
 				stepTitle: 'Tap Undo or Accept',
 				stepImage: ScheduleUndoStep3,
 				stepBody:
-					'Not happy with what you see? Tap Undo and your original schedule snaps back instantly — no undo history to dig through. Happy with the change? Tap Accept and it\'s locked in.',
+					'Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.',
 				callout: {
 					label: 'Undo is always instant',
-					text: 'It doesn\'t matter how complex the ripple was — Undo restores your exact original state in one tap.',
+					text: 'No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview.',
 				},
 			},
 			{
 				type: 'heading',
-				title: 'Why This Matters',
+				title: 'Why this matters',
 			},
 			{
 				type: 'prose',
-				text: 'Most calendar apps apply changes immediately and ask you to undo after the fact — by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this: the default is preview, not save.',
+				text: 'Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save.',
 			},
 			{
 				type: 'callout',
-				label: 'Designed for busy schedules',
-				text: 'When your day is tightly packed, a wrong move can cascade. Schedule Undo gives you a moment to breathe and verify before any change ripples outward.',
+				label: 'Built for tightly packed days',
+				text: 'When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live.',
 			},
 			{
 				type: 'prose',
-				text: 'Whether you\'re rescheduling a workout, shifting a meeting, or accepting a new task from a colleague — the preview step takes less than a second and can save you from a scheduling mistake you\'d regret.',
+				text: "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret.",
+			},
+			{
+				type: 'quote',
+				quote: 'Change your mind before it counts.',
 			},
 		],
 	},
 	{
 		slug: 'tileshare',
 		category: 'FEATURES',
-		title: 'Tileshare — Schedule Together',
+		title: 'Tileshare',
 		subtitle:
-			'Send adaptive tasks directly into someone else\'s Tiler. They land, they fit, they get done — no back-and-forth required.',
+			"Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
 		excerpt:
-			'Send adaptive tasks directly into someone else\'s Tiler. They land, they fit, they get done — no back-and-forth required.',
+			"Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 22, 2026',
@@ -261,11 +300,11 @@ export const articles: Article[] = [
 			{
 				type: 'prose',
 				lead: true,
-				text: 'Coordinating tasks across people usually means a thread of messages, a shared spreadsheet, or a calendar invite that lands at the wrong time. Tileshare replaces all of that with one tap.',
+				text: 'Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled.',
 			},
 			{
 				type: 'prose',
-				text: 'When you share a tile, it arrives in the recipient\'s Tiler as a live adaptive task — already scheduled around their day, no manual placement required.',
+				text: "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end.",
 			},
 			{
 				type: 'heading',
@@ -277,31 +316,35 @@ export const articles: Article[] = [
 				stepTitle: 'Share any tile',
 				stepImage: TileshareStep1,
 				stepBody:
-					'From any task in your schedule, tap Share and select a Tiler contact. The tile — including its duration, deadline, and location — is sent as-is.',
+					'From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.',
 				callout: {
 					label: 'What travels with the tile',
-					text: 'Task name, estimated duration, deadline, and location tags. The recipient\'s personal schedule stays completely private.',
+					text: "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private.",
 				},
 			},
 			{
 				type: 'step',
 				stepNumber: 2,
-				stepTitle: 'It lands in their schedule automatically',
+				stepTitle: 'It lands in their schedule',
 				stepImage: TileshareStep2,
 				stepBody:
-					'The shared tile appears in the recipient\'s Tiler and finds the best open slot around their existing commitments. No back-and-forth, no manual placement.',
+					"The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around.",
 			},
 			{
 				type: 'step',
 				stepNumber: 3,
-				stepTitle: 'Both sides stay in sync',
+				stepTitle: 'Track it without chasing',
 				stepImage: TileshareStep3,
 				stepBody:
-					'If the task is completed or rescheduled, the sender sees the status update. No more "did you get to that?" — Tileshare keeps everyone on the same page.',
+					"Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
 				callout: {
-					label: 'Works for teams and households',
-					text: 'Delegating work tasks or splitting errands — Tileshare makes shared responsibility visible without any extra tools.',
+					label: 'Shared accountability, zero friction',
+					text: 'Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop.',
 				},
+			},
+			{
+				type: 'quote',
+				quote: 'Send it once. Know it gets done.',
 			},
 		],
 	},

@@ -31,7 +31,7 @@ const SectionHeading = styled.h2`
 	font-size: ${palette.typography.fontSize.displayXs};
 	font-weight: 700;
 	color: white;
-	text-align: center;
+	text-align: left;
 	margin: 1rem 0 0;
 `;
 
@@ -55,6 +55,7 @@ const StepBadge = styled.div`
 	min-width: 36px;
 	border-radius: 50%;
 	background-color: ${palette.colors.brand[500]};
+	box-shadow: 0 0 0 4px rgba(237, 18, 59, 0.15);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -111,8 +112,8 @@ const StepBody = styled.p`
 `;
 
 const Callout = styled.div`
-	background-color: ${palette.colors.gray[900]};
-	border-left: 3px solid ${palette.colors.brand[500]};
+	background: linear-gradient(to right, rgba(237, 18, 59, 0.07), ${palette.colors.gray[900]});
+	border-left: 4px solid ${palette.colors.brand[500]};
 	border-radius: 0 8px 8px 0;
 	padding: 1rem 1.25rem;
 `;
@@ -138,6 +139,36 @@ const Caption = styled.p`
 	color: rgba(255, 255, 255, 0.35);
 	text-align: center;
 	margin: -1.5rem 0 0;
+`;
+
+const QuoteBlock = styled.blockquote`
+	margin: 0;
+	padding: 2rem 2.5rem;
+	border-radius: 16px;
+	background: linear-gradient(135deg, rgba(237, 18, 59, 0.08) 0%, rgba(237, 18, 59, 0.03) 100%);
+	border: 1px solid rgba(237, 18, 59, 0.2);
+	text-align: center;
+	position: relative;
+
+	&::before {
+		content: '';
+		display: block;
+		width: 32px;
+		height: 3px;
+		background: ${palette.colors.brand[500]};
+		border-radius: 2px;
+		margin: 0 auto 1.25rem;
+	}
+`;
+
+const QuoteText = styled.p`
+	font-family: ${palette.typography.fontFamily.urban};
+	font-size: ${palette.typography.fontSize.xl};
+	font-weight: 700;
+	color: white;
+	line-height: 1.4;
+	margin: 0;
+	font-style: italic;
 `;
 
 interface ArticleBodyProps {
@@ -197,6 +228,13 @@ export default function ArticleBody({ sections }: ArticleBodyProps) {
 								<StandaloneImage src={section.src} alt={section.caption || ''} />
 								{section.caption && <Caption>{section.caption}</Caption>}
 							</React.Fragment>
+						);
+
+					case 'quote':
+						return (
+							<QuoteBlock key={i}>
+								<QuoteText>{section.quote}</QuoteText>
+							</QuoteBlock>
 						);
 
 					default:
