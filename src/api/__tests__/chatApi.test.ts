@@ -93,4 +93,31 @@ describe('ChatApi', () => {
 
 		await expect(api.getMessages('session-1')).rejects.toThrow();
 	});
+
+	it('serializes location fields when executing actions', async () => {
+		fetchSpy.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { vibeRequest: {} },
+					ServerStatus: null,
+				}),
+				{ status: 200 }
+			)
+		);
+
+		await api.executeActions('request-1', 'anon-1', '', '', 'false');
+
+		expect(fetchSpy).toHaveBeenCalledTimes(1);
+		const [, init] = fetchSpy.mock.calls[0];
+		const body = JSON.parse((init as RequestInit).body as string);
+
+		expect(body).toEqual({
+			requestId: 'request-1',
+			anonymousUserId: 'anon-1',
+			userLongitude: '',
+			userLatitude: '',
+			userLocationVerified: 'false',
+		});
+	});
 });

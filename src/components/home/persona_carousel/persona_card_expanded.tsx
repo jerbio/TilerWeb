@@ -8,6 +8,7 @@ import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
 import Chat from '@/core/common/components/chat/chat';
+import UserLocation from '@/core/common/components/chat/user_location';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
@@ -317,6 +318,9 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 								data-onboarding-mobile-chat-input
 							/>
 						</MobileChatInputWrapper>
+						<MobileLocationWrapper>
+							<UserLocation idPrefix="persona-mobile-user-location" />
+						</MobileLocationWrapper>
 					</CalendarContainerActionButtons>
 				</React.Fragment>
 			),
@@ -563,11 +567,21 @@ const CalendarContainerActionButtons = styled.div`
 	left: 1rem;
 	right: 1rem;
 	display: flex;
+	flex-direction: column;
 	gap: 12px;
 	padding-left: 69px;
 
 	@media screen and (min-width: ${palette.screens.lg}) {
 		display: none;
+	}
+`;
+
+const MobileLocationWrapper = styled.div`
+	width: 100%;
+
+	& > div {
+		margin-top: 0;
+		backdrop-filter: blur(8px);
 	}
 `;
 
