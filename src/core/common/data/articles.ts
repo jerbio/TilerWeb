@@ -1,4 +1,8 @@
 import GettingStartedHero from '@/assets/articles/hero.png';
+import NLSCard from '@/assets/articles/nls-card.png';
+import SmartTravelCard from '@/assets/articles/smart-travel-card.png';
+import ScheduleUndoCard from '@/assets/articles/schedule-undo-card.png';
+import TileshareCard from '@/assets/articles/tileshare-card.png';
 import TilesBackground from '@/assets/highlights/tiles.jpg';
 import MountainBackground from '@/assets/highlights/mountain.jpg';
 import FitnessBackground from '@/assets/highlights/fitness.jpg';
@@ -79,7 +83,7 @@ export const articles: Article[] = [
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 1, 2026',
-		coverImage: NLSHero,
+		coverImage: NLSCard,
 		sections: [
 			{
 				type: 'prose',
@@ -146,7 +150,7 @@ export const articles: Article[] = [
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 8, 2026',
-		coverImage: TravelHero,
+		coverImage: SmartTravelCard,
 		sections: [
 			{
 				type: 'prose',
@@ -214,7 +218,7 @@ export const articles: Article[] = [
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'June 22, 2026',
-		coverImage: ScheduleUndoHero,
+		coverImage: ScheduleUndoCard,
 		sections: [
 			{
 				type: 'prose',
@@ -295,7 +299,7 @@ export const articles: Article[] = [
 		readTime: '4 min read',
 		author: 'Tiler Team',
 		date: 'May 22, 2026',
-		coverImage: TileshareHero,
+		coverImage: TileshareCard,
 		sections: [
 			{
 				type: 'prose',
