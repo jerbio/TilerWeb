@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { AlertCircle } from 'lucide-react';
 import Button from '@/core/common/components/button';
 import { SimulationDto, SimulationState, VibeRequest } from '@/core/common/types/chat';
 import { isRequestTerminal } from '@/core/util/simulationSelectors';
@@ -62,6 +63,11 @@ const Message = styled.span`
 	min-width: 0;
 `;
 
+const DefunctStrip = styled(Strip)`
+	opacity: 0.65;
+	color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
 /**
  * Compact status strip rendered above the action pill row. Communicates
  * simulation lifecycle to the user without ever gating Apply (Apply lives
@@ -102,17 +108,56 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 
 	// Hidden cases — no strip at all.
 	if (simulation?.state === SimulationState.Invalidated) return null;
-	// No active request and no simulation → nothing to communicate. This
-	// is the home-page first-paint state (chat session not yet hydrated,
-	// or session has no in-flight request). Without this guard the
-	// no-simulation branch below would render "Simulation starting…"
-	// unconditionally on app load.
+	// No active request and no simulation → nothing to communicate.
 	if (!simulation && !request) return null;
 	if (!simulation && isRequestTerminal(request)) return null;
-	// Plan §6.6.3 — if a newer request has superseded this one, the
-	// embedded simulation (even when 'Ready') is historical. Hide the
-	// strip so the user isn't invited to review/apply a stale preview.
-	if (request?.supersededByRequestId) return null;
+	// Request was executed (user accepted changes) or closed — nothing left
+	// to review or surface; hide the strip entirely.
+	if (request?.isClosed || request?.state?.toLowerCase() === 'executed') return null;
+	// Defunct: a newer request superseded this one, or the server flagged
+	// the simulation as stale. Show a muted warning strip instead of hiding
+	// completely — the user should know the tilecast is outdated even if
+	// they choose to review it anyway.
+	const isDefunct = !!request?.supersededByRequestId || simulation?.isStale === true;
+	if (isDefunct) {
+		const count = simulation?.previewActions?.length ?? 0;
+		return (
+			<DefunctStrip role="status" aria-live="polite" data-testid="defunct-strip">
+				<AlertCircle
+					size={13}
+					strokeWidth={2}
+					data-testid="defunct-icon"
+					aria-hidden="true"
+				/>
+				<Message>
+					{t('home.expanded.chat.simulationDefunct', 'Outdated tilecast')}
+					{count > 0 &&
+						` · ${count} ${t('home.expanded.chat.simulationChangesLabel', 'changes')}`}
+				</Message>
+				{simulation?.state === SimulationState.Ready && (
+					<Button
+						variant="ghost"
+						height={28}
+						onClick={onReview}
+						disabled={isLoadingReview}
+						aria-busy={isLoadingReview || undefined}
+						data-testid="defunct-review-button"
+					>
+						{isLoadingReview ? (
+							<>
+								<Spinner data-testid="review-loading-spinner" aria-hidden="true" />
+								<span style={{ marginLeft: 6 }}>
+									{t('home.expanded.chat.loadingSimulation', 'Loading tilecast…')}
+								</span>
+							</>
+						) : (
+							t('home.expanded.chat.review', 'Review')
+						)}
+					</Button>
+				)}
+			</DefunctStrip>
+		);
+	}
 
 	// No simulation row yet — request is fresh, generation hasn't started server-side.
 	if (!simulation) {

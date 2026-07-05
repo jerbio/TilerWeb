@@ -156,16 +156,17 @@ describe('SimulationStatusStrip', () => {
 	});
 
 	// Plan §6.6.3 — refresh into a session whose latest request was
-	// already superseded should NOT prompt the user to review/apply the
-	// stale embedded preview, even when its state is `Ready`.
-	it('renders nothing when the request is superseded (even with a Ready simulation)', () => {
-		const { container } = renderStrip({
+	// already superseded should show the defunct strip (not hide entirely),
+	// so the user knows the preview is stale even if they open review.
+	it('shows defunct strip (not empty) when the request is superseded with a Ready simulation', () => {
+		renderStrip({
 			simulation: makeSim(SimulationState.Ready, {
 				previewActions: [{ actionId: 'a', vibePreviewId: 'p1' }],
 			}),
 			request: makeRequest({ supersededByRequestId: 'r2' }),
 			onReview: vi.fn(),
 		});
-		expect(container).toBeEmptyDOMElement();
+		expect(screen.getByTestId('defunct-strip')).toBeInTheDocument();
+		expect(screen.getByText(/outdated tilecast/i)).toBeInTheDocument();
 	});
 });

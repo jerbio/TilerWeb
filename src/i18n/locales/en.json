@@ -483,6 +483,8 @@
 				"simulationGenerating": "Generating tilecast…",
 				"simulationReady": "Tilecast ready",
 				"simulationChangesLabel": "changes",
+				"simulationDefunct": "Outdated tilecast",
+				"review": "Review",
 				"simulationInProgress": "This change is still being forecast.",
 				"simulationFailed": "Tilecast unavailable",
 				"simulationStale": "Tilecast is out of date",
