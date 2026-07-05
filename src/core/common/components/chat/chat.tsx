@@ -24,7 +24,7 @@ import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/
 import analytics from '@/core/util/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
-import ActionPill from '@/core/common/components/chat/ActionPill';
+import ActionPillStrip from '@/core/common/components/chat/ActionPillStrip';
 import SimulationStatusStrip from '@/core/common/components/chat/SimulationStatusStrip';
 import SimulationReviewPanel from '@/core/common/components/chat/SimulationReviewPanel';
 import useSimulationPolling from '@/hooks/useSimulationPolling';
@@ -1457,36 +1457,23 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 										<MarkdownRenderer content={message.content} />
 									</div>
 
-									{message.actions
-										?.filter(
-											(action) =>
-												action.type !== 'conversational_and_not_supported'
-										)
-										.map((action) => {
-											const sim = simulation;
-											const simAction = sim
-												? buildSimulationActionLookups(sim).byActionId[
-														action.id
-													]
-												: undefined;
-											return (
-												<ActionPill
-													key={action.id}
-													action={action}
-													simulation={sim}
-													request={vibeRequest}
-													simulationAction={simAction}
-													onSelect={(a, sa) => {
-														// Prefer wire `actionId`; fall back to the
-														// embedded VibeAction.id and finally the source
-														// action.id so older payloads still wire up.
-														const id =
-															sa?.actionId ?? sa?.action?.id ?? a.id;
-														if (id) setSelectedActionId(id);
-													}}
-												/>
-											);
-										})}
+									{message.actions && (
+										<ActionPillStrip
+											actions={message.actions}
+											simulation={simulation}
+											request={vibeRequest}
+											simulationActionById={
+												simulation
+													? buildSimulationActionLookups(simulation)
+															.byActionId
+													: undefined
+											}
+											onSelect={(a, sa) => {
+												const id = sa?.actionId ?? sa?.action?.id ?? a.id;
+												if (id) setSelectedActionId(id);
+											}}
+										/>
+									)}
 								</MessageBubble>
 							))}
 						</div>

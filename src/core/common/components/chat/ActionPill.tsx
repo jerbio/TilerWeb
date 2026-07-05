@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { keyframes, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { ChevronRight } from 'lucide-react';
 import Button from '@/core/common/components/button';
 import ActionIcon from '@/core/common/components/chat/ActionIcon';
@@ -25,18 +25,6 @@ import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { getActionScheduleState, ScheduleState } from '@/core/util/scheduleConsistency';
 import { isRequestTerminal } from '@/core/util/simulationSelectors';
 
-// Plan §5.3 — chip affordances for review mode. Brand indigo aligns with the
-// per-tile primary tier accent in `calendar_event.tsx`.
-const PILL_BRAND = 'rgba(99,102,241,0.95)';
-const PILL_BRAND_SOFT = 'rgba(99,102,241,0.55)';
-const PILL_BRAND_GLOW = 'rgba(99,102,241,0.45)';
-
-const pillSelectionPulse = keyframes`
-	0%   { box-shadow: 0 0 0 2px ${PILL_BRAND}, 0 0 0 6px rgba(99,102,241,0.45); }
-	50%  { box-shadow: 0 0 0 2px ${PILL_BRAND}, 0 0 0 10px rgba(99,102,241,0.0); }
-	100% { box-shadow: 0 0 0 2px ${PILL_BRAND}, 0 0 0 6px rgba(99,102,241,0.45); }
-`;
-
 const PillWrapper = styled.span<{
 	$reviewable: boolean;
 	$selected: boolean;
@@ -45,22 +33,6 @@ const PillWrapper = styled.span<{
 	display: inline-flex;
 	border-radius: 999px;
 	margin: 2px 4px 2px 0;
-	transition:
-		box-shadow 0.2s ease,
-		transform 0.2s ease;
-	${(p) =>
-		p.$reviewable &&
-		!p.$selected &&
-		css`
-			box-shadow:
-				0 0 0 2px ${PILL_BRAND_SOFT},
-				0 0 8px ${PILL_BRAND_GLOW};
-		`}
-	${(p) =>
-		p.$selected &&
-		css`
-			animation: ${pillSelectionPulse} 1.6s ease-in-out infinite;
-		`}
 	${(p) =>
 		p.$navigatable &&
 		css`
@@ -68,11 +40,11 @@ const PillWrapper = styled.span<{
 		`}
 `;
 
-const NavGlyph = styled.span<{ $emphasized: boolean }>`
+const NavGlyph = styled.span`
 	display: inline-flex;
 	align-items: center;
 	margin-left: 0.25rem;
-	color: ${(p) => (p.$emphasized ? PILL_BRAND : 'rgba(255,255,255,0.55)')};
+	color: ${(p) => p.theme.colors.text.secondary};
 	flex-shrink: 0;
 `;
 
@@ -339,7 +311,7 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
 					<span className="action-description">{action.descriptions}</span>
 					{isClickable && (
-						<NavGlyph $emphasized={isReviewable || isSelectedChip} aria-hidden="true">
+						<NavGlyph aria-hidden="true">
 							<ChevronRight size={14} strokeWidth={2.25} />
 						</NavGlyph>
 					)}

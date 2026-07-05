@@ -90,6 +90,7 @@ export interface SimulationDto {
 	processingStartAt?: number;
 	processingEndAt?: number;
 	scheduleDumpId?: string;
+	isStale?: boolean;
 	previewActions?: SimulationActionDto[];
 }
 
