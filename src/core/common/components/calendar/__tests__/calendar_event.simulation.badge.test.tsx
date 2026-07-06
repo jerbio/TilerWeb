@@ -147,3 +147,50 @@ describe('CalendarEvent — filter dimming', () => {
 		);
 	});
 });
+
+describe('CalendarEvent — removed ghost tile', () => {
+	beforeEach(() => {
+		useSimulationOverlayStore.setState({ inReview: true, activeKindFilter: null });
+	});
+
+	it('marks the container as a ghost for removed tiles', () => {
+		renderTile({ tier: 'primary', kind: 'removed' });
+		expect(screen.getByTestId('event-container')).toHaveAttribute(
+			'data-simulation-ghost',
+			'true'
+		);
+	});
+
+	it('does not mark non-removed tiles as ghosts', () => {
+		renderTile({ tier: 'primary', kind: 'new' });
+		expect(screen.queryByTestId('event-container')).not.toHaveAttribute(
+			'data-simulation-ghost'
+		);
+	});
+
+	it('is read-only: clicking a ghost does not fire onSimulatedClick', () => {
+		const onSim = vi.fn();
+		render(
+			<ThemeProvider>
+				<CalendarEvent
+					event={baseEvent}
+					selectedEvent={null}
+					setSelectedEvent={() => {}}
+					setSelectedEventInfo={() => {}}
+					simulation={{ tier: 'primary', kind: 'removed' }}
+					onSimulatedClick={onSim}
+				/>
+			</ThemeProvider>
+		);
+		screen.getByRole('heading', { name: 'Workout' }).click();
+		expect(onSim).not.toHaveBeenCalled();
+	});
+
+	it('stays visible (not dimmed) when the removed filter is active', () => {
+		useSimulationOverlayStore.setState({ inReview: true, activeKindFilter: 'removed' });
+		renderTile({ tier: 'primary', kind: 'removed' });
+		const container = screen.getByTestId('event-container');
+		expect(container).toHaveAttribute('data-simulation-ghost', 'true');
+		expect(container).not.toHaveAttribute('data-filter-dimmed', 'true');
+	});
+});

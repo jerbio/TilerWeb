@@ -37,8 +37,15 @@ export interface SimulationDiffCounts {
 }
 
 export interface SimulationDiffResult {
-	/** Tiles to render in simulation mode. v1 omits ghosts for removed tiles. */
+	/** The overlay schedule tiles to render in simulation mode. */
 	events: SubCalendarEvent[];
+	/**
+	 * Read-only "ghost" tiles for removed events (kind === 'removed'). Kept
+	 * separate from `events` so the grid can render them on demand only —
+	 * they are noisy by default and are surfaced when the user filters by
+	 * deletions (see calendar_wrapper).
+	 */
+	ghostEvents: SubCalendarEvent[];
 	/** Per-tile classification keyed by composite `entityType:entityId`. */
 	classification: Record<string, SimulatedTileClassification>;
 	counts: SimulationDiffCounts;
@@ -170,12 +177,17 @@ export function buildSimulationDiff(args: BuildSimulationDiffArgs): SimulationDi
 		// Otherwise leave classification unset → treated as unchanged downstream.
 	}
 
-	// Walk live-only tiles to surface removals.
+	// Walk live-only tiles to surface removals. These are emitted as read-only
+	// "ghost" tiles (kept in a separate array) so the removed count has a
+	// visible anchor when the user filters by deletions. Force `isViable` so
+	// they clear the grid's viability render filter when surfaced.
+	const ghostEvents: SubCalendarEvent[] = [];
 	for (const liveEv of liveEvents) {
 		const key = entityKeyFromEvent(liveEv);
 		if (overlayByKey.has(key)) continue;
 		classification[key] = { kind: 'removed', tier: 'primary' };
 		if (inWindow(liveEv, window)) counts.removed += 1;
+		ghostEvents.push({ ...liveEv, isViable: true });
 	}
 
 	// Density safeguard: cap loud Primary tiles on the grid (§5.2.5).
@@ -194,7 +206,8 @@ export function buildSimulationDiff(args: BuildSimulationDiffArgs): SimulationDi
 	}
 
 	return {
-		events: overlayEvents,
+		events: [...overlayEvents],
+		ghostEvents,
 		classification,
 		counts,
 	};

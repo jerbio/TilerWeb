@@ -204,15 +204,22 @@ describe('buildSimulationDiff', () => {
 		expect(conflicts).toHaveLength(conflictCount);
 	});
 
-	it('returns events array equal to overlayEvents (v1 defers ghost rendering)', () => {
+	it('emits removed live-only tiles as separate ghostEvents (kept out of events)', () => {
 		const overlay = [ev('a'), ev('b')];
 		const result = buildSimulationDiff({
-			liveEvents: [ev('removed')],
+			liveEvents: [ev('removed', { isViable: false })],
 			overlayEvents: overlay,
 			actions: [pa('act-r', 'removed')],
 			window: FULL_WINDOW,
 		});
+		// `events` stays overlay-only — ghosts are surfaced on demand.
 		expect(result.events.map((e) => e.id)).toEqual(['a', 'b']);
+		// The removed tile lives in the separate ghostEvents array.
+		expect(result.ghostEvents.map((e) => e.id)).toEqual(['removed']);
+		// Ghost carries the removed classification...
+		expect(result.classification[entityKey(SUBCAL, 'removed')].kind).toBe('removed');
+		// ...and is forced viable so it clears the grid render filter.
+		expect(result.ghostEvents[0].isViable).toBe(true);
 	});
 
 	it('counts.added/removed/edited/shifted/conflicts all populate correctly', () => {

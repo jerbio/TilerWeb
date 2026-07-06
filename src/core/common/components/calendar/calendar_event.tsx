@@ -58,6 +58,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 }) => {
 	const { isDarkMode } = useTheme();
 	const inSimulation = !!simulation;
+	const isGhost = simulation?.kind === 'removed';
 	const { t } = useTranslation();
 	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
 	const inReview = useSimulationOverlayStore((s) => s.inReview);
@@ -71,6 +72,11 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 		!!event.thirdPartyType &&
 		event.thirdPartyType !== ThirdPartyType.Tiler &&
 		event.thirdPartyType !== 'tiler';
+	const containerStyle: React.CSSProperties | undefined = isFilterDimmed
+		? { opacity: 0.25, pointerEvents: 'none' }
+		: isGhost
+			? { pointerEvents: 'none' }
+			: undefined;
 	return (
 		<EventContainer
 			onClick={(e) => {
@@ -83,6 +89,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 			data-simulation-tier={simulation?.tier}
 			data-simulation-kind={simulation?.kind}
 			data-simulation-selected={simulationSelected || undefined}
+			data-simulation-ghost={isGhost ? 'true' : undefined}
 			data-filter-dimmed={isFilterDimmed ? 'true' : undefined}
 			data-testid="event-container"
 			aria-current={simulationSelected ? 'true' : undefined}
@@ -97,12 +104,13 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 			$focused={focused}
 			$simulation={simulation}
 			$simulationSelected={simulationSelected}
+			$isGhost={isGhost}
 			$colors={{
 				r: event.colorRed ?? TypeDefaults.RGBColor.red,
 				g: event.colorGreen ?? TypeDefaults.RGBColor.green,
 				b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
 			}}
-			style={isFilterDimmed ? { opacity: 0.25, pointerEvents: 'none' } : undefined}
+			style={containerStyle}
 		>
 			<EventContent
 				height={event.springStyles.height}
@@ -113,8 +121,11 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 					b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
 				}}
 				$simulation={simulation}
+				$isGhost={isGhost}
 				onClick={() => {
 					if (inSimulation) {
+						// Removed "ghost" tiles are display-only (plan §5.6).
+						if (isGhost) return;
 						// Plan §5.3.2 — simulation tiles route to the chip
 						// selection handler instead of the info modal.
 						onSimulatedClick?.();
@@ -258,19 +269,26 @@ const EventContainer = styled(animated.div)<{
 	$darkmode: boolean;
 	$simulation?: SimulatedTileClassification;
 	$simulationSelected?: boolean;
+	$isGhost?: boolean;
 }>`
 	padding: 4px;
 	position: relative;
 	width: 100%;
 	border-radius: 12px;
-	animation: ${({ $focused, $simulation, $simulationSelected }) => {
+	/* Removed "ghost" tiles are lifted above the dimmed retained tiles so
+	 * their solid surface fully occludes whatever sits behind them (no
+	 * bleed-through when filtering by deletions). */
+	z-index: ${({ $isGhost }) => ($isGhost ? 20 : 'auto')};
+	animation: ${({ $focused, $simulation, $simulationSelected, $isGhost }) => {
+			if ($isGhost) return 'none';
 			if ($simulationSelected) return selectionPulse;
 			if ($focused) return focusPulse;
 			if ($simulation && ($simulation.tier === 'primary' || $simulation.tier === 'conflict'))
 				return primaryEnterPulse;
 			return 'none';
 		}}
-		${({ $simulationSelected, $focused }) => {
+		${({ $simulationSelected, $focused, $isGhost }) => {
+			if ($isGhost) return '0s';
 			if ($simulationSelected) return '2s ease-in-out infinite';
 			if ($focused) return '1s ease-in-out 3';
 			return '600ms ease-out 1';
@@ -345,6 +363,7 @@ const EventContent = styled.div<{
 	height: number;
 	$variant: 'block' | 'tile';
 	$simulation?: SimulatedTileClassification;
+	$isGhost?: boolean;
 }>`
 	position: relative;
 	background-color: ${({ $colors, $darkmode }) => {
@@ -377,8 +396,23 @@ const EventContent = styled.div<{
 	 * shifts (PRD #6). The conflict tier draws an extra red left stripe via
 	 * a layered shadow. The mapped/cascade tiers draw a thin left stripe
 	 * only and skip the border. */
-	${({ $simulation }) => {
+	${({ $simulation, $isGhost, $colors, $darkmode }) => {
 		if (!$simulation || $simulation.tier === 'unchanged') return '';
+		// Removed "ghost" tiles get a dashed red frame instead of the loud
+		// primary accent, signalling a read-only deletion preview. A solid
+		// opaque surface + outer drop shadow lifts them off the dimmed grid
+		// so they read as the focused layer when filtering by deletions.
+		if ($isGhost) {
+			const surface = colorUtil.setLightness($colors, $darkmode ? 0.325 : 0.92);
+			return `
+				background-color: rgb(${surface.r}, ${surface.g}, ${surface.b});
+				box-shadow:
+					inset 0 0 0 1.5px ${TIER_ACCENT.conflict},
+					0 6px 18px rgba(0, 0, 0, ${$darkmode ? 0.55 : 0.28});
+				border-style: dashed !important;
+				cursor: default;
+			`;
+		}
 		const accent = TIER_ACCENT[$simulation.tier];
 		switch ($simulation.tier) {
 			case 'primary':
@@ -408,6 +442,7 @@ const EventContent = styled.div<{
 			overflow: hidden;
 			font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 			font-size: 13px;
+			text-decoration: ${({ $isGhost }) => ($isGhost ? 'line-through' : 'none')};
 		}
 
 		${EventLockIcon} {

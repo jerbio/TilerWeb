@@ -88,7 +88,15 @@ export function CalendarWrapper({
 	]);
 
 	const showOverlay = inReview && comparisonView === 'simulation' && diff !== null;
-	const renderedEvents = showOverlay ? diff!.events : events;
+	// Removed "ghost" tiles are hidden by default (they clutter the view when
+	// what you want to see are the updates). They are only surfaced when the
+	// user explicitly filters by deletions.
+	const renderedEvents = useMemo(() => {
+		if (!showOverlay) return events;
+		return activeKindFilter === 'removed'
+			? [...diff!.events, ...diff!.ghostEvents]
+			: diff!.events;
+	}, [showOverlay, events, diff, activeKindFilter]);
 
 	// Plan §5.3 — bidirectional selection. Build the lookups once per
 	// simulation and route tile clicks back to `selectedActionId`.

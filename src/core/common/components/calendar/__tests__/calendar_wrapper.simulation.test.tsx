@@ -22,6 +22,10 @@ import { SimulationState } from '@/core/common/types/chat';
 
 const calendarSpy = vi.fn();
 
+// Mutable holder so individual tests can inject live events (e.g. to exercise
+// the removed-ghost append path). Hoisted so the vi.mock factory can read it.
+const liveHolder = vi.hoisted(() => ({ events: [] as unknown[] }));
+
 vi.mock('@/core/common/components/calendar/calendar', () => ({
 	default: (props: { events: unknown[] }) => {
 		calendarSpy(props);
@@ -31,7 +35,7 @@ vi.mock('@/core/common/components/calendar/calendar', () => ({
 
 vi.mock('@/core/common/hooks/usePrefetchedCalendarEvents', () => ({
 	default: () => ({
-		events: [],
+		events: liveHolder.events,
 		loading: false,
 		refetchEvents: vi.fn(),
 	}),
@@ -71,6 +75,7 @@ const renderWrapper = () =>
 describe('CalendarWrapper — simulation overlay wire contract', () => {
 	beforeEach(() => {
 		calendarSpy.mockClear();
+		liveHolder.events = [];
 		// Reset store between tests.
 		useSimulationOverlayStore.setState({
 			inReview: false,
@@ -79,6 +84,7 @@ describe('CalendarWrapper — simulation overlay wire contract', () => {
 			vibeRequest: null,
 			comparisonView: 'simulation',
 			selectedActionId: null,
+			activeKindFilter: null,
 		});
 	});
 
@@ -125,6 +131,74 @@ describe('CalendarWrapper — simulation overlay wire contract', () => {
 		const lastCall = calls[calls.length - 1][0] as { events: unknown[] };
 		expect(lastCall.events).toHaveLength(expectedCount);
 		expect(expectedCount).toBeGreaterThan(0);
+	});
+
+	it('hides removed-ghost tiles by default and surfaces them under the removed filter', () => {
+		// A live event whose id is NOT in the fixture overlay → removed ghost.
+		liveHolder.events = [
+			{
+				id: 'ghost-removed-1',
+				start: 1714809600000,
+				end: 1714813200000,
+				name: 'Deleted meeting',
+				isViable: true,
+			},
+		];
+		renderWrapper();
+
+		const result = fixture as unknown as SimulationScheduleResult;
+		const overlayCount = result.preview.subCalendarEvents!.length;
+
+		const simulation: SimulationDto = {
+			id: 'sim-1',
+			vibeRequestId: 'vibe-request-fixture-id',
+			tilerUserId: 'user-1',
+			creationTimeInMs: 1714800000000,
+			state: SimulationState.Ready,
+			previewActions: [],
+		};
+		const vibeRequest: VibeRequest = {
+			id: 'vibe-request-fixture-id',
+			creationTimeInMs: 1714800000000,
+			activeAction: null,
+			isClosed: false,
+			beforeScheduleId: null,
+			afterScheduleId: null,
+			actions: [],
+		};
+
+		act(() => {
+			useSimulationOverlayStore.getState().enterReview({
+				simulation,
+				simulationResult: result,
+				vibeRequest,
+			});
+		});
+
+		// Default review: ghost is hidden, overlay tiles only.
+		let calls = calendarSpy.mock.calls;
+		let lastProps = calls[calls.length - 1][0] as {
+			events: Array<{ id: string }>;
+			simulationClassification?: Record<string, { kind: string }>;
+		};
+		expect(lastProps.events).toHaveLength(overlayCount);
+		expect(lastProps.events.some((e) => e.id === 'ghost-removed-1')).toBe(false);
+		// Classification still carries the removal (so the count/chip work).
+		expect(lastProps.simulationClassification!['SubcalendarEvent:ghost-removed-1'].kind).toBe(
+			'removed'
+		);
+
+		// Filtering by deletions surfaces the ghost tile.
+		act(() => {
+			useSimulationOverlayStore.getState().setKindFilter('removed');
+		});
+		calls = calendarSpy.mock.calls;
+		lastProps = calls[calls.length - 1][0] as {
+			events: Array<{ id: string }>;
+			simulationClassification?: Record<string, { kind: string }>;
+		};
+		expect(lastProps.events).toHaveLength(overlayCount + 1);
+		expect(lastProps.events.some((e) => e.id === 'ghost-removed-1')).toBe(true);
 	});
 
 	it('forwards classification + click handler + selection key into <Calendar /> in review', () => {
