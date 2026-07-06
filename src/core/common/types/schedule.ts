@@ -127,6 +127,25 @@ export enum ThirdPartyType {
 	Unknown = 'unknown',
 }
 
+/**
+ * Known video/conferencing source keys emitted by the backend under
+ * `otherData.videoUrls`. The key set mirrors the C# `VideoSource` enum
+ * (lowercased on the wire).
+ */
+export type VideoLinkSource = 'zoom' | 'google' | 'outlook' | 'other';
+
+/** Map of source → URLs. Each source may carry zero, one, or more URLs. */
+export type EventVideoLinks = Partial<Record<VideoLinkSource, string[]>>;
+
+/**
+ * Free-form bag of extra fields the backend ships under `otherData`. We model
+ * the keys we render (`videoUrls`) and leave the rest open for forward-compat.
+ */
+export type EventOtherData = {
+	videoUrls?: EventVideoLinks;
+	[key: string]: unknown;
+};
+
 export type SubCalendarEvent = {
 	id: string;
 	start: number;
@@ -185,6 +204,11 @@ export type SubCalendarEvent = {
 	SubCalCalEventStart?: number;
 	SubCalCalEventEnd?: number;
 	travelDetail?: TravelDetail;
+	/**
+	 * Loose bag of additional fields the backend may surface (e.g. attached
+	 * video/meeting links). Absent when there is nothing to render.
+	 */
+	otherData?: EventOtherData;
 };
 
 export type ScheduleLookupTravelDetail = TravelPath | null;
