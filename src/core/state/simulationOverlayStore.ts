@@ -19,6 +19,13 @@ import { SimulationDto, SimulationScheduleResult, VibeRequest } from '@/core/com
 export type ComparisonView = 'simulation' | 'current';
 
 /**
+ * Active tile-kind filter set from the SimulationModeBanner chip toggles.
+ * Matches the badge vocabulary: 'new' | 'removed' | 'updated' | 'conflict'.
+ * null = no filter (show all tiles).
+ */
+export type KindFilter = 'new' | 'removed' | 'updated' | 'conflict';
+
+/**
  * Mobile-only collapse state for the review bottom sheet. Four discrete
  * stops give the user predictable control over how much of the calendar
  * grid is visible while reviewing a tilecast:
@@ -46,6 +53,8 @@ export interface SimulationOverlayState {
 	selectedActionId: string | null;
 	/** Mobile bottom-sheet collapse stop (peek / mid / full). */
 	reviewStop: ReviewStop;
+	/** Active tile-kind filter driven by banner chip toggles. null = show all. */
+	activeKindFilter: KindFilter | null;
 
 	enterReview: (args: {
 		simulation: SimulationDto;
@@ -59,6 +68,8 @@ export interface SimulationOverlayState {
 	cycleReviewStop: () => void;
 	/** Update the simulationResult in-place (for refresh on stale, §5.4). */
 	setSimulationResult: (r: SimulationScheduleResult | null) => void;
+	setKindFilter: (filter: KindFilter | null) => void;
+	toggleKindFilter: (filter: KindFilter) => void;
 }
 
 const useSimulationOverlayStore = create<SimulationOverlayState>((set) => ({
@@ -69,6 +80,7 @@ const useSimulationOverlayStore = create<SimulationOverlayState>((set) => ({
 	comparisonView: 'simulation',
 	selectedActionId: null,
 	reviewStop: 'full',
+	activeKindFilter: null,
 
 	enterReview: ({ simulation, simulationResult, vibeRequest }) => {
 		// Plan §5.3 — auto-select the first reviewable action so chips,
@@ -102,6 +114,7 @@ const useSimulationOverlayStore = create<SimulationOverlayState>((set) => ({
 			selectedActionId: null,
 			comparisonView: 'simulation',
 			reviewStop: 'full',
+			activeKindFilter: null,
 		}),
 
 	setComparisonView: (comparisonView) => set({ comparisonView }),
@@ -114,6 +127,9 @@ const useSimulationOverlayStore = create<SimulationOverlayState>((set) => ({
 			return { reviewStop: next };
 		}),
 	setSimulationResult: (simulationResult) => set({ simulationResult }),
+	setKindFilter: (activeKindFilter) => set({ activeKindFilter }),
+	toggleKindFilter: (filter) =>
+		set((s) => ({ activeKindFilter: s.activeKindFilter === filter ? null : filter })),
 }));
 
 export default useSimulationOverlayStore;

@@ -5,6 +5,13 @@ import CalendarEvent from '../calendar_event';
 import type { StyledEvent } from '../calendar_events';
 import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
 
+// CalendarEvent calls useCalendarUI for the notes popover; mock it so we
+// don't need a full CalendarUIProvider in these unit tests.
+vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
+	useCalendarUI: () => vi.fn(),
+	CalendarUIProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // Plan §5.2 — per-tier styling and §5.3.2 — click forwarding through
 // `onSimulatedClick`. We assert via DOM data attributes instead of pixel
 // snapshots; styling is validated qualitatively in the styled-component

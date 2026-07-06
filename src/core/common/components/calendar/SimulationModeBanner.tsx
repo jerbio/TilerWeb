@@ -2,15 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { SimulationDiffCounts } from '@/core/util/simulationDiff';
-import { ComparisonView } from '@/core/state/simulationOverlayStore';
+import { ComparisonView, KindFilter } from '@/core/state/simulationOverlayStore';
 
 // ---------------------------------------------------------------------------
 // Phase 5 — Simulation mode banner
-// ---------------------------------------------------------------------------
-// Sits above the calendar grid while the user is in review. Surfaces the
-// `[Current | Simulation]` toggle (radiogroup), aggregate diff counts, and
-// an Exit-review button. Pure presentational — all state lives in the
-// `simulationOverlayStore`.
 // ---------------------------------------------------------------------------
 
 interface SimulationModeBannerProps {
@@ -18,6 +13,8 @@ interface SimulationModeBannerProps {
 	comparisonView: ComparisonView;
 	onComparisonViewChange: (v: ComparisonView) => void;
 	onExitReview: () => void;
+	activeKindFilter?: KindFilter | null;
+	onKindFilterChange?: (filter: KindFilter) => void;
 }
 
 const Wrapper = styled.div`
@@ -55,9 +52,40 @@ const ToggleButton = styled.button<{ $active: boolean }>`
 
 const Counts = styled.div`
 	display: inline-flex;
-	gap: 10px;
-	color: ${({ theme }) => theme.colors.text};
-	opacity: 0.85;
+	gap: 6px;
+	align-items: center;
+`;
+
+const FilterChip = styled.button<{ $color: string; $active: boolean }>`
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 999px;
+	border: 1.5px solid ${({ $color }) => $color};
+	background: ${({ $color, $active }) => ($active ? $color : 'transparent')};
+	color: ${({ $color, $active, theme }) => ($active ? '#fff' : $color)};
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	transition:
+		background 0.15s ease,
+		color 0.15s ease;
+	&:focus-visible {
+		outline: 2px solid ${({ $color }) => $color};
+		outline-offset: 2px;
+	}
+`;
+
+const Legend = styled.div`
+	display: none;
+	@media (max-width: 768px) {
+		display: flex;
+		flex-basis: 100%;
+		gap: 10px;
+		font-size: 10px;
+		opacity: 0.6;
+		color: ${({ theme }) => theme.colors.text.secondary};
+	}
 `;
 
 const Spacer = styled.div`
@@ -81,6 +109,8 @@ const SimulationModeBanner: React.FC<SimulationModeBannerProps> = ({
 	comparisonView,
 	onComparisonViewChange,
 	onExitReview,
+	activeKindFilter = null,
+	onKindFilterChange,
 }) => {
 	const { t } = useTranslation();
 	const exitLabel = t('home.expanded.chat.exitReview', { defaultValue: 'Exit review' });
@@ -88,12 +118,50 @@ const SimulationModeBanner: React.FC<SimulationModeBannerProps> = ({
 	const simulationLabel = t('home.expanded.chat.viewSimulation', {
 		defaultValue: 'Simulation',
 	});
-	// Plan §5.4 / §5.5 — empty-diff banner text.
 	const isEmptyDiff =
 		counts.added + counts.removed + counts.edited + counts.shifted + counts.conflicts === 0;
 	const emptyLabel = t('home.expanded.chat.simulationNoChangesInView', {
 		defaultValue: 'No changes in this view',
 	});
+
+	const updatedCount = counts.edited + counts.shifted;
+
+	const chips: Array<{
+		kind: KindFilter;
+		glyph: string;
+		count: number;
+		color: string;
+		title: string;
+	}> = [
+		{
+			kind: 'new',
+			glyph: '+',
+			count: counts.added,
+			color: 'rgba(22,163,74,0.9)',
+			title: `${counts.added} tile${counts.added === 1 ? '' : 's'} added`,
+		},
+		{
+			kind: 'removed',
+			glyph: '\u00D7',
+			count: counts.removed,
+			color: 'rgba(220,38,38,0.9)',
+			title: `${counts.removed} tile${counts.removed === 1 ? '' : 's'} removed`,
+		},
+		{
+			kind: 'updated',
+			glyph: '\u2192',
+			count: updatedCount,
+			color: 'rgba(37,99,235,0.9)',
+			title: `${updatedCount} tile${updatedCount === 1 ? '' : 's'} moved`,
+		},
+		{
+			kind: 'conflict',
+			glyph: '\u26A0',
+			count: counts.conflicts,
+			color: 'rgba(220,38,38,0.9)',
+			title: `${counts.conflicts} conflict${counts.conflicts === 1 ? '' : 's'}`,
+		},
+	];
 
 	return (
 		<Wrapper role="status" aria-live="polite" aria-label="Simulation mode banner">
@@ -121,14 +189,30 @@ const SimulationModeBanner: React.FC<SimulationModeBannerProps> = ({
 				</Counts>
 			) : (
 				<Counts>
-					<span>+{counts.added}</span>
-					<span>−{counts.removed}</span>
-					<span>~{counts.edited + counts.shifted}</span>
-					{counts.conflicts > 0 && (
-						<span style={{ color: 'rgb(190, 100, 0)' }}>!{counts.conflicts}</span>
-					)}
+					{chips
+						.filter((c) => c.count > 0)
+						.map((c) => (
+							<FilterChip
+								key={c.kind}
+								$color={c.color}
+								$active={activeKindFilter === c.kind}
+								aria-pressed={activeKindFilter === c.kind ? 'true' : 'false'}
+								title={c.title}
+								data-testid={`filter-chip-${c.kind}`}
+								onClick={() => onKindFilterChange?.(c.kind)}
+							>
+								{c.glyph}
+								{c.count}
+							</FilterChip>
+						))}
 				</Counts>
 			)}
+			<Legend data-testid="kind-legend">
+				<span style={{ color: 'rgba(22,163,74,0.9)' }}>+ added</span>
+				<span style={{ color: 'rgba(220,38,38,0.9)' }}>× removed</span>
+				<span style={{ color: 'rgba(37,99,235,0.9)' }}>→ moved</span>
+				<span style={{ color: 'rgba(220,38,38,0.9)' }}>⚠ conflict</span>
+			</Legend>
 			<Spacer />
 			<ExitButton onClick={onExitReview}>{exitLabel}</ExitButton>
 		</Wrapper>

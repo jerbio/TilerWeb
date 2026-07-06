@@ -10,6 +10,13 @@ import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { useCalendarUI } from './calendar-ui.provider';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
+import type { KindFilter } from '@/core/state/simulationOverlayStore';
+
+function matchesKindFilter(sim: SimulatedTileClassification, filter: KindFilter): boolean {
+	if (filter === 'conflict') return sim.tier === 'conflict';
+	return sim.kind === filter;
+}
 import { TypeDefaults } from '../../types/typeDefaults';
 import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
 import {
@@ -53,6 +60,13 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 	const inSimulation = !!simulation;
 	const { t } = useTranslation();
 	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
+	const inReview = useSimulationOverlayStore((s) => s.inReview);
+	const activeKindFilter = useSimulationOverlayStore((s) => s.activeKindFilter);
+	const isFilterDimmed =
+		inReview &&
+		!!simulation &&
+		!!activeKindFilter &&
+		!matchesKindFilter(simulation, activeKindFilter);
 	const isThirdPartyEvent =
 		!!event.thirdPartyType &&
 		event.thirdPartyType !== ThirdPartyType.Tiler &&
@@ -63,16 +77,14 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 				e.stopPropagation();
 				e.preventDefault();
 			}}
-			// In simulation mode tiles are read-only — disable drag, resize,
-			// double-click-edit, right-click menu, keyboard delete, and
-			// mark-done per plan §5.6. We suppress the gestures at the DOM
-			// boundary so child components do not even see them.
 			onContextMenu={inSimulation ? (e) => e.preventDefault() : undefined}
 			onDoubleClick={inSimulation ? (e) => e.preventDefault() : undefined}
 			onDragStart={inSimulation ? (e) => e.preventDefault() : undefined}
 			data-simulation-tier={simulation?.tier}
 			data-simulation-kind={simulation?.kind}
 			data-simulation-selected={simulationSelected || undefined}
+			data-filter-dimmed={isFilterDimmed ? 'true' : undefined}
+			data-testid="event-container"
 			aria-current={simulationSelected ? 'true' : undefined}
 			aria-label={
 				inSimulation && simulation
@@ -90,6 +102,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 				g: event.colorGreen ?? TypeDefaults.RGBColor.green,
 				b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
 			}}
+			style={isFilterDimmed ? { opacity: 0.25, pointerEvents: 'none' } : undefined}
 		>
 			<EventContent
 				height={event.springStyles.height}
@@ -160,19 +173,21 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 				</footer>
 			</EventContent>
 			{/* Plan §5.2 — simulation tier badge / marker (top-right). */}
-			{simulation && simulation.tier !== 'unchanged' && (
-				<SimulationBadge $tier={simulation.tier} $kind={simulation.kind}>
-					{simulation.tier === 'mapped'
-						? '\u25CF' /* filled circle */
-						: simulation.tier === 'conflict'
-							? '\u26A0' /* warning sign */
+			{simulation && simulation.tier !== 'unchanged' && simulation.tier !== 'mapped' && (
+				<SimulationBadge
+					$tier={simulation.tier}
+					$kind={simulation.kind}
+					data-testid="simulation-badge"
+				>
+					{
+						simulation.tier === 'conflict'
+							? '\u26A0' /* ⚠ */
 							: simulation.kind === 'new'
 								? '+'
 								: simulation.kind === 'removed'
-									? '\u2715' /* ✕ */
-									: simulation.kind === 'updated'
-										? '\u270E' /* pencil */
-										: ''}
+									? '\u00D7' /* × */
+									: '\u2192' /* → */
+					}
 				</SimulationBadge>
 			)}
 			{/* Border SVG for styling */}
@@ -494,9 +509,9 @@ const SimulationBadge = styled.div<{
 	pointer-events: none;
 	color: #ffffff;
 	background-color: ${({ $tier, $kind }) => {
-		if ($tier === 'conflict') return TIER_ACCENT.conflict;
-		if ($tier === 'mapped') return TIER_ACCENT.mapped;
-		if ($kind === 'removed') return 'rgba(120, 120, 120, 0.95)';
-		return TIER_ACCENT.primary;
+		if ($tier === 'conflict') return 'rgba(220, 38, 38, 0.95)'; // red
+		if ($kind === 'new') return 'rgba(22, 163, 74, 0.95)'; // green
+		if ($kind === 'removed') return 'rgba(220, 38, 38, 0.95)'; // red
+		return 'rgba(37, 99, 235, 0.95)'; // blue (updated/cascade)
 	}};
 `;

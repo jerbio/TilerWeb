@@ -53,6 +53,8 @@ export function CalendarWrapper({
 	const exitReview = useSimulationOverlayStore((s) => s.exitReview);
 	const selectedActionId = useSimulationOverlayStore((s) => s.selectedActionId);
 	const setSelectedActionId = useSimulationOverlayStore((s) => s.setSelectedActionId);
+	const activeKindFilter = useSimulationOverlayStore((s) => s.activeKindFilter);
+	const toggleKindFilter = useSimulationOverlayStore((s) => s.toggleKindFilter);
 
 	const overlayEvents = useMemo<SubCalendarEvent[]>(() => {
 		// Server returns `subCalendarEvents` (matching `/api/Schedule`); the
@@ -134,6 +136,8 @@ export function CalendarWrapper({
 					comparisonView={comparisonView}
 					onComparisonViewChange={setComparisonView}
 					onExitReview={exitReview}
+					activeKindFilter={activeKindFilter}
+					onKindFilterChange={toggleKindFilter}
 				/>
 			)}
 			<Calendar
