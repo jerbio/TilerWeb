@@ -1549,6 +1549,41 @@
 					"description": "A variety of tasks in one project."
 				}
 			},
+			"create": {
+				"back": "Back to tileshare",
+				"single": {
+					"title": "Create a single tileshare",
+					"description": "Create and share a single task with your colleagues. Once they accept, we'll add it to their schedule.",
+					"submit": "Create single tileshare"
+				},
+				"multi": {
+					"title": "Create a multi tileshare",
+					"description": "Create and share a variety of tasks in one project. Once colleagues accept, we'll add it to their schedule.",
+					"submit": "Continue"
+				},
+				"fields": {
+					"name": {
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"placeholder": "Add a deadline"
+					},
+					"location": {
+						"placeholder": "Add a location? (Skip if not needed)"
+					},
+					"note": {
+						"placeholder": "Add a note"
+					}
+				},
+				"shareTo": {
+					"label": "Share to :",
+					"placeholder": "email address/phone number",
+					"add": "Add recipient"
+				},
+				"buttons": {
+					"cancel": "Cancel"
+				}
+			},
 			"filter": {
 				"all": "All",
 				"inProgress": "In Progress"

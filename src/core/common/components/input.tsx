@@ -190,6 +190,14 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 				: props.$sized === 'medium'
 					? palette.inputHeights.medium
 					: palette.inputHeights.large};
+	min-height: ${(props) =>
+		props.$height
+			? `${props.$height}px`
+			: props.$sized === 'small'
+				? palette.inputHeights.small
+				: props.$sized === 'medium'
+					? palette.inputHeights.medium
+					: palette.inputHeights.large};
 
 	${(props) =>
 		props.$bordergradient &&
