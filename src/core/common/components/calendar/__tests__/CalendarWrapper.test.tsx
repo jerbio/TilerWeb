@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CalendarUIProvider, useCalendarUI } from '../calendar-ui.provider';
 import { CalendarWrapper } from '../calendar_wrapper';
+import { CalendarRequestProvider } from '../CalendarRequestProvider';
 import { CalendarViewOptions } from '../calendar.types';
 import { SubCalendarEvent } from '@/core/common/types/schedule';
 
@@ -47,8 +48,15 @@ function ViewInfoProbe() {
 function renderWrapper() {
 	return render(
 		<CalendarUIProvider demoMode={false}>
-			<CalendarWrapper chatExpanded userId="user-1" width={720} allowEventLookup={false} />
-			<ViewInfoProbe />
+			<CalendarRequestProvider>
+				<CalendarWrapper
+					chatExpanded
+					userId="user-1"
+					width={720}
+					allowEventLookup={false}
+				/>
+				<ViewInfoProbe />
+			</CalendarRequestProvider>
 		</CalendarUIProvider>
 	);
 }
