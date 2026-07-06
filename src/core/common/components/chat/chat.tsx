@@ -202,15 +202,31 @@ const NewChatHeaderButton = styled.button`
 	}
 `;
 
-const ChatContent = styled.div`
+const ChatContent = styled.div<{ $hidden?: boolean }>`
 	flex: 1;
-	display: flex;
+	/*
+	 * Toggle visibility with display instead of unmounting when entering
+	 * review mode. Keeping the node mounted preserves the .messages-list
+	 * scroll position, so exiting review returns the user to exactly where
+	 * they were reading rather than snapping to the top. display none fully
+	 * removes it from the flex layout so the review panel can take over the
+	 * space.
+	 */
+	display: ${({ $hidden }) => ($hidden ? 'none' : 'flex')};
 	flex-direction: column;
-	height: 100%;
+	/*
+	 * min-height: 0 lets this flex child shrink below its content height so
+	 * the inner .messages-list can scroll instead of pushing siblings (the
+	 * simulation strip, prompt suggestions and input form) out of view. Using
+	 * height: 100% here forced the column to overflow, which cut off the most
+	 * recent messages behind the prompt-suggestion pills.
+	 */
+	min-height: 0;
 	overflow: hidden;
 
 	.messages-list {
 		flex: 1;
+		min-height: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
@@ -1149,6 +1165,17 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 	const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
 
+	// True when the SimulationStatusStrip is showing its Ready state and will
+	// render the inline "Accept Changes" button itself (Review + Accept on one
+	// line). Mirrors the strip's Ready branch guards (a defunct/superseded or
+	// stale tilecast falls back to the standalone Accept button below). Used to
+	// avoid rendering a duplicate full-width Accept button under the strip.
+	const stripHostsAccept =
+		simulation?.state === SimulationState.Ready &&
+		!vibeRequest?.supersededByRequestId &&
+		simulation?.isStale !== true &&
+		!simulationResultError;
+
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		if (!message.trim() || isSending) return;
@@ -1452,64 +1479,64 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 						</NewChatHeaderButton>
 					</ChatHeaderRight>
 				</ChatHeader>
-				{!inReview && (
-					<ChatContent>
-						{isLoading && (
-							<LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
-						)}
-						{isBatchLoading && (
-							<LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
-						)}
+				{/* Keep ChatContent mounted (hidden) during review so the
+				    messages-list scroll position is preserved on exit. */}
+				<ChatContent $hidden={inReview} aria-hidden={inReview || undefined}>
+					{isLoading && (
+						<LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
+					)}
+					{isBatchLoading && (
+						<LoadingIndicator message={t('home.expanded.chat.loadingActions')} />
+					)}
 
-						{error && (
-							<div className="chat-error">
-								{t('home.expanded.chat.error')}: {error}
-							</div>
-						)}
-
-						{!isLoading && !error && !messages.length && (
-							<EmptyChat>
-								<Logo size={48} />
-								<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
-								<p>{t('home.expanded.chat.emptyStateDescription')}</p>
-							</EmptyChat>
-						)}
-
-						<div
-							className="messages-list"
-							ref={messagesListRef}
-							data-onboarding-chat-messages
-						>
-							{messages.map((message) => (
-								<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
-									<div className="message-content">
-										<MarkdownRenderer content={message.content} />
-									</div>
-
-									{message.actions && (
-										<ActionPillStrip
-											actions={message.actions}
-											simulation={simulation}
-											request={vibeRequest}
-											simulationActionById={
-												simulation
-													? buildSimulationActionLookups(simulation)
-															.byActionId
-													: undefined
-											}
-											onSelect={(a, sa) => {
-												const id = sa?.actionId ?? sa?.action?.id ?? a.id;
-												if (id) setSelectedActionId(id);
-											}}
-										/>
-									)}
-								</MessageBubble>
-							))}
+					{error && (
+						<div className="chat-error">
+							{t('home.expanded.chat.error')}: {error}
 						</div>
+					)}
 
-						<div ref={messagesEndRef} />
-					</ChatContent>
-				)}
+					{!isLoading && !error && !messages.length && (
+						<EmptyChat>
+							<Logo size={48} />
+							<h3>{t('home.expanded.chat.emptyStateTitle')}</h3>
+							<p>{t('home.expanded.chat.emptyStateDescription')}</p>
+						</EmptyChat>
+					)}
+
+					<div
+						className="messages-list"
+						ref={messagesListRef}
+						data-onboarding-chat-messages
+					>
+						{messages.map((message) => (
+							<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
+								<div className="message-content">
+									<MarkdownRenderer content={message.content} />
+								</div>
+
+								{message.actions && (
+									<ActionPillStrip
+										actions={message.actions}
+										simulation={simulation}
+										request={vibeRequest}
+										simulationActionById={
+											simulation
+												? buildSimulationActionLookups(simulation)
+														.byActionId
+												: undefined
+										}
+										onSelect={(a, sa) => {
+											const id = sa?.actionId ?? sa?.action?.id ?? a.id;
+											if (id) setSelectedActionId(id);
+										}}
+									/>
+								)}
+							</MessageBubble>
+						))}
+					</div>
+
+					<div ref={messagesEndRef} />
+				</ChatContent>
 
 				{/* Render chatContext buttons */}
 				<div style={{ marginBottom: '0.25rem' }}></div>
@@ -1534,6 +1561,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 							onRetry={simulationResultError ? enterReview : undefined}
 							isLoadingReview={isLoadingSimulationResult}
 							isRegenerating={isPreparingSimulation}
+							// When the tilecast is Ready, host the Accept CTA inside
+							// the strip so "Review" and "Accept Changes" share one
+							// line instead of stacking a duplicate full-width button
+							// below it.
+							onAccept={() => acceptAllChanges()}
+							showAccept={!isSending && shouldShowAcceptButton}
 						/>
 					)}
 					{inReview &&
@@ -1561,15 +1594,17 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 								)}
 							</div>
 						))}
-					{!inReview && ((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
-						<Button
-							variant="primary"
-							onClick={() => acceptAllChanges()}
-							data-onboarding-accept-button
-						>
-							{t('home.expanded.chat.acceptChanges')}
-						</Button>
-					)}
+					{!inReview &&
+						!stripHostsAccept &&
+						((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
+							<Button
+								variant="primary"
+								onClick={() => acceptAllChanges()}
+								data-onboarding-accept-button
+							>
+								{t('home.expanded.chat.acceptChanges')}
+							</Button>
+						)}
 				</div>
 
 				{/* Show prompt suggestions when input field is empty */}

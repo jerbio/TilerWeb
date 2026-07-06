@@ -63,7 +63,7 @@ const FilterChip = styled.button<{ $color: string; $active: boolean }>`
 	border-radius: 999px;
 	border: 1.5px solid ${({ $color }) => $color};
 	background: ${({ $color, $active }) => ($active ? $color : 'transparent')};
-	color: ${({ $color, $active, theme }) => ($active ? '#fff' : $color)};
+	color: ${({ $color, $active }) => ($active ? '#fff' : $color)};
 	font-size: 12px;
 	font-weight: 600;
 	cursor: pointer;

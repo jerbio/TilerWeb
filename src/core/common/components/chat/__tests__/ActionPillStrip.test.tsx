@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { setupUser } from '@/test/test-utils.tsx';
-import React from 'react';
 import ActionPillStrip, { PILL_STRIP_INITIAL_COUNT } from '../ActionPillStrip';
 import { VibeAction } from '@/core/common/types/chat';
 import { Actions, Status } from '@/core/constants/enums';

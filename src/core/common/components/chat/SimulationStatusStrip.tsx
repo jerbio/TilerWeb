@@ -45,6 +45,7 @@ interface SimulationStatusStripProps {
 const Strip = styled.div`
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 8px;
 	padding: 6px 10px;
 	font-size: 12px;
@@ -232,6 +233,10 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 	if (simulation.state === SimulationState.Ready) {
 		const count = simulation.previewActions?.length ?? 0;
 		const reviewLabel = t('home.expanded.chat.reviewSimulation', 'Review tilecast');
+		// When the Accept CTA shares the row, both pills compete for the narrow
+		// side-panel width. Drop to a compact "Review · N" label so neither pill
+		// has to wrap its text (which would break the fixed button height).
+		const compactReview = !!(showAccept && onAccept);
 		return (
 			<Strip role="status" aria-live="polite">
 				{/*
@@ -252,6 +257,7 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 					disabled={isLoadingReview || isAccepting}
 					aria-busy={isLoadingReview || undefined}
 					data-testid="review-simulation-button"
+					style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
 				>
 					{isLoadingReview ? (
 						<>
@@ -259,6 +265,10 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 							<span style={{ marginLeft: 6 }}>
 								{t('home.expanded.chat.loadingSimulation', 'Loading tilecast…')}
 							</span>
+						</>
+					) : compactReview ? (
+						<>
+							{t('home.expanded.chat.review', 'Review')} · {count}
 						</>
 					) : (
 						<>
@@ -275,6 +285,7 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 						disabled={isAccepting || isLoadingReview}
 						aria-busy={isAccepting || undefined}
 						data-onboarding-accept-button
+						style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
 					>
 						{t('home.expanded.chat.acceptChanges', 'Accept Changes')}
 					</Button>

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
 import SimulationModeBanner from '../SimulationModeBanner';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import type { SimulationDiffCounts } from '@/core/util/simulationDiff';
