@@ -118,9 +118,24 @@ describe('SimulationStatusStrip — defunct state', () => {
 		expect(screen.getByText(/outdated tilecast/i)).toBeInTheDocument();
 	});
 
-	it('shows defunct strip with no Review button when simulation is not Ready', () => {
+	it('shows the updating strip (not defunct) when a stale simulation is still Processing', () => {
+		// A stale forecast that is still Processing is being recomputed, so it
+		// is regenerating rather than defunct — the user should see
+		// "Updating tilecast…", never "Outdated tilecast".
 		renderStrip({
 			simulation: makeSim(SimulationState.Processing, { isStale: true }),
+			request: makeRequest(),
+			onReview: vi.fn(),
+		});
+		expect(screen.getByTestId('updating-strip')).toBeInTheDocument();
+		expect(screen.queryByTestId('defunct-strip')).not.toBeInTheDocument();
+	});
+
+	it('shows defunct strip with no Review button when a settled non-Ready sim is stale', () => {
+		// Failed is settled (not in-progress), so a stale/superseded Failed
+		// forecast is genuinely defunct — but there is nothing to review.
+		renderStrip({
+			simulation: makeSim(SimulationState.Failed, { isStale: true }),
 			request: makeRequest(),
 			onReview: vi.fn(),
 		});

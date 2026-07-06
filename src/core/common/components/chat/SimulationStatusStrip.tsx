@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import Button from '@/core/common/components/button';
 import { SimulationDto, SimulationState, VibeRequest } from '@/core/common/types/chat';
-import { isRequestTerminal } from '@/core/util/simulationSelectors';
+import { isRequestTerminal, isSimulationInProgress } from '@/core/util/simulationSelectors';
 
 interface SimulationStatusStripProps {
 	simulation: SimulationDto | null;
@@ -32,6 +32,14 @@ interface SimulationStatusStripProps {
 	onAccept?: () => void;
 	showAccept?: boolean;
 	isAccepting?: boolean;
+	/**
+	 * True while a fresh forecast is being (re)generated because the previous
+	 * one was superseded — e.g. the user just sent a follow-up message. When
+	 * set, the strip shows the transient "Updating tilecast…" row instead of
+	 * the stale "Outdated tilecast" state or the (now historical) Ready CTA.
+	 * This prevents the yellow-Review → defunct flash on send.
+	 */
+	isRegenerating?: boolean;
 }
 
 const Strip = styled.div`
@@ -85,6 +93,7 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 	onAccept,
 	showAccept,
 	isAccepting,
+	isRegenerating,
 }) => {
 	const { t } = useTranslation();
 
@@ -106,19 +115,80 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 		);
 	}
 
-	// Hidden cases — no strip at all.
+	// Hidden cases — no strip at all. These always win: an accepted, closed,
+	// or invalidated request has nothing to communicate regardless of any
+	// pending regeneration.
 	if (simulation?.state === SimulationState.Invalidated) return null;
-	// No active request and no simulation → nothing to communicate.
+	if (request?.isClosed || request?.state?.toLowerCase() === 'executed') return null;
+
+	// Lifecycle derivation. Ordering matters: an actively (re)generating
+	// forecast must win over the "defunct" (stale/superseded) state — a fresh
+	// tilecast on the way is the opposite of outdated. `isDefunct` is only a
+	// real dead-end once the forecast has settled (Ready) and nothing newer
+	// is being computed.
+	const inProgress = isSimulationInProgress(simulation); // Queued | Processing
+	const isDefunct = !!request?.supersededByRequestId || simulation?.isStale === true;
+	// Regenerating: an explicit signal from chat (follow-up sent, new preview
+	// pending) OR a stale/superseded forecast that is still being recomputed.
+	const isRegen = !!isRegenerating || (inProgress && isDefunct);
+
+	// (Re)generation in flight — transient "Updating tilecast…" row. Takes
+	// precedence over defunct AND over the Ready CTA to eliminate the
+	// yellow-Review → defunct flash when a follow-up message is sent. This is
+	// evaluated before the remaining "no simulation" hidden guards so a
+	// superseded request whose fresh forecast is still loading (simulation
+	// briefly null) bridges to "Updating…" instead of vanishing.
+	if (isRegen) {
+		return (
+			<Strip role="status" aria-live="polite" data-testid="updating-strip">
+				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
+				<Message>
+					{t('home.expanded.chat.simulationUpdating', 'Updating tilecast…')}
+				</Message>
+			</Strip>
+		);
+	}
+
+	// Remaining hidden cases — nothing in flight to communicate.
 	if (!simulation && !request) return null;
 	if (!simulation && isRequestTerminal(request)) return null;
-	// Request was executed (user accepted changes) or closed — nothing left
-	// to review or surface; hide the strip entirely.
-	if (request?.isClosed || request?.state?.toLowerCase() === 'executed') return null;
-	// Defunct: a newer request superseded this one, or the server flagged
-	// the simulation as stale. Show a muted warning strip instead of hiding
-	// completely — the user should know the tilecast is outdated even if
-	// they choose to review it anyway.
-	const isDefunct = !!request?.supersededByRequestId || simulation?.isStale === true;
+
+	// No simulation row yet — request is fresh, generation hasn't started server-side.
+	if (!simulation) {
+		return (
+			<Strip role="status" aria-live="polite">
+				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
+				<Message>
+					{t('home.expanded.chat.simulationStarting', 'Simulation starting…')}
+				</Message>
+			</Strip>
+		);
+	}
+
+	if (simulation.state === SimulationState.Queued) {
+		return (
+			<Strip role="status" aria-live="polite">
+				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
+				<Message>{t('home.expanded.chat.simulationQueued', 'Simulation queued…')}</Message>
+			</Strip>
+		);
+	}
+
+	if (simulation.state === SimulationState.Processing) {
+		return (
+			<Strip role="status" aria-live="polite">
+				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
+				<Message>
+					{t('home.expanded.chat.simulationGenerating', 'Generating simulation…')}
+				</Message>
+			</Strip>
+		);
+	}
+
+	// Defunct: a newer request superseded this one, or the server flagged the
+	// simulation as stale, AND no regeneration is pending (checked above). Show
+	// a muted warning strip instead of hiding — the user should know the
+	// tilecast is outdated even if they choose to peek at it.
 	if (isDefunct) {
 		const count = simulation?.previewActions?.length ?? 0;
 		return (
@@ -156,38 +226,6 @@ const SimulationStatusStrip: React.FC<SimulationStatusStripProps> = ({
 					</Button>
 				)}
 			</DefunctStrip>
-		);
-	}
-
-	// No simulation row yet — request is fresh, generation hasn't started server-side.
-	if (!simulation) {
-		return (
-			<Strip role="status" aria-live="polite">
-				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
-				<Message>
-					{t('home.expanded.chat.simulationStarting', 'Simulation starting…')}
-				</Message>
-			</Strip>
-		);
-	}
-
-	if (simulation.state === SimulationState.Queued) {
-		return (
-			<Strip role="status" aria-live="polite">
-				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
-				<Message>{t('home.expanded.chat.simulationQueued', 'Simulation queued…')}</Message>
-			</Strip>
-		);
-	}
-
-	if (simulation.state === SimulationState.Processing) {
-		return (
-			<Strip role="status" aria-live="polite">
-				<Spinner data-testid="simulation-spinner" aria-hidden="true" />
-				<Message>
-					{t('home.expanded.chat.simulationGenerating', 'Generating simulation…')}
-				</Message>
-			</Strip>
 		);
 	}
 

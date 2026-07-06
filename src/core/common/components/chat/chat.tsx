@@ -345,6 +345,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const setSelectedActionId = useSimulationOverlayStore((s) => s.setSelectedActionId);
 	const requestIdRef = useRef<string | null>(null);
 	requestIdRef.current = requestId;
+	// Tracks the requestId observed by the supersession effect on its previous
+	// run so we can distinguish a genuine swap (follow-up message superseding
+	// an existing request → show "Updating tilecast…") from the very first
+	// request of a session (→ show "Simulation starting…").
+	const prevRequestIdRef = useRef<string | null>(null);
 	// Plan §6.2 — the previewReady SignalR handler is bound once on mount
 	// against `anonymousUserId`; it cannot close over the latest VibeRequest
 	// without a ref. The ref lets the handler bail when a late `previewReady`
@@ -379,6 +384,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const isMobileReview = isMobileViewport && inReview;
 	const [isLoadingSimulationResult, setIsLoadingSimulationResult] = useState(false);
 	const [simulationResultError, setSimulationResultError] = useState<string | null>(null);
+	// True from the moment a follow-up message supersedes the active request
+	// (or a swap is detected) until the fresh forecast has been primed/loaded.
+	// Passed to `SimulationStatusStrip` as `isRegenerating` so the strip shows
+	// the transient "Updating tilecast…" row instead of flashing the previous
+	// request's stale "Outdated tilecast" / yellow Review CTA during the gap.
+	const [isPreparingSimulation, setIsPreparingSimulation] = useState(false);
 	const simulationResultIdRef = useRef<string | null>(null);
 	// Tracks an in-flight prefetch (or click-driven fetch) for a given
 	// simulation id so concurrent calls to `enterReview` reuse the same
@@ -573,19 +584,32 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		if (!requestId) {
 			setVibeRequest(null);
 			setSimulation(null);
+			setIsPreparingSimulation(false);
+			prevRequestIdRef.current = null;
 			return;
 		}
+		// Distinguish a genuine supersession (an existing request being
+		// replaced by a follow-up) from the first request of the session. Only
+		// the former should show the transient "Updating tilecast…" bridge —
+		// the first request has no prior stale state to flash over.
+		const isSupersession = !!prevRequestIdRef.current && prevRequestIdRef.current !== requestId;
+		prevRequestIdRef.current = requestId;
 		// Plan §6.3 — supersession. When the active requestId changes (user
 		// sends a follow-up message, or session bootstrap swaps requests),
 		// drop the old simulation/result snapshot synchronously so polling
 		// halts and the UI doesn't briefly attribute the previous request's
-		// state to the new one. Review mode is exited too — the old preview
-		// is no longer relevant and the calendar overlay must clear.
+		// state to the new one. The old VibeRequest is cleared too so its
+		// stale `supersededByRequestId` flag can't drive a one-frame
+		// "Outdated tilecast" / yellow-Review flash before the fresh request
+		// lands. Review mode is exited — the old preview is no longer relevant
+		// and the calendar overlay must clear.
+		setVibeRequest(null);
 		setSimulation(null);
 		setSimulationResult(null);
 		simulationResultIdRef.current = null;
 		simulationResultPromiseRef.current = null;
 		setSimulationResultError(null);
+		if (isSupersession) setIsPreparingSimulation(true);
 		useSimulationOverlayStore.getState().exitReview();
 		let cancelled = false;
 		(async () => {
@@ -636,6 +660,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				}
 			} catch (err) {
 				if (!cancelled) console.error('Failed to fetch vibe request for simulation', err);
+			} finally {
+				// The fresh request + simulation snapshot has landed (or failed
+				// to). Either way, stop bridging with "Updating tilecast…" and
+				// let the strip reflect the new request's real lifecycle state.
+				if (!cancelled) setIsPreparingSimulation(false);
 			}
 		})();
 		return () => {
@@ -1504,6 +1533,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 							fetchError={simulationResultError}
 							onRetry={simulationResultError ? enterReview : undefined}
 							isLoadingReview={isLoadingSimulationResult}
+							isRegenerating={isPreparingSimulation}
 						/>
 					)}
 					{inReview &&

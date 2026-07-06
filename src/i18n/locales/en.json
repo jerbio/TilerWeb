@@ -498,6 +498,7 @@
 				"simulationStarting": "Tilecast starting…",
 				"simulationQueued": "Tilecast queued…",
 				"simulationGenerating": "Generating tilecast…",
+				"simulationUpdating": "Updating tilecast…",
 				"simulationReady": "Tilecast ready",
 				"simulationChangesLabel": "changes",
 				"simulationDefunct": "Outdated tilecast",
