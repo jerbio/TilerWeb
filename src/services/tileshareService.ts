@@ -1,12 +1,19 @@
 import { TileshareApi } from '@/api/tileshareApi';
 import {
 	ClusterPageParams,
+	ContactModel,
+	CreateTileShareClusterParams,
 	DEFAULT_CLUSTER_PAGE_SIZE,
 	DeleteTileShareClusterParams,
 	GetClustersParams,
 	InvitationStatus,
+	TileshareFormState,
+	TileshareMode,
 } from '@/core/common/types/tileshare';
 import { normalizeError } from '@/core/error';
+import { TilerResponseError } from '@/core/common/types/errors';
+import { classifyContact, normalizePhoneNumber } from '@/core/util/contact';
+import { dateTimeToUnix } from '@/core/util/eventTimeConversion';
 
 /**
  * Converts 1-based page params into the server's offset-based query.
@@ -27,6 +34,58 @@ function toClusterQuery(params?: ClusterPageParams): Partial<GetClustersParams> 
 	if (sortOrder !== undefined) query.SortOrder = sortOrder;
 
 	return query;
+}
+
+export type TileshareCreateContext = {
+	userName: string | null;
+	timeZone: string | null;
+	timeZoneOffset: number | null;
+	/** Bare dial code (e.g. "1") prepended to phone numbers lacking a '+' area code. */
+	defaultCallingCode: string;
+};
+
+/** Default task length used until the form collects a real duration. */
+const DEFAULT_TASK_DURATION_MS = 60 * 60 * 1000; // 1h
+
+/**
+ * Routes a raw share-to value to the correct contact channel. The backend does
+ * not auto-detect email vs phone, so we classify client-side and normalize
+ * phone numbers to `+<callingCode><digits>` form.
+ */
+function toContact(value: string, defaultCallingCode: string): ContactModel {
+	const trimmed = value.trim();
+	return classifyContact(trimmed) === 'phone'
+		? { PhoneNumber: normalizePhoneNumber(trimmed, defaultCallingCode) }
+		: { Email: trimmed };
+}
+
+/**
+ * Maps the Create Tileshare form state to the server's TemplateClusterModel
+ * payload: `deadline` -> end-of-day epoch ms `EndTime`, `location` -> AddressData
+ * object, `shareTo` -> Contacts array (never null), `mode` -> IsMultiTilette.
+ */
+export function toCreateClusterParams(
+	form: TileshareFormState,
+	mode: TileshareMode,
+	ctx: TileshareCreateContext
+): CreateTileShareClusterParams {
+	const location = form.location.trim();
+	const note = form.note.trim();
+	const recipients = form.recipients.map((r) => r.trim()).filter(Boolean);
+
+	return {
+		UserName: ctx.userName,
+		TimeZone: ctx.timeZone,
+		TimeZoneOffset: ctx.timeZoneOffset,
+		Name: form.name.trim(),
+		IsMultiTilette: mode === TileshareMode.Multi,
+		IncludeMe: true,
+		EndTime: form.deadline ? dateTimeToUnix(form.deadline, '11:59 PM') : undefined,
+		DurationInMs: DEFAULT_TASK_DURATION_MS,
+		Notes: note || undefined,
+		AddressData: location ? { Address: location, AddressIsVerified: false } : undefined,
+		Contacts: recipients.map((r) => toContact(r, ctx.defaultCallingCode)),
+	};
 }
 
 class TileshareService {
@@ -64,6 +123,20 @@ class TileshareService {
 			return res.Content.designatedTiles;
 		} catch (error) {
 			console.error('Error fetching tileshare inbox', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async createCluster(params: CreateTileShareClusterParams) {
+		try {
+			const res = await this.api.createCluster(params);
+			// Success is a null Error or Code "0"; only a present non-zero code is a failure.
+			if (res.Error && res.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
+			}
+			return res.Content;
+		} catch (error) {
+			console.error('Error creating tileshare cluster', error);
 			throw normalizeError(error);
 		}
 	}

@@ -1,28 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Layers, MapPin, MessageSquare, Plus } from 'lucide-react';
+import { ChevronLeft, Layers, MapPin, MessageSquare } from 'lucide-react';
 import useFormHandler from '@/hooks/useFormHandler';
 import Input from '@/core/common/components/input';
 import DatePicker from '@/core/common/components/date_picker';
 import Button from '@/core/common/components/button';
-
-export enum TileshareMode {
-	Single = 'single',
-	Multi = 'multi',
-}
+import TagInput from '@/core/common/components/TagInput';
+import { useAuth } from '@/core/auth/useAuth';
+import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
+import { tileshareService } from '@/services';
+import { toCreateClusterParams } from '@/services/tileshareService';
+import { TileshareFormState, TileshareMode } from '@/core/common/types/tileshare';
+import { isValidRecipient } from '@/core/util/contact';
+import { DEFAULT_COUNTRY_CODE } from '@/core/constants/countryCodes';
+export { TileshareMode };
 
 type TileshareCreateProps = {
 	mode: TileshareMode;
 	onBack: () => void;
-};
-
-type TileshareFormState = {
-	name: string;
-	deadline: string;
-	location: string;
-	note: string;
-	shareTo: string;
 };
 
 const initialTileshareFormState: TileshareFormState = {
@@ -30,17 +26,82 @@ const initialTileshareFormState: TileshareFormState = {
 	deadline: '',
 	location: '',
 	note: '',
-	shareTo: '',
+	recipients: [],
 };
+
+const CREATE_NOTIFICATION_ID = notificationId(NotificationAction.CreateTileshare, 'cluster');
 
 const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 	const theme = useTheme();
 	const { t } = useTranslation();
-	const { formData, handleFormInputChange } =
+	const { user } = useAuth();
+	const showNotification = useUiStore((s) => s.notification.show);
+	const updateNotification = useUiStore((s) => s.notification.update);
+	const { formData, handleFormInputChange, setFormData, resetForm } =
 		useFormHandler<TileshareFormState>(initialTileshareFormState);
+	const [submitting, setSubmitting] = useState(false);
 
 	const isSingle = mode === TileshareMode.Single;
 	const ModeIcon = isSingle ? MessageSquare : Layers;
+
+	/** Returns the first validation problem as a message, or null when valid. */
+	const getValidationError = (): string | null => {
+		if (!formData.name.trim()) {
+			return t('tilesharedemo.dashboard.create.validation.nameRequired');
+		}
+		if (!formData.deadline) {
+			return t('tilesharedemo.dashboard.create.validation.deadlineRequired');
+		}
+		const invalid = formData.recipients.find((r) => !isValidRecipient(r));
+		if (invalid) {
+			return t('tilesharedemo.dashboard.create.validation.invalidRecipient', {
+				recipient: invalid,
+			});
+		}
+		return null;
+	};
+
+	const handleSubmit = async () => {
+		if (submitting) return;
+
+		const validationError = getValidationError();
+		if (validationError) {
+			showNotification(CREATE_NOTIFICATION_ID, validationError, 'error');
+			return;
+		}
+
+		const params = toCreateClusterParams(formData, mode, {
+			userName: user?.email ?? null,
+			timeZone: user?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+			timeZoneOffset: user?.timeZoneDifference ?? 0,
+			defaultCallingCode: user?.countryCode?.trim() || String(DEFAULT_COUNTRY_CODE.code),
+		});
+
+		setSubmitting(true);
+		showNotification(
+			CREATE_NOTIFICATION_ID,
+			t('tilesharedemo.dashboard.create.toast.creating'),
+			'loading'
+		);
+		try {
+			await tileshareService.createCluster(params);
+			updateNotification(
+				CREATE_NOTIFICATION_ID,
+				t('tilesharedemo.dashboard.create.toast.success'),
+				'success'
+			);
+			resetForm();
+			onBack();
+		} catch {
+			updateNotification(
+				CREATE_NOTIFICATION_ID,
+				t('tilesharedemo.dashboard.create.toast.error'),
+				'error'
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	};
 
 	return (
 		<Container>
@@ -90,7 +151,7 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 						placeholder={t('tilesharedemo.dashboard.create.fields.note.placeholder')}
 						value={formData.note}
 						onChange={handleFormInputChange('note')}
-						height={180}
+						rows={6}
 					/>
 
 					{isSingle && (
@@ -98,21 +159,21 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 							<ShareToLabel>
 								{t('tilesharedemo.dashboard.create.shareTo.label')}
 							</ShareToLabel>
-							<Input
-								name="shareTo"
+							<TagInput
+								value={formData.recipients}
+								onChange={(recipients) =>
+									setFormData((prev) => ({ ...prev, recipients }))
+								}
 								placeholder={t(
 									'tilesharedemo.dashboard.create.shareTo.placeholder'
 								)}
-								value={formData.shareTo}
-								onChange={handleFormInputChange('shareTo')}
-								append={
-									<AddButton
-										type="button"
-										aria-label={t('tilesharedemo.dashboard.create.shareTo.add')}
-									>
-										<Plus size={16} />
-									</AddButton>
+								addLabel={t('tilesharedemo.dashboard.create.shareTo.add')}
+								removeLabel={(recipient) =>
+									t('tilesharedemo.dashboard.create.shareTo.remove', {
+										recipient,
+									})
 								}
+								inputProps={{ name: 'shareTo' }}
 							/>
 						</ShareTo>
 					)}
@@ -131,7 +192,12 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 						>
 							{t('tilesharedemo.dashboard.create.buttons.cancel')}
 						</Button>
-						<Button type="button" variant="brand">
+						<Button
+							type="button"
+							variant="brand"
+							onClick={handleSubmit}
+							disabled={submitting}
+						>
 							{t(`tilesharedemo.dashboard.create.${mode}.submit`)}
 						</Button>
 					</Actions>
@@ -143,10 +209,19 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 
 const Container = styled.div`
 	width: 100%;
-	height: 100%;
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
+`;
+
+const Content = styled.div`
+	width: 100%;
+	max-width: ${({ theme }) => theme.screens.md};
+	margin-inline: auto;
+	padding: 2.5rem 1.5rem 2rem;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 `;
 
 const HeaderBar = styled.header`
@@ -175,22 +250,13 @@ const BackButton = styled.button`
 	}
 `;
 
-const Content = styled.div`
-	width: 100%;
-	max-width: ${({ theme }) => theme.screens.md};
-	margin-inline: auto;
-	padding: 2.5rem 1.5rem 2rem;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-`;
-
 const IconBox = styled.div`
 	width: 56px;
 	height: 56px;
 	border-radius: ${({ theme }) => theme.borderRadius.large};
 	border: 1px solid ${({ theme }) => theme.colors.border.strong};
 	color: ${({ theme }) => theme.colors.text.primary};
+	background-color: ${({ theme }) => theme.colors.background.card};
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -229,21 +295,6 @@ const ShareToLabel = styled.label`
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const AddButton = styled.button`
-	height: 28px;
-	width: 28px;
-	color: ${({ theme }) => theme.colors.button.brand.text};
-	background-color: ${({ theme }) => theme.colors.button.brand.bg};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	&:hover {
-		background-color: ${({ theme }) => theme.colors.button.brand.bgHover};
-	}
 `;
 
 const Footer = styled.div`

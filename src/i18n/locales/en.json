@@ -1559,7 +1559,7 @@
 				"multi": {
 					"title": "Create a multi tileshare",
 					"description": "Create and share a variety of tasks in one project. Once colleagues accept, we'll add it to their schedule.",
-					"submit": "Continue"
+					"submit": "Create multi tileshare"
 				},
 				"fields": {
 					"name": {
@@ -1569,19 +1569,30 @@
 						"placeholder": "Add a deadline"
 					},
 					"location": {
-						"placeholder": "Add a location? (Skip if not needed)"
+						"placeholder": "Add a location (optional)"
 					},
 					"note": {
-						"placeholder": "Add a note"
+						"placeholder": "Add a note (optional)"
 					}
 				},
 				"shareTo": {
 					"label": "Share to :",
 					"placeholder": "email address/phone number",
-					"add": "Add recipient"
+					"add": "Add recipient",
+					"remove": "Remove {{recipient}}"
 				},
 				"buttons": {
 					"cancel": "Cancel"
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"deadlineRequired": "Please add a deadline",
+					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+				},
+				"toast": {
+					"creating": "Creating tileshare…",
+					"success": "Tileshare created",
+					"error": "Couldn't create tileshare. Please try again."
 				}
 			},
 			"filter": {
