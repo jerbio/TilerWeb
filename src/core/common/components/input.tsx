@@ -271,7 +271,6 @@ const StyledInput = styled.input<StyledInputProps>`
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1;
 	color: ${({ theme }) => theme.colors.input.text};
-	height: 100%;
 
 	padding-left: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} -
@@ -314,12 +313,12 @@ const StyledTextarea = styled.textarea<StyledInputProps>`
 
 	/* Fix vertical alignment for the textarea */
 	padding: 0;
-	padding-top: ${(props) =>
+	padding-block: ${(props) =>
 		props.$sized === 'small'
-			? `calc(${palette.inputHeights.small} / 2 - 0.75rem)`
+			? `calc(${palette.inputHeights.small} / 2 - 0.75rem + 0.375rem)`
 			: props.$sized === 'medium'
-				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem)`
-				: `calc(${palette.inputHeights.large} / 2 - 1rem)`};
+				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem + 0.5rem)`
+				: `calc(${palette.inputHeights.large} / 2 - 1rem + 0.5rem)`};
 	padding-inline: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px
 	);
