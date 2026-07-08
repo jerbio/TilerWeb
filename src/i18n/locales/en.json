@@ -1576,8 +1576,8 @@
 					}
 				},
 				"shareTo": {
-					"label": "Share to :",
-					"placeholder": "email address/phone number",
+					"label": "Share to:",
+					"placeholder": "email address / phone number (Enter to select)",
 					"add": "Add recipient",
 					"remove": "Remove {{recipient}}"
 				},
@@ -1587,12 +1587,16 @@
 				"validation": {
 					"nameRequired": "Please name your task",
 					"deadlineRequired": "Please add a deadline",
+					"recipientRequired": "Please add at least one recipient",
 					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
 				},
 				"toast": {
 					"creating": "Creating tileshare…",
-					"success": "Tileshare created",
 					"error": "Couldn't create tileshare. Please try again."
+				},
+				"success": {
+					"message": "Your tileshare \"{{name}}\" has been created.",
+					"view": "View tileshare"
 				}
 			},
 			"filter": {

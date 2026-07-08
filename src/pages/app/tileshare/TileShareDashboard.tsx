@@ -63,7 +63,13 @@ const TileshareDashboardPage: React.FC = () => {
 		<Container>
 			<CalendarUIProvider>
 				{createMode ? (
-					<TileshareCreate mode={createMode} onBack={() => setCreateMode(null)} />
+					<TileshareCreate
+						mode={createMode}
+						onBack={() => {
+							setCreateMode(null);
+							navigate(Routes.Tileshare.sent);
+						}}
+					/>
 				) : (
 					<>
 						<StyledToolbar

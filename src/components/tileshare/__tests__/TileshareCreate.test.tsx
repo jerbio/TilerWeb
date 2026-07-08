@@ -26,17 +26,31 @@ vi.mock('@/core/auth/useAuth', () => ({
 	}),
 }));
 
-const { showNotification, updateNotification } = vi.hoisted(() => ({
+const { showNotification, updateNotification, dismissNotification } = vi.hoisted(() => ({
 	showNotification: vi.fn(),
 	updateNotification: vi.fn(),
+	dismissNotification: vi.fn(),
 }));
 
 vi.mock('@/core/ui', () => ({
 	useUiStore: (selector: (s: unknown) => unknown) =>
-		selector({ notification: { show: showNotification, update: updateNotification } }),
+		selector({
+			notification: {
+				show: showNotification,
+				update: updateNotification,
+				dismiss: dismissNotification,
+			},
+		}),
 	notificationId: () => 'create-tileshare-cluster',
 	NotificationAction: { CreateTileshare: 'create-tileshare' },
 }));
+
+const navigateMock = vi.hoisted(() => vi.fn());
+
+vi.mock('react-router', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('react-router')>();
+	return { ...actual, useNavigate: () => navigateMock };
+});
 
 // Replace the calendar DatePicker with a plain input so the date value can be typed.
 vi.mock('@/core/common/components/date_picker', () => ({
@@ -58,9 +72,11 @@ const createCluster = tileshareService.createCluster as Mock;
 describe('TileshareCreate', () => {
 	beforeEach(() => {
 		createCluster.mockReset();
-		createCluster.mockResolvedValue({ cluster: { id: 'cluster-1' } });
+		createCluster.mockResolvedValue({ id: 'cluster-1', name: 'Finish taxes' });
 		showNotification.mockReset();
 		updateNotification.mockReset();
+		dismissNotification.mockReset();
+		navigateMock.mockReset();
 	});
 
 	it('renders the single-mode copy, shared fields and the share-to field', () => {
@@ -215,7 +231,12 @@ describe('TileshareCreate', () => {
 				EndTime: expect.any(Number),
 			})
 		);
-		await waitFor(() => expect(onBack).toHaveBeenCalledTimes(1));
+
+		// Success modal appears (not onBack); closing it redirects to the detail page.
+		const viewAction = await screen.findByText('tilesharedemo.dashboard.create.success.view');
+		expect(onBack).not.toHaveBeenCalled();
+		await user.click(viewAction);
+		expect(navigateMock).toHaveBeenCalledWith('/tileshare/cluster-1');
 	});
 
 	it('normalizes a bare phone recipient with the default calling code on submit', async () => {
@@ -274,6 +295,10 @@ describe('TileshareCreate', () => {
 				EndTime: expect.any(Number),
 			})
 		);
-		await waitFor(() => expect(onBack).toHaveBeenCalledTimes(1));
+
+		const viewAction = await screen.findByText('tilesharedemo.dashboard.create.success.view');
+		expect(onBack).not.toHaveBeenCalled();
+		await user.click(viewAction);
+		expect(navigateMock).toHaveBeenCalledWith('/tileshare/cluster-1');
 	});
 });
