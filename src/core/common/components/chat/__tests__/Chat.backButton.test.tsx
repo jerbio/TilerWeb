@@ -148,10 +148,15 @@ vi.mock('@/core/common/components/chat/MarkdownRenderer', () => ({
 // ---------------------------------------------------------------------------
 
 import Chat from '../chat';
+import { CalendarRequestProvider } from '../../calendar/CalendarRequestProvider';
 
 function renderChat(props: React.ComponentProps<typeof Chat> = {}) {
 	return render(<Chat {...props} />, {
-		wrapper: ({ children }) => <ThemeProvider>{children}</ThemeProvider>,
+		wrapper: ({ children }) => (
+			<ThemeProvider>
+				<CalendarRequestProvider>{children}</CalendarRequestProvider>
+			</ThemeProvider>
+		),
 	});
 }
 

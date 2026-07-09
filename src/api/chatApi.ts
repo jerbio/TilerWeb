@@ -8,8 +8,23 @@ import {
 	ChatMessagesParams,
 	VibeSessionsResponse,
 	VibeSessionParams,
+	SimulationDto,
+	SimulationScheduleResult,
 } from '@/core/common/types/chat';
+import { ApiResponse } from '@/core/common/types/api';
 import { AppApi } from './appApi';
+
+/**
+ * Optional query params for fetching the rendered simulation schedule.
+ * Mirrors the backend `GetVibePreviewModel` query shape.
+ */
+export type SimulationResultParams = {
+	startRange?: string | number;
+	endRange?: string | number;
+	timeZone?: string;
+	getTimeSpan?: string;
+	anonymousUserId?: string;
+};
 
 export class ChatApi extends AppApi {
 	// Messages
@@ -100,6 +115,38 @@ export class ChatApi extends AppApi {
 	public getVibeRequest(requestId: string) {
 		return this.apiRequest<ChatVibeRequestResponse>(
 			`api/Vibe/VibeRequest?RequestId=${encodeURIComponent(requestId)}`
+		);
+	}
+
+	/**
+	 * Fetch the active simulation row for a given vibe request.
+	 * Maps to GET api/Vibe/Request/{vibeRequestId}/Preview.
+	 */
+	public getSimulationForRequest(vibeRequestId: string, anonymousUserId?: string) {
+		const qs = anonymousUserId ? `?AnonymousUserId=${encodeURIComponent(anonymousUserId)}` : '';
+		return this.apiRequest<ApiResponse<SimulationDto>>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/Preview${qs}`
+		);
+	}
+
+	/**
+	 * Fetch the rendered simulated schedule for a previewId.
+	 * Maps to GET api/Vibe/Preview?previewId=...&StartRange=...&EndRange=...
+	 */
+	public getSimulationResult(previewId: string, params?: SimulationResultParams) {
+		const parts = [`previewId=${encodeURIComponent(previewId)}`];
+		if (params?.startRange != null)
+			parts.push(`StartRange=${encodeURIComponent(String(params.startRange))}`);
+		if (params?.endRange != null)
+			parts.push(`EndRange=${encodeURIComponent(String(params.endRange))}`);
+		if (params?.timeZone) parts.push(`TimeZone=${encodeURIComponent(params.timeZone)}`);
+		if (params?.getTimeSpan)
+			parts.push(`getTimeSpan=${encodeURIComponent(params.getTimeSpan)}`);
+		if (params?.anonymousUserId) {
+			parts.push(`AnonymousUserId=${encodeURIComponent(params.anonymousUserId)}`);
+		}
+		return this.apiRequest<ApiResponse<SimulationScheduleResult>>(
+			`api/Vibe/Preview?${parts.join('&')}`
 		);
 	}
 

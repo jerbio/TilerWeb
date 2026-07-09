@@ -80,6 +80,7 @@ export const Hubs = {
 		name: 'vibeUpdateHub',
 		events: {
 			RefreshData: 'refreshDataFromSockets',
+			PreviewReady: 'previewReady',
 		},
 		server: {
 			JoinUserGroup: 'joinUserGroup',
