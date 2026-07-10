@@ -1868,50 +1868,5 @@
 				}
 			}
 		}
-	},
-	"tilesharedemo": {
-		"dashboard": {
-			"title": "Tileshare",
-			"nav": {
-				"active": "Active",
-				"sent": "Sent",
-				"received": "Received ({{count}})"
-			},
-			"filter": {
-				"all": "All",
-				"inProgress": "In Progress"
-			}
-		},
-		"card": {
-			"progress": "Progress",
-			"dueOn": "Due on:",
-			"dueBy": "Due by:",
-			"multiTileshare": "Multi tileshare",
-			"tileshare": "Tileshare"
-		},
-		"active": {
-			"title": "Active",
-			"empty": "No active tileshares",
-			"emptyFiltered": "No in-progress items in your active tileshares"
-		},
-		"sent": {
-			"title": "Sent",
-			"empty": "You haven't sent any tileshares yet",
-			"emptyFiltered": "No in-progress items in your sent tileshares"
-		},
-		"received": {
-			"title": "Received",
-			"empty": "You haven't received any tileshares yet",
-			"emptyFiltered": "No in-progress items in your received tileshares"
-		},
-		"tileshareDetail": {
-			"title": "Tileshare Detail"
-		},
-		"tiletteDetail": {
-			"title": "Tilette Detail"
-		},
-		"invite": {
-			"title": "Invite"
-		}
 	}
 }
