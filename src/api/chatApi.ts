@@ -120,12 +120,50 @@ export class ChatApi extends AppApi {
 		);
 	}
 
-	public supplyClarification(vibeRequestId: string, stepId: string, parameters: Record<string, string>) {
+	public supplyClarification(
+		vibeRequestId: string,
+		stepId: string,
+		parameters: Record<string, string>
+	) {
 		return this.apiRequest<ChatExecuteActionResponse>(
 			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/SupplyClarification`,
 			{
 				method: 'POST',
 				body: JSON.stringify({ StepId: stepId, Parameters: parameters }),
+			}
+		);
+	}
+
+	// M10 — resume a SuspendedGate (SubjectDisambiguation / ArtifactSelection) by
+	// posting the user's natural-language selection. The server matches it against
+	// the stored gate and resumes the suspended plan.
+	public resolveGate(vibeRequestId: string, gateId: string, selectionRaw: string) {
+		return this.apiRequest<ChatExecuteActionResponse>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/ResolveGate`,
+			{
+				method: 'POST',
+				body: JSON.stringify({ GateId: gateId, SelectionRaw: selectionRaw }),
+			}
+		);
+	}
+
+	// M10 — resume a SuspendedGate of kind IntegrationAuth after the user has
+	// completed the OAuth flow whose URL was surfaced via the awaiting event.
+	public completeIntegrationAuth(
+		vibeRequestId: string,
+		gateId: string,
+		integrationKey: string,
+		oauthCallbackPayload: string
+	) {
+		return this.apiRequest<ChatExecuteActionResponse>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/CompleteIntegrationAuth`,
+			{
+				method: 'POST',
+				body: JSON.stringify({
+					GateId: gateId,
+					IntegrationKey: integrationKey,
+					OAuthCallbackPayload: oauthCallbackPayload,
+				}),
 			}
 		);
 	}

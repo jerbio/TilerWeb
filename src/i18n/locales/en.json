@@ -487,6 +487,8 @@
 					"loading": "Loading variants...",
 					"error": "Failed to load variants."
 				},
+				"deepThinking": "Deep thinking",
+				"deepThinkingBanner": "Deep thinking is on. The next message will run a broader research plan and may take longer.",
 				"userLocation": {
 					"anonymous": "Anonymous",
 					"enterLocation": "Enter your location",

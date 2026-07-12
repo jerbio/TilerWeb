@@ -55,7 +55,7 @@ const FieldLabel = styled.label`
 `;
 
 const RequiredMark = styled.span`
-	color: ${({ theme }) => theme.colors.status?.error || '#e53e3e'};
+	color: ${({ theme }) => theme.colors.text.error};
 	margin-left: 2px;
 `;
 
@@ -65,7 +65,7 @@ const FieldInput = styled.input`
 	border-radius: ${({ theme }) => theme.borderRadius.small};
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-family: ${({ theme }) => theme.typography.fontFamily.inter};
-	background: ${({ theme }) => theme.colors.background.default};
+	background: ${({ theme }) => theme.colors.background.card};
 	color: ${({ theme }) => theme.colors.text.primary};
 
 	&:focus {
@@ -80,7 +80,7 @@ const FieldSelect = styled.select`
 	border-radius: ${({ theme }) => theme.borderRadius.small};
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-family: ${({ theme }) => theme.typography.fontFamily.inter};
-	background: ${({ theme }) => theme.colors.background.default};
+	background: ${({ theme }) => theme.colors.background.card};
 	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
@@ -141,11 +141,19 @@ const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 		.some((p) => !values[p.parameterName]?.trim());
 
 	if (state === 'resolved') {
-		return <ResolvedMessage>{t('home.expanded.chat.clarification.submitted', 'Clarification submitted')}</ResolvedMessage>;
+		return (
+			<ResolvedMessage>
+				{t('home.expanded.chat.clarification.submitted', 'Clarification submitted')}
+			</ResolvedMessage>
+		);
 	}
 
 	if (state === 'dismissed') {
-		return <ResolvedMessage>{t('home.expanded.chat.clarification.dismissed', 'Clarification dismissed')}</ResolvedMessage>;
+		return (
+			<ResolvedMessage>
+				{t('home.expanded.chat.clarification.dismissed', 'Clarification dismissed')}
+			</ResolvedMessage>
+		);
 	}
 
 	return (
@@ -163,9 +171,13 @@ const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 							onChange={(e) => handleChange(param.parameterName, e.target.value)}
 							disabled={state === 'submitting'}
 						>
-							<option value="">{t('home.expanded.chat.clarification.selectOption', 'Select...')}</option>
+							<option value="">
+								{t('home.expanded.chat.clarification.selectOption', 'Select...')}
+							</option>
 							{param.suggestedValues.map((sv) => (
-								<option key={sv} value={sv}>{sv}</option>
+								<option key={sv} value={sv}>
+									{sv}
+								</option>
 							))}
 						</FieldSelect>
 					) : (
@@ -180,7 +192,11 @@ const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 				</FieldGroup>
 			))}
 			<ActionsRow>
-				<Button variant="secondary" onClick={handleDismiss} disabled={state === 'submitting'}>
+				<Button
+					variant="secondary"
+					onClick={handleDismiss}
+					disabled={state === 'submitting'}
+				>
 					{t('home.expanded.chat.clarification.dismiss', 'Dismiss')}
 				</Button>
 				<Button

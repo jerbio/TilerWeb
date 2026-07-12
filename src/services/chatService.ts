@@ -53,7 +53,8 @@ class ChatService {
 		userLatitude: string = '',
 		userLocationVerified: string = '',
 		requestId: string = '',
-		actionId: string = ''
+		actionId: string = '',
+		deepThinking: boolean = false
 	) {
 		const requestBody: ChatMessageBody = {
 			EntityId: entityId,
@@ -67,6 +68,7 @@ class ChatService {
 			UserLongitude: userLongitude,
 			UserLocationVerified: userLocationVerified,
 			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			DeepThinking: deepThinking,
 		};
 		try {
 			const response = await this.chatApi.sendMessage(requestBody);
@@ -175,12 +177,53 @@ class ChatService {
 		}
 	}
 
-	async supplyClarification(vibeRequestId: string, stepId: string, parameters: Record<string, string>) {
+	async supplyClarification(
+		vibeRequestId: string,
+		stepId: string,
+		parameters: Record<string, string>
+	) {
 		try {
-			const response = await this.chatApi.supplyClarification(vibeRequestId, stepId, parameters);
+			const response = await this.chatApi.supplyClarification(
+				vibeRequestId,
+				stepId,
+				parameters
+			);
 			return response;
 		} catch (error) {
 			console.error('Error supplying clarification', error);
+			throw normalizeError(error);
+		}
+	}
+
+	// M10 — resume a SuspendedGate via POST /ResolveGate.
+	async resolveGate(vibeRequestId: string, gateId: string, selectionRaw: string) {
+		try {
+			const response = await this.chatApi.resolveGate(vibeRequestId, gateId, selectionRaw);
+			return response;
+		} catch (error) {
+			console.error('Error resolving gate', error);
+			throw normalizeError(error);
+		}
+	}
+
+	// M10 — resume an IntegrationAuth gate via POST /CompleteIntegrationAuth after
+	// the user finishes the OAuth flow.
+	async completeIntegrationAuth(
+		vibeRequestId: string,
+		gateId: string,
+		integrationKey: string,
+		oauthCallbackPayload: string
+	) {
+		try {
+			const response = await this.chatApi.completeIntegrationAuth(
+				vibeRequestId,
+				gateId,
+				integrationKey,
+				oauthCallbackPayload
+			);
+			return response;
+		} catch (error) {
+			console.error('Error completing integration auth', error);
 			throw normalizeError(error);
 		}
 	}

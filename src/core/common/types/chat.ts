@@ -13,6 +13,7 @@ export interface PromptWithActions {
 	sessionId: string;
 	actions: VibeAction[];
 	actionIds?: string[];
+	thinkingMode?: string;
 }
 
 export interface VibeAction {
@@ -92,6 +93,13 @@ export type ChatMessageBody = {
 	UserLongitude?: string;
 	UserLatitude?: string;
 	UserLocationVerified?: string;
+	/**
+	 * Unified Research Path M6 — user-facing DeepThinking toggle.
+	 * When true, the backend stamps the originating VibeRequest's
+	 * ThinkingMode to Deep, overriding the classifier's hint.
+	 * Omit / false to let the classifier decide.
+	 */
+	DeepThinking?: boolean;
 };
 
 export interface VibeSession {
