@@ -126,7 +126,7 @@ export default function ArticleHero({ article }: ArticleHeroProps) {
 				<span>{article.readTime}</span>
 			</Meta>
 
-			<CoverImage src={article.coverImage} alt={article.title} />
+			<CoverImage src={article.heroImage ?? article.coverImage} alt={article.title} />
 		</Wrapper>
 	);
 }

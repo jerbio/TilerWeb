@@ -3,6 +3,10 @@ import NLSCard from '@/assets/articles/nls-card.png';
 import SmartTravelCard from '@/assets/articles/smart-travel-card.png';
 import ScheduleUndoCard from '@/assets/articles/schedule-undo-card.png';
 import TileshareCard from '@/assets/articles/tileshare-card.png';
+import NLSArticleHero from '@/assets/articles/nls-article-hero.png';
+import SmartTravelArticleHero from '@/assets/articles/smart-travel-article-hero.png';
+import ScheduleUndoArticleHero from '@/assets/articles/schedule-undo-article-hero.png';
+import TileshareArticleHero from '@/assets/articles/tileshare-article-hero.png';
 import TilesBackground from '@/assets/highlights/tiles.jpg';
 import MountainBackground from '@/assets/highlights/mountain.jpg';
 import FitnessBackground from '@/assets/highlights/fitness.jpg';
@@ -55,6 +59,7 @@ export interface Article {
 	author: string;
 	date: string;
 	coverImage: string;
+	heroImage?: string;
 	sections: ArticleSection[];
 }
 
@@ -84,6 +89,7 @@ export const articles: Article[] = [
 		author: 'Tiler Team',
 		date: 'May 1, 2026',
 		coverImage: NLSCard,
+		heroImage: NLSArticleHero,
 		sections: [
 			{
 				type: 'prose',
@@ -151,6 +157,7 @@ export const articles: Article[] = [
 		author: 'Tiler Team',
 		date: 'May 8, 2026',
 		coverImage: SmartTravelCard,
+		heroImage: SmartTravelArticleHero,
 		sections: [
 			{
 				type: 'prose',
@@ -219,6 +226,7 @@ export const articles: Article[] = [
 		author: 'Tiler Team',
 		date: 'June 22, 2026',
 		coverImage: ScheduleUndoCard,
+		heroImage: ScheduleUndoArticleHero,
 		sections: [
 			{
 				type: 'prose',
@@ -300,6 +308,7 @@ export const articles: Article[] = [
 		author: 'Tiler Team',
 		date: 'May 22, 2026',
 		coverImage: TileshareCard,
+		heroImage: TileshareArticleHero,
 		sections: [
 			{
 				type: 'prose',
