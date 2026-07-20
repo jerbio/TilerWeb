@@ -10,6 +10,40 @@ vi.mock('@/config/config_getter', () => ({
 
 const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
+/** Build a 200 JSON Response for the standard Content envelope. */
+function jsonResponse(content: unknown) {
+	return new Response(
+		JSON.stringify({
+			Error: { Code: '0', Message: 'SUCCESS' },
+			Content: content,
+			ServerStatus: null,
+		}),
+		{ status: 200, headers: { 'Content-Type': 'application/json' } }
+	);
+}
+
+/** Extract the request URL string from a fetch mock call regardless of arg form. */
+function urlOf(call: Parameters<typeof fetch>): string {
+	const [urlArg] = call;
+	return urlArg instanceof Request
+		? urlArg.url
+		: typeof urlArg === 'string'
+			? urlArg
+			: String(urlArg);
+}
+
+const mockTemplate = {
+	id: 'TileShareTemplate+abc+def',
+	name: 'Test Tilette',
+	clusterId: 'TileShareCluster+abc+def',
+	start: 1750755360000,
+	end: 1751263140000,
+	duration: 3600000,
+	creator: null,
+	designatedUsers: [],
+	miscData: { id: 'misc-1', userNote: 'note' },
+};
+
 const mockCluster = {
 	id: 'TileShareCluster+abc+def',
 	name: 'Test Cluster',
@@ -180,6 +214,139 @@ describe('TileshareApi', () => {
 			await expect(
 				api.getDesignatedTiles({ InvitationStatus: InvitationStatus.Accepted })
 			).rejects.toThrow();
+		});
+	});
+
+	describe('getClusterHeader', () => {
+		it('requests the cluster route with ClusterId and no DataFormat', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ cluster: mockCluster }));
+
+			await api.getClusterHeader('cluster-123');
+
+			expect(fetchSpy).toHaveBeenCalledOnce();
+			const urlStr = urlOf(fetchSpy.mock.calls[0]);
+			expect(urlStr).toContain('api/TileShareCluster');
+			expect(urlStr).toContain('ClusterId=cluster-123');
+			expect(urlStr).not.toContain('DataFormat');
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(api.getClusterHeader('cluster-123')).rejects.toThrow();
+		});
+	});
+
+	describe('getClusterTilettes', () => {
+		it('requests the template route with TileShareClusterId and Format=full', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ tileShareTemplates: [mockTemplate] }));
+
+			const result = await api.getClusterTilettes('cluster-123');
+
+			const urlStr = urlOf(fetchSpy.mock.calls[0]);
+			expect(urlStr).toContain('api/TileshareTemplate');
+			expect(urlStr).toContain('TileShareClusterId=cluster-123');
+			expect(urlStr).toContain('Format=full');
+			expect(result.Content.tileShareTemplates).toHaveLength(1);
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(api.getClusterTilettes('cluster-123')).rejects.toThrow();
+		});
+	});
+
+	describe('getTilette', () => {
+		it('requests the template route with Id and Format=full', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ tileShareTemplate: mockTemplate }));
+
+			await api.getTilette('tilette-1');
+
+			const urlStr = urlOf(fetchSpy.mock.calls[0]);
+			expect(urlStr).toContain('api/TileshareTemplate');
+			expect(urlStr).toContain('Id=tilette-1');
+			expect(urlStr).toContain('Format=full');
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(api.getTilette('tilette-1')).rejects.toThrow();
+		});
+	});
+
+	describe('updateCluster', () => {
+		it('sends a PUT to api/TileShareCluster with the given body', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ cluster: mockCluster }));
+
+			await api.updateCluster({ ClusterId: 'cluster-123', Name: 'Renamed' });
+
+			const [urlArg, options] = fetchSpy.mock.calls[0];
+			expect(urlOf(fetchSpy.mock.calls[0])).toContain('api/TileShareCluster');
+			const method = urlArg instanceof Request ? urlArg.method : options?.method;
+			expect(method).toBe('PUT');
+			const bodyStr =
+				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
+			expect(JSON.parse(bodyStr)).toEqual({ ClusterId: 'cluster-123', Name: 'Renamed' });
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(api.updateCluster({ ClusterId: 'cluster-123' })).rejects.toThrow();
+		});
+	});
+
+	describe('createTilette', () => {
+		it('sends a POST to api/TileshareTemplate with the given body', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ tileShareTemplate: mockTemplate }));
+
+			const params = {
+				TileShareClusterId: 'cluster-123',
+				Name: 'New tilette',
+				StartTime: 1,
+				EndTime: 2,
+				DurationInMs: 1,
+			};
+			await api.createTilette(params);
+
+			const [urlArg, options] = fetchSpy.mock.calls[0];
+			expect(urlOf(fetchSpy.mock.calls[0])).toContain('api/TileshareTemplate');
+			const method = urlArg instanceof Request ? urlArg.method : options?.method;
+			expect(method).toBe('POST');
+			const bodyStr =
+				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
+			expect(JSON.parse(bodyStr)).toEqual(params);
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(
+				api.createTilette({
+					TileShareClusterId: 'cluster-123',
+					StartTime: 1,
+					EndTime: 2,
+					DurationInMs: 1,
+				})
+			).rejects.toThrow();
+		});
+	});
+
+	describe('updateTilette', () => {
+		it('sends a PUT to api/TileshareTemplate with the given body', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ tileShareTemplate: mockTemplate }));
+
+			await api.updateTilette({ Id: 'tilette-1', Name: 'Renamed' });
+
+			const [urlArg, options] = fetchSpy.mock.calls[0];
+			expect(urlOf(fetchSpy.mock.calls[0])).toContain('api/TileshareTemplate');
+			const method = urlArg instanceof Request ? urlArg.method : options?.method;
+			expect(method).toBe('PUT');
+			const bodyStr =
+				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
+			expect(JSON.parse(bodyStr)).toEqual({ Id: 'tilette-1', Name: 'Renamed' });
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(api.updateTilette({ Id: 'tilette-1' })).rejects.toThrow();
 		});
 	});
 

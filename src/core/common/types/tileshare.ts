@@ -18,6 +18,8 @@ export type TileshareUserProfile = {
 export type TileShareCluster = {
 	id: string | null;
 	name: string | null;
+	/** Cluster description. Persisted on write; may be null until the read payload emits it. */
+	notes: string | null;
 	start: number | null;
 	end: number | null;
 	isCompleted: boolean | null;
@@ -25,7 +27,7 @@ export type TileShareCluster = {
 	isDismissed: boolean | null;
 	isMultiTilette: boolean | null;
 	creator: TileshareUserProfile | null;
-	tileShareTemplates: unknown[] | null;
+	tileShareTemplates: TileShareTemplate[] | null;
 	truncatedUser: string | null;
 };
 
@@ -73,9 +75,42 @@ export type TileShareClusterListResponse = ApiResponse<{
 	clusters: TileShareCluster[];
 }>;
 
+/** Single-cluster fetch (ClusterId). Envelope key pending backend confirm — see tileshareApi. */
+export type TileShareClusterResponse = ApiResponse<{
+	cluster: TileShareCluster;
+}>;
+
+export type TileShareTemplateListResponse = ApiResponse<{
+	tileShareTemplates: TileShareTemplate[];
+}>;
+
+export type TileShareTemplateResponse = ApiResponse<{
+	tileShareTemplate: TileShareTemplate;
+}>;
+
 export type DesignatedTileListResponse = ApiResponse<{
 	designatedTiles: DesignatedTile[];
 }>;
+
+/**
+ * Composed shape consumed by the cluster detail page. The header and the
+ * tilette list come from two separate endpoints (the cluster route scopes
+ * tilettes to the caller, which drops the assignee stack).
+ */
+export type ClusterDetail = {
+	cluster: TileShareCluster;
+	tilettes: TileShareTemplate[];
+};
+
+/**
+ * Per-tilette completion status. Derived client-side for now — the backend
+ * has no completion field yet, so {@link deriveTileletteStatus} returns a stub.
+ * When the wire field lands, only that helper changes.
+ */
+export enum TileletteStatus {
+	InProgress = 'in_progress',
+	Completed = 'completed',
+}
 
 export type DeleteTileShareClusterParams = {
 	ClusterId: string | null;
@@ -133,4 +168,46 @@ export enum InvitationStatus {
 
 export type GetDesignatedTilesParams = {
 	InvitationStatus?: InvitationStatus;
+};
+
+export type GetClusterTilettesParams = {
+	TileShareClusterId: string;
+	/** Non-empty hydrates miscData (userNote). Use "full". */
+	Format?: string;
+};
+
+export type GetTileletteParams = {
+	Id: string;
+	/** Non-empty hydrates miscData (userNote). Use "full". */
+	Format?: string;
+};
+
+/** Body for PUT api/TileShareCluster. All fields optional — send only what changed. */
+export type UpdateClusterParams = {
+	ClusterId: string;
+	Name?: string;
+	Notes?: string;
+	/** Epoch ms. Server keeps the unspecified bound, so send both when editing dates. */
+	StartTime?: number;
+	EndTime?: number;
+};
+
+/** Body for POST api/TileshareTemplate. Adding a tilette auto-marks the cluster multi. */
+export type CreateTileletteParams = {
+	TileShareClusterId: string;
+	Name?: string;
+	Contacts?: string[];
+	NoteMiscData?: string;
+	StartTime: number;
+	EndTime: number;
+	DurationInMs: number;
+};
+
+/** Body for PUT api/TileshareTemplate. All fields except Id optional. */
+export type UpdateTileletteParams = {
+	Id: string;
+	Name?: string;
+	NoteMiscData?: string;
+	StartTime?: number;
+	EndTime?: number;
 };
