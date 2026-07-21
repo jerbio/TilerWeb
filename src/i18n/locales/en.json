@@ -1801,6 +1801,17 @@
 		"tiletteDetail": {
 			"title": "Tilette Detail"
 		},
+		"detail": {
+			"breadcrumbRoot": "Tileshare",
+			"multiTileshare": "Multi tileshare",
+			"singleTileshare": "Single tileshare",
+			"progress": "Progress",
+			"noDescription": "No description provided",
+			"due": "Due: {{date}}",
+			"editAria": "Edit",
+			"addAria": "Add tilette",
+			"loadError": "We couldn't load this tileshare. Please try again."
+		},
 		"invite": {
 			"title": "Invite"
 		}
