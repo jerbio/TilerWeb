@@ -175,6 +175,17 @@ export type AppTheme = {
 			base: string;
 			highlight: string;
 		};
+		// Tag input colors
+		tagInput: {
+			chipBg: string;
+			chipBorder: string;
+			chipText: string;
+			remove: string;
+			removeHover: string;
+			addBg: string;
+			addBgHover: string;
+			addText: string;
+		};
 		// Utility colors
 		white: string;
 		black: string;

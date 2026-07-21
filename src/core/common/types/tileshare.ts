@@ -95,6 +95,58 @@ export type DeleteTileShareClusterParams = {
 
 export type DeleteTileShareClusterResponse = ApiResponse<unknown>;
 
+export type AddressDataModel = {
+	Address: string;
+	Description?: string;
+	AddressIsVerified: boolean;
+};
+
+export type ContactModel = {
+	Id?: string;
+	FirstName?: string;
+	LastName?: string;
+	Email?: string;
+	PhoneNumber?: string;
+};
+
+export type CreateTileShareClusterParams = {
+	UserName: string | null;
+	TimeZone: string | null;
+	TimeZoneOffset: number | null;
+	Name: string;
+	IsMultiTilette: boolean;
+	IncludeMe: boolean;
+	/** epoch ms, optional earliest-start bound */
+	StartTime?: number;
+	/** epoch ms, the deadline */
+	EndTime?: number;
+	DurationInMs?: number;
+	Notes?: string;
+	AddressData?: AddressDataModel;
+	/** Must never be null — send [] when empty (backend dereferences without a null check). */
+	Contacts: ContactModel[];
+};
+
+/**
+ * Create returns the cluster object directly as `Content` (from
+ * `TileShareCluster.ToJson`) — unlike the GET-by-id path, which wraps it as
+ * `{ cluster }`. Field casing is best-effort until confirmed against a real body.
+ */
+export type CreateTileShareClusterResponse = ApiResponse<TileShareCluster>;
+
+export enum TileshareMode {
+	Single = 'single',
+	Multi = 'multi',
+}
+
+export type TileshareFormState = {
+	name: string;
+	deadline: string;
+	location: string;
+	note: string;
+	recipients: string[];
+};
+
 export type SortOrder = 'asc' | 'desc';
 
 /** Default server page size (ServerContants.batchPageSize). */

@@ -1604,6 +1604,115 @@
 			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
 		}
 	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "Tileshare",
+			"nav": {
+				"active": "Active",
+				"sent": "Sent",
+				"received": "Received ({{count}})"
+			},
+			"toolbar": {
+				"welcome": "Welcome to your Tileshare Dashboard",
+				"create": "Create tileshare"
+			},
+			"createSelection": {
+				"single": {
+					"label": "Single Tileshare",
+					"description": "A single task with your colleagues."
+				},
+				"multi": {
+					"label": "Multi Tileshare",
+					"description": "A variety of tasks in one project."
+				}
+			},
+			"create": {
+				"back": "Back to tileshare",
+				"single": {
+					"title": "Create a single tileshare",
+					"description": "Create and share a single task with your colleagues. Once they accept, we'll add it to their schedule.",
+					"submit": "Create single tileshare"
+				},
+				"multi": {
+					"title": "Create a multi tileshare",
+					"description": "Create and share a variety of tasks in one project. Once colleagues accept, we'll add it to their schedule.",
+					"submit": "Create multi tileshare"
+				},
+				"fields": {
+					"name": {
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"placeholder": "Add a deadline"
+					},
+					"location": {
+						"placeholder": "Add a location (optional)"
+					},
+					"note": {
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"shareTo": {
+					"label": "Share to:",
+					"placeholder": "email address / phone number (Enter to select)",
+					"add": "Add recipient",
+					"remove": "Remove {{recipient}}"
+				},
+				"buttons": {
+					"cancel": "Cancel"
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"deadlineRequired": "Please add a deadline",
+					"recipientRequired": "Please add at least one recipient",
+					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+				},
+				"toast": {
+					"creating": "Creating tileshare…",
+					"error": "Couldn't create tileshare. Please try again."
+				},
+				"success": {
+					"message": "Your tileshare \"{{name}}\" has been created.",
+					"view": "View tileshare"
+				}
+			},
+			"filter": {
+				"all": "All",
+				"inProgress": "In Progress"
+			}
+		},
+		"card": {
+			"progress": "Progress",
+			"dueOn": "Due on:",
+			"dueBy": "Due by:",
+			"multiTileshare": "Multi tileshare",
+			"tileshare": "Tileshare"
+		},
+		"active": {
+			"title": "Active",
+			"empty": "No active tileshares",
+			"emptyFiltered": "No in-progress items in your active tileshares"
+		},
+		"sent": {
+			"title": "Sent",
+			"empty": "You haven't sent any tileshares yet",
+			"emptyFiltered": "No in-progress items in your sent tileshares"
+		},
+		"received": {
+			"title": "Received",
+			"empty": "You haven't received any tileshares yet",
+			"emptyFiltered": "No in-progress items in your received tileshares"
+		},
+		"tileshareDetail": {
+			"title": "Tileshare Detail"
+		},
+		"tiletteDetail": {
+			"title": "Tilette Detail"
+		},
+		"invite": {
+			"title": "Invite"
+		}
+	},
 	"tile": {
 		"noteButtonAria": "Open notes for this tile"
 	},
@@ -1758,51 +1867,6 @@
 					"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
 				}
 			}
-		}
-	},
-	"tilesharedemo": {
-		"dashboard": {
-			"title": "Tileshare",
-			"nav": {
-				"active": "Active",
-				"sent": "Sent",
-				"received": "Received ({{count}})"
-			},
-			"filter": {
-				"all": "All",
-				"inProgress": "In Progress"
-			}
-		},
-		"card": {
-			"progress": "Progress",
-			"dueOn": "Due on:",
-			"dueBy": "Due by:",
-			"multiTileshare": "Multi tileshare",
-			"tileshare": "Tileshare"
-		},
-		"active": {
-			"title": "Active",
-			"empty": "No active tileshares",
-			"emptyFiltered": "No in-progress items in your active tileshares"
-		},
-		"sent": {
-			"title": "Sent",
-			"empty": "You haven't sent any tileshares yet",
-			"emptyFiltered": "No in-progress items in your sent tileshares"
-		},
-		"received": {
-			"title": "Received",
-			"empty": "You haven't received any tileshares yet",
-			"emptyFiltered": "No in-progress items in your received tileshares"
-		},
-		"tileshareDetail": {
-			"title": "Tileshare Detail"
-		},
-		"tiletteDetail": {
-			"title": "Tilette Detail"
-		},
-		"invite": {
-			"title": "Invite"
 		}
 	}
 }

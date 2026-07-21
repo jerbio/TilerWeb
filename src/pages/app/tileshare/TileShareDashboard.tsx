@@ -4,8 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, CalendarCheck2 } from 'lucide-react';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 import Tabs, { TabItem } from '@/core/common/components/Tabs';
+import TileshareToolbar from '@/components/tileshare/TileshareToolbar';
+import TileshareCreate, { TileshareMode } from '@/components/tileshare/TileshareCreate';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Routes } from '@/core/constants/routes';
+import { useAuth } from '@/core/auth/useAuth';
 
 export enum TileshareTab {
 	Active = 'active',
@@ -16,7 +19,9 @@ const TileshareDashboardPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+	const { user } = useAuth();
 	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
+	const [createMode, setCreateMode] = useState<TileshareMode | null>(null);
 
 	useEffect(() => {
 		if (pathname.endsWith(Routes.Tileshare.active)) {
@@ -51,21 +56,41 @@ const TileshareDashboardPage: React.FC = () => {
 		if (tabRoutes[id]) navigate(tabRoutes[id]);
 	};
 
+	const handleSelectSingle = () => setCreateMode(TileshareMode.Single);
+	const handleSelectMulti = () => setCreateMode(TileshareMode.Multi);
+
 	return (
 		<Container>
 			<CalendarUIProvider>
-				<Header>
-					<Tabs
-						tabs={tabs}
-						value={activeTab}
-						onChange={handleTabChange}
-						aria-label={t('tilesharedemo.dashboard.title')}
-						stretch
+				{createMode ? (
+					<TileshareCreate
+						mode={createMode}
+						onBack={() => {
+							setCreateMode(null);
+							navigate(Routes.Tileshare.sent);
+						}}
 					/>
-				</Header>
-				<Main>
-					<Outlet />
-				</Main>
+				) : (
+					<>
+						<StyledToolbar
+							user={{ name: user?.fullName ?? null, email: user?.email ?? null }}
+							onSelectSingle={handleSelectSingle}
+							onSelectMulti={handleSelectMulti}
+						/>
+						<Header>
+							<Tabs
+								tabs={tabs}
+								value={activeTab}
+								onChange={handleTabChange}
+								aria-label={t('tilesharedemo.dashboard.title')}
+								stretch
+							/>
+						</Header>
+						<Main>
+							<Outlet />
+						</Main>
+					</>
+				)}
 			</CalendarUIProvider>
 		</Container>
 	);
@@ -79,11 +104,16 @@ const Container = styled.div`
 	isolation: isolate;
 `;
 
+const StyledToolbar = styled(TileshareToolbar)`
+	padding: 1.5rem;
+	border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+`;
+
 const Header = styled.header`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 1rem 1.5rem;
+	padding: 1.5rem 1.5rem 1rem;
 `;
 
 const Main = styled.main`
