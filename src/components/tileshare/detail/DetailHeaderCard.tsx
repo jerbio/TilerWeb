@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '@/core/theme/ThemeProvider';
-import colorUtil, { RGB } from '@/core/util/colors';
+import { RGB } from '@/core/util/colors';
+import { iconSurface } from '@/core/util/colorSurface';
 
 type DetailHeaderCardProps = {
 	/** Glyph rendered inside the accent icon box. */
@@ -34,12 +35,13 @@ const DetailHeaderCard: React.FC<DetailHeaderCardProps> = ({
 	children,
 }) => {
 	const { isDarkMode } = useTheme();
+	const surface = iconSurface(accent, isDarkMode);
 
 	return (
 		<Card $darkmode={isDarkMode}>
 			<TopRow>
 				<Left>
-					<IconBox $accent={accent} $darkmode={isDarkMode}>
+					<IconBox $bg={surface.background} $fg={surface.foreground}>
 						{icon}
 					</IconBox>
 					<TitleBlock>
@@ -98,14 +100,12 @@ const Right = styled.div`
 	flex-shrink: 0;
 `;
 
-const IconBox = styled.div<{ $accent: RGB; $darkmode: boolean }>`
+const IconBox = styled.div<{ $bg: string; $fg: string }>`
 	width: 48px;
 	height: 48px;
 	border-radius: ${({ theme }) => theme.borderRadius.large};
-	background-color: ${({ $accent, $darkmode }) =>
-		colorUtil.setLightness($accent, $darkmode ? 0.325 : 0.9).toHex()};
-	color: ${({ $accent, $darkmode }) =>
-		colorUtil.setLightness($accent, $darkmode ? 0.85 : 0.3).toHex()};
+	background-color: ${({ $bg }) => $bg};
+	color: ${({ $fg }) => $fg};
 	display: flex;
 	align-items: center;
 	justify-content: center;
