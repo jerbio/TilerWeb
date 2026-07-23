@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import styled from 'styled-components';
 
@@ -37,7 +37,9 @@ const Tabs: React.FC<TabsProps> = ({
 }) => {
 	const tabListRef = useRef<HTMLDivElement>(null);
 	const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
-	const [immediate, setImmediate] = useState(true);
+	// Animation stays off until the first measured position has been committed,
+	// so the pill snaps into place on mount instead of sliding in from {0,0,0}.
+	const [animate, setAnimate] = useState(false);
 	const [indicatorRect, setIndicatorRect] = useState<IndicatorRect>({
 		left: 0,
 		width: 0,
@@ -61,8 +63,14 @@ const Tabs: React.FC<TabsProps> = ({
 
 	useLayoutEffect(() => {
 		measureIndicator();
-		setImmediate(false);
 	}, [measureIndicator, tabs]);
+
+	// Enable animation on the frame after the first measured position paints, so
+	// only subsequent value changes animate — the initial position snaps.
+	useEffect(() => {
+		const id = requestAnimationFrame(() => setAnimate(true));
+		return () => cancelAnimationFrame(id);
+	}, []);
 
 	useLayoutEffect(() => {
 		const handleResize = () => measureIndicator();
@@ -75,7 +83,7 @@ const Tabs: React.FC<TabsProps> = ({
 		width: indicatorRect.width,
 		height: indicatorRect.height,
 		config: { tension: 300, friction: 30 },
-		immediate,
+		immediate: !animate,
 	});
 
 	const setTabRef = (id: string) => (el: HTMLButtonElement | null) => {
