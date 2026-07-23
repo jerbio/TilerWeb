@@ -6,10 +6,11 @@ import AssigneeTiletteCard from './AssigneeTiletteCard';
 
 type AssigneeColumnProps = {
 	assignee: Assignee;
+	clusterId: string;
 };
 
 /** One assignee lane: a name/avatar header over that person's tilette cards. */
-const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee }) => (
+const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee, clusterId }) => (
 	<Column>
 		<Header>
 			<HeaderName>{assignee.name}</HeaderName>
@@ -17,7 +18,7 @@ const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee }) => (
 		</Header>
 		<Cards>
 			{assignee.tilettes.map((tilette) => (
-				<AssigneeTiletteCard key={tilette.id} tilette={tilette} />
+				<AssigneeTiletteCard key={tilette.id} tilette={tilette} clusterId={clusterId} />
 			))}
 		</Cards>
 	</Column>

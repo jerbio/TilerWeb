@@ -67,6 +67,7 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 			) : (
 				<AssigneeView
 					assignees={visibleAssignees}
+					clusterId={clusterId}
 					columns={columns}
 					showFooter={pageCount > 1}
 					hasPrev={safePage > 0}

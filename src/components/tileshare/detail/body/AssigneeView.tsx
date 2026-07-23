@@ -8,6 +8,8 @@ import AssigneeColumn from './AssigneeColumn';
 type AssigneeViewProps = {
 	/** The assignees visible on the current page. */
 	assignees: Assignee[];
+	/** Parent cluster id, for linking each tilette card to its detail page. */
+	clusterId: string;
 	/** Number of columns to lay the board out in. */
 	columns: number;
 	showFooter: boolean;
@@ -20,6 +22,7 @@ type AssigneeViewProps = {
 /** Presentational assignee board: a grid of lanes with a Prev/Next footer. */
 const AssigneeView: React.FC<AssigneeViewProps> = ({
 	assignees,
+	clusterId,
 	columns,
 	showFooter,
 	hasPrev,
@@ -33,7 +36,7 @@ const AssigneeView: React.FC<AssigneeViewProps> = ({
 		<Wrap>
 			<Board $columns={columns}>
 				{assignees.map((assignee) => (
-					<AssigneeColumn key={assignee.id} assignee={assignee} />
+					<AssigneeColumn key={assignee.id} assignee={assignee} clusterId={clusterId} />
 				))}
 			</Board>
 			{showFooter && (
