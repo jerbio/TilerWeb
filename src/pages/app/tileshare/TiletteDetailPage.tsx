@@ -55,6 +55,10 @@ const Container = styled.div`
 	overflow-y: auto;
 	background-color: ${({ theme }) => theme.colors.background.page};
 	padding: 1rem 1.5rem 1.5rem;
+
+	& > * {
+		flex-shrink: 0;
+	}
 `;
 
 const ErrorText = styled.p`
