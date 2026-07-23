@@ -13,6 +13,8 @@ type SingleTileshareHeaderProps = {
 	description: string | null;
 	/** Epoch used for the displayed due date. */
 	dueDate: number | null;
+	/** Subtitle under the title. Defaults to "Single tileshare"; tilettes pass "In: {cluster}". */
+	subtitle?: string;
 	/** Icon accent colour. Defaults to the brand colour when the backend gives none. */
 	accent?: RGB;
 	onEdit?: () => void;
@@ -22,6 +24,7 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 	name,
 	description,
 	dueDate,
+	subtitle,
 	accent = BRAND_ACCENT,
 	onEdit,
 }) => {
@@ -33,7 +36,7 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 			icon={<MessageSquare size={22} />}
 			accent={accent}
 			title={name ?? '—'}
-			subtitle={t('tilesharedemo.detail.singleTileshare')}
+			subtitle={subtitle ?? t('tilesharedemo.detail.singleTileshare')}
 			headerRight={
 				<>
 					<DuePill>

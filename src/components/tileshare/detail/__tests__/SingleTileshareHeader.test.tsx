@@ -35,6 +35,19 @@ describe('SingleTileshareHeader', () => {
 		).toBeInTheDocument();
 	});
 
+	it('renders a custom subtitle when provided', () => {
+		render(
+			<SingleTileshareHeader
+				name="Design Sprint"
+				description={null}
+				dueDate={DATE}
+				subtitle="In: Q1 projects 2026"
+			/>
+		);
+		expect(screen.getByText('In: Q1 projects 2026')).toBeInTheDocument();
+		expect(screen.queryByText('tilesharedemo.detail.singleTileshare')).not.toBeInTheDocument();
+	});
+
 	it('shows a fallback when no description is provided', () => {
 		render(<SingleTileshareHeader name="Design Sprint" description={null} dueDate={DATE} />);
 		expect(screen.getByText('tilesharedemo.detail.noDescription')).toBeInTheDocument();

@@ -186,6 +186,33 @@ describe('TileshareService', () => {
 		});
 	});
 
+	describe('getClusterHeader', () => {
+		it('returns the unwrapped cluster header', async () => {
+			const apiMock = {
+				getClusterHeader: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { cluster: mockCluster },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.getClusterHeader('cluster-123');
+
+			expect(result).toEqual(mockCluster);
+			expect(apiMock.getClusterHeader).toHaveBeenCalledWith('cluster-123');
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				getClusterHeader: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(service.getClusterHeader('cluster-123')).rejects.toThrow();
+		});
+	});
+
 	describe('getTileletteDetail', () => {
 		it('returns the unwrapped tilette', async () => {
 			const apiMock = {

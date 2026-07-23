@@ -19,7 +19,7 @@ const TileshareDetailPage: React.FC = () => {
 
 	return (
 		<Container>
-			<TileshareDetailBreadcrumb current={cluster?.name ?? ''} />
+			<TileshareDetailBreadcrumb current={cluster?.name ?? ''} loading={loading} />
 			{loading ? (
 				<DetailHeaderSkeleton />
 			) : error || !cluster ? (

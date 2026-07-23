@@ -93,6 +93,20 @@ class TileshareService {
 		}
 	}
 
+	/**
+	 * Cluster header only (name, dates, flags) — e.g. to resolve a tilette's
+	 * parent cluster for the breadcrumb without fetching its tilette list.
+	 */
+	async getClusterHeader(clusterId: string) {
+		try {
+			const res = await this.api.getClusterHeader(clusterId);
+			return res.Content.cluster;
+		} catch (error) {
+			console.error('Error fetching tileshare cluster header', error);
+			throw normalizeError(error);
+		}
+	}
+
 	/** Single tileshare (tilette) detail. */
 	async getTileletteDetail(id: string) {
 		try {

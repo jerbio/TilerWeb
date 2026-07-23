@@ -31,4 +31,35 @@ describe('TileshareDetailBreadcrumb', () => {
 		const current = screen.getByText('Q1 projects 2026');
 		expect(current).toHaveAttribute('aria-current', 'page');
 	});
+
+	it('renders shimmer placeholders instead of text while loading', () => {
+		render(
+			<TileshareDetailBreadcrumb
+				current="Design Sprint"
+				parent={{ label: 'Q1 projects 2026', href: '/tileshare/clu-1' }}
+				loading
+			/>
+		);
+
+		// Root stays; dynamic crumbs are replaced by placeholders (no text yet).
+		expect(
+			screen.getByRole('link', { name: 'tilesharedemo.detail.breadcrumbRoot' })
+		).toBeInTheDocument();
+		expect(screen.queryByText('Design Sprint')).not.toBeInTheDocument();
+		expect(screen.queryByText('Q1 projects 2026')).not.toBeInTheDocument();
+	});
+
+	it('renders a linked parent crumb when provided', () => {
+		render(
+			<TileshareDetailBreadcrumb
+				current="Design Sprint"
+				parent={{ label: 'Q1 projects 2026', href: '/tileshare/clu-1' }}
+			/>
+		);
+
+		const parent = screen.getByRole('link', { name: 'Q1 projects 2026' });
+		expect(parent).toHaveAttribute('href', '/tileshare/clu-1');
+		// current is still the active (non-link) crumb
+		expect(screen.getByText('Design Sprint')).toHaveAttribute('aria-current', 'page');
+	});
 });

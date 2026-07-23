@@ -3,18 +3,32 @@ import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useTiletteDetail } from '@/hooks/useTiletteDetail';
+import { useClusterHeader } from '@/hooks/useClusterHeader';
+import { Routes } from '@/core/constants/routes';
 import TileshareDetailBreadcrumb from '@/components/tileshare/detail/TileshareDetailBreadcrumb';
 import SingleTileshareHeader from '@/components/tileshare/detail/SingleTileshareHeader';
 import DetailHeaderSkeleton from '@/components/tileshare/detail/DetailHeaderSkeleton';
 
 const TiletteDetailPage: React.FC = () => {
 	const { t } = useTranslation();
-	const { tiletteId } = useParams<{ tiletteId: string }>();
+	const { id: clusterId, tiletteId } = useParams<{ id: string; tiletteId: string }>();
 	const { data: tilette, loading, error } = useTiletteDetail(tiletteId ?? null);
+	// The tilette lives under a multi cluster (this route's :id) — resolve the
+	// parent's name for the breadcrumb and the "In: {cluster}" header subtitle.
+	const { data: cluster, loading: clusterLoading } = useClusterHeader(clusterId ?? null);
+
+	const parentName = cluster?.name ?? '';
+	const parent = clusterId
+		? { label: parentName, href: Routes.Tileshare.detail(clusterId) }
+		: undefined;
 
 	return (
 		<Container>
-			<TileshareDetailBreadcrumb current={tilette?.name ?? ''} />
+			<TileshareDetailBreadcrumb
+				current={tilette?.name ?? ''}
+				parent={parent}
+				loading={loading || clusterLoading}
+			/>
 			{loading ? (
 				<DetailHeaderSkeleton />
 			) : error || !tilette ? (
@@ -24,6 +38,7 @@ const TiletteDetailPage: React.FC = () => {
 					name={tilette.name}
 					description={tilette.miscData?.userNote ?? null}
 					dueDate={tilette.end}
+					subtitle={t('tilesharedemo.detail.inCluster', { name: parentName })}
 					onEdit={() => {}}
 				/>
 			)}
