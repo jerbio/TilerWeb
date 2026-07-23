@@ -35,6 +35,8 @@ const Header = styled.div`
 	justify-content: space-between;
 	gap: 0.5rem;
 	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-bottom: none;
 	background-color: ${({ theme }) => theme.colors.background.card};
 	border-radius: ${({ theme }) => theme.borderRadius.large}
 		${({ theme }) => theme.borderRadius.large} 0 0;
