@@ -8,6 +8,7 @@ import TileshareDetailBreadcrumb from '@/components/tileshare/detail/TileshareDe
 import MultiTileshareHeader from '@/components/tileshare/detail/MultiTileshareHeader';
 import SingleTileshareHeader from '@/components/tileshare/detail/SingleTileshareHeader';
 import DetailHeaderSkeleton from '@/components/tileshare/detail/DetailHeaderSkeleton';
+import TiletteBody from '@/components/tileshare/detail/body/TiletteBody';
 
 const TileshareDetailPage: React.FC = () => {
 	const { t } = useTranslation();
@@ -24,14 +25,17 @@ const TileshareDetailPage: React.FC = () => {
 			) : error || !cluster ? (
 				<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
 			) : cluster.isMultiTilette ? (
-				<MultiTileshareHeader
-					name={cluster.name}
-					description={cluster.notes}
-					progress={computeClusterProgress(data?.tilettes ?? null)}
-					date={cluster.end}
-					onEdit={() => {}}
-					onAdd={() => {}}
-				/>
+				<>
+					<MultiTileshareHeader
+						name={cluster.name}
+						description={cluster.notes}
+						progress={computeClusterProgress(data?.tilettes ?? null)}
+						date={cluster.end}
+						onEdit={() => {}}
+						onAdd={() => {}}
+					/>
+					<TiletteBody clusterId={cluster.id ?? ''} tilettes={data?.tilettes ?? []} />
+				</>
 			) : (
 				<SingleTileshareHeader
 					name={cluster.name}

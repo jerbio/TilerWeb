@@ -1810,7 +1810,22 @@
 			"due": "Due: {{date}}",
 			"editAria": "Edit",
 			"addAria": "Add tilette",
-			"loadError": "We couldn't load this tileshare. Please try again."
+			"loadError": "We couldn't load this tileshare. Please try again.",
+			"showingTilettes": "Showing {{count}} Tilettes",
+			"showingAssignees": "Showing {{shown}} of {{total}} Assignees",
+			"statusLabel": "Status:",
+			"status": {
+				"inProgress": "In progress",
+				"completed": "Completed"
+			},
+			"view": {
+				"list": "Tilette list view",
+				"assignee": "Assignee view"
+			},
+			"viewAria": "Tilette view",
+			"openTiletteAria": "Open tilette",
+			"prev": "Prev",
+			"next": "Next"
 		},
 		"invite": {
 			"title": "Invite"
