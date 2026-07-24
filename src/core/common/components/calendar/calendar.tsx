@@ -1,6 +1,6 @@
-import React, { useCallback, useRef } from 'react';
+﻿import React, { useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, Clock, Info, TriangleAlert } from 'lucide-react';
 import styled, { useTheme } from 'styled-components';
 import calendarConfig from '@/core/constants/calendar_config';
@@ -16,6 +16,9 @@ import Tooltip from '../tooltip';
 import analytics from '@/core/util/analytics';
 import TimeUtil from '@/core/util/time';
 import CalendarEventInfo from './calendar_event_info';
+import SimulatedCalendarEventInfo from './SimulatedCalendarEventInfo';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
+import { getMobileReviewSheetHeightPx } from '@/pages/reviewSheetSizing';
 import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import CalendarContent from './calendar_content';
@@ -39,6 +42,9 @@ import { initialCreateBlockFormState, initialCreateTileFormState } from './data'
 import CalendarModal from './modals';
 import CalendarCreateSelection from './calendar_create_selection';
 import CalendarCreateBlock from './create_block';
+import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
+import type { CalendarEntityType } from './calendarRequestContext';
+import { useTilePredictionAutofill } from './create_tile/useTilePredictionAutofill';
 export type { CalendarViewOptions } from './calendar.types';
 
 type CalendarProps = {
@@ -50,6 +56,12 @@ type CalendarProps = {
 	refetchEvents: () => Promise<void>;
 	/** When false, skip REST-based event lookup (Phase 4) and fall back to cached-event search only. Defaults to true. */
 	allowEventLookup?: boolean;
+	/** Plan §5.2 — per-tile simulation classification (composite-key map). */
+	simulationClassification?: Record<string, SimulatedTileClassification>;
+	/** Plan §5.3.2 — invoked when a simulation tile is clicked. */
+	onSimulatedTileClick?: (entityId: string, entityType: CalendarEntityType) => void;
+	/** Plan §5.2.7 — composite entity key of the currently selected action. */
+	selectedSimulationKey?: string | null;
 };
 
 const Calendar = ({
@@ -60,15 +72,18 @@ const Calendar = ({
 	setViewOptions,
 	refetchEvents,
 	allowEventLookup = true,
+	simulationClassification,
+	onSimulatedTileClick,
+	selectedSimulationKey,
 }: CalendarProps) => {
 	const { t } = useTranslation();
-	const viableEvents = events.filter((event) => event.isViable);
 	const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 	const [selectedEventInfo, setSelectedEventInfo] = useState<StyledEvent | null>(null);
 	const theme = useTheme();
 	const { createTile, createBlock, createSelection } = useCalendarUI((state) => state);
 
 	const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+
 	const contentContainerRef = useRef<HTMLDivElement>(null);
 
 	// Ref holding all styled events (populated by CalendarEvents)
@@ -90,6 +105,19 @@ const Calendar = ({
 	// Stores the request to retry once events finish reloading after a date navigation
 	const pendingFocusRef = useRef<PendingFocus | null>(null);
 
+	// Mirror the latest `events` prop into a ref so the request handler
+	// (memoized once below) can resolve entities against the current pool
+	// without resubscribing. During tilecast review, `events` already carries
+	// the simulation overlay's subCalendarEvents — keeping the ref fresh lets
+	// `FocusEvent` requests hit memory and skip the `/CalendarEvent` lookup.
+	const eventsRef = useRef<SubCalendarEvent[]>(events);
+	eventsRef.current = events;
+
+	// Updated below once `reviewSheetInsetPx` is known. The handler created
+	// in the next useCallback reads through this ref so we don't need to
+	// rebuild it every time the bottom-sheet stop changes.
+	const bottomInsetPxRef = useRef<number>(0);
+
 	// ── Calendar Request Listener ──────────────────────────────────
 	const handleCalendarRequest = useCallback(
 		createCalendarRequestHandler({
@@ -97,13 +125,14 @@ const Calendar = ({
 			pendingFocusRef,
 			contentContainerRef,
 			focusTimeoutRef,
-			events,
+			eventsRef,
 			allowEventLookup,
 			setShowNonViableEvents,
 			setSelectedEventInfo,
 			setSelectedEvent,
 			setViewOptions,
 			setFocusedEventId,
+			bottomInsetPxRef,
 		}),
 		[]
 	);
@@ -125,6 +154,7 @@ const Calendar = ({
 				setSelectedEventInfo,
 				setSelectedEvent,
 				setFocusedEventId,
+				bottomInsetPxRef,
 			});
 		}, 150);
 
@@ -140,9 +170,16 @@ const Calendar = ({
 	}, []); // Only on mount
 
 	useEffect(() => {
-		// EVENTS_RELOADED — reset selection & event info (data may be stale)
-		setSelectedEvent(null);
-		setSelectedEventInfo(null);
+		// EVENTS_RELOADED — only clear selection if the selected event is no
+		// longer present (deleted/replaced). A bare reference change (e.g. a
+		// background refetch or, during tilecast review, a recompute of the
+		// simulation diff) must NOT dismiss an open info popout — otherwise
+		// stepping through preview actions on mobile can cause popouts to
+		// vanish mid-render before the focus retry finishes.
+		setSelectedEvent((prev) => (prev && events.some((e) => e.id === prev) ? prev : null));
+		setSelectedEventInfo((prev) =>
+			prev && events.some((e) => e.id === prev.id) ? prev : null
+		);
 	}, [events]);
 
 	const contentMounted = viewOptions.width > 0;
@@ -239,84 +276,75 @@ const Calendar = ({
 		);
 	}, [viewOptions.width, theme]);
 
-	// Auto-scroll to first event or current time on initial load
+	// Auto-scroll to current time on initial load
 	useEffect(() => {
 		if (!contentMounted || hasAutoScrolled || eventsLoading || !contentContainerRef.current) {
 			return;
 		}
 
-		const scrollToPosition = (scrollTop: number) => {
-			if (contentContainerRef.current) {
-				contentContainerRef.current.scrollTop = scrollTop;
-				setHasAutoScrolled(true);
-			}
-		};
+		const now = TimeUtil.nowDayjs();
+		const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
+		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 
-		// Find the earliest event in the current view
-		const viewStart = viewOptions.startDay.startOf('day');
-		const viewEnd = viewOptions.startDay.add(viewOptions.daysInView, 'day').endOf('day');
-
-		const eventsInView = viableEvents.filter((event) => {
-			const eventStart = dayjs(event.start);
-			const eventEnd = dayjs(event.end);
-			return eventStart.isBefore(viewEnd) && eventEnd.isAfter(viewStart);
-		});
-
-		if (eventsInView.length > 0) {
-			// Find the earliest event
-			const earliestEvent = eventsInView.reduce((earliest, current) => {
-				return dayjs(current.start).isBefore(dayjs(earliest.start)) ? current : earliest;
-			});
-
-			const eventStart = dayjs(earliestEvent.start);
-			const hourFraction =
-				eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before the first event (or to the event if it's in the first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		} else {
-			// No events in view, scroll to current time
-			const now = TimeUtil.nowDayjs();
-			const hourFraction = now.hour() + now.minute() / 60 + now.second() / 3600;
-			const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
-
-			// Scroll to 1 hour before current time (or to current time if in first hour)
-			const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
-			scrollToPosition(scrollTop);
-		}
-	}, [
-		contentMounted,
-		hasAutoScrolled,
-		eventsLoading,
-		viableEvents,
-		viewOptions.startDay,
-		viewOptions.daysInView,
-	]);
+		// Scroll to 1 hour before current time so the indicator sits near the top
+		const scrollTop = Math.max(0, (hourFraction - 1) * cellHeight);
+		contentContainerRef.current.scrollTop = scrollTop;
+		setHasAutoScrolled(true);
+	}, [contentMounted, hasAutoScrolled, eventsLoading]);
 
 	// Reset auto-scroll flag when view changes (date navigation)
 	useEffect(() => {
 		setHasAutoScrolled(false);
 	}, [viewOptions.startDay]);
 
+	const isMobile = useIsMobile();
+	// Timeline switches to the mobile bottom-sheet review layout at the
+	// `lg` breakpoint (1024px), not the default `useIsMobile()` 768px. We
+	// need to match Timeline's threshold here so tablet/landscape devices
+	// (768-1023px) still get the bottom-sheet inset baked into popout
+	// placement and scroll-into-view targeting.
+	const isMobileReviewLayout = useIsMobile(parseInt(theme.screens.lg, 10));
+
 	const [calendarEventInfoPos, setCalendarEventInfoPos] = useState<{
 		x: number;
 		y: number;
 		maxHeight: number;
+		width: number;
 	}>({
 		x: 100,
 		y: 100,
 		maxHeight: parseInt(calendarConfig.INFO_MODAL_HEIGHT),
+		width: parseInt(calendarConfig.INFO_MODAL_WIDTH),
 	});
 
 	const demoMode = useCalendarUI((state) => state.demoMode);
+	const inSimulationReview = useSimulationOverlayStore((s) => s.inReview);
+	const setSelectedActionId = useSimulationOverlayStore((s) => s.setSelectedActionId);
+	const reviewStop = useSimulationOverlayStore((s) => s.reviewStop);
+	// Effective px height of the mobile review bottom-sheet so popout
+	// placement and scroll-into-view logic can keep the active tile out
+	// from under the sheet.
+	const reviewSheetInsetPx = useMemo(() => {
+		if (!inSimulationReview || !isMobileReviewLayout) return 0;
+		return getMobileReviewSheetHeightPx(reviewStop, window.innerHeight);
+	}, [inSimulationReview, isMobileReviewLayout, reviewStop]);
+	bottomInsetPxRef.current = reviewSheetInsetPx;
 
 	const calendarEventInfo = [
 		{
 			key: 'info',
 			container: CalendarEventInfoModalContainer,
-			content: (
+			content: inSimulationReview ? (
+				<SimulatedCalendarEventInfo
+					event={selectedEventInfo}
+					onClose={() => {
+						setSelectedEventInfo(null);
+						setSelectedEvent(null);
+						setSelectedActionId(null);
+					}}
+					maxHeight={calendarEventInfoPos.maxHeight}
+				/>
+			) : (
 				<CalendarEventInfo
 					event={selectedEventInfo}
 					onClose={() => {
@@ -335,8 +363,8 @@ const Calendar = ({
 
 	const calculateEventInfoCoordinates = (event: StyledEvent) => {
 		const INFO_MODAL_HEIGHT = parseInt(calendarConfig.INFO_MODAL_HEIGHT);
-		const INFO_MODAL_WIDTH = parseInt(calendarConfig.INFO_MODAL_WIDTH);
 		const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
+		const INFO_MODAL_WIDTH_DEFAULT = parseInt(calendarConfig.INFO_MODAL_WIDTH);
 
 		const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
 		const totalHeaderHeight = parseInt(calendarConfig.HEADER_HEIGHT);
@@ -347,6 +375,13 @@ const Calendar = ({
 		const containerRect = contentContainerRef.current?.getBoundingClientRect();
 		const containerWidth = containerRect?.width || 0;
 		const containerHeight = containerRect?.height || 0;
+
+		// On mobile (typically 1-column view), the default 300px modal can
+		// exceed the visible width — cap it to the container so the popout
+		// never gets clipped off-screen. Desktop keeps the fixed width.
+		const INFO_MODAL_WIDTH = isMobile
+			? Math.min(INFO_MODAL_WIDTH_DEFAULT, Math.max(0, containerWidth - 2 * INFO_MODAL_GAP))
+			: INFO_MODAL_WIDTH_DEFAULT;
 
 		// Position to the right of the event by default
 		// If not enough space, position to the left
@@ -381,8 +416,10 @@ const Calendar = ({
 			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
 			calculatedY += eventIndex * 66;
 		}
-		// Total height of CalendarContainer = content area + header
-		const calendarContainerHeight = containerHeight + totalHeaderHeight;
+		// Total height of CalendarContainer = content area + header.
+		// Subtract the mobile review sheet height (when active) so the
+		// popout never gets clipped behind it.
+		const calendarContainerHeight = containerHeight + totalHeaderHeight - reviewSheetInsetPx;
 
 		if (calculatedY + INFO_MODAL_HEIGHT > calendarContainerHeight) {
 			// Not enough space at the bottom, adjust upwards
@@ -396,26 +433,62 @@ const Calendar = ({
 		// Cap modal height to available vertical space
 		const maxHeight = Math.min(INFO_MODAL_HEIGHT, calendarContainerHeight - calculatedY);
 
-		setCalendarEventInfoPos({ x: calculatedX, y: calculatedY, maxHeight });
+		setCalendarEventInfoPos({
+			x: calculatedX,
+			y: calculatedY,
+			maxHeight,
+			width: INFO_MODAL_WIDTH,
+		});
 	};
 
 	useEffect(() => {
-		if (selectedEventInfo) {
-			calculateEventInfoCoordinates(selectedEventInfo!);
-			contentContainerRef.current?.addEventListener('scroll', () => {
-				setSelectedEventInfo((prev) => {
-					if (prev) {
-						// Return a new object to trigger re-render
-						return { ...prev };
-					}
-					return null;
-				});
-			});
-		}
-	}, [selectedEventInfo]);
+		if (!selectedEventInfo) return;
+		calculateEventInfoCoordinates(selectedEventInfo);
+		const container = contentContainerRef.current;
+		if (!container) return;
+		// Recalculate the popout position when the user scrolls. We bump the
+		// state object reference (not its contents) so `calculateEventInfoCoordinates`
+		// re-runs via the dependency on `selectedEventInfo`. Critical: detach the
+		// listener on cleanup — otherwise stepping through preview actions on
+		// mobile (1-column view) accumulates listeners that thrash the spring
+		// transition and make popouts fail to appear.
+		const onScroll = () => {
+			setSelectedEventInfo((prev) => (prev ? { ...prev } : null));
+		};
+		container.addEventListener('scroll', onScroll);
+		return () => {
+			container.removeEventListener('scroll', onScroll);
+		};
+	}, [selectedEventInfo, reviewSheetInsetPx]);
+
+	// When the user changes the mobile review sheet stop while a tile is
+	// already selected, re-fire the focus dispatch so the tile is scrolled
+	// back above the (now differently-sized) bottom sheet. Only triggers in
+	// review mode on mobile.
+	useEffect(() => {
+		if (!inSimulationReview || !isMobileReviewLayout) return;
+		if (!selectedEventInfo) return;
+		const container = contentContainerRef.current;
+		if (!container) return;
+		const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
+		const eventStart = dayjs(selectedEventInfo.start);
+		const hourFraction =
+			eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
+		const visibleHeight = Math.max(0, container.clientHeight - reviewSheetInsetPx);
+		const offsetWithinVisible =
+			visibleHeight > 0 ? Math.min(visibleHeight / 3, cellHeight) : cellHeight;
+		const targetScroll = Math.max(0, hourFraction * cellHeight - offsetWithinVisible);
+		container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+	}, [reviewSheetInsetPx, inSimulationReview, isMobileReviewLayout, selectedEventInfo]);
 	const calendarEventInfoTransRef = useSpringRef();
 	const calendarEventInfoTrans = useTransition(selectedEventInfo ? calendarEventInfo : [], {
-		keys: (item) => `${item.key}-${calendarEventInfoPos.x}-${calendarEventInfoPos.y}`,
+		// Key only on the item — position changes should animate via the spring,
+		// not tear down + remount the popout. Including coordinates in the key
+		// caused leave/enter cycles every time `calculateEventInfoCoordinates`
+		// produced a new (x, y), which made stepping through preview actions on
+		// 1-column mobile views visibly flicker (or appear to skip popouts
+		// entirely during the 100ms enter delay).
+		keys: (item) => item.key,
 		ref: calendarEventInfoTransRef,
 		from: {
 			x: calendarEventInfoPos.x - 12,
@@ -428,6 +501,10 @@ const Calendar = ({
 			opacity: 1,
 			delay: 100,
 		},
+		update: {
+			x: calendarEventInfoPos.x,
+			y: calendarEventInfoPos.y,
+		},
 		leave: { opacity: 0, pointerEvents: 'none' },
 		config: { tension: 300, friction: 30, duration: 150 },
 	});
@@ -437,7 +514,6 @@ const Calendar = ({
 	// Swiping logic
 	const swiperRef = useRef<SwiperRef | null>(null);
 	const isSwiperResetting = useRef(false);
-	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		if (swiperRef.current) {
@@ -451,17 +527,23 @@ const Calendar = ({
 
 	// Create Block Form State
 	const createBlockFormHandler = useFormHandler(initialCreateBlockFormState);
-	const createBlockModalContainerRef = useRef<HTMLDivElement>(null);
-	const createBlockModalPortalTarget = createBlock.state.isExpanded
-		? document.body
-		: createBlockModalContainerRef.current;
+	const [createBlockModalPortalTarget, setCreateBlockModalPortalTarget] =
+		useState<HTMLDivElement | null>(null);
+	const createBlockModalContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setCreateBlockModalPortalTarget(node);
+	}, []);
 
 	// Create Tile Form State
 	const createTileFormHandler = useFormHandler(initialCreateTileFormState);
-	const createTileModalContainerRef = useRef<HTMLDivElement>(null);
-	const createTileModalPortalTarget = createTile.state.isExpanded
-		? document.body
-		: createTileModalContainerRef.current;
+	const createTilePredictionFeedback = useTilePredictionAutofill(
+		createTileFormHandler,
+		createTile.state.isOpen
+	);
+	const [createTileModalPortalTarget, setCreateTileModalPortalTarget] =
+		useState<HTMLDivElement | null>(null);
+	const createTileModalContainerRef = useCallback((node: HTMLDivElement | null) => {
+		setCreateTileModalPortalTarget(node);
+	}, []);
 
 	function onBackgroundClick(info: CalendarBackgroundClickInfo) {
 		// CONTENT_CLICK_OUTSIDE
@@ -487,7 +569,7 @@ const Calendar = ({
 			setCreateBlockForm({
 				...createBlockForm,
 				start: clickedDay,
-				startTime: TimeUtil.minsToMeridian(startTimeMinutes),
+				startTime: TimeUtil.minutesFromStartOfDayToMeridian(startTimeMinutes),
 			});
 
 			// Set Create Tile Form Based on day clicked
@@ -513,7 +595,8 @@ const Calendar = ({
 				start: clickedDay,
 				deadline: clickedDay,
 				recurrenceStartDate: clickedDay,
-				recurrenceWeeklyDays: [recurrenceDefaultWeeklyDay],
+				recurrenceWeeklyDays:
+					parseInt(createTileForm.count, 10) > 1 ? [] : [recurrenceDefaultWeeklyDay],
 			});
 			createSelection.actions.open();
 		} else {
@@ -579,6 +662,8 @@ const Calendar = ({
 													setShowLongDurationEvents(
 														isClosing ? null : day
 													);
+													// Collapse the other overlay
+													setShowNonViableEvents(null);
 													if (!isClosing) {
 														setSelectedEventInfo(null);
 														setSelectedEvent(null);
@@ -609,6 +694,8 @@ const Calendar = ({
 														showNonViableEvents?.isSame(day, 'day') ??
 														false;
 													setShowNonViableEvents(isClosing ? null : day);
+													// Collapse the other overlay
+													setShowLongDurationEvents(null);
 													// TOGGLE_NON_VIABLE_OVERLAY — dismiss event info when opening
 													if (!isClosing) {
 														setSelectedEventInfo(null);
@@ -657,14 +744,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysNonViableEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -695,14 +786,18 @@ const Calendar = ({
 							</Tooltip>
 						</header>
 						{todaysLongDurationEvents.map((event) => (
-							<CalendarEvent
-								event={event}
-								key={event.id}
-								selectedEvent={selectedEvent}
-								setSelectedEvent={setSelectedEvent}
-								setSelectedEventInfo={setSelectedEventInfo}
-								focused={focusedEventId === event.id}
-							/>
+							<OverlayEventItem key={event.id}>
+								<CalendarEvent
+									event={{
+										...event,
+										springStyles: { ...event.springStyles, height: 64 },
+									}}
+									selectedEvent={selectedEvent}
+									setSelectedEvent={setSelectedEvent}
+									setSelectedEventInfo={setSelectedEventInfo}
+									focused={focusedEventId === event.id}
+								/>
+							</OverlayEventItem>
 						))}
 					</NonViableEventsContainer>
 				) : null;
@@ -715,7 +810,10 @@ const Calendar = ({
 
 			{/* Info Modal Overlay */}
 			{calendarEventInfoTrans((style, item) => (
-				<item.container style={style} key={item.key}>
+				<item.container
+					style={{ ...style, width: calendarEventInfoPos.width }}
+					key={item.key}
+				>
 					{item.content}
 				</item.container>
 			))}
@@ -734,6 +832,7 @@ const Calendar = ({
 				open={createBlock.state.isOpen}
 				onBackdropClick={createBlock.actions.close}
 				containerRef={createBlockModalContainerRef}
+				expanded={createBlock.state.isExpanded}
 				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
 			/>
 			{createBlockModalPortalTarget &&
@@ -750,6 +849,7 @@ const Calendar = ({
 				open={createTile.state.isOpen}
 				onBackdropClick={createTile.actions.close}
 				containerRef={createTileModalContainerRef}
+				expanded={createTile.state.isExpanded}
 				width={calendarConfig.CREATE_EVENT_MODAL_WIDTH}
 			/>
 			{createTileModalPortalTarget &&
@@ -757,6 +857,7 @@ const Calendar = ({
 					<CalendarCreateTile
 						refetchEvents={refetchEvents}
 						formHandler={createTileFormHandler}
+						predictionFeedback={createTilePredictionFeedback}
 					/>,
 					createTileModalPortalTarget
 				)}
@@ -821,6 +922,9 @@ const Calendar = ({
 								setShowNonViableEvents(null);
 								setShowLongDurationEvents(null);
 							}}
+							simulationClassification={simulationClassification}
+							onSimulatedTileClick={onSimulatedTileClick}
+							selectedSimulationKey={selectedSimulationKey}
 						/>
 					</SwiperSlide>
 					<SwiperSlide>
@@ -1019,7 +1123,7 @@ const NonViableEventsContainer = styled.div<{
 	top: ${calendarConfig.HEADER_HEIGHT};
 	left: ${({ $cellwidth, $index }) =>
 		`${$index * $cellwidth + parseInt(calendarConfig.TIMELINE_WIDTH)}px`};
-	pacity: ${({ $visible }) => ($visible ? 1 : 0)};
+	opacity: ${({ $visible }) => ($visible ? 1 : 0)};
 	pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
 
 	height: calc(100% - ${calendarConfig.HEADER_HEIGHT});
@@ -1046,6 +1150,15 @@ const NonViableEventsContainer = styled.div<{
 	}
 
 	transition: opacity 0.2s ease-in-out;
+`;
+
+const OverlayEventItem = styled.div`
+	height: 64px;
+	min-height: 64px;
+	max-height: 64px;
+	width: 100%;
+	margin-bottom: 0.375rem;
+	overflow: hidden;
 `;
 
 const CalendarEventInfoModalContainer = styled(a.div)`

@@ -30,29 +30,58 @@ export interface CalendarRequestHandlerDeps {
 	pendingFocusRef: React.MutableRefObject<PendingFocus | null>;
 	contentContainerRef: React.RefObject<HTMLDivElement>;
 	focusTimeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
-	events: SubCalendarEvent[];
+	/**
+	 * Ref-wrapped events pool for cache-before-fetch lookup. Using a ref
+	 * (instead of a captured value) keeps the handler stable across renders
+	 * while still seeing the latest events array — including the simulation
+	 * overlay's `subCalendarEvents` during tilecast review, so clicking a
+	 * preview action resolves from memory instead of hitting `/CalendarEvent`.
+	 */
+	eventsRef: React.MutableRefObject<SubCalendarEvent[]>;
 	allowEventLookup: boolean;
 	setShowNonViableEvents: (val: dayjs.Dayjs | null) => void;
 	setSelectedEventInfo: (val: StyledEvent | null) => void;
 	setSelectedEvent: (val: string | null) => void;
 	setViewOptions: React.Dispatch<React.SetStateAction<CalendarViewOptions>>;
 	setFocusedEventId: (val: string | null) => void;
+	/**
+	 * Pixel height of any UI overlay (e.g. mobile review bottom sheet) that
+	 * occludes the bottom of the visible calendar area. `scrollToEvent` uses
+	 * this so the focused tile is positioned above the overlay rather than
+	 * underneath it. Read at call time via a ref to stay current as the
+	 * sheet stop changes without rebuilding the handler.
+	 */
+	bottomInsetPxRef?: React.MutableRefObject<number>;
 }
 
 // ── Private helpers ────────────────────────────────────────────────
 
-/** Scroll the calendar content container so the given event is visible */
+/** Scroll the calendar content container so the given event is visible.
+ *
+ * `bottomInsetPx` accounts for any overlay (e.g. the mobile review bottom
+ * sheet) that occludes the lower portion of the visible area. When set,
+ * the target shifts up so the event sits above the overlay rather than
+ * behind it.
+ */
 function scrollToEvent(
 	styledEvent: StyledEvent,
-	contentContainerRef: React.RefObject<HTMLDivElement>
+	contentContainerRef: React.RefObject<HTMLDivElement>,
+	bottomInsetPx = 0
 ): void {
 	if (!contentContainerRef.current) return;
+	const container = contentContainerRef.current;
 	const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 	const eventStart = dayjs(styledEvent.start);
 	const hourFraction = eventStart.hour() + eventStart.minute() / 60 + eventStart.second() / 3600;
-	const targetScroll = Math.max(0, (hourFraction - 1) * cellHeight);
+	// Position the event roughly one third down inside the *visible* area
+	// (container height minus any overlay inset), so the popout has room
+	// to render below it without sliding under the bottom sheet.
+	const visibleHeight = Math.max(0, container.clientHeight - bottomInsetPx);
+	const offsetWithinVisible =
+		visibleHeight > 0 ? Math.min(visibleHeight / 3, cellHeight) : cellHeight;
+	const targetScroll = Math.max(0, hourFraction * cellHeight - offsetWithinVisible);
 
-	contentContainerRef.current.scrollTo({
+	container.scrollTo({
 		top: targetScroll,
 		behavior: 'smooth',
 	});
@@ -69,13 +98,15 @@ function focusOnStyledEvent(
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
 		| 'setFocusedEventId'
+		| 'bottomInsetPxRef'
 	>
 ): void {
+	const bottomInset = deps.bottomInsetPxRef?.current ?? 0;
 	if (styledEvent.isViable) {
 		deps.setShowNonViableEvents(null);
 		deps.setSelectedEvent(styledEvent.id);
 		deps.setSelectedEventInfo(styledEvent);
-		scrollToEvent(styledEvent, deps.contentContainerRef);
+		scrollToEvent(styledEvent, deps.contentContainerRef, bottomInset);
 	} else {
 		const eventDay = dayjs(styledEvent.start);
 		deps.setShowNonViableEvents(eventDay);
@@ -121,10 +152,13 @@ export function createCalendarRequestHandler(
 				// ── Phase 4: Tile not in view ──────────────────────────
 
 				// First, try to find the event in the already-loaded events array
-				// (covers the full fetched date range, not just what's rendered)
-				const cachedTileId = resolveEntityToTileId(entityId, entityType, deps.events);
+				// (covers the full fetched date range, not just what's rendered).
+				// Read through the ref so we always see the current pool — during
+				// tilecast review this includes the simulation overlay's events.
+				const currentEvents = deps.eventsRef.current;
+				const cachedTileId = resolveEntityToTileId(entityId, entityType, currentEvents);
 				const cachedEvent = cachedTileId
-					? deps.events.find((e) => e.id === cachedTileId)
+					? currentEvents.find((e) => e.id === cachedTileId)
 					: undefined;
 
 				if (cachedEvent) {
@@ -274,6 +308,7 @@ export function retryPendingFocus(
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
 		| 'setFocusedEventId'
+		| 'bottomInsetPxRef'
 	>
 ): void {
 	const { entityId, entityType, onResult } = deps.pendingFocusRef.current!;

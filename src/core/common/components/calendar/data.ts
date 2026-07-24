@@ -6,7 +6,6 @@ import {
 	ScheduleRepeatFrequency,
 	ScheduleRepeatStartType,
 	ScheduleRepeatType,
-	ScheduleRepeatWeekday,
 } from '../../types/schedule';
 import { eventColors } from '@/core/constants/calendar_options';
 import { InitialCreateBlockFormState } from './create_block';
@@ -21,6 +20,7 @@ export enum CreateTileRestrictionType {
 export const initialCreateTileFormState: InitialCreateTileFormState = {
 	start: dayjs(),
 	action: '',
+	count: '1',
 	location: '',
 	locationId: null,
 	locationSource: '',
@@ -35,7 +35,7 @@ export const initialCreateTileFormState: InitialCreateTileFormState = {
 	isRecurring: false,
 	recurrenceType: ScheduleRepeatType.Daily,
 	recurrenceFrequency: ScheduleRepeatFrequency.Daily,
-	recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
+	recurrenceWeeklyDays: [],
 	recurrenceStartType: ScheduleRepeatStartType.Default,
 	recurrenceStartDate: dayjs(),
 	recurrenceEndType: ScheduleRepeatEndType.Never,
@@ -66,7 +66,7 @@ export const initialCreateBlockFormState: InitialCreateBlockFormState = {
 	isRecurring: false,
 	recurrenceType: ScheduleRepeatType.Daily,
 	recurrenceFrequency: ScheduleRepeatFrequency.Daily,
-	recurrenceWeeklyDays: [ScheduleRepeatWeekday.Sunday],
+	recurrenceWeeklyDays: [],
 	recurrenceStartType: ScheduleRepeatStartType.Default,
 	recurrenceStartDate: dayjs(),
 	recurrenceEndType: ScheduleRepeatEndType.Never,

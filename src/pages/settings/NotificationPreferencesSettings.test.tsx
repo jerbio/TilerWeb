@@ -138,8 +138,8 @@ describe('NotificationPreferencesSettings', () => {
 			renderWithProviders(<NotificationPreferencesSettings />);
 
 			await waitFor(() => {
-				expect(screen.getByText('Home')).toBeInTheDocument();
 				expect(screen.getByText('Settings')).toBeInTheDocument();
+				expect(screen.getAllByText('Notification Preferences')).toHaveLength(2);
 			});
 		});
 	});

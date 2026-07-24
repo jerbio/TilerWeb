@@ -351,10 +351,6 @@ const PreferencesSettings: React.FC = () => {
 	return (
 		<Container>
 			<Breadcrumb>
-				<BreadcrumbLink onClick={() => navigate('home')}>
-					{t('settings.breadcrumb.home')}
-				</BreadcrumbLink>
-				<BreadcrumbSeparator>/</BreadcrumbSeparator>
 				<BreadcrumbLink onClick={() => navigate('/settings')}>
 					{t('settings.breadcrumb.settings')}
 				</BreadcrumbLink>

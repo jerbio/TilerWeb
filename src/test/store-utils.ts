@@ -13,6 +13,10 @@ interface TestAppState {
 	isAuthLoading: boolean;
 	authenticatedUser: UserInfo | null;
 
+	// Feature flags
+	featureFlags: Record<string, boolean>;
+	setFeatureFlags: (flags: Record<string, boolean>) => void;
+
 	// Development tools
 	devUserIdOverride: string | null;
 
@@ -52,6 +56,7 @@ const defaultTestState: Omit<
 	| 'checkAuth'
 	| 'logout'
 	| 'setAuthenticated'
+	| 'setFeatureFlags'
 > = {
 	authenticatedPersonaSession: null,
 	anonymousPersonaSession: null,
@@ -59,6 +64,7 @@ const defaultTestState: Omit<
 	isAuthenticated: false,
 	isAuthLoading: false,
 	authenticatedUser: null,
+	featureFlags: {},
 	devUserIdOverride: null,
 };
 
@@ -185,6 +191,8 @@ export const createTestStore = (initialState: Partial<TestAppState> = {}) => {
 			if (!currentSession) return;
 			set({ [propertyName]: { ...currentSession, chatSessionId: id } });
 		},
+
+		setFeatureFlags: (flags) => set({ featureFlags: flags }),
 
 		setDevUserIdOverride: (userId) => set({ devUserIdOverride: userId }),
 

@@ -11,6 +11,7 @@ type InputProps = {
 	variant?: 'default' | 'brand';
 	sized?: 'small' | 'medium' | 'large';
 	height?: number;
+	highlighted?: boolean;
 	bordergradient?: Array<string>;
 	prepend?: React.ReactNode;
 	append?: React.ReactNode;
@@ -24,6 +25,7 @@ type StyledInputProps = {
 	$variant: InputProps['variant'];
 	$sized: InputProps['sized'];
 	$height: InputProps['height'];
+	$highlighted: InputProps['highlighted'];
 	$bordergradient: InputProps['bordergradient'];
 	$prepend?: InputProps['prepend'];
 	$append?: InputProps['append'];
@@ -38,6 +40,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
 	sized = 'medium',
 	required,
 	height,
+	highlighted = false,
 	bordergradient,
 	label,
 	prepend,
@@ -51,6 +54,7 @@ const BaseInput: React.FC<BaseInputProps> = ({
 		$variant: variant,
 		$sized: sized,
 		$height: height,
+		$highlighted: highlighted,
 		$bordergradient: bordergradient,
 		$label: label,
 		$prepend: prepend,
@@ -112,6 +116,7 @@ const Textarea: React.FC<TextareaProps> = ({
 	variant = 'default',
 	sized = 'medium',
 	height,
+	highlighted = false,
 	bordergradient,
 	label,
 	...props
@@ -121,6 +126,7 @@ const Textarea: React.FC<TextareaProps> = ({
 		$variant: variant,
 		$sized: sized,
 		$height: height,
+		$highlighted: highlighted,
 		$bordergradient: bordergradient,
 		$label: label,
 	};
@@ -167,7 +173,6 @@ const StyledInputAppend = styled.div<StyledInputProps>`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	pointer-events: none;
 	padding-right: ${(props) => (props.$sized === 'small' ? '8px' : '12px')};
 `;
 
@@ -178,6 +183,14 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 	isolation: isolate;
 	padding: 1px;
 	height: ${(props) =>
+		props.$height
+			? `${props.$height}px`
+			: props.$sized === 'small'
+				? palette.inputHeights.small
+				: props.$sized === 'medium'
+					? palette.inputHeights.medium
+					: palette.inputHeights.large};
+	min-height: ${(props) =>
 		props.$height
 			? `${props.$height}px`
 			: props.$sized === 'small'
@@ -201,12 +214,18 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
     animation: rotate 3s linear infinite;`}
 
 	background: ${(props) =>
-		props.$bordergradient
-			? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
-			: props.$variant === 'brand'
-				? palette.colors.brand[400] + '99'
-				: props.theme.colors.input.border};
+		props.$highlighted
+			? props.theme.colors.datepicker.dateSelectedBg
+			: props.$bordergradient
+				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
+				: props.$variant === 'brand'
+					? palette.colors.brand[400] + '99'
+					: props.theme.colors.input.border};
 	border-radius: ${palette.borderRadius.little};
+	box-shadow: ${(props) =>
+		props.$highlighted
+			? `0 0 0 4px ${props.theme.colors.datepicker.dateSelectedBg + '22'}`
+			: 'none'};
 
 	${StyledInputPrepend}, ${StyledInputAppend} {
 		color: ${({ theme }) => theme.colors.input.placeholder};
@@ -215,11 +234,13 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 
 	&:has(input:hover, input:focus) {
 		background: ${(props) =>
-			props.$bordergradient
-				? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
-				: props.$variant === 'brand'
-					? palette.colors.brand[400] + 'CC'
-					: props.theme.colors.input.borderHover};
+			props.$highlighted
+				? props.theme.colors.datepicker.dateSelectedBg
+				: props.$bordergradient
+					? `conic-gradient(from var(--rotation) at 50% 50%, ${props.$bordergradient.join(', ')}, ${props.theme.colors.input.gradientNeutral}, ${props.theme.colors.input.gradientNeutral}, ${props.$bordergradient[0]})`
+					: props.$variant === 'brand'
+						? palette.colors.brand[400] + 'CC'
+						: props.theme.colors.input.borderHover};
 	}
 
 	&:has(input:focus) {
@@ -235,8 +256,8 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 	}
 
 	transition:
-		background-color 0.2s ease-in-out,
-		box-shadow 0.2s ease-in-out;
+		background 0.2s ease-in-out,
+		box-shadow 0.45s ease-in-out;
 `;
 
 const StyledInput = styled.input<StyledInputProps>`
@@ -250,7 +271,6 @@ const StyledInput = styled.input<StyledInputProps>`
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1;
 	color: ${({ theme }) => theme.colors.input.text};
-	height: 100%;
 
 	padding-left: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} -
@@ -293,12 +313,12 @@ const StyledTextarea = styled.textarea<StyledInputProps>`
 
 	/* Fix vertical alignment for the textarea */
 	padding: 0;
-	padding-top: ${(props) =>
+	padding-block: ${(props) =>
 		props.$sized === 'small'
-			? `calc(${palette.inputHeights.small} / 2 - 0.75rem)`
+			? `calc(${palette.inputHeights.small} / 2 - 0.75rem + 0.375rem)`
 			: props.$sized === 'medium'
-				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem)`
-				: `calc(${palette.inputHeights.large} / 2 - 1rem)`};
+				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem + 0.5rem)`
+				: `calc(${palette.inputHeights.large} / 2 - 1rem + 0.5rem)`};
 	padding-inline: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px
 	);

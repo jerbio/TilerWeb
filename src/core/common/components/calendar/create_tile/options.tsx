@@ -1,147 +1,76 @@
-import useFormHandler from '@/hooks/useFormHandler';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
 import React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import CreateTileColorOptions from './options.color';
+import CreateTileActionsOptions from './options.actions';
+import { RGBColor } from '@/core/util/colors';
+import { CreateTileRestrictionType } from '../data';
 import {
+	DaySchedule,
 	ScheduleRepeatEndType,
 	ScheduleRepeatFrequency,
 	ScheduleRepeatStartType,
 	ScheduleRepeatType,
 	ScheduleRepeatWeekday,
-} from '../../../types/schedule';
-import { InitialCreateTileFormState } from '.';
-import CreateTileColorOptions from './options.color';
-import CreateTileActionsOptions from './options.actions';
-import { CreateTileRestrictionType } from '../data';
+} from '@/core/common/types/schedule';
+import dayjs from 'dayjs';
 
-type OptionsProps = {
-	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
+export type OptionsFormController = {
+	start: dayjs.Dayjs;
+	color: RGBColor;
+	setColor: (color: RGBColor) => void;
+	recurring: boolean;
+	setRecurring: (recurring: boolean) => void;
+	recurrenceType: ScheduleRepeatType;
+	setRecurrenceType: (type: ScheduleRepeatType) => void;
+	recurrenceFrequency: ScheduleRepeatFrequency;
+	setRecurrenceFrequency: (frequency: ScheduleRepeatFrequency) => void;
+	recurrenceWeeklyDays: ScheduleRepeatWeekday[];
+	setRecurrenceWeeklyDays: (days: ScheduleRepeatWeekday[]) => void;
+	recurrenceStartType: ScheduleRepeatStartType;
+	setRecurrenceStartType: (type: ScheduleRepeatStartType) => void;
+	recurrenceStartDate: dayjs.Dayjs;
+	setRecurrenceStartDate: (date: dayjs.Dayjs) => void;
+	recurrenceEndType: ScheduleRepeatEndType;
+	setRecurrenceEndType: (type: ScheduleRepeatEndType) => void;
+	recurrenceEndDate: dayjs.Dayjs;
+	setRecurrenceEndDate: (date: dayjs.Dayjs) => void;
+	// Restrictions only available for tiles
+	timeRestricted?: boolean;
+	setTimeRestricted?: (val: boolean) => void;
+	timeRestrictionType?: CreateTileRestrictionType;
+	setTimeRestrictionType?: (type: CreateTileRestrictionType) => void;
+	customTimeRestrictionSchedule?: DaySchedule[];
+	setCustomTimeRestrictionSchedule?: (schedule: DaySchedule[]) => void;
 };
 
-const CreateTileOptions: React.FC<OptionsProps> = ({ formHandler }) => {
+export enum TileOptionsMode {
+	Tile = 'tile',
+	Block = 'block',
+}
+
+type OptionsProps = {
+	mode?: TileOptionsMode;
+	controller: OptionsFormController;
+};
+
+const CreateTileOptions: React.FC<OptionsProps> = ({ controller, mode = TileOptionsMode.Tile }) => {
 	const { t } = useTranslation();
-	const { formData } = formHandler;
-
-	const recurrenceTypeOptions = [
-		{
-			label: t('calendar.createTile.sections.recurrenceType.daily'),
-			value: ScheduleRepeatType.Daily,
-			frequency: ScheduleRepeatFrequency.Daily,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceType.weekly'),
-			value: ScheduleRepeatType.Weekly,
-			frequency: ScheduleRepeatFrequency.Weekly,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceType.monthly'),
-			value: ScheduleRepeatType.Monthly,
-			frequency: ScheduleRepeatFrequency.Monthly,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceType.yearly'),
-			value: ScheduleRepeatType.Yearly,
-			frequency: ScheduleRepeatFrequency.Yearly,
-		},
-	];
-
-	const recurrenceWeekdayOptions = [
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.sunday'),
-			value: ScheduleRepeatWeekday.Sunday,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.monday'),
-			value: ScheduleRepeatWeekday.Monday,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.tuesday'),
-			value: ScheduleRepeatWeekday.Tuesday,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.wednesday'),
-			value: ScheduleRepeatWeekday.Wednesday,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.thursday'),
-			value: ScheduleRepeatWeekday.Thursday,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.friday'),
-			value: ScheduleRepeatWeekday.Friday,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceWeeklyDays.saturday'),
-			value: ScheduleRepeatWeekday.Saturday,
-		},
-	];
-
-	const recurrenceStartTypeOptions = [
-		{
-			label: (
-				<Trans
-					i18nKey="calendar.createTile.sections.recurrenceStartType.default"
-					components={{
-						date: <>{dayjs(formData.start).format('D MMM YYYY')}</>,
-					}}
-				/>
-			),
-			value: ScheduleRepeatStartType.Default,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceStartType.on'),
-			value: ScheduleRepeatStartType.On,
-		},
-	];
-
-	const recurrenceEndTypeOptions = [
-		{
-			label: t('calendar.createTile.sections.recurrenceEndType.never'),
-			value: ScheduleRepeatEndType.Never,
-		},
-		{
-			label: t('calendar.createTile.sections.recurrenceEndType.on'),
-			value: ScheduleRepeatEndType.On,
-		},
-	];
-
-	const restrictionTypeOptions = [
-		{
-			label: t('calendar.createTile.sections.restrictionType.anytime'),
-			value: CreateTileRestrictionType.Anytime,
-		},
-		{
-			label: t('calendar.createTile.sections.restrictionType.work'),
-			value: CreateTileRestrictionType.WorkHours,
-		},
-		{
-			label: t('calendar.createTile.sections.restrictionType.personal'),
-			value: CreateTileRestrictionType.PersonalHours,
-		},
-		{
-			label: t('calendar.createTile.sections.restrictionType.custom'),
-			value: CreateTileRestrictionType.Custom,
-		},
-	];
 
 	const tileOptions = [
 		{
-			title: t('calendar.createTile.sections.tileColor'),
-			content: <CreateTileColorOptions formHandler={formHandler} />,
+			title:
+				mode === TileOptionsMode.Tile
+					? t('calendar.createTile.sections.tileColor')
+					: t('calendar.createBlock.sections.blockColor'),
+			content: <CreateTileColorOptions controller={controller} />,
 		},
 		{
-			title: t('calendar.createTile.sections.tileActions'),
-			content: (
-				<CreateTileActionsOptions
-					formHandler={formHandler}
-					recurrenceTypeOptions={recurrenceTypeOptions}
-					recurrenceEndTypeOptions={recurrenceEndTypeOptions}
-					recurrenceWeekdayOptions={recurrenceWeekdayOptions}
-					recurrenceStartTypeOptions={recurrenceStartTypeOptions}
-					restrictionTypeOptions={restrictionTypeOptions}
-				/>
-			),
+			title:
+				mode === TileOptionsMode.Tile
+					? t('calendar.createTile.sections.tileActions')
+					: t('calendar.createBlock.sections.blockActions'),
+			content: <CreateTileActionsOptions mode={mode} controller={controller} />,
 		},
 	];
 
@@ -162,12 +91,12 @@ const CreateTileOptions: React.FC<OptionsProps> = ({ formHandler }) => {
 
 export default CreateTileOptions;
 
-const Divider = styled.hr<{ $visible: boolean }>`
+export const Divider = styled.hr<{ $visible: boolean }>`
 	opacity: ${(props) => (props.$visible ? 1 : 0)};
 	border: 1px solid ${(props) => props.theme.colors.border.strong};
 `;
 
-const TileOptionHeader = styled.header`
+export const TileOptionHeader = styled.header`
 	font-size: ${(props) => props.theme.typography.fontSize.lg};
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.bold};
@@ -176,13 +105,13 @@ const TileOptionHeader = styled.header`
 	line-height: 1;
 `;
 
-const TileOption = styled.div`
+export const TileOption = styled.div`
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 1rem;
 `;
 
-const TileOptionsContainer = styled.div`
+export const TileOptionsContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;

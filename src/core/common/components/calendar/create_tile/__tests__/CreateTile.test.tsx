@@ -24,7 +24,10 @@ vi.mock('react-i18next', () => ({
 	),
 }));
 vi.mock('@/services', () => ({
-	scheduleService: { createEvent: vi.fn() },
+	scheduleService: {
+		createEvent: vi.fn(),
+		getNewTilePrediction: vi.fn(() => Promise.resolve(null)),
+	},
 	userService: { getScheduleProfile: vi.fn() },
 }));
 vi.mock('@/core/common/components/calendar/CalendarRequestProvider', () => ({
@@ -548,5 +551,52 @@ describe('CalendarCreateTile UI', () => {
 				{ Start: '14:00', End: '18:00', Index: '3' },
 			],
 		});
+	});
+
+	// TILE SPLIT / COUNT TESTS
+	it('includes Count field in API payload with default value', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					count: '1',
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => expect(createMock).toHaveBeenCalled());
+
+		const payload = createMock.mock.calls[0][0];
+		expect(payload.Count).toBe('1');
+	});
+
+	it('includes Count field in API payload with custom value', async () => {
+		const createMock = vi
+			.spyOn(scheduleService, 'createEvent')
+			.mockResolvedValue(mockCreateTileResponse);
+
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler({
+					...mockValidFormState,
+					count: '3',
+				})}
+				refetchEvents={vi.fn()}
+			/>
+		);
+
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+		await waitFor(() => expect(createMock).toHaveBeenCalled());
+
+		const payload = createMock.mock.calls[0][0];
+		expect(payload.Count).toBe('3');
 	});
 });

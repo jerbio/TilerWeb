@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import type { ScheduleShuffleParams } from '@/core/common/types/schedule';
 
 const SHUFFLE_NOTIFICATION_ID = 'schedule-shuffle';
@@ -20,9 +21,11 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 	const getActivePersonaSession = useAppStore((s) => s.getActivePersonaSession);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
+	const isReadOnly = useIsReadOnly();
 
 	const handleShuffle = useCallback(async () => {
 		if (isLoading) return;
+		if (isReadOnly) return;
 		setIsLoading(true);
 		onLoadingChange?.(true);
 
@@ -53,6 +56,7 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 		}
 	}, [
 		isLoading,
+		isReadOnly,
 		getActivePersonaSession,
 		showNotification,
 		updateNotification,
@@ -63,7 +67,7 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 	return (
 		<ShuffleIconButton
 			onClick={handleShuffle}
-			disabled={isLoading || disabled}
+			disabled={isLoading || disabled || isReadOnly}
 			aria-label={t('timeline.shuffle.ariaLabel')}
 			title={t('timeline.shuffle.tooltip')}
 		>

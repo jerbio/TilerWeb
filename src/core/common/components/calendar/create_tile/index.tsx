@@ -23,6 +23,7 @@ import {
 	ScheduleRepeatWeekday,
 	ScheduleRepeatWeeklyData,
 } from '../../../types/schedule';
+import { CreateTileRestrictionType } from '../data';
 import { toast } from 'sonner';
 import { useCalendarDispatch } from '../CalendarRequestProvider';
 import {
@@ -34,10 +35,13 @@ import {
 import { Actions } from '@/core/constants/enums';
 import { useCalendarUI } from '../calendar-ui.provider';
 import CreateTileSummary from './summary';
-import CreateTileOptions from './options';
+import CreateTileOptions, { OptionsFormController } from './options';
 import CreateTileInfoInline from './info_inline';
 import CreateTileInfo from './info';
-import { CreateTileRestrictionType } from '../data';
+import {
+	EMPTY_PREDICTION_FEEDBACK,
+	type TilePredictionAutofillFeedback,
+} from './prediction-feedback';
 
 dayjs.extend(advancedFormat);
 
@@ -78,6 +82,7 @@ export function viewCreatedEvent(
 export type InitialCreateTileFormState = {
 	start: dayjs.Dayjs;
 	action: string;
+	count: string;
 	location: string;
 	locationId: string | null;
 	locationSource: string;
@@ -107,11 +112,16 @@ export type InitialCreateTileFormState = {
 type CalendarCreateTileProps = {
 	formHandler: ReturnType<typeof useFormHandler<InitialCreateTileFormState>>;
 	refetchEvents: () => Promise<void>;
+	predictionFeedback?: TilePredictionAutofillFeedback;
 };
 
-const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, refetchEvents }) => {
+const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
+	formHandler,
+	refetchEvents,
+	predictionFeedback = EMPTY_PREDICTION_FEEDBACK,
+}) => {
 	const ui = useCalendarUI((state) => state.createTile);
-	const { formData, resetForm } = formHandler;
+	const { formData, resetForm, handleFormInputChange } = formHandler;
 	const theme = useStyledTheme();
 	const { t } = useTranslation();
 	const calendarDispatch = useCalendarDispatch();
@@ -122,6 +132,36 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 		if (duration === 0) return false;
 		return true;
 	}, [formData]);
+
+	const optionsController: OptionsFormController = {
+		start: formData.start,
+		color: formData.color,
+		setColor: handleFormInputChange('color', { mode: 'static' }),
+		recurring: formData.isRecurring,
+		setRecurring: handleFormInputChange('isRecurring', { mode: 'static' }),
+		recurrenceType: formData.recurrenceType,
+		setRecurrenceType: handleFormInputChange('recurrenceType', { mode: 'static' }),
+		recurrenceFrequency: formData.recurrenceFrequency,
+		setRecurrenceFrequency: handleFormInputChange('recurrenceFrequency', { mode: 'static' }),
+		recurrenceWeeklyDays: formData.recurrenceWeeklyDays,
+		setRecurrenceWeeklyDays: handleFormInputChange('recurrenceWeeklyDays', { mode: 'static' }),
+		recurrenceStartType: formData.recurrenceStartType,
+		setRecurrenceStartType: handleFormInputChange('recurrenceStartType', { mode: 'static' }),
+		recurrenceStartDate: formData.recurrenceStartDate,
+		setRecurrenceStartDate: handleFormInputChange('recurrenceStartDate', { mode: 'static' }),
+		recurrenceEndType: formData.recurrenceEndType,
+		setRecurrenceEndType: handleFormInputChange('recurrenceEndType', { mode: 'static' }),
+		recurrenceEndDate: formData.recurrenceEndDate,
+		setRecurrenceEndDate: handleFormInputChange('recurrenceEndDate', { mode: 'static' }),
+		timeRestricted: formData.isTimeRestricted,
+		setTimeRestricted: handleFormInputChange('isTimeRestricted', { mode: 'static' }),
+		timeRestrictionType: formData.timeRestrictionType,
+		setTimeRestrictionType: handleFormInputChange('timeRestrictionType', { mode: 'static' }),
+		customTimeRestrictionSchedule: formData.customTimeRestrictionSchedule,
+		setCustomTimeRestrictionSchedule: handleFormInputChange('customTimeRestrictionSchedule', {
+			mode: 'static',
+		}),
+	};
 
 	function closeModal() {
 		resetForm();
@@ -144,6 +184,7 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				LocationId: formData.locationId || undefined,
 				LocationSource: formData.locationSource || undefined,
 				LocationTag: formData.locationTag || undefined,
+				Count: formData.count,
 				DurationDays: '0',
 				DurationHours: formData.durationHours.toString(),
 				DurationMinute: formData.durationMins.toString(),
@@ -172,12 +213,14 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				event.RepeatType = formData.recurrenceType;
 				event.RepeatFrequency = formData.recurrenceFrequency;
 				if (formData.recurrenceType === ScheduleRepeatType.Weekly) {
-					if (formData.recurrenceWeeklyDays.length === 0) {
+					const count = parseInt(formData.count, 10) || 1;
+					if (formData.recurrenceWeeklyDays.length === 0 && count <= 1) {
 						event.RepeatWeeklyData = '1';
+					} else if (formData.recurrenceWeeklyDays.length > 0) {
+						event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
+							','
+						) as ScheduleRepeatWeeklyData;
 					}
-					event.RepeatWeeklyData = formData.recurrenceWeeklyDays.join(
-						','
-					) as ScheduleRepeatWeeklyData;
 				}
 				if (formData.recurrenceEndType === ScheduleRepeatEndType.On) {
 					event.RepeatEndDay = dayjs(formData.recurrenceEndDate).format('DD');
@@ -334,12 +377,18 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 			{ui.state.isExpanded ? (
 				/* Tile Info (Classic) */
 				<Section $isexpanded={ui.state.isExpanded}>
-					<CreateTileInfo formHandler={formHandler} />
+					<CreateTileInfo
+						formHandler={formHandler}
+						predictionFeedback={predictionFeedback}
+					/>
 				</Section>
 			) : (
 				/* Tile Info (Inline) */
 				<Section $isexpanded={ui.state.isExpanded}>
-					<CreateTileInfoInline formHandler={formHandler} />
+					<CreateTileInfoInline
+						formHandler={formHandler}
+						predictionFeedback={predictionFeedback}
+					/>
 				</Section>
 			)}
 
@@ -357,11 +406,11 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({ formHandler, re
 				</p>
 			</TipContainer>
 
-			{/* Tile Actions */}
+			{/* Tile Options */}
 			{ui.state.isExpanded && (
 				<>
 					<Section $isexpanded={ui.state.isExpanded}>
-						<CreateTileOptions formHandler={formHandler} />
+						<CreateTileOptions controller={optionsController} />
 					</Section>
 					<Spacer />
 					<CreateTileSummary formData={formData} />

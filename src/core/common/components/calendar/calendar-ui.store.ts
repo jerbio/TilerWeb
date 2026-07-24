@@ -5,6 +5,7 @@ import {
 	RestrictionProfile,
 	ScheduleCreateEventResponse,
 } from '../../types/schedule';
+import { isScheduleReadOnly } from '@/hooks/useIsReadOnly';
 
 type CreateSelectionState = {
 	isOpen: boolean;
@@ -100,6 +101,16 @@ type EditTileActions = {
 	close: () => void;
 };
 
+type EditNotesState = {
+	isOpen: boolean;
+	event: CalendarEvent | null;
+};
+
+type EditNotesActions = {
+	open: (event: CalendarEvent) => void;
+	close: () => void;
+};
+
 type ViewInfo = {
 	startDay: dayjs.Dayjs;
 	daysInView: number;
@@ -123,6 +134,10 @@ export type CalendarUIStore = {
 		state: EditTileState;
 		actions: EditTileActions;
 	};
+	editNotes: {
+		state: EditNotesState;
+		actions: EditNotesActions;
+	};
 	viewInfo: ViewInfo;
 	setViewInfo: (info: ViewInfo) => void;
 };
@@ -144,7 +159,8 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 					isOpen: false,
 				},
 				actions: {
-					open: guarded(() =>
+					open: guarded(() => {
+						if (isScheduleReadOnly()) return;
 						set((state) => {
 							// Don't open if one of the other create forms is selected
 							if (state.createTile.state.isOpen) return state;
@@ -155,8 +171,8 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 									state: { ...state.createSelection.state, isOpen: true },
 								},
 							};
-						})
-					),
+						});
+					}),
 					close: guarded(() =>
 						set((state) => ({
 							createSelection: {
@@ -189,14 +205,15 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 				},
 
 				actions: {
-					open: guarded(() =>
+					open: guarded(() => {
+						if (isScheduleReadOnly()) return;
 						set((state) => ({
 							createTile: {
 								...state.createTile,
 								state: { ...state.createTile.state, isOpen: true },
 							},
-						}))
-					),
+						}));
+					}),
 
 					close: guarded(() =>
 						set((state) => ({
@@ -369,14 +386,15 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 				},
 
 				actions: {
-					open: guarded(() =>
+					open: guarded(() => {
+						if (isScheduleReadOnly()) return;
 						set((state) => ({
 							createBlock: {
 								...state.createBlock,
 								state: { ...state.createBlock.state, isOpen: true },
 							},
-						}))
-					),
+						}));
+					}),
 
 					close: guarded(() =>
 						set((state) => ({
@@ -528,6 +546,33 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 						set((state) => ({
 							editTile: {
 								...state.editTile,
+								state: { isOpen: false, event: null },
+							},
+						}))
+					),
+				},
+			},
+
+			editNotes: {
+				state: {
+					isOpen: false,
+					event: null,
+				},
+
+				actions: {
+					open: guarded((event: CalendarEvent) =>
+						set((state) => ({
+							editNotes: {
+								...state.editNotes,
+								state: { isOpen: true, event },
+							},
+						}))
+					),
+
+					close: guarded(() =>
+						set((state) => ({
+							editNotes: {
+								...state.editNotes,
 								state: { isOpen: false, event: null },
 							},
 						}))

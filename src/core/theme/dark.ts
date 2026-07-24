@@ -18,7 +18,7 @@ export const darkTheme: AppTheme = {
 		},
 		// Background colors
 		background: {
-			page: palette.colors.gray[900],
+			page: palette.colors.black,
 			header: palette.colors.gray[900],
 			card: palette.colors.gray[900],
 			card2: palette.colors.gray[800],
@@ -58,6 +58,14 @@ export const darkTheme: AppTheme = {
 			bgChecked: palette.colors.brand[400],
 			circle: palette.colors.gray[400],
 			circleChecked: palette.colors.white,
+		},
+		// Tabs colors
+		tabs: {
+			border: palette.colors.gray[800],
+			bg: 'transparent',
+			indicator: palette.colors.gray[800],
+			text: palette.colors.gray[400],
+			textActive: palette.colors.white,
 		},
 		// Radio Colors
 		radio: {
@@ -115,6 +123,39 @@ export const darkTheme: AppTheme = {
 			borderHover: palette.colors.gray[700],
 			focusRing: palette.colors.gray[900],
 			gradientNeutral: palette.colors.gray[700],
+		},
+		// Empty state colors
+		emptyState: {
+			icon: palette.colors.gray[600],
+			text: palette.colors.gray[500],
+		},
+		// Pagination colors
+		pagination: {
+			bg: palette.colors.gray[900],
+			bgHover: palette.colors.gray[800],
+			bgActive: palette.colors.brand[500],
+			border: palette.colors.gray[700],
+			borderActive: palette.colors.brand[500],
+			text: palette.colors.gray[400],
+			textActive: palette.colors.gray[100],
+			textDisabled: palette.colors.gray[700],
+			ellipsis: palette.colors.gray[600],
+		},
+		// Skeleton colors
+		skeleton: {
+			base: palette.colors.gray[800],
+			highlight: palette.colors.gray[600],
+		},
+		// Tag input colors
+		tagInput: {
+			chipBg: palette.colors.gray[900],
+			chipBorder: palette.colors.gray[800],
+			chipText: palette.colors.gray[200],
+			remove: palette.colors.gray[400],
+			removeHover: palette.colors.gray[100],
+			addBg: palette.colors.brand[500],
+			addBgHover: palette.colors.brand[600],
+			addText: palette.colors.white,
 		},
 		// hues
 		brand: palette.colors.brand,

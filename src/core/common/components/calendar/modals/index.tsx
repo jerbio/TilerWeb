@@ -5,14 +5,16 @@ import styled from 'styled-components';
 type CalendarModalProps = {
 	open: boolean;
 	onBackdropClick?: () => void;
-	containerRef?: React.RefObject<HTMLDivElement>;
+	containerRef?: React.Ref<HTMLDivElement>;
 	children?: React.ReactNode;
 	width?: number;
+	expanded?: boolean;
 };
 
 const CalendarModal: React.FC<CalendarModalProps> = ({
 	children,
 	containerRef,
+	expanded = false,
 	onBackdropClick,
 	open,
 	width,
@@ -37,15 +39,22 @@ const CalendarModal: React.FC<CalendarModalProps> = ({
 		<ModalBackdrop $visible={open} onClick={onBackdropClick}>
 			<ModalWrapper>
 				<ModalContainer
+					$expanded={expanded}
 					$width={width}
 					ref={containerRef}
-					style={{
-						scale: modalPopooutAnimation.scale,
-						opacity: modalPopooutAnimation.opacity,
-						transform: modalPopooutAnimation.y.to(
-							(y) => `translate(-50%, calc(${y}px - 50%))`
-						),
-					}}
+					style={
+						expanded
+							? {
+									opacity: modalPopooutAnimation.opacity,
+								}
+							: {
+									scale: modalPopooutAnimation.scale,
+									opacity: modalPopooutAnimation.opacity,
+									transform: modalPopooutAnimation.y.to(
+										(y) => `translate(-50%, calc(${y}px - 50%))`
+									),
+								}
+					}
 					onClick={(e) => e.stopPropagation()}
 				>
 					{children}
@@ -76,13 +85,21 @@ const ModalWrapper = styled.div`
 	height: 100%;
 `;
 
-const ModalContainer = styled(a.div)<{ $width?: number }>`
-	position: absolute;
-	top: 50%;
-	left: 50%;
+const ModalContainer = styled(a.div)<{ $expanded: boolean; $width?: number }>`
+	position: ${({ $expanded }) => ($expanded ? 'fixed' : 'absolute')};
+	${({ $expanded }) =>
+		$expanded
+			? `
+				inset: 0;
+			`
+			: `
+				top: 50%;
+				left: 50%;
+			`}
 	z-index: 1001;
-	width: calc(100% - 32px);
-	max-width: ${({ $width }) => ($width ? `${$width}px` : '600px')};
+	width: ${({ $expanded }) => ($expanded ? '100%' : 'calc(100% - 32px)')};
+	max-width: ${({ $expanded, $width }) =>
+		$expanded ? 'none' : $width ? `${$width}px` : '600px'};
 `;
 
 export default CalendarModal;

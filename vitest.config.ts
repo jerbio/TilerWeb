@@ -15,6 +15,10 @@ export default defineConfig({
 		environment: 'jsdom',
 		include: ['src/**/*.{test,spec}.{ts,tsx}'],
 		setupFiles: ['./src/test/setup.ts'],
+		env: {
+			VITE_BASE_URL: 'http://localhost',
+			VITE_NODE_ENV: 'test',
+		},
 		coverage: {
 			provider: 'v8',
 			include: ['src/core/**/*.ts', 'src/components/**/*.tsx', 'src/pages/**/*.tsx'],

@@ -2,6 +2,7 @@ import {
 	ChatMessageBody,
 	ChatMessagesParams,
 	PromptWithActions,
+	SimulationDto,
 	VibeSessionsResponse,
 	VibeSessionParams,
 } from '@/core/common/types/chat';
@@ -143,6 +144,45 @@ class ChatService {
 			return response;
 		} catch (error) {
 			console.error('Error fetching vibe request', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getSimulationForRequest(vibeRequestId: string, anonymousUserId?: string) {
+		try {
+			const response = await this.chatApi.getSimulationForRequest(
+				vibeRequestId,
+				anonymousUserId
+			);
+			// Server wraps the payload as `OkResponse("preview", ...)` →
+			// `{ Content: { preview: SimulationDto } }`. Normalize to
+			// `{ Content: SimulationDto }` here so every caller (polling,
+			// requestId effect, prefetch) sees the unwrapped shape and
+			// `simulation.state` is reachable.
+			const rawContent = response?.Content as
+				| { preview?: SimulationDto }
+				| SimulationDto
+				| null
+				| undefined;
+			const sim =
+				rawContent && typeof rawContent === 'object' && 'preview' in rawContent
+					? (rawContent.preview ?? null)
+					: ((rawContent as SimulationDto | null | undefined) ?? null);
+			return { ...response, Content: sim } as typeof response;
+		} catch (error) {
+			console.error('Error fetching simulation for request', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getSimulationResult(
+		previewId: string,
+		params?: Parameters<ChatApi['getSimulationResult']>[1]
+	) {
+		try {
+			return await this.chatApi.getSimulationResult(previewId, params);
+		} catch (error) {
+			console.error('Error fetching simulation result', error);
 			throw normalizeError(error);
 		}
 	}

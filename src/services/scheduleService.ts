@@ -11,6 +11,7 @@ import {
 	ScheduleReviseParams,
 	ScheduleShuffleParams,
 	CalendarEventUpdateParams,
+	TilePredictionResponse,
 } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
@@ -362,6 +363,21 @@ class ScheduleService {
 		} catch (error) {
 			console.error('Error searching locations', error);
 			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Fetch AI-generated tile suggestions based on the tile name.
+	 * `GET /api/Schedule/NewTilePrediction?Name=...`
+	 * Returns null on failure — callers should treat this as a silent no-op.
+	 */
+	async getNewTilePrediction(name: string): Promise<TilePredictionResponse | null> {
+		try {
+			const res = await this.scheduleApi.getNewTilePrediction(name);
+			return res.Content ?? null;
+		} catch (error) {
+			console.error('Error fetching tile prediction', error);
+			return null;
 		}
 	}
 
