@@ -73,6 +73,7 @@ const mockLookupCalendarEventById = vi.fn();
 const mockLookupLocationById = vi.fn();
 const mockSearchLocations = vi.fn();
 const mockGetScheduleProfile = vi.fn();
+const mockGetSubEventsOfCalendar = vi.fn((..._args: unknown[]) => Promise.resolve([]));
 const mockOpenNotes = vi.fn();
 vi.mock('@/services', () => ({
 	scheduleService: {
@@ -80,6 +81,7 @@ vi.mock('@/services', () => ({
 		lookupCalendarEventById: (...args: unknown[]) => mockLookupCalendarEventById(...args),
 		lookupLocationById: (...args: unknown[]) => mockLookupLocationById(...args),
 		searchLocations: (...args: unknown[]) => mockSearchLocations(...args),
+		getSubEventsOfCalendar: (...args: unknown[]) => mockGetSubEventsOfCalendar(...args),
 	},
 	userService: {
 		getScheduleProfile: (...args: unknown[]) => mockGetScheduleProfile(...args),
@@ -110,6 +112,7 @@ vi.mock('@/core/ui', () => ({
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
 		t: (key: string) => key,
+		i18n: { language: 'en' },
 	}),
 }));
 

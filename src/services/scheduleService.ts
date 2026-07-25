@@ -2,7 +2,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { LocationApi } from '@/api/locationApi';
-import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
+import { CalendarEventQueryOptions, SubEventsQueryOptions } from '@/api/calendarEventApi';
 import {
 	ScheduleCreateEventParams,
 	ScheduleLookupOptions,
@@ -118,7 +118,7 @@ class ScheduleService {
 	 * `GET /api/CalendarEvent/SubEvents?EventID=...`
 	 * Returns an array of ScheduleSubCalendarEvent.
 	 */
-	async getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
+	async getSubEventsOfCalendar(eventId: string, options?: SubEventsQueryOptions) {
 		try {
 			const response = await this.calendarEventApi.getSubEventsOfCalendar(eventId, options);
 			return response.Content;

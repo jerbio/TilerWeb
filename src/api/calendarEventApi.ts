@@ -10,9 +10,25 @@ import { AppApi } from './appApi';
 
 export type CalendarEventQueryOptions = PaginationParams;
 
+/** Sub-event ordering engine understood by the server. */
+export type SubEventOrderingEngine = 'ProximityToNow' | 'Id' | 'ClusteredIndex';
+
+/**
+ * Options for the keyset-paged sub-events endpoint. Extends pagination with the ordering
+ * engine and the two continuation cursors:
+ * - `afterSubEventId`  → page immediately after that sub-event (scroll right / load more).
+ * - `beforeSubEventId` → page immediately before that sub-event (scroll left / prepend).
+ * Supply at most one cursor; omit both for the bootstrap (nearest-to-now) page.
+ */
+export interface SubEventsQueryOptions extends CalendarEventQueryOptions {
+	orderingEngine?: SubEventOrderingEngine;
+	afterSubEventId?: string;
+	beforeSubEventId?: string;
+}
+
 export class CalendarEventApi extends AppApi {
 	/** Build query-string params shared by both endpoints. */
-	private buildParams(eventId: string, options?: CalendarEventQueryOptions): string {
+	private buildParams(eventId: string, options?: SubEventsQueryOptions): string {
 		const params: Record<string, string> = { EventID: eventId };
 
 		if (options?.batchSize != null) {
@@ -23,6 +39,15 @@ export class CalendarEventApi extends AppApi {
 		}
 		if (options?.order) {
 			params['order'] = options.order;
+		}
+		if (options?.orderingEngine) {
+			params['OrderingEngine'] = options.orderingEngine;
+		}
+		if (options?.afterSubEventId) {
+			params['AfterSubEventId'] = options.afterSubEventId;
+		}
+		if (options?.beforeSubEventId) {
+			params['BeforeSubEventId'] = options.beforeSubEventId;
 		}
 		params['mobileApp'] = 'true';
 
@@ -44,7 +69,7 @@ export class CalendarEventApi extends AppApi {
 	 *
 	 * Returns an array of ScheduleSubCalendarEvent.
 	 */
-	public getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
+	public getSubEventsOfCalendar(eventId: string, options?: SubEventsQueryOptions) {
 		const urlParams = this.buildParams(eventId, options);
 		return this.apiRequest<SubEventsOfCalendarResponse>(
 			`api/CalendarEvent/SubEvents?${urlParams}`

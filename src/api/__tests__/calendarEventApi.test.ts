@@ -192,6 +192,73 @@ describe('CalendarEventApi', () => {
 		});
 	});
 
+	describe('getSubEventsOfCalendar query building', () => {
+		const emptySubEvents = {
+			Error: { Code: '0', Message: 'SUCCESS' },
+			Content: [],
+			ServerStatus: null,
+		};
+
+		const callGetSubEvents = async (
+			eventId: string,
+			options?: Parameters<CalendarEventApi['getSubEventsOfCalendar']>[1]
+		) => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(emptySubEvents), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' },
+				})
+			);
+			await api.getSubEventsOfCalendar(eventId, options);
+			const [urlArg] = fetchSpy.mock.calls[0];
+			return typeof urlArg === 'string' ? urlArg : (urlArg as Request).url;
+		};
+
+		it('hits /api/CalendarEvent/SubEvents with the EventID and mobileApp flag', async () => {
+			const url = await callGetSubEvents('root_1');
+			expect(url).toContain('api/CalendarEvent/SubEvents');
+			expect(url).toContain('EventID=root_1');
+			expect(url).toContain('mobileApp=true');
+		});
+
+		it('forwards batchSize and orderingEngine for the bootstrap page', async () => {
+			const url = await callGetSubEvents('root_1', {
+				batchSize: 20,
+				orderingEngine: 'ProximityToNow',
+			});
+			expect(url).toContain('batchSize=20');
+			expect(url).toContain('OrderingEngine=ProximityToNow');
+		});
+
+		it('forwards the AfterSubEventId cursor (scroll right / load more)', async () => {
+			const url = await callGetSubEvents('root_1', {
+				batchSize: 20,
+				orderingEngine: 'Id',
+				afterSubEventId: 'sub_42',
+			});
+			expect(url).toContain('OrderingEngine=Id');
+			expect(url).toContain('AfterSubEventId=sub_42');
+			expect(url).not.toContain('BeforeSubEventId');
+		});
+
+		it('forwards the BeforeSubEventId cursor (scroll left / prepend)', async () => {
+			const url = await callGetSubEvents('root_1', {
+				batchSize: 20,
+				orderingEngine: 'Id',
+				beforeSubEventId: 'sub_7',
+			});
+			expect(url).toContain('BeforeSubEventId=sub_7');
+			expect(url).not.toContain('AfterSubEventId');
+		});
+
+		it('omits engine and cursor params when not supplied', async () => {
+			const url = await callGetSubEvents('root_1');
+			expect(url).not.toContain('OrderingEngine');
+			expect(url).not.toContain('AfterSubEventId');
+			expect(url).not.toContain('BeforeSubEventId');
+		});
+	});
+
 	describe('setAsNow', () => {
 		const mockResponse: CalendarEventResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },

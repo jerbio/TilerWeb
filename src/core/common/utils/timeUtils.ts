@@ -186,3 +186,60 @@ export const combineDateAndTimeString = (date: dayjs.Dayjs | null, time: string)
 	const mins = totalMinutes % 60;
 	return date.hour(hours).minute(mins).second(0).millisecond(0).valueOf();
 };
+
+/**
+ * Localized `Intl` unit formatter for a single duration component (hours or minutes).
+ * `narrow` → "1h" / "30m", `short` → "1 hr" / "30 min". Falls back to the runtime
+ * default locale when `locale` is omitted.
+ */
+const formatDurationUnit = (
+	value: number,
+	unit: 'hour' | 'minute',
+	unitDisplay: 'narrow' | 'short',
+	locale?: string
+): string => new Intl.NumberFormat(locale, { style: 'unit', unit, unitDisplay }).format(value);
+
+/**
+ * Localized duration formatter shared by the compact/verbose helpers below.
+ * Emits the non-zero hour/minute parts (always at least the minute part) using the
+ * platform `Intl` unit data, so wording, pluralization and number formatting follow
+ * the active locale automatically.
+ */
+const formatDurationParts = (
+	totalMinutes: number,
+	unitDisplay: 'narrow' | 'short',
+	locale?: string
+): string => {
+	const minutes = Math.max(0, Math.round(totalMinutes));
+	const hours = Math.floor(minutes / 60);
+	const mins = minutes % 60;
+	const parts: string[] = [];
+	if (hours > 0) parts.push(formatDurationUnit(hours, 'hour', unitDisplay, locale));
+	if (mins > 0 || hours === 0)
+		parts.push(formatDurationUnit(mins, 'minute', unitDisplay, locale));
+	return parts.join(' ');
+};
+
+/**
+ * Formats a duration (in whole minutes) as a localized, compact string using
+ * narrow units. Examples (en): 90 → "1h 30m", 45 → "45m", 60 → "1h", 0 → "0m".
+ * Pass `locale` (e.g. `i18n.language`) to localize the units.
+ */
+export const formatDurationShortFromMinutes = (totalMinutes: number, locale?: string): string =>
+	formatDurationParts(totalMinutes, 'narrow', locale);
+
+/**
+ * Formats a duration (in milliseconds) as a localized, compact string using narrow units.
+ * Examples (en): 5400000 → "1h 30m", 2700000 → "45m".
+ * Pass `locale` (e.g. `i18n.language`) to localize the units.
+ */
+export const formatDurationShort = (ms: number, locale?: string): string =>
+	formatDurationShortFromMinutes(ms / MS_PER_MINUTE, locale);
+
+/**
+ * Formats a duration (in whole minutes) as a localized, verbose string using short units.
+ * Examples (en): 90 → "1 hr 30 min", 45 → "45 min", 120 → "2 hr", 0 → "0 min".
+ * Pass `locale` (e.g. `i18n.language`) to localize the units.
+ */
+export const formatDurationVerbose = (totalMinutes: number, locale?: string): string =>
+	formatDurationParts(totalMinutes, 'short', locale);

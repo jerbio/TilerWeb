@@ -1332,7 +1332,22 @@
 			"googleResults": "Google Maps",
 			"poweredByGoogle": "Powered by Google",
 			"noLocationResults": "No locations found",
-			"openNotes": "Open notes"
+			"openNotes": "Open notes",
+			"subEvents": {
+				"title": "Sessions",
+				"titleWithCount": "Sessions ({{count}})",
+				"loading": "Loading sessions…",
+				"empty": "No sessions yet",
+				"error": "Couldn't load sessions",
+				"retry": "Retry",
+				"loadMore": "Load more",
+				"loadEarlier": "Load earlier",
+				"allLoaded": "All {{count}} sessions loaded",
+				"showCompleted": "Show completed & removed",
+				"goTo": "Go to this session on the calendar",
+				"completed": "Completed",
+				"removed": "Removed"
+			}
 		}
 	},
 	"discover": {
