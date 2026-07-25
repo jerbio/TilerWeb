@@ -1,10 +1,50 @@
-﻿{
+{
 	"common": {
+		"onboarding": {
+			"guide": {
+				"skip": "Skip",
+				"next": "Next",
+				"prev": "Back",
+				"done": "Got it!",
+				"steps": {
+					"mobile-open-chat": {
+						"title": "Open the Chat",
+						"description": "Tap this button to open the chat interface where you can talk to Tiler about your schedule."
+					},
+					"chat": {
+						"title": "Start with a Conversation",
+						"description": "Type what you need to do in plain English. Try: \"Lunch with Sarah tomorrow at noon in downtown.\""
+					},
+					"ai": {
+						"title": "AI Proposes a Schedule",
+						"description": "Tiler asks clarifying questions if needed, calculates travel time, and suggests when to schedule your task."
+					},
+					"confirm": {
+						"title": "Review and Confirm",
+						"description": "Check the proposed schedule. Click \"Accept Changes\" to add it to your calendar, or adjust as needed."
+					},
+					"calendar": {
+						"title": "See Your Smart Schedule",
+						"description": "Your task appears on the calendar with travel time included. Tiler adapts automatically when things change."
+					}
+				}
+			}
+		},
 		"buttons": {
+			"getStarted": "Get Started with Tiler",
+			"explore": "Explore",
+			"subscribe": "Subscribe",
+			"tryFree": "Start Free Today",
+			"signUp": "Sign Up",
 			"back": "Retour",
 			"createSchedule": "Créer un Horaire",
 			"creating": "Création...",
 			"cancel": "Annuler"
+		},
+		"navigation": {
+			"home": "Accueil",
+			"discover": "Explorer",
+			"waitlist": "Waitlist"
 		},
 		"voiceInput": {
 			"listening": "À l'écoute...",
@@ -40,6 +80,32 @@
 				"optimizing": "Optimisation et Sauvegarde",
 				"optimizingDesc": "Recherche du meilleur arrangement et sauvegarde de votre horaire..."
 			}
+		},
+		"copyright": "© {{year}} Tiler. All rights reserved.",
+		"social": {
+			"facebook": "Facebook",
+			"linkedin": "LinkedIn",
+			"instagram": "Instagram",
+			"x": "X (Twitter)"
+		},
+		"apps": {
+			"ios": {
+				"cta": "Download on App Store",
+				"platform": "iOS App Store"
+			},
+			"android": {
+				"cta": "Get it on Google Play",
+				"platform": "Android Play Store"
+			}
+		},
+		"legal": {
+			"title": "Legal",
+			"terms": "Terms of Use",
+			"privacy": "Privacy"
+		},
+		"partners": {
+			"title": "Partners",
+			"founderUniversity": "Founder University"
 		},
 		"consent": {
 			"banner": {
@@ -85,147 +151,334 @@
 				"cookieSettings": "Paramètres des Cookies"
 			}
 		},
-		"navigation": {
-			"home": "Accueil",
-			"discover": "Explorer"
+		"emptyState": {
+			"defaultText": "Nothing here yet"
+		},
+		"pagination": {
+			"page": "Page {{page}}"
 		}
 	},
-	"auth": {
-		"signup": {
-			"title": "Commencez avec Tiler",
-			"subtitle": "Créez votre compte gratuit pour profiter d'une planification transparente",
-			"googleButton": "S'inscrire avec Google",
-			"emailLabel": "Adresse e-mail",
-			"emailPlaceholder": "Ex. votrenom@outlook.com",
-			"submitButton": "Créer mon compte gratuit",
-			"submitting": "Création du compte...",
-			"footer": "Vous avez déjà un compte ?",
-			"footerLink": "Se connecter plutôt",
-			"verificationSent": "Code de vérification envoyé à votre e-mail !",
-			"createAccountError": "Échec de la création du compte. Veuillez réessayer."
+	"modals": {
+		"loading": {
+			"image": {
+				"alt": "Loading Indicator"
+			}
 		},
-		"signin": {
-			"title": "Bienvenue à nouveau sur Tiler",
-			"subtitle": "Connectez-vous pour continuer votre parcours de planification",
-			"googleButton": "Se connecter avec Google",
-			"submitButton": "Se connecter à mon compte",
-			"submitting": "Connexion...",
-			"footer": "Vous n'avez pas de compte ?",
-			"footerLink": "S'inscrire plutôt"
-		},
-		"verification": {
-			"title": "Vérification requise",
-			"header": "Entrez votre code de vérification",
-			"description": "Nous avons envoyé un code de vérification à",
-			"label": "Code de vérification",
-			"placeholder": "Entrez le code de vérification",
-			"verifyButton": "Vérifier le code",
-			"verifying": "Vérification...",
-			"resendButton": "Vous n'avez pas reçu de code ? Renvoyer",
-			"resending": "Envoi...",
-			"cancel": "Annuler",
-			"success": "Compte vérifié avec succès !",
-			"error": "Code de vérification invalide. Veuillez réessayer.",
-			"resendSuccess": "Code de vérification renvoyé !",
-			"resendError": "Échec de l'envoi du code. Veuillez réessayer."
-		},
-		"goBack": "Retour"
+		"success": {
+			"image": {
+				"alt": "Success Icon"
+			}
+		}
 	},
-	"timeline": {
-		"title": "Chronologie",
-		"signedInUser": "Utilisateur Connecté",
-		"signOut": "Se Déconnecter",
-		"signingOut": "Déconnexion...",
-		"signOutSuccess": "Déconnexion réussie",
-		"signOutError": "Échec de la déconnexion",
-		"searchPlaceholder": "Rechercher une tuile/bloc...",
-		"searchAriaLabel": "Rechercher une tuile ou un bloc",
-		"clearSearch": "Effacer la recherche",
-		"loadMore": "Charger plus",
-		"loading": "Chargement…",
-		"notFoundMessage": "Oups, nous n'avons pas trouvé '{{query}}'. Souhaitez-vous créer une tuile à partir de ce titre ?",
-		"notFoundDismiss": "Non merci",
-		"notFoundCreate": "Créer",
-		"setAsNow": "Définir comme maintenant",
-		"markComplete": "Terminer",
-		"markDeleted": "Supprimer",
-		"confirmCompleteTitle": "Terminer cet événement ?",
-		"confirmDeleteTitle": "Supprimer cet événement ?",
-		"confirmAction": "Confirmer",
-		"cancelAction": "Annuler",
-		"shuffle": {
-			"tooltip": "Mélanger le planning",
-			"ariaLabel": "Mélanger le planning",
-			"shuffling": "Mélange du planning...",
-			"success": "Planning mélangé !",
-			"error": "Le mélange a échoué. Veuillez réessayer."
+	"calendar": {
+		"nonViable": {
+			"title": "Non-Viable Events",
+			"infoTooltip": "These events could not be scheduled due to timing conflicts or constraints."
 		},
-		"revise": {
-			"tooltip": "Réviser le planning",
-			"ariaLabel": "Réviser le planning",
-			"revising": "Révision du planning...",
-			"success": "Planning révisé !",
-			"error": "La révision a échoué. Veuillez réessayer."
+		"longDuration": {
+			"title": "Long Duration Events",
+			"infoTooltip": "These events span more than 15 hours and are shown here for readability."
 		},
-		"procrastinateAll": {
-			"tooltip": "Reporter tous les événements",
-			"ariaLabel": "Reporter tous les événements",
-			"deferring": "Report de tous les événements...",
-			"success": "Tous les événements reportés !",
-			"error": "Échec du report. Veuillez réessayer.",
-			"pickerTitle": "Durée du report",
-			"days": "Jours",
-			"hours": "Heures",
-			"minutes": "Minutes",
-			"daysShort": "Jour",
-			"hoursShort": "H",
-			"minutesShort": "Min",
-			"confirm": "Confirmer",
-			"cancel": "Annuler"
+		"event": {
+			"dueIn": "Due in {{time}}",
+			"dateLabel": "Date:",
+			"startLabel": "Starts:",
+			"endLabel": "Ends:",
+			"durationLabel": "Duration:",
+			"repetitionLabel": "Repeats:",
+			"deadlineLabel": "Deadline:",
+			"locationLabel": "View directions on map",
+			"locationLinkLabel": "Link",
+			"videoLinkLabel": "Video call",
+			"copyLink": "Copy link",
+			"openLink": "Open link",
+			"previewBadge": "Preview",
+			"previewHint": "This is a simulated preview — changes will only apply if you accept.",
+			"secondaryActionsLabel": "Secondary Tile Actions:",
+			"secondaryActions": {
+				"editLabel": "Edit",
+				"deleteLabel": "Delete"
+			},
+			"save": "Save",
+			"cancel": "Cancel",
+			"actions": {
+				"complete": "Complete",
+				"now": "Now",
+				"defer": "Defer"
+			},
+			"validation": {
+				"endAfterStart": "End time must be after start time"
+			},
+			"moreOptions": "More options",
+			"videoSource": {
+				"zoom": "Zoom",
+				"google": "Google Meet",
+				"outlook": "Microsoft Teams",
+				"other": "Video call"
+			},
+			"deleteConfirmTitle": "Delete this event?",
+			"deleteConfirmBody": "This will permanently remove it from your schedule.",
+			"deleteConfirmThirdPartyBody": "This will also delete it from your connected calendar service.",
+			"deleteConfirmAction": "Delete",
+			"deleteConfirmActionAria": "Confirm delete"
 		},
-		"userInfo": {
-			"fullName": "Nom Complet",
-			"username": "Nom d'Utilisateur",
-			"email": "E-mail",
-			"phone": "Téléphone",
-			"timeZone": "Fuseau Horaire",
-			"userId": "ID Utilisateur",
-			"notAvailable": "N/D"
+		"createBlock": {
+			"title": "Add a New Block",
+			"info": {
+				"name": {
+					"label": "Name",
+					"placeholder": "What is the name of this block?"
+				},
+				"start": {
+					"label": "Start Time",
+					"placeholder": "What day does this block start?"
+				},
+				"end": {
+					"label": "End Time",
+					"placeholder": "What day does this block end?"
+				},
+				"hours": {
+					"label": "Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+				"minutes": {
+					"label": "Duration (Minutes)",
+					"placeholder": "How many mins will it take?"
+				},
+				"location": {
+					"label": "Address",
+					"placeholder": "Where is this block held?"
+				},
+				"locationTag": {
+					"label": "Address Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
+				"duration": {
+					"valid": "Duration <mute>~</mute> <highlight>{{duration}}</highlight>",
+					"invalid": "<highlight>Invalid Duration</highlight>"
+				}
+			},
+			"errors": {
+				"invalidDuration": "Invalid duration. End time must be after start time."
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{name}}\" to your schedule"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Block",
+				"collapse": "Less Options",
+				"expand": "More Options",
+				"viewInTimeline": "View Block"
+			},
+			"summary": {
+				"title": "Summary",
+				"description": "I have a <b>{{duration}}</b> event called <b>{{name}}</b>",
+				"locationDescription": ", at <b>{{location}}</b>",
+				"recurrenceFrequency": {
+					"daily": "day",
+					"weekly": "week",
+					"monthly": "month",
+					"yearly": "year"
+				},
+				"recurring": ". It will repeat <b>every {{recurrenceFrequency}}</b>",
+				"recurringStart": " from <b>{{recurrenceStart}}</b>",
+				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
+			},
+			"actions": {
+				"repeatBlock": "Repeat the Block"
+			},
+			"sections": {
+				"blockColor": "Select Block Color",
+				"blockActions": "Block Actions"
+			}
+		},
+		"createTile": {
+			"title": "Add a New Tile",
+			"info": {
+				"description": "I need to <action/> at <location/> It will take me <hours/> hr <minutes/> min, and I need to get it done by <date/>",
+				"action": {
+					"label": "Tile Name",
+					"placeholder": "What is the name of this tile?"
+				},
+				"tileSplit": {
+					"label": "How many times should this happen?",
+					"placeholder": "e.g. 1, 2, 3..."
+				},
+				"location": {
+					"label": "Address",
+					"placeholder": "Where is this tile held?"
+				},
+				"locationTag": {
+					"label": "Address Nickname",
+					"placeholder": "e.g. Home, Office, Gym"
+				},
+				"hours": {
+					"label": "Tile Duration (Hours)",
+					"placeholder": "How many hrs will it take?"
+				},
+				"minutes": {
+					"label": "Tile Duration (Minutes)",
+					"placeholder": "How many mins will it take?"
+				},
+				"range": {
+					"label": "Time Range",
+					"description": "Schedule between",
+					"conjunction": "and"
+				}
+			},
+			"sections": {
+				"tileColor": "Select Tile Color",
+				"tileActions": "Tile Actions",
+				"recurrenceType": {
+					"daily": "Daily",
+					"weekly": "Weekly",
+					"monthly": "Monthly",
+					"yearly": "Yearly"
+				},
+				"recurrenceStartType": {
+					"title": "Starts",
+					"default": "Default (<date/>)",
+					"on": "On"
+				},
+				"recurrenceEndType": {
+					"title": "Ends",
+					"never": "Never",
+					"on": "On"
+				},
+				"recurrenceStartDate": {
+					"title": "End Date",
+					"description": "The repetition starts <date/>"
+				},
+				"recurrenceEndDate": {
+					"title": "End Date",
+					"description": "The repetition ends on <date/>"
+				},
+				"recurrenceWeeklyDays": {
+					"title": "Repeat On",
+					"monday": "Monday",
+					"tuesday": "Tuesday",
+					"wednesday": "Wednesday",
+					"thursday": "Thursday",
+					"friday": "Friday",
+					"saturday": "Saturday",
+					"sunday": "Sunday"
+				},
+				"restrictionType": {
+					"anytime": "Anytime",
+					"work": "Work Hours",
+					"personal": "Personal Hours",
+					"custom": "Custom"
+				}
+			},
+			"tip": {
+				"description": "Press <b><key/></b> to create a new tile",
+				"keys": {
+					"enter": "Enter",
+					"return": "Return"
+				}
+			},
+			"message": {
+				"success": "<b>\"<action/>\"</b> has been added to your schedule",
+				"pending": "Hang on, Tiler is adding \"{{action}}\" to your schedule"
+			},
+			"actions": {
+				"repeatTile": "Repeat the Tile",
+				"timeRestriction": "Time Restrictions",
+				"addLocationNickname": "Add location nickname"
+			},
+			"errors": {
+				"couldNotCreate": "Could not create tile. Please try again.",
+				"scheduleProfile": "Failed to load Personal/Work Hours",
+				"workProfileNotFound": "Work hours restriction profile not found",
+				"personalProfileNotFound": "Personal hours restriction profile not found"
+			},
+			"recurrence": {
+				"description": "I need to do this <repetition/> per <period/>",
+				"periods": {
+					"daily": "Day",
+					"weekly": "Week",
+					"monthly": "Month",
+					"yearly": "Year"
+				}
+			},
+			"timeRestrictions": {
+				"anytime": "Anytime",
+				"personalHours": "Personal Hours",
+				"workHours": "Work Hours",
+				"custom": "Custom"
+			},
+			"buttons": {
+				"reset": "Reset",
+				"submit": "Create Tile",
+				"collapse": "Less Options",
+				"expand": "More Options",
+				"viewInTimeline": "View Tile"
+			},
+			"summary": {
+				"title": "Summary",
+				"description": "I need to <b>{{action}}</b>",
+				"descriptionLocation": " at <b>{{location}}</b>",
+				"descriptionDuration": ". It will take me <b>{{hours}} hr {{minutes}} min</b>",
+				"split": {
+					"once": "<b>once</b>",
+					"twice": "<b>twice</b>",
+					"times": "<b>{{count}} times</b>"
+				},
+				"range": ", between <b>{{start}}</b> and <b>{{end}}</b>",
+				"recurrenceFrequency": {
+					"daily": "day",
+					"weekly": "week",
+					"monthly": "month",
+					"yearly": "year"
+				},
+				"recurring": ". It will repeat,",
+				"recurringFrequency": " <b>every {{recurrenceFrequency}}</b>",
+				"recurringStart": " from <b>{{recurrenceStart}}</b>",
+				"recurringEnd": " until <b>{{recurrenceEnd}}</b>"
+			}
+		},
+		"createSelection": {
+			"tile": {
+				"label": "Create Tile",
+				"description": "A flexible task that can move based on your availability."
+			},
+			"block": {
+				"label": "Create Block",
+				"description": "A fixed task that stays exactly where you place it."
+			}
+		},
+		"mobileChatInput": {
+			"placeholder": "Ask tiler anything..."
 		}
 	},
 	"home": {
-		"featureHighlights": {
-			"title": "Points Forts des Fonctionnalités",
-			"subtitle": "Simplifiez votre vie avec Tiler, voici ce que nous pouvons faire pour vous aider."
+		"demoExplainer": {
+			"title": "See Tiler in Action",
+			"subtitle": "Try it now — no signup required. Choose a persona below to experience how Tiler turns natural conversation into a smart, adaptive schedule.",
+			"badge": "Interactive Demo"
 		},
-		"tileCardSection": {
-			"header": "Visualisez vos tâches et rendez-vous",
-			"subHeader": "Visualisez votre emploi du temps avec nos tuiles intuitives. Voyez vos rendez-vous, échéances et tâches en un coup d'œil.",
-			"cta": "Créez vos propres tuiles",
-			"tiles": {
-				"meetingWithCharles": "Réunion avec Charles",
-				"morningMeeting": "Réunion du matin",
-				"clientCall": "Appel client",
-				"lunchBreak": "Pause déjeuner",
-				"teamSync": "Synchronisation d'équipe",
-				"projectReview": "Revue de projet",
-				"happyHour": "Happy Hour",
-				"breakfastWithFriends": "Petit-déjeuner entre amis",
-				"groceryShopping": "Courses alimentaires",
-				"gymWorkouts": "Entraînements à la salle"
+		"persona": {
+			"created": "Profile",
+			"customCreated": "Custom Profile",
+			"cta": {
+				"create": "Create Profile",
+				"view": "View Profile"
 			},
-			"locations": {
-				"conferenceRoomA": "Salle de conférence A",
-				"restaurants": "Restaurants",
-				"groceryStore": "Épicerie",
-				"gym": "Salle de sport",
-				"zoom": "Zoom"
+			"expiresIn": "{{time}} left",
+			"tileSuggestions": "Tiles",
+			"custom": {
+				"namePlaceholder": "New Profile"
 			}
 		},
 		"expanded": {
+			"mobileChatPlaceholder": "Chat with your calendar to update...",
 			"chat": {
 				"newChat": "Nouvelle Discussion",
 				"clearSession": "Effacer la Session",
+				"title": "What would you like to do?",
+				"subtitle": "Describe a task, We'll handle the tiling.",
 				"inputPlaceholder": "Dites à Tiler ce que vous faites...",
 				"loadingMessages": "Chargement des messages...",
 				"loadingActions": "Chargement d'autres actions...",
@@ -237,6 +490,40 @@
 				"errorLoadMessages": "Échec du chargement des messages de chat",
 				"errorSendMessage": "Échec de l'envoi du message",
 				"errorAcceptChanges": "Échec de l'acceptation des modifications",
+				"tileRemoved": "Tile removed",
+				"tileCompleted": "This event has been completed",
+				"tileDeleted": "This event has been deleted",
+				"navigating": "Navigating to tile...",
+				"acceptToSee": "Accept changes to see this tile",
+				"simulationStarting": "Tilecast starting…",
+				"simulationQueued": "Tilecast queued…",
+				"simulationGenerating": "Generating tilecast…",
+				"simulationUpdating": "Updating tilecast…",
+				"simulationReady": "Tilecast ready",
+				"simulationChangesLabel": "changes",
+				"simulationDefunct": "Outdated tilecast",
+				"review": "Review",
+				"simulationInProgress": "This change is still being forecast.",
+				"simulationFailed": "Tilecast unavailable",
+				"simulationStale": "Tilecast is out of date",
+				"simulationUnavailable": "Tilecast unavailable",
+				"loadingSimulation": "Loading tilecast…",
+				"reviewSimulation": "Review tilecast",
+				"retry": "Retry",
+				"reviewNoPreview": "No forecast tile available for this change.",
+				"applyNow": "Apply now",
+				"exitReview": "Exit review",
+				"previous": "Previous",
+				"next": "Next",
+				"expand": "Expand",
+				"expandMore": "Expand more",
+				"collapse": "Collapse",
+				"viewCurrent": "Current",
+				"viewSimulation": "Tilecast",
+				"pillStrip": {
+					"showMore": "+{{count}} more",
+					"showLess": "Show less"
+				},
 				"wsStatus": {
 					"actionInitStart1": "Initialisation de la génération d'actions...",
 					"actionInitStart2": "Mise en place...",
@@ -283,19 +570,677 @@
 					"locationBenefitMessage": "Définir votre emplacement réel nous aide à créer des tuiles plus pertinentes et à améliorer votre expérience avec des suggestions de planification personnalisées.",
 					"usingDefaultLocation": "Utilisation de l'emplacement par défaut - Cliquez sur l'icône pour obtenir votre emplacement actuel.",
 					"clickIconToGetLocation": "Cliquez sur l'icône pour obtenir votre emplacement actuel ou modifier votre emplacement"
+				},
+				"sessionHistory": {
+					"title": "Chat History",
+					"loading": "Loading sessions...",
+					"loadingMore": "Loading more...",
+					"loadMore": "Load older sessions",
+					"empty": "No conversations yet",
+					"untitled": "Untitled Session",
+					"newConversation": "New Conversation"
+				},
+				"errorPopup": {
+					"chatLimitReached": "Chat Limit Reached",
+					"headerText": "Want more than 20 prompts?",
+					"altText": "Chat interface illustration",
+					"description": "Get early access to unlimited chats, smart integrations, and the full Tiler experience.",
+					"emailPlaceholder": "Enter your email",
+					"submitEmail": "Submit Email",
+					"joinWaitlist": "Join The Waitlist",
+					"submitting": "Submitting...",
+					"subtext": "Spots are limited – Save yours now.",
+					"close": "Close",
+					"errors": {
+						"emailRequired": "Email is required",
+						"emailInvalid": "Please enter a valid email address",
+						"submitFailed": "Failed to submit email. Please try again."
+					}
+				},
+				"emailConfirmation": {
+					"header": "Check your email!",
+					"message": "We sent a confirmation link to <strong>{{email}}</strong>.",
+					"messageContinued": "Click the link to unlock unlimited chats with Tiler.",
+					"button": "Got it",
+					"footer": "Didn't receive the email? Check your spam folder or try again."
+				},
+				"promptSuggestions": {
+					"coreStructural": {
+						"morningSetup": "Set up my morning routine",
+						"dailyPlanning": "Plan my day",
+						"travelBuffer": "Add travel buffer time",
+						"taskReview": "Review my tasks",
+						"dayWrapUp": "Wrap up my day"
+					},
+					"professional": {
+						"salesCall": "Schedule a sales call",
+						"clientPresentation": "Prepare client presentation",
+						"proposalDrafting": "Draft a proposal",
+						"contractReview": "Review contract",
+						"budgetReview": "Analyze budget",
+						"teamSync": "Sync with team",
+						"boardPrep": "Prepare for board meeting",
+						"performanceCheckIn": "Conduct performance check-in"
+					},
+					"operations": {
+						"dispatchSchedule": "Create dispatch schedule",
+						"shiftChangeover": "Plan shift changeover",
+						"inventoryCheck": "Check inventory",
+						"qualityAudit": "Conduct quality audit",
+						"fieldVisit": "Schedule field visit",
+						"vendorCoordination": "Coordinate with vendor",
+						"reportSubmission": "Submit report"
+					},
+					"locationLinked": {
+						"siteVisit": "Schedule site visit",
+						"officeBlock": "Block office time",
+						"onSiteInspection": "Plan on-site inspection",
+						"customerAppointment": "Book customer appointment",
+						"pickupDelivery": "Arrange pickup and delivery",
+						"routePlanning": "Plan my route"
+					},
+					"strategic": {
+						"marketResearch": "Conduct market research",
+						"competitiveScan": "Analyze competitors",
+						"weeklyForecast": "Create weekly forecast",
+						"hiringInterview": "Schedule hiring interview",
+						"investorCall": "Prepare investor call",
+						"productRoadmapReview": "Review product roadmap"
+					},
+					"deepWork": {
+						"writingSession": "Block time for writing",
+						"analysisBlock": "Schedule analysis time",
+						"designSprint": "Plan design sprint",
+						"codingBlock": "Block coding time",
+						"financialModeling": "Build financial model",
+						"researchStudy": "Conduct research study"
+					}
 				}
 			}
 		},
-		"appDownload": {
-			"ios": {
-				"title": "Télécharger sur l'App Store",
-				"alt": "App Store"
+		"waitlist": {
+			"title": "Join the Waitlist",
+			"subtitle": "Be among the first to experience Tiler's powerful scheduling features.",
+			"emailPlaceholder": "Enter your email",
+			"submit": "Join Waitlist",
+			"success": "Thanks for joining! We'll notify you when Tiler is ready.",
+			"error": "Something went wrong. Please try again."
+		},
+		"hero": {
+			"title": "Your AI-Powered Day Architect",
+			"subtitle": "Just describe what you need to do, and Tiler automatically builds a smart, location-aware schedule that adapts as life changes.",
+			"features": {
+				"natural": "Natural-language scheduling",
+				"adaptive": "Adapts to changes automatically",
+				"travel": "Smart travel-time calculation"
 			},
-			"android": {
-				"title": "Télécharger sur Google Play",
-				"alt": "Google Play"
+			"scenarios": {
+				"lunch": {
+					"calendarTitle": "Wednesday, Nov 13",
+					"messages": {
+						"userRequest": "Lunch with Sarah at noon downtown",
+						"aiResponse1": "Scheduling for 12:00 PM downtown. Add 25 min travel?",
+						"userConfirm": "Yes",
+						"aiConfirm": "Done! Travel + lunch added. ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Downtown",
+						"travelTime": "25 min",
+						"lunch": "Lunch with Sarah"
+					}
+				},
+				"errands": {
+					"calendarTitle": "Friday, Nov 15",
+					"messages": {
+						"userRequest": "Groceries and gym after 5 PM",
+						"aiResponse1": "I can fit both. Groceries at 5:00 PM, gym at 6:00 PM?",
+						"userConfirm": "Perfect",
+						"aiConfirm": "Scheduled! ✓"
+					},
+					"tiles": {
+						"groceries": "Grocery Shopping",
+						"travel": "Travel to Gym",
+						"travelTime": "12 min",
+						"gym": "Gym Workout"
+					}
+				},
+				"client": {
+					"calendarTitle": "Monday, Nov 18",
+					"messages": {
+						"userRequest": "Meeting with John Monday 2 PM at his office",
+						"aiResponse1": "35 min drive from here. Block travel time?",
+						"userConfirm": "Yes please",
+						"aiConfirm": "Added! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Client Office",
+						"travelTime": "35 min",
+						"meeting": "Client Meeting - John"
+					}
+				},
+				"dentist": {
+					"calendarTitle": "Thursday, Nov 14",
+					"messages": {
+						"userRequest": "Dentist at 9 AM, then work from home",
+						"aiResponse1": "15 min return travel. Add deep work block after?",
+						"userConfirm": "Yes, 3 hours",
+						"aiConfirm": "Perfect! ✓"
+					},
+					"tiles": {
+						"dentist": "Dentist Appointment",
+						"travel": "Travel Home",
+						"travelTime": "15 min",
+						"deepWork": "Deep Work Session"
+					}
+				},
+				"coffee": {
+					"calendarTitle": "Tuesday, Nov 19",
+					"messages": {
+						"userRequest": "Coffee with Mike at Starbucks on 5th Ave at 10 AM",
+						"aiResponse1": "18 min from your location. Leave at 9:40 AM?",
+						"userConfirm": "Sounds good",
+						"aiConfirm": "Scheduled! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Starbucks",
+						"travelTime": "18 min",
+						"coffee": "Coffee - Mike"
+					}
+				},
+				"airport": {
+					"calendarTitle": "Saturday, Nov 23",
+					"messages": {
+						"userRequest": "Flight at 3 PM, need to be at airport by 1 PM",
+						"aiResponse1": "45 min to airport. Leave at 12:10 PM with buffer?",
+						"userConfirm": "Yes",
+						"aiConfirm": "Travel time added! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Airport",
+						"travelTime": "45 min",
+						"airport": "Airport Check-in",
+						"flight": "Flight Departure"
+					}
+				},
+				"school": {
+					"calendarTitle": "Monday, Nov 18",
+					"messages": {
+						"userRequest": "Pick up kids from school at 3:30 PM",
+						"aiResponse1": "20 min drive. Leave at 3:10 PM?",
+						"userConfirm": "Perfect",
+						"aiConfirm": "Added to calendar! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to School",
+						"travelTime": "20 min",
+						"pickup": "School Pickup"
+					}
+				},
+				"doctor": {
+					"calendarTitle": "Wednesday, Nov 20",
+					"messages": {
+						"userRequest": "Doctor appointment downtown at 2:30 PM",
+						"aiResponse1": "28 min from office. Leave at 2:00 PM?",
+						"userConfirm": "Yes",
+						"aiConfirm": "Scheduled! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Clinic",
+						"travelTime": "28 min",
+						"doctor": "Doctor Appointment"
+					}
+				},
+				"haircut": {
+					"calendarTitle": "Friday, Nov 22",
+					"messages": {
+						"userRequest": "Haircut at salon near home at 4 PM",
+						"aiResponse1": "8 min walk. Leave at 3:50 PM?",
+						"userConfirm": "Yes",
+						"aiConfirm": "Done! ✓"
+					},
+					"tiles": {
+						"travel": "Walk to Salon",
+						"travelTime": "8 min",
+						"haircut": "Haircut Appointment"
+					}
+				},
+				"restaurant": {
+					"calendarTitle": "Saturday, Nov 23",
+					"messages": {
+						"userRequest": "Dinner reservation at 7 PM at Italian place",
+						"aiResponse1": "32 min drive. Leave at 6:25 PM?",
+						"userConfirm": "Perfect",
+						"aiConfirm": "Added! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Restaurant",
+						"travelTime": "32 min",
+						"dinner": "Dinner Reservation"
+					}
+				}
+			}
+		},
+		"video": {
+			"title": "YouTube video player"
+		},
+		"updates": {
+			"title": "Get the Latest Tiler News & Updates",
+			"subtitle": "Want to get more out of your schedule? Subscribe for tips, tricks, and updates delivered straight to your inbox.",
+			"emailPlaceholder": "Your Email Address..."
+		},
+		"integration": {
+			"title": "Integrate with your favorite",
+			"spanText": "calendars",
+			"subtitle": "These apps are available to integrate seamlessly with Tiler."
+		},
+		"featureHighlights": {
+			"title": "Points Forts des Fonctionnalités",
+			"subtitle": "Simplifiez votre vie avec Tiler, voici ce que nous pouvons faire pour vous aider."
+		},
+		"tileCardSection": {
+			"header": "Visualisez vos tâches et rendez-vous",
+			"subHeader": "Visualisez votre emploi du temps avec nos tuiles intuitives. Voyez vos rendez-vous, échéances et tâches en un coup d'œil.",
+			"cta": "Créez vos propres tuiles",
+			"tiles": {
+				"meetingWithCharles": "Réunion avec Charles",
+				"morningMeeting": "Réunion du matin",
+				"clientCall": "Appel client",
+				"lunchBreak": "Pause déjeuner",
+				"teamSync": "Synchronisation d'équipe",
+				"projectReview": "Revue de projet",
+				"happyHour": "Happy Hour",
+				"breakfastWithFriends": "Petit-déjeuner entre amis",
+				"groceryShopping": "Courses alimentaires",
+				"gymWorkouts": "Entraînements à la salle"
+			},
+			"locations": {
+				"conferenceRoomA": "Salle de conférence A",
+				"restaurants": "Restaurants",
+				"groceryStore": "Épicerie",
+				"gym": "Salle de sport",
+				"zoom": "Zoom"
+			}
+		},
+		"features": {
+			"conversation": {
+				"subtitle": "JUST TALK TO IT",
+				"title": "Natural-Language Scheduling",
+				"description": "Tell Tiler what you need to do in plain English. The AI asks follow-up questions, proposes smart schedules, and waits for your confirmation—no drag-and-drop required."
+			},
+			"transit": {
+				"subtitle": "OPTIMIZE YOUR DAY",
+				"title": "Smart Travel Time",
+				"description": "Tiler automatically inserts realistic travel durations between locations and adjusts your timeline when things change—so you're never late."
+			},
+			"adaptive": {
+				"subtitle": "STAYS IN SYNC",
+				"title": "Adaptive Intelligence",
+				"description": "When life throws a curveball, Tiler reschedules conflicting tasks and finds the next best time—automatically."
+			},
+			"location": {
+				"subtitle": "PRIVACY-FIRST",
+				"title": "Location Awareness",
+				"description": "Use generic labels like 'home' or 'work' instead of specific addresses. Tiler calculates travel time without oversharing your personal data."
+			}
+		},
+		"faq": {
+			"items": {
+				"whatIsTiler": {
+					"question": "What is Tiler, and how does it work?",
+					"answer": "Tiler is not a calendar, it is an AI-powered scheduling app that not only manages your tasks but also optimizes your time. It creates smart, flexible schedules using AutoTiles that adjust as your day shifts, while also letting you lock in non-negotiable tasks using Blocks."
+				},
+				"differentFromCalendar": {
+					"question": "How is Tiler different from Google Calendar or other calendar apps?",
+					"answer": "Unlike static calendars, Tiler is your AI scheduling assistant. Just tell it what you need to do in plain English—it asks clarifying questions, calculates travel time between locations, and proposes a complete schedule. When life changes, Tiler adapts your timeline automatically. You confirm changes before they're made, so you stay in control."
+				},
+				"aiAccuracy": {
+					"question": "Can I trust the AI to schedule my tasks correctly?",
+					"answer": "Tiler uses a confirmation-first approach—it proposes schedules and waits for your approval before making changes. The AI learns your patterns over time and gets smarter about durations, locations, and preferences. You can always undo or adjust any suggestion."
+				},
+				"locationPrivacy": {
+					"question": "Is my location data private? How does Tiler use it?",
+					"answer": "Tiler respects your privacy. You can use generic labels like 'home,' 'work,' or 'local cafe' instead of specific addresses. Location data is only used to calculate realistic travel times between tasks, ensuring your schedule accounts for real-world constraints. Your data is never shared or sold."
+				},
+				"calendarIntegration": {
+					"question": "Why do I need to integrate my calendar?",
+					"answer": "Integrating your calendar with Tiler lets you see all your tasks, events, and schedules in one place. No more juggling multiple apps or risking double bookings—Tiler automatically syncs everything and optimizes your day for maximum productivity."
+				},
+				"multipleCalendars": {
+					"question": "Can I integrate multiple calendars to my Tiler account?",
+					"answer": "Yes! You can integrate multiple calendars into your Tiler account. This way, all your events and tasks are in one place."
+				},
+				"tileVsBlock": {
+					"question": "What's the difference between a Tile and a Block?",
+					"answer": "Tiles are flexible tasks that Tiler automatically schedules and adjusts based on your availability. Blocks are fixed tasks that stay exactly where you set them—perfect for meetings or tasks that can't be moved."
+				},
+				"tileShare": {
+					"question": "How does TileShare work?",
+					"answer": "TileShare lets you share tasks with others—friends, family, teammates—so everyone knows what needs to be done and who's handling it. Assign tasks, track progress, and sync schedules effortlessly."
+				},
+				"missedTask": {
+					"question": "What if I miss a task or need to reschedule?",
+					"answer": "No worries! Tiler's Defer feature automatically finds the next best time to complete a missed task. You can also manually reschedule with a simple drag-and-drop."
+				},
+				"habitTracking": {
+					"question": "Can Tiler help with habit tracking?",
+					"answer": "Yes! You can use Tiler to schedule and track daily habits. Tiler auto-fits them into your schedule, so you stay consistent."
+				},
+				"transitFeature": {
+					"question": "How can I use the Transit feature?",
+					"answer": "The transit feature goes beyond just calculating travel time — it acts as your navigation assistant. It helps you plan routes, suggests the best modes of transportation, and provides real-time directions for seamless transitions between tasks and locations. Just tap the travel icon to get instant navigation, ensuring you're always on time and on track."
+				}
 			}
 		}
+	},
+	"auth": {
+		"signup": {
+			"title": "Commencez avec Tiler",
+			"subtitle": "Créez votre compte gratuit pour profiter d'une planification transparente",
+			"googleButton": "S'inscrire avec Google",
+			"emailLabel": "Adresse e-mail",
+			"emailPlaceholder": "Ex. votrenom@outlook.com",
+			"submitButton": "Créer mon compte gratuit",
+			"submitting": "Création du compte...",
+			"footer": "Vous avez déjà un compte ?",
+			"footerLink": "Se connecter plutôt",
+			"verificationSent": "Code de vérification envoyé à votre e-mail !",
+			"createAccountError": "Échec de la création du compte. Veuillez réessayer."
+		},
+		"signin": {
+			"title": "Bienvenue à nouveau sur Tiler",
+			"subtitle": "Connectez-vous pour continuer votre parcours de planification",
+			"googleButton": "Se connecter avec Google",
+			"submitButton": "Se connecter à mon compte",
+			"submitting": "Connexion...",
+			"footer": "Vous n'avez pas de compte ?",
+			"footerLink": "S'inscrire plutôt"
+		},
+		"verification": {
+			"title": "Vérification requise",
+			"header": "Entrez votre code de vérification",
+			"description": "Nous avons envoyé un code de vérification à",
+			"label": "Code de vérification",
+			"placeholder": "Entrez le code de vérification",
+			"verifyButton": "Vérifier le code",
+			"verifying": "Vérification...",
+			"resendButton": "Vous n'avez pas reçu de code ? Renvoyer",
+			"resending": "Envoi...",
+			"cancel": "Annuler",
+			"success": "Compte vérifié avec succès !",
+			"error": "Code de vérification invalide. Veuillez réessayer.",
+			"resendSuccess": "Code de vérification renvoyé !",
+			"resendError": "Échec de l'envoi du code. Veuillez réessayer."
+		},
+		"goBack": "Retour"
+	},
+	"settings": {
+		"title": "Paramètres",
+		"back": "Retour",
+		"logout": "Déconnexion",
+		"breadcrumb": {
+			"home": "Accueil",
+			"settings": "Paramètres"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "Informations du compte",
+				"description": "Consultez votre compte et modifiez vos informations personnelles",
+				"placeholder": "Account information settings coming soon...",
+				"fields": {
+					"fullName": "Nom complet",
+					"username": "Nom d'utilisateur",
+					"email": "Adresse e-mail",
+					"phoneNumber": "Numéro de téléphone",
+					"phoneNumberPlaceholder": "Ajouter un numéro de téléphone",
+					"countryCode": "Indicatif pays",
+					"countryCodeSearch": "Rechercher des pays...",
+					"countryCodeNoResults": "Aucun pays trouvé",
+					"dateOfBirth": "Date de naissance",
+					"dateOfBirthPlaceholder": "JJ/MM/AAAA"
+				},
+				"saveChanges": "Enregistrer les modifications",
+				"saving": "Enregistrement...",
+				"deleteAccount": "Supprimer mon compte",
+				"saveSuccess": "Informations du compte mises à jour avec succès",
+				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
+				"deleteNotImplemented": "La suppression de compte sera bientôt disponible"
+			},
+			"tilePreferences": {
+				"title": "Préférences de Tuile",
+				"description": "Définissez vos modes de déplacement et aidez Tiler à comprendre vos habitudes quotidiennes",
+				"placeholder": "Tile preferences settings coming soon...",
+				"howMoveAround": "Comment vous déplacez-vous ?",
+				"cycling": "Vélo",
+				"driving": "Conduite",
+				"transit": "Transport en commun",
+				"defineTimeRestrictions": "Définissez vos restrictions horaires",
+				"myWorkHours": "Mes heures de travail",
+				"myPersonalHours": "Mes heures personnelles",
+				"setBlockOutHours": "Définir les heures bloquées",
+				"bedTime": "Heure du coucher",
+				"startsAt": "Commence à",
+				"endsAt": "Finit à",
+				"useCustom": "Use custom",
+				"customTimeRestrictions": "Custom time restrictions",
+				"reset": "Reset",
+				"saveChanges": "Enregistrer les modifications",
+				"saving": "Enregistrement...",
+				"saveSuccess": "Préférences de tuile mises à jour avec succès",
+				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
+				"customSaved": "Custom time restrictions saved",
+				"bedTimeStartRequired": "Veuillez sélectionner une heure de coucher",
+				"bedTimeEndRequired": "Veuillez sélectionner une heure de réveil",
+				"scheduleIncompleteDay": "{{label}} : veuillez définir les heures de début et de fin pour {{day}}",
+				"dayLabels": {
+					"sun": "D",
+					"mon": "L",
+					"tue": "M",
+					"wed": "M",
+					"thu": "J",
+					"fri": "V",
+					"sat": "S"
+				},
+				"dayNames": {
+					"sun": "Dimanche",
+					"mon": "Lundi",
+					"tue": "Mardi",
+					"wed": "Mercredi",
+					"thu": "Jeudi",
+					"fri": "Vendredi",
+					"sat": "Samedi"
+				},
+				"start": "Début",
+				"end": "Fin",
+				"copyTimes": "Copy times",
+				"paste": "Paste times",
+				"cancelCopy": "Cancel copy",
+				"themeMode": "Color theme",
+				"themeModeLight": "Light",
+				"themeModeDark": "Dark",
+				"themeModeSystem": "Use device setting",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "AM",
+				"pm": "PM"
+			},
+			"tilerContacts": {
+				"title": "Tiler Contacts",
+				"description": "Add your colleagues as contacts in tiler so you can easily share tiles with them.",
+				"placeholder": "Contacts management coming soon...",
+				"youHave": "You have",
+				"tilerContacts": "Tiler Contacts",
+				"enterFullName": "enter full name",
+				"emailOrPhone": "email or phone number"
+			},
+			"notificationPreferences": {
+				"title": "Notification Preferences",
+				"description": "Manage reminders and email updates",
+				"placeholder": "Notification settings coming soon...",
+				"tileReminders": "Tile Reminders",
+				"emailNotifications": "Email Notifications",
+				"pushNotifications": "Push Notifications",
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"saveSuccess": "Notification preferences updated successfully",
+				"saveError": "Failed to save changes. Please try again."
+			},
+			"connections": {
+				"title": "Connections",
+				"description": "Manage apps connected to your Tiler account",
+				"placeholder": "Connection settings coming soon..."
+			}
+		}
+	},
+	"waitlist": {
+		"title": {
+			"part1": "Join the",
+			"part2": "Tiler Chat",
+			"part3": "Waitlist Today"
+		},
+		"subtitle": "Stop managing your calendar, start talking to it. Get on the waitlist and be the first to vibe with time",
+		"form": {
+			"errors": {
+				"integrations": "Please add at least one calendar integration."
+			},
+			"joinWaitlist": "Join Waitlist",
+			"nextStep": "Next",
+			"steps": {
+				"email": {
+					"key": "email",
+					"name": "Email",
+					"label": "Email Address",
+					"placeholder": "Email Address"
+				},
+				"profession": {
+					"key": "profession",
+					"name": "Profession",
+					"label": "What do you do?",
+					"placeholder": "Profession",
+					"suggestions": [
+						"Medical professional",
+						"Sales professional",
+						"Software developer",
+						"Client Consultant",
+						"Contractor",
+						"Startup founder",
+						"Researcher",
+						"Student",
+						"Lecturer",
+						"Travel Consultant"
+					]
+				},
+				"integrations": {
+					"key": "integrations",
+					"name": "Integrations",
+					"label": "Which integrations do you use?",
+					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
+					"options": [
+						{
+							"value": "google",
+							"label": "Google Calendar"
+						},
+						{
+							"value": "outlook",
+							"label": "Microsoft Outlook Calendar"
+						},
+						{
+							"value": "apple",
+							"label": "Apple Calendar"
+						},
+						{
+							"value": "slack",
+							"label": "Slack"
+						},
+						{
+							"value": "monday",
+							"label": "Monday.com"
+						},
+						{
+							"value": "reclaim",
+							"label": "Reclaim"
+						},
+						{
+							"value": "notion",
+							"label": "Notion"
+						},
+						{
+							"value": "ticktick",
+							"label": "TickTick"
+						},
+						{
+							"value": "evernote",
+							"label": "Evernote"
+						},
+						{
+							"value": "oneNote",
+							"label": "OneNote"
+						}
+					]
+				},
+				"useCase": {
+					"key": "useCase",
+					"name": "Use Case",
+					"label": "What do you want to use Tiler Chat for?",
+					"placeholder": "eg. Scheduling, Task Management"
+				}
+			}
+		}
+	},
+	"timeline": {
+		"searchPlaceholder": "Rechercher une tuile/bloc...",
+		"searchAriaLabel": "Rechercher une tuile ou un bloc",
+		"clearSearch": "Effacer la recherche",
+		"loadMore": "Charger plus",
+		"loading": "Chargement…",
+		"notFoundMessage": "Oups, nous n'avons pas trouvé '{{query}}'. Souhaitez-vous créer une tuile à partir de ce titre ?",
+		"notFoundDismiss": "Non merci",
+		"notFoundCreate": "Créer",
+		"editEvent": "Edit",
+		"setAsNow": "Définir comme maintenant",
+		"markComplete": "Terminer",
+		"markDeleted": "Supprimer",
+		"confirmCompleteTitle": "Terminer cet événement ?",
+		"confirmDeleteTitle": "Supprimer cet événement ?",
+		"confirmAction": "Confirmer",
+		"cancelAction": "Annuler",
+		"shuffle": {
+			"tooltip": "Mélanger le planning",
+			"ariaLabel": "Mélanger le planning",
+			"shuffling": "Mélange du planning...",
+			"success": "Planning mélangé !",
+			"error": "Le mélange a échoué. Veuillez réessayer."
+		},
+		"revise": {
+			"tooltip": "Réviser le planning",
+			"ariaLabel": "Réviser le planning",
+			"revising": "Révision du planning...",
+			"success": "Planning révisé !",
+			"error": "La révision a échoué. Veuillez réessayer."
+		},
+		"procrastinateAll": {
+			"tooltip": "Reporter tous les événements",
+			"ariaLabel": "Reporter tous les événements",
+			"deferring": "Report de tous les événements...",
+			"success": "Tous les événements reportés !",
+			"error": "Échec du report. Veuillez réessayer.",
+			"pickerTitle": "Durée du report",
+			"days": "Jours",
+			"hours": "Heures",
+			"minutes": "Minutes",
+			"daysShort": "Jour",
+			"hoursShort": "H",
+			"minutesShort": "Min",
+			"confirm": "Confirmer",
+			"cancel": "Annuler"
+		},
+		"userMenu": {
+			"logout": "Logout",
+			"signOutSuccess": "You have been successfully signed out",
+			"signOutError": "Failed to sign out. Please try again.",
+			"defaultUsername": "User"
+		},
+		"expandPanel": "Expand panel",
+		"collapsePanel": "Collapse panel"
 	},
 	"errors": {
 		"chatLimitReached": "Limite de chat atteinte. Veuillez réessayer plus tard.",
@@ -322,11 +1267,23 @@
 			"nameSection": "Nom",
 			"occurrenceSection": "Occurrence",
 			"timeSection": "Heure et durée",
-			"recurringToggle": "Répéter l'événement",
 			"repetitionSection": "Répétition",
+			"recurringToggle": "Répéter l'événement",
 			"locationSection": "Lieu",
 			"colorSection": "Couleur",
 			"notesSection": "Notes",
+			"restrictionSection": "Time Restrictions",
+			"restrictionEnabled": "Enable time restrictions",
+			"restrictionTypeAnytime": "Anytime",
+			"restrictionTypeWork": "Work hours",
+			"restrictionTypePersonal": "Personal hours",
+			"restrictionTypeCustom": "Custom",
+			"restrictionWorkInfo": "Work hours are managed in your Tile Preferences.",
+			"restrictionPersonalInfo": "Personal hours are managed in your Tile Preferences.",
+			"restrictionGoToPreferences": "Go to Tile Preferences",
+			"restrictionDayOff": "Off",
+			"restrictionPreviewAnytime": "Anytime",
+			"restrictionPreviewCustom": "Custom",
 			"name": "Nom",
 			"start": "Début",
 			"end": "Fin",
@@ -374,85 +1331,266 @@
 			"savedLocations": "Lieux enregistrés",
 			"googleResults": "Google Maps",
 			"poweredByGoogle": "Fourni par Google",
-			"noLocationResults": "Aucun lieu trouvé"
+			"noLocationResults": "Aucun lieu trouvé",
+			"openNotes": "Open notes",
+			"subEvents": {
+				"title": "Sessions",
+				"titleWithCount": "Sessions ({{count}})",
+				"loading": "Loading sessions…",
+				"empty": "No sessions yet",
+				"error": "Couldn't load sessions",
+				"retry": "Retry",
+				"loadMore": "Load more",
+				"loadEarlier": "Load earlier",
+				"allLoaded": "All {{count}} sessions loaded",
+				"showCompleted": "Show completed & removed",
+				"goTo": "Go to this session on the calendar",
+				"completed": "Completed",
+				"removed": "Removed"
+			}
 		}
 	},
-	"settings": {
-		"title": "Paramètres",
-		"back": "Retour",
-		"logout": "Déconnexion",
-		"breadcrumb": {
-			"home": "Accueil",
-			"settings": "Paramètres"
+	"discover": {
+		"seo": {
+			"title": "Discover - Tiler",
+			"description": "Explore the moments where your day finally makes sense. Find your way around the Tiler app and discover things to try in-app."
 		},
-		"sections": {
-			"accountInfo": {
-				"title": "Informations du compte",
-				"description": "Consultez votre compte et modifiez vos informations personnelles",
-				"fields": {
-					"fullName": "Nom complet",
-					"username": "Nom d'utilisateur",
-					"email": "Adresse e-mail",
-					"phoneNumber": "Numéro de téléphone",
-					"phoneNumberPlaceholder": "Ajouter un numéro de téléphone",
-					"countryCode": "Indicatif pays",
-					"countryCodeSearch": "Rechercher des pays...",
-					"countryCodeNoResults": "Aucun pays trouvé",
-					"dateOfBirth": "Date de naissance",
-					"dateOfBirthPlaceholder": "JJ/MM/AAAA"
-				},
-				"saveChanges": "Enregistrer les modifications",
-				"saving": "Enregistrement...",
-				"deleteAccount": "Supprimer mon compte",
-				"saveSuccess": "Informations du compte mises à jour avec succès",
-				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
-				"deleteNotImplemented": "La suppression de compte sera bientôt disponible"
+		"hero": {
+			"badge": "Navigate Tiler",
+			"title": "Here’s Where Everything Lives",
+			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
+		},
+		"setUpTiler": {
+			"badge": "Set Up Tiler",
+			"title": "Ready in under 3 minutes.",
+			"summary": "Your calendar, your preferences, your constraints — four steps that give Tiler everything it needs to run Adaptive Scheduling from day one.",
+			"visual": {
+				"step1": "Create Account",
+				"step2": "Connect Calendar",
+				"step3": "Set Up Preferences",
+				"step4": "Adaptive Scheduling"
 			},
-			"tilePreferences": {
-				"title": "Préférences de Tuile",
-				"description": "Définissez vos modes de déplacement et aidez Tiler à comprendre vos habitudes quotidiennes",
-				"howMoveAround": "Comment vous déplacez-vous ?",
-				"cycling": "Vélo",
-				"driving": "Conduite",
-				"transit": "Transport en commun",
-				"defineTimeRestrictions": "Définissez vos restrictions horaires",
-				"myWorkHours": "Mes heures de travail",
-				"myPersonalHours": "Mes heures personnelles",
-				"setBlockOutHours": "Définir les heures bloquées",
-				"bedTime": "Heure du coucher",
-				"startsAt": "Commence à",
-				"endsAt": "Finit à",
-				"saveChanges": "Enregistrer les modifications",
-				"saving": "Enregistrement...",
-				"saveSuccess": "Préférences de tuile mises à jour avec succès",
-				"saveError": "Échec de l'enregistrement. Veuillez réessayer.",
-				"bedTimeStartRequired": "Veuillez sélectionner une heure de coucher",
-				"bedTimeEndRequired": "Veuillez sélectionner une heure de réveil",
-				"scheduleIncompleteDay": "{{label}} : veuillez définir les heures de début et de fin pour {{day}}",
-				"dayLabels": {
-					"sun": "D",
-					"mon": "L",
-					"tue": "M",
-					"wed": "M",
-					"thu": "J",
-					"fri": "V",
-					"sat": "S"
+			"cards": {
+				"account": {
+					"title": "Create your account",
+					"subtext": "Sign up with your email — free to start, no credit card needed.",
+					"btnIdle": "Create free account",
+					"btnCreating": "Creating account…",
+					"btnDone": "✓ Account created!"
 				},
-				"dayNames": {
-					"sun": "Dimanche",
-					"mon": "Lundi",
-					"tue": "Mardi",
-					"wed": "Mercredi",
-					"thu": "Jeudi",
-					"fri": "Vendredi",
-					"sat": "Samedi"
+				"calendar": {
+					"title": "Connect your calendar",
+					"subtext": "Link Google or Outlook — Tiler reads your events and builds around them.",
+					"calName": "Google Calendar",
+					"statusIdle": "Tap to connect",
+					"statusConnecting": "Connecting…",
+					"statusConnected": "✓ Connected"
 				},
-				"start": "Début",
-				"end": "Fin",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
-				"am": "AM",
-				"pm": "PM"
+				"preferences": {
+					"title": "Set up your preferences",
+					"subtext": "Choose your transit mode and set time limits in your profile.",
+					"transitLabel": "Transit mode",
+					"drive": "Drive",
+					"transit": "Transit",
+					"walk": "Walk",
+					"workHoursLabel": "Work hours"
+				},
+				"adaptive": {
+					"title": "Ready for Adaptive Scheduling",
+					"subtext": "Your schedule is live — Tiler adapts automatically as your day changes.",
+					"schedLabel": "Your schedule",
+					"meeting": "9am meeting",
+					"run": "Run · 30m",
+					"newTime": "New: 10am",
+					"urgentCall": "Urgent call",
+					"recalculating": "Recalculating…",
+					"rebuilt": "✓ Schedule rebuilt"
+				}
+			},
+			"supportNote": "Each step is an input to Tiler’s scheduling engine — your calendar tells it what’s fixed, your preferences tell it how you move, and your time limits tell it when you’re free. Together, they give Tiler the full picture it needs to run Adaptive Scheduling: a schedule that adjusts itself when things change."
+		},
+		"whatIsTiler": {
+			"badge": "What Is Tiler",
+			"title": "Not a calendar. An AI that runs your day",
+			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn’t go to plan.",
+			"visual": {
+				"tile1": "Gym · 45 min",
+				"tile2": "Travel · 12 min",
+				"tile3": "Client Call · 1 hr",
+				"tile4": "Groceries · 30 min"
+			},
+			"subItems": {
+				"aiRunsDay": {
+					"title": "Tiler is an AI that runs your day.",
+					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn’t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
+				},
+				"fourCoreBlocks": {
+					"title": "The Four Core Blocks of Tiler"
+				},
+				"howDifferent": {
+					"title": "How Tiler is Different"
+				}
+			},
+			"coreBlocks": {
+				"tiles": {
+					"label": "AutoTile",
+					"title": "Tiles",
+					"desc": "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
+				},
+				"blocks": {
+					"label": "Locked",
+					"title": "Blocks",
+					"desc": "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them."
+				},
+				"route": {
+					"label": "Location-aware",
+					"title": "Route",
+					"desc": "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop."
+				},
+				"tileShare": {
+					"label": "Team & Family",
+					"title": "TileShare",
+					"desc": "Assign tiles to teammates or family. Everyone’s calendar adapts around shared commitments automatically. Context travels with the task."
+				}
+			},
+			"comparison": {
+				"headerLeft": "Google Calendar",
+				"headerRight": "Tiler",
+				"rows": [
+					{
+						"left": "You schedule everything manually",
+						"right": "AI builds your schedule from plain English"
+					},
+					{
+						"left": "No awareness of travel time",
+						"right": "Auto-calculates and adds travel buffers"
+					},
+					{
+						"left": "Static — won’t adapt when things change",
+						"right": "Detects ripples and reschedules instantly"
+					},
+					{
+						"left": "No navigation or route planning",
+						"right": "Navigate your day tile-to-tile with real transit"
+					},
+					{
+						"left": "Shared calendars only — no task assignment",
+						"right": "TileShare: assign and track tasks with anyone"
+					},
+					{
+						"left": "Nothing confirmed — events just appear",
+						"right": "Confirmation-first — you approve all changes"
+					}
+				]
+			}
+		},
+		"howToUseTiler": {
+			"badge": "How To Use Tiler",
+			"title": "From intent to done. In seconds.",
+			"summary": "Connect your calendar, add your tiles, and let Tiler build the rest. A step-by-step guide to running your day with Tiler.",
+			"visual": {
+				"step1": "Add Tiles",
+				"step2": "AI Plans",
+				"step3": "Day Built"
+			},
+			"items": {
+				"connectCalendar": {
+					"title": "Connect a Calendar",
+					"body": "Connecting your calendar allows Tiler to see your real commitments. Once synced, incoming calendar events appear as blocks in your timeline. You can accept, edit, or resolve conflicts directly inside Tiler. When events change, Tiler adapts your tiles around them so your day stays balanced and realistic."
+				},
+				"createBlock": {
+					"title": "How to Create a Block",
+					"body": "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don’t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable."
+				},
+				"flexibleTiles": {
+					"title": "Creating Flexible Tiles",
+					"body": "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline — Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions."
+				},
+				"updateTile": {
+					"title": "How to Update a Tile",
+					"body": "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don’t need to move other tasks manually, the system handles the ripple effects."
+				},
+				"travelTime": {
+					"title": "Travel Time & Route",
+					"body": "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn’t a gap — it’s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn’t just tell you what to do. It gets you there."
+				}
+			}
+		},
+		"features": {
+			"badge": "Features",
+			"title": "Everything Tiler can do.",
+			"summary": "Every feature is built around one principle: your schedule should work for you, not the other way around.",
+			"items": {
+				"adaptiveTiles": {
+					"name": "Adaptive Tiles",
+					"desc": "The core unit of Tiler. Each tile is a task, event, or habit with a duration — Tiler schedules them intelligently and moves them when your day changes.",
+					"badge": "Core feature"
+				},
+				"aiScheduling": {
+					"name": "AI scheduling assistant",
+					"desc": "Tiler asks clarifying questions, proposes the best available time, and builds a complete schedule including dependencies — always with your approval first.",
+					"badge": "Core feature"
+				},
+				"chatScheduling": {
+					"name": "Chat scheduling",
+					"desc": "Tell Tiler what you need through a natural chat interface. It understands your intent and proposes a plan without you filling in a single form.",
+					"badge": "Core feature"
+				},
+				"naturalLanguage": {
+					"name": "Natural language input",
+					"desc": "Describe tasks in plain English — no forms, no dropdowns. Tiler understands context, urgency, duration, and location from how you naturally talk.",
+					"badge": "Core feature"
+				},
+				"autoTravel": {
+					"name": "Auto travel buffers",
+					"desc": "Tiler automatically inserts realistic travel time between location-based tiles based on your actual distance and transit options. Back-to-back never means late.",
+					"badge": "Unique to Tiler"
+				},
+				"autoLocations": {
+					"name": "Auto locations",
+					"desc": "Link locations to tiles once and Tiler remembers. Every time that task appears, travel time is calculated automatically from wherever you are.",
+					"badge": "Unique to Tiler"
+				},
+				"timeRestrictions": {
+					"name": "Time restrictions",
+					"desc": "Set the hours you’re available and Tiler only schedules within those bounds. Your personal time stays yours — no task bleeds into off-hours unless you allow it.",
+					"badge": "Preferences"
+				},
+				"adaptiveRescheduling": {
+					"name": "Adaptive rescheduling",
+					"desc": "When a meeting runs long or a task gets missed, Tiler detects the ripple across your whole day and proposes fixes — instantly, with your approval before changing anything.",
+					"badge": "Core feature"
+				},
+				"calendarIntegration": {
+					"name": "Calendar integration",
+					"desc": "Connect Google Calendar or Outlook. Tiler reads your existing events and schedules all new tiles around them — no double bookings, ever. Supports multiple calendars.",
+					"badge": "Integration"
+				},
+				"crossPlatform": {
+					"name": "Cross-platform sync",
+					"desc": "Web, iOS, and Android all stay in real-time sync. Start a task on your laptop and check in on your phone without missing a beat. One schedule, everywhere.",
+					"badge": "Platform"
+				},
+				"habitScheduling": {
+					"name": "Habit scheduling",
+					"desc": "Add recurring habits and Tiler auto-fits them around your day — keeping you consistent with your routines without you having to think about it each morning.",
+					"badge": "Wellness"
+				},
+				"deferReschedule": {
+					"name": "Defer & reschedule",
+					"desc": "Missed a tile? Tiler’s Defer feature instantly finds the next best slot and reschedules with one tap. Never lose a task — just push it forward intelligently.",
+					"badge": "Core feature"
+				},
+				"smartNotifications": {
+					"name": "Smart notifications",
+					"desc": "Get alerted when it’s time to leave for your next tile — with live transit updates if your route changes. Never miss a departure time because you lost track of the clock.",
+					"badge": "Real-time"
+				},
+				"tileShare": {
+					"name": "TileShare",
+					"desc": "Share tiles with family or teammates. Assign who handles what. Track completion. Everyone’s calendar adapts around shared commitments automatically — no extra apps needed.",
+					"badge": "Collaboration"
+				}
 			}
 		}
 	},
@@ -474,5 +1612,276 @@
 		"submitting": "Envoi en cours...",
 		"submitSuccess": "Merci pour votre commentaire !",
 		"submitError": "Échec de l'envoi du commentaire. Veuillez réessayer."
+	},
+	"location": {
+		"verified": {
+			"label": "Verified",
+			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
+		}
+	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "Tileshare",
+			"nav": {
+				"active": "Actifs",
+				"sent": "Envoyés",
+				"received": "Reçus ({{count}})"
+			},
+			"toolbar": {
+				"welcome": "Bienvenue dans votre tableau de bord Tileshare",
+				"create": "Créer un Tileshare"
+			},
+			"createSelection": {
+				"single": {
+					"label": "Tileshare unique",
+					"description": "Une tâche unique avec vos collègues."
+				},
+				"multi": {
+					"label": "Tileshare multiple",
+					"description": "Un ensemble de tâches dans un même projet."
+				}
+			},
+			"create": {
+				"back": "Retour à Tileshare",
+				"single": {
+					"title": "Créer un Tileshare unique",
+					"description": "Créez et partagez une tâche unique avec vos collègues. Dès qu'ils l'acceptent, nous l'ajouterons à leur planning.",
+					"submit": "Créer un Tileshare unique"
+				},
+				"multi": {
+					"title": "Créer un Tileshare multiple",
+					"description": "Créez et partagez plusieurs tâches dans un même projet. Dès que vos collègues l'acceptent, nous les ajouterons à leur planning.",
+					"submit": "Créer un Tileshare multiple"
+				},
+				"fields": {
+					"name": {
+						"placeholder": "Nommez votre tâche"
+					},
+					"deadline": {
+						"placeholder": "Ajoutez une échéance"
+					},
+					"location": {
+						"placeholder": "Ajoutez un lieu (facultatif)"
+					},
+					"note": {
+						"placeholder": "Ajoutez une note (facultatif)"
+					}
+				},
+				"shareTo": {
+					"label": "Partager avec :",
+					"placeholder": "adresse e-mail / numéro de téléphone (Entrée pour sélectionner)",
+					"add": "Ajouter un destinataire",
+					"remove": "Retirer {{recipient}}"
+				},
+				"buttons": {
+					"cancel": "Annuler"
+				},
+				"validation": {
+					"nameRequired": "Veuillez nommer votre tâche",
+					"deadlineRequired": "Veuillez ajouter une échéance",
+					"recipientRequired": "Veuillez ajouter au moins un destinataire",
+					"invalidRecipient": "{{recipient}} n'est pas une adresse e-mail ni un numéro de téléphone valide"
+				},
+				"toast": {
+					"creating": "Creating tileshare…",
+					"error": "Impossible de créer le Tileshare. Veuillez réessayer."
+				},
+				"success": {
+					"message": "Votre Tileshare \"{{name}}\" a été créé.",
+					"view": "Voir le Tileshare"
+				}
+			},
+			"filter": {
+				"all": "Tous",
+				"inProgress": "En cours"
+			}
+		},
+		"card": {
+			"progress": "Progression",
+			"dueOn": "À échéance le :",
+			"dueBy": "À terminer avant :",
+			"multiTileshare": "Tileshare multiple",
+			"tileshare": "Tileshare"
+		},
+		"active": {
+			"title": "Actifs",
+			"empty": "Aucun Tileshare actif",
+			"emptyFiltered": "Aucun élément en cours dans vos Tileshares actifs"
+		},
+		"sent": {
+			"title": "Envoyés",
+			"empty": "Vous n'avez encore envoyé aucun Tileshare",
+			"emptyFiltered": "Aucun élément en cours dans vos Tileshares envoyés"
+		},
+		"received": {
+			"title": "Reçus",
+			"empty": "Vous n'avez encore reçu aucun Tileshare",
+			"emptyFiltered": "Aucun élément en cours dans vos Tileshares reçus"
+		},
+		"tileshareDetail": {
+			"title": "Détails du Tileshare"
+		},
+		"tiletteDetail": {
+			"title": "Détails de la Tilette"
+		},
+		"invite": {
+			"title": "Inviter"
+		}
+	},
+	"tile": {
+		"noteButtonAria": "Ouvrir les notes de cette tuile"
+	},
+	"notesEditor": {
+		"placeholder": "Commencez à écrire. Utilisez la barre d'outils ci-dessus pour mettre vos notes en forme et ajouter des liens. Vos notes sont enregistrées automatiquement et synchronisées sur tous vos appareils.",
+		"surfaceAria": "Éditeur de notes",
+		"back": "Retour",
+		"close": "Fermer",
+		"eyebrow": "Notes",
+		"loading": "Loading notes…",
+		"errorLoad": "Impossible de charger les notes.",
+		"saving": "Saving…",
+		"saved": "Enregistré",
+		"errorSave": "Non enregistré",
+		"unsaved": "Modification…",
+		"save": "Enregistrer",
+		"saveNow": "Enregistrer maintenant",
+		"linkPrompt": "URL",
+		"conflict": {
+			"title": "Une autre personne a mis à jour cette note.",
+			"discard": "Ignorer la mienne",
+			"keep": "Continuer la modification"
+		},
+		"tool": {
+			"bold": "Gras",
+			"italic": "Italique",
+			"underline": "Souligné",
+			"strike": "Barré",
+			"code": "Code en ligne",
+			"h1": "Titre 1",
+			"h2": "Titre 2",
+			"h3": "Titre 3",
+			"bullet": "Liste à puces",
+			"ordered": "Liste numérotée",
+			"task": "Liste de contrôle",
+			"quote": "Citation",
+			"link": "Lien",
+			"undo": "Annuler",
+			"redo": "Rétablir"
+		}
+	},
+	"getStarted": {
+		"seo": {
+			"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
+			"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
+			"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+		},
+		"hero": {
+			"badge": "Mise à jour du produit",
+			"title": "Vos cinq premières minutes avec Tiler",
+			"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there."
+		},
+		"intro": {
+			"lede": "Most scheduling tools ask you to start from scratch … dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
+			"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+		},
+		"steps": {
+			"heading": "Six étapes vers votre première chronologie",
+			"step1": {
+				"title": "Connectez-vous et créez votre profil",
+				"body": "Everything starts with your Tiler account. Sign in and the app immediately begins building your profile memory! The contextual layer that the engine uses to understand how you work, when you're available, and what matters to you.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step2": {
+				"title": "Définissez votre heure de réveil",
+				"body": "The first question is deceptively simple: when does your day begin? This single data point establishes the earliest boundary the engine will schedule around. Night owl or early riser, Tiler starts from your reality, not an arbitrary 9 AM default.",
+				"calloutStrong": "Pourquoi c'est important :",
+				"callout": "Every constraint in Tiler flows from your boundaries. Wake time, work hours, and location form the hard edges that the solver respects before optimizing anything else."
+			},
+			"step3": {
+				"title": "Indiquez votre emplacement",
+				"body": "Where are you most of the day? Tiler integrates with Google Maps so travel time between tasks is real, calculated by driving, transit, or walking, and not a vague guess. This is the piece most planning tools skip entirely, and it's why their schedules crumble when you actually try to live them. The autocomplete pulls from Google's Places API, so you can enter anything from a corporate headquarters to a co-working space to a job site.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step4": {
+				"title": "Définissez vos heures de travail",
+				"body": "Not every day looks the same. Tiler lets you set work hours per day of the week: toggle days on and off, shift start and end times, and copy a schedule across multiple days. This creates the temporal fence that separates work blocks from personal time. The engine treats these as soft constraints, strong enough to shape your default schedule, flexible enough to bend when a deadline or travel commitment demands it.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step5": {
+				"title": "Initialisez vos tuiles",
+				"body": "This is where Tiler begins to feel different. Based on your professional profile, the engine suggests recurring activity tiles (blocks of work) it thinks you'll need. Client calls. Deep work. Business development. Weekly reflection. You select the ones that match, delete the ones that don't, and set each to daily or weekly cadence.",
+				"calloutStrong": "Proposé par l'IA, sélectionné par l'humain.",
+				"callout": "The suggestions come from the LLM analyzing your professional context. You stay in control of what gets scheduled; the engine handles when and where."
+			},
+			"step6": {
+				"title": "Votre chronologie, prête à l'emploi",
+				"body": "With your constraints loaded, the solver runs. What appears isn't a blank calendar waiting to be filled; it's an optimized timeline with your tiles placed where they fit, travel time accounted for, and work hours respected. Each tile is color-coded and linked to a location, with expandable action menus for quick edits. Add new tasks through natural language, run what-if scenarios to test alternatives, or share tiles with your team. The onboarding planted the seeds, and the engine grows the schedule from here.",
+				"calloutStrong": "",
+				"callout": ""
+			}
+		},
+		"pillars": {
+			"heading": "Trois piliers. Une chronologie parfaite.",
+			"goals": {
+				"icon": "??",
+				"title": "Objectifs",
+				"body": "The tasks and ambitions that need time carved out for them."
+			},
+			"appointments": {
+				"icon": "??",
+				"title": "Rendez-vous",
+				"body": "Meetings, flights, and commitments already locked in."
+			},
+			"location": {
+				"icon": "??",
+				"title": "Emplacement",
+				"body": "Where you actually are, so travel time is real, not guessed."
+			}
+		},
+		"cta": {
+			"heading": "Prêt à créer votre chronologie ?",
+			"body": "Cinq minutes de configuration. Un planning qui fonctionne vraiment.",
+			"button": "Commencer gratuitement ?",
+			"sub": "Disponible sur iOS et Android. Commencez gratuitement."
+		}
+	},
+	"articles": {
+		"minRead": "min de lecture",
+		"readArticle": "Lire l'article",
+		"breadcrumbs": {
+			"home": "Accueil",
+			"articles": "Articles"
+		},
+		"index": {
+			"seo": {
+				"title": "Articles | Tiler - Guides, Product Updates & Productivity Insights",
+				"description": "Explore Tiler's library of guides, product updates, and deep dives on AI scheduling, agentic calendars, and adaptive productivity. Learn how to make your time work for you.",
+				"keywords": "Tiler articles, AI scheduling blog, smart calendar guides, productivity articles, agentic calendar, time management insights, AI productivity blog"
+			},
+			"hero": {
+				"badge": "Articles",
+				"title": "Des idées pour un meilleur planning",
+				"subtitle": "Des guides, des mises à jour produit et des idées sur la façon dont l'IA peut transformer la planification de vos journées."
+			}
+		},
+		"posts": {
+			"gettingStarted": {
+				"title": "Vos cinq premières minutes avec Tiler",
+				"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there.",
+				"excerpt": "Most scheduling tools start from an empty grid. Tiler learns the shape of your day first, then builds a constraint-aware, location-anchored timeline that actually fits your life.",
+				"seo": {
+					"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
+					"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
+					"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+				},
+				"intro": {
+					"lede": "Most scheduling tools ask you to start from scratch, dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
+					"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+				}
+			}
+		}
 	}
 }
