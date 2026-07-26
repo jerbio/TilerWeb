@@ -108,7 +108,10 @@ export class CalendarEventApi extends AppApi {
 	public setAsNow(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Now', {
 			method: 'POST',
-			body: JSON.stringify({ ID: eventId }),
+			body: JSON.stringify({
+				ID: eventId,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			}),
 		});
 	}
 
@@ -119,7 +122,10 @@ export class CalendarEventApi extends AppApi {
 	public markAsComplete(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Complete', {
 			method: 'POST',
-			body: JSON.stringify({ EventID: eventId }),
+			body: JSON.stringify({
+				EventID: eventId,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			}),
 		});
 	}
 
@@ -130,7 +136,10 @@ export class CalendarEventApi extends AppApi {
 	public deleteCalendarEvent(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent', {
 			method: 'DELETE',
-			body: JSON.stringify({ EventID: eventId }),
+			body: JSON.stringify({
+				EventID: eventId,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			}),
 		});
 	}
 
@@ -146,6 +155,8 @@ export class CalendarEventApi extends AppApi {
 			UserLongitude: params.UserLongitude ?? loc.longitude?.toString() ?? '',
 			UserLatitude: params.UserLatitude ?? loc.latitude?.toString() ?? '',
 			UserLocationVerified: params.UserLocationVerified ?? (loc.verified ? 'true' : 'false'),
+			TimeZone:
+				params.TimeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
 		};
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
 			method: 'POST',

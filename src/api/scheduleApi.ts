@@ -27,6 +27,7 @@ export class ScheduleApi extends AppApi {
 			UserLongitude: loc.longitude?.toString() ?? '',
 			UserLatitude: loc.latitude?.toString() ?? '',
 			UserLocationVerified: loc.verified ? 'true' : 'false',
+			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
 		};
 		return this.apiRequest<T>(endpoint, {
 			method,
@@ -155,6 +156,7 @@ export class ScheduleApi extends AppApi {
 			UserLongitude: loc.longitude?.toString() ?? '',
 			UserLatitude: loc.latitude?.toString() ?? '',
 			UserLocationVerified: loc.verified ? 'true' : 'false',
+			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
 		}).toString();
 		return this.apiRequest<TilePredictionApiResponse>(
 			`api/Schedule/NewTilePrediction?${urlParams}`

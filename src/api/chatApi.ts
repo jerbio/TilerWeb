@@ -108,6 +108,7 @@ export class ChatApi extends AppApi {
 				userLongitude,
 				userLatitude,
 				userLocationVerified,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
 			}),
 		});
 	}
