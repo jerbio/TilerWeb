@@ -174,6 +174,10 @@ const SubEventsSection: React.FC<SubEventsSectionProps> = ({ eventId, splitCount
 				entityId: sub.id,
 				entityType: CalendarEntityType.SubcalendarEvent,
 				actionType: Actions.None,
+				// Authoritative start from the side-panel list — lets the calendar
+				// navigate to the correct day directly, bypassing the divergent
+				// /SubCalendarEvent date lookup.
+				startHint: sub.start,
 			});
 		},
 		[dispatch]

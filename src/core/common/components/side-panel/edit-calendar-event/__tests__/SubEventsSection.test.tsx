@@ -223,6 +223,24 @@ describe('SubEventsSection navigation', () => {
 			entityId: 's_1',
 			entityType: CalendarEntityType.SubcalendarEvent,
 			actionType: Actions.None,
+			startHint: BASE + 3600000,
+		});
+	});
+
+	it('passes the row start time as startHint so the calendar skips the divergent REST lookup', async () => {
+		mockGetSubEvents.mockResolvedValueOnce(makePage(3));
+		const user = setupUser();
+		renderSection();
+
+		await waitFor(() => expect(screen.getByTestId('sub-event-row-s_2')).toBeInTheDocument());
+		await user.click(screen.getByTestId('sub-event-row-s_2'));
+
+		const calls = mockDispatch.mock.calls;
+		const call = calls[calls.length - 1][0];
+		expect(call).toMatchObject({
+			type: CalendarRequestType.FocusEvent,
+			entityId: 's_2',
+			startHint: BASE + 2 * 3600000,
 		});
 	});
 });

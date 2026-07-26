@@ -22,7 +22,23 @@ export interface PendingFocus {
 	entityId: string;
 	entityType: CalendarEntityType;
 	onResult?: (result: CalendarRequestResult) => void;
+	/**
+	 * Number of retry attempts already made. Used to bound the self-re-arming
+	 * retry loop so a tile that renders a tick late (slow fetch, Swiper slide
+	 * transition) still lands, without spinning forever if it truly never comes.
+	 */
+	attempts?: number;
 }
+
+/**
+ * Maximum number of times `retryPendingFocus` re-resolves a pending focus
+ * before reporting NotFound. Combined with {@link FOCUS_RETRY_DELAY_MS} this
+ * gives roughly a one-second window for late-rendering tiles to appear.
+ */
+const MAX_FOCUS_RETRY_ATTEMPTS = 6;
+
+/** Delay between self-re-armed focus retries (ms). */
+const FOCUS_RETRY_DELAY_MS = 200;
 
 /** All dependencies the handler needs from the Calendar component */
 export interface CalendarRequestHandlerDeps {
@@ -30,6 +46,13 @@ export interface CalendarRequestHandlerDeps {
 	pendingFocusRef: React.MutableRefObject<PendingFocus | null>;
 	contentContainerRef: React.RefObject<HTMLDivElement>;
 	focusTimeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
+	/**
+	 * Separate timeout ref driving the self-re-arming focus retry loop in
+	 * {@link retryPendingFocus}. Kept distinct from `focusTimeoutRef` (which
+	 * powers the tile pulse) so the two never clobber each other. Optional so
+	 * callers that don't wire it degrade to a single effect-driven attempt.
+	 */
+	focusRetryTimeoutRef?: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
 	/**
 	 * Ref-wrapped events pool for cache-before-fetch lookup. Using a ref
 	 * (instead of a captured value) keeps the handler stable across renders
@@ -68,7 +91,9 @@ function scrollToEvent(
 	contentContainerRef: React.RefObject<HTMLDivElement>,
 	bottomInsetPx = 0
 ): void {
-	if (!contentContainerRef.current) return;
+	if (!contentContainerRef.current) {
+		return;
+	}
 	const container = contentContainerRef.current;
 	const cellHeight = parseInt(calendarConfig.CELL_HEIGHT);
 	const eventStart = dayjs(styledEvent.start);
@@ -163,6 +188,7 @@ export function createCalendarRequestHandler(
 
 				if (cachedEvent) {
 					// Found in cache — navigate without an API call (NAVIGATE_TO_DATE)
+					const targetStartDay = dayjs(cachedEvent.start).startOf('day');
 					deps.setShowNonViableEvents(null);
 					deps.setSelectedEventInfo(null);
 					deps.setSelectedEvent(null);
@@ -170,7 +196,26 @@ export function createCalendarRequestHandler(
 					deps.pendingFocusRef.current = { entityId, entityType, onResult };
 					deps.setViewOptions((prev) => ({
 						...prev,
-						startDay: dayjs(cachedEvent.start).startOf('day'),
+						startDay: targetStartDay,
+					}));
+					return;
+				}
+
+				// Not in cache — if the caller supplied an authoritative start
+				// (e.g. the sub-events side panel), navigate straight to that day.
+				// This bypasses the `/SubCalendarEvent` date lookup, which can
+				// return a start that diverges from the grid's own value and aim
+				// navigation at the wrong (often already-loaded) day.
+				if (request.startHint != null) {
+					const targetStartDay = dayjs(request.startHint).startOf('day');
+					deps.setShowNonViableEvents(null);
+					deps.setSelectedEventInfo(null);
+					deps.setSelectedEvent(null);
+					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
+					deps.pendingFocusRef.current = { entityId, entityType, onResult };
+					deps.setViewOptions((prev) => ({
+						...prev,
+						startDay: targetStartDay,
 					}));
 					return;
 				}
@@ -245,9 +290,10 @@ export function createCalendarRequestHandler(
 					deps.pendingFocusRef.current = { entityId, entityType, onResult };
 
 					// Navigate the calendar view to the event's date
+					const targetStartDay = dayjs(startMs).startOf('day');
 					deps.setViewOptions((prev) => ({
 						...prev,
-						startDay: dayjs(startMs).startOf('day'),
+						startDay: targetStartDay,
 					}));
 				});
 
@@ -296,6 +342,13 @@ export function createCalendarRequestHandler(
 /**
  * Retries a pending focus request after events have reloaded following
  * a date navigation. Called from a useEffect in the Calendar component.
+ *
+ * Hardening: a single pass can miss because the target tile hasn't rendered
+ * yet — the new day's events may still be settling, or a Swiper slide
+ * transition is mid-flight. Rather than immediately reporting NotFound (which
+ * silently drops the navigation), this self-re-arms up to
+ * {@link MAX_FOCUS_RETRY_ATTEMPTS} times via {@link FOCUS_RETRY_DELAY_MS},
+ * only giving up once the tile is confirmed absent across the whole window.
  */
 export function retryPendingFocus(
 	deps: Pick<
@@ -304,6 +357,7 @@ export function retryPendingFocus(
 		| 'pendingFocusRef'
 		| 'contentContainerRef'
 		| 'focusTimeoutRef'
+		| 'focusRetryTimeoutRef'
 		| 'setShowNonViableEvents'
 		| 'setSelectedEventInfo'
 		| 'setSelectedEvent'
@@ -311,8 +365,10 @@ export function retryPendingFocus(
 		| 'bottomInsetPxRef'
 	>
 ): void {
-	const { entityId, entityType, onResult } = deps.pendingFocusRef.current!;
-	deps.pendingFocusRef.current = null;
+	const pending = deps.pendingFocusRef.current;
+	if (!pending) return;
+
+	const { entityId, entityType, onResult, attempts = 0 } = pending;
 
 	const resolvedTileId = resolveEntityToTileId(
 		entityId,
@@ -324,11 +380,35 @@ export function retryPendingFocus(
 		? deps.styledEventsRef.current.find((e) => e.id === resolvedTileId)
 		: undefined;
 
-	if (!styledEvent) {
-		onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
+	if (styledEvent) {
+		deps.pendingFocusRef.current = null;
+		if (deps.focusRetryTimeoutRef?.current) {
+			clearTimeout(deps.focusRetryTimeoutRef.current);
+			deps.focusRetryTimeoutRef.current = null;
+		}
+		focusOnStyledEvent(styledEvent, deps);
+		onResult?.({ status: CalendarRequestStatus.Found, entityId });
 		return;
 	}
 
-	focusOnStyledEvent(styledEvent, deps);
-	onResult?.({ status: CalendarRequestStatus.Found, entityId });
+	// Tile not rendered yet — re-arm rather than give up, so a late render
+	// (slow fetch or slide transition) still lands on the target.
+	if (attempts + 1 < MAX_FOCUS_RETRY_ATTEMPTS) {
+		deps.pendingFocusRef.current = { entityId, entityType, onResult, attempts: attempts + 1 };
+		if (deps.focusRetryTimeoutRef) {
+			if (deps.focusRetryTimeoutRef.current) clearTimeout(deps.focusRetryTimeoutRef.current);
+			deps.focusRetryTimeoutRef.current = setTimeout(
+				() => retryPendingFocus(deps),
+				FOCUS_RETRY_DELAY_MS
+			);
+		}
+		return;
+	}
+
+	deps.pendingFocusRef.current = null;
+	if (deps.focusRetryTimeoutRef?.current) {
+		clearTimeout(deps.focusRetryTimeoutRef.current);
+		deps.focusRetryTimeoutRef.current = null;
+	}
+	onResult?.({ status: CalendarRequestStatus.NotFound, entityId });
 }
