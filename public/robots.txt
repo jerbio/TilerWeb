@@ -2,8 +2,13 @@
 User-agent: *
 Allow: /
 
-# Disallow admin or private areas if any
-# Disallow: /admin/
+# Private / authenticated app areas — no SEO value, keep out of the index
+Disallow: /timeline
+Disallow: /tileshare
+Disallow: /settings
+Disallow: /admin
+Disallow: /signin
+Disallow: /signup
 
 # Sitemap location
 Sitemap: https://tiler.app/sitemap.xml

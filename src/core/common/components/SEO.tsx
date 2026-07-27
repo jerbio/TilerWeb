@@ -20,6 +20,11 @@ interface SEOProps {
 	articleTags?: string[];
 	/** Article section / category — emits article:section. */
 	articleSection?: string;
+	/**
+	 * When true, emits `robots: noindex, nofollow` so crawlers skip this page
+	 * (e.g. auth, settings, and other private/app routes). Defaults to false.
+	 */
+	noindex?: boolean;
 }
 
 const SEO: React.FC<SEOProps> = ({
@@ -36,6 +41,7 @@ const SEO: React.FC<SEOProps> = ({
 	authors,
 	articleTags,
 	articleSection,
+	noindex = false,
 }) => {
 	const siteUrl = 'https://tiler.app';
 	const fullCanonicalUrl = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl;
@@ -47,6 +53,7 @@ const SEO: React.FC<SEOProps> = ({
 			<meta name="title" content={title} />
 			<meta name="description" content={description} />
 			<meta name="keywords" content={keywords} />
+			<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
 			<link rel="canonical" href={fullCanonicalUrl} />
 
 			{/* Open Graph / Facebook */}

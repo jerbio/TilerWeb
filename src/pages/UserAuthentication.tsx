@@ -10,6 +10,7 @@ import palette from '@/core/theme/palette';
 import { Env } from '@/config/config_getter';
 import { authService } from '@/services';
 import VerificationCodePopup from '@/components/auth/VerificationCodePopup';
+import SEO from '@/core/common/components/SEO';
 
 const UserAuthentication: React.FC = () => {
 	const { t } = useTranslation();
@@ -64,6 +65,14 @@ const UserAuthentication: React.FC = () => {
 
 	return (
 		<Container>
+			<SEO
+				title={
+					isSignUp ? 'Sign Up - Tiler Smart Calendar' : 'Sign In - Tiler Smart Calendar'
+				}
+				description="Sign in or create your Tiler account to access your intelligent calendar and task scheduling."
+				canonicalUrl={isSignUp ? '/signup' : '/signin'}
+				noindex
+			/>
 			<BackButton onClick={() => navigate('/')}>
 				<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
 					<path
