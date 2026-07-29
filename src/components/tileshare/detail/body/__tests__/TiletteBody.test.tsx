@@ -79,7 +79,29 @@ const tilettes = [
 describe('TiletteBody', () => {
 	it('starts in list view showing the tilette count', () => {
 		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
-		expect(screen.getByText('tilesharedemo.detail.showingTilettes 2')).toBeInTheDocument();
+		expect(screen.getByText('tilesharedemo.detail.showingTilettes 2/2')).toBeInTheDocument();
+	});
+
+	it('does not paginate the list when everything fits on one page', () => {
+		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
+		expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument();
+	});
+
+	it('paginates the list view when there are more tilettes than fit a page', async () => {
+		const u = setupUser();
+		const many = Array.from({ length: 12 }, (_, i) => tilette(`t${i + 1}`, [user('u1', 'A')]));
+		render(<TiletteBody clusterId="c" tilettes={many} />);
+
+		// 10 per page, 12 tilettes -> first page shows 10 of 12
+		expect(screen.getByText('tilesharedemo.detail.showingTilettes 10/12')).toBeInTheDocument();
+		expect(screen.getByText('t1')).toBeInTheDocument();
+		expect(screen.queryByText('t11')).not.toBeInTheDocument();
+
+		await u.click(screen.getByRole('button', { name: /next/i }));
+
+		expect(screen.getByText('tilesharedemo.detail.showingTilettes 2/12')).toBeInTheDocument();
+		expect(screen.getByText('t11')).toBeInTheDocument();
+		expect(screen.queryByText('t1')).not.toBeInTheDocument();
 	});
 
 	it('switches to assignee view and paginates', async () => {
