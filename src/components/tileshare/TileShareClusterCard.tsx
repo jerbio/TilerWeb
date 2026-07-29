@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, CalendarDays, Clock, Layers, MessageSquare } from 'lucide-react';
+import { ArrowRight, CalendarDays, Layers, MessageSquare } from 'lucide-react';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
@@ -68,23 +68,16 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 
 			<Right>
 				<DueWrapper>
+					<DueItem />
+					<DueDivider />
 					<DueItem>
 						<DueIcon>
 							<CalendarDays size={16} />
 						</DueIcon>
+						<DueLabel>{t('tilesharedemo.card.due')}</DueLabel>
 						<DueContent>
-							<DueLabel>{t('tilesharedemo.card.dueOn')}</DueLabel>
+							<DueTime>{formattedDueBy}</DueTime>
 							<DueValue>{formattedDueOn}</DueValue>
-						</DueContent>
-					</DueItem>
-					<DueDivider />
-					<DueItem>
-						<DueIcon>
-							<Clock size={16} />
-						</DueIcon>
-						<DueContent>
-							<DueLabel>{t('tilesharedemo.card.dueBy')}</DueLabel>
-							<DueValue>{formattedDueBy}</DueValue>
 						</DueContent>
 					</DueItem>
 				</DueWrapper>
@@ -243,6 +236,10 @@ const DueValue = styled.span`
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
 	white-space: nowrap;
+`;
+
+const DueTime = styled(DueValue)`
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const AvatarRow = styled.div`

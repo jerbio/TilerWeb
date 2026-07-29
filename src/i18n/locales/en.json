@@ -1775,8 +1775,7 @@
 		},
 		"card": {
 			"progress": "Progress",
-			"dueOn": "Due on:",
-			"dueBy": "Due by:",
+			"due": "Due:",
 			"multiTileshare": "Multi tileshare",
 			"tileshare": "Tileshare"
 		},
