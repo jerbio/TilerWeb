@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ChevronDown } from 'lucide-react';
 import palette from '@/core/theme/palette';
@@ -20,6 +20,16 @@ type SelectProps<T extends string = string> = {
 	'aria-label'?: string;
 };
 
+/** Gap between the trigger and the dropdown, and the dropdown and the viewport edge. */
+const DROPDOWN_GAP = 4;
+const VIEWPORT_MARGIN = 8;
+
+type Placement = {
+	direction: 'down' | 'up';
+	/** Caps the list so it always fits the space on the chosen side. */
+	maxHeight: number;
+};
+
 function Select<T extends string = string>({
 	value,
 	onChange,
@@ -32,9 +42,51 @@ function Select<T extends string = string>({
 	'aria-label': ariaLabel,
 }: SelectProps<T>) {
 	const [open, setOpen] = useState(false);
+	const [placement, setPlacement] = useState<Placement>({
+		direction: 'down',
+		maxHeight: Infinity,
+	});
 	const containerRef = useRef<HTMLDivElement>(null);
+	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const selected = options.find((o) => o.value === value);
+
+	// Opens upwards when the list would run past the bottom of the viewport and
+	// there is more room above — e.g. a page-size select in a sticky footer.
+	const updatePlacement = useCallback(() => {
+		const trigger = containerRef.current;
+		const dropdown = dropdownRef.current;
+		if (!trigger || !dropdown) return;
+
+		const rect = trigger.getBoundingClientRect();
+		const spaceBelow = window.innerHeight - rect.bottom - DROPDOWN_GAP - VIEWPORT_MARGIN;
+		const spaceAbove = rect.top - DROPDOWN_GAP - VIEWPORT_MARGIN;
+		// scrollHeight, so a previously capped list is measured at its full size.
+		const needed = dropdown.scrollHeight;
+
+		const direction = needed > spaceBelow && spaceAbove > spaceBelow ? 'up' : 'down';
+		const maxHeight = Math.max(0, direction === 'up' ? spaceAbove : spaceBelow);
+
+		// Scroll fires often; keep the identical object so React can bail out.
+		setPlacement((prev) =>
+			prev.direction === direction && prev.maxHeight === maxHeight
+				? prev
+				: { direction, maxHeight }
+		);
+	}, []);
+
+	useLayoutEffect(() => {
+		if (!open) return;
+		updatePlacement();
+
+		// `true` so scrolling any ancestor container repositions the dropdown too.
+		window.addEventListener('scroll', updatePlacement, true);
+		window.addEventListener('resize', updatePlacement);
+		return () => {
+			window.removeEventListener('scroll', updatePlacement, true);
+			window.removeEventListener('resize', updatePlacement);
+		};
+	}, [open, updatePlacement]);
 
 	useEffect(() => {
 		if (!open) return;
@@ -73,7 +125,13 @@ function Select<T extends string = string>({
 			</Trigger>
 
 			{open && (
-				<Dropdown role="listbox" $align={align}>
+				<Dropdown
+					ref={dropdownRef}
+					role="listbox"
+					$align={align}
+					$direction={placement.direction}
+					$maxHeight={placement.maxHeight}
+				>
 					{options.map((option) => (
 						<DropdownItem
 							key={option.value}
@@ -163,18 +221,27 @@ const ChevronIcon = styled.span<{ $open: boolean }>`
 	flex-shrink: 0;
 `;
 
-const Dropdown = styled.div<{ $align: 'left' | 'right' }>`
+const Dropdown = styled.div<{
+	$align: 'left' | 'right';
+	$direction: 'down' | 'up';
+	$maxHeight: number;
+}>`
 	position: absolute;
-	top: calc(100% + 4px);
+	${({ $direction }) =>
+		$direction === 'up'
+			? `bottom: calc(100% + ${DROPDOWN_GAP}px);`
+			: `top: calc(100% + ${DROPDOWN_GAP}px);`}
 	${({ $align }) => ($align === 'right' ? 'right: 0;' : 'left: 0;')}
 	min-width: 100%;
 	width: max-content;
+	${({ $maxHeight }) => (Number.isFinite($maxHeight) ? `max-height: ${$maxHeight}px;` : '')}
 	z-index: 50;
 	background: ${({ theme }) => theme.colors.background.card};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${palette.borderRadius.medium};
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-	overflow: hidden;
+	/* Clips the items to the rounded corners; scrolls only once max-height bites. */
+	overflow: hidden auto;
 `;
 
 const DropdownItem = styled.div<{ $active: boolean }>`
