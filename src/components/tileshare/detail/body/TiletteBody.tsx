@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
 import { buildAssignees } from '@/core/util/tileshareAssignees';
 import useResponsiveColumns from '@/hooks/useResponsiveColumns';
+import usePagination from '@/hooks/usePagination';
 import Tabs from '@/core/common/components/Tabs';
 import ViewHeader from './ViewHeader';
 import TiletteListView from './TiletteListView';
@@ -17,6 +18,7 @@ type TiletteBodyProps = {
 type View = 'list' | 'assignee';
 
 const MIN_COLUMN_WIDTH = 230;
+const TILETTES_PER_PAGE = 10;
 
 const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 	const { t } = useTranslation();
@@ -38,9 +40,21 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 	const safePage = Math.min(page, pageCount - 1);
 	const visibleAssignees = assignees.slice(safePage * columns, safePage * columns + columns);
 
+	// The list pages over the tilettes themselves, at a fixed page size — unlike
+	// the assignee board, whose page size follows the column count.
+	const {
+		page: listPage,
+		totalPages: listPageCount,
+		pagedItems: visibleTilettes,
+		setPage: setListPage,
+	} = usePagination(tilettes, TILETTES_PER_PAGE, [clusterId]);
+
 	const label =
 		view === 'list'
-			? t('tilesharedemo.detail.showingTilettes', { count: tilettes.length })
+			? t('tilesharedemo.detail.showingTilettes', {
+					shown: visibleTilettes.length,
+					total: tilettes.length,
+				})
 			: t('tilesharedemo.detail.showingAssignees', {
 					shown: visibleAssignees.length,
 					total: totalAssignees,
@@ -63,7 +77,15 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 				}
 			/>
 			{view === 'list' ? (
-				<TiletteListView tilettes={tilettes} clusterId={clusterId} />
+				<TiletteListView
+					tilettes={visibleTilettes}
+					clusterId={clusterId}
+					showFooter={listPageCount > 1}
+					hasPrev={listPage > 1}
+					hasNext={listPage < listPageCount}
+					onPrev={() => setListPage((p) => Math.max(1, p - 1))}
+					onNext={() => setListPage((p) => Math.min(listPageCount, p + 1))}
+				/>
 			) : (
 				<AssigneeView
 					assignees={visibleAssignees}

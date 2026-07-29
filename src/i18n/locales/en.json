@@ -1811,7 +1811,7 @@
 			"editAria": "Edit",
 			"addAria": "Add tilette",
 			"loadError": "We couldn't load this tileshare. Please try again.",
-			"showingTilettes": "Showing {{count}} Tilettes",
+			"showingTilettes": "Showing {{shown}} of {{total}} Tilettes",
 			"showingAssignees": "Showing {{shown}} of {{total}} Assignees",
 			"statusLabel": "Status:",
 			"status": {
