@@ -25,8 +25,7 @@ vi.mock('react-i18next', () => ({
 			const translations: Record<string, string> = {
 				'tilesharedemo.card.tileshare': 'Tileshare',
 				'tilesharedemo.card.multiTileshare': 'Multi-Tileshare',
-				'tilesharedemo.card.dueOn': 'Due On',
-				'tilesharedemo.card.dueBy': 'Due By',
+				'tilesharedemo.card.due': 'Due:',
 				'tilesharedemo.card.progress': 'Progress',
 			};
 			if (opts?.count !== undefined) return `${translations[key] ?? key} (${opts.count})`;
@@ -92,10 +91,9 @@ describe('TileShareClusterCard', () => {
 		expect(screen.getByRole('button', { name: 'View' })).toBeInTheDocument();
 	});
 
-	it('renders due date labels', () => {
+	it('renders a single merged due label', () => {
 		renderCard(mockCluster);
-		expect(screen.getByText('Due On')).toBeInTheDocument();
-		expect(screen.getByText('Due By')).toBeInTheDocument();
+		expect(screen.getByText('Due:')).toBeInTheDocument();
 	});
 
 	it('shows fallback dashes when name is null', () => {
