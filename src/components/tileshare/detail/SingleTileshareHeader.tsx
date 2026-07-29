@@ -1,7 +1,8 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, MessageSquare, Pencil } from 'lucide-react';
+import { CalendarDays, Pencil } from 'lucide-react';
+import { SingleTileshareIcon } from '@/components/tileshare/icons';
 import Button from '@/core/common/components/button';
 import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderSection } from './DetailHeaderCard';
@@ -33,7 +34,7 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 
 	return (
 		<DetailHeaderCard
-			icon={<MessageSquare size={22} />}
+			icon={<SingleTileshareIcon size={22} />}
 			accent={accent}
 			title={name ?? '—'}
 			subtitle={subtitle ?? t('tilesharedemo.detail.singleTileshare')}

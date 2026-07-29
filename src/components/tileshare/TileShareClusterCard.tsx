@@ -1,7 +1,8 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, CalendarDays, Layers, MessageSquare } from 'lucide-react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
+import { MultiTileshareIcon, SingleTileshareIcon } from '@/components/tileshare/icons';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
@@ -36,7 +37,11 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
 			<Left>
 				<IconBox>
-					{cluster.isMultiTilette ? <Layers size={18} /> : <MessageSquare size={18} />}
+					{cluster.isMultiTilette ? (
+						<MultiTileshareIcon size={18} />
+					) : (
+						<SingleTileshareIcon size={18} />
+					)}
 				</IconBox>
 				<TitleBlock>
 					<Title>{cluster.name ?? '—'}</Title>

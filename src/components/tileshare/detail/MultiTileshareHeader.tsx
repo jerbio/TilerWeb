@@ -1,7 +1,8 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Layers, Pencil, Plus, Timer } from 'lucide-react';
+import { CalendarDays, Pencil, Plus, Timer } from 'lucide-react';
+import { MultiTileshareIcon } from '@/components/tileshare/icons';
 import Button from '@/core/common/components/button';
 import ProgressBar from '@/core/common/components/ProgressBar';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
@@ -37,7 +38,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 
 	return (
 		<DetailHeaderCard
-			icon={<Layers size={22} />}
+			icon={<MultiTileshareIcon size={22} />}
 			accent={accent}
 			title={name ?? '—'}
 			subtitle={t('tilesharedemo.detail.multiTileshare')}

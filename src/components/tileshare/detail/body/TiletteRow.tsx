@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { ArrowRight, Layers } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { TiletteIcon } from '@/components/tileshare/icons';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Routes } from '@/core/constants/routes';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
@@ -28,7 +29,7 @@ const TiletteRow: React.FC<TiletteRowProps> = ({ tilette, clusterId }) => {
 		<Card $darkmode={isDarkMode}>
 			<TopRow>
 				<IconBox $bg={surface.background} $fg={surface.foreground}>
-					<Layers size={18} />
+					<TiletteIcon size={18} />
 				</IconBox>
 				<Name>{tilette.name ?? '—'}</Name>
 				<ArrowLink
