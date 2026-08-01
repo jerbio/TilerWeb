@@ -114,7 +114,7 @@ const Home: React.FC = () => {
 	return (
 		<>
 			<SEO
-				title="Tiler — AI Scheduling Assistant & Smart Calendar"
+				title="Tiler - AI Scheduling Assistant & Smart Calendar"
 				description="Stop managing your calendar—talk to it. Tiler's AI builds a smart, travel-aware schedule from plain English and adapts as your day changes. Try free."
 				keywords="AI scheduling assistant, AI calendar app, smart calendar app, AI schedule planner, natural language calendar, automatic scheduling app, time blocking app, calendar with travel time, adaptive schedule, voice calendar assistant, AI task management"
 				canonicalUrl="/"
