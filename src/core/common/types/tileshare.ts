@@ -88,6 +88,16 @@ export type TileShareTemplateResponse = ApiResponse<{
 	tileShareTemplate: TileShareTemplate;
 }>;
 
+/**
+ * Create-tilette's envelope. POST api/TileshareTemplate returns its payload
+ * under `tileTemplate`, where the GET and PUT routes use `tileShareTemplate` —
+ * so each call unwraps its own key rather than sharing one helper. The contact
+ * routes (PUT/DELETE api/DesignatedTile/contact) use `tileTemplate` too.
+ */
+export type TileTemplateResponse = ApiResponse<{
+	tileTemplate: TileShareTemplate;
+}>;
+
 export type DesignatedTileListResponse = ApiResponse<{
 	designatedTiles: DesignatedTile[];
 }>;
@@ -112,11 +122,13 @@ export enum TileletteStatus {
 	Completed = 'completed',
 }
 
+/**
+ * Body for DELETE api/TileShareCluster. Only the id and TimeZone/refNow fields
+ * are read server-side; the location fields the other write routes take are
+ * never looked at on this path, so they aren't sent.
+ */
 export type DeleteTileShareClusterParams = {
 	ClusterId: string | null;
-	UserLongitude: string | null;
-	UserLatitude: string | null;
-	UserLocationVerified: string | null;
 	MobileApp: boolean | null;
 	SocketId: boolean | null;
 	TimeZoneOffset: number | null;
@@ -192,31 +204,66 @@ export type GetTileletteParams = {
 	Format?: string;
 };
 
-/** Body for PUT api/TileShareCluster. All fields optional — send only what changed. */
+/**
+ * Body for PUT api/TileShareCluster.
+ *
+ * Unlike the tilette route, this handler does NOT merge with stored values: an
+ * absent `StartTime` is written as `DateTimeOffset.MinValue`, wiping the
+ * cluster's start. Both bounds are therefore required, not optional.
+ */
 export type UpdateClusterParams = {
-	ClusterId: string;
+	/**
+	 * The cluster id. Named `Id` here — this route binds TemplateClusterModel,
+	 * which has no `ClusterId` property, so sending that binds nothing and the
+	 * null lookup 404s. (DELETE binds a different model and does use `ClusterId`.)
+	 */
+	Id: string;
 	Name?: string;
+	/** The cluster description. `ClusterNote` exists on the model but is ignored. */
 	Notes?: string;
-	/** Epoch ms. Server keeps the unspecified bound, so send both when editing dates. */
-	StartTime?: number;
-	EndTime?: number;
-};
-
-/** Body for POST api/TileshareTemplate. Adding a tilette auto-marks the cluster multi. */
-export type CreateTileletteParams = {
-	TileShareClusterId: string;
-	Name?: string;
-	Contacts?: string[];
-	NoteMiscData?: string;
+	/** Epoch ms. Always send both bounds — see the note above. */
 	StartTime: number;
 	EndTime: number;
-	DurationInMs: number;
 };
 
-/** Body for PUT api/TileshareTemplate. All fields except Id optional. */
+/** An assignee on a tilette. The wire shape the server binds — not a bare string. */
+export type ContactModel = {
+	Id?: string;
+	FirstName?: string;
+	LastName?: string;
+	Email?: string;
+	PhoneNumber?: string;
+};
+
+/**
+ * Body for POST api/TileshareTemplate.
+ *
+ * The id key is `ClusterId` — `TileShareClusterId` exists only on the GET's
+ * search model and would bind as null here. Adding a tilette flips the cluster's
+ * `isMultiTilette` to true and recomputes its truncated user list, so refetch
+ * the cluster afterwards rather than patching it locally.
+ */
+export type CreateTileletteParams = {
+	ClusterId: string;
+	Name?: string;
+	Contacts?: ContactModel[];
+	NoteMiscData?: string;
+	/** Optional — falls back to the cluster's timeline when omitted. */
+	StartTime?: number;
+	EndTime?: number;
+	/** Optional. */
+	DurationInMs?: number;
+};
+
+/**
+ * Body for PUT api/TileshareTemplate. All fields except Id optional — unlike the
+ * cluster route, this one merges with stored values, so partial time updates are
+ * safe. A missing Id is a 400; no write-access row for the caller is a 404.
+ */
 export type UpdateTileletteParams = {
 	Id: string;
 	Name?: string;
+	/** Writes miscData.UserNote, returned as `miscData.userNote`. */
 	NoteMiscData?: string;
 	StartTime?: number;
 	EndTime?: number;

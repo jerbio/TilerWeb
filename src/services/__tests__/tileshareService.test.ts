@@ -243,7 +243,7 @@ describe('TileshareService', () => {
 
 	describe('updateCluster', () => {
 		it('passes params and returns the unwrapped cluster', async () => {
-			const params = { ClusterId: 'cluster-123', Name: 'Renamed' };
+			const params = { Id: 'cluster-123', Name: 'Renamed', StartTime: 1, EndTime: 2 };
 			const apiMock = {
 				updateCluster: vi.fn().mockResolvedValue({
 					Error: { Code: '0', Message: 'SUCCESS' },
@@ -265,14 +265,18 @@ describe('TileshareService', () => {
 			} as unknown as TileshareApi;
 
 			const service = new TileshareService(apiMock);
-			await expect(service.updateCluster({ ClusterId: 'cluster-123' })).rejects.toThrow();
+			await expect(
+				service.updateCluster({ Id: 'cluster-123', StartTime: 1, EndTime: 2 })
+			).rejects.toThrow();
 		});
 	});
 
 	describe('createTilette', () => {
-		it('passes params and returns the unwrapped tilette', async () => {
+		// Create answers with `tileTemplate`; the read and update routes use
+		// `tileShareTemplate`. Unwrapping the wrong key yields undefined.
+		it('passes params and unwraps the tileTemplate key', async () => {
 			const params = {
-				TileShareClusterId: 'cluster-123',
+				ClusterId: 'cluster-123',
 				Name: 'New tilette',
 				StartTime: 1750755360000,
 				EndTime: 1751263140000,
@@ -281,7 +285,7 @@ describe('TileshareService', () => {
 			const apiMock = {
 				createTilette: vi.fn().mockResolvedValue({
 					Error: { Code: '0', Message: 'SUCCESS' },
-					Content: { tileShareTemplate: mockTemplate },
+					Content: { tileTemplate: mockTemplate },
 					ServerStatus: null,
 				}),
 			} as unknown as TileshareApi;
@@ -301,7 +305,7 @@ describe('TileshareService', () => {
 			const service = new TileshareService(apiMock);
 			await expect(
 				service.createTilette({
-					TileShareClusterId: 'cluster-123',
+					ClusterId: 'cluster-123',
 					StartTime: 1,
 					EndTime: 2,
 					DurationInMs: 1,

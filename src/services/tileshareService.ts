@@ -133,10 +133,16 @@ class TileshareService {
 		}
 	}
 
+	/**
+	 * Add a tilette to a cluster. Also flips the cluster to multi and recomputes
+	 * its truncated users server-side, so callers should refetch the cluster.
+	 */
 	async createTilette(params: CreateTileletteParams) {
 		try {
 			const res = await this.api.createTilette(params);
-			return res.Content.tileShareTemplate;
+			// Create answers with `tileTemplate`; the read and update routes use
+			// `tileShareTemplate`.
+			return res.Content.tileTemplate;
 		} catch (error) {
 			console.error('Error creating tileshare tilette', error);
 			throw normalizeError(error);
@@ -153,12 +159,7 @@ class TileshareService {
 		}
 	}
 
-	async deleteCluster(
-		params: Omit<
-			DeleteTileShareClusterParams,
-			'UserLongitude' | 'UserLatitude' | 'UserLocationVerified'
-		>
-	) {
+	async deleteCluster(params: DeleteTileShareClusterParams) {
 		try {
 			const res = await this.api.deleteCluster(params);
 			return res.Content;

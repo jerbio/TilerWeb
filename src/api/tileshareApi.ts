@@ -12,6 +12,7 @@ import {
 	TileShareClusterResponse,
 	TileShareTemplateListResponse,
 	TileShareTemplateResponse,
+	TileTemplateResponse,
 	UpdateClusterParams,
 	UpdateTileletteParams,
 } from '@/core/common/types/tileshare';
@@ -72,8 +73,9 @@ export class TileshareApi extends AppApi {
 		});
 	}
 
+	/** Note the response key is `tileTemplate` here, not `tileShareTemplate`. */
 	createTilette(params: CreateTileletteParams) {
-		return this.apiRequest<TileShareTemplateResponse>('api/TileshareTemplate', {
+		return this.apiRequest<TileTemplateResponse>('api/TileshareTemplate', {
 			method: 'POST',
 			body: JSON.stringify(params),
 		});
@@ -86,22 +88,18 @@ export class TileshareApi extends AppApi {
 		});
 	}
 
-	async deleteCluster(
-		params: Omit<
-			DeleteTileShareClusterParams,
-			'UserLongitude' | 'UserLatitude' | 'UserLocationVerified'
-		>
-	) {
-		const loc = await this.getLocationData();
-		const body: DeleteTileShareClusterParams = {
-			...params,
-			UserLongitude: loc.longitude?.toString() ?? null,
-			UserLatitude: loc.latitude?.toString() ?? null,
-			UserLocationVerified: loc.verified ? 'true' : 'false',
-		};
+	/**
+	 * Delete a cluster. Takes a JSON body, not query params. The handler reads
+	 * only the id and TimeZone/refNow — it never calls getCurrentLocation — so no
+	 * location is sent and the browser is not prompted for one.
+	 *
+	 * Note it wraps everything in a try/catch returning BadRequest, so a server
+	 * failure surfaces as a 400: don't report 400 here as invalid input.
+	 */
+	deleteCluster(params: DeleteTileShareClusterParams) {
 		return this.apiRequest<DeleteTileShareClusterResponse>('api/TileShareCluster', {
 			method: 'DELETE',
-			body: JSON.stringify(body),
+			body: JSON.stringify(params),
 		});
 	}
 }

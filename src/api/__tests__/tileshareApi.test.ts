@@ -277,7 +277,12 @@ describe('TileshareApi', () => {
 		it('sends a PUT to api/TileShareCluster with the given body', async () => {
 			fetchSpy.mockResolvedValueOnce(jsonResponse({ cluster: mockCluster }));
 
-			await api.updateCluster({ ClusterId: 'cluster-123', Name: 'Renamed' });
+			await api.updateCluster({
+				Id: 'cluster-123',
+				Name: 'Renamed',
+				StartTime: 1,
+				EndTime: 2,
+			});
 
 			const [urlArg, options] = fetchSpy.mock.calls[0];
 			expect(urlOf(fetchSpy.mock.calls[0])).toContain('api/TileShareCluster');
@@ -285,27 +290,37 @@ describe('TileshareApi', () => {
 			expect(method).toBe('PUT');
 			const bodyStr =
 				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
-			expect(JSON.parse(bodyStr)).toEqual({ ClusterId: 'cluster-123', Name: 'Renamed' });
+			// The PUT model binds `Id`; a `ClusterId` key binds nothing and 404s.
+			expect(JSON.parse(bodyStr)).toEqual({
+				Id: 'cluster-123',
+				Name: 'Renamed',
+				StartTime: 1,
+				EndTime: 2,
+			});
 		});
 
 		it('throws on network error', async () => {
 			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
-			await expect(api.updateCluster({ ClusterId: 'cluster-123' })).rejects.toThrow();
+			await expect(
+				api.updateCluster({ Id: 'cluster-123', StartTime: 1, EndTime: 2 })
+			).rejects.toThrow();
 		});
 	});
 
 	describe('createTilette', () => {
 		it('sends a POST to api/TileshareTemplate with the given body', async () => {
-			fetchSpy.mockResolvedValueOnce(jsonResponse({ tileShareTemplate: mockTemplate }));
+			// Create replies under `tileTemplate`, unlike the read/update routes.
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ tileTemplate: mockTemplate }));
 
 			const params = {
-				TileShareClusterId: 'cluster-123',
+				ClusterId: 'cluster-123',
 				Name: 'New tilette',
 				StartTime: 1,
 				EndTime: 2,
 				DurationInMs: 1,
 			};
-			await api.createTilette(params);
+			const result = await api.createTilette(params);
+			expect(result.Content.tileTemplate).toEqual(mockTemplate);
 
 			const [urlArg, options] = fetchSpy.mock.calls[0];
 			expect(urlOf(fetchSpy.mock.calls[0])).toContain('api/TileshareTemplate');
@@ -320,7 +335,7 @@ describe('TileshareApi', () => {
 			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
 			await expect(
 				api.createTilette({
-					TileShareClusterId: 'cluster-123',
+					ClusterId: 'cluster-123',
 					StartTime: 1,
 					EndTime: 2,
 					DurationInMs: 1,
@@ -364,7 +379,7 @@ describe('TileshareApi', () => {
 			UserID: 'user-1',
 		};
 
-		it('sends DELETE request to api/TileShareCluster with params and injected location', async () => {
+		it('sends DELETE request to api/TileShareCluster with params and no location', async () => {
 			fetchSpy.mockResolvedValueOnce(
 				new Response(
 					JSON.stringify({
@@ -393,9 +408,11 @@ describe('TileshareApi', () => {
 				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
 			const body = JSON.parse(bodyStr);
 			expect(body.ClusterId).toBe('cluster-123');
-			expect(body).toHaveProperty('UserLongitude');
-			expect(body).toHaveProperty('UserLatitude');
-			expect(body).toHaveProperty('UserLocationVerified');
+			// The handler never reads location on this path, so nothing is sent and
+			// the browser isn't prompted for a fix.
+			expect(body).not.toHaveProperty('UserLongitude');
+			expect(body).not.toHaveProperty('UserLatitude');
+			expect(body).not.toHaveProperty('UserLocationVerified');
 		});
 
 		it('throws on network error', async () => {
