@@ -105,7 +105,8 @@ describe('TileshareService', () => {
 
 			expect(result).toEqual([mockCluster]);
 			expect(apiMock.getClusters).toHaveBeenCalledOnce();
-			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsInbox: true });
+			// The server has no IsInbox parameter; the received list is IsOutbox=false.
+			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsOutbox: false });
 		});
 
 		it('propagates network errors', async () => {

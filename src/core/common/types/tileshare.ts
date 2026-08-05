@@ -136,8 +136,11 @@ export type SortOrder = 'asc' | 'desc';
 export const DEFAULT_CLUSTER_PAGE_SIZE = 50;
 
 export type GetClustersParams = {
+	/**
+	 * `true` for clusters the caller created, `false` for ones shared with them.
+	 * The only list filter the server reads — there is no `IsInbox` counterpart.
+	 */
 	IsOutbox?: boolean;
-	IsInbox?: boolean;
 	/** Record offset passed to .Skip() — NOT a page number. */
 	Index?: number;
 	/** Number of records to .Take(). Defaults to 50 server-side. */
@@ -160,9 +163,16 @@ export type ClusterPageParams = {
 	sortOrder?: SortOrder;
 };
 
+/**
+ * Wire values for a designated tile's invitation status. `None` is the initial
+ * state an invite is created in — the server's enum has no "pending" member, and
+ * an unrecognized value is silently coerced to `none`, so these must match
+ * exactly. Comparisons are lower-cased server-side.
+ */
 export enum InvitationStatus {
 	Accepted = 'accepted',
-	Pending = 'pending',
+	/** Invited but not yet answered. */
+	None = 'none',
 	Declined = 'declined',
 }
 

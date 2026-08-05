@@ -50,9 +50,14 @@ class TileshareService {
 		}
 	}
 
+	/**
+	 * Clusters shared with the caller. The server branches only on `IsOutbox`
+	 * (there is no `IsInbox` parameter), so the received list is `IsOutbox=false`.
+	 * Returns invitations in every status — accepted, declined and not-yet-answered.
+	 */
 	async getInboxClusters(params?: ClusterPageParams) {
 		try {
-			const res = await this.api.getClusters({ IsInbox: true, ...toClusterQuery(params) });
+			const res = await this.api.getClusters({ IsOutbox: false, ...toClusterQuery(params) });
 			return res.Content.clusters;
 		} catch (error) {
 			console.error('Error fetching tileshare inbox clusters', error);

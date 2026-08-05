@@ -34,11 +34,36 @@ describe('useServerPagination', () => {
 		await waitFor(() => expect(result.current.hasNext).toBe(true));
 	});
 
-	it('reports hasNext false when a short page is returned', async () => {
+	// The server de-duplicates after Skip/Take, so mid-list pages come back short.
+	it('reports hasNext true when a short page is returned', async () => {
 		const fetchPage = vi.fn().mockResolvedValue(makePage(4));
 		const { result } = renderHook(() => useServerPagination(fetchPage, 10));
 
 		await waitFor(() => expect(result.current.loading).toBe(false));
+		expect(result.current.hasNext).toBe(true);
+	});
+
+	it('reports hasNext false when the first page is empty', async () => {
+		const fetchPage = vi.fn().mockResolvedValue([]);
+		const { result } = renderHook(() => useServerPagination(fetchPage, 10));
+
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		expect(result.current.items).toEqual([]);
+		expect(result.current.hasNext).toBe(false);
+	});
+
+	it('steps back and keeps the last non-empty page when a later page is empty', async () => {
+		const fetchPage = vi.fn(({ page }: { page: number }) =>
+			Promise.resolve(page === 1 ? makePage(4) : [])
+		);
+		const { result } = renderHook(() => useServerPagination(fetchPage, 10));
+
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		act(() => result.current.setPage(2));
+
+		await waitFor(() => expect(result.current.page).toBe(1));
+		expect(result.current.items).toEqual(makePage(4));
+		// Page 2 is known empty, so Next is not offered again.
 		expect(result.current.hasNext).toBe(false);
 	});
 
@@ -108,9 +133,10 @@ describe('useServerPagination', () => {
 		};
 
 		test('loads the first page and navigates to the next via Pagination', async () => {
-			const fetchPage = vi.fn(({ page, pageSize }: FetchArgs) =>
-				Promise.resolve(page === 1 ? makePage(pageSize) : [101, 102])
-			);
+			const fetchPage = vi.fn(({ page, pageSize }: FetchArgs) => {
+				if (page === 1) return Promise.resolve(makePage(pageSize));
+				return Promise.resolve(page === 2 ? [101, 102] : []);
+			});
 
 			renderWithTheme(<Harness fetchPage={fetchPage} />);
 
@@ -125,8 +151,18 @@ describe('useServerPagination', () => {
 			await waitFor(() => expect(screen.getByText('item-101')).toBeInTheDocument());
 			expect(screen.getByText('item-102')).toBeInTheDocument();
 			expect(screen.getByText('Page 2')).toBeInTheDocument();
-			// short page (length < pageSize) => no further pages
-			expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+			// A short page is not the end of the list, so Next stays available.
+			const nextOnPage2 = screen.getByRole('button', { name: 'Next page' });
+			expect(nextOnPage2).toBeEnabled();
+
+			// Page 3 is empty: fall back to page 2 and stop offering Next.
+			fireEvent.click(nextOnPage2);
+
+			await waitFor(() => expect(screen.getByText('Page 2')).toBeInTheDocument());
+			expect(screen.getByText('item-101')).toBeInTheDocument();
+			await waitFor(() =>
+				expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled()
+			);
 		});
 
 		test('changing the page size refetches page 1', async () => {
