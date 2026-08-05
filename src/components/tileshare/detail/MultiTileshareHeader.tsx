@@ -8,7 +8,7 @@ import ProgressBar from '@/core/common/components/ProgressBar';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderDivider, HeaderSection } from './DetailHeaderCard';
-import { BRAND_ACCENT } from './accents';
+import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { RGB } from '@/core/util/colors';
 
 type MultiTileshareHeaderProps = {
@@ -18,7 +18,7 @@ type MultiTileshareHeaderProps = {
 	progress: number;
 	/** Epoch used for the displayed date and time. */
 	date: number | null;
-	/** Icon accent colour. Defaults to the brand colour when the backend gives none. */
+	/** Icon accent colour. Defaults to the shared tileshare accent. */
 	accent?: RGB;
 	onEdit?: () => void;
 	onAdd?: () => void;
@@ -29,7 +29,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 	description,
 	progress,
 	date,
-	accent = BRAND_ACCENT,
+	accent = TILESHARE_ACCENT,
 	onEdit,
 	onAdd,
 }) => {

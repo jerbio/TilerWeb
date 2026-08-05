@@ -3,6 +3,9 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, CalendarDays } from 'lucide-react';
 import { MultiTileshareIcon, SingleTileshareIcon } from '@/components/tileshare/icons';
+import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
+import { useTheme as useAppTheme } from '@/core/theme/ThemeProvider';
+import { iconSurface } from '@/core/util/colorSurface';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
@@ -18,7 +21,9 @@ type TileShareClusterCardProps = {
 
 const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) => {
 	const theme = useTheme();
+	const { isDarkMode } = useAppTheme();
 	const { t } = useTranslation();
+	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
 
 	const avatarUsers: AvatarUser[] = cluster.truncatedUser
 		? cluster.truncatedUser
@@ -36,7 +41,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	return (
 		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
 			<Left>
-				<IconBox>
+				<IconBox $bg={surface.background} $fg={surface.foreground}>
 					{cluster.isMultiTilette ? (
 						<MultiTileshareIcon size={18} />
 					) : (
@@ -150,15 +155,15 @@ const Right = styled.div`
 	}
 `;
 
-const IconBox = styled.div`
+const IconBox = styled.div<{ $bg: string; $fg: string }>`
 	width: 40px;
 	height: 40px;
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background-color: ${({ theme }) => theme.colors.brand[500]};
+	background-color: ${({ $bg }) => $bg};
+	color: ${({ $fg }) => $fg};
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: ${({ theme }) => theme.colors.white};
 	flex-shrink: 0;
 `;
 

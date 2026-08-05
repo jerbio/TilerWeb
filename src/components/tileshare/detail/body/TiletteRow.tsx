@@ -7,7 +7,7 @@ import { TiletteIcon } from '@/components/tileshare/icons';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Routes } from '@/core/constants/routes';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
-import { getTileletteColor } from '@/core/util/tileletteColor';
+import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { iconSurface } from '@/core/util/colorSurface';
 import { deriveTileletteStatus } from '@/core/util/tileshareProgress';
 import { designatedToAvatars } from '@/core/util/tileshareAssignees';
@@ -19,11 +19,11 @@ type TiletteRowProps = {
 	clusterId: string;
 };
 
-/** One tilette in the list view: coloured icon + name + arrow, then status + assignees. */
+/** One tilette in the list view: accent icon + name + arrow, then status + assignees. */
 const TiletteRow: React.FC<TiletteRowProps> = ({ tilette, clusterId }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
-	const surface = iconSurface(getTileletteColor(tilette.id), isDarkMode);
+	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
 
 	return (
 		<Card $darkmode={isDarkMode}>

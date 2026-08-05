@@ -6,7 +6,7 @@ import { SingleTileshareIcon } from '@/components/tileshare/icons';
 import Button from '@/core/common/components/button';
 import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderSection } from './DetailHeaderCard';
-import { BRAND_ACCENT } from './accents';
+import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { RGB } from '@/core/util/colors';
 
 type SingleTileshareHeaderProps = {
@@ -16,7 +16,7 @@ type SingleTileshareHeaderProps = {
 	dueDate: number | null;
 	/** Subtitle under the title. Defaults to "Single tileshare"; tilettes pass "In: {cluster}". */
 	subtitle?: string;
-	/** Icon accent colour. Defaults to the brand colour when the backend gives none. */
+	/** Icon accent colour. Defaults to the shared tileshare accent. */
 	accent?: RGB;
 	onEdit?: () => void;
 };
@@ -26,7 +26,7 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 	description,
 	dueDate,
 	subtitle,
-	accent = BRAND_ACCENT,
+	accent = TILESHARE_ACCENT,
 	onEdit,
 }) => {
 	const theme = useTheme();
