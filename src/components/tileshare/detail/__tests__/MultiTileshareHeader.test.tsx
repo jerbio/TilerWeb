@@ -57,6 +57,36 @@ describe('MultiTileshareHeader', () => {
 		expect(onAdd).toHaveBeenCalledOnce();
 	});
 
+	it('fires onDelete when the delete button is clicked, and hides it when omitted', async () => {
+		const onDelete = vi.fn();
+		const user = setupUser();
+
+		const { unmount } = render(
+			<MultiTileshareHeader
+				name="Q1"
+				description={null}
+				progress={0}
+				date={DATE}
+				onDelete={onDelete}
+			/>
+		);
+
+		await user.click(screen.getByRole('button', { name: 'tilesharedemo.detail.deleteAria' }));
+		expect(onDelete).toHaveBeenCalledOnce();
+
+		unmount();
+		render(<MultiTileshareHeader name="Q1" description={null} progress={0} date={DATE} />);
+		expect(
+			screen.queryByRole('button', { name: 'tilesharedemo.detail.deleteAria' })
+		).not.toBeInTheDocument();
+	});
+
+	// Assignees get a read-only header: no edit, delete or add.
+	it('renders no action buttons for a read-only viewer', () => {
+		render(<MultiTileshareHeader name="Q1" description={null} progress={0} date={DATE} />);
+		expect(screen.queryAllByRole('button')).toHaveLength(0);
+	});
+
 	it('falls back to an em dash title when name is null', () => {
 		render(<MultiTileshareHeader name={null} description={null} progress={0} date={DATE} />);
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('—');

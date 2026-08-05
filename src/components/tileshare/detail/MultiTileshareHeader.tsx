@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Pencil, Plus, Timer } from 'lucide-react';
+import { CalendarDays, Pencil, Plus, Timer, Trash2 } from 'lucide-react';
 import { MultiTileshareIcon } from '@/components/tileshare/icons';
 import Button from '@/core/common/components/button';
 import ProgressBar from '@/core/common/components/ProgressBar';
@@ -22,6 +22,8 @@ type MultiTileshareHeaderProps = {
 	accent?: RGB;
 	onEdit?: () => void;
 	onAdd?: () => void;
+	/** Omitted for viewers who can't delete — the button is hidden, not disabled. */
+	onDelete?: () => void;
 };
 
 const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
@@ -32,9 +34,11 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 	accent = TILESHARE_ACCENT,
 	onEdit,
 	onAdd,
+	onDelete,
 }) => {
 	const theme = useTheme();
 	const { t } = useTranslation();
+	const hasActions = !!onEdit || !!onDelete || !!onAdd;
 
 	return (
 		<DetailHeaderCard
@@ -43,30 +47,52 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 			title={name ?? '—'}
 			subtitle={t('tilesharedemo.detail.multiTileshare')}
 			headerRight={
-				<>
-					<Button
-						variant="ghost"
-						size="small"
-						height={40}
-						onClick={onEdit}
-						aria-label={t('tilesharedemo.detail.editAria')}
-						style={{
-							color: theme.colors.text.secondary,
-							border: `1px solid ${theme.colors.border.default}`,
-						}}
-					>
-						<Pencil size={18} />
-					</Button>
-					<Button
-						variant="brand"
-						size="small"
-						height={40}
-						onClick={onAdd}
-						aria-label={t('tilesharedemo.detail.addAria')}
-					>
-						<Plus size={18} />
-					</Button>
-				</>
+				/* Assignees get a read-only header — no actions at all. */
+				hasActions ? (
+					<>
+						{onEdit && (
+							<Button
+								variant="ghost"
+								size="small"
+								height={40}
+								onClick={onEdit}
+								aria-label={t('tilesharedemo.detail.editAria')}
+								style={{
+									color: theme.colors.text.secondary,
+									border: `1px solid ${theme.colors.border.default}`,
+								}}
+							>
+								<Pencil size={18} />
+							</Button>
+						)}
+						{onDelete && (
+							<Button
+								variant="ghost"
+								size="small"
+								height={40}
+								onClick={onDelete}
+								aria-label={t('tilesharedemo.detail.deleteAria')}
+								style={{
+									color: theme.colors.text.error,
+									border: `1px solid ${theme.colors.border.default}`,
+								}}
+							>
+								<Trash2 size={18} />
+							</Button>
+						)}
+						{onAdd && (
+							<Button
+								variant="brand"
+								size="small"
+								height={40}
+								onClick={onAdd}
+								aria-label={t('tilesharedemo.detail.addAria')}
+							>
+								<Plus size={18} />
+							</Button>
+						)}
+					</>
+				) : undefined
 			}
 		>
 			<HeaderSection>

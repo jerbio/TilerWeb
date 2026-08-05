@@ -69,4 +69,56 @@ describe('SingleTileshareHeader', () => {
 		await user.click(screen.getByRole('button', { name: 'tilesharedemo.detail.editAria' }));
 		expect(onEdit).toHaveBeenCalledOnce();
 	});
+
+	it('fires onDelete when the delete button is clicked', async () => {
+		const onDelete = vi.fn();
+		const user = setupUser();
+
+		render(
+			<SingleTileshareHeader
+				name="Design Sprint"
+				description={null}
+				dueDate={DATE}
+				onDelete={onDelete}
+			/>
+		);
+
+		await user.click(screen.getByRole('button', { name: 'tilesharedemo.detail.deleteAria' }));
+		expect(onDelete).toHaveBeenCalledOnce();
+	});
+
+	it('hides the delete button when onDelete is omitted', () => {
+		render(<SingleTileshareHeader name="Design Sprint" description={null} dueDate={DATE} />);
+
+		expect(
+			screen.queryByRole('button', { name: 'tilesharedemo.detail.deleteAria' })
+		).not.toBeInTheDocument();
+	});
+
+	// Assignees get the due pill on its own — no divider, no action buttons.
+	it('renders no actions and no divider for a read-only viewer', () => {
+		render(<SingleTileshareHeader name="Design Sprint" description={null} dueDate={DATE} />);
+
+		const due = screen.getByText('tilesharedemo.detail.due Sun, 27th July, 2025');
+		expect(screen.queryAllByRole('button')).toHaveLength(0);
+		// The pill is the sole occupant of the header's action slot.
+		const slot = due.closest('div')?.parentElement;
+		expect(slot?.children).toHaveLength(1);
+	});
+
+	it('keeps the divider when an action is present', () => {
+		render(
+			<SingleTileshareHeader
+				name="Design Sprint"
+				description={null}
+				dueDate={DATE}
+				onEdit={vi.fn()}
+			/>
+		);
+
+		const due = screen.getByText('tilesharedemo.detail.due Sun, 27th July, 2025');
+		const slot = due.closest('div')?.parentElement;
+		// pill + divider + edit button
+		expect(slot?.children).toHaveLength(3);
+	});
 });
