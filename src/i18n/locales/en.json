@@ -1,4 +1,4 @@
-﻿{
+{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1825,7 +1825,80 @@
 			"viewAria": "Tilette view",
 			"openTiletteAria": "Open tilette",
 			"prev": "Prev",
-			"next": "Next"
+			"next": "Next",
+			"deleteAria": "Delete",
+			"edit": {
+				"clusterTitle": "Edit tileshare",
+				"tiletteTitle": "Edit tilette",
+				"fields": {
+					"name": {
+						"label": "Name",
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"label": "Deadline",
+						"placeholder": "Add a deadline"
+					},
+					"note": {
+						"label": "Note",
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"deadlineRequired": "Please add a deadline"
+				},
+				"cancel": "Cancel",
+				"save": "Save changes",
+				"saving": "Saving changes…",
+				"success": "Changes saved",
+				"error": "Couldn't save your changes. Please try again."
+			},
+			"delete": {
+				"title": "Delete tileshare",
+				"body": "Delete \"{{name}}\"?",
+				"warning": "This removes it for everyone it was shared with and cannot be undone.",
+				"cancel": "Cancel",
+				"confirm": "Delete",
+				"deleting": "Deleting…",
+				"success": "Tileshare deleted",
+				"error": "Couldn't delete this tileshare. Please try again."
+			},
+			"add": {
+				"back": "Back to tileshare",
+				"title": "Add a tilette",
+				"description": "Add another task to \"{{name}}\" and share it with your colleagues. Once they accept, we'll add it to their schedule.",
+				"fields": {
+					"name": {
+						"label": "Name",
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"label": "Deadline",
+						"placeholder": "Add a deadline (optional)"
+					},
+					"note": {
+						"label": "Note",
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"shareTo": {
+					"label": "Share to:",
+					"placeholder": "email address / phone number (Enter to select)"
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+				},
+				"cancel": "Cancel",
+				"submit": "Add tilette",
+				"creating": "Adding tilette…",
+				"error": "Couldn't add the tilette. Please try again.",
+				"success": {
+					"message": "Your tilette \"{{name}}\" has been added.",
+					"view": "View tilette"
+				}
+			}
 		},
 		"invite": {
 			"title": "Invite"
