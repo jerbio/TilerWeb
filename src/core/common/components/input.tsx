@@ -29,6 +29,8 @@ type StyledInputProps = {
 	$bordergradient: InputProps['bordergradient'];
 	$prepend?: InputProps['prepend'];
 	$append?: InputProps['append'];
+	/** Set for textareas: height follows `rows` instead of the single-line height. */
+	$multiline?: boolean;
 };
 
 export type BaseInputProps = React.InputHTMLAttributes<HTMLInputElement> & InputProps;
@@ -119,6 +121,9 @@ const Textarea: React.FC<TextareaProps> = ({
 	highlighted = false,
 	bordergradient,
 	label,
+	required,
+	containerClass,
+	containerStyle,
 	...props
 }) => {
 	const styledProps = {
@@ -129,11 +134,32 @@ const Textarea: React.FC<TextareaProps> = ({
 		$highlighted: highlighted,
 		$bordergradient: bordergradient,
 		$label: label,
+		$multiline: true,
 	};
-	return (
-		<StyledInputWrapper {...styledProps}>
-			<StyledTextarea disabled={disabled} {...styledProps} {...props} />
+	const id = label
+		? (props.id ?? `textarea-${Math.random().toString(36).substring(2, 9)}`)
+		: props.id;
+	const styledTextarea = (
+		<StyledInputWrapper {...styledProps} className={containerClass} style={containerStyle}>
+			<StyledTextarea disabled={disabled} {...styledProps} {...props} id={id} />
 		</StyledInputWrapper>
+	);
+
+	// Mirrors BaseInput: a label wraps the field so it reads as one control.
+	return label ? (
+		<div style={containerStyle} className={containerClass}>
+			<StyledLabel htmlFor={id} {...styledProps}>
+				{label}{' '}
+				{required && (
+					<StyledLabelRequired>
+						<Asterisk size={12} />
+					</StyledLabelRequired>
+				)}
+			</StyledLabel>
+			{styledTextarea}
+		</div>
+	) : (
+		styledTextarea
 	);
 };
 
@@ -182,7 +208,20 @@ const StyledInputWrapper = styled.div<StyledInputProps>`
 	position: relative;
 	isolation: isolate;
 	padding: 1px;
+	/* A textarea sizes itself from its rows attribute; explicit height still wins. */
 	height: ${(props) =>
+		props.$height
+			? `${props.$height}px`
+			: props.$multiline
+				? 'auto'
+				: props.$sized === 'small'
+					? palette.inputHeights.small
+					: props.$sized === 'medium'
+						? palette.inputHeights.medium
+						: palette.inputHeights.large};
+	/* The wrapper's own flex: 1 collapses its height to a 0% basis inside a
+	   column flex parent. Hold the field at its intended height regardless. */
+	min-height: ${(props) =>
 		props.$height
 			? `${props.$height}px`
 			: props.$sized === 'small'
@@ -263,7 +302,6 @@ const StyledInput = styled.input<StyledInputProps>`
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1;
 	color: ${({ theme }) => theme.colors.input.text};
-	height: 100%;
 
 	padding-left: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} -
@@ -302,16 +340,18 @@ const StyledTextarea = styled.textarea<StyledInputProps>`
 	font-weight: ${palette.typography.fontWeight.normal};
 	line-height: 1.5;
 	color: ${({ theme }) => theme.colors.input.text};
-	height: 100%;
+	/* No height: the rows attribute sets the intrinsic height, and the flex
+	   wrapper stretches this to fill when a caller pins an explicit height. */
 
-	/* Fix vertical alignment for the textarea */
+	/* Fix vertical alignment for the textarea — padded on both blocks so the
+	   text isn't flush against the bottom edge on a multi-row field. */
 	padding: 0;
-	padding-top: ${(props) =>
+	padding-block: ${(props) =>
 		props.$sized === 'small'
-			? `calc(${palette.inputHeights.small} / 2 - 0.75rem)`
+			? `calc(${palette.inputHeights.small} / 2 - 0.75rem + 0.375rem)`
 			: props.$sized === 'medium'
-				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem)`
-				: `calc(${palette.inputHeights.large} / 2 - 1rem)`};
+				? `calc(${palette.inputHeights.medium} / 2 - 0.875rem + 0.5rem)`
+				: `calc(${palette.inputHeights.large} / 2 - 1rem + 0.5rem)`};
 	padding-inline: calc(
 		${(props) => (props.$sized === 'small' ? palette.space.small : palette.space.medium)} - 6px
 	);
