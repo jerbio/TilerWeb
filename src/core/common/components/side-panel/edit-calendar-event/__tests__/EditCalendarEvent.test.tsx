@@ -73,7 +73,7 @@ const mockLookupCalendarEventById = vi.fn();
 const mockLookupLocationById = vi.fn();
 const mockSearchLocations = vi.fn();
 const mockGetScheduleProfile = vi.fn();
-const mockGetSubEventsOfCalendar = vi.fn((..._args: unknown[]) => Promise.resolve([]));
+const mockGetSubEventsOfCalendar = vi.fn(() => Promise.resolve([]));
 const mockOpenNotes = vi.fn();
 vi.mock('@/services', () => ({
 	scheduleService: {
