@@ -1,6 +1,6 @@
 export interface Tile {
-	id?: string;
-	name?: string;
+	id: string;
+	name: string;
 }
 
 export interface TileCardProps {
@@ -18,4 +18,5 @@ export interface Highlight {
 	header: string;
 	body: string;
 	backgroundImage: string;
+	slug: string;
 }

@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="480" viewBox="0 0 860 480">
+  <defs>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </linearGradient>
+    <linearGradient id="headerBg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#161616"/>
+      <stop offset="100%" stop-color="#131313"/>
+    </linearGradient>
+    <linearGradient id="sheetBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c1c1c"/>
+      <stop offset="100%" stop-color="#181818"/>
+    </linearGradient>
+    <linearGradient id="acceptBtn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(74,222,128,0.22)"/>
+      <stop offset="100%" stop-color="rgba(74,222,128,0.14)"/>
+    </linearGradient>
+    <linearGradient id="undoBtn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(239,68,68,0.2)"/>
+      <stop offset="100%" stop-color="rgba(239,68,68,0.12)"/>
+    </linearGradient>
+    <linearGradient id="previewTile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(74,222,128,0.07)"/>
+      <stop offset="100%" stop-color="rgba(74,222,128,0.03)"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080808" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#080808" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="glowGreen">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feFlood flood-color="#4ade80" flood-opacity="0.18" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <filter id="glowRed">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#ED123B" flood-opacity="0.2" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <filter id="cardShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+    <clipPath id="appClip">
+      <rect width="860" height="480" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <!-- App container -->
+  <g clip-path="url(#appClip)">
+    <rect width="860" height="480" fill="url(#pageBg)"/>
+
+    <!-- ── TOP NAV BAR ── -->
+    <rect width="860" height="52" fill="url(#headerBg)"/>
+    <rect y="52" width="860" height="1" fill="rgba(255,255,255,0.06)"/>
+
+    <!-- Nav: back + title + date nav -->
+    <text x="24" y="32" font-family="Inter, sans-serif" font-size="20" fill="#525252">←</text>
+    <text x="430" y="33" font-family="Urbanist, Inter, sans-serif" font-size="16" font-weight="700" fill="#e5e5e5" text-anchor="middle">Wednesday, Jun 18</text>
+    <text x="806" y="32" font-family="Inter, sans-serif" font-size="20" fill="#525252" text-anchor="end">→</text>
+
+    <!-- Tiler wordmark top-right -->
+    <text x="840" y="33" font-family="Urbanist, Inter, sans-serif" font-size="13" font-weight="800" fill="#ED123B" text-anchor="end">tiler</text>
+
+    <!-- ── LEFT TIME COLUMN ── -->
+    <rect x="0" y="52" width="52" height="428" fill="#111111"/>
+    <rect x="52" y="52" width="1" height="428" fill="rgba(255,255,255,0.05)"/>
+
+    <!-- Hour labels -->
+    <text x="26" y="98"  font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">8 AM</text>
+    <text x="26" y="148" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">9 AM</text>
+    <text x="26" y="198" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">10 AM</text>
+    <text x="26" y="248" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">11 AM</text>
+    <text x="26" y="298" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">12 PM</text>
+    <text x="26" y="348" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">1 PM</text>
+    <text x="26" y="398" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">2 PM</text>
+    <text x="26" y="448" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">3 PM</text>
+
+    <!-- Hour grid lines -->
+    <line x1="53" y1="96"  x2="580" y2="96"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="146" x2="580" y2="146" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="196" x2="580" y2="196" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="246" x2="580" y2="246" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="296" x2="580" y2="296" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="346" x2="580" y2="346" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="396" x2="580" y2="396" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    <line x1="53" y1="446" x2="580" y2="446" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+    <!-- ── SCHEDULE TILES (background, dimmed) ── -->
+
+    <!-- Morning run 8:00–8:30 -->
+    <rect x="61" y="98" width="350" height="26" rx="7" fill="#05A39C" fill-opacity="0.12" stroke="#05A39C" stroke-opacity="0.3" stroke-width="1"/>
+    <rect x="61" y="98" width="3" height="26" rx="1.5" fill="#05A39C" fill-opacity="0.6"/>
+    <text x="74" y="115" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="rgba(5,163,156,0.7)">Morning run · 8:00 AM</text>
+
+    <!-- Team standup 9:00–9:45 -->
+    <rect x="61" y="148" width="350" height="36" rx="7" fill="#0077FF" fill-opacity="0.12" stroke="#0077FF" stroke-opacity="0.3" stroke-width="1"/>
+    <rect x="61" y="148" width="3" height="36" rx="1.5" fill="#0077FF" fill-opacity="0.6"/>
+    <text x="74" y="163" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="rgba(106,171,255,0.7)">Team standup</text>
+    <text x="74" y="177" font-family="Inter, sans-serif" font-size="9" fill="rgba(106,171,255,0.4)">9:00 – 9:45 AM</text>
+
+    <!-- Lunch 12:00 -->
+    <rect x="61" y="296" width="350" height="26" rx="7" fill="#171717" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <text x="74" y="313" font-family="Inter, sans-serif" font-size="10" fill="#3d3d3d">Lunch break · 12:00 PM</text>
+
+    <!-- Client call 1:00 -->
+    <rect x="61" y="346" width="350" height="26" rx="7" fill="#171717" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <text x="74" y="363" font-family="Inter, sans-serif" font-size="10" fill="#3d3d3d">Client call · 1:00 PM</text>
+
+    <!-- ── PREVIEW TILE: Gym session — Wed 2:00 PM (the changed version) ── -->
+    <rect x="61" y="396" width="350" height="50" rx="9" fill="url(#previewTile)" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="6,3" filter="url(#glowGreen)"/>
+    <rect x="61" y="396" width="4" height="50" rx="2" fill="#4ade80" fill-opacity="0.7"/>
+    <text x="76" y="416" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Gym session</text>
+    <text x="76" y="433" font-family="Inter, sans-serif" font-size="10" fill="rgba(255,255,255,0.45)">@ Home · 2:00 – 3:00 PM</text>
+    <!-- PREVIEW chip on tile -->
+    <rect x="344" y="402" width="60" height="16" rx="8" fill="rgba(74,222,128,0.12)" stroke="rgba(74,222,128,0.3)" stroke-width="1"/>
+    <text x="374" y="413" font-family="Inter, sans-serif" font-size="7.5" font-weight="700" fill="#4ade80" text-anchor="middle" letter-spacing="0.5">PREVIEW</text>
+
+    <!-- ORIGINAL position ghost (10:00 AM was here) -->
+    <rect x="61" y="198" width="350" height="46" rx="9" fill="rgba(237,18,59,0.05)" stroke="rgba(237,18,59,0.15)" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="130" y="225" font-family="Inter, sans-serif" font-size="9" fill="rgba(237,18,59,0.3)" text-anchor="middle">original slot</text>
+
+    <!-- Vertical separator -->
+    <rect x="580" y="52" width="1" height="428" fill="rgba(255,255,255,0.06)"/>
+
+    <!-- ── RIGHT PANEL: ACTION SHEET ── -->
+    <rect x="581" y="52" width="279" height="428" fill="#0f0f0f"/>
+
+    <!-- Panel header -->
+    <rect x="581" y="52" width="279" height="56" fill="#141414"/>
+    <rect x="581" y="108" width="279" height="1" fill="rgba(255,255,255,0.06)"/>
+    <text x="720" y="82" font-family="Urbanist, Inter, sans-serif" font-size="14" font-weight="700" fill="#e5e5e5" text-anchor="middle">Confirm Change</text>
+    <!-- PREVIEW badge -->
+    <rect x="672" y="92" width="96" height="18" rx="9" fill="rgba(74,222,128,0.1)" stroke="rgba(74,222,128,0.3)" stroke-width="1"/>
+    <text x="720" y="104" font-family="Inter, sans-serif" font-size="8.5" font-weight="700" fill="#4ade80" text-anchor="middle" letter-spacing="0.5">● PREVIEW MODE</text>
+
+    <!-- Change summary card -->
+    <rect x="597" y="120" width="246" height="80" rx="12" fill="#1a1a1a" stroke="rgba(255,255,255,0.07)" stroke-width="1" filter="url(#cardShadow)"/>
+
+    <!-- Task name row -->
+    <text x="613" y="142" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#ffffff">Gym session</text>
+    <text x="827" y="142" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="end">@ Home</text>
+
+    <!-- Divider in card -->
+    <line x1="613" y1="150" x2="827" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+    <!-- Before row -->
+    <text x="613" y="166" font-family="Inter, sans-serif" font-size="8.5" fill="#525252">Before</text>
+    <text x="827" y="166" font-family="Inter, sans-serif" font-size="8.5" fill="#a3a3a3" text-anchor="end">Tue · 10:00 AM</text>
+
+    <!-- After row -->
+    <text x="613" y="184" font-family="Inter, sans-serif" font-size="8.5" fill="#4ade80">After</text>
+    <text x="827" y="184" font-family="Inter, sans-serif" font-size="8.5" font-weight="600" fill="#4ade80" text-anchor="end">Wed · 2:00 PM ✓</text>
+
+    <!-- Ripple note -->
+    <rect x="597" y="212" width="246" height="32" rx="8" fill="rgba(74,222,128,0.04)" stroke="rgba(74,222,128,0.1)" stroke-width="1"/>
+    <text x="613" y="227" font-family="Inter, sans-serif" font-size="8.5" fill="rgba(74,222,128,0.7)">↕ No conflicts detected</text>
+    <text x="613" y="239" font-family="Inter, sans-serif" font-size="8" fill="rgba(74,222,128,0.4)">Your schedule stays intact after this change</text>
+
+    <!-- Spacer -->
+    <text x="720" y="272" font-family="Inter, sans-serif" font-size="9" fill="#3d3d3d" text-anchor="middle">Nothing has been saved yet</text>
+
+    <!-- UNDO button -->
+    <rect x="597" y="284" width="246" height="52" rx="12" fill="url(#undoBtn)" stroke="rgba(239,68,68,0.35)" stroke-width="1.5"/>
+    <text x="635" y="313" font-family="Inter, sans-serif" font-size="18" fill="rgba(239,68,68,0.8)">✕</text>
+    <text x="720" y="315" font-family="Urbanist, Inter, sans-serif" font-size="15" font-weight="700" fill="rgba(239,68,68,0.85)" text-anchor="middle">Undo</text>
+    <text x="720" y="329" font-family="Inter, sans-serif" font-size="9" fill="rgba(239,68,68,0.4)" text-anchor="middle">Restore Tue 10:00 AM</text>
+
+    <!-- ACCEPT button (glowing) -->
+    <rect x="597" y="348" width="246" height="56" rx="12" fill="url(#acceptBtn)" stroke="rgba(74,222,128,0.55)" stroke-width="2" filter="url(#glowGreen)"/>
+    <text x="635" y="379" font-family="Inter, sans-serif" font-size="18" fill="#4ade80">✓</text>
+    <text x="720" y="381" font-family="Urbanist, Inter, sans-serif" font-size="15" font-weight="700" fill="#4ade80" text-anchor="middle">Accept</text>
+    <text x="720" y="395" font-family="Inter, sans-serif" font-size="9" fill="rgba(74,222,128,0.5)" text-anchor="middle">Save Wed 2:00 PM</text>
+
+    <!-- Bottom hint -->
+    <rect x="597" y="416" width="246" height="28" rx="8" fill="transparent"/>
+    <text x="720" y="433" font-family="Inter, sans-serif" font-size="8" fill="#2d2d2d" text-anchor="middle">Changes are reversible at any time</text>
+
+    <!-- ── SUBTLE BOTTOM FADE ── -->
+    <rect x="53" y="380" width="527" height="100" fill="url(#bottomFade)"/>
+  </g>
+</svg>

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="480" viewBox="0 0 860 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#161616"/>
+      <stop offset="100%" stop-color="#121212"/>
+    </linearGradient>
+    <linearGradient id="inputBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c1c1c"/>
+      <stop offset="100%" stop-color="#181818"/>
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e1e"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0.88"/>
+    </linearGradient>
+    <filter id="redGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#ED123B" flood-opacity="0.15" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <clipPath id="clip">
+      <rect width="860" height="480" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#clip)">
+    <rect width="860" height="480" fill="url(#bg)"/>
+
+    <!-- Header -->
+    <rect width="860" height="52" fill="url(#hdr)"/>
+    <rect y="52" width="860" height="1" fill="rgba(255,255,255,0.06)"/>
+    <text x="430" y="33" font-family="Urbanist,Inter,sans-serif" font-size="15" font-weight="700" fill="#d4d4d4" text-anchor="middle">New Task</text>
+    <text x="836" y="33" font-family="Urbanist,Inter,sans-serif" font-size="13" font-weight="800" fill="#ED123B" text-anchor="end">tiler</text>
+
+    <!-- Prompt label -->
+    <text x="430" y="98" font-family="Inter,sans-serif" font-size="12" fill="#525252" text-anchor="middle" letter-spacing="0.5">WHAT DO YOU NEED TO DO?</text>
+
+    <!-- Input field -->
+    <rect x="80" y="110" width="700" height="72" rx="16" fill="url(#inputBg)" stroke="rgba(237,18,59,0.35)" stroke-width="1.5" filter="url(#redGlow)"/>
+    <text x="108" y="152" font-family="Inter,sans-serif" font-size="18" fill="#e5e5e5">Dentist at 9 AM Thursday, then coffee with Priya</text>
+    <!-- cursor blink -->
+    <rect x="745" y="136" width="2" height="24" rx="1" fill="#ED123B" opacity="0.8"/>
+
+    <!-- Parsed result cards row -->
+    <text x="430" y="220" font-family="Inter,sans-serif" font-size="10" fill="#3a3a3a" text-anchor="middle" letter-spacing="1">TILER UNDERSTOOD</text>
+
+    <!-- Card 1: Dentist -->
+    <rect x="80" y="232" width="320" height="100" rx="14" fill="url(#cardBg)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <rect x="80" y="232" width="5" height="100" rx="2.5" fill="#ED123B" fill-opacity="0.8"/>
+    <text x="102" y="263" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#ffffff">Dentist</text>
+    <text x="102" y="283" font-family="Inter,sans-serif" font-size="10" fill="#525252">📅  Thursday · 9:00 AM</text>
+    <text x="102" y="300" font-family="Inter,sans-serif" font-size="10" fill="#525252">⏱  ~45 min estimated</text>
+    <text x="102" y="317" font-family="Inter,sans-serif" font-size="10" fill="#525252">📍  Location not specified</text>
+    <!-- Needs input badge -->
+    <rect x="300" y="241" width="88" height="18" rx="9" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+    <text x="344" y="253" font-family="Inter,sans-serif" font-size="8" fill="rgba(245,158,11,0.8)" text-anchor="middle">needs location</text>
+
+    <!-- Card 2: Coffee -->
+    <rect x="460" y="232" width="320" height="100" rx="14" fill="url(#cardBg)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <rect x="460" y="232" width="5" height="100" rx="2.5" fill="#05A39C" fill-opacity="0.8"/>
+    <text x="482" y="263" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#ffffff">Coffee with Priya</text>
+    <text x="482" y="283" font-family="Inter,sans-serif" font-size="10" fill="#525252">📅  Thursday · after 9 AM</text>
+    <text x="482" y="300" font-family="Inter,sans-serif" font-size="10" fill="#525252">⏱  ~60 min estimated</text>
+    <text x="482" y="317" font-family="Inter,sans-serif" font-size="10" fill="#525252">📍  Downtown</text>
+    <!-- Ready badge -->
+    <rect x="672" y="241" width="96" height="18" rx="9" fill="rgba(74,222,128,0.08)" stroke="rgba(74,222,128,0.25)" stroke-width="1"/>
+    <text x="720" y="253" font-family="Inter,sans-serif" font-size="8" fill="rgba(74,222,128,0.8)" text-anchor="middle">✓ ready to schedule</text>
+
+    <!-- Bottom action -->
+    <rect x="80" y="356" width="700" height="52" rx="14" fill="rgba(237,18,59,0.1)" stroke="rgba(237,18,59,0.3)" stroke-width="1.5"/>
+    <text x="430" y="387" font-family="Urbanist,Inter,sans-serif" font-size="15" font-weight="700" fill="rgba(237,18,59,0.85)" text-anchor="middle">Schedule both →</text>
+
+    <!-- Bottom fade -->
+    <rect x="0" y="380" width="860" height="100" fill="url(#bottomFade)"/>
+  </g>
+</svg>
