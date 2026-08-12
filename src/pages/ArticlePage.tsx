@@ -5,6 +5,7 @@ import ArticleHero from '@/components/articles/ArticleHero';
 import ArticleBody from '@/components/articles/ArticleBody';
 import ArticleCTA from '@/components/articles/ArticleCTA';
 import SEO from '@/core/common/components/SEO';
+import { useTranslation } from 'react-i18next';
 
 const PageWrapper = styled.div`
 	background-color: black;
@@ -12,8 +13,9 @@ const PageWrapper = styled.div`
 `;
 
 export default function ArticlePage() {
+	const { t } = useTranslation();
 	const { slug } = useParams<{ slug: string }>();
-	const article = slug ? getArticleBySlug(slug) : undefined;
+	const article = slug ? getArticleBySlug(slug, t) : undefined;
 
 	if (!article) {
 		return <Navigate to="/articles" replace />;

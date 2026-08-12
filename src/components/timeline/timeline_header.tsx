@@ -11,6 +11,7 @@ import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarR
 import { CalendarRequestType } from '@/core/common/components/calendar/calendarRequestContext';
 import CalendarDatePicker from '@/core/common/components/calendar/calendar_date_picker';
 import appLayoutConfig from '@/core/constants/app_layout_config';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 
 const TimelineHeader: React.FC = () => {
 	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -20,6 +21,7 @@ const TimelineHeader: React.FC = () => {
 	const triggerRef = useRef<HTMLDivElement>(null);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const viewInfo = useCalendarUI((state) => state.viewInfo);
+	const isReadOnly = useIsReadOnly();
 	const dispatch = useCalendarDispatch();
 
 	// Close menu when clicking outside
@@ -81,7 +83,7 @@ const TimelineHeader: React.FC = () => {
 					disabled={isScheduleActionLoading}
 					onLoadingChange={setIsScheduleActionLoading}
 				/>
-				<CreateEventButton onClick={openCreateSelection}>
+				<CreateEventButton onClick={openCreateSelection} disabled={isReadOnly}>
 					<Plus size={16} />
 				</CreateEventButton>
 			</HeaderRight>

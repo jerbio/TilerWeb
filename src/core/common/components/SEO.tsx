@@ -20,12 +20,17 @@ interface SEOProps {
 	articleTags?: string[];
 	/** Article section / category — emits article:section. */
 	articleSection?: string;
+	/**
+	 * When true, emits `robots: noindex, nofollow` so crawlers skip this page
+	 * (e.g. auth, settings, and other private/app routes). Defaults to false.
+	 */
+	noindex?: boolean;
 }
 
 const SEO: React.FC<SEOProps> = ({
-	title = 'Tiler - Smart Calendar & Task Management App',
-	description = 'Tiler is your intelligent calendar assistant that helps you schedule tasks, manage time, and boost productivity. Integrate with Google Calendar, track locations, and never miss a deadline.',
-	keywords = 'calendar app, task management, scheduling, productivity, time management, google calendar integration, smart scheduling, task organizer, tiler app',
+	title = 'Tiler - AI Scheduling Assistant & Smart Calendar',
+	description = 'Tiler is an AI scheduling assistant that turns plain English into a smart, travel-aware schedule and adapts as your day changes. Integrate Google Calendar, get automatic travel time, and never miss a deadline.',
+	keywords = 'AI scheduling assistant, AI calendar app, smart calendar app, AI schedule planner, natural language calendar, automatic scheduling app, time blocking app, calendar with travel time, adaptive schedule, task management, tiler app',
 	ogImage = 'https://tiler.app/og-image.png',
 	ogType = 'website',
 	canonicalUrl,
@@ -36,6 +41,7 @@ const SEO: React.FC<SEOProps> = ({
 	authors,
 	articleTags,
 	articleSection,
+	noindex = false,
 }) => {
 	const siteUrl = 'https://tiler.app';
 	const fullCanonicalUrl = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl;
@@ -47,6 +53,7 @@ const SEO: React.FC<SEOProps> = ({
 			<meta name="title" content={title} />
 			<meta name="description" content={description} />
 			<meta name="keywords" content={keywords} />
+			<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
 			<link rel="canonical" href={fullCanonicalUrl} />
 
 			{/* Open Graph / Facebook */}

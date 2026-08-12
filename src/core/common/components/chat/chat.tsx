@@ -23,7 +23,30 @@ import EmailConfirmationModal from '@/core/common/components/email-confirmation/
 import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
-import ActionPill from '@/core/common/components/chat/ActionPill';
+import useIsMobile from '@/core/common/hooks/useIsMobile';
+import ActionPillStrip from '@/core/common/components/chat/ActionPillStrip';
+import SimulationStatusStrip from '@/core/common/components/chat/SimulationStatusStrip';
+import SimulationReviewPanel from '@/core/common/components/chat/SimulationReviewPanel';
+import useSimulationPolling from '@/hooks/useSimulationPolling';
+import {
+	SimulationDto,
+	SimulationScheduleResult,
+	SimulationState,
+	VibeRequest as VibeRequestType,
+	PreviewReadyPayload,
+} from '@/core/common/types/chat';
+import {
+	buildSimulationActionLookups,
+	primeSimulationFromRequest,
+	isRequestTerminal,
+	isSimulationTerminal,
+} from '@/core/util/simulationSelectors';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
+import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
+import {
+	CalendarEntityType,
+	CalendarRequestType,
+} from '@/core/common/components/calendar/calendarRequestContext';
 
 // Custom hook to check unexecuted actions
 const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithActions[]) => {
@@ -62,17 +85,25 @@ const useHasUnexecutedActions = (requestId: string | null, messages: PromptWithA
 const ChatWrapper = styled.section`
 	height: 100%;
 	position: relative;
-`;
-
-const ChatContainer = styled.section`
-	position: absolute;
-	inset: 0;
-	height: 100%;
 	display: flex;
 	flex-direction: column;
-	padding: 1.5rem;
+`;
+
+const ChatContainer = styled.section<{ $mobilereview?: boolean }>`
+	position: ${(props) => (props.$mobilereview ? 'relative' : 'absolute')};
+	inset: ${(props) => (props.$mobilereview ? 'auto' : '0')};
+	flex: ${(props) => (props.$mobilereview ? '1 1 auto' : '0 0 auto')};
+	height: ${(props) => (props.$mobilereview ? 'auto' : '100%')};
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: ${(props) => (props.$mobilereview ? '8px 12px 12px' : '1.5rem')};
 
 	@media screen and (min-width: ${({ theme }) => theme.screens.lg}) {
+		position: absolute;
+		inset: 0;
+		height: 100%;
+		flex: 0 0 auto;
 		padding: 0;
 	}
 `;
@@ -171,15 +202,31 @@ const NewChatHeaderButton = styled.button`
 	}
 `;
 
-const ChatContent = styled.div`
+const ChatContent = styled.div<{ $hidden?: boolean }>`
 	flex: 1;
-	display: flex;
+	/*
+	 * Toggle visibility with display instead of unmounting when entering
+	 * review mode. Keeping the node mounted preserves the .messages-list
+	 * scroll position, so exiting review returns the user to exactly where
+	 * they were reading rather than snapping to the top. display none fully
+	 * removes it from the flex layout so the review panel can take over the
+	 * space.
+	 */
+	display: ${({ $hidden }) => ($hidden ? 'none' : 'flex')};
 	flex-direction: column;
-	height: 100%;
+	/*
+	 * min-height: 0 lets this flex child shrink below its content height so
+	 * the inner .messages-list can scroll instead of pushing siblings (the
+	 * simulation strip, prompt suggestions and input form) out of view. Using
+	 * height: 100% here forced the column to overflow, which cut off the most
+	 * recent messages behind the prompt-suggestion pills.
+	 */
+	min-height: 0;
 	overflow: hidden;
 
 	.messages-list {
 		flex: 1;
+		min-height: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
@@ -300,6 +347,368 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const [errorPopupMessage, setErrorPopupMessage] = useState('');
 	const [showSessionHistory, setShowSessionHistory] = useState(false);
 	const [currentSessionTitle, setCurrentSessionTitle] = useState<string | null>(null);
+
+	// --- Simulated Schedule Experience (Phase 3.1) ----------------------------
+	// Tracks the simulation row + parent VibeRequest for the *active* request.
+	// Per-message simulation lookup can be layered on later by keying these by
+	// requestId.
+	const [simulation, setSimulation] = useState<SimulationDto | null>(null);
+	const [vibeRequest, setVibeRequest] = useState<VibeRequestType | null>(null);
+	// Selection is the single source of truth shared with the calendar overlay
+	// (plan §5.3.1) — both chip clicks here and tile clicks in
+	// `CalendarWrapper` write through the store.
+	const selectedActionId = useSimulationOverlayStore((s) => s.selectedActionId);
+	const setSelectedActionId = useSimulationOverlayStore((s) => s.setSelectedActionId);
+	const requestIdRef = useRef<string | null>(null);
+	requestIdRef.current = requestId;
+	// Tracks the requestId observed by the supersession effect on its previous
+	// run so we can distinguish a genuine swap (follow-up message superseding
+	// an existing request → show "Updating tilecast…") from the very first
+	// request of a session (→ show "Simulation starting…").
+	const prevRequestIdRef = useRef<string | null>(null);
+	// Plan §6.2 — the previewReady SignalR handler is bound once on mount
+	// against `anonymousUserId`; it cannot close over the latest VibeRequest
+	// without a ref. The ref lets the handler bail when a late `previewReady`
+	// arrives for a request that has since become terminal (Applied / Closed),
+	// avoiding a stale UI flip back to "Ready".
+	const vibeRequestRef = useRef<VibeRequestType | null>(null);
+	vibeRequestRef.current = vibeRequest;
+	// Plan §6.5.2 — cache of VibeRequest payloads embedded in chat-history
+	// responses (`getMessages` → `Content.vibeRequests`). When the active
+	// requestId changes, the requestId effect consults this cache first
+	// and skips the per-request `getVibeRequest` round-trip if a hydrated
+	// entry (with `preview` / `previews`) is available. Single-fetch
+	// session bootstrap, AC "Initial chat render needs no extra simulation
+	// fetch" and AC "Refresh restores active simulation status".
+	const vibeRequestCacheRef = useRef<Record<string, VibeRequestType>>({});
+
+	// Phase 4.2 — lazy-fetched simulation result for the review panel.
+	// Cached per `simulation.id`; re-entries do NOT re-fetch unless the id
+	// changes (see `simulationResultIdRef` invalidation below).
+	const [simulationResult, setSimulationResult] = useState<SimulationScheduleResult | null>(null);
+	// `inReview` is owned by the cross-cut overlay store so the calendar
+	// banner's Exit-review button (and any future surface) stays in sync
+	// with the chat panel. Local writes go through the store API only.
+	const inReview = useSimulationOverlayStore((s) => s.inReview);
+	// Mobile review takeover: when reviewing a tilecast on a small viewport,
+	// hide the chat header, message input, and location card so the review
+	// panel dominates the side panel and the calendar grid (rendered
+	// underneath the absolute-positioned side panel on mobile) becomes
+	// visible above. The Apply / Exit footer inside the review panel
+	// remains the only commit/cancel surface during this state.
+	const isMobileViewport = useIsMobile(parseInt(theme.screens.lg, 10));
+	const isMobileReview = isMobileViewport && inReview;
+	const [isLoadingSimulationResult, setIsLoadingSimulationResult] = useState(false);
+	const [simulationResultError, setSimulationResultError] = useState<string | null>(null);
+	// True from the moment a follow-up message supersedes the active request
+	// (or a swap is detected) until the fresh forecast has been primed/loaded.
+	// Passed to `SimulationStatusStrip` as `isRegenerating` so the strip shows
+	// the transient "Updating tilecast…" row instead of flashing the previous
+	// request's stale "Outdated tilecast" / yellow Review CTA during the gap.
+	const [isPreparingSimulation, setIsPreparingSimulation] = useState(false);
+	const simulationResultIdRef = useRef<string | null>(null);
+	// Tracks an in-flight prefetch (or click-driven fetch) for a given
+	// simulation id so concurrent calls to `enterReview` reuse the same
+	// promise instead of issuing a duplicate `api/Vibe/Preview` request.
+	const simulationResultPromiseRef = useRef<{
+		id: string;
+		promise: Promise<SimulationScheduleResult | null>;
+	} | null>(null);
+
+	// Plan §5.3.2 / §5.3.4 / §5.3.5 — when a simulation chip is selected (or
+	// a tile is clicked, since both write through the same store) ask the
+	// calendar to scroll to & pulse the matching tile. Debounced ~150ms so
+	// rapid stepper presses (Previous/Next held down) only dispatch the
+	// final selection — visuals (tier border, hue) update instantly because
+	// they are pure derived state, but scroll/navigation is debounced.
+	const calendarDispatch = useCalendarDispatch();
+	const focusDispatchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(() => {
+		if (!inReview || !simulation || !selectedActionId) return;
+		const action = buildSimulationActionLookups(simulation).byActionId[selectedActionId];
+		if (!action || !action.entityId || !action.entityType) return;
+		if (focusDispatchTimerRef.current) {
+			clearTimeout(focusDispatchTimerRef.current);
+		}
+		focusDispatchTimerRef.current = setTimeout(() => {
+			calendarDispatch({
+				type: CalendarRequestType.FocusEvent,
+				entityId: action.entityId!,
+				entityType: action.entityType as CalendarEntityType,
+				actionType: action.action?.type ?? 'none',
+			});
+			focusDispatchTimerRef.current = null;
+		}, 150);
+		return () => {
+			if (focusDispatchTimerRef.current) {
+				clearTimeout(focusDispatchTimerRef.current);
+				focusDispatchTimerRef.current = null;
+			}
+		};
+	}, [inReview, simulation, selectedActionId, calendarDispatch]);
+
+	// Drop the cached simulation result whenever the active simulation id changes
+	// so the next review entry re-fetches against the new preview.
+	useEffect(() => {
+		const currentSimId = simulation?.id ?? null;
+		if (simulationResultIdRef.current && simulationResultIdRef.current !== currentSimId) {
+			setSimulationResult(null);
+			simulationResultIdRef.current = null;
+		}
+		// A new simulation invalidates any in-flight prefetch promise too.
+		if (
+			simulationResultPromiseRef.current &&
+			simulationResultPromiseRef.current.id !== currentSimId
+		) {
+			simulationResultPromiseRef.current = null;
+		}
+	}, [simulation?.id]);
+
+	// Shared fetch helper — kicks off (or returns the existing) GET
+	// api/Vibe/Preview request for `simulation.id` and caches the result so
+	// both the background prefetch and the click-driven `enterReview` flow
+	// observe a single round-trip.
+	const ensureSimulationResult = useCallback(
+		(sim: SimulationDto): Promise<SimulationScheduleResult | null> => {
+			if (simulationResult != null && simulationResultIdRef.current === sim.id) {
+				return Promise.resolve(simulationResult);
+			}
+			if (
+				simulationResultPromiseRef.current &&
+				simulationResultPromiseRef.current.id === sim.id
+			) {
+				return simulationResultPromiseRef.current.promise;
+			}
+			const promise = (async () => {
+				try {
+					const resp = await chatService.getSimulationResult(sim.id);
+					const content = (resp?.Content ?? null) as SimulationScheduleResult | null;
+					if (content) {
+						setSimulationResult(content);
+						simulationResultIdRef.current = sim.id;
+					}
+					return content;
+				} finally {
+					if (
+						simulationResultPromiseRef.current &&
+						simulationResultPromiseRef.current.id === sim.id
+					) {
+						simulationResultPromiseRef.current = null;
+					}
+				}
+			})();
+			simulationResultPromiseRef.current = { id: sim.id, promise };
+			return promise;
+		},
+		[simulationResult]
+	);
+
+	// Background prefetch — as soon as we know the simulation is Ready we
+	// fire the `api/Vibe/Preview` GET so that clicking "Review Simulation"
+	// resolves instantly. Errors are swallowed here; if the user clicks
+	// Review and the preview still isn't cached, `enterReview` will retry
+	// and surface the failure through the existing error path.
+	useEffect(() => {
+		if (!simulation || simulation.state !== SimulationState.Ready) return;
+		if (simulationResultIdRef.current === simulation.id) return;
+		void ensureSimulationResult(simulation).catch((err) => {
+			console.warn('Simulation result prefetch failed', err);
+		});
+	}, [simulation, ensureSimulationResult]);
+
+	const enterReview = useCallback(async () => {
+		// Read vibeRequest from the cache first (always up-to-date, populated
+		// before the requestId effect can set simulation), then fall back to the
+		// committed-render ref. React 18 can batch setVibeRequest together with
+		// setSimulation in a way that leaves vibeRequestRef.current null in the
+		// render that makes the Review button visible.
+		const rid = requestIdRef.current;
+		const currentVibeRequest =
+			(rid ? (vibeRequestCacheRef.current[rid] ?? null) : null) ??
+			vibeRequestRef.current ??
+			null;
+		if (!simulation) return;
+		if (simulationResult != null && simulationResultIdRef.current === simulation.id) {
+			// Cached — publish to overlay store (sets inReview=true) and skip re-fetch.
+			if (currentVibeRequest) {
+				useSimulationOverlayStore
+					.getState()
+					.enterReview({ simulation, simulationResult, vibeRequest: currentVibeRequest });
+			}
+			return;
+		}
+		setIsLoadingSimulationResult(true);
+		setSimulationResultError(null);
+		try {
+			const content = await ensureSimulationResult(simulation);
+			if (content) {
+				if (currentVibeRequest) {
+					useSimulationOverlayStore.getState().enterReview({
+						simulation,
+						simulationResult: content,
+						vibeRequest: currentVibeRequest,
+					});
+				}
+			} else {
+				// Plan §5.5 — empty/null body counts as a fetch failure.
+				setSimulationResultError('empty');
+			}
+		} catch (err) {
+			console.error('Failed to fetch simulation result', err);
+			// Plan §5.5 — surface "Simulation unavailable" with Retry. Review
+			// mode is NOT entered, satisfying the auto-exit requirement.
+			setSimulationResultError(err instanceof Error ? err.message : 'fetch_failed');
+		} finally {
+			setIsLoadingSimulationResult(false);
+		}
+	}, [simulation, simulationResult, ensureSimulationResult]);
+
+	const exitReview = useCallback(() => {
+		useSimulationOverlayStore.getState().exitReview();
+	}, []);
+
+	// Plan §5.3.6 / §5.4 — Escape from anywhere exits review mode. Bound once
+	// at the chat container level rather than per-component.
+	useEffect(() => {
+		if (!inReview) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				exitReview();
+			}
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, [inReview, exitReview]);
+
+	// Plan §5.4 — stale overlay guard. If the active request changes (user
+	// sent a new message during review, or a non-chat origin started a fresh
+	// simulation) discard the overlay and exit review mode. The overlay store
+	// is keyed on the original vibeRequestId; mismatch means the on-screen
+	// overlay no longer matches the user's intent.
+	useEffect(() => {
+		if (!inReview) return;
+		const overlay = useSimulationOverlayStore.getState();
+		if (overlay.vibeRequest && overlay.vibeRequest.id !== requestId) {
+			useSimulationOverlayStore.getState().exitReview();
+		}
+	}, [inReview, requestId]);
+
+	// Pull the latest VibeRequest whenever the active requestId changes so the
+	// simulation polling loop has terminal-state context, and so any embedded
+	// `previews` payload can prime the local simulation cache.
+	useEffect(() => {
+		if (!requestId) {
+			setVibeRequest(null);
+			setSimulation(null);
+			setIsPreparingSimulation(false);
+			prevRequestIdRef.current = null;
+			return;
+		}
+		// Distinguish a genuine supersession (an existing request being
+		// replaced by a follow-up) from the first request of the session. Only
+		// the former should show the transient "Updating tilecast…" bridge —
+		// the first request has no prior stale state to flash over.
+		const isSupersession = !!prevRequestIdRef.current && prevRequestIdRef.current !== requestId;
+		prevRequestIdRef.current = requestId;
+		// Plan §6.3 — supersession. When the active requestId changes (user
+		// sends a follow-up message, or session bootstrap swaps requests),
+		// drop the old simulation/result snapshot synchronously so polling
+		// halts and the UI doesn't briefly attribute the previous request's
+		// state to the new one. The old VibeRequest is cleared too so its
+		// stale `supersededByRequestId` flag can't drive a one-frame
+		// "Outdated tilecast" / yellow-Review flash before the fresh request
+		// lands. Review mode is exited — the old preview is no longer relevant
+		// and the calendar overlay must clear.
+		setVibeRequest(null);
+		setSimulation(null);
+		setSimulationResult(null);
+		simulationResultIdRef.current = null;
+		simulationResultPromiseRef.current = null;
+		setSimulationResultError(null);
+		if (isSupersession) setIsPreparingSimulation(true);
+		useSimulationOverlayStore.getState().exitReview();
+		let cancelled = false;
+		(async () => {
+			try {
+				// Plan §6.5.2 — prefer the cache populated from getMessages
+				// responses; only fall back to a dedicated getVibeRequest
+				// round-trip when the chat-history payload didn't carry the
+				// embedded request (older sessions, follow-up `sendMessage`
+				// before the next `getMessages`, or refresh into a request
+				// that wasn't in the most recent batch).
+				const cached = vibeRequestCacheRef.current[requestId] ?? null;
+				let vr: VibeRequestType | null = cached;
+				if (!vr) {
+					const resp = await chatService.getVibeRequest(requestId);
+					if (cancelled) return;
+					vr = (resp?.Content?.vibeRequest ?? null) as VibeRequestType | null;
+					if (vr) vibeRequestCacheRef.current[requestId] = vr;
+				}
+				setVibeRequest(vr);
+				const primed = primeSimulationFromRequest(vr);
+				if (primed) setSimulation(primed);
+				// The embedded `vibeRequest.preview` payload omits
+				// `previewActions` (VibePreview.PreviewActions is [NotMapped]
+				// server-side, so EF won't auto-load it via .Include). Fetch
+				// the dedicated preview endpoint to hydrate the chip<->preview
+				// wiring (halos, navigatable affordances) on first paint.
+				try {
+					const previewResp = await chatService.getSimulationForRequest(requestId);
+					if (cancelled) return;
+					// `OkResponse("preview", ...)` server-side wraps the payload
+					// as `{ preview: SimulationDto }`. The declared type lies;
+					// unwrap defensively (and fall back to Content itself for
+					// any future endpoint refactor that drops the wrapper).
+					const rawContent = previewResp?.Content as
+						| { preview?: SimulationDto }
+						| SimulationDto
+						| null
+						| undefined;
+					const sim =
+						(rawContent && 'preview' in rawContent
+							? (rawContent.preview ?? null)
+							: (rawContent as SimulationDto | null)) ?? null;
+					if (sim && sim.id) setSimulation(sim);
+				} catch (previewErr) {
+					if (!cancelled) {
+						console.error('Failed to fetch simulation preview for request', previewErr);
+					}
+				}
+			} catch (err) {
+				if (!cancelled) console.error('Failed to fetch vibe request for simulation', err);
+			} finally {
+				// The fresh request + simulation snapshot has landed (or failed
+				// to). Either way, stop bridging with "Updating tilecast…" and
+				// let the strip reflect the new request's real lifecycle state.
+				if (!cancelled) setIsPreparingSimulation(false);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [requestId]);
+
+	// Polls the backend for the active simulation; ramps from 2s → 10s after 30s.
+	useSimulationPolling(
+		vibeRequest,
+		simulation,
+		(sim) => {
+			setSimulation((prev) => {
+				// Ignore stale `previewReady` for terminal requests (invariant).
+				if (prev && isSimulationTerminal(prev) && prev.id === sim.id) return prev;
+				return sim;
+			});
+		},
+		// Plan §6.6.5 — anonymous-user threading. Without this, the polling
+		// fetch returns 401 / NotFound for anonymous sessions on refresh.
+		// Derived inline to dodge a forward-reference: the canonical
+		// `anonymousUserId` const is declared further down in the
+		// component for legacy ordering reasons.
+		{
+			anonymousUserId:
+				activePersonaSession?.userInfo?.id ?? activePersonaSession?.userId ?? undefined,
+		}
+	);
 
 	// Track chat component mount
 	useEffect(() => {
@@ -425,6 +834,35 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					setWsStatusKey(rawStatus);
 					setWebSocketStatus(formattedStatus);
 				}
+			}
+		);
+
+		// Phase 3.1: react to backend-pushed previewReady events.
+		service.subscribe(
+			Hubs.VibeUpdate.name,
+			Hubs.VibeUpdate.events.PreviewReady,
+			(data: unknown) => {
+				const payload = data as PreviewReadyPayload | null;
+				if (!payload || payload.type !== 'requestPreviewReady') return;
+				const activeRequestId = requestIdRef.current;
+				if (!activeRequestId || payload.vibeRequestId !== activeRequestId) return;
+				// Plan §6.2 — ignore late notifications for a request that has
+				// already been applied/closed. Without this guard a `previewReady`
+				// arriving after Apply would re-populate `simulation` and reopen
+				// the status strip on a request the user has already moved past.
+				if (isRequestTerminal(vibeRequestRef.current)) return;
+				(async () => {
+					try {
+						const resp = await chatService.getSimulationForRequest(
+							payload.vibeRequestId,
+							anonymousUserId || undefined
+						);
+						const sim = (resp?.Content ?? null) as SimulationDto | null;
+						if (sim) setSimulation(sim);
+					} catch (err) {
+						console.error('Failed to refetch simulation after previewReady', err);
+					}
+				})();
 			}
 		);
 
@@ -592,6 +1030,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				});
 
 				const rawMessages = data.Content.chats || [];
+				// Plan §6.5.2 — hydrate the per-request cache from the
+				// embedded `vibeRequests` payload before any state setter
+				// fires; that way the requestId effect (triggered by the
+				// imminent setRequestId below) finds the entry on first read.
+				const embeddedRequests = data.Content.vibeRequests ?? [];
+				for (const r of embeddedRequests) {
+					if (r && r.id) vibeRequestCacheRef.current[r.id] = r as VibeRequestType;
+				}
 				if (!rawMessages.length) {
 					setHasMoreMessages(false);
 					return;
@@ -643,6 +1089,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			});
 
 			const rawMessages = data.Content.chats || [];
+			// Plan §6.5.2 — also fold older-batch embedded requests into
+			// the cache so historical request rows can prime simulation if
+			// the user scrolls back and re-selects them.
+			const embeddedRequests = data.Content.vibeRequests ?? [];
+			for (const r of embeddedRequests) {
+				if (r && r.id) vibeRequestCacheRef.current[r.id] = r as VibeRequestType;
+			}
 			if (!rawMessages.length) {
 				setHasMoreMessages(false);
 				shouldPreserveScrollPositionRef.current = false;
@@ -712,6 +1165,17 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 	const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
 
+	// True when the SimulationStatusStrip is showing its Ready state and will
+	// render the inline "Accept Changes" button itself (Review + Accept on one
+	// line). Mirrors the strip's Ready branch guards (a defunct/superseded or
+	// stale tilecast falls back to the standalone Accept button below). Used to
+	// avoid rendering a duplicate full-width Accept button under the strip.
+	const stripHostsAccept =
+		simulation?.state === SimulationState.Ready &&
+		!vibeRequest?.supersededByRequestId &&
+		simulation?.isStale !== true &&
+		!simulationResultError;
+
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		if (!message.trim() || isSending) return;
@@ -722,6 +1186,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			hasContext: chatContext.length > 0,
 			personaId: selectedPersonaId,
 		});
+
+		// If the user sends a new message while in review, exit review
+		// synchronously — before any await — so the chat view is restored
+		// immediately while the API call completes in the background.
+		if (inReview) {
+			exitReview();
+			setSimulation(null);
+			setSimulationResult(null);
+			simulationResultIdRef.current = null;
+			simulationResultPromiseRef.current = null;
+			setSimulationResultError(null);
+		}
 
 		try {
 			setIsSending(true);
@@ -829,6 +1305,17 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			requestId: requestId || undefined,
 			personaId: selectedPersonaId,
 		});
+
+		// EXIT REVIEW SYNCHRONOUSLY - before any await so the user immediately
+		// returns to the chat view with the WebSocket LoadingIndicator showing.
+		// The simulation state is cleared here regardless of whether the API
+		// call succeeds or fails.
+		useSimulationOverlayStore.getState().exitReview();
+		setSimulation(null);
+		setSimulationResult(null);
+		simulationResultIdRef.current = null;
+		simulationResultPromiseRef.current = null;
+		setSimulationResultError(null);
 
 		try {
 			setIsSending(true);
@@ -992,7 +1479,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 						</NewChatHeaderButton>
 					</ChatHeaderRight>
 				</ChatHeader>
-				<ChatContent>
+				{/* Keep ChatContent mounted (hidden) during review so the
+				    messages-list scroll position is preserved on exit. */}
+				<ChatContent $hidden={inReview} aria-hidden={inReview || undefined}>
 					{isLoading && (
 						<LoadingIndicator message={t('home.expanded.chat.loadingMessages')} />
 					)}
@@ -1025,14 +1514,23 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 									<MarkdownRenderer content={message.content} />
 								</div>
 
-								{message.actions
-									?.filter(
-										(action) =>
-											action.type !== 'conversational_and_not_supported'
-									)
-									.map((action) => (
-										<ActionPill key={action.id} action={action} />
-									))}
+								{message.actions && (
+									<ActionPillStrip
+										actions={message.actions}
+										simulation={simulation}
+										request={vibeRequest}
+										simulationActionById={
+											simulation
+												? buildSimulationActionLookups(simulation)
+														.byActionId
+												: undefined
+										}
+										onSelect={(a, sa) => {
+											const id = sa?.actionId ?? sa?.action?.id ?? a.id;
+											if (id) setSelectedActionId(id);
+										}}
+									/>
+								)}
 							</MessageBubble>
 						))}
 					</div>
@@ -1044,55 +1542,113 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				<div style={{ marginBottom: '0.25rem' }}></div>
 
 				<div>
-					{isSending && (
+					{!inReview && isSending && (
 						<LoadingIndicator
 							message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
 							wsStatus={wsStatusKey}
 						/>
 					)}
-					{((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
-						<Button
-							variant="primary"
-							onClick={() => acceptAllChanges()}
-							data-onboarding-accept-button
-						>
-							{t('home.expanded.chat.acceptChanges')}
-						</Button>
+					{!inReview && (
+						<SimulationStatusStrip
+							// Plan §6.6.3 supersession is now centralized in
+							// `isRequestTerminal` (selector check inside the strip),
+							// so we can pass the live simulation through and let
+							// the strip's hide-when-terminal branch take over.
+							simulation={simulation}
+							request={vibeRequest}
+							onReview={enterReview}
+							fetchError={simulationResultError}
+							onRetry={simulationResultError ? enterReview : undefined}
+							isLoadingReview={isLoadingSimulationResult}
+							isRegenerating={isPreparingSimulation}
+							// When the tilecast is Ready, host the Accept CTA inside
+							// the strip so "Review" and "Accept Changes" share one
+							// line instead of stacking a duplicate full-width button
+							// below it.
+							onAccept={() => acceptAllChanges()}
+							showAccept={!isSending && shouldShowAcceptButton}
+						/>
 					)}
+					{inReview &&
+						simulation &&
+						vibeRequest &&
+						(simulationResult ? (
+							<SimulationReviewPanel
+								request={vibeRequest}
+								simulation={simulation}
+								result={simulationResult}
+								selectedActionId={selectedActionId}
+								onSelect={setSelectedActionId}
+								onApply={() => acceptAllChanges()}
+								onExitReview={exitReview}
+							/>
+						) : (
+							<div
+								role="status"
+								aria-busy={isLoadingSimulationResult}
+								data-testid="simulation-review-skeleton"
+							>
+								{t(
+									'home.expanded.chat.simulationGenerating',
+									'Loading simulation…'
+								)}
+							</div>
+						))}
+					{!inReview &&
+						!stripHostsAccept &&
+						((!isSending && shouldShowAcceptButton) || isDemoMode()) && (
+							<Button
+								variant="primary"
+								onClick={() => acceptAllChanges()}
+								data-onboarding-accept-button
+							>
+								{t('home.expanded.chat.acceptChanges')}
+							</Button>
+						)}
 				</div>
 
 				{/* Show prompt suggestions when input field is empty */}
-				{!message.trim() && <PromptSuggestions onPromptClick={handlePromptClick} />}
+				{!inReview && !message.trim() && (
+					<PromptSuggestions onPromptClick={handlePromptClick} />
+				)}
 
-				<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
-					<Input.Textarea
-						value={message}
-						onChange={(e) => setMessage(e.target.value)}
-						onKeyDown={(e) => {
-							// Submit form on Enter key press without Shift key
-							if (e.key === 'Enter' && !e.shiftKey) {
-								e.preventDefault(); // Prevent new line
+				{!isMobileReview && (
+					<>
+						<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
+							<Input.Textarea
+								value={message}
+								onChange={(e) => setMessage(e.target.value)}
+								onKeyDown={(e) => {
+									// Submit form on Enter key press without Shift key
+									if (e.key === 'Enter' && !e.shiftKey) {
+										e.preventDefault(); // Prevent new line
 
-								// Use form.requestSubmit() instead of handleSubmit directly
-								// This triggers a single form submission through the standard form mechanism
-								const form = e.currentTarget.form;
-								if (form) form.requestSubmit();
-							}
-						}}
-						placeholder={t('home.expanded.chat.inputPlaceholder')}
-						disabled={isSending}
-						bordergradient={[theme.colors.brand[500]]}
-						height={50} // Set a fixed height for consistent alignment
-					/>
-					<ChatButton
-						type="submit"
-						disabled={isSending || !message.trim()}
-						data-onboarding-chat-button
-					>
-						{isSending ? <CircleStop size={20} /> : <SendHorizontal size={20} />}
-					</ChatButton>
-				</ChatForm>
-				<UserLocation />
+										// Use form.requestSubmit() instead of handleSubmit directly
+										// This triggers a single form submission through the standard form mechanism
+										const form = e.currentTarget.form;
+										if (form) form.requestSubmit();
+									}
+								}}
+								placeholder={t('home.expanded.chat.inputPlaceholder')}
+								disabled={isSending}
+								bordergradient={[theme.colors.brand[500]]}
+								height={50} // Set a fixed height for consistent alignment
+							/>
+							<ChatButton
+								type="submit"
+								disabled={isSending || !message.trim()}
+								data-onboarding-chat-button
+							>
+								{isSending ? (
+									<CircleStop size={20} />
+								) : (
+									<SendHorizontal size={20} />
+								)}
+							</ChatButton>
+						</ChatForm>
+						<UserLocation />
+					</>
+				)}
 			</ChatContainer>
 
 			{anonymousUserId && (

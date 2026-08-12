@@ -1,13 +1,12 @@
 import React from 'react';
 import { useState } from 'react';
 import { UserApi } from '@/api/userApi';
-import { Tile } from '@/core/common/types/tile';
 import { scheduleService } from '@/services';
 import { SubCalendarEvent } from '@/core/common/types/schedule';
 
-function renderTileNames(tiles: Array<Tile>) {
+function renderTileNames(tiles: Array<SubCalendarEvent>) {
 	if (tiles != null && tiles.length > 0) {
-		return tiles.map((eachTile: Tile) => {
+		return tiles.map((eachTile: SubCalendarEvent) => {
 			return (
 				<div className="indent" key={eachTile.id}>
 					{eachTile.name}

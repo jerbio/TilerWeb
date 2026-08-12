@@ -40,6 +40,8 @@ export class SubCalendarEventApi extends AppApi {
 			Longitude: payload.Longitude ?? loc.longitude,
 			Latitude: payload.Latitude ?? loc.latitude,
 			LocationVerified: payload.LocationVerified ?? loc.verified,
+			TimeZone:
+				payload.TimeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
 		};
 		return this.apiRequest<SubCalendarEventLookupResponse>('api/SubCalendarEvent', {
 			method: 'POST',

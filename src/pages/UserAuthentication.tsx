@@ -10,6 +10,7 @@ import palette from '@/core/theme/palette';
 import { Env } from '@/config/config_getter';
 import { authService } from '@/services';
 import VerificationCodePopup from '@/components/auth/VerificationCodePopup';
+import SEO from '@/core/common/components/SEO';
 
 const UserAuthentication: React.FC = () => {
 	const { t } = useTranslation();
@@ -64,6 +65,14 @@ const UserAuthentication: React.FC = () => {
 
 	return (
 		<Container>
+			<SEO
+				title={
+					isSignUp ? 'Sign Up - Tiler Smart Calendar' : 'Sign In - Tiler Smart Calendar'
+				}
+				description="Sign in or create your Tiler account to access your intelligent calendar and task scheduling."
+				canonicalUrl={isSignUp ? '/signup' : '/signin'}
+				noindex
+			/>
 			<BackButton onClick={() => navigate('/')}>
 				<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
 					<path
@@ -85,7 +94,7 @@ const UserAuthentication: React.FC = () => {
 
 				<SocialLoginForm
 					id="SocialLogin"
-					action={`${baseUrl}/Account/ExternalLogin`}
+					action={`${baseUrl}Account/ExternalLogin`}
 					method="post"
 				>
 					<input
@@ -119,6 +128,58 @@ const UserAuthentication: React.FC = () => {
 						</GoogleIcon>
 					</GoogleButton>
 				</SocialLoginForm>
+
+				<AppleLoginForm
+					id="AppleLogin"
+					action={`${baseUrl}Account/AppleLogin`}
+					method="get"
+				>
+					<AppleButton type="submit">
+						<span>
+							{t(isSignUp ? 'auth.signup.appleButton' : 'auth.signin.appleButton')}
+						</span>
+						<AppleIcon>
+							<svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+								<path
+									fill="currentColor"
+									d="M16.53 12.72c-.03-2.7 2.2-3.99 2.3-4.06-1.25-1.84-3.2-2.09-3.9-2.12-1.66-.17-3.24.97-4.08.97-.84 0-2.14-.95-3.52-.92-1.81.03-3.48 1.05-4.41 2.67-1.88 3.27-.48 8.11 1.35 10.76.89 1.3 1.96 2.75 3.36 2.7 1.35-.05 1.86-.87 3.49-.87 1.63 0 2.09.87 3.52.84 1.45-.03 2.37-1.32 3.26-2.62 1.03-1.51 1.45-2.97 1.47-3.05-.03-.01-2.82-1.08-2.85-4.29zM13.87 4.7c.74-.9 1.24-2.15 1.1-3.4-1.07.04-2.36.71-3.13 1.61-.69.79-1.29 2.06-1.13 3.28 1.19.09 2.42-.6 3.16-1.49z"
+								/>
+							</svg>
+						</AppleIcon>
+					</AppleButton>
+				</AppleLoginForm>
+
+				<MicrosoftLoginForm
+					id="MicrosoftLogin"
+					action={`${baseUrl}Account/ExternalLogin`}
+					method="post"
+				>
+					<input
+						name="__RequestVerificationToken"
+						type="hidden"
+						value="E6PHbDLl86PTMhuBBti-2XuPdDm_WMFryLW4Jp-ZDvXCJcv7talXKZvZCipwiQSaKcgeWxMLgnTruLQT3cn55A7GcBDMRuoRzS98CzSrq481"
+					/>
+					{/* The web Microsoft OIDC middleware registers with authentication type
+					    "OpenIdConnect" (see Startup.Auth.cs); challenging that provider begins
+					    the existing Microsoft sign-in + calendar-connect flow via /signin-microsoft. */}
+					<MicrosoftButton type="submit" name="provider" value="OpenIdConnect">
+						<span>
+							{t(
+								isSignUp
+									? 'auth.signup.microsoftButton'
+									: 'auth.signin.microsoftButton'
+							)}
+						</span>
+						<MicrosoftIcon>
+							<svg width="20" height="20" viewBox="0 0 21 21">
+								<rect x="1" y="1" width="9" height="9" fill="#F25022" />
+								<rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
+								<rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
+								<rect x="11" y="11" width="9" height="9" fill="#FFB900" />
+							</svg>
+						</MicrosoftIcon>
+					</MicrosoftButton>
+				</MicrosoftLoginForm>
 
 				<Divider>
 					<DividerLine />
@@ -259,6 +320,76 @@ const GoogleButton = styled.button`
 `;
 
 const GoogleIcon = styled.div`
+	position: absolute;
+	right: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
+const AppleLoginForm = styled.form`
+	width: 100%;
+	margin-top: 0.75rem;
+`;
+
+const AppleButton = styled.button`
+	width: 100%;
+	height: 48px;
+	background-color: ${palette.colors.black};
+	border: 1px solid ${palette.colors.gray[800]};
+	border-radius: ${palette.borderRadius.little};
+	color: ${palette.colors.white};
+	font-size: ${palette.typography.fontSize.base};
+	font-weight: ${palette.typography.fontWeight.medium};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	position: relative;
+
+	&:hover {
+		background-color: ${palette.colors.gray[900]};
+	}
+`;
+
+const AppleIcon = styled.div`
+	position: absolute;
+	right: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
+const MicrosoftLoginForm = styled.form`
+	width: 100%;
+	margin-top: 0.75rem;
+`;
+
+const MicrosoftButton = styled.button`
+	width: 100%;
+	height: 48px;
+	background-color: ${palette.colors.gray[900]};
+	border: 1px solid ${palette.colors.gray[800]};
+	border-radius: ${palette.borderRadius.little};
+	color: ${palette.colors.white};
+	font-size: ${palette.typography.fontSize.base};
+	font-weight: ${palette.typography.fontWeight.medium};
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	position: relative;
+
+	&:hover {
+		background-color: ${palette.colors.gray[800]};
+	}
+`;
+
+const MicrosoftIcon = styled.div`
 	position: absolute;
 	right: 1rem;
 	display: flex;

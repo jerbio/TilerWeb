@@ -1,21 +1,24 @@
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
-import { articles } from '@/core/common/data/articles';
+import { getArticles } from '@/core/common/data/articles';
 import ArticleCard from '@/components/articles/ArticleCard';
 import SEO from '@/core/common/components/SEO';
+import { useTranslation } from 'react-i18next';
 
 const SITE_URL = 'https://tiler.app';
 
-const buildStructuredData = () => ({
+const buildStructuredData = (
+	articles: ReturnType<typeof getArticles>,
+	t: (key: string) => string
+) => ({
 	'@context': 'https://schema.org',
 	'@graph': [
 		{
 			'@type': 'CollectionPage',
 			'@id': `${SITE_URL}/articles`,
 			url: `${SITE_URL}/articles`,
-			name: 'Articles | Tiler – Guides, Product Updates & Productivity Insights',
-			description:
-				"Explore Tiler's library of guides, product updates, and deep dives on AI scheduling and adaptive productivity.",
+			name: t('articles.index.seo.title'),
+			description: t('articles.index.seo.description'),
 			isPartOf: { '@type': 'WebSite', name: 'Tiler', url: SITE_URL },
 		},
 		{
@@ -30,8 +33,18 @@ const buildStructuredData = () => ({
 		{
 			'@type': 'BreadcrumbList',
 			itemListElement: [
-				{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-				{ '@type': 'ListItem', position: 2, name: 'Articles', item: `${SITE_URL}/articles` },
+				{
+					'@type': 'ListItem',
+					position: 1,
+					name: t('articles.breadcrumbs.home'),
+					item: SITE_URL,
+				},
+				{
+					'@type': 'ListItem',
+					position: 2,
+					name: t('articles.breadcrumbs.articles'),
+					item: `${SITE_URL}/articles`,
+				},
 			],
 		},
 	],
@@ -100,23 +113,24 @@ const Grid = styled.div`
 `;
 
 export default function Articles() {
+	const { t } = useTranslation();
+	const articles = getArticles(t);
+
 	return (
 		<PageWrapper>
 			<SEO
-				title="Articles | Tiler – Guides, Product Updates & Productivity Insights"
-				description="Explore Tiler's library of guides, product updates, and deep dives on AI scheduling and adaptive productivity."
-				keywords="Tiler articles, AI scheduling, smart calendar guides, productivity, time management"
+				title={t('articles.index.seo.title')}
+				description={t('articles.index.seo.description')}
+				keywords={t('articles.index.seo.keywords')}
 				canonicalUrl="/articles"
 				ogType="website"
 				twitterCard="summary_large_image"
-				structuredData={buildStructuredData()}
+				structuredData={buildStructuredData(articles, t)}
 			/>
 			<Hero>
-				<CategoryPill>ARTICLES</CategoryPill>
-				<HeroTitle>Insights for a Better Schedule</HeroTitle>
-				<HeroSubtitle>
-					Guides, product updates, and ideas on how AI can reshape the way you plan your day.
-				</HeroSubtitle>
+				<CategoryPill>{t('articles.index.hero.badge')}</CategoryPill>
+				<HeroTitle>{t('articles.index.hero.title')}</HeroTitle>
+				<HeroSubtitle>{t('articles.index.hero.subtitle')}</HeroSubtitle>
 			</Hero>
 
 			<Grid>

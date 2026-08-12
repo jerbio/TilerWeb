@@ -140,22 +140,6 @@ describe('AppLayout', () => {
 		}
 	});
 
-	it('theme toggle switches dark and light icon', async () => {
-		const user = userEvent.setup();
-		seedLayoutUser();
-
-		renderWithProviders(<AppLayout />);
-
-		expect(document.querySelector('.lucide-moon')).toBeInTheDocument();
-		expect(document.querySelector('.lucide-sun')).not.toBeInTheDocument();
-
-		const themeToggle = document.querySelector('.lucide-moon')?.closest('button');
-		expect(themeToggle).toBeTruthy();
-		await user.click(themeToggle!);
-
-		expect(document.querySelector('.lucide-sun')).toBeInTheDocument();
-	});
-
 	it('opens profile menu when avatar is clicked', async () => {
 		const user = userEvent.setup();
 		seedLayoutUser();

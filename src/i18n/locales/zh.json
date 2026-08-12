@@ -1,4 +1,4 @@
-﻿{
+{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "主页",
-			"waitlist": "等候名单",
-			"discover": "功能"
+			"discover": "功能",
+			"waitlist": "等候名单"
 		},
 		"voiceInput": {
 			"listening": "正在聆听...",
@@ -150,6 +150,307 @@
 			"footer": {
 				"cookieSettings": "Cookie设置"
 			}
+		},
+		"emptyState": {
+			"defaultText": "这里还没有内容"
+		},
+		"pagination": {
+			"page": "第 {{page}} 页"
+		}
+	},
+	"modals": {
+		"loading": {
+			"image": {
+				"alt": "加载指示器"
+			}
+		},
+		"success": {
+			"image": {
+				"alt": "成功图标"
+			}
+		}
+	},
+	"calendar": {
+		"nonViable": {
+			"title": "无法安排的事件",
+			"infoTooltip": "由于时间冲突或限制，无法安排这些事件。"
+		},
+		"longDuration": {
+			"title": "长时长事件",
+			"infoTooltip": "这些事件持续超过 15 小时，为便于阅读显示在此处。"
+		},
+		"event": {
+			"dueIn": "{{time}} 后到期",
+			"dateLabel": "日期：",
+			"startLabel": "开始：",
+			"endLabel": "结束：",
+			"durationLabel": "时长：",
+			"repetitionLabel": "重复：",
+			"deadlineLabel": "截止日期：",
+			"locationLabel": "在地图上查看路线",
+			"locationLinkLabel": "链接",
+			"videoLinkLabel": "视频通话",
+			"copyLink": "复制链接",
+			"openLink": "打开链接",
+			"previewBadge": "预览",
+			"previewHint": "This is a simulated preview — changes will only apply if you accept.",
+			"secondaryActionsLabel": "图块次要操作：",
+			"secondaryActions": {
+				"editLabel": "编辑",
+				"deleteLabel": "删除"
+			},
+			"save": "保存",
+			"cancel": "取消",
+			"actions": {
+				"complete": "完成",
+				"now": "现在",
+				"defer": "稍后处理"
+			},
+			"validation": {
+				"endAfterStart": "结束时间必须晚于开始时间"
+			},
+			"moreOptions": "更多选项",
+			"videoSource": {
+				"zoom": "Zoom",
+				"google": "Google Meet",
+				"outlook": "Microsoft Teams",
+				"other": "视频通话"
+			},
+			"deleteConfirmTitle": "删除此事件？",
+			"deleteConfirmBody": "这会将其从您的日程中永久移除。",
+			"deleteConfirmThirdPartyBody": "这也会从您已连接的日历服务中删除它。",
+			"deleteConfirmAction": "删除",
+			"deleteConfirmActionAria": "确认删除"
+		},
+		"createBlock": {
+			"title": "添加新区块",
+			"info": {
+				"name": {
+					"label": "名称",
+					"placeholder": "此区块叫什么名称？"
+				},
+				"start": {
+					"label": "开始时间",
+					"placeholder": "此区块从哪天开始？"
+				},
+				"end": {
+					"label": "结束时间",
+					"placeholder": "此区块在哪天结束？"
+				},
+				"hours": {
+					"label": "时长（小时）",
+					"placeholder": "需要多少小时？"
+				},
+				"minutes": {
+					"label": "时长（分钟）",
+					"placeholder": "需要多少分钟？"
+				},
+				"location": {
+					"label": "地址",
+					"placeholder": "此区块在哪里进行？"
+				},
+				"locationTag": {
+					"label": "地址别名",
+					"placeholder": "例如：家、办公室、健身房"
+				},
+				"duration": {
+					"valid": "时长 <mute>~</mute> <highlight>{{duration}}</highlight>",
+					"invalid": "<highlight>无效时长</highlight>"
+				}
+			},
+			"errors": {
+				"invalidDuration": "时长无效。结束时间必须晚于开始时间。"
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b> 已添加到您的日程",
+				"pending": "请稍候，Tiler 正在将 \"{{name}}\" 添加到您的日程"
+			},
+			"buttons": {
+				"reset": "重置",
+				"submit": "创建区块",
+				"collapse": "收起选项",
+				"expand": "更多选项",
+				"viewInTimeline": "查看区块"
+			},
+			"summary": {
+				"title": "摘要",
+				"description": "我有一个时长为 <b>{{duration}}</b>、名为 <b>{{name}}</b> 的事件",
+				"locationDescription": "，地点为 <b>{{location}}</b>",
+				"recurrenceFrequency": {
+					"daily": "天",
+					"weekly": "周",
+					"monthly": "月",
+					"yearly": "年"
+				},
+				"recurring": "。它将每 <b>{{recurrenceFrequency}}</b> 重复一次",
+				"recurringStart": "，从 <b>{{recurrenceStart}}</b> 开始",
+				"recurringEnd": "，直到 <b>{{recurrenceEnd}}</b>"
+			},
+			"actions": {
+				"repeatBlock": "重复此区块"
+			},
+			"sections": {
+				"blockColor": "选择区块颜色",
+				"blockActions": "区块操作"
+			}
+		},
+		"createTile": {
+			"title": "添加新图块",
+			"info": {
+				"description": "我需要在 <location/> 进行 <action/>。这需要 <hours/> 小时 <minutes/> 分钟，并且需在 <date/> 前完成。",
+				"action": {
+					"label": "图块名称",
+					"placeholder": "此图块叫什么名称？"
+				},
+				"tileSplit": {
+					"label": "此任务应发生几次？",
+					"placeholder": "例如：1、2、3..."
+				},
+				"location": {
+					"label": "地址",
+					"placeholder": "此图块在哪里进行？"
+				},
+				"locationTag": {
+					"label": "地址别名",
+					"placeholder": "例如：家、办公室、健身房"
+				},
+				"hours": {
+					"label": "图块时长（小时）",
+					"placeholder": "需要多少小时？"
+				},
+				"minutes": {
+					"label": "图块时长（分钟）",
+					"placeholder": "需要多少分钟？"
+				},
+				"range": {
+					"label": "时间范围",
+					"description": "安排在",
+					"conjunction": "和"
+				}
+			},
+			"sections": {
+				"tileColor": "选择图块颜色",
+				"tileActions": "图块操作",
+				"recurrenceType": {
+					"daily": "每天",
+					"weekly": "每周",
+					"monthly": "每月",
+					"yearly": "每年"
+				},
+				"recurrenceStartType": {
+					"title": "开始",
+					"default": "默认（<date/>）",
+					"on": "于"
+				},
+				"recurrenceEndType": {
+					"title": "结束",
+					"never": "永不",
+					"on": "于"
+				},
+				"recurrenceStartDate": {
+					"title": "结束日期",
+					"description": "重复从 <date/> 开始"
+				},
+				"recurrenceEndDate": {
+					"title": "结束日期",
+					"description": "重复于 <date/> 结束"
+				},
+				"recurrenceWeeklyDays": {
+					"title": "重复日期",
+					"monday": "星期一",
+					"tuesday": "星期二",
+					"wednesday": "星期三",
+					"thursday": "星期四",
+					"friday": "星期五",
+					"saturday": "星期六",
+					"sunday": "星期日"
+				},
+				"restrictionType": {
+					"anytime": "任意时间",
+					"work": "工作时间",
+					"personal": "个人时间",
+					"custom": "自定义"
+				}
+			},
+			"tip": {
+				"description": "按 <b><key/></b> 创建新图块",
+				"keys": {
+					"enter": "Enter",
+					"return": "Return"
+				}
+			},
+			"message": {
+				"success": "<b>\"<action/>\"</b> 已添加到您的日程",
+				"pending": "请稍候，Tiler 正在将 \"{{action}}\" 添加到您的日程"
+			},
+			"actions": {
+				"repeatTile": "重复此图块",
+				"timeRestriction": "时间限制",
+				"addLocationNickname": "添加地点别名"
+			},
+			"errors": {
+				"couldNotCreate": "无法创建图块。请重试。",
+				"scheduleProfile": "无法加载个人/工作时间",
+				"workProfileNotFound": "未找到工作时间限制配置",
+				"personalProfileNotFound": "未找到个人时间限制配置"
+			},
+			"recurrence": {
+				"description": "我需要每 <period/> 执行此任务 <repetition/> 次",
+				"periods": {
+					"daily": "天",
+					"weekly": "周",
+					"monthly": "月",
+					"yearly": "年"
+				}
+			},
+			"timeRestrictions": {
+				"anytime": "任意时间",
+				"personalHours": "个人时间",
+				"workHours": "工作时间",
+				"custom": "自定义"
+			},
+			"buttons": {
+				"reset": "重置",
+				"submit": "创建图块",
+				"collapse": "收起选项",
+				"expand": "更多选项",
+				"viewInTimeline": "查看图块"
+			},
+			"summary": {
+				"title": "摘要",
+				"description": "我需要 <b>{{action}}</b>",
+				"descriptionLocation": "，地点在 <b>{{location}}</b>",
+				"descriptionDuration": "。这需要 <b>{{hours}} 小时 {{minutes}} 分钟</b>",
+				"split": {
+					"once": "<b>一次</b>",
+					"twice": "<b>两次</b>",
+					"times": "<b>{{count}} 次</b>"
+				},
+				"range": "，在 <b>{{start}}</b> 与 <b>{{end}}</b> 之间",
+				"recurrenceFrequency": {
+					"daily": "天",
+					"weekly": "周",
+					"monthly": "月",
+					"yearly": "年"
+				},
+				"recurring": "。它将重复：",
+				"recurringFrequency": "每 <b>{{recurrenceFrequency}}</b> 一次",
+				"recurringStart": "，从 <b>{{recurrenceStart}}</b> 开始",
+				"recurringEnd": "，直到 <b>{{recurrenceEnd}}</b>"
+			}
+		},
+		"createSelection": {
+			"tile": {
+				"label": "创建图块",
+				"description": "可根据您的空闲时间调整的灵活任务。"
+			},
+			"block": {
+				"label": "创建区块",
+				"description": "固定任务，会保留在您指定的确切时间。"
+			}
+		},
+		"mobileChatInput": {
+			"placeholder": "向 Tiler 询问任何问题..."
 		}
 	},
 	"home": {
@@ -189,6 +490,40 @@
 				"errorLoadMessages": "加载聊天消息失败",
 				"errorSendMessage": "发送消息失败",
 				"errorAcceptChanges": "接受更改失败",
+				"tileRemoved": "图块已移除",
+				"tileCompleted": "此事件已完成",
+				"tileDeleted": "此事件已删除",
+				"navigating": "正在前往图块...",
+				"acceptToSee": "接受更改以查看此图块",
+				"simulationStarting": "Tilecast starting…",
+				"simulationQueued": "Tilecast queued…",
+				"simulationGenerating": "Generating tilecast…",
+				"simulationUpdating": "Updating tilecast…",
+				"simulationReady": "Tilecast 已就绪",
+				"simulationChangesLabel": "项更改",
+				"simulationDefunct": "Tilecast 已过期",
+				"review": "查看",
+				"simulationInProgress": "仍在预测此更改。",
+				"simulationFailed": "Tilecast 不可用",
+				"simulationStale": "Tilecast 已过期",
+				"simulationUnavailable": "Tilecast 不可用",
+				"loadingSimulation": "Loading tilecast…",
+				"reviewSimulation": "查看 Tilecast",
+				"retry": "重试",
+				"reviewNoPreview": "此更改没有可用的预测图块。",
+				"applyNow": "立即应用",
+				"exitReview": "退出查看",
+				"previous": "上一个",
+				"next": "下一个",
+				"expand": "展开",
+				"expandMore": "展开更多",
+				"collapse": "收起",
+				"viewCurrent": "当前",
+				"viewSimulation": "Tilecast",
+				"pillStrip": {
+					"showMore": "+{{count}} 个更多",
+					"showLess": "收起"
+				},
 				"wsStatus": {
 					"actionInitStart1": "正在初始化操作生成...",
 					"actionInitStart2": "正在设置...",
@@ -236,6 +571,15 @@
 					"usingDefaultLocation": "正在使用默认位置 - 点击图标获取您当前的位置。",
 					"clickIconToGetLocation": "点击图标获取您当前的位置或编辑您的位置"
 				},
+				"sessionHistory": {
+					"title": "聊天记录",
+					"loading": "正在加载会话...",
+					"loadingMore": "正在加载更多...",
+					"loadMore": "加载更早的会话",
+					"empty": "尚无对话",
+					"untitled": "未命名会话",
+					"newConversation": "新建对话"
+				},
 				"errorPopup": {
 					"chatLimitReached": "聊天次数已达上限",
 					"headerText": "想要超过20个提示吗？",
@@ -259,6 +603,58 @@
 					"messageContinued": "点击链接即可解锁与Tiler的无限聊天。",
 					"button": "知道了",
 					"footer": "没有收到电子邮件？请检查您的垃圾邮件文件夹或重试。"
+				},
+				"promptSuggestions": {
+					"coreStructural": {
+						"morningSetup": "安排我的晨间例行事项",
+						"dailyPlanning": "规划我的一天",
+						"travelBuffer": "添加出行缓冲时间",
+						"taskReview": "查看我的任务",
+						"dayWrapUp": "总结我的一天"
+					},
+					"professional": {
+						"salesCall": "安排销售电话",
+						"clientPresentation": "准备客户演示",
+						"proposalDrafting": "起草提案",
+						"contractReview": "审阅合同",
+						"budgetReview": "分析预算",
+						"teamSync": "与团队同步",
+						"boardPrep": "准备董事会会议",
+						"performanceCheckIn": "进行绩效沟通"
+					},
+					"operations": {
+						"dispatchSchedule": "创建调度计划",
+						"shiftChangeover": "规划交接班",
+						"inventoryCheck": "检查库存",
+						"qualityAudit": "进行质量审核",
+						"fieldVisit": "安排现场拜访",
+						"vendorCoordination": "协调供应商",
+						"reportSubmission": "提交报告"
+					},
+					"locationLinked": {
+						"siteVisit": "安排现场拜访",
+						"officeBlock": "预留办公室时间",
+						"onSiteInspection": "规划现场检查",
+						"customerAppointment": "预约客户会面",
+						"pickupDelivery": "安排取送服务",
+						"routePlanning": "规划我的路线"
+					},
+					"strategic": {
+						"marketResearch": "进行市场调研",
+						"competitiveScan": "分析竞争对手",
+						"weeklyForecast": "创建每周预测",
+						"hiringInterview": "安排招聘面试",
+						"investorCall": "准备投资者电话",
+						"productRoadmapReview": "审阅产品路线图"
+					},
+					"deepWork": {
+						"writingSession": "预留写作时间",
+						"analysisBlock": "安排分析时间",
+						"designSprint": "规划设计冲刺",
+						"codingBlock": "预留编码时间",
+						"financialModeling": "建立财务模型",
+						"researchStudy": "进行研究"
+					}
 				}
 			}
 		},
@@ -336,6 +732,91 @@
 						"travelTime": "15分钟车程",
 						"deepWork": "深度工作时段"
 					}
+				},
+				"coffee": {
+					"calendarTitle": "11 月 19 日，星期二",
+					"messages": {
+						"userRequest": "上午 10 点在第五大道的星巴克与迈克喝咖啡",
+						"aiResponse1": "距离您当前位置 18 分钟。9:40 出发吗？",
+						"userConfirm": "听起来不错",
+						"aiConfirm": "Scheduled! ✓"
+					},
+					"tiles": {
+						"travel": "前往星巴克",
+						"travelTime": "18 分钟",
+						"coffee": "与迈克喝咖啡"
+					}
+				},
+				"airport": {
+					"calendarTitle": "11 月 23 日，星期六",
+					"messages": {
+						"userRequest": "下午 3 点的航班，需要下午 1 点前到机场",
+						"aiResponse1": "到机场需要 45 分钟。预留缓冲时间，12:10 出发吗？",
+						"userConfirm": "是的",
+						"aiConfirm": "Travel time added! ✓"
+					},
+					"tiles": {
+						"travel": "前往机场",
+						"travelTime": "45 分钟",
+						"airport": "机场值机",
+						"flight": "航班起飞"
+					}
+				},
+				"school": {
+					"calendarTitle": "Monday, Nov 18",
+					"messages": {
+						"userRequest": "Pick up kids from school at 3:30 PM",
+						"aiResponse1": "20 min drive. Leave at 3:10 PM?",
+						"userConfirm": "Perfect",
+						"aiConfirm": "Added to calendar! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to School",
+						"travelTime": "20 min",
+						"pickup": "School Pickup"
+					}
+				},
+				"doctor": {
+					"calendarTitle": "Wednesday, Nov 20",
+					"messages": {
+						"userRequest": "Doctor appointment downtown at 2:30 PM",
+						"aiResponse1": "28 min from office. Leave at 2:00 PM?",
+						"userConfirm": "Yes",
+						"aiConfirm": "Scheduled! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Clinic",
+						"travelTime": "28 min",
+						"doctor": "Doctor Appointment"
+					}
+				},
+				"haircut": {
+					"calendarTitle": "Friday, Nov 22",
+					"messages": {
+						"userRequest": "Haircut at salon near home at 4 PM",
+						"aiResponse1": "8 min walk. Leave at 3:50 PM?",
+						"userConfirm": "Yes",
+						"aiConfirm": "Done! ✓"
+					},
+					"tiles": {
+						"travel": "Walk to Salon",
+						"travelTime": "8 min",
+						"haircut": "Haircut Appointment"
+					}
+				},
+				"restaurant": {
+					"calendarTitle": "Saturday, Nov 23",
+					"messages": {
+						"userRequest": "Dinner reservation at 7 PM at Italian place",
+						"aiResponse1": "32 min drive. Leave at 6:25 PM?",
+						"userConfirm": "Perfect",
+						"aiConfirm": "Added! ✓"
+					},
+					"tiles": {
+						"travel": "Travel to Restaurant",
+						"travelTime": "32 min",
+						"dinner": "Dinner Reservation"
+					}
 				}
 			}
 		},
@@ -354,7 +835,47 @@
 		},
 		"featureHighlights": {
 			"title": "功能亮点",
-			"subtitle": "使用Tiler简化您的生活，这是我们可以帮助您做的事情。"
+			"subtitle": "使用Tiler简化您的生活，这是我们可以帮助您做的事情。",
+			"animations": {
+				"nls": {
+					"transcript": "Lunch with Sarah tomorrow at noon...",
+					"responsePrimary": "Scheduled: Lunch with Sarah - Tomorrow 12:00 PM",
+					"responseTravel": "+ 25 min travel block added",
+					"responseLocation": "Downtown - 1 hr"
+				},
+				"travel": {
+					"stops": {
+						"home": {
+							"label": "Home",
+							"time": "8:00 AM"
+						},
+						"office": {
+							"label": "Office",
+							"time": "9:15 AM"
+						},
+						"cafe": {
+							"label": "Cafe",
+							"time": "1:00 PM"
+						},
+						"gym": {
+							"label": "Gym",
+							"time": "5:30 PM"
+						}
+					}
+				},
+				"undo": {
+					"tileName": "Gym session",
+					"originalMeta": "At Home - Tue - 10:00 AM",
+					"previewMeta": "At Home - Wed - 2:00 PM",
+					"previewBadge": "PREVIEW",
+					"undoAction": "Undo",
+					"acceptAction": "Accept"
+				},
+				"tileshare": {
+					"tileName": "Gym session",
+					"tileSub": "From Alex - 1 hr"
+				}
+			}
 		},
 		"tileCardSection": {
 			"header": "可视化您的任务和预约",
@@ -448,6 +969,169 @@
 					"question": "如何使用公交功能？",
 					"answer": "公交功能不仅仅是计算旅行时间——它还充当您的导航助手。它帮助您规划路线，建议最佳交通方式，并提供实时方向，实现任务和地点之间的无缝过渡。只需点击旅行图标即可获得即时导航，确保您始终准时并走在正确的轨道上。"
 				}
+			}
+		}
+	},
+	"auth": {
+		"signup": {
+			"title": "Get started with Tiler",
+			"subtitle": "Create your free account to enjoy seamless scheduling",
+			"googleButton": "Sign up with Google",
+			"appleButton": "Sign up with Apple",
+			"microsoftButton": "Sign up with Microsoft",
+			"emailLabel": "Email Address",
+			"emailPlaceholder": "E.g yourname@outlook.com",
+			"submitButton": "Create my free account",
+			"submitting": "Creating account...",
+			"footer": "Already have an account?",
+			"footerLink": "Sign in instead",
+			"verificationSent": "Verification code sent to your email!",
+			"createAccountError": "Failed to create account. Please try again."
+		},
+		"signin": {
+			"title": "Welcome back to Tiler",
+			"subtitle": "Sign in to continue your scheduling journey",
+			"googleButton": "Sign in with Google",
+			"appleButton": "Sign in with Apple",
+			"microsoftButton": "Sign in with Microsoft",
+			"submitButton": "Sign in to my account",
+			"submitting": "Signing in...",
+			"footer": "Don't have an account?",
+			"footerLink": "Sign up instead"
+		},
+		"verification": {
+			"title": "Verification Required",
+			"header": "Enter your verification code",
+			"description": "We've sent a verification code to",
+			"label": "Verification Code",
+			"placeholder": "Enter verification code",
+			"verifyButton": "Verify Code",
+			"verifying": "Verifying...",
+			"resendButton": "Didn't receive a code? Resend",
+			"resending": "Sending...",
+			"cancel": "Cancel",
+			"success": "Account verified successfully!",
+			"error": "Invalid verification code. Please try again.",
+			"resendSuccess": "Verification code resent!",
+			"resendError": "Failed to resend code. Please try again."
+		},
+		"goBack": "Go back"
+	},
+	"settings": {
+		"title": "设置",
+		"back": "返回",
+		"logout": "退出登录",
+		"breadcrumb": {
+			"home": "首页",
+			"settings": "设置"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "账户信息",
+				"description": "查看您的账户并修改个人信息",
+				"placeholder": "Account information settings coming soon...",
+				"fields": {
+					"fullName": "全名",
+					"username": "用户名",
+					"email": "电子邮箱",
+					"phoneNumber": "电话号码",
+					"phoneNumberPlaceholder": "添加电话号码",
+					"countryCode": "国家区号",
+					"countryCodeSearch": "搜索国家...",
+					"countryCodeNoResults": "未找到国家",
+					"dateOfBirth": "出生日期",
+					"dateOfBirthPlaceholder": "年/月/日"
+				},
+				"saveChanges": "保存更改",
+				"saving": "保存中...",
+				"deleteAccount": "删除我的账户",
+				"saveSuccess": "账户信息更新成功",
+				"saveError": "保存更改失败，请重试。",
+				"deleteNotImplemented": "删除账户功能即将推出"
+			},
+			"tilePreferences": {
+				"title": "图块偏好",
+				"description": "定义您的出行方式，帮助Tiler理解您的日常时间模式",
+				"placeholder": "Tile preferences settings coming soon...",
+				"howMoveAround": "您如何出行？",
+				"cycling": "骑行",
+				"driving": "驾车",
+				"transit": "公共交通",
+				"defineTimeRestrictions": "定义您的时间限制",
+				"myWorkHours": "我的工作时间",
+				"myPersonalHours": "我的个人时间",
+				"setBlockOutHours": "设置屏蔽时间",
+				"bedTime": "就寝时间",
+				"startsAt": "开始于",
+				"endsAt": "结束于",
+				"useCustom": "Use custom",
+				"customTimeRestrictions": "Custom time restrictions",
+				"reset": "Reset",
+				"saveChanges": "保存更改",
+				"saving": "保存中...",
+				"saveSuccess": "图块偏好已成功更新",
+				"saveError": "保存失败，请重试。",
+				"customSaved": "Custom time restrictions saved",
+				"bedTimeStartRequired": "请选择就寝开始时间",
+				"bedTimeEndRequired": "请选择起床时间",
+				"scheduleIncompleteDay": "{{label}}：请为{{day}}设置开始和结束时间",
+				"dayLabels": {
+					"sun": "日",
+					"mon": "一",
+					"tue": "二",
+					"wed": "三",
+					"thu": "四",
+					"fri": "五",
+					"sat": "六"
+				},
+				"dayNames": {
+					"sun": "星期日",
+					"mon": "星期一",
+					"tue": "星期二",
+					"wed": "星期三",
+					"thu": "星期四",
+					"fri": "星期五",
+					"sat": "星期六"
+				},
+				"start": "开始",
+				"end": "结束",
+				"copyTimes": "Copy times",
+				"paste": "Paste times",
+				"cancelCopy": "Cancel copy",
+				"themeMode": "Color theme",
+				"themeModeLight": "Light",
+				"themeModeDark": "Dark",
+				"themeModeSystem": "Use device setting",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "上午",
+				"pm": "下午"
+			},
+			"tilerContacts": {
+				"title": "Tiler Contacts",
+				"description": "Add your colleagues as contacts in tiler so you can easily share tiles with them.",
+				"placeholder": "Contacts management coming soon...",
+				"youHave": "You have",
+				"tilerContacts": "Tiler Contacts",
+				"enterFullName": "enter full name",
+				"emailOrPhone": "email or phone number"
+			},
+			"notificationPreferences": {
+				"title": "Notification Preferences",
+				"description": "Manage reminders and email updates",
+				"placeholder": "Notification settings coming soon...",
+				"tileReminders": "Tile Reminders",
+				"emailNotifications": "Email Notifications",
+				"pushNotifications": "Push Notifications",
+				"saveChanges": "Save changes",
+				"saving": "Saving...",
+				"saveSuccess": "Notification preferences updated successfully",
+				"saveError": "Failed to save changes. Please try again."
+			},
+			"connections": {
+				"title": "Connections",
+				"description": "Manage apps connected to your Tiler account",
+				"placeholder": "Connection settings coming soon..."
 			}
 		}
 	},
@@ -555,6 +1239,7 @@
 		"notFoundMessage": "哎呀，我们找不到'{{query}}'。您想用这个标题创建一个磁贴吗？",
 		"notFoundDismiss": "不用了",
 		"notFoundCreate": "创建",
+		"editEvent": "Edit",
 		"setAsNow": "设为当前",
 		"markComplete": "完成",
 		"markDeleted": "删除",
@@ -591,7 +1276,16 @@
 			"minutesShort": "分钟",
 			"confirm": "确认",
 			"cancel": "取消"
-		}
+		},
+		"userMenu": {
+			"logout": "Logout",
+			"signOutSuccess": "You have been successfully signed out",
+			"signOutError": "Failed to sign out. Please try again.",
+			"defaultUsername": "User",
+			"settings": "Settings"
+		},
+		"expandPanel": "Expand panel",
+		"collapsePanel": "Collapse panel"
 	},
 	"errors": {
 		"chatLimitReached": "聊天限制已达到。请稍后再试。",
@@ -616,13 +1310,25 @@
 			"titleBlock": "编辑区块",
 			"titleTile": "编辑磁贴",
 			"nameSection": "名称",
-			"occurrenceSection": "????",
+			"occurrenceSection": "发生次数",
 			"timeSection": "时间和时长",
-			"recurringToggle": "重复事件",
 			"repetitionSection": "重复",
+			"recurringToggle": "重复事件",
 			"locationSection": "位置",
 			"colorSection": "颜色",
 			"notesSection": "备注",
+			"restrictionSection": "Time Restrictions",
+			"restrictionEnabled": "Enable time restrictions",
+			"restrictionTypeAnytime": "Anytime",
+			"restrictionTypeWork": "Work hours",
+			"restrictionTypePersonal": "Personal hours",
+			"restrictionTypeCustom": "Custom",
+			"restrictionWorkInfo": "Work hours are managed in your Tile Preferences.",
+			"restrictionPersonalInfo": "Personal hours are managed in your Tile Preferences.",
+			"restrictionGoToPreferences": "Go to Tile Preferences",
+			"restrictionDayOff": "Off",
+			"restrictionPreviewAnytime": "Anytime",
+			"restrictionPreviewCustom": "Custom",
 			"name": "名称",
 			"start": "开始",
 			"end": "结束",
@@ -670,85 +1376,266 @@
 			"savedLocations": "已保存的位置",
 			"googleResults": "谷歌地图",
 			"poweredByGoogle": "由 Google 提供支持",
-			"noLocationResults": "未找到位置"
+			"noLocationResults": "未找到位置",
+			"openNotes": "Open notes",
+			"subEvents": {
+				"title": "Sessions",
+				"titleWithCount": "Sessions ({{count}})",
+				"loading": "Loading sessions…",
+				"empty": "No sessions yet",
+				"error": "Couldn't load sessions",
+				"retry": "Retry",
+				"loadMore": "Load more",
+				"loadEarlier": "Load earlier",
+				"allLoaded": "All {{count}} sessions loaded",
+				"showCompleted": "Show completed & removed",
+				"goTo": "Go to this session on the calendar",
+				"completed": "Completed",
+				"removed": "Removed"
+			}
 		}
 	},
-	"settings": {
-		"title": "设置",
-		"back": "返回",
-		"logout": "退出登录",
-		"breadcrumb": {
-			"home": "首页",
-			"settings": "设置"
+	"discover": {
+		"seo": {
+			"title": "Discover - Tiler",
+			"description": "Explore the moments where your day finally makes sense. Find your way around the Tiler app and discover things to try in-app."
 		},
-		"sections": {
-			"accountInfo": {
-				"title": "账户信息",
-				"description": "查看您的账户并修改个人信息",
-				"fields": {
-					"fullName": "全名",
-					"username": "用户名",
-					"email": "电子邮箱",
-					"phoneNumber": "电话号码",
-					"phoneNumberPlaceholder": "添加电话号码",
-					"countryCode": "国家区号",
-					"countryCodeSearch": "搜索国家...",
-					"countryCodeNoResults": "未找到国家",
-					"dateOfBirth": "出生日期",
-					"dateOfBirthPlaceholder": "年/月/日"
-				},
-				"saveChanges": "保存更改",
-				"saving": "保存中...",
-				"deleteAccount": "删除我的账户",
-				"saveSuccess": "账户信息更新成功",
-				"saveError": "保存更改失败，请重试。",
-				"deleteNotImplemented": "删除账户功能即将推出"
+		"hero": {
+			"badge": "Navigate Tiler",
+			"title": "Here’s Where Everything Lives",
+			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
+		},
+		"setUpTiler": {
+			"badge": "Set Up Tiler",
+			"title": "Ready in under 3 minutes.",
+			"summary": "Your calendar, your preferences, your constraints — four steps that give Tiler everything it needs to run Adaptive Scheduling from day one.",
+			"visual": {
+				"step1": "Create Account",
+				"step2": "Connect Calendar",
+				"step3": "Set Up Preferences",
+				"step4": "Adaptive Scheduling"
 			},
-			"tilePreferences": {
-				"title": "图块偏好",
-				"description": "定义您的出行方式，帮助Tiler理解您的日常时间模式",
-				"howMoveAround": "您如何出行？",
-				"cycling": "骑行",
-				"driving": "驾车",
-				"transit": "公共交通",
-				"defineTimeRestrictions": "定义您的时间限制",
-				"myWorkHours": "我的工作时间",
-				"myPersonalHours": "我的个人时间",
-				"setBlockOutHours": "设置屏蔽时间",
-				"bedTime": "就寝时间",
-				"startsAt": "开始于",
-				"endsAt": "结束于",
-				"saveChanges": "保存更改",
-				"saving": "保存中...",
-				"saveSuccess": "图块偏好已成功更新",
-				"saveError": "保存失败，请重试。",
-				"bedTimeStartRequired": "请选择就寝开始时间",
-				"bedTimeEndRequired": "请选择起床时间",
-				"scheduleIncompleteDay": "{{label}}：请为{{day}}设置开始和结束时间",
-				"dayLabels": {
-					"sun": "日",
-					"mon": "一",
-					"tue": "二",
-					"wed": "三",
-					"thu": "四",
-					"fri": "五",
-					"sat": "六"
+			"cards": {
+				"account": {
+					"title": "Create your account",
+					"subtext": "Sign up with your email — free to start, no credit card needed.",
+					"btnIdle": "Create free account",
+					"btnCreating": "Creating account…",
+					"btnDone": "✓ Account created!"
 				},
-				"dayNames": {
-					"sun": "星期日",
-					"mon": "星期一",
-					"tue": "星期二",
-					"wed": "星期三",
-					"thu": "星期四",
-					"fri": "星期五",
-					"sat": "星期六"
+				"calendar": {
+					"title": "Connect your calendar",
+					"subtext": "Link Google or Outlook — Tiler reads your events and builds around them.",
+					"calName": "Google Calendar",
+					"statusIdle": "Tap to connect",
+					"statusConnecting": "Connecting…",
+					"statusConnected": "✓ Connected"
 				},
-				"start": "开始",
-				"end": "结束",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
-				"am": "上午",
-				"pm": "下午"
+				"preferences": {
+					"title": "Set up your preferences",
+					"subtext": "Choose your transit mode and set time limits in your profile.",
+					"transitLabel": "Transit mode",
+					"drive": "Drive",
+					"transit": "Transit",
+					"walk": "Walk",
+					"workHoursLabel": "Work hours"
+				},
+				"adaptive": {
+					"title": "Ready for Adaptive Scheduling",
+					"subtext": "Your schedule is live — Tiler adapts automatically as your day changes.",
+					"schedLabel": "Your schedule",
+					"meeting": "9am meeting",
+					"run": "Run · 30m",
+					"newTime": "New: 10am",
+					"urgentCall": "Urgent call",
+					"recalculating": "Recalculating…",
+					"rebuilt": "✓ Schedule rebuilt"
+				}
+			},
+			"supportNote": "Each step is an input to Tiler’s scheduling engine — your calendar tells it what’s fixed, your preferences tell it how you move, and your time limits tell it when you’re free. Together, they give Tiler the full picture it needs to run Adaptive Scheduling: a schedule that adjusts itself when things change."
+		},
+		"whatIsTiler": {
+			"badge": "What Is Tiler",
+			"title": "Not a calendar. An AI that runs your day",
+			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn’t go to plan.",
+			"visual": {
+				"tile1": "Gym · 45 min",
+				"tile2": "Travel · 12 min",
+				"tile3": "Client Call · 1 hr",
+				"tile4": "Groceries · 30 min"
+			},
+			"subItems": {
+				"aiRunsDay": {
+					"title": "Tiler is an AI that runs your day.",
+					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn’t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
+				},
+				"fourCoreBlocks": {
+					"title": "The Four Core Blocks of Tiler"
+				},
+				"howDifferent": {
+					"title": "How Tiler is Different"
+				}
+			},
+			"coreBlocks": {
+				"tiles": {
+					"label": "AutoTile",
+					"title": "Tiles",
+					"desc": "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
+				},
+				"blocks": {
+					"label": "Locked",
+					"title": "Blocks",
+					"desc": "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them."
+				},
+				"route": {
+					"label": "Location-aware",
+					"title": "Route",
+					"desc": "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop."
+				},
+				"tileShare": {
+					"label": "Team & Family",
+					"title": "TileShare",
+					"desc": "Assign tiles to teammates or family. Everyone’s calendar adapts around shared commitments automatically. Context travels with the task."
+				}
+			},
+			"comparison": {
+				"headerLeft": "Google Calendar",
+				"headerRight": "Tiler",
+				"rows": [
+					{
+						"left": "You schedule everything manually",
+						"right": "AI builds your schedule from plain English"
+					},
+					{
+						"left": "No awareness of travel time",
+						"right": "Auto-calculates and adds travel buffers"
+					},
+					{
+						"left": "Static — won’t adapt when things change",
+						"right": "Detects ripples and reschedules instantly"
+					},
+					{
+						"left": "No navigation or route planning",
+						"right": "Navigate your day tile-to-tile with real transit"
+					},
+					{
+						"left": "Shared calendars only — no task assignment",
+						"right": "TileShare: assign and track tasks with anyone"
+					},
+					{
+						"left": "Nothing confirmed — events just appear",
+						"right": "Confirmation-first — you approve all changes"
+					}
+				]
+			}
+		},
+		"howToUseTiler": {
+			"badge": "How To Use Tiler",
+			"title": "From intent to done. In seconds.",
+			"summary": "Connect your calendar, add your tiles, and let Tiler build the rest. A step-by-step guide to running your day with Tiler.",
+			"visual": {
+				"step1": "Add Tiles",
+				"step2": "AI Plans",
+				"step3": "Day Built"
+			},
+			"items": {
+				"connectCalendar": {
+					"title": "Connect a Calendar",
+					"body": "Connecting your calendar allows Tiler to see your real commitments. Once synced, incoming calendar events appear as blocks in your timeline. You can accept, edit, or resolve conflicts directly inside Tiler. When events change, Tiler adapts your tiles around them so your day stays balanced and realistic."
+				},
+				"createBlock": {
+					"title": "How to Create a Block",
+					"body": "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don’t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable."
+				},
+				"flexibleTiles": {
+					"title": "Creating Flexible Tiles",
+					"body": "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline — Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions."
+				},
+				"updateTile": {
+					"title": "How to Update a Tile",
+					"body": "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don’t need to move other tasks manually, the system handles the ripple effects."
+				},
+				"travelTime": {
+					"title": "Travel Time & Route",
+					"body": "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn’t a gap — it’s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn’t just tell you what to do. It gets you there."
+				}
+			}
+		},
+		"features": {
+			"badge": "Features",
+			"title": "Everything Tiler can do.",
+			"summary": "Every feature is built around one principle: your schedule should work for you, not the other way around.",
+			"items": {
+				"adaptiveTiles": {
+					"name": "Adaptive Tiles",
+					"desc": "The core unit of Tiler. Each tile is a task, event, or habit with a duration — Tiler schedules them intelligently and moves them when your day changes.",
+					"badge": "Core feature"
+				},
+				"aiScheduling": {
+					"name": "AI scheduling assistant",
+					"desc": "Tiler asks clarifying questions, proposes the best available time, and builds a complete schedule including dependencies — always with your approval first.",
+					"badge": "Core feature"
+				},
+				"chatScheduling": {
+					"name": "Chat scheduling",
+					"desc": "Tell Tiler what you need through a natural chat interface. It understands your intent and proposes a plan without you filling in a single form.",
+					"badge": "Core feature"
+				},
+				"naturalLanguage": {
+					"name": "Natural language input",
+					"desc": "Describe tasks in plain English — no forms, no dropdowns. Tiler understands context, urgency, duration, and location from how you naturally talk.",
+					"badge": "Core feature"
+				},
+				"autoTravel": {
+					"name": "Auto travel buffers",
+					"desc": "Tiler automatically inserts realistic travel time between location-based tiles based on your actual distance and transit options. Back-to-back never means late.",
+					"badge": "Unique to Tiler"
+				},
+				"autoLocations": {
+					"name": "Auto locations",
+					"desc": "Link locations to tiles once and Tiler remembers. Every time that task appears, travel time is calculated automatically from wherever you are.",
+					"badge": "Unique to Tiler"
+				},
+				"timeRestrictions": {
+					"name": "Time restrictions",
+					"desc": "Set the hours you’re available and Tiler only schedules within those bounds. Your personal time stays yours — no task bleeds into off-hours unless you allow it.",
+					"badge": "Preferences"
+				},
+				"adaptiveRescheduling": {
+					"name": "Adaptive rescheduling",
+					"desc": "When a meeting runs long or a task gets missed, Tiler detects the ripple across your whole day and proposes fixes — instantly, with your approval before changing anything.",
+					"badge": "Core feature"
+				},
+				"calendarIntegration": {
+					"name": "Calendar integration",
+					"desc": "Connect Google Calendar or Outlook. Tiler reads your existing events and schedules all new tiles around them — no double bookings, ever. Supports multiple calendars.",
+					"badge": "Integration"
+				},
+				"crossPlatform": {
+					"name": "Cross-platform sync",
+					"desc": "Web, iOS, and Android all stay in real-time sync. Start a task on your laptop and check in on your phone without missing a beat. One schedule, everywhere.",
+					"badge": "Platform"
+				},
+				"habitScheduling": {
+					"name": "Habit scheduling",
+					"desc": "Add recurring habits and Tiler auto-fits them around your day — keeping you consistent with your routines without you having to think about it each morning.",
+					"badge": "Wellness"
+				},
+				"deferReschedule": {
+					"name": "Defer & reschedule",
+					"desc": "Missed a tile? Tiler’s Defer feature instantly finds the next best slot and reschedules with one tap. Never lose a task — just push it forward intelligently.",
+					"badge": "Core feature"
+				},
+				"smartNotifications": {
+					"name": "Smart notifications",
+					"desc": "Get alerted when it’s time to leave for your next tile — with live transit updates if your route changes. Never miss a departure time because you lost track of the clock.",
+					"badge": "Real-time"
+				},
+				"tileShare": {
+					"name": "TileShare",
+					"desc": "Share tiles with family or teammates. Assign who handles what. Track completion. Everyone’s calendar adapts around shared commitments automatically — no extra apps needed.",
+					"badge": "Collaboration"
+				}
 			}
 		}
 	},
@@ -770,5 +1657,481 @@
 		"submitting": "提交中...",
 		"submitSuccess": "感谢您的反馈！",
 		"submitError": "提交反馈失败，请重试。"
+	},
+	"location": {
+		"verified": {
+			"label": "Verified",
+			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
+		}
+	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "Tileshare",
+			"nav": {
+				"active": "Active",
+				"sent": "Sent",
+				"received": "Received ({{count}})",
+				"inbox": "Inbox Link",
+				"outbox": "Outbox Link"
+			},
+			"toolbar": {
+				"welcome": "Welcome to your Tileshare Dashboard",
+				"create": "Create tileshare"
+			},
+			"createSelection": {
+				"single": {
+					"label": "Single Tileshare",
+					"description": "A single task with your colleagues."
+				},
+				"multi": {
+					"label": "Multi Tileshare",
+					"description": "A variety of tasks in one project."
+				}
+			},
+			"create": {
+				"back": "Back to tileshare",
+				"single": {
+					"title": "Create a single tileshare",
+					"description": "Create and share a single task with your colleagues. Once they accept, we'll add it to their schedule.",
+					"submit": "Create single tileshare"
+				},
+				"multi": {
+					"title": "Create a multi tileshare",
+					"description": "Create and share a variety of tasks in one project. Once colleagues accept, we'll add it to their schedule.",
+					"submit": "Create multi tileshare"
+				},
+				"fields": {
+					"name": {
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"placeholder": "Add a deadline"
+					},
+					"location": {
+						"placeholder": "Add a location (optional)"
+					},
+					"note": {
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"shareTo": {
+					"label": "Share to:",
+					"placeholder": "email address / phone number (Enter to select)",
+					"add": "Add recipient",
+					"remove": "Remove {{recipient}}"
+				},
+				"buttons": {
+					"cancel": "Cancel"
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"deadlineRequired": "Please add a deadline",
+					"recipientRequired": "Please add at least one recipient",
+					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+				},
+				"toast": {
+					"creating": "Creating tileshare…",
+					"error": "Couldn't create tileshare. Please try again."
+				},
+				"success": {
+					"message": "Your tileshare \"{{name}}\" has been created.",
+					"view": "View tileshare"
+				}
+			},
+			"filter": {
+				"all": "All",
+				"inProgress": "In Progress"
+			}
+		},
+		"card": {
+			"progress": "Progress",
+			"dueOn": "Due on:",
+			"dueBy": "Due by:",
+			"multiTileshare": "Multi tileshare",
+			"tileshare": "Tileshare"
+		},
+		"active": {
+			"title": "Active",
+			"empty": "No active tileshares",
+			"emptyFiltered": "No in-progress items in your active tileshares"
+		},
+		"sent": {
+			"title": "Sent",
+			"empty": "You haven't sent any tileshares yet",
+			"emptyFiltered": "No in-progress items in your sent tileshares"
+		},
+		"received": {
+			"title": "Received",
+			"empty": "You haven't received any tileshares yet",
+			"emptyFiltered": "No in-progress items in your received tileshares"
+		},
+		"tileshareDetail": {
+			"title": "Tileshare Detail"
+		},
+		"tiletteDetail": {
+			"title": "Tilette Detail"
+		},
+		"invite": {
+			"title": "Invite"
+		},
+		"inbox": {
+			"title": "Inbox"
+		},
+		"outbox": {
+			"title": "Outbox"
+		}
+	},
+	"tile": {
+		"noteButtonAria": "Open notes for this tile"
+	},
+	"notesEditor": {
+		"placeholder": "Start writing. Use the toolbar above to format your notes and add links. Your notes are saved automatically and sync across all your devices.",
+		"surfaceAria": "Note editor",
+		"back": "Back",
+		"close": "Close",
+		"eyebrow": "Notes",
+		"loading": "Loading notes…",
+		"errorLoad": "Couldn't load notes.",
+		"saving": "Saving…",
+		"saved": "Saved",
+		"errorSave": "Not saved",
+		"unsaved": "Editing…",
+		"save": "Save",
+		"saveNow": "Save now",
+		"linkPrompt": "URL",
+		"conflict": {
+			"title": "Someone else updated this note.",
+			"discard": "Discard mine",
+			"keep": "Keep editing"
+		},
+		"tool": {
+			"bold": "Bold",
+			"italic": "Italic",
+			"underline": "Underline",
+			"strike": "Strikethrough",
+			"code": "Inline code",
+			"h1": "Heading 1",
+			"h2": "Heading 2",
+			"h3": "Heading 3",
+			"bullet": "Bullet list",
+			"ordered": "Numbered list",
+			"task": "Checklist",
+			"quote": "Quote",
+			"link": "Link",
+			"undo": "Undo",
+			"redo": "Redo"
+		}
+	},
+	"getStarted": {
+		"seo": {
+			"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
+			"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
+			"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+		},
+		"hero": {
+			"badge": "Product Update",
+			"title": "Your First Five Minutes with Tiler",
+			"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there."
+		},
+		"intro": {
+			"lede": "Most scheduling tools ask you to start from scratch … dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
+			"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+		},
+		"steps": {
+			"heading": "Six Steps to Your First Timeline",
+			"step1": {
+				"title": "Sign In & Create Your Profile",
+				"body": "Everything starts with your Tiler account. Sign in and the app immediately begins building your profile memory! The contextual layer that the engine uses to understand how you work, when you're available, and what matters to you.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step2": {
+				"title": "Set Your Wake-Up Time",
+				"body": "The first question is deceptively simple: when does your day begin? This single data point establishes the earliest boundary the engine will schedule around. Night owl or early riser, Tiler starts from your reality, not an arbitrary 9 AM default.",
+				"calloutStrong": "Why this matters:",
+				"callout": "Every constraint in Tiler flows from your boundaries. Wake time, work hours, and location form the hard edges that the solver respects before optimizing anything else."
+			},
+			"step3": {
+				"title": "Pin Your Location",
+				"body": "Where are you most of the day? Tiler integrates with Google Maps so travel time between tasks is real, calculated by driving, transit, or walking, and not a vague guess. This is the piece most planning tools skip entirely, and it's why their schedules crumble when you actually try to live them. The autocomplete pulls from Google's Places API, so you can enter anything from a corporate headquarters to a co-working space to a job site.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step4": {
+				"title": "Define Your Work Hours",
+				"body": "Not every day looks the same. Tiler lets you set work hours per day of the week: toggle days on and off, shift start and end times, and copy a schedule across multiple days. This creates the temporal fence that separates work blocks from personal time. The engine treats these as soft constraints, strong enough to shape your default schedule, flexible enough to bend when a deadline or travel commitment demands it.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step5": {
+				"title": "Seed Your Tiles",
+				"body": "This is where Tiler begins to feel different. Based on your professional profile, the engine suggests recurring activity tiles (blocks of work) it thinks you'll need. Client calls. Deep work. Business development. Weekly reflection. You select the ones that match, delete the ones that don't, and set each to daily or weekly cadence.",
+				"calloutStrong": "AI-seeded, human-curated.",
+				"callout": "The suggestions come from the LLM analyzing your professional context. You stay in control of what gets scheduled; the engine handles when and where."
+			},
+			"step6": {
+				"title": "Your Timeline, Built",
+				"body": "With your constraints loaded, the solver runs. What appears isn't a blank calendar waiting to be filled; it's an optimized timeline with your tiles placed where they fit, travel time accounted for, and work hours respected. Each tile is color-coded and linked to a location, with expandable action menus for quick edits. Add new tasks through natural language, run what-if scenarios to test alternatives, or share tiles with your team. The onboarding planted the seeds, and the engine grows the schedule from here.",
+				"calloutStrong": "",
+				"callout": ""
+			}
+		},
+		"pillars": {
+			"heading": "Three Pillars. One Perfect Timeline.",
+			"goals": {
+				"icon": "??",
+				"title": "Goals",
+				"body": "The tasks and ambitions that need time carved out for them."
+			},
+			"appointments": {
+				"icon": "??",
+				"title": "Appointments",
+				"body": "Meetings, flights, and commitments already locked in."
+			},
+			"location": {
+				"icon": "??",
+				"title": "Location",
+				"body": "Where you actually are, so travel time is real, not guessed."
+			}
+		},
+		"cta": {
+			"heading": "Ready to build your timeline?",
+			"body": "Five minutes of setup. A schedule that actually works.",
+			"button": "Get Started Free ?",
+			"sub": "Available on iOS and Android. Free to start."
+		}
+	},
+	"articles": {
+		"minRead": "min read",
+		"readArticle": "Read article",
+		"breadcrumbs": {
+			"home": "Home",
+			"articles": "Articles"
+		},
+		"index": {
+			"seo": {
+				"title": "Articles | Tiler - Guides, Product Updates & Productivity Insights",
+				"description": "Explore Tiler's library of guides, product updates, and deep dives on AI scheduling, agentic calendars, and adaptive productivity. Learn how to make your time work for you.",
+				"keywords": "Tiler articles, AI scheduling blog, smart calendar guides, productivity articles, agentic calendar, time management insights, AI productivity blog"
+			},
+			"hero": {
+				"badge": "Articles",
+				"title": "Insights for a Better Schedule",
+				"subtitle": "Guides, product updates, and ideas on how AI can reshape the way you plan your day."
+			}
+		},
+		"posts": {
+			"gettingStarted": {
+				"category": "GETTING STARTED",
+				"title": "Your First Five Minutes with Tiler",
+				"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there.",
+				"excerpt": "Most scheduling tools start from an empty grid. Tiler learns the shape of your day first, then builds a constraint-aware, location-anchored timeline that actually fits your life.",
+				"readTime": "6 min read",
+				"author": "Tiler Team",
+				"date": "May 1, 2026",
+				"seo": {
+					"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
+					"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
+					"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+				},
+				"intro": {
+					"lede": "Most scheduling tools ask you to start from scratch, dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
+					"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+				}
+			},
+			"naturalLanguageScheduling": {
+				"category": "FEATURES",
+				"title": "Natural-Language Scheduling",
+				"subtitle": "Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.",
+				"excerpt": "Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "May 1, 2026",
+				"sections": [
+					{
+						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+					},
+					{
+						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+					},
+					{
+						"title": "How it works"
+					},
+					{
+						"stepTitle": "Describe the task",
+						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"callout": {
+							"label": "What Tiler understands",
+							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+						}
+					},
+					{
+						"stepTitle": "The AI fills in the gaps",
+						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"callout": {
+							"label": "Reasoning, not guessing",
+							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+						}
+					},
+					{
+						"stepTitle": "Review, then confirm",
+						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"callout": {
+							"label": "Confirmation-first",
+							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+						}
+					},
+					{
+						"quote": "You live it. Tiler plans it."
+					}
+				]
+			},
+			"smartTravelAndLocation": {
+				"category": "FEATURES",
+				"title": "Smart Travel and Location",
+				"subtitle": "A schedule that ignores location isn't a schedule. It's a guess.",
+				"excerpt": "Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "May 8, 2026",
+				"sections": [
+					{
+						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+					},
+					{
+						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+					},
+					{
+						"title": "How it works"
+					},
+					{
+						"stepTitle": "Set your locations once",
+						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"callout": {
+							"label": "Location labels Tiler understands",
+							"text": "Home · Work · Downtown · The gym · Near the office"
+						}
+					},
+					{
+						"stepTitle": "Travel time slots into your timeline",
+						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"callout": {
+							"label": "Real routes, not estimates",
+							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+						}
+					},
+					{
+						"stepTitle": "Nearby tasks get grouped automatically",
+						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"callout": {
+							"label": "Less travel, more done",
+							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+						}
+					},
+					{
+						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+					}
+				]
+			},
+			"scheduleUndo": {
+				"category": "FEATURES",
+				"title": "Schedule Undo",
+				"subtitle": "Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.",
+				"excerpt": "Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "June 22, 2026",
+				"sections": [
+					{
+						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+					},
+					{
+						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+					},
+					{
+						"title": "How Schedule Undo works"
+					},
+					{
+						"stepTitle": "Make a change",
+						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"callout": {
+							"label": "Nothing saves automatically",
+							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+						}
+					},
+					{
+						"stepTitle": "See exactly what changed",
+						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+					},
+					{
+						"stepTitle": "Tap Undo or Accept",
+						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"callout": {
+							"label": "Undo is always instant",
+							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+						}
+					},
+					{
+						"title": "Why this matters"
+					},
+					{
+						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+					},
+					{
+						"label": "Built for tightly packed days",
+						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+					},
+					{
+						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+					},
+					{
+						"quote": "Change your mind before it counts."
+					}
+				]
+			},
+			"tileshare": {
+				"category": "FEATURES",
+				"title": "Tileshare",
+				"subtitle": "Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
+				"excerpt": "Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "May 22, 2026",
+				"sections": [
+					{
+						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+					},
+					{
+						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+					},
+					{
+						"title": "How Tileshare works"
+					},
+					{
+						"stepTitle": "Share any tile",
+						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"callout": {
+							"label": "What travels with the tile",
+							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+						}
+					},
+					{
+						"stepTitle": "It lands in their schedule",
+						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+					},
+					{
+						"stepTitle": "Track it without chasing",
+						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"callout": {
+							"label": "Shared accountability, zero friction",
+							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+						}
+					},
+					{
+						"quote": "Send it once. Know it gets done."
+					}
+				]
+			}
+		}
 	}
 }

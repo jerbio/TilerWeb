@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import type { ScheduleProcrastinateAllParams } from '@/core/common/types/schedule';
 
 const PROCRASTINATE_ALL_NOTIFICATION_ID = 'schedule-procrastinate-all';
@@ -29,6 +30,7 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({
 	const getActivePersonaSession = useAppStore((s) => s.getActivePersonaSession);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
+	const isReadOnly = useIsReadOnly();
 
 	// Close picker on click outside
 	useEffect(() => {
@@ -45,9 +47,9 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({
 	}, [isPickerOpen]);
 
 	const handleTogglePicker = useCallback(() => {
-		if (isLoading || disabled) return;
+		if (isLoading || disabled || isReadOnly) return;
 		setIsPickerOpen((prev) => !prev);
-	}, [isLoading, disabled]);
+	}, [isLoading, disabled, isReadOnly]);
 
 	const handleCancel = useCallback(() => {
 		setIsPickerOpen(false);
@@ -111,7 +113,7 @@ const ProcrastinateAllButton: React.FC<ProcrastinateAllButtonProps> = ({
 		<Container ref={containerRef}>
 			<ProcrastinateAllIconButton
 				onClick={handleTogglePicker}
-				disabled={isLoading || disabled}
+				disabled={isLoading || disabled || isReadOnly}
 				aria-label={t('timeline.procrastinateAll.ariaLabel')}
 				title={t('timeline.procrastinateAll.tooltip')}
 			>

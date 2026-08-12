@@ -10,7 +10,15 @@ import colorUtil, { RGB } from '@/core/util/colors';
 import { StyledEvent } from './calendar_events';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { useCalendarUI } from './calendar-ui.provider';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
+import type { KindFilter } from '@/core/state/simulationOverlayStore';
+
+function matchesKindFilter(sim: SimulatedTileClassification, filter: KindFilter): boolean {
+	if (filter === 'conflict') return sim.tier === 'conflict';
+	return sim.kind === filter;
+}
 import { TypeDefaults } from '../../types/typeDefaults';
+import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
 import {
 	ThirdPartyType,
 	type CalendarEvent as CalendarEventType,
@@ -24,6 +32,17 @@ type CalendarEventProps = {
 	onClick?: () => void;
 	/** When true, shows a pulse-glow ring to draw attention */
 	focused?: boolean;
+	/**
+	 * Plan §5.2 — when present, the tile is rendered in simulation mode and
+	 * receives tier-based styling (border/stripe/badge). Read-only behaviour
+	 * is also enforced: the regular click path that opens the info modal is
+	 * suppressed (see plan §5.6) and `onSimulatedClick` runs instead.
+	 */
+	simulation?: SimulatedTileClassification;
+	/** Click forwarder used when `simulation` is present. */
+	onSimulatedClick?: () => void;
+	/** Selected-state visual layered on top of tier styling (plan §5.2.7). */
+	simulationSelected?: boolean;
 };
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
@@ -33,29 +52,65 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 	setSelectedEventInfo,
 	onClick,
 	focused = false,
+	simulation,
+	onSimulatedClick,
+	simulationSelected = false,
 }) => {
 	const { isDarkMode } = useTheme();
+	const inSimulation = !!simulation;
+	const isGhost = simulation?.kind === 'removed';
 	const { t } = useTranslation();
 	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
+	const inReview = useSimulationOverlayStore((s) => s.inReview);
+	const activeKindFilter = useSimulationOverlayStore((s) => s.activeKindFilter);
+	const isFilterDimmed =
+		inReview &&
+		!!simulation &&
+		!!activeKindFilter &&
+		!matchesKindFilter(simulation, activeKindFilter);
 	const isThirdPartyEvent =
 		!!event.thirdPartyType &&
 		event.thirdPartyType !== ThirdPartyType.Tiler &&
 		event.thirdPartyType !== 'tiler';
+	const containerStyle: React.CSSProperties | undefined = isFilterDimmed
+		? { opacity: 0.25, pointerEvents: 'none' }
+		: isGhost
+			? { pointerEvents: 'none' }
+			: undefined;
 	return (
 		<EventContainer
 			onClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
 			}}
+			onContextMenu={inSimulation ? (e) => e.preventDefault() : undefined}
+			onDoubleClick={inSimulation ? (e) => e.preventDefault() : undefined}
+			onDragStart={inSimulation ? (e) => e.preventDefault() : undefined}
+			data-simulation-tier={simulation?.tier}
+			data-simulation-kind={simulation?.kind}
+			data-simulation-selected={simulationSelected || undefined}
+			data-simulation-ghost={isGhost ? 'true' : undefined}
+			data-filter-dimmed={isFilterDimmed ? 'true' : undefined}
+			data-testid="event-container"
+			aria-current={simulationSelected ? 'true' : undefined}
+			aria-label={
+				inSimulation && simulation
+					? `Simulated change (${simulation.kind})${simulationSelected ? ', currently selected' : ''}`
+					: undefined
+			}
 			key={event.id}
 			$darkmode={isDarkMode}
 			$selected={selectedEvent === event.id}
 			$focused={focused}
+			$simulation={simulation}
+			$simulationSelected={simulationSelected}
+			$isGhost={isGhost}
 			$colors={{
 				r: event.colorRed ?? TypeDefaults.RGBColor.red,
 				g: event.colorGreen ?? TypeDefaults.RGBColor.green,
 				b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
 			}}
+			style={containerStyle}
 		>
 			<EventContent
 				height={event.springStyles.height}
@@ -65,7 +120,17 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 					g: event.colorGreen ?? TypeDefaults.RGBColor.green,
 					b: event.colorBlue ?? TypeDefaults.RGBColor.blue,
 				}}
+				$simulation={simulation}
+				$isGhost={isGhost}
 				onClick={() => {
+					if (inSimulation) {
+						// Removed "ghost" tiles are display-only (plan §5.6).
+						if (isGhost) return;
+						// Plan §5.3.2 — simulation tiles route to the chip
+						// selection handler instead of the info modal.
+						onSimulatedClick?.();
+						return;
+					}
 					setSelectedEvent(event.id);
 					setSelectedEventInfo(event);
 					onClick?.();
@@ -118,6 +183,24 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 					)}
 				</footer>
 			</EventContent>
+			{/* Plan §5.2 — simulation tier badge / marker (top-right). */}
+			{simulation && simulation.tier !== 'unchanged' && simulation.tier !== 'mapped' && (
+				<SimulationBadge
+					$tier={simulation.tier}
+					$kind={simulation.kind}
+					data-testid="simulation-badge"
+				>
+					{
+						simulation.tier === 'conflict'
+							? '\u26A0' /* ⚠ */
+							: simulation.kind === 'new'
+								? '+'
+								: simulation.kind === 'removed'
+									? '\u00D7' /* × */
+									: '\u2192' /* → */
+					}
+				</SimulationBadge>
+			)}
 			{/* Border SVG for styling */}
 			<svg viewBox="0 0 1 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
 				<rect
@@ -155,17 +238,61 @@ const focusPulse = keyframes`
   }
 `;
 
+// Plan §5.2 — one-shot 600ms entry pulse for primary/conflict tiles.
+const primaryEnterPulse = keyframes`
+  0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.55); }
+  100% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+`;
+
+// Plan §5.2.7 — continuous selection pulse, animated via `box-shadow` only
+// (NOT border) so the tile bounding box does not shift (PRD #6).
+const selectionPulse = keyframes`
+  0%   { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.85), 0 4px 14px rgba(0, 0, 0, 0.18); }
+  50%  { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.45), 0 4px 14px rgba(0, 0, 0, 0.18); }
+  100% { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.85), 0 4px 14px rgba(0, 0, 0, 0.18); }
+`;
+
+// Tier accent colors. Hard-coded rgba (theme exposes only `theme.colors.text`
+// reliably for now — see project notes).
+const TIER_ACCENT: Record<string, string> = {
+	primary: 'rgba(99, 102, 241, 0.95)', // indigo (brand accent)
+	conflict: 'rgba(220, 38, 38, 0.95)', // red — warning
+	cascade: 'rgba(99, 102, 241, 0.7)', // brand, slightly muted
+	mapped: 'rgba(99, 102, 241, 0.7)',
+	unchanged: 'transparent',
+};
+
 const EventContainer = styled(animated.div)<{
 	$selected: boolean;
 	$focused: boolean;
 	$colors: RGB;
 	$darkmode: boolean;
+	$simulation?: SimulatedTileClassification;
+	$simulationSelected?: boolean;
+	$isGhost?: boolean;
 }>`
 	padding: 4px;
 	position: relative;
 	width: 100%;
 	border-radius: 12px;
-	animation: ${({ $focused }) => ($focused ? focusPulse : 'none')} 1s ease-in-out 3;
+	/* Removed "ghost" tiles are lifted above the dimmed retained tiles so
+	 * their solid surface fully occludes whatever sits behind them (no
+	 * bleed-through when filtering by deletions). */
+	z-index: ${({ $isGhost }) => ($isGhost ? 20 : 'auto')};
+	animation: ${({ $focused, $simulation, $simulationSelected, $isGhost }) => {
+			if ($isGhost) return 'none';
+			if ($simulationSelected) return selectionPulse;
+			if ($focused) return focusPulse;
+			if ($simulation && ($simulation.tier === 'primary' || $simulation.tier === 'conflict'))
+				return primaryEnterPulse;
+			return 'none';
+		}}
+		${({ $simulationSelected, $focused, $isGhost }) => {
+			if ($isGhost) return '0s';
+			if ($simulationSelected) return '2s ease-in-out infinite';
+			if ($focused) return '1s ease-in-out 3';
+			return '600ms ease-out 1';
+		}};
 
 	> svg {
 		position: absolute;
@@ -235,6 +362,8 @@ const EventContent = styled.div<{
 	$darkmode: boolean;
 	height: number;
 	$variant: 'block' | 'tile';
+	$simulation?: SimulatedTileClassification;
+	$isGhost?: boolean;
 }>`
 	position: relative;
 	background-color: ${({ $colors, $darkmode }) => {
@@ -262,6 +391,42 @@ const EventContent = styled.div<{
 	justify-content: space-between;
 	overflow: hidden;
 
+	/* Plan §5.2 — simulation tier accents.
+	 * Implemented entirely with inset box-shadow so the bounding box never
+	 * shifts (PRD #6). The conflict tier draws an extra red left stripe via
+	 * a layered shadow. The mapped/cascade tiers draw a thin left stripe
+	 * only and skip the border. */
+	${({ $simulation, $isGhost, $colors, $darkmode }) => {
+		if (!$simulation || $simulation.tier === 'unchanged') return '';
+		// Removed "ghost" tiles get a dashed red frame instead of the loud
+		// primary accent, signalling a read-only deletion preview. A solid
+		// opaque surface + outer drop shadow lifts them off the dimmed grid
+		// so they read as the focused layer when filtering by deletions.
+		if ($isGhost) {
+			const surface = colorUtil.setLightness($colors, $darkmode ? 0.325 : 0.92);
+			return `
+				background-color: rgb(${surface.r}, ${surface.g}, ${surface.b});
+				box-shadow:
+					inset 0 0 0 1.5px ${TIER_ACCENT.conflict},
+					0 6px 18px rgba(0, 0, 0, ${$darkmode ? 0.55 : 0.28});
+				border-style: dashed !important;
+				cursor: default;
+			`;
+		}
+		const accent = TIER_ACCENT[$simulation.tier];
+		switch ($simulation.tier) {
+			case 'primary':
+				return `box-shadow: inset 0 0 0 2px ${accent};`;
+			case 'conflict':
+				return `box-shadow: inset 4px 0 0 ${TIER_ACCENT.conflict}, inset 0 0 0 2px ${TIER_ACCENT.primary};`;
+			case 'cascade':
+			case 'mapped':
+				return `box-shadow: inset 3px 0 0 ${accent};`;
+			default:
+				return '';
+		}
+	}}
+
 	header {
 		display: flex;
 		align-items: start;
@@ -277,6 +442,7 @@ const EventContent = styled.div<{
 			overflow: hidden;
 			font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 			font-size: 13px;
+			text-decoration: ${({ $isGhost }) => ($isGhost ? 'line-through' : 'none')};
 		}
 
 		${EventLockIcon} {
@@ -356,3 +522,31 @@ const EventContent = styled.div<{
 `;
 
 export default CalendarEvent;
+
+// Plan §5.2 — small badge in the top-right of a simulation tile. Pseudo-glyph
+// content is set inline by the renderer; this only handles positioning and
+// color theming for each tier.
+const SimulationBadge = styled.div<{
+	$tier: SimulatedTileClassification['tier'];
+	$kind: SimulatedTileClassification['kind'];
+}>`
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 16px;
+	height: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	line-height: 1;
+	border-radius: 50%;
+	pointer-events: none;
+	color: #ffffff;
+	background-color: ${({ $tier, $kind }) => {
+		if ($tier === 'conflict') return 'rgba(220, 38, 38, 0.95)'; // red
+		if ($kind === 'new') return 'rgba(22, 163, 74, 0.95)'; // green
+		if ($kind === 'removed') return 'rgba(220, 38, 38, 0.95)'; // red
+		return 'rgba(37, 99, 235, 0.95)'; // blue (updated/cascade)
+	}};
+`;

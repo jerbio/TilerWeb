@@ -1,4 +1,4 @@
-﻿{
+{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "ホーム",
-			"waitlist": "ウェイティングリスト",
-			"discover": "機能"
+			"discover": "機能",
+			"waitlist": "ウェイティングリスト"
 		},
 		"voiceInput": {
 			"listening": "聞いています...",
@@ -150,6 +150,307 @@
 			"footer": {
 				"cookieSettings": "Cookie設定"
 			}
+		},
+		"emptyState": {
+			"defaultText": "まだ何もありません"
+		},
+		"pagination": {
+			"page": "{{page}}ページ"
+		}
+	},
+	"modals": {
+		"loading": {
+			"image": {
+				"alt": "読み込みインジケーター"
+			}
+		},
+		"success": {
+			"image": {
+				"alt": "成功アイコン"
+			}
+		}
+	},
+	"calendar": {
+		"nonViable": {
+			"title": "実行不可能なイベント",
+			"infoTooltip": "これらのイベントは、時間の競合または制約のためスケジュールできませんでした。"
+		},
+		"longDuration": {
+			"title": "長時間のイベント",
+			"infoTooltip": "これらのイベントは15時間を超えるため、見やすさを考慮してここに表示されています。"
+		},
+		"event": {
+			"dueIn": "期限まで{{time}}",
+			"dateLabel": "日付：",
+			"startLabel": "開始：",
+			"endLabel": "終了：",
+			"durationLabel": "期間：",
+			"repetitionLabel": "繰り返し：",
+			"deadlineLabel": "締切：",
+			"locationLabel": "地図で経路を表示",
+			"locationLinkLabel": "リンク",
+			"videoLinkLabel": "ビデオ通話",
+			"copyLink": "リンクをコピー",
+			"openLink": "リンクを開く",
+			"previewBadge": "プレビュー",
+			"previewHint": "これはシミュレーションのプレビューです。承認した場合にのみ変更が適用されます。",
+			"secondaryActionsLabel": "その他のタイル操作：",
+			"secondaryActions": {
+				"editLabel": "編集",
+				"deleteLabel": "削除"
+			},
+			"save": "保存",
+			"cancel": "キャンセル",
+			"actions": {
+				"complete": "完了",
+				"now": "今すぐ",
+				"defer": "延期"
+			},
+			"validation": {
+				"endAfterStart": "終了時刻は開始時刻より後にしてください"
+			},
+			"moreOptions": "その他のオプション",
+			"videoSource": {
+				"zoom": "Zoom",
+				"google": "Google Meet",
+				"outlook": "Microsoft Teams",
+				"other": "ビデオ通話"
+			},
+			"deleteConfirmTitle": "このイベントを削除しますか？",
+			"deleteConfirmBody": "このイベントはスケジュールから完全に削除されます。",
+			"deleteConfirmThirdPartyBody": "接続済みのカレンダーサービスからも削除されます。",
+			"deleteConfirmAction": "削除",
+			"deleteConfirmActionAria": "削除を確認"
+		},
+		"createBlock": {
+			"title": "新しいブロックを追加",
+			"info": {
+				"name": {
+					"label": "名前",
+					"placeholder": "このブロックの名前は何ですか？"
+				},
+				"start": {
+					"label": "開始時刻",
+					"placeholder": "このブロックは何日に開始しますか？"
+				},
+				"end": {
+					"label": "終了時刻",
+					"placeholder": "このブロックは何日に終了しますか？"
+				},
+				"hours": {
+					"label": "所要時間（時間）",
+					"placeholder": "何時間かかりますか？"
+				},
+				"minutes": {
+					"label": "所要時間（分）",
+					"placeholder": "何分かかりますか？"
+				},
+				"location": {
+					"label": "住所",
+					"placeholder": "このブロックはどこで行われますか？"
+				},
+				"locationTag": {
+					"label": "住所のニックネーム",
+					"placeholder": "例：自宅、オフィス、ジム"
+				},
+				"duration": {
+					"valid": "所要時間 <mute>~</mute> <highlight>{{duration}}</highlight>",
+					"invalid": "<highlight>無効な所要時間</highlight>"
+				}
+			},
+			"errors": {
+				"invalidDuration": "所要時間が無効です。終了時刻は開始時刻より後にしてください。"
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b>をスケジュールに追加しました",
+				"pending": "お待ちください。Tilerが\"{{name}}\"をスケジュールに追加しています"
+			},
+			"buttons": {
+				"reset": "リセット",
+				"submit": "ブロックを作成",
+				"collapse": "オプションを減らす",
+				"expand": "その他のオプション",
+				"viewInTimeline": "ブロックを表示"
+			},
+			"summary": {
+				"title": "概要",
+				"description": "<b>{{duration}}</b>のイベント「<b>{{name}}</b>」があります",
+				"locationDescription": "、場所は<b>{{location}}</b>",
+				"recurrenceFrequency": {
+					"daily": "日",
+					"weekly": "週",
+					"monthly": "か月",
+					"yearly": "年"
+				},
+				"recurring": "。<b>{{recurrenceFrequency}}</b>ごとに繰り返します",
+				"recurringStart": "（<b>{{recurrenceStart}}</b>から）",
+				"recurringEnd": "（<b>{{recurrenceEnd}}</b>まで）"
+			},
+			"actions": {
+				"repeatBlock": "ブロックを繰り返す"
+			},
+			"sections": {
+				"blockColor": "ブロックの色を選択",
+				"blockActions": "ブロック操作"
+			}
+		},
+		"createTile": {
+			"title": "新しいタイルを追加",
+			"info": {
+				"description": "<location/>で<action/>をする必要があります。<hours/>時間<minutes/>分かかり、<date/>までに完了する必要があります",
+				"action": {
+					"label": "タイル名",
+					"placeholder": "このタイルの名前は何ですか？"
+				},
+				"tileSplit": {
+					"label": "何回行いますか？",
+					"placeholder": "例：1、2、3..."
+				},
+				"location": {
+					"label": "住所",
+					"placeholder": "このタイルはどこで行われますか？"
+				},
+				"locationTag": {
+					"label": "住所のニックネーム",
+					"placeholder": "例：自宅、オフィス、ジム"
+				},
+				"hours": {
+					"label": "タイルの所要時間（時間）",
+					"placeholder": "何時間かかりますか？"
+				},
+				"minutes": {
+					"label": "タイルの所要時間（分）",
+					"placeholder": "何分かかりますか？"
+				},
+				"range": {
+					"label": "時間帯",
+					"description": "次の間にスケジュール",
+					"conjunction": "と"
+				}
+			},
+			"sections": {
+				"tileColor": "タイルの色を選択",
+				"tileActions": "タイル操作",
+				"recurrenceType": {
+					"daily": "毎日",
+					"weekly": "毎週",
+					"monthly": "毎月",
+					"yearly": "毎年"
+				},
+				"recurrenceStartType": {
+					"title": "開始",
+					"default": "デフォルト（<date/>）",
+					"on": "指定日"
+				},
+				"recurrenceEndType": {
+					"title": "終了",
+					"never": "なし",
+					"on": "指定日"
+				},
+				"recurrenceStartDate": {
+					"title": "終了日",
+					"description": "繰り返しは<date/>に開始します"
+				},
+				"recurrenceEndDate": {
+					"title": "終了日",
+					"description": "繰り返しは<date/>に終了します"
+				},
+				"recurrenceWeeklyDays": {
+					"title": "繰り返す曜日",
+					"monday": "月曜日",
+					"tuesday": "火曜日",
+					"wednesday": "水曜日",
+					"thursday": "木曜日",
+					"friday": "金曜日",
+					"saturday": "土曜日",
+					"sunday": "日曜日"
+				},
+				"restrictionType": {
+					"anytime": "いつでも",
+					"work": "勤務時間",
+					"personal": "個人の時間",
+					"custom": "カスタム"
+				}
+			},
+			"tip": {
+				"description": "<b><key/></b>を押して新しいタイルを作成",
+				"keys": {
+					"enter": "Enter",
+					"return": "Return"
+				}
+			},
+			"message": {
+				"success": "<b>\"<action/>\"</b>をスケジュールに追加しました",
+				"pending": "お待ちください。Tilerが\"{{action}}\"をスケジュールに追加しています"
+			},
+			"actions": {
+				"repeatTile": "タイルを繰り返す",
+				"timeRestriction": "時間制限",
+				"addLocationNickname": "場所のニックネームを追加"
+			},
+			"errors": {
+				"couldNotCreate": "タイルを作成できませんでした。もう一度お試しください。",
+				"scheduleProfile": "個人／勤務時間を読み込めませんでした",
+				"workProfileNotFound": "勤務時間制限のプロフィールが見つかりません",
+				"personalProfileNotFound": "個人時間制限のプロフィールが見つかりません"
+			},
+			"recurrence": {
+				"description": "このタスクを<period/>ごとに<repetition/>回行う必要があります",
+				"periods": {
+					"daily": "日",
+					"weekly": "週",
+					"monthly": "月",
+					"yearly": "年"
+				}
+			},
+			"timeRestrictions": {
+				"anytime": "いつでも",
+				"personalHours": "個人の時間",
+				"workHours": "勤務時間",
+				"custom": "カスタム"
+			},
+			"buttons": {
+				"reset": "リセット",
+				"submit": "タイルを作成",
+				"collapse": "オプションを減らす",
+				"expand": "その他のオプション",
+				"viewInTimeline": "タイルを表示"
+			},
+			"summary": {
+				"title": "概要",
+				"description": "<b>{{action}}</b>をする必要があります",
+				"descriptionLocation": "（場所：<b>{{location}}</b>）",
+				"descriptionDuration": "。所要時間は<b>{{hours}}時間{{minutes}}分</b>です",
+				"split": {
+					"once": "<b>1回</b>",
+					"twice": "<b>2回</b>",
+					"times": "<b>{{count}}回</b>"
+				},
+				"range": "（<b>{{start}}</b>から<b>{{end}}</b>の間）",
+				"recurrenceFrequency": {
+					"daily": "日",
+					"weekly": "週",
+					"monthly": "か月",
+					"yearly": "年"
+				},
+				"recurring": "。繰り返します：",
+				"recurringFrequency": "<b>{{recurrenceFrequency}}</b>ごと",
+				"recurringStart": "（<b>{{recurrenceStart}}</b>から）",
+				"recurringEnd": "（<b>{{recurrenceEnd}}</b>まで）"
+			}
+		},
+		"createSelection": {
+			"tile": {
+				"label": "タイルを作成",
+				"description": "空き状況に合わせて移動できる柔軟なタスクです。"
+			},
+			"block": {
+				"label": "ブロックを作成",
+				"description": "配置した場所に固定されるタスクです。"
+			}
+		},
+		"mobileChatInput": {
+			"placeholder": "Tilerに何でも聞いてください..."
 		}
 	},
 	"home": {
@@ -189,6 +490,40 @@
 				"errorLoadMessages": "チャットメッセージの読み込みに失敗しました",
 				"errorSendMessage": "メッセージの送信に失敗しました",
 				"errorAcceptChanges": "変更の承認に失敗しました",
+				"tileRemoved": "タイルを削除しました",
+				"tileCompleted": "このイベントは完了しました",
+				"tileDeleted": "このイベントは削除されました",
+				"navigating": "タイルに移動中...",
+				"acceptToSee": "変更を承認してこのタイルを表示",
+				"simulationStarting": "Tilecastを開始中…",
+				"simulationQueued": "Tilecastをキューに追加しました…",
+				"simulationGenerating": "Tilecastを生成中…",
+				"simulationUpdating": "Tilecastを更新中…",
+				"simulationReady": "Tilecastの準備ができました",
+				"simulationChangesLabel": "件の変更",
+				"simulationDefunct": "古いTilecast",
+				"review": "確認",
+				"simulationInProgress": "この変更はまだ予測中です。",
+				"simulationFailed": "Tilecastを利用できません",
+				"simulationStale": "Tilecastは最新ではありません",
+				"simulationUnavailable": "Tilecastを利用できません",
+				"loadingSimulation": "Tilecastを読み込み中…",
+				"reviewSimulation": "Tilecastを確認",
+				"retry": "再試行",
+				"reviewNoPreview": "この変更に利用できる予測タイルはありません。",
+				"applyNow": "今すぐ適用",
+				"exitReview": "確認を終了",
+				"previous": "前へ",
+				"next": "次へ",
+				"expand": "展開",
+				"expandMore": "さらに展開",
+				"collapse": "折りたたむ",
+				"viewCurrent": "現在",
+				"viewSimulation": "Tilecast",
+				"pillStrip": {
+					"showMore": "+{{count}}件を表示",
+					"showLess": "表示を減らす"
+				},
 				"wsStatus": {
 					"actionInitStart1": "アクション生成を初期化中...",
 					"actionInitStart2": "準備中...",
@@ -236,6 +571,15 @@
 					"usingDefaultLocation": "デフォルトの場所を使用しています - アイコンをクリックして現在地を取得してください。",
 					"clickIconToGetLocation": "アイコンをクリックして現在地を取得するか、場所を編集してください"
 				},
+				"sessionHistory": {
+					"title": "チャット履歴",
+					"loading": "セッションを読み込み中...",
+					"loadingMore": "さらに読み込み中...",
+					"loadMore": "以前のセッションを読み込む",
+					"empty": "会話はまだありません",
+					"untitled": "無題のセッション",
+					"newConversation": "新しい会話"
+				},
 				"errorPopup": {
 					"chatLimitReached": "チャット制限に達しました",
 					"headerText": "20以上のプロンプトが必要ですか？",
@@ -259,6 +603,58 @@
 					"messageContinued": "リンクをクリックして、Tilerとの無制限のチャットをアンロックしてください。",
 					"button": "了解しました",
 					"footer": "メールが届かない場合は、迷惑メールフォルダを確認するか、もう一度お試しください。"
+				},
+				"promptSuggestions": {
+					"coreStructural": {
+						"morningSetup": "朝のルーティンを設定する",
+						"dailyPlanning": "一日の予定を立てる",
+						"travelBuffer": "移動時間の余裕を追加する",
+						"taskReview": "タスクを確認する",
+						"dayWrapUp": "一日を振り返る"
+					},
+					"professional": {
+						"salesCall": "営業電話を予定に入れる",
+						"clientPresentation": "クライアント向けプレゼンを準備する",
+						"proposalDrafting": "提案書を作成する",
+						"contractReview": "契約書を確認する",
+						"budgetReview": "予算を分析する",
+						"teamSync": "チームと同期する",
+						"boardPrep": "役員会の準備をする",
+						"performanceCheckIn": "業績面談を行う"
+					},
+					"operations": {
+						"dispatchSchedule": "配送スケジュールを作成する",
+						"shiftChangeover": "シフト交代を計画する",
+						"inventoryCheck": "在庫を確認する",
+						"qualityAudit": "品質監査を実施する",
+						"fieldVisit": "現地訪問を予定に入れる",
+						"vendorCoordination": "取引先と調整する",
+						"reportSubmission": "レポートを提出する"
+					},
+					"locationLinked": {
+						"siteVisit": "現地訪問を予定に入れる",
+						"officeBlock": "オフィスでの時間を確保する",
+						"onSiteInspection": "現地検査を計画する",
+						"customerAppointment": "顧客との予定を入れる",
+						"pickupDelivery": "集荷と配達を手配する",
+						"routePlanning": "ルートを計画する"
+					},
+					"strategic": {
+						"marketResearch": "市場調査を行う",
+						"competitiveScan": "競合を分析する",
+						"weeklyForecast": "週間予測を作成する",
+						"hiringInterview": "採用面接を予定に入れる",
+						"investorCall": "投資家との電話の準備をする",
+						"productRoadmapReview": "プロダクトロードマップを確認する"
+					},
+					"deepWork": {
+						"writingSession": "執筆時間を確保する",
+						"analysisBlock": "分析時間を予定に入れる",
+						"designSprint": "デザインスプリントを計画する",
+						"codingBlock": "コーディング時間を確保する",
+						"financialModeling": "財務モデルを作成する",
+						"researchStudy": "調査研究を行う"
+					}
 				}
 			}
 		},
@@ -336,6 +732,91 @@
 						"travelTime": "車で15分",
 						"deepWork": "集中作業セッション"
 					}
+				},
+				"coffee": {
+					"calendarTitle": "11月19日火曜日",
+					"messages": {
+						"userRequest": "午前10時に5番街のStarbucksでマイクとコーヒー",
+						"aiResponse1": "現在地から18分です。午前9:40に出発しますか？",
+						"userConfirm": "いいですね",
+						"aiConfirm": "予定に追加しました！ ✓"
+					},
+					"tiles": {
+						"travel": "Starbucksへ移動",
+						"travelTime": "18分",
+						"coffee": "コーヒー - マイク"
+					}
+				},
+				"airport": {
+					"calendarTitle": "11月23日土曜日",
+					"messages": {
+						"userRequest": "午後3時のフライトなので、午後1時までに空港に着く必要がある",
+						"aiResponse1": "空港まで45分です。余裕を見て午後12:10に出発しますか？",
+						"userConfirm": "はい",
+						"aiConfirm": "移動時間を追加しました！ ✓"
+					},
+					"tiles": {
+						"travel": "空港へ移動",
+						"travelTime": "45分",
+						"airport": "空港でチェックイン",
+						"flight": "フライト出発"
+					}
+				},
+				"school": {
+					"calendarTitle": "11月18日月曜日",
+					"messages": {
+						"userRequest": "午後3:30に子どもを学校へ迎えに行く",
+						"aiResponse1": "車で20分です。午後3:10に出発しますか？",
+						"userConfirm": "完璧です",
+						"aiConfirm": "カレンダーに追加しました！ ✓"
+					},
+					"tiles": {
+						"travel": "学校へ移動",
+						"travelTime": "20分",
+						"pickup": "学校へのお迎え"
+					}
+				},
+				"doctor": {
+					"calendarTitle": "11月20日水曜日",
+					"messages": {
+						"userRequest": "午後2:30にダウンタウンで医師の予約",
+						"aiResponse1": "オフィスから28分です。午後2:00に出発しますか？",
+						"userConfirm": "はい",
+						"aiConfirm": "予定に追加しました！ ✓"
+					},
+					"tiles": {
+						"travel": "クリニックへ移動",
+						"travelTime": "28分",
+						"doctor": "診察の予約"
+					}
+				},
+				"haircut": {
+					"calendarTitle": "11月22日金曜日",
+					"messages": {
+						"userRequest": "午後4時に自宅近くのサロンでヘアカット",
+						"aiResponse1": "徒歩8分です。午後3:50に出発しますか？",
+						"userConfirm": "はい",
+						"aiConfirm": "完了しました！ ✓"
+					},
+					"tiles": {
+						"travel": "サロンまで徒歩",
+						"travelTime": "8分",
+						"haircut": "ヘアカットの予約"
+					}
+				},
+				"restaurant": {
+					"calendarTitle": "11月23日土曜日",
+					"messages": {
+						"userRequest": "午後7時にイタリアンレストランを予約",
+						"aiResponse1": "車で32分です。午後6:25に出発しますか？",
+						"userConfirm": "完璧です",
+						"aiConfirm": "追加しました！ ✓"
+					},
+					"tiles": {
+						"travel": "レストランへ移動",
+						"travelTime": "32分",
+						"dinner": "ディナーの予約"
+					}
 				}
 			}
 		},
@@ -354,7 +835,47 @@
 		},
 		"featureHighlights": {
 			"title": "機能のハイライト",
-			"subtitle": "Tilerであなたの生活を簡素化します。私たちがあなたを助けるためにできることは次のとおりです。"
+			"subtitle": "Tilerであなたの生活を簡素化します。私たちがあなたを助けるためにできることは次のとおりです。",
+			"animations": {
+				"nls": {
+					"transcript": "Lunch with Sarah tomorrow at noon...",
+					"responsePrimary": "Scheduled: Lunch with Sarah - Tomorrow 12:00 PM",
+					"responseTravel": "+ 25 min travel block added",
+					"responseLocation": "Downtown - 1 hr"
+				},
+				"travel": {
+					"stops": {
+						"home": {
+							"label": "Home",
+							"time": "8:00 AM"
+						},
+						"office": {
+							"label": "Office",
+							"time": "9:15 AM"
+						},
+						"cafe": {
+							"label": "Cafe",
+							"time": "1:00 PM"
+						},
+						"gym": {
+							"label": "Gym",
+							"time": "5:30 PM"
+						}
+					}
+				},
+				"undo": {
+					"tileName": "Gym session",
+					"originalMeta": "At Home - Tue - 10:00 AM",
+					"previewMeta": "At Home - Wed - 2:00 PM",
+					"previewBadge": "PREVIEW",
+					"undoAction": "Undo",
+					"acceptAction": "Accept"
+				},
+				"tileshare": {
+					"tileName": "Gym session",
+					"tileSub": "From Alex - 1 hr"
+				}
+			}
 		},
 		"tileCardSection": {
 			"header": "タスクと予定を視覚化",
@@ -448,6 +969,169 @@
 					"question": "トランジット機能はどのように使用できますか？",
 					"answer": "トランジット機能は、単に移動時間を計算するだけではありません—ナビゲーションアシスタントとして機能します。ルートの計画、最適な交通手段の提案、タスクと場所の間のシームレスな移行のためのリアルタイムの道順を提供します。移動アイコンをタップするだけで、常に時間通りに正しい道を進むことができます。"
 				}
+			}
+		}
+	},
+	"auth": {
+		"signup": {
+			"title": "Tilerを始めましょう",
+			"subtitle": "無料アカウントを作成して、スムーズなスケジュール管理をお楽しみください",
+			"googleButton": "Googleで登録",
+			"appleButton": "Sign up with Apple",
+			"microsoftButton": "Sign up with Microsoft",
+			"emailLabel": "メールアドレス",
+			"emailPlaceholder": "例：yourname@outlook.com",
+			"submitButton": "無料アカウントを作成",
+			"submitting": "アカウントを作成中...",
+			"footer": "すでにアカウントをお持ちですか？",
+			"footerLink": "ログインする",
+			"verificationSent": "確認コードをメールで送信しました！",
+			"createAccountError": "アカウントの作成に失敗しました。もう一度お試しください。"
+		},
+		"signin": {
+			"title": "Tilerへお帰りなさい",
+			"subtitle": "ログインしてスケジュール管理を続けましょう",
+			"googleButton": "Googleでログイン",
+			"appleButton": "Sign in with Apple",
+			"microsoftButton": "Sign in with Microsoft",
+			"submitButton": "アカウントにログイン",
+			"submitting": "ログイン中...",
+			"footer": "アカウントをお持ちでないですか？",
+			"footerLink": "登録する"
+		},
+		"verification": {
+			"title": "確認が必要です",
+			"header": "確認コードを入力してください",
+			"description": "確認コードを次の宛先に送信しました",
+			"label": "確認コード",
+			"placeholder": "確認コードを入力",
+			"verifyButton": "コードを確認",
+			"verifying": "確認中...",
+			"resendButton": "コードが届きませんか？再送する",
+			"resending": "送信中...",
+			"cancel": "キャンセル",
+			"success": "アカウントを確認しました！",
+			"error": "確認コードが正しくありません。もう一度お試しください。",
+			"resendSuccess": "確認コードを再送しました！",
+			"resendError": "コードの再送に失敗しました。もう一度お試しください。"
+		},
+		"goBack": "戻る"
+	},
+	"settings": {
+		"title": "設定",
+		"back": "戻る",
+		"logout": "ログアウト",
+		"breadcrumb": {
+			"home": "ホーム",
+			"settings": "設定"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "アカウント情報",
+				"description": "アカウントを確認し、個人情報を変更してください",
+				"placeholder": "アカウント情報の設定は近日公開予定です...",
+				"fields": {
+					"fullName": "氏名",
+					"username": "ユーザー名",
+					"email": "メールアドレス",
+					"phoneNumber": "電話番号",
+					"phoneNumberPlaceholder": "電話番号を追加",
+					"countryCode": "国番号",
+					"countryCodeSearch": "国を検索...",
+					"countryCodeNoResults": "国が見つかりません",
+					"dateOfBirth": "生年月日",
+					"dateOfBirthPlaceholder": "年/月/日"
+				},
+				"saveChanges": "変更を保存",
+				"saving": "保存中...",
+				"deleteAccount": "アカウントを削除",
+				"saveSuccess": "アカウント情報が正常に更新されました",
+				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
+				"deleteNotImplemented": "アカウント削除機能は近日公開予定です"
+			},
+			"tilePreferences": {
+				"title": "タイル設定",
+				"description": "移動手段を定義し、Tilerが日々の時間パターンを理解するのを助けましょう",
+				"placeholder": "タイル設定は近日公開予定です...",
+				"howMoveAround": "どうやって移動しますか？",
+				"cycling": "自転車",
+				"driving": "車",
+				"transit": "公共交通機関",
+				"defineTimeRestrictions": "時間制限を定義",
+				"myWorkHours": "勤務時間",
+				"myPersonalHours": "個人の時間",
+				"setBlockOutHours": "ブロック時間を設定",
+				"bedTime": "就寝時間",
+				"startsAt": "開始時刻",
+				"endsAt": "終了時刻",
+				"useCustom": "カスタムを使用",
+				"customTimeRestrictions": "カスタム時間制限",
+				"reset": "リセット",
+				"saveChanges": "変更を保存",
+				"saving": "保存中...",
+				"saveSuccess": "タイル設定が正常に更新されました",
+				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
+				"customSaved": "カスタム時間制限を保存しました",
+				"bedTimeStartRequired": "就寝開始時刻を選択してください",
+				"bedTimeEndRequired": "起床時刻を選択してください",
+				"scheduleIncompleteDay": "{{label}}: {{day}}の開始時刻と終了時刻の両方を設定してください",
+				"dayLabels": {
+					"sun": "日",
+					"mon": "月",
+					"tue": "火",
+					"wed": "水",
+					"thu": "木",
+					"fri": "金",
+					"sat": "土"
+				},
+				"dayNames": {
+					"sun": "日曜日",
+					"mon": "月曜日",
+					"tue": "火曜日",
+					"wed": "水曜日",
+					"thu": "木曜日",
+					"fri": "金曜日",
+					"sat": "土曜日"
+				},
+				"start": "開始",
+				"end": "終了",
+				"copyTimes": "時刻をコピー",
+				"paste": "時刻を貼り付け",
+				"cancelCopy": "コピーをキャンセル",
+				"themeMode": "カラーテーマ",
+				"themeModeLight": "ライト",
+				"themeModeDark": "ダーク",
+				"themeModeSystem": "デバイスの設定を使用",
+				"defaultStartTime": "8:00 AM",
+				"defaultEndTime": "6:00 PM",
+				"am": "午前",
+				"pm": "午後"
+			},
+			"tilerContacts": {
+				"title": "Tilerの連絡先",
+				"description": "同僚をTilerの連絡先に追加すると、タイルを簡単に共有できます。",
+				"placeholder": "連絡先管理は近日公開予定です...",
+				"youHave": "連絡先数：",
+				"tilerContacts": "Tilerの連絡先",
+				"enterFullName": "氏名を入力",
+				"emailOrPhone": "メールアドレスまたは電話番号"
+			},
+			"notificationPreferences": {
+				"title": "通知設定",
+				"description": "リマインダーとメール更新を管理します",
+				"placeholder": "通知設定は近日公開予定です...",
+				"tileReminders": "タイルのリマインダー",
+				"emailNotifications": "メール通知",
+				"pushNotifications": "プッシュ通知",
+				"saveChanges": "変更を保存",
+				"saving": "保存中...",
+				"saveSuccess": "通知設定を更新しました",
+				"saveError": "変更の保存に失敗しました。もう一度お試しください。"
+			},
+			"connections": {
+				"title": "連携",
+				"description": "Tilerアカウントに接続したアプリを管理します",
+				"placeholder": "連携設定は近日公開予定です..."
 			}
 		}
 	},
@@ -555,6 +1239,7 @@
 		"notFoundMessage": "おっと、'{{query}}'が見つかりませんでした。このタイトルでタイルを作成しますか？",
 		"notFoundDismiss": "いいえ",
 		"notFoundCreate": "作成",
+		"editEvent": "編集",
 		"setAsNow": "現在に設定",
 		"markComplete": "完了",
 		"markDeleted": "削除",
@@ -591,7 +1276,16 @@
 			"minutesShort": "分",
 			"confirm": "確認",
 			"cancel": "キャンセル"
-		}
+		},
+		"userMenu": {
+			"logout": "ログアウト",
+			"signOutSuccess": "ログアウトしました",
+			"signOutError": "ログアウトに失敗しました。もう一度お試しください。",
+			"defaultUsername": "ユーザー",
+			"settings": "Settings"
+		},
+		"expandPanel": "パネルを展開",
+		"collapsePanel": "パネルを折りたたむ"
 	},
 	"errors": {
 		"chatLimitReached": "チャット制限に達しました。後でもう一度お試しください。",
@@ -618,11 +1312,23 @@
 			"nameSection": "名前",
 			"occurrenceSection": "??",
 			"timeSection": "時間と期間",
-			"recurringToggle": "イベントを繰り返す",
 			"repetitionSection": "繰り返し",
+			"recurringToggle": "イベントを繰り返す",
 			"locationSection": "場所",
 			"colorSection": "色",
 			"notesSection": "メモ",
+			"restrictionSection": "時間制限",
+			"restrictionEnabled": "時間制限を有効にする",
+			"restrictionTypeAnytime": "いつでも",
+			"restrictionTypeWork": "勤務時間",
+			"restrictionTypePersonal": "個人の時間",
+			"restrictionTypeCustom": "カスタム",
+			"restrictionWorkInfo": "勤務時間はタイル設定で管理します。",
+			"restrictionPersonalInfo": "個人の時間はタイル設定で管理します。",
+			"restrictionGoToPreferences": "タイル設定に移動",
+			"restrictionDayOff": "オフ",
+			"restrictionPreviewAnytime": "いつでも",
+			"restrictionPreviewCustom": "カスタム",
 			"name": "名前",
 			"start": "開始",
 			"end": "終了",
@@ -670,85 +1376,266 @@
 			"savedLocations": "保存済みの場所",
 			"googleResults": "Googleマップ",
 			"poweredByGoogle": "Google提供",
-			"noLocationResults": "場所が見つかりません"
+			"noLocationResults": "場所が見つかりません",
+			"openNotes": "メモを開く",
+			"subEvents": {
+				"title": "セッション",
+				"titleWithCount": "セッション（{{count}}件）",
+				"loading": "セッションを読み込み中…",
+				"empty": "セッションはまだありません",
+				"error": "セッションを読み込めませんでした",
+				"retry": "再試行",
+				"loadMore": "さらに読み込む",
+				"loadEarlier": "以前のセッションを読み込む",
+				"allLoaded": "{{count}}件のセッションをすべて読み込みました",
+				"showCompleted": "完了・削除済みを表示",
+				"goTo": "カレンダーでこのセッションに移動",
+				"completed": "完了",
+				"removed": "削除済み"
+			}
 		}
 	},
-	"settings": {
-		"title": "設定",
-		"back": "戻る",
-		"logout": "ログアウト",
-		"breadcrumb": {
-			"home": "ホーム",
-			"settings": "設定"
+	"discover": {
+		"seo": {
+			"title": "見つける - Tiler",
+			"description": "一日の流れがようやく納得できる瞬間を見つけましょう。Tilerアプリの使い方を知り、アプリ内で試せることを発見してください。"
 		},
-		"sections": {
-			"accountInfo": {
-				"title": "アカウント情報",
-				"description": "アカウントを確認し、個人情報を変更してください",
-				"fields": {
-					"fullName": "氏名",
-					"username": "ユーザー名",
-					"email": "メールアドレス",
-					"phoneNumber": "電話番号",
-					"phoneNumberPlaceholder": "電話番号を追加",
-					"countryCode": "国番号",
-					"countryCodeSearch": "国を検索...",
-					"countryCodeNoResults": "国が見つかりません",
-					"dateOfBirth": "生年月日",
-					"dateOfBirthPlaceholder": "年/月/日"
-				},
-				"saveChanges": "変更を保存",
-				"saving": "保存中...",
-				"deleteAccount": "アカウントを削除",
-				"saveSuccess": "アカウント情報が正常に更新されました",
-				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
-				"deleteNotImplemented": "アカウント削除機能は近日公開予定です"
+		"hero": {
+			"badge": "Tilerを使いこなす",
+			"title": "必要なものはすべてここにあります",
+			"subtitle": "一日の流れがようやく納得できる瞬間を見つけましょう。アプリの使い方を知り、アプリ内で試せることを発見してください。"
+		},
+		"setUpTiler": {
+			"badge": "Tilerを設定",
+			"title": "3分以内で準備完了。",
+			"summary": "カレンダー、設定、制約条件を登録する4つのステップで、初日からTilerがアダプティブスケジューリングを実行するために必要な情報がそろいます。",
+			"visual": {
+				"step1": "アカウントを作成",
+				"step2": "カレンダーを接続",
+				"step3": "設定を行う",
+				"step4": "アダプティブスケジューリング"
 			},
-			"tilePreferences": {
-				"title": "タイル設定",
-				"description": "移動手段を定義し、Tilerが日々の時間パターンを理解するのを助けましょう",
-				"howMoveAround": "どうやって移動しますか？",
-				"cycling": "自転車",
-				"driving": "車",
-				"transit": "公共交通機関",
-				"defineTimeRestrictions": "時間制限を定義",
-				"myWorkHours": "勤務時間",
-				"myPersonalHours": "個人の時間",
-				"setBlockOutHours": "ブロック時間を設定",
-				"bedTime": "就寝時間",
-				"startsAt": "開始時刻",
-				"endsAt": "終了時刻",
-				"saveChanges": "変更を保存",
-				"saving": "保存中...",
-				"saveSuccess": "タイル設定が正常に更新されました",
-				"saveError": "変更の保存に失敗しました。もう一度お試しください。",
-				"bedTimeStartRequired": "就寝開始時刻を選択してください",
-				"bedTimeEndRequired": "起床時刻を選択してください",
-				"scheduleIncompleteDay": "{{label}}: {{day}}の開始時刻と終了時刻の両方を設定してください",
-				"dayLabels": {
-					"sun": "日",
-					"mon": "月",
-					"tue": "火",
-					"wed": "水",
-					"thu": "木",
-					"fri": "金",
-					"sat": "土"
+			"cards": {
+				"account": {
+					"title": "アカウントを作成",
+					"subtext": "メールアドレスで登録できます。無料で始められ、クレジットカードは不要です。",
+					"btnIdle": "無料アカウントを作成",
+					"btnCreating": "アカウントを作成中…",
+					"btnDone": "✓ アカウントを作成しました！"
 				},
-				"dayNames": {
-					"sun": "日曜日",
-					"mon": "月曜日",
-					"tue": "火曜日",
-					"wed": "水曜日",
-					"thu": "木曜日",
-					"fri": "金曜日",
-					"sat": "土曜日"
+				"calendar": {
+					"title": "カレンダーを接続",
+					"subtext": "GoogleまたはOutlookを連携すると、Tilerがイベントを読み取り、それらを考慮して予定を組み立てます。",
+					"calName": "Google Calendar",
+					"statusIdle": "タップして接続",
+					"statusConnecting": "接続中…",
+					"statusConnected": "✓ 接続済み"
 				},
-				"start": "開始",
-				"end": "終了",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
-				"am": "午前",
-				"pm": "午後"
+				"preferences": {
+					"title": "設定を行う",
+					"subtext": "プロフィールで移動手段を選び、時間の制限を設定します。",
+					"transitLabel": "移動手段",
+					"drive": "車",
+					"transit": "公共交通機関",
+					"walk": "徒歩",
+					"workHoursLabel": "勤務時間"
+				},
+				"adaptive": {
+					"title": "アダプティブスケジューリングの準備完了",
+					"subtext": "スケジュールは有効です。Tilerは一日の変化に自動で対応します。",
+					"schedLabel": "あなたのスケジュール",
+					"meeting": "9amの会議",
+					"run": "ランニング・30m",
+					"newTime": "新規：10am",
+					"urgentCall": "緊急の電話",
+					"recalculating": "再計算中…",
+					"rebuilt": "✓ スケジュールを再構築しました"
+				}
+			},
+			"supportNote": "各ステップはTilerのスケジューリングエンジンへの入力です。カレンダーは固定予定を、設定は移動方法を、時間制限は空いている時間を伝えます。これらを合わせることで、変化に応じて自ら調整するアダプティブスケジューリングに必要な全体像がTilerに伝わります。"
+		},
+		"whatIsTiler": {
+			"badge": "Tilerとは",
+			"title": "カレンダーではない。一日を動かすAI",
+			"summary": "やるべきことをTilerに伝えるだけ。時間を見つけ、競合を処理し、一日が予定どおり進まないときも調整します。",
+			"visual": {
+				"tile1": "ジム・45 min",
+				"tile2": "移動・12 min",
+				"tile3": "クライアントへの電話・1 hr",
+				"tile4": "買い物・30 min"
+			},
+			"subItems": {
+				"aiRunsDay": {
+					"title": "Tilerは一日を動かすAIです。",
+					"content": "会議が長引いたりタスクを延期したりしても、Tilerはあなたの修正を待ちません。変化を検知し、それを中心にスケジュールを即座に組み直します。あなたは意図を決め、残りはTilerが処理します。"
+				},
+				"fourCoreBlocks": {
+					"title": "Tilerの4つの基本要素"
+				},
+				"howDifferent": {
+					"title": "Tilerの違い"
+				}
+			},
+			"coreBlocks": {
+				"tiles": {
+					"label": "AutoTile",
+					"title": "タイル",
+					"desc": "柔軟なタスクです。目標と所要時間を設定すると、Tilerが時間枠を見つけ、一日の変化に応じて移動し、最適な順序に並べます。"
+				},
+				"blocks": {
+					"label": "固定",
+					"title": "ブロック",
+					"desc": "会議、フライト、予定などの固定された予定です。Tilerはこれらを動かせない基準として扱い、他のすべてをその周りにスケジュールします。"
+				},
+				"route": {
+					"label": "場所を考慮",
+					"title": "ルート",
+					"desc": "タイルに場所がある場合、Tilerは地理的に順序付け、実際の移動手段を示し、各立ち寄り先の間に移動時間を確保します。"
+				},
+				"tileShare": {
+					"label": "チームと家族",
+					"title": "TileShare",
+					"desc": "チームメイトや家族にタイルを割り当てます。全員のカレンダーは共有予定に合わせて自動的に調整され、タスクの文脈も共有されます。"
+				}
+			},
+			"comparison": {
+				"headerLeft": "Google Calendar",
+				"headerRight": "Tiler",
+				"rows": [
+					{
+						"left": "すべて手動で予定を入れる",
+						"right": "AIが自然な言葉からスケジュールを作成"
+					},
+					{
+						"left": "移動時間を考慮しない",
+						"right": "移動時間を自動計算して余裕を追加"
+					},
+					{
+						"left": "固定的で、変化に対応しない",
+						"right": "影響を検知して即座に再スケジュール"
+					},
+					{
+						"left": "ナビゲーションや経路計画がない",
+						"right": "実際の移動手段でタイルからタイルへ案内"
+					},
+					{
+						"left": "カレンダー共有のみで、タスクの割り当てはできない",
+						"right": "TileShare：誰とでもタスクを割り当て、追跡"
+					},
+					{
+						"left": "確認なしでイベントが追加される",
+						"right": "確認を優先し、すべての変更を承認できる"
+					}
+				]
+			}
+		},
+		"howToUseTiler": {
+			"badge": "Tilerの使い方",
+			"title": "意図から完了まで、わずか数秒。",
+			"summary": "カレンダーを接続し、タイルを追加すれば、あとはTilerが組み立てます。Tilerで一日を管理するためのステップガイドです。",
+			"visual": {
+				"step1": "タイルを追加",
+				"step2": "AIが計画",
+				"step3": "一日の予定が完成"
+			},
+			"items": {
+				"connectCalendar": {
+					"title": "カレンダーを接続する",
+					"body": "カレンダーを接続すると、Tilerが実際の予定を把握できます。同期されると、受信したカレンダーイベントはタイムラインにブロックとして表示されます。Tiler内で直接、承認、編集、競合の解決ができます。イベントが変わると、Tilerはタイルをその周囲に調整し、一日をバランスよく現実的に保ちます。"
+				},
+				"createBlock": {
+					"title": "ブロックの作成方法",
+					"body": "ブロックは、固定された予定、会議、予約、イベント、特定の時刻に必ず行うことを表します。ブロックを作成または同期すると、Tilerはそれを動かせないものとして扱い、柔軟に動かせる作業をその周囲に予定します。あなたが動かさない限り、ブロックは移動しません。これによりTilerは、現実の予定を尊重しながら一日を無理なく管理できる状態に保ちます。"
+				},
+				"flexibleTiles": {
+					"title": "柔軟なタイルを作成する",
+					"body": "タイルこそがTilerの強みです。タイルは、固定の時刻に縛られない、あなたが行う必要のあることを表します。目的、見積所要時間、任意の締切を設定すれば、配置はTilerが処理します。タイルは一日の変化に応じて移動、適応、再編成できるため、実際の仕事、用事、習慣、集中作業の時間に最適です。"
+				},
+				"updateTile": {
+					"title": "タイルの更新方法",
+					"body": "タイルを更新することで、システムに変更を伝えられます。所要時間の調整、延期、締切の変更、完了のマークが可能です。変更した瞬間に、Tilerは更新内容を反映するようタイムラインを再最適化します。他のタスクを手動で動かす必要はありません。影響の連鎖はシステムが処理します。"
+				},
+				"travelTime": {
+					"title": "移動時間とルート",
+					"body": "どのタイルにも場所を追加でき、あとはTilerが処理します。行く必要がある場所を自動検出し、一日のすべての立ち寄り先の間に必要な実際の移動時間を計算します。タイルの間にあるオレンジのブロックは空白ではなく、すでに計画された移動です。タップするとルートが開き、ターンバイターンの案内が読み込まれ、時間も考慮されています。スケジュールはすることを伝えるだけではなく、そこへ行く手助けもします。"
+				}
+			}
+		},
+		"features": {
+			"badge": "機能",
+			"title": "Tilerにできるすべてのこと。",
+			"summary": "すべての機能は、スケジュールがあなたに合わせて機能すべきであり、その逆ではないという一つの原則に基づいています。",
+			"items": {
+				"adaptiveTiles": {
+					"name": "アダプティブタイル",
+					"desc": "Tilerの中核となる単位です。各タイルは所要時間を持つタスク、イベント、または習慣で、Tilerが賢く予定を組み、一日の変化に応じて移動します。",
+					"badge": "中核機能"
+				},
+				"aiScheduling": {
+					"name": "AIスケジューリングアシスタント",
+					"desc": "Tilerは明確化の質問をし、利用可能な最適な時間を提案し、依存関係を含む完全なスケジュールを作成します。常にあなたの承認を得てから実行します。",
+					"badge": "中核機能"
+				},
+				"chatScheduling": {
+					"name": "チャットによるスケジューリング",
+					"desc": "自然なチャットインターフェースで、必要なことをTilerに伝えます。フォームを1つも入力しなくても、意図を理解して計画を提案します。",
+					"badge": "中核機能"
+				},
+				"naturalLanguage": {
+					"name": "自然言語入力",
+					"desc": "タスクを普段の言葉で説明します。フォームもドロップダウンも不要です。Tilerは自然な話し方から、文脈、緊急度、所要時間、場所を理解します。",
+					"badge": "中核機能"
+				},
+				"autoTravel": {
+					"name": "自動移動バッファ",
+					"desc": "Tilerは実際の距離と移動手段の選択肢に基づき、場所に紐づくタイルの間に現実的な移動時間を自動で挿入します。予定が連続していても遅刻を意味しません。",
+					"badge": "Tiler独自"
+				},
+				"autoLocations": {
+					"name": "自動ロケーション",
+					"desc": "場所を一度タイルに紐づければ、Tilerが記憶します。そのタスクが表示されるたびに、現在地からの移動時間が自動計算されます。",
+					"badge": "Tiler独自"
+				},
+				"timeRestrictions": {
+					"name": "時間の制限",
+					"desc": "対応可能な時間を設定すると、Tilerはその範囲内でのみ予定を組みます。あなたが許可しない限り、タスクが時間外に入り込むことはなく、私的な時間はあなたのものです。",
+					"badge": "設定"
+				},
+				"adaptiveRescheduling": {
+					"name": "アダプティブな再スケジューリング",
+					"desc": "会議が長引いたりタスクを逃したりすると、Tilerは一日全体への影響を検知し、解決策を即座に提案します。何かを変更する前に、必ずあなたの承認を得ます。",
+					"badge": "中核機能"
+				},
+				"calendarIntegration": {
+					"name": "カレンダー連携",
+					"desc": "Google CalendarまたはOutlookを接続します。Tilerは既存のイベントを読み取り、それらの周囲にすべての新しいタイルを予定します。二重予約はありません。複数のカレンダーに対応しています。",
+					"badge": "連携"
+				},
+				"crossPlatform": {
+					"name": "クロスプラットフォーム同期",
+					"desc": "Web、iOS、Androidはすべてリアルタイムで同期されます。ノートパソコンでタスクを始め、スマートフォンで途切れることなく確認できます。1つのスケジュールを、どこでも利用できます。",
+					"badge": "プラットフォーム"
+				},
+				"habitScheduling": {
+					"name": "習慣のスケジューリング",
+					"desc": "繰り返す習慣を追加すると、Tilerが一日に合わせて自動的に組み込みます。毎朝考えなくても、ルーティンを継続できます。",
+					"badge": "ウェルネス"
+				},
+				"deferReschedule": {
+					"name": "延期と再スケジューリング",
+					"desc": "タイルを逃しましたか？Tilerの延期機能は、次に最適な時間枠を即座に見つけ、ワンタップで再スケジュールします。タスクを失うことなく、賢く先送りできます。",
+					"badge": "中核機能"
+				},
+				"smartNotifications": {
+					"name": "スマート通知",
+					"desc": "次のタイルへ向けて出発する時間になると通知を受け取れます。ルートが変わった場合は、移動状況のライブ更新も届きます。時間を見失って出発時刻を逃すことはありません。",
+					"badge": "リアルタイム"
+				},
+				"tileShare": {
+					"name": "TileShare",
+					"desc": "家族やチームメイトとタイルを共有できます。誰が何を担当するかを割り当て、完了を追跡します。全員のカレンダーは共有予定に合わせて自動調整され、追加のアプリは不要です。",
+					"badge": "コラボレーション"
+				}
 			}
 		}
 	},
@@ -770,5 +1657,481 @@
 		"submitting": "送信中...",
 		"submitSuccess": "フィードバックありがとうございます！",
 		"submitError": "フィードバックの送信に失敗しました。もう一度お試しください。"
+	},
+	"location": {
+		"verified": {
+			"label": "確認済み",
+			"tooltip": "この住所はGoogle Mapsまたは保存済みの場所によって確認されています。プラットフォームは正確な移動時間の計算に使用します。未確認の住所については、プラットフォームが最も適した候補を見つけようとします。"
+		}
+	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "TileShare",
+			"nav": {
+				"active": "アクティブ",
+				"sent": "送信済み",
+				"received": "受信済み（{{count}}）",
+				"inbox": "Inbox Link",
+				"outbox": "Outbox Link"
+			},
+			"toolbar": {
+				"welcome": "TileShareダッシュボードへようこそ",
+				"create": "TileShareを作成"
+			},
+			"createSelection": {
+				"single": {
+					"label": "単一のTileShare",
+					"description": "同僚と共有する単一のタスクです。"
+				},
+				"multi": {
+					"label": "複数のTileShare",
+					"description": "1つのプロジェクト内のさまざまなタスクです。"
+				}
+			},
+			"create": {
+				"back": "TileShareに戻る",
+				"single": {
+					"title": "単一のTileShareを作成",
+					"description": "単一のタスクを作成して同僚と共有します。相手が承諾すると、そのスケジュールに追加されます。",
+					"submit": "単一のTileShareを作成"
+				},
+				"multi": {
+					"title": "複数のTileShareを作成",
+					"description": "1つのプロジェクト内のさまざまなタスクを作成して共有します。同僚が承諾すると、そのスケジュールに追加されます。",
+					"submit": "複数のTileShareを作成"
+				},
+				"fields": {
+					"name": {
+						"placeholder": "タスク名を入力"
+					},
+					"deadline": {
+						"placeholder": "締切を追加"
+					},
+					"location": {
+						"placeholder": "場所を追加（任意）"
+					},
+					"note": {
+						"placeholder": "メモを追加（任意）"
+					}
+				},
+				"shareTo": {
+					"label": "共有先：",
+					"placeholder": "メールアドレス／電話番号（Enterで選択）",
+					"add": "受信者を追加",
+					"remove": "{{recipient}}を削除"
+				},
+				"buttons": {
+					"cancel": "キャンセル"
+				},
+				"validation": {
+					"nameRequired": "タスク名を入力してください",
+					"deadlineRequired": "締切を追加してください",
+					"recipientRequired": "少なくとも1人の受信者を追加してください",
+					"invalidRecipient": "{{recipient}}は有効なメールアドレスまたは電話番号ではありません"
+				},
+				"toast": {
+					"creating": "TileShareを作成中…",
+					"error": "TileShareを作成できませんでした。もう一度お試しください。"
+				},
+				"success": {
+					"message": "TileShare「{{name}}」を作成しました。",
+					"view": "TileShareを表示"
+				}
+			},
+			"filter": {
+				"all": "すべて",
+				"inProgress": "進行中"
+			}
+		},
+		"card": {
+			"progress": "進捗",
+			"dueOn": "期限日：",
+			"dueBy": "期限：",
+			"multiTileshare": "複数のTileShare",
+			"tileshare": "TileShare"
+		},
+		"active": {
+			"title": "アクティブ",
+			"empty": "アクティブなTileShareはありません",
+			"emptyFiltered": "アクティブなTileShareに進行中の項目はありません"
+		},
+		"sent": {
+			"title": "送信済み",
+			"empty": "まだTileShareを送信していません",
+			"emptyFiltered": "送信したTileShareに進行中の項目はありません"
+		},
+		"received": {
+			"title": "受信済み",
+			"empty": "まだTileShareを受信していません",
+			"emptyFiltered": "受信したTileShareに進行中の項目はありません"
+		},
+		"tileshareDetail": {
+			"title": "TileShareの詳細"
+		},
+		"tiletteDetail": {
+			"title": "Tiletteの詳細"
+		},
+		"invite": {
+			"title": "招待"
+		},
+		"inbox": {
+			"title": "Inbox"
+		},
+		"outbox": {
+			"title": "Outbox"
+		}
+	},
+	"tile": {
+		"noteButtonAria": "このタイルのメモを開く"
+	},
+	"notesEditor": {
+		"placeholder": "入力を始めてください。上のツールバーでメモの書式設定やリンクの追加ができます。メモは自動的に保存され、すべてのデバイス間で同期されます。",
+		"surfaceAria": "メモエディター",
+		"back": "戻る",
+		"close": "閉じる",
+		"eyebrow": "メモ",
+		"loading": "メモを読み込み中…",
+		"errorLoad": "メモを読み込めませんでした。",
+		"saving": "保存中…",
+		"saved": "保存済み",
+		"errorSave": "保存されていません",
+		"unsaved": "編集中…",
+		"save": "保存",
+		"saveNow": "今すぐ保存",
+		"linkPrompt": "URL",
+		"conflict": {
+			"title": "他のユーザーがこのメモを更新しました。",
+			"discard": "自分の変更を破棄",
+			"keep": "編集を続ける"
+		},
+		"tool": {
+			"bold": "太字",
+			"italic": "斜体",
+			"underline": "下線",
+			"strike": "取り消し線",
+			"code": "インラインコード",
+			"h1": "見出し 1",
+			"h2": "見出し 2",
+			"h3": "見出し 3",
+			"bullet": "箇条書き",
+			"ordered": "番号付きリスト",
+			"task": "チェックリスト",
+			"quote": "引用",
+			"link": "リンク",
+			"undo": "元に戻す",
+			"redo": "やり直す"
+		}
+	},
+	"getStarted": {
+		"seo": {
+			"title": "Tilerを始める | AIスケジューリングとスマートカレンダーアプリ",
+			"description": "Tilerは、最適な毎日のスケジュールを自動で組み立てるAI搭載カレンダーです。予定の境界を設定し、場所を指定すれば、AIソルバーが暮らしに合うタイムラインを作成します。",
+			"keywords": "AIスケジューリングアプリ、スマートカレンダー、エージェント型カレンダー、AIタスクスケジューラー、アダプティブスケジューリング、AIカレンダーアプリ、インテリジェントな時間管理、場所を考慮したスケジューリング、AI生産性アプリ、スマートデイリープランナー"
+		},
+		"hero": {
+			"badge": "プロダクトアップデート",
+			"title": "Tilerを始める最初の5分間",
+			"subtitle": "Tilerは、目標、予定、場所という3つの情報から最適なタイムラインを作ります。オンボーディングの進め方をご紹介します。"
+		},
+		"intro": {
+			"lede": "多くのスケジュールツールは、空のグリッドに空白のボックスをドラッグして、パズルがうまく解けることを願うところから始まります。Tilerは違います。タイムラインを表示する前に、アプリがあなたの一日の形を学習し、実際に合う予定を作ります。",
+			"body": "オンボーディングは約5分です。完了時には、週の変化に適応する、制約と場所を考慮したスケジュールを生成するために必要な文脈がTilerのエンジンにそろいます。すべてを支える3つの柱："
+		},
+		"steps": {
+			"heading": "最初のタイムラインを作る6つのステップ",
+			"step1": {
+				"title": "サインインしてプロフィールを作成",
+				"body": "すべてはTilerアカウントから始まります。サインインすると、アプリはすぐにプロフィールの記憶を構築し始めます。これは、あなたの働き方、対応可能な時間、そして大切にしていることをエンジンが理解するために使うコンテキストの層です。",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step2": {
+				"title": "起床時間を設定",
+				"body": "最初の質問は一見シンプルです。あなたの一日はいつ始まりますか？この1つのデータが、エンジンがスケジュールを組む際の最も早い境界を定めます。夜型でも早起きでも、Tilerは任意の9 AMを初期値にするのではなく、あなたの現実から始めます。",
+				"calloutStrong": "これが重要な理由：",
+				"callout": "Tilerのすべての制約は、あなたが設定した境界から生まれます。起床時間、勤務時間、場所が、ほかの最適化よりも先にソルバーが尊重する明確な境界を形作ります。"
+			},
+			"step3": {
+				"title": "場所を指定",
+				"body": "一日の大半をどこで過ごしますか？TilerはGoogle Mapsと連携しているため、タスク間の移動時間を車、公共交通機関、徒歩に基づいて実際に計算できます。曖昧な推測ではありません。これは多くの計画ツールが完全に省いている部分であり、実際に予定どおりに過ごそうとするとそのスケジュールが崩れてしまう理由です。オートコンプリートにはGoogleのPlaces APIが使われているため、本社、コワーキングスペース、現場など、どのような場所でも入力できます。",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step4": {
+				"title": "勤務時間を設定",
+				"body": "毎日が同じとは限りません。Tilerでは曜日ごとに勤務時間を設定できます。曜日のオン・オフ、開始・終了時刻の変更、複数の日へのスケジュールのコピーが可能です。これにより、仕事のブロックとプライベートな時間を分ける時間的な境界が作られます。エンジンはこれらをソフト制約として扱います。既定のスケジュールを形作るには十分に強く、締め切りや移動の予定に応じて柔軟に調整できる制約です。",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step5": {
+				"title": "タイルの候補を追加",
+				"body": "ここからTilerの違いを実感できます。エンジンはあなたの職業プロフィールに基づいて、必要になりそうな繰り返しアクティビティタイル（仕事のブロック）を提案します。クライアントとの通話。集中作業。事業開発。週次の振り返り。該当するものを選び、不要なものを削除し、それぞれを毎日または毎週の頻度に設定します。",
+				"calloutStrong": "AIが候補を提示し、人が選びます。",
+				"callout": "提案は、LLMがあなたの職業上のコンテキストを分析して作成します。何を予定に入れるかはあなたが決め、いつどこに入れるかはエンジンが処理します。"
+			},
+			"step6": {
+				"title": "あなたのタイムラインが完成",
+				"body": "制約を読み込むと、ソルバーが実行されます。表示されるのは、入力待ちの空白カレンダーではありません。タイルが適切な場所に配置され、移動時間が考慮され、勤務時間が尊重された最適化済みのタイムラインです。各タイルは色分けされ、場所にリンクされています。また、展開可能なアクションメニューで素早く編集できます。自然言語で新しいタスクを追加したり、what-ifシナリオで代替案を試したり、チームとタイルを共有したりできます。オンボーディングが種をまき、ここからエンジンがスケジュールを育てます。",
+				"calloutStrong": "",
+				"callout": ""
+			}
+		},
+		"pillars": {
+			"heading": "3つの柱。1つの最適なタイムライン。",
+			"goals": {
+				"icon": "??",
+				"title": "目標",
+				"body": "時間を確保する必要があるタスクや目標です。"
+			},
+			"appointments": {
+				"icon": "??",
+				"title": "予定",
+				"body": "すでに決まっている会議、フライト、その他の約束です。"
+			},
+			"location": {
+				"icon": "??",
+				"title": "場所",
+				"body": "あなたが実際にいる場所。だから移動時間は推測ではなく正確です。"
+			}
+		},
+		"cta": {
+			"heading": "タイムラインを作る準備はできましたか？",
+			"body": "設定は5分。本当に機能するスケジュールを。",
+			"button": "無料で始める ?",
+			"sub": "iOSとAndroidで利用可能。無料で始められます。"
+		}
+	},
+	"articles": {
+		"minRead": "分で読めます",
+		"readArticle": "記事を読む",
+		"breadcrumbs": {
+			"home": "ホーム",
+			"articles": "記事"
+		},
+		"index": {
+			"seo": {
+				"title": "記事 | Tiler - ガイド、プロダクトアップデート、生産性向上のヒント",
+				"description": "AIスケジューリング、エージェント型カレンダー、適応型の生産性向上に関するTilerのガイド、プロダクトアップデート、詳細な解説をご覧ください。自分のために時間を活かす方法を学べます。",
+				"keywords": "Tilerの記事、AIスケジューリングブログ、スマートカレンダーガイド、生産性向上の記事、エージェント型カレンダー、時間管理のヒント、AI生産性向上ブログ"
+			},
+			"hero": {
+				"badge": "記事",
+				"title": "より良いスケジュールのためのヒント",
+				"subtitle": "AIが一日の計画の立て方をどう変えられるかについてのガイド、プロダクトアップデート、アイデアをご紹介します。"
+			}
+		},
+		"posts": {
+			"gettingStarted": {
+				"category": "GETTING STARTED",
+				"title": "Tilerを始める最初の5分間",
+				"subtitle": "Tilerは、目標、予定、場所という3つの情報から最適なタイムラインを作ります。オンボーディングの進め方をご紹介します。",
+				"excerpt": "多くのスケジュールツールは空のグリッドから始まります。Tilerはまずあなたの一日の形を学習し、次に実際の暮らしに合う、制約と場所を考慮したタイムラインを作成します。",
+				"readTime": "6 min read",
+				"author": "Tiler Team",
+				"date": "May 1, 2026",
+				"seo": {
+					"title": "Tilerを始める | AIスケジューリングとスマートカレンダーアプリ",
+					"description": "Tilerは、最適な毎日のスケジュールを自動で組み立てるAI搭載カレンダーです。予定の境界を設定し、場所を指定すれば、AIソルバーが暮らしに合うタイムラインを作成します。",
+					"keywords": "AIスケジューリングアプリ、スマートカレンダー、エージェント型カレンダー、AIタスクスケジューラー、アダプティブスケジューリング、AIカレンダーアプリ、インテリジェントな時間管理、場所を考慮したスケジューリング、AI生産性アプリ、スマートデイリープランナー"
+				},
+				"intro": {
+					"lede": "多くのスケジュールツールは、空のグリッドに空白のボックスをドラッグして、パズルがうまく解けることを願うところから始まります。Tilerは違います。タイムラインを表示する前に、アプリがあなたの一日の形を学習し、実際に合う予定を作ります。",
+					"body": "オンボーディングは約5分です。完了時には、週の変化に適応する、制約と場所を考慮したスケジュールを生成するために必要な文脈がTilerのエンジンにそろいます。すべてを支える3つの柱："
+				}
+			},
+			"naturalLanguageScheduling": {
+				"category": "FEATURES",
+				"title": "Natural-Language Scheduling",
+				"subtitle": "Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.",
+				"excerpt": "Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "May 1, 2026",
+				"sections": [
+					{
+						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+					},
+					{
+						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+					},
+					{
+						"title": "How it works"
+					},
+					{
+						"stepTitle": "Describe the task",
+						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"callout": {
+							"label": "What Tiler understands",
+							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+						}
+					},
+					{
+						"stepTitle": "The AI fills in the gaps",
+						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"callout": {
+							"label": "Reasoning, not guessing",
+							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+						}
+					},
+					{
+						"stepTitle": "Review, then confirm",
+						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"callout": {
+							"label": "Confirmation-first",
+							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+						}
+					},
+					{
+						"quote": "You live it. Tiler plans it."
+					}
+				]
+			},
+			"smartTravelAndLocation": {
+				"category": "FEATURES",
+				"title": "Smart Travel and Location",
+				"subtitle": "A schedule that ignores location isn't a schedule. It's a guess.",
+				"excerpt": "Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "May 8, 2026",
+				"sections": [
+					{
+						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+					},
+					{
+						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+					},
+					{
+						"title": "How it works"
+					},
+					{
+						"stepTitle": "Set your locations once",
+						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"callout": {
+							"label": "Location labels Tiler understands",
+							"text": "Home · Work · Downtown · The gym · Near the office"
+						}
+					},
+					{
+						"stepTitle": "Travel time slots into your timeline",
+						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"callout": {
+							"label": "Real routes, not estimates",
+							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+						}
+					},
+					{
+						"stepTitle": "Nearby tasks get grouped automatically",
+						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"callout": {
+							"label": "Less travel, more done",
+							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+						}
+					},
+					{
+						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+					}
+				]
+			},
+			"scheduleUndo": {
+				"category": "FEATURES",
+				"title": "Schedule Undo",
+				"subtitle": "Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.",
+				"excerpt": "Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "June 22, 2026",
+				"sections": [
+					{
+						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+					},
+					{
+						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+					},
+					{
+						"title": "How Schedule Undo works"
+					},
+					{
+						"stepTitle": "Make a change",
+						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"callout": {
+							"label": "Nothing saves automatically",
+							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+						}
+					},
+					{
+						"stepTitle": "See exactly what changed",
+						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+					},
+					{
+						"stepTitle": "Tap Undo or Accept",
+						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"callout": {
+							"label": "Undo is always instant",
+							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+						}
+					},
+					{
+						"title": "Why this matters"
+					},
+					{
+						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+					},
+					{
+						"label": "Built for tightly packed days",
+						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+					},
+					{
+						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+					},
+					{
+						"quote": "Change your mind before it counts."
+					}
+				]
+			},
+			"tileshare": {
+				"category": "FEATURES",
+				"title": "Tileshare",
+				"subtitle": "Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
+				"excerpt": "Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
+				"readTime": "4 min read",
+				"author": "Tiler Team",
+				"date": "May 22, 2026",
+				"sections": [
+					{
+						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+					},
+					{
+						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+					},
+					{
+						"title": "How Tileshare works"
+					},
+					{
+						"stepTitle": "Share any tile",
+						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"callout": {
+							"label": "What travels with the tile",
+							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+						}
+					},
+					{
+						"stepTitle": "It lands in their schedule",
+						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+					},
+					{
+						"stepTitle": "Track it without chasing",
+						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"callout": {
+							"label": "Shared accountability, zero friction",
+							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+						}
+					},
+					{
+						"quote": "Send it once. Know it gets done."
+					}
+				]
+			}
+		}
 	}
 }

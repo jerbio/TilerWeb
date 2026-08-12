@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, setupUser, waitFor } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import ReviseButton from '../revise_button';
 
 const mockReviseSchedule = vi.fn();
@@ -212,6 +213,26 @@ describe('ReviseButton', () => {
 		await waitFor(() => {
 			expect(onLoadingChange).toHaveBeenCalledWith(true);
 			expect(onLoadingChange).toHaveBeenCalledWith(false);
+		});
+	});
+
+	describe('read-only mode', () => {
+		afterEach(() => {
+			useSimulationOverlayStore.setState({ inReview: false });
+		});
+
+		it('is disabled while the schedule is read-only', () => {
+			useSimulationOverlayStore.setState({ inReview: true });
+			renderReviseButton();
+			expect(screen.getByRole('button', { name: 'Revise schedule' })).toBeDisabled();
+		});
+
+		it('does not call reviseSchedule when clicked while read-only', async () => {
+			useSimulationOverlayStore.setState({ inReview: true });
+			const user = setupUser();
+			renderReviseButton();
+			await user.click(screen.getByRole('button', { name: 'Revise schedule' }));
+			expect(mockReviseSchedule).not.toHaveBeenCalled();
 		});
 	});
 });

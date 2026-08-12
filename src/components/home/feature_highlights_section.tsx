@@ -41,7 +41,9 @@ const HighlightCard = styled.div<{ $bg: string }>`
 	border: 1px solid ${palette.colors.borderRed};
 	display: flex;
 	flex-direction: column;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
 
 	&:hover {
 		transform: translateY(-4px);
@@ -65,7 +67,7 @@ const CardText = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	border-top: 1px solid rgba(255,255,255,0.06);
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
 	overflow: hidden;
 `;
 
@@ -117,11 +119,6 @@ const barBounce = keyframes`
 	50%      { transform: scaleY(1); }
 `;
 
-const typeIn = keyframes`
-	0%   { width: 0; }
-	100% { width: 100%; }
-`;
-
 const NLSScene = styled.div`
 	position: absolute;
 	inset: 0;
@@ -147,11 +144,14 @@ const SceneVoice = styled.div`
 `;
 
 const MicIcon = styled.div`
-	width: 28px; height: 28px;
+	width: 28px;
+	height: 28px;
 	border-radius: 50%;
-	background: rgba(220,38,38,0.2);
-	border: 1.5px solid rgba(220,38,38,0.6);
-	display: flex; align-items: center; justify-content: center;
+	background: rgba(220, 38, 38, 0.2);
+	border: 1.5px solid rgba(220, 38, 38, 0.6);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	font-size: 13px;
 	animation: ${micPulse} 1.2s ease-in-out infinite;
 `;
@@ -167,7 +167,7 @@ const Bar = styled.div<{ $h: number; $d: number }>`
 	width: 3px;
 	height: ${(p) => p.$h}px;
 	border-radius: 2px;
-	background: rgba(220,38,38,0.7);
+	background: rgba(220, 38, 38, 0.7);
 	transform-origin: bottom;
 	animation: ${barBounce} ${(p) => 0.5 + p.$d * 0.1}s ease-in-out infinite;
 	animation-delay: ${(p) => p.$d * 0.08}s;
@@ -175,8 +175,8 @@ const Bar = styled.div<{ $h: number; $d: number }>`
 
 const TranscriptLine = styled.div`
 	font-size: 8.5px;
-	color: rgba(255,255,255,0.6);
-	background: rgba(255,255,255,0.06);
+	color: rgba(255, 255, 255, 0.6);
+	background: rgba(255, 255, 255, 0.06);
 	border-radius: 6px;
 	padding: 4px 8px;
 	width: 90%;
@@ -203,13 +203,13 @@ const ResponseRow = styled.div<{ $w: string; $accent?: boolean }>`
 	height: 16px;
 	width: ${(p) => p.$w};
 	border-radius: 5px;
-	background: ${(p) => p.$accent ? 'rgba(220,38,38,0.25)' : 'rgba(255,255,255,0.08)'};
-	border: 1px solid ${(p) => p.$accent ? 'rgba(220,38,38,0.5)' : 'rgba(255,255,255,0.1)'};
+	background: ${(p) => (p.$accent ? 'rgba(220,38,38,0.25)' : 'rgba(255,255,255,0.08)')};
+	border: 1px solid ${(p) => (p.$accent ? 'rgba(220,38,38,0.5)' : 'rgba(255,255,255,0.1)')};
 	display: flex;
 	align-items: center;
 	padding: 0 6px;
 	font-size: 8px;
-	color: ${(p) => p.$accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)'};
+	color: ${(p) => (p.$accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)')};
 `;
 
 function NLSAnimation() {
@@ -220,7 +220,7 @@ function NLSAnimation() {
 				<SceneVoice>
 					<MicIcon>🎙</MicIcon>
 					<WaveRow>
-						{[6,10,14,18,14,10,16,12,8,14,10,6].map((h, i) => (
+						{[6, 10, 14, 18, 14, 10, 16, 12, 8, 14, 10, 6].map((h, i) => (
 							<Bar key={i} $h={h} $d={i} />
 						))}
 					</WaveRow>
@@ -229,7 +229,9 @@ function NLSAnimation() {
 
 				{/* Scene 2: AI scheduled response */}
 				<SceneResponse>
-					<ResponseRow $w="88%" $accent>✓ Lunch with Sarah — Tomorrow 12:00 PM</ResponseRow>
+					<ResponseRow $w="88%" $accent>
+						✓ Lunch with Sarah — Tomorrow 12:00 PM
+					</ResponseRow>
 					<ResponseRow $w="70%">+ 25 min travel block added</ResponseRow>
 					<ResponseRow $w="55%">📍 Downtown · 1 hr</ResponseRow>
 				</SceneResponse>
@@ -265,7 +267,7 @@ const TravelSVG = styled.svg`
 `;
 
 const RoutePath = styled.line`
-	stroke: rgba(96,165,250,0.6);
+	stroke: rgba(96, 165, 250, 0.6);
 	stroke-width: 2;
 	stroke-dasharray: 210;
 	stroke-dashoffset: 210;
@@ -283,10 +285,10 @@ const TravelDot = styled.circle`
 
 // stops: x position, label, time — time always above, label always below
 const STOPS = [
-	{ x: 22,  label: 'Home',   time: '8:00 AM' },
-	{ x: 88,  label: 'Office', time: '9:15 AM' },
-	{ x: 155, label: 'Café',   time: '1:00 PM' },
-	{ x: 240, label: 'Gym',    time: '5:30 PM' },
+	{ x: 22, label: 'Home', time: '8:00 AM' },
+	{ x: 88, label: 'Office', time: '9:15 AM' },
+	{ x: 155, label: 'Café', time: '1:00 PM' },
+	{ x: 240, label: 'Gym', time: '5:30 PM' },
 ];
 
 function TravelAnimation() {
@@ -299,17 +301,41 @@ function TravelAnimation() {
 				{/* Stops */}
 				{STOPS.map((s) => (
 					<g key={s.label}>
-						<circle cx={s.x} cy={55} r={6} fill="rgba(96,165,250,0.15)" stroke="#60a5fa" strokeWidth="1.5"/>
-						<circle cx={s.x} cy={55} r={2.5} fill="#60a5fa"/>
+						<circle
+							cx={s.x}
+							cy={55}
+							r={6}
+							fill="rgba(96,165,250,0.15)"
+							stroke="#60a5fa"
+							strokeWidth="1.5"
+						/>
+						<circle cx={s.x} cy={55} r={2.5} fill="#60a5fa" />
 						{/* Time above dot */}
-						<text x={s.x} y={40} fontSize="7.5" fill="rgba(96,165,250,0.85)" textAnchor="middle" fontWeight="600">{s.time}</text>
+						<text
+							x={s.x}
+							y={40}
+							fontSize="7.5"
+							fill="rgba(96,165,250,0.85)"
+							textAnchor="middle"
+							fontWeight="600"
+						>
+							{s.time}
+						</text>
 						{/* Label below dot */}
-						<text x={s.x} y={74} fontSize="8" fill="rgba(255,255,255,0.55)" textAnchor="middle">{s.label}</text>
+						<text
+							x={s.x}
+							y={74}
+							fontSize="8"
+							fill="rgba(255,255,255,0.55)"
+							textAnchor="middle"
+						>
+							{s.label}
+						</text>
 					</g>
 				))}
 
 				{/* Traveling dot */}
-				<TravelDot cx="0" cy="0" r="4.5"/>
+				<TravelDot cx="0" cy="0" r="4.5" />
 			</TravelSVG>
 		</AnimArea>
 	);
@@ -370,8 +396,9 @@ const UndoSceneC = styled(UndoSceneBase)`
 const UndoTileCard = styled.div<{ $ghost?: boolean }>`
 	width: 100%;
 	border-radius: 8px;
-	background: ${({ $ghost }) => $ghost ? 'rgba(74,222,128,0.05)' : 'rgba(255,255,255,0.07)'};
-	border: ${({ $ghost }) => $ghost ? '1.5px dashed rgba(74,222,128,0.5)' : '1px solid rgba(255,255,255,0.1)'};
+	background: ${({ $ghost }) => ($ghost ? 'rgba(74,222,128,0.05)' : 'rgba(255,255,255,0.07)')};
+	border: ${({ $ghost }) =>
+		$ghost ? '1.5px dashed rgba(74,222,128,0.5)' : '1px solid rgba(255,255,255,0.1)'};
 	padding: 6px 10px;
 	display: flex;
 	flex-direction: column;
@@ -381,17 +408,17 @@ const UndoTileCard = styled.div<{ $ghost?: boolean }>`
 const UndoTileName = styled.span`
 	font-size: 9px;
 	font-weight: 600;
-	color: rgba(255,255,255,0.9);
+	color: rgba(255, 255, 255, 0.9);
 `;
 
 const UndoTileMeta = styled.span`
 	font-size: 8px;
-	color: rgba(255,255,255,0.45);
+	color: rgba(255, 255, 255, 0.45);
 `;
 
 const UndoPreviewBadge = styled.span`
 	font-size: 7px;
-	color: rgba(74,222,128,0.9);
+	color: rgba(74, 222, 128, 0.9);
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	margin-top: 1px;
@@ -416,9 +443,11 @@ const UndoActionBtn = styled.button<{ $variant: 'undo' | 'accept' }>`
 		$variant === 'accept' ? 'rgba(74,222,128,0.15)' : 'rgba(239,68,68,0.12)'};
 	color: ${({ $variant }) =>
 		$variant === 'accept' ? 'rgba(74,222,128,0.9)' : 'rgba(239,68,68,0.8)'};
-	border: 1px solid ${({ $variant }) =>
-		$variant === 'accept' ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.25)'};
-	animation: ${({ $variant }) => $variant === 'accept' ? acceptPulse : 'none'} 7.5s ease-in-out infinite;
+	border: 1px solid
+		${({ $variant }) =>
+			$variant === 'accept' ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.25)'};
+	animation: ${({ $variant }) => ($variant === 'accept' ? acceptPulse : 'none')} 7.5s ease-in-out
+		infinite;
 `;
 
 function ScheduleUndoAnimation() {
@@ -511,14 +540,14 @@ const Avatar = styled.div<{ $receiver?: boolean }>`
 	width: 34px;
 	height: 34px;
 	border-radius: 50%;
-	background: rgba(244,114,182,0.12);
-	border: 1.5px solid rgba(255,255,255,0.15);
+	background: rgba(244, 114, 182, 0.12);
+	border: 1.5px solid rgba(255, 255, 255, 0.15);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: 14px;
 	flex-shrink: 0;
-	animation: ${(p) => p.$receiver ? receiverLight : senderPulse} 5s ease-in-out infinite;
+	animation: ${(p) => (p.$receiver ? receiverLight : senderPulse)} 5s ease-in-out infinite;
 `;
 
 const MiddleSpace = styled.div`
@@ -535,27 +564,27 @@ const SharedTile = styled.div`
 	width: 92px;
 	height: 32px;
 	border-radius: 7px;
-	background: rgba(244,114,182,0.15);
-	border: 1px solid rgba(244,114,182,0.5);
+	background: rgba(244, 114, 182, 0.15);
+	border: 1px solid rgba(244, 114, 182, 0.5);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	padding: 0 7px;
 	opacity: 0;
 	animation: ${tileSlide} 5s ease-in-out infinite;
-	box-shadow: 0 0 12px rgba(244,114,182,0.2);
+	box-shadow: 0 0 12px rgba(244, 114, 182, 0.2);
 `;
 
 const TileName = styled.span`
 	font-size: 7.5px;
 	font-weight: 700;
-	color: rgba(255,255,255,0.9);
+	color: rgba(255, 255, 255, 0.9);
 	white-space: nowrap;
 `;
 
 const TileSub = styled.span`
 	font-size: 7px;
-	color: rgba(244,114,182,0.8);
+	color: rgba(244, 114, 182, 0.8);
 	white-space: nowrap;
 `;
 
@@ -570,7 +599,7 @@ const ArcSVG = styled.svg`
 
 const ArcLine = styled.path`
 	fill: none;
-	stroke: rgba(244,114,182,0.55);
+	stroke: rgba(244, 114, 182, 0.55);
 	stroke-width: 1.5;
 	stroke-dasharray: 100;
 	stroke-dashoffset: 100;
@@ -662,7 +691,11 @@ const FeatureHighlightsSection: React.FC = () => {
 				{highlights.map((highlight, index) => {
 					const { bg, Animation } = CARD_CONFIGS[index];
 					return (
-						<Link key={index} to={`/articles/${highlight.slug}`} style={{ textDecoration: 'none' }}>
+						<Link
+							key={index}
+							to={`/articles/${highlight.slug}`}
+							style={{ textDecoration: 'none' }}
+						>
 							<HighlightCard $bg={bg}>
 								<Animation />
 								<CardText>

@@ -1,6 +1,7 @@
 import { Actions, Status } from '@/core/constants/enums';
 import { UserInfo } from '@/global_state';
 import { ApiResponse, PaginationParams } from './api';
+import { SubCalendarEvent } from './schedule';
 
 export type ActionType = `${Actions}`;
 
@@ -47,7 +48,74 @@ export interface VibeRequest {
 	beforeScheduleId: string | null;
 	afterScheduleId: string | null;
 	actions: VibeAction[];
-	previews?: unknown[];
+	previews?: SimulationDto[];
+	preview?: SimulationDto | null;
+	state?: string;
+	supersededByRequestId?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Simulated Schedule Experience (frontend uses "simulation"; backend stays
+// "preview"). See SIMULATED_SCHEDULE_EXPERIENCE_EXECUTION_PLAN.md Phase 1.1.
+// ---------------------------------------------------------------------------
+
+export enum SimulationState {
+	Queued = 'Queued',
+	Processing = 'Processing',
+	Ready = 'Ready',
+	Invalidated = 'Invalidated',
+	Failed = 'Failed',
+}
+
+export interface SimulationActionDto {
+	actionId: string;
+	entityId?: string | null;
+	entityType?: string | null;
+	vibePreviewId: string;
+	action?: VibeAction;
+}
+
+export interface SimulationDto {
+	id: string;
+	vibeRequestId: string;
+	tilerUserId: string;
+	creationTimeInMs: number;
+	state: SimulationState;
+	previewJobId?: string;
+	failureReason?: string;
+	generatedAt?: number;
+	invalidatedAt?: number;
+	invalidationReason?: string;
+	queuedAt?: number;
+	processingStartAt?: number;
+	processingEndAt?: number;
+	scheduleDumpId?: string;
+	isStale?: boolean;
+	previewActions?: SimulationActionDto[];
+}
+
+/**
+ * Loose envelope returned by GET api/Vibe/Preview?previewId=... — the
+ * backend embeds the simulated schedule under `preview`. Kept loose for
+ * Phase 1; Phase 5 will narrow the calendar-event shape.
+ */
+export interface SimulationScheduleResult {
+	preview: Record<string, unknown> & {
+		/** Wire shape mirrors `/api/Schedule` — see VibeController.buildScheduleResponse. */
+		subCalendarEvents?: SubCalendarEvent[];
+		calendarEvents?: unknown[];
+		previewActions?: unknown[];
+		previewId?: string;
+		vibeRequestId?: string;
+	};
+}
+
+export interface PreviewReadyPayload {
+	type: 'requestPreviewReady';
+	vibeRequestId: string;
+	previewId: string;
+	scheduleDumpId?: string;
+	timestamp?: number;
 }
 
 export type ChatSendMessageResponse = ApiResponse<{
@@ -69,6 +137,10 @@ export type ChatVibeRequestResponse = ApiResponse<{
 
 export type ChatMessagesResponse = ApiResponse<{
 	chats: PromptWithActions[];
+	// Plan §6.5.2 — backend embeds VibeRequests (with `preview`/`previews`
+	// hydrated) referenced by the prompts in this page so the frontend can
+	// prime simulation state without a per-request fan-out fetch.
+	vibeRequests?: VibeRequest[];
 }>;
 
 export interface ChatMessagesParams extends PaginationParams {
