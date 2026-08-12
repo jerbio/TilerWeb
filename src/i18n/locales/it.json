@@ -91,11 +91,11 @@
 		"apps": {
 			"ios": {
 				"cta": "Scarica su App Store",
-				"platform": "iOS App Store"
+				"platform": "App Store iOS"
 			},
 			"android": {
 				"cta": "Disponibile su Google Play",
-				"platform": "Android Play Store"
+				"platform": "Play Store Android"
 			}
 		},
 		"legal": {
@@ -375,7 +375,7 @@
 			"tip": {
 				"description": "Premi <b><key/></b> per creare una nuova tessera",
 				"keys": {
-					"enter": "Enter",
+					"enter": "Invio",
 					"return": "Return"
 				}
 			},
@@ -739,7 +739,7 @@
 						"userRequest": "Caffè con Mike da Starbucks sulla 5th Ave alle 10:00",
 						"aiResponse1": "18 min dalla tua posizione. Parti alle 9:40?",
 						"userConfirm": "Va bene",
-						"aiConfirm": "Scheduled! ✓"
+						"aiConfirm": "Programmato! ✓"
 					},
 					"tiles": {
 						"travel": "Viaggio verso Starbucks",
@@ -753,7 +753,7 @@
 						"userRequest": "Volo alle 15:00, devo essere in aeroporto entro le 13:00",
 						"aiResponse1": "45 min per l'aeroporto. Parti alle 12:10 con un margine?",
 						"userConfirm": "Sì",
-						"aiConfirm": "Travel time added! ✓"
+						"aiConfirm": "Tempo di viaggio aggiunto! ✓"
 					},
 					"tiles": {
 						"travel": "Viaggio verso l'aeroporto",
@@ -768,7 +768,7 @@
 						"userRequest": "Prendi i bambini a scuola alle 15:30",
 						"aiResponse1": "20 min in auto. Parti alle 15:10?",
 						"userConfirm": "Perfetto",
-						"aiConfirm": "Added to calendar! ✓"
+						"aiConfirm": "Aggiunto al calendario! ✓"
 					},
 					"tiles": {
 						"travel": "Viaggio verso la scuola",
@@ -782,7 +782,7 @@
 						"userRequest": "Appuntamento dal medico in centro alle 14:30",
 						"aiResponse1": "28 min dall'ufficio. Parti alle 14:00?",
 						"userConfirm": "Sì",
-						"aiConfirm": "Scheduled! ✓"
+						"aiConfirm": "Programmato! ✓"
 					},
 					"tiles": {
 						"travel": "Viaggio verso la clinica",
@@ -796,7 +796,7 @@
 						"userRequest": "Taglio di capelli al salone vicino a casa alle 16:00",
 						"aiResponse1": "8 min a piedi. Parti alle 15:50?",
 						"userConfirm": "Sì",
-						"aiConfirm": "Done! ✓"
+						"aiConfirm": "Fatto! ✓"
 					},
 					"tiles": {
 						"travel": "A piedi verso il salone",
@@ -810,7 +810,7 @@
 						"userRequest": "Prenotazione per cena alle 19:00 al ristorante italiano",
 						"aiResponse1": "32 min in auto. Parti alle 18:25?",
 						"userConfirm": "Perfetto",
-						"aiConfirm": "Added! ✓"
+						"aiConfirm": "Aggiunto! ✓"
 					},
 					"tiles": {
 						"travel": "Viaggio verso il ristorante",
@@ -838,42 +838,42 @@
 			"subtitle": "Semplifica la tua vita con Tiler, Ecco cosa possiamo fare per aiutarti.",
 			"animations": {
 				"nls": {
-					"transcript": "Lunch with Sarah tomorrow at noon...",
-					"responsePrimary": "Scheduled: Lunch with Sarah - Tomorrow 12:00 PM",
-					"responseTravel": "+ 25 min travel block added",
-					"responseLocation": "Downtown - 1 hr"
+					"transcript": "Pranzo con Sarah domani a mezzogiorno...",
+					"responsePrimary": "Programmato: pranzo con Sarah - domani alle 12:00",
+					"responseTravel": "+ Aggiunti 25 min di viaggio",
+					"responseLocation": "Centro città - 1 ora"
 				},
 				"travel": {
 					"stops": {
 						"home": {
-							"label": "Home",
-							"time": "8:00 AM"
+							"label": "Casa",
+							"time": "8:00"
 						},
 						"office": {
-							"label": "Office",
-							"time": "9:15 AM"
+							"label": "Ufficio",
+							"time": "9:15"
 						},
 						"cafe": {
-							"label": "Cafe",
-							"time": "1:00 PM"
+							"label": "Caffè",
+							"time": "13:00"
 						},
 						"gym": {
-							"label": "Gym",
-							"time": "5:30 PM"
+							"label": "Palestra",
+							"time": "17:30"
 						}
 					}
 				},
 				"undo": {
-					"tileName": "Gym session",
-					"originalMeta": "At Home - Tue - 10:00 AM",
-					"previewMeta": "At Home - Wed - 2:00 PM",
-					"previewBadge": "PREVIEW",
-					"undoAction": "Undo",
-					"acceptAction": "Accept"
+					"tileName": "Sessione in palestra",
+					"originalMeta": "A casa - mar - 10:00",
+					"previewMeta": "A casa - mer - 14:00",
+					"previewBadge": "ANTEPRIMA",
+					"undoAction": "Annulla",
+					"acceptAction": "Accetta"
 				},
 				"tileshare": {
-					"tileName": "Gym session",
-					"tileSub": "From Alex - 1 hr"
+					"tileName": "Sessione in palestra",
+					"tileSub": "Da Alex - 1 ora"
 				}
 			}
 		},
@@ -977,8 +977,8 @@
 			"title": "Inizia con Tiler",
 			"subtitle": "Crea il tuo account gratuito per una pianificazione senza interruzioni",
 			"googleButton": "Registrati con Google",
-			"appleButton": "Sign up with Apple",
-			"microsoftButton": "Sign up with Microsoft",
+			"appleButton": "Registrati con Apple",
+			"microsoftButton": "Registrati con Microsoft",
 			"emailLabel": "Indirizzo e-mail",
 			"emailPlaceholder": "Es. tuo.nome@outlook.com",
 			"submitButton": "Crea il mio account gratuito",
@@ -992,8 +992,8 @@
 			"title": "Bentornato su Tiler",
 			"subtitle": "Accedi per continuare a pianificare",
 			"googleButton": "Accedi con Google",
-			"appleButton": "Sign in with Apple",
-			"microsoftButton": "Sign in with Microsoft",
+			"appleButton": "Accedi con Apple",
+			"microsoftButton": "Accedi con Microsoft",
 			"submitButton": "Accedi al mio account",
 			"submitting": "Accesso in corso...",
 			"footer": "Non hai un account?",
@@ -1102,8 +1102,8 @@
 				"themeModeLight": "Chiaro",
 				"themeModeDark": "Scuro",
 				"themeModeSystem": "Usa l'impostazione del dispositivo",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
+				"defaultStartTime": "8:00",
+				"defaultEndTime": "18:00",
 				"am": "AM",
 				"pm": "PM"
 			},
@@ -1282,7 +1282,7 @@
 			"signOutSuccess": "Hai effettuato la disconnessione correttamente",
 			"signOutError": "Impossibile effettuare la disconnessione. Riprova.",
 			"defaultUsername": "Utente",
-			"settings": "Settings"
+			"settings": "Impostazioni"
 		},
 		"expandPanel": "Espandi pannello",
 		"collapsePanel": "Comprimi pannello"
@@ -1379,123 +1379,123 @@
 			"noLocationResults": "Nessuna posizione trovata",
 			"openNotes": "Apri note",
 			"subEvents": {
-				"title": "Sessions",
-				"titleWithCount": "Sessions ({{count}})",
-				"loading": "Loading sessions…",
-				"empty": "No sessions yet",
-				"error": "Couldn't load sessions",
-				"retry": "Retry",
-				"loadMore": "Load more",
-				"loadEarlier": "Load earlier",
-				"allLoaded": "All {{count}} sessions loaded",
-				"showCompleted": "Show completed & removed",
-				"goTo": "Go to this session on the calendar",
-				"completed": "Completed",
-				"removed": "Removed"
+				"title": "Sessioni",
+				"titleWithCount": "Sessioni ({{count}})",
+				"loading": "Caricamento sessioni…",
+				"empty": "Ancora nessuna sessione",
+				"error": "Impossibile caricare le sessioni",
+				"retry": "Riprova",
+				"loadMore": "Carica altro",
+				"loadEarlier": "Carica precedenti",
+				"allLoaded": "Tutte le {{count}} sessioni caricate",
+				"showCompleted": "Mostra completate e rimosse",
+				"goTo": "Vai a questa sessione nel calendario",
+				"completed": "Completata",
+				"removed": "Rimossa"
 			}
 		}
 	},
 	"discover": {
 		"seo": {
-			"title": "Discover - Tiler",
-			"description": "Explore the moments where your day finally makes sense. Find your way around the Tiler app and discover things to try in-app."
+			"title": "Scopri - Tiler",
+			"description": "Esplora i momenti in cui la tua giornata finalmente ha senso. Trova la tua strada nell'app Tiler e scopri cosa provare."
 		},
 		"hero": {
-			"badge": "Navigate Tiler",
-			"title": "Here’s Where Everything Lives",
-			"subtitle": "Explore the moments where your day finally makes sense. Find your way around the app. Find things to try in-app."
+			"badge": "Esplora Tiler",
+			"title": "Ecco dove trovi tutto",
+			"subtitle": "Esplora i momenti in cui la tua giornata finalmente ha senso. Trova la tua strada nell'app. Scopri cosa provare."
 		},
 		"setUpTiler": {
-			"badge": "Set Up Tiler",
-			"title": "Ready in under 3 minutes.",
-			"summary": "Your calendar, your preferences, your constraints — four steps that give Tiler everything it needs to run Adaptive Scheduling from day one.",
+			"badge": "Configura Tiler",
+			"title": "Pronto in meno di 3 minuti.",
+			"summary": "Il tuo calendario, le tue preferenze, i tuoi vincoli — quattro passaggi che danno a Tiler tutto ciò che serve per eseguire la Pianificazione Adattiva dal primo giorno.",
 			"visual": {
-				"step1": "Create Account",
-				"step2": "Connect Calendar",
-				"step3": "Set Up Preferences",
-				"step4": "Adaptive Scheduling"
+				"step1": "Crea account",
+				"step2": "Collega calendario",
+				"step3": "Configura preferenze",
+				"step4": "Pianificazione adattiva"
 			},
 			"cards": {
 				"account": {
-					"title": "Create your account",
-					"subtext": "Sign up with your email — free to start, no credit card needed.",
-					"btnIdle": "Create free account",
-					"btnCreating": "Creating account…",
-					"btnDone": "✓ Account created!"
+					"title": "Crea il tuo account",
+					"subtext": "Registrati con la tua email — gratis per iniziare, nessuna carta di credito richiesta.",
+					"btnIdle": "Crea account gratuito",
+					"btnCreating": "Creazione account…",
+					"btnDone": "✓ Account creato!"
 				},
 				"calendar": {
-					"title": "Connect your calendar",
-					"subtext": "Link Google or Outlook — Tiler reads your events and builds around them.",
+					"title": "Collega il tuo calendario",
+					"subtext": "Collega Google o Outlook — Tiler legge i tuoi eventi e organizza tutto intorno a essi.",
 					"calName": "Google Calendar",
-					"statusIdle": "Tap to connect",
-					"statusConnecting": "Connecting…",
-					"statusConnected": "✓ Connected"
+					"statusIdle": "Tocca per collegare",
+					"statusConnecting": "Connessione…",
+					"statusConnected": "✓ Connesso"
 				},
 				"preferences": {
-					"title": "Set up your preferences",
-					"subtext": "Choose your transit mode and set time limits in your profile.",
-					"transitLabel": "Transit mode",
-					"drive": "Drive",
-					"transit": "Transit",
-					"walk": "Walk",
-					"workHoursLabel": "Work hours"
+					"title": "Configura le tue preferenze",
+					"subtext": "Scegli il mezzo di trasporto e imposta i limiti di orario nel tuo profilo.",
+					"transitLabel": "Mezzo di trasporto",
+					"drive": "Auto",
+					"transit": "Mezzi pubblici",
+					"walk": "A piedi",
+					"workHoursLabel": "Orario di lavoro"
 				},
 				"adaptive": {
-					"title": "Ready for Adaptive Scheduling",
-					"subtext": "Your schedule is live — Tiler adapts automatically as your day changes.",
-					"schedLabel": "Your schedule",
-					"meeting": "9am meeting",
-					"run": "Run · 30m",
-					"newTime": "New: 10am",
-					"urgentCall": "Urgent call",
-					"recalculating": "Recalculating…",
-					"rebuilt": "✓ Schedule rebuilt"
+					"title": "Pronto per la pianificazione adattiva",
+					"subtext": "Il tuo programma è attivo — Tiler si adatta automaticamente al cambiare della giornata.",
+					"schedLabel": "Il tuo programma",
+					"meeting": "Riunione alle 9",
+					"run": "Corsa · 30 min",
+					"newTime": "Nuovo orario: 10",
+					"urgentCall": "Chiamata urgente",
+					"recalculating": "Ricalcolo…",
+					"rebuilt": "✓ Programma ricostruito"
 				}
 			},
-			"supportNote": "Each step is an input to Tiler’s scheduling engine — your calendar tells it what’s fixed, your preferences tell it how you move, and your time limits tell it when you’re free. Together, they give Tiler the full picture it needs to run Adaptive Scheduling: a schedule that adjusts itself when things change."
+			"supportNote": "Ogni passaggio è un dato per il motore di pianificazione di Tiler — il calendario indica cosa è fisso, le preferenze indicano come ti muovi e i limiti di orario indicano quando sei libero. Insieme, danno a Tiler il quadro completo necessario per eseguire la Pianificazione Adattiva: un programma che si adatta da solo quando le cose cambiano."
 		},
 		"whatIsTiler": {
-			"badge": "What Is Tiler",
-			"title": "Not a calendar. An AI that runs your day",
-			"summary": "Tell Tiler what needs doing. It finds the time, handles conflicts, and adjusts when your day doesn’t go to plan.",
+			"badge": "Cos'è Tiler",
+			"title": "Non un calendario. Un'IA che gestisce la tua giornata",
+			"summary": "Dì a Tiler cosa c'è da fare. Trova il momento giusto, gestisce i conflitti e si adatta quando la giornata non va come previsto.",
 			"visual": {
-				"tile1": "Gym · 45 min",
-				"tile2": "Travel · 12 min",
-				"tile3": "Client Call · 1 hr",
-				"tile4": "Groceries · 30 min"
+				"tile1": "Palestra · 45 min",
+				"tile2": "Viaggio · 12 min",
+				"tile3": "Chiamata cliente · 1 ora",
+				"tile4": "Spesa · 30 min"
 			},
 			"subItems": {
 				"aiRunsDay": {
-					"title": "Tiler is an AI that runs your day.",
-					"content": "When a meeting runs long, or a task gets deferred, Tiler doesn’t wait for you to fix it. It detects the shift and rebuilds your schedule around it, instantly. You set the intent. Tiler handles the rest."
+					"title": "Tiler è un'IA che gestisce la tua giornata.",
+					"content": "Quando una riunione si prolunga o un'attività viene rinviata, Tiler non aspetta che tu la risolva. Rileva il cambiamento e ricostruisce il tuo programma istantaneamente. Tu stabilisci l'intento. Tiler fa il resto."
 				},
 				"fourCoreBlocks": {
-					"title": "The Four Core Blocks of Tiler"
+					"title": "I quattro blocchi principali di Tiler"
 				},
 				"howDifferent": {
-					"title": "How Tiler is Different"
+					"title": "In cosa Tiler è diverso"
 				}
 			},
 			"coreBlocks": {
 				"tiles": {
 					"label": "AutoTile",
 					"title": "Tiles",
-					"desc": "Flexible tasks. Set a goal and duration — Tiler finds the slot, moves them as your day shifts, and sequences them intelligently."
+					"desc": "Attività flessibili. Imposta un obiettivo e una durata — Tiler trova lo spazio, le sposta al cambiare della giornata e le organizza in modo intelligente."
 				},
 				"blocks": {
-					"label": "Locked",
-					"title": "Blocks",
-					"desc": "Fixed commitments: meetings, flights, appointments. Tiler treats these as immovable anchors and schedules everything else around them."
+					"label": "Fisso",
+					"title": "Blocchi",
+					"desc": "Impegni fissi: riunioni, voli, appuntamenti. Tiler li tratta come ancore immobili e pianifica tutto il resto intorno a essi."
 				},
 				"route": {
-					"label": "Location-aware",
-					"title": "Route",
-					"desc": "When tiles have locations, Tiler sequences them geographically, surfaces real transit options, and builds travel buffers between every stop."
+					"label": "Basato sulla posizione",
+					"title": "Percorso",
+					"desc": "Quando i tiles hanno una posizione, Tiler li ordina geograficamente, mostra opzioni di trasporto reali e crea margini di viaggio tra ogni tappa."
 				},
 				"tileShare": {
-					"label": "Team & Family",
+					"label": "Team e famiglia",
 					"title": "TileShare",
-					"desc": "Assign tiles to teammates or family. Everyone’s calendar adapts around shared commitments automatically. Context travels with the task."
+					"desc": "Assegna tiles a colleghi o familiari. Il calendario di tutti si adatta automaticamente agli impegni condivisi. Il contesto viaggia con l'attività."
 				}
 			},
 			"comparison": {
@@ -1530,111 +1530,111 @@
 			}
 		},
 		"howToUseTiler": {
-			"badge": "How To Use Tiler",
-			"title": "From intent to done. In seconds.",
-			"summary": "Connect your calendar, add your tiles, and let Tiler build the rest. A step-by-step guide to running your day with Tiler.",
+			"badge": "Come usare Tiler",
+			"title": "Dall'intento al fatto. In pochi secondi.",
+			"summary": "Collega il tuo calendario, aggiungi i tuoi tiles e lascia che Tiler faccia il resto. Una guida passo dopo passo per gestire la giornata con Tiler.",
 			"visual": {
-				"step1": "Add Tiles",
-				"step2": "AI Plans",
-				"step3": "Day Built"
+				"step1": "Aggiungi tiles",
+				"step2": "L'IA pianifica",
+				"step3": "Giornata costruita"
 			},
 			"items": {
 				"connectCalendar": {
-					"title": "Connect a Calendar",
-					"body": "Connecting your calendar allows Tiler to see your real commitments. Once synced, incoming calendar events appear as blocks in your timeline. You can accept, edit, or resolve conflicts directly inside Tiler. When events change, Tiler adapts your tiles around them so your day stays balanced and realistic."
+					"title": "Collega un calendario",
+					"body": "Collegare il calendario permette a Tiler di vedere i tuoi impegni reali. Una volta sincronizzato, gli eventi in arrivo appaiono come blocchi nella tua timeline. Puoi accettare, modificare o risolvere conflitti direttamente in Tiler. Quando gli eventi cambiano, Tiler adatta i tuoi tiles di conseguenza, così la giornata resta equilibrata e realistica."
 				},
 				"createBlock": {
-					"title": "How to Create a Block",
-					"body": "Blocks represent fixed commitments, meetings, appointments, events, and things that must happen at a specific time. When you create or sync a block, Tiler treats it as non-negotiable and schedules your flexible work around it. Blocks don’t move unless you move them. This is how Tiler respects real-world commitments while still keeping your day workable."
+					"title": "Come creare un blocco",
+					"body": "I blocchi rappresentano impegni fissi, riunioni, appuntamenti, eventi e cose che devono avvenire in un momento specifico. Quando crei o sincronizzi un blocco, Tiler lo tratta come non negoziabile e pianifica il lavoro flessibile intorno a esso. I blocchi non si spostano a meno che non li sposti tu. Così Tiler rispetta gli impegni reali mantenendo la giornata gestibile."
 				},
 				"flexibleTiles": {
-					"title": "Creating Flexible Tiles",
-					"body": "Tiles are where Tiler becomes powerful. A tile represents something you need to do, without locking it to a rigid time. You set the intent, estimated duration, and optional deadline — Tiler handles placement. Tiles can move, adapt, and reshuffle as your day changes, making them ideal for real work, errands, habits, and focus sessions."
+					"title": "Creare tiles flessibili",
+					"body": "I tiles sono ciò che rende Tiler potente. Un tile rappresenta qualcosa da fare, senza fissarlo a un orario rigido. Imposti l'intento, la durata stimata e una scadenza opzionale — Tiler si occupa del posizionamento. I tiles possono spostarsi, adattarsi e riorganizzarsi al cambiare della giornata, rendendoli ideali per lavoro reale, commissioni, abitudini e sessioni di concentrazione."
 				},
 				"updateTile": {
-					"title": "How to Update a Tile",
-					"body": "Updating a tile is how you communicate change to the system. You can adjust its duration, defer it, change its deadline, or mark it complete. The moment you do, Tiler re-optimises your timeline to reflect the update. You don’t need to move other tasks manually, the system handles the ripple effects."
+					"title": "Come aggiornare un tile",
+					"body": "Aggiornare un tile è il modo per comunicare un cambiamento al sistema. Puoi modificarne la durata, rinviarlo, cambiarne la scadenza o segnarlo come completato. Nel momento in cui lo fai, Tiler riottimizza la timeline per riflettere l'aggiornamento. Non devi spostare manualmente altre attività, il sistema gestisce gli effetti a cascata."
 				},
 				"travelTime": {
-					"title": "Travel Time & Route",
-					"body": "Add a location to any tile and Tiler handles the rest. It auto-detects where you need to be and calculates real travel time between every stop on your day. That orange block sitting between your tiles isn’t a gap — it’s your journey, already planned. Tap it and your route opens: turn-by-turn directions loaded, time accounted for. Your schedule doesn’t just tell you what to do. It gets you there."
+					"title": "Tempo di viaggio e percorso",
+					"body": "Aggiungi una posizione a qualsiasi tile e Tiler fa il resto. Rileva automaticamente dove devi essere e calcola il tempo di viaggio reale tra ogni tappa della giornata. Quel blocco arancione tra i tuoi tiles non è uno spazio vuoto — è il tuo percorso, già pianificato. Toccalo e si apre il percorso: indicazioni passo dopo passo caricate, tempo considerato. Il tuo programma non ti dice solo cosa fare. Ti ci porta."
 				}
 			}
 		},
 		"features": {
-			"badge": "Features",
-			"title": "Everything Tiler can do.",
-			"summary": "Every feature is built around one principle: your schedule should work for you, not the other way around.",
+			"badge": "Funzionalità",
+			"title": "Tutto quello che Tiler può fare.",
+			"summary": "Ogni funzionalità è costruita su un principio: il tuo programma deve lavorare per te, non il contrario.",
 			"items": {
 				"adaptiveTiles": {
-					"name": "Adaptive Tiles",
-					"desc": "The core unit of Tiler. Each tile is a task, event, or habit with a duration — Tiler schedules them intelligently and moves them when your day changes.",
-					"badge": "Core feature"
+					"name": "Tiles adattivi",
+					"desc": "L'unità principale di Tiler. Ogni tile è un'attività, un evento o un'abitudine con una durata — Tiler li pianifica in modo intelligente e li sposta al cambiare della giornata.",
+					"badge": "Funzione principale"
 				},
 				"aiScheduling": {
-					"name": "AI scheduling assistant",
-					"desc": "Tiler asks clarifying questions, proposes the best available time, and builds a complete schedule including dependencies — always with your approval first.",
-					"badge": "Core feature"
+					"name": "Assistente di pianificazione IA",
+					"desc": "Tiler fa domande di chiarimento, propone il miglior orario disponibile e crea un programma completo incluse le dipendenze — sempre con la tua approvazione prima.",
+					"badge": "Funzione principale"
 				},
 				"chatScheduling": {
-					"name": "Chat scheduling",
-					"desc": "Tell Tiler what you need through a natural chat interface. It understands your intent and proposes a plan without you filling in a single form.",
-					"badge": "Core feature"
+					"name": "Pianificazione via chat",
+					"desc": "Dì a Tiler cosa ti serve tramite un'interfaccia di chat naturale. Comprende il tuo intento e propone un piano senza che tu compili un solo modulo.",
+					"badge": "Funzione principale"
 				},
 				"naturalLanguage": {
-					"name": "Natural language input",
-					"desc": "Describe tasks in plain English — no forms, no dropdowns. Tiler understands context, urgency, duration, and location from how you naturally talk.",
-					"badge": "Core feature"
+					"name": "Input in linguaggio naturale",
+					"desc": "Descrivi le attività in italiano semplice — niente moduli, niente menu a discesa. Tiler comprende contesto, urgenza, durata e posizione dal modo naturale in cui parli.",
+					"badge": "Funzione principale"
 				},
 				"autoTravel": {
-					"name": "Auto travel buffers",
-					"desc": "Tiler automatically inserts realistic travel time between location-based tiles based on your actual distance and transit options. Back-to-back never means late.",
-					"badge": "Unique to Tiler"
+					"name": "Margini di viaggio automatici",
+					"desc": "Tiler inserisce automaticamente un tempo di viaggio realistico tra i tiles basati sulla posizione, in base alla distanza reale e alle opzioni di trasporto. Impegni consecutivi non significano mai ritardo.",
+					"badge": "Esclusivo di Tiler"
 				},
 				"autoLocations": {
-					"name": "Auto locations",
-					"desc": "Link locations to tiles once and Tiler remembers. Every time that task appears, travel time is calculated automatically from wherever you are.",
-					"badge": "Unique to Tiler"
+					"name": "Posizioni automatiche",
+					"desc": "Collega le posizioni ai tiles una sola volta e Tiler le ricorda. Ogni volta che quell'attività appare, il tempo di viaggio viene calcolato automaticamente da dove ti trovi.",
+					"badge": "Esclusivo di Tiler"
 				},
 				"timeRestrictions": {
-					"name": "Time restrictions",
-					"desc": "Set the hours you’re available and Tiler only schedules within those bounds. Your personal time stays yours — no task bleeds into off-hours unless you allow it.",
-					"badge": "Preferences"
+					"name": "Restrizioni orarie",
+					"desc": "Imposta le ore in cui sei disponibile e Tiler pianificherà solo entro quei limiti. Il tuo tempo personale resta tuo — nessuna attività invade le ore libere a meno che tu non lo permetta.",
+					"badge": "Preferenze"
 				},
 				"adaptiveRescheduling": {
-					"name": "Adaptive rescheduling",
-					"desc": "When a meeting runs long or a task gets missed, Tiler detects the ripple across your whole day and proposes fixes — instantly, with your approval before changing anything.",
-					"badge": "Core feature"
+					"name": "Riprogrammazione adattiva",
+					"desc": "Quando una riunione si prolunga o un'attività viene persa, Tiler rileva l'effetto a cascata sull'intera giornata e propone soluzioni — istantaneamente, con la tua approvazione prima di ogni modifica.",
+					"badge": "Funzione principale"
 				},
 				"calendarIntegration": {
-					"name": "Calendar integration",
-					"desc": "Connect Google Calendar or Outlook. Tiler reads your existing events and schedules all new tiles around them — no double bookings, ever. Supports multiple calendars.",
-					"badge": "Integration"
+					"name": "Integrazione calendario",
+					"desc": "Collega Google Calendar o Outlook. Tiler legge i tuoi eventi esistenti e pianifica tutti i nuovi tiles intorno a essi — mai doppie prenotazioni. Supporta più calendari.",
+					"badge": "Integrazione"
 				},
 				"crossPlatform": {
-					"name": "Cross-platform sync",
-					"desc": "Web, iOS, and Android all stay in real-time sync. Start a task on your laptop and check in on your phone without missing a beat. One schedule, everywhere.",
-					"badge": "Platform"
+					"name": "Sincronizzazione multipiattaforma",
+					"desc": "Web, iOS e Android restano sincronizzati in tempo reale. Inizia un'attività sul laptop e controllala sul telefono senza perdere nulla. Un programma, ovunque.",
+					"badge": "Piattaforma"
 				},
 				"habitScheduling": {
-					"name": "Habit scheduling",
-					"desc": "Add recurring habits and Tiler auto-fits them around your day — keeping you consistent with your routines without you having to think about it each morning.",
-					"badge": "Wellness"
+					"name": "Pianificazione abitudini",
+					"desc": "Aggiungi abitudini ricorrenti e Tiler le inserisce automaticamente nella tua giornata — mantenendo la costanza nelle tue routine senza doverci pensare ogni mattina.",
+					"badge": "Benessere"
 				},
 				"deferReschedule": {
-					"name": "Defer & reschedule",
-					"desc": "Missed a tile? Tiler’s Defer feature instantly finds the next best slot and reschedules with one tap. Never lose a task — just push it forward intelligently.",
-					"badge": "Core feature"
+					"name": "Rinvia e riprogramma",
+					"desc": "Hai perso un tile? La funzione Rinvia di Tiler trova istantaneamente il miglior orario successivo e riprogramma con un tocco. Non perdere mai un'attività — spostala solo in modo intelligente.",
+					"badge": "Funzione principale"
 				},
 				"smartNotifications": {
-					"name": "Smart notifications",
-					"desc": "Get alerted when it’s time to leave for your next tile — with live transit updates if your route changes. Never miss a departure time because you lost track of the clock.",
-					"badge": "Real-time"
+					"name": "Notifiche intelligenti",
+					"desc": "Ricevi un avviso quando è ora di partire per il prossimo tile — con aggiornamenti di trasporto in tempo reale se il percorso cambia. Non perdere mai un orario di partenza per aver perso il conto del tempo.",
+					"badge": "Tempo reale"
 				},
 				"tileShare": {
 					"name": "TileShare",
-					"desc": "Share tiles with family or teammates. Assign who handles what. Track completion. Everyone’s calendar adapts around shared commitments automatically — no extra apps needed.",
-					"badge": "Collaboration"
+					"desc": "Condividi tiles con familiari o colleghi. Assegna chi fa cosa. Traccia il completamento. Il calendario di tutti si adatta automaticamente agli impegni condivisi — senza app aggiuntive.",
+					"badge": "Collaborazione"
 				}
 			}
 		}
@@ -1660,293 +1660,293 @@
 	},
 	"location": {
 		"verified": {
-			"label": "Verified",
-			"tooltip": "This address was confirmed via Google Maps or a saved location. The platform uses it for accurate travel time calculations. Unverified addresses will have the platform attempt to find the best match."
+			"label": "Verificato",
+			"tooltip": "Questo indirizzo è stato confermato tramite Google Maps o una posizione salvata. La piattaforma lo usa per calcoli precisi del tempo di viaggio. Per gli indirizzi non verificati, la piattaforma cercherà di trovare la corrispondenza migliore."
 		}
 	},
 	"tilesharedemo": {
 		"dashboard": {
 			"title": "Tileshare",
 			"nav": {
-				"active": "Active",
-				"sent": "Sent",
-				"received": "Received ({{count}})",
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"active": "Attive",
+				"sent": "Inviate",
+				"received": "Ricevute ({{count}})",
+				"inbox": "Link posta in arrivo",
+				"outbox": "Link posta in uscita"
 			},
 			"toolbar": {
-				"welcome": "Welcome to your Tileshare Dashboard",
-				"create": "Create tileshare"
+				"welcome": "Benvenuto nella tua Dashboard Tileshare",
+				"create": "Crea tileshare"
 			},
 			"createSelection": {
 				"single": {
-					"label": "Single Tileshare",
-					"description": "A single task with your colleagues."
+					"label": "Tileshare singolo",
+					"description": "Un'attività singola con i tuoi colleghi."
 				},
 				"multi": {
-					"label": "Multi Tileshare",
-					"description": "A variety of tasks in one project."
+					"label": "Tileshare multiplo",
+					"description": "Diverse attività in un unico progetto."
 				}
 			},
 			"create": {
-				"back": "Back to tileshare",
+				"back": "Torna a tileshare",
 				"single": {
-					"title": "Create a single tileshare",
-					"description": "Create and share a single task with your colleagues. Once they accept, we'll add it to their schedule.",
-					"submit": "Create single tileshare"
+					"title": "Crea un tileshare singolo",
+					"description": "Crea e condividi un'attività singola con i tuoi colleghi. Una volta accettata, la aggiungeremo al loro programma.",
+					"submit": "Crea tileshare singolo"
 				},
 				"multi": {
-					"title": "Create a multi tileshare",
-					"description": "Create and share a variety of tasks in one project. Once colleagues accept, we'll add it to their schedule.",
-					"submit": "Create multi tileshare"
+					"title": "Crea un tileshare multiplo",
+					"description": "Crea e condividi diverse attività in un unico progetto. Una volta accettate dai colleghi, le aggiungeremo al loro programma.",
+					"submit": "Crea tileshare multiplo"
 				},
 				"fields": {
 					"name": {
-						"placeholder": "Name your task"
+						"placeholder": "Assegna un nome all'attività"
 					},
 					"deadline": {
-						"placeholder": "Add a deadline"
+						"placeholder": "Aggiungi una scadenza"
 					},
 					"location": {
-						"placeholder": "Add a location (optional)"
+						"placeholder": "Aggiungi una posizione (opzionale)"
 					},
 					"note": {
-						"placeholder": "Add a note (optional)"
+						"placeholder": "Aggiungi una nota (opzionale)"
 					}
 				},
 				"shareTo": {
-					"label": "Share to:",
-					"placeholder": "email address / phone number (Enter to select)",
-					"add": "Add recipient",
-					"remove": "Remove {{recipient}}"
+					"label": "Condividi con:",
+					"placeholder": "email / numero di telefono (Invio per selezionare)",
+					"add": "Aggiungi destinatario",
+					"remove": "Rimuovi {{recipient}}"
 				},
 				"buttons": {
-					"cancel": "Cancel"
+					"cancel": "Annulla"
 				},
 				"validation": {
-					"nameRequired": "Please name your task",
-					"deadlineRequired": "Please add a deadline",
-					"recipientRequired": "Please add at least one recipient",
-					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+					"nameRequired": "Assegna un nome all'attività",
+					"deadlineRequired": "Aggiungi una scadenza",
+					"recipientRequired": "Aggiungi almeno un destinatario",
+					"invalidRecipient": "{{recipient}} non è un'email o un numero di telefono valido"
 				},
 				"toast": {
-					"creating": "Creating tileshare…",
-					"error": "Couldn't create tileshare. Please try again."
+					"creating": "Creazione tileshare…",
+					"error": "Impossibile creare il tileshare. Riprova."
 				},
 				"success": {
-					"message": "Your tileshare \"{{name}}\" has been created.",
-					"view": "View tileshare"
+					"message": "Il tuo tileshare \"{{name}}\" è stato creato.",
+					"view": "Visualizza tileshare"
 				}
 			},
 			"filter": {
-				"all": "All",
-				"inProgress": "In Progress"
+				"all": "Tutti",
+				"inProgress": "In corso"
 			}
 		},
 		"card": {
-			"progress": "Progress",
-			"dueOn": "Due on:",
-			"dueBy": "Due by:",
-			"multiTileshare": "Multi tileshare",
+			"progress": "Avanzamento",
+			"dueOn": "Scadenza il:",
+			"dueBy": "Scadenza entro:",
+			"multiTileshare": "Tileshare multiplo",
 			"tileshare": "Tileshare"
 		},
 		"active": {
-			"title": "Active",
-			"empty": "No active tileshares",
-			"emptyFiltered": "No in-progress items in your active tileshares"
+			"title": "Attive",
+			"empty": "Nessun tileshare attivo",
+			"emptyFiltered": "Nessun elemento in corso tra i tuoi tileshare attivi"
 		},
 		"sent": {
-			"title": "Sent",
-			"empty": "You haven't sent any tileshares yet",
-			"emptyFiltered": "No in-progress items in your sent tileshares"
+			"title": "Inviate",
+			"empty": "Non hai ancora inviato nessun tileshare",
+			"emptyFiltered": "Nessun elemento in corso tra i tuoi tileshare inviati"
 		},
 		"received": {
-			"title": "Received",
-			"empty": "You haven't received any tileshares yet",
-			"emptyFiltered": "No in-progress items in your received tileshares"
+			"title": "Ricevute",
+			"empty": "Non hai ancora ricevuto nessun tileshare",
+			"emptyFiltered": "Nessun elemento in corso tra i tuoi tileshare ricevuti"
 		},
 		"tileshareDetail": {
-			"title": "Tileshare Detail"
+			"title": "Dettaglio tileshare"
 		},
 		"tiletteDetail": {
-			"title": "Tilette Detail"
+			"title": "Dettaglio tilette"
 		},
 		"invite": {
-			"title": "Invite"
+			"title": "Invita"
 		},
 		"inbox": {
-			"title": "Inbox"
+			"title": "Posta in arrivo"
 		},
 		"outbox": {
-			"title": "Outbox"
+			"title": "Posta in uscita"
 		}
 	},
 	"tile": {
-		"noteButtonAria": "Open notes for this tile"
+		"noteButtonAria": "Apri le note per questo tile"
 	},
 	"notesEditor": {
-		"placeholder": "Start writing. Use the toolbar above to format your notes and add links. Your notes are saved automatically and sync across all your devices.",
-		"surfaceAria": "Note editor",
-		"back": "Back",
-		"close": "Close",
-		"eyebrow": "Notes",
-		"loading": "Loading notes…",
-		"errorLoad": "Couldn't load notes.",
-		"saving": "Saving…",
-		"saved": "Saved",
-		"errorSave": "Not saved",
-		"unsaved": "Editing…",
-		"save": "Save",
-		"saveNow": "Save now",
+		"placeholder": "Inizia a scrivere. Usa la barra degli strumenti sopra per formattare le note e aggiungere link. Le note vengono salvate automaticamente e sincronizzate su tutti i tuoi dispositivi.",
+		"surfaceAria": "Editor di note",
+		"back": "Indietro",
+		"close": "Chiudi",
+		"eyebrow": "Note",
+		"loading": "Caricamento note…",
+		"errorLoad": "Impossibile caricare le note.",
+		"saving": "Salvataggio…",
+		"saved": "Salvato",
+		"errorSave": "Non salvato",
+		"unsaved": "Modifica in corso…",
+		"save": "Salva",
+		"saveNow": "Salva ora",
 		"linkPrompt": "URL",
 		"conflict": {
-			"title": "Someone else updated this note.",
-			"discard": "Discard mine",
-			"keep": "Keep editing"
+			"title": "Qualcun altro ha aggiornato questa nota.",
+			"discard": "Scarta le mie modifiche",
+			"keep": "Continua a modificare"
 		},
 		"tool": {
-			"bold": "Bold",
-			"italic": "Italic",
-			"underline": "Underline",
-			"strike": "Strikethrough",
-			"code": "Inline code",
-			"h1": "Heading 1",
-			"h2": "Heading 2",
-			"h3": "Heading 3",
-			"bullet": "Bullet list",
-			"ordered": "Numbered list",
-			"task": "Checklist",
-			"quote": "Quote",
+			"bold": "Grassetto",
+			"italic": "Corsivo",
+			"underline": "Sottolineato",
+			"strike": "Barrato",
+			"code": "Codice inline",
+			"h1": "Titolo 1",
+			"h2": "Titolo 2",
+			"h3": "Titolo 3",
+			"bullet": "Elenco puntato",
+			"ordered": "Elenco numerato",
+			"task": "Lista di controllo",
+			"quote": "Citazione",
 			"link": "Link",
-			"undo": "Undo",
-			"redo": "Redo"
+			"undo": "Annulla",
+			"redo": "Ripeti"
 		}
 	},
 	"getStarted": {
 		"seo": {
-			"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
-			"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
-			"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+			"title": "Inizia con Tiler | App di pianificazione IA e calendario intelligente",
+			"description": "Tiler è il calendario basato sull'IA che crea automaticamente il tuo programma giornaliero perfetto. Imposta i limiti del tuo orario, indica la tua posizione e lascia che il risolutore IA costruisca una timeline che si adatta davvero alla tua vita.",
+			"keywords": "app di pianificazione IA, calendario intelligente, calendario agentico, pianificatore attività IA, pianificazione adattiva, app calendario IA, gestione intelligente del tempo, pianificazione basata sulla posizione, app di produttività IA, pianificatore giornaliero intelligente"
 		},
 		"hero": {
-			"badge": "Product Update",
-			"title": "Your First Five Minutes with Tiler",
-			"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there."
+			"badge": "Aggiornamento prodotto",
+			"title": "I tuoi primi cinque minuti con Tiler",
+			"subtitle": "Tiler costruisce la tua timeline perfetta a partire da tre cose: i tuoi obiettivi, i tuoi appuntamenti e la tua posizione. Ecco come l'onboarding ti ci porta."
 		},
 		"intro": {
-			"lede": "Most scheduling tools ask you to start from scratch … dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
-			"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+			"lede": "La maggior parte degli strumenti di pianificazione ti chiede di iniziare da zero… trascinando caselle vuote su una griglia vuota sperando che il puzzle si risolva da solo. Tiler funziona diversamente. Prima ancora di vedere una timeline, l'app apprende la forma della tua giornata per poterne costruire una che si adatti davvero.",
+			"body": "L'onboarding richiede circa cinque minuti. Al termine, il motore di Tiler ha abbastanza contesto per generare un programma consapevole dei vincoli e ancorato alla posizione, che si adatta al cambiare della settimana. Tre pilastri guidano tutto:"
 		},
 		"steps": {
-			"heading": "Six Steps to Your First Timeline",
+			"heading": "Sei passaggi per la tua prima timeline",
 			"step1": {
-				"title": "Sign In & Create Your Profile",
-				"body": "Everything starts with your Tiler account. Sign in and the app immediately begins building your profile memory! The contextual layer that the engine uses to understand how you work, when you're available, and what matters to you.",
+				"title": "Accedi e crea il tuo profilo",
+				"body": "Tutto inizia con il tuo account Tiler. Accedi e l'app inizia immediatamente a costruire la memoria del tuo profilo! Il livello contestuale che il motore usa per capire come lavori, quando sei disponibile e cosa conta per te.",
 				"calloutStrong": "",
 				"callout": ""
 			},
 			"step2": {
-				"title": "Set Your Wake-Up Time",
-				"body": "The first question is deceptively simple: when does your day begin? This single data point establishes the earliest boundary the engine will schedule around. Night owl or early riser, Tiler starts from your reality, not an arbitrary 9 AM default.",
-				"calloutStrong": "Why this matters:",
-				"callout": "Every constraint in Tiler flows from your boundaries. Wake time, work hours, and location form the hard edges that the solver respects before optimizing anything else."
+				"title": "Imposta l'orario di sveglia",
+				"body": "La prima domanda è ingannevolmente semplice: quando inizia la tua giornata? Questo unico dato stabilisce il limite più precoce attorno al quale il motore pianificherà. Che tu sia notturno o mattiniero, Tiler parte dalla tua realtà, non da un valore predefinito arbitrario delle 9.",
+				"calloutStrong": "Perché è importante:",
+				"callout": "Ogni vincolo in Tiler deriva dai tuoi limiti. Orario di sveglia, orario di lavoro e posizione formano i confini rigidi che il risolutore rispetta prima di ottimizzare qualsiasi altra cosa."
 			},
 			"step3": {
-				"title": "Pin Your Location",
-				"body": "Where are you most of the day? Tiler integrates with Google Maps so travel time between tasks is real, calculated by driving, transit, or walking, and not a vague guess. This is the piece most planning tools skip entirely, and it's why their schedules crumble when you actually try to live them. The autocomplete pulls from Google's Places API, so you can enter anything from a corporate headquarters to a co-working space to a job site.",
+				"title": "Indica la tua posizione",
+				"body": "Dove ti trovi per la maggior parte della giornata? Tiler si integra con Google Maps così che il tempo di viaggio tra le attività sia reale, calcolato in auto, con i mezzi o a piedi, e non una vaga stima. Questo è l'elemento che la maggior parte degli strumenti di pianificazione ignora completamente, ed è il motivo per cui i loro programmi crollano quando li si prova davvero a vivere. Il completamento automatico proviene dall'API Places di Google, quindi puoi inserire qualsiasi cosa, da una sede aziendale a uno spazio di coworking a un cantiere.",
 				"calloutStrong": "",
 				"callout": ""
 			},
 			"step4": {
-				"title": "Define Your Work Hours",
-				"body": "Not every day looks the same. Tiler lets you set work hours per day of the week: toggle days on and off, shift start and end times, and copy a schedule across multiple days. This creates the temporal fence that separates work blocks from personal time. The engine treats these as soft constraints, strong enough to shape your default schedule, flexible enough to bend when a deadline or travel commitment demands it.",
+				"title": "Definisci il tuo orario di lavoro",
+				"body": "Non tutti i giorni sono uguali. Tiler ti permette di impostare l'orario di lavoro per ogni giorno della settimana: attiva o disattiva i giorni, sposta gli orari di inizio e fine e copia un programma su più giorni. Questo crea il confine temporale che separa i blocchi di lavoro dal tempo personale. Il motore tratta questi come vincoli flessibili, sufficientemente forti da definire il tuo programma predefinito, ma abbastanza adattabili da cedere quando una scadenza o un impegno di viaggio lo richiedono.",
 				"calloutStrong": "",
 				"callout": ""
 			},
 			"step5": {
-				"title": "Seed Your Tiles",
-				"body": "This is where Tiler begins to feel different. Based on your professional profile, the engine suggests recurring activity tiles (blocks of work) it thinks you'll need. Client calls. Deep work. Business development. Weekly reflection. You select the ones that match, delete the ones that don't, and set each to daily or weekly cadence.",
-				"calloutStrong": "AI-seeded, human-curated.",
-				"callout": "The suggestions come from the LLM analyzing your professional context. You stay in control of what gets scheduled; the engine handles when and where."
+				"title": "Semina i tuoi tiles",
+				"body": "Qui è dove Tiler comincia a sentirsi diverso. In base al tuo profilo professionale, il motore suggerisce tiles di attività ricorrenti (blocchi di lavoro) che pensa ti serviranno. Chiamate con i clienti. Lavoro profondo. Sviluppo del business. Riflessione settimanale. Selezioni quelli che ti interessano, elimini quelli che non ti interessano e imposti ciascuno con cadenza giornaliera o settimanale.",
+				"calloutStrong": "Suggerito dall'IA, curato dall'uomo.",
+				"callout": "I suggerimenti provengono dall'LLM che analizza il tuo contesto professionale. Tu mantieni il controllo su cosa viene pianificato; il motore gestisce quando e dove."
 			},
 			"step6": {
-				"title": "Your Timeline, Built",
-				"body": "With your constraints loaded, the solver runs. What appears isn't a blank calendar waiting to be filled; it's an optimized timeline with your tiles placed where they fit, travel time accounted for, and work hours respected. Each tile is color-coded and linked to a location, with expandable action menus for quick edits. Add new tasks through natural language, run what-if scenarios to test alternatives, or share tiles with your team. The onboarding planted the seeds, and the engine grows the schedule from here.",
+				"title": "La tua timeline, costruita",
+				"body": "Con i vincoli caricati, il risolutore si avvia. Ciò che appare non è un calendario vuoto in attesa di essere riempito; è una timeline ottimizzata con i tuoi tiles posizionati dove si adattano, il tempo di viaggio considerato e l'orario di lavoro rispettato. Ogni tile è codificato per colore e collegato a una posizione, con menu di azioni espandibili per modifiche rapide. Aggiungi nuove attività tramite linguaggio naturale, esegui scenari ipotetici per testare alternative o condividi tiles con il tuo team. L'onboarding ha piantato i semi, e il motore fa crescere il programma da qui.",
 				"calloutStrong": "",
 				"callout": ""
 			}
 		},
 		"pillars": {
-			"heading": "Three Pillars. One Perfect Timeline.",
+			"heading": "Tre pilastri. Una timeline perfetta.",
 			"goals": {
 				"icon": "??",
-				"title": "Goals",
-				"body": "The tasks and ambitions that need time carved out for them."
+				"title": "Obiettivi",
+				"body": "Le attività e le ambizioni per cui serve tempo dedicato."
 			},
 			"appointments": {
 				"icon": "??",
-				"title": "Appointments",
-				"body": "Meetings, flights, and commitments already locked in."
+				"title": "Appuntamenti",
+				"body": "Riunioni, voli e impegni già fissati."
 			},
 			"location": {
 				"icon": "??",
-				"title": "Location",
-				"body": "Where you actually are, so travel time is real, not guessed."
+				"title": "Posizione",
+				"body": "Dove ti trovi realmente, così il tempo di viaggio è reale, non una stima."
 			}
 		},
 		"cta": {
-			"heading": "Ready to build your timeline?",
-			"body": "Five minutes of setup. A schedule that actually works.",
-			"button": "Get Started Free ?",
-			"sub": "Available on iOS and Android. Free to start."
+			"heading": "Pronto a costruire la tua timeline?",
+			"body": "Cinque minuti di configurazione. Un programma che funziona davvero.",
+			"button": "Inizia gratis ?",
+			"sub": "Disponibile su iOS e Android. Gratis per iniziare."
 		}
 	},
 	"articles": {
-		"minRead": "min read",
-		"readArticle": "Read article",
+		"minRead": "min di lettura",
+		"readArticle": "Leggi l'articolo",
 		"breadcrumbs": {
 			"home": "Home",
-			"articles": "Articles"
+			"articles": "Articoli"
 		},
 		"index": {
 			"seo": {
-				"title": "Articles | Tiler - Guides, Product Updates & Productivity Insights",
-				"description": "Explore Tiler's library of guides, product updates, and deep dives on AI scheduling, agentic calendars, and adaptive productivity. Learn how to make your time work for you.",
-				"keywords": "Tiler articles, AI scheduling blog, smart calendar guides, productivity articles, agentic calendar, time management insights, AI productivity blog"
+				"title": "Articoli | Tiler - Guide, aggiornamenti prodotto e approfondimenti sulla produttività",
+				"description": "Esplora la libreria di guide, aggiornamenti prodotto e approfondimenti di Tiler su pianificazione IA, calendari agentici e produttività adattiva. Scopri come far lavorare il tuo tempo per te.",
+				"keywords": "articoli Tiler, blog pianificazione IA, guide calendario intelligente, articoli produttività, calendario agentico, approfondimenti gestione del tempo, blog produttività IA"
 			},
 			"hero": {
-				"badge": "Articles",
-				"title": "Insights for a Better Schedule",
-				"subtitle": "Guides, product updates, and ideas on how AI can reshape the way you plan your day."
+				"badge": "Articoli",
+				"title": "Spunti per un programma migliore",
+				"subtitle": "Guide, aggiornamenti prodotto e idee su come l'IA può trasformare il modo in cui pianifichi la giornata."
 			}
 		},
 		"posts": {
 			"gettingStarted": {
-				"category": "GETTING STARTED",
-				"title": "Your First Five Minutes with Tiler",
-				"subtitle": "Tiler builds your perfect timeline from three things: your goals, your appointments, and your location. Here's how onboarding gets you there.",
-				"excerpt": "Most scheduling tools start from an empty grid. Tiler learns the shape of your day first, then builds a constraint-aware, location-anchored timeline that actually fits your life.",
-				"readTime": "6 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"category": "PER INIZIARE",
+				"title": "I tuoi primi cinque minuti con Tiler",
+				"subtitle": "Tiler costruisce la tua timeline perfetta a partire da tre cose: i tuoi obiettivi, i tuoi appuntamenti e la tua posizione. Ecco come l'onboarding ti ci porta.",
+				"excerpt": "La maggior parte degli strumenti di pianificazione parte da una griglia vuota. Tiler apprende prima la forma della tua giornata, poi costruisce una timeline consapevole dei vincoli e ancorata alla posizione che si adatta davvero alla tua vita.",
+				"readTime": "6 min di lettura",
+				"author": "Team Tiler",
+				"date": "1 maggio 2026",
 				"seo": {
-					"title": "Get Started with Tiler | AI Scheduling & Smart Calendar App",
-					"description": "Tiler is the AI-powered calendar that automatically builds your perfect daily schedule. Set your schedule boundaries, pin your location, and let the AI solver build a timeline that actually fits your life.",
-					"keywords": "AI scheduling app, smart calendar, agentic calendar, AI task scheduler, adaptive scheduling, AI calendar app, intelligent time management, location-aware scheduling, AI productivity app, smart daily planner"
+					"title": "Inizia con Tiler | App di pianificazione IA e calendario intelligente",
+					"description": "Tiler è il calendario basato sull'IA che crea automaticamente il tuo programma giornaliero perfetto. Imposta i limiti del tuo orario, indica la tua posizione e lascia che il risolutore IA costruisca una timeline che si adatta davvero alla tua vita.",
+					"keywords": "app di pianificazione IA, calendario intelligente, calendario agentico, pianificatore attività IA, pianificazione adattiva, app calendario IA, gestione intelligente del tempo, pianificazione basata sulla posizione, app di produttività IA, pianificatore giornaliero intelligente"
 				},
 				"intro": {
-					"lede": "Most scheduling tools ask you to start from scratch, dragging blank boxes onto an empty grid and hoping the puzzle solves itself. Tiler works differently. Before you ever see a timeline, the app learns the shape of your day so it can build one that actually fits.",
-					"body": "Onboarding takes about five minutes. By the end, Tiler's engine has enough context to generate a constraint-aware, location-anchored schedule that adapts as your week shifts. Three pillars drive everything:"
+					"lede": "La maggior parte degli strumenti di pianificazione ti chiede di iniziare da zero, trascinando caselle vuote su una griglia vuota sperando che il puzzle si risolva da solo. Tiler funziona diversamente. Prima ancora di vedere una timeline, l'app apprende la forma della tua giornata per poterne costruire una che si adatti davvero.",
+					"body": "L'onboarding richiede circa cinque minuti. Al termine, il motore di Tiler ha abbastanza contesto per generare un programma consapevole dei vincoli e ancorato alla posizione, che si adatta al cambiare della settimana. Tre pilastri guidano tutto:"
 				}
 			},
 			"naturalLanguageScheduling": {
-				"category": "FEATURES",
-				"title": "Natural-Language Scheduling",
-				"subtitle": "Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.",
-				"excerpt": "Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"category": "FUNZIONALITÀ",
+				"title": "Pianificazione in linguaggio naturale",
+				"subtitle": "Dì semplicemente a Tiler cosa devi fare, in italiano semplice, e osserva apparire un programma intelligente.",
+				"excerpt": "Smetti di lottare con il trascina e rilascia. Dì semplicemente a Tiler cosa devi fare in italiano semplice e osserva apparire un programma intelligente.",
+				"readTime": "4 min di lettura",
+				"author": "Team Tiler",
+				"date": "1 maggio 2026",
 				"sections": [
 					{
 						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
@@ -1987,13 +1987,13 @@
 				]
 			},
 			"smartTravelAndLocation": {
-				"category": "FEATURES",
-				"title": "Smart Travel and Location",
-				"subtitle": "A schedule that ignores location isn't a schedule. It's a guess.",
-				"excerpt": "Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 8, 2026",
+				"category": "FUNZIONALITÀ",
+				"title": "Viaggio e posizione intelligenti",
+				"subtitle": "Un programma che ignora la posizione non è un programma. È una supposizione.",
+				"excerpt": "Tiler calcola il tempo di viaggio tra ogni impegno e lo integra nella tua giornata così che il tuo programma rifletta la vita reale, non un'illusione.",
+				"readTime": "4 min di lettura",
+				"author": "Team Tiler",
+				"date": "8 maggio 2026",
 				"sections": [
 					{
 						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
@@ -2034,13 +2034,13 @@
 				]
 			},
 			"scheduleUndo": {
-				"category": "FEATURES",
-				"title": "Schedule Undo",
-				"subtitle": "Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.",
-				"excerpt": "Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "June 22, 2026",
+				"category": "FUNZIONALITÀ",
+				"title": "Annulla programma",
+				"subtitle": "Ogni modifica al programma ti mostra prima un'anteprima dal vivo. Annullala all'istante o accettala con sicurezza. Il tuo piano originale è sempre a un tocco di distanza.",
+				"excerpt": "Visualizza l'anteprima di qualsiasi modifica al programma prima che venga salvata. Annullala all'istante o accettala con sicurezza. Il tuo programma attivo non viene mai modificato senza la tua approvazione.",
+				"readTime": "4 min di lettura",
+				"author": "Team Tiler",
+				"date": "22 giugno 2026",
 				"sections": [
 					{
 						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
@@ -2090,13 +2090,13 @@
 				]
 			},
 			"tileshare": {
-				"category": "FEATURES",
+				"category": "FUNZIONALITÀ",
 				"title": "Tileshare",
-				"subtitle": "Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
-				"excerpt": "Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 22, 2026",
+				"subtitle": "Invia un'attività direttamente nel programma di qualcun altro. Si adatta automaticamente alla sua giornata. Nessuno scambio di messaggi richiesto.",
+				"excerpt": "Invia attività adattive direttamente al Tiler di qualcun altro. Arrivano, si adattano e vengono completate. Nessun sovraccarico di coordinamento.",
+				"readTime": "4 min di lettura",
+				"author": "Team Tiler",
+				"date": "22 maggio 2026",
 				"sections": [
 					{
 						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."

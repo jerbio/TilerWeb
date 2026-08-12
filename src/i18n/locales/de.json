@@ -838,42 +838,42 @@
 			"subtitle": "Vereinfachen Sie Ihr Leben mit Tiler. Hier ist, was wir tun können, um Ihnen zu helfen.",
 			"animations": {
 				"nls": {
-					"transcript": "Lunch with Sarah tomorrow at noon...",
-					"responsePrimary": "Scheduled: Lunch with Sarah - Tomorrow 12:00 PM",
-					"responseTravel": "+ 25 min travel block added",
-					"responseLocation": "Downtown - 1 hr"
+					"transcript": "Mittagessen mit Sarah morgen um 12 Uhr...",
+					"responsePrimary": "Geplant: Mittagessen mit Sarah - Morgen 12:00 Uhr",
+					"responseTravel": "+ 25 Min. Fahrzeit hinzugefügt",
+					"responseLocation": "Innenstadt - 1 Std."
 				},
 				"travel": {
 					"stops": {
 						"home": {
-							"label": "Home",
-							"time": "8:00 AM"
+							"label": "Zuhause",
+							"time": "8:00 Uhr"
 						},
 						"office": {
-							"label": "Office",
-							"time": "9:15 AM"
+							"label": "Büro",
+							"time": "9:15 Uhr"
 						},
 						"cafe": {
-							"label": "Cafe",
-							"time": "1:00 PM"
+							"label": "Café",
+							"time": "13:00 Uhr"
 						},
 						"gym": {
-							"label": "Gym",
-							"time": "5:30 PM"
+							"label": "Fitnessstudio",
+							"time": "17:30 Uhr"
 						}
 					}
 				},
 				"undo": {
-					"tileName": "Gym session",
-					"originalMeta": "At Home - Tue - 10:00 AM",
-					"previewMeta": "At Home - Wed - 2:00 PM",
-					"previewBadge": "PREVIEW",
-					"undoAction": "Undo",
-					"acceptAction": "Accept"
+					"tileName": "Fitnessstudio-Termin",
+					"originalMeta": "Zuhause - Di - 10:00 Uhr",
+					"previewMeta": "Zuhause - Mi - 14:00 Uhr",
+					"previewBadge": "VORSCHAU",
+					"undoAction": "Rückgängig",
+					"acceptAction": "Akzeptieren"
 				},
 				"tileshare": {
-					"tileName": "Gym session",
-					"tileSub": "From Alex - 1 hr"
+					"tileName": "Fitnessstudio-Termin",
+					"tileSub": "Von Alex - 1 Std."
 				}
 			}
 		},
@@ -977,8 +977,8 @@
 			"title": "Starten Sie mit Tiler",
 			"subtitle": "Erstellen Sie Ihr kostenloses Konto für nahtlose Terminplanung",
 			"googleButton": "Mit Google registrieren",
-			"appleButton": "Sign up with Apple",
-			"microsoftButton": "Sign up with Microsoft",
+			"appleButton": "Mit Apple registrieren",
+			"microsoftButton": "Mit Microsoft registrieren",
 			"emailLabel": "E-Mail-Adresse",
 			"emailPlaceholder": "z. B. ihrname@outlook.com",
 			"submitButton": "Mein kostenloses Konto erstellen",
@@ -992,8 +992,8 @@
 			"title": "Willkommen zurück bei Tiler",
 			"subtitle": "Melden Sie sich an, um Ihre Terminplanung fortzusetzen",
 			"googleButton": "Mit Google anmelden",
-			"appleButton": "Sign in with Apple",
-			"microsoftButton": "Sign in with Microsoft",
+			"appleButton": "Mit Apple anmelden",
+			"microsoftButton": "Mit Microsoft anmelden",
 			"submitButton": "In meinem Konto anmelden",
 			"submitting": "Anmeldung läuft...",
 			"footer": "Sie haben noch kein Konto?",
@@ -1102,10 +1102,10 @@
 				"themeModeLight": "Hell",
 				"themeModeDark": "Dunkel",
 				"themeModeSystem": "Geräteeinstellung verwenden",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
-				"am": "AM",
-				"pm": "PM"
+				"defaultStartTime": "8:00 Uhr",
+				"defaultEndTime": "18:00 Uhr",
+				"am": "vorm.",
+				"pm": "nachm."
 			},
 			"tilerContacts": {
 				"title": "Tiler-Kontakte",
@@ -1282,7 +1282,7 @@
 			"signOutSuccess": "Sie wurden erfolgreich abgemeldet",
 			"signOutError": "Abmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
 			"defaultUsername": "Benutzer",
-			"settings": "Settings"
+			"settings": "Einstellungen"
 		},
 		"expandPanel": "Bereich erweitern",
 		"collapsePanel": "Bereich einklappen"
@@ -1336,8 +1336,8 @@
 			"duration": "Dauer",
 			"hours": "Std",
 			"minutes": "Min",
-			"durationHoursPreview": "{{count}}h",
-			"durationMinutesPreview": "{{count}}m",
+			"durationHoursPreview": "{{count}}Std",
+			"durationMinutesPreview": "{{count}}Min",
 			"split": "Anzahl der Teilungen",
 			"splitPlaceholder": "z.B. 3",
 			"location": "Adresse",
@@ -1671,8 +1671,8 @@
 				"active": "Aktiv",
 				"sent": "Gesendet",
 				"received": "Empfangen ({{count}})",
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"inbox": "Posteingang-Link",
+				"outbox": "Postausgang-Link"
 			},
 			"toolbar": {
 				"welcome": "Willkommen in Ihrem Tileshare-Dashboard",
@@ -1775,10 +1775,10 @@
 			"title": "Einladen"
 		},
 		"inbox": {
-			"title": "Inbox"
+			"title": "Posteingang"
 		},
 		"outbox": {
-			"title": "Outbox"
+			"title": "Postausgang"
 		}
 	},
 	"tile": {
@@ -1922,13 +1922,13 @@
 		},
 		"posts": {
 			"gettingStarted": {
-				"category": "GETTING STARTED",
+				"category": "ERSTE SCHRITTE",
 				"title": "Ihre ersten fünf Minuten mit Tiler",
 				"subtitle": "Tiler erstellt Ihre perfekte Zeitleiste aus drei Dingen: Ihren Zielen, Ihren Terminen und Ihrem Standort. So bringt Sie das Onboarding dorthin.",
 				"excerpt": "Die meisten Terminplanungstools starten mit einem leeren Raster. Tiler lernt zunächst die Form Ihres Tages und erstellt dann eine einschränkungsbewusste, standortverankerte Zeitleiste, die wirklich zu Ihrem Leben passt.",
-				"readTime": "6 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"readTime": "6 Min. Lesezeit",
+				"author": "Tiler-Team",
+				"date": "1. Mai 2026",
 				"seo": {
 					"title": "Erste Schritte mit Tiler | KI-Terminplanung & smarter Kalender",
 					"description": "Tiler ist der KI-gestützte Kalender, der automatisch Ihren perfekten Tagesplan erstellt. Legen Sie Ihre Zeitplangrenzen fest, geben Sie Ihren Standort an und lassen Sie den KI-Solver eine Zeitleiste erstellen, die wirklich zu Ihrem Leben passt.",
@@ -1940,13 +1940,13 @@
 				}
 			},
 			"naturalLanguageScheduling": {
-				"category": "FEATURES",
-				"title": "Natural-Language Scheduling",
-				"subtitle": "Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.",
-				"excerpt": "Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"category": "FUNKTIONEN",
+				"title": "Terminplanung in natürlicher Sprache",
+				"subtitle": "Sagen Sie Tiler einfach in normaler Sprache, was zu tun ist, und sehen Sie, wie ein intelligenter Zeitplan entsteht.",
+				"excerpt": "Schluss mit Drag-and-Drop-Frust. Sagen Sie Tiler einfach in normaler Sprache, was zu tun ist, und sehen Sie, wie ein intelligenter Zeitplan entsteht.",
+				"readTime": "4 Min. Lesezeit",
+				"author": "Tiler-Team",
+				"date": "1. Mai 2026",
 				"sections": [
 					{
 						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
@@ -1987,13 +1987,13 @@
 				]
 			},
 			"smartTravelAndLocation": {
-				"category": "FEATURES",
-				"title": "Smart Travel and Location",
-				"subtitle": "A schedule that ignores location isn't a schedule. It's a guess.",
-				"excerpt": "Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 8, 2026",
+				"category": "FUNKTIONEN",
+				"title": "Intelligente Fahrzeit und Standortplanung",
+				"subtitle": "Ein Zeitplan, der den Standort ignoriert, ist kein Zeitplan. Er ist eine Vermutung.",
+				"excerpt": "Tiler berechnet die Fahrzeit zwischen jedem Termin und baut sie in Ihren Tag ein, damit Ihr Zeitplan die Realität widerspiegelt, kein Wunschdenken.",
+				"readTime": "4 Min. Lesezeit",
+				"author": "Tiler-Team",
+				"date": "8. Mai 2026",
 				"sections": [
 					{
 						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
@@ -2034,13 +2034,13 @@
 				]
 			},
 			"scheduleUndo": {
-				"category": "FEATURES",
-				"title": "Schedule Undo",
-				"subtitle": "Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.",
-				"excerpt": "Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "June 22, 2026",
+				"category": "FUNKTIONEN",
+				"title": "Terminplan-Rückgängig",
+				"subtitle": "Jede Zeitplanänderung zeigt Ihnen zunächst eine Live-Vorschau. Machen Sie sie sofort rückgängig oder akzeptieren Sie sie mit Zuversicht. Ihr ursprünglicher Plan ist immer nur einen Klick entfernt.",
+				"excerpt": "Sehen Sie sich eine Vorschau jeder Zeitplanänderung an, bevor sie gespeichert wird. Machen Sie sie sofort rückgängig oder akzeptieren Sie sie mit Zuversicht. Ihr aktueller Zeitplan wird nie ohne Ihre Zustimmung geändert.",
+				"readTime": "4 Min. Lesezeit",
+				"author": "Tiler-Team",
+				"date": "22. Juni 2026",
 				"sections": [
 					{
 						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
@@ -2090,13 +2090,13 @@
 				]
 			},
 			"tileshare": {
-				"category": "FEATURES",
+				"category": "FUNKTIONEN",
 				"title": "Tileshare",
-				"subtitle": "Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
-				"excerpt": "Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 22, 2026",
+				"subtitle": "Senden Sie eine Aufgabe direkt in den Zeitplan einer anderen Person. Sie passt sich automatisch in deren Tag ein. Kein Hin und Her nötig.",
+				"excerpt": "Senden Sie anpassungsfähige Aufgaben direkt an den Tiler einer anderen Person. Sie landen, passen sich ein und werden erledigt. Kein Koordinationsaufwand.",
+				"readTime": "4 Min. Lesezeit",
+				"author": "Tiler-Team",
+				"date": "22. Mai 2026",
 				"sections": [
 					{
 						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."

@@ -86,7 +86,7 @@
 			"facebook": "Facebook",
 			"linkedin": "LinkedIn",
 			"instagram": "Instagram",
-			"x": "X (Twitter)"
+			"x": "X (旧Twitter)"
 		},
 		"apps": {
 			"ios": {
@@ -95,7 +95,7 @@
 			},
 			"android": {
 				"cta": "Google Playで入手",
-				"platform": "Android Play Store"
+				"platform": "Google Play ストア"
 			}
 		},
 		"legal": {
@@ -838,42 +838,42 @@
 			"subtitle": "Tilerであなたの生活を簡素化します。私たちがあなたを助けるためにできることは次のとおりです。",
 			"animations": {
 				"nls": {
-					"transcript": "Lunch with Sarah tomorrow at noon...",
-					"responsePrimary": "Scheduled: Lunch with Sarah - Tomorrow 12:00 PM",
-					"responseTravel": "+ 25 min travel block added",
-					"responseLocation": "Downtown - 1 hr"
+					"transcript": "明日の正午、サラとランチ...",
+					"responsePrimary": "予定済み: サラとランチ - 明日 12:00",
+					"responseTravel": "+ 移動時間25分を追加",
+					"responseLocation": "ダウンタウン - 1時間"
 				},
 				"travel": {
 					"stops": {
 						"home": {
-							"label": "Home",
-							"time": "8:00 AM"
+							"label": "自宅",
+							"time": "午前8:00"
 						},
 						"office": {
-							"label": "Office",
-							"time": "9:15 AM"
+							"label": "オフィス",
+							"time": "午前9:15"
 						},
 						"cafe": {
-							"label": "Cafe",
-							"time": "1:00 PM"
+							"label": "カフェ",
+							"time": "午後1:00"
 						},
 						"gym": {
-							"label": "Gym",
-							"time": "5:30 PM"
+							"label": "ジム",
+							"time": "午後5:30"
 						}
 					}
 				},
 				"undo": {
-					"tileName": "Gym session",
-					"originalMeta": "At Home - Tue - 10:00 AM",
-					"previewMeta": "At Home - Wed - 2:00 PM",
-					"previewBadge": "PREVIEW",
-					"undoAction": "Undo",
-					"acceptAction": "Accept"
+					"tileName": "ジムのセッション",
+					"originalMeta": "自宅 - 火曜 - 午前10:00",
+					"previewMeta": "自宅 - 水曜 - 午後2:00",
+					"previewBadge": "プレビュー",
+					"undoAction": "元に戻す",
+					"acceptAction": "承認"
 				},
 				"tileshare": {
-					"tileName": "Gym session",
-					"tileSub": "From Alex - 1 hr"
+					"tileName": "ジムのセッション",
+					"tileSub": "Alexから - 1時間"
 				}
 			}
 		},
@@ -977,8 +977,8 @@
 			"title": "Tilerを始めましょう",
 			"subtitle": "無料アカウントを作成して、スムーズなスケジュール管理をお楽しみください",
 			"googleButton": "Googleで登録",
-			"appleButton": "Sign up with Apple",
-			"microsoftButton": "Sign up with Microsoft",
+			"appleButton": "Appleで登録",
+			"microsoftButton": "Microsoftで登録",
 			"emailLabel": "メールアドレス",
 			"emailPlaceholder": "例：yourname@outlook.com",
 			"submitButton": "無料アカウントを作成",
@@ -992,8 +992,8 @@
 			"title": "Tilerへお帰りなさい",
 			"subtitle": "ログインしてスケジュール管理を続けましょう",
 			"googleButton": "Googleでログイン",
-			"appleButton": "Sign in with Apple",
-			"microsoftButton": "Sign in with Microsoft",
+			"appleButton": "Appleでサインイン",
+			"microsoftButton": "Microsoftでサインイン",
 			"submitButton": "アカウントにログイン",
 			"submitting": "ログイン中...",
 			"footer": "アカウントをお持ちでないですか？",
@@ -1102,8 +1102,8 @@
 				"themeModeLight": "ライト",
 				"themeModeDark": "ダーク",
 				"themeModeSystem": "デバイスの設定を使用",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
+				"defaultStartTime": "午前8:00",
+				"defaultEndTime": "午後6:00",
 				"am": "午前",
 				"pm": "午後"
 			},
@@ -1282,7 +1282,7 @@
 			"signOutSuccess": "ログアウトしました",
 			"signOutError": "ログアウトに失敗しました。もう一度お試しください。",
 			"defaultUsername": "ユーザー",
-			"settings": "Settings"
+			"settings": "設定"
 		},
 		"expandPanel": "パネルを展開",
 		"collapsePanel": "パネルを折りたたむ"
@@ -1671,8 +1671,8 @@
 				"active": "アクティブ",
 				"sent": "送信済み",
 				"received": "受信済み（{{count}}）",
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"inbox": "受信リンク",
+				"outbox": "送信リンク"
 			},
 			"toolbar": {
 				"welcome": "TileShareダッシュボードへようこそ",
@@ -1775,10 +1775,10 @@
 			"title": "招待"
 		},
 		"inbox": {
-			"title": "Inbox"
+			"title": "受信箱"
 		},
 		"outbox": {
-			"title": "Outbox"
+			"title": "送信箱"
 		}
 	},
 	"tile": {
@@ -1922,13 +1922,13 @@
 		},
 		"posts": {
 			"gettingStarted": {
-				"category": "GETTING STARTED",
+				"category": "はじめに",
 				"title": "Tilerを始める最初の5分間",
 				"subtitle": "Tilerは、目標、予定、場所という3つの情報から最適なタイムラインを作ります。オンボーディングの進め方をご紹介します。",
 				"excerpt": "多くのスケジュールツールは空のグリッドから始まります。Tilerはまずあなたの一日の形を学習し、次に実際の暮らしに合う、制約と場所を考慮したタイムラインを作成します。",
-				"readTime": "6 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"readTime": "6分で読める",
+				"author": "Tilerチーム",
+				"date": "2026年5月1日",
 				"seo": {
 					"title": "Tilerを始める | AIスケジューリングとスマートカレンダーアプリ",
 					"description": "Tilerは、最適な毎日のスケジュールを自動で組み立てるAI搭載カレンダーです。予定の境界を設定し、場所を指定すれば、AIソルバーが暮らしに合うタイムラインを作成します。",
@@ -1940,13 +1940,13 @@
 				}
 			},
 			"naturalLanguageScheduling": {
-				"category": "FEATURES",
-				"title": "Natural-Language Scheduling",
-				"subtitle": "Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.",
-				"excerpt": "Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"category": "機能",
+				"title": "自然言語スケジューリング",
+				"subtitle": "やるべきことを普通の言葉でTilerに伝えるだけで、スマートなスケジュールが作成されます。",
+				"excerpt": "ドラッグ&ドロップに悩む必要はありません。やるべきことを普通の言葉でTilerに伝えるだけで、スマートなスケジュールが作成されます。",
+				"readTime": "4分で読める",
+				"author": "Tilerチーム",
+				"date": "2026年5月1日",
 				"sections": [
 					{
 						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
@@ -1987,13 +1987,13 @@
 				]
 			},
 			"smartTravelAndLocation": {
-				"category": "FEATURES",
-				"title": "Smart Travel and Location",
-				"subtitle": "A schedule that ignores location isn't a schedule. It's a guess.",
-				"excerpt": "Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 8, 2026",
+				"category": "機能",
+				"title": "スマートな移動と場所の管理",
+				"subtitle": "場所を無視したスケジュールはスケジュールではなく、単なる推測です。",
+				"excerpt": "Tilerはすべての予定間の移動時間を計算し、一日の予定に組み込みます。願望ではなく、現実に即したスケジュールになります。",
+				"readTime": "4分で読める",
+				"author": "Tilerチーム",
+				"date": "2026年5月8日",
 				"sections": [
 					{
 						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
@@ -2034,13 +2034,13 @@
 				]
 			},
 			"scheduleUndo": {
-				"category": "FEATURES",
-				"title": "Schedule Undo",
-				"subtitle": "Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.",
-				"excerpt": "Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "June 22, 2026",
+				"category": "機能",
+				"title": "スケジュールの取り消し",
+				"subtitle": "スケジュールの変更は、まずライブプレビューで表示されます。すぐに取り消すことも、安心して承認することもできます。元の予定はいつでもワンタップで戻せます。",
+				"excerpt": "保存前にスケジュールの変更内容をプレビューできます。すぐに取り消すことも、安心して承認することもできます。承認なしに実際のスケジュールが変更されることはありません。",
+				"readTime": "4分で読める",
+				"author": "Tilerチーム",
+				"date": "2026年6月22日",
 				"sections": [
 					{
 						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
@@ -2090,13 +2090,13 @@
 				]
 			},
 			"tileshare": {
-				"category": "FEATURES",
+				"category": "機能",
 				"title": "Tileshare",
-				"subtitle": "Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
-				"excerpt": "Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 22, 2026",
+				"subtitle": "タスクを直接相手のスケジュールに送信できます。相手の一日に自動的に組み込まれ、やり取りは不要です。",
+				"excerpt": "相手のTilerに直接タスクを送信できます。届いたタスクは自動的に組み込まれ、実行されます。調整の手間はかかりません。",
+				"readTime": "4分で読める",
+				"author": "Tilerチーム",
+				"date": "2026年5月22日",
 				"sections": [
 					{
 						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."

@@ -304,7 +304,7 @@
 				},
 				"tileSplit": {
 					"label": "Πόσες φορές πρέπει να συμβεί αυτό;",
-					"placeholder": "e.g. 1, 2, 3..."
+					"placeholder": "π.χ. 1, 2, 3..."
 				},
 				"location": {
 					"label": "Διεύθυνση",
@@ -838,42 +838,42 @@
 			"subtitle": "Απλοποιήστε τη ζωή σας με τον Tiler, Δείτε τι μπορούμε να κάνουμε για να σας βοηθήσουμε.",
 			"animations": {
 				"nls": {
-					"transcript": "Lunch with Sarah tomorrow at noon...",
-					"responsePrimary": "Scheduled: Lunch with Sarah - Tomorrow 12:00 PM",
-					"responseTravel": "+ 25 min travel block added",
-					"responseLocation": "Downtown - 1 hr"
+					"transcript": "Μεσημεριανό με τη Sarah αύριο το μεσημέρι...",
+					"responsePrimary": "Προγραμματίστηκε: Μεσημεριανό με τη Sarah - Αύριο 12:00 μ.μ.",
+					"responseTravel": "+ Προστέθηκαν 25 λεπτά μετακίνησης",
+					"responseLocation": "Κέντρο πόλης - 1 ώρα"
 				},
 				"travel": {
 					"stops": {
 						"home": {
-							"label": "Home",
-							"time": "8:00 AM"
+							"label": "Σπίτι",
+							"time": "8:00 π.μ."
 						},
 						"office": {
-							"label": "Office",
-							"time": "9:15 AM"
+							"label": "Γραφείο",
+							"time": "9:15 π.μ."
 						},
 						"cafe": {
-							"label": "Cafe",
-							"time": "1:00 PM"
+							"label": "Καφετέρια",
+							"time": "1:00 μ.μ."
 						},
 						"gym": {
-							"label": "Gym",
-							"time": "5:30 PM"
+							"label": "Γυμναστήριο",
+							"time": "5:30 μ.μ."
 						}
 					}
 				},
 				"undo": {
-					"tileName": "Gym session",
-					"originalMeta": "At Home - Tue - 10:00 AM",
-					"previewMeta": "At Home - Wed - 2:00 PM",
-					"previewBadge": "PREVIEW",
-					"undoAction": "Undo",
-					"acceptAction": "Accept"
+					"tileName": "Προπόνηση στο γυμναστήριο",
+					"originalMeta": "Στο σπίτι - Τρίτη - 10:00 π.μ.",
+					"previewMeta": "Στο σπίτι - Τετάρτη - 2:00 μ.μ.",
+					"previewBadge": "ΠΡΟΕΠΙΣΚΟΠΗΣΗ",
+					"undoAction": "Αναίρεση",
+					"acceptAction": "Αποδοχή"
 				},
 				"tileshare": {
-					"tileName": "Gym session",
-					"tileSub": "From Alex - 1 hr"
+					"tileName": "Προπόνηση στο γυμναστήριο",
+					"tileSub": "Από τον Alex - 1 ώρα"
 				}
 			}
 		},
@@ -977,8 +977,8 @@
 			"title": "Ξεκινήστε με τον Tiler",
 			"subtitle": "Δημιουργήστε τον δωρεάν λογαριασμό σας για απρόσκοπτο προγραμματισμό",
 			"googleButton": "Εγγραφή με Google",
-			"appleButton": "Sign up with Apple",
-			"microsoftButton": "Sign up with Microsoft",
+			"appleButton": "Εγγραφή με Apple",
+			"microsoftButton": "Εγγραφή με Microsoft",
 			"emailLabel": "Διεύθυνση email",
 			"emailPlaceholder": "π.χ. yourname@outlook.com",
 			"submitButton": "Δημιουργία δωρεάν λογαριασμού",
@@ -992,8 +992,8 @@
 			"title": "Καλώς ήρθατε ξανά στον Tiler",
 			"subtitle": "Συνδεθείτε για να συνεχίσετε το ταξίδι προγραμματισμού σας",
 			"googleButton": "Σύνδεση με Google",
-			"appleButton": "Sign in with Apple",
-			"microsoftButton": "Sign in with Microsoft",
+			"appleButton": "Σύνδεση με Apple",
+			"microsoftButton": "Σύνδεση με Microsoft",
 			"submitButton": "Σύνδεση στον λογαριασμό μου",
 			"submitting": "Σύνδεση...",
 			"footer": "Δεν έχετε λογαριασμό;",
@@ -1102,8 +1102,8 @@
 				"themeModeLight": "Φωτεινό",
 				"themeModeDark": "Σκούρο",
 				"themeModeSystem": "Χρήση ρύθμισης συσκευής",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
+				"defaultStartTime": "8:00 π.μ.",
+				"defaultEndTime": "6:00 μ.μ.",
 				"am": "π.μ.",
 				"pm": "μ.μ."
 			},
@@ -1282,7 +1282,7 @@
 			"signOutSuccess": "Αποσυνδεθήκατε επιτυχώς",
 			"signOutError": "Αποτυχία αποσύνδεσης. Δοκιμάστε ξανά.",
 			"defaultUsername": "Χρήστης",
-			"settings": "Settings"
+			"settings": "Ρυθμίσεις"
 		},
 		"expandPanel": "Ανάπτυξη πλαισίου",
 		"collapsePanel": "Σύμπτυξη πλαισίου"
@@ -1671,8 +1671,8 @@
 				"active": "Ενεργό",
 				"sent": "Σταλμένο",
 				"received": "Λήψη ({{count}})",
-				"inbox": "Inbox Link",
-				"outbox": "Outbox Link"
+				"inbox": "Σύνδεσμος εισερχομένων",
+				"outbox": "Σύνδεσμος εξερχομένων"
 			},
 			"toolbar": {
 				"welcome": "Καλώς ήρθατε στον Πίνακα Ελέγχου Tileshare",
@@ -1775,10 +1775,10 @@
 			"title": "Πρόσκληση"
 		},
 		"inbox": {
-			"title": "Inbox"
+			"title": "Εισερχόμενα"
 		},
 		"outbox": {
-			"title": "Outbox"
+			"title": "Εξερχόμενα"
 		}
 	},
 	"tile": {
@@ -1922,13 +1922,13 @@
 		},
 		"posts": {
 			"gettingStarted": {
-				"category": "GETTING STARTED",
+				"category": "ΞΕΚΙΝΩΝΤΑΣ",
 				"title": "Τα πρώτα πέντε λεπτά σας με τον Tiler",
 				"subtitle": "Ο Tiler χτίζει το ιδανικό χρονολόγιό σας από τρία στοιχεία: τους στόχους σας, τα ραντεβού σας και την τοποθεσία σας. Δείτε πώς η διαδικασία εισαγωγής σάς οδηγεί εκεί.",
 				"excerpt": "Τα περισσότερα εργαλεία προγραμματισμού ξεκινούν από ένα κενό πλέγμα. Ο Tiler μαθαίνει πρώτα το σχήμα της ημέρας σας και έπειτα χτίζει ένα χρονολόγιο που λαμβάνει υπόψη τους περιορισμούς και την τοποθεσία σας και ταιριάζει πραγματικά στη ζωή σας.",
-				"readTime": "6 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"readTime": "6 λεπτά ανάγνωση",
+				"author": "Ομάδα Tiler",
+				"date": "1 Μαΐου 2026",
 				"seo": {
 					"title": "Ξεκινήστε με τον Tiler | Εφαρμογή προγραμματισμού AI και έξυπνου ημερολογίου",
 					"description": "Ο Tiler είναι το ημερολόγιο με AI που δημιουργεί αυτόματα το ιδανικό καθημερινό πρόγραμμά σας. Ορίστε τα όρια του προγράμματός σας, επισημάνετε την τοποθεσία σας και αφήστε τον αλγόριθμο AI να χτίσει ένα χρονολόγιο που ταιριάζει πραγματικά στη ζωή σας.",
@@ -1940,13 +1940,13 @@
 				}
 			},
 			"naturalLanguageScheduling": {
-				"category": "FEATURES",
-				"title": "Natural-Language Scheduling",
-				"subtitle": "Just tell Tiler what you need to do, in plain English, and watch a smart schedule appear.",
-				"excerpt": "Stop wrestling with drag-and-drop. Just tell Tiler what you need to do in plain English and watch a smart schedule appear.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 1, 2026",
+				"category": "ΛΕΙΤΟΥΡΓΙΕΣ",
+				"title": "Προγραμματισμός με Φυσική Γλώσσα",
+				"subtitle": "Απλά πείτε στο Tiler τι πρέπει να κάνετε, σε απλά λόγια, και δείτε να εμφανίζεται ένα έξυπνο πρόγραμμα.",
+				"excerpt": "Σταματήστε να παλεύετε με το drag-and-drop. Απλά πείτε στο Tiler τι πρέπει να κάνετε σε απλά λόγια και δείτε να εμφανίζεται ένα έξυπνο πρόγραμμα.",
+				"readTime": "4 λεπτά ανάγνωση",
+				"author": "Ομάδα Tiler",
+				"date": "1 Μαΐου 2026",
 				"sections": [
 					{
 						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
@@ -1987,13 +1987,13 @@
 				]
 			},
 			"smartTravelAndLocation": {
-				"category": "FEATURES",
-				"title": "Smart Travel and Location",
-				"subtitle": "A schedule that ignores location isn't a schedule. It's a guess.",
-				"excerpt": "Tiler calculates travel time between every commitment and builds it into your day so your schedule reflects real life, not wishful thinking.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 8, 2026",
+				"category": "ΛΕΙΤΟΥΡΓΙΕΣ",
+				"title": "Έξυπνη Μετακίνηση και Τοποθεσία",
+				"subtitle": "Ένα πρόγραμμα που αγνοεί την τοποθεσία δεν είναι πρόγραμμα. Είναι μια εικασία.",
+				"excerpt": "Το Tiler υπολογίζει τον χρόνο μετακίνησης μεταξύ κάθε δέσμευσης και τον ενσωματώνει στην ημέρα σας, ώστε το πρόγραμμά σας να αντικατοπτρίζει την πραγματική ζωή, όχι ευχολόγιο.",
+				"readTime": "4 λεπτά ανάγνωση",
+				"author": "Ομάδα Tiler",
+				"date": "8 Μαΐου 2026",
 				"sections": [
 					{
 						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
@@ -2034,13 +2034,13 @@
 				]
 			},
 			"scheduleUndo": {
-				"category": "FEATURES",
-				"title": "Schedule Undo",
-				"subtitle": "Every schedule change shows you a live preview first. Undo it instantly or accept it with confidence. Your original plan is always one tap away.",
-				"excerpt": "Preview any schedule change before it saves. Undo it instantly or accept it with confidence. Your live schedule is never touched without your approval.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "June 22, 2026",
+				"category": "ΛΕΙΤΟΥΡΓΙΕΣ",
+				"title": "Αναίρεση Προγράμματος",
+				"subtitle": "Κάθε αλλαγή προγράμματος σας δείχνει πρώτα μια ζωντανή προεπισκόπηση. Αναιρέστε την αμέσως ή αποδεχτείτε την με σιγουριά. Το αρχικό σας σχέδιο είναι πάντα ένα άγγιγμα μακριά.",
+				"excerpt": "Προεπισκοπήστε οποιαδήποτε αλλαγή προγράμματος πριν αποθηκευτεί. Αναιρέστε την αμέσως ή αποδεχτείτε την με σιγουριά. Το ενεργό σας πρόγραμμα δεν αλλάζει ποτέ χωρίς την έγκρισή σας.",
+				"readTime": "4 λεπτά ανάγνωση",
+				"author": "Ομάδα Tiler",
+				"date": "22 Ιουνίου 2026",
 				"sections": [
 					{
 						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
@@ -2090,13 +2090,13 @@
 				]
 			},
 			"tileshare": {
-				"category": "FEATURES",
+				"category": "ΛΕΙΤΟΥΡΓΙΕΣ",
 				"title": "Tileshare",
-				"subtitle": "Send a task directly into someone else's schedule. It fits around their day automatically. No back-and-forth required.",
-				"excerpt": "Send adaptive tasks directly into someone else's Tiler. They land, they fit, they get done. No coordination overhead.",
-				"readTime": "4 min read",
-				"author": "Tiler Team",
-				"date": "May 22, 2026",
+				"subtitle": "Στείλτε μια εργασία απευθείας στο πρόγραμμα κάποιου άλλου. Προσαρμόζεται αυτόματα στην ημέρα του. Δεν απαιτείται καμία επικοινωνία.",
+				"excerpt": "Στείλτε προσαρμοστικές εργασίες απευθείας στο Tiler κάποιου άλλου. Φτάνουν, προσαρμόζονται και ολοκληρώνονται. Χωρίς επιπλέον συντονισμό.",
+				"readTime": "4 λεπτά ανάγνωση",
+				"author": "Ομάδα Tiler",
+				"date": "22 Μαΐου 2026",
 				"sections": [
 					{
 						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
