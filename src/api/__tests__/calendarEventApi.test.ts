@@ -286,7 +286,7 @@ describe('CalendarEventApi', () => {
 			expect(request.url).toContain('api/CalendarEvent/Now');
 			expect(request.method).toBe('POST');
 			const body = await request.json();
-			expect(body).toEqual({ ID: 'event-id-123' });
+			expect(body).toEqual({ ID: 'event-id-123', TimeZone: 'UTC' });
 		});
 
 		it('returns parsed response on success', async () => {
@@ -341,7 +341,7 @@ describe('CalendarEventApi', () => {
 			expect(request.url).toContain('api/CalendarEvent/Complete');
 			expect(request.method).toBe('POST');
 			const body = await request.json();
-			expect(body).toEqual({ EventID: 'event-id-456' });
+			expect(body).toEqual({ EventID: 'event-id-456', TimeZone: 'UTC' });
 		});
 
 		it('returns parsed response on success', async () => {
@@ -397,7 +397,7 @@ describe('CalendarEventApi', () => {
 			expect(request.url).not.toContain('api/CalendarEvent/');
 			expect(request.method).toBe('DELETE');
 			const body = await request.json();
-			expect(body).toEqual({ EventID: 'event-id-789' });
+			expect(body).toEqual({ EventID: 'event-id-789', TimeZone: 'UTC' });
 		});
 
 		it('returns parsed response on success', async () => {
@@ -472,6 +472,7 @@ describe('CalendarEventApi', () => {
 			const body = await request.json();
 			expect(body).toEqual({
 				...updateParams,
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),

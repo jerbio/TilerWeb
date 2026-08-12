@@ -81,7 +81,7 @@ vi.mock('@/services', () => ({
 		lookupCalendarEventById: (...args: unknown[]) => mockLookupCalendarEventById(...args),
 		lookupLocationById: (...args: unknown[]) => mockLookupLocationById(...args),
 		searchLocations: (...args: unknown[]) => mockSearchLocations(...args),
-		getSubEventsOfCalendar: (...args: unknown[]) => mockGetSubEventsOfCalendar(...args),
+		getSubEventsOfCalendar: () => mockGetSubEventsOfCalendar(),
 	},
 	userService: {
 		getScheduleProfile: (...args: unknown[]) => mockGetScheduleProfile(...args),

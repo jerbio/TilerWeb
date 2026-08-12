@@ -241,6 +241,7 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				EventID: eventId,
 				Version: 'v2',
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),
@@ -292,6 +293,7 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				EventID: eventId,
 				Version: 'v2',
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),
@@ -349,6 +351,7 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				...procrastinateParams,
 				Version: 'v2',
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),
