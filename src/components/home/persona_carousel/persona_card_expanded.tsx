@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PersonaId } from '@/core/constants/persona';
 import styled from 'styled-components';
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
@@ -20,6 +20,7 @@ import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 import { createPortal } from 'react-dom';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
+import { generateSectionDurations } from './progress_walk';
 
 type PersonaExpandedCardProps = {
 	persona: Persona;
@@ -56,6 +57,21 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 
 	const [isCreatingPersona, setIsCreatingPersona] = useState(false);
 	const [processingStep, setProcessingStep] = useState(0);
+
+	// Progress simulation controls. We schedule the walk through the timed
+	// sections up front and cancel/fast-forward when the server responds.
+	const stepTimersRef = useRef<number[]>([]);
+	const currentStepRef = useRef(0);
+
+	// Target time (ms) to walk from step 0 to arriving at the final step.
+	// Beyond this, the loader parks on the last step waiting for the server.
+	const TOTAL_WALK_MS = 45_000;
+	// Minimum time each timed section is guaranteed to be visible.
+	const MIN_SECTION_MS = 2_000;
+	// Speed at which we catch up any remaining steps on early server response.
+	const FAST_STEP_MS = 120;
+	// How long we linger on "all complete" before hiding the overlay.
+	const COMPLETION_TAIL_MS = 800;
 
 	// Backend processing steps
 	const PROCESSING_STEPS = [
@@ -98,19 +114,57 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 		}
 	}
 
+	function clearStepTimers() {
+		stepTimersRef.current.forEach((id) => clearTimeout(id));
+		stepTimersRef.current = [];
+	}
+
+	// Schedules `totalSteps - 1` transitions so the visible step index advances
+	// from 0 up to `totalSteps - 1` over TOTAL_WALK_MS. The last step is left
+	// unscheduled: it stays active until the server response triggers
+	// `completeStepWalk`.
+	function scheduleStepWalk(totalSteps: number) {
+		clearStepTimers();
+		const timedSections = Math.max(0, totalSteps - 1);
+		if (timedSections === 0) return;
+		const durations = generateSectionDurations(timedSections, TOTAL_WALK_MS, MIN_SECTION_MS);
+		let cumulative = 0;
+		for (let i = 0; i < durations.length; i++) {
+			cumulative += durations[i];
+			const nextStep = i + 1;
+			const id = window.setTimeout(() => {
+				currentStepRef.current = nextStep;
+				setProcessingStep(nextStep);
+			}, cumulative);
+			stepTimersRef.current.push(id);
+		}
+	}
+
+	// Called when the server responds. Cancels the scheduled walk, quickly
+	// advances through any steps the user hasn't reached yet (so early returns
+	// still visually click through checkmarks), then flashes all-complete.
+	async function completeStepWalk(totalSteps: number) {
+		clearStepTimers();
+		while (currentStepRef.current < totalSteps - 1) {
+			currentStepRef.current += 1;
+			setProcessingStep(currentStepRef.current);
+			await new Promise((resolve) => setTimeout(resolve, FAST_STEP_MS));
+		}
+		// Show all steps as complete (all checkmarks)
+		setProcessingStep(totalSteps);
+		await new Promise((resolve) => setTimeout(resolve, COMPLETION_TAIL_MS));
+	}
+
 	async function getPersonaUser() {
 		setIsCreatingPersona(true);
 		setProcessingStep(0);
+		currentStepRef.current = 0;
 
-		// Simulate progressive steps with intervals
-		const stepInterval = setInterval(() => {
-			setProcessingStep((prev) => {
-				if (prev < PROCESSING_STEPS.length - 1) {
-					return prev + 1;
-				}
-				return prev;
-			});
-		}, 2000); // Progress every 2 seconds
+		// Pre-compute a random walk across the timed sections so the visible
+		// progression varies per invocation but always lands on the final step
+		// around TOTAL_WALK_MS. The final step has no scheduled duration — it
+		// simply waits for the server to respond.
+		scheduleStepWalk(PROCESSING_STEPS.length);
 
 		try {
 			// Check if dev mode override is active
@@ -135,73 +189,62 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 					userInfo: null, // Will be populated on first API call
 					scheduleLastUpdatedBy: null,
 				});
+			} else {
+				// NORMAL MODE: Create a new anonymous user
+				const personaUser = await personaService.createAnonymousUser(persona);
+				const newUserId = personaUser.anonymousUser.id;
 
-				clearInterval(stepInterval);
-				setProcessingStep(PROCESSING_STEPS.length);
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-				setIsCreatingPersona(false);
-				setProcessingStep(0);
-				return;
+				if (!newUserId) {
+					console.error('Failed to create user for persona: userId is null');
+					return;
+				}
+
+				setPersonaUser(persona.id, {
+					userId: newUserId,
+					personaInfo: { name: persona.name },
+				});
+
+				// Create a new persona session using PersonaSessionManager
+				// This automatically syncs to both localStorage and global state
+				createSession({
+					personaId: PersonaId.AnonymousPersonaId,
+					personaName: persona.name,
+					userId: newUserId,
+					scheduleId: null,
+					chatSessionId: '',
+					chatContext: [],
+					userInfo: {
+						id: newUserId,
+						username: personaUser.anonymousUser.username || '',
+						timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
+						timeZone:
+							personaUser.anonymousUser.timeZone ||
+							Intl.DateTimeFormat().resolvedOptions().timeZone.toString() ||
+							'UTC',
+						email: personaUser.anonymousUser.email,
+						endOfDay: personaUser.anonymousUser.endOfDay || '',
+						phoneNumber: personaUser.anonymousUser.phoneNumber,
+						fullName: personaUser.anonymousUser.fullName || '',
+						firstName: personaUser.anonymousUser.firstName || '',
+						lastName: personaUser.anonymousUser.lastName || '',
+						countryCode: personaUser.anonymousUser.countryCode || '1',
+						dateOfBirth: '',
+					},
+					scheduleLastUpdatedBy: null,
+				});
 			}
 
-			// NORMAL MODE: Create a new anonymous user
-			const personaUser = await personaService.createAnonymousUser(persona);
-			const newUserId = personaUser.anonymousUser.id;
-
-			if (!newUserId) {
-				console.error('Failed to create user for persona: userId is null');
-				clearInterval(stepInterval);
-				setIsCreatingPersona(false);
-				setProcessingStep(0);
-				return;
-			}
-
-			setPersonaUser(persona.id, {
-				userId: newUserId,
-				personaInfo: { name: persona.name },
-			});
-
-			// Create a new persona session using PersonaSessionManager
-			// This automatically syncs to both localStorage and global state
-			createSession({
-				personaId: PersonaId.AnonymousPersonaId,
-				personaName: persona.name,
-				userId: newUserId,
-				scheduleId: null,
-				chatSessionId: '',
-				chatContext: [],
-				userInfo: {
-					id: newUserId,
-					username: personaUser.anonymousUser.username || '',
-					timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
-					timeZone: personaUser.anonymousUser.timeZone || 'UTC',
-					email: personaUser.anonymousUser.email,
-					endOfDay: personaUser.anonymousUser.endOfDay || '',
-					phoneNumber: personaUser.anonymousUser.phoneNumber,
-					fullName: personaUser.anonymousUser.fullName || '',
-					firstName: personaUser.anonymousUser.firstName || '',
-					lastName: personaUser.anonymousUser.lastName || '',
-					countryCode: personaUser.anonymousUser.countryCode || '1',
-					dateOfBirth: '',
-				},
-				scheduleLastUpdatedBy: null,
-			});
-
-			clearInterval(stepInterval);
-
-			// Show all steps as complete (all checkmarks)
-			setProcessingStep(PROCESSING_STEPS.length);
-
-			// Wait 1 second to show all checkmarks before hiding
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			setIsCreatingPersona(false);
-			setProcessingStep(0);
+			// Server responded — quickly walk through any remaining steps the
+			// user hasn't seen yet, then flash the "all complete" state before
+			// handing off to the next phase.
+			await completeStepWalk(PROCESSING_STEPS.length);
 		} catch (error) {
-			clearInterval(stepInterval);
 			console.error("Couldn't create profile for persona: ", error);
+		} finally {
+			clearStepTimers();
 			setIsCreatingPersona(false);
 			setProcessingStep(0);
+			currentStepRef.current = 0;
 		}
 	}
 
