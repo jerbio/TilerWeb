@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CalendarEventApi } from '../calendarEventApi';
 import {
 	CalendarEvent,
@@ -36,6 +36,7 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
 describe('CalendarEventApi', () => {
 	let api: CalendarEventApi;
+	let _origResolvedOptions: Intl.DateTimeFormat['resolvedOptions'];
 
 	const mockSearchResults: CalendarEventSearchResponse = {
 		Error: { Code: '0', Message: 'SUCCESS' },
@@ -82,8 +83,17 @@ describe('CalendarEventApi', () => {
 	};
 
 	beforeEach(() => {
+		// Override Intl timezone so TimeZone assertions are deterministic across machines
+		_origResolvedOptions = Intl.DateTimeFormat.prototype.resolvedOptions;
+		Intl.DateTimeFormat.prototype.resolvedOptions = function () {
+			return { timeZone: 'UTC' } as unknown as Intl.ResolvedDateTimeFormatOptions;
+		};
 		api = new CalendarEventApi();
 		fetchSpy.mockReset();
+	});
+
+	afterEach(() => {
+		Intl.DateTimeFormat.prototype.resolvedOptions = _origResolvedOptions;
 	});
 
 	describe('searchByName', () => {
