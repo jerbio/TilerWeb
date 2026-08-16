@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -471,7 +472,7 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({ isOpen, onClose
 		}
 	};
 
-	return (
+	return createPortal(
 		<ModalOverlay $isOpen={isOpen} onClick={handleOverlayClick}>
 			<ModalContent $isOpen={isOpen}>
 				<ModalHeader>
@@ -577,7 +578,8 @@ const CustomPersonaModal: React.FC<CustomPersonaModalProps> = ({ isOpen, onClose
 					</LoadingContent>
 				</LoadingOverlay>
 			</ModalContent>
-		</ModalOverlay>
+		</ModalOverlay>,
+		document.body
 	);
 };
 
