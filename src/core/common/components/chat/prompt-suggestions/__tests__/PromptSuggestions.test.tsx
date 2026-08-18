@@ -128,7 +128,6 @@ describe('PromptSuggestions', () => {
 		});
 
 		it('does not call onPromptClick when loading', async () => {
-			const user = userEvent.setup();
 			const onPromptClick = vi.fn();
 
 			renderWithTheme(

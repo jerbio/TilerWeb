@@ -37,4 +37,16 @@ export default [
 			'react/prop-types': 'off',
 		},
 	},
+
+	// One-off maintenance scripts run under Node as CommonJS.
+	{
+		files: ['scripts/**/*.cjs', 'scripts/phase2-replace.js'],
+		languageOptions: {
+			sourceType: 'commonjs',
+			globals: globals.node,
+		},
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off',
+		},
+	},
 ];

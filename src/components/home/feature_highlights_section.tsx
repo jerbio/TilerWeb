@@ -213,6 +213,7 @@ const ResponseRow = styled.div<{ $w: string; $accent?: boolean }>`
 `;
 
 function NLSAnimation() {
+	const { t } = useTranslation();
 	return (
 		<AnimArea>
 			<NLSScene>
@@ -224,16 +225,22 @@ function NLSAnimation() {
 							<Bar key={i} $h={h} $d={i} />
 						))}
 					</WaveRow>
-					<TranscriptLine>"Lunch with Sarah tomorrow at noon…"</TranscriptLine>
+					<TranscriptLine>
+						&ldquo;{t('home.featureHighlights.animations.nls.transcript')}&rdquo;
+					</TranscriptLine>
 				</SceneVoice>
 
 				{/* Scene 2: AI scheduled response */}
 				<SceneResponse>
 					<ResponseRow $w="88%" $accent>
-						✓ Lunch with Sarah — Tomorrow 12:00 PM
+						✓ {t('home.featureHighlights.animations.nls.responsePrimary')}
 					</ResponseRow>
-					<ResponseRow $w="70%">+ 25 min travel block added</ResponseRow>
-					<ResponseRow $w="55%">📍 Downtown · 1 hr</ResponseRow>
+					<ResponseRow $w="70%">
+						{t('home.featureHighlights.animations.nls.responseTravel')}
+					</ResponseRow>
+					<ResponseRow $w="55%">
+						📍 {t('home.featureHighlights.animations.nls.responseLocation')}
+					</ResponseRow>
 				</SceneResponse>
 			</NLSScene>
 		</AnimArea>
@@ -283,15 +290,16 @@ const TravelDot = styled.circle`
 	animation-delay: 0.6s;
 `;
 
-// stops: x position, label, time — time always above, label always below
+// stops: x position, translation key — time always above, label always below
 const STOPS = [
-	{ x: 22, label: 'Home', time: '8:00 AM' },
-	{ x: 88, label: 'Office', time: '9:15 AM' },
-	{ x: 155, label: 'Café', time: '1:00 PM' },
-	{ x: 240, label: 'Gym', time: '5:30 PM' },
+	{ x: 22, key: 'home' },
+	{ x: 88, key: 'office' },
+	{ x: 155, key: 'cafe' },
+	{ x: 240, key: 'gym' },
 ];
 
 function TravelAnimation() {
+	const { t } = useTranslation();
 	return (
 		<AnimArea>
 			<TravelSVG viewBox="0 0 262 110" preserveAspectRatio="xMidYMid meet">
@@ -300,7 +308,7 @@ function TravelAnimation() {
 
 				{/* Stops */}
 				{STOPS.map((s) => (
-					<g key={s.label}>
+					<g key={s.key}>
 						<circle
 							cx={s.x}
 							cy={55}
@@ -319,7 +327,7 @@ function TravelAnimation() {
 							textAnchor="middle"
 							fontWeight="600"
 						>
-							{s.time}
+							{t(`home.featureHighlights.animations.travel.stops.${s.key}.time`)}
 						</text>
 						{/* Label below dot */}
 						<text
@@ -329,7 +337,7 @@ function TravelAnimation() {
 							fill="rgba(255,255,255,0.55)"
 							textAnchor="middle"
 						>
-							{s.label}
+							{t(`home.featureHighlights.animations.travel.stops.${s.key}.label`)}
 						</text>
 					</g>
 				))}
@@ -451,35 +459,45 @@ const UndoActionBtn = styled.button<{ $variant: 'undo' | 'accept' }>`
 `;
 
 function ScheduleUndoAnimation() {
+	const { t } = useTranslation();
+	const tileName = t('home.featureHighlights.animations.undo.tileName');
+	const previewMeta = t('home.featureHighlights.animations.undo.previewMeta');
+	const previewBadge = t('home.featureHighlights.animations.undo.previewBadge');
 	return (
 		<AnimArea>
 			{/* Scene A — original tile */}
 			<UndoSceneA>
 				<UndoTileCard>
-					<UndoTileName>Gym session</UndoTileName>
-					<UndoTileMeta>@ Home · Tue · 10:00 AM</UndoTileMeta>
+					<UndoTileName>{tileName}</UndoTileName>
+					<UndoTileMeta>
+						{t('home.featureHighlights.animations.undo.originalMeta')}
+					</UndoTileMeta>
 				</UndoTileCard>
 			</UndoSceneA>
 
 			{/* Scene B — preview with changed time */}
 			<UndoSceneB>
 				<UndoTileCard $ghost>
-					<UndoTileName>Gym session</UndoTileName>
-					<UndoTileMeta>@ Home · Wed · 2:00 PM</UndoTileMeta>
-					<UndoPreviewBadge>PREVIEW</UndoPreviewBadge>
+					<UndoTileName>{tileName}</UndoTileName>
+					<UndoTileMeta>{previewMeta}</UndoTileMeta>
+					<UndoPreviewBadge>{previewBadge}</UndoPreviewBadge>
 				</UndoTileCard>
 			</UndoSceneB>
 
 			{/* Scene C — Undo / Accept */}
 			<UndoSceneC>
 				<UndoTileCard $ghost>
-					<UndoTileName>Gym session</UndoTileName>
-					<UndoTileMeta>@ Home · Wed · 2:00 PM</UndoTileMeta>
-					<UndoPreviewBadge>PREVIEW</UndoPreviewBadge>
+					<UndoTileName>{tileName}</UndoTileName>
+					<UndoTileMeta>{previewMeta}</UndoTileMeta>
+					<UndoPreviewBadge>{previewBadge}</UndoPreviewBadge>
 				</UndoTileCard>
 				<UndoActionRow>
-					<UndoActionBtn $variant="undo">✕ Undo</UndoActionBtn>
-					<UndoActionBtn $variant="accept">✓ Accept</UndoActionBtn>
+					<UndoActionBtn $variant="undo">
+						✕ {t('home.featureHighlights.animations.undo.undoAction')}
+					</UndoActionBtn>
+					<UndoActionBtn $variant="accept">
+						✓ {t('home.featureHighlights.animations.undo.acceptAction')}
+					</UndoActionBtn>
 				</UndoActionRow>
 			</UndoSceneC>
 		</AnimArea>
@@ -615,6 +633,7 @@ const CheckMark = styled.div`
 `;
 
 function TileshareAnimation() {
+	const { t } = useTranslation();
 	return (
 		<AnimArea>
 			<TileshareScene>
@@ -624,8 +643,12 @@ function TileshareAnimation() {
 						<ArcLine d="M 10 17 Q 60 -10 110 17" />
 					</ArcSVG>
 					<SharedTile>
-						<TileName>Gym session</TileName>
-						<TileSub>From Alex · 1 hr</TileSub>
+						<TileName>
+							{t('home.featureHighlights.animations.tileshare.tileName')}
+						</TileName>
+						<TileSub>
+							{t('home.featureHighlights.animations.tileshare.tileSub')}
+						</TileSub>
 					</SharedTile>
 					<CheckMark>✅</CheckMark>
 				</MiddleSpace>
