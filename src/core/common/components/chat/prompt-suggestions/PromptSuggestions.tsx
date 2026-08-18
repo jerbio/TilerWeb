@@ -1,10 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
+import styled, { keyframes } from 'styled-components';
 
-interface PromptSuggestionsProps {
-	onPromptClick: (prompt: string) => void;
-	chatContext?: string;
+export interface PromptSuggestionsProps {
+	/** Keyed suggestions from the backend: { "sug_abc": "Plan my day", ... } */
+	suggestions: Record<string, string>;
+	isLoading: boolean;
+	onPromptClick: (key: string, text: string) => void;
 }
 
 const Container = styled.div`
@@ -50,82 +51,45 @@ const PromptPill = styled.button`
 	}
 `;
 
-// Utility function to get random prompts
-const getRandomPrompts = async (count: number = 5, allPrompts: string[]): Promise<string[]> => {
-	const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
-	return shuffled.slice(0, count);
-};
+const shimmer = keyframes`
+	0%   { opacity: 0.4; }
+	50%  { opacity: 0.8; }
+	100% { opacity: 0.4; }
+`;
 
-const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ onPromptClick }) => {
-	const { t } = useTranslation();
-	const [displayedPrompts, setDisplayedPrompts] = React.useState<string[]>([]);
+const SkeletonPill = styled.div.attrs({ role: 'presentation' })`
+	height: 34px;
+	border-radius: 16px;
+	background: ${({ theme }) => theme.colors.background.card2};
+	animation: ${shimmer} 1.4s ease-in-out infinite;
+`;
 
-	// Build the prompts array using translations
-	const allPrompts = [
-		// ⚙️ Core / Structural
-		t('home.expanded.chat.promptSuggestions.coreStructural.morningSetup'),
-		t('home.expanded.chat.promptSuggestions.coreStructural.dailyPlanning'),
-		t('home.expanded.chat.promptSuggestions.coreStructural.travelBuffer'),
-		t('home.expanded.chat.promptSuggestions.coreStructural.taskReview'),
-		t('home.expanded.chat.promptSuggestions.coreStructural.dayWrapUp'),
+/** Number of skeleton pills shown while suggestions are loading. */
+const SKELETON_COUNT = 5;
 
-		// 🧑‍💼 Professional
-		t('home.expanded.chat.promptSuggestions.professional.salesCall'),
-		t('home.expanded.chat.promptSuggestions.professional.clientPresentation'),
-		t('home.expanded.chat.promptSuggestions.professional.proposalDrafting'),
-		t('home.expanded.chat.promptSuggestions.professional.contractReview'),
-		t('home.expanded.chat.promptSuggestions.professional.budgetReview'),
-		t('home.expanded.chat.promptSuggestions.professional.teamSync'),
-		t('home.expanded.chat.promptSuggestions.professional.boardPrep'),
-		t('home.expanded.chat.promptSuggestions.professional.performanceCheckIn'),
+const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({
+	suggestions,
+	isLoading,
+	onPromptClick,
+}) => {
+	if (isLoading) {
+		return (
+			<Container>
+				{Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+					<SkeletonPill key={i} />
+				))}
+			</Container>
+		);
+	}
 
-		// 📊 Operations / Execution
-		t('home.expanded.chat.promptSuggestions.operations.dispatchSchedule'),
-		t('home.expanded.chat.promptSuggestions.operations.shiftChangeover'),
-		t('home.expanded.chat.promptSuggestions.operations.inventoryCheck'),
-		t('home.expanded.chat.promptSuggestions.operations.qualityAudit'),
-		t('home.expanded.chat.promptSuggestions.operations.fieldVisit'),
-		t('home.expanded.chat.promptSuggestions.operations.vendorCoordination'),
-		t('home.expanded.chat.promptSuggestions.operations.reportSubmission'),
-
-		// 📍 Location-Linked
-		t('home.expanded.chat.promptSuggestions.locationLinked.siteVisit'),
-		t('home.expanded.chat.promptSuggestions.locationLinked.officeBlock'),
-		t('home.expanded.chat.promptSuggestions.locationLinked.onSiteInspection'),
-		t('home.expanded.chat.promptSuggestions.locationLinked.customerAppointment'),
-		t('home.expanded.chat.promptSuggestions.locationLinked.pickupDelivery'),
-		t('home.expanded.chat.promptSuggestions.locationLinked.routePlanning'),
-
-		// 🚀 Strategic
-		t('home.expanded.chat.promptSuggestions.strategic.marketResearch'),
-		t('home.expanded.chat.promptSuggestions.strategic.competitiveScan'),
-		t('home.expanded.chat.promptSuggestions.strategic.weeklyForecast'),
-		t('home.expanded.chat.promptSuggestions.strategic.hiringInterview'),
-		t('home.expanded.chat.promptSuggestions.strategic.investorCall'),
-		t('home.expanded.chat.promptSuggestions.strategic.productRoadmapReview'),
-
-		// 🧠 Deep Work
-		t('home.expanded.chat.promptSuggestions.deepWork.writingSession'),
-		t('home.expanded.chat.promptSuggestions.deepWork.analysisBlock'),
-		t('home.expanded.chat.promptSuggestions.deepWork.designSprint'),
-		t('home.expanded.chat.promptSuggestions.deepWork.codingBlock'),
-		t('home.expanded.chat.promptSuggestions.deepWork.financialModeling'),
-		t('home.expanded.chat.promptSuggestions.deepWork.researchStudy'),
-	];
-
-	React.useEffect(() => {
-		const loadPrompts = async () => {
-			const prompts = await getRandomPrompts(5, allPrompts);
-			setDisplayedPrompts(prompts);
-		};
-		loadPrompts();
-	}, []);
+	const entries = Object.entries(suggestions);
+	if (entries.length === 0) return null;
 
 	return (
 		<Container>
-			{displayedPrompts.map((prompt, index) => (
-				<PromptPill key={index} onClick={() => onPromptClick(prompt)} title={prompt}>
-					{prompt}
+			{entries.map(([key, text]) => (
+				<PromptPill key={key} onClick={() => onPromptClick(key, text)} title={text}>
+					{text}
 				</PromptPill>
 			))}
 		</Container>

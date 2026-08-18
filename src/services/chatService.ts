@@ -5,6 +5,7 @@ import {
 	SimulationDto,
 	VibeSessionsResponse,
 	VibeSessionParams,
+	AutoSuggestions,
 } from '@/core/common/types/chat';
 import { ChatApi } from '@/api/chatApi';
 import { normalizeError } from '@/core/error';
@@ -182,6 +183,46 @@ class ChatService {
 		} catch (error) {
 			console.error('Error fetching simulation result', error);
 			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Returns stored suggestions plus whether they lag the session's latest exchange.
+	 * Failures resolve to an empty, non-stale set so an unavailable endpoint never
+	 * blocks the chat surface.
+	 */
+	async getAutoSuggestions(params?: {
+		sessionId?: string;
+		anonymousUserId?: string;
+		language?: string;
+	}): Promise<{ suggestions: AutoSuggestions; isStale: boolean }> {
+		try {
+			const response = await this.chatApi.getAutoSuggestions(params);
+			const payload = response?.Content?.autoSuggestions;
+			return {
+				suggestions: payload?.suggestions ?? {},
+				isStale: payload?.isStale ?? false,
+			};
+		} catch (error) {
+			console.error('Error fetching auto suggestions', error);
+			return { suggestions: {}, isStale: false };
+		}
+	}
+
+	async refreshAutoSuggestions(
+		sessionId: string,
+		anonymousUserId?: string
+	): Promise<{ suggestions: AutoSuggestions; isStale: boolean }> {
+		try {
+			const response = await this.chatApi.refreshAutoSuggestions(sessionId, anonymousUserId);
+			const payload = response?.Content?.autoSuggestions;
+			return {
+				suggestions: payload?.suggestions ?? {},
+				isStale: payload?.isStale ?? false,
+			};
+		} catch (error) {
+			console.error('Error refreshing auto suggestions', error);
+			return { suggestions: {}, isStale: false };
 		}
 	}
 

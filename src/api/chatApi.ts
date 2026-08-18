@@ -10,6 +10,7 @@ import {
 	VibeSessionParams,
 	SimulationDto,
 	SimulationScheduleResult,
+	AutoSuggestionsResponse,
 } from '@/core/common/types/chat';
 import { ApiResponse } from '@/core/common/types/api';
 import { AppApi } from './appApi';
@@ -148,6 +149,35 @@ export class ChatApi extends AppApi {
 		}
 		return this.apiRequest<ApiResponse<SimulationScheduleResult>>(
 			`api/Vibe/Preview?${parts.join('&')}`
+		);
+	}
+
+	/**
+	 * Read stored auto suggestions. Never triggers generation server-side.
+	 * Omit sessionId to get the capability-discovery defaults for a language.
+	 */
+	public getAutoSuggestions(params?: {
+		sessionId?: string;
+		anonymousUserId?: string;
+		language?: string;
+	}) {
+		const parts: string[] = [];
+		if (params?.sessionId) parts.push(`SessionId=${encodeURIComponent(params.sessionId)}`);
+		if (params?.anonymousUserId) {
+			parts.push(`AnonymousUserId=${encodeURIComponent(params.anonymousUserId)}`);
+		}
+		if (params?.language) parts.push(`Language=${encodeURIComponent(params.language)}`);
+		const qs = parts.length ? `?${parts.join('&')}` : '';
+		return this.apiRequest<AutoSuggestionsResponse>(`api/Vibe/Session/AutoSuggestions${qs}`);
+	}
+
+	public refreshAutoSuggestions(sessionId: string, anonymousUserId?: string) {
+		return this.apiRequest<AutoSuggestionsResponse>(
+			'api/Vibe/Session/AutoSuggestions/Refresh',
+			{
+				method: 'POST',
+				body: JSON.stringify({ sessionId, anonymousUserId }),
+			}
 		);
 	}
 
