@@ -14,6 +14,7 @@ import {
 } from '@/core/common/types/chat';
 import { ApiResponse } from '@/core/common/types/api';
 import { AppApi } from './appApi';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 /**
  * Optional query params for fetching the rendered simulation schedule.
@@ -109,7 +110,7 @@ export class ChatApi extends AppApi {
 				userLongitude,
 				userLatitude,
 				userLocationVerified,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+				TimeZone: deviceTimeZone().toString(),
 			}),
 		});
 	}

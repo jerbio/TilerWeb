@@ -11,6 +11,7 @@ import { ChatApi } from '@/api/chatApi';
 import { normalizeError } from '@/core/error';
 import { setStoredSessionId } from '@/core/storage/chatSession';
 import { parseServerError, ChatLimitError } from '@/core/common/types/errors';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 class ChatService {
 	private chatApi: ChatApi;
@@ -68,7 +69,7 @@ class ChatService {
 			UserLatitude: userLatitude,
 			UserLongitude: userLongitude,
 			UserLocationVerified: userLocationVerified,
-			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			TimeZone: deviceTimeZone().toString(),
 		};
 		try {
 			const response = await this.chatApi.sendMessage(requestBody);

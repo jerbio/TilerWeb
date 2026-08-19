@@ -7,6 +7,7 @@
 } from '../core/common/types/schedule';
 import { PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 export type CalendarEventQueryOptions = PaginationParams;
 
@@ -110,7 +111,7 @@ export class CalendarEventApi extends AppApi {
 			method: 'POST',
 			body: JSON.stringify({
 				ID: eventId,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+				TimeZone: deviceTimeZone().toString(),
 			}),
 		});
 	}
@@ -124,7 +125,7 @@ export class CalendarEventApi extends AppApi {
 			method: 'POST',
 			body: JSON.stringify({
 				EventID: eventId,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+				TimeZone: deviceTimeZone().toString(),
 			}),
 		});
 	}
@@ -138,7 +139,7 @@ export class CalendarEventApi extends AppApi {
 			method: 'DELETE',
 			body: JSON.stringify({
 				EventID: eventId,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+				TimeZone: deviceTimeZone().toString(),
 			}),
 		});
 	}
@@ -155,8 +156,7 @@ export class CalendarEventApi extends AppApi {
 			UserLongitude: params.UserLongitude ?? loc.longitude?.toString() ?? '',
 			UserLatitude: params.UserLatitude ?? loc.latitude?.toString() ?? '',
 			UserLocationVerified: params.UserLocationVerified ?? (loc.verified ? 'true' : 'false'),
-			TimeZone:
-				params.TimeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			TimeZone: params.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
 			method: 'POST',

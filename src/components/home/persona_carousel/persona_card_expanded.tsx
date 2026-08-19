@@ -21,6 +21,7 @@ import { createPortal } from 'react-dom';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 import { generateSectionDurations } from './progress_walk';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 type PersonaExpandedCardProps = {
 	persona: Persona;
@@ -217,10 +218,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 						id: newUserId,
 						username: personaUser.anonymousUser.username || '',
 						timeZoneDifference: personaUser.anonymousUser.timeZoneDifference || 0,
-						timeZone:
-							personaUser.anonymousUser.timeZone ||
-							Intl.DateTimeFormat().resolvedOptions().timeZone.toString() ||
-							'UTC',
+						timeZone: deviceTimeZone().toString() || 'UTC',
 						email: personaUser.anonymousUser.email,
 						endOfDay: personaUser.anonymousUser.endOfDay || '',
 						phoneNumber: personaUser.anonymousUser.phoneNumber,

@@ -15,6 +15,7 @@ import {
 } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
 import TimeUtil from '@/core/util/time';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 const defaultScheduleOptions: ScheduleLookupOptions = {
 	startRange: TimeUtil.now() - TimeUtil.inMilliseconds(3, 'd'),
@@ -151,7 +152,7 @@ class ScheduleService {
 				SubCalendarEventStart: updates.start,
 				SubCalendarEventEnd: updates.end,
 				CalendarEventEnd: updates.calendarEnd,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				TimeZone: deviceTimeZone(),
 				ThirdPartyEventID: updates.thirdPartyEventId,
 				ThirdPartyUserID: updates.thirdPartyUserId,
 				CalendarType: updates.calendarType,

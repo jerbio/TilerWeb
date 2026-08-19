@@ -1,3 +1,4 @@
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 import { SubCalendarEventLookupResponse } from '../core/common/types/schedule';
 import { AppApi } from './appApi';
 
@@ -40,8 +41,7 @@ export class SubCalendarEventApi extends AppApi {
 			Longitude: payload.Longitude ?? loc.longitude,
 			Latitude: payload.Latitude ?? loc.latitude,
 			LocationVerified: payload.LocationVerified ?? loc.verified,
-			TimeZone:
-				payload.TimeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			TimeZone: payload.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<SubCalendarEventLookupResponse>('api/SubCalendarEvent', {
 			method: 'POST',

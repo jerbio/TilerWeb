@@ -56,6 +56,7 @@ const mockSettings = (themeMode: string): UserSettings => ({
 	scheduleProfile: {
 		travelMedium: 'driving',
 		pinPreference: 'start',
+		intensityRate: 0.5,
 		sleepDuration: 0,
 		endTimeOfDay: '',
 	},

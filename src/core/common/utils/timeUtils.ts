@@ -243,3 +243,6 @@ export const formatDurationShort = (ms: number, locale?: string): string =>
  */
 export const formatDurationVerbose = (totalMinutes: number, locale?: string): string =>
 	formatDurationParts(totalMinutes, 'short', locale);
+
+export const deviceTimeZone = (): string =>
+	Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC';
