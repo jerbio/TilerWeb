@@ -165,7 +165,42 @@ class ScheduleService {
 	}
 
 	/**
-	 * Search calendar events by name.
+	 * Accept or decline a third-party (external calendar) SubCalendarEvent.
+	 * Reuses `POST /api/SubCalendarEvent` with the `RsvpStatusUpdate` field.
+	 * Sends the event's current start/end times alongside the RSVP so the backend
+	 * receives the full time range (matching the mobile client).
+	 * Returns the updated SubCalendarEvent payload (server is authoritative).
+	 */
+	async updateSubCalendarEventRsvp(
+		eventId: string,
+		rsvp: 'Accepted' | 'Declined',
+		options: {
+			start?: number;
+			end?: number;
+			thirdPartyEventId?: string;
+			thirdPartyUserId?: string;
+			calendarType?: string;
+		}
+	) {
+		try {
+			const response = await this.subCalendarEventApi.updateSubCalendarEvent({
+				Id: eventId,
+				RsvpStatusUpdate: rsvp,
+				SubCalendarEventStart: options.start,
+				SubCalendarEventEnd: options.end,
+				ThirdPartyEventID: options.thirdPartyEventId,
+				ThirdPartyUserID: options.thirdPartyUserId,
+				CalendarType: options.calendarType,
+				TimeZone: deviceTimeZone(),
+			});
+			return response.Content;
+		} catch (error) {
+			console.error('Error updating SubCalendarEvent RSVP', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
 	 * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
 	 * Returns an array of CalendarEvent matching the search query.
 	 */

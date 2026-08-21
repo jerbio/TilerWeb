@@ -204,7 +204,9 @@
 			"actions": {
 				"complete": "Complete",
 				"now": "Now",
-				"defer": "Defer"
+				"defer": "Defer",
+				"accept": "Accept",
+				"decline": "Decline"
 			},
 			"validation": {
 				"endAfterStart": "End time must be after start time"
@@ -1310,6 +1312,10 @@
 			"updateSuccess": "Changes saved!",
 			"deleting": "Deleting event...",
 			"deleteSuccess": "Event deleted!",
+			"accepting": "Accepting invite...",
+			"acceptSuccess": "Invite accepted!",
+			"declining": "Declining invite...",
+			"declineSuccess": "Invite declined!",
 			"actionFailed": "Action failed. Please try again."
 		},
 		"edit": {

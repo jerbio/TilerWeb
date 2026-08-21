@@ -17,6 +17,12 @@ export type UpdateSubCalendarEventPayload = {
 	TimeZone: string;
 	ThirdPartyEventID?: string;
 	ThirdPartyUserID?: string;
+	/**
+	 * RSVP response update for third-party events. Sent only when the user
+	 * accepts or declines an invite. (Widen to include `'Tentative'` if that
+	 * action is exposed later.)
+	 */
+	RsvpStatusUpdate?: 'Accepted' | 'Declined';
 };
 
 export class SubCalendarEventApi extends AppApi {
