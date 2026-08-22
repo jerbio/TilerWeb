@@ -9,11 +9,15 @@ import Button from '@/core/common/components/button';
 import Input from '@/core/common/components/input';
 import Logo from '@/core/common/components/icons/logo';
 import { authService, userService } from '@/services';
+import { hashEmail, linkConversionIdentity, trackConversion } from '@/core/analytics';
+import analytics from '@/core/util/analytics';
 import useAppStore from '@/global_state';
 
 interface VerificationCodePopupProps {
 	isOpen: boolean;
 	email: string;
+	/** Only a signup flow is a conversion; a returning sign-in is not. */
+	isSignUp?: boolean;
 	onClose: () => void;
 	onResendCode?: () => Promise<void>;
 }
@@ -21,6 +25,7 @@ interface VerificationCodePopupProps {
 const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
 	isOpen,
 	email,
+	isSignUp = true,
 	onClose,
 	onResendCode,
 }) => {
@@ -45,6 +50,17 @@ const VerificationCodePopup: React.FC<VerificationCodePopupProps> = ({
 			// Fetch user info and update global auth state
 			const user = await userService.getCurrentUser();
 			setAuthenticated(user);
+
+			// Runs for sign-in too: this is the only moment both identities are known.
+			void linkConversionIdentity(user.id);
+			analytics.identifyUser(user.id);
+
+			if (isSignUp) {
+				trackConversion('signup_verified', {
+					userId: user.id,
+					emailSha256: await hashEmail(email),
+				});
+			}
 
 			// Success: Close popup, show success message, and redirect
 			toast.success(t('auth.verification.success'));

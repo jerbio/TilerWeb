@@ -49,4 +49,13 @@ export default [
 			'@typescript-eslint/no-require-imports': 'off',
 		},
 	},
+
+	// ES-module scripts (prerender, conversion verifier) also run under Node.
+	{
+		files: ['scripts/**/*.mjs'],
+		languageOptions: {
+			sourceType: 'module',
+			globals: globals.node,
+		},
+	},
 ];

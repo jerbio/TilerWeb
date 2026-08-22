@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate, useSearchParams } from 'react-router';
+import {
+	useNavigate,
+	// , useSearchParams
+} from 'react-router';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Logo from '@/core/common/components/icons/logo';
@@ -9,19 +12,20 @@ import Input from '@/core/common/components/input';
 import palette from '@/core/theme/palette';
 import { Env } from '@/config/config_getter';
 import { authService } from '@/services';
+import { hashEmail, trackConversion } from '@/core/analytics';
 import VerificationCodePopup from '@/components/auth/VerificationCodePopup';
 import SEO from '@/core/common/components/SEO';
 
 const UserAuthentication: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
+	// const [searchParams] = useSearchParams();
 
 	// Determine mode from URL path or query parameter
-	const pathname = window.location.pathname;
-	const queryMode = searchParams.get('mode');
-	const mode = queryMode || (pathname.includes('signin') ? 'signin' : 'signup');
-	const isSignUp = mode === 'signup';
+	// const pathname = window.location.pathname;
+	// const queryMode = searchParams.get('mode');
+	// const mode = queryMode || (pathname.includes('signin') ? 'signin' : 'signup');
+	const isSignUp = true;
 
 	const baseUrl = Env.get('BASE_URL');
 	const [email, setEmail] = useState('');
@@ -42,6 +46,14 @@ const UserAuthentication: React.FC = () => {
 		try {
 			await authService.signUp(email);
 			toast.success(t('auth.signup.verificationSent'));
+
+			// Attribution is attached here rather than at verification: the code may be
+			// opened on a different device, where this device's first touch is gone.
+			if (isSignUp) {
+				trackConversion('signup_started', {
+					emailSha256: await hashEmail(email),
+				});
+			}
 
 			// Show verification popup
 			setShowVerificationPopup(true);
@@ -232,6 +244,7 @@ const UserAuthentication: React.FC = () => {
 			<VerificationCodePopup
 				isOpen={showVerificationPopup}
 				email={email}
+				isSignUp={isSignUp}
 				onClose={() => setShowVerificationPopup(false)}
 				onResendCode={handleResendCode}
 			/>

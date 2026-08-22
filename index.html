@@ -2,19 +2,33 @@
 <html class="dark" lang="en">
 	<head>
 		<!-- Google tag (gtag.js) -->
-		<script
-			async
-			src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA_MEASUREMENT_ID%"
-		></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
 			function gtag() {
 				dataLayer.push(arguments);
 			}
+
+			// Consent Mode v2. Must be declared before the gtag library loads.
+			// Defaults are granted because the conversion tracker ships in bypass mode;
+			// consent-manager flips these via gtag('consent','update') once
+			// VITE_CONSENT_MODE=enforce. See CONVERSION_TRACKING_DESIGN.md 4.5.
+			gtag('consent', 'default', {
+				ad_storage: 'granted',
+				ad_user_data: 'granted',
+				ad_personalization: 'granted',
+				analytics_storage: 'granted',
+			});
+
 			gtag('js', new Date());
 
-			gtag('config', '%VITE_GA_MEASUREMENT_ID%');
+			// Route changes are tracked explicitly by the SPA; leaving the automatic
+			// page view on double counts every navigation.
+			gtag('config', '%VITE_GA_MEASUREMENT_ID%', { send_page_view: false });
 		</script>
+		<script
+			async
+			src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA_MEASUREMENT_ID%"
+		></script>
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/png" href="TilerLogo.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
