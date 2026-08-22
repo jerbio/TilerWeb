@@ -11,6 +11,8 @@ import { Trans, useTranslation } from 'react-i18next';
 import LoadingModal from '../../modals/loading-modal';
 import SuccessModal from '../../modals/success-modal';
 import { scheduleService, userService } from '@/services';
+import useAppStore from '@/global_state';
+import { trackActivated } from '@/core/analytics';
 import {
 	DaySchedule,
 	ScheduleBooleanString,
@@ -268,6 +270,13 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 
 			const newEvent = await scheduleService.createEvent(event);
 			await refetchEvents();
+
+			const store = useAppStore.getState();
+			trackActivated({
+				userId: store.authenticatedUser?.id,
+				isAuthenticated: store.isAuthenticated,
+			});
+
 			closeModal();
 			ui.actions.navigateToTileComplete();
 			ui.actions.showSuccess(newEvent);

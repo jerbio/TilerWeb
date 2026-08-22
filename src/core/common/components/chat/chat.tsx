@@ -7,7 +7,7 @@ import Button from '@/core/common/components/button';
 import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
-import useAppStore, { ChatContextType } from '@/global_state';
+import useAppStore, { ChatContextType, SessionType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 // VibeSession imported above with SessionHistory
 import { Status } from '@/core/constants/enums';
@@ -22,6 +22,7 @@ import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
 import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
 import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
+import { trackDemoEngaged } from '@/core/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import ActionPillStrip from '@/core/common/components/chat/ActionPillStrip';
@@ -1218,6 +1219,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			messageLength: textToSend.length,
 			hasContext: chatContext.length > 0,
 			personaId: selectedPersonaId,
+		});
+
+		trackDemoEngaged({
+			personaId: selectedPersonaId,
+			messageLength: textToSend.length,
+			isAnonymous: useAppStore.getState().activeSessionType === SessionType.ANONYMOUS,
 		});
 
 		// If the user sends a new message while in review, exit review

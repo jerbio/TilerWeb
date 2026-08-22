@@ -14,6 +14,7 @@ import { personaService } from '@/services';
 import useAppStore from '@/global_state';
 import { usePersonaSessionManager } from '@/core/common/hooks/usePersonaSessionManager';
 import analytics from '@/core/util/analytics';
+import { trackDemoStarted } from '@/core/analytics';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/core/common/components/loader';
 import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
@@ -267,6 +268,12 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 				personaId: persona.id,
 				personaName: persona.name,
 				hasExistingUser: !!personaUserId,
+			});
+
+			trackDemoStarted({
+				personaId: persona.id,
+				personaName: persona.name,
+				isAnonymous: !useAppStore.getState().isAuthenticated,
 			});
 
 			if (!personaUserId) {

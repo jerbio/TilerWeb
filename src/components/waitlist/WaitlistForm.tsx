@@ -11,6 +11,7 @@ import MultiInput from '@/core/common/components/multi_input';
 import { useTranslation } from 'react-i18next';
 import WaitlistSuccessModal from './waitlist_success_modal';
 import analytics from '@/core/util/analytics';
+import { hashEmail, trackConversion } from '@/core/analytics';
 
 const WaitlistForm: React.FC = () => {
 	const { t } = useTranslation();
@@ -110,6 +111,10 @@ const WaitlistForm: React.FC = () => {
 				profession: formValues.profession,
 				integrations: formValues.integrations.map((i) => i.value),
 				useCases: formValues.useCase,
+			});
+			trackConversion('waitlist_joined', {
+				emailSha256: await hashEmail(formValues.email),
+				dedupeKey: formValues.email.trim().toLowerCase(),
 			});
 			toast('Signed up successfully!', {
 				duration: 2000,

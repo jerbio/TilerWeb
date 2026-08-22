@@ -22,7 +22,7 @@ export default defineConfig({
 		// --localstorage-file) that shadows jsdom's implementation. Disable
 		// the experimental Web Storage API so jsdom owns the global.
 		execArgv: ['--no-experimental-webstorage'],
-		include: ['src/**/*.{test,spec}.{ts,tsx}'],
+		include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.{test,spec}.mjs'],
 		setupFiles: ['./src/test/setup.ts'],
 		env: {
 			VITE_BASE_URL: 'http://localhost',

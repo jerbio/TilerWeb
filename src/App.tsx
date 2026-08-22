@@ -20,6 +20,7 @@ import useDevTools from './core/common/hooks/useDevTools';
 import { AuthProvider } from './core/auth/AuthProvider';
 import { ProtectedRoute } from './core/auth/ProtectedRoute';
 import analytics from './core/util/analytics';
+import ConversionTrackerMount from './core/analytics/useConversionTracking';
 import { PublicRoute } from './components/auth/PublicRoute';
 import SettingsLayout from './pages/settings/SettingsLayout';
 import AccountSettings from './pages/settings/AccountSettings';
@@ -92,6 +93,7 @@ const App: React.FC = () => {
 						<BrowserRouter>
 							<ThemeInitializer />
 							<AnalyticsTracker />
+							<ConversionTrackerMount />
 							<ScrollToTop />
 							<BrowserRoutes>
 								<Route path={Routes.Home} element={<Layout />}>
