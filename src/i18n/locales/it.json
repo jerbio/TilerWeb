@@ -1013,7 +1013,8 @@
 			"slides": {
 				"first": {
 					"alt": "Un programma Tiler che organizza un'intera giornata di attività negli spazi di tempo disponibili.",
-					"caption": "Guarda la tua intera giornata prendere forma."
+					"caption": "Guarda la tua intera giornata prendere forma.",
+					"description": "Tiler trova il momento libero migliore per ogni attività e crea un piano facile da seguire."
 				},
 				"second": {
 					"alt": "Un programma Tiler che si adatta dopo lo spostamento di una revisione con gli investitori a un altro giorno.",

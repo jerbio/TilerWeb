@@ -1013,7 +1013,8 @@
 			"slides": {
 				"first": {
 					"alt": "Ein Tiler-Zeitplan, der die Aufgaben eines ganzen Tages in freie Zeitfenster einordnet.",
-					"caption": "Sehen Sie, wie Ihr ganzer Tag Gestalt annimmt."
+					"caption": "Sehen Sie, wie Ihr ganzer Tag Gestalt annimmt.",
+					"description": "Tiler findet für jede Aufgabe die beste freie Zeit und erstellt einen Plan, dem Sie leicht folgen können."
 				},
 				"second": {
 					"alt": "Ein Tiler-Zeitplan, der sich anpasst, nachdem eine Investorenbesprechung auf einen anderen Tag verschoben wurde.",

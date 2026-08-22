@@ -1015,7 +1015,8 @@
 			"slides": {
 				"first": {
 					"alt": "A Tiler schedule arranging a full day of tasks into open time.",
-					"caption": "See your entire day take shape."
+					"caption": "See your entire day take shape.",
+					"description": "Tiler finds the best open time for every task, then builds a plan you can follow."
 				},
 				"second": {
 					"alt": "A Tiler schedule adapting after an investor review is moved to a different day.",

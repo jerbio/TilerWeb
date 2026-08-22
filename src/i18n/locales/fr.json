@@ -1013,7 +1013,8 @@
 			"slides": {
 				"first": {
 					"alt": "Un planning Tiler qui organise une journée complète de tâches dans les créneaux disponibles.",
-					"caption": "Voyez votre journée entière prendre forme."
+					"caption": "Voyez votre journée entière prendre forme.",
+					"description": "Tiler trouve le meilleur créneau pour chaque tâche, puis crée un planning facile à suivre."
 				},
 				"second": {
 					"alt": "Un planning Tiler qui s'adapte après le déplacement d'une revue d'investisseur à un autre jour.",

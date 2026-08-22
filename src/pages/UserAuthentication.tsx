@@ -1,12 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import {
-	useNavigate,
-	// , useSearchParams
-} from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Logo from '@/core/common/components/icons/logo';
 import Button from '@/core/common/components/button';
 import Input from '@/core/common/components/input';
@@ -40,13 +36,13 @@ const creatives = [
 const UserAuthentication: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	// const [searchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 
 	// Determine mode from URL path or query parameter
-	// const pathname = window.location.pathname;
-	// const queryMode = searchParams.get('mode');
-	// const mode = queryMode || (pathname.includes('signin') ? 'signin' : 'signup');
-	const isSignUp = true;
+	const pathname = window.location.pathname;
+	const queryMode = searchParams.get('mode');
+	const mode = queryMode || (pathname.includes('signin') ? 'signin' : 'signup');
+	const isSignUp = mode === 'signup';
 
 	const baseUrl = Env.get('BASE_URL');
 	const [email, setEmail] = useState('');
@@ -138,6 +134,16 @@ const UserAuthentication: React.FC = () => {
 		setSelectedCreative(1);
 	};
 
+	const handleVideoEnded = () => {
+		if (!window.matchMedia('(min-width: 1040px)').matches) {
+			setIsCreativeCollapsed(true);
+			return;
+		}
+
+		if (videoRef.current) videoRef.current.currentTime = 0;
+		setSelectedCreative(0);
+	};
+
 	const handleTouchEnd = (event: React.TouchEvent) => {
 		if (touchStartX.current === null) return;
 
@@ -199,11 +205,10 @@ const UserAuthentication: React.FC = () => {
 								height={creatives[1].height}
 								aria-label={t('auth.creative.slides.second.alt')}
 								onCanPlay={handleVideoCanPlay}
-								onEnded={() => setIsCreativeCollapsed(true)}
+								onEnded={handleVideoEnded}
 								onError={() => {
 									if (selectedCreative === 1) setIsCreativeCollapsed(true);
 								}}
-								controls
 								muted
 								playsInline
 								preload="auto"
@@ -211,45 +216,32 @@ const UserAuthentication: React.FC = () => {
 						</CreativeTrack>
 					</CreativeFrame>
 
-					<CreativeNavigation>
-						<CarouselButton
-							type="button"
-							onClick={() => selectCreative(selectedCreative - 1)}
-							aria-label={t('auth.creative.previous')}
-						>
-							<ChevronLeft size={20} aria-hidden="true" />
-						</CarouselButton>
-						<SlideStatus aria-live="polite">
-							<CreativeCaption>
-								{t(
-									`auth.creative.slides.${creatives[selectedCreative].translationKey}.caption`
-								)}
-							</CreativeCaption>
-							<Pagination aria-label={t('auth.creative.paginationLabel')}>
-								{creatives.map((creative, index) => (
-									<PaginationDot
-										key={creative.src}
-										type="button"
-										$active={selectedCreative === index}
-										onClick={() => selectCreative(index)}
-										aria-label={t('auth.creative.showSlide', {
-											number: index + 1,
-										})}
-										aria-current={
-											selectedCreative === index ? 'true' : undefined
-										}
-									/>
-								))}
-							</Pagination>
-						</SlideStatus>
-						<CarouselButton
-							type="button"
-							onClick={() => selectCreative(selectedCreative + 1)}
-							aria-label={t('auth.creative.next')}
-						>
-							<ChevronRight size={20} aria-hidden="true" />
-						</CarouselButton>
-					</CreativeNavigation>
+					<SlideStatus aria-live="polite">
+						<CreativeCaption>
+							{t(
+								`auth.creative.slides.${creatives[selectedCreative].translationKey}.caption`
+							)}
+						</CreativeCaption>
+						{selectedCreative === 0 && (
+							<CreativeDescription>
+								{t('auth.creative.slides.first.description')}
+							</CreativeDescription>
+						)}
+						<Pagination aria-label={t('auth.creative.paginationLabel')}>
+							{creatives.map((creative, index) => (
+								<PaginationDot
+									key={creative.src}
+									type="button"
+									$active={selectedCreative === index}
+									onClick={() => selectCreative(index)}
+									aria-label={t('auth.creative.showSlide', {
+										number: index + 1,
+									})}
+									aria-current={selectedCreative === index ? 'true' : undefined}
+								/>
+							))}
+						</Pagination>
+					</SlideStatus>
 				</CreativeRegion>
 
 				<Content>
@@ -407,7 +399,7 @@ const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 2rem clamp(1.5rem, 4vw, 4rem) 3rem;
+	padding: 1.5rem clamp(1.5rem, 4vw, 4rem) 3rem;
 	overflow-x: hidden;
 
 	@media (max-width: 1039px) {
@@ -428,8 +420,10 @@ const BackButton = styled.button`
 	color: ${palette.colors.gray[400]};
 	font-size: ${palette.typography.fontSize.base};
 	cursor: pointer;
-	align-self: flex-start;
-	margin-bottom: 1.5rem;
+	align-self: center;
+	width: 100%;
+	max-width: 1600px;
+	margin-bottom: 1rem;
 	transition: color 0.2s;
 
 	&:hover {
@@ -440,11 +434,17 @@ const BackButton = styled.button`
 const PageLayout = styled.main<{ $creativeCollapsed: boolean }>`
 	display: grid;
 	grid-template-columns: minmax(440px, 54fr) minmax(480px, 46fr);
-	align-items: start;
+	align-items: center;
 	gap: clamp(2rem, 3.5vw, 3rem);
-	max-width: 1280px;
+	max-width: 1600px;
 	width: 100%;
 	margin: auto 0;
+
+	@media (min-width: 1600px) {
+		grid-template-columns: minmax(680px, 56fr) minmax(560px, 44fr);
+		gap: clamp(3rem, 4vw, 4.5rem);
+		margin: clamp(8rem, 18vh, 15rem) 0 auto;
+	}
 
 	@media (max-width: 1279px) {
 		grid-template-columns: minmax(440px, 1fr) minmax(480px, 1fr);
@@ -530,38 +530,9 @@ const CreativeVideo = styled.video`
 	object-fit: contain;
 `;
 
-const CreativeNavigation = styled.div`
-	display: grid;
-	grid-template-columns: 44px minmax(0, 1fr) 44px;
-	align-items: center;
-	gap: 0.75rem;
-	width: 100%;
-`;
-
-const CarouselButton = styled.button`
-	width: 44px;
-	height: 44px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border: 1px solid ${palette.colors.gray[700]};
-	border-radius: 50%;
-	background: ${palette.colors.gray[900]};
-	color: ${palette.colors.white};
-	cursor: pointer;
-
-	&:hover {
-		background: ${palette.colors.gray[800]};
-	}
-
-	&:focus-visible {
-		outline: 2px solid ${palette.colors.brand[400]};
-		outline-offset: 2px;
-	}
-`;
-
 const SlideStatus = styled.div`
 	min-width: 0;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -581,6 +552,25 @@ const CreativeCaption = styled.p`
 	max-width: 100%;
 
 	@media (max-width: 520px), (max-height: 700px) {
+		display: none;
+	}
+`;
+
+const CreativeDescription = styled.p`
+	color: ${palette.colors.gray[400]};
+	font-family: ${palette.typography.fontFamily.urban};
+	font-size: ${palette.typography.fontSize.base};
+	line-height: 1.5;
+	text-align: center;
+	margin: -0.125rem 0 0;
+	max-width: 560px;
+
+	@media (max-width: 600px) {
+		font-size: ${palette.typography.fontSize.sm};
+		max-width: 36ch;
+	}
+
+	@media (max-height: 700px) {
 		display: none;
 	}
 `;
@@ -612,7 +602,7 @@ const Content = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	max-width: 480px;
+	max-width: 560px;
 	width: 100%;
 	gap: 1.5rem;
 	justify-self: center;
@@ -634,11 +624,16 @@ const Title = styled.h1`
 	text-align: center;
 	margin: 0;
 	margin-top: 1rem;
+
+	@media (min-width: 1600px) {
+		font-size: ${palette.typography.fontSize.displayBase};
+	}
 `;
 
 const Subtitle = styled.p`
 	color: ${palette.colors.gray[400]};
-	font-size: ${palette.typography.fontSize.base};
+	font-size: ${palette.typography.fontSize.lg};
+	line-height: 1.5;
 	text-align: center;
 	margin: 0;
 	max-width: 400px;

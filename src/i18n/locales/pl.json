@@ -1013,7 +1013,8 @@
 			"slides": {
 				"first": {
 					"alt": "Harmonogram Tiler układający zadania z całego dnia w wolnych przedziałach czasu.",
-					"caption": "Zobacz, jak cały Twój dzień nabiera kształtu."
+					"caption": "Zobacz, jak cały Twój dzień nabiera kształtu.",
+					"description": "Tiler znajduje najlepszy wolny czas na każde zadanie i tworzy plan, który łatwo zrealizujesz."
 				},
 				"second": {
 					"alt": "Harmonogram Tiler dostosowujący się po przeniesieniu przeglądu inwestorskiego na inny dzień.",

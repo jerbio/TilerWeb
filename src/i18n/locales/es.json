@@ -1013,7 +1013,8 @@
 			"slides": {
 				"first": {
 					"alt": "Un horario de Tiler que organiza un día completo de tareas en el tiempo disponible.",
-					"caption": "Mira cómo toma forma todo tu día."
+					"caption": "Mira cómo toma forma todo tu día.",
+					"description": "Tiler encuentra el mejor momento libre para cada tarea y crea un plan que puedes seguir."
 				},
 				"second": {
 					"alt": "Un horario de Tiler que se adapta después de trasladar una revisión con inversores a otro día.",
