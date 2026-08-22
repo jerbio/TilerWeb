@@ -999,6 +999,29 @@
 			"footer": "Vous n'avez pas de compte ?",
 			"footerLink": "S'inscrire plutôt"
 		},
+		"seo": {
+			"signupTitle": "Inscription - Calendrier intelligent Tiler",
+			"signinTitle": "Connexion - Calendrier intelligent Tiler",
+			"description": "Connectez-vous ou créez votre compte Tiler pour accéder à votre calendrier intelligent et à la planification de vos tâches."
+		},
+		"creative": {
+			"regionLabel": "Exemples de plannings Tiler",
+			"previous": "Afficher le planning précédent",
+			"next": "Afficher le planning suivant",
+			"paginationLabel": "Choisir un exemple de planning",
+			"showSlide": "Afficher le planning {{number}}",
+			"slides": {
+				"first": {
+					"alt": "Un planning Tiler qui organise une journée complète de tâches dans les créneaux disponibles.",
+					"caption": "Voyez votre journée entière prendre forme."
+				},
+				"second": {
+					"alt": "Un planning Tiler qui s'adapte après le déplacement d'une revue d'investisseur à un autre jour.",
+					"caption": "Voyez votre planning s'adapter lorsque vos plans changent."
+				}
+			}
+		},
+		"or": "OU",
 		"verification": {
 			"title": "Vérification requise",
 			"header": "Entrez votre code de vérification",

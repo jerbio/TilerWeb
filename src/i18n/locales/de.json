@@ -999,6 +999,29 @@
 			"footer": "Sie haben noch kein Konto?",
 			"footerLink": "Stattdessen registrieren"
 		},
+		"seo": {
+			"signupTitle": "Registrieren - Tiler Smart Calendar",
+			"signinTitle": "Anmelden - Tiler Smart Calendar",
+			"description": "Melden Sie sich an oder erstellen Sie Ihr Tiler-Konto, um auf Ihren intelligenten Kalender und Ihre Aufgabenplanung zuzugreifen."
+		},
+		"creative": {
+			"regionLabel": "Beispiele für Tiler-Zeitpläne",
+			"previous": "Vorherigen Zeitplan anzeigen",
+			"next": "Nächsten Zeitplan anzeigen",
+			"paginationLabel": "Beispielzeitplan auswählen",
+			"showSlide": "Zeitplan {{number}} anzeigen",
+			"slides": {
+				"first": {
+					"alt": "Ein Tiler-Zeitplan, der die Aufgaben eines ganzen Tages in freie Zeitfenster einordnet.",
+					"caption": "Sehen Sie, wie Ihr ganzer Tag Gestalt annimmt."
+				},
+				"second": {
+					"alt": "Ein Tiler-Zeitplan, der sich anpasst, nachdem eine Investorenbesprechung auf einen anderen Tag verschoben wurde.",
+					"caption": "Sehen Sie, wie sich Ihr Zeitplan an geänderte Pläne anpasst."
+				}
+			}
+		},
+		"or": "ODER",
 		"verification": {
 			"title": "Verifizierung erforderlich",
 			"header": "Geben Sie Ihren Bestätigungscode ein",

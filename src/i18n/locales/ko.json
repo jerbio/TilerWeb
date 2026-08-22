@@ -999,6 +999,29 @@
 			"footer": "계정이 없으신가요?",
 			"footerLink": "가입하기"
 		},
+		"seo": {
+			"signupTitle": "가입 - Tiler 스마트 캘린더",
+			"signinTitle": "로그인 - Tiler 스마트 캘린더",
+			"description": "Tiler 계정에 로그인하거나 새로 만들어 스마트 캘린더와 작업 일정 관리를 이용하세요."
+		},
+		"creative": {
+			"regionLabel": "Tiler 일정 예시",
+			"previous": "이전 일정 보기",
+			"next": "다음 일정 보기",
+			"paginationLabel": "일정 예시 선택",
+			"showSlide": "일정 {{number}} 보기",
+			"slides": {
+				"first": {
+					"alt": "하루의 모든 작업을 빈 시간에 배치한 Tiler 일정입니다.",
+					"caption": "하루 전체가 완성되는 모습을 확인하세요."
+				},
+				"second": {
+					"alt": "투자자 검토 일정이 다른 날로 이동한 후 자동으로 조정되는 Tiler 일정입니다.",
+					"caption": "계획이 바뀔 때 일정이 적응하는 모습을 확인하세요."
+				}
+			}
+		},
+		"or": "또는",
 		"verification": {
 			"title": "인증 필요",
 			"header": "인증 코드를 입력하세요",

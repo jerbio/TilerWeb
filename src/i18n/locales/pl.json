@@ -999,6 +999,29 @@
 			"footer": "Nie masz konta?",
 			"footerLink": "Zarejestruj się"
 		},
+		"seo": {
+			"signupTitle": "Rejestracja - Inteligentny kalendarz Tiler",
+			"signinTitle": "Logowanie - Inteligentny kalendarz Tiler",
+			"description": "Zaloguj się lub utwórz konto Tiler, aby korzystać z inteligentnego kalendarza i planowania zadań."
+		},
+		"creative": {
+			"regionLabel": "Przykładowe harmonogramy Tiler",
+			"previous": "Pokaż poprzedni harmonogram",
+			"next": "Pokaż następny harmonogram",
+			"paginationLabel": "Wybierz przykładowy harmonogram",
+			"showSlide": "Pokaż harmonogram {{number}}",
+			"slides": {
+				"first": {
+					"alt": "Harmonogram Tiler układający zadania z całego dnia w wolnych przedziałach czasu.",
+					"caption": "Zobacz, jak cały Twój dzień nabiera kształtu."
+				},
+				"second": {
+					"alt": "Harmonogram Tiler dostosowujący się po przeniesieniu przeglądu inwestorskiego na inny dzień.",
+					"caption": "Zobacz, jak harmonogram dostosowuje się do zmian planów."
+				}
+			}
+		},
+		"or": "LUB",
 		"verification": {
 			"title": "Wymagana weryfikacja",
 			"header": "Wprowadź swój kod weryfikacyjny",

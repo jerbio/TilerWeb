@@ -999,6 +999,29 @@
 			"footer": "アカウントをお持ちでないですか？",
 			"footerLink": "登録する"
 		},
+		"seo": {
+			"signupTitle": "登録 - Tilerスマートカレンダー",
+			"signinTitle": "ログイン - Tilerスマートカレンダー",
+			"description": "Tilerアカウントにログインまたは新規登録して、スマートカレンダーとタスク管理をご利用ください。"
+		},
+		"creative": {
+			"regionLabel": "Tilerスケジュールの例",
+			"previous": "前のスケジュールを表示",
+			"next": "次のスケジュールを表示",
+			"paginationLabel": "スケジュール例を選択",
+			"showSlide": "スケジュール{{number}}を表示",
+			"slides": {
+				"first": {
+					"alt": "一日分のタスクを空き時間に配置したTilerスケジュール。",
+					"caption": "一日の予定が形になる様子をご覧ください。"
+				},
+				"second": {
+					"alt": "投資家レビューを別の日に移動した後、自動的に調整されるTilerスケジュール。",
+					"caption": "予定の変更に合わせてスケジュールが適応する様子をご覧ください。"
+				}
+			}
+		},
+		"or": "または",
 		"verification": {
 			"title": "確認が必要です",
 			"header": "確認コードを入力してください",
