@@ -1001,6 +1001,29 @@
 			"footer": "Don't have an account?",
 			"footerLink": "Sign up instead"
 		},
+		"seo": {
+			"signupTitle": "Sign Up - Tiler Smart Calendar",
+			"signinTitle": "Sign In - Tiler Smart Calendar",
+			"description": "Sign in or create your Tiler account to access your intelligent calendar and task scheduling."
+		},
+		"creative": {
+			"regionLabel": "Tiler schedule examples",
+			"previous": "Show previous schedule",
+			"next": "Show next schedule",
+			"paginationLabel": "Choose a schedule example",
+			"showSlide": "Show schedule {{number}}",
+			"slides": {
+				"first": {
+					"alt": "A Tiler schedule arranging a full day of tasks into open time.",
+					"caption": "See your entire day take shape."
+				},
+				"second": {
+					"alt": "A Tiler schedule adapting after an investor review is moved to a different day.",
+					"caption": "See your schedule adapt as plans change."
+				}
+			}
+		},
+		"or": "OR",
 		"verification": {
 			"title": "Verification Required",
 			"header": "Enter your verification code",

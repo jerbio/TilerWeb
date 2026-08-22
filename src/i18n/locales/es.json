@@ -999,6 +999,29 @@
 			"footer": "¿No tienes una cuenta?",
 			"footerLink": "Regístrate"
 		},
+		"seo": {
+			"signupTitle": "Registro - Calendario inteligente Tiler",
+			"signinTitle": "Inicio de sesión - Calendario inteligente Tiler",
+			"description": "Inicia sesión o crea tu cuenta de Tiler para acceder a tu calendario inteligente y a la programación de tareas."
+		},
+		"creative": {
+			"regionLabel": "Ejemplos de horarios de Tiler",
+			"previous": "Mostrar el horario anterior",
+			"next": "Mostrar el horario siguiente",
+			"paginationLabel": "Elegir un ejemplo de horario",
+			"showSlide": "Mostrar horario {{number}}",
+			"slides": {
+				"first": {
+					"alt": "Un horario de Tiler que organiza un día completo de tareas en el tiempo disponible.",
+					"caption": "Mira cómo toma forma todo tu día."
+				},
+				"second": {
+					"alt": "Un horario de Tiler que se adapta después de trasladar una revisión con inversores a otro día.",
+					"caption": "Mira cómo se adapta tu horario cuando cambian los planes."
+				}
+			}
+		},
+		"or": "O",
 		"verification": {
 			"title": "Se requiere verificación",
 			"header": "Introduce tu código de verificación",

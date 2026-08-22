@@ -999,6 +999,29 @@
 			"footer": "还没有账户？",
 			"footerLink": "改为注册"
 		},
+		"seo": {
+			"signupTitle": "注册 - Tiler 智能日历",
+			"signinTitle": "登录 - Tiler 智能日历",
+			"description": "登录或创建 Tiler 账户，即可使用智能日历和任务规划功能。"
+		},
+		"creative": {
+			"regionLabel": "Tiler 日程示例",
+			"previous": "显示上一个日程",
+			"next": "显示下一个日程",
+			"paginationLabel": "选择日程示例",
+			"showSlide": "显示日程 {{number}}",
+			"slides": {
+				"first": {
+					"alt": "Tiler 日程将全天任务安排到可用时间中。",
+					"caption": "让您的一整天清晰成形。"
+				},
+				"second": {
+					"alt": "投资者审查移至另一天后，Tiler 日程随之自动调整。",
+					"caption": "查看您的日程如何随计划变化而调整。"
+				}
+			}
+		},
+		"or": "或",
 		"verification": {
 			"title": "需要验证",
 			"header": "输入您的验证码",

@@ -999,6 +999,29 @@
 			"footer": "Non hai un account?",
 			"footerLink": "Registrati invece"
 		},
+		"seo": {
+			"signupTitle": "Registrazione - Calendario intelligente Tiler",
+			"signinTitle": "Accesso - Calendario intelligente Tiler",
+			"description": "Accedi o crea il tuo account Tiler per usare il calendario intelligente e la pianificazione delle attività."
+		},
+		"creative": {
+			"regionLabel": "Esempi di programmi Tiler",
+			"previous": "Mostra il programma precedente",
+			"next": "Mostra il programma successivo",
+			"paginationLabel": "Scegli un esempio di programma",
+			"showSlide": "Mostra il programma {{number}}",
+			"slides": {
+				"first": {
+					"alt": "Un programma Tiler che organizza un'intera giornata di attività negli spazi di tempo disponibili.",
+					"caption": "Guarda la tua intera giornata prendere forma."
+				},
+				"second": {
+					"alt": "Un programma Tiler che si adatta dopo lo spostamento di una revisione con gli investitori a un altro giorno.",
+					"caption": "Guarda il tuo programma adattarsi quando cambiano i piani."
+				}
+			}
+		},
+		"or": "OPPURE",
 		"verification": {
 			"title": "Verifica richiesta",
 			"header": "Inserisci il codice di verifica",
