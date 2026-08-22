@@ -13,7 +13,7 @@ import { hashEmail, trackConversion } from '@/core/analytics';
 import VerificationCodePopup from '@/components/auth/VerificationCodePopup';
 import SEO from '@/core/common/components/SEO';
 import timelineCreative from '@/assets/waitlist/timeline-content.webp';
-import scheduleDemoVideo from '@/assets/Sigin Up video.mp4';
+import scheduleDemoVideo from '@/assets/Sigin-Up-video.mp4';
 import scheduleDemoPoster from '@/assets/sign-up-video-poster.jpg';
 
 const creatives = [
@@ -130,8 +130,15 @@ const UserAuthentication: React.FC = () => {
 	};
 
 	const handleVideoCanPlay = () => {
-		if (requestedCreative || prefersReducedMotion || hasUserSelectedCreative.current) return;
-		setSelectedCreative(1);
+		if (prefersReducedMotion) return;
+		if (!requestedCreative && !hasUserSelectedCreative.current) {
+			setSelectedCreative(1);
+			return;
+		}
+		// useEffect may have called play() before the video was ready; retry now that it is
+		if (selectedCreative === 1) {
+			void videoRef.current?.play().catch(() => undefined);
+		}
 	};
 
 	const handleVideoEnded = () => {

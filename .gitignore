@@ -32,3 +32,5 @@ coverage
 
 # Claude Code
 .claude
+src/assets/*.mp4
+src/assets/*.webm
