@@ -67,6 +67,10 @@ export const analyticsConfig = {
 	get aliasEndpoint() {
 		return this.conversionEndpoint.replace(/\/+$/, '') + '/alias';
 	},
+	/** Separate from the conversion endpoint: exposure must never reach an ad platform. */
+	get experimentExposureEndpoint() {
+		return toRootRelative(read('VITE_EXPERIMENT_ENDPOINT') ?? 'api/Experiment/exposure');
+	},
 };
 
 /**

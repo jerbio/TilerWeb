@@ -3,7 +3,7 @@ import PersonaCarousel from '../components/home/persona_carousel/persona_carouse
 import FeatureHighlightsSection from '../components/home/feature_highlights_section';
 import TileCardSection from '../components/home/tile_card_section';
 import CalendarIntegrationSection from '../components/home/integration_section';
-import HeroSection from '../components/home/hero_section';
+import HeroExperiment from '../components/home/hero_experiment';
 import VideoIframeSection from '../components/home/video_iframe_section';
 import Waitlist from '../components/home/waitlist_input';
 import AppDownloadSection from '../components/home/app_download_section';
@@ -121,7 +121,7 @@ const Home: React.FC = () => {
 				canonicalUrl="/"
 				structuredData={structuredData}
 			/>
-			<HeroSection />
+			<HeroExperiment />
 			<AppDownloadSection />
 			<VideoIframeSection
 				src="https://www.youtube.com/embed/87RGNntLBRY"

@@ -58,12 +58,22 @@ export type CtaClickedInput = {
 	label: string;
 	location: string;
 	destination: string;
+	/** Distinguishes the hero's primary, secondary, and in-demo nudge. */
+	ctaRole?: string;
+	/** Experiment arm, for call sites the envelope stamp cannot infer. */
+	variant?: string;
 };
 
-export const trackCtaClicked = ({ label, location, destination }: CtaClickedInput): void => {
+export const trackCtaClicked = ({
+	label,
+	location,
+	destination,
+	ctaRole,
+	variant,
+}: CtaClickedInput): void => {
 	trackConversion('cta_clicked', {
 		once: false,
-		properties: { label, location, destination },
+		properties: { label, location, destination, ctaRole, variant },
 	});
 };
 

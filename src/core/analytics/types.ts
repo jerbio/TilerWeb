@@ -68,6 +68,18 @@ export type ConversionEventPage = {
 	title: string;
 };
 
+/**
+ * Experiment arm the visitor was in when the event fired.
+ *
+ * Denormalised onto every event on purpose: it freezes the arm as-of-event, so a
+ * later assignment correction cannot silently rewrite funnel history.
+ */
+export type ConversionExperiment = {
+	key: string;
+	variant: string;
+	forced: boolean;
+};
+
 export type ConversionEvent = {
 	/** Identical on the browser pixel and the server CAPI call. Powers deduplication. */
 	eventId: string;
@@ -84,6 +96,8 @@ export type ConversionEvent = {
 	firstTouch: Attribution | null;
 	lastTouch: Attribution | null;
 	page: ConversionEventPage;
+	/** Optional and additive, so a cached older client still posts a valid payload. */
+	experiments?: ConversionExperiment[];
 	consent: ConsentSnapshot;
 };
 

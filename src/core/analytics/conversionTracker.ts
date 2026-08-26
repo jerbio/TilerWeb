@@ -8,9 +8,11 @@ import { logConversion, logInit } from './debugLog';
 import { defaultDestinations } from './destinations';
 import { createDestinationRegistry, type DestinationRegistry } from './destinations/registry';
 import { getAnonymousId, getSessionId } from './identity';
+import { getConversionExperiments } from '@/core/experiments/current';
 import type {
 	ConsentSnapshot,
 	ConversionEvent,
+	ConversionExperiment,
 	ConversionProperties,
 	DestinationLogLine,
 } from './types';
@@ -44,6 +46,7 @@ export type TrackerDeps = {
 	resolveConsentFn: () => ConsentSnapshot;
 	isAutomated: () => boolean;
 	endpoint: string;
+	experiments: () => ConversionExperiment[] | undefined;
 };
 
 const newEventId = (): string => {
@@ -77,6 +80,7 @@ export const createConversionTracker = (deps: Partial<TrackerDeps> = {}) => {
 		resolveConsentFn = resolveConsent,
 		isAutomated = isAutomatedRender,
 		endpoint = analyticsConfig.conversionEndpoint,
+		experiments = getConversionExperiments,
 	} = deps;
 
 	// In-memory mirror of the persisted guard so a StrictMode double-invocation in
@@ -116,6 +120,15 @@ export const createConversionTracker = (deps: Partial<TrackerDeps> = {}) => {
 		}
 
 		const consent = resolveConsentFn();
+
+		let arms: ConversionExperiment[] | undefined;
+		try {
+			arms = experiments();
+		} catch {
+			// A broken experiment must never cost a conversion.
+			arms = undefined;
+		}
+
 		const event: ConversionEvent = {
 			eventId: newEventId(),
 			stage,
@@ -134,6 +147,7 @@ export const createConversionTracker = (deps: Partial<TrackerDeps> = {}) => {
 				referrer: document.referrer,
 				title: document.title,
 			},
+			experiments: arms,
 			consent,
 		};
 
