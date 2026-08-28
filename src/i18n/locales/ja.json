@@ -204,7 +204,9 @@
 			"actions": {
 				"complete": "完了",
 				"now": "今すぐ",
-				"defer": "延期"
+				"defer": "延期",
+				"accept": "承認",
+				"decline": "辞退"
 			},
 			"validation": {
 				"endAfterStart": "終了時刻は開始時刻より後にしてください"
@@ -665,6 +667,178 @@
 			"submit": "ウェイティングリストに参加",
 			"success": "ご参加ありがとうございます！Tilerの準備が整い次第、お知らせします。",
 			"error": "問題が発生しました。もう一度お試しください。"
+		},
+		"heroExperiment": {
+			"nl_scheduling": {
+				"eyebrow": "Effortless natural-language scheduling",
+				"titleLead": "Just say it.",
+				"titleAccent": "It's scheduled.",
+				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
+				"primaryCta": "Tell Tiler what you need",
+				"secondaryCta": "See how it works",
+				"nudgeCta": "Schedule this for real",
+				"nudgeCaption": "That took one sentence. Yours will too.",
+				"demo": {
+					"request": "Gym four times this week",
+					"schedule": "Schedule",
+					"scheduled": "Scheduled",
+					"thisWeek": "This week",
+					"rearranging": "rearranging",
+					"done": "done",
+					"days": {
+						"mon": "Mon",
+						"tue": "Tue",
+						"wed": "Wed",
+						"thu": "Thu",
+						"fri": "Fri",
+						"sat": "Sat",
+						"sun": "Sun"
+					},
+					"items": {
+						"gym": "Gym",
+						"deepWork": "Deep work",
+						"standup": "Standup",
+						"report": "Report",
+						"oneOnOne": "1:1",
+						"review": "Review",
+						"rest": "Rest"
+					},
+					"legend": {
+						"placed": "placed",
+						"moving": "moving",
+						"moved": "report → Thu"
+					}
+				}
+			},
+			"stop_deciding": {
+				"eyebrow": "Your day, planned for you",
+				"title": "Stop deciding when.",
+				"subtitle": "Add what you need to get done. Tiler builds your day around your working hours, your commute, and your deadlines.",
+				"primaryCta": "Build my first day",
+				"secondaryCta": "See how it works",
+				"nudgeCta": "Build my day",
+				"nudgeCaption": "You brought the list. Tiler brought the day.",
+				"demo": {
+					"listLabel": "Your list",
+					"scheduledLabel": "Today, scheduled",
+					"items": {
+						"memo": "Draft Q3 budget memo",
+						"pharmacy": "Call the pharmacy",
+						"review": "Review Ana's design file",
+						"gym": "Gym — legs",
+						"train": "Book train to Leeds"
+					},
+					"caption": "Placed around a 9–5 day and a 40-minute commute."
+				}
+			},
+			"self_healing": {
+				"eyebrow": "Automatic recovery from disruption",
+				"titleLead": "Your day fell apart at 10am.",
+				"titleAccent": "Your schedule already recovered.",
+				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
+				"primaryCta": "See it recover",
+				"secondaryCta": "See how it works",
+				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
+				"nudgeCta": "Keep this schedule",
+				"nudgeCaption": "Nothing was dropped. Nothing needed your attention.",
+				"demo": {
+					"label": "Tuesday",
+					"status": "Rebuilt",
+					"rebuiltIn": "Rebuilt in 0.4s",
+					"clientCall": "Client call",
+					"onTrack": "on track",
+					"movedSameDay": "moved, same day",
+					"overran": "Ran 90 min late",
+					"wasAt": "was {{time}}",
+					"items": {
+						"morningReview": "Morning review",
+						"clientCall": "Client call",
+						"deepWork": "Deep work — draft",
+						"designSync": "Design sync",
+						"gym": "Gym"
+					},
+					"caption": "Gym kept · Deep work protected · Nothing dropped"
+				}
+			},
+			"task_splitting": {
+				"eyebrow": "Automatic decomposition of big work",
+				"titleLead": "One big task.",
+				"titleAccent": "Automatically split across your week.",
+				"subtitle": "Tell Tiler what's due and how long it'll take. It breaks the work into sessions and spreads them across your week.",
+				"primaryCta": "Split my first project",
+				"secondaryCta": "See how it works",
+				"nudgeCta": "Split my project",
+				"nudgeCaption": "One deadline in. Six sessions out.",
+				"demo": {
+					"label": "One task",
+					"status": "Split",
+					"task": "Thesis",
+					"total": "12 hrs",
+					"due": "Due Sun 14 Jun",
+					"dueFlag": "Due",
+					"days": {
+						"mon": "Mon",
+						"tue": "Tue",
+						"wed": "Wed",
+						"thu": "Thu",
+						"fri": "Fri",
+						"sat": "Sat",
+						"sun": "Sun"
+					},
+					"parts": {
+						"outline": "Outline",
+						"sources": "Sources",
+						"draftOne": "Draft ch. 1",
+						"notes": "Notes",
+						"draftTwo": "Draft ch. 2",
+						"edit": "Edit pass"
+					},
+					"caption": "6 sessions · spread unevenly around your week"
+				}
+			},
+			"capacity_check": {
+				"eyebrow": "An honest capacity reality check",
+				"title": "Does it actually fit?",
+				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
+				"primaryCta": "See if your week fits",
+				"secondaryCta": "See how it works",
+				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
+				"nudgeCta": "Check my real week",
+				"nudgeCaption": "Better to know on Monday than to discover it on Friday.",
+				"demo": {
+					"label": "This week",
+					"capacity": "Over capacity",
+					"overflow": "Overflow",
+					"load": "38 hrs of work / 32 hrs available",
+					"wontFit": "6 hrs won't fit",
+					"days": {
+						"mon": "Mon",
+						"tue": "Tue",
+						"wed": "Wed",
+						"thu": "Thu",
+						"fri": "Fri"
+					},
+					"items": {
+						"standup": "Standup + planning",
+						"designReview": "Design review",
+						"deepWork": "Deep work",
+						"sync": "Sync",
+						"build": "Build",
+						"inbox": "Inbox",
+						"oneOnOnes": "1:1s",
+						"sprintPrep": "Sprint prep",
+						"writeup": "Writeup",
+						"retro": "Retro",
+						"implementation": "Implementation",
+						"qaHandoff": "QA handoff",
+						"demo": "Demo",
+						"wrapUp": "Wrap-up",
+						"review": "Review",
+						"urgentFix": "Urgent fix",
+						"clientCall": "Client call"
+					}
+				}
+			}
 		},
 		"hero": {
 			"title": "あなたのAI搭載デイアーキテクト",
@@ -1334,6 +1508,10 @@
 			"updateSuccess": "変更が保存されました！",
 			"deleting": "イベントを削除中...",
 			"deleteSuccess": "イベントが削除されました！",
+			"accepting": "招待を承認しています...",
+			"acceptSuccess": "招待を承認しました！",
+			"declining": "招待を辞退しています...",
+			"declineSuccess": "招待を辞退しました！",
 			"actionFailed": "アクションに失敗しました。もう一度お試しください。"
 		},
 		"edit": {
