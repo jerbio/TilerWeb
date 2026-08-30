@@ -1336,7 +1336,28 @@
 			"connections": {
 				"title": "연결",
 				"description": "Tiler 계정에 연결된 앱을 관리하세요",
-				"placeholder": "연결 설정이 곧 제공됩니다..."
+				"placeholder": "연결 설정이 곧 제공됩니다...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "Connect",
+				"comingSoon": "Coming soon",
+				"connectedAccounts": "Connected accounts",
+				"loading": "Loading connections...",
+				"loadError": "We couldn't load your connections. Please try again.",
+				"retry": "Retry",
+				"empty": "No connected accounts yet.",
+				"calendarsConnected": "{{count}} calendars connected",
+				"manage": "Manage",
+				"notifications": {
+					"success": "Connected Google Calendar",
+					"declined": "Google connection cancelled",
+					"error": "We couldn't connect Google. Please try again."
+				}
 			}
 		}
 	},

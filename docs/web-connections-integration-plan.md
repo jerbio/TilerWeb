@@ -457,32 +457,32 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`, `NEEDS FEEDBACK`.
 
 ### Phase 3: Connections list and OAuth return handling
 
-**Status:** `TODO`
+**Status:** `IN PROGRESS` — automated implementation and tests complete (29 tests: `ConnectionsSettings.test.tsx` + `oauthUrl.test.ts`); live manual OAuth redirect QA pending.
 
 **Objective:** Render the provider list and complete the server-owned OAuth round trip.
 
 **Implementation tasks:**
 
-- [ ] Render Google as available.
-- [ ] Render Microsoft, Apple, Slack, and Google Tasks as unavailable if product still wants them visible.
-- [ ] Implement the Google Add action using the confirmed `Account/ExternalLogin` form parameters.
-- [ ] Preserve the intended Connections return destination.
-- [ ] Parse `oauth` and `provider` on return.
-- [ ] Show one success, cancellation, or error notification.
-- [ ] Refresh integrations after success.
-- [ ] Clear transient query parameters with replace navigation.
-- [ ] Prevent duplicate refreshes caused by React effects or browser back navigation.
+- [x] Render Google as available.
+- [x] Render Microsoft, Apple, Slack, and Google Tasks as unavailable (rendered as "Coming soon" from `CONNECTION_PROVIDERS`).
+- [x] Implement the Google Add action. The confirmed contract (Phase 0, verified against TilerFront) is a server-owned `GET api/Integrations?provider=google&redirectTarget=<own-origin URL>` browser navigation built by `buildOauthStartUrl`, not an `Account/ExternalLogin` form post.
+- [x] Preserve the intended Connections return destination (`redirectTarget` = own origin + `/settings/connections`).
+- [x] Parse the transient OAuth return parameters on return via `parseOauthReturn` over the router's `location.search` (the verified contract carries `calendarConnect`/`integrationId`/`reason`, not `oauth`/`provider`).
+- [x] Show one success, cancellation, or error notification (auto-dismiss after 6 s).
+- [x] Refresh integrations after success only.
+- [x] Clear transient query parameters with replace navigation.
+- [x] Prevent duplicate refreshes caused by React effects or browser back navigation (`oauthHandledRef` one-shot guard).
 
 **TDD tests first:**
 
-- [ ] Google Add submits the expected provider/action/return parameters.
-- [ ] A successful OAuth result refreshes integrations.
-- [ ] A cancelled OAuth result shows cancellation feedback and does not refresh unnecessarily.
-- [ ] An error result shows provider-specific failure feedback.
-- [ ] Unsupported or malformed OAuth values are handled safely.
-- [ ] Query parameters are removed after handling.
-- [ ] Refresh does not repeat after the clean URL is established.
-- [ ] Empty, loading, retry, and loaded states render correctly.
+- [x] Google Add builds the expected start URL (`provider` + `redirectTarget` only) and navigates the browser to it.
+- [x] A successful OAuth result refreshes integrations.
+- [x] A cancelled OAuth result shows cancellation feedback and does not refresh unnecessarily.
+- [x] An error result shows provider-specific failure feedback.
+- [x] Unsupported or malformed OAuth values are handled safely.
+- [x] Query parameters are removed after handling.
+- [x] Refresh does not repeat after the clean URL is established.
+- [x] Empty, loading, retry, and loaded states render correctly.
 
 **User feedback:**
 
@@ -499,10 +499,10 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`, `NEEDS FEEDBACK`.
 
 **Exit criteria:**
 
-- [ ] OAuth contract tests pass against approved fixtures.
-- [ ] Manual success and failure redirects behave correctly.
-- [ ] Clean URL is restored.
-- [ ] The newly connected integration appears after server refresh.
+- [x] OAuth contract tests pass against approved fixtures.
+- [ ] Manual success and failure redirects behave correctly (pending live QA).
+- [x] Clean URL is restored.
+- [ ] The newly connected integration appears after server refresh (pending live QA; the refresh-on-success behavior itself is unit-tested).
 
 ### Phase 4: Integration detail and location draft
 

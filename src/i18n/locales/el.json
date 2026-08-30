@@ -1,4 +1,4 @@
-﻿{
+{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1336,7 +1336,28 @@
 			"connections": {
 				"title": "Συνδέσεις",
 				"description": "Διαχείριση εφαρμογών που συνδέονται με τον λογαριασμό σας Tiler",
-				"placeholder": "Οι ρυθμίσεις σύνδεσης θα είναι σύντομα διαθέσιμες..."
+				"placeholder": "Οι ρυθμίσεις σύνδεσης θα είναι σύντομα διαθέσιμες...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "Connect",
+				"comingSoon": "Coming soon",
+				"connectedAccounts": "Connected accounts",
+				"loading": "Loading connections...",
+				"loadError": "We couldn't load your connections. Please try again.",
+				"retry": "Retry",
+				"empty": "No connected accounts yet.",
+				"calendarsConnected": "{{count}} calendars connected",
+				"manage": "Manage",
+				"notifications": {
+					"success": "Connected Google Calendar",
+					"declined": "Google connection cancelled",
+					"error": "We couldn't connect Google. Please try again."
+				}
 			}
 		}
 	},
