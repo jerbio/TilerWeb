@@ -54,6 +54,7 @@ const mockCreator = {
 const mockCluster: TileShareCluster = {
 	id: 'cluster-1',
 	name: 'Design Sprint',
+	notes: null,
 	start: 1750755360000,
 	end: 1751263140000,
 	isCompleted: false,

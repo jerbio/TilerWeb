@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ScheduleApi } from '../scheduleApi';
 import {
 	ScheduleShuffleParams,
@@ -36,6 +36,7 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
 describe('ScheduleApi', () => {
 	let api: ScheduleApi;
+	let _origResolvedOptions: Intl.DateTimeFormat['resolvedOptions'];
 
 	const mockShuffleResponse: ScheduleLookupResponse = {
 		Error: { Code: '0', Message: 'SUCCESS' },
@@ -46,8 +47,17 @@ describe('ScheduleApi', () => {
 	};
 
 	beforeEach(() => {
+		// Override Intl timezone so TimeZone assertions are deterministic across machines
+		_origResolvedOptions = Intl.DateTimeFormat.prototype.resolvedOptions;
+		Intl.DateTimeFormat.prototype.resolvedOptions = function () {
+			return { timeZone: 'UTC' } as unknown as Intl.ResolvedDateTimeFormatOptions;
+		};
 		api = new ScheduleApi();
 		fetchSpy.mockReset();
+	});
+
+	afterEach(() => {
+		Intl.DateTimeFormat.prototype.resolvedOptions = _origResolvedOptions;
 	});
 
 	describe('shuffle', () => {
@@ -241,6 +251,7 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				EventID: eventId,
 				Version: 'v2',
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),
@@ -292,6 +303,7 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				EventID: eventId,
 				Version: 'v2',
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),
@@ -349,6 +361,7 @@ describe('ScheduleApi', () => {
 			expect(body).toEqual({
 				...procrastinateParams,
 				Version: 'v2',
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),

@@ -128,6 +128,54 @@ export enum ThirdPartyType {
 }
 
 /**
+ * RSVP response state for a third-party (external calendar) event. Mirrors the
+ * mobile app's `RsvpStatus` enum. The backend ships this under the `rsvpStatus`
+ * field (string, casing may vary) — use {@link normalizeRsvpStatus} to parse.
+ */
+export enum RsvpStatus {
+	Accepted = 'accepted',
+	Declined = 'declined',
+	Tentative = 'tentative',
+	NeedsAction = 'needsAction',
+	NotApplicable = 'notApplicable',
+}
+
+/** Parse a wire `rsvpStatus` string into an {@link RsvpStatus} (case-insensitive). */
+export function normalizeRsvpStatus(value?: string | null): RsvpStatus | undefined {
+	if (value == null || value === '') return undefined;
+	switch (value.toString().toLowerCase()) {
+		case 'accepted':
+			return RsvpStatus.Accepted;
+		case 'declined':
+			return RsvpStatus.Declined;
+		case 'tentative':
+			return RsvpStatus.Tentative;
+		case 'needsaction':
+		case 'needs_action':
+			return RsvpStatus.NeedsAction;
+		case 'notapplicable':
+		case 'not_applicable':
+		case 'none':
+			return RsvpStatus.NotApplicable;
+		default:
+			return RsvpStatus.NotApplicable;
+	}
+}
+
+/**
+ * Whether an RSVP status is actionable — i.e. the user can accept or decline (or
+ * change a prior response). `NotApplicable`/undefined are not actionable.
+ */
+export function isActionableRsvp(status?: RsvpStatus): boolean {
+	return (
+		status === RsvpStatus.NeedsAction ||
+		status === RsvpStatus.Tentative ||
+		status === RsvpStatus.Accepted ||
+		status === RsvpStatus.Declined
+	);
+}
+
+/**
  * Known video/conferencing source keys emitted by the backend under
  * `otherData.videoUrls`. The key set mirrors the C# `VideoSource` enum
  * (lowercased on the wire).
@@ -175,6 +223,11 @@ export type SubCalendarEvent = {
 	thirdPartyType?: ThirdPartyType | string;
 	thirdPartyUserId?: string | null;
 	thirdPartyId?: string;
+	/**
+	 * RSVP response for third-party events (wire field: `rsvpStatus`). Absent for
+	 * native Tiler tiles. Parse with {@link normalizeRsvpStatus}.
+	 */
+	rsvpStatus?: RsvpStatus | string;
 	priority?: number;
 	tileShareDesignatedId?: null;
 	projectionType?: ['SimpleObject'];

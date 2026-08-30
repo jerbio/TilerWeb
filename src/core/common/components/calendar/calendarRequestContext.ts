@@ -70,6 +70,15 @@ export interface FocusEventRequest {
 	actionType: ActionType;
 	/** Optional schedule context for staleness detection */
 	scheduleContext?: ScheduleContext;
+	/**
+	 * Optional authoritative start time (unix ms) of the target tile, supplied
+	 * by callers that already know it (e.g. the sub-events side panel, whose
+	 * list comes from `/CalendarEvent/SubEvents`). When present, the calendar
+	 * navigates straight to this day instead of re-deriving the date via a
+	 * `/SubCalendarEvent` REST lookup that can disagree with the grid's own
+	 * start. Other callers omit it and keep the lookup path.
+	 */
+	startHint?: number;
 }
 
 /**

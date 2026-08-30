@@ -7,6 +7,11 @@ import ReviseButton from '../revise_button';
 
 const mockReviseSchedule = vi.fn();
 
+vi.mock('@/core/common/utils/timeUtils', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@/core/common/utils/timeUtils')>();
+	return { ...actual, deviceTimeZone: () => 'America/New_York' };
+});
+
 // Mock the services module
 vi.mock('@/services', () => ({
 	scheduleService: {

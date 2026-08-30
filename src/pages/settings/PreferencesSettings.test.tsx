@@ -50,6 +50,7 @@ const createMockSettings = (
 	scheduleProfile: {
 		travelMedium: 'driving',
 		pinPreference: 'start',
+		intensityRate: 0.5,
 		endTimeOfDay: '22:00:00',
 		sleepDuration: 28800000, // 8 hours in ms
 		...overrides,
@@ -442,6 +443,82 @@ describe('PreferencesSettings', () => {
 					},
 				});
 			});
+		});
+	});
+
+	describe('Schedule Fullness', () => {
+		it('should render the API rate as an accessible percentage slider', async () => {
+			(userService.getSettings as Mock).mockResolvedValue(
+				createMockSettings({ intensityRate: 0.65 })
+			);
+
+			renderWithProviders(<PreferencesSettings />);
+
+			const slider = await screen.findByRole('slider', { name: 'Schedule fullness' });
+			expect(slider).toHaveAttribute('min', '15');
+			expect(slider).toHaveAttribute('max', '95');
+			expect(slider).toHaveAttribute('step', '5');
+			expect(slider).toHaveValue('65');
+			expect(slider).toHaveAttribute('aria-valuetext', '65 percent target fullness');
+			expect(slider).toHaveAttribute(
+				'aria-describedby',
+				'schedule-fullness-description schedule-fullness-limits'
+			);
+			expect(screen.getByText('65%')).toBeInTheDocument();
+			expect(
+				screen.getByText(
+					'Targets range from 15% to 95%. This keeps a useful baseline while leaving room for changes and travel.'
+				)
+			).toBeInTheDocument();
+		});
+
+		it('should only send IntensityRate when only schedule fullness changed', async () => {
+			renderWithProviders(<PreferencesSettings />);
+
+			const slider = await screen.findByRole('slider', { name: 'Schedule fullness' });
+			fireEvent.change(slider, { target: { value: '65' } });
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			await waitFor(() => {
+				expect(userService.updateSettings).toHaveBeenCalledWith({
+					ScheduleProfile: { IntensityRate: 0.65 },
+				});
+			});
+		});
+
+		it('should combine intensity with other changed schedule settings', async () => {
+			renderWithProviders(<PreferencesSettings />);
+
+			const slider = await screen.findByRole('slider', { name: 'Schedule fullness' });
+			fireEvent.change(slider, { target: { value: '70' } });
+			fireEvent.click(screen.getByLabelText('Transit'));
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			await waitFor(() => {
+				expect(userService.updateSettings).toHaveBeenCalledWith({
+					ScheduleProfile: {
+						IntensityRate: 0.7,
+						TravelMedium: 'transit',
+					},
+				});
+			});
+		});
+
+		it('should reconcile the slider with the persisted response value', async () => {
+			(userService.updateSettings as Mock).mockResolvedValue(
+				createMockSettings({ intensityRate: 0.7 })
+			);
+
+			renderWithProviders(<PreferencesSettings />);
+
+			const slider = await screen.findByRole('slider', { name: 'Schedule fullness' });
+			fireEvent.change(slider, { target: { value: '65' } });
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			await waitFor(() => expect(slider).toHaveValue('70'));
+			fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+			expect(userService.updateSettings).toHaveBeenCalledTimes(1);
 		});
 	});
 

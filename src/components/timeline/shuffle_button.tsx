@@ -7,6 +7,7 @@ import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import type { ScheduleShuffleParams } from '@/core/common/types/schedule';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 const SHUFFLE_NOTIFICATION_ID = 'schedule-shuffle';
 
@@ -41,7 +42,7 @@ const ShuffleButton: React.FC<ShuffleButtonProps> = ({ disabled, onLoadingChange
 				SocketId: true,
 				TimeZoneOffset: userInfo?.timeZoneDifference ?? 0,
 				Version: 'v2',
-				TimeZone: userInfo?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+				TimeZone: deviceTimeZone(),
 				IsTimeZoneAdjusted: 'true',
 			};
 

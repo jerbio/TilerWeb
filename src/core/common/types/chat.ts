@@ -182,4 +182,14 @@ export type VibeSessionsResponse = ApiResponse<{
 	vibeSessions: VibeSession[];
 }>;
 
+/** Keyed so a suggestion keeps its identity across regenerations: { "sug_abc": "Plan my day" }. */
+export type AutoSuggestions = Record<string, string>;
+
+export type AutoSuggestionsResponse = ApiResponse<{
+	autoSuggestions: {
+		suggestions: AutoSuggestions;
+		isStale: boolean;
+	};
+}>;
+
 export type { PromptWithActions as Message };

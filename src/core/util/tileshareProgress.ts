@@ -8,8 +8,7 @@ import { TileletteStatus, TileShareTemplate } from '@/core/common/types/tileshar
  * this is the only place that changes — call sites and the progress rollup stay
  * as they are.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function deriveTileletteStatus(tilette: TileShareTemplate): TileletteStatus {
+export function deriveTileletteStatus(_tilette: TileShareTemplate): TileletteStatus {
 	return TileletteStatus.InProgress;
 }
 

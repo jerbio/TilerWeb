@@ -36,8 +36,10 @@ import {
 	epochToDate,
 	epochToTimeString,
 	combineDateAndTimeString,
+	formatDurationVerbose,
 } from '@/core/common/utils/timeUtils';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
+import SubEventsSection from './SubEventsSection';
 
 /**
  * Default end-date offsets per recurrence frequency.
@@ -110,15 +112,6 @@ export function isRepetitionConfigValid({
 	return true;
 }
 
-function formatDuration(totalMinutes: number): string {
-	const h = Math.floor(totalMinutes / 60);
-	const m = totalMinutes % 60;
-	const parts: string[] = [];
-	if (h > 0) parts.push(`${h} hr${h !== 1 ? 's' : ''}`);
-	if (m > 0) parts.push(`${m} min`);
-	return parts.join(' ') || '0 min';
-}
-
 const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 	event,
 	workProfileId,
@@ -126,7 +119,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 	isLocationVerified: initLocationVerified = false,
 	onClose,
 }) => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 	const openNotes = useCalendarUI((s) => s.editNotes.actions.open);
@@ -506,9 +499,9 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 						{!timeOpen &&
 							(isRecurring && tileMins > 0 && splitNum > 0 ? (
 								<PreviewText>
-									{formatDuration(tileMins * splitNum)}
+									{formatDurationVerbose(tileMins * splitNum, i18n.language)}
 									{' - '}
-									{formatDuration(tileMins)}
+									{formatDurationVerbose(tileMins, i18n.language)}
 									{' - '}
 									{splitNum}
 								</PreviewText>
@@ -1082,6 +1075,16 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 							</SwatchGrid>
 						</SectionBody>
 					)}
+				</Section>
+
+				{/* Sub-events Section (technical: sub-events) — kept last in the edit list */}
+				<Section>
+					<SectionBody>
+						<SubEventsSection
+							eventId={event.id ?? ''}
+							splitCount={Number(splitCount) || null}
+						/>
+					</SectionBody>
 				</Section>
 			</Form>
 			{isDirty && (

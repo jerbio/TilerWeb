@@ -146,6 +146,17 @@ export const lightTheme: AppTheme = {
 			base: palette.colors.gray[200],
 			highlight: palette.colors.gray[50],
 		},
+		// Tag input colors
+		tagInput: {
+			chipBg: palette.colors.gray[100],
+			chipBorder: palette.colors.gray[200],
+			chipText: palette.colors.gray[700],
+			remove: palette.colors.gray[500],
+			removeHover: palette.colors.gray[900],
+			addBg: palette.colors.brand[500],
+			addBgHover: palette.colors.brand[600],
+			addText: palette.colors.white,
+		},
 		// hues
 		brand: palette.colors.brand,
 		gray: palette.colors.gray,

@@ -7,7 +7,7 @@ import Button from '@/core/common/components/button';
 import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
-import useAppStore, { ChatContextType } from '@/global_state';
+import useAppStore, { ChatContextType, SessionType } from '@/global_state';
 import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
 // VibeSession imported above with SessionHistory
 import { Status } from '@/core/constants/enums';
@@ -22,6 +22,7 @@ import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
 import EmailConfirmationModal from '@/core/common/components/email-confirmation/EmailConfirmationModal';
 import PromptSuggestions from '@/core/common/components/chat/prompt-suggestions/PromptSuggestions';
 import analytics from '@/core/util/analytics';
+import { trackDemoEngaged } from '@/core/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import ActionPillStrip from '@/core/common/components/chat/ActionPillStrip';
@@ -347,6 +348,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const [errorPopupMessage, setErrorPopupMessage] = useState('');
 	const [showSessionHistory, setShowSessionHistory] = useState(false);
 	const [currentSessionTitle, setCurrentSessionTitle] = useState<string | null>(null);
+	const [suggestions, setSuggestions] = useState<Record<string, string>>({});
+	const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
 
 	// --- Simulated Schedule Experience (Phase 3.1) ----------------------------
 	// Tracks the simulation row + parent VibeRequest for the *active* request.
@@ -913,6 +916,36 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		fetchAndSetLatestSession();
 	}, [activePersonaSession?.userId, activePersonaSession?.personaId]);
 
+	// Reads stored suggestions, then regenerates in the background only when the
+	// session has moved on since they were built. A page refresh hits the read
+	// path alone, so it costs no inference.
+	const loadAutoSuggestions = useCallback(async () => {
+		setIsSuggestionsLoading(true);
+		try {
+			const stored = await chatService.getAutoSuggestions({
+				sessionId: sessionId || undefined,
+				anonymousUserId: anonymousUserId || undefined,
+				language: navigator.language?.split('-')[0],
+			});
+			setSuggestions(stored.suggestions);
+			if (!stored.isStale || !sessionId) return;
+
+			const fresh = await chatService.refreshAutoSuggestions(
+				sessionId,
+				anonymousUserId || undefined
+			);
+			if (Object.keys(fresh.suggestions).length > 0) {
+				setSuggestions(fresh.suggestions);
+			}
+		} finally {
+			setIsSuggestionsLoading(false);
+		}
+	}, [sessionId, anonymousUserId]);
+
+	useEffect(() => {
+		void loadAutoSuggestions();
+	}, [loadAutoSuggestions]);
+
 	const extractTimestamp = useCallback((id: string): number => {
 		const match = id.match(/(\d{18})/);
 		return match ? parseInt(match[1], 10) : 0;
@@ -1176,15 +1209,22 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		simulation?.isStale !== true &&
 		!simulationResultError;
 
-	const handleSubmit = async (e: FormEvent) => {
+	const handleSubmit = async (e: FormEvent, overrideMessage?: string) => {
 		e.preventDefault();
-		if (!message.trim() || isSending) return;
+		const textToSend = overrideMessage ?? message;
+		if (!textToSend.trim() || isSending) return;
 
 		// Track message send
 		analytics.trackChatEvent('Message Sent', {
-			messageLength: message.length,
+			messageLength: textToSend.length,
 			hasContext: chatContext.length > 0,
 			personaId: selectedPersonaId,
+		});
+
+		trackDemoEngaged({
+			personaId: selectedPersonaId,
+			messageLength: textToSend.length,
+			isAnonymous: useAppStore.getState().activeSessionType === SessionType.ANONYMOUS,
 		});
 
 		// If the user sends a new message while in review, exit review
@@ -1210,7 +1250,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			const locationApiData = locationService.toApiFormat(locationData);
 
 			const response = await chatService.sendMessage(
-				message,
+				textToSend,
 				entityId,
 				sessionId,
 				anonymousUserId,
@@ -1280,6 +1320,9 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			}
 
 			setMessage('');
+			// The exchange bumped the session hash, so pick up conversation-aware
+			// suggestions without blocking the send.
+			void loadAutoSuggestions();
 		} catch (err) {
 			if (err instanceof ChatLimitError) {
 				analytics.trackError('Chat Limit Reached', { personaId: selectedPersonaId });
@@ -1385,16 +1428,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		setShowEmailConfirmation(true); // Show confirmation modal
 	};
 
-	const handlePromptClick = (prompt: string) => {
-		setMessage(prompt);
-		// Auto-submit by creating a synthetic form event
-		const syntheticEvent = {
-			preventDefault: () => {},
-		} as FormEvent;
-		// Set message first, then trigger submit on next tick
-		setTimeout(() => {
-			handleSubmit(syntheticEvent);
-		}, 0);
+	const handlePromptClick = (_key: string, text: string) => {
+		// Keep the input field in sync visually, then submit immediately using
+		// overrideMessage so handleSubmit reads the prompt text directly rather
+		// than the stale `message` state value from this render.
+		setMessage(text);
+		const syntheticEvent = { preventDefault: () => {} } as FormEvent;
+		handleSubmit(syntheticEvent, text);
 	};
 
 	const handleSessionSelect = (session: VibeSession) => {
@@ -1609,7 +1649,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 				{/* Show prompt suggestions when input field is empty */}
 				{!inReview && !message.trim() && (
-					<PromptSuggestions onPromptClick={handlePromptClick} />
+					<PromptSuggestions
+						suggestions={suggestions}
+						isLoading={isSuggestionsLoading}
+						onPromptClick={handlePromptClick}
+					/>
 				)}
 
 				{!isMobileReview && (

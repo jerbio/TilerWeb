@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="incomingTile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(74,222,128,0.08)"/>
+      <stop offset="100%" stop-color="rgba(74,222,128,0.03)"/>
+    </linearGradient>
+    <filter id="greenGlow">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feFlood flood-color="#4ade80" flood-opacity="0.22" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="320" fill="url(#bg2)"/>
+
+  <!-- Header -->
+  <rect width="640" height="48" fill="#141414"/>
+  <rect y="48" width="640" height="1" fill="rgba(255,255,255,0.06)"/>
+  <text x="20" y="30" font-family="Inter,sans-serif" font-size="18" fill="#3a3a3a">←</text>
+  <text x="320" y="30" font-family="Urbanist,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e5e5" text-anchor="middle">Jamie's Schedule</text>
+  <text x="618" y="30" font-family="Urbanist,Inter,sans-serif" font-size="12" font-weight="800" fill="#ED123B" text-anchor="end">tiler</text>
+
+  <!-- Time col -->
+  <rect x="0" y="48" width="44" height="272" fill="#111111"/>
+  <rect x="44" y="48" width="1" height="272" fill="rgba(255,255,255,0.04)"/>
+  <text x="22" y="108" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">9 AM</text>
+  <text x="22" y="178" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">10 AM</text>
+  <text x="22" y="248" font-family="Inter,sans-serif" font-size="8" fill="#2e2e2e" text-anchor="middle">11 AM</text>
+
+  <line x1="45" y1="105" x2="640" y2="105" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  <line x1="45" y1="175" x2="640" y2="175" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  <line x1="45" y1="245" x2="640" y2="245" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+
+  <!-- Existing tile -->
+  <rect x="52" y="80" width="576" height="36" rx="8" fill="#05A39C" fill-opacity="0.09" stroke="#05A39C" stroke-opacity="0.2" stroke-width="1"/>
+  <rect x="52" y="80" width="3.5" height="36" rx="1.5" fill="#05A39C" fill-opacity="0.6"/>
+  <text x="66" y="96" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="rgba(180,240,235,0.7)">Morning run</text>
+  <text x="66" y="109" font-family="Inter,sans-serif" font-size="9" fill="rgba(5,163,156,0.4)">@ Home · 9:00 – 9:30 AM</text>
+
+  <!-- Incoming shared tile — landing with green glow and dashed border -->
+  <rect x="52" y="158" width="576" height="62" rx="12" fill="url(#incomingTile)" stroke="rgba(74,222,128,0.45)" stroke-width="1.5" stroke-dasharray="5,3" filter="url(#greenGlow)"/>
+  <rect x="52" y="158" width="4" height="62" rx="2" fill="#8b5cf6" fill-opacity="0.7"/>
+  <text x="68" y="181" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#ffffff">Design review</text>
+  <text x="68" y="200" font-family="Inter,sans-serif" font-size="10" fill="rgba(167,139,250,0.6)">@ Studio  ·  10:30 AM – 11:30 AM</text>
+  <!-- NEW chip -->
+  <rect x="544" y="165" width="76" height="18" rx="9" fill="rgba(74,222,128,0.1)" stroke="rgba(74,222,128,0.3)" stroke-width="1"/>
+  <text x="582" y="177" font-family="Inter,sans-serif" font-size="8" fill="#4ade80" text-anchor="middle">● NEW</text>
+  <!-- From label -->
+  <text x="68" y="214" font-family="Inter,sans-serif" font-size="9" fill="#3a3a3a">Shared by Alex</text>
+
+  <!-- Banner notification -->
+  <rect x="52" y="240" width="576" height="34" rx="10" fill="rgba(74,222,128,0.05)" stroke="rgba(74,222,128,0.15)" stroke-width="1"/>
+  <text x="320" y="261" font-family="Inter,sans-serif" font-size="10" fill="rgba(74,222,128,0.6)" text-anchor="middle">Tiler found a free slot and placed it automatically · No conflicts</text>
+</svg>

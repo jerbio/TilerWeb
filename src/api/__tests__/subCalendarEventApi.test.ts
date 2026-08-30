@@ -227,6 +227,57 @@ describe('SubCalendarEventApi', () => {
 			expect(body.CalendarEventEnd).toBe(1770600000000);
 		});
 
+		it('includes RsvpStatusUpdate when provided', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockResponse), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' },
+				})
+			);
+
+			await api.updateSubCalendarEvent({
+				Id: 'sub-event-123',
+				RsvpStatusUpdate: 'Accepted',
+				ThirdPartyEventID: 'gcal-1',
+				ThirdPartyUserID: 'guser-1',
+				CalendarType: 'google',
+				TimeZone: 'America/New_York',
+			});
+
+			const callArgs = fetchSpy.mock.calls[0];
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+
+			const body = await request.json();
+			expect(body.RsvpStatusUpdate).toBe('Accepted');
+		});
+
+		it('omits RsvpStatusUpdate when not provided', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify(mockResponse), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' },
+				})
+			);
+
+			await api.updateSubCalendarEvent({
+				Id: 'sub-event-123',
+				SubCalendarEventStart: 1769930000000,
+				TimeZone: 'America/New_York',
+			});
+
+			const callArgs = fetchSpy.mock.calls[0];
+			const request =
+				callArgs[0] instanceof Request
+					? callArgs[0]
+					: new Request(callArgs[0] as string, callArgs[1] as RequestInit);
+
+			const body = await request.json();
+			expect(body).not.toHaveProperty('RsvpStatusUpdate');
+		});
+
 		it('returns parsed response on success', async () => {
 			fetchSpy.mockResolvedValueOnce(
 				new Response(JSON.stringify(mockResponse), {

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="280" viewBox="0 0 860 280">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <filter id="blueGlow">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feFlood flood-color="#60a5fa" flood-opacity="0.18" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="860" height="280" fill="url(#bg1)"/>
+
+  <!-- LEFT EVENT -->
+  <rect x="28" y="60" width="264" height="160" rx="16" fill="#0077FF" fill-opacity="0.09" stroke="#0077FF" stroke-opacity="0.22" stroke-width="1.5"/>
+  <rect x="28" y="60" width="5" height="160" rx="2.5" fill="#0077FF" fill-opacity="0.7"/>
+  <text x="148" y="138" font-family="Urbanist,Inter,sans-serif" font-size="17" font-weight="700" fill="rgba(210,228,255,0.9)" text-anchor="middle">Team standup</text>
+  <text x="148" y="163" font-family="Inter,sans-serif" font-size="11" fill="rgba(96,165,250,0.5)" text-anchor="middle">@ Work</text>
+  <text x="148" y="185" font-family="Inter,sans-serif" font-size="10" fill="rgba(96,165,250,0.3)" text-anchor="middle">ends 9:45 AM</text>
+
+  <!-- connector -->
+  <circle cx="292" cy="140" r="3.5" fill="rgba(96,165,250,0.35)" stroke="rgba(96,165,250,0.12)" stroke-width="9"/>
+
+  <!-- TRAVEL BLOCK -->
+  <rect x="312" y="96" width="236" height="88" rx="16" fill="rgba(96,165,250,0.07)" stroke="rgba(96,165,250,0.3)" stroke-width="1.5" stroke-dasharray="6,4" filter="url(#blueGlow)"/>
+  <text x="430" y="145" font-family="Inter,sans-serif" font-size="26" text-anchor="middle">🚗</text>
+  <text x="430" y="170" font-family="Urbanist,Inter,sans-serif" font-size="14" font-weight="700" fill="rgba(96,165,250,0.8)" text-anchor="middle">Drive · 22 min</text>
+
+  <!-- connector -->
+  <circle cx="548" cy="140" r="3.5" fill="rgba(96,165,250,0.35)" stroke="rgba(96,165,250,0.12)" stroke-width="9"/>
+
+  <!-- RIGHT EVENT -->
+  <rect x="568" y="60" width="264" height="160" rx="16" fill="#05A39C" fill-opacity="0.09" stroke="#05A39C" stroke-opacity="0.22" stroke-width="1.5"/>
+  <rect x="568" y="60" width="5" height="160" rx="2.5" fill="#05A39C" fill-opacity="0.7"/>
+  <text x="700" y="132" font-family="Urbanist,Inter,sans-serif" font-size="17" font-weight="700" fill="rgba(200,242,240,0.9)" text-anchor="middle">Coffee with</text>
+  <text x="700" y="154" font-family="Urbanist,Inter,sans-serif" font-size="17" font-weight="700" fill="rgba(200,242,240,0.9)" text-anchor="middle">Priya</text>
+  <text x="700" y="177" font-family="Inter,sans-serif" font-size="11" fill="rgba(5,163,156,0.5)" text-anchor="middle">@ Downtown Café</text>
+  <text x="700" y="197" font-family="Inter,sans-serif" font-size="10" fill="rgba(5,163,156,0.3)" text-anchor="middle">starts 10:10 AM</text>
+</svg>

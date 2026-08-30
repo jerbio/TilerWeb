@@ -1,4 +1,4 @@
-﻿{
+{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -43,8 +43,8 @@
 		},
 		"navigation": {
 			"home": "홈",
-			"waitlist": "대기자 명단",
-			"discover": "기능"
+			"discover": "기능",
+			"waitlist": "대기자 명단"
 		},
 		"voiceInput": {
 			"listening": "듣는 중...",
@@ -86,16 +86,16 @@
 			"facebook": "Facebook",
 			"linkedin": "LinkedIn",
 			"instagram": "Instagram",
-			"x": "X (Twitter)"
+			"x": "X (트위터)"
 		},
 		"apps": {
 			"ios": {
 				"cta": "App Store에서 다운로드",
-				"platform": "iOS App Store"
+				"platform": "iOS 앱스토어"
 			},
 			"android": {
 				"cta": "Google Play에서 받기",
-				"platform": "Android Play Store"
+				"platform": "Android 플레이스토어"
 			}
 		},
 		"legal": {
@@ -150,6 +150,309 @@
 			"footer": {
 				"cookieSettings": "쿠키 설정"
 			}
+		},
+		"emptyState": {
+			"defaultText": "아직 여기에 아무것도 없습니다"
+		},
+		"pagination": {
+			"page": "{{page}}페이지"
+		}
+	},
+	"modals": {
+		"loading": {
+			"image": {
+				"alt": "로딩 표시기"
+			}
+		},
+		"success": {
+			"image": {
+				"alt": "성공 아이콘"
+			}
+		}
+	},
+	"calendar": {
+		"nonViable": {
+			"title": "일정 배정 불가 이벤트",
+			"infoTooltip": "시간 충돌 또는 제약 조건으로 인해 이 이벤트는 일정에 배정할 수 없습니다."
+		},
+		"longDuration": {
+			"title": "장시간 이벤트",
+			"infoTooltip": "이 이벤트는 15시간 이상 지속되며, 가독성을 위해 여기에 표시됩니다."
+		},
+		"event": {
+			"dueIn": "{{time}} 후 마감",
+			"dateLabel": "날짜:",
+			"startLabel": "시작:",
+			"endLabel": "종료:",
+			"durationLabel": "기간:",
+			"repetitionLabel": "반복:",
+			"deadlineLabel": "마감일:",
+			"locationLabel": "지도에서 길찾기 보기",
+			"locationLinkLabel": "링크",
+			"videoLinkLabel": "화상 통화",
+			"copyLink": "링크 복사",
+			"openLink": "링크 열기",
+			"previewBadge": "미리 보기",
+			"previewHint": "이것은 시뮬레이션 미리 보기입니다. 수락해야만 변경 사항이 적용됩니다.",
+			"secondaryActionsLabel": "보조 타일 작업:",
+			"secondaryActions": {
+				"editLabel": "편집",
+				"deleteLabel": "삭제"
+			},
+			"save": "저장",
+			"cancel": "취소",
+			"actions": {
+				"complete": "완료",
+				"now": "현재로",
+				"defer": "연기",
+				"accept": "수락",
+				"decline": "거절"
+			},
+			"validation": {
+				"endAfterStart": "종료 시간은 시작 시간 이후여야 합니다"
+			},
+			"moreOptions": "옵션 더 보기",
+			"videoSource": {
+				"zoom": "Zoom",
+				"google": "Google Meet",
+				"outlook": "Microsoft Teams",
+				"other": "화상 통화"
+			},
+			"deleteConfirmTitle": "이 이벤트를 삭제하시겠습니까?",
+			"deleteConfirmBody": "일정에서 영구적으로 삭제됩니다.",
+			"deleteConfirmThirdPartyBody": "연결된 캘린더 서비스에서도 삭제됩니다.",
+			"deleteConfirmAction": "삭제",
+			"deleteConfirmActionAria": "삭제 확인"
+		},
+		"createBlock": {
+			"title": "새 블록 추가",
+			"info": {
+				"name": {
+					"label": "이름",
+					"placeholder": "이 블록의 이름은 무엇인가요?"
+				},
+				"start": {
+					"label": "시작 시간",
+					"placeholder": "이 블록은 언제 시작하나요?"
+				},
+				"end": {
+					"label": "종료 시간",
+					"placeholder": "이 블록은 언제 끝나나요?"
+				},
+				"hours": {
+					"label": "기간(시간)",
+					"placeholder": "몇 시간 걸리나요?"
+				},
+				"minutes": {
+					"label": "기간(분)",
+					"placeholder": "몇 분 걸리나요?"
+				},
+				"location": {
+					"label": "주소",
+					"placeholder": "이 블록은 어디에서 진행되나요?"
+				},
+				"locationTag": {
+					"label": "주소 별칭",
+					"placeholder": "예: 집, 사무실, 헬스장"
+				},
+				"duration": {
+					"valid": "기간 <mute>~</mute> <highlight>{{duration}}</highlight>",
+					"invalid": "<highlight>잘못된 기간</highlight>"
+				}
+			},
+			"errors": {
+				"invalidDuration": "잘못된 기간입니다. 종료 시간은 시작 시간 이후여야 합니다."
+			},
+			"message": {
+				"success": "<b>\"<name/>\"</b>이(가) 일정에 추가되었습니다",
+				"pending": "잠시만요. Tiler가 \"{{name}}\"을(를) 일정에 추가하고 있습니다"
+			},
+			"buttons": {
+				"reset": "재설정",
+				"submit": "블록 만들기",
+				"collapse": "옵션 줄이기",
+				"expand": "옵션 더 보기",
+				"viewInTimeline": "블록 보기"
+			},
+			"summary": {
+				"title": "요약",
+				"description": "<b>{{duration}}</b> 동안 진행되는 <b>{{name}}</b> 이벤트가 있습니다",
+				"locationDescription": ", 장소: <b>{{location}}</b>",
+				"recurrenceFrequency": {
+					"daily": "일",
+					"weekly": "주",
+					"monthly": "개월",
+					"yearly": "년"
+				},
+				"recurring": ". <b>{{recurrenceFrequency}}</b>마다 반복됩니다",
+				"recurringStart": " <b>{{recurrenceStart}}</b>부터",
+				"recurringEnd": " <b>{{recurrenceEnd}}</b>까지"
+			},
+			"actions": {
+				"repeatBlock": "블록 반복"
+			},
+			"sections": {
+				"blockColor": "블록 색상 선택",
+				"blockActions": "블록 작업"
+			}
+		},
+		"createTile": {
+			"title": "새 타일 추가",
+			"info": {
+				"description": "<location/>에서 <action/>을(를) 해야 합니다. <hours/>시간 <minutes/>분이 걸리며 <date/>까지 완료해야 합니다",
+				"action": {
+					"label": "타일 이름",
+					"placeholder": "이 타일의 이름은 무엇인가요?"
+				},
+				"tileSplit": {
+					"label": "몇 번 진행해야 하나요?",
+					"placeholder": "예: 1, 2, 3..."
+				},
+				"location": {
+					"label": "주소",
+					"placeholder": "이 타일은 어디에서 진행되나요?"
+				},
+				"locationTag": {
+					"label": "주소 별칭",
+					"placeholder": "예: 집, 사무실, 헬스장"
+				},
+				"hours": {
+					"label": "타일 기간(시간)",
+					"placeholder": "몇 시간 걸리나요?"
+				},
+				"minutes": {
+					"label": "타일 기간(분)",
+					"placeholder": "몇 분 걸리나요?"
+				},
+				"range": {
+					"label": "시간 범위",
+					"description": "다음 시간 사이에 일정 배정",
+					"conjunction": "및"
+				}
+			},
+			"sections": {
+				"tileColor": "타일 색상 선택",
+				"tileActions": "타일 작업",
+				"recurrenceType": {
+					"daily": "매일",
+					"weekly": "매주",
+					"monthly": "매월",
+					"yearly": "매년"
+				},
+				"recurrenceStartType": {
+					"title": "시작",
+					"default": "기본값(<date/>)",
+					"on": "지정일"
+				},
+				"recurrenceEndType": {
+					"title": "종료",
+					"never": "안 함",
+					"on": "지정일"
+				},
+				"recurrenceStartDate": {
+					"title": "종료일",
+					"description": "반복은 <date/>에 시작됩니다"
+				},
+				"recurrenceEndDate": {
+					"title": "종료일",
+					"description": "반복은 <date/>에 끝납니다"
+				},
+				"recurrenceWeeklyDays": {
+					"title": "반복 요일",
+					"monday": "월요일",
+					"tuesday": "화요일",
+					"wednesday": "수요일",
+					"thursday": "목요일",
+					"friday": "금요일",
+					"saturday": "토요일",
+					"sunday": "일요일"
+				},
+				"restrictionType": {
+					"anytime": "언제든지",
+					"work": "근무 시간",
+					"personal": "개인 시간",
+					"custom": "사용자 지정"
+				}
+			},
+			"tip": {
+				"description": "새 타일을 만들려면 <b><key/></b> 키를 누르세요",
+				"keys": {
+					"enter": "Enter",
+					"return": "Return"
+				}
+			},
+			"message": {
+				"success": "<b>\"<action/>\"</b>이(가) 일정에 추가되었습니다",
+				"pending": "잠시만요. Tiler가 \"{{action}}\"을(를) 일정에 추가하고 있습니다"
+			},
+			"actions": {
+				"repeatTile": "타일 반복",
+				"timeRestriction": "시간 제한",
+				"addLocationNickname": "위치 별칭 추가"
+			},
+			"errors": {
+				"couldNotCreate": "타일을 만들 수 없습니다. 다시 시도해 주세요.",
+				"scheduleProfile": "개인/근무 시간을 불러오지 못했습니다",
+				"workProfileNotFound": "근무 시간 제한 프로필을 찾을 수 없습니다",
+				"personalProfileNotFound": "개인 시간 제한 프로필을 찾을 수 없습니다"
+			},
+			"recurrence": {
+				"description": "이 작업을 <period/>마다 <repetition/>회 해야 합니다",
+				"periods": {
+					"daily": "일",
+					"weekly": "주",
+					"monthly": "개월",
+					"yearly": "년"
+				}
+			},
+			"timeRestrictions": {
+				"anytime": "언제든지",
+				"personalHours": "개인 시간",
+				"workHours": "근무 시간",
+				"custom": "사용자 지정"
+			},
+			"buttons": {
+				"reset": "재설정",
+				"submit": "타일 만들기",
+				"collapse": "옵션 줄이기",
+				"expand": "옵션 더 보기",
+				"viewInTimeline": "타일 보기"
+			},
+			"summary": {
+				"title": "요약",
+				"description": "<b>{{action}}</b>을(를) 해야 합니다",
+				"descriptionLocation": " 장소: <b>{{location}}</b>",
+				"descriptionDuration": ". <b>{{hours}}시간 {{minutes}}분</b> 걸립니다",
+				"split": {
+					"once": "<b>한 번</b>",
+					"twice": "<b>두 번</b>",
+					"times": "<b>{{count}}번</b>"
+				},
+				"range": ", <b>{{start}}</b>부터 <b>{{end}}</b> 사이",
+				"recurrenceFrequency": {
+					"daily": "일",
+					"weekly": "주",
+					"monthly": "개월",
+					"yearly": "년"
+				},
+				"recurring": ". 반복:",
+				"recurringFrequency": " <b>{{recurrenceFrequency}}</b>마다",
+				"recurringStart": " <b>{{recurrenceStart}}</b>부터",
+				"recurringEnd": " <b>{{recurrenceEnd}}</b>까지"
+			}
+		},
+		"createSelection": {
+			"tile": {
+				"label": "타일 만들기",
+				"description": "가능한 시간에 따라 이동할 수 있는 유연한 작업입니다."
+			},
+			"block": {
+				"label": "블록 만들기",
+				"description": "지정한 시간에 그대로 유지되는 고정 작업입니다."
+			}
+		},
+		"mobileChatInput": {
+			"placeholder": "Tiler에게 무엇이든 물어보세요..."
 		}
 	},
 	"home": {
@@ -189,6 +492,40 @@
 				"errorLoadMessages": "채팅 메시지를 로드하지 못했습니다.",
 				"errorSendMessage": "메시지를 보내지 못했습니다.",
 				"errorAcceptChanges": "변경 사항을 수락하지 못했습니다.",
+				"tileRemoved": "타일이 삭제되었습니다",
+				"tileCompleted": "이 일정이 완료되었습니다",
+				"tileDeleted": "이 일정이 삭제되었습니다",
+				"navigating": "타일로 이동 중...",
+				"acceptToSee": "변경 사항을 수락하면 이 타일을 볼 수 있습니다",
+				"simulationStarting": "Tilecast 시작 중…",
+				"simulationQueued": "Tilecast 대기 중…",
+				"simulationGenerating": "Tilecast 생성 중…",
+				"simulationUpdating": "Tilecast 업데이트 중…",
+				"simulationReady": "Tilecast 준비 완료",
+				"simulationChangesLabel": "변경 사항",
+				"simulationDefunct": "오래된 Tilecast",
+				"review": "검토",
+				"simulationInProgress": "이 변경 사항은 아직 예측 중입니다.",
+				"simulationFailed": "Tilecast를 사용할 수 없습니다",
+				"simulationStale": "Tilecast가 오래되었습니다",
+				"simulationUnavailable": "Tilecast를 사용할 수 없습니다",
+				"loadingSimulation": "Tilecast 로딩 중…",
+				"reviewSimulation": "Tilecast 검토",
+				"retry": "재시도",
+				"reviewNoPreview": "이 변경 사항에 사용할 수 있는 예측 타일이 없습니다.",
+				"applyNow": "지금 적용",
+				"exitReview": "검토 종료",
+				"previous": "이전",
+				"next": "다음",
+				"expand": "펼치기",
+				"expandMore": "더 펼치기",
+				"collapse": "접기",
+				"viewCurrent": "현재",
+				"viewSimulation": "Tilecast",
+				"pillStrip": {
+					"showMore": "+{{count}}개 더보기",
+					"showLess": "간략히 보기"
+				},
 				"wsStatus": {
 					"actionInitStart1": "액션 생성 초기화 중...",
 					"actionInitStart2": "설정 중...",
@@ -236,6 +573,15 @@
 					"usingDefaultLocation": "기본 위치 사용 중 - 아이콘을 클릭하여 현재 위치를 가져옵니다.",
 					"clickIconToGetLocation": "아이콘을 클릭하여 현재 위치를 가져오거나 위치를 편집합니다."
 				},
+				"sessionHistory": {
+					"title": "채팅 기록",
+					"loading": "세션 로딩 중...",
+					"loadingMore": "더 로딩 중...",
+					"loadMore": "이전 세션 불러오기",
+					"empty": "아직 대화가 없습니다",
+					"untitled": "제목 없는 세션",
+					"newConversation": "새 대화"
+				},
 				"errorPopup": {
 					"chatLimitReached": "채팅 한도 도달",
 					"headerText": "20개 이상의 프롬프트를 원하시나요?",
@@ -259,6 +605,58 @@
 					"messageContinued": "링크를 클릭하여 Tiler와의 무제한 채팅을 잠금 해제하세요.",
 					"button": "알겠습니다",
 					"footer": "이메일을 받지 못하셨나요? 스팸 폴더를 확인하거나 다시 시도하세요."
+				},
+				"promptSuggestions": {
+					"coreStructural": {
+						"morningSetup": "아침 루틴 설정하기",
+						"dailyPlanning": "하루 계획하기",
+						"travelBuffer": "이동 여유 시간 추가하기",
+						"taskReview": "작업 검토하기",
+						"dayWrapUp": "하루 마무리하기"
+					},
+					"professional": {
+						"salesCall": "영업 전화 일정 잡기",
+						"clientPresentation": "고객 발표 준비하기",
+						"proposalDrafting": "제안서 작성하기",
+						"contractReview": "계약서 검토하기",
+						"budgetReview": "예산 분석하기",
+						"teamSync": "팀과 동기화하기",
+						"boardPrep": "이사회 준비하기",
+						"performanceCheckIn": "성과 점검하기"
+					},
+					"operations": {
+						"dispatchSchedule": "배차 일정 만들기",
+						"shiftChangeover": "교대 인수인계 계획하기",
+						"inventoryCheck": "재고 확인하기",
+						"qualityAudit": "품질 감사 진행하기",
+						"fieldVisit": "현장 방문 일정 잡기",
+						"vendorCoordination": "공급업체와 조율하기",
+						"reportSubmission": "보고서 제출하기"
+					},
+					"locationLinked": {
+						"siteVisit": "현장 방문 일정 잡기",
+						"officeBlock": "사무실 근무 시간 확보하기",
+						"onSiteInspection": "현장 점검 계획하기",
+						"customerAppointment": "고객 예약 잡기",
+						"pickupDelivery": "픽업 및 배송 준비하기",
+						"routePlanning": "경로 계획하기"
+					},
+					"strategic": {
+						"marketResearch": "시장 조사 진행하기",
+						"competitiveScan": "경쟁사 분석하기",
+						"weeklyForecast": "주간 예측 작성하기",
+						"hiringInterview": "채용 면접 일정 잡기",
+						"investorCall": "투자자 통화 준비하기",
+						"productRoadmapReview": "제품 로드맵 검토하기"
+					},
+					"deepWork": {
+						"writingSession": "집필 시간 확보하기",
+						"analysisBlock": "분석 시간 일정 잡기",
+						"designSprint": "디자인 스프린트 계획하기",
+						"codingBlock": "코딩 시간 확보하기",
+						"financialModeling": "재무 모델 구축하기",
+						"researchStudy": "연구 조사 진행하기"
+					}
 				}
 			}
 		},
@@ -269,6 +667,178 @@
 			"submit": "대기자 명단에 가입",
 			"success": "가입해 주셔서 감사합니다! Tiler가 준비되면 알려드리겠습니다.",
 			"error": "문제가 발생했습니다. 다시 시도하세요."
+		},
+		"heroExperiment": {
+			"nl_scheduling": {
+				"eyebrow": "Effortless natural-language scheduling",
+				"titleLead": "Just say it.",
+				"titleAccent": "It's scheduled.",
+				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
+				"primaryCta": "Tell Tiler what you need",
+				"secondaryCta": "See how it works",
+				"nudgeCta": "Schedule this for real",
+				"nudgeCaption": "That took one sentence. Yours will too.",
+				"demo": {
+					"request": "Gym four times this week",
+					"schedule": "Schedule",
+					"scheduled": "Scheduled",
+					"thisWeek": "This week",
+					"rearranging": "rearranging",
+					"done": "done",
+					"days": {
+						"mon": "Mon",
+						"tue": "Tue",
+						"wed": "Wed",
+						"thu": "Thu",
+						"fri": "Fri",
+						"sat": "Sat",
+						"sun": "Sun"
+					},
+					"items": {
+						"gym": "Gym",
+						"deepWork": "Deep work",
+						"standup": "Standup",
+						"report": "Report",
+						"oneOnOne": "1:1",
+						"review": "Review",
+						"rest": "Rest"
+					},
+					"legend": {
+						"placed": "placed",
+						"moving": "moving",
+						"moved": "report → Thu"
+					}
+				}
+			},
+			"stop_deciding": {
+				"eyebrow": "Your day, planned for you",
+				"title": "Stop deciding when.",
+				"subtitle": "Add what you need to get done. Tiler builds your day around your working hours, your commute, and your deadlines.",
+				"primaryCta": "Build my first day",
+				"secondaryCta": "See how it works",
+				"nudgeCta": "Build my day",
+				"nudgeCaption": "You brought the list. Tiler brought the day.",
+				"demo": {
+					"listLabel": "Your list",
+					"scheduledLabel": "Today, scheduled",
+					"items": {
+						"memo": "Draft Q3 budget memo",
+						"pharmacy": "Call the pharmacy",
+						"review": "Review Ana's design file",
+						"gym": "Gym — legs",
+						"train": "Book train to Leeds"
+					},
+					"caption": "Placed around a 9–5 day and a 40-minute commute."
+				}
+			},
+			"self_healing": {
+				"eyebrow": "Automatic recovery from disruption",
+				"titleLead": "Your day fell apart at 10am.",
+				"titleAccent": "Your schedule already recovered.",
+				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
+				"primaryCta": "See it recover",
+				"secondaryCta": "See how it works",
+				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
+				"nudgeCta": "Keep this schedule",
+				"nudgeCaption": "Nothing was dropped. Nothing needed your attention.",
+				"demo": {
+					"label": "Tuesday",
+					"status": "Rebuilt",
+					"rebuiltIn": "Rebuilt in 0.4s",
+					"clientCall": "Client call",
+					"onTrack": "on track",
+					"movedSameDay": "moved, same day",
+					"overran": "Ran 90 min late",
+					"wasAt": "was {{time}}",
+					"items": {
+						"morningReview": "Morning review",
+						"clientCall": "Client call",
+						"deepWork": "Deep work — draft",
+						"designSync": "Design sync",
+						"gym": "Gym"
+					},
+					"caption": "Gym kept · Deep work protected · Nothing dropped"
+				}
+			},
+			"task_splitting": {
+				"eyebrow": "Automatic decomposition of big work",
+				"titleLead": "One big task.",
+				"titleAccent": "Automatically split across your week.",
+				"subtitle": "Tell Tiler what's due and how long it'll take. It breaks the work into sessions and spreads them across your week.",
+				"primaryCta": "Split my first project",
+				"secondaryCta": "See how it works",
+				"nudgeCta": "Split my project",
+				"nudgeCaption": "One deadline in. Six sessions out.",
+				"demo": {
+					"label": "One task",
+					"status": "Split",
+					"task": "Thesis",
+					"total": "12 hrs",
+					"due": "Due Sun 14 Jun",
+					"dueFlag": "Due",
+					"days": {
+						"mon": "Mon",
+						"tue": "Tue",
+						"wed": "Wed",
+						"thu": "Thu",
+						"fri": "Fri",
+						"sat": "Sat",
+						"sun": "Sun"
+					},
+					"parts": {
+						"outline": "Outline",
+						"sources": "Sources",
+						"draftOne": "Draft ch. 1",
+						"notes": "Notes",
+						"draftTwo": "Draft ch. 2",
+						"edit": "Edit pass"
+					},
+					"caption": "6 sessions · spread unevenly around your week"
+				}
+			},
+			"capacity_check": {
+				"eyebrow": "An honest capacity reality check",
+				"title": "Does it actually fit?",
+				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
+				"primaryCta": "See if your week fits",
+				"secondaryCta": "See how it works",
+				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
+				"nudgeCta": "Check my real week",
+				"nudgeCaption": "Better to know on Monday than to discover it on Friday.",
+				"demo": {
+					"label": "This week",
+					"capacity": "Over capacity",
+					"overflow": "Overflow",
+					"load": "38 hrs of work / 32 hrs available",
+					"wontFit": "6 hrs won't fit",
+					"days": {
+						"mon": "Mon",
+						"tue": "Tue",
+						"wed": "Wed",
+						"thu": "Thu",
+						"fri": "Fri"
+					},
+					"items": {
+						"standup": "Standup + planning",
+						"designReview": "Design review",
+						"deepWork": "Deep work",
+						"sync": "Sync",
+						"build": "Build",
+						"inbox": "Inbox",
+						"oneOnOnes": "1:1s",
+						"sprintPrep": "Sprint prep",
+						"writeup": "Writeup",
+						"retro": "Retro",
+						"implementation": "Implementation",
+						"qaHandoff": "QA handoff",
+						"demo": "Demo",
+						"wrapUp": "Wrap-up",
+						"review": "Review",
+						"urgentFix": "Urgent fix",
+						"clientCall": "Client call"
+					}
+				}
+			}
 		},
 		"hero": {
 			"title": "AI 기반의 하루 설계자",
@@ -336,6 +906,91 @@
 						"travelTime": "차로 15분",
 						"deepWork": "집중 작업 세션"
 					}
+				},
+				"coffee": {
+					"calendarTitle": "11월 19일 화요일",
+					"messages": {
+						"userRequest": "오전 10시에 5번가 스타벅스에서 마이크와 커피",
+						"aiResponse1": "현재 위치에서 18분입니다. 오전 9시 40분에 출발할까요?",
+						"userConfirm": "좋아요",
+						"aiConfirm": "일정에 추가되었습니다! ✓"
+					},
+					"tiles": {
+						"travel": "스타벅스로 이동",
+						"travelTime": "18분",
+						"coffee": "커피 - 마이크"
+					}
+				},
+				"airport": {
+					"calendarTitle": "11월 23일 토요일",
+					"messages": {
+						"userRequest": "오후 3시 비행기, 오후 1시까지 공항 도착 필요",
+						"aiResponse1": "공항까지 45분입니다. 여유 시간을 두고 오후 12시 10분에 출발할까요?",
+						"userConfirm": "네",
+						"aiConfirm": "이동 시간이 추가되었습니다! ✓"
+					},
+					"tiles": {
+						"travel": "공항으로 이동",
+						"travelTime": "45분",
+						"airport": "공항 체크인",
+						"flight": "비행기 출발"
+					}
+				},
+				"school": {
+					"calendarTitle": "11월 18일 월요일",
+					"messages": {
+						"userRequest": "오후 3시 30분에 학교에서 아이들 데리러 가기",
+						"aiResponse1": "차로 20분입니다. 오후 3시 10분에 출발할까요?",
+						"userConfirm": "완벽해요",
+						"aiConfirm": "캘린더에 추가되었습니다! ✓"
+					},
+					"tiles": {
+						"travel": "학교로 이동",
+						"travelTime": "20분",
+						"pickup": "학교 픽업"
+					}
+				},
+				"doctor": {
+					"calendarTitle": "11월 20일 수요일",
+					"messages": {
+						"userRequest": "오후 2시 30분 시내 병원 예약",
+						"aiResponse1": "사무실에서 28분입니다. 오후 2시에 출발할까요?",
+						"userConfirm": "네",
+						"aiConfirm": "일정에 추가되었습니다! ✓"
+					},
+					"tiles": {
+						"travel": "병원으로 이동",
+						"travelTime": "28분",
+						"doctor": "병원 예약"
+					}
+				},
+				"haircut": {
+					"calendarTitle": "11월 22일 금요일",
+					"messages": {
+						"userRequest": "오후 4시 집 근처 미용실에서 이발",
+						"aiResponse1": "걸어서 8분입니다. 오후 3시 50분에 출발할까요?",
+						"userConfirm": "네",
+						"aiConfirm": "완료되었습니다! ✓"
+					},
+					"tiles": {
+						"travel": "미용실로 걸어가기",
+						"travelTime": "8분",
+						"haircut": "이발 예약"
+					}
+				},
+				"restaurant": {
+					"calendarTitle": "11월 23일 토요일",
+					"messages": {
+						"userRequest": "오후 7시 이탈리안 레스토랑 저녁 예약",
+						"aiResponse1": "차로 32분입니다. 오후 6시 25분에 출발할까요?",
+						"userConfirm": "완벽해요",
+						"aiConfirm": "추가되었습니다! ✓"
+					},
+					"tiles": {
+						"travel": "레스토랑으로 이동",
+						"travelTime": "32분",
+						"dinner": "저녁 예약"
+					}
 				}
 			}
 		},
@@ -354,7 +1009,47 @@
 		},
 		"featureHighlights": {
 			"title": "주요 기능",
-			"subtitle": "Tiler로 삶을 단순화하세요. 저희가 도와드릴 수 있는 것은 다음과 같습니다."
+			"subtitle": "Tiler로 삶을 단순화하세요. 저희가 도와드릴 수 있는 것은 다음과 같습니다.",
+			"animations": {
+				"nls": {
+					"transcript": "내일 정오에 사라와 점심...",
+					"responsePrimary": "예약됨: 사라와 점심 - 내일 오후 12:00",
+					"responseTravel": "+ 이동 시간 25분 추가됨",
+					"responseLocation": "시내 - 1시간"
+				},
+				"travel": {
+					"stops": {
+						"home": {
+							"label": "집",
+							"time": "오전 8:00"
+						},
+						"office": {
+							"label": "사무실",
+							"time": "오전 9:15"
+						},
+						"cafe": {
+							"label": "카페",
+							"time": "오후 1:00"
+						},
+						"gym": {
+							"label": "헬스장",
+							"time": "오후 5:30"
+						}
+					}
+				},
+				"undo": {
+					"tileName": "헬스장 세션",
+					"originalMeta": "집 - 화 - 오전 10:00",
+					"previewMeta": "집 - 수 - 오후 2:00",
+					"previewBadge": "미리보기",
+					"undoAction": "되돌리기",
+					"acceptAction": "수락"
+				},
+				"tileshare": {
+					"tileName": "헬스장 세션",
+					"tileSub": "Alex로부터 - 1시간"
+				}
+			}
 		},
 		"tileCardSection": {
 			"header": "작업과 일정을 시각화하세요",
@@ -448,6 +1143,200 @@
 					"question": "대중교통 기능은 어떻게 사용하나요?",
 					"answer": "대중교통 기능은 단순히 이동 시간을 계산하는 것 이상으로, 내비게이션 비서 역할을 합니다. 경로를 계획하고, 최적의 교통 수단을 제안하며, 작업과 위치 간의 원활한 이동을 위한 실시간 길 안내를 제공합니다. 이동 아이콘을 탭하기만 하면 즉시 내비게이션을 받아 항상 정시에 올바른 길을 갈 수 있습니다."
 				}
+			}
+		}
+	},
+	"auth": {
+		"signup": {
+			"title": "Tiler 시작하기",
+			"subtitle": "원활한 일정 관리를 위해 무료 계정을 만드세요",
+			"googleButton": "Google로 가입",
+			"appleButton": "Apple로 가입하기",
+			"microsoftButton": "Microsoft로 가입하기",
+			"emailLabel": "이메일 주소",
+			"emailPlaceholder": "예: yourname@outlook.com",
+			"submitButton": "무료 계정 만들기",
+			"submitting": "계정 생성 중...",
+			"footer": "이미 계정이 있으신가요?",
+			"footerLink": "로그인하기",
+			"verificationSent": "인증 코드가 이메일로 전송되었습니다!",
+			"createAccountError": "계정을 만들지 못했습니다. 다시 시도해 주세요."
+		},
+		"signin": {
+			"title": "Tiler에 다시 오신 것을 환영합니다",
+			"subtitle": "일정 관리를 계속하려면 로그인하세요",
+			"googleButton": "Google로 로그인",
+			"appleButton": "Apple로 로그인",
+			"microsoftButton": "Microsoft로 로그인",
+			"submitButton": "내 계정으로 로그인",
+			"submitting": "로그인 중...",
+			"footer": "계정이 없으신가요?",
+			"footerLink": "가입하기"
+		},
+		"seo": {
+			"signupTitle": "가입 - Tiler 스마트 캘린더",
+			"signinTitle": "로그인 - Tiler 스마트 캘린더",
+			"description": "Tiler 계정에 로그인하거나 새로 만들어 스마트 캘린더와 작업 일정 관리를 이용하세요."
+		},
+		"creative": {
+			"regionLabel": "Tiler 일정 예시",
+			"previous": "이전 일정 보기",
+			"next": "다음 일정 보기",
+			"paginationLabel": "일정 예시 선택",
+			"showSlide": "일정 {{number}} 보기",
+			"slides": {
+				"first": {
+					"alt": "하루의 모든 작업을 빈 시간에 배치한 Tiler 일정입니다.",
+					"caption": "하루 전체가 완성되는 모습을 확인하세요.",
+					"description": "Tiler가 각 작업에 가장 알맞은 빈 시간을 찾아 실천하기 쉬운 계획을 만들어 드립니다."
+				},
+				"second": {
+					"alt": "투자자 검토 일정이 다른 날로 이동한 후 자동으로 조정되는 Tiler 일정입니다.",
+					"caption": "계획이 바뀔 때 일정이 적응하는 모습을 확인하세요."
+				}
+			}
+		},
+		"or": "또는",
+		"verification": {
+			"title": "인증 필요",
+			"header": "인증 코드를 입력하세요",
+			"description": "인증 코드를 다음 주소로 전송했습니다:",
+			"label": "인증 코드",
+			"placeholder": "인증 코드 입력",
+			"verifyButton": "코드 확인",
+			"verifying": "확인 중...",
+			"resendButton": "코드를 받지 못하셨나요? 다시 보내기",
+			"resending": "전송 중...",
+			"cancel": "취소",
+			"success": "계정이 성공적으로 인증되었습니다!",
+			"error": "잘못된 인증 코드입니다. 다시 시도해 주세요.",
+			"resendSuccess": "인증 코드를 다시 보냈습니다!",
+			"resendError": "코드를 다시 보내지 못했습니다. 다시 시도해 주세요."
+		},
+		"goBack": "뒤로 가기"
+	},
+	"settings": {
+		"title": "설정",
+		"back": "뒤로",
+		"logout": "로그아웃",
+		"breadcrumb": {
+			"home": "홈",
+			"settings": "설정"
+		},
+		"sections": {
+			"accountInfo": {
+				"title": "계정 정보",
+				"description": "계정을 검토하고 개인 정보를 변경하세요",
+				"placeholder": "계정 정보 설정이 곧 제공됩니다...",
+				"fields": {
+					"fullName": "전체 이름",
+					"username": "사용자 이름",
+					"email": "이메일 주소",
+					"phoneNumber": "전화번호",
+					"phoneNumberPlaceholder": "전화번호 추가",
+					"countryCode": "국가 코드",
+					"countryCodeSearch": "국가 검색...",
+					"countryCodeNoResults": "국가를 찾을 수 없습니다",
+					"dateOfBirth": "생년월일",
+					"dateOfBirthPlaceholder": "년/월/일"
+				},
+				"saveChanges": "변경사항 저장",
+				"saving": "저장 중...",
+				"deleteAccount": "내 계정 삭제",
+				"saveSuccess": "계정 정보가 성공적으로 업데이트되었습니다",
+				"saveError": "변경사항을 저장할 수 없습니다. 다시 시도해 주세요.",
+				"deleteNotImplemented": "계정 삭제 기능이 곧 제공됩니다"
+			},
+			"tilePreferences": {
+				"title": "타일 환경설정",
+				"description": "이동 수단을 정의하고 Tiler가 일일 시간 패턴을 이해하도록 도와주세요",
+				"placeholder": "타일 환경설정이 곧 제공됩니다...",
+				"howMoveAround": "어떻게 이동하시나요?",
+				"cycling": "자전거",
+				"driving": "운전",
+				"transit": "대중교통",
+				"defineTimeRestrictions": "시간 제한 정의",
+				"myWorkHours": "내 근무 시간",
+				"myPersonalHours": "내 개인 시간",
+				"scheduleFullness": "일정 채움 정도",
+				"scheduleFullnessDescription": "Tiler가 예약된 타일로 사용 가능한 하루를 얼마나 채울지 목표를 설정하세요.",
+				"scheduleFullnessValue": "목표 채움 정도 {{percentage}}퍼센트",
+				"scheduleFullnessLighter": "가볍게",
+				"scheduleFullnessBalanced": "균형",
+				"scheduleFullnessFuller": "더 많이",
+				"scheduleFullnessLimits": "목표 범위는 {{minimum}}%에서 {{maximum}}%까지입니다. 유용한 기본 수준을 유지하면서 변경 사항과 이동 시간을 위한 여유를 둡니다.",
+				"setBlockOutHours": "차단 시간 설정",
+				"bedTime": "취침 시간",
+				"startsAt": "시작 시간",
+				"endsAt": "종료 시간",
+				"useCustom": "사용자 지정 사용",
+				"customTimeRestrictions": "사용자 지정 시간 제한",
+				"reset": "재설정",
+				"saveChanges": "변경 사항 저장",
+				"saving": "저장 중...",
+				"saveSuccess": "타일 환경설정이 성공적으로 업데이트되었습니다",
+				"saveError": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요.",
+				"customSaved": "사용자 지정 시간 제한이 저장되었습니다",
+				"bedTimeStartRequired": "취침 시작 시간을 선택해 주세요",
+				"bedTimeEndRequired": "기상 시간을 선택해 주세요",
+				"scheduleIncompleteDay": "{{label}}: {{day}}의 시작 시간과 종료 시간을 모두 설정해 주세요",
+				"dayLabels": {
+					"sun": "일",
+					"mon": "월",
+					"tue": "화",
+					"wed": "수",
+					"thu": "목",
+					"fri": "금",
+					"sat": "토"
+				},
+				"dayNames": {
+					"sun": "일요일",
+					"mon": "월요일",
+					"tue": "화요일",
+					"wed": "수요일",
+					"thu": "목요일",
+					"fri": "금요일",
+					"sat": "토요일"
+				},
+				"start": "시작",
+				"end": "종료",
+				"copyTimes": "시간 복사",
+				"paste": "시간 붙여넣기",
+				"cancelCopy": "복사 취소",
+				"themeMode": "색상 테마",
+				"themeModeLight": "라이트",
+				"themeModeDark": "다크",
+				"themeModeSystem": "기기 설정 사용",
+				"defaultStartTime": "오전 8:00",
+				"defaultEndTime": "오후 6:00",
+				"am": "오전",
+				"pm": "오후"
+			},
+			"tilerContacts": {
+				"title": "Tiler 연락처",
+				"description": "동료를 Tiler 연락처에 추가하여 타일을 쉽게 공유하세요.",
+				"placeholder": "연락처 관리 기능이 곧 제공됩니다...",
+				"youHave": "보유한 연락처:",
+				"tilerContacts": "Tiler 연락처",
+				"enterFullName": "전체 이름 입력",
+				"emailOrPhone": "이메일 또는 전화번호"
+			},
+			"notificationPreferences": {
+				"title": "알림 환경설정",
+				"description": "미리 알림과 이메일 업데이트를 관리하세요",
+				"placeholder": "알림 설정이 곧 제공됩니다...",
+				"tileReminders": "타일 미리 알림",
+				"emailNotifications": "이메일 알림",
+				"pushNotifications": "푸시 알림",
+				"saveChanges": "변경 사항 저장",
+				"saving": "저장 중...",
+				"saveSuccess": "알림 환경설정이 성공적으로 업데이트되었습니다",
+				"saveError": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요."
+			},
+			"connections": {
+				"title": "연결",
+				"description": "Tiler 계정에 연결된 앱을 관리하세요",
+				"placeholder": "연결 설정이 곧 제공됩니다..."
 			}
 		}
 	},
@@ -555,6 +1444,7 @@
 		"notFoundMessage": "이런, '{{query}}'을(를) 찾을 수 없습니다. 이 제목으로 타일을 만드시겠습니까?",
 		"notFoundDismiss": "아니요",
 		"notFoundCreate": "만들기",
+		"editEvent": "편집",
 		"setAsNow": "지금으로 설정",
 		"markComplete": "완료",
 		"markDeleted": "삭제",
@@ -591,7 +1481,16 @@
 			"minutesShort": "분",
 			"confirm": "확인",
 			"cancel": "취소"
-		}
+		},
+		"userMenu": {
+			"logout": "로그아웃",
+			"signOutSuccess": "성공적으로 로그아웃되었습니다",
+			"signOutError": "로그아웃하지 못했습니다. 다시 시도해 주세요.",
+			"defaultUsername": "사용자",
+			"settings": "설정"
+		},
+		"expandPanel": "패널 펼치기",
+		"collapsePanel": "패널 접기"
 	},
 	"errors": {
 		"chatLimitReached": "채팅 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
@@ -609,6 +1508,10 @@
 			"updateSuccess": "변경 사항이 저장되었습니다!",
 			"deleting": "이벤트 삭제 중...",
 			"deleteSuccess": "이벤트가 삭제되었습니다!",
+			"accepting": "초대 수락 중...",
+			"acceptSuccess": "초대가 수락되었습니다!",
+			"declining": "초대 거절 중...",
+			"declineSuccess": "초대가 거절되었습니다!",
 			"actionFailed": "작업이 실패했습니다. 다시 시도해 주세요."
 		},
 		"edit": {
@@ -618,11 +1521,23 @@
 			"nameSection": "이름",
 			"occurrenceSection": "발생",
 			"timeSection": "시간 및 기간",
-			"recurringToggle": "이벤트 반복",
 			"repetitionSection": "반복",
+			"recurringToggle": "이벤트 반복",
 			"locationSection": "위치",
 			"colorSection": "색상",
 			"notesSection": "메모",
+			"restrictionSection": "시간 제한",
+			"restrictionEnabled": "시간 제한 활성화",
+			"restrictionTypeAnytime": "언제든지",
+			"restrictionTypeWork": "근무 시간",
+			"restrictionTypePersonal": "개인 시간",
+			"restrictionTypeCustom": "사용자 지정",
+			"restrictionWorkInfo": "근무 시간은 타일 설정에서 관리됩니다.",
+			"restrictionPersonalInfo": "개인 시간은 타일 설정에서 관리됩니다.",
+			"restrictionGoToPreferences": "타일 설정으로 이동",
+			"restrictionDayOff": "휴무",
+			"restrictionPreviewAnytime": "언제든지",
+			"restrictionPreviewCustom": "사용자 지정",
 			"name": "이름",
 			"start": "시작",
 			"end": "종료",
@@ -670,85 +1585,266 @@
 			"savedLocations": "저장된 위치",
 			"googleResults": "구글 지도",
 			"poweredByGoogle": "Google 제공",
-			"noLocationResults": "위치를 찾을 수 없습니다"
+			"noLocationResults": "위치를 찾을 수 없습니다",
+			"openNotes": "메모 열기",
+			"subEvents": {
+				"title": "세션",
+				"titleWithCount": "세션 ({{count}}개)",
+				"loading": "세션 로딩 중…",
+				"empty": "아직 세션이 없습니다",
+				"error": "세션을 불러올 수 없습니다",
+				"retry": "재시도",
+				"loadMore": "더 불러오기",
+				"loadEarlier": "이전 항목 불러오기",
+				"allLoaded": "모든 {{count}}개 세션을 불러왔습니다",
+				"showCompleted": "완료 및 삭제된 항목 표시",
+				"goTo": "캘린더에서 이 세션으로 이동",
+				"completed": "완료됨",
+				"removed": "삭제됨"
+			}
 		}
 	},
-	"settings": {
-		"title": "설정",
-		"back": "뒤로",
-		"logout": "로그아웃",
-		"breadcrumb": {
-			"home": "홈",
-			"settings": "설정"
+	"discover": {
+		"seo": {
+			"title": "탐색 - Tiler",
+			"description": "하루가 마침내 이해되는 순간들을 탐색해보세요. Tiler 앱을 둘러보고 앱 안에서 시도해볼 것들을 발견하세요."
 		},
-		"sections": {
-			"accountInfo": {
-				"title": "계정 정보",
-				"description": "계정을 검토하고 개인 정보를 변경하세요",
-				"fields": {
-					"fullName": "전체 이름",
-					"username": "사용자 이름",
-					"email": "이메일 주소",
-					"phoneNumber": "전화번호",
-					"phoneNumberPlaceholder": "전화번호 추가",
-					"countryCode": "국가 코드",
-					"countryCodeSearch": "국가 검색...",
-					"countryCodeNoResults": "국가를 찾을 수 없습니다",
-					"dateOfBirth": "생년월일",
-					"dateOfBirthPlaceholder": "년/월/일"
-				},
-				"saveChanges": "변경사항 저장",
-				"saving": "저장 중...",
-				"deleteAccount": "내 계정 삭제",
-				"saveSuccess": "계정 정보가 성공적으로 업데이트되었습니다",
-				"saveError": "변경사항을 저장할 수 없습니다. 다시 시도해 주세요.",
-				"deleteNotImplemented": "계정 삭제 기능이 곧 제공됩니다"
+		"hero": {
+			"badge": "Tiler 탐색하기",
+			"title": "모든 것이 여기 있습니다",
+			"subtitle": "하루가 마침내 이해되는 순간들을 탐색해보세요. 앱을 둘러보세요. 앱 안에서 시도해볼 것들을 발견하세요."
+		},
+		"setUpTiler": {
+			"badge": "Tiler 설정하기",
+			"title": "3분 이내에 준비 완료.",
+			"summary": "당신의 캘린더, 선호도, 제약 조건 — Tiler가 첫날부터 적응형 일정 관리를 실행하는 데 필요한 모든 것을 제공하는 네 가지 단계입니다.",
+			"visual": {
+				"step1": "계정 생성",
+				"step2": "캘린더 연결",
+				"step3": "선호도 설정",
+				"step4": "적응형 일정 관리"
 			},
-			"tilePreferences": {
-				"title": "타일 환경설정",
-				"description": "이동 수단을 정의하고 Tiler가 일일 시간 패턴을 이해하도록 도와주세요",
-				"howMoveAround": "어떻게 이동하시나요?",
-				"cycling": "자전거",
-				"driving": "운전",
-				"transit": "대중교통",
-				"defineTimeRestrictions": "시간 제한 정의",
-				"myWorkHours": "내 근무 시간",
-				"myPersonalHours": "내 개인 시간",
-				"setBlockOutHours": "차단 시간 설정",
-				"bedTime": "취침 시간",
-				"startsAt": "시작 시간",
-				"endsAt": "종료 시간",
-				"saveChanges": "변경 사항 저장",
-				"saving": "저장 중...",
-				"saveSuccess": "타일 환경설정이 성공적으로 업데이트되었습니다",
-				"saveError": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요.",
-				"bedTimeStartRequired": "취침 시작 시간을 선택해 주세요",
-				"bedTimeEndRequired": "기상 시간을 선택해 주세요",
-				"scheduleIncompleteDay": "{{label}}: {{day}}의 시작 시간과 종료 시간을 모두 설정해 주세요",
-				"dayLabels": {
-					"sun": "일",
-					"mon": "월",
-					"tue": "화",
-					"wed": "수",
-					"thu": "목",
-					"fri": "금",
-					"sat": "토"
+			"cards": {
+				"account": {
+					"title": "계정을 생성하세요",
+					"subtext": "이메일로 가입하세요 — 무료로 시작, 신용카드 필요 없음.",
+					"btnIdle": "무료 계정 만들기",
+					"btnCreating": "계정 생성 중…",
+					"btnDone": "✓ 계정이 생성되었습니다!"
 				},
-				"dayNames": {
-					"sun": "일요일",
-					"mon": "월요일",
-					"tue": "화요일",
-					"wed": "수요일",
-					"thu": "목요일",
-					"fri": "금요일",
-					"sat": "토요일"
+				"calendar": {
+					"title": "캘린더를 연결하세요",
+					"subtext": "Google이나 Outlook을 연결하세요 — Tiler가 일정을 읽고 그에 맞춰 계획합니다.",
+					"calName": "Google Calendar",
+					"statusIdle": "탭하여 연결",
+					"statusConnecting": "연결 중…",
+					"statusConnected": "✓ 연결됨"
 				},
-				"start": "시작",
-				"end": "종료",
-				"defaultStartTime": "8:00 AM",
-				"defaultEndTime": "6:00 PM",
-				"am": "오전",
-				"pm": "오후"
+				"preferences": {
+					"title": "선호도를 설정하세요",
+					"subtext": "이동 수단을 선택하고 프로필에서 시간 제한을 설정하세요.",
+					"transitLabel": "이동 수단",
+					"drive": "운전",
+					"transit": "대중교통",
+					"walk": "도보",
+					"workHoursLabel": "근무 시간"
+				},
+				"adaptive": {
+					"title": "적응형 일정 관리 준비 완료",
+					"subtext": "일정이 실시간으로 반영됩니다 — 하루가 바뀌면 Tiler가 자동으로 적응합니다.",
+					"schedLabel": "당신의 일정",
+					"meeting": "오전 9시 회의",
+					"run": "달리기 · 30분",
+					"newTime": "새 시간: 오전 10시",
+					"urgentCall": "긴급 전화",
+					"recalculating": "재계산 중…",
+					"rebuilt": "✓ 일정이 재구성되었습니다"
+				}
+			},
+			"supportNote": "각 단계는 Tiler의 일정 관리 엔진에 대한 입력입니다 — 캘린더는 고정된 것을 알려주고, 선호도는 당신이 어떻게 이동하는지 알려주며, 시간 제한은 언제 여유가 있는지 알려줍니다. 이 모든 것이 합쳐져 Tiler는 적응형 일정 관리를 실행하는 데 필요한 전체 그림을 얻게 됩니다: 상황이 바뀌면 스스로 조정되는 일정입니다."
+		},
+		"whatIsTiler": {
+			"badge": "Tiler란 무엇인가",
+			"title": "캘린더가 아닙니다. 당신의 하루를 운영하는 AI입니다",
+			"summary": "해야 할 일을 Tiler에게 알려주세요. 시간을 찾고, 충돌을 처리하고, 하루가 계획대로 되지 않을 때 조정합니다.",
+			"visual": {
+				"tile1": "헬스장 · 45분",
+				"tile2": "이동 · 12분",
+				"tile3": "고객 전화 · 1시간",
+				"tile4": "장보기 · 30분"
+			},
+			"subItems": {
+				"aiRunsDay": {
+					"title": "Tiler는 당신의 하루를 운영하는 AI입니다.",
+					"content": "회의가 길어지거나 작업이 지연되어도 Tiler는 당신이 해결하기를 기다리지 않습니다. 변화를 즉시 감지하고 일정을 재구성합니다. 당신은 의도를 정하기만 하면 됩니다. 나머지는 Tiler가 처리합니다."
+				},
+				"fourCoreBlocks": {
+					"title": "Tiler의 네 가지 핵심 블록"
+				},
+				"howDifferent": {
+					"title": "Tiler가 다른 점"
+				}
+			},
+			"coreBlocks": {
+				"tiles": {
+					"label": "AutoTile",
+					"title": "타일",
+					"desc": "유연한 작업. 목표와 기간을 설정하면 — Tiler가 시간을 찾아 하루가 바뀔 때 이동시키고 지능적으로 순서를 정합니다."
+				},
+				"blocks": {
+					"label": "고정됨",
+					"title": "블록",
+					"desc": "고정된 약속: 회의, 항공편, 예약. Tiler는 이를 움직일 수 없는 기준점으로 취급하고 나머지 모든 것을 그 주변에 배치합니다."
+				},
+				"route": {
+					"label": "위치 인식",
+					"title": "경로",
+					"desc": "타일에 위치가 있으면 Tiler는 지리적으로 순서를 정하고, 실제 이동 옵션을 표시하며, 각 정류지 사이에 이동 여유 시간을 만듭니다."
+				},
+				"tileShare": {
+					"label": "팀 및 가족",
+					"title": "TileShare",
+					"desc": "동료나 가족에게 타일을 할당하세요. 모든 사람의 캘린더가 공유된 약속에 자동으로 맞춰집니다. 컨텍스트가 작업과 함께 이동합니다."
+				}
+			},
+			"comparison": {
+				"headerLeft": "Google Calendar",
+				"headerRight": "Tiler",
+				"rows": [
+					{
+						"left": "You schedule everything manually",
+						"right": "AI builds your schedule from plain English"
+					},
+					{
+						"left": "No awareness of travel time",
+						"right": "Auto-calculates and adds travel buffers"
+					},
+					{
+						"left": "Static — won’t adapt when things change",
+						"right": "Detects ripples and reschedules instantly"
+					},
+					{
+						"left": "No navigation or route planning",
+						"right": "Navigate your day tile-to-tile with real transit"
+					},
+					{
+						"left": "Shared calendars only — no task assignment",
+						"right": "TileShare: assign and track tasks with anyone"
+					},
+					{
+						"left": "Nothing confirmed — events just appear",
+						"right": "Confirmation-first — you approve all changes"
+					}
+				]
+			}
+		},
+		"howToUseTiler": {
+			"badge": "Tiler 사용법",
+			"title": "의도에서 완료까지. 몇 초 만에.",
+			"summary": "캘린더를 연결하고 타일을 추가하면 나머지는 Tiler가 처리합니다. Tiler로 하루를 운영하는 단계별 가이드입니다.",
+			"visual": {
+				"step1": "타일 추가",
+				"step2": "AI 계획",
+				"step3": "하루 완성"
+			},
+			"items": {
+				"connectCalendar": {
+					"title": "캘린더 연결하기",
+					"body": "캘린더를 연결하면 Tiler가 당신의 실제 약속을 볼 수 있습니다. 동기화되면 들어오는 캘린더 일정이 타임라인에 블록으로 표시됩니다. Tiler 안에서 직접 수락, 편집 또는 충돌 해결이 가능합니다. 일정이 바뀌면 Tiler가 그에 맞춰 타일을 조정하여 하루가 균형 있고 현실적으로 유지됩니다."
+				},
+				"createBlock": {
+					"title": "블록 만드는 방법",
+					"body": "블록은 회의, 예약, 일정 및 특정 시간에 일어나야 하는 것과 같은 고정된 약속을 나타냅니다. 블록을 만들거나 동기화하면 Tiler는 이를 협상 불가능한 것으로 취급하고 유연한 작업을 그 주변에 배치합니다. 블록은 직접 이동시키지 않으면 움직이지 않습니다. 이것이 Tiler가 실제 약속을 존중하면서도 하루를 관리 가능하게 유지하는 방법입니다."
+				},
+				"flexibleTiles": {
+					"title": "유연한 타일 만들기",
+					"body": "타일은 Tiler가 강력해지는 부분입니다. 타일은 엄격한 시간에 고정하지 않고 해야 할 일을 나타냅니다. 의도, 예상 소요 시간, 선택적 마감일을 설정하면 — Tiler가 배치를 처리합니다. 타일은 하루가 바뀌면 이동하고 적응하며 재배열될 수 있어 실제 업무, 심부름, 습관, 집중 시간에 이상적입니다."
+				},
+				"updateTile": {
+					"title": "타일 업데이트 방법",
+					"body": "타일을 업데이트하는 것은 시스템에 변경 사항을 전달하는 방법입니다. 소요 시간을 조정하거나, 연기하거나, 마감일을 변경하거나, 완료로 표시할 수 있습니다. 그 순간 Tiler는 업데이트를 반영하여 타임라인을 재최적화합니다. 다른 작업을 수동으로 옮길 필요 없이 시스템이 파급 효과를 처리합니다."
+				},
+				"travelTime": {
+					"title": "이동 시간 및 경로",
+					"body": "타일에 위치를 추가하면 나머지는 Tiler가 처리합니다. 당신이 있어야 할 곳을 자동으로 감지하고 하루의 각 정류지 사이의 실제 이동 시간을 계산합니다. 타일 사이에 있는 그 주황색 블록은 빈틈이 아니라 이미 계획된 당신의 여정입니다. 탭하면 경로가 열립니다: 단계별 경로가 로드되고 시간이 반영됩니다. 당신의 일정은 단순히 무엇을 할지 알려주는 것이 아닙니다. 그곳까지 데려다줍니다."
+				}
+			}
+		},
+		"features": {
+			"badge": "기능",
+			"title": "Tiler가 할 수 있는 모든 것.",
+			"summary": "모든 기능은 하나의 원칙을 기반으로 만들어졌습니다: 일정은 당신을 위해 작동해야 하며, 그 반대가 아닙니다.",
+			"items": {
+				"adaptiveTiles": {
+					"name": "적응형 타일",
+					"desc": "Tiler의 핵심 단위입니다. 각 타일은 소요 시간이 있는 작업, 일정 또는 습관입니다 — Tiler는 이를 지능적으로 배치하고 하루가 바뀌면 이동시킵니다.",
+					"badge": "핵심 기능"
+				},
+				"aiScheduling": {
+					"name": "AI 일정 관리 어시스턴트",
+					"desc": "Tiler는 명확화 질문을 하고, 가능한 최적의 시간을 제안하며, 종속성을 포함한 완전한 일정을 작성합니다 — 항상 먼저 당신의 승인을 받습니다.",
+					"badge": "핵심 기능"
+				},
+				"chatScheduling": {
+					"name": "채팅 일정 관리",
+					"desc": "자연스러운 채팅 인터페이스로 필요한 것을 Tiler에게 말하세요. 의도를 이해하고 양식을 작성할 필요 없이 계획을 제안합니다.",
+					"badge": "핵심 기능"
+				},
+				"naturalLanguage": {
+					"name": "자연어 입력",
+					"desc": "작업을 일반 언어로 설명하세요 — 양식이나 드롭다운 없이. Tiler는 당신이 자연스럽게 말하는 방식에서 맥락, 긴급성, 소요 시간, 위치를 이해합니다.",
+					"badge": "핵심 기능"
+				},
+				"autoTravel": {
+					"name": "자동 이동 여유 시간",
+					"desc": "Tiler는 실제 거리와 이동 옵션을 기반으로 위치 기반 타일 사이에 현실적인 이동 시간을 자동으로 삽입합니다. 연속된 일정이 늦어지는 일은 없습니다.",
+					"badge": "Tiler만의 특징"
+				},
+				"autoLocations": {
+					"name": "자동 위치",
+					"desc": "타일에 위치를 한 번만 연결하면 Tiler가 기억합니다. 그 작업이 나타날 때마다 현재 위치에서 이동 시간이 자동으로 계산됩니다.",
+					"badge": "Tiler만의 특징"
+				},
+				"timeRestrictions": {
+					"name": "시간 제한",
+					"desc": "가능한 시간을 설정하면 Tiler는 그 범위 내에서만 일정을 잡습니다. 개인 시간은 그대로 당신의 것입니다 — 허용하지 않으면 어떤 작업도 근무 외 시간을 침범하지 않습니다.",
+					"badge": "환경설정"
+				},
+				"adaptiveRescheduling": {
+					"name": "적응형 일정 재조정",
+					"desc": "회의가 길어지거나 작업을 놓치면 Tiler가 하루 전체에 미치는 파급 효과를 감지하고 해결책을 제안합니다 — 즉시, 변경 전에 당신의 승인을 받습니다.",
+					"badge": "핵심 기능"
+				},
+				"calendarIntegration": {
+					"name": "캘린더 통합",
+					"desc": "Google Calendar 또는 Outlook을 연결하세요. Tiler는 기존 일정을 읽고 새 타일을 모두 그 주변에 배치합니다 — 중복 예약은 절대 없습니다. 여러 캘린더를 지원합니다.",
+					"badge": "통합"
+				},
+				"crossPlatform": {
+					"name": "크로스 플랫폼 동기화",
+					"desc": "웹, iOS, Android가 모두 실시간으로 동기화됩니다. 노트북에서 작업을 시작하고 놓치는 것 없이 휴대폰에서 확인하세요. 하나의 일정, 어디서나.",
+					"badge": "플랫폼"
+				},
+				"habitScheduling": {
+					"name": "습관 일정 관리",
+					"desc": "반복되는 습관을 추가하면 Tiler가 하루에 자동으로 맞춰줍니다 — 매일 아침 생각할 필요 없이 루틴을 일관되게 유지합니다.",
+					"badge": "웰빙"
+				},
+				"deferReschedule": {
+					"name": "연기 및 재조정",
+					"desc": "타일을 놓쳤나요? Tiler의 연기 기능이 즉시 다음 최적 시간을 찾아 한 번의 탭으로 재조정합니다. 작업을 잃지 마세요 — 지능적으로 앞당기기만 하세요.",
+					"badge": "핵심 기능"
+				},
+				"smartNotifications": {
+					"name": "스마트 알림",
+					"desc": "경로가 바뀌면 실시간 이동 업데이트와 함께 다음 타일로 떠날 시간을 알려줍니다. 시간을 놓쳐서 출발 시간을 놓치는 일이 없습니다.",
+					"badge": "실시간"
+				},
+				"tileShare": {
+					"name": "TileShare",
+					"desc": "가족이나 동료와 타일을 공유하세요. 누가 무엇을 처리할지 지정하세요. 완료 여부를 추적하세요. 모든 사람의 캘린더가 공유된 약속에 자동으로 맞춰집니다 — 추가 앱 필요 없음.",
+					"badge": "협업"
+				}
 			}
 		}
 	},
@@ -770,5 +1866,481 @@
 		"submitting": "제출 중...",
 		"submitSuccess": "피드백 감사합니다!",
 		"submitError": "피드백 제출에 실패했습니다. 다시 시도해 주세요."
+	},
+	"location": {
+		"verified": {
+			"label": "확인됨",
+			"tooltip": "이 주소는 Google Maps 또는 저장된 위치를 통해 확인되었습니다. 플랫폼은 정확한 이동 시간 계산을 위해 이를 사용합니다. 확인되지 않은 주소는 플랫폼이 최선의 일치를 찾으려고 시도합니다."
+		}
+	},
+	"tilesharedemo": {
+		"dashboard": {
+			"title": "TileShare",
+			"nav": {
+				"active": "진행 중",
+				"sent": "보냄",
+				"received": "받음({{count}})",
+				"inbox": "받은 편지함 링크",
+				"outbox": "보낸 편지함 링크"
+			},
+			"toolbar": {
+				"welcome": "TileShare 대시보드에 오신 것을 환영합니다",
+				"create": "TileShare 만들기"
+			},
+			"createSelection": {
+				"single": {
+					"label": "단일 TileShare",
+					"description": "동료와 함께하는 단일 작업입니다."
+				},
+				"multi": {
+					"label": "다중 TileShare",
+					"description": "하나의 프로젝트에 여러 작업을 포함합니다."
+				}
+			},
+			"create": {
+				"back": "TileShare로 돌아가기",
+				"single": {
+					"title": "단일 TileShare 만들기",
+					"description": "동료와 단일 작업을 만들고 공유하세요. 수락하면 일정에 추가됩니다.",
+					"submit": "단일 TileShare 만들기"
+				},
+				"multi": {
+					"title": "다중 TileShare 만들기",
+					"description": "하나의 프로젝트에 여러 작업을 만들고 동료와 공유하세요. 수락하면 일정에 추가됩니다.",
+					"submit": "다중 TileShare 만들기"
+				},
+				"fields": {
+					"name": {
+						"placeholder": "작업 이름 지정"
+					},
+					"deadline": {
+						"placeholder": "마감일 추가"
+					},
+					"location": {
+						"placeholder": "위치 추가(선택 사항)"
+					},
+					"note": {
+						"placeholder": "메모 추가(선택 사항)"
+					}
+				},
+				"shareTo": {
+					"label": "공유 대상:",
+					"placeholder": "이메일 주소 / 전화번호(Enter로 선택)",
+					"add": "수신자 추가",
+					"remove": "{{recipient}} 제거"
+				},
+				"buttons": {
+					"cancel": "취소"
+				},
+				"validation": {
+					"nameRequired": "작업 이름을 입력하세요",
+					"deadlineRequired": "마감일을 추가하세요",
+					"recipientRequired": "수신자를 한 명 이상 추가하세요",
+					"invalidRecipient": "{{recipient}}은(는) 유효한 이메일 또는 전화번호가 아닙니다"
+				},
+				"toast": {
+					"creating": "TileShare 만드는 중…",
+					"error": "TileShare를 만들지 못했습니다. 다시 시도해 주세요."
+				},
+				"success": {
+					"message": "TileShare \"{{name}}\"이(가) 만들어졌습니다.",
+					"view": "TileShare 보기"
+				}
+			},
+			"filter": {
+				"all": "전체",
+				"inProgress": "진행 중"
+			}
+		},
+		"card": {
+			"progress": "진행률",
+			"dueOn": "마감일:",
+			"dueBy": "마감 기한:",
+			"multiTileshare": "다중 TileShare",
+			"tileshare": "TileShare"
+		},
+		"active": {
+			"title": "진행 중",
+			"empty": "진행 중인 TileShare가 없습니다",
+			"emptyFiltered": "진행 중인 TileShare에 진행 중인 항목이 없습니다"
+		},
+		"sent": {
+			"title": "보냄",
+			"empty": "아직 보낸 TileShare가 없습니다",
+			"emptyFiltered": "보낸 TileShare에 진행 중인 항목이 없습니다"
+		},
+		"received": {
+			"title": "받음",
+			"empty": "아직 받은 TileShare가 없습니다",
+			"emptyFiltered": "받은 TileShare에 진행 중인 항목이 없습니다"
+		},
+		"tileshareDetail": {
+			"title": "TileShare 상세"
+		},
+		"tiletteDetail": {
+			"title": "Tilette 상세"
+		},
+		"invite": {
+			"title": "초대"
+		},
+		"inbox": {
+			"title": "받은 편지함"
+		},
+		"outbox": {
+			"title": "보낸 편지함"
+		}
+	},
+	"tile": {
+		"noteButtonAria": "이 타일의 메모 열기"
+	},
+	"notesEditor": {
+		"placeholder": "작성하세요. 위 도구 모음에서 메모 서식을 지정하고 링크를 추가할 수 있습니다. 메모는 자동으로 저장되고 모든 기기에서 동기화됩니다.",
+		"surfaceAria": "메모 편집기",
+		"back": "뒤로",
+		"close": "닫기",
+		"eyebrow": "메모",
+		"loading": "메모 불러오는 중…",
+		"errorLoad": "메모를 불러오지 못했습니다.",
+		"saving": "저장 중…",
+		"saved": "저장됨",
+		"errorSave": "저장되지 않음",
+		"unsaved": "편집 중…",
+		"save": "저장",
+		"saveNow": "지금 저장",
+		"linkPrompt": "URL",
+		"conflict": {
+			"title": "다른 사용자가 이 메모를 업데이트했습니다.",
+			"discard": "내 변경 사항 버리기",
+			"keep": "계속 편집"
+		},
+		"tool": {
+			"bold": "굵게",
+			"italic": "기울임꼴",
+			"underline": "밑줄",
+			"strike": "취소선",
+			"code": "인라인 코드",
+			"h1": "제목 1",
+			"h2": "제목 2",
+			"h3": "제목 3",
+			"bullet": "글머리 기호 목록",
+			"ordered": "번호 매기기 목록",
+			"task": "체크리스트",
+			"quote": "인용",
+			"link": "링크",
+			"undo": "실행 취소",
+			"redo": "다시 실행"
+		}
+	},
+	"getStarted": {
+		"seo": {
+			"title": "Tiler 시작하기 | AI 일정 관리 및 스마트 캘린더 앱",
+			"description": "Tiler는 완벽한 하루 일정을 자동으로 만드는 AI 기반 캘린더입니다. 일정 경계를 설정하고 위치를 고정하면 AI 솔버가 삶에 꼭 맞는 타임라인을 구성합니다.",
+			"keywords": "AI 일정 관리 앱, 스마트 캘린더, 에이전틱 캘린더, AI 작업 스케줄러, 적응형 일정 관리, AI 캘린더 앱, 지능형 시간 관리, 위치 인식 일정 관리, AI 생산성 앱, 스마트 일일 플래너"
+		},
+		"hero": {
+			"badge": "제품 업데이트",
+			"title": "Tiler와 함께하는 첫 5분",
+			"subtitle": "Tiler는 목표, 약속, 위치라는 세 가지 정보로 완벽한 타임라인을 만듭니다. 온보딩이 이를 어떻게 가능하게 하는지 알아보세요."
+		},
+		"intro": {
+			"lede": "대부분의 일정 관리 도구는 빈 상자를 빈 그리드에 끌어다 놓고 퍼즐이 스스로 풀리기를 바라며 처음부터 시작하라고 요구합니다. Tiler는 다르게 작동합니다. 타임라인을 보기도 전에 앱은 당신의 하루의 형태를 학습하여 실제로 맞는 타임라인을 만들 수 있습니다.",
+			"body": "온보딩은 약 5분이 걸립니다. 끝날 때쯔음 Tiler의 엔진은 제약 조건을 인식하고 위치에 고정된 일정을 생성할 충분한 맥락을 갖게 되며, 이는 주간이 바뀌면서 적응합니다. 세 가지 기둥이 모든 것을 움직입니다:"
+		},
+		"steps": {
+			"heading": "첫 타임라인을 만드는 6단계",
+			"step1": {
+				"title": "로그인 및 프로필 만들기",
+				"body": "모든 것은 Tiler 계정에서 시작됩니다. 로그인하면 앱이 즉시 프로필 메모리를 구축하기 시작합니다! 이는 엔진이 당신이 어떻게 일하고, 언제 여유가 있으며, 무엇이 중요한지 이해하는 데 사용하는 맥락 계층입니다.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step2": {
+				"title": "기상 시간 설정",
+				"body": "첫 번째 질문은 속기 쉬울 정도로 간단합니다: 하루가 언제 시작되나요? 이 하나의 데이터 포인트는 엔진이 일정을 잡을 가장 이른 경계를 설정합니다. 밤늦게 자는 사람이든 일찍 일어나는 사람이든, Tiler는 임의의 오전 9시 기본값이 아닌 당신의 실제 상황에서 시작합니다.",
+				"calloutStrong": "중요한 이유:",
+				"callout": "Tiler의 모든 제약 조건은 당신의 경계에서 나옵니다. 기상 시간, 근무 시간, 위치는 다른 어떤 것을 최적화하기 전에 솔버가 준수하는 확고한 경계를 형성합니다."
+			},
+			"step3": {
+				"title": "위치 고정",
+				"body": "하루 중 대부분 어디에 있나요? Tiler는 Google Maps와 통합되어 작업 사이의 이동 시간이 운전, 대중교통, 도보로 계산된 실제 값이며 모호한 추측이 아닙니다. 이것은 대부분의 계획 도구가 완전히 생략하는 부분이며, 그래서 실제로 사용해보려고 하면 그들의 일정이 무너지는 이유입니다. 자동완성은 Google의 Places API에서 가져오므로 회사 본사부터 코워킹 스페이스, 작업 현장까지 무엇이든 입력할 수 있습니다.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step4": {
+				"title": "근무 시간 정의",
+				"body": "모든 날이 똑같아 보이지는 않습니다. Tiler는 요일별로 근무 시간을 설정할 수 있게 합니다: 요일을 켜고 끄고, 시작 및 종료 시간을 조정하고, 여러 날에 걸쳐 일정을 복사할 수 있습니다. 이는 근무 블록과 개인 시간을 분리하는 시간적 경계를 만듭니다. 엔진은 이를 부드러운 제약으로 취급하여 기본 일정을 형성할 만큼 강하지만 마감일이나 이동 약속이 요구할 때 유연하게 조정될 수 있습니다.",
+				"calloutStrong": "",
+				"callout": ""
+			},
+			"step5": {
+				"title": "타일 초안 만들기",
+				"body": "여기서 Tiler가 다르게 느껴지기 시작합니다. 당신의 직업 프로필을 기반으로 엔진은 필요할 것으로 생각되는 반복적인 활동 타일(작업 블록)을 제안합니다. 고객 전화. 심층 작업. 사업 개발. 주간 회고. 맞는 것을 선택하고, 맞지 않는 것을 삭제하고, 각각을 일일 또는 주간 주기로 설정합니다.",
+				"calloutStrong": "AI가 제안하고, 사람이 선택합니다.",
+				"callout": "제안은 당신의 직업적 맥락을 분석하는 LLM에서 나옵니다. 무엇이 일정에 잡히는지는 당신이 계속 통제하며, 엔진은 언제 어디서인지를 처리합니다."
+			},
+			"step6": {
+				"title": "완성된 나의 타임라인",
+				"body": "제약 조건이 로드되면 솔버가 실행됩니다. 나타나는 것은 채워지기를 기다리는 빈 캘린더가 아니라, 타일이 맞는 곳에 배치되고 이동 시간이 반영되며 근무 시간이 준수되는 최적화된 타임라인입니다. 각 타일은 색상으로 구분되고 위치에 연결되며, 빠른 편집을 위한 확장 가능한 작업 메뉴가 있습니다. 자연어로 새 작업을 추가하고, 대안을 테스트하기 위해 가상 시나리오를 실행하거나, 팀과 타일을 공유하세요. 온보딩은 씨앗을 심었고, 엔진은 여기서부터 일정을 키워갑니다.",
+				"calloutStrong": "",
+				"callout": ""
+			}
+		},
+		"pillars": {
+			"heading": "세 가지 핵심 요소. 하나의 완벽한 타임라인.",
+			"goals": {
+				"icon": "??",
+				"title": "목표",
+				"body": "시간을 확보해야 하는 작업과 포부입니다."
+			},
+			"appointments": {
+				"icon": "??",
+				"title": "약속",
+				"body": "이미 확정된 회의, 항공편 및 약속입니다."
+			},
+			"location": {
+				"icon": "??",
+				"title": "위치",
+				"body": "실제 위치를 바탕으로 이동 시간을 추측이 아닌 정확한 값으로 계산합니다."
+			}
+		},
+		"cta": {
+			"heading": "타임라인을 만들 준비가 되셨나요?",
+			"body": "5분 설정으로 실제로 작동하는 일정을 만드세요.",
+			"button": "무료로 시작하기 ?",
+			"sub": "iOS와 Android에서 이용할 수 있습니다. 무료로 시작하세요."
+		}
+	},
+	"articles": {
+		"minRead": "분 읽기",
+		"readArticle": "기사 읽기",
+		"breadcrumbs": {
+			"home": "홈",
+			"articles": "기사"
+		},
+		"index": {
+			"seo": {
+				"title": "기사 | Tiler - 가이드, 제품 업데이트 및 생산성 인사이트",
+				"description": "AI 일정 관리, 에이전틱 캘린더, 적응형 생산성에 대한 Tiler의 가이드, 제품 업데이트, 심층 분석 라이브러리를 살펴보세요. 시간을 당신을 위해 일하게 만드는 방법을 배우세요.",
+				"keywords": "Tiler 기사, AI 일정 관리 블로그, 스마트 캘린더 가이드, 생산성 기사, 에이전틱 캘린더, 시간 관리 인사이트, AI 생산성 블로그"
+			},
+			"hero": {
+				"badge": "기사",
+				"title": "더 나은 일정을 위한 인사이트",
+				"subtitle": "AI가 하루를 계획하는 방식을 어떻게 바꿀 수 있는지에 대한 가이드, 제품 업데이트, 아이디어."
+			}
+		},
+		"posts": {
+			"gettingStarted": {
+				"category": "시작하기",
+				"title": "Tiler와의 첫 5분",
+				"subtitle": "Tiler는 세 가지 요소로 완벽한 타임라인을 만듭니다: 당신의 목표, 약속, 위치. 온보딩이 그곳까지 어떻게 안내하는지 알아보세요.",
+				"excerpt": "대부분의 일정 관리 도구는 빈 그리드에서 시작합니다. Tiler는 먼저 당신의 하루의 형태를 학습한 다음, 실제로 당신의 삶에 맞는 제약 인식 및 위치 고정 타임라인을 만듭니다.",
+				"readTime": "6분 읽기",
+				"author": "Tiler 팀",
+				"date": "2026년 5월 1일",
+				"seo": {
+					"title": "Tiler 시작하기 | AI 일정 관리 및 스마트 캘린더 앱",
+					"description": "Tiler는 완벽한 일일 일정을 자동으로 만들어주는 AI 기반 캘린더입니다. 일정 경계를 설정하고, 위치를 고정하고, AI 솔버가 실제로 당신의 삶에 맞는 타임라인을 만들도록 하세요.",
+					"keywords": "AI 일정 관리 앱, 스마트 캘린더, 에이전틱 캘린더, AI 작업 스케줄러, 적응형 일정 관리, AI 캘린더 앱, 지능형 시간 관리, 위치 인식 일정 관리, AI 생산성 앱, 스마트 일일 플래너"
+				},
+				"intro": {
+					"lede": "대부분의 일정 관리 도구는 빈 상자를 빈 그리드에 끌어다 놓고 퍼즐이 스스로 풀리기를 바라며 처음부터 시작하라고 요구합니다. Tiler는 다르게 작동합니다. 타임라인을 보기도 전에 앱은 당신의 하루의 형태를 학습하여 실제로 맞는 타임라인을 만들 수 있습니다.",
+					"body": "온보딩은 약 5분이 걸립니다. 끝날 때쯔음 Tiler의 엔진은 제약 조건을 인식하고 위치에 고정된 일정을 생성할 충분한 맥락을 갖게 되며, 이는 주간이 바뀌면서 적응합니다. 세 가지 기둥이 모든 것을 움직입니다:"
+				}
+			},
+			"naturalLanguageScheduling": {
+				"category": "기능",
+				"title": "자연어 일정 관리",
+				"subtitle": "해야 할 일을 일반 언어로 Tiler에게 말하기만 하면 스마트한 일정이 나타나는 것을 확인하세요.",
+				"excerpt": "드래그 앤 드롭과 씨름하는 것을 그만두세요. 해야 할 일을 일반 언어로 Tiler에게 말하기만 하면 스마트한 일정이 나타나는 것을 확인하세요.",
+				"readTime": "4분 읽기",
+				"author": "Tiler 팀",
+				"date": "2026년 5월 1일",
+				"sections": [
+					{
+						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+					},
+					{
+						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+					},
+					{
+						"title": "How it works"
+					},
+					{
+						"stepTitle": "Describe the task",
+						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"callout": {
+							"label": "What Tiler understands",
+							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+						}
+					},
+					{
+						"stepTitle": "The AI fills in the gaps",
+						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"callout": {
+							"label": "Reasoning, not guessing",
+							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+						}
+					},
+					{
+						"stepTitle": "Review, then confirm",
+						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"callout": {
+							"label": "Confirmation-first",
+							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+						}
+					},
+					{
+						"quote": "You live it. Tiler plans it."
+					}
+				]
+			},
+			"smartTravelAndLocation": {
+				"category": "기능",
+				"title": "스마트 이동 및 위치",
+				"subtitle": "위치를 무시하는 일정은 일정이 아닙니다. 그것은 추측입니다.",
+				"excerpt": "Tiler는 모든 약속 사이의 이동 시간을 계산하여 하루에 포함시켜, 당신의 일정이 희망이 아닌 실제 삶을 반영하도록 합니다.",
+				"readTime": "4분 읽기",
+				"author": "Tiler 팀",
+				"date": "2026년 5월 8일",
+				"sections": [
+					{
+						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+					},
+					{
+						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+					},
+					{
+						"title": "How it works"
+					},
+					{
+						"stepTitle": "Set your locations once",
+						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"callout": {
+							"label": "Location labels Tiler understands",
+							"text": "Home · Work · Downtown · The gym · Near the office"
+						}
+					},
+					{
+						"stepTitle": "Travel time slots into your timeline",
+						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"callout": {
+							"label": "Real routes, not estimates",
+							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+						}
+					},
+					{
+						"stepTitle": "Nearby tasks get grouped automatically",
+						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"callout": {
+							"label": "Less travel, more done",
+							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+						}
+					},
+					{
+						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+					}
+				]
+			},
+			"scheduleUndo": {
+				"category": "기능",
+				"title": "일정 되돌리기",
+				"subtitle": "모든 일정 변경 사항은 먼저 실시간 미리보기를 보여줍니다. 즉시 되돌리거나 자신 있게 수락하세요. 원래 계획은 항상 한 번의 탭으로 되돌아갈 수 있습니다.",
+				"excerpt": "저장되기 전에 모든 일정 변경 사항을 미리 확인하세요. 즉시 되돌리거나 자신 있게 수락하세요. 당신의 실시간 일정은 승인 없이는 절대 변경되지 않습니다.",
+				"readTime": "4분 읽기",
+				"author": "Tiler 팀",
+				"date": "2026년 6월 22일",
+				"sections": [
+					{
+						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+					},
+					{
+						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+					},
+					{
+						"title": "How Schedule Undo works"
+					},
+					{
+						"stepTitle": "Make a change",
+						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"callout": {
+							"label": "Nothing saves automatically",
+							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+						}
+					},
+					{
+						"stepTitle": "See exactly what changed",
+						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+					},
+					{
+						"stepTitle": "Tap Undo or Accept",
+						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"callout": {
+							"label": "Undo is always instant",
+							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+						}
+					},
+					{
+						"title": "Why this matters"
+					},
+					{
+						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+					},
+					{
+						"label": "Built for tightly packed days",
+						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+					},
+					{
+						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+					},
+					{
+						"quote": "Change your mind before it counts."
+					}
+				]
+			},
+			"tileshare": {
+				"category": "기능",
+				"title": "Tileshare",
+				"subtitle": "다른 사람의 일정에 직접 작업을 보내세요. 자동으로 그들의 하루에 맞춰집니다. 주고받는 조정이 필요 없습니다.",
+				"excerpt": "다른 사람의 Tiler에 적응형 작업을 직접 보내세요. 도착하고, 맞춰지고, 완료됩니다. 조정 부담이 없습니다.",
+				"readTime": "4분 읽기",
+				"author": "Tiler 팀",
+				"date": "2026년 5월 22일",
+				"sections": [
+					{
+						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+					},
+					{
+						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+					},
+					{
+						"title": "How Tileshare works"
+					},
+					{
+						"stepTitle": "Share any tile",
+						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"callout": {
+							"label": "What travels with the tile",
+							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+						}
+					},
+					{
+						"stepTitle": "It lands in their schedule",
+						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+					},
+					{
+						"stepTitle": "Track it without chasing",
+						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"callout": {
+							"label": "Shared accountability, zero friction",
+							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+						}
+					},
+					{
+						"quote": "Send it once. Know it gets done."
+					}
+				]
+			}
+		}
 	}
 }

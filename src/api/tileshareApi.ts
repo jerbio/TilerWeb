@@ -1,6 +1,8 @@
 import { AppApi } from './appApi';
 import {
 	CreateTileletteParams,
+	CreateTileShareClusterParams,
+	CreateTileShareClusterResponse,
 	DeleteTileShareClusterParams,
 	DeleteTileShareClusterResponse,
 	DesignatedTileListResponse,
@@ -64,6 +66,13 @@ export class TileshareApi extends AppApi {
 		return this.apiRequest<DesignatedTileListResponse>(
 			`api/DesignatedTile/designated${buildQuery(params)}`
 		);
+	}
+
+	createCluster(body: CreateTileShareClusterParams) {
+		return this.apiRequest<CreateTileShareClusterResponse>('api/TileShareCluster', {
+			method: 'POST',
+			body: JSON.stringify(body),
+		});
 	}
 
 	updateCluster(params: UpdateClusterParams) {

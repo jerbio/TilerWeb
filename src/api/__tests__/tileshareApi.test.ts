@@ -420,4 +420,49 @@ describe('TileshareApi', () => {
 			await expect(api.deleteCluster(deleteParams)).rejects.toThrow();
 		});
 	});
+
+	describe('createCluster', () => {
+		const createParams = {
+			UserName: 'test@example.com',
+			TimeZone: 'America/Denver',
+			TimeZoneOffset: 360,
+			Name: 'Finish tax documents',
+			IsMultiTilette: false,
+			IncludeMe: true,
+			EndTime: 1751932800000,
+			DurationInMs: 3600000,
+			Notes: 'Bring last year returns',
+			AddressData: { Address: '123 Main St', AddressIsVerified: false },
+			Contacts: [{ Email: 'jane@example.com' }],
+		};
+
+		it('sends POST request to api/TileShareCluster with the JSON body', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse({ cluster: mockCluster }));
+
+			await api.createCluster(createParams);
+
+			expect(fetchSpy).toHaveBeenCalledOnce();
+			const [urlArg, options] = fetchSpy.mock.calls[0];
+			const urlStr =
+				urlArg instanceof Request
+					? urlArg.url
+					: typeof urlArg === 'string'
+						? urlArg
+						: String(urlArg);
+			expect(urlStr).toContain('api/TileShareCluster');
+			const method = urlArg instanceof Request ? urlArg.method : options?.method;
+			expect(method).toBe('POST');
+			const bodyStr =
+				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
+			const body = JSON.parse(bodyStr);
+			expect(body.Name).toBe('Finish tax documents');
+			expect(body.IsMultiTilette).toBe(false);
+			expect(body.Contacts).toEqual([{ Email: 'jane@example.com' }]);
+		});
+
+		it('throws on network error', async () => {
+			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+			await expect(api.createCluster(createParams)).rejects.toThrow();
+		});
+	});
 });

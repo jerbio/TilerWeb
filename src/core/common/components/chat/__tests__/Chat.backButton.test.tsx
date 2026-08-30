@@ -71,6 +71,8 @@ vi.mock('@/services', () => ({
 		sendMessage: vi.fn(),
 		sendChatAcceptChanges: vi.fn(),
 		getVibeRequest: vi.fn().mockResolvedValue(null),
+		getAutoSuggestions: vi.fn().mockResolvedValue({ suggestions: {}, isStale: false }),
+		refreshAutoSuggestions: vi.fn().mockResolvedValue({ suggestions: {}, isStale: false }),
 	},
 }));
 

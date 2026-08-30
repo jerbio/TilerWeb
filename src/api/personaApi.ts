@@ -1,3 +1,4 @@
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 import {
 	Persona,
 	PersonaResponse,
@@ -15,7 +16,7 @@ export class PersonaApi extends AppApi {
 			method: 'POST',
 			body: JSON.stringify({
 				...persona,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+				TimeZone: deviceTimeZone().toString(),
 			}),
 		});
 	}
@@ -26,7 +27,7 @@ export class PersonaApi extends AppApi {
 			formData.append('AudioFile', audioFile, 'recording.webm');
 		}
 		formData.append('Description', description);
-		formData.append('TimeZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+		formData.append('TimeZone', deviceTimeZone());
 
 		return this.apiRequestFormData<PersonaAnonymousUserResponse>(
 			'api/Persona/CreateWithAudio',

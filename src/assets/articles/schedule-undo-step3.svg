@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="sheetGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#161616"/>
+    </linearGradient>
+    <linearGradient id="acceptGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(74,222,128,0.2)"/>
+      <stop offset="100%" stop-color="rgba(74,222,128,0.12)"/>
+    </linearGradient>
+    <linearGradient id="undoGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(239,68,68,0.18)"/>
+      <stop offset="100%" stop-color="rgba(239,68,68,0.1)"/>
+    </linearGradient>
+    <filter id="acceptGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#4ade80" flood-opacity="0.3" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <filter id="sheetShadow">
+      <feDropShadow dx="0" dy="-4" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background (timeline, dimmed) -->
+  <rect width="640" height="320" fill="url(#bg3)"/>
+
+  <!-- Header -->
+  <rect width="640" height="48" fill="#141414" opacity="0.5"/>
+  <rect y="48" width="640" height="1" fill="rgba(255,255,255,0.04)"/>
+  <text x="280" y="30" font-family="Urbanist, Inter, sans-serif" font-size="15" font-weight="600" fill="#737373" text-anchor="middle">Schedule Preview</text>
+
+  <!-- Dimmed timeline behind sheet -->
+  <rect x="0" y="48" width="640" height="148" fill="rgba(0,0,0,0.55)"/>
+
+  <!-- Faint tiles visible in background -->
+  <rect x="52" y="70" width="200" height="18" rx="5" fill="rgba(0,119,255,0.08)" stroke="rgba(0,119,255,0.15)" stroke-width="1"/>
+  <text x="62" y="83" font-family="Inter, sans-serif" font-size="8" fill="rgba(106,171,255,0.35)">Team standup</text>
+  <rect x="52" y="96" width="200" height="36" rx="7" fill="rgba(74,222,128,0.04)" stroke="rgba(74,222,128,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="112" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,0.25)">Gym session</text>
+  <text x="62" y="124" font-family="Inter, sans-serif" font-size="8" fill="rgba(255,255,255,0.15)">@ Home · Wed · 2:00 PM · PREVIEW</text>
+  <rect x="52" y="140" width="200" height="18" rx="5" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="62" y="153" font-family="Inter, sans-serif" font-size="8" fill="rgba(165,165,165,0.25)">Client call</text>
+
+  <!-- Bottom action sheet -->
+  <rect x="0" y="140" width="640" height="180" rx="0" fill="url(#sheetGrad)" filter="url(#sheetShadow)"/>
+  <rect x="0" y="140" width="640" height="1" fill="rgba(255,255,255,0.08)"/>
+
+  <!-- Sheet drag handle -->
+  <rect x="292" y="152" width="56" height="4" rx="2" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Sheet title -->
+  <text x="320" y="183" font-family="Urbanist, Inter, sans-serif" font-size="15" font-weight="700" fill="#e5e5e5" text-anchor="middle">Confirm change?</text>
+
+  <!-- Tile preview card in sheet -->
+  <rect x="40" y="194" width="560" height="52" rx="12" fill="#222222" stroke="rgba(74,222,128,0.2)" stroke-width="1" stroke-dasharray="5,3"/>
+  <rect x="40" y="194" width="4" height="52" rx="2" fill="#4ade80"/>
+
+  <!-- Tile info -->
+  <text x="58" y="213" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Gym session</text>
+  <text x="58" y="230" font-family="Inter, sans-serif" font-size="10" fill="#a3a3a3">@ Home</text>
+
+  <!-- Change indicator -->
+  <text x="420" y="213" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="middle">Tue 10:00 AM</text>
+  <text x="488" y="213" font-family="Inter, sans-serif" font-size="10" fill="#525252">→</text>
+  <text x="560" y="213" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#4ade80" text-anchor="end">Wed 2:00 PM</text>
+  <rect x="414" y="220" width="180" height="18" rx="4" fill="rgba(74,222,128,0.06)"/>
+  <text x="504" y="232" font-family="Inter, sans-serif" font-size="8" fill="#4ade80" text-anchor="middle">↕ Date &amp; time changed</text>
+
+  <!-- Action buttons -->
+  <!-- Undo button -->
+  <rect x="40" y="258" width="262" height="48" rx="12" fill="url(#undoGrad)" stroke="rgba(239,68,68,0.3)" stroke-width="1.5"/>
+  <text x="96" y="287" font-family="Inter, sans-serif" font-size="15" fill="rgba(239,68,68,0.85)">✕</text>
+  <text x="171" y="288" font-family="Urbanist, Inter, sans-serif" font-size="14" font-weight="700" fill="rgba(239,68,68,0.85)" text-anchor="middle">Undo</text>
+  <text x="171" y="300" font-family="Inter, sans-serif" font-size="9" fill="rgba(239,68,68,0.45)" text-anchor="middle">Restore original</text>
+
+  <!-- Accept button (glowing) -->
+  <rect x="318" y="258" width="282" height="48" rx="12" fill="url(#acceptGrad)" stroke="rgba(74,222,128,0.5)" stroke-width="2" filter="url(#acceptGlow)"/>
+  <text x="374" y="287" font-family="Inter, sans-serif" font-size="15" fill="#4ade80">✓</text>
+  <text x="459" y="288" font-family="Urbanist, Inter, sans-serif" font-size="14" font-weight="700" fill="#4ade80" text-anchor="middle">Accept</text>
+  <text x="459" y="300" font-family="Inter, sans-serif" font-size="9" fill="rgba(74,222,128,0.55)" text-anchor="middle">Save to schedule</text>
+</svg>

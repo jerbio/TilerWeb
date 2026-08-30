@@ -4,6 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import { Loader2 } from 'lucide-react';
 import { CalendarEvent } from '@/core/common/types/schedule';
 import { scheduleService, userService } from '@/services';
+import { normalizeRootId } from '@/core/common/utils/tilerEventUtils';
 import EditCalendarEvent from './EditCalendarEvent';
 
 interface EditCalendarEventLoaderProps {
@@ -25,7 +26,7 @@ const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event
 
 	useEffect(() => {
 		let cancelled = false;
-		const rootId = (event.id ?? '').split('_')[0] + '_7_0_0';
+		const rootId = normalizeRootId(event.id ?? '');
 
 		Promise.all([
 			scheduleService.lookupCalendarEventById(rootId),
