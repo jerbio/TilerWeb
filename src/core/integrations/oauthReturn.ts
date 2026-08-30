@@ -2,45 +2,66 @@
  * Client-side handling of the server-owned OAuth round trip for calendar
  * connections (see docs/web-connections-integration-plan.md, section 6).
  *
- * The server initiates and completes OAuth and redirects the browser back to
- * `/settings/connections` with transient query parameters:
+ * Contract verified against TilerFront (IntegrationsController +
+ * RedirectTargetValidator):
  *
- *   - Success:     ?oauth=success&provider=google
- *   - Cancelled:   ?oauth=cancelled&provider=google
- *   - Failure:     ?oauth=error&provider=google&reason=access_denied
+ *   1. Start: the client navigates the browser to
+ *      `GET api/Integrations?provider=google&redirectTarget=<own-origin https URL>`;
+ *      the server 302-redirects to the provider consent screen with a signed
+ *      state that binds the Tiler user.
+ *   2. `GET api/Integrations/connect/callback` exchanges the authorization
+ *      code and persists the integration. The callback deliberately does not
+ *      require the Tiler session; the signed state is authoritative.
+ *   3. The server redirects the browser back to `redirectTarget` with
+ *      transient result query parameters:
+ *
+ *      - Success:     ?calendarConnect=success&integrationId={guid}
+ *      - Cancelled:   ?calendarConnect=declined
+ *      - Failure:     ?calendarConnect=error&reason={failureReason}
  *
  * Security invariants (Phase 0 of the plan):
- * - Only the `oauth`, `provider`, and optional `reason` parameters are ever
- *   read from the return URL. No other query parameter — authorization
+ * - Only the `calendarConnect`, `integrationId`, and `reason` parameters are
+ *   ever read from the return URL. No other query parameter — authorization
  *   codes, state, access/refresh tokens, provider response payloads — is
  *   ever surfaced to callers, UI, analytics, or logs.
- * - `provider` must be a non-sensitive identifier from a fixed allow-list.
- *   Values that look like emails, tokens, or anything else are rejected.
- * - `reason` is only kept when it matches a short, safe token pattern;
- *   otherwise it is dropped while the result itself is still reported.
+ * - `calendarConnect` must be one of the exact lowercase result tokens the
+ *   server emits. Anything else means "no recognisable result".
+ * - `integrationId` is only kept when it is a well-formed GUID; anything else
+ *   (tokens, emails, raw payloads) is dropped while the result is still
+ *   reported.
+ * - `reason` is only kept when it matches a bounded, safe token pattern
+ *   (short lowercase phrases, as emitted by the server); otherwise it is
+ *   dropped while the result itself is still reported.
  */
 
-export type OauthResult = 'success' | 'cancelled' | 'error';
-
-export type IntegrationProvider = 'google';
+export type OauthResult = 'success' | 'declined' | 'error';
 
 export interface ParsedOauthReturn {
 	result: OauthResult;
-	provider: IntegrationProvider;
+	/**
+	 * Integration id reported by the server on a successful connect.
+	 * Only present after validation as a well-formed GUID.
+	 */
+	integrationId?: string;
 	/** Sanitized, non-sensitive reason token. Only present for `error` results. */
 	reason?: string;
 }
 
-const OAUTH_RESULTS: readonly OauthResult[] = ['success', 'cancelled', 'error'];
-
-const SUPPORTED_PROVIDERS: readonly string[] = ['google'];
+const OAUTH_RESULTS: readonly OauthResult[] = ['success', 'declined', 'error'];
 
 /**
- * A reason token is only trusted when it is a short lowercase
- * alphanumeric/underscore string. Anything else is treated as a potential
+ * The server reports the newly persisted integration id on success. It is a
+ * GUID; any other value is treated as a potential token/payload and dropped.
+ */
+const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * A reason token is only trusted when it is a short lowercase phrase
+ * (alphanumeric with spaces and a few punctuation marks), as emitted by the
+ * server's fixed failure reasons. Anything else is treated as a potential
  * raw provider response and dropped.
  */
-const SAFE_REASON_PATTERN = /^[a-z0-9_]{1,64}$/;
+const SAFE_REASON_PATTERN = /^[a-z0-9_-][a-z0-9_ .,()-]{0,127}$/;
 
 function parseSearch(search: string): URLSearchParams | null {
 	const body = search.startsWith('?') ? search.slice(1) : search;
@@ -53,26 +74,28 @@ function parseSearch(search: string): URLSearchParams | null {
 }
 
 /**
- * Parse and validate the transient OAuth query parameters on the
+ * Parse and validate the transient connect-result query parameters on the
  * Connections return URL. Returns `null` when the URL carries no
- * recognisable OAuth result (e.g. a plain page load).
+ * recognisable result (e.g. a plain page load).
  */
 export function parseOauthReturn(search: string): ParsedOauthReturn | null {
 	const params = parseSearch(search);
 	if (!params) return null;
 
-	const rawResult = params.get('oauth');
+	const rawResult = params.get('calendarConnect');
 	if (!rawResult || !(OAUTH_RESULTS as readonly string[]).includes(rawResult)) {
 		return null;
 	}
 	const result = rawResult as OauthResult;
 
-	const rawProvider = params.get('provider');
-	if (!rawProvider) return null;
-	const provider = rawProvider.toLowerCase();
-	if (!SUPPORTED_PROVIDERS.includes(provider)) return null;
+	const parsed: ParsedOauthReturn = { result };
 
-	const parsed: ParsedOauthReturn = { result, provider: provider as IntegrationProvider };
+	if (result === 'success') {
+		const rawId = params.get('integrationId');
+		if (rawId && GUID_PATTERN.test(rawId)) {
+			parsed.integrationId = rawId;
+		}
+	}
 
 	if (result === 'error') {
 		const rawReason = params.get('reason');
@@ -85,16 +108,17 @@ export function parseOauthReturn(search: string): ParsedOauthReturn | null {
 }
 
 /**
- * Remove the transient OAuth query parameters (`oauth`, `provider`,
- * `reason`) from a search string, preserving any unrelated parameters.
- * Returns `''` when nothing remains so callers can replace the URL with a
- * clean `/settings/connections`. Unparseable input is dropped entirely —
- * values we could not validate must not survive the cleanup.
+ * Remove the transient connect-result query parameters
+ * (`calendarConnect`, `integrationId`, `reason`) from a search string,
+ * preserving any unrelated parameters. Returns `''` when nothing remains so
+ * callers can replace the URL with a clean `/settings/connections`.
+ * Unparseable input is dropped entirely — values we could not validate must
+ * not survive the cleanup.
  */
 export function stripOauthParams(search: string): string {
 	const params = parseSearch(search);
 	if (!params) return '';
-	for (const key of ['oauth', 'provider', 'reason']) {
+	for (const key of ['calendarConnect', 'integrationId', 'reason']) {
 		params.delete(key);
 	}
 	const remaining = params.toString();
