@@ -19,7 +19,7 @@ import analytics from '@/core/util/analytics';
  * `integrationsService`, and completes the server-owned OAuth round trip:
  *
  * - Start: the Connect action navigates the browser to
- *   `GET api/Integrations?provider=google&redirectTarget=<this page>`;
+ *   `GET api/Integrations/connect?provider=google&redirectTarget=<this page>`;
  *   the server redirects to the provider consent screen.
  * - Return: the transient `calendarConnect`/`integrationId`/`reason` query
  *   parameters on this page are parsed with `parseOauthReturn`, exactly one

@@ -6,10 +6,14 @@
  * Start step: the client navigates the browser (a top-level GET that carries
  * the Tiler session cookies) to:
  *
- *   GET <base>api/Integrations?provider=google&redirectTarget=<own-origin https URL>
+ *   GET <base>api/Integrations/connect?provider=google&redirectTarget=<own-origin https URL>
  *
- * and the server 302-redirects to the provider consent screen. The round trip
- * is fully server-owned; the client only ever constructs this one URL.
+ * and the server (`IntegrationsController.StartCalendarConnect`) 302-redirects
+ * to the provider consent screen. The round trip is fully server-owned; the
+ * client only ever constructs this one URL.
+ *
+ * `api/Integrations` without the `/connect` segment is the integrations LIST
+ * endpoint (returns JSON) — it is never used to start the round trip.
  *
  * This module is pure and total: invalid input returns `null` (the caller
  * keeps the user on the page) instead of throwing.
@@ -23,8 +27,11 @@
  *   parameter value.
  */
 
-/** The server endpoint that starts the OAuth round trip (GET, browser navigation). */
-export const OAUTH_START_PATH = 'api/Integrations';
+/**
+ * The server endpoint that starts the OAuth round trip
+ * (`IntegrationsController.StartCalendarConnect`; GET, browser navigation).
+ */
+export const OAUTH_START_PATH = 'api/Integrations/connect';
 
 /**
  * Build the full OAuth start URL for a provider.

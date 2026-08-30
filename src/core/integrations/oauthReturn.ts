@@ -3,19 +3,22 @@
  * connections (see docs/web-connections-integration-plan.md, section 6).
  *
  * Contract verified against TilerFront (IntegrationsController +
- * RedirectTargetValidator):
+ * RedirectTargetValidator, 2026-08-30):
  *
  *   1. Start: the client navigates the browser to
- *      `GET api/Integrations?provider=google&redirectTarget=<own-origin https URL>`;
- *      the server 302-redirects to the provider consent screen with a signed
- *      state that binds the Tiler user.
+ *      `GET api/Integrations/connect?provider=google&redirectTarget=<own-origin https URL>`
+ *      (the Tiler user is resolved from the session cookie — no userID
+ *      parameter); the server 302-redirects to the provider consent screen
+ *      with a signed state that binds the Tiler user. NOTE: `api/Integrations`
+ *      without `/connect` is the integrations LIST endpoint, not the start.
  *   2. `GET api/Integrations/connect/callback` exchanges the authorization
  *      code and persists the integration. The callback deliberately does not
  *      require the Tiler session; the signed state is authoritative.
  *   3. The server redirects the browser back to `redirectTarget` with
- *      transient result query parameters:
+ *      transient result query parameters
+ *      (`RedirectTargetValidator.AppendCallbackResult`):
  *
- *      - Success:     ?calendarConnect=success&integrationId={guid}
+ *      - Success:     ?calendarConnect=success&integrationId={compositeId}
  *      - Cancelled:   ?calendarConnect=declined
  *      - Failure:     ?calendarConnect=error&reason={failureReason}
  *
@@ -26,9 +29,9 @@
  *   ever surfaced to callers, UI, analytics, or logs.
  * - `calendarConnect` must be one of the exact lowercase result tokens the
  *   server emits. Anything else means "no recognisable result".
- * - `integrationId` is only kept when it is a well-formed GUID; anything else
- *   (tokens, emails, raw payloads) is dropped while the result is still
- *   reported.
+ * - `integrationId` is only kept when it matches the server's composite id
+ *   format exactly; anything else (tokens, unknown shapes, raw payloads) is
+ *   dropped while the result is still reported.
  * - `reason` is only kept when it matches a bounded, safe token pattern
  *   (short lowercase phrases, as emitted by the server); otherwise it is
  *   dropped while the result itself is still reported.
@@ -40,7 +43,8 @@ export interface ParsedOauthReturn {
 	result: OauthResult;
 	/**
 	 * Integration id reported by the server on a successful connect.
-	 * Only present after validation as a well-formed GUID.
+	 * Only present after validation against the server's composite id
+	 * format (see `INTEGRATION_ID_PATTERN` below).
 	 */
 	integrationId?: string;
 	/** Sanitized, non-sensitive reason token. Only present for `error` results. */
@@ -50,10 +54,24 @@ export interface ParsedOauthReturn {
 const OAUTH_RESULTS: readonly OauthResult[] = ['success', 'declined', 'error'];
 
 /**
- * The server reports the newly persisted integration id on success. It is a
- * GUID; any other value is treated as a potential token/payload and dropped.
+ * The server reports the newly persisted integration id on success. It is
+ * the server's composite id format (TilerElements
+ * .ThirdPartyCalendarAuthentication.generateID):
+ *
+ *   {tilerUserId GUID}_TCA_{connectedAccountEmail}_TCA_{providerId}_TCA_{ULID}
+ *
+ * The value embeds the connected account's email, so it must never be logged
+ * or tracked — it is surfaced ONLY as the parsed `integrationId`. Any value
+ * that does not match this exact shape is treated as a potential token/
+ * payload and dropped (the success result itself is still reported).
  */
-const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const GUID_SEGMENT = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+const EMAIL_SEGMENT = '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+';
+const PROVIDER_SEGMENT = '[a-z][a-z0-9]*';
+const ULID_SEGMENT = '[0-9A-Za-z]{26}';
+const INTEGRATION_ID_PATTERN = new RegExp(
+	`^${GUID_SEGMENT}_TCA_${EMAIL_SEGMENT}_TCA_${PROVIDER_SEGMENT}_TCA_${ULID_SEGMENT}$`
+);
 
 /**
  * A reason token is only trusted when it is a short lowercase phrase
@@ -92,7 +110,7 @@ export function parseOauthReturn(search: string): ParsedOauthReturn | null {
 
 	if (result === 'success') {
 		const rawId = params.get('integrationId');
-		if (rawId && GUID_PATTERN.test(rawId)) {
+		if (rawId && INTEGRATION_ID_PATTERN.test(rawId)) {
 			parsed.integrationId = rawId;
 		}
 	}

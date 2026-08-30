@@ -5,13 +5,13 @@ import { parseOauthReturn, stripOauthParams } from '../oauthReturn';
 // Phase 0 contract tests for the server-owned OAuth round trip.
 //
 // Contract verified against the backend (TilerFront):
-//   - `IntegrationsController.GetIntegration` start:
-//       GET api/Integrations?provider=google&redirectTarget=<allow-listed https URL>
+//   - `IntegrationsController.StartCalendarConnect` start:
+//       GET api/Integrations/connect?provider=google&redirectTarget=<allow-listed https URL>
 //     The server 302s the browser to provider consent with a signed state.
 //   - `IntegrationsController.ConnectCallback` (GET api/Integrations/connect/callback):
 //     exchanges the code, persists the integration, then redirects the browser
 //     back to `redirectTarget` with `RedirectTargetValidator.AppendCallbackResult`:
-//       - Success:     ?calendarConnect=success&integrationId={guid}
+//       - Success:     ?calendarConnect=success&integrationId={compositeId}
 //       - Cancelled:   ?calendarConnect=declined
 //       - Failure:     ?calendarConnect=error&reason={failureReason}
 //
@@ -20,14 +20,22 @@ import { parseOauthReturn, stripOauthParams } from '../oauthReturn';
 // NEVER included in what client-side redirect handling surfaces.
 // ---------------------------------------------------------------------------
 
-const GUID = '3f2b7c1d-9a4e-4f6b-8c2a-1d5e9f3b7a2c';
+const TILER_USER_ID = '3f2b7c1d-9a4e-4f6b-8c2a-1d5e9f3b7a2c';
+/**
+ * The server's composite integration id
+ * ({tilerUserId}_TCA_{connectedAccountEmail}_TCA_{providerId}_TCA_{ulid}),
+ * as emitted by TilerElements.ThirdPartyCalendarAuthentication.generateID.
+ */
+const COMPOSITE_ID = `${TILER_USER_ID}_TCA_person@example.com_TCA_google_TCA_01J9V4Q7T8Z01J9V4Q7T8Z01J9`;
 
 describe('parseOauthReturn', () => {
 	describe('valid results (server-appended contract)', () => {
-		it('parses a successful connect return with a GUID integration id', () => {
-			expect(parseOauthReturn(`?calendarConnect=success&integrationId=${GUID}`)).toEqual({
+		it('parses a successful connect return with the server composite integration id', () => {
+			expect(
+				parseOauthReturn(`?calendarConnect=success&integrationId=${COMPOSITE_ID}`)
+			).toEqual({
 				result: 'success',
-				integrationId: GUID,
+				integrationId: COMPOSITE_ID,
 			});
 		});
 
@@ -67,10 +75,16 @@ describe('parseOauthReturn', () => {
 	});
 
 	describe('non-conforming values are dropped, never surfaced', () => {
-		it('drops a non-GUID integrationId while still reporting success', () => {
-			const parsed = parseOauthReturn('?calendarConnect=success&integrationId=not-a-guid');
+		it('drops a non-conforming integrationId (bare GUIDs included) while still reporting success', () => {
+			// The server never emits a bare GUID or a short placeholder id.
+			const parsed = parseOauthReturn(
+				`?calendarConnect=success&integrationId=${TILER_USER_ID}`
+			);
 			expect(parsed).toEqual({ result: 'success' });
 			expect(parsed?.integrationId).toBeUndefined();
+			expect(parseOauthReturn('?calendarConnect=success&integrationId=not-an-id')).toEqual({
+				result: 'success',
+			});
 		});
 
 		it('drops an integrationId that looks like a token or payload', () => {
@@ -139,9 +153,9 @@ describe('parseOauthReturn', () => {
 	describe('sensitive values never leak into the parsed result', () => {
 		it('never surfaces extra OAuth parameters (code, state, tokens)', () => {
 			const parsed = parseOauthReturn(
-				`?calendarConnect=success&integrationId=${GUID}&code=4%2Fsecret-code&state=csrf-123&access_token=at&refresh_token=rt`
+				`?calendarConnect=success&integrationId=${COMPOSITE_ID}&code=4%2Fsecret-code&state=csrf-123&access_token=at&refresh_token=rt`
 			);
-			expect(parsed).toEqual({ result: 'success', integrationId: GUID });
+			expect(parsed).toEqual({ result: 'success', integrationId: COMPOSITE_ID });
 			const serialised = JSON.stringify(parsed);
 			expect(serialised).not.toContain('secret-code');
 			expect(serialised).not.toContain('csrf-123');
@@ -163,7 +177,7 @@ describe('parseOauthReturn', () => {
 
 describe('stripOauthParams', () => {
 	it('removes all transient connect-result parameters', () => {
-		expect(stripOauthParams(`?calendarConnect=success&integrationId=${GUID}`)).toBe('');
+		expect(stripOauthParams(`?calendarConnect=success&integrationId=${COMPOSITE_ID}`)).toBe('');
 	});
 
 	it('removes the error result parameters', () => {
@@ -175,9 +189,9 @@ describe('stripOauthParams', () => {
 	});
 
 	it('preserves unrelated query parameters', () => {
-		expect(stripOauthParams(`?calendarConnect=success&integrationId=${GUID}&tab=cards`)).toBe(
-			'?tab=cards'
-		);
+		expect(
+			stripOauthParams(`?calendarConnect=success&integrationId=${COMPOSITE_ID}&tab=cards`)
+		).toBe('?tab=cards');
 	});
 
 	it('tolerates a missing leading ? and empty input', () => {

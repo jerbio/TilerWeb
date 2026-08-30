@@ -241,40 +241,64 @@ Confirm whether the backend supports a true batch payload. If it does not, the s
 
 ## 6. OAuth Redirect Contract
 
-The recommended web redirects are:
+> **Verified against TilerFront on 2026-08-30** (`IntegrationsController`,
+> `RedirectTargetValidator`, `TilerElements.ThirdPartyCalendarAuthentication`).
+> The flow is fully server-owned through `api/Integrations/connect` and
+> supersedes the original `oauth=` proposal kept at the end of this section.
+
+**Start** — the client navigates the browser (top-level GET, cookie-authenticated):
+
+    GET api/Integrations/connect?provider=google&redirectTarget=<own-origin https URL>
+
+- `provider` is parsed case-insensitively; `google` and `microsoft` are
+  supported (`google` only in v1). No `userID` parameter is sent: the server
+  resolves the Tiler user from the session.
+- `redirectTarget` is accepted only for `https` URLs whose host is on the
+  `calendarConnectAllowedRedirectHosts` allow-list (open-redirect guard);
+  plain `http` is rejected.
+- The server 302-redirects to the provider consent screen with calendar-only
+  scopes and an HMAC-signed state binding (tilerUserId, provider,
+  redirectTarget). If `calendarConnectStateSigningKey` is not configured, the
+  start refuses (fail closed).
+
+**Callback** — server-owned:
+
+    GET api/Integrations/connect/callback
+
+The callback exchanges the authorization code, persists the connection via the
+shared `PersistNewGoogleConnection` role (reconnecting the same account updates
+the existing row's tokens — no duplicate rows), and redirects the browser back
+to `redirectTarget` with transient result parameters:
+
+- Success: `/settings/connections?calendarConnect=success&integrationId={id}`
+- Cancellation: `/settings/connections?calendarConnect=declined`
+- Failure: `/settings/connections?calendarConnect=error&reason={reason}`
+
+`integrationId` is the persisted composite id
+`{tilerUserId}_TCA_{accountEmail}_TCA_{providerId}_TCA_{ulid}` (it embeds the
+connected account email — the client validates it against that exact shape and
+never logs or tracks it). `reason` is a fixed, lowercase server token
+(e.g. `persistence failed`); values outside the client's safe pattern are
+dropped while the error result is still reported.
+
+After returning, the page:
+
+1. Reads only `calendarConnect`, `integrationId`, and `reason`.
+2. Displays one notification (auto-dismiss after 6 s).
+3. Refreshes integrations only for a successful result.
+4. Removes the transient parameters with replace navigation, leaving the clean
+   URL `/settings/connections`.
+
+**Deployment prerequisites** (server app settings):
+`calendarConnectStateSigningKey`, `googleClientId`/`googleClientSecret`,
+`googleCalendarConnectRedirectUri`, and a `calendarConnectAllowedRedirectHosts`
+list that includes the web app's origin.
+
+### Original (superseded) proposal
 
 - Success: `/settings/connections?oauth=success&provider=google`
 - Cancellation: `/settings/connections?oauth=cancelled&provider=google`
 - Failure: `/settings/connections?oauth=error&provider=google&reason=access_denied`
-
-The `provider` value must be a non-sensitive identifier such as `google`. It must never contain an email address, account ID, authorization code, access token, refresh token, or provider response payload.
-
-After returning, the page should:
-
-1. Read `oauth` and `provider`.
-2. Validate that the provider is supported.
-3. Display one provider-specific notification.
-4. Refresh integrations only for a successful result.
-5. Remove transient query parameters with replace navigation.
-6. Leave the clean URL as `/settings/connections`.
-
-The server should generate or validate the final return destination. The client must not be able to provide an arbitrary redirect URL.
-
-### Required backend confirmation
-
-Before Phase 1 is marked complete, confirm:
-
-- Whether `Account/ExternalLogin` distinguishes calendar linking from normal Tiler sign-in.
-- Whether an action, return URL, or linking parameter is required.
-- The exact server callback and final browser redirect URLs.
-- The exact Google Calendar scopes.
-- The OAuth state and CSRF protection mechanism.
-- Whether the existing authentication cookie survives the round trip.
-- The success, cancellation, and failure result format.
-- Whether errors can expose sensitive provider response data in the URL.
-- Whether browser requests require an antiforgery header or token.
-- Whether multiple Google connections are allowed.
-- Whether duplicate connections are rejected or merged.
 
 ## 7. Proposed Web Architecture
 
@@ -457,7 +481,7 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`, `NEEDS FEEDBACK`.
 
 ### Phase 3: Connections list and OAuth return handling
 
-**Status:** `IN PROGRESS` — automated implementation and tests complete (29 tests: `ConnectionsSettings.test.tsx` + `oauthUrl.test.ts`); live manual OAuth redirect QA pending.
+**Status:** `IN PROGRESS` — automated implementation and tests complete (29 tests: `ConnectionsSettings.test.tsx` + `oauthUrl.test.ts`, plus 19 in `oauthReturn.test.ts`); live manual OAuth redirect QA pending.
 
 **Objective:** Render the provider list and complete the server-owned OAuth round trip.
 
@@ -465,7 +489,8 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`, `NEEDS FEEDBACK`.
 
 - [x] Render Google as available.
 - [x] Render Microsoft, Apple, Slack, and Google Tasks as unavailable (rendered as "Coming soon" from `CONNECTION_PROVIDERS`).
-- [x] Implement the Google Add action. The confirmed contract (Phase 0, verified against TilerFront) is a server-owned `GET api/Integrations?provider=google&redirectTarget=<own-origin URL>` browser navigation built by `buildOauthStartUrl`, not an `Account/ExternalLogin` form post.
+- [x] Implement the Google Add action. The confirmed contract (2026-08-30 audit against TilerFront's `IntegrationsController`) is a server-owned `GET api/Integrations/connect?provider=google&redirectTarget=<own-origin URL>` browser navigation built by `buildOauthStartUrl`, not an `Account/ExternalLogin` form post. (`api/Integrations` without `/connect` is the integrations list endpoint.)
+- [x] Validate the returned `integrationId` against the server's composite id format (`{tilerUserId}_TCA_{accountEmail}_TCA_{providerId}_TCA_{ulid}`) before retaining it — the server does not emit bare GUIDs.
 - [x] Preserve the intended Connections return destination (`redirectTarget` = own origin + `/settings/connections`).
 - [x] Parse the transient OAuth return parameters on return via `parseOauthReturn` over the router's `location.search` (the verified contract carries `calendarConnect`/`integrationId`/`reason`, not `oauth`/`provider`).
 - [x] Show one success, cancellation, or error notification (auto-dismiss after 6 s).
@@ -843,7 +868,8 @@ These must be resolved before the relevant tracker phase is marked `DONE`:
 
 ## 14. Change History
 
-| Date       | Change                                                                                                                                                                        |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-29 | Initial comprehensive architecture, OAuth, TDD, tracker, feedback, logging, and release plan.                                                                                 |
-| 2026-08-30 | Phase 2 complete: shared wire/domain types, total non-throwing mapping, `getIntegrations` API and service, fixtures re-pointed at shared wire types, all Phase 2 tests green. |
+| Date       | Change                                                                                                                                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-29 | Initial comprehensive architecture, OAuth, TDD, tracker, feedback, logging, and release plan.                                                                                                                                                                      |
+| 2026-08-30 | Phase 2 complete: shared wire/domain types, total non-throwing mapping, `getIntegrations` API and service, fixtures re-pointed at shared wire types, all Phase 2 tests green.                                                                                      |
+| 2026-08-30 | Phase 3 backend audit against `IntegrationsController`: corrected the OAuth start path to `api/Integrations/connect` and `integrationId` validation to the server's composite id format; rewrote section 6 as the verified contract with deployment prerequisites. |

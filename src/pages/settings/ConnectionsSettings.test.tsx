@@ -218,15 +218,22 @@ describe('detail route', () => {
 // OAuth contract under test (verified against TilerFront, see
 // `src/core/integrations/oauthReturn.ts`): the return URL carries the
 // transient parameters `calendarConnect=success|declined|error` plus optional
-// `integrationId` (GUID) and `reason` (safe token). The page must show one
-// notification, refresh only on success, and replace the URL with a clean one.
+// `integrationId` (composite server id) and `reason` (safe token). The page
+// must show one notification, refresh only on success, and replace the URL
+// with a clean one.
 // ---------------------------------------------------------------------------
 
 // jsdom's location.origin (set via the vitest jsdom url) is what the page uses
 // for the OAuth redirectTarget. `origin` is a non-configurable getter, so the
 // tests assert against the real origin instead of trying to redefine it.
 const pageOrigin = window.location.origin;
-const integrationGuid = '9f86d081-884c-4baf-a5e2-4b9c6d1e7f21';
+/**
+ * The server reports the newly persisted integration as a composite id
+ * ({tilerUserId}_TCA_{accountEmail}_TCA_{providerId}_TCA_{ulid}), so the
+ * fixture mirrors that exact shape.
+ */
+const integrationIdParam =
+	'9f86d081-884c-4baf-a5e2-4b9c6d1e7f21_TCA_person@example.com_TCA_google_TCA_01J9V4Q7T8Z01J9V4Q7T8Z01J9';
 
 describe('provider list', () => {
 	it('renders Google as an available provider with a Connect action', async () => {
@@ -327,7 +334,7 @@ describe('Google connect start', () => {
 			expect(assignSpy).toHaveBeenCalledOnce();
 			const url = new URL(assignSpy.mock.calls[0][0] as string);
 			expect(url.origin).toBe('https://api.tiler.test');
-			expect(url.pathname).toBe('/api/Integrations');
+			expect(url.pathname).toBe('/api/Integrations/connect');
 			expect(url.searchParams.get('provider')).toBe('google');
 			// The intended return destination is the own-origin Connections page.
 			expect(url.searchParams.get('redirectTarget')).toBe(
@@ -349,10 +356,12 @@ describe('OAuth return handling', () => {
 		integrationsServiceMock.getIntegrations
 			.mockResolvedValueOnce([])
 			.mockResolvedValueOnce(data);
-		const captured = { current: `?calendarConnect=success&integrationId=${integrationGuid}` };
+		const captured = {
+			current: `?calendarConnect=success&integrationId=${integrationIdParam}`,
+		};
 
 		renderSettingsRoutes(
-			`${AppRoutes.SettingsConnections}?calendarConnect=success&integrationId=${integrationGuid}`,
+			`${AppRoutes.SettingsConnections}?calendarConnect=success&integrationId=${integrationIdParam}`,
 			captured
 		);
 
