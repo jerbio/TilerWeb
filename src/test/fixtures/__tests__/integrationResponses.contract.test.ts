@@ -31,8 +31,11 @@ function assertNoSensitiveKeys(value: unknown, path = 'root'): void {
 
 describe('integration response fixtures (contract)', () => {
 	it('success envelope carries the standard Error block', () => {
-		expect(integrationSuccessEnvelope.Error.Code).toBe('0');
-		expect(typeof integrationSuccessEnvelope.Error.Message).toBe('string');
+		// The shared wire envelope types `Error` as optional (the server may
+		// omit it), so the fixtures are asserted through optional chaining:
+		// a fixture missing `Error` fails these assertions.
+		expect(integrationSuccessEnvelope.Error?.Code).toBe('0');
+		expect(typeof integrationSuccessEnvelope.Error?.Message).toBe('string');
 	});
 
 	it('success envelope contains multiple integration records', () => {
@@ -71,7 +74,7 @@ describe('integration response fixtures (contract)', () => {
 	});
 
 	it('empty envelope has an empty Content array', () => {
-		expect(integrationEmptyEnvelope.Error.Code).toBe('0');
+		expect(integrationEmptyEnvelope.Error?.Code).toBe('0');
 		expect(integrationEmptyEnvelope.Content).toEqual([]);
 	});
 
@@ -88,8 +91,11 @@ describe('integration response fixtures (contract)', () => {
 	});
 
 	it('error envelope has a non-zero Code and no Content', () => {
-		expect(integrationErrorEnvelope.Error.Code).not.toBe('0');
-		expect(typeof integrationErrorEnvelope.Error.Message).toBe('string');
+		// `Error` is optional on the wire envelope, so an error envelope is
+		// asserted to actually carry one before checking its Code.
+		expect(integrationErrorEnvelope.Error).toBeDefined();
+		expect(integrationErrorEnvelope.Error?.Code).not.toBe('0');
+		expect(typeof integrationErrorEnvelope.Error?.Message).toBe('string');
 		expect('Content' in integrationErrorEnvelope).toBe(false);
 	});
 

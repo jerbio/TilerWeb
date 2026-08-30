@@ -12,49 +12,14 @@
  * casing and nullability the server actually returns.
  */
 
-/** Standard error block returned in every integrations envelope. */
-export interface IntegrationsErrorFixture {
-	Code: string;
-	Message: string;
-}
+/**
+ * The fixtures are typed directly against the shared wire types in
+ * `@/core/integrations/types`, so any drift between what the server returns
+ * (as pinned by these fixtures) and what the mapping code consumes is a
+ * compile-time error.
+ */
 
-/** Envelope returned by every integrations endpoint. */
-export interface IntegrationsResponseEnvelope {
-	Error: IntegrationsErrorFixture;
-	Content?: unknown;
-}
-
-/** Location block as returned inside an integration record. */
-export interface IntegrationLocationFixture {
-	id: string;
-	description: string;
-	address: string;
-	thirdPartyId: string;
-	longitude: number;
-	latitude: number;
-	isVerified: boolean;
-}
-
-/** Calendar item block as returned inside an integration record. */
-export interface IntegrationCalendarItemFixture {
-	id: string;
-	name: string;
-	isEnabled: boolean;
-	isSelected: boolean;
-	description?: string;
-	authenticationId?: string;
-	userIdentifier?: string;
-}
-
-/** A single integration record as returned inside `Content`. */
-export interface IntegrationRecordFixture {
-	id: string;
-	provider: string;
-	email?: string;
-	userId?: string;
-	location?: IntegrationLocationFixture | null;
-	calendarItems?: IntegrationCalendarItemFixture[] | null;
-}
+import type { IntegrationsResponseEnvelope } from '@/core/integrations/types';
 
 /**
  * Success: two fully-populated Google integrations.
@@ -95,7 +60,7 @@ export const integrationSuccessEnvelope: IntegrationsResponseEnvelope = {
 					isSelected: false,
 				},
 			],
-		} as IntegrationRecordFixture,
+		},
 		{
 			id: 'integration-id-2',
 			provider: 'Google',
@@ -103,7 +68,7 @@ export const integrationSuccessEnvelope: IntegrationsResponseEnvelope = {
 			userId: 'provider-user-id-2',
 			location: null,
 			calendarItems: [],
-		} as IntegrationRecordFixture,
+		},
 	],
 };
 
@@ -126,7 +91,7 @@ export const integrationMalformedEnvelope: IntegrationsResponseEnvelope = {
 			provider: 'Google',
 			location: null,
 			calendarItems: null,
-		} as IntegrationRecordFixture,
+		},
 		{
 			id: 'integration-id-partial-items',
 			provider: 'Google',
@@ -135,9 +100,9 @@ export const integrationMalformedEnvelope: IntegrationsResponseEnvelope = {
 					id: 'calendar-id-partial',
 					isEnabled: false,
 					isSelected: false,
-				} as IntegrationCalendarItemFixture,
+				},
 			],
-		} as IntegrationRecordFixture,
+		},
 	],
 };
 

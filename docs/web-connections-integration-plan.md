@@ -415,28 +415,28 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`, `NEEDS FEEDBACK`.
 
 ### Phase 2: Models and read API
 
-**Status:** `TODO`
+**Status:** `DONE`
 
 **Objective:** Fetch and safely map the mobile-compatible integration response.
 
 **Implementation tasks:**
 
-- [ ] Define integration, calendar item, and integration location types.
-- [ ] Define the response envelope type.
-- [ ] Implement `getIntegrations(integrationId?)`.
-- [ ] Map nullable fields safely.
-- [ ] Keep provider capability metadata separate from returned records.
-- [ ] Expose normalized errors to the service layer.
+- [x] Define integration, calendar item, and integration location types.
+- [x] Define the response envelope type.
+- [x] Implement `getIntegrations(integrationId?)`.
+- [x] Map nullable fields safely.
+- [x] Keep provider capability metadata separate from returned records.
+- [x] Expose normalized errors to the service layer.
 
 **TDD tests first:**
 
-- [ ] Successful response maps all integration fields.
-- [ ] Empty Content maps to an empty list.
-- [ ] Missing location maps to null without throwing.
-- [ ] Missing calendar items maps to an empty list or documented null behavior.
-- [ ] HTTP errors and structured server errors reject consistently.
-- [ ] Requests include credentials and the optional integration ID only when present.
-- [ ] No provider token or secret is retained in the mapped model.
+- [x] Successful response maps all integration fields.
+- [x] Empty Content maps to an empty list.
+- [x] Missing location maps to null without throwing.
+- [x] Missing calendar items maps to an empty list or documented null behavior.
+- [x] HTTP errors and structured server errors reject consistently.
+- [x] Requests include credentials and the optional integration ID only when present.
+- [x] No provider token or secret is retained in the mapped model.
 
 **User feedback:**
 
@@ -451,9 +451,9 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`, `NEEDS FEEDBACK`.
 
 **Exit criteria:**
 
-- [ ] API tests are green.
-- [ ] TypeScript build passes.
-- [ ] Fixtures represent real backend casing and nullability.
+- [x] API tests are green.
+- [x] TypeScript build passes.
+- [x] Fixtures represent real backend casing and nullability.
 
 ### Phase 3: Connections list and OAuth return handling
 
@@ -843,6 +843,7 @@ These must be resolved before the relevant tracker phase is marked `DONE`:
 
 ## 14. Change History
 
-| Date       | Change                                                                                        |
-| ---------- | --------------------------------------------------------------------------------------------- |
-| 2026-08-29 | Initial comprehensive architecture, OAuth, TDD, tracker, feedback, logging, and release plan. |
+| Date       | Change                                                                                                                                                                        |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-29 | Initial comprehensive architecture, OAuth, TDD, tracker, feedback, logging, and release plan.                                                                                 |
+| 2026-08-30 | Phase 2 complete: shared wire/domain types, total non-throwing mapping, `getIntegrations` API and service, fixtures re-pointed at shared wire types, all Phase 2 tests green. |
