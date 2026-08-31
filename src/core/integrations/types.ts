@@ -135,7 +135,7 @@ export interface ConnectionProvider {
  */
 export const CONNECTION_PROVIDERS: readonly ConnectionProvider[] = [
 	{ id: 'google', status: 'available' },
-	{ id: 'microsoft', status: 'unavailable' },
+	{ id: 'microsoft', status: 'available' },
 	{ id: 'apple', status: 'unavailable' },
 	{ id: 'slack', status: 'unavailable' },
 	{ id: 'googleTasks', status: 'unavailable' },

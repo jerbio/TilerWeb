@@ -151,8 +151,7 @@ const ConnectionsSettings: React.FC = () => {
 		return () => window.clearTimeout(timer);
 	}, [notification]);
 
-	const handleConnectGoogle = useCallback(() => {
-		const provider = 'google';
+	const handleConnectToProvider = useCallback((provider: string) => {
 		analytics.trackEvent('Connections', 'OAuth started', provider, undefined, { provider });
 		try {
 			// Best-effort start marker for the elapsed-time telemetry on return.
@@ -219,7 +218,7 @@ const ConnectionsSettings: React.FC = () => {
 							{t(`settings.sections.connections.providers.${provider.id}`)}
 						</ProviderName>
 						{provider.status === 'available' ? (
-							<ConnectButton onClick={handleConnectGoogle}>
+							<ConnectButton onClick={() => handleConnectToProvider(provider.id)}>
 								{t('settings.sections.connections.connect')}
 							</ConnectButton>
 						) : (
