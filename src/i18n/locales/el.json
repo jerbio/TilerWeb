@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Συνδέσεις",
 				"description": "Διαχείριση εφαρμογών που συνδέονται με τον λογαριασμό σας Tiler",
-				"placeholder": "Οι ρυθμίσεις σύνδεσης θα είναι σύντομα διαθέσιμες...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Ανάπτυξη λογαριασμών",
+				"collapseAccounts": "Σύμπτυξη λογαριασμών",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Φόρτωση σύνδεσης...",
+					"loadError": "Δεν ήταν δυνατή η φόρτωση αυτής της σύνδεσης. Παρακαλούμε δοκιμάστε ξανά.",
+					"retry": "Επαναλήψη",
+					"notFound": "Αυτή η σύνδεση δεν είναι πλέον διαθέσιμη.",
+					"backToConnections": "Επιστροφή στις Συνδέσεις",
+					"calendarsTitle": "Ημερολόγια",
+					"calendarsDescription": "Επιλέξτε ποια ημερολόγια μπορεί να διαβάζει ο Tiler.",
+					"calendarsEmpty": "Δεν υπάρχουν διαθέσιμα ημερολόγια για τον λογαριασμό αυτό.",
+					"toggleError": "Δεν ήταν δυνατή η ενημέρωση αυτού του ημερολογίου. Παρακαλούμε δοκιμάστε ξανά.",
+					"disconnectSection": "Αποσύνδεση",
+					"disconnectDescription": "Με την αποσύνδεση αυτού του λογαριασμού ο Tiler δεν θα διαβάζει πλέον τα ημερολόγια του.",
+					"disconnectAction": "Αποσύνδεση",
+					"disconnecting": "Γίνεται αποσύνδεση...",
+					"disconnectConfirmTitle": "Αποσύνδεση αυτού του λογαριασμού;",
+					"disconnectConfirmDescription": "Ο Tiler δεν θα μπορεί πλέον να διαβάζει {{email}}.",
+					"disconnectCancel": "Άκυρο",
+					"disconnectError": "Δεν ήταν δυνατή η αποσύνδεση αυτού του λογαριασμού. Παρακαλούμε δοκιμάστε ξανά.",
+					"disconnectProviderError": "Δεν ήταν δυνατή η αποσύνδεση του ημερολογίου αυτή τη στιγμή. Παρακαλούμε δοκιμάστε ξανά σε λίγο."
 				}
 			}
 		}

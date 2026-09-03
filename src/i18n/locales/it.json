@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Connessioni",
 				"description": "Gestisci le app collegate al tuo account Tiler",
-				"placeholder": "Le impostazioni delle connessioni saranno disponibili a breve...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Espandi account",
+				"collapseAccounts": "Comprimi account",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Caricamento connessione...",
+					"loadError": "Non è stato possibile caricare questa connessione. Riprova.",
+					"retry": "Riprova",
+					"notFound": "Questa connessione non è più disponibile.",
+					"backToConnections": "Torna a Connessioni",
+					"calendarsTitle": "Agende",
+					"calendarsDescription": "Scegli quali agende Tiler può leggere.",
+					"calendarsEmpty": "Nessuna agenda disponibile per questo account.",
+					"toggleError": "Non è stato possibile aggiornare questa agenda. Riprova.",
+					"disconnectSection": "Disconnetti",
+					"disconnectDescription": "Disconnettendo questo account, Tiler smetterà di leggerne le agende.",
+					"disconnectAction": "Disconnetti",
+					"disconnecting": "Disconnessione...",
+					"disconnectConfirmTitle": "Disconnettere questo account?",
+					"disconnectConfirmDescription": "Tiler non potrà più leggere {{email}}.",
+					"disconnectCancel": "Annulla",
+					"disconnectError": "Non è stato possibile disconnettere questo account. Riprova.",
+					"disconnectProviderError": "Il provider dell'agenda non può essere disconnesso al momento. Riprova tra un momento."
 				}
 			}
 		}

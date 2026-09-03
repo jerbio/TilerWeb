@@ -69,6 +69,39 @@ export interface IntegrationsResponseEnvelope {
 	Content?: IntegrationRecord[] | null;
 }
 
+/**
+ * Envelope returned by `GET /api/integrations/calendarItem`. The server wraps
+ * the items as `Content.calendarItems` — always list-shaped, even when a
+ * single `calendarItemId` filter is supplied (the controller's single-item
+ * branch falls through to the list query). `Content` is absent/null on error.
+ */
+export interface CalendarItemsEnvelope {
+	Error?: ApiCodeResponse | null;
+	Content?: {
+		calendarItems?: IntegrationCalendarItemRecord[] | null;
+	} | null;
+}
+
+/**
+ * Envelope returned by `POST /api/integrations/google/calendarItem`. On
+ * success `Content` is the single updated item (no list wrapper).
+ */
+export interface CalendarItemToggleEnvelope {
+	Error?: ApiCodeResponse | null;
+	Content?: IntegrationCalendarItemRecord | null;
+}
+
+/**
+ * Envelope returned by `DELETE /api/integrations`. Success carries no useful
+ * `Content` (the server echoes its success message as a string), so success
+ * must be judged on `Error.Code` alone. A provider-side delete failure answers
+ * with HTTP 200 and `Error.Code` `10000009`.
+ */
+export interface IntegrationMutationEnvelope {
+	Error?: ApiCodeResponse | null;
+	Content?: unknown | null;
+}
+
 // ---------------------------------------------------------------------------
 // Domain models (normalized shape the UI consumes)
 // ---------------------------------------------------------------------------

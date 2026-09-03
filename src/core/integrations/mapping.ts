@@ -86,3 +86,21 @@ export function mapIntegrationsEnvelope(envelope: unknown): Integration[] {
 		(integration): integration is Integration => integration !== null
 	);
 }
+
+/**
+ * Map the `GET /api/integrations/calendarItem` envelope to a calendar item
+ * list. The server answers `Content.calendarItems` — always list-shaped, even
+ * for a single item (see the wire type docs) — so any other shape maps to
+ * `[]` without throwing. Reuses {@link mapIntegrationCalendarItem}, so
+ * provider credential identifiers are dropped exactly as for the
+ * integrations envelope.
+ */
+export function mapCalendarItemsEnvelope(envelope: unknown): IntegrationCalendarItem[] {
+	if (!isRecord(envelope)) return [];
+	const content = envelope.Content;
+	if (!isRecord(content)) return [];
+	if (!Array.isArray(content.calendarItems)) return [];
+	return content.calendarItems
+		.map(mapIntegrationCalendarItem)
+		.filter((item): item is IntegrationCalendarItem => item !== null);
+}

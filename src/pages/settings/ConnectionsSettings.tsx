@@ -1,22 +1,33 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { Apple, ChevronDown, ChevronRight, ListChecks, Slack, type LucideIcon } from 'lucide-react';
 import useAuthNavigate from '@/hooks/useNavigateHome';
 import { useLocation } from 'react-router';
 import { Routes } from '@/core/constants/routes';
 import { integrationsService } from '@/services';
-import { CONNECTION_PROVIDERS, type Integration } from '@/core/integrations/types';
+import {
+	CONNECTION_PROVIDERS,
+	type ConnectionProvider,
+	type Integration,
+} from '@/core/integrations/types';
 import { parseOauthReturn, stripOauthParams } from '@/core/integrations/oauthReturn';
 import { buildOauthStartUrl } from '@/core/integrations/oauthUrl';
 import { Env } from '@/config/config_getter';
 import analytics from '@/core/util/analytics';
+import GoogleLogo from '@/assets/google_logo.png';
+import MicrosoftLogo from '@/assets/microsoft_logo.png';
+import Loader from '@/core/common/components/loader';
 
 /**
  * Connections list page (Phase 3).
  *
- * Renders the provider capability list (Google is the only connectable
- * provider in v1) and the connected integrations loaded through
- * `integrationsService`, and completes the server-owned OAuth round trip:
+ * Renders a single provider panel: every row from `CONNECTION_PROVIDERS`,
+ * with each available provider's connected integrations (loaded through
+ * `integrationsService`) nested under its expandable row — including the
+ * app-wide loading bar while the integrations are retrieved, an error state
+ * with retry, and a per-provider empty state. Completes the server-owned OAuth
+ * round trip:
  *
  * - Start: the Connect action navigates the browser to
  *   `GET api/Integrations/connect?provider=google&redirectTarget=<this page>`;
@@ -44,6 +55,55 @@ interface ConnectionState {
 	data: Integration[];
 }
 
+/**
+ * Brand logo assets for the connectable providers (the same assets the home
+ * integration section uses). Keyed by the stable `CONNECTION_PROVIDERS` id.
+ */
+const PROVIDER_LOGOS: Record<string, string> = {
+	google: GoogleLogo,
+	microsoft: MicrosoftLogo,
+};
+
+/** Muted line icons for the not-yet-available provider rows. */
+const COMING_SOON_ICONS: Record<string, LucideIcon> = {
+	apple: Apple,
+	slack: Slack,
+	googleTasks: ListChecks,
+};
+
+/** Row icon for a provider list row: brand asset or muted line icon. */
+const ProviderRowIcon: React.FC<{ provider: ConnectionProvider }> = ({ provider }) => {
+	const logo = PROVIDER_LOGOS[provider.id];
+	if (logo) {
+		return <ProviderBrandLogo src={logo} alt="" />;
+	}
+	const LineIcon = COMING_SOON_ICONS[provider.id];
+	if (!LineIcon) return null;
+	return (
+		<ProviderLineIcon>
+			<LineIcon size={18} />
+		</ProviderLineIcon>
+	);
+};
+
+/** Provider icon for a connected account row (null when the provider is unknown). */
+const integrationProviderLogo = (provider: string | null): string | null => {
+	if (!provider) return null;
+	// Wire records can carry a differently-cased provider value (e.g. "Google").
+	return PROVIDER_LOGOS[provider.toLowerCase()] ?? null;
+};
+
+/** Icon slot for a connected account row; renders nothing for unknown providers. */
+const IntegrationProviderLogoSlot: React.FC<{ provider: string | null }> = ({ provider }) => {
+	const logo = integrationProviderLogo(provider);
+	if (!logo) return null;
+	return (
+		<ProviderIconSlot>
+			<ProviderBrandLogo src={logo} alt="" />
+		</ProviderIconSlot>
+	);
+};
+
 const ConnectionsSettings: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useAuthNavigate();
@@ -51,6 +111,8 @@ const ConnectionsSettings: React.FC = () => {
 
 	const [state, setState] = useState<ConnectionState>({ loading: true, error: false, data: [] });
 	const [notification, setNotification] = useState<'success' | 'declined' | 'error' | null>(null);
+	// Available provider rows the user has opened to reveal their accounts.
+	const [expandedProviders, setExpandedProviders] = useState<ReadonlySet<string>>(new Set());
 
 	// The transient OAuth return parameters are handled exactly once per mount.
 	const oauthHandledRef = useRef(false);
@@ -77,10 +139,12 @@ const ConnectionsSettings: React.FC = () => {
 					}
 				);
 			}
+			return integrations;
 		} catch {
 			// IntegrationsService normalizes all failures; the page only needs
 			// to surface the retryable error state.
 			setState({ loading: false, error: true, data: [] });
+			return [];
 		}
 	}, []);
 
@@ -88,6 +152,19 @@ const ConnectionsSettings: React.FC = () => {
 	useEffect(() => {
 		void loadIntegrations(false);
 	}, [loadIntegrations]);
+
+	/** Opens or closes a provider row's nested account list. */
+	const toggleProviderExpanded = useCallback((providerId: string) => {
+		setExpandedProviders((prev) => {
+			const next = new Set(prev);
+			if (next.has(providerId)) {
+				next.delete(providerId);
+			} else {
+				next.add(providerId);
+			}
+			return next;
+		});
+	}, []);
 
 	// One-shot OAuth return handling: clean the URL, parse the result, notify,
 	// and refresh (success only). Runs before the parse so transient params are
@@ -139,8 +216,28 @@ const ConnectionsSettings: React.FC = () => {
 		setNotification(parsed.result);
 		if (parsed.result === 'success') {
 			// Refresh so the newly connected integration appears even if the
-			// initial load raced the server-side persist.
-			void loadIntegrations(true);
+			// initial load raced the server-side persist, then open the
+			// provider rows that gained accounts so the result is visible.
+			void (async () => {
+				const integrations = await loadIntegrations(true);
+				// Normalize casing to match the CONNECTION_PROVIDERS ids.
+				const providerIds = Array.from(
+					new Set(
+						integrations
+							.map((integration) => integration.provider?.toLowerCase() ?? '')
+							.filter((providerId) => providerId.length > 0)
+					)
+				);
+				if (providerIds.length > 0) {
+					setExpandedProviders((prev) => {
+						const next = new Set(prev);
+						for (const providerId of providerIds) {
+							next.add(providerId);
+						}
+						return next;
+					});
+				}
+			})();
 		}
 	}, [loadIntegrations, navigate, location.search]);
 
@@ -212,66 +309,155 @@ const ConnectionsSettings: React.FC = () => {
 			)}
 
 			<Panel>
-				{CONNECTION_PROVIDERS.map((provider) => (
-					<ProviderRow key={provider.id}>
-						<ProviderName>
-							{t(`settings.sections.connections.providers.${provider.id}`)}
-						</ProviderName>
-						{provider.status === 'available' ? (
-							<ConnectButton onClick={() => handleConnectToProvider(provider.id)}>
-								{t('settings.sections.connections.connect')}
-							</ConnectButton>
-						) : (
-							<ComingSoon>{t('settings.sections.connections.comingSoon')}</ComingSoon>
-						)}
-					</ProviderRow>
-				))}
-			</Panel>
+				{CONNECTION_PROVIDERS.map((provider) => {
+					const isExpanded = expandedProviders.has(provider.id);
+					// Wire records can carry a differently-cased provider value
+					// (e.g. "Google"); group case-insensitively.
+					const accounts = state.data.filter(
+						(integration) => (integration.provider ?? '').toLowerCase() === provider.id
+					);
+					return (
+						<ProviderSection key={provider.id}>
+							<ProviderRow
+								$interactive={provider.status === 'available'}
+								onClick={
+									provider.status === 'available'
+										? () => toggleProviderExpanded(provider.id)
+										: undefined
+								}
+							>
+								<ProviderIconSlot>
+									<ProviderRowIcon provider={provider} />
+								</ProviderIconSlot>
+								<ProviderName>
+									{t(`settings.sections.connections.providers.${provider.id}`)}
+								</ProviderName>
+								<ProviderActions>
+									{provider.status === 'available' ? (
+										<>
+											<ConnectButton
+												onClick={(event) => {
+													// The whole row toggles the expansion;
+													// Connect must not trigger it.
+													event.stopPropagation();
+													handleConnectToProvider(provider.id);
+												}}
+											>
+												{t('settings.sections.connections.connect')}
+											</ConnectButton>
+											<ExpandButton
+												aria-controls={`connections-accounts-${provider.id}`}
+												aria-expanded={isExpanded}
+												aria-label={t(
+													isExpanded
+														? 'settings.sections.connections.collapseAccounts'
+														: 'settings.sections.connections.expandAccounts'
+												)}
+												onClick={(event) => {
+													// The whole row toggles the
+													// expansion; stop the row handler
+													// from firing a second time for
+													// the same click.
+													event.stopPropagation();
+													toggleProviderExpanded(provider.id);
+												}}
+											>
+												{isExpanded ? (
+													<ChevronDown size={16} />
+												) : (
+													<ChevronRight size={16} />
+												)}
+											</ExpandButton>
+										</>
+									) : (
+										<ComingSoon>
+											{t('settings.sections.connections.comingSoon')}
+										</ComingSoon>
+									)}
+								</ProviderActions>
+							</ProviderRow>
 
-			<Panel>
-				<PanelTitle>{t('settings.sections.connections.connectedAccounts')}</PanelTitle>
+							{provider.status === 'available' && isExpanded && (
+								<ExpandedAccounts id={`connections-accounts-${provider.id}`}>
+									{state.loading ? (
+										<ExpandedLoader>
+											<Loader />
+										</ExpandedLoader>
+									) : state.error ? (
+										<StatusText role="alert">
+											{t('settings.sections.connections.loadError')}
+										</StatusText>
+									) : accounts.length === 0 ? (
+										<StatusText>
+											{t('settings.sections.connections.empty')}
+										</StatusText>
+									) : (
+										<IntegrationList>
+											{accounts.map((integration, index) => (
+												<IntegrationRow
+													key={integration.id ?? `integration-${index}`}
+												>
+													<IntegrationProviderLogoSlot
+														provider={integration.provider}
+													/>
+													<IntegrationInfo>
+														<IntegrationEmail>
+															{integration.email ?? ''}
+														</IntegrationEmail>
+														{integration.calendarItems.length > 0 && (
+															<IntegrationMeta>
+																{t(
+																	'settings.sections.connections.calendarsConnected',
+																	{
+																		count: integration
+																			.calendarItems.length,
+																	}
+																)}
+															</IntegrationMeta>
+														)}
+													</IntegrationInfo>
+													{integration.id && (
+														<ManageButton
+															onClick={() =>
+																handleManage(integration)
+															}
+														>
+															{t(
+																'settings.sections.connections.manage'
+															)}
+														</ManageButton>
+													)}
+												</IntegrationRow>
+											))}
+										</IntegrationList>
+									)}
+								</ExpandedAccounts>
+							)}
+						</ProviderSection>
+					);
+				})}
 
 				{state.loading && (
-					<StatusText>{t('settings.sections.connections.loading')}</StatusText>
+					<LoadingStatus data-testid="connections-loading">
+						<Loader />
+					</LoadingStatus>
 				)}
 
 				{!state.loading && state.error && (
-					<>
+					<PanelStatus>
 						<StatusText role="alert">
 							{t('settings.sections.connections.loadError')}
 						</StatusText>
 						<ConnectButton onClick={() => void loadIntegrations(false)}>
 							{t('settings.sections.connections.retry')}
 						</ConnectButton>
-					</>
+					</PanelStatus>
 				)}
 
 				{!state.loading && !state.error && state.data.length === 0 && (
-					<StatusText>{t('settings.sections.connections.empty')}</StatusText>
-				)}
-
-				{!state.loading && !state.error && state.data.length > 0 && (
-					<IntegrationList>
-						{state.data.map((integration, index) => (
-							<IntegrationRow key={integration.id ?? `integration-${index}`}>
-								<IntegrationInfo>
-									<IntegrationEmail>{integration.email ?? ''}</IntegrationEmail>
-									{integration.calendarItems.length > 0 && (
-										<IntegrationMeta>
-											{t('settings.sections.connections.calendarsConnected', {
-												count: integration.calendarItems.length,
-											})}
-										</IntegrationMeta>
-									)}
-								</IntegrationInfo>
-								{integration.id && (
-									<ManageButton onClick={() => handleManage(integration)}>
-										{t('settings.sections.connections.manage')}
-									</ManageButton>
-								)}
-							</IntegrationRow>
-						))}
-					</IntegrationList>
+					<PanelStatus>
+						<StatusText>{t('settings.sections.connections.empty')}</StatusText>
+					</PanelStatus>
 				)}
 			</Panel>
 		</Container>
@@ -343,25 +529,122 @@ const Notification = styled.div<{ $tone: 'success' | 'declined' | 'error' }>`
 `;
 
 const Panel = styled.section`
-	border: 1px solid ${({ theme }) => theme.colors.gray[700]};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: 0.75rem;
+	background-color: ${({ theme }) => theme.colors.background.card};
 	padding: 1rem;
 	margin-bottom: 1.5rem;
 `;
 
-const PanelTitle = styled.h2`
-	font-size: ${({ theme }) => theme.typography.fontSize.base};
-	color: ${({ theme }) => theme.colors.text.primary};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-	margin: 0 0 0.75rem 0;
+const ProviderSection = styled.div`
+	&:not(:last-child) {
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	}
 `;
 
-const ProviderRow = styled.div`
+const ProviderRow = styled.div<{ $interactive?: boolean }>`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 0.5rem 0;
+	// The negative horizontal margin plus equal padding lets the hover
+	// background extend slightly beyond the row content without shifting
+	// the layout.
+	margin: 0 -0.5rem;
+	padding: 0.625rem 0.5rem;
+	border-radius: 0.5rem;
+
+	${({ $interactive, theme }) =>
+		$interactive &&
+		`
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+
+		&:hover {
+			background-color: ${theme.colors.background.card2};
+		}
+	`}
+`;
+
+const ProviderActions = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+`;
+
+const ExpandButton = styled.button`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	border: none;
+	border-radius: 0.5rem;
+	background-color: transparent;
+	color: ${({ theme }) => theme.colors.text.muted};
+	cursor: pointer;
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease;
+
+	&:hover {
+		background-color: ${({ theme }) => theme.colors.background.card2};
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+`;
+
+const ExpandedAccounts = styled.div`
+	margin: 0.25rem 0 0.75rem 2.5rem;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 0.5rem;
+	background-color: ${({ theme }) => theme.colors.background.card2};
+`;
+
+const PanelStatus = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 0.75rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+`;
+
+/** Centered host for the app-wide loading bar (page level, under the rows). */
+const LoadingStatus = styled.div`
+	display: flex;
+	justify-content: center;
+	margin-top: 0.75rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+`;
+
+/** Centered host for the app-wide loading bar inside an expanded provider row. */
+const ExpandedLoader = styled.div`
+	display: flex;
+	justify-content: center;
+	padding: 0.75rem 0;
+`;
+
+const ProviderIconSlot = styled.span`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 1.5rem;
+	height: 1.5rem;
+`;
+
+const ProviderBrandLogo = styled.img`
+	height: 1.25rem;
+	width: auto;
+`;
+
+const ProviderLineIcon = styled.span`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: ${({ theme }) => theme.colors.text.muted};
 `;
 
 const ProviderName = styled.span`
@@ -411,7 +694,11 @@ const IntegrationRow = styled.li`
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 0.5rem 0;
+	padding: 0.625rem 0;
+
+	&:not(:last-child) {
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	}
 `;
 
 const IntegrationInfo = styled.div`
@@ -441,6 +728,6 @@ const ManageButton = styled.button`
 	transition: border-color 0.2s ease;
 
 	&:hover {
-		border-color: ${({ theme }) => theme.colors.gray[300]};
+		background-color: ${({ theme }) => theme.colors.background.card2};
 	}
 `;

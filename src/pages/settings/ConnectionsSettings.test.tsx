@@ -1,13 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Navigate, Route, Routes as BrowserRoutes, useLocation } from 'react-router';
 import { I18nextProvider } from 'react-i18next';
 import { ThemeProvider, ThemeMode } from '@/core/theme/ThemeProvider';
 import i18n from '@/i18n/config';
 import { Routes as AppRoutes } from '@/core/constants/routes';
 import { ProtectedRoute } from '@/core/auth/ProtectedRoute';
-import { mapIntegrationsEnvelope } from '@/core/integrations/mapping';
-import { integrationSuccessEnvelope } from '@/test/fixtures/integrationResponses';
+import { mapCalendarItemsEnvelope, mapIntegrationsEnvelope } from '@/core/integrations/mapping';
+import {
+	calendarItemsEnvelope,
+	integrationSuccessEnvelope,
+} from '@/test/fixtures/integrationResponses';
 import SettingsLayout from './SettingsLayout';
 import ConnectionsSettings from './ConnectionsSettings';
 import ConnectionsDetailSettings from './ConnectionsDetailSettings';
@@ -57,6 +60,9 @@ vi.mock('@/global_state', () => ({
 // ---------------------------------------------------------------------------
 const integrationsServiceMock = vi.hoisted(() => ({
 	getIntegrations: vi.fn(),
+	getCalendarItems: vi.fn(),
+	toggleCalendarItem: vi.fn(),
+	disconnectIntegration: vi.fn(),
 }));
 
 vi.mock('@/services', () => ({
@@ -136,6 +142,16 @@ beforeEach(() => {
 	envStore.baseUrl = 'https://api.tiler.test/';
 	integrationsServiceMock.getIntegrations.mockReset();
 	integrationsServiceMock.getIntegrations.mockResolvedValue([]);
+	// Detail-page defaults (P4-3): a populated calendar list and no-op
+	// mutations, so the detail route renders in tests that don't care about it.
+	integrationsServiceMock.getCalendarItems.mockReset();
+	integrationsServiceMock.getCalendarItems.mockResolvedValue(
+		mapCalendarItemsEnvelope(calendarItemsEnvelope)
+	);
+	integrationsServiceMock.toggleCalendarItem.mockReset();
+	integrationsServiceMock.toggleCalendarItem.mockResolvedValue(null);
+	integrationsServiceMock.disconnectIntegration.mockReset();
+	integrationsServiceMock.disconnectIntegration.mockResolvedValue(undefined);
 });
 
 // ---------------------------------------------------------------------------
@@ -169,9 +185,10 @@ describe('Settings index', () => {
 		// target the clickable section item by its heading rather than raw text.
 		fireEvent.click(screen.getByRole('heading', { name: 'Connections' }));
 
-		// The page shell renders and the connected-accounts section is fetched.
+		// The page shell renders and the integrations fetch completes (the empty
+		// status shows because no integrations are mocked in this test).
 		await waitFor(() => {
-			expect(screen.getByRole('heading', { name: 'Connected accounts' })).toBeInTheDocument();
+			expect(screen.getByText('No connected accounts yet.')).toBeInTheDocument();
 		});
 	});
 });
@@ -182,7 +199,8 @@ describe('route protection', () => {
 		renderSettingsRoutes(AppRoutes.SettingsConnections);
 
 		expect(screen.getByText('signin-page-stub')).toBeInTheDocument();
-		expect(screen.queryByText('Connection settings coming soon...')).not.toBeInTheDocument();
+		// The list page itself must not have rendered either.
+		expect(screen.queryByText('No connected accounts yet.')).not.toBeInTheDocument();
 	});
 
 	it('redirects unauthenticated users to /signin for the detail route', () => {
@@ -190,26 +208,40 @@ describe('route protection', () => {
 		renderSettingsRoutes(AppRoutes.SettingsConnectionDetail('integration-1'));
 
 		expect(screen.getByText('signin-page-stub')).toBeInTheDocument();
-		expect(screen.queryByText('Connection settings coming soon...')).not.toBeInTheDocument();
+		// The detail page itself must not have rendered either.
+		expect(
+			screen.queryByText('This connection is no longer available.')
+		).not.toBeInTheDocument();
 	});
 });
 
 describe('detail route', () => {
-	it('renders through the Settings outlet from a direct (deep-link/refresh) URL', () => {
+	it('renders through the Settings outlet from a direct (deep-link/refresh) URL', async () => {
+		integrationsServiceMock.getIntegrations.mockResolvedValueOnce(
+			mapIntegrationsEnvelope(integrationSuccessEnvelope)
+		);
 		renderSettingsRoutes(AppRoutes.SettingsConnectionDetail('integration-1'));
 
 		// On detail pages SettingsLayout renders only the <Outlet />, so the
-		// page's own breadcrumb (Settings / Connections) proves it rendered
-		// inside the Settings shell rather than as a standalone route.
-		expect(screen.getAllByText('Connections').length).toBeGreaterThanOrEqual(2);
-		expect(screen.getByText('Connection settings coming soon...')).toBeInTheDocument();
+		// page's own breadcrumb (Settings / Connections / email) proves it
+		// rendered inside the Settings shell rather than a standalone route.
+		expect(await screen.findByRole('heading', { name: 'Google Calendar' })).toBeInTheDocument();
+		expect(screen.getByText('Settings')).toBeInTheDocument();
+		expect(screen.getByText('Connections')).toBeInTheDocument();
+		// The email appears twice: in the breadcrumb and in the account header.
+		expect(screen.getAllByText('person@example.com').length).toBe(2);
 	});
 
-	it('still renders the Settings shell for the detail URL after an unauthenticated redirect back', () => {
+	it('still renders the Settings shell for the detail URL after an unauthenticated redirect back', async () => {
 		// Simulates the user signing in and the router restoring the original
 		// deep link: an authenticated load of the same detail URL must render.
+		// The default mock resolves an empty integration list, so the restored
+		// deep link surfaces the not-found state instead of a blank page.
 		renderSettingsRoutes(AppRoutes.SettingsConnectionDetail('integration-1'));
-		expect(screen.getByText('Connection settings coming soon...')).toBeInTheDocument();
+		expect(
+			await screen.findByText('This connection is no longer available.')
+		).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Back to Connections' })).toBeInTheDocument();
 	});
 });
 // ---------------------------------------------------------------------------
@@ -239,37 +271,74 @@ describe('provider list', () => {
 	it('renders Google as an available provider with a Connect action', async () => {
 		renderSettingsRoutes(AppRoutes.SettingsConnections);
 
-		expect(await screen.findByText('Google Calendar')).toBeInTheDocument();
-		expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument();
+		// "Google Calendar" is unique to the provider row (the connected
+		// accounts list shows emails), so scope the Connect action to that
+		// row — Microsoft is available too and has its own Connect button.
+		const googleRow = (await screen.findByText('Google Calendar')).closest(
+			'div'
+		) as HTMLElement;
+		expect(within(googleRow).getByRole('button', { name: 'Connect' })).toBeInTheDocument();
 	});
 
-	it('renders Microsoft, Apple, Slack, and Google Tasks as unavailable', async () => {
+	it('renders Apple, Slack, and Google Tasks unavailable, Microsoft available', async () => {
 		renderSettingsRoutes(AppRoutes.SettingsConnections);
 
-		for (const name of ['Microsoft', 'Apple', 'Slack', 'Google Tasks']) {
+		for (const name of ['Apple', 'Slack', 'Google Tasks']) {
 			expect(await screen.findByText(name)).toBeInTheDocument();
 		}
-		// Four unavailable rows — and still exactly one Connect action (Google).
-		expect(screen.getAllByText('Coming soon').length).toBe(4);
-		expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument();
+		// Three unavailable rows...
+		expect(screen.getAllByText('Coming soon').length).toBe(3);
+		// ...and exactly two Connect actions — one per available provider
+		// (Google and Microsoft).
+		expect(screen.getAllByRole('button', { name: 'Connect' }).length).toBe(2);
+		const microsoftRow = screen.getByText('Microsoft').closest('div') as HTMLElement;
+		expect(within(microsoftRow).getByRole('button', { name: 'Connect' })).toBeInTheDocument();
 	});
 });
 
 describe('connected accounts states', () => {
-	it('shows a loading state while integrations are fetching', async () => {
+	it('shows the app-wide loading bar while integrations are fetching', async () => {
 		integrationsServiceMock.getIntegrations.mockReturnValueOnce(new Promise(() => {}));
 
 		renderSettingsRoutes(AppRoutes.SettingsConnections);
 
-		expect(screen.getByText('Loading connections...')).toBeInTheDocument();
+		expect(screen.getByTestId('connections-loading')).toBeInTheDocument();
+	});
+
+	it('toggles the expansion when the whole provider row is clicked', async () => {
+		const data = mapIntegrationsEnvelope(integrationSuccessEnvelope);
+		integrationsServiceMock.getIntegrations.mockResolvedValueOnce(data);
+
+		renderSettingsRoutes(AppRoutes.SettingsConnections);
+
+		const googleRow = (await screen.findByText('Google Calendar')).closest(
+			'div'
+		) as HTMLElement;
+		// The row header itself toggles the expansion (no need to hit the chevron).
+		fireEvent.click(googleRow);
+		expect(await screen.findByText('person@example.com')).toBeInTheDocument();
+
+		// A second click collapses the row again.
+		fireEvent.click(googleRow);
+		await waitFor(() => {
+			expect(screen.queryByText('person@example.com')).not.toBeInTheDocument();
+		});
 	});
 
 	it('renders connected accounts after load and links to the detail page', async () => {
-		integrationsServiceMock.getIntegrations.mockResolvedValueOnce(
-			mapIntegrationsEnvelope(integrationSuccessEnvelope)
-		);
+		const data = mapIntegrationsEnvelope(integrationSuccessEnvelope);
+		// The list load and the detail load both receive the success envelope.
+		integrationsServiceMock.getIntegrations.mockResolvedValueOnce(data);
+		integrationsServiceMock.getIntegrations.mockResolvedValueOnce(data);
 
 		renderSettingsRoutes(AppRoutes.SettingsConnections);
+
+		// Accounts render inside the expandable provider row (Microsoft is
+		// available too but has no accounts), so open the Google row first.
+		const googleRow = (await screen.findByText('Google Calendar')).closest(
+			'div'
+		) as HTMLElement;
+		fireEvent.click(within(googleRow).getByRole('button', { name: 'Expand accounts' }));
 
 		expect(await screen.findByText('person@example.com')).toBeInTheDocument();
 		expect(screen.getByText('2 calendars connected')).toBeInTheDocument();
@@ -277,8 +346,11 @@ describe('connected accounts states', () => {
 		// Two integrations are rendered (person@example.com and other@example.com),
 		// so target the first row's Manage action rather than a single-element query.
 		fireEvent.click(screen.getAllByRole('button', { name: 'Manage' })[0]);
-		// The detail stub (Phase 1) proves the navigation reached the detail route.
-		await screen.findByText('Connection settings coming soon...');
+		// The detail page (P4-3) proves the navigation reached the detail route:
+		// the provider header and the calendar toggles render.
+		expect(await screen.findByRole('heading', { name: 'Google Calendar' })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Work — Enabled' })).toBeInTheDocument();
+		expect(integrationsServiceMock.getIntegrations).toHaveBeenCalledTimes(2);
 	});
 
 	it('renders the empty state when the server returns no integrations', async () => {
@@ -299,6 +371,9 @@ describe('connected accounts states', () => {
 		).toBeInTheDocument();
 		fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
 
+		// Recovery loads the accounts inside the Google row — expand it.
+		const googleRow = screen.getByText('Google Calendar').closest('div') as HTMLElement;
+		fireEvent.click(within(googleRow).getByRole('button', { name: 'Expand accounts' }));
 		await screen.findByText('person@example.com');
 		expect(integrationsServiceMock.getIntegrations).toHaveBeenCalledTimes(2);
 	});
@@ -329,7 +404,10 @@ describe('Google connect start', () => {
 
 		try {
 			renderSettingsRoutes(AppRoutes.SettingsConnections);
-			fireEvent.click(screen.getByRole('button', { name: 'Connect' }));
+			// Google and Microsoft both expose a Connect action; this test
+			// pins the Google row's OAuth start URL, so target that row.
+			const googleRow = screen.getByText('Google Calendar').closest('div') as HTMLElement;
+			fireEvent.click(within(googleRow).getByRole('button', { name: 'Connect' }));
 
 			expect(assignSpy).toHaveBeenCalledOnce();
 			const url = new URL(assignSpy.mock.calls[0][0] as string);

@@ -191,9 +191,9 @@ describe('integrations mapping (Phase 2)', () => {
 	});
 
 	describe('provider capability metadata is separate from returned records', () => {
-		it('exposes exactly one available provider (google) and the rest as unavailable', () => {
+		it('exposes google and microsoft as available providers and the rest as unavailable', () => {
 			const available = CONNECTION_PROVIDERS.filter((p) => p.status === 'available');
-			expect(available.map((p) => p.id)).toEqual(['google']);
+			expect(available.map((p) => p.id)).toEqual(['google', 'microsoft']);
 			expect(CONNECTION_PROVIDERS.length).toBeGreaterThan(1);
 			for (const provider of CONNECTION_PROVIDERS) {
 				expect(['available', 'unavailable']).toContain(provider.status);

@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Connexions",
 				"description": "Gérez les applications connectées à votre compte Tiler",
-				"placeholder": "Les paramètres de connexion arrivent bientôt...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Développer les comptes",
+				"collapseAccounts": "Réduire les comptes",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Chargement de la connexion...",
+					"loadError": "Impossible de charger cette connexion. Veuillez réessayer.",
+					"retry": "Réessayer",
+					"notFound": "Cette connexion n'est plus disponible.",
+					"backToConnections": "Retour aux connexions",
+					"calendarsTitle": "Calendriers",
+					"calendarsDescription": "Choisissez les calendriers que Tiler peut lire.",
+					"calendarsEmpty": "Aucun calendrier disponible pour ce compte.",
+					"toggleError": "Impossible de mettre à jour ce calendrier. Veuillez réessayer.",
+					"disconnectSection": "Déconnexion",
+					"disconnectDescription": "La déconnexion de ce compte empêche Tiler de lire ses calendriers.",
+					"disconnectAction": "Déconnecter",
+					"disconnecting": "Déconnexion...",
+					"disconnectConfirmTitle": "Déconnecter ce compte ?",
+					"disconnectConfirmDescription": "Tiler ne pourra plus lire {{email}}.",
+					"disconnectCancel": "Annuler",
+					"disconnectError": "Impossible de déconnecter ce compte. Veuillez réessayer.",
+					"disconnectProviderError": "Le fournisseur de calendrier n'a pas pu être déconnecté pour le moment. Veuillez réessayer dans un instant."
 				}
 			}
 		}

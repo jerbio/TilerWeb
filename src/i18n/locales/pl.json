@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Połączenia",
 				"description": "Zarządzaj aplikacjami połączonymi z Twoim kontem Tiler",
-				"placeholder": "Ustawienia połączeń wkrótce...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Rozwiń konta",
+				"collapseAccounts": "Zwiń konta",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Wczytywanie połączenia...",
+					"loadError": "Nie udało się wczytać tego połączenia. Spróbuj ponownie.",
+					"retry": "Spróbuj ponownie",
+					"notFound": "To połączenie nie jest już dostępne.",
+					"backToConnections": "Wróć do Połączeń",
+					"calendarsTitle": "Kalendarze",
+					"calendarsDescription": "Wybierz, które kalendarze może odczytywać Tiler.",
+					"calendarsEmpty": "Brak dostępnych kalendarzy dla tego konta.",
+					"toggleError": "Nie udało się zaktualizować tego kalendarza. Spróbuj ponownie.",
+					"disconnectSection": "Rozłącz",
+					"disconnectDescription": "Rozłączenie tego konta uniemożliwi Tilerowi odczytywanie jego kalendarzy.",
+					"disconnectAction": "Rozłącz",
+					"disconnecting": "Rozłączanie...",
+					"disconnectConfirmTitle": "Rozłączyć to konto?",
+					"disconnectConfirmDescription": "Tiler nie będzie już mógł odczytywać {{email}}.",
+					"disconnectCancel": "Anuluj",
+					"disconnectError": "Nie udało się rozłączyć tego konta. Spróbuj ponownie.",
+					"disconnectProviderError": "Nie można teraz rozłączyć dostawcy kalendarza. Spróbuj ponownie za chwilę."
 				}
 			}
 		}

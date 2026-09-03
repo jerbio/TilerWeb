@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "연결",
 				"description": "Tiler 계정에 연결된 앱을 관리하세요",
-				"placeholder": "연결 설정이 곧 제공됩니다...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "계정 확장",
+				"collapseAccounts": "계정 접기",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "연결 로딩 중...",
+					"loadError": "이 연결을 불러올 수 없습니다. 다시 시도해 주세요.",
+					"retry": "다시 시도",
+					"notFound": "이 연결은 더 이상 사용할 수 없습니다.",
+					"backToConnections": "연결로 돌아가기",
+					"calendarsTitle": "캘린더",
+					"calendarsDescription": "Tiler가 읽을 수 있는 캘린더를 선택하세요.",
+					"calendarsEmpty": "이 계정에 사용할 수 있는 캘린더가 없습니다.",
+					"toggleError": "이 캘린더를 업데이트할 수 없습니다. 다시 시도해 주세요.",
+					"disconnectSection": "연결 해제",
+					"disconnectDescription": "이 계정의 연결을 해제하면 Tiler가 해당 캘린더를 읽지 않게 됩니다.",
+					"disconnectAction": "연결 해제",
+					"disconnecting": "연결 해제 중...",
+					"disconnectConfirmTitle": "이 계정의 연결을 해제할까요?",
+					"disconnectConfirmDescription": "Tiler가 더 이상 {{email}}을(를) 읽지 못합니다.",
+					"disconnectCancel": "취소",
+					"disconnectError": "이 계정의 연결을 해제할 수 없습니다. 다시 시도해 주세요.",
+					"disconnectProviderError": "캘린더 제공자를 지금 해제할 수 없습니다. 잠시 후 다시 시도해 주세요."
 				}
 			}
 		}

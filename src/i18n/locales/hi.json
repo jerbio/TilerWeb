@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "कनेक्शन",
 				"description": "अपने Tiler खाते से जुड़े ऐप्स प्रबंधित करें",
-				"placeholder": "कनेक्शन सेटिंग्स जल्द आ रही हैं...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "खाते विस्तारित करें",
+				"collapseAccounts": "खाते संचित करें",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "कनेक्शन लोड हो रहा है...",
+					"loadError": "इस कनेक्शन को लोड नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+					"retry": "पुनः प्रयास करें",
+					"notFound": "यह कनेक्शन अब उपलब्ध नहीं है।",
+					"backToConnections": "कनेक्शनों पर वापस जाएँ",
+					"calendarsTitle": "कैलेंडर",
+					"calendarsDescription": "चुनें कि Tiler कौन से कैलेंडर पढ़ सकता है।",
+					"calendarsEmpty": "इस खाते के लिए कोई कैलेंडर उपलब्ध नहीं है।",
+					"toggleError": "इस कैलेंडर को अपडेट नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+					"disconnectSection": "अलग करें",
+					"disconnectDescription": "इस खाते को अलग करने पर Tiler उसके कैलेंडर पढ़ना बंद कर देगा।",
+					"disconnectAction": "अलग करें",
+					"disconnecting": "अलग हो रहा है...",
+					"disconnectConfirmTitle": "क्या यह खाता अलग करना है?",
+					"disconnectConfirmDescription": "Tiler अब {{email}} पढ़ नहीं पाएगा।",
+					"disconnectCancel": "रद्द करें",
+					"disconnectError": "इस खाते को अलग नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+					"disconnectProviderError": "कैलेंडर प्रोवाइडर को अभी अलग नहीं किया जा सका। कृपया थोड़ी देर बाद पुनः प्रयास करें।"
 				}
 			}
 		}

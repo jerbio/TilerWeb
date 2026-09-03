@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "連携",
 				"description": "Tilerアカウントに接続したアプリを管理します",
-				"placeholder": "連携設定は近日公開予定です...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "アカウントを展開",
+				"collapseAccounts": "アカウントを折りたたむ",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "接続を読み込み中...",
+					"loadError": "この接続を読み込めませんでした。もう一度お試しください。",
+					"retry": "再試行",
+					"notFound": "この接続はもう利用できません。",
+					"backToConnections": "接続一覧へ戻る",
+					"calendarsTitle": "カレンダー",
+					"calendarsDescription": "Tilerが読み取り可能なカレンダーを選択してください。",
+					"calendarsEmpty": "このアカウントで利用可能なカレンダーはありません。",
+					"toggleError": "このカレンダーを更新できませんでした。もう一度お試しください。",
+					"disconnectSection": "切断",
+					"disconnectDescription": "このアカウントを切断すると、Tilerはそのカレンダーを読み取らなくなります。",
+					"disconnectAction": "切断",
+					"disconnecting": "切断中...",
+					"disconnectConfirmTitle": "このアカウントを切断しますか？",
+					"disconnectConfirmDescription": "Tilerは{{email}}をもう読み取れません。",
+					"disconnectCancel": "キャンセル",
+					"disconnectError": "このアカウントを切断できませんでした。もう一度お試しください。",
+					"disconnectProviderError": "カレンダープロバイダを現在切断できません。しばらくしてからもう一度お試しください。"
 				}
 			}
 		}

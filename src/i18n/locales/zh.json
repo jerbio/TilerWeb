@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "连接",
 				"description": "管理与您的 Tiler 账户连接的应用",
-				"placeholder": "连接设置即将推出...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "展开账户",
+				"collapseAccounts": "收起账户",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "正在加载连接...",
+					"loadError": "无法加载此连接。请重试。",
+					"retry": "重试",
+					"notFound": "此连接已不可用。",
+					"backToConnections": "返回连接",
+					"calendarsTitle": "日历",
+					"calendarsDescription": "选择 Tiler 可以读取的日历。",
+					"calendarsEmpty": "此账户没有可用的日历。",
+					"toggleError": "无法更新此日历。请重试。",
+					"disconnectSection": "断开连接",
+					"disconnectDescription": "断开此账户后，Tiler 将不再读取其日历。",
+					"disconnectAction": "断开连接",
+					"disconnecting": "正在断开连接...",
+					"disconnectConfirmTitle": "断开此账户的连接？",
+					"disconnectConfirmDescription": "Tiler 将无法再读取 {{email}}。",
+					"disconnectCancel": "取消",
+					"disconnectError": "无法断开此账户的连接。请重试。",
+					"disconnectProviderError": "暂时无法断开日历服务商的连接。请稍后重试。"
 				}
 			}
 		}

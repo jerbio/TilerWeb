@@ -19,7 +19,12 @@
  * compile-time error.
  */
 
-import type { IntegrationsResponseEnvelope } from '@/core/integrations/types';
+import type {
+	CalendarItemToggleEnvelope,
+	CalendarItemsEnvelope,
+	IntegrationMutationEnvelope,
+	IntegrationsResponseEnvelope,
+} from '@/core/integrations/types';
 
 /**
  * Success: two fully-populated Google integrations.
@@ -109,4 +114,83 @@ export const integrationMalformedEnvelope: IntegrationsResponseEnvelope = {
 /** Structured server error: non-zero Code and no usable Content. */
 export const integrationErrorEnvelope: IntegrationsResponseEnvelope = {
 	Error: { Code: '500', Message: 'An error occurred while retrieving integrations' },
+};
+
+/**
+ * Success: the calendar items for one integration, as returned by
+ * `GET /api/integrations/calendarItem`. The server always answers the list
+ * shape `Content.calendarItems` (even for a single item) — see
+ * `IntegrationsController.GetCalendarItem`.
+ */
+export const calendarItemsEnvelope: CalendarItemsEnvelope = {
+	Error: { Code: '0', Message: 'SUCCESS' },
+	Content: {
+		calendarItems: [
+			{
+				id: 'calendar-id',
+				name: 'Work',
+				isEnabled: true,
+				isSelected: true,
+				description: 'Work calendar',
+				authenticationId: 'auth-id',
+				userIdentifier: 'user-identifier',
+			},
+			{
+				id: 'calendar-id-2',
+				name: 'Personal',
+				isEnabled: true,
+				isSelected: false,
+			},
+		],
+	},
+};
+
+/** Success with no calendar items: `Content.calendarItems` is an empty list. */
+export const calendarItemsEmptyEnvelope: CalendarItemsEnvelope = {
+	Error: { Code: '0', Message: 'SUCCESS' },
+	Content: { calendarItems: [] },
+};
+
+/** Structured server error for the calendar-items read. */
+export const calendarItemsErrorEnvelope: CalendarItemsEnvelope = {
+	Error: { Code: '500', Message: 'An error occurred while retrieving calendar items' },
+};
+
+/**
+ * Success: the single updated item echoed in `Content` (no list wrapper) by
+ * `POST /api/integrations/google/calendarItem`.
+ */
+export const calendarItemToggleEnvelope: CalendarItemToggleEnvelope = {
+	Error: { Code: '0', Message: 'SUCCESS' },
+	Content: {
+		id: 'calendar-id',
+		name: 'Work',
+		isEnabled: true,
+		isSelected: false,
+		description: 'Work calendar',
+	},
+};
+
+/**
+ * Success for `DELETE /api/integrations`: the server echoes its success
+ * message as a string in `Content`; success is judged on `Error.Code` alone.
+ */
+export const integrationDeleteSuccessEnvelope: IntegrationMutationEnvelope = {
+	Error: { Code: '0', Message: 'Success' },
+	Content: 'Success',
+};
+
+/**
+ * Provider-side delete failure: the server answers HTTP 200 with this
+ * non-zero code (`CustomErrors.Errors.Failed_To_Delete_Integration`), so the
+ * client must NOT treat the 200 as success.
+ */
+export const integrationDeleteProviderFailureEnvelope: IntegrationMutationEnvelope = {
+	Error: { Code: '10000009', Message: 'Failed to delete third party integrations' },
+	Content: 'Failed to delete third party integrations',
+};
+
+/** Generic server error for the delete. */
+export const integrationDeleteErrorEnvelope: IntegrationMutationEnvelope = {
+	Error: { Code: '500', Message: 'An error occurred while deleting the integration' },
 };

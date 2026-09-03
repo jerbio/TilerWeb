@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Подключения",
 				"description": "Управляйте приложениями, подключёнными к вашему аккаунту Tiler",
-				"placeholder": "Настройки подключений скоро появятся...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Развернуть аккаунты",
+				"collapseAccounts": "Свернуть аккаунты",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Загрузка соединения...",
+					"loadError": "Не удалось загрузить это соединение. Пожалуйста, попробуйте ещё раз.",
+					"retry": "Повторить",
+					"notFound": "Это соединение больше не доступно.",
+					"backToConnections": "Назад к соединениям",
+					"calendarsTitle": "Календари",
+					"calendarsDescription": "Выберите, какие календари может читать Tiler.",
+					"calendarsEmpty": "Для этого аккаунта нет доступных календарей.",
+					"toggleError": "Не удалось обновить этот календарь. Пожалуйста, попробуйте ещё раз.",
+					"disconnectSection": "Отключение",
+					"disconnectDescription": "Отключение этого аккаунта прекратит чтение его календарей Tiler.",
+					"disconnectAction": "Отключить",
+					"disconnecting": "Отключение...",
+					"disconnectConfirmTitle": "Отключить этот аккаунт?",
+					"disconnectConfirmDescription": "Tiler больше не сможет читать {{email}}.",
+					"disconnectCancel": "Отмена",
+					"disconnectError": "Не удалось отключить этот аккаунт. Пожалуйста, попробуйте ещё раз.",
+					"disconnectProviderError": "Не удалось отключить провайдера календаря. Повторите попытку через минуту."
 				}
 			}
 		}

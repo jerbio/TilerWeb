@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Connections",
 				"description": "Manage apps connected to your Tiler account",
-				"placeholder": "Connection settings coming soon...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,39 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Expand accounts",
+				"collapseAccounts": "Collapse accounts",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Loading connection...",
+					"loadError": "We couldn't load this connection. Please try again.",
+					"retry": "Retry",
+					"notFound": "This connection is no longer available.",
+					"backToConnections": "Back to Connections",
+					"calendarsTitle": "Calendars",
+					"calendarsDescription": "Choose which calendars Tiler can read.",
+					"calendarsEmpty": "No calendars available for this account.",
+					"toggleError": "We couldn't update this calendar. Please try again.",
+					"disconnectSection": "Disconnect",
+					"disconnectDescription": "Disconnecting this account stops Tiler from reading its calendars.",
+					"disconnectAction": "Disconnect",
+					"disconnecting": "Disconnecting...",
+					"disconnectConfirmTitle": "Disconnect this account?",
+					"disconnectConfirmDescription": "Tiler will no longer be able to read {{email}}.",
+					"disconnectCancel": "Cancel",
+					"disconnectError": "We couldn't disconnect this account. Please try again.",
+					"disconnectProviderError": "The calendar provider couldn't be disconnected right now. Please try again in a moment.",
+					"toggleEnabled": "Enabled",
+					"toggleDisabled": "Disabled"
 				}
 			}
 		}

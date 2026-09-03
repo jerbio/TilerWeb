@@ -1336,7 +1336,6 @@
 			"connections": {
 				"title": "Verbindungen",
 				"description": "Mit Ihrem Tiler-Konto verbundene Apps verwalten",
-				"placeholder": "Verbindungseinstellungen folgen in Kürze...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1346,17 +1345,37 @@
 				},
 				"connect": "Connect",
 				"comingSoon": "Coming soon",
-				"connectedAccounts": "Connected accounts",
-				"loading": "Loading connections...",
 				"loadError": "We couldn't load your connections. Please try again.",
 				"retry": "Retry",
 				"empty": "No connected accounts yet.",
 				"calendarsConnected": "{{count}} calendars connected",
 				"manage": "Manage",
+				"expandAccounts": "Konten ausklappen",
+				"collapseAccounts": "Konten einklappen",
 				"notifications": {
 					"success": "Connected Google Calendar",
 					"declined": "Google connection cancelled",
 					"error": "We couldn't connect Google. Please try again."
+				},
+				"detail": {
+					"loading": "Verbindung wird geladen...",
+					"loadError": "Diese Verbindung konnte nicht geladen werden. Bitte versuche es erneut.",
+					"retry": "Erneut versuchen",
+					"notFound": "Diese Verbindung ist nicht länger verfügbar.",
+					"backToConnections": "Zurück zu Verbindungen",
+					"calendarsTitle": "Kalender",
+					"calendarsDescription": "Wähle aus, welche Kalender Tiler lesen darf.",
+					"calendarsEmpty": "Für dieses Konto sind keine Kalender verfügbar.",
+					"toggleError": "Dieser Kalender konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+					"disconnectSection": "Trennen",
+					"disconnectDescription": "Wenn du dieses Konto trennst, liest Tiler seine Kalender nicht mehr.",
+					"disconnectAction": "Trennen",
+					"disconnecting": "Wird getrennt...",
+					"disconnectConfirmTitle": "Dieses Konto trennen?",
+					"disconnectConfirmDescription": "Tiler wird {{email}} nicht mehr lesen können.",
+					"disconnectCancel": "Abbrechen",
+					"disconnectError": "Dieses Konto konnte nicht getrennt werden. Bitte versuche es erneut.",
+					"disconnectProviderError": "Der Kalenderanbieter konnte gerade nicht getrennt werden. Bitte versuche es in einem Moment erneut."
 				}
 			}
 		}
