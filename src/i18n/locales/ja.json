@@ -1353,9 +1353,9 @@
 				"expandAccounts": "アカウントを展開",
 				"collapseAccounts": "アカウントを折りたたむ",
 				"notifications": {
-					"success": "Connected Google Calendar",
-					"declined": "Google connection cancelled",
-					"error": "We couldn't connect Google. Please try again."
+					"success": "Connected {{provider}} Calendar",
+					"declined": "{{provider}} connection cancelled",
+					"error": "We couldn't connect {{provider}}. Please try again."
 				},
 				"detail": {
 					"loading": "接続を読み込み中...",

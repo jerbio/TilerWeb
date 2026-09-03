@@ -1353,9 +1353,9 @@
 				"expandAccounts": "계정 확장",
 				"collapseAccounts": "계정 접기",
 				"notifications": {
-					"success": "Connected Google Calendar",
-					"declined": "Google connection cancelled",
-					"error": "We couldn't connect Google. Please try again."
+					"success": "Connected {{provider}} Calendar",
+					"declined": "{{provider}} connection cancelled",
+					"error": "We couldn't connect {{provider}}. Please try again."
 				},
 				"detail": {
 					"loading": "연결 로딩 중...",

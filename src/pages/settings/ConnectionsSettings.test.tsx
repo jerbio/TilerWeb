@@ -471,6 +471,61 @@ describe('OAuth return handling', () => {
 		expect(integrationsServiceMock.getIntegrations).toHaveBeenCalledTimes(1);
 	});
 
+	it('shows a Microsoft success notification when the integrationId carries a microsoft provider', async () => {
+		const microsoftIntegrationId =
+			'9f86d081-884c-4baf-a5e2-4b9c6d1e7f21_TCA_person@example.com_TCA_microsoft_TCA_01J9V4Q7T8Z01J9V4Q7T8Z01J9';
+		const data = mapIntegrationsEnvelope(integrationSuccessEnvelope);
+		integrationsServiceMock.getIntegrations
+			.mockResolvedValueOnce([])
+			.mockResolvedValueOnce(data);
+		const captured = {
+			current: `?calendarConnect=success&integrationId=${microsoftIntegrationId}`,
+		};
+
+		renderSettingsRoutes(
+			`${AppRoutes.SettingsConnections}?calendarConnect=success&integrationId=${microsoftIntegrationId}`,
+			captured
+		);
+
+		expect(await screen.findByText('Connected Microsoft Calendar')).toBeInTheDocument();
+		// The transient params are cleaned with replace navigation.
+		await waitFor(() => expect(captured.current).toBe(''));
+	});
+
+	it('prefers the provider embedded in the integrationId over a stale started-provider marker', async () => {
+		// The marker is what a Microsoft Connect click would have written; the
+		// server-reported Google integrationId must win over it.
+		localStorage.setItem('connections.oauth.startedProvider', 'microsoft');
+		renderSettingsRoutes(
+			`${AppRoutes.SettingsConnections}?calendarConnect=success&integrationId=${integrationIdParam}`
+		);
+
+		expect(await screen.findByText('Connected Google Calendar')).toBeInTheDocument();
+	});
+
+	it('shows a Microsoft cancellation notification when the round trip was started for Microsoft', async () => {
+		localStorage.setItem('connections.oauth.startedProvider', 'microsoft');
+
+		renderSettingsRoutes(`${AppRoutes.SettingsConnections}?calendarConnect=declined`);
+
+		expect(await screen.findByText('Microsoft connection cancelled')).toBeInTheDocument();
+		// Only the initial load — no unnecessary refresh after a cancellation.
+		expect(integrationsServiceMock.getIntegrations).toHaveBeenCalledTimes(1);
+	});
+
+	it('shows a Microsoft failure notification when the round trip was started for Microsoft', async () => {
+		localStorage.setItem('connections.oauth.startedProvider', 'microsoft');
+
+		renderSettingsRoutes(
+			`${AppRoutes.SettingsConnections}?calendarConnect=error&reason=microsoft_auth_failed`
+		);
+
+		expect(
+			await screen.findByText("We couldn't connect Microsoft. Please try again.")
+		).toBeInTheDocument();
+		expect(integrationsServiceMock.getIntegrations).toHaveBeenCalledTimes(1);
+	});
+
 	it('ignores an unsupported calendarConnect value (no notification, no refresh) and still cleans the URL', async () => {
 		const captured = { current: '?calendarConnect=weird' };
 

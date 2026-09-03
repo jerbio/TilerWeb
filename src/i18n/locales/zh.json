@@ -1353,9 +1353,9 @@
 				"expandAccounts": "展开账户",
 				"collapseAccounts": "收起账户",
 				"notifications": {
-					"success": "Connected Google Calendar",
-					"declined": "Google connection cancelled",
-					"error": "We couldn't connect Google. Please try again."
+					"success": "Connected {{provider}} Calendar",
+					"declined": "{{provider}} connection cancelled",
+					"error": "We couldn't connect {{provider}}. Please try again."
 				},
 				"detail": {
 					"loading": "正在加载连接...",

@@ -755,17 +755,18 @@ const ConnectionsDetailSettings: React.FC = () => {
 };
 
 /**
- * Resolves the provider display name from the i18n namespace. Google is the
- * only provider the server knows today, so unknown values fall back to the
- * raw provider string.
+ * Resolves the provider display name from the i18n namespace. Unknown
+ * values fall back to the raw provider string so a future provider still
+ * renders a readable heading instead of a blank title.
  */
 function providerLabel(
 	provider: string,
 	t: (key: string, options?: Record<string, unknown>) => string
 ): string {
-	if (provider.toLowerCase() === 'google') {
-		return t('settings.sections.connections.providers.google', {
-			defaultValue: 'Google Calendar',
+	const key = provider.toLowerCase();
+	if (key === 'google' || key === 'microsoft') {
+		return t(`settings.sections.connections.providers.${key}`, {
+			defaultValue: key === 'google' ? 'Google Calendar' : 'Microsoft',
 		});
 	}
 	return provider;

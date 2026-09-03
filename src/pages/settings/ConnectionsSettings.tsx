@@ -46,8 +46,46 @@ import Loader from '@/core/common/components/loader';
 /** Best-effort marker (ms epoch) of when the Connect click started the round trip. */
 const OAUTH_STARTED_AT_STORAGE_KEY = 'connections.oauth.startedAt';
 
+/**
+ * Best-effort marker of the provider the Connect click started the round trip
+ * for. The server only reports the provider on success (inside the composite
+ * integrationId), so declined/error returns are labelled with this marker.
+ */
+const OAUTH_STARTED_PROVIDER_STORAGE_KEY = 'connections.oauth.startedProvider';
+
 /** The one OAuth return notification auto-dismisses after this delay. */
 const NOTIFICATION_DISMISS_MS = 6000;
+
+/**
+ * Display names for the OAuth return notification. Unknown providers fall
+ * back to a capitalized raw value so a future provider still reads as a
+ * proper name in the message.
+ */
+const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+	google: 'Google',
+	microsoft: 'Microsoft',
+};
+
+/**
+ * Extracts the provider id embedded in the server's composite integration id
+ * (`{tilerUserId}_TCA_{email}_TCA_{providerId}_TCA_{ulid}`, see
+ * `oauthReturn.ts`). Anchored to the trailing provider+ULID segments so an
+ * underscore inside the email segment cannot shift the split. Only the
+ * provider id is ever surfaced — never the email or any other segment.
+ */
+const INTEGRATION_ID_PROVIDER_PATTERN = /_TCA_([a-z][a-z0-9]*)_TCA_[0-9A-Za-z]{26}$/;
+
+function providerFromIntegrationId(integrationId: string | undefined): string | null {
+	if (!integrationId) return null;
+	const match = INTEGRATION_ID_PROVIDER_PATTERN.exec(integrationId);
+	return match ? match[1] : null;
+}
+
+/** Human-readable provider name for the notification (unknown values are capitalized). */
+function providerDisplayName(provider: string): string {
+	const key = provider.toLowerCase();
+	return PROVIDER_DISPLAY_NAMES[key] ?? provider.charAt(0).toUpperCase() + provider.slice(1);
+}
 
 interface ConnectionState {
 	loading: boolean;
@@ -110,43 +148,51 @@ const ConnectionsSettings: React.FC = () => {
 	const location = useLocation();
 
 	const [state, setState] = useState<ConnectionState>({ loading: true, error: false, data: [] });
-	const [notification, setNotification] = useState<'success' | 'declined' | 'error' | null>(null);
+	const [notification, setNotification] = useState<{
+		kind: 'success' | 'declined' | 'error';
+		provider: string;
+	} | null>(null);
 	// Available provider rows the user has opened to reveal their accounts.
 	const [expandedProviders, setExpandedProviders] = useState<ReadonlySet<string>>(new Set());
 
 	// The transient OAuth return parameters are handled exactly once per mount.
 	const oauthHandledRef = useRef(false);
 
-	const loadIntegrations = useCallback(async (trackZeroIntegrations: boolean) => {
-		setState((prev) => ({ ...prev, loading: true, error: false }));
-		try {
-			const integrations = await integrationsService.getIntegrations();
-			setState({ loading: false, error: false, data: integrations });
-			if (trackZeroIntegrations && integrations.length === 0) {
-				// A successful OAuth return should be followed by at least one
-				// integration. Zero is a support-worthy diagnostic (count only —
-				// never contents or user-identifying data).
-				console.warn('[connections] oauth success return followed by zero integrations');
-				analytics.trackEvent(
-					'Connections',
-					'OAuth zero integrations after success',
-					'google',
-					undefined,
-					{
-						provider: 'google',
-						result: 'success',
-						integrationCount: 0,
-					}
-				);
+	const loadIntegrations = useCallback(
+		async (trackZeroIntegrations: boolean, provider: string = 'google') => {
+			setState((prev) => ({ ...prev, loading: true, error: false }));
+			try {
+				const integrations = await integrationsService.getIntegrations();
+				setState({ loading: false, error: false, data: integrations });
+				if (trackZeroIntegrations && integrations.length === 0) {
+					// A successful OAuth return should be followed by at least one
+					// integration. Zero is a support-worthy diagnostic (count only —
+					// never contents or user-identifying data).
+					console.warn(
+						'[connections] oauth success return followed by zero integrations'
+					);
+					analytics.trackEvent(
+						'Connections',
+						'OAuth zero integrations after success',
+						provider,
+						undefined,
+						{
+							provider,
+							result: 'success',
+							integrationCount: 0,
+						}
+					);
+				}
+				return integrations;
+			} catch {
+				// IntegrationsService normalizes all failures; the page only needs
+				// to surface the retryable error state.
+				setState({ loading: false, error: true, data: [] });
+				return [];
 			}
-			return integrations;
-		} catch {
-			// IntegrationsService normalizes all failures; the page only needs
-			// to surface the retryable error state.
-			setState({ loading: false, error: true, data: [] });
-			return [];
-		}
-	}, []);
+		},
+		[]
+	);
 
 	// Initial load.
 	useEffect(() => {
@@ -201,8 +247,27 @@ const ConnectionsSettings: React.FC = () => {
 			// Storage unavailable: telemetry is best-effort, never surface it.
 		}
 
-		// v1 is Google-only; the return contract does not carry a provider.
-		const provider = 'google';
+		// Best-effort record of the provider the Connect click started the
+		// round trip for (see handleConnectToProvider); the server only
+		// reports the provider on success, inside the composite id.
+		let startedProvider: string | null = null;
+		try {
+			const storedProvider = localStorage.getItem(OAUTH_STARTED_PROVIDER_STORAGE_KEY);
+			if (storedProvider) {
+				startedProvider = storedProvider.trim().toLowerCase();
+				localStorage.removeItem(OAUTH_STARTED_PROVIDER_STORAGE_KEY);
+			}
+		} catch {
+			// Storage unavailable: the notification falls back to the default.
+		}
+
+		// Provider derivation, most authoritative source first: the server's
+		// integrationId (success only), the client's started-provider marker
+		// (declined/error carries no provider), then the v1 default.
+		const provider =
+			providerFromIntegrationId(parsed.integrationId) ??
+			(startedProvider && startedProvider.length > 0 ? startedProvider : null) ??
+			'google';
 		analytics.trackEvent('Connections', 'OAuth returned', provider, undefined, {
 			provider,
 			elapsedMs,
@@ -213,13 +278,13 @@ const ConnectionsSettings: React.FC = () => {
 			elapsedMs,
 		});
 
-		setNotification(parsed.result);
+		setNotification({ kind: parsed.result, provider: providerDisplayName(provider) });
 		if (parsed.result === 'success') {
 			// Refresh so the newly connected integration appears even if the
 			// initial load raced the server-side persist, then open the
 			// provider rows that gained accounts so the result is visible.
 			void (async () => {
-				const integrations = await loadIntegrations(true);
+				const integrations = await loadIntegrations(true, provider);
 				// Normalize casing to match the CONNECTION_PROVIDERS ids.
 				const providerIds = Array.from(
 					new Set(
@@ -251,8 +316,11 @@ const ConnectionsSettings: React.FC = () => {
 	const handleConnectToProvider = useCallback((provider: string) => {
 		analytics.trackEvent('Connections', 'OAuth started', provider, undefined, { provider });
 		try {
-			// Best-effort start marker for the elapsed-time telemetry on return.
+			// Best-effort start markers for the return: the elapsed-time
+			// telemetry and the provider the round trip was started for (the
+			// label source for declined/error notifications).
 			localStorage.setItem(OAUTH_STARTED_AT_STORAGE_KEY, String(Date.now()));
+			localStorage.setItem(OAUTH_STARTED_PROVIDER_STORAGE_KEY, provider);
 		} catch {
 			// Storage unavailable: telemetry is best-effort, the flow proceeds.
 		}
@@ -301,10 +369,12 @@ const ConnectionsSettings: React.FC = () => {
 
 			{notification && (
 				<Notification
-					$tone={notification}
-					role={notification === 'success' ? 'status' : 'alert'}
+					$tone={notification.kind}
+					role={notification.kind === 'success' ? 'status' : 'alert'}
 				>
-					{t(`settings.sections.connections.notifications.${notification}`)}
+					{t(`settings.sections.connections.notifications.${notification.kind}`, {
+						provider: notification.provider,
+					})}
 				</Notification>
 			)}
 
