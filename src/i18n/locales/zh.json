@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler 将无法再读取 {{email}}。",
 					"disconnectCancel": "取消",
 					"disconnectError": "无法断开此账户的连接。请重试。",
-					"disconnectProviderError": "暂时无法断开日历服务商的连接。请稍后重试。"
+					"disconnectProviderError": "暂时无法断开日历服务商的连接。请稍后重试。",
+					"locationSection": "默认位置",
+					"locationDescription": "Tiler 将为此账户的新事件使用该位置。",
+					"locationUnset": "尚未设置默认位置。",
+					"locationChangeAction": "更改位置",
+					"locationPickerTitle": "选择默认位置",
+					"locationSearchPlaceholder": "搜索位置...",
+					"locationSearching": "正在搜索位置...",
+					"locationNoResults": "未找到匹配的位置。",
+					"locationSaving": "正在保存位置...",
+					"locationSaveError": "无法保存该位置。请重试。"
 				}
 			}
 		}

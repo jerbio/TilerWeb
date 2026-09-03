@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler ne pourra plus lire {{email}}.",
 					"disconnectCancel": "Annuler",
 					"disconnectError": "Impossible de déconnecter ce compte. Veuillez réessayer.",
-					"disconnectProviderError": "Le fournisseur de calendrier n'a pas pu être déconnecté pour le moment. Veuillez réessayer dans un instant."
+					"disconnectProviderError": "Le fournisseur de calendrier n'a pas pu être déconnecté pour le moment. Veuillez réessayer dans un instant.",
+					"locationSection": "Lieu par défaut",
+					"locationDescription": "Tiler utilise ce lieu pour les nouveaux événements de ce compte.",
+					"locationUnset": "Aucun lieu par défaut défini.",
+					"locationChangeAction": "Changer de lieu",
+					"locationPickerTitle": "Choisir un lieu par défaut",
+					"locationSearchPlaceholder": "Rechercher un lieu...",
+					"locationSearching": "Recherche des lieux...",
+					"locationNoResults": "Aucun lieu correspondant trouvé.",
+					"locationSaving": "Enregistrement du lieu...",
+					"locationSaveError": "Impossible d'enregistrer ce lieu. Veuillez réessayer."
 				}
 			}
 		}

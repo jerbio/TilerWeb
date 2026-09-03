@@ -1,4 +1,6 @@
 import type {
+	CalendarDefaultLocationEnvelope,
+	CalendarDefaultLocationPayload,
 	CalendarItemToggleEnvelope,
 	CalendarItemsEnvelope,
 	IntegrationMutationEnvelope,
@@ -15,6 +17,7 @@ import { AppApi } from './appApi';
  * - `GET /api/integrations/calendarItem?integrationId=...` — calendar items
  *   for one integration (authoritative toggle state; `Content.calendarItems`)
  * - `POST /api/integrations/google/calendarItem` — toggle one calendar item
+ * - `POST /api/integrations/location` — set the integration's default location
  * - `DELETE /api/integrations` — disconnect (delete) an integration
  *
  * This class returns the raw envelopes; envelope unwrapping, error
@@ -71,6 +74,24 @@ export class IntegrationsApi extends AppApi {
 				CalendarItemId: payload.CalendarItemId,
 				IsSelected: payload.IsSelected,
 			}),
+		});
+	}
+
+	/**
+	 * Set the integration's default location.
+	 * `POST /api/integrations/location` — PascalCase body (the server's
+	 * `CalendarDefaultLocation` model; `ThirdPartyCalendarId` is the
+	 * integration row id). The server answers `Content` with the stored
+	 * location. The mobile client additionally sends `UserName`/`MobileApp`
+	 * body fields; the web omits them (cookie auth, matching the other web
+	 * mutations).
+	 */
+	public setCalendarDefaultLocation(
+		payload: CalendarDefaultLocationPayload
+	): Promise<CalendarDefaultLocationEnvelope> {
+		return this.apiRequest<CalendarDefaultLocationEnvelope>('api/integrations/location', {
+			method: 'POST',
+			body: JSON.stringify(payload),
 		});
 	}
 

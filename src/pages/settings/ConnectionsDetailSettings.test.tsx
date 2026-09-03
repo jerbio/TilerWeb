@@ -9,11 +9,14 @@ import { ProtectedRoute } from '@/core/auth/ProtectedRoute';
 import {
 	mapCalendarItemsEnvelope,
 	mapIntegrationCalendarItem,
+	mapIntegrationLocation,
 	mapIntegrationsEnvelope,
 } from '@/core/integrations/mapping';
 import { TilerResponseError } from '@/core/common/types/errors';
 import ServerError from '@/core/error/server';
+import type { EventLocation } from '@/core/common/types/schedule';
 import {
+	calendarDefaultLocationSuccessEnvelope,
 	calendarItemToggleEnvelope,
 	calendarItemsEnvelope,
 	integrationDeleteErrorEnvelope,
@@ -66,11 +69,17 @@ const integrationsServiceMock = vi.hoisted(() => ({
 	getCalendarItems: vi.fn(),
 	toggleCalendarItem: vi.fn(),
 	disconnectIntegration: vi.fn(),
+	setCalendarDefaultLocation: vi.fn(),
+}));
+
+const scheduleServiceMock = vi.hoisted(() => ({
+	searchLocations: vi.fn(),
 }));
 
 vi.mock('@/services', () => ({
 	__esModule: true,
 	integrationsService: integrationsServiceMock,
+	scheduleService: scheduleServiceMock,
 }));
 
 const envStore = vi.hoisted(() => ({ baseUrl: 'https://api.tiler.test/' }));
@@ -132,6 +141,12 @@ beforeEach(() => {
 	integrationsServiceMock.toggleCalendarItem.mockResolvedValue(null);
 	integrationsServiceMock.disconnectIntegration.mockReset();
 	integrationsServiceMock.disconnectIntegration.mockResolvedValue(undefined);
+	integrationsServiceMock.setCalendarDefaultLocation.mockReset();
+	integrationsServiceMock.setCalendarDefaultLocation.mockResolvedValue(
+		mapIntegrationLocation(calendarDefaultLocationSuccessEnvelope.Content)
+	);
+	scheduleServiceMock.searchLocations.mockReset();
+	scheduleServiceMock.searchLocations.mockResolvedValue([]);
 	analyticsMock.trackEvent.mockReset();
 });
 
@@ -551,6 +566,314 @@ describe('ConnectionsDetailSettings', () => {
 				undefined,
 				{ provider: 'Google' }
 			);
+		});
+	});
+
+	describe('default location', () => {
+		// A searched location distinct from the stored fixture copy so the
+		// optimistic update, the result row and the server copy can be told
+		// apart by their addresses.
+		const location1: EventLocation = {
+			id: 'location-1',
+			description: 'Oak Street Café',
+			address: '456 Oak Ave, New York, NY',
+			longitude: -73.9845,
+			latitude: 40.7495,
+			isVerified: true,
+			isDefault: false,
+			isNull: false,
+			thirdPartyId: 'google-place-id-2',
+			userId: null,
+			source: 'google',
+			nickname: '',
+		};
+
+		const locationInput = () =>
+			screen.getByRole('textbox', { name: 'Search for a location...' });
+
+		const resultButton = () => screen.getByRole('button', { name: /Oak Street Café/ });
+
+		// Clicks the "Change location" action and waits for the inline
+		// editor to expand inside the "Default location" section.
+		const openPicker = async (): Promise<void> => {
+			await waitForDetailReady();
+			fireEvent.click(screen.getByRole('button', { name: 'Change location' }));
+			await screen.findByRole('heading', { name: 'Choose a default location' });
+		};
+
+		// Advances the faked 300 ms search debounce and flushes the mocked
+		// round trip through a few microtask hops.
+		const flushSearch = async () => {
+			await act(async () => {
+				vi.advanceTimersByTime(300);
+				await Promise.resolve();
+				await Promise.resolve();
+				await Promise.resolve();
+				await Promise.resolve();
+			});
+		};
+
+		const flushSave = async () => {
+			await act(async () => {
+				await Promise.resolve();
+				await Promise.resolve();
+				await Promise.resolve();
+				await Promise.resolve();
+			});
+		};
+
+		it('shows the stored default location and a change action in the ready state', async () => {
+			renderDetailRoute();
+
+			expect(await waitForDetailReady()).toBeInTheDocument();
+			expect(screen.getByRole('heading', { name: 'Default location' })).toBeInTheDocument();
+			expect(
+				screen.getByText('Tiler uses this location for new events from this account.')
+			).toBeInTheDocument();
+			// The stored address is surfaced; the server's cal-default-location-*
+			// description marker is not, and the empty state is hidden.
+			expect(screen.getByTitle('123 Main St')).toBeInTheDocument();
+			expect(screen.queryByText('No default location set.')).not.toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Change location' })).toBeInTheDocument();
+		});
+
+		it('shows the empty state when no default location is stored', async () => {
+			const noLocationData = mapIntegrationsEnvelope({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: [
+					{
+						id: 'integration-id',
+						provider: 'Google',
+						email: accountEmail,
+						location: null,
+						calendarItems: [
+							{ id: 'calendar-id', name: 'Work', isEnabled: true, isSelected: true },
+						],
+					},
+				],
+			});
+			integrationsServiceMock.getIntegrations.mockResolvedValueOnce(noLocationData);
+
+			renderDetailRoute();
+
+			expect(await waitForDetailReady()).toBeInTheDocument();
+			expect(screen.getByRole('heading', { name: 'Default location' })).toBeInTheDocument();
+			expect(screen.getByText('No default location set.')).toBeInTheDocument();
+			expect(screen.queryByTitle('123 Main St')).not.toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Change location' })).toBeInTheDocument();
+		});
+
+		it('expands the inline editor with a search field and a cancel action', async () => {
+			renderDetailRoute();
+			await openPicker();
+
+			// Fresh editor: the search field is present and enabled, the
+			// cancel action is available, and the searching / no-results
+			// states are not.
+			expect(locationInput()).not.toBeDisabled();
+			expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+			expect(screen.queryByText('Searching locations...')).not.toBeInTheDocument();
+			expect(screen.queryByText('No matching locations found.')).not.toBeInTheDocument();
+			expect(scheduleServiceMock.searchLocations).not.toHaveBeenCalled();
+			// The editor expands in place of the button: the stored location
+			// stays visible above it and the button is gone.
+			expect(screen.getByTitle('123 Main St')).toBeInTheDocument();
+			expect(
+				screen.queryByRole('button', { name: 'Change location' })
+			).not.toBeInTheDocument();
+		});
+
+		it('debounces the search and shows the searching state until it settles', async () => {
+			scheduleServiceMock.searchLocations.mockResolvedValueOnce([location1]);
+
+			renderDetailRoute();
+			await openPicker();
+
+			// Freeze time before typing so the 300 ms debounce is faked.
+			vi.useFakeTimers();
+			fireEvent.change(locationInput(), { target: { value: 'Oak' } });
+
+			// The query crossed the 3-character minimum: the searching state
+			// shows, but the debounced search has not fired yet.
+			expect(scheduleServiceMock.searchLocations).not.toHaveBeenCalled();
+			expect(screen.getByText('Searching locations...')).toBeInTheDocument();
+
+			await flushSearch();
+
+			expect(scheduleServiceMock.searchLocations).toHaveBeenCalledTimes(1);
+			expect(scheduleServiceMock.searchLocations).toHaveBeenCalledWith('Oak');
+			expect(screen.queryByText('Searching locations...')).not.toBeInTheDocument();
+			// Both the description and the address of the result render.
+			expect(screen.getByText('Oak Street Café')).toBeInTheDocument();
+			expect(screen.getByText('456 Oak Ave, New York, NY')).toBeInTheDocument();
+		});
+
+		it('shows no results when the search finds nothing', async () => {
+			scheduleServiceMock.searchLocations.mockResolvedValueOnce([]);
+
+			renderDetailRoute();
+			await openPicker();
+			vi.useFakeTimers();
+			fireEvent.change(locationInput(), { target: { value: 'Nowhere' } });
+			await flushSearch();
+
+			expect(screen.getByText('No matching locations found.')).toBeInTheDocument();
+			expect(screen.queryByText('Searching locations...')).not.toBeInTheDocument();
+			expect(analyticsMock.trackEvent).toHaveBeenCalledWith(
+				'Connections',
+				'Connection location search completed',
+				'Google',
+				undefined,
+				expect.objectContaining({ provider: 'Google', resultCount: 0 })
+			);
+		});
+
+		it('treats a failed search like no results', async () => {
+			scheduleServiceMock.searchLocations.mockRejectedValueOnce(new Error('boom'));
+
+			renderDetailRoute();
+			await openPicker();
+			vi.useFakeTimers();
+			fireEvent.change(locationInput(), { target: { value: 'Broken' } });
+			await flushSearch();
+
+			expect(screen.getByText('No matching locations found.')).toBeInTheDocument();
+			expect(screen.queryByText('Searching locations...')).not.toBeInTheDocument();
+			expect(analyticsMock.trackEvent).toHaveBeenCalledWith(
+				'Connections',
+				'Connection location search failed',
+				'Google',
+				undefined,
+				{ provider: 'Google' }
+			);
+		});
+
+		it('selecting a location saves it, lets the server copy win and collapses the editor', async () => {
+			scheduleServiceMock.searchLocations.mockResolvedValueOnce([location1]);
+
+			renderDetailRoute();
+			await openPicker();
+			vi.useFakeTimers();
+			fireEvent.change(locationInput(), { target: { value: 'Oak' } });
+			await flushSearch();
+			fireEvent.click(resultButton());
+			await flushSave();
+
+			// The saved server copy (456 Oak Ave) wins and the editor
+			// collapses back to the "Change location" action.
+			expect(screen.getByTitle('456 Oak Ave')).toBeInTheDocument();
+			expect(screen.queryByTitle('456 Oak Ave, New York, NY')).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole('heading', { name: 'Choose a default location' })
+			).not.toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Change location' })).toBeInTheDocument();
+			// The server's internal description marker is never surfaced.
+			expect(
+				screen.queryByText('cal-default-location-9c1d2e3f-0000-0000-0000-000000000000')
+			).not.toBeInTheDocument();
+			expect(integrationsServiceMock.setCalendarDefaultLocation).toHaveBeenCalledTimes(1);
+			expect(integrationsServiceMock.setCalendarDefaultLocation).toHaveBeenCalledWith({
+				integrationId,
+				location: mapIntegrationLocation(location1),
+			});
+			expect(analyticsMock.trackEvent).toHaveBeenCalledWith(
+				'Connections',
+				'Connection location save requested',
+				'Google',
+				undefined,
+				{ provider: 'Google' }
+			);
+			expect(analyticsMock.trackEvent).toHaveBeenCalledWith(
+				'Connections',
+				'Connection location saved',
+				'Google',
+				undefined,
+				{ provider: 'Google' }
+			);
+		});
+
+		it('keeps the editor open with an error on save failure and retries', async () => {
+			scheduleServiceMock.searchLocations.mockResolvedValue([location1]);
+			integrationsServiceMock.setCalendarDefaultLocation
+				.mockRejectedValueOnce(new Error('boom'))
+				.mockResolvedValueOnce(
+					mapIntegrationLocation(calendarDefaultLocationSuccessEnvelope.Content)
+				);
+
+			renderDetailRoute();
+			await openPicker();
+			vi.useFakeTimers();
+			fireEvent.change(locationInput(), { target: { value: 'Oak' } });
+			await flushSearch();
+			fireEvent.click(resultButton());
+			await flushSave();
+
+			// Failure: the error surfaces, the previous location is restored
+			// and the editor stays open with the results intact for a retry.
+			expect(
+				screen.getByText("We couldn't save this location. Please try again.")
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole('heading', { name: 'Choose a default location' })
+			).toBeInTheDocument();
+			expect(screen.getByTitle('123 Main St')).toBeInTheDocument();
+			expect(resultButton()).toBeInTheDocument();
+			expect(screen.queryByText('Saving location...')).not.toBeInTheDocument();
+			expect(analyticsMock.trackEvent).toHaveBeenCalledWith(
+				'Connections',
+				'Connection location save failed',
+				'Google',
+				undefined,
+				{ provider: 'Google' }
+			);
+
+			// Retry: the second attempt succeeds and collapses the editor.
+			fireEvent.click(resultButton());
+			await flushSave();
+			expect(screen.getByTitle('456 Oak Ave')).toBeInTheDocument();
+			expect(
+				screen.queryByRole('heading', { name: 'Choose a default location' })
+			).not.toBeInTheDocument();
+			expect(integrationsServiceMock.setCalendarDefaultLocation).toHaveBeenCalledTimes(2);
+		});
+
+		it('disables the search field and results while a save is in flight', async () => {
+			scheduleServiceMock.searchLocations.mockResolvedValueOnce([location1]);
+			integrationsServiceMock.setCalendarDefaultLocation.mockReturnValueOnce(
+				new Promise(() => {})
+			);
+
+			renderDetailRoute();
+			await openPicker();
+			vi.useFakeTimers();
+			fireEvent.change(locationInput(), { target: { value: 'Oak' } });
+			await flushSearch();
+			fireEvent.click(resultButton());
+
+			// The saving state shows and the inputs are frozen; the save was
+			// requested exactly once.
+			expect(screen.getByText('Saving location...')).toBeInTheDocument();
+			expect(locationInput()).toBeDisabled();
+			expect(resultButton()).toBeDisabled();
+			expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+			expect(integrationsServiceMock.setCalendarDefaultLocation).toHaveBeenCalledTimes(1);
+		});
+
+		it('discards changes when the editor is cancelled without selecting', async () => {
+			renderDetailRoute();
+			await openPicker();
+			fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+			expect(
+				screen.queryByRole('heading', { name: 'Choose a default location' })
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole('textbox', { name: 'Search for a location...' })
+			).not.toBeInTheDocument();
+			expect(integrationsServiceMock.setCalendarDefaultLocation).not.toHaveBeenCalled();
+			// The section is untouched.
+			expect(screen.getByTitle('123 Main St')).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Change location' })).toBeInTheDocument();
 		});
 	});
 });

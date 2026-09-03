@@ -1377,7 +1377,17 @@
 					"disconnectError": "We couldn't disconnect this account. Please try again.",
 					"disconnectProviderError": "The calendar provider couldn't be disconnected right now. Please try again in a moment.",
 					"toggleEnabled": "Enabled",
-					"toggleDisabled": "Disabled"
+					"toggleDisabled": "Disabled",
+					"locationSection": "Default location",
+					"locationDescription": "Tiler uses this location for new events from this account.",
+					"locationUnset": "No default location set.",
+					"locationChangeAction": "Change location",
+					"locationPickerTitle": "Choose a default location",
+					"locationSearchPlaceholder": "Search for a location...",
+					"locationSearching": "Searching locations...",
+					"locationNoResults": "No matching locations found.",
+					"locationSaving": "Saving location...",
+					"locationSaveError": "We couldn't save this location. Please try again."
 				}
 			}
 		}

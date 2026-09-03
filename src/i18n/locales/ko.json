@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler가 더 이상 {{email}}을(를) 읽지 못합니다.",
 					"disconnectCancel": "취소",
 					"disconnectError": "이 계정의 연결을 해제할 수 없습니다. 다시 시도해 주세요.",
-					"disconnectProviderError": "캘린더 제공자를 지금 해제할 수 없습니다. 잠시 후 다시 시도해 주세요."
+					"disconnectProviderError": "캘린더 제공자를 지금 해제할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+					"locationSection": "기본 위치",
+					"locationDescription": "Tiler는 이 계정의 새 이벤트에 이 위치를 사용합니다.",
+					"locationUnset": "기본 위치가 설정되어 있지 않습니다.",
+					"locationChangeAction": "위치 변경",
+					"locationPickerTitle": "기본 위치 선택",
+					"locationSearchPlaceholder": "위치 검색...",
+					"locationSearching": "위치 검색 중...",
+					"locationNoResults": "일치하는 위치를 찾을 수 없습니다.",
+					"locationSaving": "위치 저장 중...",
+					"locationSaveError": "위치를 저장할 수 없습니다. 다시 시도해 주세요."
 				}
 			}
 		}

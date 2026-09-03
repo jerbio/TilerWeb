@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler больше не сможет читать {{email}}.",
 					"disconnectCancel": "Отмена",
 					"disconnectError": "Не удалось отключить этот аккаунт. Пожалуйста, попробуйте ещё раз.",
-					"disconnectProviderError": "Не удалось отключить провайдера календаря. Повторите попытку через минуту."
+					"disconnectProviderError": "Не удалось отключить провайдера календаря. Повторите попытку через минуту.",
+					"locationSection": "Локация по умолчанию",
+					"locationDescription": "Tiler использует это место для новых событий этого аккаунта.",
+					"locationUnset": "Место по умолчанию не задано.",
+					"locationChangeAction": "Изменить место",
+					"locationPickerTitle": "Выбор места по умолчанию",
+					"locationSearchPlaceholder": "Поиск места...",
+					"locationSearching": "Выполняется поиск мест...",
+					"locationNoResults": "Совпадающие места не найдены.",
+					"locationSaving": "Сохранение места...",
+					"locationSaveError": "Не удалось сохранить это место. Повторите попытку."
 				}
 			}
 		}

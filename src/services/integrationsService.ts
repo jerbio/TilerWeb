@@ -4,9 +4,14 @@ import { normalizeError } from '@/core/error';
 import {
 	mapCalendarItemsEnvelope,
 	mapIntegrationCalendarItem,
+	mapIntegrationLocation,
 	mapIntegrationsEnvelope,
 } from '@/core/integrations/mapping';
-import type { Integration, IntegrationCalendarItem } from '@/core/integrations/types';
+import type {
+	Integration,
+	IntegrationCalendarItem,
+	IntegrationLocation,
+} from '@/core/integrations/types';
 
 /**
  * Thin wrapper around {@link IntegrationsApi} that unwraps the standard
@@ -100,6 +105,37 @@ export class IntegrationsService {
 			return response.Content ? mapIntegrationCalendarItem(response.Content) : null;
 		} catch (error) {
 			console.error('Error toggling calendar item', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Set the integration's default location (a full round trip — the server
+	 * is the source of truth). Resolves with the stored location mapped from
+	 * the response `Content` (or `null` when the server omits it). The caller
+	 * owns optimistic UI and failure restoration. The server overwrites the
+	 * sent `description` with an internal marker and stores the row as
+	 * non-searchable, so the resolved model is the one to keep.
+	 */
+	async setCalendarDefaultLocation(args: {
+		integrationId: string;
+		location: IntegrationLocation;
+	}): Promise<IntegrationLocation | null> {
+		try {
+			const response = await this.integrationsApi.setCalendarDefaultLocation({
+				Id: args.location.id ?? '',
+				ThirdPartyId: args.location.thirdPartyId ?? undefined,
+				Longitude: args.location.longitude,
+				Latitude: args.location.latitude,
+				Address: args.location.address ?? '',
+				Description: args.location.description ?? '',
+				IsVerified: args.location.isVerified,
+				ThirdPartyCalendarId: args.integrationId,
+			});
+			this.assertSuccessEnvelope(response);
+			return mapIntegrationLocation(response.Content);
+		} catch (error) {
+			console.error('Error setting calendar default location', error);
 			throw normalizeError(error);
 		}
 	}

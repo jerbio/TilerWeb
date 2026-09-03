@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler nie będzie już mógł odczytywać {{email}}.",
 					"disconnectCancel": "Anuluj",
 					"disconnectError": "Nie udało się rozłączyć tego konta. Spróbuj ponownie.",
-					"disconnectProviderError": "Nie można teraz rozłączyć dostawcy kalendarza. Spróbuj ponownie za chwilę."
+					"disconnectProviderError": "Nie można teraz rozłączyć dostawcy kalendarza. Spróbuj ponownie za chwilę.",
+					"locationSection": "Lokalizacja domyślna",
+					"locationDescription": "Tiler używa tej lokalizacji dla nowych wydarzeń tego konta.",
+					"locationUnset": "Nie ustawiono domyślnej lokalizacji.",
+					"locationChangeAction": "Zmień lokalizację",
+					"locationPickerTitle": "Wybierz domyślną lokalizację",
+					"locationSearchPlaceholder": "Szukaj lokalizacji...",
+					"locationSearching": "Szukanie lokalizacji...",
+					"locationNoResults": "Nie znaleziono pasujących lokalizacji.",
+					"locationSaving": "Zapisywanie lokalizacji...",
+					"locationSaveError": "Nie udało się zapisać tej lokalizacji. Spróbuj ponownie."
 				}
 			}
 		}

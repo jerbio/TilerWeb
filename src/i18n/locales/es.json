@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler ya no podrá leer {{email}}.",
 					"disconnectCancel": "Cancelar",
 					"disconnectError": "No se pudo desconectar esta cuenta. Inténtalo de nuevo.",
-					"disconnectProviderError": "No se pudo desconectar el proveedor de calendario ahora mismo. Inténtalo de nuevo en un momento."
+					"disconnectProviderError": "No se pudo desconectar el proveedor de calendario ahora mismo. Inténtalo de nuevo en un momento.",
+					"locationSection": "Ubicación predeterminada",
+					"locationDescription": "Tiler usa esta ubicación para los nuevos eventos de esta cuenta.",
+					"locationUnset": "No hay ninguna ubicación predeterminada.",
+					"locationChangeAction": "Cambiar ubicación",
+					"locationPickerTitle": "Elegir una ubicación predeterminada",
+					"locationSearchPlaceholder": "Buscar una ubicación...",
+					"locationSearching": "Buscando ubicaciones...",
+					"locationNoResults": "No se encontraron ubicaciones coincidentes.",
+					"locationSaving": "Guardando ubicación...",
+					"locationSaveError": "No se pudo guardar esta ubicación. Inténtalo de nuevo."
 				}
 			}
 		}

@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler non potrà più leggere {{email}}.",
 					"disconnectCancel": "Annulla",
 					"disconnectError": "Non è stato possibile disconnettere questo account. Riprova.",
-					"disconnectProviderError": "Il provider dell'agenda non può essere disconnesso al momento. Riprova tra un momento."
+					"disconnectProviderError": "Il provider dell'agenda non può essere disconnesso al momento. Riprova tra un momento.",
+					"locationSection": "Posizione predefinita",
+					"locationDescription": "Tiler usa questa posizione per i nuovi eventi di questo account.",
+					"locationUnset": "Nessuna posizione predefinita impostata.",
+					"locationChangeAction": "Cambia posizione",
+					"locationPickerTitle": "Scegli una posizione predefinita",
+					"locationSearchPlaceholder": "Cerca una posizione...",
+					"locationSearching": "Ricerca delle posizioni in corso...",
+					"locationNoResults": "Nessuna posizione corrispondente trovata.",
+					"locationSaving": "Salvataggio della posizione...",
+					"locationSaveError": "Non è stato possibile salvare questa posizione. Riprova."
 				}
 			}
 		}

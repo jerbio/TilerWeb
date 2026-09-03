@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler अब {{email}} पढ़ नहीं पाएगा।",
 					"disconnectCancel": "रद्द करें",
 					"disconnectError": "इस खाते को अलग नहीं किया जा सका। कृपया पुनः प्रयास करें।",
-					"disconnectProviderError": "कैलेंडर प्रोवाइडर को अभी अलग नहीं किया जा सका। कृपया थोड़ी देर बाद पुनः प्रयास करें।"
+					"disconnectProviderError": "कैलेंडर प्रोवाइडर को अभी अलग नहीं किया जा सका। कृपया थोड़ी देर बाद पुनः प्रयास करें।",
+					"locationSection": "डिफ़ॉल्ट लोकेशन",
+					"locationDescription": "Tiler इस अकाउंट की नई इवेंट्स के लिए यह लोकेशन उपयोग करता है।",
+					"locationUnset": "कोई डिफ़ॉल्ट लोकेशन सेट नहीं है।",
+					"locationChangeAction": "लोकेशन बदलें",
+					"locationPickerTitle": "डिफ़ॉल्ट लोकेशन चुनें",
+					"locationSearchPlaceholder": "लोकेशन खोजें...",
+					"locationSearching": "लोकेशन खोजी जा रही हैं...",
+					"locationNoResults": "कोई मेल खाती लोकेशन नहीं मिली।",
+					"locationSaving": "लोकेशन सेव हो रही है...",
+					"locationSaveError": "यह लोकेशन सेव नहीं हो सकी। कृपया पुनः प्रयास करें।"
 				}
 			}
 		}

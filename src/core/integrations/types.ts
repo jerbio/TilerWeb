@@ -102,6 +102,34 @@ export interface IntegrationMutationEnvelope {
 	Content?: unknown | null;
 }
 
+/**
+ * Body of `POST /api/integrations/location` (PascalCase, mirroring the
+ * server's `CalendarDefaultLocation` model). `ThirdPartyCalendarId` keys the
+ * integration: the server matches it against the `ThirdPartyAuthentication`
+ * row id, not a provider calendar id.
+ */
+export interface CalendarDefaultLocationPayload {
+	Id: string;
+	ThirdPartyId?: string;
+	Longitude: number;
+	Latitude: number;
+	Address: string;
+	Description: string;
+	IsVerified: boolean;
+	ThirdPartyCalendarId: string;
+}
+
+/**
+ * Envelope returned by `POST /api/integrations/location`. `Content` is the
+ * stored location as the server now holds it: the server overwrites
+ * `Description` with an internal marker (`cal-default-location-*`) and stores
+ * the row as non-searchable.
+ */
+export interface CalendarDefaultLocationEnvelope {
+	Error?: ApiCodeResponse | null;
+	Content?: IntegrationLocationRecord | null;
+}
+
 // ---------------------------------------------------------------------------
 // Domain models (normalized shape the UI consumes)
 // ---------------------------------------------------------------------------

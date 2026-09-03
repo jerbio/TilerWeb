@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tilerは{{email}}をもう読み取れません。",
 					"disconnectCancel": "キャンセル",
 					"disconnectError": "このアカウントを切断できませんでした。もう一度お試しください。",
-					"disconnectProviderError": "カレンダープロバイダを現在切断できません。しばらくしてからもう一度お試しください。"
+					"disconnectProviderError": "カレンダープロバイダを現在切断できません。しばらくしてからもう一度お試しください。",
+					"locationSection": "デフォルトの場所",
+					"locationDescription": "Tilerはこのアカウントの新しいイベントにこの場所を使用します。",
+					"locationUnset": "デフォルトの場所が設定されていません。",
+					"locationChangeAction": "場所を変更",
+					"locationPickerTitle": "デフォルトの場所を選択",
+					"locationSearchPlaceholder": "場所を検索...",
+					"locationSearching": "場所を検索中...",
+					"locationNoResults": "該当する場所が見つかりません。",
+					"locationSaving": "場所を保存中...",
+					"locationSaveError": "場所を保存できませんでした。もう一度お試しください。"
 				}
 			}
 		}

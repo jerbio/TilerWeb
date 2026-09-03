@@ -4,13 +4,16 @@ import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import useAuthNavigate from '@/hooks/useNavigateHome';
 import { Routes } from '@/core/constants/routes';
-import { integrationsService } from '@/services';
+import { integrationsService, scheduleService } from '@/services';
 import ServerError from '@/core/error/server';
 import { ERROR_CODES, TilerResponseError } from '@/core/common/types/errors';
+import { mapIntegrationLocation } from '@/core/integrations/mapping';
 import type { Integration, IntegrationCalendarItem } from '@/core/integrations/types';
+import type { EventLocation } from '@/core/common/types/schedule';
 import Toggle from '@/core/common/components/Toggle';
 import Modal from '@/core/common/components/modals';
 import analytics from '@/core/util/analytics';
+import { Loader2, MapPin } from 'lucide-react';
 
 /**
  * Integration detail page (P4-3).
@@ -30,6 +33,16 @@ import analytics from '@/core/util/analytics';
  *   authoritative source for the toggle states.
  * - Toggles are optimistic: the UI flips immediately, the server round trip
  *   follows, and the previous state is restored when the call fails.
+ * - `POST /api/integrations/location` sets the default location from the
+ *   inline editor that expands in place of the "Change location" action.
+ *   The search reuses the debounced, stale-guarded pattern from
+ *   `EditCalendarEvent`; the selected row saves immediately (mobile
+ *   parity): the page updates optimistically, the server's stored copy (the
+ *   response `Content`) wins on success, and the previous location is
+ *   restored when the call fails while the editor stays open for a retry.
+ *   The server overwrites `description` with an internal
+ *   `cal-default-location-*` marker, so the stored copy is the source of
+ *   truth.
  * - Disconnect confirms through a modal. The server can answer HTTP 200
  *   with `Error.Code` `10000009` when the provider-side delete fails, so
  *   success is judged on the normalized `TilerResponseError` code.
@@ -63,10 +76,24 @@ const ConnectionsDetailSettings: React.FC = () => {
 	const [disconnectErrorKind, setDisconnectErrorKind] = useState<'provider' | 'generic' | null>(
 		null
 	);
+	// Default-location picker (mirrors the mobile app's save-on-select flow).
+	// The editor expands inline inside the "Default location" section.
+	const [locationEditing, setLocationEditing] = useState(false);
+	const [locationQuery, setLocationQuery] = useState('');
+	const [locationResults, setLocationResults] = useState<EventLocation[]>([]);
+	const [isLocationSearching, setIsLocationSearching] = useState(false);
+	const [isLocationSaving, setIsLocationSaving] = useState(false);
+	const [locationErrorVisible, setLocationErrorVisible] = useState(false);
 
 	// Monotonic guard: a slow response for a previous integrationId must not
 	// render over the current one (client-side navigation between details).
 	const requestIdRef = useRef(0);
+	// Monotonic guard for the debounced location search: a slow response for
+	// an older query (or a collapsed editor) must not overwrite newer results.
+	const locationSearchIdRef = useRef(0);
+	// Provider string for analytics, kept in a ref so the search effect does
+	// not re-run when the optimistic location update lands.
+	const locationProviderRef = useRef('unknown');
 
 	// Development-only route diagnostic. Loading the route is not treated as a
 	// connection attempt (see the plan's logging rules).
@@ -123,6 +150,63 @@ const ConnectionsDetailSettings: React.FC = () => {
 		);
 		return () => window.clearTimeout(timer);
 	}, [toggleErrorVisible]);
+
+	useEffect(() => {
+		locationProviderRef.current = integration?.provider ?? 'unknown';
+	}, [integration?.provider]);
+
+	// Debounced location search while the inline editor is open (mirrors the
+	// EditCalendarEvent pattern). Queries under 3 characters yield no
+	// search; the server additionally rejects queries under 4 characters,
+	// and that failure is treated like an empty result set. Stale responses
+	// are dropped via the monotonic search id.
+	useEffect(() => {
+		if (!locationEditing) return;
+		const query = locationQuery.trim();
+		if (query.length < 3) {
+			locationSearchIdRef.current += 1;
+			setLocationResults([]);
+			setIsLocationSearching(false);
+			return;
+		}
+		const searchId = ++locationSearchIdRef.current;
+		const startedAt = performance.now();
+		setIsLocationSearching(true);
+		const timer = window.setTimeout(async () => {
+			try {
+				const results = await scheduleService.searchLocations(query);
+				if (searchId !== locationSearchIdRef.current) return; // stale
+				const list = Array.isArray(results) ? results : [];
+				setLocationResults(list);
+				analytics.trackEvent(
+					'Connections',
+					'Connection location search completed',
+					locationProviderRef.current,
+					undefined,
+					{
+						provider: locationProviderRef.current,
+						resultCount: list.length,
+						latencyMs: Math.round(performance.now() - startedAt),
+					}
+				);
+			} catch {
+				if (searchId !== locationSearchIdRef.current) return; // stale
+				setLocationResults([]);
+				analytics.trackEvent(
+					'Connections',
+					'Connection location search failed',
+					locationProviderRef.current,
+					undefined,
+					{ provider: locationProviderRef.current }
+				);
+			} finally {
+				if (searchId === locationSearchIdRef.current) {
+					setIsLocationSearching(false);
+				}
+			}
+		}, 300);
+		return () => window.clearTimeout(timer);
+	}, [locationEditing, locationQuery]);
 
 	const handleToggle = useCallback(
 		async (item: IntegrationCalendarItem, next: boolean) => {
@@ -183,6 +267,85 @@ const ConnectionsDetailSettings: React.FC = () => {
 		if (disconnectPending) return;
 		setDisconnectModalOpen(false);
 	}, [disconnectPending]);
+
+	const openLocationEditor = useCallback(() => {
+		locationSearchIdRef.current += 1; // invalidate any in-flight search
+		setLocationErrorVisible(false);
+		setLocationQuery('');
+		setLocationResults([]);
+		setIsLocationSearching(false);
+		setIsLocationSaving(false);
+		setLocationEditing(true);
+	}, []);
+
+	const closeLocationEditor = useCallback(() => {
+		// Ignore closes while the location save is in flight.
+		if (isLocationSaving) return;
+		locationSearchIdRef.current += 1;
+		setLocationEditing(false);
+		setLocationQuery('');
+		setLocationResults([]);
+	}, [isLocationSaving]);
+
+	const handleSelectLocation = useCallback(
+		async (loc: EventLocation) => {
+			if (!integrationId || !integration || isLocationSaving) return;
+			const mapped = mapIntegrationLocation(loc);
+			if (!mapped) return;
+			const provider = integration.provider ?? 'unknown';
+			const previousLocation = integration.location;
+			// Optimistic update; the server is the source of truth and the
+			// previous location is restored when the round trip fails.
+			setIntegration((prev) => (prev ? { ...prev, location: mapped } : prev));
+			setLocationErrorVisible(false);
+			setIsLocationSaving(true);
+			analytics.trackEvent(
+				'Connections',
+				'Connection location save requested',
+				provider,
+				undefined,
+				{ provider }
+			);
+			try {
+				const stored = await integrationsService.setCalendarDefaultLocation({
+					integrationId,
+					location: mapped,
+				});
+				// Reconcile with the authoritative server copy (the server
+				// overwrites description with its cal-default-location-*
+				// marker), then collapse the editor.
+				setIntegration((prev) => (prev ? { ...prev, location: stored ?? mapped } : prev));
+				locationSearchIdRef.current += 1;
+				setLocationEditing(false);
+				setLocationQuery('');
+				setLocationResults([]);
+				analytics.trackEvent(
+					'Connections',
+					'Connection location saved',
+					provider,
+					undefined,
+					{
+						provider,
+					}
+				);
+			} catch {
+				// Roll back to the previous location and keep the editor open
+				// with the search results intact so the user can retry.
+				setIntegration((prev) => (prev ? { ...prev, location: previousLocation } : prev));
+				setLocationErrorVisible(true);
+				analytics.trackEvent(
+					'Connections',
+					'Connection location save failed',
+					provider,
+					undefined,
+					{ provider }
+				);
+			} finally {
+				setIsLocationSaving(false);
+			}
+		},
+		[integrationId, integration, isLocationSaving]
+	);
 
 	const handleDisconnectConfirm = useCallback(async () => {
 		if (!integrationId || !integration || disconnectPending) return;
@@ -310,6 +473,16 @@ const ConnectionsDetailSettings: React.FC = () => {
 	const provider = integration?.provider ?? 'unknown';
 	const providerName = providerLabel(provider, t);
 	const accountEmail = integration?.email ?? '';
+	// The stored copy's `description` is the server's cal-default-location-*
+	// marker, so the section surfaces the address only.
+	const locationAddress = integration?.location?.address ?? '';
+	// "No results" only after a real search attempt (the 3-character
+	// minimum), never on a fresh editor or a too-short query.
+	const shouldShowLocationNoResults =
+		!isLocationSearching &&
+		!isLocationSaving &&
+		locationResults.length === 0 &&
+		locationQuery.trim().length >= 3;
 	const toggleAriaLabel = (item: IntegrationCalendarItem): string => {
 		const calendarName = item.name ?? providerName;
 		return `${calendarName} — ${
@@ -389,6 +562,119 @@ const ConnectionsDetailSettings: React.FC = () => {
 				)}
 			</Section>
 
+			<Section>
+				<SectionTitle>
+					{t('settings.sections.connections.detail.locationSection', {
+						defaultValue: 'Default location',
+					})}
+				</SectionTitle>
+				<SectionDescription>
+					{t('settings.sections.connections.detail.locationDescription', {
+						defaultValue: 'Tiler uses this location for new events from this account.',
+					})}
+				</SectionDescription>
+				{locationAddress ? (
+					<LocationSummary title={locationAddress}>
+						<MapPin size={16} aria-hidden="true" />
+						<span>{locationAddress}</span>
+					</LocationSummary>
+				) : (
+					<EmptyState>
+						{t('settings.sections.connections.detail.locationUnset', {
+							defaultValue: 'No default location set.',
+						})}
+					</EmptyState>
+				)}
+				{locationEditing ? (
+					<LocationEditor>
+						<LocationEditorHeader>
+							<LocationEditorHeading>
+								{t('settings.sections.connections.detail.locationPickerTitle', {
+									defaultValue: 'Choose a default location',
+								})}
+							</LocationEditorHeading>
+							<ModalButton onClick={closeLocationEditor} disabled={isLocationSaving}>
+								{t('settings.sections.connections.detail.disconnectCancel', {
+									defaultValue: 'Cancel',
+								})}
+							</ModalButton>
+						</LocationEditorHeader>
+						<LocationSearchInput
+							value={locationQuery}
+							aria-label={t(
+								'settings.sections.connections.detail.locationSearchPlaceholder',
+								{
+									defaultValue: 'Search for a location...',
+								}
+							)}
+							placeholder={t(
+								'settings.sections.connections.detail.locationSearchPlaceholder',
+								{
+									defaultValue: 'Search for a location...',
+								}
+							)}
+							onChange={(event) => setLocationQuery(event.target.value)}
+							disabled={isLocationSaving}
+						/>
+						{isLocationSaving ? (
+							<LocationStatus>
+								<Loader2 size={16} className="spin" aria-hidden="true" />
+								{t('settings.sections.connections.detail.locationSaving', {
+									defaultValue: 'Saving location...',
+								})}
+							</LocationStatus>
+						) : isLocationSearching ? (
+							<LocationStatus>
+								{t('settings.sections.connections.detail.locationSearching', {
+									defaultValue: 'Searching locations...',
+								})}
+							</LocationStatus>
+						) : shouldShowLocationNoResults ? (
+							<EmptyState>
+								{t('settings.sections.connections.detail.locationNoResults', {
+									defaultValue: 'No matching locations found.',
+								})}
+							</EmptyState>
+						) : null}
+						{locationResults.length > 0 ? (
+							<LocationResults>
+								{locationResults.map((location) => (
+									<LocationResultButton
+										key={location.id}
+										type="button"
+										disabled={isLocationSaving}
+										onClick={() => void handleSelectLocation(location)}
+									>
+										<LocationResultName>
+											{location.description || location.address}
+										</LocationResultName>
+										{location.address ? (
+											<LocationResultAddress>
+												{location.address}
+											</LocationResultAddress>
+										) : null}
+									</LocationResultButton>
+								))}
+							</LocationResults>
+						) : null}
+						{locationErrorVisible ? (
+							<ErrorText role="alert">
+								{t('settings.sections.connections.detail.locationSaveError', {
+									defaultValue:
+										"We couldn't save this location. Please try again.",
+								})}
+							</ErrorText>
+						) : null}
+					</LocationEditor>
+				) : (
+					<PrimaryButton onClick={openLocationEditor}>
+						{t('settings.sections.connections.detail.locationChangeAction', {
+							defaultValue: 'Change location',
+						})}
+					</PrimaryButton>
+				)}
+			</Section>
+
 			<Section $danger>
 				<SectionTitle>
 					{t('settings.sections.connections.detail.disconnectSection', {
@@ -447,7 +733,7 @@ const ConnectionsDetailSettings: React.FC = () => {
 						})}
 					</ModalBodyText>
 					{disconnectErrorKind ? (
-						<ModalErrorText role="alert">
+						<ErrorText role="alert">
 							{disconnectErrorKind === 'provider'
 								? t(
 										'settings.sections.connections.detail.disconnectProviderError',
@@ -460,7 +746,7 @@ const ConnectionsDetailSettings: React.FC = () => {
 										defaultValue:
 											"We couldn't disconnect this account. Please try again.",
 									})}
-						</ModalErrorText>
+						</ErrorText>
 					) : null}
 				</Modal>
 			) : null}
@@ -646,10 +932,145 @@ const ModalBodyText = styled.p`
 	margin: 0;
 `;
 
-const ModalErrorText = styled.p`
+const ErrorText = styled.p`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.error};
 	margin: 0.75rem 0 0 0;
+`;
+
+const LocationSummary = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.primary};
+
+	svg {
+		flex-shrink: 0;
+		color: ${({ theme }) => theme.colors.text.secondary};
+	}
+
+	span {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+`;
+
+const LocationEditor = styled.div`
+	margin-top: 1.5rem;
+	padding: 1rem;
+	border: 1px solid ${({ theme }) => theme.colors.gray[700]};
+	border-radius: 0.75rem;
+`;
+
+const LocationEditorHeader = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+`;
+
+const LocationEditorHeading = styled.h3`
+	font-size: ${({ theme }) => theme.typography.fontSize.base};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+	margin: 0;
+`;
+
+const LocationSearchInput = styled.input`
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.5rem 0.75rem;
+	margin-bottom: 0.75rem;
+	border: 1px solid ${({ theme }) => theme.colors.gray[700]};
+	border-radius: 0.5rem;
+	background-color: ${({ theme }) => theme.colors.background.card2};
+	color: ${({ theme }) => theme.colors.text.primary};
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	outline: none;
+
+	&::placeholder {
+		color: ${({ theme }) => theme.colors.text.muted};
+	}
+
+	&:focus {
+		border-color: ${({ theme }) => theme.colors.gray[500]};
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+`;
+
+const LocationStatus = styled.p`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0.75rem 0.25rem;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
+
+	.spin {
+		animation: location-picker-spin 1s linear infinite;
+	}
+
+	@keyframes location-picker-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+`;
+
+const LocationResults = styled.div`
+	display: flex;
+	flex-direction: column;
+	max-height: 240px;
+	overflow-y: auto;
+`;
+
+const LocationResultButton = styled.button`
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	border: none;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+
+	&:not(:last-child) {
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	}
+
+	&:hover:not(:disabled) {
+		background: ${({ theme }) => theme.colors.background.card2};
+	}
+
+	&:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.gray[500]};
+		outline-offset: -2px;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+`;
+
+const LocationResultName = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const LocationResultAddress = styled.span`
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.text.muted};
 `;
 
 export default ConnectionsDetailSettings;

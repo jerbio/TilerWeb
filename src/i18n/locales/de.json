@@ -1375,7 +1375,17 @@
 					"disconnectConfirmDescription": "Tiler wird {{email}} nicht mehr lesen können.",
 					"disconnectCancel": "Abbrechen",
 					"disconnectError": "Dieses Konto konnte nicht getrennt werden. Bitte versuche es erneut.",
-					"disconnectProviderError": "Der Kalenderanbieter konnte gerade nicht getrennt werden. Bitte versuche es in einem Moment erneut."
+					"disconnectProviderError": "Der Kalenderanbieter konnte gerade nicht getrennt werden. Bitte versuche es in einem Moment erneut.",
+					"locationSection": "Standardstandort",
+					"locationDescription": "Tiler verwendet diesen Standort für neue Termine dieses Kontos.",
+					"locationUnset": "Kein Standardstandort festgelegt.",
+					"locationChangeAction": "Standort ändern",
+					"locationPickerTitle": "Standardstandort auswählen",
+					"locationSearchPlaceholder": "Standort suchen...",
+					"locationSearching": "Standorte werden durchsucht...",
+					"locationNoResults": "Keine passenden Standorte gefunden.",
+					"locationSaving": "Standort wird gespeichert...",
+					"locationSaveError": "Dieser Standort konnte nicht gespeichert werden. Bitte versuche es erneut."
 				}
 			}
 		}

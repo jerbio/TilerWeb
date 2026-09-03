@@ -20,6 +20,7 @@
  */
 
 import type {
+	CalendarDefaultLocationEnvelope,
 	CalendarItemToggleEnvelope,
 	CalendarItemsEnvelope,
 	IntegrationMutationEnvelope,
@@ -169,6 +170,30 @@ export const calendarItemToggleEnvelope: CalendarItemToggleEnvelope = {
 		isSelected: false,
 		description: 'Work calendar',
 	},
+};
+
+/**
+ * Success for `POST /api/integrations/location`: `Content` is the stored
+ * location as the server now holds it (the server overwrites `description`
+ * with an internal `cal-default-location-*` marker — see
+ * `IntegrationsController.AddLocationToIntegration`).
+ */
+export const calendarDefaultLocationSuccessEnvelope: CalendarDefaultLocationEnvelope = {
+	Error: { Code: '0', Message: 'SUCCESS' },
+	Content: {
+		id: 'stored-location-id',
+		description: 'cal-default-location-9c1d2e3f-0000-0000-0000-000000000000',
+		address: '456 Oak Ave',
+		thirdPartyId: 'google-place-id-2',
+		longitude: -73.9845,
+		latitude: 40.7495,
+		isVerified: true,
+	},
+};
+
+/** Structured server error for the default-location write. */
+export const calendarDefaultLocationErrorEnvelope: CalendarDefaultLocationEnvelope = {
+	Error: { Code: '500', Message: 'An error occurred while updating the integration location' },
 };
 
 /**
