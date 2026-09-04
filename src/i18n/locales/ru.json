@@ -1353,9 +1353,9 @@
 				"expandAccounts": "Развернуть аккаунты",
 				"collapseAccounts": "Свернуть аккаунты",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "Календарь {{provider}} подключен",
+					"declined": "Подключение {{provider}} отменено",
+					"error": "Не удалось подключить {{provider}}. Пожалуйста, попробуйте снова."
 				},
 				"detail": {
 					"loading": "Загрузка соединения...",

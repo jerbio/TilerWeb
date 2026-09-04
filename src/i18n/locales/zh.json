@@ -1353,9 +1353,9 @@
 				"expandAccounts": "展开账户",
 				"collapseAccounts": "收起账户",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "已连接 {{provider}} 日历",
+					"declined": "{{provider}} 连接已取消",
+					"error": "无法连接 {{provider}}。请重试。"
 				},
 				"detail": {
 					"loading": "正在加载连接...",

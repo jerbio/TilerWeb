@@ -1353,9 +1353,9 @@
 				"expandAccounts": "Espandi account",
 				"collapseAccounts": "Comprimi account",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "Agenda {{provider}} collegata",
+					"declined": "Connessione {{provider}} annullata",
+					"error": "Non siamo riusciti a collegare {{provider}}. Riprova."
 				},
 				"detail": {
 					"loading": "Caricamento connessione...",
