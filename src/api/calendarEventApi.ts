@@ -4,8 +4,10 @@
 	CalendarEventSearchResponse,
 	CalendarEventUpdateParams,
 	SubEventsOfCalendarResponse,
+	CalendarSearchParams,
+	CalendarSearchEnvelope,
 } from '../core/common/types/schedule';
-import { PaginationParams } from '../core/common/types/api';
+import { ApiResponse, PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
 import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
@@ -100,6 +102,29 @@ export class CalendarEventApi extends AppApi {
 		const urlParams = new URLSearchParams(urlEntries).toString();
 
 		return this.apiRequest<CalendarEventSearchResponse>(`api/CalendarEvent/Name?${urlParams}`);
+	}
+
+	/**
+	 * Multi-source calendar event search.
+	 * `GET /api/CalendarEvent/Search?query=...&sources=...`
+	 *
+	 * NOT paginated. Returns the raw PostBack response (envelope under
+	 * `Content`) so the service layer can unwrap it and map typed errors.
+	 * Total failure surfaces as a `502`; a missing flag surfaces as a plain
+	 * `404` (no body).
+	 */
+	public searchCalendarEvents(params: CalendarSearchParams) {
+		const urlEntries: Record<string, string> = { query: params.query };
+
+		if (params.sources && params.sources.length > 0) {
+			urlEntries['sources'] = params.sources.join(',');
+		}
+
+		const urlParams = new URLSearchParams(urlEntries).toString();
+
+		return this.apiRequest<ApiResponse<CalendarSearchEnvelope>>(
+			`api/CalendarEvent/Search?${urlParams}`
+		);
 	}
 
 	/**

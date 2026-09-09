@@ -22,6 +22,13 @@ vi.mock('@/services', () => ({
 	},
 }));
 
+// Phase 4: SearchBar now reads the `calendarSearchMultiSource` feature flag.
+// This suite pins the flag OFF so it continues to exercise the legacy name-search
+// path. (The multi-source path is covered in search_bar.multisource.test.tsx.)
+vi.mock('@/hooks/useFlag', () => ({
+	useFlag: () => false,
+}));
+
 // Mock the global state
 vi.mock('@/global_state', () => ({
 	__esModule: true,
@@ -153,6 +160,13 @@ vi.mock('react-i18next', () => ({
 		},
 		i18n: { language: 'en' },
 	}),
+	initReactI18next: () => {},
+}));
+
+// Mock the i18n config so errors.ts's top-level `i18n.init()` never runs.
+vi.mock('@/i18n/config', () => ({
+	__esModule: true,
+	default: { isInitialized: false, t: (key: string) => key },
 }));
 
 const mockResults: CalendarEvent[] = [

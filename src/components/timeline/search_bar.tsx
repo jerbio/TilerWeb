@@ -4,8 +4,14 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { scheduleService } from '@/services';
 import useAppStore from '@/global_state';
-import { CalendarEvent } from '@/core/common/types/schedule';
+import {
+	CalendarEvent,
+	CalendarSearchItem,
+	CalendarSearchSourceStatus,
+} from '@/core/common/types/schedule';
+import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
+import { useFlag } from '@/hooks/useFlag';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import colorUtil from '@/core/util/colors';
@@ -20,6 +26,57 @@ export type SearchBarProps = {
 	debounceMs?: number;
 	/** Number of results per page (default: 10) */
 	pageSize?: number;
+};
+
+/** Map a multi-source search item to the shape the edit path / onResults expect. */
+const searchItemToCalendarEvent = (item: CalendarSearchItem): CalendarEvent => ({
+	id: item.id,
+	start: item.start,
+	end: item.end,
+	name: item.name,
+	address: null,
+	addressDescription: null,
+	searchdDescription: null,
+	splitCount: null,
+	completeCount: null,
+	deletionCount: null,
+	// Forward third-party routing metadata so the edit path can dispatch to the
+	// correct provider (S4-6).
+	thirdpartyType: item.source,
+	thirdPartyId: item.thirdPartyEventId ?? null,
+	thirdPartyUserId: item.thirdPartyUserId ?? null,
+	colorOpacity: null,
+	colorRed: null,
+	colorGreen: null,
+	colorBlue: null,
+	isComplete: null,
+	isEnabled: null,
+	isRecurring: null,
+	locationId: null,
+	isReadOnly: item.isReadOnly ?? null,
+	isProcrastinateEvent: null,
+	isRigid: null,
+	uiConfig: null,
+	repetition: null,
+	eachTileDuration: null,
+	restrictionProfile: null,
+	emojis: null,
+	isWhatIf: null,
+	entityName: null,
+	blob: null,
+	subEvents: null,
+});
+
+/** i18n key for a source vocabulary value (`tiler`/`google`/`microsoft`). */
+const sourceLabelKey = (source: string): string => {
+	switch (source) {
+		case 'google':
+			return 'timeline.multiSource.sourceGoogle';
+		case 'microsoft':
+			return 'timeline.multiSource.sourceMicrosoft';
+		default:
+			return 'timeline.multiSource.sourceTiler';
+	}
 };
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -44,6 +101,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		action: 'complete' | 'delete';
 	} | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const searchSeqRef = useRef(0);
+	const isMultiSource = useFlag('calendarSearchMultiSource');
+	const [msItems, setMsItems] = useState<CalendarSearchItem[]>([]);
+	const [msSources, setMsSources] = useState<CalendarSearchSourceStatus[]>([]);
+	const [searchUnavailable, setSearchUnavailable] =
+		useState<CalendarSearchUnavailableError | null>(null);
+	const [correlationId, setCorrelationId] = useState<string | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
@@ -91,6 +155,95 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		[authenticatedUser, onResults, pageSize]
 	);
 
+	/**
+	 * Multi-source (Phase 4) search. Non-paginated. Uses a monotonically
+	 * increasing sequence token so stale / out-of-order responses are discarded
+	 * (S4-2) — a slow earlier query can never flash over a newer one.
+	 */
+	const performMultiSourceSearch = useCallback(
+		async (searchQuery: string) => {
+			if (!searchQuery.trim() || !authenticatedUser) {
+				setMsItems([]);
+				setMsSources([]);
+				setSearchUnavailable(null);
+				setHasSearched(false);
+				setShowDropdown(false);
+				onResults?.([]);
+				return;
+			}
+
+			const token = ++searchSeqRef.current;
+			setIsLoading(true);
+			setSearchUnavailable(null);
+			try {
+				const envelope = await scheduleService.searchCalendarEventsMultiSource(searchQuery);
+
+				// Stale / out-of-order response — discard silently.
+				if (token !== searchSeqRef.current) return;
+
+				if (envelope === null) {
+					// Plain 404 (flag off server-side) — treat as no results.
+					setMsItems([]);
+					setMsSources([]);
+					setHasSearched(true);
+					setShowDropdown(true);
+					onResults?.([]);
+					return;
+				}
+
+				setCorrelationId(envelope.correlationId);
+				setMsItems(envelope.items);
+				setMsSources(envelope.sources);
+				setHasSearched(true);
+				setShowDropdown(true);
+				onResults?.(envelope.items.map(searchItemToCalendarEvent));
+			} catch (error) {
+				if (token !== searchSeqRef.current) return; // stale — discard
+
+				if (error instanceof CalendarSearchUnavailableError) {
+					// Total failure (502) — typed unavailable state, never "no matches".
+					setCorrelationId(error.correlationId);
+					setMsItems([]);
+					setMsSources([]);
+					setSearchUnavailable(error);
+				} else {
+					console.error('Multi-source search failed:', error);
+					setMsItems([]);
+					setMsSources([]);
+				}
+				setHasSearched(true);
+				setShowDropdown(true);
+				onResults?.([]);
+			} finally {
+				if (token === searchSeqRef.current) setIsLoading(false);
+			}
+		},
+		[authenticatedUser, onResults]
+	);
+
+	/**
+	 * Open the edit path from a multi-source result, forwarding third-party
+	 * routing metadata (S4-6) and emitting `calendar_search_edit_opened`.
+	 */
+	const handleMultiSourceEdit = useCallback(
+		(item: CalendarSearchItem) => {
+			openEditTile(searchItemToCalendarEvent(item));
+			setShowDropdown(false);
+			if (typeof window !== 'undefined') {
+				window.dispatchEvent(
+					new CustomEvent('calendar_search_edit_opened', {
+						detail: {
+							correlationId,
+							source: item.source,
+							capabilities: item.capabilities,
+						},
+					})
+				);
+			}
+		},
+		[openEditTile, correlationId]
+	);
+
 	const loadMore = useCallback(async () => {
 		if (!query.trim() || !authenticatedUser || isLoadingMore) return;
 
@@ -124,7 +277,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			clearTimeout(debounceRef.current);
 		}
 		debounceRef.current = setTimeout(() => {
-			performSearch(value);
+			if (isMultiSource) {
+				performMultiSourceSearch(value);
+			} else {
+				performSearch(value);
+			}
 		}, debounceMs);
 	};
 
@@ -137,6 +294,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		setHasMore(false);
 		setActionLoading({});
 		setConfirmingAction(null);
+		// Reset multi-source (Phase 4) state and invalidate any in-flight search.
+		searchSeqRef.current++;
+		setMsItems([]);
+		setMsSources([]);
+		setSearchUnavailable(null);
+		setCorrelationId(null);
 		onSearch?.('');
 		onResults?.([]);
 		if (debounceRef.current) {
@@ -261,10 +424,29 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [showDropdown]);
 
-	const showResults = showDropdown && hasSearched && results.length > 0;
-	const showNotFound = showDropdown && hasSearched && results.length === 0;
+	const showResults = !isMultiSource && showDropdown && hasSearched && results.length > 0;
+	const showNotFound = !isMultiSource && showDropdown && hasSearched && results.length === 0;
 	const isAnyActionInProgress = Object.keys(actionLoading).length > 0;
 	const isInteractionBlocked = isAnyActionInProgress || !!confirmingAction;
+
+	// Multi-source (Phase 4) derived state.
+	const msHasPartialFailure = msSources.some(
+		(s) => s.status === 'partial' || s.status === 'failed'
+	);
+	const msFailedSourceLabels = msSources
+		.filter((s) => s.status === 'partial' || s.status === 'failed')
+		.map((s) => t(sourceLabelKey(s.source)))
+		.join(', ');
+	const showMsResults =
+		isMultiSource && showDropdown && hasSearched && msItems.length > 0 && !searchUnavailable;
+	const showMsUnavailable = isMultiSource && showDropdown && !!searchUnavailable;
+	const showMsNotFound =
+		isMultiSource &&
+		showDropdown &&
+		hasSearched &&
+		msItems.length === 0 &&
+		!searchUnavailable &&
+		!msHasPartialFailure;
 
 	return (
 		<SearchContainer ref={containerRef}>
@@ -418,6 +600,127 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			)}
 
 			{showNotFound && (
+				<NotFoundPrompt data-testid="search-not-found">
+					<NotFoundIcon>
+						<HelpCircle size={24} />
+					</NotFoundIcon>
+					<NotFoundText>{t('timeline.notFoundMessage', { query })}</NotFoundText>
+					<NotFoundActions>
+						<DismissButton onClick={handleDismissNotFound}>
+							{t('timeline.notFoundDismiss')}
+						</DismissButton>
+						<CreateButton onClick={handleCreate}>
+							{t('timeline.notFoundCreate')}
+						</CreateButton>
+					</NotFoundActions>
+				</NotFoundPrompt>
+			)}
+			{isMultiSource && showMsResults && (
+				<ResultsDropdown data-testid="search-results-dropdown">
+					{msHasPartialFailure && (
+						<PartialWarning data-testid="partial-warning">
+							<PartialWarningText>
+								{t('timeline.multiSource.partialFailure', {
+									sources: msFailedSourceLabels,
+								})}
+							</PartialWarningText>
+							<RetryButton
+								data-testid="retry-search"
+								onClick={() => performMultiSourceSearch(query)}
+							>
+								{t('timeline.multiSource.retrySearch')}
+							</RetryButton>
+						</PartialWarning>
+					)}
+					{msItems.map((item) => (
+						<ResultItem key={item.id} data-testid="search-result-item">
+							<ResultName>{item.name}</ResultName>
+							<ResultTime>{TimeUtil.relativeTime(item.start)}</ResultTime>
+							<SourceBadge data-testid="source-badge">
+								{t(sourceLabelKey(item.source))}
+							</SourceBadge>
+							{item.thirdPartyUserId && (
+								<ConnectedAccount data-testid="connected-account">
+									{t('timeline.multiSource.connectedAccount', {
+										account: item.thirdPartyUserId,
+									})}
+								</ConnectedAccount>
+							)}
+							{item.isReadOnly ? (
+								<ReadOnlyBadge data-testid="read-only-badge">
+									{t('timeline.multiSource.readOnly')}
+								</ReadOnlyBadge>
+							) : (
+								<ResultActions data-testid="result-actions">
+									{item.capabilities?.canEdit && (
+										<ActionButton
+											data-testid="action-edit"
+											title={t('timeline.editEvent')}
+											disabled={isInteractionBlocked}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleMultiSourceEdit(item);
+											}}
+										>
+											<Pencil size={12} />
+										</ActionButton>
+									)}
+									{item.capabilities?.canSetAsNow && (
+										<ActionButton
+											data-testid="action-set-as-now"
+											title={t('timeline.setAsNow')}
+											disabled={isInteractionBlocked}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleSetAsNow(item.id);
+											}}
+										>
+											<Play size={12} />
+										</ActionButton>
+									)}
+									{item.capabilities?.canComplete && (
+										<ActionButton
+											data-testid="action-mark-complete"
+											title={t('timeline.markComplete')}
+											disabled={isInteractionBlocked}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleMarkComplete(item.id);
+											}}
+										>
+											<Check size={12} />
+										</ActionButton>
+									)}
+									{item.capabilities?.canDelete && (
+										<ActionButton
+											data-testid="action-delete"
+											title={t('timeline.markDeleted')}
+											disabled={isInteractionBlocked}
+											$danger
+											onClick={(e) => {
+												e.stopPropagation();
+												handleDelete(item.id);
+											}}
+										>
+											<Trash2 size={12} />
+										</ActionButton>
+									)}
+								</ResultActions>
+							)}
+						</ResultItem>
+					))}
+				</ResultsDropdown>
+			)}
+
+			{isMultiSource && showMsUnavailable && (
+				<UnavailablePrompt data-testid="search-unavailable">
+					<NotFoundText>
+						{searchUnavailable?.message || t('timeline.multiSource.unavailable')}
+					</NotFoundText>
+				</UnavailablePrompt>
+			)}
+
+			{isMultiSource && showMsNotFound && (
 				<NotFoundPrompt data-testid="search-not-found">
 					<NotFoundIcon>
 						<HelpCircle size={24} />
@@ -658,6 +961,82 @@ const ConfirmButton = styled.button<{ $danger?: boolean; $success?: boolean }>`
 					? 'rgba(18, 183, 106, 0.2)'
 					: theme.colors.background.card2};
 	}
+`;
+
+const SourceBadge = styled.span`
+	margin-left: auto;
+	padding: 1px 6px;
+	border-radius: 8px;
+	font-size: 10px;
+	font-weight: 600;
+	white-space: nowrap;
+	background: ${({ theme }) => theme.colors.background.card2};
+	color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const ConnectedAccount = styled.span`
+	font-size: 11px;
+	color: ${({ theme }) => theme.colors.text.muted};
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 180px;
+`;
+
+const ReadOnlyBadge = styled.span`
+	margin-left: auto;
+	padding: 1px 6px;
+	border-radius: 8px;
+	font-size: 10px;
+	font-weight: 600;
+	white-space: nowrap;
+	background: rgba(245, 158, 11, 0.15);
+	color: #b45309;
+`;
+
+const PartialWarning = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+	background: rgba(245, 158, 11, 0.08);
+`;
+
+const PartialWarningText = styled.span`
+	flex: 1;
+	font-size: 12px;
+	color: #b45309;
+`;
+
+const RetryButton = styled.button`
+	flex-shrink: 0;
+	padding: 2px 10px;
+	border: 1px solid rgba(245, 158, 11, 0.4);
+	border-radius: 4px;
+	background: transparent;
+	color: #b45309;
+	font-size: 11px;
+	cursor: pointer;
+
+	&:hover {
+		background: rgba(245, 158, 11, 0.15);
+	}
+`;
+
+const UnavailablePrompt = styled.div`
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	margin-top: 4px;
+	padding: 16px;
+	background: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid rgba(220, 38, 38, 0.4);
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	z-index: 50;
+	text-align: center;
 `;
 
 const LoadMoreButton = styled.button`

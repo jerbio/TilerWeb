@@ -467,6 +467,105 @@ export type CalendarEventSearchParams = {
 /** Response shape for `GET /api/CalendarEvent/Name` */
 export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
 
+// ── Multi-source calendar event search (Phase 4) ─────────────────
+/**
+ * Source vocabulary for the non-paginated `GET /api/CalendarEvent/Search`
+ * endpoint. Mirrors the server's `getDispatchCalendarType()` casing.
+ */
+export type CalendarSearchSource = 'tiler' | 'google' | 'microsoft';
+
+/**
+ * Per-source execution status for the multi-source search envelope.
+ * - `success`   — every calendar in the source returned results.
+ * - `partial`   — surviving events shipped but some calendars failed.
+ * - `failed`    — the source could not execute at all.
+ */
+export type CalendarSearchSourceStatus = {
+	source: string;
+	status: 'success' | 'partial' | 'failed';
+	/** `native-query` or `default-filter`, reported by the source itself. */
+	queryMode?: string;
+	/** Sanitized failure category; present for `failed`/`partial`. */
+	category?: string;
+	/** Whether the client may retry this source; present for `failed`/`partial`. */
+	retryable?: boolean;
+	/** Number of per-calendar failures; present only when `partial`. */
+	failureCount?: number;
+};
+
+/**
+ * Per-result actionable capabilities. A read-only event exposes none of them.
+ */
+export type CalendarSearchCapabilities = {
+	canEdit: boolean;
+	canDelete: boolean;
+	canComplete: boolean;
+	canSetAsNow: boolean;
+};
+
+/** One multi-source search result row (Gate-A wire shape). */
+export type CalendarSearchItem = {
+	/** Tiler-facing `EventID`, identical to the one schedule retrieval produces. */
+	id: string;
+	name: string;
+	/** Start time as Unix epoch milliseconds (UTC). */
+	start: number;
+	/** End time as Unix epoch milliseconds (UTC). */
+	end: number;
+	/** `tiler` / `google` / `microsoft`. */
+	source: string;
+	/** Provider event id for third-party results; null for native Tiler. */
+	thirdPartyEventId?: string | null;
+	/** Connected provider account for third-party results; null for native Tiler. */
+	thirdPartyUserId?: string | null;
+	isReadOnly?: boolean;
+	capabilities: CalendarSearchCapabilities;
+};
+
+/**
+ * The canonical search envelope: top-level `items`, `sources`, `correlationId`.
+ * Served as the standard PostBack wrapper's `Content`. NOT paginated.
+ */
+export type CalendarSearchEnvelope = {
+	items: CalendarSearchItem[];
+	sources: CalendarSearchSourceStatus[];
+	correlationId: string;
+};
+
+/** One failed third-party provider in a total-failure (502) body. */
+export type CalendarSearchFailedSource = {
+	/** Provider vocabulary (`google` / `microsoft`). */
+	provider: string;
+	/** Connected-account email (the user's own first-party account). */
+	email?: string;
+	/** Sanitized failure category. */
+	category?: string;
+};
+
+/**
+ * Typed error body for a TOTAL search source failure (HTTP 502).
+ * Deliberately NOT the search envelope — an empty "no matches" envelope would
+ * misreport a total failure as a successful empty search.
+ */
+export type CalendarSearchErrorBody = {
+	/** Stable machine-readable code (`search_unavailable`). */
+	error: string;
+	message: string;
+	/** Sanitized failure category of the failed sources. */
+	category?: string;
+	/** The request's correlation id (matches the logs). */
+	correlationId: string;
+	/** Every failed third-party provider; omitted when no provider was involved. */
+	sources?: CalendarSearchFailedSource[];
+};
+
+/** Params for `GET /api/CalendarEvent/Search` */
+export type CalendarSearchParams = {
+	query: string;
+	/** Restrict to specific sources; omitted to search all connected sources. */
+	sources?: CalendarSearchSource[];
+};
+
 /** Params for `POST /api/CalendarEvent/Update` */
 
 export type CalendarEventWeekDayOption = {

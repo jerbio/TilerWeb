@@ -12,8 +12,13 @@ import {
 	ScheduleShuffleParams,
 	CalendarEventUpdateParams,
 	TilePredictionResponse,
+	CalendarSearchEnvelope,
+	CalendarSearchSource,
+	CalendarSearchErrorBody,
 } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
+import ServerError from '@/core/error/server';
+import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import TimeUtil from '@/core/util/time';
 import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
@@ -221,6 +226,42 @@ class ScheduleService {
 			return response.Content;
 		} catch (error) {
 			console.error('Error searching calendar events by name', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Multi-source calendar event search (Phase 4).
+	 * `GET /api/CalendarEvent/Search?query=...&sources=...`
+	 *
+	 * Unwraps the PostBack `Content` envelope. Total failure (HTTP 502) maps to
+	 * a typed `CalendarSearchUnavailableError`; a plain `404` (feature flag off /
+	 * no body) maps to `null`. Never collapses a 502 into an empty result set.
+	 */
+	async searchCalendarEventsMultiSource(
+		query: string,
+		sources?: CalendarSearchSource[]
+	): Promise<CalendarSearchEnvelope | null> {
+		try {
+			const response = await this.calendarEventApi.searchCalendarEvents({
+				query,
+				sources,
+			});
+			return response.Content;
+		} catch (error) {
+			if (error instanceof ServerError) {
+				// Plain 404 (flag off / missing) — no body — is not a failure.
+				if (error.status === 404) {
+					return null;
+				}
+				// Total source failure — typed body under `details`.
+				if (error.status === 502) {
+					throw new CalendarSearchUnavailableError(
+						(error.details ?? {}) as CalendarSearchErrorBody
+					);
+				}
+			}
+			console.error('Error searching calendar events (multi-source)', error);
 			throw normalizeError(error);
 		}
 	}
