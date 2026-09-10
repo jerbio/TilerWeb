@@ -244,6 +244,35 @@ describe('SearchBar multi-source (Phase 4)', () => {
 		expect(screen.getAllByTestId('action-set-as-now')).toHaveLength(1);
 	});
 
+	it('renders the event name for each multi-source row (name must not be blanked)', async () => {
+		const envelope: CalendarSearchEnvelope = {
+			items: [googleItem, tilerItem],
+			sources: [
+				{ source: 'google', status: 'success', queryMode: 'native-query' },
+				{ source: 'tiler', status: 'success', queryMode: 'native-query' },
+			],
+			correlationId: 'c1',
+		};
+		mockSearchMultiSource.mockResolvedValue(envelope);
+
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+
+		await waitFor(() => expect(screen.getAllByTestId('search-result-item')).toHaveLength(2));
+
+		// The name is the primary field of every row (provider and native alike) and must
+		// render as text — a regression guard for the layout that once left provider rows
+		// with a 0-width (invisible) name.
+		expect(screen.getByText('Golf')).toBeInTheDocument();
+		expect(screen.getByText('Workout')).toBeInTheDocument();
+
+		// The name is the first rendered field inside each result row.
+		const rows = screen.getAllByTestId('search-result-item');
+		expect(rows[0].firstElementChild).toHaveTextContent('Golf');
+		expect(rows[1].firstElementChild).toHaveTextContent('Workout');
+	});
+
 	it('discards stale / out-of-order responses (S4-2)', async () => {
 		const itemA: CalendarSearchItem = { ...tilerItem, id: 'a', name: 'AAA' };
 		const itemB: CalendarSearchItem = { ...tilerItem, id: 'b', name: 'BBB' };
@@ -395,5 +424,38 @@ describe('SearchBar multi-source (Phase 4)', () => {
 		expect(mockSearchByName).toHaveBeenCalled();
 		expect(mockSearchMultiSource).not.toHaveBeenCalled();
 		expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+	});
+
+	it('shows inline confirmation for Complete/Delete on a writable multi-source row and cancels (S4-7)', async () => {
+		mockSearchMultiSource.mockResolvedValue({
+			items: [tilerItem],
+			sources: [],
+			correlationId: 'c1',
+		});
+
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+
+		await waitFor(() => expect(screen.getByTestId('action-mark-complete')).toBeInTheDocument());
+
+		// Complete swaps the action buttons for the inline confirmation.
+		await user.click(screen.getByTestId('action-mark-complete'));
+		await waitFor(() => expect(screen.getByTestId('confirm-inline')).toBeInTheDocument());
+		expect(screen.queryByTestId('result-actions')).not.toBeInTheDocument();
+		expect(screen.getByTestId('confirm-yes')).toBeInTheDocument();
+		expect(screen.getByTestId('confirm-cancel')).toBeInTheDocument();
+		expect(mockMarkCalendarEventComplete).not.toHaveBeenCalled();
+
+		// Cancel restores the action buttons without performing the action.
+		await user.click(screen.getByTestId('confirm-cancel'));
+		await waitFor(() => expect(screen.getByTestId('result-actions')).toBeInTheDocument());
+		expect(screen.queryByTestId('confirm-inline')).not.toBeInTheDocument();
+		expect(mockMarkCalendarEventComplete).not.toHaveBeenCalled();
+
+		// Delete also surfaces the confirmation before acting.
+		await user.click(screen.getByTestId('action-delete'));
+		await waitFor(() => expect(screen.getByTestId('confirm-inline')).toBeInTheDocument());
+		expect(mockDeleteCalendarEvent).not.toHaveBeenCalled();
 	});
 });
