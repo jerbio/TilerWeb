@@ -358,6 +358,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const [requestId, setRequestId] = useState<string | null>(null);
 	const [webSocketStatus, setWebSocketStatus] = useState<string | null>(null);
 	const [wsStatusKey, setWsStatusKey] = useState<string | null>(null);
+	// Sticky per-turn list of failed research steps. The rotating status slot is
+	// overwritten within milliseconds by follow-up frames (plan_completed,
+	// summary_action_start), so step failures get their own persistent lane.
+	const [failedResearchSteps, setFailedResearchSteps] = useState<string[]>([]);
 	const [researchProgress, setResearchProgress] = useState<{
 		completedSteps: number;
 		totalSteps: number;
@@ -860,6 +864,12 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			research_step_starting: [t('home.expanded.chat.wsStatus.researchStepStarting')],
 			research_step_completed: [t('home.expanded.chat.wsStatus.researchStepCompleted')],
 			research_step_failed: [t('home.expanded.chat.wsStatus.researchStepFailed')],
+			research_step_retrying: [
+				t(
+					'home.expanded.chat.wsStatus.researchStepRetrying',
+					'Hit a temporary snag — retrying...'
+				),
+			],
 			research_parallel_dispatch: [t('home.expanded.chat.wsStatus.researchParallelDispatch')],
 			research_fork_start: [t('home.expanded.chat.wsStatus.researchForkStart')],
 			research_fork_variant_ready: [
@@ -916,6 +926,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		if (rawStatus === 'research_step_completed' && resultSummary) {
 			return resultSummary;
 		}
+		if (rawStatus === 'research_step_retrying' && resultSummary) {
+			// Backend supplies "Retrying after transient error (attempt N/M)".
+			return resultSummary;
+		}
 		if (rawStatus === 'research_step_failed' && description) {
 			return `⚠ ${description}${resultSummary ? ' — ' + resultSummary : ''}`;
 		}
@@ -956,6 +970,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					setWsStatusKey(rawStatus);
 					setWebSocketStatus(formattedStatus);
 
+					if (rawStatus === 'research_step_failed') {
+						// Keep failures visible for the rest of the turn even after
+						// later frames replace the rotating status.
+						setFailedResearchSteps((prev) =>
+							prev.includes(formattedStatus) ? prev : [...prev, formattedStatus]
+						);
+					}
+
 					if (
 						research &&
 						typeof research.completedSteps === 'number' &&
@@ -968,13 +990,21 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					}
 
 					if (rawStatus === 'research_fork_awaiting_selection') {
-						const sessionId = vibeData.sessionId as string | undefined;
-						if (sessionId) {
-							setVariantSelection({ vibeRequestId: sessionId });
+						// G9: resume routes (api/Vibe/Request/{id}/*) are keyed on the
+						// VibeRequest id, which the research payload now carries. The
+						// envelope's sessionId is the VibeSession id — kept only as a
+						// legacy fallback for frames from older backends.
+						const requestId =
+							(research?.vibeRequestId as string | undefined) ??
+							(vibeData.sessionId as string | undefined);
+						if (requestId) {
+							setVariantSelection({ vibeRequestId: requestId });
 						}
 					} else if (rawStatus === 'research_step_awaiting_clarification') {
-						const sessionId = vibeData.sessionId as string | undefined;
-						if (sessionId && research?.clarificationRequest) {
+						const requestId =
+							(research?.vibeRequestId as string | undefined) ??
+							(vibeData.sessionId as string | undefined);
+						if (requestId && research?.clarificationRequest) {
 							const cr = research.clarificationRequest as {
 								stepId: string;
 								providerMessage: string;
@@ -986,7 +1016,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 								}>;
 							};
 							setClarificationSelection({
-								vibeRequestId: sessionId,
+								vibeRequestId: requestId,
 								clarification: cr,
 							});
 						}
@@ -995,16 +1025,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					} else if (rawStatus === 'research_awaiting_gate_resolution') {
 						// Subject disambiguation / artifact selection / etc. The gateId comes
 						// from the persisted SuspendedGate; without it we cannot call /ResolveGate.
-						const sessionId = vibeData.sessionId as string | undefined;
+						const requestId =
+							(research?.vibeRequestId as string | undefined) ??
+							(vibeData.sessionId as string | undefined);
 						const gateId = research?.gateId as string | undefined;
-						if (sessionId && gateId) {
+						if (requestId && gateId) {
 							const candidates = Array.isArray(research?.candidateArtifactIds)
 								? (research?.candidateArtifactIds as unknown[]).filter(
 										(c): c is string => typeof c === 'string' && c.length > 0
 									)
 								: undefined;
 							setGateResolution({
-								vibeRequestId: sessionId,
+								vibeRequestId: requestId,
 								gate: {
 									gateId,
 									gateKind: research?.gateKind as string | undefined,
@@ -1017,12 +1049,14 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 							});
 						}
 					} else if (rawStatus === 'research_awaiting_integration_auth') {
-						const sessionId = vibeData.sessionId as string | undefined;
+						const requestId =
+							(research?.vibeRequestId as string | undefined) ??
+							(vibeData.sessionId as string | undefined);
 						const gateId = research?.gateId as string | undefined;
 						const integrationKey = research?.integrationKey as string | undefined;
-						if (sessionId && gateId && integrationKey) {
+						if (requestId && gateId && integrationKey) {
 							setIntegrationAuth({
-								vibeRequestId: sessionId,
+								vibeRequestId: requestId,
 								gate: {
 									gateId,
 									integrationKey,
@@ -1424,6 +1458,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			setError(null);
 			setWebSocketStatus(null); // Reset status to prepare for new updates
 			setWsStatusKey(null);
+			setFailedResearchSteps([]);
 
 			// Get current location data
 			const locationData = await locationService.getCurrentLocation();
@@ -1545,6 +1580,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 			setError(null);
 			setWebSocketStatus(null); // Reset status to prepare for new updates
 			setWsStatusKey(null);
+			setFailedResearchSteps([]);
 			// Get current location data
 			const locationData = await locationService.getCurrentLocation();
 			const locationApiData = locationService.toApiFormat(locationData);
@@ -1771,6 +1807,25 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 							wsStatus={wsStatusKey}
 							researchProgress={researchProgress}
 						/>
+					)}
+					{!inReview && isSending && failedResearchSteps.length > 0 && (
+						<div
+							data-testid="failed-research-steps"
+							style={{
+								margin: '0.25rem 0',
+								padding: '0.375rem 0.625rem',
+								borderRadius: '6px',
+								background: 'rgba(255, 82, 82, 0.08)',
+								border: '1px solid rgba(255, 82, 82, 0.35)',
+								color: '#c62828',
+								fontSize: '0.8125rem',
+								lineHeight: 1.4,
+							}}
+						>
+							{failedResearchSteps.map((msg) => (
+								<div key={msg}>{msg}</div>
+							))}
+						</div>
 					)}
 					{variantSelection && (
 						<VariantSelector
