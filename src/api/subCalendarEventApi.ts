@@ -1,3 +1,4 @@
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 import { SubCalendarEventLookupResponse } from '../core/common/types/schedule';
 import { AppApi } from './appApi';
 
@@ -16,6 +17,12 @@ export type UpdateSubCalendarEventPayload = {
 	TimeZone: string;
 	ThirdPartyEventID?: string;
 	ThirdPartyUserID?: string;
+	/**
+	 * RSVP response update for third-party events. Sent only when the user
+	 * accepts or declines an invite. (Widen to include `'Tentative'` if that
+	 * action is exposed later.)
+	 */
+	RsvpStatusUpdate?: 'Accepted' | 'Declined';
 };
 
 export class SubCalendarEventApi extends AppApi {
@@ -40,6 +47,7 @@ export class SubCalendarEventApi extends AppApi {
 			Longitude: payload.Longitude ?? loc.longitude,
 			Latitude: payload.Latitude ?? loc.latitude,
 			LocationVerified: payload.LocationVerified ?? loc.verified,
+			TimeZone: payload.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<SubCalendarEventLookupResponse>('api/SubCalendarEvent', {
 			method: 'POST',

@@ -67,6 +67,17 @@ export function useCalendarDispatch() {
 	return ctx.dispatch;
 }
 
+/**
+ * Like {@link useCalendarDispatch} but returns `null` instead of throwing when
+ * rendered outside a `CalendarRequestProvider`. Use this from components that
+ * may be mounted in isolation (e.g. the edit panel's sub-events section) where
+ * calendar navigation is a best-effort enhancement rather than a hard require.
+ */
+export function useOptionalCalendarDispatch() {
+	const ctx = useContext(CalendarRequestCtx);
+	return ctx?.dispatch ?? null;
+}
+
 // ── Hook: listeners (Calendar internals) ───────────────────────
 
 /**

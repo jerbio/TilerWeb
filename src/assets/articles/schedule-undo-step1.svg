@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#171717"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="selectedGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#ED123B" flood-opacity="0.4" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Page background -->
+  <rect width="640" height="320" fill="url(#bgGrad)"/>
+
+  <!-- Top header bar -->
+  <rect width="640" height="48" fill="url(#headerGrad)"/>
+  <rect y="48" width="640" height="1" fill="rgba(255,255,255,0.06)"/>
+
+  <!-- Header: back arrow + date -->
+  <text x="20" y="30" font-family="Inter, sans-serif" font-size="18" fill="#a3a3a3">←</text>
+  <text x="280" y="30" font-family="Urbanist, Inter, sans-serif" font-size="15" font-weight="600" fill="#e5e5e5" text-anchor="middle">Tuesday, Jun 17</text>
+  <circle cx="620" cy="24" r="12" fill="#ED123B" fill-opacity="0.15" stroke="#ED123B" stroke-width="1.5"/>
+  <text x="620" y="29" font-family="Inter, sans-serif" font-size="11" fill="#ED123B" text-anchor="middle">+</text>
+
+  <!-- Time column -->
+  <rect x="0" y="48" width="44" height="272" fill="#111111"/>
+  <rect x="44" y="48" width="1" height="272" fill="rgba(255,255,255,0.05)"/>
+
+  <!-- Hour labels -->
+  <text x="22" y="86" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="middle">8 AM</text>
+  <text x="22" y="134" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="middle">9 AM</text>
+  <text x="22" y="182" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="middle">10 AM</text>
+  <text x="22" y="230" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="middle">11 AM</text>
+  <text x="22" y="278" font-family="Inter, sans-serif" font-size="9" fill="#525252" text-anchor="middle">12 PM</text>
+
+  <!-- Hour grid lines -->
+  <line x1="45" y1="84" x2="590" y2="84" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="45" y1="132" x2="590" y2="132" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="45" y1="180" x2="590" y2="180" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="45" y1="228" x2="590" y2="228" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="45" y1="276" x2="590" y2="276" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+  <!-- Tile: Morning run (8:00–8:30) -->
+  <rect x="52" y="86" width="258" height="22" rx="6" fill="#05A39C" fill-opacity="0.2" stroke="#05A39C" stroke-width="1" stroke-opacity="0.5"/>
+  <text x="62" y="101" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#05A39C">Morning run · 8:00 AM</text>
+
+  <!-- Tile: Team standup (9:00–9:30) -->
+  <rect x="52" y="134" width="258" height="22" rx="6" fill="#0077FF" fill-opacity="0.2" stroke="#0077FF" stroke-width="1" stroke-opacity="0.5"/>
+  <text x="62" y="149" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#6aabff">Team standup · 9:00 AM</text>
+
+  <!-- SELECTED Tile: Gym session (10:00–11:00) — highlighted with red glow -->
+  <rect x="52" y="182" width="258" height="44" rx="8" fill="#ED123B" fill-opacity="0.18" stroke="#ED123B" stroke-width="2" filter="url(#selectedGlow)"/>
+  <rect x="52" y="182" width="4" height="44" rx="2" fill="#ED123B"/>
+  <text x="64" y="200" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#ffffff">Gym session</text>
+  <text x="64" y="216" font-family="Inter, sans-serif" font-size="9" fill="rgba(255,255,255,0.55)">@ Home · 10:00 – 11:00 AM</text>
+
+  <!-- Tile: Client call (11:30) -->
+  <rect x="52" y="252" width="258" height="22" rx="6" fill="#171717" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="62" y="267" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#a3a3a3">Client call · 11:30 AM</text>
+
+  <!-- Right panel: Action prompt -->
+  <rect x="320" y="60" width="308" height="220" rx="16" fill="#171717" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Panel header -->
+  <rect x="320" y="60" width="308" height="48" rx="16" fill="#1c1c1c"/>
+  <rect x="320" y="92" width="308" height="16" fill="#1c1c1c"/>
+  <text x="474" y="91" font-family="Urbanist, Inter, sans-serif" font-size="13" font-weight="700" fill="#e5e5e5" text-anchor="middle">Move Tile</text>
+
+  <!-- Divider -->
+  <line x1="336" y1="108" x2="612" y2="108" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Tile preview in panel -->
+  <rect x="336" y="118" width="276" height="52" rx="10" fill="#222222" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <rect x="336" y="118" width="4" height="52" rx="2" fill="#ED123B"/>
+  <text x="350" y="137" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Gym session</text>
+  <text x="350" y="153" font-family="Inter, sans-serif" font-size="10" fill="#a3a3a3">@ Home</text>
+  <text x="536" y="153" font-family="Inter, sans-serif" font-size="10" fill="#525252" text-anchor="end">Tue · 10:00 AM</text>
+
+  <!-- Arrow down -->
+  <text x="474" y="191" font-family="Inter, sans-serif" font-size="14" fill="#525252" text-anchor="middle">↓</text>
+
+  <!-- New time suggestion -->
+  <rect x="336" y="200" width="276" height="36" rx="8" fill="#1a1a1a" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="350" y="222" font-family="Inter, sans-serif" font-size="11" fill="#a3a3a3">Move to <tspan font-weight="700" fill="#e5e5e5">Wednesday · 2:00 PM</tspan></text>
+
+  <!-- Action buttons -->
+  <rect x="336" y="248" width="130" height="24" rx="6" fill="#262626" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="401" y="264" font-family="Inter, sans-serif" font-size="11" font-weight="500" fill="#a3a3a3" text-anchor="middle">Cancel</text>
+
+  <rect x="478" y="248" width="134" height="24" rx="6" fill="#ED123B" fill-opacity="0.15" stroke="#ED123B" stroke-width="1.5"/>
+  <text x="545" y="264" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ED123B" text-anchor="middle">Preview →</text>
+
+  <!-- Bottom fade -->
+  <defs>
+    <linearGradient id="fadeBottom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+  <rect y="260" width="640" height="60" fill="url(#fadeBottom)"/>
+</svg>

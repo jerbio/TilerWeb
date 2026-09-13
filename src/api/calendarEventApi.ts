@@ -7,12 +7,29 @@
 } from '../core/common/types/schedule';
 import { PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 export type CalendarEventQueryOptions = PaginationParams;
 
+/** Sub-event ordering engine understood by the server. */
+export type SubEventOrderingEngine = 'ProximityToNow' | 'Id' | 'ClusteredIndex';
+
+/**
+ * Options for the keyset-paged sub-events endpoint. Extends pagination with the ordering
+ * engine and the two continuation cursors:
+ * - `afterSubEventId`  → page immediately after that sub-event (scroll right / load more).
+ * - `beforeSubEventId` → page immediately before that sub-event (scroll left / prepend).
+ * Supply at most one cursor; omit both for the bootstrap (nearest-to-now) page.
+ */
+export interface SubEventsQueryOptions extends CalendarEventQueryOptions {
+	orderingEngine?: SubEventOrderingEngine;
+	afterSubEventId?: string;
+	beforeSubEventId?: string;
+}
+
 export class CalendarEventApi extends AppApi {
 	/** Build query-string params shared by both endpoints. */
-	private buildParams(eventId: string, options?: CalendarEventQueryOptions): string {
+	private buildParams(eventId: string, options?: SubEventsQueryOptions): string {
 		const params: Record<string, string> = { EventID: eventId };
 
 		if (options?.batchSize != null) {
@@ -23,6 +40,15 @@ export class CalendarEventApi extends AppApi {
 		}
 		if (options?.order) {
 			params['order'] = options.order;
+		}
+		if (options?.orderingEngine) {
+			params['OrderingEngine'] = options.orderingEngine;
+		}
+		if (options?.afterSubEventId) {
+			params['AfterSubEventId'] = options.afterSubEventId;
+		}
+		if (options?.beforeSubEventId) {
+			params['BeforeSubEventId'] = options.beforeSubEventId;
 		}
 		params['mobileApp'] = 'true';
 
@@ -44,7 +70,7 @@ export class CalendarEventApi extends AppApi {
 	 *
 	 * Returns an array of ScheduleSubCalendarEvent.
 	 */
-	public getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
+	public getSubEventsOfCalendar(eventId: string, options?: SubEventsQueryOptions) {
 		const urlParams = this.buildParams(eventId, options);
 		return this.apiRequest<SubEventsOfCalendarResponse>(
 			`api/CalendarEvent/SubEvents?${urlParams}`
@@ -83,7 +109,10 @@ export class CalendarEventApi extends AppApi {
 	public setAsNow(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Now', {
 			method: 'POST',
-			body: JSON.stringify({ ID: eventId }),
+			body: JSON.stringify({
+				ID: eventId,
+				TimeZone: deviceTimeZone().toString(),
+			}),
 		});
 	}
 
@@ -94,7 +123,10 @@ export class CalendarEventApi extends AppApi {
 	public markAsComplete(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Complete', {
 			method: 'POST',
-			body: JSON.stringify({ EventID: eventId }),
+			body: JSON.stringify({
+				EventID: eventId,
+				TimeZone: deviceTimeZone().toString(),
+			}),
 		});
 	}
 
@@ -105,7 +137,10 @@ export class CalendarEventApi extends AppApi {
 	public deleteCalendarEvent(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent', {
 			method: 'DELETE',
-			body: JSON.stringify({ EventID: eventId }),
+			body: JSON.stringify({
+				EventID: eventId,
+				TimeZone: deviceTimeZone().toString(),
+			}),
 		});
 	}
 
@@ -121,6 +156,7 @@ export class CalendarEventApi extends AppApi {
 			UserLongitude: params.UserLongitude ?? loc.longitude?.toString() ?? '',
 			UserLatitude: params.UserLatitude ?? loc.latitude?.toString() ?? '',
 			UserLocationVerified: params.UserLocationVerified ?? (loc.verified ? 'true' : 'false'),
+			TimeZone: params.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
 			method: 'POST',

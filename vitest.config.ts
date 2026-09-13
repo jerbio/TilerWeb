@@ -13,7 +13,16 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		include: ['src/**/*.{test,spec}.{ts,tsx}'],
+		environmentOptions: {
+			jsdom: {
+				url: 'http://localhost/',
+			},
+		},
+		// Node.js 26 exposes a native `localStorage` global (undefined without
+		// --localstorage-file) that shadows jsdom's implementation. Disable
+		// the experimental Web Storage API so jsdom owns the global.
+		execArgv: ['--no-experimental-webstorage'],
+		include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.{test,spec}.mjs'],
 		setupFiles: ['./src/test/setup.ts'],
 		env: {
 			VITE_BASE_URL: 'http://localhost',

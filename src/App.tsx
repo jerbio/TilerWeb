@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes as BrowserRoutes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
 import Articles from './pages/Articles';
 import GettingStartedArticle from './pages/articles/GettingStartedArticle';
+import ArticlePage from './pages/ArticlePage';
 import Layout from './pages/Layout';
 import { Toaster } from 'sonner';
 import Waitlist from './pages/Waitlist';
@@ -19,11 +20,14 @@ import useDevTools from './core/common/hooks/useDevTools';
 import { AuthProvider } from './core/auth/AuthProvider';
 import { ProtectedRoute } from './core/auth/ProtectedRoute';
 import analytics from './core/util/analytics';
+import ConversionTrackerMount from './core/analytics/useConversionTracking';
 import { PublicRoute } from './components/auth/PublicRoute';
 import SettingsLayout from './pages/settings/SettingsLayout';
 import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
+import ConnectionsSettings from './pages/settings/ConnectionsSettings';
+import ConnectionsDetailSettings from './pages/settings/ConnectionsDetailSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
@@ -91,6 +95,7 @@ const App: React.FC = () => {
 						<BrowserRouter>
 							<ThemeInitializer />
 							<AnalyticsTracker />
+							<ConversionTrackerMount />
 							<ScrollToTop />
 							<BrowserRoutes>
 								<Route path={Routes.Home} element={<Layout />}>
@@ -101,6 +106,7 @@ const App: React.FC = () => {
 										path={Routes.ArticlesGettingStarted}
 										element={<GettingStartedArticle />}
 									/>
+									<Route path="/articles/:slug" element={<ArticlePage />} />
 									{/* Legacy URL — keep redirect for SEO + backlinks */}
 									<Route
 										path="/get-started"
@@ -194,6 +200,14 @@ const App: React.FC = () => {
 											<Route
 												path={Routes.SettingsNotifications}
 												element={<NotificationPreferencesSettings />}
+											/>
+											<Route
+												path={Routes.SettingsConnections}
+												element={<ConnectionsSettings />}
+											/>
+											<Route
+												path={Routes.SettingsConnectionDetail.pattern}
+												element={<ConnectionsDetailSettings />}
 											/>
 										</Route>
 									</Route>

@@ -144,6 +144,8 @@ const mockChatService = vi.hoisted(() => ({
 	getActions: vi.fn(),
 	sendChatAcceptChanges: vi.fn(),
 	sendMessage: vi.fn(),
+	getAutoSuggestions: vi.fn(async () => ({ suggestions: {}, isStale: false })),
+	refreshAutoSuggestions: vi.fn(async () => ({ suggestions: {}, isStale: false })),
 }));
 
 // ---------------------------------------------------------------------------

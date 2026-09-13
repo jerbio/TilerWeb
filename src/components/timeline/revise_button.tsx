@@ -6,6 +6,7 @@ import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import type { ScheduleReviseParams } from '@/core/common/types/schedule';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 const REVISE_NOTIFICATION_ID = 'schedule-revise';
 
@@ -40,7 +41,7 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 				SocketId: true,
 				TimeZoneOffset: userInfo?.timeZoneDifference ?? 0,
 				Version: 'v2',
-				TimeZone: userInfo?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+				TimeZone: deviceTimeZone() ?? userInfo?.timeZone ?? 'UTC',
 				IsTimeZoneAdjusted: 'true',
 			};
 

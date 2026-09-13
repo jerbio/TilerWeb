@@ -10,6 +10,7 @@ import Logo from '@/core/common/components/icons/logo';
 import CustomPersonaModal from './navigation/CustomPersonaModal';
 import { PersonaApi } from '@/api/personaApi';
 import analytics from '@/core/util/analytics';
+import { trackCtaClicked } from '@/core/analytics';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -194,6 +195,8 @@ const Navigation: React.FC = () => {
 			isModalOpen: isModalOpen,
 			isOnHomePage: window.location.pathname === '/',
 		});
+
+		trackCtaClicked({ label: 'Try Free', location: 'Navigation', destination: '/signin' });
 
 		setIsOpen(false); // Close mobile menu if open
 

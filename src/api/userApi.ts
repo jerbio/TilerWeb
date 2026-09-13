@@ -77,6 +77,7 @@ export interface MarketingPreference {
 export interface ScheduleProfile {
 	travelMedium: string;
 	pinPreference: string;
+	intensityRate: number;
 	endTimeOfDay: string;
 	sleepDuration: number;
 }
@@ -127,6 +128,7 @@ export interface UpdateSettingsRequest {
 	ScheduleProfile?: Partial<{
 		TravelMedium: string;
 		PinPreference: string;
+		IntensityRate: number;
 		SleepDuration: number;
 		EndTimeOfDay: string;
 	}>;
@@ -158,7 +160,7 @@ export class UserApi extends AppApi {
 	}
 
 	public getSettings() {
-		return this.apiRequest<UserSettingsResponse>('api/User/Settings?mobileApi=true', {
+		return this.apiRequest<UserSettingsResponse>('api/User/Settings?version=v2', {
 			method: 'GET',
 		});
 	}

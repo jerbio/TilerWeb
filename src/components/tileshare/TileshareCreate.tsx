@@ -17,6 +17,7 @@ import { TileshareFormState, TileshareMode } from '@/core/common/types/tileshare
 import { isValidRecipient } from '@/core/util/contact';
 import { DEFAULT_COUNTRY_CODE } from '@/core/constants/countryCodes';
 import { Routes } from '@/core/constants/routes';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 export { TileshareMode };
 
 type TileshareCreateProps = {
@@ -85,7 +86,7 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 
 		const params = toCreateClusterParams(formData, mode, {
 			userName: user?.email ?? null,
-			timeZone: user?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+			timeZone: deviceTimeZone() ?? user?.timeZone ?? 'UTC',
 			timeZoneOffset: user?.timeZoneDifference ?? 0,
 			defaultCallingCode: user?.countryCode?.trim() || String(DEFAULT_COUNTRY_CODE.code),
 		});

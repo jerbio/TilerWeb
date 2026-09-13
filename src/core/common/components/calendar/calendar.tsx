@@ -177,9 +177,16 @@ const Calendar = ({
 		// stepping through preview actions on mobile can cause popouts to
 		// vanish mid-render before the focus retry finishes.
 		setSelectedEvent((prev) => (prev && events.some((e) => e.id === prev) ? prev : null));
-		setSelectedEventInfo((prev) =>
-			prev && events.some((e) => e.id === prev.id) ? prev : null
-		);
+		setSelectedEventInfo((prev) => {
+			if (!prev) return null;
+			const updatedRaw = events.find((e) => e.id === prev.id);
+			// Event was removed — close the popout
+			if (!updatedRaw) return null;
+			// Merge refreshed server fields into the existing StyledEvent so the
+			// popout shows the latest data (e.g. new rsvpStatus) without losing
+			// the layout/spring properties that CalendarEvents computed.
+			return { ...prev, ...updatedRaw };
+		});
 	}, [events]);
 
 	const contentMounted = viewOptions.width > 0;

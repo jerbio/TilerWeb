@@ -691,6 +691,67 @@ describe('ScheduleService', () => {
 		});
 	});
 
+	describe('updateSubCalendarEventRsvp', () => {
+		const mockSubCalendarEvent = {
+			id: 'sub-event-123',
+			rsvpStatus: 'Accepted',
+		} as unknown as SubCalendarEvent;
+
+		it('sends RsvpStatusUpdate with third-party identifiers and returns Content', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.updateSubCalendarEventRsvp('sub-event-123', 'Accepted', {
+				start: 1769930000000,
+				end: 1769933600000,
+				thirdPartyEventId: 'google-event-abc',
+				thirdPartyUserId: 'google-user-xyz',
+				calendarType: 'google',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					RsvpStatusUpdate: 'Accepted',
+					SubCalendarEventStart: 1769930000000,
+					SubCalendarEventEnd: 1769933600000,
+					ThirdPartyEventID: 'google-event-abc',
+					ThirdPartyUserID: 'google-user-xyz',
+					CalendarType: 'google',
+					TimeZone: expect.any(String),
+				})
+			);
+			expect(result).toEqual(mockSubCalendarEvent);
+		});
+
+		it('supports Declined status', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEventRsvp('sub-event-123', 'Declined', {});
+
+			const calledWith = vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mock
+				.calls[0][0];
+			expect(calledWith.RsvpStatusUpdate).toBe('Declined');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(
+				service.updateSubCalendarEventRsvp('sub-event-123', 'Accepted', {})
+			).rejects.toThrow();
+		});
+	});
+
 	describe('lookupLocationById', () => {
 		it('calls getLocation on locationApi and returns Content', async () => {
 			const mockLocation = {

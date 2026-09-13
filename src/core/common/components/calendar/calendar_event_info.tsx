@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CalendarEvent, SubCalendarEvent, ThirdPartyType } from '../../types/schedule';
+import { RsvpStatus, normalizeRsvpStatus, isActionableRsvp } from '../../types/schedule';
 import styled, { keyframes } from 'styled-components';
 import {
 	CalendarArrowDown,
@@ -47,6 +48,10 @@ import { collectVideoLinks, type VideoLink } from '@/core/util/videoLink';
 import calendarConfig from '@/core/constants/calendar_config';
 import CyclingEmoji from './cycling_emoji';
 import { TypeDefaults } from '../../types/typeDefaults';
+
+/** Active-state accent colors for the third-party RSVP buttons (match mobile). */
+const RSVP_ACCEPT_COLOR = '#4CAF50';
+const RSVP_DECLINE_COLOR = '#E5484D';
 
 type CalendarEventInfoProps = {
 	event: SubCalendarEvent | null;
@@ -96,7 +101,7 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 
 	// Action loading state
 	const [actionLoading, setActionLoading] = useState<
-		'complete' | 'now' | 'defer' | 'delete' | null
+		'complete' | 'now' | 'defer' | 'delete' | 'accept' | 'decline' | null
 	>(null);
 	const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
 
@@ -404,6 +409,51 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		}
 	}, [event, actionLoading, showNotification, updateNotification, t, onEventAction]);
 
+	const handleRsvpUpdate = useCallback(
+		async (status: 'Accepted' | 'Declined') => {
+			if (!event || actionLoading) return;
+			setActionLoading(status === 'Accepted' ? 'accept' : 'decline');
+			const nId = notificationId(NotificationAction.Update, event.id);
+			showNotification(
+				nId,
+				t(
+					status === 'Accepted'
+						? 'calendarEvent.notifications.accepting'
+						: 'calendarEvent.notifications.declining'
+				),
+				'loading'
+			);
+			try {
+				await scheduleService.updateSubCalendarEventRsvp(event.id, status, {
+					start: event.originalStart ?? event.start,
+					end: event.originalEnd ?? event.end,
+					thirdPartyEventId: event.thirdPartyId,
+					thirdPartyUserId: event.thirdPartyUserId ?? undefined,
+					calendarType:
+						event.thirdPartyType && event.thirdPartyType !== ThirdPartyType.Tiler
+							? String(event.thirdPartyType)
+							: undefined,
+				});
+				updateNotification(
+					nId,
+					t(
+						status === 'Accepted'
+							? 'calendarEvent.notifications.acceptSuccess'
+							: 'calendarEvent.notifications.declineSuccess'
+					),
+					'success'
+				);
+				onEventAction?.();
+			} catch (error) {
+				console.error('RSVP update failed:', error);
+				updateNotification(nId, t('calendarEvent.notifications.actionFailed'), 'error');
+			} finally {
+				setActionLoading(null);
+			}
+		},
+		[event, actionLoading, showNotification, updateNotification, t, onEventAction]
+	);
+
 	const handleCopyLink = useCallback(async (url: string) => {
 		try {
 			await navigator.clipboard.writeText(url);
@@ -420,6 +470,11 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 		b: event ? (event.colorBlue ?? TypeDefaults.RGBColor.blue) : TypeDefaults.RGBColor.blue,
 	});
 	const videoLinks: VideoLink[] = event ? collectVideoLinks(event) : [];
+
+	// RSVP (third-party accept/decline) state
+	const currentRsvp = normalizeRsvpStatus(event?.rsvpStatus);
+	const shouldShowDecisionButtons =
+		isThirdPartyEvent && !readOnly && isActionableRsvp(currentRsvp);
 
 	const videoSourceLabel = (link: VideoLink): string =>
 		t(`calendar.event.videoSource.${link.source}`, {
@@ -1032,6 +1087,46 @@ const CalendarEventInfo: React.FC<CalendarEventInfoProps> = ({
 					{/* Delete button for third-party events */}
 					{!hasChanges && isThirdPartyEvent && !readOnly && (
 						<EventActionBar>
+							{shouldShowDecisionButtons && (
+								<>
+									<EventActionButton
+										onClick={() => handleRsvpUpdate('Accepted')}
+										disabled={!!actionLoading}
+										title={t('calendar.event.actions.accept')}
+										$color={eventColor}
+										$darkmode={isDarkMode}
+										$active={currentRsvp === RsvpStatus.Accepted}
+										$activeColor={RSVP_ACCEPT_COLOR}
+									>
+										<div className="action-icon">
+											{actionLoading === 'accept' ? (
+												<ActionSpinner />
+											) : (
+												<Check size={20} />
+											)}
+										</div>
+										<span>{t('calendar.event.actions.accept')}</span>
+									</EventActionButton>
+									<EventActionButton
+										onClick={() => handleRsvpUpdate('Declined')}
+										disabled={!!actionLoading}
+										title={t('calendar.event.actions.decline')}
+										$color={eventColor}
+										$darkmode={isDarkMode}
+										$active={currentRsvp === RsvpStatus.Declined}
+										$activeColor={RSVP_DECLINE_COLOR}
+									>
+										<div className="action-icon">
+											{actionLoading === 'decline' ? (
+												<ActionSpinner />
+											) : (
+												<X size={20} />
+											)}
+										</div>
+										<span>{t('calendar.event.actions.decline')}</span>
+									</EventActionButton>
+								</>
+							)}
 							<EventActionButton
 								onClick={handleOpenDeleteConfirm}
 								disabled={!!actionLoading}
@@ -1260,7 +1355,12 @@ const EventActionBar = styled.div`
 	flex-shrink: 0;
 `;
 
-const EventActionButton = styled.button<{ $color: RGBColor; $darkmode: boolean }>`
+const EventActionButton = styled.button<{
+	$color: RGBColor;
+	$darkmode: boolean;
+	$active?: boolean;
+	$activeColor?: string;
+}>`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -1279,9 +1379,14 @@ const EventActionButton = styled.button<{ $color: RGBColor; $darkmode: boolean }
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
-		background: transparent;
+		background: ${({ $active, $activeColor }) =>
+			$active && $activeColor ? $activeColor : 'transparent'};
+		color: ${({ $active }) => ($active ? '#ffffff' : 'inherit')};
 		border: 1px solid
-			${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.3 : 0.7).toHex()};
+			${({ $color, $darkmode, $active, $activeColor }) =>
+				$active && $activeColor
+					? $activeColor
+					: $color.setLightness($darkmode ? 0.3 : 0.7).toHex()};
 		transition: background-color 0.2s ease;
 	}
 
@@ -1289,12 +1394,17 @@ const EventActionButton = styled.button<{ $color: RGBColor; $darkmode: boolean }
 		font-size: ${({ theme }) => theme.typography.fontSize.xs};
 		font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 		font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-		color: ${({ $color, $darkmode }) => $color.setLightness($darkmode ? 0.6 : 0.4).toHex()};
+		color: ${({ $color, $darkmode, $active, $activeColor }) =>
+			$active && $activeColor
+				? $activeColor
+				: $color.setLightness($darkmode ? 0.6 : 0.4).toHex()};
 	}
 
 	&:hover:not(:disabled) .action-icon {
-		background: ${({ $color, $darkmode }) =>
-			$color.setLightness($darkmode ? 0.2 : 0.85).toHex()};
+		background: ${({ $color, $darkmode, $active, $activeColor }) =>
+			$active && $activeColor
+				? $activeColor
+				: $color.setLightness($darkmode ? 0.2 : 0.85).toHex()};
 	}
 
 	&:disabled {

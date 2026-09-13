@@ -9,6 +9,9 @@ import {
 	epochToDate,
 	epochToTimeString,
 	combineDateAndTimeString,
+	formatDurationShort,
+	formatDurationShortFromMinutes,
+	formatDurationVerbose,
 } from './timeUtils';
 
 const MS_PER_MINUTE = 60 * 1000;
@@ -432,6 +435,58 @@ describe('timeUtils', () => {
 			expect(new Date(result).getHours()).toBe(17);
 			expect(new Date(result).getMinutes()).toBe(45);
 			expect(new Date(result).getDate()).toBe(20);
+		});
+	});
+
+	describe('formatDurationShortFromMinutes', () => {
+		it('formats hours and minutes', () => {
+			expect(formatDurationShortFromMinutes(90)).toBe('1h 30m');
+		});
+		it('formats only minutes', () => {
+			expect(formatDurationShortFromMinutes(45)).toBe('45m');
+		});
+		it('formats whole hours without minutes', () => {
+			expect(formatDurationShortFromMinutes(120)).toBe('2h');
+		});
+		it('formats zero as "0m"', () => {
+			expect(formatDurationShortFromMinutes(0)).toBe('0m');
+		});
+		it('clamps negatives to "0m"', () => {
+			expect(formatDurationShortFromMinutes(-15)).toBe('0m');
+		});
+		it('rounds fractional minutes', () => {
+			expect(formatDurationShortFromMinutes(29.6)).toBe('30m');
+		});
+	});
+
+	describe('formatDurationShort', () => {
+		it('formats milliseconds as hours and minutes', () => {
+			expect(formatDurationShort(90 * MS_PER_MINUTE)).toBe('1h 30m');
+		});
+		it('formats milliseconds as minutes only', () => {
+			expect(formatDurationShort(45 * MS_PER_MINUTE)).toBe('45m');
+		});
+		it('formats a whole hour', () => {
+			expect(formatDurationShort(MS_PER_HOUR)).toBe('1h');
+		});
+	});
+
+	describe('formatDurationVerbose', () => {
+		it('formats hours and minutes', () => {
+			expect(formatDurationVerbose(90)).toBe('1 hr 30 min');
+		});
+		it('formats whole hours', () => {
+			expect(formatDurationVerbose(120)).toBe('2 hr');
+		});
+		it('formats only minutes', () => {
+			expect(formatDurationVerbose(45)).toBe('45 min');
+		});
+		it('formats zero as "0 min"', () => {
+			expect(formatDurationVerbose(0)).toBe('0 min');
+		});
+		it('localizes the units for the given locale', () => {
+			// German uses "Std." for the short hour unit.
+			expect(formatDurationVerbose(90, 'de')).toContain('Std.');
 		});
 	});
 });

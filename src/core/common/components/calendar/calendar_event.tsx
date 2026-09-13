@@ -21,6 +21,8 @@ import { TypeDefaults } from '../../types/typeDefaults';
 import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
 import {
 	ThirdPartyType,
+	RsvpStatus,
+	normalizeRsvpStatus,
 	type CalendarEvent as CalendarEventType,
 } from '@/core/common/types/schedule';
 
@@ -72,6 +74,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 		!!event.thirdPartyType &&
 		event.thirdPartyType !== ThirdPartyType.Tiler &&
 		event.thirdPartyType !== 'tiler';
+	const isDeclined = normalizeRsvpStatus(event.rsvpStatus) === RsvpStatus.Declined;
 	const containerStyle: React.CSSProperties | undefined = isFilterDimmed
 		? { opacity: 0.25, pointerEvents: 'none' }
 		: isGhost
@@ -105,6 +108,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 			$simulation={simulation}
 			$simulationSelected={simulationSelected}
 			$isGhost={isGhost}
+			$isDeclined={isDeclined}
 			$colors={{
 				r: event.colorRed ?? TypeDefaults.RGBColor.red,
 				g: event.colorGreen ?? TypeDefaults.RGBColor.green,
@@ -122,6 +126,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 				}}
 				$simulation={simulation}
 				$isGhost={isGhost}
+				$isDeclined={isDeclined}
 				onClick={() => {
 					if (inSimulation) {
 						// Removed "ghost" tiles are display-only (plan §5.6).
@@ -182,7 +187,13 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 						</a>
 					)}
 				</footer>
-			</EventContent>
+			</EventContent>{' '}
+			{/* Declined RSVP badge — top-right ✕, grey. */}
+			{isDeclined && (
+				<DeclinedBadge data-testid="declined-badge" aria-label="Declined">
+					×
+				</DeclinedBadge>
+			)}{' '}
 			{/* Plan §5.2 — simulation tier badge / marker (top-right). */}
 			{simulation && simulation.tier !== 'unchanged' && simulation.tier !== 'mapped' && (
 				<SimulationBadge
@@ -270,6 +281,7 @@ const EventContainer = styled(animated.div)<{
 	$simulation?: SimulatedTileClassification;
 	$simulationSelected?: boolean;
 	$isGhost?: boolean;
+	$isDeclined?: boolean;
 }>`
 	padding: 4px;
 	position: relative;
@@ -364,6 +376,7 @@ const EventContent = styled.div<{
 	$variant: 'block' | 'tile';
 	$simulation?: SimulatedTileClassification;
 	$isGhost?: boolean;
+	$isDeclined?: boolean;
 }>`
 	position: relative;
 	background-color: ${({ $colors, $darkmode }) => {
@@ -442,7 +455,8 @@ const EventContent = styled.div<{
 			overflow: hidden;
 			font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 			font-size: 13px;
-			text-decoration: ${({ $isGhost }) => ($isGhost ? 'line-through' : 'none')};
+			text-decoration: ${({ $isGhost, $isDeclined }) =>
+				$isGhost || $isDeclined ? 'line-through' : 'none'};
 		}
 
 		${EventLockIcon} {
@@ -519,6 +533,24 @@ const EventContent = styled.div<{
 			white-space: nowrap;
 		}
 	}
+`;
+
+/** Small ✕ badge shown on declined third-party events. */
+const DeclinedBadge = styled.div`
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 16px;
+	height: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	line-height: 1;
+	border-radius: 50%;
+	pointer-events: none;
+	color: #ffffff;
+	background-color: rgba(107, 114, 128, 0.85);
 `;
 
 export default CalendarEvent;
