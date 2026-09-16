@@ -6,7 +6,7 @@ import { useFlag } from '@/hooks/useFlag';
 import useAppStore from '@/global_state';
 import { User } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { featureFlags } from '@/core/constants/featureFlags';
 
@@ -45,7 +45,9 @@ const AppLayout: React.FC = () => {
 		<Container>
 			<Header>
 				<HeaderLeft>
-					<Logo size={30} />
+					<NavLink key={'backToHome'} to={'/timeline'}>
+						<Logo size={30} />
+					</NavLink>
 				</HeaderLeft>
 				<HeaderRight>
 					{tileshareEnabled && (
