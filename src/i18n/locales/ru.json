@@ -1336,7 +1336,58 @@
 			"connections": {
 				"title": "Подключения",
 				"description": "Управляйте приложениями, подключёнными к вашему аккаунту Tiler",
-				"placeholder": "Настройки подключений скоро появятся..."
+				"placeholder": "Настройки подключений скоро появятся...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "Подключить",
+				"comingSoon": "Скоро появится",
+				"loadError": "Не удалось загрузить ваши подключения. Пожалуйста, попробуйте ещё раз.",
+				"retry": "Повторить",
+				"empty": "Пока нет подключённых аккаунтов.",
+				"calendarsConnected": "{{count}} подключённых календарей",
+				"manage": "Управлять",
+				"expandAccounts": "Развернуть аккаунты",
+				"collapseAccounts": "Свернуть аккаунты",
+				"notifications": {
+					"success": "Календарь {{provider}} подключён",
+					"declined": "Подключение к {{provider}} отменено",
+					"error": "Не удалось подключиться к {{provider}}. Пожалуйста, попробуйте ещё раз."
+				},
+				"detail": {
+					"loading": "Загрузка соединения...",
+					"loadError": "Не удалось загрузить это соединение. Пожалуйста, попробуйте ещё раз.",
+					"retry": "Повторить",
+					"notFound": "Это соединение больше не доступно.",
+					"backToConnections": "Назад к соединениям",
+					"calendarsTitle": "Календари",
+					"calendarsDescription": "Выберите, какие календари может читать Tiler.",
+					"calendarsEmpty": "Для этого аккаунта нет доступных календарей.",
+					"toggleError": "Не удалось обновить этот календарь. Пожалуйста, попробуйте ещё раз.",
+					"disconnectSection": "Отключение",
+					"disconnectDescription": "Отключение этого аккаунта прекратит чтение его календарей Tiler.",
+					"disconnectAction": "Отключить",
+					"disconnecting": "Отключение...",
+					"disconnectConfirmTitle": "Отключить этот аккаунт?",
+					"disconnectConfirmDescription": "Tiler больше не сможет читать {{email}}.",
+					"disconnectCancel": "Отмена",
+					"disconnectError": "Не удалось отключить этот аккаунт. Пожалуйста, попробуйте ещё раз.",
+					"disconnectProviderError": "Не удалось отключить провайдера календаря. Повторите попытку через минуту.",
+					"locationSection": "Локация по умолчанию",
+					"locationDescription": "Tiler использует это место для новых событий этого аккаунта.",
+					"locationUnset": "Место по умолчанию не задано.",
+					"locationChangeAction": "Изменить место",
+					"locationPickerTitle": "Выбор места по умолчанию",
+					"locationSearchPlaceholder": "Поиск места...",
+					"locationSearching": "Выполняется поиск мест...",
+					"locationNoResults": "Совпадающие места не найдены.",
+					"locationSaving": "Сохранение места...",
+					"locationSaveError": "Не удалось сохранить это место. Повторите попытку."
+				}
 			}
 		}
 	},

@@ -51,6 +51,12 @@ export class TilerResponseError extends Error {
 export const ERROR_CODES = {
 	CHAT_LIMIT_REACHED: '60000001',
 	USERNAME_ALREADY_EXISTS: '1004',
+	/**
+	 * Provider-side integration delete failed. The server answers HTTP 200
+	 * with this code (see IntegrationsController.DeleteIntegration), so the
+	 * failure must be detected from the envelope, not the status.
+	 */
+	INTEGRATION_DELETE_FAILED: '10000009',
 } as const;
 
 // Error message map for internationalization

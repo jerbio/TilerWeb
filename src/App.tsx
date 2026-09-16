@@ -26,6 +26,8 @@ import SettingsLayout from './pages/settings/SettingsLayout';
 import AccountSettings from './pages/settings/AccountSettings';
 import PreferencesSettings from './pages/settings/PreferencesSettings';
 import NotificationPreferencesSettings from './pages/settings/NotificationPreferencesSettings';
+import ConnectionsSettings from './pages/settings/ConnectionsSettings';
+import ConnectionsDetailSettings from './pages/settings/ConnectionsDetailSettings';
 import { ThemeProvider } from './core/theme/ThemeProvider';
 import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
@@ -198,6 +200,14 @@ const App: React.FC = () => {
 											<Route
 												path={Routes.SettingsNotifications}
 												element={<NotificationPreferencesSettings />}
+											/>
+											<Route
+												path={Routes.SettingsConnections}
+												element={<ConnectionsSettings />}
+											/>
+											<Route
+												path={Routes.SettingsConnectionDetail.pattern}
+												element={<ConnectionsDetailSettings />}
 											/>
 										</Route>
 									</Route>

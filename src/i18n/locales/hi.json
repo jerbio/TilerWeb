@@ -1336,7 +1336,58 @@
 			"connections": {
 				"title": "कनेक्शन",
 				"description": "अपने Tiler खाते से जुड़े ऐप्स प्रबंधित करें",
-				"placeholder": "कनेक्शन सेटिंग्स जल्द आ रही हैं..."
+				"placeholder": "कनेक्शन सेटिंग्स जल्द आ रही हैं...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "कनेक्ट करें",
+				"comingSoon": "जल्द आ रहा है",
+				"loadError": "हम आपके कनेक्शनों को लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+				"retry": "पुनः प्रयास करें",
+				"empty": "अभी तक कोई कनेक्टेड अकाउंट नहीं है।",
+				"calendarsConnected": "{{count}} कैलेंडर कनेक्टेड",
+				"manage": "प्रबंधित करें",
+				"expandAccounts": "खाते विस्तारित करें",
+				"collapseAccounts": "खाते संचित करें",
+				"notifications": {
+					"success": "{{provider}} कैलेंडर कनेक्टेड",
+					"declined": "{{provider}} कनेक्शन रद्द किया गया",
+					"error": "हम {{provider}} से कनेक्ट नहीं कर सके। कृपया पुनः प्रयास करें।"
+				},
+				"detail": {
+					"loading": "कनेक्शन लोड हो रहा है...",
+					"loadError": "इस कनेक्शन को लोड नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+					"retry": "पुनः प्रयास करें",
+					"notFound": "यह कनेक्शन अब उपलब्ध नहीं है।",
+					"backToConnections": "कनेक्शनों पर वापस जाएँ",
+					"calendarsTitle": "कैलेंडर",
+					"calendarsDescription": "चुनें कि Tiler कौन से कैलेंडर पढ़ सकता है।",
+					"calendarsEmpty": "इस खाते के लिए कोई कैलेंडर उपलब्ध नहीं है।",
+					"toggleError": "इस कैलेंडर को अपडेट नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+					"disconnectSection": "अलग करें",
+					"disconnectDescription": "इस खाते को अलग करने पर Tiler उसके कैलेंडर पढ़ना बंद कर देगा।",
+					"disconnectAction": "अलग करें",
+					"disconnecting": "अलग हो रहा है...",
+					"disconnectConfirmTitle": "क्या यह खाता अलग करना है?",
+					"disconnectConfirmDescription": "Tiler अब {{email}} पढ़ नहीं पाएगा।",
+					"disconnectCancel": "रद्द करें",
+					"disconnectError": "इस खाते को अलग नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+					"disconnectProviderError": "कैलेंडर प्रोवाइडर को अभी अलग नहीं किया जा सका। कृपया थोड़ी देर बाद पुनः प्रयास करें।",
+					"locationSection": "डिफ़ॉल्ट लोकेशन",
+					"locationDescription": "Tiler इस अकाउंट की नई इवेंट्स के लिए यह लोकेशन उपयोग करता है।",
+					"locationUnset": "कोई डिफ़ॉल्ट लोकेशन सेट नहीं है।",
+					"locationChangeAction": "लोकेशन बदलें",
+					"locationPickerTitle": "डिफ़ॉल्ट लोकेशन चुनें",
+					"locationSearchPlaceholder": "लोकेशन खोजें...",
+					"locationSearching": "लोकेशन खोजी जा रही हैं...",
+					"locationNoResults": "कोई मेल खाती लोकेशन नहीं मिली।",
+					"locationSaving": "लोकेशन सेव हो रही है...",
+					"locationSaveError": "यह लोकेशन सेव नहीं हो सकी। कृपया पुनः प्रयास करें।"
+				}
 			}
 		}
 	},

@@ -1336,7 +1336,58 @@
 			"connections": {
 				"title": "Połączenia",
 				"description": "Zarządzaj aplikacjami połączonymi z Twoim kontem Tiler",
-				"placeholder": "Ustawienia połączeń wkrótce..."
+				"placeholder": "Ustawienia połączeń wkrótce...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "Połącz",
+				"comingSoon": "Wkrótce",
+				"loadError": "Nie udało się wczytać Twoich połączeń. Spróbuj ponownie.",
+				"retry": "Spróbuj ponownie",
+				"empty": "Brak połączonych kont.",
+				"calendarsConnected": "{{count}} połączonych kalendarzy",
+				"manage": "Zarządzaj",
+				"expandAccounts": "Rozwiń konta",
+				"collapseAccounts": "Zwiń konta",
+				"notifications": {
+					"success": "Połączono kalendarz {{provider}}",
+					"declined": "Połączenie z {{provider}} anulowane",
+					"error": "Nie udało się połączyć z {{provider}}. Spróbuj ponownie."
+				},
+				"detail": {
+					"loading": "Wczytywanie połączenia...",
+					"loadError": "Nie udało się wczytać tego połączenia. Spróbuj ponownie.",
+					"retry": "Spróbuj ponownie",
+					"notFound": "To połączenie nie jest już dostępne.",
+					"backToConnections": "Wróć do Połączeń",
+					"calendarsTitle": "Kalendarze",
+					"calendarsDescription": "Wybierz, które kalendarze może odczytywać Tiler.",
+					"calendarsEmpty": "Brak dostępnych kalendarzy dla tego konta.",
+					"toggleError": "Nie udało się zaktualizować tego kalendarza. Spróbuj ponownie.",
+					"disconnectSection": "Rozłącz",
+					"disconnectDescription": "Rozłączenie tego konta uniemożliwi Tilerowi odczytywanie jego kalendarzy.",
+					"disconnectAction": "Rozłącz",
+					"disconnecting": "Rozłączanie...",
+					"disconnectConfirmTitle": "Rozłączyć to konto?",
+					"disconnectConfirmDescription": "Tiler nie będzie już mógł odczytywać {{email}}.",
+					"disconnectCancel": "Anuluj",
+					"disconnectError": "Nie udało się rozłączyć tego konta. Spróbuj ponownie.",
+					"disconnectProviderError": "Nie można teraz rozłączyć dostawcy kalendarza. Spróbuj ponownie za chwilę.",
+					"locationSection": "Lokalizacja domyślna",
+					"locationDescription": "Tiler używa tej lokalizacji dla nowych wydarzeń tego konta.",
+					"locationUnset": "Nie ustawiono domyślnej lokalizacji.",
+					"locationChangeAction": "Zmień lokalizację",
+					"locationPickerTitle": "Wybierz domyślną lokalizację",
+					"locationSearchPlaceholder": "Szukaj lokalizacji...",
+					"locationSearching": "Szukanie lokalizacji...",
+					"locationNoResults": "Nie znaleziono pasujących lokalizacji.",
+					"locationSaving": "Zapisywanie lokalizacji...",
+					"locationSaveError": "Nie udało się zapisać tej lokalizacji. Spróbuj ponownie."
+				}
 			}
 		}
 	},

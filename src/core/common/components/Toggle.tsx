@@ -6,6 +6,12 @@ interface ToggleProps {
 	isOn: boolean;
 	onChange: (value: boolean) => void;
 	disabled?: boolean;
+	/**
+	 * Accessible name for the switch button (screen readers and test queries).
+	 * The visible label is a sibling element without an `htmlFor` association,
+	 * so the button carries no accessible name on its own.
+	 */
+	ariaLabel?: string;
 	containerStyle?: React.CSSProperties;
 }
 
@@ -14,6 +20,7 @@ const Toggle: React.FC<ToggleProps> = ({
 	isOn,
 	onChange,
 	disabled = false,
+	ariaLabel,
 	containerStyle,
 }) => {
 	const handleClick = () => {
@@ -25,7 +32,15 @@ const Toggle: React.FC<ToggleProps> = ({
 	return (
 		<ToggleRow style={containerStyle}>
 			{label && <ToggleLabel>{label}</ToggleLabel>}
-			<ToggleSwitch type="button" $isOn={isOn} $disabled={disabled} onClick={handleClick}>
+			<ToggleSwitch
+				type="button"
+				aria-label={ariaLabel}
+				aria-pressed={isOn}
+				disabled={disabled}
+				$isOn={isOn}
+				$disabled={disabled}
+				onClick={handleClick}
+			>
 				<ToggleKnob $isOn={isOn} />
 			</ToggleSwitch>
 		</ToggleRow>

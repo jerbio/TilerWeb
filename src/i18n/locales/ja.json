@@ -1336,7 +1336,58 @@
 			"connections": {
 				"title": "連携",
 				"description": "Tilerアカウントに接続したアプリを管理します",
-				"placeholder": "連携設定は近日公開予定です..."
+				"placeholder": "連携設定は近日公開予定です...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "接続",
+				"comingSoon": "近日公開予定",
+				"loadError": "接続を読み込めませんでした。もう一度お試しください。",
+				"retry": "再試行",
+				"empty": "接続されているアカウントはありません。",
+				"calendarsConnected": "{{count}} 件のカレンダーが接続されました",
+				"manage": "管理",
+				"expandAccounts": "アカウントを展開",
+				"collapseAccounts": "アカウントを折りたたむ",
+				"notifications": {
+					"success": "{{provider}} カレンダーが接続されました",
+					"declined": "{{provider}} への接続がキャンセルされました",
+					"error": "{{provider}} に接続できませんでした。もう一度お試しください。"
+				},
+				"detail": {
+					"loading": "接続を読み込み中...",
+					"loadError": "この接続を読み込めませんでした。もう一度お試しください。",
+					"retry": "再試行",
+					"notFound": "この接続はもう利用できません。",
+					"backToConnections": "接続一覧へ戻る",
+					"calendarsTitle": "カレンダー",
+					"calendarsDescription": "Tilerが読み取り可能なカレンダーを選択してください。",
+					"calendarsEmpty": "このアカウントで利用可能なカレンダーはありません。",
+					"toggleError": "このカレンダーを更新できませんでした。もう一度お試しください。",
+					"disconnectSection": "切断",
+					"disconnectDescription": "このアカウントを切断すると、Tilerはそのカレンダーを読み取らなくなります。",
+					"disconnectAction": "切断",
+					"disconnecting": "切断中...",
+					"disconnectConfirmTitle": "このアカウントを切断しますか？",
+					"disconnectConfirmDescription": "Tilerは{{email}}をもう読み取れません。",
+					"disconnectCancel": "キャンセル",
+					"disconnectError": "このアカウントを切断できませんでした。もう一度お試しください。",
+					"disconnectProviderError": "カレンダープロバイダを現在切断できません。しばらくしてからもう一度お試しください。",
+					"locationSection": "デフォルトの場所",
+					"locationDescription": "Tilerはこのアカウントの新しいイベントにこの場所を使用します。",
+					"locationUnset": "デフォルトの場所が設定されていません。",
+					"locationChangeAction": "場所を変更",
+					"locationPickerTitle": "デフォルトの場所を選択",
+					"locationSearchPlaceholder": "場所を検索...",
+					"locationSearching": "場所を検索中...",
+					"locationNoResults": "該当する場所が見つかりません。",
+					"locationSaving": "場所を保存中...",
+					"locationSaveError": "場所を保存できませんでした。もう一度お試しください。"
+				}
 			}
 		}
 	},

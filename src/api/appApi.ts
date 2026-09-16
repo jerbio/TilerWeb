@@ -42,7 +42,8 @@ export class AppApi {
 					throw new ServerError(
 						`HTTP error! status: ${res.status}`,
 						requestEndpoint,
-						errorBody
+						errorBody,
+						res.status
 					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
@@ -52,7 +53,12 @@ export class AppApi {
 					) {
 						throw jsonError;
 					}
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						undefined,
+						res.status
+					);
 				}
 			}
 
@@ -103,7 +109,8 @@ export class AppApi {
 					throw new ServerError(
 						`HTTP error! status: ${res.status}`,
 						requestEndpoint,
-						errorBody
+						errorBody,
+						res.status
 					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
@@ -113,7 +120,12 @@ export class AppApi {
 					) {
 						throw jsonError;
 					}
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						undefined,
+						res.status
+					);
 				}
 			}
 			return (await res.json()) as T;

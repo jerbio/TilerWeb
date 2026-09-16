@@ -1336,7 +1336,58 @@
 			"connections": {
 				"title": "Connessioni",
 				"description": "Gestisci le app collegate al tuo account Tiler",
-				"placeholder": "Le impostazioni delle connessioni saranno disponibili a breve..."
+				"placeholder": "Le impostazioni delle connessioni saranno disponibili a breve...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "Connetti",
+				"comingSoon": "Disponibile a breve",
+				"loadError": "Non è stato possibile caricare le tue connessioni. Riprova.",
+				"retry": "Riprova",
+				"empty": "Nessun account connesso.",
+				"calendarsConnected": "{{count}} agende connesse",
+				"manage": "Gestisci",
+				"expandAccounts": "Espandi account",
+				"collapseAccounts": "Comprimi account",
+				"notifications": {
+					"success": "Agenda {{provider}} connessa",
+					"declined": "Connessione a {{provider}} annullata",
+					"error": "Non è stato possibile connettere {{provider}}. Riprova."
+				},
+				"detail": {
+					"loading": "Caricamento connessione...",
+					"loadError": "Non è stato possibile caricare questa connessione. Riprova.",
+					"retry": "Riprova",
+					"notFound": "Questa connessione non è più disponibile.",
+					"backToConnections": "Torna a Connessioni",
+					"calendarsTitle": "Agende",
+					"calendarsDescription": "Scegli quali agende Tiler può leggere.",
+					"calendarsEmpty": "Nessuna agenda disponibile per questo account.",
+					"toggleError": "Non è stato possibile aggiornare questa agenda. Riprova.",
+					"disconnectSection": "Disconnetti",
+					"disconnectDescription": "Disconnettendo questo account, Tiler smetterà di leggerne le agende.",
+					"disconnectAction": "Disconnetti",
+					"disconnecting": "Disconnessione...",
+					"disconnectConfirmTitle": "Disconnettere questo account?",
+					"disconnectConfirmDescription": "Tiler non potrà più leggere {{email}}.",
+					"disconnectCancel": "Annulla",
+					"disconnectError": "Non è stato possibile disconnettere questo account. Riprova.",
+					"disconnectProviderError": "Il provider dell'agenda non può essere disconnesso al momento. Riprova tra un momento.",
+					"locationSection": "Posizione predefinita",
+					"locationDescription": "Tiler usa questa posizione per i nuovi eventi di questo account.",
+					"locationUnset": "Nessuna posizione predefinita impostata.",
+					"locationChangeAction": "Cambia posizione",
+					"locationPickerTitle": "Scegli una posizione predefinita",
+					"locationSearchPlaceholder": "Cerca una posizione...",
+					"locationSearching": "Ricerca delle posizioni in corso...",
+					"locationNoResults": "Nessuna posizione corrispondente trovata.",
+					"locationSaving": "Salvataggio della posizione...",
+					"locationSaveError": "Non è stato possibile salvare questa posizione. Riprova."
+				}
 			}
 		}
 	},

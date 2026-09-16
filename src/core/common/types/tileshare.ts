@@ -197,6 +197,7 @@ export type GetClustersParams = {
 	 * The only list filter the server reads — there is no `IsInbox` counterpart.
 	 */
 	IsOutbox?: boolean;
+	IsInbox?: boolean;
 	/** Record offset passed to .Skip() — NOT a page number. */
 	Index?: number;
 	/** Number of records to .Take(). Defaults to 50 server-side. */
@@ -229,6 +230,7 @@ export enum InvitationStatus {
 	Accepted = 'accepted',
 	/** Invited but not yet answered. */
 	None = 'none',
+	Pending = 'pending',
 	Declined = 'declined',
 }
 

@@ -40,6 +40,12 @@ export const Routes = {
 	SettingsAccount: '/settings/account',
 	SettingsPreferences: '/settings/preferences',
 	SettingsNotifications: '/settings/notifications',
+	SettingsConnections: '/settings/connections',
+	// Pattern route - call() for navigation, use .pattern for <Route path=...>
+	SettingsConnectionDetail: Object.assign(
+		(integrationId: string) => `/settings/connections/${integrationId}`,
+		{ pattern: '/settings/connections/:integrationId' } as const
+	),
 
 	// Admin (protected + admin role)
 	Admin: {

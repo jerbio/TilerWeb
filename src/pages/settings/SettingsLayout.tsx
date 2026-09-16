@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useAuthNavigate from '@/hooks/useNavigateHome';
 import useAppStore from '@/global_state';
 import { toast } from 'sonner';
+import { Routes } from '@/core/constants/routes';
 
 const SettingsLayout: React.FC = () => {
 	const { t } = useTranslation();
@@ -29,6 +30,11 @@ const SettingsLayout: React.FC = () => {
 			title: t('settings.sections.notificationPreferences.title'),
 			description: t('settings.sections.notificationPreferences.description'),
 			path: '/settings/notifications',
+		},
+		{
+			title: t('settings.sections.connections.title'),
+			description: t('settings.sections.connections.description'),
+			path: Routes.SettingsConnections,
 		},
 	];
 

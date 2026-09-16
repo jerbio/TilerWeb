@@ -1336,7 +1336,58 @@
 			"connections": {
 				"title": "Conexiones",
 				"description": "Gestiona las aplicaciones conectadas a tu cuenta de Tiler",
-				"placeholder": "La configuración de conexiones estará disponible próximamente..."
+				"placeholder": "La configuración de conexiones estará disponible próximamente...",
+				"providers": {
+					"google": "Google Calendar",
+					"microsoft": "Microsoft",
+					"apple": "Apple",
+					"slack": "Slack",
+					"googleTasks": "Google Tasks"
+				},
+				"connect": "Conectar",
+				"comingSoon": "Próximamente",
+				"loadError": "No se pudieron cargar tus conexiones. Inténtalo de nuevo.",
+				"retry": "Reintentar",
+				"empty": "No hay cuentas conectadas todavía.",
+				"calendarsConnected": "{{count}} calendarios conectados",
+				"manage": "Gestionar",
+				"expandAccounts": "Expandir cuentas",
+				"collapseAccounts": "Contraer cuentas",
+				"notifications": {
+					"success": "Calendario {{provider}} conectado",
+					"declined": "Conexión {{provider}} cancelada",
+					"error": "No se pudo conectar {{provider}}. Inténtalo de nuevo."
+				},
+				"detail": {
+					"loading": "Cargando conexión...",
+					"loadError": "No se pudo cargar esta conexión. Inténtalo de nuevo.",
+					"retry": "Reintentar",
+					"notFound": "Esta conexión ya no está disponible.",
+					"backToConnections": "Volver a Conexiones",
+					"calendarsTitle": "Calendarios",
+					"calendarsDescription": "Elige qué calendarios puede leer Tiler.",
+					"calendarsEmpty": "No hay calendarios disponibles para esta cuenta.",
+					"toggleError": "No se pudo actualizar este calendario. Inténtalo de nuevo.",
+					"disconnectSection": "Desconectar",
+					"disconnectDescription": "Al desconectar esta cuenta, Tiler dejará de leer sus calendarios.",
+					"disconnectAction": "Desconectar",
+					"disconnecting": "Desconectando...",
+					"disconnectConfirmTitle": "¿Desconectar esta cuenta?",
+					"disconnectConfirmDescription": "Tiler ya no podrá leer {{email}}.",
+					"disconnectCancel": "Cancelar",
+					"disconnectError": "No se pudo desconectar esta cuenta. Inténtalo de nuevo.",
+					"disconnectProviderError": "No se pudo desconectar el proveedor de calendario ahora mismo. Inténtalo de nuevo en un momento.",
+					"locationSection": "Ubicación predeterminada",
+					"locationDescription": "Tiler usa esta ubicación para los nuevos eventos de esta cuenta.",
+					"locationUnset": "No hay ninguna ubicación predeterminada.",
+					"locationChangeAction": "Cambiar ubicación",
+					"locationPickerTitle": "Elegir una ubicación predeterminada",
+					"locationSearchPlaceholder": "Buscar una ubicación...",
+					"locationSearching": "Buscando ubicaciones...",
+					"locationNoResults": "No se encontraron ubicaciones coincidentes.",
+					"locationSaving": "Guardando ubicación...",
+					"locationSaveError": "No se pudo guardar esta ubicación. Inténtalo de nuevo."
+				}
 			}
 		}
 	},
