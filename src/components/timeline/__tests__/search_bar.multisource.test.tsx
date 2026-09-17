@@ -9,6 +9,7 @@ import {
 	CalendarSearchEnvelope,
 } from '@/core/common/types/schedule';
 import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
+import { Actions } from '@/core/constants/enums';
 import dayjs from 'dayjs';
 
 // Feature flag is mutable per-test so we can exercise both on and off.
@@ -22,6 +23,7 @@ const mockSearchByName = vi.fn();
 const mockSetCalendarEventAsNow = vi.fn();
 const mockMarkCalendarEventComplete = vi.fn();
 const mockDeleteCalendarEvent = vi.fn();
+const mockDeleteScheduleEvent = vi.fn();
 
 vi.mock('@/services', () => ({
 	scheduleService: {
@@ -30,6 +32,7 @@ vi.mock('@/services', () => ({
 		setCalendarEventAsNow: (...args: unknown[]) => mockSetCalendarEventAsNow(...args),
 		markCalendarEventComplete: (...args: unknown[]) => mockMarkCalendarEventComplete(...args),
 		deleteCalendarEvent: (...args: unknown[]) => mockDeleteCalendarEvent(...args),
+		deleteScheduleEvent: (...args: unknown[]) => mockDeleteScheduleEvent(...args),
 	},
 }));
 
@@ -68,6 +71,11 @@ vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 
 vi.mock('@/core/theme/ThemeProvider', () => ({
 	useTheme: () => ({ isDarkMode: false, toggleTheme: vi.fn() }),
+}));
+
+const mockDispatchCalendarRequest = vi.fn();
+vi.mock('@/core/common/components/calendar/CalendarRequestProvider', () => ({
+	useOptionalCalendarDispatch: () => mockDispatchCalendarRequest,
 }));
 
 vi.mock('@/core/util/colors', () => ({
@@ -362,7 +370,7 @@ describe('SearchBar multi-source (Phase 4)', () => {
 		expect(screen.queryByTestId('search-not-found')).not.toBeInTheDocument();
 	});
 
-	it('forwards third-party edit metadata and emits calendar_search_edit_opened (S4-6)', async () => {
+	it('dispatches a FocusEvent with third-party metadata for provider rows and emits calendar_search_edit_opened (S4-6)', async () => {
 		const envelope: CalendarSearchEnvelope = {
 			items: [googleItem],
 			sources: [{ source: 'google', status: 'success', queryMode: 'native-query' }],
@@ -383,15 +391,101 @@ describe('SearchBar multi-source (Phase 4)', () => {
 		await waitFor(() => expect(screen.getByTestId('action-edit')).toBeInTheDocument());
 		await user.click(screen.getByTestId('action-edit'));
 
-		expect(mockOpenEditTile).toHaveBeenCalledTimes(1);
-		const passed = mockOpenEditTile.mock.calls[0][0] as CalendarEvent;
-		expect(passed.thirdpartyType).toBe('google');
-		expect(passed.thirdPartyId).toBe('gp-evt-99');
-		expect(passed.thirdPartyUserId).toBe('golfer@gmail.com');
+		// Third-party rows route through the calendar request bus so the
+		// calendar can navigate to the tile and hand CalendarEventInfo the
+		// provider routing metadata — the classic edit panel is NOT opened.
+		expect(mockOpenEditTile).not.toHaveBeenCalled();
+		expect(mockDispatchCalendarRequest).toHaveBeenCalledTimes(1);
+		const [request] = mockDispatchCalendarRequest.mock.calls[0];
+		expect(request).toMatchObject({
+			type: 'focus_event',
+			entityId: 'g-1',
+			entityType: 'SubcalendarEvent',
+			actionType: Actions.None,
+			startHint: googleItem.start,
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-evt-99',
+			thirdPartyUserId: 'golfer@gmail.com',
+		});
 
 		expect(emitted).toMatchObject({ source: 'google', correlationId: 'c1' });
 
 		window.removeEventListener('calendar_search_edit_opened', onEditOpened);
+	});
+
+	it('opens Tiler rows through the classic edit panel in multi-source mode', async () => {
+		mockSearchMultiSource.mockResolvedValue({
+			items: [tilerItem],
+			sources: [],
+			correlationId: 'c1',
+		});
+
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+
+		await waitFor(() => expect(screen.getByTestId('action-edit')).toBeInTheDocument());
+		await user.click(screen.getByTestId('action-edit'));
+
+		expect(mockOpenEditTile).toHaveBeenCalledTimes(1);
+		const passed = mockOpenEditTile.mock.calls[0][0] as CalendarEvent;
+		expect(passed.id).toBe('t-1');
+		expect(passed.name).toBe('Workout');
+		// Native rows never touch the calendar request bus.
+		expect(mockDispatchCalendarRequest).not.toHaveBeenCalled();
+	});
+
+	it('deletes third-party rows through deleteScheduleEvent (DELETE /api/Schedule/Event)', async () => {
+		mockSearchMultiSource.mockResolvedValue({
+			items: [googleItem],
+			sources: [],
+			correlationId: 'c1',
+		});
+		mockDeleteScheduleEvent.mockResolvedValue(undefined);
+
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+
+		await waitFor(() => expect(screen.getByTestId('action-delete')).toBeInTheDocument());
+		await user.click(screen.getByTestId('action-delete'));
+
+		await waitFor(() => expect(screen.getByTestId('confirm-inline')).toBeInTheDocument());
+		await user.click(screen.getByTestId('confirm-yes'));
+
+		await waitFor(() => expect(mockDeleteScheduleEvent).toHaveBeenCalledTimes(1));
+		// Parent CalendarEvent id is derived from the sub-event id, and the
+		// provider routing metadata comes straight from the search row.
+		expect(mockDeleteScheduleEvent).toHaveBeenCalledWith(
+			'g-1_0_0',
+			'google',
+			'gp-evt-99',
+			'golfer@gmail.com'
+		);
+		expect(mockDeleteCalendarEvent).not.toHaveBeenCalled();
+	});
+
+	it('deletes Tiler rows through deleteCalendarEvent in multi-source mode', async () => {
+		mockSearchMultiSource.mockResolvedValue({
+			items: [tilerItem],
+			sources: [],
+			correlationId: 'c1',
+		});
+		mockDeleteCalendarEvent.mockResolvedValue(undefined);
+
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+
+		await waitFor(() => expect(screen.getByTestId('action-delete')).toBeInTheDocument());
+		await user.click(screen.getByTestId('action-delete'));
+
+		await waitFor(() => expect(screen.getByTestId('confirm-inline')).toBeInTheDocument());
+		await user.click(screen.getByTestId('confirm-yes'));
+
+		await waitFor(() => expect(mockDeleteCalendarEvent).toHaveBeenCalledTimes(1));
+		expect(mockDeleteCalendarEvent).toHaveBeenCalledWith('t-1');
+		expect(mockDeleteScheduleEvent).not.toHaveBeenCalled();
 	});
 
 	it('renders no Load More / pagination in multi-source mode', async () => {

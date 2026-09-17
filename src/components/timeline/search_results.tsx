@@ -34,7 +34,7 @@ export type SearchResultsProps = {
 	onEdit: (event: CalendarEvent) => void;
 	onSetAsNow: (eventId: string) => void;
 	onMarkComplete: (eventId: string) => void;
-	onDelete: (eventId: string) => void;
+	onDelete: (eventId: string, item?: CalendarSearchItem) => void;
 	onConfirmAction: () => void;
 	onCancelConfirm: () => void;
 	onLoadMore: () => void;
@@ -374,7 +374,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 														$danger
 														onClick={(e) => {
 															e.stopPropagation();
-															onDelete(item.id);
+															onDelete(item.id, item);
 														}}
 													>
 														<Trash2 size={12} />

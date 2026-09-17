@@ -11,7 +11,14 @@ import {
 } from '@/core/common/types/schedule';
 import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
+import { useOptionalCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
+import {
+	CalendarEntityType,
+	CalendarRequestType,
+} from '@/core/common/components/calendar/calendarRequestContext';
+import { Actions } from '@/core/constants/enums';
 import { useFlag } from '@/hooks/useFlag';
+import { getCalendarEventId } from '@/core/util/entityResolution';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { SearchResults } from './search_results';
 
@@ -85,6 +92,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		eventId: string;
 		action: 'complete' | 'delete';
 	} | null>(null);
+	/** Multi-source row that triggered a pending delete, if any (third-party routing). */
+	const [confirmingItem, setConfirmingItem] = useState<CalendarSearchItem | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const searchSeqRef = useRef(0);
 	const isMultiSource = useFlag('calendarSearchMultiSource');
@@ -96,6 +105,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
+	const dispatchCalendarRequest = useOptionalCalendarDispatch();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 
@@ -207,12 +217,36 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	);
 
 	/**
-	 * Open the edit path from a multi-source result, forwarding third-party
-	 * routing metadata (S4-6) and emitting `calendar_search_edit_opened`.
+	 * Open the edit path from a multi-source result and emit
+	 * `calendar_search_edit_opened` (S4-6).
+	 *
+	 * - Tiler rows open the classic edit panel (`openEditTile`) with the row
+	 *   mapped to the `CalendarEvent` shape.
+	 * - Third-party rows (google / microsoft) dispatch a `FocusEvent` calendar
+	 *   request carrying the provider routing metadata; the calendar handler
+	 *   navigates to the tile and hands `CalendarEventInfo` the metadata it
+	 *   needs to dispatch edits to the correct provider.
 	 */
 	const handleMultiSourceEdit = useCallback(
 		(item: CalendarSearchItem) => {
-			openEditTile(searchItemToCalendarEvent(item));
+			if (item.source === 'tiler') {
+				openEditTile(searchItemToCalendarEvent(item));
+			} else if (dispatchCalendarRequest) {
+				dispatchCalendarRequest({
+					type: CalendarRequestType.FocusEvent,
+					entityId: item.id,
+					entityType: CalendarEntityType.SubcalendarEvent,
+					actionType: Actions.None,
+					startHint: item.start,
+					thirdPartyType: item.source,
+					thirdPartyId: item.thirdPartyEventId ?? undefined,
+					thirdPartyUserId: item.thirdPartyUserId ?? undefined,
+				});
+			} else {
+				// No calendar bus (isolated mount) — degrade to the classic
+				// edit panel, which still receives the third-party fields.
+				openEditTile(searchItemToCalendarEvent(item));
+			}
 			setShowDropdown(false);
 			if (typeof window !== 'undefined') {
 				window.dispatchEvent(
@@ -226,7 +260,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				);
 			}
 		},
-		[openEditTile, correlationId]
+		[dispatchCalendarRequest, openEditTile, correlationId]
 	);
 
 	const loadMore = useCallback(async () => {
@@ -341,14 +375,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		setConfirmingAction({ eventId, action: 'complete' });
 	}, []);
 
-	const handleDelete = useCallback((eventId: string) => {
+	const handleDelete = useCallback((eventId: string, item?: CalendarSearchItem) => {
 		setConfirmingAction({ eventId, action: 'delete' });
+		// Remember the multi-source row (if any) so the confirmed delete
+		// can route third-party events through `DELETE /api/Schedule/Event`.
+		setConfirmingItem(item ?? null);
 	}, []);
 
 	const handleConfirmAction = useCallback(async () => {
 		if (!confirmingAction) return;
 		const { eventId, action } = confirmingAction;
+		const confirmItem = confirmingItem;
 		setConfirmingAction(null);
+		setConfirmingItem(null);
 		setActionLoading((prev) => ({ ...prev, [eventId]: action }));
 		const notifAction =
 			action === 'complete' ? NotificationAction.Complete : NotificationAction.Delete;
@@ -374,6 +413,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		try {
 			if (action === 'complete') {
 				await scheduleService.markCalendarEventComplete(eventId);
+			} else if (confirmItem && confirmItem.source !== 'tiler') {
+				// Third-party rows delete through the schedule service so the
+				// provider event is removed from its source system.
+				await scheduleService.deleteScheduleEvent(
+					getCalendarEventId(confirmItem.id),
+					confirmItem.source,
+					confirmItem.thirdPartyEventId ?? '',
+					confirmItem.thirdPartyUserId ?? ''
+				);
 			} else {
 				await scheduleService.deleteCalendarEvent(eventId);
 			}
@@ -388,10 +436,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				return next;
 			});
 		}
-	}, [confirmingAction, showNotification, updateNotification, t, onSearch, onResults]);
+	}, [
+		confirmingAction,
+		confirmingItem,
+		showNotification,
+		updateNotification,
+		t,
+		onSearch,
+		onResults,
+	]);
 
 	const handleCancelConfirm = useCallback(() => {
 		setConfirmingAction(null);
+		setConfirmingItem(null);
 	}, []);
 
 	// Click-outside handler to dismiss dropdown
