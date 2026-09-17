@@ -7,7 +7,7 @@ import { LocationApi } from '@/api/locationApi';
 import ServerError from '@/core/error/server';
 import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import { ApiResponse } from '@/core/common/types/api';
-import { CalendarSearchEnvelope } from '@/core/common/types/schedule';
+import { CalendarSearchEnvelope, CalendarSearchSource } from '@/core/common/types/schedule';
 
 // Mock the API classes
 vi.mock('@/api/scheduleApi');
@@ -83,11 +83,14 @@ describe('ScheduleService.searchCalendarEventsMultiSource', () => {
 	it('forwards optional sources to the API', async () => {
 		vi.mocked(calendarEventApi.searchCalendarEvents).mockResolvedValueOnce(okResponse);
 
-		await service.searchCalendarEventsMultiSource('coffee', ['tiler', 'google']);
+		await service.searchCalendarEventsMultiSource('coffee', [
+			CalendarSearchSource.Tiler,
+			CalendarSearchSource.Google,
+		]);
 
 		expect(calendarEventApi.searchCalendarEvents).toHaveBeenCalledWith({
 			query: 'coffee',
-			sources: ['tiler', 'google'],
+			sources: [CalendarSearchSource.Tiler, CalendarSearchSource.Google],
 		});
 	});
 

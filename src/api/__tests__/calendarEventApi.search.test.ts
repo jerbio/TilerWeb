@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarEventApi } from '../calendarEventApi';
 import ServerError from '@/core/error/server';
 import { ApiResponse } from '@/core/common/types/api';
-import { CalendarSearchEnvelope, CalendarSearchItem } from '@/core/common/types/schedule';
+import {
+	CalendarSearchEnvelope,
+	CalendarSearchItem,
+	CalendarSearchSource,
+} from '@/core/common/types/schedule';
 
 // Mock config to provide a base URL
 vi.mock('@/config/config_getter', () => ({
@@ -112,7 +116,10 @@ describe('CalendarEventApi.searchCalendarEvents', () => {
 	it('comma-joins optional sources', async () => {
 		fetchSpy.mockResolvedValueOnce(mockOkResponse());
 
-		await api.searchCalendarEvents({ query: 'coffee', sources: ['tiler', 'google'] });
+		await api.searchCalendarEvents({
+			query: 'coffee',
+			sources: [CalendarSearchSource.Tiler, CalendarSearchSource.Google],
+		});
 
 		expect(requestedUrl().searchParams.get('sources')).toBe('tiler,google');
 	});

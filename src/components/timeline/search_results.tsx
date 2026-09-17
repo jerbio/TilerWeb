@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
 	CalendarEvent,
 	CalendarSearchItem,
+	CalendarSearchSource,
 	CalendarSearchSourceStatus,
 } from '@/core/common/types/schedule';
 import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
@@ -56,9 +57,9 @@ export type SearchResultsProps = {
 /** i18n key for a source vocabulary value (`tiler`/`google`/`microsoft`). */
 const sourceLabelKey = (source: string): string => {
 	switch (source) {
-		case 'google':
+		case CalendarSearchSource.Google:
 			return 'timeline.multiSource.sourceGoogle';
-		case 'microsoft':
+		case CalendarSearchSource.Microsoft:
 			return 'timeline.multiSource.sourceMicrosoft';
 		default:
 			return 'timeline.multiSource.sourceTiler';

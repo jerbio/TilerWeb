@@ -7,6 +7,7 @@ import useAppStore from '@/global_state';
 import {
 	CalendarEvent,
 	CalendarSearchItem,
+	CalendarSearchSource,
 	CalendarSearchSourceStatus,
 } from '@/core/common/types/schedule';
 import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
@@ -229,7 +230,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	 */
 	const handleMultiSourceEdit = useCallback(
 		(item: CalendarSearchItem) => {
-			if (item.source === 'tiler') {
+			if (item.source === CalendarSearchSource.Tiler) {
 				openEditTile(searchItemToCalendarEvent(item));
 			} else if (dispatchCalendarRequest) {
 				dispatchCalendarRequest({
@@ -413,7 +414,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		try {
 			if (action === 'complete') {
 				await scheduleService.markCalendarEventComplete(eventId);
-			} else if (confirmItem && confirmItem.source !== 'tiler') {
+			} else if (confirmItem && confirmItem.source !== CalendarSearchSource.Tiler) {
 				// Third-party rows delete through the schedule service so the
 				// provider event is removed from its source system.
 				await scheduleService.deleteScheduleEvent(

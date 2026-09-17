@@ -472,7 +472,11 @@ export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
  * Source vocabulary for the non-paginated `GET /api/CalendarEvent/Search`
  * endpoint. Mirrors the server's `getDispatchCalendarType()` casing.
  */
-export type CalendarSearchSource = 'tiler' | 'google' | 'microsoft';
+export enum CalendarSearchSource {
+	Tiler = 'tiler',
+	Google = 'google',
+	Microsoft = 'microsoft',
+}
 
 /**
  * Per-source execution status for the multi-source search envelope.
