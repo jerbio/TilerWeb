@@ -1353,9 +1353,9 @@
 				"expandAccounts": "खाते विस्तारित करें",
 				"collapseAccounts": "खाते संचित करें",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "{{provider}} कैलेंडर से जुड़ा गया",
+					"declined": "{{provider}} कनेक्शन रद्द कर दिया गया",
+					"error": "{{provider}} से कनेक्ट नहीं हो सके। कृपया फिर प्रयास करें।"
 				},
 				"detail": {
 					"loading": "कनेक्शन लोड हो रहा है...",

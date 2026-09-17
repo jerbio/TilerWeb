@@ -1353,9 +1353,9 @@
 				"expandAccounts": "Rozwiń konta",
 				"collapseAccounts": "Zwiń konta",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "Kalendarz {{provider}} połączony",
+					"declined": "Połączenie z {{provider}} anulowane",
+					"error": "Nie udało się połączyć z {{provider}}. Spróbuj ponownie."
 				},
 				"detail": {
 					"loading": "Wczytywanie połączenia...",

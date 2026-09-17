@@ -1353,9 +1353,9 @@
 				"expandAccounts": "계정 확장",
 				"collapseAccounts": "계정 접기",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "{{provider}} 캘린더가 연결되었습니다",
+					"declined": "{{provider}} 연결이 취소되었습니다",
+					"error": "{{provider}}을(를) 연결할 수 없습니다. 다시 시도해 주세요."
 				},
 				"detail": {
 					"loading": "연결 로딩 중...",

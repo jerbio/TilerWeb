@@ -1353,9 +1353,9 @@
 				"expandAccounts": "Ανάπτυξη λογαριασμών",
 				"collapseAccounts": "Σύμπτυξη λογαριασμών",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "Συνδέθηκε το ημερολόγιο {{provider}}",
+					"declined": "Η σύνδεση {{provider}} ακυρώθηκε",
+					"error": "Δεν μπορέσαμε να συνδέσουμε το {{provider}}. Παρακαλούμε δοκιμάστε ξανά."
 				},
 				"detail": {
 					"loading": "Φόρτωση σύνδεσης...",
