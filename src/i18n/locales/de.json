@@ -1353,9 +1353,9 @@
 				"expandAccounts": "Konten ausklappen",
 				"collapseAccounts": "Konten einklappen",
 				"notifications": {
-					"success": "Connected {{provider}} Calendar",
-					"declined": "{{provider}} connection cancelled",
-					"error": "We couldn't connect {{provider}}. Please try again."
+					"success": "{{provider}}-Calendar verbunden",
+					"declined": "{{provider}}-Verbindung abgebrochen",
+					"error": "{{provider}} konnte nicht verbunden werden. Bitte versuche es erneut."
 				},
 				"detail": {
 					"loading": "Verbindung wird geladen...",
