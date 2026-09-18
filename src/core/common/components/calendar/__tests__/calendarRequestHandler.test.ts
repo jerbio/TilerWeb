@@ -31,8 +31,13 @@ vi.mock('@/services', () => ({
 
 // ── Helpers ────────────────────────────────────────────────────────
 
-function makeStyled(id: string, start: number, isViable = true): StyledEvent {
-	return { id, start, isViable } as unknown as StyledEvent;
+function makeStyled(
+	id: string,
+	start: number,
+	isViable = true,
+	metadata: Record<string, unknown> = {}
+): StyledEvent {
+	return { id, start, isViable, ...metadata } as unknown as StyledEvent;
 }
 
 function makeDeps(overrides: Partial<CalendarRequestHandlerDeps> = {}): CalendarRequestHandlerDeps {
@@ -228,5 +233,336 @@ describe('retryPendingFocus — bounded re-arm', () => {
 		const deps = makeDeps();
 		expect(() => retryPendingFocus(deps)).not.toThrow();
 		expect(deps.setViewOptions).not.toHaveBeenCalled();
+	});
+});
+
+// ── third-party metadata merge ─────────────────────────────────────
+
+describe('createCalendarRequestHandler — third-party metadata', () => {
+	const TILE_MS = Date.UTC(2026, 7, 18, 9, 0);
+	const META = {
+		thirdPartyType: 'google',
+		thirdPartyId: 'gp-evt-99',
+		thirdPartyUserId: 'golfer@gmail.com',
+	};
+
+	it('merges supplied third-party metadata into the selected event info', () => {
+		const tile = makeStyled('x_7_a_b', TILE_MS);
+		const deps = makeDeps({ styledEventsRef: { current: [tile] } });
+		const onResult = vi.fn();
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'x_7_a_b',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+				startHint: TILE_MS,
+				...META,
+			},
+			onResult,
+		});
+
+		// In-view tile → immediate Found, no navigation.
+		expect(deps.setViewOptions).not.toHaveBeenCalled();
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: 'x_7_a_b',
+		});
+
+		// The selected event info (what CalendarEventInfo renders) carries
+		// the provider routing metadata on top of the tile's own values.
+		const selected = (deps.setSelectedEventInfo as ReturnType<typeof vi.fn>).mock
+			.calls[0][0] as StyledEvent;
+		expect(selected).toMatchObject({
+			id: 'x_7_a_b',
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-evt-99',
+			thirdPartyUserId: 'golfer@gmail.com',
+		});
+
+		// The source tile object is never mutated.
+		expect(tile.thirdPartyType).toBeUndefined();
+	});
+
+	it('passes the tile through unchanged when no metadata is supplied', () => {
+		const tile = makeStyled('x_7_a_b', TILE_MS);
+		const deps = makeDeps({ styledEventsRef: { current: [tile] } });
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'x_7_a_b',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+			},
+			onResult: vi.fn(),
+		});
+
+		// No metadata → the exact same tile reference is selected (identity
+		// preserved, so downstream memoization is unaffected).
+		const selected = (deps.setSelectedEventInfo as ReturnType<typeof vi.fn>).mock
+			.calls[0][0] as StyledEvent;
+		expect(selected).toBe(tile);
+	});
+
+	it('carries third-party metadata through navigate-and-retry', () => {
+		const deps = makeDeps();
+		const onResult = vi.fn();
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'x_7_a_b',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+				startHint: TILE_MS,
+				...META,
+			},
+			onResult,
+		});
+
+		// Off-screen tile → navigation + queued pending focus with metadata.
+		expect(deps.pendingFocusRef.current).toEqual(
+			expect.objectContaining({
+				entityId: 'x_7_a_b',
+				thirdPartyType: 'google',
+				thirdPartyId: 'gp-evt-99',
+				thirdPartyUserId: 'golfer@gmail.com',
+			})
+		);
+
+		// Tile renders after navigation — the retry must still merge metadata.
+		deps.styledEventsRef.current = [makeStyled('x_7_a_b', TILE_MS)];
+		retryPendingFocus(deps);
+
+		// The navigation step first cleared the selection (null); the retry's
+		// focus is the most recent call.
+		const setInfo = deps.setSelectedEventInfo as ReturnType<typeof vi.fn>;
+		const selected = setInfo.mock.calls[setInfo.mock.calls.length - 1]?.[0] as StyledEvent;
+		expect(selected).toMatchObject({
+			id: 'x_7_a_b',
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-evt-99',
+			thirdPartyUserId: 'golfer@gmail.com',
+		});
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: 'x_7_a_b',
+		});
+	});
+});
+
+// ── third-party focus resolution (search-time entityId → tile) ─────
+
+describe('createCalendarRequestHandler — third-party focus resolution', () => {
+	const TILE_MS = Date.UTC(2026, 7, 18, 9, 0);
+	const META = {
+		thirdPartyType: 'google',
+		thirdPartyId: 'gp-evt-99',
+		thirdPartyUserId: 'golfer@gmail.com',
+	};
+	// The SearchBar dispatches a search-time `entityId` that never matches a
+	// rendered grid tile — the tile must be found via the provider metadata.
+	const SEARCH_ID = 'search-uuid-123';
+
+	it('resolves and focuses a tile by thirdPartyId when the entityId never matches', () => {
+		const tile = makeStyled('real_7_aaa_bbb', TILE_MS, true, { ...META });
+		const deps = makeDeps({ styledEventsRef: { current: [tile] } });
+		const onResult = vi.fn();
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: SEARCH_ID,
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+				startHint: TILE_MS,
+				...META,
+			},
+			onResult,
+		});
+
+		// The tile is in view → immediate Found (no navigation, no retry queue).
+		expect(deps.setViewOptions).not.toHaveBeenCalled();
+		expect(deps.pendingFocusRef.current).toBeNull();
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: SEARCH_ID,
+		});
+
+		// The focused tile is the third-party one, with routing metadata merged.
+		const setInfo = deps.setSelectedEventInfo as ReturnType<typeof vi.fn>;
+		const selected = setInfo.mock.calls[setInfo.mock.calls.length - 1]?.[0] as StyledEvent;
+		expect(selected).toMatchObject({
+			id: 'real_7_aaa_bbb',
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-evt-99',
+			thirdPartyUserId: 'golfer@gmail.com',
+		});
+	});
+
+	it('falls back to entity-ID resolution when no tile matches the third-party metadata', () => {
+		const tile = makeStyled('real_7_aaa_bbb', TILE_MS, true, {
+			thirdPartyType: 'google',
+			thirdPartyId: 'some-other-event',
+		});
+		const deps = makeDeps({ styledEventsRef: { current: [tile] } });
+		const onResult = vi.fn();
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'real_7_aaa_bbb',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+				startHint: TILE_MS,
+				...META,
+			},
+			onResult,
+		});
+
+		// Third-party ref misses → classic resolution finds the tile by id.
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: 'real_7_aaa_bbb',
+		});
+	});
+
+	it('picks the earliest tile when several tiles share the third-party id', () => {
+		const second = makeStyled('real_7_ccc_ddd', TILE_MS + 24 * 60 * 60 * 1000, true, {
+			...META,
+		});
+		const first = makeStyled('real_7_aaa_bbb', TILE_MS, true, { ...META });
+		const deps = makeDeps({ styledEventsRef: { current: [second, first] } });
+		const onResult = vi.fn();
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: SEARCH_ID,
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+				startHint: TILE_MS,
+				...META,
+			},
+			onResult,
+		});
+
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: SEARCH_ID,
+		});
+		const setInfo = deps.setSelectedEventInfo as ReturnType<typeof vi.fn>;
+		const selected = setInfo.mock.calls[setInfo.mock.calls.length - 1]?.[0] as StyledEvent;
+		expect(selected?.id).toBe('real_7_aaa_bbb');
+	});
+
+	it('keeps Tiler entityId behavior unchanged when no metadata is supplied', () => {
+		const tile = makeStyled('real_7_aaa_bbb', TILE_MS);
+		const deps = makeDeps({ styledEventsRef: { current: [tile] } });
+		const onResult = vi.fn();
+		const handler = createCalendarRequestHandler(deps);
+
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'real_7_aaa_bbb',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+				startHint: TILE_MS,
+			},
+			onResult,
+		});
+
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: 'real_7_aaa_bbb',
+		});
+		const setInfo = deps.setSelectedEventInfo as ReturnType<typeof vi.fn>;
+		const selected = setInfo.mock.calls[setInfo.mock.calls.length - 1]?.[0];
+		expect(selected).toBe(tile); // identity preserved, no merge
+	});
+});
+// ── retryPendingFocus — third-party metadata ───────────────────────
+
+describe('retryPendingFocus — third-party metadata', () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it('re-resolves by thirdPartyId after navigation and preserves metadata on re-arm', () => {
+		const onResult = vi.fn();
+		const deps = makeDeps();
+		deps.pendingFocusRef.current = {
+			entityId: 'search-uuid-123',
+			entityType: CalendarEntityType.SubcalendarEvent,
+			onResult,
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-evt-99',
+			thirdPartyUserId: 'golfer@gmail.com',
+		};
+
+		retryPendingFocus(deps); // miss → re-arm
+
+		// Metadata must survive the re-arm so a later retry still resolves.
+		expect(deps.pendingFocusRef.current).toEqual(
+			expect.objectContaining({
+				thirdPartyType: 'google',
+				thirdPartyId: 'gp-evt-99',
+				thirdPartyUserId: 'golfer@gmail.com',
+			})
+		);
+
+		// The tile renders with the search-time entityId — only the provider
+		// metadata can resolve it.
+		deps.styledEventsRef.current = [
+			makeStyled('real_7_aaa_bbb', Date.UTC(2026, 7, 18, 9, 0), true, {
+				thirdPartyType: 'google',
+				thirdPartyId: 'gp-evt-99',
+				thirdPartyUserId: 'golfer@gmail.com',
+			}),
+		];
+		vi.advanceTimersByTime(1000);
+
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Found,
+			entityId: 'search-uuid-123',
+		});
+		expect(deps.pendingFocusRef.current).toBeNull();
+
+		const setInfo = deps.setSelectedEventInfo as ReturnType<typeof vi.fn>;
+		const selected = setInfo.mock.calls[setInfo.mock.calls.length - 1]?.[0] as StyledEvent;
+		expect(selected).toMatchObject({
+			id: 'real_7_aaa_bbb',
+			thirdPartyId: 'gp-evt-99',
+		});
+	});
+
+	it('does not add third-party metadata for pending focuses without it', () => {
+		const onResult = vi.fn();
+		const deps = makeDeps();
+		deps.pendingFocusRef.current = {
+			entityId: 'x_7_a_b',
+			entityType: CalendarEntityType.SubcalendarEvent,
+			onResult,
+		};
+
+		retryPendingFocus(deps); // miss → re-arm
+
+		const pending = deps.pendingFocusRef.current as PendingFocus;
+		expect(pending.entityId).toBe('x_7_a_b');
+		expect(pending).not.toHaveProperty('thirdPartyType');
+		expect(pending).not.toHaveProperty('thirdPartyId');
+		expect(pending).not.toHaveProperty('thirdPartyUserId');
 	});
 });

@@ -10,7 +10,7 @@ import {
 import { StyledEvent } from './calendar_events';
 import { SubCalendarEvent } from '@/core/common/types/schedule';
 import { CalendarViewOptions } from './calendar.types';
-import { resolveEntityToTileId } from '@/core/util/entityResolution';
+import { resolveTileForFocus, type ThirdPartyEventRef } from '@/core/util/entityResolution';
 import { findEventDate } from '@/core/util/eventDateLookup';
 import { scheduleService } from '@/services';
 import calendarConfig from '@/core/constants/calendar_config';
@@ -28,6 +28,48 @@ export interface PendingFocus {
 	 * transition) still lands, without spinning forever if it truly never comes.
 	 */
 	attempts?: number;
+	/**
+	 * Third-party routing metadata carried through navigation so the retry
+	 * path can hand it to {@link focusOnStyledEvent} when the tile finally
+	 * renders (see {@link withThirdPartyMetadata}).
+	 */
+	thirdPartyType?: string;
+	thirdPartyId?: string;
+	thirdPartyUserId?: string;
+}
+
+/** Third-party routing metadata a FocusEvent request may supply. */
+export type ThirdPartyMetadata = {
+	thirdPartyType?: string;
+	thirdPartyId?: string;
+	thirdPartyUserId?: string;
+};
+
+/**
+ * Merges third-party routing metadata from a FocusEvent request into a
+ * resolved tile, returning a new object (the source tile is never mutated).
+ * Only fields the caller actually supplied overwrite the tile's own values,
+ * so callers that don't supply metadata keep today's behavior untouched.
+ */
+function withThirdPartyMetadata(
+	styledEvent: StyledEvent,
+	thirdParty: ThirdPartyMetadata
+): StyledEvent {
+	if (
+		thirdParty.thirdPartyType == null &&
+		thirdParty.thirdPartyId == null &&
+		thirdParty.thirdPartyUserId == null
+	) {
+		return styledEvent;
+	}
+	return {
+		...styledEvent,
+		...(thirdParty.thirdPartyType != null ? { thirdPartyType: thirdParty.thirdPartyType } : {}),
+		...(thirdParty.thirdPartyId != null ? { thirdPartyId: thirdParty.thirdPartyId } : {}),
+		...(thirdParty.thirdPartyUserId != null
+			? { thirdPartyUserId: thirdParty.thirdPartyUserId }
+			: {}),
+	};
 }
 
 /**
@@ -162,11 +204,25 @@ export function createCalendarRequestHandler(
 		if (request.type === CalendarRequestType.FocusEvent) {
 			const { entityId, entityType } = request;
 
-			// Resolve the entity to a concrete tile ID on the calendar grid
-			const resolvedTileId = resolveEntityToTileId(
+			// Third-party routing metadata (e.g. from the timeline SearchBar) —
+			// merged into the tile before it is selected so CalendarEventInfo
+			// knows which provider owns the event.
+			const thirdPartyMeta: ThirdPartyMetadata = {
+				thirdPartyType: request.thirdPartyType,
+				thirdPartyId: request.thirdPartyId,
+				thirdPartyUserId: request.thirdPartyUserId,
+			};
+
+			// Resolve the entity to a concrete tile ID on the calendar grid.
+			// Third-party focus requests (e.g. from the timeline SearchBar) carry
+			// a search-time `entityId` that never matches a tile, so the stable
+			// provider routing metadata is tried first when present and the
+			// classic entity-ID resolution remains the fallback.
+			const resolvedTileId = resolveTileForFocus(
 				entityId,
 				entityType,
-				deps.styledEventsRef.current
+				deps.styledEventsRef.current,
+				thirdPartyMeta
 			);
 
 			const styledEvent = resolvedTileId
@@ -181,7 +237,12 @@ export function createCalendarRequestHandler(
 				// Read through the ref so we always see the current pool — during
 				// tilecast review this includes the simulation overlay's events.
 				const currentEvents = deps.eventsRef.current;
-				const cachedTileId = resolveEntityToTileId(entityId, entityType, currentEvents);
+				const cachedTileId = resolveTileForFocus(
+					entityId,
+					entityType,
+					currentEvents,
+					thirdPartyMeta
+				);
 				const cachedEvent = cachedTileId
 					? currentEvents.find((e) => e.id === cachedTileId)
 					: undefined;
@@ -193,7 +254,12 @@ export function createCalendarRequestHandler(
 					deps.setSelectedEventInfo(null);
 					deps.setSelectedEvent(null);
 					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
-					deps.pendingFocusRef.current = { entityId, entityType, onResult };
+					deps.pendingFocusRef.current = {
+						entityId,
+						entityType,
+						onResult,
+						...thirdPartyMeta,
+					};
 					deps.setViewOptions((prev) => ({
 						...prev,
 						startDay: targetStartDay,
@@ -212,7 +278,12 @@ export function createCalendarRequestHandler(
 					deps.setSelectedEventInfo(null);
 					deps.setSelectedEvent(null);
 					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
-					deps.pendingFocusRef.current = { entityId, entityType, onResult };
+					deps.pendingFocusRef.current = {
+						entityId,
+						entityType,
+						onResult,
+						...thirdPartyMeta,
+					};
 					deps.setViewOptions((prev) => ({
 						...prev,
 						startDay: targetStartDay,
@@ -287,7 +358,12 @@ export function createCalendarRequestHandler(
 					}
 
 					// Store the pending focus so it retries after events reload
-					deps.pendingFocusRef.current = { entityId, entityType, onResult };
+					deps.pendingFocusRef.current = {
+						entityId,
+						entityType,
+						onResult,
+						...thirdPartyMeta,
+					};
 
 					// Navigate the calendar view to the event's date
 					const targetStartDay = dayjs(startMs).startOf('day');
@@ -300,8 +376,10 @@ export function createCalendarRequestHandler(
 				return;
 			}
 
-			// Event found in current view — focus on it
-			focusOnStyledEvent(styledEvent, deps);
+			// Event found in current view — focus on it (with any third-party
+			// routing metadata the caller supplied, so the edit panel can
+			// dispatch to the correct provider)
+			focusOnStyledEvent(withThirdPartyMetadata(styledEvent, thirdPartyMeta), deps);
 			onResult?.({ status: CalendarRequestStatus.Found, entityId });
 		}
 
@@ -368,12 +446,29 @@ export function retryPendingFocus(
 	const pending = deps.pendingFocusRef.current;
 	if (!pending) return;
 
-	const { entityId, entityType, onResult, attempts = 0 } = pending;
-
-	const resolvedTileId = resolveEntityToTileId(
+	const {
 		entityId,
 		entityType,
-		deps.styledEventsRef.current
+		onResult,
+		attempts = 0,
+		thirdPartyType,
+		thirdPartyId,
+		thirdPartyUserId,
+	} = pending;
+
+	// Rebuild the routing reference so the retry matches third-party tiles
+	// by provider identity just like the initial pass. Callers without
+	// metadata stay `undefined` and keep the classic entity-ID behavior.
+	const thirdPartyRef: ThirdPartyEventRef | undefined =
+		thirdPartyType != null || thirdPartyId != null || thirdPartyUserId != null
+			? { thirdPartyType, thirdPartyId, thirdPartyUserId }
+			: undefined;
+
+	const resolvedTileId = resolveTileForFocus(
+		entityId,
+		entityType,
+		deps.styledEventsRef.current,
+		thirdPartyRef
 	);
 
 	const styledEvent = resolvedTileId
@@ -386,7 +481,7 @@ export function retryPendingFocus(
 			clearTimeout(deps.focusRetryTimeoutRef.current);
 			deps.focusRetryTimeoutRef.current = null;
 		}
-		focusOnStyledEvent(styledEvent, deps);
+		focusOnStyledEvent(withThirdPartyMetadata(styledEvent, pending), deps);
 		onResult?.({ status: CalendarRequestStatus.Found, entityId });
 		return;
 	}
@@ -394,7 +489,19 @@ export function retryPendingFocus(
 	// Tile not rendered yet — re-arm rather than give up, so a late render
 	// (slow fetch or slide transition) still lands on the target.
 	if (attempts + 1 < MAX_FOCUS_RETRY_ATTEMPTS) {
-		deps.pendingFocusRef.current = { entityId, entityType, onResult, attempts: attempts + 1 };
+		deps.pendingFocusRef.current = {
+			entityId,
+			entityType,
+			onResult,
+			attempts: attempts + 1,
+			...(thirdPartyRef
+				? {
+						thirdPartyType: thirdPartyRef.thirdPartyType ?? undefined,
+						thirdPartyId: thirdPartyRef.thirdPartyId ?? undefined,
+						thirdPartyUserId: thirdPartyRef.thirdPartyUserId ?? undefined,
+					}
+				: {}),
+		};
 		if (deps.focusRetryTimeoutRef) {
 			if (deps.focusRetryTimeoutRef.current) clearTimeout(deps.focusRetryTimeoutRef.current);
 			deps.focusRetryTimeoutRef.current = setTimeout(

@@ -79,6 +79,18 @@ export interface FocusEventRequest {
 	 * start. Other callers omit it and keep the lookup path.
 	 */
 	startHint?: number;
+	/**
+	 * Optional third-party routing metadata (provider, provider event id,
+	 * connected-account id) supplied by callers such as the timeline SearchBar
+	 * when the focused tile represents a provider-synced event. When present,
+	 * the calendar handler merges these into the selected event before opening
+	 * `CalendarEventInfo` so the edit panel can dispatch to the right provider.
+	 * All three are optional — callers that don't supply them keep the existing
+	 * tile values.
+	 */
+	thirdPartyType?: string;
+	thirdPartyId?: string;
+	thirdPartyUserId?: string;
 }
 
 /**

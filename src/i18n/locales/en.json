@@ -1488,9 +1488,19 @@
 		}
 	},
 	"timeline": {
-		"searchPlaceholder": "Search for a tile/block...",
-		"searchAriaLabel": "Search for a tile or block",
+		"searchPlaceholder": "Search events, tiles & blocks...",
+		"searchAriaLabel": "Search for events, tiles, or blocks",
 		"clearSearch": "Clear search",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "Connected account: {{account}}",
+			"partialFailure": "Some connected calendars failed to search: {{sources}}",
+			"retrySearch": "Retry",
+			"unavailable": "Search is temporarily unavailable. This is a service issue — not a lack of matches. Please try again later.",
+			"readOnly": "Read-only"
+		},
 		"loadMore": "Load more",
 		"loading": "Loading…",
 		"notFoundMessage": "Oops, we couldn't find '{{query}}'. Would you like to create a Tile from this title?",

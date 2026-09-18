@@ -1,4 +1,5 @@
 import { ApiResponse, ApiCodeResponse } from './api';
+import { CalendarSearchErrorBody, CalendarSearchFailedSource } from './schedule';
 import i18n from '@/i18n/config';
 
 export interface ErrorInfo {
@@ -45,6 +46,30 @@ export class TilerResponseError extends Error {
 				? apiCodeResponse.Message
 				: `Error code: ${apiCodeResponse.Code}`;
 		return new TilerResponseError(apiCodeResponse.Code, message);
+	}
+}
+
+/**
+ * Typed error for a TOTAL multi-source calendar search failure (HTTP 502).
+ * Carries the server's `CalendarSearchError` body fields so the UI can render
+ * a "temporarily unavailable" state (never "no matches") and map a
+ * user-reported issue to the correlation id / failing accounts.
+ */
+export class CalendarSearchUnavailableError extends Error {
+	public readonly error: string;
+	public readonly message: string;
+	public readonly category: string | null;
+	public readonly correlationId: string;
+	public readonly sources: CalendarSearchFailedSource[];
+
+	constructor(body: CalendarSearchErrorBody) {
+		super(body.message || 'Search is temporarily unavailable');
+		this.name = 'CalendarSearchUnavailableError';
+		this.error = body.error;
+		this.message = body.message;
+		this.category = body.category ?? null;
+		this.correlationId = body.correlationId;
+		this.sources = body.sources ?? [];
 	}
 }
 
