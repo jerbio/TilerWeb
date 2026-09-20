@@ -21,8 +21,10 @@ interface SEOProps {
 	/** Article section / category — emits article:section. */
 	articleSection?: string;
 	/**
-	 * When true, emits `robots: noindex, nofollow` so crawlers skip this page
-	 * (e.g. auth, settings, and other private/app routes). Defaults to false.
+	 * When true, emits `robots: noindex, follow` so crawlers can still traverse the
+	 * page's links but must not index it (e.g. auth, settings, private/app routes).
+	 * `noindex, nofollow` would additionally block crawling of shared/outbound links.
+	 * Defaults to false.
 	 */
 	noindex?: boolean;
 }
@@ -53,7 +55,7 @@ const SEO: React.FC<SEOProps> = ({
 			<meta name="title" content={title} />
 			<meta name="description" content={description} />
 			<meta name="keywords" content={keywords} />
-			<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+			<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
 			<link rel="canonical" href={fullCanonicalUrl} />
 
 			{/* Open Graph / Facebook */}

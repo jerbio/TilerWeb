@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "Home",
+			"features": "Features",
 			"discover": "Discover",
+			"articles": "Articles",
 			"waitlist": "Waitlist"
 		},
 		"voiceInput": {
