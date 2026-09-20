@@ -2208,40 +2208,40 @@
 				"date": "2026年5月1日",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "ほとんどのスケジューリングツールは、あなたをカレンダーのオペレーターのように扱います。ドラッグして、ドロップして、リサイズして——そして人生が変わり、最初からやり直し。Tilerは異なるアプローチを取ります。あなたが話し、Tilerがスケジューリングする。"
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "\"木曜9時に歯医者、その後11時頃にダウンタウンでPriyaとコーヒー\"といったことを入力すれば、Tilerが残りすべてを処理します。所要時間、移動時間、バッファ、確認。すべてです。"
 					},
 					{
-						"title": "How it works"
+						"title": "仕組み"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "タスクを説明する",
+						"stepBody": "何をすべきかを、普段の言葉で入力してください。特別な文法も、ドロップダウンも不要です。「明日の朝、1時間ジム」で十分です。",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Tilerが理解すること",
+							"text": "相対時間（\"明日\"）、所要時間（\"1時間\"）、場所のヒント（\"ダウンタウン\"）。追加の設定は不要です。"
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "AIが不足を埋める",
+						"stepBody": "Tilerは応答する前にあなたのリクエストを推論します。文脈から所要時間を推測し、既存の予定を確認し、移動を考慮します。1つの詳細が本当に不明確な場合、Tilerは1つの的確な質問をします——フォームではありません。",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "推論、推測ではない",
+							"text": "Tilerは提案する前に、あなたの場所、既存のタイル、希望する時間枠を照合します。"
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "確認して、承認する",
+						"stepBody": "Tilerは時間、場所、移動を含む完全な詳細付きの予定案を表示します。承認、調整、または代替案を依頼できます。あなたの許可なくカレンダーに反映されることはありません。",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "確認が先",
+							"text": "Tilerが提案します。あなたが決定します。AIが重労働をする間も、あなたはコントロールを保持します。"
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "あなたが生き、Tilerが計画する。"
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "2026年5月8日",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "ほとんどのカレンダーは、1つのタスクが終了したら次の準備ができていると想定します。しかし実際の生活には通勤があります。Tilerはあなたのスケジュールにその移動を組み込み、タイムラインのすべてのブロックが実際に行くべき場所を反映するようにします。"
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "ミーティング、用事、コーヒー、学校の送り迎えを追加してください。Tilerは自動的にそこへの行き方と所要時間を計算し、移動時間をその日に直接配置します。"
 					},
 					{
-						"title": "How it works"
+						"title": "仕組み"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "場所を一度設定する",
+						"stepBody": "毎回正確な住所を入力する必要はありません。家、職場、頻繁に訪れる場所を一度設定してください。それ以降、Tilerはどこから出発しどこに向かうかを知っています。",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Tilerが理解する場所ラベル",
+							"text": "家 · 職場 · ダウンタウン · ジム · オフィス周辺"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "移動時間がタイムラインに入る",
+						"stepBody": "場所付きのタスクを毎回追加すると、Tilerは前後のタスクと移動ブロックを挿入します。タイムラインに独立したセグメントとして表示され、いつ出発すべきか常にわかります。",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "実際のルート、推定ではない",
+							"text": "Tilerは運転、公共交通、徒歩をカバーするリアルタイムのルートデータを使用し、実際の移動方法に合わせた移動時間を反映します。"
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "近くのタスクが自動的にグループ化される",
+						"stepBody": "複数のタスクが同じエリアにある場合、Tilerはそれらをグループ化し、町中を往復することを防ぎます。ジムの近くのご用事はワークアウトの前後に配置されます。ダウンタウン近辺の顧客訪問は近所のランチと組み合わせられます。",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "移動を減らし、達成を増やす",
+							"text": "スマートなグループ化により、移動回数が減り、移動中の浪費時間が減り、本来あるべき流れの日になります。"
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "何かを成し遂げることは、単に時間を見つけることではありません。正しい場所に居ることです。"
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "2026年6月22日",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "スケジュールを変更することはリスクがあります。1つのタスクを動かすと、他に何がずれるかわからなくなります。提案を受け入れたが、それが正しい判断だったのか心配になります。Schedule Undoは、意図と確定の間に安全なゾーンを与えます。"
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Tilerでのすべての変更——リクエストを入力した、提案を受け入れた、タイルを動かした——は、すべてまずプレビューとして表示されます。ライブスケジュールはあなたがそう決めるまで無傷のままです。"
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Schedule Undoの仕組み"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "変更を行う",
+						"stepBody": "タイルを動かす、新しいタスクを追加する、AIの提案を受け入れる。すぐに保存する代わりに、Tilerは変更をプレビューに置きます。破線とPREVIEWラベルで表示され、まだ確定していないことがわかります。",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "自動保存はしない",
+							"text": "レビュー中はライブスケジュールが固定されます。部分的な保存も、誤っての上書きもありません。"
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "何が変わったか正確に確認する",
+						"stepBody": "プレビューのタイルは、更新された名前、場所、時間、日付を、それ以前のものと並べて表示します。頭の中で何が変わったかを追うことなく、全体像を一目で見ることができます。"
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "元に戻すか承認するかをタップ",
+						"stepBody": "結果に満足しない？「元に戻す」をタップすると元のスケジュールが即座に戻ります。満足している？「承認」をタップすると確定します。どちらの場合も、あなたが判断しています。",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "元に戻すは常に即時",
+							"text": "スクロールする元に戻す履歴はありません。1回のタップで、プレビューでどれだけずれても、正確な元の状態が戻ります。"
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "なぜ重要なのか"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "ほとんどのカレンダーアプリは変更を即座に適用し、後から元に戻すよう求めます——その時点では通知が送信済み、同期が完了し、手遅れです。Schedule Undoはこれを逆転します。デフォルトはプレビューで、保存ではありません。"
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "ぎゅうぎゅう詰めの日に備えて",
+						"text": "日に余裕がないとき、1つのミスがすべてに波及します。Schedule Undoは、変更がライブになる前に、一呼吸置いて確認するための時間を与えます。"
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "ワークアウトの日程変更、ミーティングの移動、同僚から送られたタスクの引き受け——プレビューのステップは1秒もかからず、後悔する電話を防いでくれます。"
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "問題になる前に、考えを変えてください。"
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "2026年5月22日",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "ほとんどのタスクの引き継ぎはメッセージスレッドで終わります。送る、読む、スケジューリングするのを忘れる、フォローアップ。Tileshareは中継を省きます。タイルを共有すると、相手のTilerにすでにスケジューリング済みで届きます。"
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "タイルを共有すると、受取人のスケジュールにライブの適応タスクとして届きます。既存の予定の周りで最適な空きスロットを見つけます。どちらの側も配置は不要です。"
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Tileshareの仕組み"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "任意のタイルを共有する",
+						"stepBody": "スケジュールの任意のタスクから、「共有」をタップしてTilerの連絡先を選択します。タイルは、受取人が完了するために必要なすべての情報とともに送信されます。",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "タイルと共に届くもの",
+							"text": "タスク名、推定所要時間、締切、場所タグ。受取人の個人的なスケジュールは完全にプライベートのままです。"
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "相手のスケジュールに届く",
+						"stepBody": "共有されたタイルは受取人のTilerに表示され、既存の予定の周りで最適な空きスロットを見つけます。相手の日に適応し、その逆ではありません。"
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "追跡するが、追いかけない",
+						"stepBody": "タスクが送信されると、いつスケジューリングされたか、いつ完了するか、移動されたかを確認できます。フォローアップのメッセージは不要。ステータス確認も不要。わかります。",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "共有された責任、ゼロの摩擦",
+							"text": "両側が同じタイルを見ます。片方が完了し、もう片方が完了したのを見ます。実際にループを閉じるデリゲーション。"
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "一度送る。完了することを確信する。"
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "AIスケジューリング",
+				"title": "AIカレンダーとは？本来あるべき役割とは",
+				"subtitle": "ほとんどの人は、もうひとつカレンダーアプリを増やす必要はありません。必要なのは、意思決定が静かに壊れてしまう場所であることからの脱却です。AIカレンダーが本当に担うべきこと、そして絶対にしてはいけないこととは何か。",
+				"excerpt": "スマートカレンダー、AIスケジューラー、時間管理ツールは次々と登場します。しかし多くのツールが答えているのは同じ、弱い問いです。「これをどこに置けばいいの？」AIカレンダーの本当の仕事は、すでに大切なものを守ることです。",
+				"readTime": "5分で読める",
+				"author": "Tilerチーム",
+				"date": "2026年5月1日",
+				"sections": [
+					{
+						"lead": true,
+						"text": "数ヶ月に一度、新しいアプリがあなたの時間をよりスマートに管理すると約束します。しかしほとんどのカレンダーはまだ同じように動作しています：イベントを保存するだけ。あなたの一日が何をしようとしているかを本当に考えていません。AIカレンダーは重要な点で異なります：スケジュールを制約のシステムとして扱うのではなく、単なるブロックのリストとしてではなく。これが、イベントを保存するツールと、結果を推論するツールの違いです。"
+					},
+					{
+						"caption": "カレンダーの三世代：無知なリスト、スマートカレンダー、そして結果を推論するAIカレンダー。"
+					},
+					{
+						"title": "無知なリストから意思決定へ"
+					},
+					{
+						"text": "デジタルカレンダーの第一世代は紙のプランナーの代わりでした。イベントを入力し、時間を選び、カレンダーが記憶していました。それは役に立ちました。しかし、あなたがすでに正しい判断を下していると前提づけていました。カレンダーは単なる保存場所でした。"
+					},
+					{
+						"text": "第二世代は知能を加えました、ただし端っこの部分だけです。カレンダーが競合をリマインドし、空き時間を提案し、移動時間を少しブロックする。それは役立つものでした。しかし、まだ各イベントを孤立して扱っていました。カレンダーは何か問題があることを伝えることができました。しかし、何がより良いかを伝えることはできませんでした。"
+					},
+					{
+						"text": "第三世代は異なります。イベントはグリッド上の孤立した箱ではないことを理解しています。それらには重み、場所、依存関係、そして結果があります。顧客との通話、ワークアウト、そして運転は、単なる時間ではありません。それは互いに関係し合う一日のパーツです。そこに「AI」という言葉がついにその価値を証明します。"
+					},
+					{
+						"label": "重要な転換点",
+						"text": "カレンダーは「このイベントはどこにあるか？」という問いから、「それが移動したとき一日全体に何が起きるか？」という問いに移りました。保存から推論へのこのシフトが、カレンダーを単にスマートではなくAIにしているのです。"
+					},
+					{
+						"title": "AIカレンダーが実際に答えること"
+					},
+					{
+						"text": "本物のAIカレンダーは、古いカレンダーが一度も答えようとしなかった質問に答えます：これを入れ込むと、すでに重要になっているものに壊れることなく間に合いますか？これを動かしたら何が起きますか？これを入れるのに一番痛みが少ない場所は？これらは小さな質問ではありません。一日を機能させる、あるいは静かに台無しにする質問です。"
+					},
+					{
+						"text": "ここで「AIカレンダー」はマーケティングのフレーズではなくなります。イベントの横にいるチャットボットの話ではありません。あなたが決定する前に、スケジュール判断の結果を予測できるシステムの話しです。"
+					},
+					{
+						"title": "なぜチャットボットだけでは違うのか"
+					},
+					{
+						"text": "多くのツールが今、通常のカレンダーにチャットインターフェースを追加しています。それは便利です、しかしそれではカレンダーはAIになりません。チャットボットは質問に答えられますが、スケジュールの挙動は変えません。本物のAIカレンダーは挙動そのものを変えます。何かを伝えるだけでは終わりません。変更をテストし、影響をシミュレーションし、あなたが承認する前に何が起きるかを表示します。"
+					},
+					{
+						"text": "それは根本的に異なるものです。カレンダーを決定の記録から、より良い判断を助けるツールに変えます。変更を受け入れる、調整する、元に戻すことができます。カレンダーが先にトレードオフを表示してくれるから。これが多くの製品がまだ間違っている部分です。カレンダーを話すようにしますが、考えさせるにはしていないのです。"
+					},
+					{
+						"title": "Tilerでの姿"
+					},
+					{
+						"stepTitle": "本物のカレンダーの質問をする",
+						"stepBody": "ブロックを場所へドラッグして祈りません。Tilerに仕事後にジムを間に合わせてと言います。Tilerはすでにあるものを確認し、実際にそれらと機能するスケジュールを提案します。"
+					},
+					{
+						"stepTitle": "起きる前に影響を確認する",
+						"stepBody": "Tilerは単にタイルを動かして最善を願うだけではありません。何が変わるかを表示します。スタンドアップが30分後ろにずれた場合、あなたがコミットする前に見えます。予期しない競合も、壊れた移動時間もない。"
+					},
+					{
+						"stepTitle": "受け入れるか、考えを変える",
+						"stepBody": "最終決定権はあなたにあります。計画を受け入れる、単一のタイルを調整する、すべてを元に戻すことができます。カレンダーが考え、あなたが決定します。"
+					},
+					{
+						"quote": "AIカレンダーはチャットボットではありません。意思決定レイヤーです。"
+					},
+					{
+						"label": "ヒント",
+						"text": "カレンダーに本物の質問をしましょう。「私の一日を壊さずにどこに収まるか？」は「3時に設定して」に勝ります。前者はカレンダーを働かせます。後者はただ従わせるだけです。"
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "次の記事：自然言語スケジューリング — カレンダーにあなたの意図を問う"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "次の記事：Schedule Undo — ぐちゃぐちゃになったスケジュールを取り消す正しい方法"
+					},
+					{
+						"items": [
+							{
+								"question": "AIカレンダーは私のカレンダーの上に載ったチャットボットですか？",
+								"answer": "いいえ。チャットボットはイベントについての質問に答えます。AIカレンダーはスケジュール自体の挙動を変えます：変更をテストし、影響をシミュレーションし、何かがコミットされる前にトレードオフを表示します。"
+							},
+							{
+								"question": "聞かずに私のイベントを移動しますか？",
+								"answer": "いいえ。カレンダーが提案し、あなたが決定します。計画全体を受け入れる、調整する、元に戻すことができるので、あなたの承認前に何も変わりません。"
+							},
+							{
+								"question": "それでも今のカレンダーアプリは必要ですか？",
+								"answer": "Tilerはあなたがすでに使っているカレンダーの上で動作します。イベントの住む場所を置き換えるのではなく、それらの周りの判断をよりやすくします。"
+							},
+							{
+								"question": "私に代わったり、怠け者にするのですか？",
+								"answer": "AIカレンダーはあなたをより人間にすべきです、より少なくは。機械的なトレードオフを処理するので、本当に人間が必要である部分に注力することができます。"
+							}
+						]
 					}
 				]
 			}

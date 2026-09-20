@@ -19,10 +19,21 @@ import NLSStep3 from '@/assets/articles/nls-step3.svg';
 import TileshareStep1 from '@/assets/articles/tileshare-step1.svg';
 import TileshareStep2 from '@/assets/articles/tileshare-step2.svg';
 import TileshareStep3 from '@/assets/articles/tileshare-step3.svg';
+import AICalendarHero from '@/assets/articles/aicalendar-hero.svg';
+import AICalendarCard from '@/assets/articles/aicalendar-card.svg';
+import AICalendarJourney from '@/assets/articles/aicalendar-journey.svg';
+import AICalendarStep1 from '@/assets/articles/aicalendar-step1.svg';
+import AICalendarStep2 from '@/assets/articles/aicalendar-step2.svg';
+import AICalendarStep3 from '@/assets/articles/aicalendar-step3.svg';
 import type { TFunction } from 'i18next';
 
+export interface FAQItem {
+	question: string;
+	answer: string;
+}
+
 export interface ArticleSection {
-	type: 'prose' | 'heading' | 'step' | 'callout' | 'image' | 'quote';
+	type: 'prose' | 'heading' | 'step' | 'callout' | 'image' | 'quote' | 'link' | 'faq';
 	// prose
 	text?: string;
 	lead?: boolean;
@@ -41,6 +52,10 @@ export interface ArticleSection {
 	caption?: string;
 	// quote
 	quote?: string;
+	// internal link ("Read next")
+	to?: string;
+	// FAQ
+	items?: FAQItem[];
 }
 
 export interface Article {
@@ -627,6 +642,280 @@ export const getArticles = (t: TFunction): Article[] => [
 					'articles.posts.tileshare.sections.6.quote',
 					'Send it once. Know it gets done.'
 				),
+			},
+		],
+	},
+	{
+		slug: 'what-is-an-ai-calendar',
+		category: tr(t, 'articles.posts.aiCalendar.category', 'AI SCHEDULING'),
+		title: tr(
+			t,
+			'articles.posts.aiCalendar.title',
+			'What Is an AI Calendar, and What Should It Actually Do?'
+		),
+		subtitle: tr(
+			t,
+			'articles.posts.aiCalendar.subtitle',
+			'Most people do not need more calendar apps. They need the calendar to stop being a place where decisions quietly break. Here is what an AI calendar should actually handle, and what it should never do.'
+		),
+		excerpt: tr(
+			t,
+			'articles.posts.aiCalendar.excerpt',
+			'Smart calendars, AI schedulers, and time management tools keep appearing. Most of them answer the same weak question: where should I put this? But the real job of an AI calendar is to protect what already matters.'
+		),
+		readTime: tr(t, 'articles.posts.aiCalendar.readTime', '5 min read'),
+		author: tr(t, 'articles.posts.aiCalendar.author', 'Tiler Team'),
+		date: tr(t, 'articles.posts.aiCalendar.date', 'May 1, 2026'),
+		coverImage: AICalendarCard,
+		heroImage: AICalendarHero,
+		sections: [
+			{
+				type: 'prose',
+				lead: true,
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.0.text',
+					'Every few months, a new app promises to be smarter about your time. But most calendars still work the same way: they store events. They do not really think about what your day is doing. An AI calendar is different in one important way: it treats your schedule as a system of constraints, not just a list of blocks. That is the difference between a tool that stores events and a tool that reasons about outcomes.'
+				),
+			},
+			{
+				type: 'image',
+				src: AICalendarJourney,
+				caption: tr(
+					t,
+					'articles.posts.aiCalendar.sections.1.caption',
+					'The three generations of calendars: the dumb list, the smart calendar, and the AI calendar that reasons about outcomes.'
+				),
+			},
+			{
+				type: 'heading',
+				title: tr(
+					t,
+					'articles.posts.aiCalendar.sections.2.title',
+					'From dumb lists to decisions'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.3.text',
+					'The first generation of digital calendars was a replacement for the paper planner. You typed an event, picked a time, and the calendar remembered it. That was useful. But it assumed you already made the right decision. The calendar was just storage.'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.4.text',
+					'The second generation added intelligence, but only at the edges. A calendar might remind you of a conflict, suggest a free slot, or block a bit of travel time. These were helpful. But they still treated each event in isolation. The calendar could tell you something was wrong. It could not tell you what was better.'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.5.text',
+					'The third generation is different. It understands that events are not isolated boxes on a grid. They have weight, location, dependencies, and consequences. A client call, a workout, and a drive are not just times. They are pieces of a day that affect each other. That is where the word "AI" finally earns its place.'
+				),
+			},
+			{
+				type: 'callout',
+				label: tr(t, 'articles.posts.aiCalendar.sections.6.label', 'Key shift'),
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.6.text',
+					'Calendars moved from asking "where is this event?" to "what happens to the whole day when it moves?" That shift from storage to reasoning is what makes a calendar AI rather than just smart.'
+				),
+			},
+			{
+				type: 'heading',
+				title: tr(
+					t,
+					'articles.posts.aiCalendar.sections.7.title',
+					'What an AI calendar actually answers'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.8.text',
+					'A real AI calendar answers questions that older calendars never tried to answer: Can I fit this in without breaking what already matters? What happens if I move this thing? Where is the least painful place for this to go? These are not small questions. They are the questions that make a day work, or quietly ruin it.'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.9.text',
+					'This is where "AI calendar" stops being a marketing phrase. It is not about a chatbot sitting next to your events. It is about a system that can predict the consequences of scheduling decisions before you commit to them.'
+				),
+			},
+			{
+				type: 'heading',
+				title: tr(
+					t,
+					'articles.posts.aiCalendar.sections.10.title',
+					'Why this is not just a chatbot'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.11.text',
+					'Many tools now bolt a chat interface onto a normal calendar. That is convenient, but it is not what makes a calendar AI. A chatbot can answer questions, but it does not change how the schedule behaves. A true AI calendar changes the behavior itself. It does not just tell you something. It tests a change, simulates the impact, and shows you what happens before you accept it.'
+				),
+			},
+			{
+				type: 'prose',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.12.text',
+					'That is a fundamentally different thing. It turns the calendar from a record of decisions into a tool that helps you make better ones. You can accept, adjust, or undo the change, because the calendar shows you the tradeoff first. That is the part most products still get wrong. They make the calendar talk. They do not make it think.'
+				),
+			},
+			{
+				type: 'heading',
+				title: tr(
+					t,
+					'articles.posts.aiCalendar.sections.13.title',
+					'How it looks in Tiler'
+				),
+			},
+			{
+				type: 'step',
+				stepNumber: 1,
+				stepTitle: tr(
+					t,
+					'articles.posts.aiCalendar.sections.14.stepTitle',
+					'Ask a real calendar question'
+				),
+				stepImage: AICalendarStep1,
+				stepBody: tr(
+					t,
+					'articles.posts.aiCalendar.sections.14.stepBody',
+					'You do not drag a block into place and pray. You ask Tiler to fit the gym in after work. Tiler looks at what is already there and proposes a schedule that actually works with it.'
+				),
+			},
+			{
+				type: 'step',
+				stepNumber: 2,
+				stepTitle: tr(
+					t,
+					'articles.posts.aiCalendar.sections.15.stepTitle',
+					'See the impact before it happens'
+				),
+				stepImage: AICalendarStep2,
+				stepBody: tr(
+					t,
+					'articles.posts.aiCalendar.sections.15.stepBody',
+					'Tiler does not just move a tile and hope for the best. It shows you what changes. If the standup slides 30 minutes later, you see that before you commit. No surprise conflicts, no broken travel time.'
+				),
+			},
+			{
+				type: 'step',
+				stepNumber: 3,
+				stepTitle: tr(
+					t,
+					'articles.posts.aiCalendar.sections.16.stepTitle',
+					'Accept it or change your mind'
+				),
+				stepImage: AICalendarStep3,
+				stepBody: tr(
+					t,
+					'articles.posts.aiCalendar.sections.16.stepBody',
+					'You keep the final say. You can accept the plan, tweak a single tile, or undo the whole thing. The calendar thinks. You decide.'
+				),
+			},
+			{
+				type: 'quote',
+				quote: tr(
+					t,
+					'articles.posts.aiCalendar.sections.17.quote',
+					'An AI calendar is not a chatbot. It is a decision layer.'
+				),
+			},
+			{
+				type: 'callout',
+				label: tr(t, 'articles.posts.aiCalendar.sections.18.label', 'Tip'),
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.18.text',
+					'Ask the calendar real questions. "Where does this fit without breaking my day?" beats "Schedule it at 3." The first makes the calendar work. The second just makes it obey.'
+				),
+			},
+			{
+				type: 'link',
+				to: '/articles/natural-language-scheduling',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.19.text',
+					'Read next: Natural-Language Scheduling — Ask Your Calendar What You Mean'
+				),
+			},
+			{
+				type: 'link',
+				to: '/articles/schedule-undo',
+				text: tr(
+					t,
+					'articles.posts.aiCalendar.sections.20.text',
+					'Read next: Schedule Undo — The Right Way to Undo a Messy Schedule'
+				),
+			},
+			{
+				type: 'faq',
+				items: [
+					{
+						question: tr(
+							t,
+							'articles.posts.aiCalendar.faq.0.question',
+							'Is an AI calendar just a chatbot on top of my calendar?'
+						),
+						answer: tr(
+							t,
+							'articles.posts.aiCalendar.faq.0.answer',
+							'No. A chatbot answers questions about your events. An AI calendar changes how the schedule itself behaves: it tests a change, simulates the impact, and shows you the tradeoff before anything is committed.'
+						),
+					},
+					{
+						question: tr(
+							t,
+							'articles.posts.aiCalendar.faq.1.question',
+							'Will it move my events without asking?'
+						),
+						answer: tr(
+							t,
+							'articles.posts.aiCalendar.faq.1.answer',
+							'No. The calendar proposes; you decide. You can accept, adjust, or undo the whole plan, so nothing changes until you approve it.'
+						),
+					},
+					{
+						question: tr(
+							t,
+							'articles.posts.aiCalendar.faq.2.question',
+							'Do I still need my existing calendar app?'
+						),
+						answer: tr(
+							t,
+							'articles.posts.aiCalendar.faq.2.answer',
+							'Tiler works on top of the calendars you already use. It does not replace where your events live — it makes the decisions around them easier.'
+						),
+					},
+					{
+						question: tr(
+							t,
+							'articles.posts.aiCalendar.faq.3.question',
+							'Is it replacing me or making me lazy?'
+						),
+						answer: tr(
+							t,
+							'articles.posts.aiCalendar.faq.3.answer',
+							'An AI calendar should make you more human, not less. It handles the mechanical tradeoffs so you can spend your attention on the parts that actually need a human.'
+						),
+					},
+				],
 			},
 		],
 	},

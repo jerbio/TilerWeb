@@ -2208,40 +2208,40 @@
 				"date": "2026년 5월 1일",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "대부분의 스케줄링 도구는 당신을 캘린더 운영자로 취급합니다. 드래그하고, 드롭하고, 리사이즈하고, 그러다 삶이 바뀌면 처음부터 다시 시작합니다. Tiler는 다른 접근을 취합니다: 당신이 말하면, Tiler가 스케줄링합니다."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "\"목요일 오전 9시에 치과, 그리고 11시쯤 다운타운에서 Priya와 커피\" 같은 내용을 입력하면, Tiler가 나머지를 처리합니다. 소요 시간, 이동 시간, 버퍼, 확인. 전부입니다."
 					},
 					{
-						"title": "How it works"
+						"title": "동작 방식"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "과제를 설명하세요",
+						"stepBody": "해야 할 일을 평소 말투로 입력하세요. 특수 문법도, 드롭다운도 없습니다. \"내일 아침 한 시간 운동\"이면 충분합니다.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Tiler가 이해하는 것",
+							"text": "상대 시간(\"내일\"), 소요 시간(\"한 시간\"), 위치 단서(\"다운타운\"). 추가 설정 불필요."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "AI가 빈 부분을 채웁니다",
+						"stepBody": "Tiler는 응답하기 전에 요청을 추론합니다. 맥락에서 소요 시간을 추론하고, 기존 약속을 확인하며, 이동 시간을 고려합니다. 정말 모호한 부분이 있으면, Tiler는 한 가지 정확한 질문을 합니다——폼이 아닙니다.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "추론, 추측이 아님",
+							"text": "Tiler는 제안하기 전에 당신의 위치, 기존 타일, 선호 시간대를 교차 확인합니다."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "확인한 후 승인하세요",
+						"stepBody": "Tiler는 시간, 장소, 이동을 포함한 모든 세부 사항과 함께 제안된 일정을 보여줍니다. 승인, 조정, 또는 대안을 요청할 수 있습니다. 당신의 동의 없이 캘린더에 반영되는 것은 없습니다.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "확인이 먼저",
+							"text": "Tiler가 제안합니다. 당신이 결정합니다. AI가 중대한 작업을 처리하는 동안에도 당신은 통제권을 유지합니다."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "당신은 순간을 살고, Tiler는 계획을 세웁니다."
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "2026년 5월 8일",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "대부분의 캘린더는 하나의 과제가 끝나면 바로 다음 준비가 되어 있다고 가정합니다. 하지만 현실에는 이동 시간이 있습니다. Tiler는 일정 속에 그 이동을 통합하여 타임라인의 모든 블록이 실제로 있어야 할 장소를 반영하도록 합니다."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "미팅, 부업, 커피, 학교 등하교를 추가하세요. Tiler는 자동으로 이동 경로와 소요 시간을 계산하고, 이동 시간을 하루에 직접 배치합니다."
 					},
 					{
-						"title": "How it works"
+						"title": "동작 방식"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "장소를 한 번만 설정",
+						"stepBody": "매번 정확한 주소를 입력할 필요가 없습니다. 집, 직장, 자주 가는 장소를 한 번만 설정하세요. 그 이후 Tiler는 어디에서 출발하고 어디로 가는지 알 수 있습니다.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Tiler가 이해하는 위치 라벨",
+							"text": "집 · 직장 · 다운타운 · 짐 · 회사 근처"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "이동 시간이 타임라인에 배치됩니다",
+						"stepBody": "장소가 있는 과제를 추가할 때마다, Tiler는 이전 또는 다음 과제 사이에 이동 블록을 삽입합니다. 타임라인에 독립 세그먼트로 표시되어 언제 출발해야 하는지 항상 알 수 있습니다.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "실제 경로, 추정이 아님",
+							"text": "Tiler는 운전, 대중교통, 보행을 실시간으로 다루는 라우팅 데이터를 사용하여 실제 이동 방식에 맞는 이동 시간을 반영합니다."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "인근 과제가 자동으로 그룹화됩니다",
+						"stepBody": "여러 과제가 같은 지역에 있으면, Tiler는 왕복 이동을 막기 위해 그룹화합니다. 짐 근처 부업은 운동 전후에 배치됩니다. 다운타운 근처 고객 방문은 인근 점심과 매칭됩니다.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "이동 감소, 달성 증가",
+							"text": "스마트 그룹화로 이동 횟수가 줄고, 이동 중 낭비 시간이 줄며, 본래 그래야 하는 하루가 됩니다."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "무언가를 성취한다는 것은 시간을 찾는 것만이 아닙니다. 올바른 장소에 있는 것입니다."
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "2026년 6월 22일",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "일정 변경은 위험해 보입니다. 하나의 과제를 이동하면 무엇도 함께 이동하는지 불확실합니다. 제안을 수락했지만 그것이 올바른 결정이었는지 궁금해집니다. Schedule Undo는 의도와 확정 사이에 안전 지대를 제공합니다."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Tiler의 모든 변경——요청을 입력했거나, 제안을 수락했거나, 타일을 이동했거나——모두 먼저 미리보기로 표시됩니다. 당신의 실시간 일정은 당신이 결정할 때까지 그대로 유지됩니다."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Schedule Undo 동작 방식"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "변경을 수행하세요",
+						"stepBody": "타일을 이동하거나, 새 과제를 추가하거나, AI의 제안을 수락하세요. 즉시 저장하기 대신, Tiler는 변경 사항을 미리보기로 놓습니다. 점선 경계선과 PREVIEW 라벨로 표시되어 아직 확정되지 않았음을 알 수 있습니다.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "자동 저장 없음",
+							"text": "검토 중 실시간 일정은 고정됩니다. 부분 저장도, 우발적 덮어쓰기도 없습니다."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "정확히 무엇이 변경되었는지 확인",
+						"stepBody": "미리보기 타일은 업데이트된 이름, 장소, 시간, 날짜를 이전 내용과 나란히 보여줍니다. 머릿속으로 무엇을 이동했는지 추적할 필요 없이 한눈에 전체를 볼 수 있습니다."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "실행 취소 또는 승인을 탭하세요",
+						"stepBody": "결과에 만족하지 못합니까? 실행 취소 탭으로 원래 일정이 즉시 복원됩니다. 만족합니까? 승인 탭으로 확정됩니다. 어느 쪽이든 당신이 결정했습니다.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "실행 취소는 항상 즉시",
+							"text": "스크롤해야 할 실행 취소 기록이 없습니다. 한 번 탭하면, 미리보기에서 얼마나 이동했든 정확한 원래 상태로 돌아갑니다."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "왜 중요한가"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "대부분의 캘린더 앱은 변경을 즉시 적용하고 나중에 실행 취소하라고 요청합니다——그때는 이미 알림이 보내졌고, 동기화가 완료되었고, 손이 늦습니다. Schedule Undo는 논리를 반전시킵니다. 기본값은 미리보기이지, 저장이 아닙니다."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "빡빡한 일정을 위해 설계",
+						"text": "하루에 여유가 없을 때, 한 번의 실수가 모든 것에 영향을 미칩니다. Schedule Undo는 변경 사항이 라이브로 올라가기 전에 숨을 쉬고 확인하는 시간을 줍니다."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "운동을 재예약하거나, 미팅을 이동하거나, 동료가 보낸 과제를 떠맡거나——미리보기 단계는 1초도 걸리지 않고 후회할 전화를 피하게 해줍니다."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "문제가 되기 전에, 생각을 바꾸세요."
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "2026년 5월 22일",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "대부분의 과제 전달은 메시지 스레드에서 끝납니다. 보내고, 읽고, 스케줄링을 잊고, 당신이 팔로우업합니다. Tileshare는 중개를 없앱니다. 타일을 공유하면 상대방의 Tiler에 이미 스케줄링되어 도착합니다."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "타일을 공유하면, 수신자의 일정에 라이브 적응형 과제로 도착합니다. 기존 약속 주변에서 최적의 빈 슬롯을 찾습니다. 어느 쪽도 배치할 필요가 없습니다."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Tileshare 동작 방식"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "모든 타일을 공유",
+						"stepBody": "일정의 모든 과제에서, 공유를 탭하고 Tiler連絡先을 선택하세요. 타일은 수신자가 완료하는 데 필요한 모든 정보와 함께 전송됩니다.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "타일과 함께 이동하는 것",
+							"text": "과제 이름, 예상 소요 시간, 마감일, 위치 태그. 수신자의 개인 일정은 완전히 비공개로 유지됩니다."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "상대방의 일정에 도착",
+						"stepBody": "공유된 타일은 수신자의 Tiler에 표시되고, 기존 약속 주변에서 최적의 빈 슬롯을 찾습니다. 상대방의 하루에 적응합니다, 반대는 아닙니다."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "추적하되 추궁하지 않음",
+						"stepBody": "과제가 전송되면, 언제 스케줄링되었는지, 언제 완료될지, 이동되었는지 확인할 수 있습니다. 팔로우업 메시지 불필요. 상태 확인 불필요. 알 수 있습니다.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "공유 책임, 마찰 제로",
+							"text": "양쪽이 같은 타일을 봅니다. 한쪽이 완료하고, 다른 쪽이 완료됨을 확인합니다. 실제로 루프를 닫는 위임입니다."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "한 번 보내세요. 완료될 것을 압니다."
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "AI 스케줄링",
+				"title": "AI 캘린더란, 그리고 그것이 정말로 해야 할 일은?",
+				"subtitle": "대부분의 사람은 캘린더 앱이 더 필요한 것이 아닙니다. 필요한 것은 결정이 조용히 깨지는 곳이었던 캘린더가 그런 곳에서 벗어나는 것입니다. AI 캘린더가 실제로 처리해야 하는 것과 절대 하지 말아야 하는 것이 무엇인지 살펴봅니다.",
+				"excerpt": "스마트 캘린더, AI 스케줄러, 시간 관리 도구가 계속 등장합니다. 대부분은 같은 약한 질문에 답합니다. “이걸 어디에 넣지?” 하지만 AI 캘린더의 진정한 역할은 이미 중요한 것을 지키는 것입니다.",
+				"readTime": "5분 읽기",
+				"author": "Tiler 팀",
+				"date": "2026년 5월 1일",
+				"sections": [
+					{
+						"lead": true,
+						"text": "몇 달에 한 번씩, 새로운 앱이 당신의 시간을 더 스마트하게 관리하겠다고 약속합니다. 하지만 대부분의 캘린더는 여전히 같은 방식으로 작동합니다: 이벤트를 저장할 뿐입니다. 하루가 무엇을 하고 있는지 진지하게 생각하지 않습니다. AI 캘린더는 중요한 한 가지 점에서 다릅니다: 스케줄을 블록 목록이 아니라 제약 시스템으로 대합니다. 이벤트만 저장하는 도구와 결과를 추론하는 도구의 차이가 바로 이겁니다."
+					},
+					{
+						"caption": "캘린더의 세 세대: 멍청한 목록, 스마트 캘린더, 그리고 결과를 추론하는 AI 캘린더."
+					},
+					{
+						"title": "멍청한 목록에서 의사결정으로"
+					},
+					{
+						"text": "디지털 캘린더의 첫 세대는 종이 플래너의 대체재였습니다. 이벤트를 입력하고 시간을 고르면 캘린더가 기억했습니다. 유용했죠. 하지만 이미 올바른 결정을 내렸다고 가정했습니다. 캘린더는 단순한 저장공간이었습니다."
+					},
+					{
+						"text": "두 번째 세대는 지능을 추가했지만, 가장자리에서만. 캘린더가 충돌을 알려주거나, 빈 시간을 제안하거나, 이동 시간을 조금 확보해 주었습니다. 도움이 되긴 했지만, 여전히 각 이벤트를 고립된 상태로 대했습니다. 캘린더는 문제가 있다는 것은 말해줄 수 있었지만, 무엇이 더 나은지 말해줄 수는 없었습니다."
+					},
+					{
+						"text": "세 번째 세대는 다릅니다. 이벤트가 그리드 위의 고립된 박스가 아님을 이해합니다. 그것들은 무게, 위치, 의존 관계, 그리고 결과물을 가집니다. 고객 통화, 운동, 그리고 운전은 단순한 시간이 아닙니다. 서로 영향을 주는 하루의 조각들입니다. 바로 여기에 'AI'라는 단어가 마침내 그 자리에 합당한 이유가 생깁니다."
+					},
+					{
+						"label": "핵심 전환",
+						"text": "캘린더는 '이 이벤트는 어디에 있는가?'에서 '이동하면 하루 전체에 무슨 일이 일어나는가?'로 바뀌었습니다. 저장에서 추론으로의 이 전환이 캘린더를 단순히 스마트한 것이 아닌 AI로 만듭니다."
+					},
+					{
+						"title": "AI 캘린더가 실제로 답하는 것"
+					},
+					{
+						"text": "진정한 AI 캘린더는 오래된 캘린더가 한 번도 답하려 하지 않은 질문에 답합니다: 이것을 넣으면 이미 중요한 것이 무너지지 않고 들어맞을까? 이것을 옮기면 무슨 일이 일어나나? 이것을 넣기 위한 가장 덜 아픈 곳은 어디인가? 이런 것들은 작은 질문이 아닙니다. 하루를 funzionare하게 하거나, 조용히 망가뜨리는 질문입니다."
+					},
+					{
+						"text": "여기서 'AI 캘린더'는 마케팅 문구가不再是됩니다. 이벤트 옆에 앉아 있는 챗봇이 아닙니다. 당신이 결정하기 전에 스케줄링 의사결정의 결과를 예측할 수 있는 시스템입니다."
+					},
+					{
+						"title": "왜 단순한 챗봇이 아닌지"
+					},
+					{
+						"text": "많은 도구가 이제 일반 캘린더에 챗 인터페이스를 붙였습니다. 편리하지만, 그것이 캘린더를 AI로 만드는 것은 아닙니다. 챗봇은 질문에 답할 수 있지만, 스케줄의 행동은 바꾸지 못합니다. 진정한 AI 캘린더는 행동 자체를 바꿉니다. 단순히 무언가를 알려주는 게 아닙니다. 변경 사항을 테스트하고, 영향을 시뮬레이션하고, 당신이 승인하기 전에 무슨 일이 일어나는지 보여줍니다."
+					},
+					{
+						"text": "그것은 근본적으로 다른 것입니다. 캘린더를 의사결정의 기록에서 더 나은 결정을 내리도록 돕는 도구로 바꿉니다. 변경 사항을 받아들일 수 있고, 조정할 수 있고, 되돌릴 수 있습니다. 캘린더가 먼저 트레이드오프를 보여주기 때문이죠. 이것이 대부분 제품이 여전히 잘못하는 부분입니다. 캘린더가 말하게는 하지만, 생각하게는 하지 않습니다."
+					},
+					{
+						"title": "Tiler에서의 모습"
+					},
+					{
+						"stepTitle": "진정한 캘린더 질문을 하기",
+						"stepBody": "블록을 위치로 드래그하고 기도하지 않습니다. Tiler에게 퇴근 후 헬스를 끼워넣으라고 요청합니다. Tiler는 이미 있는 것을 확인하고, 실제로 그것들과 함께 작동하는 스케줄을 제안합니다."
+					},
+					{
+						"stepTitle": "발생 전에 영향 확인하기",
+						"stepBody": "Tiler는 단순히 타일을 움직이고 최고를 기원하는 것이 아닙니다. 무엇이 바뀌는지 보여줍니다. 스탠드업이 30분 늦어지면, 당신이 확정하기 전에 볼 수 있습니다. 예기치 않은 충돌도, 깨진 이동 시간도 없습니다."
+					},
+					{
+						"stepTitle": "수락하거나 생각 바꾸기",
+						"stepBody": "마지막 결정권은 당신에게 있습니다. 계획을 받아들이거나, 단일 타일을 조정하거나, 전체를 되돌릴 수 있습니다. 캘린더가 생각하고, 당신이 결정합니다."
+					},
+					{
+						"quote": "AI 캘린더는 챗봇이 아닙니다. 의사결정 레이어입니다."
+					},
+					{
+						"label": "팁",
+						"text": "캘린더에게 진정한 질문을 하세요. '내 하루를 깨뜨리지 않고 어디에 들어맞나?'가 '3시에 넣어'를 이깁니다. 전자는 캘린더를 일하게 하고, 후자는 단순히 복종하게 만듭니다."
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "다음 읽기: 자연어 스케줄링 — 캘린더에게 당신의 의도를 물어보세요"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "다음 읽기: Schedule Undo — 엉망이 된 스케줄을 되돌리는 올바른 방법"
+					},
+					{
+						"items": [
+							{
+								"question": "AI 캘린더는 내 캘린더 위에 얹힌 챗봇입니까?",
+								"answer": "아니요. 챗봇은 이벤트에 대한 질문에 답합니다. AI 캘린더는 스케줄 자체의 행동을 바꿉니다: 변경 사항을 테스트하고, 영향을 시뮬레이션하고, 무엇이 확정되기 전에 트레이드오프를 보여줍니다."
+							},
+							{
+								"question": "묻지 않고 제 이벤트를 이동합니까?",
+								"answer": "아니요. 캘린더가 제안하고, 당신이 결정합니다. 전체 계획을 승인하거나, 조정하거나, 되돌릴 수 있으므로, 당신의 승인 전에 아무것도 바뀌지 않습니다."
+							},
+							{
+								"question": "그래도 기존 캘린더 앱이 필요합니까?",
+								"answer": "Tiler는 이미 사용 중인 캘린더 위에서 작동합니다. 이벤트가 사는 자리를 대체하는 것이 아니라, 그 주위의 의사결정을 더 쉽게 만듭니다."
+							},
+							{
+								"question": "내게 대체하거나 게으르게 만듭니까?",
+								"answer": "AI 캘린더는 당신을 더 인간적으로 만들어야 합니다, 더 적게는. 기계적 트레이드오프를 처리하므로, 진정으로 인간이 필요한 부분에 집중할 수 있습니다."
+							}
+						]
 					}
 				]
 			}

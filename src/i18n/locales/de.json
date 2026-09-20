@@ -2208,40 +2208,40 @@
 				"date": "1. Mai 2026",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "Die meisten Planungs-Tools behandeln dich wie einen Kalenderoperator. Du ziehst, verschiebst, änderst die Größe – und dann ändert sich dein Leben, und du fängst von vorne an. Tiler geht einen anderen Weg: Du sprichst, es planst."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "Tipp etwas wie \"Dentist am Donnerstag um 9, danach Kaffee mit Priya in der Innenstadt gegen 11\" ein, und Tiler übernimmt den Rest. Dauer, Fahrzeit, Puffer, Bestätigung. Alles."
 					},
 					{
-						"title": "How it works"
+						"title": "So funktioniert es"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "Beschreibe die Aufgabe",
+						"stepBody": "Schreib, was du erledigen musst, in gewöhnlicher Sprache. Keine spezielle Syntax, keine Dropdowns. \"Gym morgen früh für eine Stunde\" reicht, um loszulegen.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Was Tiler versteht",
+							"text": "Relative Zeit (\"morgen\"), Dauer (\"eine Stunde\") und Standort-Hinweise (\"Innenstadt\"). Keine zusätzliche Einrichtung nötig."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "Die KI füllt die Lücken",
+						"stepBody": "Tiler überlegt über deine Anfrage nach, bevor es antwortet. Es leitet die Dauer aus dem Kontext ab, prüft deine bestehenden Verpflichtungen und berücksichtigt Fahrzeiten. Wenn ein Detail wirklich unklar ist, stellt es eine gezielte Frage – nie ein Formular.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "Nachdenken, nicht raten",
+							"text": "Tiler vergleicht deinen Standort, deine bestehenden Tiles und deine bevorzugten Zeitfenster, bevor es irgendetwas vorschlägt."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "Prüfen, dann bestätigen",
+						"stepBody": "Tiler zeigt dir den vorgeschlagenen Zeitplan mit allen Details: Zeit, Ort und Fahrt. Du bestätigst, passt an oder bittest um Alternativen. Nichts landet in deinem Kalender, ohne dass du es gesagt hast.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "Bestätigung zuerst",
+							"text": "Tiler schlägt vor. Du entscheidest. Du behältst die Kontrolle, auch wenn die KI die schwere Arbeit macht."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "Du lebst es. Tiler plant es."
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "8. Mai 2026",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "Die meisten Kalender gehen davon aus, dass du bereit bist, sobald ein Auftrag endet. Aber das echte Leben hat einen Arbeitsweg. Tiler baut diese Fahrzeit in deinen Zeitplan ein, damit jeder Block in deinem Zeitstrahl wiedergibt, wo du sein musst."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "Füge ein Meeting, eine Erledigung, ein Kaffee-Treffen oder eine Abholung von der Schule hinzu. Tiler berechnet automatisch, wie du hinkommst und wie lange es dauert, und fügt die Fahrzeit direkt in deinen Tag ein."
 					},
 					{
-						"title": "How it works"
+						"title": "So funktioniert es"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "Standorte einmalig festlegen",
+						"stepBody": "Du musst nicht jedes Mal exakte Adressen eingeben. Leg deinen Heim-, Arbeits- und anderen festen Standorte einmal fest. Von da an weiß Tiler, wo du startest und wohin du gehst.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Standort-Labels, die Tiler versteht",
+							"text": "Zuhause · Arbeit · Innenstadt · Das Gym · Nahe dem Büro"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "Fahrzeit wird in deinen Zeitstrahl eingeplant",
+						"stepBody": "Jedes Mal, wenn du eine Aufgabe mit Standort hinzufügst, fügt Tiler einen Fahrtblock zwischen ihr und dem, was davor oder danach kommt, ein. Es erscheint als eigenes Segment in deinem Zeitstrahl, damit du immer weißt, wann du losmüssen musst.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "Echte Routen, keine Schätzungen",
+							"text": "Tiler verwendet Live-Routendaten für Autofahren, öffentliche Verkehrsmittel und Fußwege, damit die Fahrzeit wiedergibt, wie du tatsächlich unterwegs bist."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "Nahe Aufgaben werden automatisch zusammengefasst",
+						"stepBody": "Wenn mehrere Aufgaben in derselben Gegend liegen, fasst Tiler sie zusammen, damit du nicht durch die ganze Stadt zickzackst. Erledigungen in der Nähe deines Gyms landen vor oder nach deinem Training. Ein Kundenbesuch in der Innenstadt wird mit deinem Mittagessen in der Nähe kombiniert.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "Weniger fahren, mehr erledigt",
+							"text": "Intelligente Gruppierung bedeutet weniger Fahrten, weniger verschwendete Zeit unterwegs und ein Tag, der so abläuft, wie er soll."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "Etwas erledigen heißt nicht nur, die Zeit zu finden. Es heißt, am richtigen Ort zu sein."
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "22. Juni 2026",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "Deinen Zeitplan zu ändern fühlt sich riskant an. Du bewegst eine Aufgabe und bist dir nicht sicher, was sich noch verschoben hat. Du nimmst einen Vorschlag an und fragst dich, ob das die richtige Entscheidung war. Schedule Undo gibt dir eine sichere Zone zwischen Absicht und Verpflichtung."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Jede Änderung in Tiler – ob du eine Anfrage eingegeben, einen Vorschlag akzeptiert oder ein Tile bewegt hast – erscheint zuerst als Vorschau. Dein aktiver Zeitplan bleibt unverändert, bis du sagst, dass es so bleibt."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "So funktioniert Schedule Undo"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "Ändere etwas",
+						"stepBody": "Beweg ein Tile, füge eine neue Aufgabe hinzu oder akzeptiere einen KI-Vorschlag. Statt sofort zu speichern, legt Tiler die Änderung in die Vorschau. Sie erscheint mit gestricheltem Rand und einem PREVIEW-Label, damit du weißt, dass sie noch nicht festgesetzt ist.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "Nichts wird automatisch gespeichert",
+							"text": "Dein aktiver Zeitplan ist eingefroren, während du prüfst. Keine teilweisen Speicherungen, keine versehentlichen Überschreibungen."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "Sieh genau, was sich geändert hat",
+						"stepBody": "Das Vorschau-Tile zeigt den aktualisierten Namen, den Standort, die Zeit und das Datum neben dem, was vorher da war. Du siehst das volle Bild auf einen Blick, ohne mental verfolgen zu müssen, was sich bewegt hat."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Tippe auf Rückgängig oder Akzeptieren",
+						"stepBody": "Nicht zufrieden mit dem Ergebnis? Tippe auf Rückgängig und dein ursprünglicher Zeitplan springt sofort zurück. Zufrieden? Tippe auf Akzeptieren und es ist festgelegt. In beiden Fällen hast du die Entscheidung getroffen.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Rückgängig ist immer sofort",
+							"text": "Kein Rückgängig-Verlauf zum Durchscrollen. Ein Tipp und dein exakter ursprünglicher Zustand ist wieder da, egal wie viel sich in der Vorschau verschoben hat."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "Warum das wichtig ist"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "Die meisten Kalender-Apps wenden Änderungen sofort an und bitten dich, sie nachträglich rückgängig zu machen – zu dem Punkt, an dem Benachrichtigungen verschickt, Synchronisation passiert und der Schaden angerichtet ist. Schedule Undo dreht das um. Der Standard ist Vorschau, nicht Speichern."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "Gebaut für eng gepackte Tage",
+						"text": "Wenn dein Tag keinen Puffer hat, kann ein falscher Zug alles beeinflussen. Schedule Undo gibt dir einen Moment zum Durchatmen und Prüfen, bevor eine Änderung live geht."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "Ob du ein Workout verschiebst, ein Meeting verlegst oder eine Aufgabe übernimmst, die ein Kollege dir geschickt hat – der Vorschau-Schritt dauert weniger als eine Sekunde und kann dich vor einem Anruf retten, den du bereuen würdest."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "Ändere deine Meinung, bevor es zählt."
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "22. Mai 2026",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "Die meisten Aufgabenübergaben enden in einem Chatverlauf. Du schickst es, sie liest es, sie vergisst es einzuplanen, du folgst nach. Tileshare streicht die Mittelsmänner. Teile ein Tile und es landet in deren Tiler, bereits eingeplant."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "Wenn du ein Tile teilst, kommt es als adaptiver Live-Auftrag im Zeitplan des Empfängers an. Es findet den besten freien Slot um deren bestehenden Verpflichtungen herum. Keine Platzierung erforderlich auf beiden Seiten."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "So funktioniert Tileshare"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "Teile jedes Tile",
+						"stepBody": "Von jeder Aufgabe in deinem Zeitplan: Tippe auf Teilen und wähle einen Tiler-Kontakt. Das Tile wird mit allem gesendet, was der Empfänger braucht, um es zu erledigen.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "Was mit dem Tile reist",
+							"text": "Aufgabenname, geschätzte Dauer, Deadline und Standort-Tags. Der persönliche Zeitplan des Empfängers bleibt vollständig privat."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "Es landet in deren Zeitplan",
+						"stepBody": "Das geteilte Tile erscheint im Tiler des Empfängers und findet den besten freien Slot um deren bestehenden Verpflichtungen. Es passt sich deren Tag an, nicht umgekehrt."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "Verfolge es ohne nachzuhaken",
+						"stepBody": "Sobald die Aufgabe gesendet ist, kannst du sehen, wann sie eingeplant wurde, wann sie erledigt wird und ob sie verschoben wird. Keine Folge-Nachrichten. Keine Status-Checks. Du wirst es wissen.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "Geteilte Verantwortung, null Reibung",
+							"text": "Beide Seiten sehen dasselbe Tile. Eines erledigt es. Das andere sieht es erledigt. Delegation, die den Kreis tatsächlich schließt."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "Schicke es einmal. Wisse, dass es erledigt wird."
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "KI-PLANUNG",
+				"title": "Was ist ein KI-Kalender – und was sollte er wirklich können?",
+				"subtitle": "Die meisten Menschen brauchen keine weiteren Kalender-Apps. Sie brauchen einen Kalender, der nicht länger der Ort ist, an dem Entscheidungen still und leise zerbrechen. Hier ist, was ein KI-Kalender wirklich übernehmen sollte – und was er niemals tun sollte.",
+				"excerpt": "Smart Calendars, KI-Scheduler und Zeitmanagement-Tools tauchen immer wieder auf. Die meisten beantworten dieselbe schwache Frage: Wo soll ich das hinlegen? Die eigentliche Aufgabe eines KI-Kalenders ist es, zu schützen, was bereits zählt.",
+				"readTime": "5 Min. Lesezeit",
+				"author": "Tiler-Team",
+				"date": "1. Mai 2026",
+				"sections": [
+					{
+						"lead": true,
+						"text": "Alle paar Monate verspricht eine neue App, klüger mit deiner Zeit umzugehen. Doch die meisten Kalender funktionieren nach wie vor auf dieselbe Weise: Sie speichern Termine. Sie denken nicht wirklich darüber nach, was dein Tag tut. Ein KI-Kalender unterscheidet sich in einem entscheidenden Punkt: Er behandelt deinen Stundenplan als ein System von Einschränkungen, nicht nur als eine Liste von Blöcken. Das ist der Unterschied zwischen einem Tool, das Termine speichert, und einem Tool, das über Ergebnisse nachdenkt."
+					},
+					{
+						"caption": "Die drei Generationen von Kalendern: die simple Liste, der smarte Kalender und der KI-Kalender, der über Ergebnisse nachdenkt."
+					},
+					{
+						"title": "Von simplen Listen zu Entscheidungen"
+					},
+					{
+						"text": "Die erste Generation digitaler Kalender war ein Ersatz für den Papierplaner. Du tipptest einen Termin ein, wählte eine Uhrzeit, und der Kalender merkte ihn sich. Das war nützlich. Aber er ging davon aus, dass du schon die richtige Entscheidung getroffen hattest. Der Kalender war nur Speicher."
+					},
+					{
+						"text": "Die zweite Generation fügte Intelligenz hinzu – aber nur an den Rändern. Ein Kalender konnte dich auf einen Konflikt hinweisen, einen freien Slot vorschlagen oder etwas Reisezeit einplanen. Das war hilfreich. Aber sie behandelten jeden Termin weiterhin isoliert. Der Kalender konnte dir sagen, dass etwas nicht stimmt. Er konnte dir nicht sagen, was besser wäre."
+					},
+					{
+						"text": "Die dritte Generation ist anders. Sie versteht, dass Termine keine isolierten Kästchen auf einem Raster sind. Sie haben Gewicht, Standort, Abhängigkeiten und Konsequenzen. Ein Kundenanruf, ein Training und eine Fahrt sind nicht nur Zeitpunkte. Sie sind Teile eines Tages, die sich gegenseitig beeinflussen. Genau dort verdient das Wort „KI\" endlich seinen Platz."
+					},
+					{
+						"label": "Schlüsselschritt",
+						"text": "Kalender sind vom Fragen „Wo ist dieser Termin?\" zum „Was passiert mit dem ganzen Tag, wenn er sich bewegt?\" gewechselt. Diese Verschiebung von Speicherung zu Schlussfolgerung macht einen Kalender zur KI und nicht nur smart."
+					},
+					{
+						"title": "Was ein KI-Kalender tatsächlich beantwortet"
+					},
+					{
+						"text": "Ein echter KI-Kalender beantwortet Fragen, die ältere Kalender nie versucht haben zu beantworten: Kann ich das unterbringen, ohne das zu zerstören, was bereits wichtig ist? Was passiert, wenn ich das hier verschiebe? Wo ist der am wenigsten schmerzhafte Platz dafür? Das sind keine kleinen Fragen. Es sind die Fragen, die einen Tag funktionieren lassen – oder ihn still ruiniert."
+					},
+					{
+						"text": "Hier hört „KI-Kalender\" auf, eine Marketingphrase zu sein. Es geht nicht um einen Chatbot neben deinen Terminen. Es geht um ein System, das die Konsequenzen von Planungsentscheidungen vorhersagen kann, bevor du dich festlegst."
+					},
+					{
+						"title": "Warum das nicht nur ein Chatbot ist"
+					},
+					{
+						"text": "Viele Tools hängen jetzt eine Chat-Schnittstelle an einen normalen Kalender. Das ist praktisch, aber das macht einen Kalender nicht zur KI. Ein Chatbot kann Fragen beantworten, aber er verändert nicht, wie der Kalender funktioniert. Ein echter KI-Kalender verändert das Verhalten selbst. Er erzählt dir nicht nur etwas. Er testet eine Änderung, simuliert die Auswirkung und zeigt dir, was passiert, bevor du akzeptierst."
+					},
+					{
+						"text": "Das ist etwas Grundlegend anderes. Er verwandelt den Kalender von einer Aufzeichnung von Entscheidungen in ein Tool, das dir hilft, bessere zu treffen. Du kannst die Änderung akzeptieren, anpassen oder rückgängig machen, weil der Kalender dir zuerst den Kompromiss zeigt. Das ist der Teil, den die meisten Produkte immer noch falsch machen. Sie lassen den Kalender sprechen. Sie lassen ihn nicht denken."
+					},
+					{
+						"title": "Wie es in Tiler aussieht"
+					},
+					{
+						"stepTitle": "Stell eine echte Kalenderfrage",
+						"stepBody": "Du ziehst keinen Block an seinen Platz und bittest. Du fragst Tiler, das Gym nach der Arbeit unterzubringen. Tiler schaut, was bereits dort ist, und schlägt einen Plan vor, der tatsächlich damit funktioniert."
+					},
+					{
+						"stepTitle": "Sieh die Auswirkung, bevor sie eintritt",
+						"stepBody": "Tiler verschiebt nicht einfach eine Kachel und hofft aufs Beste. Es zeigt dir, was sich ändert. Wenn der Standup 30 Minuten später wird, siehst du das, bevor du festlegst. Keine überraschenden Konflikte, keine zerbrochene Reisezeit."
+					},
+					{
+						"stepTitle": "Akzeptiere es oder ändere deine Meinung",
+						"stepBody": "Du behältst das letzte Wort. Du kannst den Plan akzeptieren, eine einzelne Kachel anpassen oder das Ganze rückgängig machen. Der Kalender denkt. Du entscheidest."
+					},
+					{
+						"quote": "Ein KI-Kalender ist kein Chatbot. Er ist eine Entscheidungsschicht."
+					},
+					{
+						"label": "Tipp",
+						"text": "Stell dem Kalender echte Fragen. „Wo passt das hin, ohne meinen Tag zu zerstören?\" schlägt „Leg es auf 15 Uhr.\" Das erste lässt den Kalender arbeiten. Das zweite lässt ihn nur gehorchen."
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "Weiterlesen: Natürlichsprachliche Planung – Frag deinen Kalender, was du meinst"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "Weiterlesen: Schedule Undo – Der richtige Weg, einen chaotischen Kalender rückgängig zu machen"
+					},
+					{
+						"items": [
+							{
+								"question": "Ist ein KI-Kalender nur ein Chatbot über meinem Kalender?",
+								"answer": "Nein. Ein Chatbot beantwortet Fragen über deine Termine. Ein KI-Kalender verändert, wie der Kalender selbst funktioniert: Er testet eine Änderung, simuliert die Auswirkung und zeigt dir den Kompromiss, bevor etwas festgelegt wird."
+							},
+							{
+								"question": "Wird er meine Termine ohne Rücksprache verschieben?",
+								"answer": "Nein. Der Kalender schlägt vor; du entscheidest. Du kannst den ganzen Plan akzeptieren, anpassen oder rückgängig machen, sodass sich nichts ändert, bis du es genehmigst."
+							},
+							{
+								"question": "Brauche ich meine bestehende Kalender-App noch?",
+								"answer": "Tiler arbeitet über den Kalendern, die du bereits nutzt. Er ersetzt nicht, wo deine Termine leben – er macht die Entscheidungen darum leichter."
+							},
+							{
+								"question": "Ersetzt es mich oder macht es mich faul?",
+								"answer": "Ein KI-Kalender sollte dich menschlicher machen, nicht weniger. Er übernimmt die mechanischen Kompromisse, damit du deine Aufmerksamkeit auf die Teile richten kannst, die tatsächlich einen Menschen brauchen."
+							}
+						]
 					}
 				]
 			}

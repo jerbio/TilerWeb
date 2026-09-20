@@ -2208,40 +2208,40 @@
 				"date": "1 Μαΐου 2026",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "Τα περισσότερα εργαλεία προγραμματισμού σας μεταχειρίζονται ως χειριστή ημερολογίου. Στέλεχωνετε, αποθέτετε, επαναδιαστασιολογείτε, και μετά η ζωή αλλάζει και ξαναρχίζετε. To Tiler παίρνει μια διαφορετική προσέγγιση: μιλάτε, και το Tiler προγραμματίζει."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "Πληκτρολογήστε κάτι όπως \"Οδοντίατρος την Πέμπτη στις 9, μετά καφέ με την Priya downtown γύρω στις 11\" και το Tiler αναλαμβάνει το υπόλοιπο. Διάρκεια, χρόνος μετακίνησης, περιθώρια, επιβεβαίωση. Όλα."
 					},
 					{
-						"title": "How it works"
+						"title": "Πώς λειτουργεί"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "Περιγράψτε την εργασία",
+						"stepBody": "Πληκτρολογήστε τι χρειάζεται να κάνετε με καθημερινή ορολογία. Χωρίς ειδική σύνταξη, χωρίς μενού επιλογών. \"Συνεδρία γυμναστικής αύριο το πρωί για μία ώρα\" είναι αρκετό για να ξεκινήσετε.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Τι κατανοεί το Tiler",
+							"text": "Σχετικός χρόνος (\"αύριο\"), διάρκεια (\"μία ώρα\") και ενδείξεις θέσης (\"downtown\"). Χωρίς πρόσθετη ρύθμιση."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "Η AI γεμίζει τα κενά",
+						"stepBody": "Το Tiler σκέφτεται το αίτημά σας πριν απαντήσει. Προεξάγει τη διάρκεια από το πλαίσιο, ελέγχει τις υπάρχουσες δεσμεύσεις σας και λαμβάνει υπόψη την μετακίνηση. Αν μια λεπτομέρεια είναι γνήσια ασαφής, κάνει ένα στοχευμένο ερώτημα, ποτέ ένα φόρμα.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "Συλλογισμός, όχι μαντέμα",
+							"text": "Το Tiler διασταυρώνει τη θέση σας, τα υπάρχοντα tiles σας και τα προτιμώμενα παράθυρα χρόνου πριν προτείνει οτιδήποτε."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "Ελέγξτε, μετά επιβεβαιώστε",
+						"stepBody": "Το Tiler σας δείχνει την προτεινόμενη ωράριση με όλα τα στοιχεία: ώρα, θέση και μετακίνηση. Επιβεβαιώνετε, προσαρμόζετε ή ζητάτε εναλλακτικές. Κανένα δεν φτάνει στο ημερολόγιό σας χωρίς την έγκρισή σας.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "Επιβεβαίωση πρώτα",
+							"text": "Το Tiler προτείνει. Εσείς αποφασίζετε. Διατηρείτε τον έλεγχο ακόμα κι ενώ η AI κάνει τη δύσκολη δουλειά."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "Εσείς ζείτε τη στιγμή. To Tiler την προγραμματίζει."
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "8 Μαΐου 2026",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "Τα περισσότερα ημερολόγια υποθέτουν ότι όταν μία εργασία τελειώνει, είστε έτοιμοι για την επόμενη. Αλλά η πραγματική ζωή έχει μετακίνηση. Το Tiler ενσωματώνει αυτήν τη μετακίνηση στο χρονοδιάγραμμά σας, ώστε κάθε μπλοκ στη χρονική σας γραμμή να αντανακλά πού πρέπει να είστε."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "Προσθέστε ένα συνέδριο, μια επιθεώρηση, έναν καφέ ή το σχολείο. Το Tiler υπολογίζει αυτόματα πώς φτάνετε και πόσο χρόνο χρειάζεται, και ενσωματώνει τον χρόνο μετακίνησης απευθείας στη μέρα σας."
 					},
 					{
-						"title": "How it works"
+						"title": "Πώς λειτουργεί"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "Ορίστε τις θέσεις σας μία φορά",
+						"stepBody": "Δεν χρειάζεται να πληκτρολογείτε ακριβείς διευθύνσεις κάθε φορά. Ορίστε το σπίτι σας, την εργασία σας και κάθε συνήθη σημείο μία φορά. Από τότε, το Tiler ξέρει από πού ξεκινάτε και πού πηγαίνετε.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Ετικέτες θέσης που κατανοεί το Tiler",
+							"text": "Σπίτι · Εργασία · Downtown · Το γυμναστήριο · Κοντά στο γραφείο"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "Ο χρόνος μετακίνησης μπαίνει στη χρονική σας γραμμή",
+						"stepBody": "Κάθε φορά που προσθέτετε μια εργασία με θέση, το Tiler εισάγει ένα μπλοκ μετακίνησης μεταξύ αυτής και ό,τι προηγείται ή έπεται. Εμφανίζεται ως αυτόνομο τμήμα στη χρονική γραμμή σας, ώστε να ξέρετε πάντα πότε να φύγετε.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "Πραγματικές διαδρομές, όχι εκτίμηση",
+							"text": "Το Tiler χρησιμοποιεί δεδομένα διαδρομής σε πραγματικό χρόνο που καλύπτουν οδήγηση, δημόσια μεταφορά και περπατήματα, ώστε ο χρόνος μετακίνησης να αντανακλά πώς μετακινείτε πραγματικά."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "Οι κοντινές εργασίες ομαδοποιούνται αυτόματα",
+						"stepBody": "Όταν πολλαπλές εργασίες μοιράζονται την ίδια γειτονιά, το Tiler τις ομαδοποιεί ώστε να μην τρέχετε πάνω-κάτω στο χωριό. Οι επιθεώρησεις κοντά στο γυμναστήριο μπαίνουν πριν ή μετά το γυμναστικό σας. Ένα επίσκεψη σε πελάτη κοντά στο κέντρο συνδυάζεται με το γεύμα σας εκεί.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "Λιγότερη μετακίνηση, περισσότερα επιτεύγματα",
+							"text": "Η έξυπνη ομαδοποίηση σημαίνει λιγότερα ταξίδια, λιγότερος χαμένος χρόνος σε μεταφορά και μια μέρα που ρέει όπως πρέπει."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "Το να κάνετε κάτι δεν είναι μόνο να βρείτε χρόνο. Είναι να είστε στο σωστό μέρος."
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "22 Ιουνίου 2026",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "Το να αλλάξετε το χρονοδιάγραμμά σας φαίνεται επικίνδυνο. Μετακινείτε μια εργασία και δεν είστε σίγουροι τι else κινείται. Δέχεστε μια πρόταση και αναρωτιέστε αν ήταν η σωστή επιλογή. To Schedule Undo σας δίνει μια ζώνη ασφαλείας μεταξύ πρόθεσης και δέσμευσης."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Κάθε αλλαγή στο Tiler—είτε πληκτρολογήσατε ένα αίτημα, είτε δέχτηκατε μια πρόταση, είτε μετακινήσατε ένα tile—εμφανίζεται πρώτα ως προεπισκόπηση. Το ζωντανό σας χρονοδιάγραμμα παραμένει αναλλοίωτο μέχρι να το αποφασίσετε."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Πώς λειτουργεί το Schedule Undo"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "Κάντε μια αλλαγή",
+						"stepBody": "Μετακινήστε ένα tile, προσθέστε νέα εργασία ή δεχτείτε μια AI πρόταση. Αντί να αποθηκευτεί αμέσως, το Tiler τοποθετεί την αλλαγή σε προεπισκόπηση. Εμφανίζεται με διακεκομμένη περίμετρο και ετικέτα PREVIEW ώστε να ξέρετε ότι δεν έχει επιβεβαιωθεί ακόμα.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "Κανένα δεν αποθηκεύεται αυτόματα",
+							"text": "Το ζωντανό σας χρονοδιάγραμμα είναι παγωμένο όσο ελέγχετε. Κανένα μερική αποθήκευση, κανένα τυχαίο overwrite."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "Δείτε ακριβώς τι άλλαξε",
+						"stepBody": "Το tile στην προεπισκόπηση δείχνει το ενημερωμένο όνομα, τη θέση, την ώρα και ημερομηνία δίπλα σε ό,τι ήταν πριν. Βλέπετε την ολόκληρη εικόνα σε μια ματιά χωρίς να χρειάζεται να παρακολουθείτε mentalmente τι κινήθηκε."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Πατήστε Cancel ή Accept",
+						"stepBody": "Δεν είστε ικανοποιημένοι με το αποτέλεσμα; Πατήστε Cancel και το αρχικό σας χρονοδιάγραμμα επιστρέφει άμεσα. Ικανοποιημένοι; Πατήστε Accept και επιβεβαιώνεται. Και στις δύο περιπτώσεις, εσείς αποφασίσατε.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Το Cancel είναι πάντα άμεσο",
+							"text": "Κανένα ιστορικό cancel για σκρόλλing. Ένα πατήμα και η ακριβής αρχική σας κατάσταση είναι πίσω, όποια κι αν είναι η μετατόπιση στην προεπισκόπηση."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "Γιατί μετράει"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "Τα περισσότερα apps ημερολογίου εφαρμόζουν αλλαγές αμέσως και σας ζητούν να cancel back, στο οποίο σημείο οι ειδοποιήσεις έχουν ήδη σταλεί, η συγχρονισμός έγινε και το βόλεμα έγινε. To Schedule Undo αντιστρέφει τη λογική. Το default είναι προεπισκόπηση, όχι αποθήκευση."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "Σχεδιασμένο για γεμάτες ημέρες",
+						"text": "Όταν η ημέρα σας δεν έχει περιθώρια, ένα λάθος μπορεί να χτυπήσει παντού. To Schedule Undo σας δίνει μια αναπνοή για να ελέγξετε πριν μια αλλαγή γίνει live."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "Είτε επαναπρογραμματίζετε ένα γυμναστικό, μετακινείτε ένα συνέδριο είτε αναλαμβάνετε μια εργασία που σας έστειλε συναδέλφος, το βήμα της προεπισκόπησης παίρνει λιγότερο από ένα δευτερόλεπτο και μπορεί να σας εξοικονομήσει ένα φωνή που θα το λυποθήκατε."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "Αλλάξτε γνώμη πριν έχει σημασία."
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "22 Μαΐου 2026",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "Η περισσότερη μεταβίβαση εργασιών τελειώνει σε ένα thread μηνυμάτων. Το στέλνετε, το διαβάζουν, ξεχνούν να το προγραμματίσουν, εσείς κάνετε follow-up. To Tileshare εξαιρεί το μεσάζον. Μεταβείτε ένα tile και φτάνει στο Tiler του άλλου, ήδη προγραμματισμένο."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "Όταν μεταβείτε ένα tile, φτάνει ως ζωντανή προσαρμοστική εργασία στο χρονοδιάγραμμα του παραλήπτη. Βρίσκει το καλύτερο κενό slot γύρω από τις υπάρχουσες δεσμεύσεις του. Δεν απαιτείται τοποθέτηση από κανένα μέρος."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Πώς λειτουργεί το Tileshare"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "Μεταβείτε οποιοδήποτε tile",
+						"stepBody": "Από οποιαδήποτε εργασία στο χρονοδιάγραμμα σας, πατήστε Share και επιλέξτε έναν Tiler contact. Το tile στέλνεται με ό,τι χρειάζεται ο παραλήπτης για να το ολοκληρώσει.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "Τι ταξιδεύει με το tile",
+							"text": "Όνομα εργασίας, εκτιμώμενη διάρκεια, ημερομηνία λήξης και ετικέτες θέσης. Το προσωπικό χρονοδιάγραμμα του παραλήπτη παραμένει πλήρως ιδιωτικό."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "Φτάνει στο χρονοδιάγραμμά του",
+						"stepBody": "Το μεταβιβαζόμενο tile εμφανίζεται στο Tiler του παραλήπτη και βρίσκει το καλύτερο κενό slot γύρω από τις υπάρχουσες δεσμεύσεις του. Προσαρμόζεται στη μέρα του, όχι το αντίστροφο."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "Ελέγξτε χωρίς κυνήγι",
+						"stepBody": "Μόλις η εργασία σταλεί, μπορείτε να δείτε πότε προγραμματίστηκε, πότε θα ολοκληρωθεί και αν μετακινηθεί. Κανένα follow-up message. Κανένα ερώτημα status. Θα το ξέρετε.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "Κοινοποιήθηκε ευθύνη, μηδέν τριβής",
+							"text": "Και τα δύο μέρη βλέπουν το ίδιο tile. Ο ένας το ολοκληρώνει. Ο άλλος το βλέπει ολοκληρωμένο. Αποστολή που πραγματικά κλείνει τον κύκλο."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "Στείλτε το μία φορά. Ξέρετε ότι θα γίνει."
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "ΠΛΑΝΩΣΗ ΜΕ ΤΕΧΝΟΠΝΟΙΑ",
+				"title": "Τι είναι ένα ημερολόγιο ΤΠ και τι θα έπρεπε πραγματικά να κάνει;",
+				"subtitle": "Οι περισσότεροι άνθρωποι δεν χρειάζονται περισσότερες εφαρμογές ημερολογίου. Χρειάζονται το ημερολόγιό τους να σταματήσει να είναι ο χώρος όπου οι αποφάσεις σπάνε σε σιωπή. Ορίστε τι πρέπει πραγματικά να διαχειρίζεται ένα ημερολόγιο ΤΠ — και τι δεν πρέπει ποτέ να κάνει.",
+				"excerpt": "Έξυπνα ημερολόγια, προγραμματιστές ΤΠ και εργαλεία διαχείρισης του χρόνου εμφανίζονται σταθερά. Οι περισσότεροι απαντούν στο ίδιο αδύναμο ερώτημα: πού να το βάλω αυτό; Αλλά το πραγματικό έργο ενός ημερολογίου ΤΠ είναι να προστατεύσει όσα ήδη μετρούν.",
+				"readTime": "5 λεπτά ανάγνωση",
+				"author": "Ομάδα Tiler",
+				"date": "1 Μαΐου 2026",
+				"sections": [
+					{
+						"lead": true,
+						"text": "Κάθε μερικούς μήνες, μια νέα εφαρμογή υπόσχεται να χειρίζεται πιο έξυπνα τον χρόνο σας. Αλλά τα περισσότερα ημερολόγια λειτουργούν ακόμα με τον ίδιο τρόπο: αποθηκεύουν συμβάντα. Δεν σκέφτονται πραγματικά τι κάνει η μέρα σας. Ένα ημερολόγιο ΤΠ διαφέρει σε ένα σημαντικό σημείο: αντιμετωπίζει το πρόγραμμά σας ως ένα σύστημα περιορισμών, όχι απλά ως μια λίστα μπλοκ. Αυτή είναι η διαφορά ανάμεσα σε ένα εργαλείο που αποθηκεύει συμβάντα και ένα εργαλείο που σκέφτεται σχετικά με αποτελέσματα."
+					},
+					{
+						"caption": "Οι τρεις γενιές των ημερολογίων: η βεβιασμένη λίστα, το έξυπνο ημερολόγιο και το ημερολόγιο ΤΠ που σκέφτεται σχετικά με αποτελέσματα."
+					},
+					{
+						"title": "Από βεβιασμένες λίστες σε αποφάσεις"
+					},
+					{
+						"text": "Η πρώτη γενιά ψηφιακών ημερολογίων ήταν υποκατάσταση του χαρτί προγραμματιστή. Εισήγατε ένα συμβάν, επιλέξατε ώρα, και το ημερολόγιο το θυμόταν. Αυτό ήταν χρήσιμο. Αλλά υπέθετε ότι είχατε ήδη πάρει τη σωστή απόφαση. Το ημερολόγιο ήταν απλώς αποθήκευση."
+					},
+					{
+						"text": "Η δεύτερη γενιά πρόσθεσε νοημοσύνη, αλλά μόνο στις άκρες. Ένα ημερολόγιο μπορεί να σας θυμίσει μια σύγκρουση, να προτείνει μια ελεύθερη θέση ή να κρατήσει λίγο χρόνο μετακίνησης. Αυτά ήταν χρήσιμα. Αλλά ακόμα χειρίστηκαν κάθε συμβάν απομονωμένα. Το ημερολόγιο μπορούσε να σας πει ότι κάτι ήταν λάθος. Δε μπορούσε να σας πει τι θα ήταν καλύτερο."
+					},
+					{
+						"text": "Η τρίτη γενιά είναι διαφορετική. Καταλαβαίνει ότι τα συμβάντα δεν είναι απομονωμένα κουτιά σε ένα πλέγμα. Έχουν βάρος, θέση, εξαρτήσεις και συνέπειες. Ένα τηλεφωνικό με πελάτη, ένα γυμναστήριο και ένα οδήγηση δεν είναι απλώς ώρες. Είναι κομμάτια μιας ημέρας που επηρεάζουν το ένα το άλλο. Εκεί η λέξη «ΤΠ» κερδίζει επιτέλους τη θέση της."
+					},
+					{
+						"label": "Κρίσιμη μετατόπιση",
+						"text": "Τα ημερολόγια πέρασαν από το «πού είναι αυτό το συμβάν;» στο «τι συμβαίνει σε όλη τη μέρα όταν μετακινείται;». Αυτή η μετατόπιση από αποθήκευση σε σκέψη είναι αυτό που κάνει ένα ημερολόγιο ΤΠ και όχι απλά έξυπνο."
+					},
+					{
+						"title": "Τι απαντά πραγματικά ένα ημερολόγιο ΤΠ"
+					},
+					{
+						"text": "Ένα πραγματικό ημερολόγιο ΤΠ απαντά σε ερωτήσεις που τα παλαιότερα ημερολόγια δεν προσπάθησαν ποτέ να απαντήσουν: Μπορώ να το βάλω χωρίς να σπάσω αυτό που ήδη μετρά; Τι συμβαίνει αν μετακινήσω αυτό; Πού είναι ο λιγότερο επώδυνος χώρος γι' αυτό; Αυτές δεν είναι μικρές ερωτήσεις. Είναι οι ερωτήσεις που κάνουν μια μέρα να λειτουργεί – ή να την αλλοιώνουν σιωπηλά."
+					},
+					{
+						"text": "Εδώ το «ημερολόγιο ΤΠ» σταματά να είναι φράση μάρκετινγκ. Δεν πρόκειται για έναν chatbot δίπλα στα συμβάντα σας. Πρόκειται για ένα σύστημα που μπορεί να προβλέψει τις συνέπειες των αποφάσεων προγραμματισμού πριν δεσμευτείτε."
+					},
+					{
+						"title": "Γιατί αυτό δεν είναι απλά ένας chatbot"
+					},
+					{
+						"text": "Πολλά εργαλεία προσθέτουν τώρα μια διεπαφή chat σε ένα κανονικό ημερολόγιο. Αυτό είναι βολικό, αλλά δεν κάνει ένα ημερολόγιο ΤΠ. Ένας chatbot μπορεί να απαντήσει σε ερωτήσεις, αλλά δεν αλλάζει πώς συμπεριφέρεται το πρόγραμμα. Ένα πραγματικό ημερολόγιο ΤΠ αλλάζει τη συμπεριφορά από μόνη της. Δεν σας λέει απλά κάτι. Δοκιμάζει μια αλλαγή, προσομοιώνει την επιρροή και σας δείχνει τι συμβαίνει πριν το δεχτείτε."
+					},
+					{
+						"text": "Αυτό είναι βασικά διαφορετικό. Μετατρέπει το ημερολόγιο από μια εγγραφή αποφάσεων σε ένα εργαλείο που σας βοηθά να παίρνετε καλύτερες. Μπορείτε να δεχτείτε, να προσαρμόσετε ή να αναστρέψετε την αλλαγή, γιατί το ημερολόγιο σας δείχνει πρώτα τη συμβιβαστική λύση. Αυτή είναι η μέρη που τα περισσότερα προϊόντα κάνουν ακόμα λάθος. Κάνουν το ημερολόγιο να μιλάει. Δεν το κάνουν να σκέφτεται."
+					},
+					{
+						"title": "Πώς φαίνεται στο Tiler"
+					},
+					{
+						"stepTitle": "Ρωτήστε μια πραγματική ερώτηση ημερολογίου",
+						"stepBody": "Δεν ρίχνετε ένα μπλοκ στη θέση του και ελπίζετε. Ζητάτε από το Tiler να βρει χρόνο για το γυμναστήριο μετά την δουλειά. Το Tiler κοιτάει τι υπάρχει ήδη και προτείνει ένα πρόγραμμα που πραγματικά λειτουργεί μαζί του."
+					},
+					{
+						"stepTitle": "Δείτε την επιρροή πριν συμβεί",
+						"stepBody": "Το Tiler δεν μετακινά απλά ένα πλακάκι και ελπίζει για το καλύτερο. Σας δείχνει τι αλλάζει. Αν η standup μετακινηθεί 30 λεπτά αργότερα, το βλέπετε πριν δεσμευτείτε. Καμία έκπληξη σύγκρουση, κανένα κατεστραμμένο χρόνο μετακίνησης."
+					},
+					{
+						"stepTitle": "Δεχτείτε το ή αλλάξτε γνώμη",
+						"stepBody": "Κρατάτε τον τελευταίο λόγο. Μπορείτε να δεχτείτε το σχέδιο, να προσαρμόσετε ένα πλακάκι ή να αναστρέψετε το σύνολο. Το ημερολόγιο σκέφτεται. Εσείς αποφασίζετε."
+					},
+					{
+						"quote": "Ένα ημερολόγιο ΤΠ δεν είναι chatbot. Είναι στρώμα αποφάσεων."
+					},
+					{
+						"label": "Συμβουλή",
+						"text": "Ρωτήστε το ημερολόγιο πραγματικές ερωτήσεις. «Πού ταιριάζει αυτό χωρίς να σπάσει η μέρα μου;» κερδίζει από το «Πρόγραμμά το στις 3». Το πρώτο κάνει το ημερολόγιο να δουλεύει. Το δεύτερο απλά το κάνει να υπακούει."
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "Διαβάστε επόμενο: Φυσική Γλώσσα Προγραμματισμού – Ρωτήστε το ημερολόγιό σας τι εννοείτε"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "Διαβάστε επόμενο: Schedule Undo – Ο σωστός τρόπος να αναστρέψετε ένα χαοτικό πρόγραμμα"
+					},
+					{
+						"items": [
+							{
+								"question": "Είναι ένα ημερολόγιο ΤΠ απλά ένας chatbot πάνω από το ημερολόγιό μου;",
+								"answer": "Όχι. Ένας chatbot απαντά σε ερωτήσεις για τα συμβάντα σας. Ένα ημερολόγιο ΤΠ αλλάζει πώς συμπεριφέρεται το ίδιο το πρόγραμμα: δοκιμάζει μια αλλαγή, προσομοιώνει την επιρροή και σας δείχνει τη συμβιβαστική λύση πριν οτιδήποτε δεσμευτεί."
+							},
+							{
+								"question": "Θα μετακινήσει τα συμβάντα μου χωρίς να ρωτήσει;",
+								"answer": "Όχι. Το ημερολόγιο προτείνει· εσείς αποφασίζετε. Μπορείτε να δεχτείτε, να προσαρμόσετε ή να αναστρέψετε το σύνολο, ώστε τίποτα να μην αλλάζει μέχρι να το εγκρίνετε."
+							},
+							{
+								"question": "Χρειάζομαι ακόμα την υφιστάμενη εφαρμογή ημερολογίου μου;",
+								"answer": "Το Tiler λειτουργεί πάνω από τα ημερολόγια που ήδη χρησιμοποιείτε. Δεν αντικαθιστά πού ζουν τα συμβάντά σας – κάνει τις αποφάσεις γύρω από αυτά ευκολότερες."
+							},
+							{
+								"question": "Με αντικαθιστά ή με κάνει λιγότερο παραγωγικό;",
+								"answer": "Ένα ημερολόγιο ΤΠ πρέπει να σας κάνει πιο ανθρώπινο, όχι λιγότερο. Χειρίζεται τους μηχανικούς συμβιβασμούς ώστε να ξοδεύετε την προσοχή σας στα μέρη που πραγματικά χρειάζονται έναν άνθρωπο."
+							}
+						]
 					}
 				]
 			}

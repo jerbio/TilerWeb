@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <clipPath id="clip"><rect width="640" height="320" rx="16"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="640" height="320" fill="url(#bg)"/>
+
+    <!-- Left: chat panel -->
+    <rect x="24" y="24" width="272" height="272" rx="14" fill="#171717" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="44" y="52" font-family="Urbanist,Inter,sans-serif" font-size="12" font-weight="700" fill="#e5e5e5">Ask Tiler</text>
+    <line x1="44" y1="64" x2="276" y2="64" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+    <!-- User bubble -->
+    <rect x="104" y="80" width="172" height="44" rx="10" fill="rgba(237,18,59,0.12)" stroke="rgba(237,18,59,0.35)" stroke-width="1"/>
+    <text x="118" y="99" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.75)">I want to fit the gym in</text>
+    <text x="118" y="113" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.75)">after work today.</text>
+
+    <!-- Assistant reply -->
+    <rect x="44" y="140" width="212" height="52" rx="10" fill="#222222" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="58" y="159" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">Best fit: 3:00 PM. It moves</text>
+    <text x="58" y="173" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">2 other things &#8212; see the plan</text>
+    <text x="58" y="187" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">on the right &#8594;</text>
+
+    <!-- Input bar -->
+    <rect x="44" y="264" width="232" height="22" rx="11" fill="#0f0f0f" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="58" y="279" font-family="Inter,sans-serif" font-size="9" fill="#525252">Ask anything about today&#8230;</text>
+    <circle cx="262" cy="275" r="9" fill="#ED123B" fill-opacity="0.2" stroke="#ED123B" stroke-width="1"/>
+
+    <!-- Right: mini schedule -->
+    <rect x="320" y="24" width="296" height="272" rx="14" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="340" y="52" font-family="Urbanist,Inter,sans-serif" font-size="12" font-weight="700" fill="#e5e5e5">Thursday</text>
+    <line x1="340" y1="64" x2="596" y2="64" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+    <rect x="340" y="80" width="256" height="36" rx="9" fill="#0077FF" fill-opacity="0.14" stroke="#0077FF" stroke-opacity="0.45" stroke-width="1"/>
+    <text x="354" y="102" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#6aabff">Design review &#183; 1:00 PM</text>
+
+    <rect x="340" y="128" width="256" height="36" rx="9" fill="#171717" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="354" y="150" font-family="Inter,sans-serif" font-size="10" fill="#a3a3a3">Client call &#183; 2:00 PM</text>
+
+    <rect x="340" y="176" width="256" height="36" rx="9" fill="#05A39C" fill-opacity="0.14" stroke="#05A39C" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="5,4"/>
+    <text x="354" y="198" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#3EDCD6">Gym &#183; 3:00 PM</text>
+    <rect x="522" y="184" width="64" height="16" rx="8" fill="rgba(5,163,156,0.15)"/>
+    <text x="554" y="195" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#3EDCD6" text-anchor="middle">PROPOSED</text>
+
+    <rect x="340" y="224" width="256" height="36" rx="9" fill="#ED123B" fill-opacity="0.14" stroke="#ED123B" stroke-opacity="0.5" stroke-width="1"/>
+    <text x="354" y="246" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#F793A6">Standup &#183; 4:00 PM (moved)</text>
+
+    <!-- Buttons -->
+    <rect x="340" y="272" width="120" height="20" rx="6" fill="#262626" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="400" y="285" font-family="Inter,sans-serif" font-size="9" fill="#a3a3a3" text-anchor="middle">Ask another</text>
+    <rect x="472" y="272" width="124" height="20" rx="6" fill="#ED123B" fill-opacity="0.18" stroke="#ED123B" stroke-width="1"/>
+    <text x="534" y="285" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#ED123B" text-anchor="middle">See the plan</text>
+  </g>
+</svg>

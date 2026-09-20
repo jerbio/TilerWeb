@@ -2208,40 +2208,40 @@
 				"date": "1 мая 2026 г.",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "Большинство инструментов планирования относятся к вам как к оператору календаря. Вы перетаскиваете, устанавливаете, изменяете размер, а потом жизнь меняется и вы начинаете заново. Tiler берёт другой подход: вы говорите, и Tiler планирует."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "Введите что-нибудь вроде «Стоматолог в четверг в 9, потом кофе с Priya в центре около 11» и Tiler займётся остальным. Длительность, время в пути, буфер, подтверждение. Всё."
 					},
 					{
-						"title": "How it works"
+						"title": "Как это работает"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "Опишите задачу",
+						"stepBody": "Введите, что вам нужно сделать, обычным языком. Без особого синтаксиса, без выпадающих меню. «Час в зале завтра утром» — достаточно для начала.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Что понимает Tiler",
+							"text": "Относительное время (\"завтра\"), длительность (\"один час\") и указания места (\"в центре\"). Без дополнительной настройки."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "ИИ заполняет пробелы",
+						"stepBody": "Tiler рассуждает над вашим запросом перед ответом. Вычисляет длительность из контекста, проверяет существующие обязательства и учитывает дорогу. Если деталь действительно неоднозначна, он задаёт один точный вопрос, никогда не форму.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "Разумование, не угадывание",
+							"text": "Tiler сопоставляет ваше местоположение, существующие плитки и предпочтительные временные окна, прежде чем что-то предложить."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "Проверьте, потом подтвердите",
+						"stepBody": "Tiler показывает вам предложенный график со всеми деталями: время, место и дорога. Вы подтверждаете, корректируете или запрашиваете альтернативы. Ничего не попадает в ваш календарь без вашего одобрения.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "Подтверждение прежде всего",
+							"text": "Tiler предлагает. Вы решаете. Вы остаётесь в управлении, даже когда ИИ выполняет тяжёлую работу."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "Вы живёте моментом. Tiler планирует."
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "8 мая 2026 г.",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "Большинство календарей предполагают, что когда одна задача завершена, вы готовы к следующей. Но в реальной жизни есть дорога. Tiler включает эту дорогу в ваше расписание, чтобы каждый блок на вашей временной шкале отражал, где вы должны быть."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "Добавьте встречу, поручение, кофе или школьную поездку. Tiler автоматически рассчитывает, как вы туда доберётесь и сколько это займёт, затем вставляет время в путь прямо в ваш день."
 					},
 					{
-						"title": "How it works"
+						"title": "Как это работает"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "Настройте свои места один раз",
+						"stepBody": "Не нужно вводить точные адреса каждый раз. Настройте дом, офис и любое регулярное место один раз. После этого Tiler знает, откуда вы стартуете и куда едете.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Метки мест, которые понимает Tiler",
+							"text": "Дом · Работа · Центр · Зал · Рядом с офисом"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "Время в пути встраивается в вашу временную шкалу",
+						"stepBody": "Каждый раз, когда вы добавляете задачу с местом, Tiler вставляет блок дороги между ней и тем, что до или после неё. Он появляется как самостоятельный сегмент на временной шкале, так что вы всегда знаете, когда выезжать.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "Реальные маршруты, не оценки",
+							"text": "Tiler использует данные о маршрутизации в реальном времени, покрывающие вождение, общественный транспорт и пешие прогулки, чтобы время в пути отражало, как вы на самом деле перемещаетесь."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "Близкие задачи автоматически группируются",
+						"stepBody": "Когда несколько задач делят один район города, Tiler группирует их, чтобы вы не ездили туда-сюда через весь город. Поручения рядом с залом попадают до или после вашей тренировки. Визит к клиенту рядом с центром объединяется с вашим обедом поблизости.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "Меньше дороги, больше сделано",
+							"text": "Умная группировка означает меньше поездок, меньше потраченного времени в дороге и день, который течёт, как должен."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "Сделать что-то — это не только найти время. Это быть в правильном месте."
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "22 июня 2026 г.",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "Изменение вашего расписания кажется рискованным. Вы перемещаете задачу и не уверены, что ещё сдвигается. Вы принимаете предложение и спрашиваете себя, было ли это правильное решение. Schedule Undo даёт вам безопасную зону между намерением и обязательством."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Каждое изменение в Tilerе—введите ли вы запрос, приняли ли вы предложение или переместили ли плитку—сначала появляется как предпросмотр. Ваше живое расписание остаётся нетронутым, пока вы не решите."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Как работает Schedule Undo"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "Сделайте изменение",
+						"stepBody": "Переместите плитку, добавьте новую задачу или примите предложение ИИ. Вместо немедленного сохранения Tiler помещает изменение в предпросмотр. Оно появляется с пунктирной рамкой и меткой ПРЕДПРОСМОТР, чтобы вы знали, что оно ещё не подтверждено.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "Ничего не сохраняется автоматически",
+							"text": "Ваше живое расписание заморожено, пока вы ревьюируете. Никаких частичных сохранений, никаких случайных перезаписей."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "Увидьте точно, что изменилось",
+						"stepBody": "Плитка в предпросмотре показывает обновлённое имя, место, время и дату рядом с тем, что было до этого. Вы видите полную картину одним взглядом, не отслеживая в уме, что сдвинулось."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Нажмите Отмена или Принять",
+						"stepBody": "Недовольны результатом? Нажмите Отмена, и ваше оригинальное расписание мгновенно вернётся. Удовлетворены? Нажмите Принять, и оно подтвердится. В обоих случаях вы решили.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Отмена всегда мгновенная",
+							"text": "Нет истории отмены для прокрутки. Одно нажатие, и ваше точное исходное состояние снова на месте, независимо от того, насколько сдвинулось в предпросмотре."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "Почему это важно"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "Большинство календарных приложений немедленно применяют изменения и просят отменить постфактум, к тому времени уведомления уже ушли, синхронизация произошла, и урон уже нанесён. Schedule Undo переворачивает логику. По умолчанию — предпросмотр, а не сохранение."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "Спроектировано для плотных дней",
+						"text": "Когда в вашем дне нет буфера, одна ошибка может отразиться на всём. Schedule Undo даёт вам секунду вдохнуть и проверить, прежде чем изменение попадёт в жизнь."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "Будь то вы перепланируете тренировку, перемещаете встречу или берёте задачу от коллеги, шаг предпросмотра занимает меньше секунды и может сэкономить вам звонок, о котором вы бы пожалели."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "Поменяйте мнение, прежде чем это станет важно."
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "22 мая 2026 г.",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "Большинство передачи задач заканчиваются в потоке сообщений. Вы отправляете, они читают, забывают запланировать, вы делаете фоллоу-ап. Tileshare устраняет посредника. Поделитесь плиткой, и она попадает в Tiler другого человека, уже запланированная."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "Когда вы делитесь плиткой, она попадает как живая адаптивная задача в расписание получателя. Она находит лучший свободный слот вокруг его существующих обязательств. Ни с чьей стороны не требуется размещение."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Как работает Tileshare"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "Поделитесь любой плиткой",
+						"stepBody": "Из любой задачи в вашем расписании нажмите Поделиться и выберите контакт Tiler. Плитка отправляется со всем, что нужно получателю для её выполнения.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "Что едет с плиткой",
+							"text": "Имя задачи, предполагаемая длительность, дедлайн и метки места. Личное расписание получателя остаётся полностью приватным."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "Она попадает в его расписание",
+						"stepBody": "Поделённая плитка появляется в Tilerе получателя и находит лучший свободный слот вокруг его существующих обязательств. Она адаптируется к его дню, а не наоборот."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "Следите без догоняния",
+						"stepBody": "После отправки задачи вы можете увидеть, когда она была запланирована, когда будет выполнена и была ли перемещена. Без фоллоу-ап сообщений. Без проверки статуса. Вы узнаете.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "Общая ответственность, ноль трения",
+							"text": "Обе стороны видят одну и ту же плитку. Один выполняет. Другой видит, что это сделано. Делегирование, которое действительно закрывает цикл."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "Отправьте один раз. Вы знаете, что это будет сделано."
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "ИИ-ПЛАНИРОВАНИЕ",
+				"title": "Что такое ИИ-календарь и что он должен делать на самом деле?",
+				"subtitle": "Большинству людей не нужно больше приложений календаря. Нужно, чтобы календарь перестал быть местом, где решения тихо ломаются. Вот что ИИ-календарь должен решать по-настоящему — и чего он никогда не должен делать.",
+				"excerpt": "Умные календари, ИИ-планировщики и инструменты управления временем появляются один за другим. Большинство из них отвечают на один и тот же слабый вопрос: куда это поставить? Но настоящее дело ИИ-календаря — защитить то, что уже важно.",
+				"readTime": "5 мин чтения",
+				"author": "Команда Tiler",
+				"date": "1 мая 2026 г.",
+				"sections": [
+					{
+						"lead": true,
+						"text": "Каждые несколько месяцев новое приложение обещает быть умнее с вашим временем. Но большинство календарей по-прежнему работают так же: они хранят события. Они не по-настоящему думают о том, что делает ваш день. ИИ-календарь отличается в одном важном смысле: он рассматривает ваш расписание как систему ограничений, а не просто список блоков. Это разница между инструментом, который хранит события, и инструментом, который рассуждает об итогах."
+					},
+					{
+						"caption": "Три поколения календарей: тупой список, умный календарь и ИИ-календарь, который рассуждает об итогах."
+					},
+					{
+						"title": "От тупых списков к решениям"
+					},
+					{
+						"text": "Первое поколение цифровых календарей было заменой бумажного планировщика. Вы вводили событие, выбирали время, и календарь запоминал его. Это было полезно. Но он предполагал, что вы уже приняли правильное решение. Календарь был просто хранилищем."
+					},
+					{
+						"text": "Второе поколение добавило интеллект, но только по краям. Календарь мог напомнить о конфликте, предложить свободный слот или зарезервировать немного времени на дорогу. Это было полезно. Но они по-прежнему рассматривали каждое событие изолированно. Календарь мог сказать, что что-то не так. Он не мог сказать, что было бы лучше."
+					},
+					{
+						"text": "Третье поколение отличается. Оно понимает, что события не являются изолированными клетками на сетке. У них есть вес, местоположение, зависимости и последствия. Звонок клиенту, тренировка и поездка — это не просто времена. Это части дня, которые влияют друг на друга. Именно здесь слово «ИИ» наконец оправдывает своё место."
+					},
+					{
+						"label": "Ключевой сдвиг",
+						"text": "Календари перешли от вопроса «где это событие?» к «что происходит с целым днём, когда оно перемещается?». Этот сдвиг от хранения к рассуждению делает календарь ИИ, а не просто умным."
+					},
+					{
+						"title": "Что на самом деле отвечает ИИ-календарь"
+					},
+					{
+						"text": "Настоящий ИИ-календарь отвечает на вопросы, которые старые календари никогда не пытались решить: Поместится ли это, не сломав то, что уже важно? Что случится, если я перемещу это? Где наименее болезненное место для этого? Это не маленькие вопросы. Это вопросы, которые заставляют день работать — или тихонько разрушают его."
+					},
+					{
+						"text": "Здесь «ИИ-календарь» перестаёт быть маркетинговой фразой. Речь не о чат-боте рядом с вашими событиями. Речь о системе, которая может предсказать последствия решений о планировании до того, как вы решитесь."
+					},
+					{
+						"title": "Почему это не просто чат-бот"
+					},
+					{
+						"text": "Многие инструменты теперь добавляют чат-интерфейс к обычному календарю. Это удобно, но это не делает календарь ИИ. Чат-бот может отвечать на вопросы, но он не меняет то, как ведёт себя расписание. Настоящий ИИ-календарь меняет само поведение. Он не просто говорит вам что-то. Он тестирует изменение, симулирует влияние и показывает, что произойдёт, прежде чем вы примете это."
+					},
+					{
+						"text": "Это фундаментально другое. Он превращает календарь из записи решений в инструмент, который помогает принимать лучшие. Вы можете принять, отрегулировать или отменить изменение, потому что календарь сначала показывает компромисс. Вот та часть, которую большинство продуктов до сих пор делают неправильно. Они заставляют календарь говорить. Они не заставляют его думать."
+					},
+					{
+						"title": "Как это выглядит в Tiler"
+					},
+					{
+						"stepTitle": "Задайте настоящий вопрос календарю",
+						"stepBody": "Вы не перетаскиваете блок на место и не молитесь. Вы просите Tiler вписать спортзал после работы. Tiler смотрит, что уже есть, и предлагает расписание, которое действительно работает с этим."
+					},
+					{
+						"stepTitle": "Увидьте влияние до того, как оно случится",
+						"stepBody": "Tiler не просто перемещает плитку и надеется на лучшее. Он показывает, что меняется. Если стендап сдвигается на 30 минут позже, вы видите это до того, как зафиксируете. Без неожиданных конфликтов, без сломанного времени на дорогу."
+					},
+					{
+						"stepTitle": "Примите или передумайте",
+						"stepBody": "У вас последнее слово. Вы можете принять план, отрегулировать одну плитку или отменить всё. Календарь думает. Вы решаете."
+					},
+					{
+						"quote": "ИИ-календарь — это не чат-бот. Это слой принятия решений."
+					},
+					{
+						"label": "Совет",
+						"text": "Задавайте календарю настоящие вопросы. «Где это поместится, не сломав мой день?» побеждает «Поставь на 15:00». Первое заставляет календарь работать. Второе просто заставляет его подчиняться."
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "Читать далее: Планирование на естественном языке — Спросите календарь, что вы имеете в виду"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "Читать далее: Schedule Undo — Правильный способ отменить запутанный расписание"
+					},
+					{
+						"items": [
+							{
+								"question": "ИИ-календарь — это просто чат-бот поверх моего календаря?",
+								"answer": "Нет. Чат-бот отвечает на вопросы о ваших событиях. ИИ-календарь меняет поведение самого расписания: он тестирует изменение, симулирует влияние и показывает компромисс до того, как что-то будет зафиксировано."
+							},
+							{
+								"question": "Переместит ли он мои события без спроса?",
+								"answer": "Нет. Календарь предлагает; вы решаете. Вы можете принять, отрегулировать или отменить весь план, так что ничего не изменится, пока вы не одобрите."
+							},
+							{
+								"question": "Мне всё ещё нужен мой текущий календарь-приложение?",
+								"answer": "Tiler работает поверх календарей, которые вы уже используете. Он не заменяет место, где живут ваши события — он облегчает решения вокруг них."
+							},
+							{
+								"question": "Он заменяет меня или делает ленивым?",
+								"answer": "ИИ-календарь должен сделать вас более человечным, а не менее. Он обрабатывает механические компромиссы, чтобы вы могли сосредоточить внимание на тех частях, где действительно нужен человек."
+							}
+						]
 					}
 				]
 			}

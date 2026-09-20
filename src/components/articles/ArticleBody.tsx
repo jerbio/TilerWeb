@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import styled from 'styled-components';
 import palette from '@/core/theme/palette';
 import { ArticleSection } from '@/core/common/data/articles';
@@ -171,6 +172,75 @@ const QuoteText = styled.p`
 	font-style: italic;
 `;
 
+const ReadNext = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding-top: 1rem;
+	border-top: 1px solid ${palette.colors.gray[800]};
+`;
+
+const ReadNextLabel = styled.span`
+	font-size: ${palette.typography.fontSize.xs};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.4);
+`;
+
+const ReadNextLink = styled(Link)`
+	color: ${palette.colors.brand[500]};
+	font-size: ${palette.typography.fontSize.sm};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	text-decoration: none;
+	line-height: 1.5;
+	display: inline-block;
+
+	&:hover {
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+`;
+
+const FAQSection = styled.section`
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1.5rem;
+	border: 1px solid ${palette.colors.gray[800]};
+	border-radius: 16px;
+	background: ${palette.colors.gray[900]};
+`;
+
+const FAQHeading = styled.h3`
+	font-family: ${palette.typography.fontFamily.urban};
+	font-size: ${palette.typography.fontSize.lg};
+	font-weight: 700;
+	color: white;
+	margin: 0 0 0.25rem;
+`;
+
+const FAQItem = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+`;
+
+const FAQQuestion = styled.p`
+	font-size: ${palette.typography.fontSize.base};
+	font-weight: ${palette.typography.fontWeight.semibold};
+	color: white;
+	margin: 0;
+`;
+
+const FAQAnswer = styled.p`
+	font-size: ${palette.typography.fontSize.sm};
+	color: rgba(255, 255, 255, 0.55);
+	line-height: 1.7;
+	margin: 0;
+`;
+
 interface ArticleBodyProps {
 	sections: ArticleSection[];
 }
@@ -199,13 +269,18 @@ export default function ArticleBody({ sections }: ArticleBodyProps) {
 								</StepHeader>
 								<StepContentRow>
 									{section.stepImage && (
-										<StepImage src={section.stepImage} alt={section.stepTitle} />
+										<StepImage
+											src={section.stepImage}
+											alt={section.stepTitle}
+										/>
 									)}
 									<StepText>
 										<StepBody>{section.stepBody}</StepBody>
 										{section.callout && (
 											<Callout>
-												<CalloutLabel>{section.callout.label}: </CalloutLabel>
+												<CalloutLabel>
+													{section.callout.label}:{' '}
+												</CalloutLabel>
 												<CalloutText>{section.callout.text}</CalloutText>
 											</Callout>
 										)}
@@ -235,6 +310,29 @@ export default function ArticleBody({ sections }: ArticleBodyProps) {
 							<QuoteBlock key={i}>
 								<QuoteText>{section.quote}</QuoteText>
 							</QuoteBlock>
+						);
+
+					case 'link':
+						return (
+							<ReadNext key={i}>
+								<ReadNextLabel>Read next</ReadNextLabel>
+								<ReadNextLink to={section.to ?? '/articles'}>
+									{section.text}
+								</ReadNextLink>
+							</ReadNext>
+						);
+
+					case 'faq':
+						return (
+							<FAQSection key={i}>
+								<FAQHeading>FAQ</FAQHeading>
+								{(section.items ?? []).map((item, j) => (
+									<FAQItem key={j}>
+										<FAQQuestion>{item.question}</FAQQuestion>
+										<FAQAnswer>{item.answer}</FAQAnswer>
+									</FAQItem>
+								))}
+							</FAQSection>
 						);
 
 					default:

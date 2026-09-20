@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <clipPath id="clip"><rect width="640" height="320" rx="16"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="640" height="320" fill="url(#bg)"/>
+
+    <!-- Success badge -->
+    <rect x="150" y="24" width="340" height="40" rx="20" fill="rgba(5,163,156,0.10)" stroke="rgba(5,163,156,0.4)" stroke-width="1"/>
+    <circle cx="178" cy="44" r="8" fill="rgba(5,163,156,0.25)"/>
+    <text x="178" y="48" font-family="Inter,sans-serif" font-size="10" fill="#3EDCD6" text-anchor="middle">&#10003;</text>
+    <text x="330" y="40" font-family="Urbanist,Inter,sans-serif" font-size="13" font-weight="700" fill="#9EFFFB" text-anchor="middle">Plan applied</text>
+    <text x="330" y="55" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">3 tiles moved &#183; 0 conflicts</text>
+
+    <!-- Calendar view -->
+    <rect x="24" y="84" width="592" height="164" rx="14" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="44" y="112" font-family="Urbanist,Inter,sans-serif" font-size="12" font-weight="700" fill="#e5e5e5">Thursday, Jun 19</text>
+    <line x1="44" y1="124" x2="596" y2="124" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+    <rect x="44" y="140" width="552" height="30" rx="9" fill="#0077FF" fill-opacity="0.14" stroke="#0077FF" stroke-opacity="0.45" stroke-width="1"/>
+    <text x="58" y="159" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#6aabff">Design review &#183; 1:00 PM</text>
+
+    <rect x="44" y="180" width="552" height="30" rx="9" fill="#05A39C" fill-opacity="0.14" stroke="#05A39C" stroke-opacity="0.5" stroke-width="1"/>
+    <text x="58" y="199" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#3EDCD6">Gym &#183; 3:00 PM</text>
+    <rect x="510" y="186" width="72" height="16" rx="8" fill="rgba(5,163,156,0.15)"/>
+    <text x="546" y="197" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#3EDCD6" text-anchor="middle">CONFIRMED</text>
+
+    <rect x="44" y="220" width="552" height="30" rx="9" fill="#ED123B" fill-opacity="0.12" stroke="#ED123B" stroke-opacity="0.45" stroke-width="1"/>
+    <text x="58" y="239" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#F793A6">Standup &#183; 4:00 PM</text>
+    <rect x="510" y="226" width="72" height="16" rx="8" fill="rgba(237,18,59,0.15)"/>
+    <text x="546" y="237" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#F793A6" text-anchor="middle">MOVED</text>
+
+    <!-- Bottom controls -->
+    <rect x="24" y="268" width="150" height="32" rx="8" fill="#171717" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="99" y="288" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#e5e5e5" text-anchor="middle">&#8592; Undo plan</text>
+
+    <rect x="190" y="268" width="150" height="32" rx="8" fill="#262626" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="265" y="288" font-family="Inter,sans-serif" font-size="11" fill="#a3a3a3" text-anchor="middle">Adjust a tile</text>
+
+    <rect x="496" y="268" width="120" height="32" rx="8" fill="#0f0f0f" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="556" y="288" font-family="Inter,sans-serif" font-size="10" fill="#525252" text-anchor="middle">8 events kept</text>
+  </g>
+</svg>

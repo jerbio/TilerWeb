@@ -2208,40 +2208,40 @@
 				"date": "1 मई, 2026",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "ज्यादातर शेड्यूलिंग टूल्स आपको कैलेंडर ऑपरेटर की तरह मानते हैं। आप ड्रैग करते हैं, ड्रॉप करते हैं, रीसाइज़ करते हैं, और फिर ज़िंदगी बदल जाती है और आप फिर से शुरू करते हैं। Tiler एक अलग दृष्टिकोण अपनाता है: आप बोलते हैं, और Tiler शेड्यूल करता है।"
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "कोई भी चीज़ टाइप करें जैसे \"गुरुवार को 9 बजे डेंटिस्ट, फिर 11 बजे के आसपास डेटाउन में Priya के साथ कॉफ़ी\" और Tiler बाकी सब देखता है। अवधि, यात्रा समय, बफर, पुष्टि। सब कुछ।"
 					},
 					{
-						"title": "How it works"
+						"title": "यह कैसे काम करता है"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "कार्य का विवरण दें",
+						"stepBody": "आपको क्या करना है, रोज़मर्रा की भाषा में टाइप करें। कोई विशेष सिंटैक्स नहीं, कोई ड्रॉपडाउन मेनू नहीं। \"कल सुबह एक घंटे की जिम सेशन\" शुरुआत के लिए काफी है।",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Tiler क्या समझता है",
+							"text": "सापेक्ष समय (\"कल\"), अवधि (\"एक घंटा\") और स्थान संकेत (\"डेटाउन\")। कोई अतिरिक्त कॉन्फ़िगरेशन ज़रूरी नहीं।"
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "AI गैप भरता है",
+						"stepBody": "Tiler जवाब देने से पहले आपकी अनुरोध पर विचार करता है। संदर्भ से अवधि अनुमानित करता है, आपकी मौजूदा प्रतिबद्धताओं की जाँच करता है और यात्रा को ध्यान में रखता है। अगर कोई विवरण वास्तव में अस्पष्ट है, तो यह एक लक्षित प्रश्न पूछता है, कभी फ़ॉर्म नहीं।",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "तर्क, अनुमान नहीं",
+							"text": "Tiler कुछ सुझाव देने से पहले आपकी स्थिति, आपके मौजूदा tiles और पसंदीदा समय विंडोओं को क्रॉस-रेफरेंस करता है।"
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "जाँचें, फिर पुष्टि करें",
+						"stepBody": "Tiler आपको प्रस्तावित शेड्यूल दिखाता है सभी विवरणों के साथ: समय, स्थान और यात्रा। आप पुष्टि करते हैं, समायोजित करते हैं या विकल्प माँगते हैं। आपकी मंज़ूरी के बिना कुछ भी आपके कैलेंडर में नहीं आता।",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "पुष्टि पहले",
+							"text": "Tiler सुझाव देता है। आप तय करते हैं। आप नियंत्रण में रहते हैं, भले ही AI भारी काम कर रहा हो।"
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "आप पल जीते हैं। Tiler इसे शेड्यूल करता है।"
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "8 मई, 2026",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "ज्यादातर कैलेंडर यह मानते हैं कि जब एक कार्य समाप्त होता है, आप अगले के लिए तैयार हैं। लेकिन वास्तविक ज़िंदगी में यात्रा होती है। Tiler आपके शेड्यूल में उस यात्रा को समाहित करता है, ताकि आपके टाइमलाइन का हर ब्लॉक यह दर्शाए कि आपको कहाँ होने चाहिए।"
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "एक मीटिंग, एक एरंडा, एक कॉफ़ी या स्कूल ड्रॉप-ऑफ़ जोड़ें। Tiler स्वतः गणना करता है कि आप वहाँ कैसे पहुँचेंगे और कितना समय लगेगा, और यात्रा समय सीधे आपके दिन में डाल देता है।"
 					},
 					{
-						"title": "How it works"
+						"title": "यह कैसे काम करता है"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "अपनी स्थान एक बार सेट करें",
+						"stepBody": "आपको हर बार सटीक पता टाइप करने की ज़रूरत नहीं है। अपना घर, कार्यालय और हर नियमित जगह एक बार सेट करें। उसके बाद, Tiler जानता है कि आप कहाँ से शुरू कर रहे हैं और कहाँ जा रहे हैं।",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "स्थान लेबल जो Tiler समझता है",
+							"text": "घर · कार्यालय · डेटाउन · जिम · ऑफिस के पास"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "यात्रा समय आपके टाइमलाइन में आता है",
+						"stepBody": "हर बार जब आप एक स्थान वाला कार्य जोड़ते हैं, Tiler उसके बीच में एक यात्रा ब्लॉक डालता है। यह आपके टाइमलाइन में एक स्वतंत्र खंड के रूप में दिखाई देता है, ताकि आप हमेशा जानें कि कब निकलना है।",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "वास्तविक रास्ते, अनुमान नहीं",
+							"text": "Tiler ड्राइविंग, सार्वजनिक परिवहन और पैदल चलने को कवर करने वाले रियल-टाइम राउटिंग डेटा का उपयोग करता है, ताकि यात्रा समय यह दर्शाए कि आप वास्तव में कैसे सफ़र करते हैं।"
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "नज़दीकी कार्य स्वतः समूहबद्ध होते हैं",
+						"stepBody": "जब कई कार्य एक ही एरिया में हों, Tiler उन्हें समूहबद्ध करता है ताकि आप शहर में आगे-पीछे न भागें। जिम के पास के एरंडे आपके वर्कआउट से पहले या बाद में आते हैं। डेटाउन के पास एक ग्राहक भेट आपके पास की दोपहर के भोजन से जुड़ती है।",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "कम यात्रा, ज़्यादा पूरा",
+							"text": "स्मार्ट ग्रुपिंग का मतलब है कम सफ़र, कम बर्बाद ट्रांज़िट समय और एक दिन जो सही तरीक़े से बहे।"
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "कुछ पूरा करना सिर्फ़ समय खोजना नहीं है। सही जगह पर होना है।"
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "22 जून, 2026",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "अपना शेड्यूल बदलना खतरनाक लगता है। आप एक कार्य हटाते हैं और आपको पक्का नहीं है कि और क्या भी हिलेगा। आप एक सुझाव स्वीकार करते हैं और सोचते हैं कि क्या यह सही फैसला था। Schedule Undo आपको इरादे और प्रतिबद्धता के बीच एक सुरक्षित क्षेत्र देता है।"
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Tiler में हर बदलाव—चाहे आपने कोई अनुरोध टाइप किया हो, कोई सुझाव स्वीकार किया हो, या कोई tile हटाया हो—पहले प्रीव्यू के रूप में दिखाई देता है। आपका लाइव शेड्यूल वैसा ही रहता है जब तक आप तय नहीं कर लेते।"
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Schedule Undo कैसे काम करता है"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "एक बदलाव करें",
+						"stepBody": "एक tile हटाएँ, नया कार्य जोड़ें या AI सुझाव स्वीकार करें। तुरंत सेव करने के बजाय, Tiler बदलाव को प्रीव्यू में डालता है। यह एक डैश्ड बॉर्डर और PREVIEW लेबल के साथ दिखाई देता है ताकि आपको पता चले कि यह अभी पुष्टि नहीं हुआ है।",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "कुछ भी स्वतः सेव नहीं होता",
+							"text": "जब तक आप समीक्षा कर रहे हैं, आपका लाइव शेड्यूल फ़्रीज़ है। कोई आंशिक सेव नहीं, कोई ग़लती से ओवरराइट नहीं।"
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "ठीक देखें कि क्या बदला",
+						"stepBody": "प्रीव्यू tile में अपडेटेड नाम, स्थान, समय और तिथि दिखाई देती है, जो पहले वहाँ थी उसके बगल में। आप बिना दिमाग़ में खींचे हुए एक नज़र में पूरा चित्र देख सकते हैं कि क्या हिला।"
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Cancel या Accept दबाएँ",
+						"stepBody": "नतीजे से संतुष्ट नहीं? Cancel दबाएँ और आपका मूल शेड्यूल तुरंत वापस आ जाता है। संतुष्ट हैं? Accept दबाएँ और यह पुष्टि हो जाता है। दोनों मामलों में, आपने तय किया।",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Cancel हमेशा तुरंत है",
+							"text": "किसी cancel history में स्क्रॉल करने की ज़रूरत नहीं। एक दबाव और आपकी ठीक मूल स्थिति वापस है, चाहे प्रीव्यू में कितना भी शिफ़्ट हुआ हो।"
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "यह क्यों ज़रूरी है"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "ज्यादातर कैलेंडर ऐप्स बदलाव तुरंत लागू करते हैं और आपको बाद में undo करने को कहते हैं, तब तक नोटिफ़िकेशन जा चुकी होती हैं, सिंक हो चुका होता है और नुकसान हो चुका होता है। Schedule Undo तर्क उलट देता है। डिफ़ॉल्ट प्रीव्यू है, सेव नहीं।"
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "भरे दिन के लिए बनाया गया",
+						"text": "जब आपके दिन में कोई बफर नहीं है, एक ग़लती हर जगह तक पहुँच सकती है। Schedule Undo आपको एक साँस लेने का पल देता है बदलाव लाइव होने से पहले।"
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "चाहे आप वर्कआउट पुनर्शेड्यूल कर रहे हों, मीटिंग हटा रहे हों या एक साथी द्वारा भेजा गया कार्य अपना रहे हों, प्रीव्यू का चरण एक सेकंड से कम लेता है और आपको एक फ़ोन से बचा सकता है जिसका आप पछताते।"
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "जब तक ग़लती न हो, विचार बदल लें।"
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "22 मई, 2026",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "ज़्यादातर कार्य हस्तांतरण एक संदेश thread में समाप्त होते हैं। आप भेजते हैं, वे पढ़ते हैं, शेड्यूल करना भूल जाते हैं, आप फ़ॉलो-अप करते हैं। Tileshare मध्यस्थ को हटा देता है। एक tile साझा करें और वह दूसरे व्यक्ति के Tiler में पहुँचता है, पहले से शेड्यूल होकर।"
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "जब आप एक tile साझा करते हैं, वह प्राप्तकर्ता के शेड्यूल में एक लाइव अनुकूली कार्य के रूप में पहुँचता है। यह उनकी मौजूदा प्रतिबद्धताओं के आसपास सबसे अच्छा खाली slot खोजता है। किसी भी ओर से प्लेसमेंट ज़रूरी नहीं।"
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Tileshare कैसे काम करता है"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "कोई भी tile साझा करें",
+						"stepBody": "आपके शेड्यूल में किसी भी कार्य से, Share दबाएँ और एक Tiler संपर्क चुनें। tile भेजा जाता है, प्राप्तकर्ता को उसे पूरा करने के लिए ज़रूरी सब कुछ के साथ।",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "tile के साथ क्या जाता है",
+							"text": "कार्य का नाम, अनुमानित अवधि, डेडलाइन और स्थान टैग। प्राप्तकर्ता का व्यक्तिगत शेड्यूल पूरी तरह निजी रहता है।"
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "यह उनके शेड्यूल में पहुँचता है",
+						"stepBody": "साझा किया गया tile प्राप्तकर्ता के Tiler में दिखाई देता है और उनकी मौजूदा प्रतिबद्धताओं के आसपास सबसे अच्छा खाली slot खोजता है। यह उनके दिन के अनुकूल होता है, न कि उल्टा।"
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "फ़ॉलो-अप के बिना ट्रैक करें",
+						"stepBody": "जब कार्य भेज दिया जाए, आप देख सकते हैं कि कब शेड्यूल हुआ, कब पूरा होगा और क्या हिला गया है। कोई फ़ॉलो-अप संदेश नहीं। कोई स्थिति जाँच नहीं। आप जान जाएँगे।",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "साझा जिम्मेदारी, शून्य घर्षण",
+							"text": "दोनों पक्ष उसी tile को देखते हैं। एक इसे पूरा करता है। दूसरा देखता है कि यह हो गया। एक डिलीगेशन जो वास्तव में लूप बंद करती है।"
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "एक बार भेजें। आपको पता है कि यह हो जाएगा।"
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "एआई शेड्यूलिंग",
+				"title": "एआई कैलेंडर क्या है, और यह वास्तव में क्या करना चाहिए?",
+				"subtitle": "ज़्यादातर लोगों को और कैलेंडर ऐप्स की ज़रूरत नहीं है। उन्हें चाहिए कि कैलेंडर वह जगह बने जहाँ तयारियां चुपचाप टूटें, यह बंद हो जाए। देखिए एक एआई कैलेंडर वास्तव में क्या संभालना चाहिए — और क्या कभी नहीं करना चाहिए।",
+				"excerpt": "स्मार्ट कैलेंडर, एआई शेड्यूलर और टाइम मैनेजमेंट टूल्स लगातार सामने आ रहे हैं। ज़्यादातर वही कमज़ोर सवाल जवाब देते हैं: इसे कहाँ रखूँ? पर एक एआई कैलेंडर की असली जिम्मेदारी है उसकी रक्षा करना जो पहले से मायने रखता है।",
+				"readTime": "5 मिनट पढ़ें",
+				"author": "Tiler टीम",
+				"date": "1 मई, 2026",
+				"sections": [
+					{
+						"lead": true,
+						"text": "हर कुछ महीनों में, एक नया ऐप वादा करता है कि यह आपके समय के बारे में अधिक स्मार्ट होगा। लेकिन अधिकांश कैलेंडर अभी भी वही करते हैं: वे इवेंट स्टोर करते हैं। वे वास्तव में इस बारे में नहीं सोचते कि आपका दिन क्या कर रहा है। एक AI कैलेंडर एक महत्वपूर्ण तरीके से अलग है: यह आपके शेड्यूल को संवैधानिक प्रणाली के रूप में देखता है, सिर्फ ब्लॉकों की सूची के रूप में नहीं। यह वही अंतर है जो इवेंट स्टोर करने वाले टूल और परिणामों पर विचार करने वाले टूल के बीच है।"
+					},
+					{
+						"caption": "कैलेंडर की तीन पीढ़ियाँ: बेवकूफ़ सूची, स्मार्ट कैलेंडर और AI कैलेंडर जो परिणामों पर विचार करता है।"
+					},
+					{
+						"title": "बेवकूफ़ सूचियों से निर्णयों तक"
+					},
+					{
+						"text": "डिजिटल कैलेंडर की पहली पीढ़ी के प्लानर का विकल्प थी। आप एक इवेंट टाइप करते, समय चुनते, और कैलेंडर याद रख लेता। यह उपयोगी था। लेकिन यह मानता था कि आपने सही निर्णय पहले ही ले लिया है। कैलेंडर सिर्फ स्टोरेज था।"
+					},
+					{
+						"text": "दूसरी पीढ़ी ने बुद्धिमत्ता जोड़ी, लेकिन केवल किनारों पर। एक कैलेंडर आपको टक्कर की याद दिला सकता था, खाली स्लॉट सुझा सकता था, या थोड़ा यात्रा समय ब्लॉक कर सकता था। ये उपयोगी थे। लेकिन ये हर इवेंट को अभी भी अलग-अलग संभालते थे। कैलेंडर बताने में सक्षम था कि कुछ ग़लत है। यह बताने में सक्षम नहीं था कि क्या बेहतर होगा।"
+					},
+					{
+						"text": "तीसरी पीढ़ी अलग है। यह समझती है कि इवेंट ग्रिड पर अलग-अलग बॉक्स नहीं हैं। इनमें वजन, स्थान, निर्भरताएँ और परिणाम हैं। एक क्लाइंट कॉल, एक वर्कआउट और एक ड्राइव सिर्फ समय नहीं हैं। ये दिन के टुकड़े हैं जो एक-दूसरे को प्रभावित करते हैं। यहीं पर 'AI' शब्द अंत में अपनी जगह कमाता है।"
+					},
+					{
+						"label": "मुख्य बदलाव",
+						"text": "कैलेंडर 'यह इवेंट कहाँ है?' पूछने से 'जब यह हिला तो पूरे दिन में क्या होता है?' तक पहुँच गए। स्टोरेज से विचारशीलता तक यह बदलाव है जो कैलेंडर को AI बनाता है, सिर्फ स्मार्ट नहीं।"
+					},
+					{
+						"title": "एक AI कैलेंडर वास्तव में क्या जवाब देता है"
+					},
+					{
+						"text": "एक असली AI कैलेंडर उन सवालों का जवाब देता है जो पुराने कैलेंडर ने कभी कोशिश नहीं की: क्या मैं यह बिना उससे टकराए फिट कर सकता हूँ जो पहले से महत्वपूर्ण है? अगर मैं इसे हिलाता हूँ तो क्या होगा? इसका सबसे कम दर्द भरा स्थान कहाँ है? ये छोटे सवाल नहीं हैं। ये वही सवाल हैं जो दिन को चलाते हैं — या चुपचाप खराब कर देते हैं।"
+					},
+					{
+						"text": "यहीं पर 'AI कैलेंडर' मार्केटिंग फ़्रेज़ बंद हो जाता है। यह आपके इवेंट के बगल बैठे चैटबॉट के बारे में नहीं है। यह एक ऐसी प्रणाली के बारे में है जो आपकी बंद होने से पहले शेड्यूलिंग निर्णयों के परिणामों की भविष्यवाणी कर सकती है।"
+					},
+					{
+						"title": "यह सिर्फ चैटबॉट क्यों नहीं है"
+					},
+					{
+						"text": "अनेक टूल्स अब एक सामान्य कैलेंडर पर चैट इंटरफ़ेस जोड़ते हैं। यह सुविधाजनक है, लेकिन यह कैलेंडर को AI नहीं बनाता। चैटबॉट सवालों के जवाब दे सकता है, लेकिन यह शेड्यूल के व्यवहार को नहीं बदलता। एक सच्चा AI कैलेंडर व्यवहार खुद बदलता है। यह सिर्फ कुछ नहीं बताता। यह एक बदलाव की परीक्षा लेता है, प्रभाव सिम्युलेट करता है, और आप स्वीकार करने से पहले दिखाता है कि क्या होता है।"
+					},
+					{
+						"text": "यह मूलभूत रूप से अलग चीज़ है। यह कैलेंडर को निर्णयों के रिकॉर्ड से एक टूल में बदल देता है जो आपको बेहतर निर्णय लेने में मदद करता है। आप बदलाव स्वीकार, समायोजित, या रद्द कर सकते हैं, क्योंकि कैलेंडर पहले समझौता दिखाता है। यही वह हिस्सा है जो अधिकांश उत्पाद अभी भी ग़लत करते हैं। वे कैलेंडर को बोलने देते हैं। वे इसे सोचने नहीं देते।"
+					},
+					{
+						"title": "Tiler में यह कैसे दिखता है"
+					},
+					{
+						"stepTitle": "एक असली कैलेंडर सवाल पूछें",
+						"stepBody": "आप ब्लॉक को जगह पर खींचकर नहीं प्रार्थना करते। आप Tiler से कहते हैं कि ऑफिस के बाद जिम फिट करें। Tiler देखता है कि वहाँ पहले से क्या है, और ऐसा शेड्यूल प्रस्तावित करता है जो वास्तव में उसके साथ काम करता है।"
+					},
+					{
+						"stepTitle": "होने से पहले प्रभाव देखें",
+						"stepBody": "Tiler सिर्फ टाइल हिलाकर बेस्ट नहीं उम्मीद करता। यह दिखाता है कि क्या बदलता है। अगर स्टैंडअप 30 मिनट बाद हो जाती है, आप commit करने से पहले देख लेते हैं। कोई आश्चर्य टक्कर नहीं, कोई टूटी यात्रा समय नहीं।"
+					},
+					{
+						"stepTitle": "स्वीकार करें या मन बदलें",
+						"stepBody": "आप अंतिम शब्द रखते हैं। आप प्लान स्वीकार कर सकते हैं, एक टाइल समायोजित कर सकते हैं, या पूरा रद्द कर सकते हैं। कैलेंडर सोचता है। आप तय करते हैं।"
+					},
+					{
+						"quote": "AI कैलेंडर चैटबॉट नहीं है। यह निर्णय परत है।"
+					},
+					{
+						"label": "टिप",
+						"text": "कैलेंडर से असली सवाल पूछें। 'यह मेरे दिन को बिना टूटे कहाँ फिट होता है?' 'इसे 3 बजे रखो' को हराता है। पहला कैलेंडर को काम करने देता है। दूसरा सिर्फ उसे आज्ञाकारि करता है।"
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "अगला पढ़ें: नेचरल लैंग्वेज शेड्यूलिंग — अपने कैलेंडर से पूछें कि आप क्या मतलब रखते हैं"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "अगला पढ़ें: Schedule Undo — गंदा शेड्यूल रद्द करने का सही तरीका"
+					},
+					{
+						"items": [
+							{
+								"question": "क्या AI कैलेंडर मेरे कैलेंडर के ऊपर सिर्फ चैटबॉट है?",
+								"answer": "नहीं। चैटबॉट आपके इवेंट के बारे में सवालों के जवाब देता है। AI कैलेंडर शेड्यूल के अपने व्यवहार को बदलता है: यह एक बदलाव की परीक्षा लेता है, प्रभाव सिम्युलेट करता है, और कुछ commit होने से पहले समझौता दिखाता है।"
+							},
+							{
+								"question": "क्या यह बिना पूछे मेरे इवेंट हिला देगा?",
+								"answer": "नहीं। कैलेंडर प्रस्तावित करता है; आप तय करते हैं। आप पूरा प्लान स्वीकार, समायोजित, या रद्द कर सकते हैं, तो कुछ भी आपकी अनुमोदन से पहले नहीं बदलता।"
+							},
+							{
+								"question": "क्या मुझे अभी भी अपना मौजूदा कैलेंडर ऐप चाहिए?",
+								"answer": "Tiler उन कैलेंडर पर काम करता है जो आप पहले से उपयोग करते हैं। यह आपके इवेंट के रहने की जगह नहीं बदलता — इसके चारों ओर के निर्णय आसान बनाता है।"
+							},
+							{
+								"question": "क्या यह मुझे बदल रहा है या आलसी बना रहा है?",
+								"answer": "AI कैलेंडर आपको और अधिक मानवीय बनाना चाहिए, कम नहीं। यह यांत्रिक समझौतों को संभालता है ताकि आप अपनी ध्यान उन हिस्सों पर लगा सकें जहाँ वास्तव में एक इंसान चाहिए।"
+							}
+						]
 					}
 				]
 			}

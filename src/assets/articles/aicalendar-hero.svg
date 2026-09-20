@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="480" viewBox="0 0 860 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#161616"/>
+      <stop offset="100%" stop-color="#121212"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0.9"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <rect width="860" height="480" rx="16"/>
+    </clipPath>
+    <filter id="selGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#ED123B" flood-opacity="0.45" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+  </defs>
+
+  <g clip-path="url(#clip)">
+    <rect width="860" height="480" fill="url(#bg)"/>
+
+    <!-- Header -->
+    <rect width="860" height="52" fill="url(#hdr)"/>
+    <rect y="52" width="860" height="1" fill="rgba(255,255,255,0.06)"/>
+    <text x="28" y="33" font-family="Inter,sans-serif" font-size="18" fill="#3a3a3a">&#8592;</text>
+    <text x="400" y="33" font-family="Urbanist,Inter,sans-serif" font-size="15" font-weight="700" fill="#d4d4d4" text-anchor="middle">Thursday, Jun 19</text>
+    <text x="836" y="33" font-family="Urbanist,Inter,sans-serif" font-size="13" font-weight="800" fill="#ED123B" text-anchor="end">tiler</text>
+
+    <!-- Time column -->
+    <rect x="0" y="52" width="56" height="428" fill="#0f0f0f"/>
+    <rect x="56" y="52" width="1" height="428" fill="rgba(255,255,255,0.05)"/>
+    <text x="28" y="103" font-family="Inter,sans-serif" font-size="9" fill="#333" text-anchor="middle">1 PM</text>
+    <text x="28" y="193" font-family="Inter,sans-serif" font-size="9" fill="#333" text-anchor="middle">2 PM</text>
+    <text x="28" y="283" font-family="Inter,sans-serif" font-size="9" fill="#333" text-anchor="middle">3 PM</text>
+    <text x="28" y="373" font-family="Inter,sans-serif" font-size="9" fill="#333" text-anchor="middle">4 PM</text>
+
+    <!-- Grid lines -->
+    <line x1="57" y1="100" x2="560" y2="100" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+    <line x1="57" y1="190" x2="560" y2="190" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+    <line x1="57" y1="280" x2="560" y2="280" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+    <line x1="57" y1="370" x2="560" y2="370" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+
+    <!-- Fixed block: Design review -->
+    <rect x="66" y="70" width="484" height="56" rx="14" fill="#0077FF" fill-opacity="0.10" stroke="#0077FF" stroke-opacity="0.28" stroke-width="1.5"/>
+    <rect x="66" y="70" width="5" height="56" rx="2.5" fill="#0077FF" fill-opacity="0.7"/>
+    <text x="86" y="94" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="rgba(210,228,255,0.92)">Design review</text>
+    <text x="86" y="113" font-family="Inter,sans-serif" font-size="11" fill="rgba(96,165,250,0.5)">@ Studio &#183; 1:00 &#8211; 2:00 PM</text>
+
+    <!-- Proposed (simulated) tile: Gym -->
+    <rect x="66" y="252" width="484" height="60" rx="14" fill="#05A39C" fill-opacity="0.10" stroke="#05A39C" stroke-opacity="0.26" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <rect x="66" y="252" width="5" height="60" rx="2.5" fill="#05A39C" fill-opacity="0.7"/>
+    <text x="86" y="278" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="rgba(200,242,240,0.92)">Gym</text>
+    <text x="86" y="296" font-family="Inter,sans-serif" font-size="11" fill="rgba(5,163,156,0.5)">@ Home &#183; 3:00 &#8211; 3:45 PM</text>
+    <rect x="430" y="264" width="104" height="18" rx="9" fill="rgba(5,163,156,0.15)"/>
+    <text x="482" y="276" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#3EDCD6" text-anchor="middle">PROPOSED</text>
+
+    <!-- Selected tile with glow: Standup (moved) -->
+    <rect x="66" y="342" width="484" height="60" rx="14" fill="#ED123B" fill-opacity="0.16" stroke="#ED123B" stroke-width="2" filter="url(#selGlow)"/>
+    <rect x="66" y="342" width="5" height="60" rx="2.5" fill="#ED123B" fill-opacity="0.8"/>
+    <text x="86" y="368" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="#ffffff">Team standup</text>
+    <text x="86" y="386" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.55)">@ Work &#183; 4:00 &#8211; 4:30 PM</text>
+
+    <!-- Impact chips panel -->
+    <rect x="580" y="70" width="260" height="330" rx="16" fill="#171717" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="600" y="102" font-family="Urbanist,Inter,sans-serif" font-size="13" font-weight="700" fill="#e5e5e5">Impact</text>
+    <line x1="600" y1="116" x2="820" y2="116" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+    <rect x="600" y="134" width="220" height="40" rx="10" fill="rgba(5,163,156,0.12)" stroke="rgba(5,163,156,0.35)" stroke-width="1"/>
+    <circle cx="618" cy="154" r="4" fill="#05A39C"/>
+    <text x="630" y="151" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#9EFFFB">Gym placed</text>
+    <text x="630" y="165" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)">3:00 &#8211; 3:45 PM</text>
+
+    <rect x="600" y="184" width="220" height="40" rx="10" fill="rgba(237,18,59,0.10)" stroke="rgba(237,18,59,0.35)" stroke-width="1"/>
+    <circle cx="618" cy="204" r="4" fill="#ED123B"/>
+    <text x="630" y="201" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#F793A6">Standup moved</text>
+    <text x="630" y="215" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)">3:30 &#8594; 4:00 PM</text>
+
+    <rect x="600" y="234" width="220" height="40" rx="10" fill="rgba(237,18,59,0.10)" stroke="rgba(237,18,59,0.35)" stroke-width="1"/>
+    <circle cx="618" cy="254" r="4" fill="#ED123B"/>
+    <text x="630" y="251" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#F793A6">Review shifted</text>
+    <text x="630" y="265" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)">+15 min earlier</text>
+
+    <!-- Accept button -->
+    <rect x="600" y="352" width="220" height="30" rx="8" fill="#ED123B" fill-opacity="0.15" stroke="#ED123B" stroke-width="1.5"/>
+    <text x="710" y="371" font-family="Urbanist,Inter,sans-serif" font-size="12" font-weight="700" fill="#ED123B" text-anchor="middle">Accept plan</text>
+
+    <!-- Bottom fade -->
+    <rect x="0" y="400" width="860" height="80" fill="url(#bottomFade)"/>
+  </g>
+</svg>

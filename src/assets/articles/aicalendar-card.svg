@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d0d0d"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <clipPath id="clip"><rect width="400" height="240" rx="16"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="400" height="240" fill="url(#bg)"/>
+
+    <!-- Three horizontal timeline bars -->
+    <!-- Row 1 -->
+    <rect x="24" y="48" width="70" height="28" rx="8" fill="#0077FF" fill-opacity="0.18" stroke="#0077FF" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="104" y="48" width="130" height="28" rx="8" fill="#05A39C" fill-opacity="0.18" stroke="#05A39C" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="244" y="48" width="50" height="28" rx="8" fill="#ED123B" fill-opacity="0.18" stroke="#ED123B" stroke-opacity="0.6" stroke-width="1.5"/>
+    <rect x="304" y="48" width="72" height="28" rx="8" fill="#171717" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <!-- Row 2 -->
+    <rect x="24" y="108" width="110" height="28" rx="8" fill="#05A39C" fill-opacity="0.18" stroke="#05A39C" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="144" y="108" width="60" height="28" rx="8" fill="#ED123B" fill-opacity="0.18" stroke="#ED123B" stroke-opacity="0.6" stroke-width="1.5"/>
+    <rect x="214" y="108" width="90" height="28" rx="8" fill="#0077FF" fill-opacity="0.18" stroke="#0077FF" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="314" y="108" width="62" height="28" rx="8" fill="#171717" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <!-- Row 3 -->
+    <rect x="24" y="168" width="56" height="28" rx="8" fill="#171717" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <rect x="90" y="168" width="84" height="28" rx="8" fill="#0077FF" fill-opacity="0.18" stroke="#0077FF" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="184" y="168" width="96" height="28" rx="8" fill="#05A39C" fill-opacity="0.18" stroke="#05A39C" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="290" y="168" width="86" height="28" rx="8" fill="#171717" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+    <!-- Question chip -->
+    <rect x="100" y="14" width="200" height="22" rx="11" fill="#171717" stroke="rgba(237,18,59,0.4)" stroke-width="1"/>
+    <circle cx="114" cy="25" r="3" fill="#ED123B"/>
+    <text x="124" y="28" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="rgba(255,255,255,0.65)">Where does the gym fit?</text>
+  </g>
+</svg>

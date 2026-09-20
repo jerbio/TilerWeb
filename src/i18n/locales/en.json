@@ -2402,6 +2402,108 @@
 						"quote": "Send it once. Know it gets done."
 					}
 				]
+			},
+			"aiCalendar": {
+				"category": "AI SCHEDULING",
+				"title": "What Is an AI Calendar, and What Should It Actually Do?",
+				"subtitle": "Most people do not need more calendar apps. They need the calendar to stop being a place where decisions quietly break. Here is what an AI calendar should actually handle, and what it should never do.",
+				"excerpt": "Smart calendars, AI schedulers, and time management tools keep appearing. Most of them answer the same weak question: where should I put this? But the real job of an AI calendar is to protect what already matters.",
+				"readTime": "5 min read",
+				"author": "Tiler Team",
+				"date": "May 1, 2026",
+				"sections": [
+					{
+						"lead": true,
+						"text": "Every few months, a new app promises to be smarter about your time. But most calendars still work the same way: they store events. They do not really think about what your day is doing. An AI calendar is different in one important way: it treats your schedule as a system of constraints, not just a list of blocks. That is the difference between a tool that stores events and a tool that reasons about outcomes."
+					},
+					{
+						"caption": "The three generations of calendars: the dumb list, the smart calendar, and the AI calendar that reasons about outcomes."
+					},
+					{
+						"title": "From dumb lists to decisions"
+					},
+					{
+						"text": "The first generation of digital calendars was a replacement for the paper planner. You typed an event, picked a time, and the calendar remembered it. That was useful. But it assumed you already made the right decision. The calendar was just storage."
+					},
+					{
+						"text": "The second generation added intelligence, but only at the edges. A calendar might remind you of a conflict, suggest a free slot, or block a bit of travel time. These were helpful. But they still treated each event in isolation. The calendar could tell you something was wrong. It could not tell you what was better."
+					},
+					{
+						"text": "The third generation is different. It understands that events are not isolated boxes on a grid. They have weight, location, dependencies, and consequences. A client call, a workout, and a drive are not just times. They are pieces of a day that affect each other. That is where the word \"AI\" finally earns its place."
+					},
+					{
+						"label": "Key shift",
+						"text": "Calendars moved from asking \"where is this event?\" to \"what happens to the whole day when it moves?\" That shift from storage to reasoning is what makes a calendar AI rather than just smart."
+					},
+					{
+						"title": "What an AI calendar actually answers"
+					},
+					{
+						"text": "A real AI calendar answers questions that older calendars never tried to answer: Can I fit this in without breaking what already matters? What happens if I move this thing? Where is the least painful place for this to go? These are not small questions. They are the questions that make a day work, or quietly ruin it."
+					},
+					{
+						"text": "This is where \"AI calendar\" stops being a marketing phrase. It is not about a chatbot sitting next to your events. It is about a system that can predict the consequences of scheduling decisions before you commit to them."
+					},
+					{
+						"title": "Why this is not just a chatbot"
+					},
+					{
+						"text": "Many tools now bolt a chat interface onto a normal calendar. That is convenient, but it is not what makes a calendar AI. A chatbot can answer questions, but it does not change how the schedule behaves. A true AI calendar changes the behavior itself. It does not just tell you something. It tests a change, simulates the impact, and shows you what happens before you accept it."
+					},
+					{
+						"text": "That is a fundamentally different thing. It turns the calendar from a record of decisions into a tool that helps you make better ones. You can accept, adjust, or undo the change, because the calendar shows you the tradeoff first. That is the part most products still get wrong. They make the calendar talk. They do not make it think."
+					},
+					{
+						"title": "How it looks in Tiler"
+					},
+					{
+						"stepTitle": "Ask a real calendar question",
+						"stepBody": "You do not drag a block into place and pray. You ask Tiler to fit the gym in after work. Tiler looks at what is already there and proposes a schedule that actually works with it."
+					},
+					{
+						"stepTitle": "See the impact before it happens",
+						"stepBody": "Tiler does not just move a tile and hope for the best. It shows you what changes. If the standup slides 30 minutes later, you see that before you commit. No surprise conflicts, no broken travel time."
+					},
+					{
+						"stepTitle": "Accept it or change your mind",
+						"stepBody": "You keep the final say. You can accept the plan, tweak a single tile, or undo the whole thing. The calendar thinks. You decide."
+					},
+					{
+						"quote": "An AI calendar is not a chatbot. It is a decision layer."
+					},
+					{
+						"label": "Tip",
+						"text": "Ask the calendar real questions. \"Where does this fit without breaking my day?\" beats \"Schedule it at 3.\" The first makes the calendar work. The second just makes it obey."
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "Read next: Natural-Language Scheduling — Ask Your Calendar What You Mean"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "Read next: Schedule Undo — The Right Way to Undo a Messy Schedule"
+					},
+					{
+						"items": [
+							{
+								"question": "Is an AI calendar just a chatbot on top of my calendar?",
+								"answer": "No. A chatbot answers questions about your events. An AI calendar changes how the schedule itself behaves: it tests a change, simulates the impact, and shows you the tradeoff before anything is committed."
+							},
+							{
+								"question": "Will it move my events without asking?",
+								"answer": "No. The calendar proposes; you decide. You can accept, adjust, or undo the whole plan, so nothing changes until you approve it."
+							},
+							{
+								"question": "Do I still need my existing calendar app?",
+								"answer": "Tiler works on top of the calendars you already use. It does not replace where your events live — it makes the decisions around them easier."
+							},
+							{
+								"question": "Is it replacing me or making me lazy?",
+								"answer": "An AI calendar should make you more human, not less. It handles the mechanical tradeoffs so you can spend your attention on the parts that actually need a human."
+							}
+						]
+					}
+				]
 			}
 		}
 	}

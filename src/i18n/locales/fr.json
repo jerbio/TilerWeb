@@ -2208,40 +2208,40 @@
 				"date": "1 mai 2026",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "La plupart des outils de planification vous traitent comme un opérateur de calendrier. Vous faites glisser, vous déposez, vous redimensionnez, puis la vie change et vous recommencez. Tiler prend une approche différente : vous parlez, il planifie."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "Tapez quelque chose comme \"Dentiste jeudi à 9h, puis café avec Priya en ville vers 11h\" et Tiler s’occupe du reste. Durée, temps de trajet, marges de sécurité, confirmation. Tout."
 					},
 					{
-						"title": "How it works"
+						"title": "Comment ça marche"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "Décrivez la tâche",
+						"stepBody": "Tapez ce que vous devez faire en langage courant. Pas de syntaxe spéciale, pas de menus déroulants. \"Séance de gym demain matin pendant une heure\" suffit pour démarrer.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Ce que Tiler comprend",
+							"text": "Temps relatif (\"demain\"), durée (\"une heure\") et repères de localisation (\"en ville\"). Aucune configuration supplémentaire nécessaire."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "L’IA comble les lacunes",
+						"stepBody": "Tiler réfléchit à votre demande avant de répondre. Il déduit la durée depuis le contexte, vérifie vos engagements existants et tient compte du déplacement. Si un détail est vraiment ambigu, il pose une question ciblée, jamais un formulaire.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "Raisonnement, pas devinette",
+							"text": "Tiler croise votre localisation, vos tuiles existantes et vos fenêtres horaires préférées avant de proposer quoi que ce soit."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "Vérifiez, puis confirmez",
+						"stepBody": "Tiler vous montre l’horaire proposé avec tous les détails : heure, lieu et trajet. Vous confirmez, ajustez ou demandez des alternatives. Rien ne tombe dans votre calendrier sans votre accord.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "Confirmation d’abord",
+							"text": "Tiler propose. Vous décidez. Vous restez en contrêle même si l’IA fait le travail lourd."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "Vous vivez le moment. Tiler le planifie."
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "8 mai 2026",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "La plupart des calendriers supposent qu’à la fin d’une tâche, vous êtes prêt pour la suivante. Mais la vie réelle a un trajet. Tiler intègre ce trajet dans votre horaire, afin que chaque bloc de votre chronologie reflète là où vous devez être."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "Ajoutez une réunion, une démarche, un café ou le ramassage à l’école. Tiler calcule automatiquement comment vous y arriverez et combien de temps cela prend, puis insère le temps de trajet directement dans votre journée."
 					},
 					{
-						"title": "How it works"
+						"title": "Comment ça marche"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "Définissez vos lieux une fois",
+						"stepBody": "Vous n’avez pas besoin de saisir des adresses exactes à chaque fois. Définissez votre maison, votre bureau et tout endroit régulier une seule fois. Dès lors, Tiler sait dà où vous partez et où vous allez.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Libellés de lieu que Tiler comprend",
+							"text": "Maison · Travail · Centre-ville · La salle de sport · Près du bureau"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "Le temps de trajet s’intègre dans votre chronologie",
+						"stepBody": "Chaque fois que vous ajoutez une tâche avec un lieu, Tiler insère un bloc de trajet entre elle et ce qui vient avant ou après. Il apparaît comme un segment autonome dans votre chronologie, afin que vous sachiez toujours quand partir.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "Véritables itinéraires, pas des estimations",
+							"text": "Tiler utilise des données de routage en temps réel couvrant la conduite, les transports en commun et la marche, afin que le temps de trajet reflète votre façon réelle de se déplacer."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "Les tâches proches sont regroupées automatiquement",
+						"stepBody": "Lorsque plusieurs tâches partagent le même quartier, Tiler les regroupe pour que vous ne fassiez pas aller-retour dans toute la ville. Les démarches près de votre salle de sport se placent avant ou après votre séance. Une visite client près du centre-ville est associée à votre déjeuner à proximité.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "Moins de trajet, plus de réalisé",
+							"text": "Le regroupement intelligent signifie moins de déplacements, moins de temps perdu en transit et une journée qui découle comme elle devrait."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "Réaliser quelque chose, ce n’est pas seulement trouver le temps. C’est être au bon endroit."
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "22 juin 2026",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "Modifier votre horaire semble risqué. Vous déplacez une tâche et vous n’êtes pas sûr de ce qui bouge aussi. Vous acceptez une suggestion et vous vous demandez si c’était le bon choix. Schedule Undo vous offre une zone de sécurité entre l’intention et l’engagement."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Chaque modification dans Tiler, que vous ayez tapé une demande, accepté une suggestion ou déplacé une tuile, apparaît d’abord en aperçu. Votre horaire en cours reste intact jusqu’à ce que vous en décidiez."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Comment fonctionne Schedule Undo"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "Effectuez une modification",
+						"stepBody": "Déplacez une tuile, ajoutez une nouvelle tâche ou acceptez une suggestion de l’IA. Au lieu d’enregistrer immédiatement, Tiler dépose le changement en aperçu. Il s’affiche avec une bordure en pointillés et un libellé APERçU pour que vous sachiez qu’il n’est pas encore validé.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "Rien n’est enregistré automatiquement",
+							"text": "Votre horaire en cours est figé pendant votre révision. Pas d’enregistrement partiel, pas d’écrasement accidentel."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "Voyez exactement ce qui a changé",
+						"stepBody": "La tuile en aperçu affiche le nom mis à jour, le lieu, l’heure et la date à côté de ce qui était précédemment là. Vous avez l’image complète d’un coup dœil sans avoir à suivre mentalement ce qui s’est déplacé."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Appuyez sur Annuler ou Accepter",
+						"stepBody": "Pas satisfait du résultat ? Appuyez sur Annuler et votre horaire d’origine revient instantanément. Satisfait ? Appuyez sur Accepter et c’est confirmé. Dans les deux cas, vous avez décidé.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Annuler est toujours instantané",
+							"text": "Pas d’historique d’annulation à parcourir. Un appui et votre état d’origine exact est de retour, quel que soit le décalage dans l’aperçu."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "Pourquoi c’est important"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "La plupart des applications de calendrier appliquent les modifications immédiatement et vous demandent d’annuler a posteriori, auquel moment les notifications sont déjá parties, la synchro a eu lieu et le dommage est fait. Schedule Undo inverse la logique. La valeur par défaut est l’aperçu, pas l’enregistrement."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "Conçu pour les journées chargées",
+						"text": "Lorsque votre journée n’a pas de marge, un faux mouvement peut se répercuter partout. Schedule Undo vous donne un instant pour respirer et vérifier avant qu’une modification ne passe en production."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "Que vous reprogrammiez un entraînement, déplaciez une réunion ou repreniez une tâche qu’un collègue vous a envoyée, l’étape d’aperçu prend moins d’une seconde et peut vous éviter un appel dont vous vous seriez mordu les doigts."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "Changez d’avis avant que ça ne compte."
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "22 mai 2026",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "La plupart des transmissions de tâches finissent dans un fil de messages. Vous envoyez, ils lisent, ils oublient de planifier, vous relancez. Tileshare élimine l’intermédiaire. Partagez une tuile et elle arrive dans le Tiler de l’autre personne, déjà planifiée."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "Quand vous partagez une tuile, elle arrive comme une tâche adaptative en cours dans l’horaire du destinataire. Elle trouve le meilleur slot libre autour de ses engagements existants. Aucune disposition nécessaire de part et d’autre."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Comment fonctionne Tileshare"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "Partagez n’importe quelle tuile",
+						"stepBody": "Depuis n’importe quelle tâche de votre horaire, appuyez sur Partager et sélectionnez un contact Tiler. La tuile est envoyée avec tout ce dont le destinataire a besoin pour l’accomplir.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "Ce qui voyage avec la tuile",
+							"text": "Nom de la tâche, durée estimée, échéance et étiquettes de lieu. L’horaire personnel du destinataire reste strictement privé."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "Elle atterrit dans son horaire",
+						"stepBody": "La tuile partagée apparaît dans le Tiler du destinataire et trouve le meilleur slot libre autour de ses engagements existants. Elle s’adapte à sa journée, pas l’inverse."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "Suivez sans relancer",
+						"stepBody": "Dès que la tâche est envoyée, vous pouvez voir quand elle a été planifiée, quand elle sera accomplie et si elle est déplacée. Pas de messages de relance. Pas de vérifications de statut. Vous le saurez.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "Responsabilité partagée, zéro friction",
+							"text": "Les deux côtés voient la même tuile. L’un l’accomplit. L’autre voit qu’elle est faite. Une délégation qui réellement boucle la boucle."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "Envoyez une fois. Sáchez que ça sera fait."
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "PLANIFICATION IA",
+				"title": "Qu'est-ce qu'un calendrier IA, et que devrait-il vraiment faire ?",
+				"subtitle": "La plupart des gens n'ont pas besoin de plus d'applications de calendrier. Ils ont besoin que leur calendrier cesse d'être l'endroit où les décisions se cassent en silence. Voici ce qu'un calendrier IA devrait vraiment gérer — et ce qu'il ne devrait jamais faire.",
+				"excerpt": "Calendriers intelligents, planificateurs IA et outils de gestion du temps apparaissent sans cesse. La plupart répondent à la même question faible : où dois-je placer cela ? Mais le vrai rôle d'un calendrier IA est de protéger ce qui compte déjà.",
+				"readTime": "5 min de lecture",
+				"author": "Équipe Tiler",
+				"date": "1 mai 2026",
+				"sections": [
+					{
+						"lead": true,
+						"text": "Tous les quelques mois, une nouvelle application promet d'être plus intelligente avec votre temps. Mais la plupart des calendriers fonctionnent encore de la même façon : ils stockent des événements. Ils ne réfléchissent pas vraiment à ce que fait votre journée. Un calendrier IA est différent d'une manière importante : il traite votre emploi du temps comme un système de contraintes, pas simplement comme une liste de blocs. C'est la différence entre un outil qui stocke des événements et un outil qui raisonne sur les résultats."
+					},
+					{
+						"caption": "Les trois générations de calendriers : la liste bête, le calendrier intelligent et le calendrier IA qui raisonne sur les résultats."
+					},
+					{
+						"title": "Des listes bêtes aux décisions"
+					},
+					{
+						"text": "La première génération de calendriers numériques était un remplacement du planificateur papier. Vous tapiez un événement, choisissiez une heure et le calendrier s'en souvenait. C'était utile. Mais il supposait que vous aviez déjà pris la bonne décision. Le calendrier n'était que du stockage."
+					},
+					{
+						"text": "La deuxième génération a ajouté de l'intelligence, mais seulement aux bords. Un calendrier pouvait vous rappeler un conflit, suggérer un créneau libre ou bloquer un peu de temps de trajet. C'était utile. Mais ils traitaient encore chaque événement de manière isolée. Le calendrier pouvait vous dire que quelque chose n'allait pas. Il ne pouvait pas vous dire ce qui serait mieux."
+					},
+					{
+						"text": "La troisième génération est différente. Elle comprend que les événements ne sont pas des boîtes isolées sur une grille. Ils ont un poids, une localisation, des dépendances et des conséquences. Un appel client, un entraînement et un trajet ne sont pas juste des heures. Ce sont des pièces d'une journée qui s'influencent mutuellement. C'est là que le mot « IA » gagne enfin sa place."
+					},
+					{
+						"label": "Changement clé",
+						"text": "Les calendriers sont passés de la question « où est cet événement ? » à « que se passe-t-il dans toute la journée quand il bouge ? ». Ce passage du stockage au raisonnement est ce qui rend un calendrier IA plutôt que simplement intelligent."
+					},
+					{
+						"title": "Ce qu'un calendrier IA répond réellement"
+					},
+					{
+						"text": "Un véritable calendrier IA répond à des questions que les anciens calendriers n'ont jamais essayé de répondre : Puis-je caser ça sans casser ce qui compte déjà ? Que se passe-t-il si je déplace ça ? Quel est l'endroit le moins douloureux pour le placer ? Ce ne sont pas de petites questions. Ce sont les questions qui font qu'une journée fonctionne — ou qui la ruinent silencieusement."
+					},
+					{
+						"text": "C'est ici que « calendrier IA » cesse d'être une phrase marketing. Il ne s'agit pas d'un chatbot à côté de vos événements. Il s'agit d'un système capable de prédire les conséquences des décisions de planification avant que vous ne vous engagiez."
+					},
+					{
+						"title": "Pourquoi ce n'est pas juste un chatbot"
+					},
+					{
+						"text": "Beaucoup d'outils ajoutent maintenant une interface de chat à un calendrier normal. C'est pratique, mais ce n'est pas ce qui rend un calendrier IA. Un chatbot peut répondre à des questions, mais il ne change pas le comportement de l'emploi du temps. Un véritable calendrier IA change le comportement lui-même. Il ne vous dit pas juste quelque chose. Il teste un changement, simule l'impact et vous montre ce qui se passe avant que vous acceptiez."
+					},
+					{
+						"text": "C'est fondamentalement différent. Cela transforme le calendrier d'un registre de décisions en un outil qui vous aide à en prendre de meilleures. Vous pouvez accepter, ajuster ou annuler le changement, car le calendrier vous montre d'abord le compromis. C'est la partie que la plupart des produits continuent de faire mal. Ils font parler le calendrier. Ils ne le font pas penser."
+					},
+					{
+						"title": "À quoi ça ressemble dans Tiler"
+					},
+					{
+						"stepTitle": "Posez une vraie question de calendrier",
+						"stepBody": "Vous ne glissez pas un bloc en place et priez. Vous demandez à Tiler d'insérer la salle de sport après le travail. Tiler regarde ce qui est déjà là et propose un emploi du temps qui fonctionne réellement avec."
+					},
+					{
+						"stepTitle": "Voyez l'impact avant qu'il n'arrive",
+						"stepBody": "Tiler ne déplace pas simplement un tile et espère le mieux. Il vous montre ce qui change. Si la standup glisse de 30 minutes plus tard, vous le voyez avant de vous engager. Pas de conflits surprises, pas de temps de trajet cassé."
+					},
+					{
+						"stepTitle": "Acceptez ou changez d'avis",
+						"stepBody": "Vous gardez le dernier mot. Vous pouvez accepter le plan, ajuster un seul tile ou annuler le tout. Le calendrier pense. Vous décidez."
+					},
+					{
+						"quote": "Un calendrier IA n'est pas un chatbot. C'est une couche de décision."
+					},
+					{
+						"label": "Astuce",
+						"text": "Posez au calendrier de vraies questions. « Où ça s'insère sans casser ma journée ? » bat « Mets-le à 15h. » Le premier fait travailler le calendrier. Le second le fait simplement obéir."
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "Lire la suite : Planification en langage naturel — Demandez à votre calendrier ce que vous voulez dire"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "Lire la suite : Schedule Undo — La bonne façon d'annuler un emploi du temps brouillon"
+					},
+					{
+						"items": [
+							{
+								"question": "Un calendrier IA est-il juste un chatbot sur mon calendrier ?",
+								"answer": "Non. Un chatbot répond à des questions sur vos événements. Un calendrier IA change le comportement de l'emploi du temps lui-même : il teste un changement, simule l'impact et vous montre le compromis avant que quoi que ce soit soit engagé."
+							},
+							{
+								"question": "Va-t-il déplacer mes événements sans demander ?",
+								"answer": "Non. Le calendrier propose ; vous décidez. Vous pouvez accepter, ajuster ou annuler tout le plan, donc rien ne change avant votre approbation."
+							},
+							{
+								"question": "Ai-je encore besoin de mon application de calendrier actuelle ?",
+								"answer": "Tiler fonctionne sur les calendriers que vous utilisez déjà. Il ne remplace pas l'endroit où vivent vos événements — il rend les décisions autour d'eux plus faciles."
+							},
+							{
+								"question": "Est-ce que ça me remplace ou me rend paresseux ?",
+								"answer": "Un calendrier IA devrait vous rendre plus humain, pas moins. Il gère les compromis mécaniques pour que vous puissiez consacrer votre attention aux parties qui ont réellement besoin d'un humain."
+							}
+						]
 					}
 				]
 			}

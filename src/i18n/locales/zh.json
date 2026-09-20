@@ -2208,40 +2208,40 @@
 				"date": "2026年5月1日",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "大多数日程安排工具把你当作日历操作员。你拖拽、放置、调整大小，然后生活变了，你重新开始。Tiler采取不同的方法：你说，Tiler安排。"
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "输入类似\"周四早上9点看牙医，然后11点左右在市中心和Priya喝咖啡\"这样的内容，Tiler会处理其余一切。时长、通勤时间、缓冲、确认。全部。"
 					},
 					{
-						"title": "How it works"
+						"title": "工作原理"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "描述任务",
+						"stepBody": "用日常语言输入你需要做什么。无需特殊语法，无需下拉菜单。\"明天早上去健身房一小时\"就足够了。",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Tiler理解的内容",
+							"text": "相对时间(\"明天\")、时长(\"一小时\")和位置提示(\"市中心\")。无需额外配置。"
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "AI填补空白",
+						"stepBody": "Tiler在回复之前会先推理你的请求。它从上下文推断时长，检查现有安排，考虑通勤。如果某个细节确实模糊，它会提出一个精准的问题——而不是表单。",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "推理，而非猜测",
+							"text": "在提出建议之前，Tiler会交叉核对你的位置、现有时间块和偏好时间段。"
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "审核，然后确认",
+						"stepBody": "Tiler会显示包含所有细节的拟定日程：时间、地点和通勤。你可以确认、调整或请求替代方案。没有经过你的批准，任何内容都不会进入你的日历。",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "确认优先",
+							"text": "Tiler提出建议。你做决定。即使AI在做繁重的工作，你仍掌握控制权。"
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "你活在当下，Tiler负责规划。"
 					}
 				]
 			},
@@ -2255,40 +2255,40 @@
 				"date": "2026年5月8日",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "大多数日历假设一项任务结束后，你立刻准备好开始下一项。但现实生活有通勤。Tiler将通勤纳入你的日程，让你时间线上的每个区块都反映你应该在哪里。"
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "添加一个会议、一个差事、一杯咖啡或送孩子上学。Tiler会自动计算你如何到达以及需要多长时间，然后将通勤时间直接放入你的一天中。"
 					},
 					{
-						"title": "How it works"
+						"title": "工作原理"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "一次性设置你的位置",
+						"stepBody": "你不需要每次都输入精确地址。只需设置一次你的家、办公室和任何常去的地方。之后，Tiler就知道你从哪里出发、去哪里。",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Tiler理解的位置标签",
+							"text": "家 · 公司 · 市中心 · 健身房 · 公司附近"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "通勤时间进入你的时间线",
+						"stepBody": "每次你添加一个有位置的任务，Tiler会在它和前后任务之间插入一个通勤块。它以独立片段的形式显示在你的时间线上，让你始终知道该何时出发。",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "真实路线，而非估算",
+							"text": "Tiler使用覆盖驾车、公共交通和步行的实时路线数据，确保通勤时间反映你实际的出行方式。"
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "附近任务自动分组",
+						"stepBody": "当多个任务位于同一区域时，Tiler会将它们分组，避免你来回穿梭整个城市。健身房附近的差事会安排在你的训练之前或之后。市中心附近的客户拜访会和你在那里的午餐合并。",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "更少通勤，更多完成",
+							"text": "智能分组意味着更少的出行、更少的路上浪费时间，以及一个如预期般流畅的一天。"
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "完成任务不仅是找到时间，而是身处正确的地方。"
 					}
 				]
 			},
@@ -2302,49 +2302,49 @@
 				"date": "2026年6月22日",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "更改你的日程看起来很危险。你移动一个任务，不确定还有什么会跟着动。你接受了一个建议，然后怀疑那是否正确。Schedule Undo在意图和确认之间提供了一个安全区。"
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Tiler中的每次更改——无论你输入了请求、接受了建议还是移动了时间块——都会先显示为预览。你的实时日程在你决定之前保持不变。"
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Schedule Undo工作原理"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "做出更改",
+						"stepBody": "移动一个时间块、添加新任务或接受AI建议。而不是立即保存，Tiler将更改放入预览中。它会以虚线边框和PREVIEW标签显示，让你知道尚未确认。",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "不会自动保存",
+							"text": "在你审核期间，你的实时日程被冻结。没有部分保存，没有意外覆盖。"
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "精确查看更改内容",
+						"stepBody": "预览中的时间块会显示更新后的名称、地点、时间和日期，旁边是之前的内容。你一眼就能看到全貌，无需在脑中追踪什么被移动了。"
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "点击取消或接受",
+						"stepBody": "对结果不满意？点击取消，你的原始日程立即恢复。满意？点击接受，它就被确认了。两种情况下，都是你做的决定。",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "取消总是即时",
+							"text": "没有取消历史需要滚动。一次点击，你的精确原始状态就回来了，无论预览中移动了多少。"
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "为什么重要"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "大多数日历应用立即应用更改，然后让你事后撤销——那时通知已发出，同步已完成，损失已造成。Schedule Undo反转了这个逻辑。默认是预览，而不是保存。"
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "为繁忙的一天设计",
+						"text": "当你的日程没有缓冲时，一个错误可能影响一切。Schedule Undo给你一个喘息的空间，在更改上线之前进行审核。"
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "无论你是重新安排训练、移动会议还是接受同事发送的任务，预览步骤不到一秒，却能帮你省下一通你会后悔的电话。"
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "在重要之前改变想法。"
 					}
 				]
 			},
@@ -2358,36 +2358,138 @@
 				"date": "2026年5月22日",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "大多数任务交接结束于消息线程。你发送，他们阅读，忘记安排，你跟进。Tileshare消除了中间环节。分享一个时间块，它会以已安排好的状态到达对方的Tiler。"
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "当你分享一个时间块时，它以动态自适应任务的形式到达接收者的日程中。它会在其现有安排周围找到最佳空闲时段。无需任何一方进行放置。"
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Tileshare工作原理"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "分享任何时间块",
+						"stepBody": "从你日程中的任何任务，点击分享并选择一个Tiler联系人。时间块会带着接收者完成任务所需的一切信息发送出去。",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "随时间块传递的内容",
+							"text": "任务名称、预计时长、截止日期和位置标签。接收者的个人日程完全保持私密。"
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "到达对方的日程",
+						"stepBody": "分享的时间块会出现在接收者的Tiler中，并在其现有安排周围找到最佳空闲时段。它适应对方的日程，而不是反过来。"
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "跟踪而不催促",
+						"stepBody": "任务发送后，你可以查看它何时被安排、何时完成、是否被移动。无需跟进消息。无需状态询问。你会知道的。",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "共享责任，零摩擦",
+							"text": "双方看到同一个时间块。一个完成它。另一个看到它已完成。真正闭环的委派。"
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "发送一次。你知道它会完成。"
+					}
+				]
+			},
+			"aiCalendar": {
+				"category": "AI 日程安排",
+				"title": "什么是 AI 日历？它真正应该做什么？",
+				"subtitle": "大多数人不需要更多的日历应用。他们需要的是让日历不再成为决定被悄悄打破的地方。AI 日历真正应该处理的是什么，又有哪些是它绝不该做的。",
+				"excerpt": "智能日历、AI 日程安排器和时间管理工具层出不穷。大多数回答的都是同一个薄弱的问题：我该把这个放哪里？但 AI 日历的真正职责，是保护已经重要的东西。",
+				"readTime": "5分钟阅读",
+				"author": "Tiler 团队",
+				"date": "2026年5月1日",
+				"sections": [
+					{
+						"lead": true,
+						"text": "每隔几个月，就有一款新应用承诺对你的时间更聪明。但大多数日历仍然以同样的方式工作：它们存储事件。它们并不会真正思考你的一天在做什么。AI日历在一点上不同：它将你的日程视为一套约束系统，而不仅仅是时间块的列表。这就是只存储事件的工具和会对结果进行推理的工具之间的区别。"
+					},
+					{
+						"caption": "日历的三代：笨拙的列表、智能日历，以及对结果进行推理的AI日历。"
+					},
+					{
+						"title": "从笨拙列表到决策"
+					},
+					{
+						"text": "第一代数字日历是纸质计划的替代品。你输入一个事件，选择一个时间，日历就记住了。这很有用。但它假设你已经做出了正确的决定。日历只是存储空间。"
+					},
+					{
+						"text": "第二代加入了智能，但只是在边缘。日历可以提醒你冲突、建议空闲时间或预留一点路程时间。这些都有帮助。但它们仍然孤立地对待每个事件。日历可以告诉你有什么不对。但它无法告诉你什么更好。"
+					},
+					{
+						"text": "第三代不同。它理解事件不是网格上孤立的方块。它们有重量、位置、依赖关系和后果。客户电话、锻炼和开车不仅仅是时间段。它们是一天中相互影响的各个部分。正是在这里，「AI」这个词终于有了它的立足之地。"
+					},
+					{
+						"label": "关键转变",
+						"text": "日历从问「这个事件在哪里？」转变为「它移动时，整天会发生什么？」。这个从存储到推理的转变，才让日历成为AI，而不仅仅是智能。"
+					},
+					{
+						"title": "AI日历真正回答的问题"
+					},
+					{
+						"text": "一个真正的AI日历回答那些旧日历从未试图回答的问题：我能在不破坏已经重要事项的情况下把它安排进去吗？如果我移动这个会怎样？把它放在哪里最不太痛苦？这些不是小问题。这些是让一天运转起来——或者悄悄毁掉它的问题。"
+					},
+					{
+						"text": "在这里，「AI日历」不再是营销口号。它不是指一个坐在你事件旁边的聊天机器人。它是一个系统，可以在你做出决定之前预测排程决策的后果。"
+					},
+					{
+						"title": "为什么这不仅仅是个聊天机器人"
+					},
+					{
+						"text": "许多工具现在将聊天界面附加到普通日历上。这很方便，但这并不能让日历成为AI。聊天机器人可以回答问题，但它不会改变日程的行为方式。真正的AI日历改变的是行为本身。它不仅仅是告诉你某件事。它测试变更、模拟影响，并在你接受之前展示结果。"
+					},
+					{
+						"text": "这是根本不同的东西。它将日历从决策的记录变成了帮助你做出更好决策的工具。你可以接受、调整或撤销变更，因为日历首先展示权衡。这就是大多数产品仍然做错的部分。它们让日历说话。它们没有让它思考。"
+					},
+					{
+						"title": "在 Tiler 中的表现"
+					},
+					{
+						"stepTitle": "提出一个真正的日历问题",
+						"stepBody": "你不是拖一个块到某个位置然后祈祷。你告诉 Tiler 在工作后安排健身。Tiler 查看已有的内容，并提出一个确实能与之协调的日程。"
+					},
+					{
+						"stepTitle": "在看到发生之前了解影响",
+						"stepBody": "Tiler 不只是移动一个块然后希望最好。它展示什么会改变。如果站会推迟了30分钟，你在确认之前就能看到。没有意外的冲突，没有被打乱的路程时间。"
+					},
+					{
+						"stepTitle": "接受或改变主意",
+						"stepBody": "你拥有最终决定权。你可以接受计划、调整单个块或撤销全部。日历思考。你做决定。"
+					},
+					{
+						"quote": "AI日历不是聊天机器人。它是决策层。"
+					},
+					{
+						"label": "提示",
+						"text": "向日历提出真正的问题。「什么在不毁掉我一天的情况下能放下这件事？」比「放在3点」更好。前者让日历工作。后者只是让它服从。"
+					},
+					{
+						"to": "/articles/natural-language-scheduling",
+						"text": "下一篇：自然语言排程 — 向你的日历表达你的意思"
+					},
+					{
+						"to": "/articles/schedule-undo",
+						"text": "下一篇：Schedule Undo — 撤销混乱日程的正确方式"
+					},
+					{
+						"items": [
+							{
+								"question": "AI日历只是我日历上的一个聊天机器人吗？",
+								"answer": "不是。聊天机器人回答关于你事件的问题。AI日历改变的是日程本身的行为方式：它测试变更、模拟影响，并在任何事项确认之前展示权衡。"
+							},
+							{
+								"question": "它会不经过询问就移动我的事件吗？",
+								"answer": "不会。日历提出建议；你做决定。你可以接受、调整或撤销整个计划，所以在你批准之前什么都不会改变。"
+							},
+							{
+								"question": "我仍然需要我现有的日历应用吗？",
+								"answer": "Tiler 在你已经使用的日历上工作。它不替代你事件所在的平台 — 它让你围绕事件的决策更轻松。"
+							},
+							{
+								"question": "它是替代我让我变懒吗？",
+								"answer": "AI日历应该让你更有人性，而不是更少。它处理机械性的权衡，让你把注意力集中在真正需要人的地方。"
+							}
+						]
 					}
 				]
 			}
