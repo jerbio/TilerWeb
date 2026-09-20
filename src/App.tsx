@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes as BrowserRoutes, useLocation, Navigate } 
 import Home from './pages/Home';
 import Discover from './pages/Discover';
 import Articles from './pages/Articles';
+import Features from './pages/Features';
+import NotFound from './pages/NotFound';
 import GettingStartedArticle from './pages/articles/GettingStartedArticle';
 import ArticlePage from './pages/ArticlePage';
 import Layout from './pages/Layout';
@@ -102,6 +104,7 @@ const App: React.FC = () => {
 									<Route index element={<Home />} />
 									<Route path={Routes.Discover} element={<Discover />} />
 									<Route path={Routes.Articles} element={<Articles />} />
+									<Route path={Routes.Features} element={<Features />} />
 									<Route
 										path={Routes.ArticlesGettingStarted}
 										element={<GettingStartedArticle />}
@@ -228,6 +231,8 @@ const App: React.FC = () => {
 										/>
 									</Route>
 								</Route>
+								{/* Catch-all: unknown URLs render the 404 page */}
+								<Route path="*" element={<NotFound />} />
 							</BrowserRoutes>
 							<Toaster position="bottom-left" theme="system" />
 							<NotificationToast />

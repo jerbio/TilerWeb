@@ -30,6 +30,9 @@ obj/*
 # Test coverage
 coverage
 
+# Vitest fake-localStorage side-effect files
+.vitest-localstorage*
+
 # Claude Code
 .claude
 src/assets/*.mp4
