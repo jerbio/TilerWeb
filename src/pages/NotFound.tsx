@@ -86,7 +86,7 @@ const NotFound: React.FC = () => (
 			<Code>404</Code>
 			<Title>Page not found</Title>
 			<Description>
-				We couldn't find the page you're looking for. It may have moved, or the link might
+				We couldn’t find the page you’re looking for. It may have moved, or the link might
 				be out of date.
 			</Description>
 			<HomeLink href="/">Back to Home</HomeLink>
