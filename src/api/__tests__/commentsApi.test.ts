@@ -102,6 +102,24 @@ describe('CommentsApi', () => {
 		});
 	});
 
+	describe('getReplies', () => {
+		it('puts the comment id in the query string, not the path', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				json(envelope({ comments: [], nextCursor: null, total: 0 }))
+			);
+
+			await api.getReplies('Comment+tileshare_tilette+abc+def', { limit: 50 });
+
+			const url = urlOf(fetchSpy.mock.calls[0]);
+			expect(url).toContain('api/Comments/replies');
+			expect(url).toContain('commentId=Comment%2Btileshare_tilette%2Babc%2Bdef');
+			expect(url).toContain('limit=50');
+			// The id must never appear as a path segment (IIS Express 404s on '+' paths).
+			expect(url).not.toMatch(/replies\/[^?]+/);
+			expect(methodOf(fetchSpy.mock.calls[0])).toBe('GET');
+		});
+	});
+
 	describe('createComment', () => {
 		it('sends a POST with a JSON body including the idempotency key', async () => {
 			fetchSpy.mockResolvedValueOnce(json(envelope({ comment: mockComment })));
@@ -126,21 +144,25 @@ describe('CommentsApi', () => {
 	});
 
 	describe('updateComment', () => {
-		it('sends a PUT to the comment id with a JSON body', async () => {
+		it('sends a PUT with the comment id as a query parameter', async () => {
 			fetchSpy.mockResolvedValueOnce(json(envelope({ comment: mockComment })));
 			await api.updateComment('Comment+abc', { text: 'edited', idempotencyKey: 'k2' });
 			const call = fetchSpy.mock.calls[0];
-			expect(urlOf(call)).toContain('api/Comments/');
+			const url = urlOf(call);
+			expect(url).toContain('api/Comments?id=Comment%2Babc');
+			expect(url).not.toContain('api/Comments/');
 			expect(methodOf(call)).toBe('PUT');
 		});
 	});
 
 	describe('deleteComment', () => {
-		it('sends a DELETE to the comment id with a JSON body', async () => {
+		it('sends a DELETE with the comment id as a query parameter', async () => {
 			fetchSpy.mockResolvedValueOnce(json(envelope({ comment: mockComment })));
 			await api.deleteComment('Comment+abc', { idempotencyKey: 'k3' });
 			const call = fetchSpy.mock.calls[0];
-			expect(urlOf(call)).toContain('api/Comments/');
+			const url = urlOf(call);
+			expect(url).toContain('api/Comments?id=Comment%2Babc');
+			expect(url).not.toContain('api/Comments/');
 			expect(methodOf(call)).toBe('DELETE');
 		});
 	});
