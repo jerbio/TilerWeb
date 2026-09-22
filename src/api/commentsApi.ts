@@ -8,10 +8,10 @@ import {
 	DeleteCommentParams,
 	GetCommentsParams,
 	GetParticipantsParams,
-	GetRepliesParams,
 	ParticipantsResponse,
-	UpdateCommentParams,
 	UploadAttachmentParams,
+	GetRepliesParams,
+	UpdateCommentParams,
 } from '@/core/common/types/comment';
 
 /**
