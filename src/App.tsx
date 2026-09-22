@@ -33,6 +33,7 @@ import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
 import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
+import TileShareActivityTimeline from './components/tileshare/TileShareActivityTimeline';
 import TileshareActive from './pages/app/tileshare/TileshareActive';
 import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
 import TileshareSent from './pages/app/tileshare/TileshareSent';
@@ -172,6 +173,10 @@ const App: React.FC = () => {
 												/>
 												<Route path="inbox" element={<TileshareActive />} />
 												<Route path="outbox" element={<TileshareSent />} />
+												<Route
+													path="activity"
+													element={<TileShareActivityTimeline />}
+												/>
 											</Route>
 											<Route
 												path={Routes.Tileshare.detail.pattern}

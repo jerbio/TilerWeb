@@ -134,6 +134,7 @@ class TileshareService {
 			if (res.Error && res.Error.Code !== '0') {
 				throw TilerResponseError.fromApiCodeResponse(res.Error);
 			}
+			window.dispatchEvent(new Event('tileshare-changed'));
 			return res.Content;
 		} catch (error) {
 			console.error('Error creating tileshare cluster', error);
@@ -149,6 +150,10 @@ class TileshareService {
 	) {
 		try {
 			const res = await this.api.deleteCluster(params);
+			if (res.Error && res.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
+			}
+			window.dispatchEvent(new Event('tileshare-changed'));
 			return res.Content;
 		} catch (error) {
 			console.error('Error deleting tileshare cluster', error);

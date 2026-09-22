@@ -13,6 +13,7 @@ import { useAuth } from '@/core/auth/useAuth';
 export enum TileshareTab {
 	Active = 'active',
 	Sent = 'sent',
+	Activity = 'activity',
 }
 
 const TileshareDashboardPage: React.FC = () => {
@@ -28,11 +29,14 @@ const TileshareDashboardPage: React.FC = () => {
 			setActiveTab(TileshareTab.Active);
 		} else if (pathname.endsWith(Routes.Tileshare.sent)) {
 			setActiveTab(TileshareTab.Sent);
+		} else if (pathname.endsWith(Routes.Tileshare.activity)) {
+			setActiveTab(TileshareTab.Activity);
 		}
 	}, [pathname]);
 
 	const tabs = useMemo<TabItem[]>(
 		() => [
+			{ id: TileshareTab.Activity, label: t('tileshareActivity.title', 'Activities') },
 			{
 				id: TileshareTab.Active,
 				label: t('tilesharedemo.dashboard.nav.active'),
@@ -50,6 +54,7 @@ const TileshareDashboardPage: React.FC = () => {
 	const tabRoutes: Record<string, string> = {
 		active: Routes.Tileshare.active,
 		sent: Routes.Tileshare.sent,
+		activity: Routes.Tileshare.activity,
 	};
 
 	const handleTabChange = (id: string) => {

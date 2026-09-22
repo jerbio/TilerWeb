@@ -1437,6 +1437,7 @@
 					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
 					"options": [
 						{
+							"tileshareActivity": { "title": "Activities" },
 							"value": "google",
 							"label": "Google Calendar"
 						},

@@ -21,6 +21,7 @@ export const Routes = {
 		root: '/tileshare',
 		active: '/tileshare/inbox',
 		sent: '/tileshare/outbox',
+		activity: '/tileshare/activity',
 		// Pattern routes - call() for navigation, use .pattern for <Route path=...>
 		detail: Object.assign((id: string) => `/tileshare/${id}`, {
 			pattern: '/tileshare/:id',

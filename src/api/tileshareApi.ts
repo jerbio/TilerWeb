@@ -1,5 +1,9 @@
 import { AppApi } from './appApi';
 import {
+	TileShareActivityPage,
+	TileShareActivityQuery,
+} from '@/core/common/types/tileshareActivity';
+import {
 	CreateTileShareClusterParams,
 	CreateTileShareClusterResponse,
 	DeleteTileShareClusterParams,
@@ -11,6 +15,18 @@ import {
 } from '@/core/common/types/tileshare';
 
 export class TileshareApi extends AppApi {
+	getActivity(params: TileShareActivityQuery = {}, signal?: AbortSignal) {
+		const query = new URLSearchParams(
+			Object.entries(params)
+				.filter(([, value]) => value !== undefined)
+				.map(([key, value]) => [key, String(value)])
+		);
+		return this.apiRequest<TileShareActivityPage>(`api/TileShare/Activity?${query}`, {
+			signal,
+			cache: 'no-store',
+		});
+	}
+
 	getClusters(params?: GetClustersParams) {
 		const qs = params
 			? '?' +
