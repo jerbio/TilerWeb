@@ -2155,6 +2155,29 @@
 			"title": "Outbox"
 		}
 	},
+	"comments": {
+		"count": "{{count}} comments",
+		"empty": "No comments yet",
+		"loading": "Loading…",
+		"loadMore": "Load more",
+		"retry": "Retry",
+		"loadError": "Couldn't load comments. Please try again.",
+		"loadMoreError": "Couldn't load more comments.",
+		"createError": "Couldn't post your comment.",
+		"editError": "Couldn't save your edit.",
+		"deleteError": "Couldn't delete the comment.",
+		"placeholder": "Write a comment…",
+		"send": "Send",
+		"sending": "Sending…",
+		"edit": "Edit",
+		"save": "Save",
+		"cancel": "Cancel",
+		"delete": "Delete",
+		"edited": "edited",
+		"deletedPlaceholder": "This comment was deleted.",
+		"deletedAuthor": "Deleted user",
+		"missingTarget": "Comment target not found."
+	},
 	"tile": {
 		"noteButtonAria": "Open notes for this tile"
 	},
