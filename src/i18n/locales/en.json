@@ -2176,6 +2176,15 @@
 		"edited": "edited",
 		"deletedPlaceholder": "This comment was deleted.",
 		"deletedAuthor": "Deleted user",
+		"reply": "Reply",
+		"replyPlaceholder": "Write a reply…",
+		"replies": "{{count}} replies",
+		"showReplies": "Show replies",
+		"hideReplies": "Hide replies",
+		"loadingReplies": "Loading replies…",
+		"noReplies": "No replies yet",
+		"loadRepliesError": "Couldn't load replies.",
+		"createReplyError": "Couldn't post your reply.",
 		"missingTarget": "Comment target not found."
 	},
 	"tile": {

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, setupUser } from '@/test/test-utils';
+import { render, screen, setupUser, within } from '@/test/test-utils';
 import CommentThread from '../CommentThread';
 import CommentsService from '@/services/commentsService';
+import type { CommentView } from '@/core/common/types/comment';
 
 vi.mock('react-i18next', async () => {
 	const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next');
@@ -16,7 +17,7 @@ vi.mock('react-i18next', async () => {
 	};
 });
 
-const comment = (id: string, text: string) => ({
+const comment = (id: string, text: string, overrides: Partial<CommentView> = {}) => ({
 	id,
 	targetType: 'tileshare_tilette',
 	targetId: 't',
@@ -28,17 +29,25 @@ const comment = (id: string, text: string) => ({
 	isDeleted: false,
 	canEdit: true,
 	canDelete: true,
+	rootCommentId: null,
+	isReply: false,
 	hasReplies: false,
+	...overrides,
 });
+
+const reply = (id: string, text: string, rootCommentId = 'c1') =>
+	comment(id, text, { rootCommentId, isReply: true });
 
 const makeService = (impl: {
 	getComments: ReturnType<typeof vi.fn>;
+	getReplies?: ReturnType<typeof vi.fn>;
 	createComment?: ReturnType<typeof vi.fn>;
 	updateComment?: ReturnType<typeof vi.fn>;
 	deleteComment?: ReturnType<typeof vi.fn>;
 }) =>
 	({
 		getComments: impl.getComments,
+		getReplies: impl.getReplies ?? vi.fn(),
 		createComment: impl.createComment ?? vi.fn(),
 		updateComment: impl.updateComment ?? vi.fn(),
 		deleteComment: impl.deleteComment ?? vi.fn(),
@@ -122,5 +131,167 @@ describe('CommentThread', () => {
 		expect(await screen.findAllByTestId('comment-item')).toHaveLength(2);
 		expect(screen.queryByTestId('comment-load-more')).not.toBeInTheDocument();
 		expect(service.getComments).toHaveBeenCalledTimes(2);
+	});
+});
+
+describe('CommentThread — two-level replies', () => {
+	const rootThread = (overrides: Partial<CommentView> = {}) =>
+		vi.fn().mockResolvedValue({
+			comments: [comment('c1', 'root', { hasReplies: true, ...overrides })],
+			nextCursor: null,
+			total: 1,
+		});
+
+	it('shows the reply toggle on a root and opens the inline reply composer without fetching', async () => {
+		const user = setupUser();
+		const service = makeService({ getComments: rootThread({ hasReplies: false }) });
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+
+		const replyToggle = await screen.findByTestId('comment-reply-toggle');
+		expect(screen.queryByTestId('comment-reply-composer')).not.toBeInTheDocument();
+
+		await user.click(replyToggle);
+
+		expect(screen.getByTestId('comment-reply-composer')).toBeInTheDocument();
+		expect(
+			screen.getByRole('textbox', { name: 'comments.replyPlaceholder' })
+		).toBeInTheDocument();
+		// Opening the composer must not trigger a reply fetch.
+		expect(service.getReplies).not.toHaveBeenCalled();
+	});
+
+	it('submits a reply via the service with the root comment id', async () => {
+		const user = setupUser();
+		const createComment = vi.fn().mockResolvedValue(reply('r1', 'new reply'));
+		const service = makeService({
+			getComments: rootThread({ hasReplies: false }),
+			createComment,
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+
+		await user.click(await screen.findByTestId('comment-reply-toggle'));
+		await user.type(
+			screen.getByRole('textbox', { name: 'comments.replyPlaceholder' }),
+			'hello'
+		);
+		await user.click(
+			within(screen.getByTestId('comment-reply-composer')).getByTestId(
+				'comment-composer-submit'
+			)
+		);
+
+		expect(createComment).toHaveBeenCalledTimes(1);
+		const args = createComment.mock.calls[0][0] as Record<string, unknown>;
+		expect(args).toMatchObject({
+			targetType: 'tileshare_tilette',
+			targetId: 't',
+			text: 'hello',
+			rootCommentId: 'c1',
+		});
+		expect(typeof args.idempotencyKey).toBe('string');
+		// On success the composer closes and the created reply renders inline.
+		expect(screen.queryByTestId('comment-reply-composer')).not.toBeInTheDocument();
+		const items = await screen.findAllByTestId('comment-item');
+		expect(items).toHaveLength(2);
+	});
+
+	it('loads replies lazily on the first expand and hides them without re-fetching', async () => {
+		const user = setupUser();
+		const service = makeService({
+			getComments: rootThread(),
+			getReplies: vi.fn().mockResolvedValue({
+				comments: [reply('r1', 'one'), reply('r2', 'two')],
+				nextCursor: null,
+				total: 2,
+			}),
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+		await screen.findByTestId('comment-item', { exact: false });
+
+		// Nothing fetched until the user expands.
+		expect(service.getReplies).not.toHaveBeenCalled();
+
+		await user.click(screen.getByTestId('comment-replies-toggle'));
+		expect(await screen.findByTestId('comment-reply-list')).toBeInTheDocument();
+		expect(service.getReplies).toHaveBeenCalledTimes(1);
+		expect(service.getReplies).toHaveBeenCalledWith(
+			'c1',
+			expect.objectContaining({ limit: 50 })
+		);
+		expect(await screen.findAllByTestId('comment-item')).toHaveLength(3);
+
+		// Nested replies never show a reply affordance (two-level limit).
+		expect(screen.getAllByTestId('comment-reply-toggle')).toHaveLength(1);
+		expect(screen.queryByTestId('comment-reply-composer')).not.toBeInTheDocument();
+
+		// Collapse again — no second fetch.
+		await user.click(screen.getByTestId('comment-replies-toggle'));
+		expect(screen.queryByTestId('comment-reply-list')).not.toBeInTheDocument();
+		expect(service.getReplies).toHaveBeenCalledTimes(1);
+	});
+
+	it('shows the empty state when a root has no replies', async () => {
+		const user = setupUser();
+		const service = makeService({
+			getComments: rootThread(),
+			getReplies: vi.fn().mockResolvedValue({ comments: [], nextCursor: null, total: 0 }),
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+
+		await user.click(await screen.findByTestId('comment-replies-toggle'));
+		expect(await screen.findByTestId('comment-replies-empty')).toBeInTheDocument();
+	});
+
+	it('shows a reply error with a retry that re-fetches', async () => {
+		const user = setupUser();
+		const getReplies = vi
+			.fn()
+			.mockRejectedValueOnce(new Error('replies boom'))
+			.mockResolvedValueOnce({ comments: [], nextCursor: null, total: 0 });
+		const service = makeService({ getComments: rootThread(), getReplies });
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+
+		await user.click(await screen.findByTestId('comment-replies-toggle'));
+		expect(await screen.findByTestId('comment-replies-error')).toBeInTheDocument();
+		expect(screen.getByText('replies boom')).toBeInTheDocument();
+
+		await user.click(screen.getByTestId('comment-replies-retry'));
+		expect(await screen.findByTestId('comment-replies-empty')).toBeInTheDocument();
+		expect(getReplies).toHaveBeenCalledTimes(2);
+	});
+
+	it('loads more replies with the next cursor', async () => {
+		const user = setupUser();
+		const getReplies = vi
+			.fn()
+			.mockResolvedValueOnce({
+				comments: [reply('r1', 'one')],
+				nextCursor: 'rc1',
+				total: 2,
+			})
+			.mockResolvedValueOnce({
+				comments: [reply('r2', 'two')],
+				nextCursor: null,
+				total: 2,
+			});
+		const service = makeService({ getComments: rootThread(), getReplies });
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+		await user.click(await screen.findByTestId('comment-replies-toggle'));
+
+		await user.click(await screen.findByTestId('comment-replies-load-more'));
+
+		expect(await screen.findAllByTestId('comment-item')).toHaveLength(3);
+		expect(getReplies).toHaveBeenCalledTimes(2);
+		expect(getReplies).toHaveBeenLastCalledWith(
+			'c1',
+			expect.objectContaining({ cursor: 'rc1', limit: 50 })
+		);
+		expect(screen.queryByTestId('comment-replies-load-more')).not.toBeInTheDocument();
 	});
 });

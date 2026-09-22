@@ -10,6 +10,8 @@ type CommentComposerProps = {
 	 */
 	onSubmit: (text: string) => Promise<void>;
 	disabled?: boolean;
+	/** Placeholder text. Defaults to the general comment placeholder. */
+	placeholder?: string;
 };
 
 /**
@@ -17,10 +19,11 @@ type CommentComposerProps = {
  * disables the control while a request is in flight, and only clears the field
  * on success (failures keep the draft).
  */
-const CommentComposer: React.FC<CommentComposerProps> = ({ onSubmit, disabled }) => {
+const CommentComposer: React.FC<CommentComposerProps> = ({ onSubmit, disabled, placeholder }) => {
 	const { t } = useTranslation();
 	const [text, setText] = useState('');
 	const [submitting, setSubmitting] = useState(false);
+	const placeholderText = placeholder ?? t('comments.placeholder');
 
 	const trimmed = text.trim();
 	const canSubmit = trimmed.length > 0 && !submitting && !disabled;
@@ -54,11 +57,11 @@ const CommentComposer: React.FC<CommentComposerProps> = ({ onSubmit, disabled })
 				value={text}
 				onChange={(e) => setText(e.target.value)}
 				onKeyDown={handleKeyDown}
-				placeholder={t('comments.placeholder')}
+				placeholder={placeholderText}
 				disabled={disabled}
 				maxLength={2000}
 				rows={2}
-				aria-label={t('comments.placeholder')}
+				aria-label={placeholderText}
 			/>
 			<FootRow>
 				<CharCount>{text.length}/2000</CharCount>

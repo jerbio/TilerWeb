@@ -63,6 +63,38 @@ describe('CommentsService', () => {
 		});
 	});
 
+	describe('getReplies', () => {
+		it('returns unwrapped content on success', async () => {
+			const apiMock = {
+				getReplies: vi
+					.fn()
+					.mockResolvedValue(ok({ comments: [mockComment], nextCursor: null, total: 1 })),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+
+			const res = await svc.getReplies('c1', { limit: 50 });
+
+			expect(apiMock.getReplies).toHaveBeenCalledWith('c1', { limit: 50 });
+			expect(res).toEqual({ comments: [mockComment], nextCursor: null, total: 1 });
+		});
+
+		it('throws on a non-zero error code', async () => {
+			const apiMock = {
+				getReplies: vi.fn().mockResolvedValue(fail),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+			await expect(svc.getReplies('c1')).rejects.toThrow();
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				getReplies: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+			await expect(svc.getReplies('c1')).rejects.toThrow();
+		});
+	});
+
 	describe('createComment', () => {
 		it('returns the created comment and forwards params', async () => {
 			const apiMock = {

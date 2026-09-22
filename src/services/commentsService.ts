@@ -4,6 +4,7 @@ import {
 	CreateCommentParams,
 	DeleteCommentParams,
 	GetCommentsParams,
+	GetRepliesParams,
 	UpdateCommentParams,
 } from '@/core/common/types/comment';
 import { normalizeError } from '@/core/error';
@@ -75,6 +76,23 @@ class CommentsService {
 			return res.Content;
 		} catch (error) {
 			console.error('Error fetching comments', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Fetches a page of replies under a single root comment (two-level thread).
+	 * Returns the unwrapped content: `{ comments, nextCursor, total }`.
+	 */
+	async getReplies(rootCommentId: string, params: GetRepliesParams = {}) {
+		try {
+			const res = await this.api.getReplies(rootCommentId, params);
+			if (res.Error && res.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
+			}
+			return res.Content;
+		} catch (error) {
+			console.error('Error fetching replies', error);
 			throw normalizeError(error);
 		}
 	}

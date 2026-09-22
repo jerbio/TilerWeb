@@ -167,6 +167,9 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 						<CommentItem
 							key={c.id}
 							comment={c}
+							service={svc}
+							targetType={targetType}
+							targetId={targetId}
 							onEdit={(id, text) =>
 								handleEdit(id, text).catch(() => {
 									toast.error(t('comments.editError'));
