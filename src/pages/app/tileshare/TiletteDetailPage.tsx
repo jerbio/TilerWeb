@@ -15,6 +15,8 @@ import DetailHeaderSkeleton from '@/components/tileshare/detail/DetailHeaderSkel
 import EditTileshareModal, {
 	type EditTileshareValues,
 } from '@/components/tileshare/detail/EditTileshareModal';
+import CommentThread from '@/components/comments/CommentThread';
+import { CommentTargetType } from '@/core/common/types/comment';
 
 const TiletteDetailPage: React.FC = () => {
 	const { t } = useTranslation();
@@ -83,6 +85,12 @@ const TiletteDetailPage: React.FC = () => {
 						subtitle={t('tilesharedemo.detail.inCluster', { name: parentName })}
 						onEdit={isOwner ? () => setEditing(true) : undefined}
 					/>
+					{tilette.id ? (
+						<CommentThread
+							targetType={CommentTargetType.TileshareTilette}
+							targetId={tilette.id}
+						/>
+					) : null}
 					<EditTileshareModal
 						show={editing}
 						setShow={setEditing}
