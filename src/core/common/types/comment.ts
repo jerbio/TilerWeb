@@ -40,6 +40,8 @@ export type CommentView = {
 	isReply: boolean | null;
 	/** True when a root has at least one (non-deleted) reply. */
 	hasReplies: boolean | null;
+	/** Number of non-deleted replies for a root; always 0 for replies. */
+	replyCount: number;
 };
 
 /** Paged comment thread response. */

@@ -32,6 +32,7 @@ const comment = (id: string, text: string, overrides: Partial<CommentView> = {})
 	rootCommentId: null,
 	isReply: false,
 	hasReplies: false,
+	replyCount: 0,
 	...overrides,
 });
 
@@ -137,7 +138,7 @@ describe('CommentThread', () => {
 describe('CommentThread — two-level replies', () => {
 	const rootThread = (overrides: Partial<CommentView> = {}) =>
 		vi.fn().mockResolvedValue({
-			comments: [comment('c1', 'root', { hasReplies: true, ...overrides })],
+			comments: [comment('c1', 'root', { hasReplies: true, replyCount: 2, ...overrides })],
 			nextCursor: null,
 			total: 1,
 		});

@@ -189,7 +189,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 	}
 
 	const showRepliesToggle =
-		canReply && (comment.hasReplies === true || replies.length > 0 || repliesLoaded);
+		canReply && ((comment.replyCount ?? 0) > 0 || replies.length > 0 || repliesLoaded);
 
 	return (
 		<ItemWrapper data-testid="comment-item" data-comment-id={comment.id} nested={isNested}>
@@ -244,7 +244,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
 								onClick={() => void toggleReplies()}
 								disabled={loadingReplies}
 							>
-								{expanded ? t('comments.hideReplies') : t('comments.showReplies')}
+								{expanded
+									? t('comments.hideReplies')
+									: t('comments.replies', { count: comment.replyCount ?? 0 })}
 							</ActionButton>
 						)}
 					</Actions>

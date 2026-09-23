@@ -27,6 +27,7 @@ const mockComment = {
 	canEdit: true,
 	canDelete: true,
 	hasReplies: false,
+	replyCount: 0,
 };
 
 describe('CommentsService', () => {
