@@ -199,13 +199,18 @@ export default function ArticleBody({ sections }: ArticleBodyProps) {
 								</StepHeader>
 								<StepContentRow>
 									{section.stepImage && (
-										<StepImage src={section.stepImage} alt={section.stepTitle} />
+										<StepImage
+											src={section.stepImage}
+											alt={section.stepTitle}
+										/>
 									)}
 									<StepText>
 										<StepBody>{section.stepBody}</StepBody>
 										{section.callout && (
 											<Callout>
-												<CalloutLabel>{section.callout.label}: </CalloutLabel>
+												<CalloutLabel>
+													{section.callout.label}:{' '}
+												</CalloutLabel>
 												<CalloutText>{section.callout.text}</CalloutText>
 											</Callout>
 										)}

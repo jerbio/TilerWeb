@@ -1336,6 +1336,7 @@
 			"connections": {
 				"title": "Connessioni",
 				"description": "Gestisci le app collegate al tuo account Tiler",
+				"placeholder": "Le impostazioni delle connessioni saranno disponibili a breve...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1343,19 +1344,19 @@
 					"slack": "Slack",
 					"googleTasks": "Google Tasks"
 				},
-				"connect": "Connect",
-				"comingSoon": "Coming soon",
-				"loadError": "We couldn't load your connections. Please try again.",
-				"retry": "Retry",
-				"empty": "No connected accounts yet.",
-				"calendarsConnected": "{{count}} calendars connected",
-				"manage": "Manage",
+				"connect": "Connetti",
+				"comingSoon": "Disponibile a breve",
+				"loadError": "Non è stato possibile caricare le tue connessioni. Riprova.",
+				"retry": "Riprova",
+				"empty": "Nessun account connesso.",
+				"calendarsConnected": "{{count}} agende connesse",
+				"manage": "Gestisci",
 				"expandAccounts": "Espandi account",
 				"collapseAccounts": "Comprimi account",
 				"notifications": {
-					"success": "Agenda {{provider}} collegata",
-					"declined": "Connessione {{provider}} annullata",
-					"error": "Non siamo riusciti a collegare {{provider}}. Riprova."
+					"success": "Agenda {{provider}} connessa",
+					"declined": "Connessione a {{provider}} annullata",
+					"error": "Non è stato possibile connettere {{provider}}. Riprova."
 				},
 				"detail": {
 					"loading": "Caricamento connessione...",

@@ -1,4 +1,4 @@
-{
+﻿{
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -1336,6 +1336,7 @@
 			"connections": {
 				"title": "连接",
 				"description": "管理与您的 Tiler 账户连接的应用",
+				"placeholder": "连接设置即将推出...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1343,13 +1344,13 @@
 					"slack": "Slack",
 					"googleTasks": "Google Tasks"
 				},
-				"connect": "Connect",
-				"comingSoon": "Coming soon",
-				"loadError": "We couldn't load your connections. Please try again.",
-				"retry": "Retry",
-				"empty": "No connected accounts yet.",
-				"calendarsConnected": "{{count}} calendars connected",
-				"manage": "Manage",
+				"connect": "连接",
+				"comingSoon": "即将推出",
+				"loadError": "无法加载您的连接。请重试。",
+				"retry": "重试",
+				"empty": "尚无已连接的账户。",
+				"calendarsConnected": "{{count}} 个已连接的日历",
+				"manage": "管理",
 				"expandAccounts": "展开账户",
 				"collapseAccounts": "收起账户",
 				"notifications": {

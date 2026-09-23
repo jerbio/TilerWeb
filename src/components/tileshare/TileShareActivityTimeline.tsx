@@ -21,6 +21,7 @@ const labels: Record<string, string> = {
 	assignment_declined: 'Assignment declined',
 	invitation_sent: 'Invitation sent',
 	invitation_send_failed: 'Invitation could not be sent',
+	invitation_send_unknown: 'Invitation send outcome unknown',
 };
 
 export default function TileShareActivityTimeline({
@@ -150,6 +151,16 @@ export default function TileShareActivityTimeline({
 						item.schemaVersion === 1 &&
 						Object.prototype.hasOwnProperty.call(labels, item.eventType);
 					const title = known ? item.metadata?.title : undefined;
+					const channel =
+						known &&
+						[
+							'invitation_sent',
+							'invitation_send_failed',
+							'invitation_send_unknown',
+						].includes(item.eventType) &&
+						['email', 'sms', 'push'].includes(item.metadata?.channel ?? '')
+							? item.metadata?.channel
+							: undefined;
 					const path =
 						`/tileshare/${encodeURIComponent(item.clusterId)}` +
 						(item.tiletteId ? `/tilette/${encodeURIComponent(item.tiletteId)}` : '');
@@ -164,6 +175,24 @@ export default function TileShareActivityTimeline({
 										)
 									: t('tileshareActivity.unknown', 'Activity updated')}
 							</p>
+							{channel && (
+								<p>
+									{t(
+										`tileshareActivity.channels.${channel}`,
+										{ email: 'Email', sms: 'SMS', push: 'Push notification' }[
+											channel
+										] ?? ''
+									)}
+								</p>
+							)}
+							{known && item.eventType === 'invitation_send_unknown' && (
+								<p>
+									{t(
+										'tileshareActivity.explicitResend',
+										'The invitation may have been sent. Resend explicitly if needed.'
+									)}
+								</p>
+							)}
 							{item.actorId && item.actorName && <p>{item.actorName}</p>}
 							{!ClusterId && item.clusterTitle && <p>{item.clusterTitle}</p>}
 							{known && item.metadata?.changedFields && (

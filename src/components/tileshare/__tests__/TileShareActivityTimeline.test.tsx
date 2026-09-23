@@ -31,6 +31,34 @@ const event = (id: string) => ({
 beforeEach(() => mocks.getActivity.mockReset());
 
 describe('TileShareActivityTimeline', () => {
+	it('shows safe channel and explicit-resend wording for an unknown send outcome', async () => {
+		mocks.getActivity.mockResolvedValue({
+			items: [
+				{
+					...event('unknown'),
+					eventType: 'invitation_send_unknown',
+					metadata: { channel: 'email' },
+				},
+				{
+					...event('unsafe'),
+					eventType: 'invitation_sent',
+					metadata: { channel: 'private@example.test' },
+				},
+			],
+			nextCursor: null,
+		});
+		render(
+			<MemoryRouter>
+				<TileShareActivityTimeline />
+			</MemoryRouter>
+		);
+		await screen.findByText('Invitation send outcome unknown');
+		expect(screen.getByText('Email')).toBeInTheDocument();
+		expect(
+			screen.getByText('The invitation may have been sent. Resend explicitly if needed.')
+		).toBeInTheDocument();
+		expect(screen.queryByText('private@example.test')).not.toBeInTheDocument();
+	});
 	it('passes tilette scope, deduplicates pages, and clears history on revoked access', async () => {
 		mocks.getActivity
 			.mockResolvedValueOnce({ items: [event('one')], nextCursor: 'cursor' })

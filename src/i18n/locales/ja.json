@@ -1336,6 +1336,7 @@
 			"connections": {
 				"title": "連携",
 				"description": "Tilerアカウントに接続したアプリを管理します",
+				"placeholder": "連携設定は近日公開予定です...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1343,19 +1344,19 @@
 					"slack": "Slack",
 					"googleTasks": "Google Tasks"
 				},
-				"connect": "Connect",
-				"comingSoon": "Coming soon",
-				"loadError": "We couldn't load your connections. Please try again.",
-				"retry": "Retry",
-				"empty": "No connected accounts yet.",
-				"calendarsConnected": "{{count}} calendars connected",
-				"manage": "Manage",
+				"connect": "接続",
+				"comingSoon": "近日公開予定",
+				"loadError": "接続を読み込めませんでした。もう一度お試しください。",
+				"retry": "再試行",
+				"empty": "接続されているアカウントはありません。",
+				"calendarsConnected": "{{count}} 件のカレンダーが接続されました",
+				"manage": "管理",
 				"expandAccounts": "アカウントを展開",
 				"collapseAccounts": "アカウントを折りたたむ",
 				"notifications": {
-					"success": "{{provider}} カレンダーを接続しました",
-					"declined": "{{provider}} の接続を取り消しました",
-					"error": "{{provider}} への接続に失敗しました。もう一度お試しください。"
+					"success": "{{provider}} カレンダーが接続されました",
+					"declined": "{{provider}} への接続がキャンセルされました",
+					"error": "{{provider}} に接続できませんでした。もう一度お試しください。"
 				},
 				"detail": {
 					"loading": "接続を読み込み中...",

@@ -1336,6 +1336,7 @@
 			"connections": {
 				"title": "Подключения",
 				"description": "Управляйте приложениями, подключёнными к вашему аккаунту Tiler",
+				"placeholder": "Настройки подключений скоро появятся...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1343,19 +1344,19 @@
 					"slack": "Slack",
 					"googleTasks": "Google Tasks"
 				},
-				"connect": "Connect",
-				"comingSoon": "Coming soon",
-				"loadError": "We couldn't load your connections. Please try again.",
-				"retry": "Retry",
-				"empty": "No connected accounts yet.",
-				"calendarsConnected": "{{count}} calendars connected",
-				"manage": "Manage",
+				"connect": "Подключить",
+				"comingSoon": "Скоро появится",
+				"loadError": "Не удалось загрузить ваши подключения. Пожалуйста, попробуйте ещё раз.",
+				"retry": "Повторить",
+				"empty": "Пока нет подключённых аккаунтов.",
+				"calendarsConnected": "{{count}} подключённых календарей",
+				"manage": "Управлять",
 				"expandAccounts": "Развернуть аккаунты",
 				"collapseAccounts": "Свернуть аккаунты",
 				"notifications": {
-					"success": "Календарь {{provider}} подключен",
-					"declined": "Подключение {{provider}} отменено",
-					"error": "Не удалось подключить {{provider}}. Пожалуйста, попробуйте снова."
+					"success": "Календарь {{provider}} подключён",
+					"declined": "Подключение к {{provider}} отменено",
+					"error": "Не удалось подключиться к {{provider}}. Пожалуйста, попробуйте ещё раз."
 				},
 				"detail": {
 					"loading": "Загрузка соединения...",

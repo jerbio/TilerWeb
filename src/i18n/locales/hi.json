@@ -1336,6 +1336,7 @@
 			"connections": {
 				"title": "कनेक्शन",
 				"description": "अपने Tiler खाते से जुड़े ऐप्स प्रबंधित करें",
+				"placeholder": "कनेक्शन सेटिंग्स जल्द आ रही हैं...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1343,19 +1344,19 @@
 					"slack": "Slack",
 					"googleTasks": "Google Tasks"
 				},
-				"connect": "Connect",
-				"comingSoon": "Coming soon",
-				"loadError": "We couldn't load your connections. Please try again.",
-				"retry": "Retry",
-				"empty": "No connected accounts yet.",
-				"calendarsConnected": "{{count}} calendars connected",
-				"manage": "Manage",
+				"connect": "कनेक्ट करें",
+				"comingSoon": "जल्द आ रहा है",
+				"loadError": "हम आपके कनेक्शनों को लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+				"retry": "पुनः प्रयास करें",
+				"empty": "अभी तक कोई कनेक्टेड अकाउंट नहीं है।",
+				"calendarsConnected": "{{count}} कैलेंडर कनेक्टेड",
+				"manage": "प्रबंधित करें",
 				"expandAccounts": "खाते विस्तारित करें",
 				"collapseAccounts": "खाते संचित करें",
 				"notifications": {
-					"success": "{{provider}} कैलेंडर से जुड़ा गया",
-					"declined": "{{provider}} कनेक्शन रद्द कर दिया गया",
-					"error": "{{provider}} से कनेक्ट नहीं हो सके। कृपया फिर प्रयास करें।"
+					"success": "{{provider}} कैलेंडर कनेक्टेड",
+					"declined": "{{provider}} कनेक्शन रद्द किया गया",
+					"error": "हम {{provider}} से कनेक्ट नहीं कर सके। कृपया पुनः प्रयास करें।"
 				},
 				"detail": {
 					"loading": "कनेक्शन लोड हो रहा है...",

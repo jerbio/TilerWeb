@@ -12,7 +12,12 @@ export interface TileShareActivity {
 	targetUserId?: string;
 	occurredAt: number;
 	targetAvailable: boolean;
-	metadata?: { title?: string; changedFields?: string[]; initialTiletteCount?: number };
+	metadata?: {
+		title?: string;
+		changedFields?: string[];
+		initialTiletteCount?: number;
+		channel?: string;
+	};
 }
 
 export interface TileShareActivityPage {

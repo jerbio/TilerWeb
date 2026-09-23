@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import Select from '@/core/common/components/select';
@@ -110,6 +110,67 @@ describe('Select', () => {
 				'aria-selected',
 				'false'
 			);
+		});
+	});
+
+	describe('Placement', () => {
+		const stubRect = (top: number, bottom: number) =>
+			vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+				top,
+				bottom,
+				left: 0,
+				right: 0,
+				width: 100,
+				height: bottom - top,
+				x: 0,
+				y: top,
+				toJSON: () => ({}),
+			} as DOMRect);
+
+		const stubDropdownHeight = (height: number) =>
+			vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(height);
+
+		afterEach(() => {
+			vi.restoreAllMocks();
+		});
+
+		it('drops downwards when there is room below', () => {
+			window.innerHeight = 800;
+			stubRect(100, 132);
+			stubDropdownHeight(120);
+
+			renderWithTheme(<Select value="all" onChange={vi.fn()} options={options} />);
+			fireEvent.click(screen.getByRole('button'));
+
+			const style = getComputedStyle(screen.getByRole('listbox'));
+			expect(style.top).toBe('calc(100% + 4px)');
+			expect(style.bottom).toBe('');
+		});
+
+		it('flips upwards when the list would overflow the bottom of the viewport', () => {
+			window.innerHeight = 800;
+			// Trigger sits at the very bottom, e.g. inside a sticky pagination footer.
+			stubRect(750, 782);
+			stubDropdownHeight(120);
+
+			renderWithTheme(<Select value="all" onChange={vi.fn()} options={options} />);
+			fireEvent.click(screen.getByRole('button'));
+
+			const style = getComputedStyle(screen.getByRole('listbox'));
+			expect(style.bottom).toBe('calc(100% + 4px)');
+			expect(style.top).toBe('');
+		});
+
+		it('caps the height to the space available on the chosen side', () => {
+			window.innerHeight = 800;
+			stubRect(750, 782);
+			stubDropdownHeight(2000);
+
+			renderWithTheme(<Select value="all" onChange={vi.fn()} options={options} />);
+			fireEvent.click(screen.getByRole('button'));
+
+			// 750 above the trigger, less the 4px gap and 8px viewport margin.
+			expect(getComputedStyle(screen.getByRole('listbox')).maxHeight).toBe('738px');
 		});
 	});
 

@@ -1,4 +1,9 @@
 ﻿{
+	"tileshareActivity": {
+		"events": { "invitation_send_unknown": "Invitation send outcome unknown" },
+		"channels": { "email": "Email", "sms": "SMS", "push": "Push notification" },
+		"explicitResend": "The invitation may have been sent. Resend explicitly if needed."
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2019,6 +2024,7 @@
 			"progress": "Progress",
 			"dueOn": "Due on:",
 			"dueBy": "Due by:",
+			"due": "Due:",
 			"multiTileshare": "Multi tileshare",
 			"tileshare": "Tileshare"
 		},
@@ -2042,6 +2048,106 @@
 		},
 		"tiletteDetail": {
 			"title": "Tilette Detail"
+		},
+		"detail": {
+			"breadcrumbRoot": "Tileshare",
+			"multiTileshare": "Multi tileshare",
+			"singleTileshare": "Single tileshare",
+			"inCluster": "In: {{name}}",
+			"progress": "Progress",
+			"noDescription": "No description provided",
+			"due": "Due: {{date}}",
+			"editAria": "Edit",
+			"addAria": "Add tilette",
+			"loadError": "We couldn't load this tileshare. Please try again.",
+			"showingTilettes": "Showing {{shown}} of {{total}} Tilettes",
+			"showingAssignees": "Showing {{shown}} of {{total}} Assignees",
+			"statusLabel": "Status:",
+			"status": {
+				"inProgress": "In progress",
+				"completed": "Completed"
+			},
+			"view": {
+				"list": "Tilette list view",
+				"assignee": "Assignee view"
+			},
+			"viewAria": "Tilette view",
+			"openTiletteAria": "Open tilette",
+			"prev": "Prev",
+			"next": "Next",
+			"deleteAria": "Delete",
+			"edit": {
+				"clusterTitle": "Edit tileshare",
+				"tiletteTitle": "Edit tilette",
+				"fields": {
+					"name": {
+						"label": "Name",
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"label": "Deadline",
+						"placeholder": "Add a deadline"
+					},
+					"note": {
+						"label": "Note",
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"deadlineRequired": "Please add a deadline"
+				},
+				"cancel": "Cancel",
+				"save": "Save changes",
+				"saving": "Saving changes…",
+				"success": "Changes saved",
+				"error": "Couldn't save your changes. Please try again."
+			},
+			"delete": {
+				"title": "Delete tileshare",
+				"body": "Delete \"{{name}}\"?",
+				"warning": "This removes it for everyone it was shared with and cannot be undone.",
+				"cancel": "Cancel",
+				"confirm": "Delete",
+				"deleting": "Deleting…",
+				"success": "Tileshare deleted",
+				"error": "Couldn't delete this tileshare. Please try again."
+			},
+			"add": {
+				"back": "Back to tileshare",
+				"title": "Add a tilette",
+				"description": "Add another task to \"{{name}}\" and share it with your colleagues. Once they accept, we'll add it to their schedule.",
+				"fields": {
+					"name": {
+						"label": "Name",
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"label": "Deadline",
+						"placeholder": "Add a deadline (optional)"
+					},
+					"note": {
+						"label": "Note",
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"shareTo": {
+					"label": "Share to:",
+					"placeholder": "email address / phone number (Enter to select)"
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+				},
+				"cancel": "Cancel",
+				"submit": "Add tilette",
+				"creating": "Adding tilette…",
+				"error": "Couldn't add the tilette. Please try again.",
+				"success": {
+					"message": "Your tilette \"{{name}}\" has been added.",
+					"view": "View tilette"
+				}
+			}
 		},
 		"invite": {
 			"title": "Invite"

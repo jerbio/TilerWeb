@@ -17,6 +17,8 @@ vi.mock('react-router', async () => {
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import TileShareClusterCard from '../TileShareClusterCard';
+import { TILESHARE_ACCENT } from '../accents';
+import { iconSurface } from '@/core/util/colorSurface';
 import { TileShareCluster } from '@/core/common/types/tileshare';
 
 vi.mock('react-i18next', () => ({
@@ -25,8 +27,7 @@ vi.mock('react-i18next', () => ({
 			const translations: Record<string, string> = {
 				'tilesharedemo.card.tileshare': 'Tileshare',
 				'tilesharedemo.card.multiTileshare': 'Multi-Tileshare',
-				'tilesharedemo.card.dueOn': 'Due On',
-				'tilesharedemo.card.dueBy': 'Due By',
+				'tilesharedemo.card.due': 'Due:',
 				'tilesharedemo.card.progress': 'Progress',
 			};
 			if (opts?.count !== undefined) return `${translations[key] ?? key} (${opts.count})`;
@@ -53,6 +54,7 @@ const mockCreator = {
 const mockCluster: TileShareCluster = {
 	id: 'cluster-1',
 	name: 'Design Sprint',
+	notes: null,
 	start: 1750755360000,
 	end: 1751263140000,
 	isCompleted: false,
@@ -62,6 +64,13 @@ const mockCluster: TileShareCluster = {
 	creator: mockCreator,
 	tileShareTemplates: [],
 	truncatedUser: 'bob@example.com, carol@example.com',
+};
+
+/** jsdom reports colours as `rgb(r, g, b)`, so compare against that form. */
+const hexToRgbString = (hex: string) => {
+	const h = hex.replace('#', '');
+	const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+	return `rgb(${r}, ${g}, ${b})`;
 };
 
 const renderCard = (cluster: TileShareCluster) =>
@@ -92,10 +101,9 @@ describe('TileShareClusterCard', () => {
 		expect(screen.getByRole('button', { name: 'View' })).toBeInTheDocument();
 	});
 
-	it('renders due date labels', () => {
+	it('renders a single merged due label', () => {
 		renderCard(mockCluster);
-		expect(screen.getByText('Due On')).toBeInTheDocument();
-		expect(screen.getByText('Due By')).toBeInTheDocument();
+		expect(screen.getByText('Due:')).toBeInTheDocument();
 	});
 
 	it('shows fallback dashes when name is null', () => {
@@ -112,6 +120,15 @@ describe('TileShareClusterCard', () => {
 		renderCard(mockCluster);
 		expect(screen.getByText('B')).toBeInTheDocument();
 		expect(screen.getByText('C')).toBeInTheDocument();
+	});
+
+	it('derives the icon box colours from the shared tileshare accent', () => {
+		const { container } = renderCard(mockCluster);
+		const iconBox = container.querySelector('svg')?.parentElement as HTMLElement;
+		const surface = iconSurface(TILESHARE_ACCENT, false);
+		const styles = getComputedStyle(iconBox);
+		expect(styles.backgroundColor).toBe(hexToRgbString(surface.background));
+		expect(styles.color).toBe(hexToRgbString(surface.foreground));
 	});
 
 	it('renders no avatars when truncatedUser is null', () => {

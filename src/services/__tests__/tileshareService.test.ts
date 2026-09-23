@@ -19,9 +19,22 @@ const mockCreator = {
 	countryCode: '1',
 };
 
+const mockTemplate = {
+	id: 'TileShareTemplate+abc+def',
+	name: 'Test Tilette',
+	creator: mockCreator,
+	designatedUsers: [],
+	clusterId: 'TileShareCluster+abc+def',
+	duration: 3600000,
+	start: 1750755360000,
+	end: 1751263140000,
+	miscData: { id: 'misc-1', userNote: 'A note' },
+};
+
 const mockCluster = {
 	id: 'TileShareCluster+abc+def',
 	name: 'Test Cluster',
+	notes: 'Cluster description',
 	start: 1750755360000,
 	end: 1751263140000,
 	isCompleted: null,
@@ -29,7 +42,7 @@ const mockCluster = {
 	isDismissed: null,
 	isMultiTilette: true,
 	creator: mockCreator,
-	tileShareTemplates: [],
+	tileShareTemplates: [mockTemplate],
 	truncatedUser: 'other@example.com',
 };
 
@@ -93,7 +106,8 @@ describe('TileshareService', () => {
 
 			expect(result).toEqual([mockCluster]);
 			expect(apiMock.getClusters).toHaveBeenCalledOnce();
-			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsInbox: true });
+			// The server has no IsInbox parameter; the received list is IsOutbox=false.
+			expect(apiMock.getClusters).toHaveBeenCalledWith({ IsOutbox: false });
 		});
 
 		it('propagates network errors', async () => {
@@ -304,6 +318,199 @@ describe('TileshareService', () => {
 
 			const service = new TileshareService(apiMock);
 			await expect(service.createCluster(createParams)).rejects.toThrow();
+		});
+	});
+
+	describe('getClusterDetail', () => {
+		it('composes the header and tilette list from two calls', async () => {
+			const apiMock = {
+				getClusterHeader: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { cluster: mockCluster },
+					ServerStatus: null,
+				}),
+				getClusterTilettes: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { tileShareTemplates: [mockTemplate] },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.getClusterDetail('cluster-123');
+
+			expect(result).toEqual({ cluster: mockCluster, tilettes: [mockTemplate] });
+			expect(apiMock.getClusterHeader).toHaveBeenCalledWith('cluster-123');
+			expect(apiMock.getClusterTilettes).toHaveBeenCalledWith('cluster-123');
+		});
+
+		it('propagates network errors from either call', async () => {
+			const apiMock = {
+				getClusterHeader: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { cluster: mockCluster },
+					ServerStatus: null,
+				}),
+				getClusterTilettes: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(service.getClusterDetail('cluster-123')).rejects.toThrow();
+		});
+	});
+
+	describe('getClusterHeader', () => {
+		it('returns the unwrapped cluster header', async () => {
+			const apiMock = {
+				getClusterHeader: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { cluster: mockCluster },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.getClusterHeader('cluster-123');
+
+			expect(result).toEqual(mockCluster);
+			expect(apiMock.getClusterHeader).toHaveBeenCalledWith('cluster-123');
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				getClusterHeader: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(service.getClusterHeader('cluster-123')).rejects.toThrow();
+		});
+	});
+
+	describe('getTileletteDetail', () => {
+		it('returns the unwrapped tilette', async () => {
+			const apiMock = {
+				getTilette: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { tileShareTemplate: mockTemplate },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.getTileletteDetail('tilette-1');
+
+			expect(result).toEqual(mockTemplate);
+			expect(apiMock.getTilette).toHaveBeenCalledWith('tilette-1');
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				getTilette: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(service.getTileletteDetail('tilette-1')).rejects.toThrow();
+		});
+	});
+
+	describe('updateCluster', () => {
+		it('passes params and returns the unwrapped cluster', async () => {
+			const params = { Id: 'cluster-123', Name: 'Renamed', StartTime: 1, EndTime: 2 };
+			const apiMock = {
+				updateCluster: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { cluster: mockCluster },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.updateCluster(params);
+
+			expect(result).toEqual(mockCluster);
+			expect(apiMock.updateCluster).toHaveBeenCalledWith(params);
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				updateCluster: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(
+				service.updateCluster({ Id: 'cluster-123', StartTime: 1, EndTime: 2 })
+			).rejects.toThrow();
+		});
+	});
+
+	describe('createTilette', () => {
+		// Create answers with `tileTemplate`; the read and update routes use
+		// `tileShareTemplate`. Unwrapping the wrong key yields undefined.
+		it('passes params and unwraps the tileTemplate key', async () => {
+			const params = {
+				ClusterId: 'cluster-123',
+				Name: 'New tilette',
+				StartTime: 1750755360000,
+				EndTime: 1751263140000,
+				DurationInMs: 3600000,
+			};
+			const apiMock = {
+				createTilette: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { tileTemplate: mockTemplate },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.createTilette(params);
+
+			expect(result).toEqual(mockTemplate);
+			expect(apiMock.createTilette).toHaveBeenCalledWith(params);
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				createTilette: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(
+				service.createTilette({
+					ClusterId: 'cluster-123',
+					StartTime: 1,
+					EndTime: 2,
+					DurationInMs: 1,
+				})
+			).rejects.toThrow();
+		});
+	});
+
+	describe('updateTilette', () => {
+		it('passes params and returns the unwrapped tilette', async () => {
+			const params = { Id: 'tilette-1', Name: 'Renamed tilette' };
+			const apiMock = {
+				updateTilette: vi.fn().mockResolvedValue({
+					Error: { Code: '0', Message: 'SUCCESS' },
+					Content: { tileShareTemplate: mockTemplate },
+					ServerStatus: null,
+				}),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			const result = await service.updateTilette(params);
+
+			expect(result).toEqual(mockTemplate);
+			expect(apiMock.updateTilette).toHaveBeenCalledWith(params);
+		});
+
+		it('propagates network errors', async () => {
+			const apiMock = {
+				updateTilette: vi.fn().mockRejectedValue(new Error('Network error')),
+			} as unknown as TileshareApi;
+
+			const service = new TileshareService(apiMock);
+			await expect(service.updateTilette({ Id: 'tilette-1' })).rejects.toThrow();
 		});
 	});
 

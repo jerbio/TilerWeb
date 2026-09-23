@@ -1336,6 +1336,7 @@
 			"connections": {
 				"title": "Συνδέσεις",
 				"description": "Διαχείριση εφαρμογών που συνδέονται με τον λογαριασμό σας Tiler",
+				"placeholder": "Οι ρυθμίσεις σύνδεσης θα είναι σύντομα διαθέσιμες...",
 				"providers": {
 					"google": "Google Calendar",
 					"microsoft": "Microsoft",
@@ -1343,19 +1344,19 @@
 					"slack": "Slack",
 					"googleTasks": "Google Tasks"
 				},
-				"connect": "Connect",
-				"comingSoon": "Coming soon",
-				"loadError": "We couldn't load your connections. Please try again.",
-				"retry": "Retry",
-				"empty": "No connected accounts yet.",
-				"calendarsConnected": "{{count}} calendars connected",
-				"manage": "Manage",
+				"connect": "Σύνδεση",
+				"comingSoon": "Σύντομα διαθέσιμο",
+				"loadError": "Δεν ήταν δυνατή η φόρτωση των συνδέσεών σας. Παρακαλούμε δοκιμάστε ξανά.",
+				"retry": "Επαναλήψη",
+				"empty": "Δεν υπάρχουν ακόμη συνδεδεμένοι λογαριασμοί.",
+				"calendarsConnected": "{{count}} ημερολόγια συνδεδεμένα",
+				"manage": "Διαχείριση",
 				"expandAccounts": "Ανάπτυξη λογαριασμών",
 				"collapseAccounts": "Σύμπτυξη λογαριασμών",
 				"notifications": {
-					"success": "Συνδέθηκε το ημερολόγιο {{provider}}",
-					"declined": "Η σύνδεση {{provider}} ακυρώθηκε",
-					"error": "Δεν μπορέσαμε να συνδέσουμε το {{provider}}. Παρακαλούμε δοκιμάστε ξανά."
+					"success": "Ο {{provider}} Ημερολόγιο συνδέθηκε",
+					"declined": "Η σύνδεση με τον {{provider}} ακυρώθηκε",
+					"error": "Δεν ήταν δυνατή η σύνδεση με τον {{provider}}. Παρακαλούμε δοκιμάστε ξανά."
 				},
 				"detail": {
 					"loading": "Φόρτωση σύνδεσης...",
