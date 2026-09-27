@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "Αρχική",
+			"features": "Χαρακτηριστικά",
 			"discover": "Χαρακτηριστικά",
+			"articles": "Άρθρα",
 			"waitlist": "Λίστα αναμονής"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "Άκυρο",
 					"disconnectError": "Δεν ήταν δυνατή η αποσύνδεση αυτού του λογαριασμού. Παρακαλούμε δοκιμάστε ξανά.",
 					"disconnectProviderError": "Δεν ήταν δυνατή η αποσύνδεση του ημερολογίου αυτή τη στιγμή. Παρακαλούμε δοκιμάστε ξανά σε λίγο.",
+					"toggleEnabled": "Ενεργό",
+					"toggleDisabled": "Μη ενεργό",
 					"locationSection": "Προεπιλεγμένη τοποθεσία",
 					"locationDescription": "Ο Tiler χρησιμοποιεί αυτήν την τοποθεσία για τα νέα ραντεβού αυτού του λογαριασμού.",
 					"locationUnset": "Δεν έχει οριστεί προεπιλεγμένη τοποθεσία.",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "Αναζήτηση πλακιδίου/μπλοκ...",
 		"searchAriaLabel": "Αναζήτηση πλακιδίου ή μπλοκ",
 		"clearSearch": "Εκκαθάριση αναζήτησης",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "Συνδεδεμένος λογαριασμός: {{account}}",
+			"partialFailure": "Η αναζήτηση απέτυχε σε ορισμένα συνδεδεμένα ημερολόγια: {{sources}}",
+			"retrySearch": "Δοκιμάστε ξανά",
+			"unavailable": "Η αναζήτηση δεν είναι διαθέσιμη προσωρινά. Πρόκειται για πρόβλημα της υπηρεσίας — όχι για έλλειψη αποτελεσμάτων. Δοκιμάστε ξανά αργότερα.",
+			"readOnly": "Μόνο για ανάγνωση"
+		},
 		"loadMore": "Φόρτωση περισσότερων",
 		"loading": "Φόρτωση…",
 		"notFoundMessage": "Ωχ, δεν μπορέσαμε να βρούμε '{{query}}'. Θα θέλατε να δημιουργήσετε ένα πλακίδιο με αυτόν τον τίτλο;",
@@ -2007,6 +2021,7 @@
 			"progress": "Πρόοδος",
 			"dueOn": "Λήγει:",
 			"dueBy": "Λήξη στις:",
+			"due": "Καταληκτική:",
 			"multiTileshare": "Πολλαπλό tileshare",
 			"tileshare": "Tileshare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Λεπτομέρεια Tilette"
 		},
+		"detail": {
+			"breadcrumbRoot": "Tileshare",
+			"multiTileshare": "Πολλαπλό tileshare",
+			"singleTileshare": "Μονό tileshare",
+			"inCluster": "Σε: {{name}}",
+			"progress": "Πρόοδος",
+			"noDescription": "Δεν έχει παρασχεθεί περιγραφή",
+			"due": "Καταληκτική: {{date}}",
+			"editAria": "Επεξεργασία",
+			"addAria": "Προσθήκη tilette",
+			"loadError": "Δεν ήταν δυνατή η φόρτωση αυτού του tileshare. Δοκιμάστε ξανά.",
+			"showingTilettes": "Εμφάνιση {{shown}} από {{total}} Tilettes",
+			"showingAssignees": "Εμφάνιση {{shown}} από {{total}} αποδέκτες",
+			"statusLabel": "Κατάσταση:",
+			"status": {
+				"inProgress": "Εν εξελίξει",
+				"completed": "Ολοκληρώθηκε"
+			},
+			"view": {
+				"list": "Οπτικοποίηση λίστας tilette",
+				"assignee": "Οπτικοποίηση αποδέκτη"
+			},
+			"viewAria": "Οπτικοποίηση tilette",
+			"openTiletteAria": "Άνοιγμα tilette",
+			"prev": "Προηγούμενο",
+			"next": "Επόμενο",
+			"deleteAria": "Διαγραφή",
+			"edit": {
+				"clusterTitle": "Επεξεργασία tileshare",
+				"tiletteTitle": "Επεξεργασία tilette",
+				"fields": {
+					"name": {
+						"label": "Όνομα",
+						"placeholder": "Δώστε όνομα στο έργο σας"
+					},
+					"deadline": {
+						"label": "Καταληκτική ημερομηνία",
+						"placeholder": "Προσθήκη καταληκτικής ημερομηνίας"
+					},
+					"note": {
+						"label": "Σημείωση",
+						"placeholder": "Προσθήκη σημείωσης (προαιρετικό)"
+					}
+				},
+				"validation": {
+					"nameRequired": "Δώστε όνομα στο έργο σας",
+					"deadlineRequired": "Προσθέστε μια καταληκτική ημερομηνία"
+				},
+				"cancel": "Ακύρωση",
+				"save": "Αποθήκευση αλλαγών",
+				"saving": "Αποθήκευση αλλαγών...",
+				"success": "Οι αλλαγές αποθηκεύτηκαν",
+				"error": "Δεν ήταν δυνατή η αποθήκευση των αλλαγών σας. Δοκιμάστε ξανά."
+			},
+			"delete": {
+				"title": "Διαγραφή tileshare",
+				"body": "Να διαγραφεί το «{{name}}»;",
+				"warning": "Θα αφαιρεθεί από όλους, στους οποίους είχε κοινοποιηθεί, και η ενέργεια δεν μπορεί να αναιρεθεί.",
+				"cancel": "Ακύρωση",
+				"confirm": "Διαγραφή",
+				"deleting": "Διαγραφή...",
+				"success": "Το Tileshare διαγράφηκε",
+				"error": "Δεν ήταν δυνατή η διαγραφή αυτού του tileshare. Δοκιμάστε ξανά."
+			},
+			"add": {
+				"back": "Επιστροφή στο tileshare",
+				"title": "Προσθήκη tilette",
+				"description": "Προσθέστε άλλο έργο στο «{{name}}» και κοινοποιήστε το στους συναδέλφους σας. Μόλις το αποδεχτούν, θα το προσθέσουμε στο πρόγραμμα τους.",
+				"fields": {
+					"name": {
+						"label": "Όνομα",
+						"placeholder": "Δώστε όνομα στο έργο σας"
+					},
+					"deadline": {
+						"label": "Καταληκτική ημερομηνία",
+						"placeholder": "Προσθήκη καταληκτικής ημερομηνίας (προαιρετικό)"
+					},
+					"note": {
+						"label": "Σημείωση",
+						"placeholder": "Προσθήκη σημείωσης (προαιρετικό)"
+					}
+				},
+				"shareTo": {
+					"label": "Κοινοποίηση σε:",
+					"placeholder": "διεύθυνση email / αριθμός τηλεφώνου (Enter για επιλογή)"
+				},
+				"validation": {
+					"nameRequired": "Δώστε όνομα στο έργο σας",
+					"invalidRecipient": "Το {{recipient}} δεν είναι έγκυρη διεύθυνση email ή αριθμός τηλεφώνου"
+				},
+				"cancel": "Ακύρωση",
+				"submit": "Προσθήκη tilette",
+				"creating": "Προσθήκη tilette...",
+				"error": "Δεν ήταν δυνατή η προσθήκη της tilette. Δοκιμάστε ξανά.",
+				"success": {
+					"message": "Η tilette «{{name}}» σας προστέθηκε.",
+					"view": "Προβολή tilette"
+				}
+			}
+		},
 		"invite": {
 			"title": "Πρόσκληση"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "Εξερχόμενα"
 		}
+	},
+	"comments": {
+		"count": "{{count}} σχόλια",
+		"empty": "Δεν υπάρχουν σχόλια ακόμα",
+		"loading": "Φόρτωση...",
+		"loadMore": "Φόρτωση περισσότερων",
+		"retry": "Δοκιμάστε ξανά",
+		"loadError": "Δεν ήταν δυνατή η φόρτωση των σχολίων. Δοκιμάστε ξανά.",
+		"loadMoreError": "Δεν ήταν δυνατή η φόρτωση περισσότερων σχολίων.",
+		"createError": "Δεν ήταν δυνατή η ανάρτηση του σχολίου σας.",
+		"editError": "Δεν ήταν δυνατή η αποθήκευση της επεξεργασίας σας.",
+		"deleteError": "Δεν ήταν δυνατή η διαγραφή του σχολίου.",
+		"placeholder": "Γράψτε ένα σχόλιο...",
+		"send": "Αποστολή",
+		"sending": "Αποστολή...",
+		"edit": "Επεξεργασία",
+		"save": "Αποθήκευση",
+		"cancel": "Ακύρωση",
+		"delete": "Διαγραφή",
+		"edited": "επεξεργάστηκε",
+		"deletedPlaceholder": "Αυτό το σχόλιο διαγράφηκε.",
+		"deletedAuthor": "Χρήστης που διαγράφηκε",
+		"reply": "Απάντηση",
+		"replyPlaceholder": "Γράψτε μια απάντηση...",
+		"replies": "{{count}} απαντήσεις",
+		"showReplies": "Εμφάνιση απαντήσεων",
+		"hideReplies": "Απόκρυψη απαντήσεων",
+		"loadingReplies": "Φόρτωση απαντήσεων...",
+		"noReplies": "Δεν υπάρχουν απαντήσεις ακόμα",
+		"loadRepliesError": "Δεν ήταν δυνατή η φόρτωση των απαντήσεων.",
+		"createReplyError": "Δεν ήταν δυνατή η ανάρτηση της απάντησής σας.",
+		"missingTarget": "Δεν βρέθηκε ο στόχος του σχολίου.",
+		"you": "(εσείς)",
+		"mentionSuggestions": "Άτομα που μπορείτε να αναφέρετε",
+		"loadEarlier": "Φόρτωση παλαιότερων σχολίων",
+		"loadEarlierReplies": "Φόρτωση παλαιότερων απαντήσεων",
+		"attach": "Συνημμένο αρχείο",
+		"attachmentProcessing": "Έλεγχος αρχείου...",
+		"attachmentUploaded": "Μεταφορτώθηκε",
+		"attachmentUploadingSummary": "Μεταφόρτωση αρχείων (μετά {{count}}). Κρατήστε αυτή τη σελίδα ανοιχτή.",
+		"attachmentUploadFailed": "Η μεταφόρτωση απέτυχε",
+		"attachmentRetry": "Δοκιμάστε ξανά",
+		"attachmentRemove": "Αφαίρεση {{name}}",
+		"attachmentDownload": "Λήψη",
+		"attachmentDownloadAria": "Λήψη {{name}}",
+		"attachmentDownloadError": "Δεν ήταν δυνατή η λήψη του αρχείου.",
+		"attachmentInvalidType": "Μόνο αρχεία PDF, DOCX, PNG και JPEG μπορούν να συνδεθούν.",
+		"attachmentTooLarge": "Τα αρχεία πρέπει να είναι 10 MB ή μικρότερα.",
+		"attachmentEmpty": "Αυτό το αρχείο είναι άδειο.",
+		"attachmentLimit": "Μπορείτε να συνδέσετε έως {{count}} αρχεία."
 	},
 	"tile": {
 		"noteButtonAria": "Άνοιγμα σημειώσεων για αυτό το πλακίδιο"

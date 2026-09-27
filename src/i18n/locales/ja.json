@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "ホーム",
+			"features": "機能",
 			"discover": "機能",
+			"articles": "記事",
 			"waitlist": "ウェイティングリスト"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "キャンセル",
 					"disconnectError": "このアカウントを切断できませんでした。もう一度お試しください。",
 					"disconnectProviderError": "カレンダープロバイダを現在切断できません。しばらくしてからもう一度お試しください。",
+					"toggleEnabled": "有効",
+					"toggleDisabled": "無効",
 					"locationSection": "デフォルトの場所",
 					"locationDescription": "Tilerはこのアカウントの新しいイベントにこの場所を使用します。",
 					"locationUnset": "デフォルトの場所が設定されていません。",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "タイル/ブロックを検索...",
 		"searchAriaLabel": "タイルまたはブロックを検索",
 		"clearSearch": "検索をクリア",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "接続済みアカウント: {{account}}",
+			"partialFailure": "一部の接続済みカレンダーで検索に失敗しました: {{sources}}",
+			"retrySearch": "再試行",
+			"unavailable": "検索は一時的に利用できません。これはサービス側の問題であり、一致する項目がないわけではありません。しばらくしてからもう一度お試しください。",
+			"readOnly": "読み取り専用"
+		},
 		"loadMore": "もっと読み込む",
 		"loading": "読み込み中…",
 		"notFoundMessage": "おっと、'{{query}}'が見つかりませんでした。このタイトルでタイルを作成しますか？",
@@ -2007,6 +2021,7 @@
 			"progress": "進捗",
 			"dueOn": "期限日：",
 			"dueBy": "期限：",
+			"due": "締切:",
 			"multiTileshare": "複数のTileShare",
 			"tileshare": "TileShare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Tiletteの詳細"
 		},
+		"detail": {
+			"breadcrumbRoot": "TileShare",
+			"multiTileshare": "マルチTileShare",
+			"singleTileshare": "シングルTileShare",
+			"inCluster": "所属: {{name}}",
+			"progress": "進捗",
+			"noDescription": "説明はありません",
+			"due": "締切: {{date}}",
+			"editAria": "編集",
+			"addAria": "Tiletteを追加",
+			"loadError": "このTileShareを読み込めませんでした。もう一度お試しください。",
+			"showingTilettes": "Tilette: {{shown}}件 / {{total}}件を表示中",
+			"showingAssignees": "割り当て先: {{shown}}件 / {{total}}件を表示中",
+			"statusLabel": "ステータス:",
+			"status": {
+				"inProgress": "進行中",
+				"completed": "完了"
+			},
+			"view": {
+				"list": "Tiletteのリスト表示",
+				"assignee": "割り当て先表示"
+			},
+			"viewAria": "Tiletteビュー",
+			"openTiletteAria": "Tiletteを開く",
+			"prev": "前へ",
+			"next": "次へ",
+			"deleteAria": "削除",
+			"edit": {
+				"clusterTitle": "TileShareを編集",
+				"tiletteTitle": "Tiletteを編集",
+				"fields": {
+					"name": {
+						"label": "名前",
+						"placeholder": "タスク名を入力"
+					},
+					"deadline": {
+						"label": "締切",
+						"placeholder": "締切を追加"
+					},
+					"note": {
+						"label": "メモ",
+						"placeholder": "メモを追加 (任意)"
+					}
+				},
+				"validation": {
+					"nameRequired": "タスク名を入力してください",
+					"deadlineRequired": "締切を追加してください"
+				},
+				"cancel": "キャンセル",
+				"save": "変更を保存",
+				"saving": "変更を保存中...",
+				"success": "変更を保存しました",
+				"error": "変更を保存できませんでした。もう一度お試しください。"
+			},
+			"delete": {
+				"title": "TileShareを削除",
+				"body": "「{{name}}」を削除しますか?",
+				"warning": "共有していたすべての人の元から削除され、取り消せなくなります。",
+				"cancel": "キャンセル",
+				"confirm": "削除",
+				"deleting": "削除中...",
+				"success": "TileShareを削除しました",
+				"error": "このTileShareを削除できませんでした。もう一度お試しください。"
+			},
+			"add": {
+				"back": "TileShareに戻る",
+				"title": "Tiletteを追加",
+				"description": "「{{name}}」にタスクを追加して、同僚と共有しましょう。受け入れられたら、相手のスケジュールに追加されます。",
+				"fields": {
+					"name": {
+						"label": "名前",
+						"placeholder": "タスク名を入力"
+					},
+					"deadline": {
+						"label": "締切",
+						"placeholder": "締切を追加 (任意)"
+					},
+					"note": {
+						"label": "メモ",
+						"placeholder": "メモを追加 (任意)"
+					}
+				},
+				"shareTo": {
+					"label": "共有先:",
+					"placeholder": "メールアドレス / 電話番号 (Enterキーで選択)"
+				},
+				"validation": {
+					"nameRequired": "タスク名を入力してください",
+					"invalidRecipient": "{{recipient}} は有効なメールアドレスまたは電話番号ではありません"
+				},
+				"cancel": "キャンセル",
+				"submit": "Tiletteを追加",
+				"creating": "Tiletteを追加中...",
+				"error": "Tiletteを追加できませんでした。もう一度お試しください。",
+				"success": {
+					"message": "Tilette「{{name}}」を追加しました。",
+					"view": "Tiletteを表示"
+				}
+			}
+		},
 		"invite": {
 			"title": "招待"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "送信箱"
 		}
+	},
+	"comments": {
+		"count": "{{count}}件のコメント",
+		"empty": "まだコメントはありません",
+		"loading": "読み込み中...",
+		"loadMore": "さらに読み込む",
+		"retry": "再試行",
+		"loadError": "コメントを読み込めませんでした。もう一度お試しください。",
+		"loadMoreError": "コメントをさらに読み込めませんでした。",
+		"createError": "コメントを投稿できませんでした。",
+		"editError": "編集を保存できませんでした。",
+		"deleteError": "コメントを削除できませんでした。",
+		"placeholder": "コメントを書く...",
+		"send": "送信",
+		"sending": "送信中...",
+		"edit": "編集",
+		"save": "保存",
+		"cancel": "キャンセル",
+		"delete": "削除",
+		"edited": "編集済み",
+		"deletedPlaceholder": "このコメントは削除されました。",
+		"deletedAuthor": "削除されたユーザー",
+		"reply": "返信",
+		"replyPlaceholder": "返信を書く...",
+		"replies": "{{count}}件の返信",
+		"showReplies": "返信を表示",
+		"hideReplies": "返信を非表示",
+		"loadingReplies": "返信を読み込み中...",
+		"noReplies": "まだ返信はありません",
+		"loadRepliesError": "返信を読み込めませんでした。",
+		"createReplyError": "返信を投稿できませんでした。",
+		"missingTarget": "コメントの対象が見つかりません。",
+		"you": "(あなた)",
+		"mentionSuggestions": "メンションできる人",
+		"loadEarlier": "以前のコメントを読み込む",
+		"loadEarlierReplies": "以前の返信を読み込む",
+		"attach": "ファイルを添付",
+		"attachmentProcessing": "ファイルを確認中...",
+		"attachmentUploaded": "アップロード済み",
+		"attachmentUploadingSummary": "ファイルをアップロード中 (残り{{count}}件)。このページを開いたままにしてください。",
+		"attachmentUploadFailed": "アップロードに失敗しました",
+		"attachmentRetry": "再試行",
+		"attachmentRemove": "{{name}} を削除",
+		"attachmentDownload": "ダウンロード",
+		"attachmentDownloadAria": "{{name}} をダウンロード",
+		"attachmentDownloadError": "ファイルをダウンロードできませんでした。",
+		"attachmentInvalidType": "添付できるのはPDF、DOCX、PNG、JPEGファイルだけです。",
+		"attachmentTooLarge": "ファイルは10 MB以下でなければなりません。",
+		"attachmentEmpty": "そのファイルは空です。",
+		"attachmentLimit": "最大{{count}}件までファイルを添付できます。"
 	},
 	"tile": {
 		"noteButtonAria": "このタイルのメモを開く"

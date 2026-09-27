@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "होम",
+			"features": "फ़ीचर्स",
 			"discover": "विशेषताएँ",
+			"articles": "लेख",
 			"waitlist": "प्रतीक्षा सूची"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "रद्द करें",
 					"disconnectError": "इस खाते को अलग नहीं किया जा सका। कृपया पुनः प्रयास करें।",
 					"disconnectProviderError": "कैलेंडर प्रोवाइडर को अभी अलग नहीं किया जा सका। कृपया थोड़ी देर बाद पुनः प्रयास करें।",
+					"toggleEnabled": "सक्रिय",
+					"toggleDisabled": "निष्क्रिय",
 					"locationSection": "डिफ़ॉल्ट लोकेशन",
 					"locationDescription": "Tiler इस अकाउंट की नई इवेंट्स के लिए यह लोकेशन उपयोग करता है।",
 					"locationUnset": "कोई डिफ़ॉल्ट लोकेशन सेट नहीं है।",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "टाइल/ब्लॉक खोजें...",
 		"searchAriaLabel": "टाइल या ब्लॉक खोजें",
 		"clearSearch": "खोज साफ़ करें",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "कनेक्टेड खाता: {{account}}",
+			"partialFailure": "कुछ कनेक्टेड कैलेंडर में खोज विफल रही: {{sources}}",
+			"retrySearch": "पुनः प्रयास करें",
+			"unavailable": "खोज अस्थायी रूप से उपलब्ध नहीं है। यह एक सर्विस समस्या है — मैच के अभाव की नहीं। कृपया बाद में पुनः प्रयास करें।",
+			"readOnly": "केवल-पठन"
+		},
 		"loadMore": "और लोड करें",
 		"loading": "लोड हो रहा है…",
 		"notFoundMessage": "उफ़, हमें '{{query}}' नहीं मिला। क्या आप इस शीर्षक से एक टाइल बनाना चाहेंगे?",
@@ -2007,6 +2021,7 @@
 			"progress": "प्रगति",
 			"dueOn": "नियत तिथि:",
 			"dueBy": "तक देय:",
+			"due": "अवधि:",
 			"multiTileshare": "बहु TileShare",
 			"tileshare": "TileShare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Tilette विवरण"
 		},
+		"detail": {
+			"breadcrumbRoot": "TileShare",
+			"multiTileshare": "मल्टी TileShare",
+			"singleTileshare": "एकल TileShare",
+			"inCluster": "में: {{name}}",
+			"progress": "प्रगति",
+			"noDescription": "कोई विवरण प्रदान नहीं किया गया",
+			"due": "अवधि: {{date}}",
+			"editAria": "संपादित करें",
+			"addAria": "Tilette जोड़ें",
+			"loadError": "इस TileShare को लोड नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+			"showingTilettes": "Tilettes: {{shown}} / {{total}} दिखाए जा रहे हैं",
+			"showingAssignees": "जिम्मेदार: {{shown}} / {{total}} दिखाए जा रहे हैं",
+			"statusLabel": "स्थिति:",
+			"status": {
+				"inProgress": "प्रगति पर",
+				"completed": "पूर्ण"
+			},
+			"view": {
+				"list": "Tilette सूची दृश्य",
+				"assignee": "जिम्मेदार दृश्य"
+			},
+			"viewAria": "Tilette दृश्य",
+			"openTiletteAria": "Tilette खोलें",
+			"prev": "पिछला",
+			"next": "अगला",
+			"deleteAria": "हटाएं",
+			"edit": {
+				"clusterTitle": "TileShare संपादित करें",
+				"tiletteTitle": "Tilette संपादित करें",
+				"fields": {
+					"name": {
+						"label": "नाम",
+						"placeholder": "अपने कार्य को नाम दें"
+					},
+					"deadline": {
+						"label": "अंतिम समय",
+						"placeholder": "अंतिम समय जोड़ें"
+					},
+					"note": {
+						"label": "नोट",
+						"placeholder": "नोट जोड़ें (वैकल्पिक)"
+					}
+				},
+				"validation": {
+					"nameRequired": "कृपया अपने कार्य को नाम दें",
+					"deadlineRequired": "कृपया अंतिम समय जोड़ें"
+				},
+				"cancel": "रद्द करें",
+				"save": "बदलाव सहेजें",
+				"saving": "बदलाव सहेजे जा रहे हैं...",
+				"success": "बदलाव सहेजे गए",
+				"error": "आपके बदलाव सहेजे नहीं जा सके। कृपया पुनः प्रयास करें।"
+			},
+			"delete": {
+				"title": "TileShare हटाएं",
+				"body": "\"{{name}}\" हटाएं?",
+				"warning": "इसे सभी लोगों के लिए हटा दिया जाएगा जिनके साथ यह साझा किया गया था, और इसे पूर्ववत नहीं किया जा सकता।",
+				"cancel": "रद्द करें",
+				"confirm": "हटाएं",
+				"deleting": "हटाया जा रहा है...",
+				"success": "TileShare हटा दिया गया",
+				"error": "यह TileShare हटाया नहीं जा सका। कृपया पुनः प्रयास करें।"
+			},
+			"add": {
+				"back": "TileShare पर वापस जाएं",
+				"title": "Tilette जोड़ें",
+				"description": "\"{{name}}\" में एक और कार्य जोड़ें और इसे अपने सहकर्मियों के साथ साझा करें। वे स्वीकार करने के बाद, हम इसे उनके शेड्यूल में जोड़ देंगे।",
+				"fields": {
+					"name": {
+						"label": "नाम",
+						"placeholder": "अपने कार्य को नाम दें"
+					},
+					"deadline": {
+						"label": "अंतिम समय",
+						"placeholder": "अंतिम समय जोड़ें (वैकल्पिक)"
+					},
+					"note": {
+						"label": "नोट",
+						"placeholder": "नोट जोड़ें (वैकल्पिक)"
+					}
+				},
+				"shareTo": {
+					"label": "साझा करें:",
+					"placeholder": "ईमेल पता / फ़ोन नंबर (चयन के लिए Enter दबाएं)"
+				},
+				"validation": {
+					"nameRequired": "कृपया अपने कार्य को नाम दें",
+					"invalidRecipient": "{{recipient}} एक मान्य ईमेल या फ़ोन नंबर नहीं है"
+				},
+				"cancel": "रद्द करें",
+				"submit": "Tilette जोड़ें",
+				"creating": "Tilette जोड़ी जा रही है...",
+				"error": "Tilette जोड़ी नहीं जा सकी। कृपया पुनः प्रयास करें।",
+				"success": {
+					"message": "आपकी Tilette \"{{name}}\" जोड़ी गई है।",
+					"view": "Tilette देखें"
+				}
+			}
+		},
 		"invite": {
 			"title": "आमंत्रित करें"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "आउटबॉक्स"
 		}
+	},
+	"comments": {
+		"count": "{{count}} टिप्पणियाँ",
+		"empty": "अभी कोई टिप्पणी नहीं",
+		"loading": "लोड हो रहा है...",
+		"loadMore": "और लोड करें",
+		"retry": "पुनः प्रयास करें",
+		"loadError": "टिप्पणियाँ लोड नहीं की जा सकीं। कृपया पुनः प्रयास करें।",
+		"loadMoreError": "अधिक टिप्पणियाँ लोड नहीं की जा सकीं।",
+		"createError": "आपकी टिप्पणी पोस्ट नहीं की जा सकी।",
+		"editError": "आपका संपादन सहेजा नहीं जा सका।",
+		"deleteError": "टिप्पणी हटाई नहीं जा सकी।",
+		"placeholder": "टिप्पणी लिखें...",
+		"send": "भेजें",
+		"sending": "भेजा जा रहा है...",
+		"edit": "संपादित करें",
+		"save": "सहेजें",
+		"cancel": "रद्द करें",
+		"delete": "हटाएं",
+		"edited": "संपादित किया गया",
+		"deletedPlaceholder": "यह टिप्पणी हटा दी गई है।",
+		"deletedAuthor": "हटाया गया उपयोगकर्ता",
+		"reply": "उत्तर दें",
+		"replyPlaceholder": "उत्तर लिखें...",
+		"replies": "{{count}} उत्तर",
+		"showReplies": "उत्तर दिखाएं",
+		"hideReplies": "उत्तर छिपाएं",
+		"loadingReplies": "उत्तर लोड हो रहे हैं...",
+		"noReplies": "अभी कोई उत्तर नहीं",
+		"loadRepliesError": "उत्तर लोड नहीं की जा सके।",
+		"createReplyError": "आपका उत्तर पोस्ट नहीं किया जा सका।",
+		"missingTarget": "टिप्पणी का लक्ष्य नहीं मिला।",
+		"you": "(आप)",
+		"mentionSuggestions": "लोग जिनको आप उल्लेखित कर सकते हैं",
+		"loadEarlier": "पहली टिप्पणियाँ लोड करें",
+		"loadEarlierReplies": "पहले के उत्तर लोड करें",
+		"attach": "फ़ाइल संलग्न करें",
+		"attachmentProcessing": "फ़ाइल की जाँच हो रही है...",
+		"attachmentUploaded": "अपलोड हो गया",
+		"attachmentUploadingSummary": "फ़ाइलें अपलोड हो रही हैं ({{count}} शेष)। यह पेज खुला रखें।",
+		"attachmentUploadFailed": "अपलोड विफल रहा",
+		"attachmentRetry": "पुनः प्रयास करें",
+		"attachmentRemove": "{{name}} हटाएं",
+		"attachmentDownload": "डाउनलोड करें",
+		"attachmentDownloadAria": "{{name}} डाउनलोड करें",
+		"attachmentDownloadError": "फ़ाइल डाउनलोड नहीं की जा सकी।",
+		"attachmentInvalidType": "केवल PDF, DOCX, PNG और JPEG फ़ाइलें संलग्न की जा सकती हैं।",
+		"attachmentTooLarge": "फ़ाइल 10 MB या उससे छोटी होनी चाहिए।",
+		"attachmentEmpty": "वह फ़ाइल खाली है।",
+		"attachmentLimit": "आप अधिकतम {{count}} फ़ाइलें संलग्न कर सकते हैं।"
 	},
 	"tile": {
 		"noteButtonAria": "इस टाइल के नोट्स खोलें"

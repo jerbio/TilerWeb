@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "홈",
+			"features": "기능",
 			"discover": "기능",
+			"articles": "기사",
 			"waitlist": "대기자 명단"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "취소",
 					"disconnectError": "이 계정의 연결을 해제할 수 없습니다. 다시 시도해 주세요.",
 					"disconnectProviderError": "캘린더 제공자를 지금 해제할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+					"toggleEnabled": "사용",
+					"toggleDisabled": "사용 안 함",
 					"locationSection": "기본 위치",
 					"locationDescription": "Tiler는 이 계정의 새 이벤트에 이 위치를 사용합니다.",
 					"locationUnset": "기본 위치가 설정되어 있지 않습니다.",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "타일/블록 검색...",
 		"searchAriaLabel": "타일 또는 블록 검색",
 		"clearSearch": "검색 지우기",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "연결된 계정: {{account}}",
+			"partialFailure": "일부 연결된 달력에서 검색에 실패했습니다: {{sources}}",
+			"retrySearch": "다시 시도",
+			"unavailable": "검색을 일시적으로 사용할 수 없습니다. 이는 서비스 문제이며 일치하는 항목이 없는 것이 아닙니다. 나중에 다시 시도해 주세요.",
+			"readOnly": "읽기 전용"
+		},
 		"loadMore": "더 불러오기",
 		"loading": "로딩 중…",
 		"notFoundMessage": "이런, '{{query}}'을(를) 찾을 수 없습니다. 이 제목으로 타일을 만드시겠습니까?",
@@ -2007,6 +2021,7 @@
 			"progress": "진행률",
 			"dueOn": "마감일:",
 			"dueBy": "마감 기한:",
+			"due": "마감:",
 			"multiTileshare": "다중 TileShare",
 			"tileshare": "TileShare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Tilette 상세"
 		},
+		"detail": {
+			"breadcrumbRoot": "TileShare",
+			"multiTileshare": "멀티 TileShare",
+			"singleTileshare": "단일 TileShare",
+			"inCluster": "다음 안의: {{name}}",
+			"progress": "진행률",
+			"noDescription": "설명이 제공되지 않았습니다",
+			"due": "마감: {{date}}",
+			"editAria": "편집",
+			"addAria": "Tilette 추가",
+			"loadError": "이 TileShare를 불러오지 못했습니다. 다시 시도해 주세요.",
+			"showingTilettes": "Tilette {{shown}}개 / {{total}}개 표시 중",
+			"showingAssignees": "지정된 사람 {{shown}}명 / {{total}}명 표시 중",
+			"statusLabel": "상태:",
+			"status": {
+				"inProgress": "진행 중",
+				"completed": "완료됨"
+			},
+			"view": {
+				"list": "Tilette 목록 보기",
+				"assignee": "담당자 보기"
+			},
+			"viewAria": "Tilette 보기",
+			"openTiletteAria": "Tilette 열기",
+			"prev": "이전",
+			"next": "다음",
+			"deleteAria": "삭제",
+			"edit": {
+				"clusterTitle": "TileShare 편집",
+				"tiletteTitle": "Tilette 편집",
+				"fields": {
+					"name": {
+						"label": "이름",
+						"placeholder": "작업 이름 입력"
+					},
+					"deadline": {
+						"label": "마감일",
+						"placeholder": "마감일 추가"
+					},
+					"note": {
+						"label": "메모",
+						"placeholder": "메모 추가 (선택 사항)"
+					}
+				},
+				"validation": {
+					"nameRequired": "작업 이름을 입력해 주세요",
+					"deadlineRequired": "마감일을 추가해 주세요"
+				},
+				"cancel": "취소",
+				"save": "변경 사항 저장",
+				"saving": "변경 사항 저장 중...",
+				"success": "변경 사항이 저장되었습니다",
+				"error": "변경 사항을 저장하지 못했습니다. 다시 시도해 주세요."
+			},
+			"delete": {
+				"title": "TileShare 삭제",
+				"body": "\"{{name}}\"을(를) 삭제할까요?",
+				"warning": "공유한 모든 사람에게서 제거되며 되돌릴 수 없습니다.",
+				"cancel": "취소",
+				"confirm": "삭제",
+				"deleting": "삭제 중...",
+				"success": "TileShare가 삭제되었습니다",
+				"error": "이 TileShare를 삭제하지 못했습니다. 다시 시도해 주세요."
+			},
+			"add": {
+				"back": "TileShare로 돌아가기",
+				"title": "Tilette 추가",
+				"description": "\"{{name}}\"에 작업을 추가하고 동료들과 공유하세요. 수락하면 상대방의 일정에도 추가됩니다.",
+				"fields": {
+					"name": {
+						"label": "이름",
+						"placeholder": "작업 이름 입력"
+					},
+					"deadline": {
+						"label": "마감일",
+						"placeholder": "마감일 추가 (선택 사항)"
+					},
+					"note": {
+						"label": "메모",
+						"placeholder": "메모 추가 (선택 사항)"
+					}
+				},
+				"shareTo": {
+					"label": "공유 대상:",
+					"placeholder": "이메일 주소 / 전화번호 (Enter로 선택)"
+				},
+				"validation": {
+					"nameRequired": "작업 이름을 입력해 주세요",
+					"invalidRecipient": "{{recipient}}(은)는 유효한 이메일 주소 또는 전화 번호가 아닙니다"
+				},
+				"cancel": "취소",
+				"submit": "Tilette 추가",
+				"creating": "Tilette 추가 중...",
+				"error": "Tilette를 추가하지 못했습니다. 다시 시도해 주세요.",
+				"success": {
+					"message": "\"{{name}}\" Tilette가 추가되었습니다.",
+					"view": "Tilette 보기"
+				}
+			}
+		},
 		"invite": {
 			"title": "초대"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "보낸 편지함"
 		}
+	},
+	"comments": {
+		"count": "댓글 {{count}}개",
+		"empty": "아직 댓글이 없습니다",
+		"loading": "불러오는 중...",
+		"loadMore": "더 불러오기",
+		"retry": "다시 시도",
+		"loadError": "댓글을 불러오지 못했습니다. 다시 시도해 주세요.",
+		"loadMoreError": "더 많은 댓글을 불러오지 못했습니다.",
+		"createError": "댓글을 게시하지 못했습니다.",
+		"editError": "편집을 저장하지 못했습니다.",
+		"deleteError": "댓글을 삭제하지 못했습니다.",
+		"placeholder": "댓글 작성...",
+		"send": "보내기",
+		"sending": "보내는 중...",
+		"edit": "편집",
+		"save": "저장",
+		"cancel": "취소",
+		"delete": "삭제",
+		"edited": "수정됨",
+		"deletedPlaceholder": "이 댓글은 삭제되었습니다.",
+		"deletedAuthor": "삭제된 사용자",
+		"reply": "답장",
+		"replyPlaceholder": "답장 작성...",
+		"replies": "답장 {{count}}개",
+		"showReplies": "답장 보기",
+		"hideReplies": "답장 숨기기",
+		"loadingReplies": "답장 불러오는 중...",
+		"noReplies": "아직 답장이 없습니다",
+		"loadRepliesError": "답장을 불러오지 못했습니다.",
+		"createReplyError": "답장을 게시하지 못했습니다.",
+		"missingTarget": "댓글 대상이 없습니다.",
+		"you": "(나)",
+		"mentionSuggestions": "멘션할 수 있는 사람들",
+		"loadEarlier": "이전 댓글 불러오기",
+		"loadEarlierReplies": "이전 답장 불러오기",
+		"attach": "파일 첨부",
+		"attachmentProcessing": "파일 확인 중...",
+		"attachmentUploaded": "업로드됨",
+		"attachmentUploadingSummary": "파일 업로드 중 (남은 {{count}}개). 이 페이지를 열어 두세요.",
+		"attachmentUploadFailed": "업로드 실패",
+		"attachmentRetry": "다시 시도",
+		"attachmentRemove": "{{name}} 제거",
+		"attachmentDownload": "다운로드",
+		"attachmentDownloadAria": "{{name}} 다운로드",
+		"attachmentDownloadError": "파일을 다운로드하지 못했습니다.",
+		"attachmentInvalidType": "PDF, DOCX, PNG, JPEG 파일만 첨부할 수 있습니다.",
+		"attachmentTooLarge": "파일은 10MB 이하여야 합니다.",
+		"attachmentEmpty": "해당 파일은 빈 파일입니다.",
+		"attachmentLimit": "최대 {{count}}개의 파일을 첨부할 수 있습니다."
 	},
 	"tile": {
 		"noteButtonAria": "이 타일의 메모 열기"
