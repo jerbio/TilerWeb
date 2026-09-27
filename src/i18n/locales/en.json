@@ -2185,7 +2185,25 @@
 		"noReplies": "No replies yet",
 		"loadRepliesError": "Couldn't load replies.",
 		"createReplyError": "Couldn't post your reply.",
-		"missingTarget": "Comment target not found."
+		"missingTarget": "Comment target not found.",
+		"you": "(you)",
+		"mentionSuggestions": "People you can mention",
+		"loadEarlier": "Load earlier comments",
+		"loadEarlierReplies": "Load earlier replies",
+		"attach": "Attach file",
+		"attachmentProcessing": "Checking file…",
+		"attachmentUploaded": "Uploaded",
+		"attachmentUploadingSummary": "Uploading files ({{count}} left). Keep this page open.",
+		"attachmentUploadFailed": "Upload failed",
+		"attachmentRetry": "Retry",
+		"attachmentRemove": "Remove {{name}}",
+		"attachmentDownload": "Download",
+		"attachmentDownloadAria": "Download {{name}}",
+		"attachmentDownloadError": "Couldn't download the file.",
+		"attachmentInvalidType": "Only PDF, DOCX, PNG and JPEG files can be attached.",
+		"attachmentTooLarge": "Files must be 10 MB or smaller.",
+		"attachmentEmpty": "That file is empty.",
+		"attachmentLimit": "You can attach up to {{count}} files."
 	},
 	"tile": {
 		"noteButtonAria": "Open notes for this tile"

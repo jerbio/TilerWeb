@@ -2,14 +2,24 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { CommentView, DEFAULT_COMMENT_PAGE_SIZE } from '@/core/common/types/comment';
-import CommentsService, { generateIdempotencyKey } from '@/services/commentsService';
+import {
+	AttachmentView,
+	CommentParticipant,
+	CommentView,
+	DEFAULT_COMMENT_PAGE_SIZE,
+} from '@/core/common/types/comment';
+import CommentsService from '@/services/commentsService';
 import CommentComposer from './CommentComposer';
+import CommentAttachments from './CommentAttachments';
+import CommentAvatar from './CommentAvatar';
+import CommentText from './CommentText';
+import { mentionedUserIds, SelectedMention, toDisplayText, toTokenText } from './mentions';
 
 type CommentItemProps = {
 	comment: CommentView;
 	onEdit: (commentId: string, text: string) => Promise<void>;
 	onDelete: (commentId: string) => Promise<void>;
+	onDownloadAttachment?: (attachment: AttachmentView) => Promise<void>;
 	/**
 	 * When provided (and this row is a live root) the two-level reply UI is
 	 * enabled: an inline reply composer and a lazy-loaded reply list. Replies
@@ -21,6 +31,8 @@ type CommentItemProps = {
 	targetId?: string;
 	/** True when this row is a nested reply under a root. */
 	isNested?: boolean;
+	/** People who can be mentioned in the reply composer. */
+	participants?: CommentParticipant[];
 };
 
 /**
@@ -38,14 +50,17 @@ const CommentItem: React.FC<CommentItemProps> = ({
 	comment,
 	onEdit,
 	onDelete,
+	onDownloadAttachment,
 	service,
 	targetType,
 	targetId,
 	isNested,
+	participants,
 }) => {
 	const { t } = useTranslation();
 	const [editing, setEditing] = useState(false);
 	const [draft, setDraft] = useState('');
+	const [editSelected, setEditSelected] = useState<SelectedMention[]>([]);
 	const [busy, setBusy] = useState(false);
 
 	const isDeleted = comment.isDeleted === true;
@@ -99,14 +114,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
 		setExpanded(willExpand);
 	};
 
-	const submitReply = async (text: string) => {
+	const submitReply = async (text: string, attachmentIds: string[], idempotencyKey: string) => {
 		if (!service || !targetType || !targetId) return;
 		const created = await service.createComment({
 			targetType,
 			targetId,
 			text,
-			idempotencyKey: generateIdempotencyKey(),
+			idempotencyKey,
 			rootCommentId: comment.id,
+			attachmentIds,
+			mentionedUserIds: mentionedUserIds(text),
 		});
 		setReplies((prev) => [created, ...prev]);
 		setRepliesLoaded(true);
@@ -116,7 +133,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
 	const startEdit = () => {
 		if (!canEdit || busy) return;
-		setDraft(comment.text ?? '');
+		const editable = toDisplayText(comment.text ?? '', comment.mentions ?? []);
+		setDraft(editable.text);
+		setEditSelected(editable.selected);
 		setEditing(true);
 	};
 
@@ -128,14 +147,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
 	const saveEdit = async () => {
 		if (!canEdit || busy) return;
-		const trimmed = draft.trim();
-		if (!trimmed || trimmed === (comment.text ?? '')) {
+		const next = toTokenText(draft.trim(), editSelected);
+		if (!next || next === (comment.text ?? '')) {
 			cancelEdit();
 			return;
 		}
 		setBusy(true);
 		try {
-			await onEdit(comment.id, trimmed);
+			await onEdit(comment.id, next);
 			setEditing(false);
 			setDraft('');
 		} catch {
@@ -157,164 +176,231 @@ const CommentItem: React.FC<CommentItemProps> = ({
 		}
 	};
 
-	const timestamp =
-		comment.createdAt != null ? dayjs(comment.createdAt).format('DD MMM YYYY, HH:mm') : null;
+	const createdAt = comment.createdAt != null ? dayjs(comment.createdAt) : null;
+	const time = createdAt
+		? createdAt.format(createdAt.isSame(dayjs(), 'day') ? 'h:mm A' : 'MMM D, h:mm A')
+		: null;
+	const isViewer = comment.author?.isViewer === true;
+	const avatar = (
+		<CommentAvatar
+			id={comment.author?.id ?? null}
+			name={comment.author?.displayName ?? null}
+			size={isNested ? 'sm' : 'md'}
+		/>
+	);
+	const header = (
+		<Header>
+			<Name $viewer={isViewer}>{displayName}</Name>
+			{isViewer && <Muted>{t('comments.you')}</Muted>}
+			{createdAt && time && (
+				<>
+					<Muted aria-hidden="true">•</Muted>
+					<Time
+						dateTime={createdAt.toISOString()}
+						title={createdAt.format('dddd, MMM D YYYY, h:mm A')}
+					>
+						{time}
+					</Time>
+				</>
+			)}
+			{comment.editedAt != null && !isDeleted && (
+				<Muted title={dayjs(comment.editedAt).format('dddd, MMM D YYYY, h:mm A')}>
+					{t('comments.edited')}
+				</Muted>
+			)}
+		</Header>
+	);
 
 	if (editing) {
 		return (
-			<ItemWrapper data-testid="comment-item" data-comment-id={comment.id} nested={isNested}>
-				<AuthorLine>{displayName}</AuthorLine>
-				<EditBox
-					data-testid="comment-edit-input"
-					value={draft}
-					onChange={(e) => setDraft(e.target.value)}
-					disabled={busy}
-					autoFocus
-				/>
-				<Actions>
-					<ActionButton type="button" onClick={cancelEdit} disabled={busy}>
-						{t('comments.cancel')}
-					</ActionButton>
-					<ActionButton
-						type="button"
-						data-testid="comment-edit-save"
-						onClick={() => void saveEdit()}
-						disabled={busy || !draft.trim()}
-					>
-						{t('comments.save')}
-					</ActionButton>
-				</Actions>
-			</ItemWrapper>
+			<Row data-testid="comment-item" data-comment-id={comment.id} $nested={isNested}>
+				<AvatarCol>{avatar}</AvatarCol>
+				<Body>
+					{header}
+					<EditBox
+						data-testid="comment-edit-input"
+						value={draft}
+						onChange={(e) => setDraft(e.target.value)}
+						disabled={busy}
+						autoFocus
+					/>
+					<Actions>
+						<ActionButton type="button" onClick={cancelEdit} disabled={busy}>
+							{t('comments.cancel')}
+						</ActionButton>
+						<ActionButton
+							type="button"
+							data-testid="comment-edit-save"
+							onClick={() => void saveEdit()}
+							disabled={busy || !draft.trim()}
+						>
+							{t('comments.save')}
+						</ActionButton>
+					</Actions>
+				</Body>
+			</Row>
 		);
 	}
 
 	const showRepliesToggle =
 		canReply && ((comment.replyCount ?? 0) > 0 || replies.length > 0 || repliesLoaded);
+	const replyAuthors = comment.replyAuthors ?? [];
 
 	return (
-		<ItemWrapper data-testid="comment-item" data-comment-id={comment.id} nested={isNested}>
-			<AuthorLine>
-				<span>{displayName}</span>
-				{timestamp && <Time>{timestamp}</Time>}
-				{comment.editedAt != null && !isDeleted && (
-					<Edited>
-						{t('comments.edited')}
-						{comment.editedAt != null &&
-							` ${dayjs(comment.editedAt).format('DD MMM YYYY, HH:mm')}`}
-					</Edited>
+		<Row data-testid="comment-item" data-comment-id={comment.id} $nested={isNested}>
+			<AvatarCol>
+				{avatar}
+				{(showRepliesToggle || showComposer) && <ThreadLine aria-hidden="true" />}
+			</AvatarCol>
+			<Body>
+				{header}
+				<Text deleted={isDeleted} data-testid="comment-text">
+					{isDeleted ? (
+						t('comments.deletedPlaceholder')
+					) : (
+						<CommentText text={comment.text ?? ''} mentions={comment.mentions} />
+					)}
+				</Text>
+				{!isDeleted && onDownloadAttachment && comment.attachments && (
+					<CommentAttachments
+						attachments={comment.attachments}
+						onDownload={onDownloadAttachment}
+					/>
 				)}
-			</AuthorLine>
-			<Text deleted={isDeleted} data-testid="comment-text">
-				{isDeleted ? t('comments.deletedPlaceholder') : comment.text}
-			</Text>
-			{(canEdit || canDelete) && (
-				<Actions>
-					{canEdit && (
-						<ActionButton type="button" onClick={startEdit} disabled={busy}>
-							{t('comments.edit')}
-						</ActionButton>
-					)}
-					{canDelete && (
-						<ActionButton
-							type="button"
-							data-testid="comment-delete"
-							onClick={() => void remove()}
-							disabled={busy}
-						>
-							{t('comments.delete')}
-						</ActionButton>
-					)}
-				</Actions>
-			)}
-
-			{canReply && (
-				<ReplySection>
-					<Actions>
-						<ActionButton
-							type="button"
-							data-testid="comment-reply-toggle"
-							onClick={() => setShowComposer((v) => !v)}
-						>
-							{t('comments.reply')}
-						</ActionButton>
-						{showRepliesToggle && (
+				{(canReply || canEdit || canDelete) && (
+					<Actions className="comment-actions">
+						{canReply && (
 							<ActionButton
 								type="button"
-								data-testid="comment-replies-toggle"
-								onClick={() => void toggleReplies()}
-								disabled={loadingReplies}
+								data-testid="comment-reply-toggle"
+								onClick={() => setShowComposer((v) => !v)}
 							>
-								{expanded
-									? t('comments.hideReplies')
-									: t('comments.replies', { count: comment.replyCount ?? 0 })}
+								{t('comments.reply')}
+							</ActionButton>
+						)}
+						{canEdit && (
+							<ActionButton type="button" onClick={startEdit} disabled={busy}>
+								{t('comments.edit')}
+							</ActionButton>
+						)}
+						{canDelete && (
+							<ActionButton
+								type="button"
+								data-testid="comment-delete"
+								onClick={() => void remove()}
+								disabled={busy}
+							>
+								{t('comments.delete')}
 							</ActionButton>
 						)}
 					</Actions>
+				)}
 
-					{showComposer && (
-						<ReplyComposerWrap data-testid="comment-reply-composer">
-							<CommentComposer
-								placeholder={t('comments.replyPlaceholder')}
-								onSubmit={submitReply}
+				{showRepliesToggle && (
+					<RepliesToggle
+						type="button"
+						data-testid="comment-replies-toggle"
+						aria-expanded={expanded}
+						onClick={() => void toggleReplies()}
+						disabled={loadingReplies}
+					>
+						{!expanded && replyAuthors.length > 0 && (
+							<AvatarStack>
+								{replyAuthors.map((a) => (
+									<CommentAvatar
+										key={a.id}
+										id={a.id}
+										name={a.isDeleted ? null : a.displayName}
+										size="sm"
+										stacked
+									/>
+								))}
+							</AvatarStack>
+						)}
+						<span>
+							{expanded
+								? t('comments.hideReplies')
+								: t('comments.replies', { count: comment.replyCount ?? 0 })}
+						</span>
+					</RepliesToggle>
+				)}
+
+				{canReply && showComposer && (
+					<ReplyComposerWrap data-testid="comment-reply-composer">
+						<CommentComposer
+							placeholder={t('comments.replyPlaceholder')}
+							onSubmit={submitReply}
+							participants={participants}
+							onUpload={(file, retryKey, onProgress) =>
+								service!.uploadAttachment(
+									{
+										targetType: targetType!,
+										targetId: targetId!,
+										retryKey,
+										file,
+									},
+									onProgress
+								)
+							}
+							onCancelAttachment={(id) => service!.deleteAttachment(id)}
+						/>
+					</ReplyComposerWrap>
+				)}
+
+				{canReply && expanded && (
+					<ReplyList data-testid="comment-reply-list">
+						{loadingReplies && !repliesLoaded && !repliesError && (
+							<ReplyStatus data-testid="comment-replies-loading">
+								{t('comments.loadingReplies')}
+							</ReplyStatus>
+						)}
+						{!loadingReplies && repliesError && (
+							<ReplyStatus $error data-testid="comment-replies-error">
+								{repliesError}
+								<ActionButton
+									type="button"
+									data-testid="comment-replies-retry"
+									onClick={() => void loadReplies()}
+								>
+									{t('comments.retry')}
+								</ActionButton>
+							</ReplyStatus>
+						)}
+						{!loadingReplies &&
+							!repliesError &&
+							repliesLoaded &&
+							replies.length === 0 && (
+								<ReplyStatus data-testid="comment-replies-empty">
+									{t('comments.noReplies')}
+								</ReplyStatus>
+							)}
+						{repliesNextCursor && !loadingReplies && (
+							<ReplyLoadMore>
+								<ActionButton
+									type="button"
+									data-testid="comment-replies-load-more"
+									onClick={() => void loadReplies(repliesNextCursor)}
+									disabled={loadingReplies}
+								>
+									{t('comments.loadEarlierReplies')}
+								</ActionButton>
+							</ReplyLoadMore>
+						)}
+						{/* Server pages are newest-first; show oldest to newest like a chat. */}
+						{[...replies].reverse().map((r) => (
+							<CommentItem
+								key={r.id}
+								comment={r}
+								isNested
+								onEdit={onEdit}
+								onDelete={onDelete}
+								onDownloadAttachment={onDownloadAttachment}
 							/>
-						</ReplyComposerWrap>
-					)}
-
-					{expanded && (
-						<ReplyList data-testid="comment-reply-list">
-							{loadingReplies && !repliesLoaded && !repliesError && (
-								<ReplyStatus data-testid="comment-replies-loading">
-									{t('comments.loadingReplies')}
-								</ReplyStatus>
-							)}
-							{!loadingReplies && repliesError && (
-								<ReplyStatus $error data-testid="comment-replies-error">
-									{repliesError}
-									<ActionButton
-										type="button"
-										data-testid="comment-replies-retry"
-										onClick={() => void loadReplies()}
-									>
-										{t('comments.retry')}
-									</ActionButton>
-								</ReplyStatus>
-							)}
-							{!loadingReplies &&
-								!repliesError &&
-								repliesLoaded &&
-								replies.length === 0 && (
-									<ReplyStatus data-testid="comment-replies-empty">
-										{t('comments.noReplies')}
-									</ReplyStatus>
-								)}
-							{replies.map((r) => (
-								<CommentItem
-									key={r.id}
-									comment={r}
-									isNested
-									onEdit={onEdit}
-									onDelete={onDelete}
-								/>
-							))}
-							{repliesNextCursor && !loadingReplies && (
-								<ReplyLoadMore>
-									<ActionButton
-										type="button"
-										data-testid="comment-replies-load-more"
-										onClick={() => void loadReplies(repliesNextCursor)}
-										disabled={loadingReplies}
-									>
-										{loadingReplies
-											? t('comments.loading')
-											: t('comments.loadMore')}
-									</ActionButton>
-								</ReplyLoadMore>
-							)}
-						</ReplyList>
-					)}
-				</ReplySection>
-			)}
-		</ItemWrapper>
+						))}
+					</ReplyList>
+				)}
+			</Body>
+		</Row>
 	);
 };
 
@@ -332,39 +418,101 @@ function messageOf(err: unknown, fallback: string): string {
 	return fallback;
 }
 
-const ItemWrapper = styled.div<{ nested?: boolean }>`
+const Row = styled.div<{ $nested?: boolean }>`
 	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-	padding: 0.75rem 1rem;
-	padding-left: ${({ nested }) => (nested ? '2rem' : '1rem')};
-	border-left: ${({ nested, theme }) =>
-		nested ? `2px solid ${theme.colors.border.default}` : 'none'};
-	border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	gap: ${({ $nested }) => ($nested ? '0.5rem' : '0.75rem')};
+	padding: ${({ $nested }) => ($nested ? '0.5rem 0 0' : '0.875rem 0')};
 
-	&:last-child {
-		border-bottom: none;
+	.comment-actions {
+		opacity: 0;
+		transition: opacity 120ms ease;
+	}
+	&:hover > div > .comment-actions,
+	&:focus-within > div > .comment-actions {
+		opacity: 1;
+	}
+	@media (hover: none) {
+		.comment-actions {
+			opacity: 1;
+		}
 	}
 `;
 
-const AuthorLine = styled.div`
+const AvatarCol = styled.div`
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 0.5rem;
-	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+`;
+
+const ThreadLine = styled.span`
+	flex: 1;
+	width: 2px;
+	min-height: 1rem;
+	margin-top: 0.375rem;
+	border-radius: 1px;
+	background-color: ${({ theme }) => theme.colors.border.default};
+`;
+
+const Body = styled.div`
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+`;
+
+const Header = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.375rem;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-const Time = styled.span`
-	font-weight: ${({ theme }) => theme.typography.fontWeight.normal};
-	color: ${({ theme }) => theme.colors.text.muted};
+const Name = styled.span<{ $viewer: boolean }>`
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+	color: ${({ theme, $viewer }) =>
+		$viewer ? theme.colors.warning[300] : theme.colors.teal[200]};
 `;
 
-const Edited = styled.span`
-	font-weight: ${({ theme }) => theme.typography.fontWeight.normal};
+const Muted = styled.span`
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const Time = styled.time`
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const RepliesToggle = styled.button`
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	align-self: flex-start;
+	margin-top: 0.25rem;
+	padding: 0.125rem 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+	color: ${({ theme }) => theme.colors.text.secondary};
+
+	&:hover:not(:disabled) {
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+	&:disabled {
+		cursor: progress;
+	}
+`;
+
+const AvatarStack = styled.span`
+	display: inline-flex;
+
+	& > * + * {
+		margin-left: -0.375rem;
+	}
 `;
 
 const Text = styled.p<{ deleted?: boolean }>`
@@ -398,9 +546,14 @@ const ActionButton = styled.button`
 	border: none;
 	padding: 0;
 	cursor: pointer;
-	color: ${({ theme }) => theme.colors.brand[300]};
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.muted};
+	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+
+	&:hover:not(:disabled),
+	&:focus-visible {
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
 
 	&:disabled {
 		opacity: 0.5;
@@ -408,15 +561,8 @@ const ActionButton = styled.button`
 	}
 `;
 
-const ReplySection = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	margin-top: 0.25rem;
-`;
-
 const ReplyComposerWrap = styled.div`
-	padding-left: 0.5rem;
+	margin-top: 0.5rem;
 `;
 
 const ReplyList = styled.div`

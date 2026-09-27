@@ -14,7 +14,32 @@ export type CommentAuthor = {
 	displayName: string | null;
 	isOwner: boolean | null;
 	isDeleted: boolean | null;
+	/** True when the author is the signed-in viewer. */
+	isViewer?: boolean | null;
 };
+
+/** A person shown next to a comment (mention or reply author); deleted accounts carry no name. */
+export type CommentPerson = {
+	id: string;
+	displayName: string | null;
+	isDeleted: boolean;
+};
+
+/** Someone who can read the target and can therefore be mentioned. */
+export type CommentParticipant = {
+	id: string;
+	displayName: string;
+	isViewer: boolean;
+};
+
+export type GetParticipantsParams = {
+	targetType: string;
+	targetId: string;
+};
+
+export type ParticipantsResponse = ApiResponse<{
+	participants: CommentParticipant[];
+}>;
 
 /** A single comment as it is projected over the wire. */
 export type CommentView = {
@@ -42,7 +67,41 @@ export type CommentView = {
 	hasReplies: boolean | null;
 	/** Number of non-deleted replies for a root; always 0 for replies. */
 	replyCount: number;
+	/** Files claimed into this comment; empty for deleted comments. */
+	attachments?: AttachmentView[];
+	/** People referenced by `<@userId>` tokens in `text`, with live names. */
+	mentions?: CommentPerson[];
+	/** Up to three most recent distinct reply authors (roots only). */
+	replyAuthors?: CommentPerson[];
 };
+
+/** Sanitized attachment metadata. Storage keys and hashes never reach the client. */
+export type AttachmentView = {
+	id: string;
+	fileName: string;
+	contentType: string;
+	byteSize: number;
+	/** pending | ready | attached | rejected | expired */
+	state: string;
+};
+
+export type AttachmentSingleResponse = ApiResponse<{
+	attachment: AttachmentView;
+}>;
+
+export type UploadAttachmentParams = {
+	targetType: string;
+	targetId: string;
+	/** Reused on retry so a lost response does not create a second upload. */
+	retryKey: string;
+	file: File;
+};
+
+/** Mirrors the server's AttachmentLimits; the server remains authoritative. */
+export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+export const MAX_ATTACHMENTS_PER_COMMENT = 5;
+export const ALLOWED_ATTACHMENT_EXTENSIONS = ['pdf', 'docx', 'png', 'jpg', 'jpeg'] as const;
+export const ATTACHMENT_ACCEPT = ALLOWED_ATTACHMENT_EXTENSIONS.map((e) => `.${e}`).join(',');
 
 /** Paged comment thread response. */
 export type CommentListResponse = ApiResponse<{
@@ -87,6 +146,10 @@ export type CreateCommentParams = {
 	 * when omitted the comment is a top-level root.
 	 */
 	rootCommentId?: string | null;
+	/** Ready attachment ids (same uploader and target) to claim into this comment. */
+	attachmentIds?: string[];
+	/** Ids of everyone tagged in `text` (for notifications); must match its `<@id>` tokens. */
+	mentionedUserIds?: string[];
 };
 
 /** Params for editing a comment. */
@@ -94,6 +157,8 @@ export type UpdateCommentParams = {
 	text: string;
 	/** Client-generated UUID for safe retries / idempotency. */
 	idempotencyKey: string;
+	/** Ids of everyone tagged in `text`; must match its `<@id>` tokens. */
+	mentionedUserIds?: string[];
 };
 
 /** Params for deleting (soft) a comment. */

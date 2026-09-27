@@ -4,10 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { CommentsApi } from '@/api/commentsApi';
 import CommentsService, { generateIdempotencyKey } from '@/services/commentsService';
-import { CommentView, DEFAULT_COMMENT_PAGE_SIZE } from '@/core/common/types/comment';
+import {
+	AttachmentView,
+	CommentParticipant,
+	CommentView,
+	DEFAULT_COMMENT_PAGE_SIZE,
+} from '@/core/common/types/comment';
 import Button from '@/core/common/components/button';
 import CommentComposer from './CommentComposer';
 import CommentItem from './CommentItem';
+import { mentionedUserIds } from './mentions';
 
 type CommentThreadProps = {
 	/** Registered related-entity target type (e.g. 'tileshare_tilette'). */
@@ -42,6 +48,20 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [reloadKey, setReloadKey] = useState(0);
+	const [participants, setParticipants] = useState<CommentParticipant[]>([]);
+
+	useEffect(() => {
+		let cancelled = false;
+		svc.getParticipants({ targetType, targetId })
+			.then((people) => {
+				if (!cancelled) setParticipants(people);
+			})
+			// Without participants the thread still works; the @ picker just has no suggestions.
+			.catch(() => undefined);
+		return () => {
+			cancelled = true;
+		};
+	}, [targetType, targetId, svc]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -86,17 +106,38 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 	}, [nextCursor, loadingMore, targetType, targetId, svc]);
 
 	const handleCreate = useCallback(
-		async (text: string) => {
+		async (text: string, attachmentIds: string[], idempotencyKey: string) => {
 			const created = await svc.createComment({
 				targetType,
 				targetId,
 				text,
-				idempotencyKey: generateIdempotencyKey(),
+				idempotencyKey,
+				attachmentIds,
+				mentionedUserIds: mentionedUserIds(text),
 			});
-			setComments((prev) => [...prev, created]);
+			setComments((prev) => [created, ...prev]);
 			setTotal((n) => n + 1);
 		},
 		[svc, targetType, targetId]
+	);
+
+	const handleUpload = useCallback(
+		(file: File, retryKey: string, onProgress?: (fraction: number) => void) =>
+			svc.uploadAttachment({ targetType, targetId, retryKey, file }, onProgress),
+		[svc, targetType, targetId]
+	);
+
+	const handleDownload = useCallback(
+		async (attachment: AttachmentView) => {
+			const blob = await svc.downloadAttachment(attachment.id);
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = attachment.fileName;
+			link.click();
+			URL.revokeObjectURL(url);
+		},
+		[svc]
 	);
 
 	const handleEdit = useCallback(
@@ -104,6 +145,7 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 			const updated = await svc.updateComment(commentId, {
 				text,
 				idempotencyKey: generateIdempotencyKey(),
+				mentionedUserIds: mentionedUserIds(text),
 			});
 			setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)));
 		},
@@ -135,14 +177,6 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 				<Count>{t('comments.count', { count: total })}</Count>
 			</Header>
 
-			<CommentComposer
-				onSubmit={(text) =>
-					handleCreate(text).catch(() => {
-						toast.error(t('comments.createError'));
-					})
-				}
-			/>
-
 			{loading && <Status data-testid="comment-loading">{t('comments.loading')}</Status>}
 
 			{!loading && error && (
@@ -161,15 +195,32 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 
 			{showEmpty && <Status data-testid="comment-empty">{t('comments.empty')}</Status>}
 
+			{showList && hasMore && (
+				<LoadMoreRow>
+					<Button
+						size="small"
+						variant="ghost"
+						onClick={() => void loadMore()}
+						disabled={loadingMore}
+						data-testid="comment-load-more"
+					>
+						{loadingMore ? t('comments.loading') : t('comments.loadEarlier')}
+					</Button>
+				</LoadMoreRow>
+			)}
+
 			{showList && (
 				<List data-testid="comment-list">
-					{comments.map((c) => (
+					{/* Server pages are newest-first; show oldest to newest like a chat. */}
+					{[...comments].reverse().map((c) => (
 						<CommentItem
 							key={c.id}
 							comment={c}
 							service={svc}
 							targetType={targetType}
 							targetId={targetId}
+							participants={participants}
+							onDownloadAttachment={handleDownload}
 							onEdit={(id, text) =>
 								handleEdit(id, text).catch(() => {
 									toast.error(t('comments.editError'));
@@ -185,19 +236,20 @@ const CommentThread: React.FC<CommentThreadProps> = ({ targetType, targetId, ser
 				</List>
 			)}
 
-			{showList && hasMore && (
-				<LoadMoreRow>
-					<Button
-						size="small"
-						variant="ghost"
-						onClick={() => void loadMore()}
-						disabled={loadingMore}
-						data-testid="comment-load-more"
-					>
-						{loadingMore ? t('comments.loading') : t('comments.loadMore')}
-					</Button>
-				</LoadMoreRow>
-			)}
+			<ComposerDock>
+				<CommentComposer
+					onSubmit={(text, attachmentIds, idempotencyKey) =>
+						handleCreate(text, attachmentIds, idempotencyKey).catch((err) => {
+							toast.error(t('comments.createError'));
+							// Rethrow so the composer keeps the draft and its idempotency key.
+							throw err;
+						})
+					}
+					onUpload={handleUpload}
+					onCancelAttachment={(id) => svc.deleteAttachment(id)}
+					participants={participants}
+				/>
+			</ComposerDock>
 		</ThreadRoot>
 	);
 };
@@ -255,10 +307,14 @@ const ErrorState = styled.div`
 const List = styled.div`
 	display: flex;
 	flex-direction: column;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.large};
-	overflow: hidden;
-	background-color: ${({ theme }) => theme.colors.background.card};
+`;
+
+const ComposerDock = styled.div`
+	position: sticky;
+	bottom: 0;
+	padding: 0.75rem 0;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	background-color: ${({ theme }) => theme.colors.background.page};
 `;
 
 const LoadMoreRow = styled.div`

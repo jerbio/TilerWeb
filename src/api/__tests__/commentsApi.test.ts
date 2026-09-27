@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CommentsApi } from '../commentsApi';
 import { CommentTargetType } from '@/core/common/types/comment';
 
@@ -44,6 +44,11 @@ const methodOf = (call: unknown[]) => {
 	const first = call[0];
 	const options = call[1] as RequestInit | undefined;
 	return (first instanceof Request ? first.method : options?.method) ?? 'GET';
+};
+
+const requestOf = (call: unknown[]) => {
+	const first = call[0];
+	return first instanceof Request ? first : new Request(String(first), call[1] as RequestInit);
 };
 
 describe('CommentsApi', () => {
@@ -164,6 +169,139 @@ describe('CommentsApi', () => {
 			expect(url).toContain('api/Comments?id=Comment%2Babc');
 			expect(url).not.toContain('api/Comments/');
 			expect(methodOf(call)).toBe('DELETE');
+		});
+	});
+
+	describe('getParticipants', () => {
+		it('requests the participants for a target', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				json(
+					envelope({ participants: [{ id: 'u1', displayName: 'Ada', isViewer: false }] })
+				)
+			);
+			const res = await api.getParticipants({
+				targetType: 'tileshare_tilette',
+				targetId: 't1',
+			});
+			const url = urlOf(fetchSpy.mock.calls[0]);
+			expect(url).toContain('api/Comments/participants');
+			expect(url).toContain('targetType=tileshare_tilette');
+			expect(url).toContain('targetId=t1');
+			expect(res.Content.participants).toHaveLength(1);
+		});
+	});
+
+	describe('attachments', () => {
+		const attachment = {
+			id: '01HATTACH',
+			fileName: 'a.pdf',
+			contentType: 'application/pdf',
+			byteSize: 3,
+			state: 'ready',
+		};
+
+		class FakeXhr {
+			static last: FakeXhr;
+			upload: { onprogress: ((e: Partial<ProgressEvent>) => void) | null } = {
+				onprogress: null,
+			};
+			onload: (() => void) | null = null;
+			onerror: (() => void) | null = null;
+			withCredentials = false;
+			status = 0;
+			responseText = '';
+			method = '';
+			url = '';
+			body: unknown;
+			open(method: string, url: string) {
+				this.method = method;
+				this.url = url;
+			}
+			send(body: unknown) {
+				this.body = body;
+				FakeXhr.last = this;
+			}
+			respond(status: number, text: string) {
+				this.status = status;
+				this.responseText = text;
+				this.onload?.();
+			}
+		}
+
+		const upload = (onProgress?: (fraction: number) => void) =>
+			api.uploadAttachment(
+				{
+					targetType: 'tileshare_tilette',
+					targetId: 't1',
+					retryKey: 'rk-1',
+					file: new File(['abc'], 'a.pdf', { type: 'application/pdf' }),
+				},
+				onProgress
+			);
+
+		beforeEach(() => {
+			vi.stubGlobal('XMLHttpRequest', FakeXhr);
+		});
+
+		afterEach(() => {
+			vi.unstubAllGlobals();
+		});
+
+		it('uploads multipart with credentials, the file part last, and reports progress', async () => {
+			const onProgress = vi.fn();
+			const pending = upload(onProgress);
+			const xhr = FakeXhr.last;
+
+			expect(xhr.method).toBe('POST');
+			expect(xhr.url).toContain('api/CommentAttachments');
+			expect(xhr.withCredentials).toBe(true);
+			const form = xhr.body as FormData;
+			expect(Array.from(form.keys())).toEqual(['targetType', 'targetId', 'retryKey', 'file']);
+			expect(form.get('retryKey')).toBe('rk-1');
+
+			xhr.upload.onprogress?.({ lengthComputable: true, loaded: 1, total: 4 });
+			expect(onProgress).toHaveBeenLastCalledWith(0.25);
+
+			xhr.respond(200, envelope({ attachment }));
+			const res = await pending;
+			expect(res.Content.attachment).toEqual(attachment);
+		});
+
+		it('rejects with the server error envelope on a failed upload', async () => {
+			const pending = upload();
+			FakeXhr.last.respond(
+				400,
+				JSON.stringify({ Error: { Code: '400', Message: 'bad' }, Content: null })
+			);
+			await expect(pending).rejects.toMatchObject({ Error: { Code: '400' } });
+		});
+
+		it('rejects on a network error', async () => {
+			const pending = upload();
+			FakeXhr.last.onerror?.();
+			await expect(pending).rejects.toThrow();
+		});
+
+		it('cancels an attachment with DELETE', async () => {
+			fetchSpy.mockResolvedValueOnce(json(envelope({ id: '01HATTACH' })));
+			await api.deleteAttachment('01HATTACH');
+			const call = fetchSpy.mock.calls[0];
+			expect(urlOf(call)).toContain('api/CommentAttachments/01HATTACH');
+			expect(methodOf(call)).toBe('DELETE');
+		});
+
+		it('downloads the file as a blob with credentials', async () => {
+			fetchSpy.mockResolvedValueOnce(new Response('abc', { status: 200 }));
+			const blob = await api.downloadAttachment('01HATTACH');
+			const call = fetchSpy.mock.calls[0];
+			expect(urlOf(call)).toContain('api/CommentAttachments/01HATTACH/download');
+			expect(requestOf(call).credentials).toBe('include');
+			expect(blob.size).toBe(3);
+		});
+
+		it('rejects a failed download', async () => {
+			fetchSpy.mockResolvedValueOnce(new Response('', { status: 404 }));
+			await expect(api.downloadAttachment('01HATTACH')).rejects.toThrow();
 		});
 	});
 });

@@ -1,14 +1,32 @@
 import { CommentsApi } from '@/api/commentsApi';
 import {
+	ALLOWED_ATTACHMENT_EXTENSIONS,
+	AttachmentView,
+	CommentParticipant,
 	CommentView,
 	CreateCommentParams,
 	DeleteCommentParams,
 	GetCommentsParams,
+	GetParticipantsParams,
 	GetRepliesParams,
+	MAX_ATTACHMENT_BYTES,
 	UpdateCommentParams,
+	UploadAttachmentParams,
 } from '@/core/common/types/comment';
 import { normalizeError } from '@/core/error';
 import { TilerResponseError } from '@/core/common/types/errors';
+
+export type AttachmentValidationError = 'type' | 'size' | 'empty';
+
+/** Client-side pre-check against the server allowlist; the server still validates and scans. */
+export function validateAttachmentFile(file: File): AttachmentValidationError | null {
+	const dot = file.name.lastIndexOf('.');
+	const ext = dot > 0 ? file.name.slice(dot + 1).toLowerCase() : '';
+	if (!(ALLOWED_ATTACHMENT_EXTENSIONS as readonly string[]).includes(ext)) return 'type';
+	if (file.size === 0) return 'empty';
+	if (file.size > MAX_ATTACHMENT_BYTES) return 'size';
+	return null;
+}
 
 /**
  * Generates a UUID idempotency key for safe comment retries. Uses
@@ -84,6 +102,20 @@ class CommentsService {
 	 * Fetches a page of replies under a single root comment (two-level thread).
 	 * Returns the unwrapped content: `{ comments, nextCursor, total }`.
 	 */
+	/** People who can read the target; only they can be mentioned. */
+	async getParticipants(params: GetParticipantsParams): Promise<CommentParticipant[]> {
+		try {
+			const res = await this.api.getParticipants(params);
+			if (res.Error && res.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
+			}
+			return res.Content.participants ?? [];
+		} catch (error) {
+			console.error('Error fetching comment participants', error);
+			throw normalizeError(error);
+		}
+	}
+
 	async getReplies(rootCommentId: string, params: GetRepliesParams = {}) {
 		try {
 			const res = await this.api.getReplies(rootCommentId, params);
@@ -152,6 +184,47 @@ class CommentsService {
 				}
 			}
 		);
+	}
+
+	/** Uploads one file into private quarantine; resolves with its ready (or rejected) metadata. */
+	async uploadAttachment(
+		params: UploadAttachmentParams,
+		onProgress?: (fraction: number) => void
+	): Promise<AttachmentView> {
+		return withSingleFlight(`attachment:upload:${params.retryKey}`, async () => {
+			try {
+				const res = await this.api.uploadAttachment(params, onProgress);
+				if (res.Error && res.Error.Code !== '0') {
+					throw TilerResponseError.fromApiCodeResponse(res.Error);
+				}
+				return res.Content.attachment;
+			} catch (error) {
+				console.error('Error uploading attachment', error);
+				throw normalizeError(error);
+			}
+		});
+	}
+
+	/** Cancels the uploader's own unclaimed attachment. */
+	async deleteAttachment(attachmentId: string): Promise<void> {
+		try {
+			const res = await this.api.deleteAttachment(attachmentId);
+			if (res.Error && res.Error.Code !== '0') {
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
+			}
+		} catch (error) {
+			console.error('Error cancelling attachment', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async downloadAttachment(attachmentId: string): Promise<Blob> {
+		try {
+			return await this.api.downloadAttachment(attachmentId);
+		} catch (error) {
+			console.error('Error downloading attachment', error);
+			throw normalizeError(error);
+		}
 	}
 }
 

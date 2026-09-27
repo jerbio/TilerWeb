@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import CommentsService, { generateIdempotencyKey } from '../commentsService';
+import CommentsService, {
+	generateIdempotencyKey,
+	validateAttachmentFile,
+} from '../commentsService';
+import { MAX_ATTACHMENT_BYTES } from '@/core/common/types/comment';
 import type { CommentsApi } from '@/api/commentsApi';
 
 const ok = (content: unknown) => ({
@@ -197,6 +201,80 @@ describe('CommentsService', () => {
 			await svc.deleteComment('c1', { idempotencyKey: 'k' });
 
 			expect(apiMock.deleteComment).toHaveBeenCalledWith('c1', { idempotencyKey: 'k' });
+		});
+	});
+
+	describe('attachments', () => {
+		const attachment = {
+			id: 'a1',
+			fileName: 'a.pdf',
+			contentType: 'application/pdf',
+			byteSize: 3,
+			state: 'ready',
+		};
+		const file = new File(['abc'], 'a.pdf', { type: 'application/pdf' });
+
+		it('uploads and unwraps the attachment, forwarding progress', async () => {
+			const apiMock = {
+				uploadAttachment: vi.fn().mockResolvedValue(ok({ attachment })),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+			const params = { targetType: 'tileshare_tilette', targetId: 't', retryKey: 'rk', file };
+			const onProgress = vi.fn();
+
+			const res = await svc.uploadAttachment(params, onProgress);
+
+			expect(apiMock.uploadAttachment).toHaveBeenCalledWith(params, onProgress);
+			expect(res).toEqual(attachment);
+		});
+
+		it('rejects an upload the server answers with an error code', async () => {
+			const apiMock = {
+				uploadAttachment: vi.fn().mockResolvedValue(fail),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+			await expect(
+				svc.uploadAttachment({ targetType: 'x', targetId: 'y', retryKey: 'rk', file })
+			).rejects.toThrow();
+		});
+
+		it('forwards cancel to the api', async () => {
+			const apiMock = {
+				deleteAttachment: vi.fn().mockResolvedValue(ok({ id: 'a1' })),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+			await svc.deleteAttachment('a1');
+			expect(apiMock.deleteAttachment).toHaveBeenCalledWith('a1');
+		});
+	});
+
+	describe('getParticipants', () => {
+		it('returns the unwrapped participant list', async () => {
+			const participants = [{ id: 'u1', displayName: 'Ada', isViewer: false }];
+			const apiMock = {
+				getParticipants: vi.fn().mockResolvedValue(ok({ participants })),
+			} as unknown as CommentsApi;
+			const svc = new CommentsService(apiMock);
+			expect(await svc.getParticipants({ targetType: 'x', targetId: 'y' })).toEqual(
+				participants
+			);
+		});
+	});
+
+	describe('validateAttachmentFile', () => {
+		it('accepts the allowlisted types within the size limit', () => {
+			for (const name of ['a.pdf', 'b.docx', 'c.png', 'd.jpg', 'e.JPEG']) {
+				expect(validateAttachmentFile(new File(['x'], name))).toBeNull();
+			}
+		});
+
+		it('rejects other types, empty files and oversize files', () => {
+			expect(validateAttachmentFile(new File(['x'], 'a.exe'))).toBe('type');
+			expect(validateAttachmentFile(new File(['x'], 'noext'))).toBe('type');
+			expect(validateAttachmentFile(new File([], 'a.pdf'))).toBe('empty');
+			const big = new File(['x'], 'big.pdf');
+			Object.defineProperty(big, 'size', { value: MAX_ATTACHMENT_BYTES + 1 });
+			expect(validateAttachmentFile(big)).toBe('size');
 		});
 	});
 

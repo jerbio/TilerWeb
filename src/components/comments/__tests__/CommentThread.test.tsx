@@ -45,6 +45,10 @@ const makeService = (impl: {
 	createComment?: ReturnType<typeof vi.fn>;
 	updateComment?: ReturnType<typeof vi.fn>;
 	deleteComment?: ReturnType<typeof vi.fn>;
+	uploadAttachment?: ReturnType<typeof vi.fn>;
+	deleteAttachment?: ReturnType<typeof vi.fn>;
+	downloadAttachment?: ReturnType<typeof vi.fn>;
+	getParticipants?: ReturnType<typeof vi.fn>;
 }) =>
 	({
 		getComments: impl.getComments,
@@ -52,6 +56,10 @@ const makeService = (impl: {
 		createComment: impl.createComment ?? vi.fn(),
 		updateComment: impl.updateComment ?? vi.fn(),
 		deleteComment: impl.deleteComment ?? vi.fn(),
+		uploadAttachment: impl.uploadAttachment ?? vi.fn(),
+		deleteAttachment: impl.deleteAttachment ?? vi.fn(),
+		downloadAttachment: impl.downloadAttachment ?? vi.fn(),
+		getParticipants: impl.getParticipants ?? vi.fn().mockResolvedValue([]),
 	}) as unknown as CommentsService;
 
 describe('CommentThread', () => {
@@ -190,6 +198,7 @@ describe('CommentThread — two-level replies', () => {
 			targetId: 't',
 			text: 'hello',
 			rootCommentId: 'c1',
+			mentionedUserIds: [],
 		});
 		expect(typeof args.idempotencyKey).toBe('string');
 		// On success the composer closes and the created reply renders inline.
@@ -294,5 +303,146 @@ describe('CommentThread — two-level replies', () => {
 			expect.objectContaining({ cursor: 'rc1', limit: 50 })
 		);
 		expect(screen.queryByTestId('comment-replies-load-more')).not.toBeInTheDocument();
+	});
+});
+
+describe('CommentThread — attachments', () => {
+	const empty = () => vi.fn().mockResolvedValue({ comments: [], nextCursor: null, total: 0 });
+
+	it('renders attachment cards and downloads through the service', async () => {
+		const user = setupUser();
+		URL.createObjectURL = vi.fn(() => 'blob:mock');
+		URL.revokeObjectURL = vi.fn();
+		const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+		const downloadAttachment = vi.fn().mockResolvedValue(new Blob(['x']));
+		const service = makeService({
+			getComments: vi.fn().mockResolvedValue({
+				comments: [
+					comment('c1', 'see file', {
+						attachments: [
+							{
+								id: 'a1',
+								fileName: 'plan.pdf',
+								contentType: 'application/pdf',
+								byteSize: 2048,
+								state: 'attached',
+							},
+						],
+					}),
+				],
+				nextCursor: null,
+				total: 1,
+			}),
+			downloadAttachment,
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+
+		expect(await screen.findByText('plan.pdf')).toBeInTheDocument();
+		await user.click(screen.getByTestId('comment-attachment-download'));
+
+		expect(downloadAttachment).toHaveBeenCalledWith('a1');
+		expect(click).toHaveBeenCalled();
+		click.mockRestore();
+	});
+
+	it('sends uploaded attachment ids when creating a comment', async () => {
+		const user = setupUser();
+		const createComment = vi.fn().mockResolvedValue(comment('c9', 'with file'));
+		const service = makeService({
+			getComments: empty(),
+			createComment,
+			uploadAttachment: vi.fn().mockResolvedValue({
+				id: 'a1',
+				fileName: 'a.pdf',
+				contentType: 'application/pdf',
+				byteSize: 3,
+				state: 'ready',
+			}),
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+		await screen.findByTestId('comment-empty');
+
+		await user.upload(
+			screen.getByTestId('comment-attach-input'),
+			new File(['abc'], 'a.pdf', { type: 'application/pdf' })
+		);
+		await screen.findByText('a.pdf');
+		await user.type(screen.getByTestId('comment-composer-input'), 'with file');
+		await user.click(screen.getByTestId('comment-composer-submit'));
+
+		expect(createComment).toHaveBeenCalledWith(
+			expect.objectContaining({ text: 'with file', attachmentIds: ['a1'] })
+		);
+	});
+
+	it('sends the ids of mentioned people when creating a comment', async () => {
+		const user = setupUser();
+		const createComment = vi.fn().mockResolvedValue(comment('c9', 'hi <@u-ada>'));
+		const service = makeService({
+			getComments: empty(),
+			createComment,
+			getParticipants: vi
+				.fn()
+				.mockResolvedValue([{ id: 'u-ada', displayName: 'Ada Okafor', isViewer: false }]),
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+		await screen.findByTestId('comment-empty');
+
+		await user.type(screen.getByTestId('comment-composer-input'), 'hi @ad');
+		await screen.findByRole('option', { name: 'Ada Okafor' });
+		await user.keyboard('{Enter}');
+		await user.click(screen.getByTestId('comment-composer-submit'));
+
+		expect(createComment).toHaveBeenCalledWith(
+			expect.objectContaining({ text: 'hi <@u-ada>', mentionedUserIds: ['u-ada'] })
+		);
+	});
+
+	it('sends the ids of people still mentioned after an edit', async () => {
+		const user = setupUser();
+		const updateComment = vi.fn().mockResolvedValue(comment('c1', 'hi <@u-ada> again'));
+		const service = makeService({
+			getComments: vi.fn().mockResolvedValue({
+				comments: [
+					comment('c1', 'hi <@u-ada>', {
+						mentions: [{ id: 'u-ada', displayName: 'Ada Okafor', isDeleted: false }],
+					}),
+				],
+				nextCursor: null,
+				total: 1,
+			}),
+			updateComment,
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+		await user.click(await screen.findByRole('button', { name: 'comments.edit' }));
+		await user.type(screen.getByTestId('comment-edit-input'), ' again');
+		await user.click(screen.getByTestId('comment-edit-save'));
+
+		expect(updateComment).toHaveBeenCalledWith(
+			'c1',
+			expect.objectContaining({ text: 'hi <@u-ada> again', mentionedUserIds: ['u-ada'] })
+		);
+	});
+
+	it('keeps the draft when creating a comment fails', async () => {
+		const user = setupUser();
+		const service = makeService({
+			getComments: empty(),
+			createComment: vi.fn().mockRejectedValue(new Error('boom')),
+		});
+
+		render(<CommentThread targetType="tileshare_tilette" targetId="t" service={service} />);
+		await screen.findByTestId('comment-empty');
+
+		const input = screen.getByTestId('comment-composer-input') as HTMLTextAreaElement;
+		await user.type(input, 'keep me');
+		await user.click(screen.getByTestId('comment-composer-submit'));
+
+		expect(service.createComment).toHaveBeenCalledTimes(1);
+		expect(input.value).toBe('keep me');
 	});
 });
