@@ -8,6 +8,11 @@ export const lightTheme: AppTheme = {
 			default: 'rgba(0, 0, 0, 0.5)',
 			glass: '#f0f0f0a7',
 		},
+		avatar: {
+			background: palette.colors.gray[200],
+			border: palette.colors.gray[400],
+			text: palette.colors.gray[900],
+		},
 		// Text colors
 		text: {
 			primary: palette.colors.gray[900],
@@ -15,6 +20,8 @@ export const lightTheme: AppTheme = {
 			muted: palette.colors.gray[500],
 			inverse: palette.colors.white,
 			error: palette.colors.error[600],
+			success: palette.colors.success[700],
+			warning: palette.colors.warning[700],
 		},
 		// Background colors
 		background: {

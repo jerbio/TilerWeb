@@ -63,6 +63,32 @@ const mockDesignatedTile = {
 };
 
 describe('TileshareService', () => {
+	it('requests a combined server page with ownership and deadline ordering', async () => {
+		const getClusters = vi
+			.fn()
+			.mockResolvedValue({ Content: { clusters: [mockCluster] }, Error: { Code: '0' } });
+		const service = new TileshareService({ getClusters } as unknown as TileshareApi);
+		expect(
+			await service.getClusters({
+				page: 2,
+				pageSize: 20,
+				createdByMe: true,
+				sortBy: 'Deadline',
+				sortOrder: 'asc',
+			})
+		).toEqual([mockCluster]);
+		expect(getClusters).toHaveBeenCalledWith({
+			IncludeCreated: true,
+			IsOutbox: true,
+			Index: 20,
+			PageSize: 20,
+			SortBy: 'Deadline',
+			SortOrder: 'asc',
+		});
+		await service.getClusters();
+		expect(getClusters).toHaveBeenLastCalledWith({ IncludeCreated: true, IsOutbox: false });
+	});
+
 	describe('getOutbox', () => {
 		it('returns unwrapped clusters array and passes IsOutbox param', async () => {
 			const apiMock = {

@@ -8,6 +8,11 @@ export const darkTheme: AppTheme = {
 			default: 'rgba(0, 0, 0, 0.5)',
 			glass: '#232323a7',
 		},
+		avatar: {
+			background: palette.colors.gray[800],
+			border: palette.colors.gray[600],
+			text: palette.colors.gray[200],
+		},
 		// Text colors
 		text: {
 			primary: palette.colors.gray[200],
@@ -15,6 +20,8 @@ export const darkTheme: AppTheme = {
 			muted: palette.colors.gray[500],
 			inverse: palette.colors.white,
 			error: palette.colors.error[400],
+			success: palette.colors.success[400],
+			warning: palette.colors.warning[400],
 		},
 		// Background colors
 		background: {

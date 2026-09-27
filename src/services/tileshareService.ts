@@ -28,7 +28,7 @@ function toClusterQuery(params?: ClusterPageParams): Partial<GetClustersParams> 
 	if (!params) return {};
 
 	const query: Partial<GetClustersParams> = {};
-	const { page, pageSize, sortOrder } = params;
+	const { page, pageSize, sortOrder, sortBy } = params;
 
 	if (pageSize !== undefined) query.PageSize = pageSize;
 	if (page !== undefined) {
@@ -36,6 +36,7 @@ function toClusterQuery(params?: ClusterPageParams): Partial<GetClustersParams> 
 		query.Index = Math.max(0, (page - 1) * size);
 	}
 	if (sortOrder !== undefined) query.SortOrder = sortOrder;
+	if (sortBy !== undefined) query.SortBy = sortBy;
 
 	return query;
 }
@@ -97,6 +98,21 @@ class TileshareService {
 
 	constructor(api: TileshareApi) {
 		this.api = api;
+	}
+
+	async getClusters(params?: ClusterPageParams) {
+		try {
+			const res = await this.api.getClusters({
+				IncludeCreated: true,
+				IsOutbox: params?.createdByMe ?? false,
+				...toClusterQuery(params),
+			});
+			if (res.Error && res.Error.Code !== '0')
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
+			return res.Content.clusters;
+		} catch (error) {
+			throw normalizeError(error);
+		}
 	}
 
 	async getOutboxClusters(params?: ClusterPageParams) {

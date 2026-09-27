@@ -321,15 +321,20 @@ const useAppStore = create<AppState>()((set, get) => {
 					// Re-create the authenticated persona session so Chat/Calendar work after reload
 					get().setAuthenticated(user);
 
-					// Fetch feature flags — fire-and-forget, failure leaves flags at defaults (all off)
-					featureFlagApi
-						.getFlags()
-						.then((res) => {
-							if (res?.Content?.flags) {
-								get().setFeatureFlags(res.Content.flags);
-							}
-						})
-						.catch(() => {});
+					// Fetch feature flags and await them before clearing isAuthLoading.
+					// Guards (ProtectedRoute / FlaggedRoute) gate on isAuthLoading; if it were
+					// cleared before the flags arrive, FlaggedRoute would read the flag as off
+					// and bounce the user to its redirectTo (e.g. /timeline) on a hard refresh.
+					// Failure still leaves flags at defaults (all off), and we always clear
+					// isAuthLoading below so the app doesn't hang on the loader.
+					try {
+						const res = await featureFlagApi.getFlags();
+						if (res?.Content?.flags) {
+							get().setFeatureFlags(res.Content.flags);
+						}
+					} catch {
+						// Ignore flag-fetch failure; flags remain at defaults (all off).
+					}
 
 					set({ isAuthLoading: false });
 				} else {

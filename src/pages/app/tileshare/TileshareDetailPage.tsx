@@ -1,3 +1,9 @@
+import TiletteRsvpStatus, {
+	TileShareViewerContext,
+} from '@/components/tileshare/TiletteRsvpStatus';
+import TiletteInvitationActions, {
+	TiletteInvitationRefreshContext,
+} from '@/components/tileshare/TiletteInvitationActions';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +27,8 @@ import EditTileshareModal, {
 } from '@/components/tileshare/detail/EditTileshareModal';
 import DeleteClusterDialog from '@/components/tileshare/detail/DeleteClusterDialog';
 import TiletteCreate from '@/components/tileshare/TiletteCreate';
+import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
+import { TileShareTemplate } from '@/core/common/types/tileshare';
 
 const TileshareDetailPage: React.FC = () => {
 	const { t } = useTranslation();
@@ -118,64 +126,88 @@ const TileshareDetailPage: React.FC = () => {
 	}
 
 	return (
-		<TileShareDetailLayout ClusterId={id}>
-			<Container>
-				<TileshareDetailBreadcrumb current={cluster?.name ?? ''} loading={loading} />
-				{loading ? (
-					<DetailHeaderSkeleton />
-				) : error || !cluster ? (
-					<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
-				) : (
-					<>
-						{cluster.isMultiTilette ? (
+		<TileShareViewerContext.Provider value={{ isOwner, viewerId: user?.id ?? null }}>
+			<TiletteInvitationRefreshContext.Provider value={refresh}>
+				<TileShareDetailLayout ClusterId={id}>
+					<Container>
+						<TileshareDetailBreadcrumb
+							current={cluster?.name ?? ''}
+							loading={loading}
+						/>
+						{loading ? (
+							<DetailHeaderSkeleton />
+						) : error || !cluster ? (
+							<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
+						) : (
 							<>
-								<MultiTileshareHeader
-									name={cluster.name}
-									description={cluster.notes}
-									progress={computeClusterProgress(data?.tilettes ?? null)}
-									date={cluster.end}
-									onEdit={isOwner ? () => setEditing(true) : undefined}
-									onAdd={isOwner ? () => setAdding(true) : undefined}
-									onDelete={isOwner ? () => setConfirmingDelete(true) : undefined}
+								{cluster.isMultiTilette ? (
+									<>
+										<MultiTileshareHeader
+											name={cluster.name}
+											description={cluster.notes}
+											progress={computeClusterProgress(
+												data?.tilettes ?? null
+											)}
+											date={cluster.end}
+											onEdit={isOwner ? () => setEditing(true) : undefined}
+											onAdd={isOwner ? () => setAdding(true) : undefined}
+											onDelete={
+												isOwner
+													? () => setConfirmingDelete(true)
+													: undefined
+											}
+										/>
+										<TiletteBody
+											clusterId={cluster.id ?? ''}
+											tilettes={data?.tilettes ?? []}
+										/>
+									</>
+								) : (
+									<SingleTileshareHeader
+										name={cluster.name}
+										description={cluster.notes}
+										dueDate={cluster.end}
+										onEdit={isOwner ? () => setEditing(true) : undefined}
+										onDelete={
+											isOwner ? () => setConfirmingDelete(true) : undefined
+										}
+									/>
+								)}
+
+								{!cluster.isMultiTilette &&
+									data?.tilettes.map((tilette) => (
+										<SingleTiletteResponse
+											key={tilette.id}
+											tilette={tilette}
+											clusterId={cluster.id ?? ''}
+										/>
+									))}
+
+								<EditTileshareModal
+									show={editing}
+									setShow={setEditing}
+									headerText={t('tilesharedemo.detail.edit.clusterTitle')}
+									initial={{
+										name: cluster.name,
+										description: cluster.notes,
+										dueDate: cluster.end,
+									}}
+									saving={saving}
+									onSubmit={handleSave}
 								/>
-								<TiletteBody
-									clusterId={cluster.id ?? ''}
-									tilettes={data?.tilettes ?? []}
+								<DeleteClusterDialog
+									show={confirmingDelete}
+									setShow={setConfirmingDelete}
+									name={cluster.name ?? ''}
+									deleting={deleting}
+									onConfirm={handleDelete}
 								/>
 							</>
-						) : (
-							<SingleTileshareHeader
-								name={cluster.name}
-								description={cluster.notes}
-								dueDate={cluster.end}
-								onEdit={isOwner ? () => setEditing(true) : undefined}
-								onDelete={isOwner ? () => setConfirmingDelete(true) : undefined}
-							/>
 						)}
-
-						<EditTileshareModal
-							show={editing}
-							setShow={setEditing}
-							headerText={t('tilesharedemo.detail.edit.clusterTitle')}
-							initial={{
-								name: cluster.name,
-								description: cluster.notes,
-								dueDate: cluster.end,
-							}}
-							saving={saving}
-							onSubmit={handleSave}
-						/>
-						<DeleteClusterDialog
-							show={confirmingDelete}
-							setShow={setConfirmingDelete}
-							name={cluster.name ?? ''}
-							deleting={deleting}
-							onConfirm={handleDelete}
-						/>
-					</>
-				)}
-			</Container>
-		</TileShareDetailLayout>
+					</Container>
+				</TileShareDetailLayout>
+			</TiletteInvitationRefreshContext.Provider>
+		</TileShareViewerContext.Provider>
 	);
 };
 
@@ -198,6 +230,39 @@ const Container = styled.div`
 const ErrorText = styled.p`
 	color: ${({ theme }) => theme.colors.text.secondary};
 	font-size: ${({ theme }) => theme.typography.fontSize.base};
+`;
+
+/** A single tilette's response section: badge + inline actions + a saving shimmer. */
+const SingleTiletteResponse: React.FC<{ tilette: TileShareTemplate; clusterId: string }> = ({
+	tilette,
+	clusterId,
+}) => {
+	const [saving, setSaving] = useState(false);
+	return (
+		<ResponseSection>
+			<TiletteRsvpStatus tilette={tilette} embedded />
+			<TiletteInvitationActions
+				tilette={tilette}
+				clusterId={clusterId}
+				embedded
+				reportBusy={setSaving}
+			/>
+			{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
+		</ResponseSection>
+	);
+};
+
+const ResponseSection = styled.div`
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 12px 20px;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+	&:empty {
+		display: none;
+	}
 `;
 
 export default TileshareDetailPage;

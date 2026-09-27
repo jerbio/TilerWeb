@@ -1,64 +1,51 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ArrowUpRight, CalendarCheck2 } from 'lucide-react';
+import { CalendarCheck2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarUIProvider } from '@/core/common/components/calendar/calendar-ui.provider';
 import Tabs, { TabItem } from '@/core/common/components/Tabs';
 import TileshareToolbar from '@/components/tileshare/TileshareToolbar';
 import TileshareCreate, { TileshareMode } from '@/components/tileshare/TileshareCreate';
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { Routes } from '@/core/constants/routes';
+import TileShareActivityTimeline from '@/components/tileshare/TileShareActivityTimeline';
 import { useAuth } from '@/core/auth/useAuth';
-
-export enum TileshareTab {
-	Active = 'active',
-	Sent = 'sent',
-	Activity = 'activity',
-}
 
 const TileshareDashboardPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const { user } = useAuth();
-	const [activeTab, setActiveTab] = useState<TileshareTab>(TileshareTab.Active);
+	const [params, setParams] = useSearchParams();
+	const expanded = params.get('activities') === '1';
+	const activeTab = pathname === Routes.Tileshare.invitations ? 'invitations' : 'projects';
+	const toggleActivities = () =>
+		setParams((previous) => {
+			const next = new URLSearchParams(previous);
+			if (expanded) next.delete('activities');
+			else next.set('activities', '1');
+			return next;
+		});
 	const [createMode, setCreateMode] = useState<TileshareMode | null>(null);
-
-	useEffect(() => {
-		if (pathname.endsWith(Routes.Tileshare.active)) {
-			setActiveTab(TileshareTab.Active);
-		} else if (pathname.endsWith(Routes.Tileshare.sent)) {
-			setActiveTab(TileshareTab.Sent);
-		} else if (pathname.endsWith(Routes.Tileshare.activity)) {
-			setActiveTab(TileshareTab.Activity);
-		}
-	}, [pathname]);
 
 	const tabs = useMemo<TabItem[]>(
 		() => [
-			{ id: TileshareTab.Activity, label: t('tileshareActivity.title', 'Activities') },
 			{
-				id: TileshareTab.Active,
-				label: t('tilesharedemo.dashboard.nav.active'),
+				id: 'projects',
+				label: t('tileshareList.title', 'TileShares'),
 				icon: <CalendarCheck2 size={16} />,
 			},
-			{
-				id: TileshareTab.Sent,
-				label: t('tilesharedemo.dashboard.nav.sent'),
-				icon: <ArrowUpRight size={16} />,
-			},
+			{ id: 'invitations', label: t('tileshareInvitations.title', 'Invitations') },
 		],
 		[t]
 	);
-
 	const tabRoutes: Record<string, string> = {
-		active: Routes.Tileshare.active,
-		sent: Routes.Tileshare.sent,
-		activity: Routes.Tileshare.activity,
+		projects: Routes.Tileshare.list,
+		invitations: Routes.Tileshare.invitations,
 	};
 
 	const handleTabChange = (id: string) => {
-		if (tabRoutes[id]) navigate(tabRoutes[id]);
+		if (tabRoutes[id]) navigate(tabRoutes[id] + (expanded ? '?activities=1' : ''));
 	};
 
 	const handleSelectSingle = () => setCreateMode(TileshareMode.Single);
@@ -72,7 +59,7 @@ const TileshareDashboardPage: React.FC = () => {
 						mode={createMode}
 						onBack={() => {
 							setCreateMode(null);
-							navigate(Routes.Tileshare.sent);
+							navigate(Routes.Tileshare.list);
 						}}
 					/>
 				) : (
@@ -88,11 +75,29 @@ const TileshareDashboardPage: React.FC = () => {
 								value={activeTab}
 								onChange={handleTabChange}
 								aria-label={t('tilesharedemo.dashboard.title')}
-								stretch
 							/>
+							<ActivityToggle
+								type="button"
+								aria-expanded={expanded}
+								aria-controls="dashboard-activities"
+								onClick={toggleActivities}
+							>
+								{expanded ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+								{t('tileshareActivity.title', 'Activities')}
+							</ActivityToggle>
 						</Header>
-						<Main>
-							<Outlet />
+						<Main $expanded={expanded}>
+							<Content>
+								<Outlet />
+							</Content>
+							{expanded && (
+								<ActivityPanel
+									id="dashboard-activities"
+									aria-label={t('tileshareActivity.title', 'Activities')}
+								>
+									<TileShareActivityTimeline />
+								</ActivityPanel>
+							)}
 						</Main>
 					</>
 				)}
@@ -115,13 +120,47 @@ const StyledToolbar = styled(TileshareToolbar)`
 `;
 
 const Header = styled.header`
+	gap: 1rem;
+	flex-wrap: wrap;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 1.5rem 1.5rem 1rem;
 `;
 
-const Main = styled.main`
+const Content = styled.div`
+	min-width: 0;
+`;
+const ActivityToggle = styled.button`
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
+	cursor: pointer;
+	padding: 10px;
+	border-radius: 8px;
+	background: ${({ theme }) => theme.colors.button.primary.bg};
+	color: ${({ theme }) => theme.colors.button.primary.text};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+`;
+const ActivityPanel = styled.aside`
+	min-width: 0;
+	padding-left: 1.5rem;
+	border-left: 1px solid ${({ theme }) => theme.colors.border.default};
+	@media (max-width: 960px) {
+		padding: 1.5rem 0 0;
+		border-left: 0;
+		border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+	}
+`;
+const Main = styled.main<{ $expanded: boolean }>`
+	display: grid;
+	grid-template-columns: ${({ $expanded }) =>
+		$expanded ? 'minmax(0,1fr) minmax(20rem,28%)' : 'minmax(0,1fr)'};
+	gap: 1.5rem;
+	@media (max-width: 960px) {
+		grid-template-columns: minmax(0, 1fr);
+	}
 	padding: 0 1.5rem 1.5rem;
 `;
 

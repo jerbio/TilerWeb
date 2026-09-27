@@ -21,7 +21,8 @@ function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsP
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSizeState] = useState<ItemsPerPage>(defaultPageSize);
 	const [items, setItems] = useState<T[]>([]);
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<unknown>(null);
 	const [hasNext, setHasNext] = useState(false);
 
 	// Keep the latest fetcher without making it an effect dependency, so passing
@@ -38,6 +39,7 @@ function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsP
 
 		const load = async () => {
 			setLoading(true);
+			setError(null);
 			try {
 				const data = await fetchPageRef.current({ page, pageSize });
 				if (cancelled) return;
@@ -56,6 +58,7 @@ function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsP
 			} catch (error) {
 				if (cancelled) return;
 				console.error('Error fetching paginated data', error);
+				setError(error);
 				setItems([]);
 				setHasNext(false);
 			} finally {
@@ -76,7 +79,7 @@ function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsP
 		setPage(1);
 	};
 
-	return { items, page, setPage, pageSize, setPageSize, hasNext, loading };
+	return { items, page, setPage, pageSize, setPageSize, hasNext, loading, error };
 }
 
 export default useServerPagination;

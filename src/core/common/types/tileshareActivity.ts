@@ -7,6 +7,7 @@ export interface TileShareActivity {
 	assignmentId?: string;
 	actorId?: string;
 	actorName?: string;
+	tiletteTitle?: string;
 	clusterTitle?: string;
 	ownerId?: string;
 	targetUserId?: string;
@@ -17,6 +18,7 @@ export interface TileShareActivity {
 		changedFields?: string[];
 		initialTiletteCount?: number;
 		channel?: string;
+		calendarEventId?: string;
 	};
 }
 
@@ -32,6 +34,7 @@ export interface TileShareActivityScope {
 }
 
 export interface TileShareActivityQuery extends TileShareActivityScope {
+	DismissedOnly?: boolean;
 	EventType?: string;
 	PageSize?: number;
 	Cursor?: string;

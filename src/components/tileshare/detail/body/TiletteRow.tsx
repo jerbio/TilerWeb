@@ -1,4 +1,7 @@
-import React from 'react';
+import TiletteRsvpStatus from '@/components/tileshare/TiletteRsvpStatus';
+import TiletteInvitationActions from '@/components/tileshare/TiletteInvitationActions';
+import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -24,9 +27,11 @@ const TiletteRow: React.FC<TiletteRowProps> = ({ tilette, clusterId }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
 	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
+	// Shimmer the whole card while an RSVP response is saving in place.
+	const [saving, setSaving] = useState(false);
 
 	return (
-		<Card $darkmode={isDarkMode}>
+		<Card $darkmode={isDarkMode} aria-busy={saving || undefined}>
 			<TopRow>
 				<IconBox $bg={surface.background} $fg={surface.foreground}>
 					<TiletteIcon size={18} />
@@ -42,16 +47,26 @@ const TiletteRow: React.FC<TiletteRowProps> = ({ tilette, clusterId }) => {
 			<Divider />
 			<BottomRow>
 				<StatusGroup>
-					<StatusLabel>{t('tilesharedemo.detail.statusLabel')}</StatusLabel>
 					<TiletteStatus status={deriveTileletteStatus(tilette)} />
 				</StatusGroup>
 				<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={28} />
 			</BottomRow>
+			<RsvpRow>
+				<TiletteRsvpStatus tilette={tilette} embedded />
+				<TiletteInvitationActions
+					tilette={tilette}
+					clusterId={clusterId}
+					embedded
+					reportBusy={setSaving}
+				/>
+			</RsvpRow>
+			{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
 		</Card>
 	);
 };
 
 const Card = styled.div<{ $darkmode: boolean }>`
+	position: relative;
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	overflow: hidden;
@@ -127,9 +142,17 @@ const StatusGroup = styled.div`
 	gap: 0.5rem;
 `;
 
-const StatusLabel = styled.span`
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	color: ${({ theme }) => theme.colors.text.secondary};
+/** One bordered row hosting the RSVP badge(s) and the inline invitation actions. */
+const RsvpRow = styled.div`
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 12px 20px;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+	&:empty {
+		display: none;
+	}
 `;
 
 export default TiletteRow;

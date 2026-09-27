@@ -18,7 +18,12 @@ const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee, clusterId }) 
 		</Header>
 		<Cards>
 			{assignee.tilettes.map((tilette) => (
-				<AssigneeTiletteCard key={tilette.id} tilette={tilette} clusterId={clusterId} />
+				<AssigneeTiletteCard
+					key={tilette.id}
+					tilette={tilette}
+					clusterId={clusterId}
+					assigneeId={assignee.id}
+				/>
 			))}
 		</Cards>
 	</Column>

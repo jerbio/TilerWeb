@@ -1,3 +1,9 @@
+import TiletteRsvpStatus, {
+	TileShareViewerContext,
+} from '@/components/tileshare/TiletteRsvpStatus';
+import TiletteInvitationActions, {
+	TiletteInvitationRefreshContext,
+} from '@/components/tileshare/TiletteInvitationActions';
 import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +22,7 @@ import DetailHeaderSkeleton from '@/components/tileshare/detail/DetailHeaderSkel
 import EditTileshareModal, {
 	type EditTileshareValues,
 } from '@/components/tileshare/detail/EditTileshareModal';
+import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
 
 const TiletteDetailPage: React.FC = () => {
 	const { t } = useTranslation();
@@ -26,6 +33,8 @@ const TiletteDetailPage: React.FC = () => {
 	const updateNotification = useUiStore((s) => s.notification.update);
 	const [editing, setEditing] = useState(false);
 	const [saving, setSaving] = useState(false);
+	// Shimmer the detail section while an RSVP response is saving in place.
+	const [rsvpSaving, setRsvpSaving] = useState(false);
 	// The tilette lives under a multi cluster (this route's :id) — resolve the
 	// parent's name for the breadcrumb and the "In: {cluster}" header subtitle.
 	const { data: cluster, loading: clusterLoading } = useClusterHeader(clusterId ?? null);
@@ -66,42 +75,65 @@ const TiletteDetailPage: React.FC = () => {
 	};
 
 	return (
-		<TileShareDetailLayout ClusterId={tiletteId ? clusterId : undefined} TiletteId={tiletteId}>
-			<Container>
-				<TileshareDetailBreadcrumb
-					current={tilette?.name ?? ''}
-					parent={parent}
-					loading={loading || clusterLoading}
-				/>
-				{loading ? (
-					<DetailHeaderSkeleton />
-				) : error || !tilette ? (
-					<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
-				) : (
-					<>
-						<SingleTileshareHeader
-							name={tilette.name}
-							description={tilette.miscData?.userNote ?? null}
-							dueDate={tilette.end}
-							subtitle={t('tilesharedemo.detail.inCluster', { name: parentName })}
-							onEdit={isOwner ? () => setEditing(true) : undefined}
+		<TileShareViewerContext.Provider value={{ isOwner, viewerId: user?.id ?? null }}>
+			<TiletteInvitationRefreshContext.Provider value={refresh}>
+				<TileShareDetailLayout
+					ClusterId={tiletteId ? clusterId : undefined}
+					TiletteId={tiletteId}
+				>
+					<Container>
+						<TileshareDetailBreadcrumb
+							current={tilette?.name ?? ''}
+							parent={parent}
+							loading={loading || clusterLoading}
 						/>
-						<EditTileshareModal
-							show={editing}
-							setShow={setEditing}
-							headerText={t('tilesharedemo.detail.edit.tiletteTitle')}
-							initial={{
-								name: tilette.name,
-								description: tilette.miscData?.userNote ?? null,
-								dueDate: tilette.end,
-							}}
-							saving={saving}
-							onSubmit={handleSave}
-						/>
-					</>
-				)}
-			</Container>
-		</TileShareDetailLayout>
+						{loading ? (
+							<DetailHeaderSkeleton />
+						) : error || !tilette ? (
+							<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
+						) : (
+							<>
+								<Detail>
+									<SingleTileshareHeader
+										name={tilette.name}
+										description={tilette.miscData?.userNote ?? null}
+										dueDate={tilette.end}
+										subtitle={t('tilesharedemo.detail.inCluster', {
+											name: parentName,
+										})}
+										onEdit={isOwner ? () => setEditing(true) : undefined}
+									/>
+									<RsvpRow>
+										<TiletteRsvpStatus tilette={tilette} embedded />
+										<TiletteInvitationActions
+											tilette={tilette}
+											clusterId={clusterId ?? ''}
+											embedded
+											reportBusy={setRsvpSaving}
+										/>
+										{rsvpSaving && (
+											<ShimmerOverlay data-testid="tilette-shimmer" />
+										)}
+									</RsvpRow>
+								</Detail>
+								<EditTileshareModal
+									show={editing}
+									setShow={setEditing}
+									headerText={t('tilesharedemo.detail.edit.tiletteTitle')}
+									initial={{
+										name: tilette.name,
+										description: tilette.miscData?.userNote ?? null,
+										dueDate: tilette.end,
+									}}
+									saving={saving}
+									onSubmit={handleSave}
+								/>
+							</>
+						)}
+					</Container>
+				</TileShareDetailLayout>
+			</TiletteInvitationRefreshContext.Provider>
+		</TileShareViewerContext.Provider>
 	);
 };
 
@@ -116,6 +148,26 @@ const Container = styled.div`
 
 	& > * {
 		flex-shrink: 0;
+	}
+`;
+
+/** Header + response section as one relative surface so the saving shimmer can cover it. */
+const Detail = styled.div`
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+`;
+/** One bordered row hosting the RSVP badge and the inline response actions. */
+const RsvpRow = styled.div`
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 12px 20px;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+	&:empty {
+		display: none;
 	}
 `;
 

@@ -1,3 +1,4 @@
+vi.mock('@/components/tileshare/TiletteInvitationActions', () => ({ default: () => null }));
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { Routes } from '@/core/constants/routes';

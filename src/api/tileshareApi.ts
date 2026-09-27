@@ -1,4 +1,8 @@
+import { InvitationStatus } from '@/core/common/types/tileshare';
 import { AppApi } from './appApi';
+import { ApiResponse } from '@/core/common/types/api';
+import { TilerResponseError } from '@/core/common/types/errors';
+import { InvitationPage, InvitationScope } from '@/core/common/types/tileshareInvitations';
 import {
 	TileShareActivityPage,
 	TileShareActivityQuery,
@@ -34,16 +38,83 @@ function buildQuery(params?: Record<string, unknown>): string {
 }
 
 export class TileshareApi extends AppApi {
-	getActivity(params: TileShareActivityQuery = {}, signal?: AbortSignal) {
+	async setActivityDismissed(eventId: string, isDismissed: boolean) {
+		const response = await this.apiRequest<ApiResponse<null>>(
+			'api/TileShare/Activity/Dismissal',
+			{
+				method: 'POST',
+				body: JSON.stringify({ EventId: eventId, IsDismissed: isDismissed }),
+			}
+		);
+		if (response.Error?.Code !== '0')
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? {
+					Code: 'invalid_response',
+					Message: 'Invalid TileShare response.',
+				}
+			);
+		return response.Content;
+	}
+
+	async getInvitations(
+		params: InvitationScope & { AfterId?: string; PageSize?: number } = {},
+		signal?: AbortSignal
+	) {
+		const response = await this.apiRequest<ApiResponse<InvitationPage>>(
+			`api/TileShare/Invitations${buildQuery(params)}`,
+			{
+				signal,
+				cache: 'no-store',
+			}
+		);
+		if (response.Error?.Code !== '0')
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? {
+					Code: 'invalid_response',
+					Message: 'Invalid TileShare response.',
+				}
+			);
+		return response.Content;
+	}
+	async respondToInvitation(
+		id: string,
+		status: InvitationStatus.Accepted | InvitationStatus.Declined
+	) {
+		const response = await this.apiRequest<ApiResponse<unknown>>('api/DesignatedTile/status', {
+			method: 'POST',
+			body: JSON.stringify({ Id: id, Status: status }),
+		});
+		if (response.Error?.Code !== '0')
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? {
+					Code: 'invalid_response',
+					Message: 'Invalid TileShare response.',
+				}
+			);
+		return response;
+	}
+
+	async getActivity(params: TileShareActivityQuery = {}, signal?: AbortSignal) {
 		const query = new URLSearchParams(
 			Object.entries(params)
 				.filter(([, value]) => value !== undefined)
 				.map(([key, value]) => [key, String(value)])
 		);
-		return this.apiRequest<TileShareActivityPage>(`api/TileShare/Activity?${query}`, {
-			signal,
-			cache: 'no-store',
-		});
+		const response = await this.apiRequest<ApiResponse<TileShareActivityPage>>(
+			`api/TileShare/Activity?${query}`,
+			{
+				signal,
+				cache: 'no-store',
+			}
+		);
+		if (response.Error?.Code !== '0')
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? {
+					Code: 'invalid_response',
+					Message: 'Invalid TileShare response.',
+				}
+			);
+		return response.Content;
 	}
 
 	getClusters(params?: GetClustersParams) {

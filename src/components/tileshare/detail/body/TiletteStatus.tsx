@@ -36,7 +36,7 @@ const Wrap = styled.span<{ $completed: boolean }>`
 	align-items: center;
 	gap: 0.375rem;
 	color: ${({ $completed, theme }) =>
-		$completed ? theme.colors.success[400] : theme.colors.warning[400]};
+		$completed ? theme.colors.text.success : theme.colors.text.warning};
 `;
 
 const Label = styled.span`

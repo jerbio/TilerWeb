@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes as BrowserRoutes, useLocation, Navigate } from 'react-router';
 import Home from './pages/Home';
@@ -33,10 +33,9 @@ import ThemeInitializer from './core/theme/ThemeInitializer';
 import NotificationToast from './core/ui/NotificationToast';
 import AppLayout from './pages/app/AppLayout';
 import TileshareDetailPage from './pages/app/tileshare/TileshareDetailPage';
-import TileShareActivityTimeline from './components/tileshare/TileShareActivityTimeline';
-import TileshareActive from './pages/app/tileshare/TileshareActive';
+import TileShareInvitations from './components/tileshare/TileShareInvitations';
+import TileshareList from './pages/app/tileshare/TileshareList';
 import TileshareInvitePage from './pages/app/tileshare/TileshareInvitePage';
-import TileshareSent from './pages/app/tileshare/TileshareSent';
 import TiletteDetailPage from './pages/app/tileshare/TiletteDetailPage';
 import TileshareDashboardPage from './pages/app/tileshare/TileShareDashboard';
 import { FlaggedRoute } from './core/auth/FlaggedRoute';
@@ -169,13 +168,42 @@ const App: React.FC = () => {
 											>
 												<Route
 													index
-													element={<Navigate to="inbox" replace />}
+													element={<Navigate to="projects" replace />}
 												/>
-												<Route path="inbox" element={<TileshareActive />} />
-												<Route path="outbox" element={<TileshareSent />} />
+												<Route
+													path="projects"
+													element={<TileshareList />}
+												/>
+												<Route
+													path="inbox"
+													element={
+														<Navigate
+															to={Routes.Tileshare.list}
+															replace
+														/>
+													}
+												/>
+												<Route
+													path="outbox"
+													element={
+														<Navigate
+															to={`${Routes.Tileshare.list}?createdByMe=1`}
+															replace
+														/>
+													}
+												/>
+												<Route
+													path="invitations"
+													element={<TileShareInvitations />}
+												/>
 												<Route
 													path="activity"
-													element={<TileShareActivityTimeline />}
+													element={
+														<Navigate
+															to={`${Routes.Tileshare.list}?activities=1`}
+															replace
+														/>
+													}
 												/>
 											</Route>
 											<Route

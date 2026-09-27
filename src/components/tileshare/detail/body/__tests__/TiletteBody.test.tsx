@@ -1,3 +1,4 @@
+vi.mock('@/components/tileshare/TiletteInvitationActions', () => ({ default: () => null }));
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, setupUser } from '@/test/test-utils';
 import type { DesignatedUser, TileShareTemplate } from '@/core/common/types/tileshare';
@@ -5,7 +6,8 @@ import TiletteBody from '../TiletteBody';
 
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
-		t: (key: string, opts?: Record<string, unknown>) => {
+		t: (key: string, opts?: Record<string, unknown> | string) => {
+			if (typeof opts === 'string') return opts;
 			if (opts && 'count' in opts) return `${key} ${opts.count}`;
 			if (opts && 'shown' in opts) return `${key} ${opts.shown}/${opts.total}`;
 			return key;

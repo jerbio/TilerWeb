@@ -37,6 +37,11 @@ export type AppTheme = {
 			default: string;
 			glass: string;
 		};
+		avatar: {
+			background: string;
+			border: string;
+			text: string;
+		};
 		// Text colors
 		text: {
 			primary: string;
@@ -44,6 +49,8 @@ export type AppTheme = {
 			muted: string;
 			inverse: string;
 			error: string;
+			success: string;
+			warning: string;
 		};
 		// Background colors
 		background: {

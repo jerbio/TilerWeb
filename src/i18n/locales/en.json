@@ -1,8 +1,92 @@
-﻿{
+{
+	"tileshareList": {
+		"title": "TileShares",
+		"createdByMe": "Created by me",
+		"sort": "Sort by",
+		"createdDesc": "Creation time: newest first",
+		"createdAsc": "Creation time: oldest first",
+		"deadlineAsc": "Deadline: earliest first",
+		"deadlineDesc": "Deadline: latest first",
+		"empty": "No TileShares match this filter.",
+		"failed": "Could not load TileShares.",
+		"retry": "Retry"
+	},
+	"tileshareRsvp": {
+		"accepted": "Accepted",
+		"declined": "Declined",
+		"none": "Awaiting response",
+		"tentative": "Tentative",
+		"unknown": "Unknown response",
+		"yours": "Your response",
+		"response": "Invitation response",
+		"responses": "Invitation responses",
+		"noParticipants": "No participants",
+		"viewPeople": "View responses",
+		"participant": "Participant"
+	},
+	"tileshareInvitations": {
+		"yourInvitation": "You are invited to this tilette.",
+		"unavailable": "This invitation is no longer pending.",
+		"title": "Invitations",
+		"refresh": "Refresh",
+		"all": "All invitations",
+		"loading": "Loading invitations?",
+		"failed": "Invitations could not be loaded. Refresh to try again.",
+		"empty": "No pending invitations.",
+		"pending": "pending tilettes",
+		"review": "Review invitations",
+		"from": "Invited by",
+		"due": "Due:",
+		"accept": "Accept",
+		"decline": "Decline",
+		"changeResponse": "Change response",
+		"cancel": "Cancel",
+		"currentAccepted": "Current response: Accepted.",
+		"currentDeclined": "Current response: Declined.",
+		"updatedAccepted": "Response updated to Accepted.",
+		"updatedDeclined": "Response updated to Declined.",
+		"responding": "Saving response?",
+		"next": "Next page",
+		"accepted": "Accepted. Your tile has been created.",
+		"declined": "Invitation declined.",
+		"responseFailed": "The response could not be confirmed. Refresh to check its status before trying again."
+	},
 	"tileshareActivity": {
-		"events": { "invitation_send_unknown": "Invitation send outcome unknown" },
-		"channels": { "email": "Email", "sms": "SMS", "push": "Push notification" },
-		"explicitResend": "The invitation may have been sent. Resend explicitly if needed."
+		"showDismissed": "Show dismissed",
+		"dismiss": "Dismiss",
+		"restore": "Show in activities",
+		"dismissFailed": "The activity preference could not be saved. Try again.",
+		"events": {
+			"invitation_send_unknown": "Invitation send outcome unknown",
+			"assignment_completed": "Occurrence completed",
+			"assignment_reopened": "Occurrence reopened"
+		},
+		"channels": {
+			"email": "Email",
+			"sms": "SMS",
+			"push": "Push notification"
+		},
+		"explicitResend": "The invitation may have been sent. Resend explicitly if needed.",
+		"options": "Activity options",
+		"actions": {
+			"cluster_invitation": "invited you to",
+			"cluster_created": "created",
+			"cluster_deleted": "deleted",
+			"tilette_added": "added",
+			"tilette_edited": "updated",
+			"tilette_deleted": "deleted",
+			"tilette_restored": "restored",
+			"recipient_added": "added a participant to",
+			"recipient_removed": "removed a participant from",
+			"recipient_restored": "restored a participant to",
+			"assignment_accepted": "accepted",
+			"assignment_completed": "completed an occurrence of",
+			"assignment_reopened": "reopened an occurrence of",
+			"assignment_declined": "declined",
+			"invitation_sent": "sent an invitation to",
+			"invitation_send_failed": "could not send an invitation to",
+			"invitation_send_unknown": "sent an invitation with an unknown outcome for"
+		}
 	},
 	"common": {
 		"onboarding": {

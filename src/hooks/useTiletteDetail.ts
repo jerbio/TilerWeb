@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { tileshareService } from '@/services';
 import type { TileShareTemplate } from '@/core/common/types/tileshare';
 
@@ -13,32 +13,55 @@ export interface UseTiletteDetailResult {
 /**
  * Loads a single tilette's (single tileshare) detail. Inert while `tiletteId`
  * is null.
+ *
+ * `loading` and `error` only describe the initial fetch. `refresh()` re-fetches
+ * in the background instead: it keeps the page's content mounted (no skeleton,
+ * no remount of the body or of open modals) and a failed background refresh
+ * keeps the existing data rather than wiping the page.
  */
 export function useTiletteDetail(tiletteId: string | null): UseTiletteDetailResult {
 	const [data, setData] = useState<TileShareTemplate | null>(null);
 	const [loading, setLoading] = useState<boolean>(tiletteId !== null);
 	const [error, setError] = useState<Error | null>(null);
+	// Whether a load has already succeeded, so a background refresh doesn't
+	// flip `loading` and unmount the page's content while it re-fetches.
+	const hasLoaded = useRef(false);
 
 	const load = useCallback(async () => {
 		if (!tiletteId) {
+			hasLoaded.current = false;
 			setData(null);
 			setLoading(false);
+			setError(null);
 			return;
 		}
-		setLoading(true);
-		setError(null);
+		const initial = !hasLoaded.current;
+		if (initial) {
+			setLoading(true);
+			setError(null);
+		}
 		try {
 			const next = await tileshareService.getTileletteDetail(tiletteId);
+			hasLoaded.current = true;
 			setData(next);
 		} catch (err) {
-			setError(err instanceof Error ? err : new Error(String(err)));
-			setData(null);
+			// Only an initial failure surfaces the error state (which also
+			// clears the content); a failed background refresh keeps the page
+			// as-is so in-progress UI is not torn down.
+			if (initial) {
+				setError(err instanceof Error ? err : new Error(String(err)));
+				setData(null);
+			} else {
+				console.error('Error refreshing tilette detail', err);
+			}
 		} finally {
-			setLoading(false);
+			if (initial) setLoading(false);
 		}
 	}, [tiletteId]);
 
 	useEffect(() => {
+		// A new tilette is a fresh initial load even if the previous one succeeded.
+		hasLoaded.current = false;
 		void load();
 	}, [load]);
 

@@ -95,6 +95,64 @@ describe('TileshareApi', () => {
 		fetchSpy.mockReset();
 	});
 
+	describe('activity response envelopes', () => {
+		it('unwraps activity content and preserves cursor and scope parameters', async () => {
+			const page = { items: [], nextCursor: 'next', historyAvailableFrom: 1 };
+			fetchSpy.mockResolvedValueOnce(jsonResponse(page));
+			await expect(
+				api.getActivity({ ClusterId: 'cluster+one', Cursor: 'cursor', DismissedOnly: true })
+			).resolves.toEqual(page);
+			const url = new URL(urlOf(fetchSpy.mock.calls[0]));
+			expect(url.searchParams.get('ClusterId')).toBe('cluster+one');
+			expect(url.searchParams.get('Cursor')).toBe('cursor');
+			expect(url.searchParams.get('DismissedOnly')).toBe('true');
+		});
+
+		it('unwraps invitation content', async () => {
+			const page = {
+				projects: [{ clusterId: 'cluster', name: 'Project', pendingCount: 2 }],
+				nextCursor: null,
+			};
+			fetchSpy.mockResolvedValueOnce(jsonResponse(page));
+			await expect(api.getInvitations()).resolves.toEqual(page);
+		});
+
+		it('accepts the standard dismissal response', async () => {
+			fetchSpy.mockResolvedValueOnce(jsonResponse(null));
+			await expect(api.setActivityDismissed('event', true)).resolves.toBeNull();
+		});
+
+		it.each(['activity', 'invitations', 'dismissal', 'invitation response'])(
+			'rejects a failed %s envelope',
+			async (endpoint) => {
+				fetchSpy.mockResolvedValueOnce(
+					new Response(
+						JSON.stringify({
+							Error: { Code: '1', Message: 'Request denied' },
+							Content: null,
+						}),
+						{
+							status: 200,
+						}
+					)
+				);
+				const request =
+					endpoint === 'activity'
+						? api.getActivity()
+						: endpoint === 'invitations'
+							? api.getInvitations()
+							: endpoint === 'dismissal'
+								? api.setActivityDismissed('event', true)
+								: api.respondToInvitation('assignment', InvitationStatus.Accepted);
+				await expect(request).rejects.toMatchObject({
+					name: 'TilerResponseError',
+					code: '1',
+					message: 'Request denied',
+				});
+			}
+		);
+	});
+
 	describe('getOutbox', () => {
 		it('appends provided params as query string', async () => {
 			fetchSpy.mockResolvedValueOnce(

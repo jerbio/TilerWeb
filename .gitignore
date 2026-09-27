@@ -30,6 +30,9 @@ obj/*
 # Test coverage
 coverage
 
+# Local dev HTTPS certificates (generated via `npm run certs:generate`)
+certs/
+
 # Claude Code
 .claude
 src/assets/*.mp4

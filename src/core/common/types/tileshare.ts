@@ -194,15 +194,18 @@ export const DEFAULT_CLUSTER_PAGE_SIZE = 50;
 export type GetClustersParams = {
 	/**
 	 * `true` for clusters the caller created, `false` for ones shared with them.
-	 * The only list filter the server reads — there is no `IsInbox` counterpart.
+	 * With IncludeCreated, true narrows the combined list to owned clusters.
 	 */
 	IsOutbox?: boolean;
+	/** Include owned and received clusters in one server-paginated list. */
+	IncludeCreated?: boolean;
+	SortBy?: 'CreationTime' | 'Deadline';
 	IsInbox?: boolean;
 	/** Record offset passed to .Skip() — NOT a page number. */
 	Index?: number;
 	/** Number of records to .Take(). Defaults to 50 server-side. */
 	PageSize?: number;
-	/** "asc" / "desc" on creation time. Case-insensitive. */
+	/** "asc" / "desc" on the selected sort field. Case-insensitive. */
 	SortOrder?: SortOrder;
 	/** When non-empty, also hydrates TileShareTemplates per cluster. */
 	DataFormat?: string;
@@ -218,6 +221,8 @@ export type ClusterPageParams = {
 	page?: number;
 	pageSize?: number;
 	sortOrder?: SortOrder;
+	sortBy?: 'CreationTime' | 'Deadline';
+	createdByMe?: boolean;
 };
 
 /**
@@ -230,6 +235,7 @@ export enum InvitationStatus {
 	Accepted = 'accepted',
 	/** Invited but not yet answered. */
 	None = 'none',
+	Tentative = 'tentative',
 	Pending = 'pending',
 	Declined = 'declined',
 }
