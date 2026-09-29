@@ -22,6 +22,8 @@ import DetailHeaderSkeleton from '@/components/tileshare/detail/DetailHeaderSkel
 import EditTileshareModal, {
 	type EditTileshareValues,
 } from '@/components/tileshare/detail/EditTileshareModal';
+import CommentThread from '@/components/comments/CommentThread';
+import { CommentTargetType } from '@/core/common/types/comment';
 import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
 
 const TiletteDetailPage: React.FC = () => {
@@ -116,6 +118,12 @@ const TiletteDetailPage: React.FC = () => {
 										)}
 									</RsvpRow>
 								</Detail>
+								{tilette.id ? (
+									<CommentThread
+										targetType={CommentTargetType.TileshareTilette}
+										targetId={tilette.id}
+									/>
+								) : null}
 								<EditTileshareModal
 									show={editing}
 									setShow={setEditing}

@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "Главная",
+			"features": "Возможности",
 			"discover": "Функции",
+			"articles": "Статьи",
 			"waitlist": "Список ожидания"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "Отмена",
 					"disconnectError": "Не удалось отключить этот аккаунт. Пожалуйста, попробуйте ещё раз.",
 					"disconnectProviderError": "Не удалось отключить провайдера календаря. Повторите попытку через минуту.",
+					"toggleEnabled": "Включено",
+					"toggleDisabled": "Отключено",
 					"locationSection": "Локация по умолчанию",
 					"locationDescription": "Tiler использует это место для новых событий этого аккаунта.",
 					"locationUnset": "Место по умолчанию не задано.",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "Поиск плитки/блока...",
 		"searchAriaLabel": "Поиск плитки или блока",
 		"clearSearch": "Очистить поиск",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "Подключённый аккаунт: {{account}}",
+			"partialFailure": "Поиск не удалось выполнить в некоторых подключённых календарях: {{sources}}",
+			"retrySearch": "Повторить",
+			"unavailable": "Поиск временно недоступен. Это проблема службы, а не отсутствие совпадений. Попробуйте снова позже.",
+			"readOnly": "Только для чтения"
+		},
 		"loadMore": "Загрузить ещё",
 		"loading": "Загрузка…",
 		"notFoundMessage": "Упс, мы не смогли найти '{{query}}'. Хотите создать плитку с этим названием?",
@@ -2007,6 +2021,7 @@
 			"progress": "Прогресс",
 			"dueOn": "Срок:",
 			"dueBy": "Выполнить до:",
+			"due": "Срок:",
 			"multiTileshare": "Несколько TileShare",
 			"tileshare": "Tileshare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Сведения о Tilette"
 		},
+		"detail": {
+			"breadcrumbRoot": "TileShare",
+			"multiTileshare": "Мульти TileShare",
+			"singleTileshare": "Одиночный TileShare",
+			"inCluster": "В: {{name}}",
+			"progress": "Прогресс",
+			"noDescription": "Описание не предоставлено",
+			"due": "Срок: {{date}}",
+			"editAria": "Изменить",
+			"addAria": "Добавить Tilette",
+			"loadError": "Не удалось загрузить этот TileShare. Попробуйте снова.",
+			"showingTilettes": "Показаны Tilette {{shown}} из {{total}}",
+			"showingAssignees": "Показаны назначенные {{shown}} из {{total}}",
+			"statusLabel": "Статус:",
+			"status": {
+				"inProgress": "В процессе",
+				"completed": "Завершено"
+			},
+			"view": {
+				"list": "Режим списка Tilette",
+				"assignee": "Режим по назначенным"
+			},
+			"viewAria": "Режим Tilette",
+			"openTiletteAria": "Открыть Tilette",
+			"prev": "Назад",
+			"next": "Далее",
+			"deleteAria": "Удалить",
+			"edit": {
+				"clusterTitle": "Изменить TileShare",
+				"tiletteTitle": "Изменить Tilette",
+				"fields": {
+					"name": {
+						"label": "Название",
+						"placeholder": "Назовите вашу задачу"
+					},
+					"deadline": {
+						"label": "Срок",
+						"placeholder": "Добавить срок"
+					},
+					"note": {
+						"label": "Заметка",
+						"placeholder": "Добавить заметку (необязательно)"
+					}
+				},
+				"validation": {
+					"nameRequired": "Пожалуйста, назовите вашу задачу",
+					"deadlineRequired": "Пожалуйста, добавьте срок"
+				},
+				"cancel": "Отмена",
+				"save": "Сохранить изменения",
+				"saving": "Сохранение изменений...",
+				"success": "Изменения сохранены",
+				"error": "Не удалось сохранить изменения. Попробуйте снова."
+			},
+			"delete": {
+				"title": "Удалить TileShare",
+				"body": "Удалить «{{name}}»?",
+				"warning": "Это удалит его у всех, с кем он был общим, и отменить это невозможно.",
+				"cancel": "Отмена",
+				"confirm": "Удалить",
+				"deleting": "Удаление...",
+				"success": "TileShare удалён",
+				"error": "Не удалось удалить этот TileShare. Попробуйте снова."
+			},
+			"add": {
+				"back": "Назад к TileShare",
+				"title": "Добавить Tilette",
+				"description": "Добавьте ещё одну задачу в «{{name}}» и поделитесь ею с коллегами. После их подтверждения мы добавим её в их расписание.",
+				"fields": {
+					"name": {
+						"label": "Название",
+						"placeholder": "Назовите вашу задачу"
+					},
+					"deadline": {
+						"label": "Срок",
+						"placeholder": "Добавить срок (необязательно)"
+					},
+					"note": {
+						"label": "Заметка",
+						"placeholder": "Добавить заметку (необязательно)"
+					}
+				},
+				"shareTo": {
+					"label": "Поделиться с:",
+					"placeholder": "адрес e-mail / номер телефона (Enter для выбора)"
+				},
+				"validation": {
+					"nameRequired": "Пожалуйста, назовите вашу задачу",
+					"invalidRecipient": "{{recipient}} — недействительный адрес e-mail или номер телефона"
+				},
+				"cancel": "Отмена",
+				"submit": "Добавить Tilette",
+				"creating": "Добавление Tilette...",
+				"error": "Не удалось добавить Tilette. Попробуйте снова.",
+				"success": {
+					"message": "Ваша Tilette «{{name}}» добавлена.",
+					"view": "Посмотреть Tilette"
+				}
+			}
+		},
 		"invite": {
 			"title": "Пригласить"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "Исходящие"
 		}
+	},
+	"comments": {
+		"count": "Комментариев: {{count}}",
+		"empty": "Пока нет комментариев",
+		"loading": "Загрузка...",
+		"loadMore": "Загрузить ещё",
+		"retry": "Повторить",
+		"loadError": "Не удалось загрузить комментарии. Попробуйте снова.",
+		"loadMoreError": "Не удалось загрузить ещё комментарии.",
+		"createError": "Не удалось опубликовать ваш комментарий.",
+		"editError": "Не удалось сохранить редактирование.",
+		"deleteError": "Не удалось удалить комментарий.",
+		"placeholder": "Напишите комментарий...",
+		"send": "Отправить",
+		"sending": "Отправка...",
+		"edit": "Изменить",
+		"save": "Сохранить",
+		"cancel": "Отмена",
+		"delete": "Удалить",
+		"edited": "изменено",
+		"deletedPlaceholder": "Этот комментарий был удалён.",
+		"deletedAuthor": "Удалённый пользователь",
+		"reply": "Ответить",
+		"replyPlaceholder": "Напишите ответ...",
+		"replies": "Ответов: {{count}}",
+		"showReplies": "Показать ответы",
+		"hideReplies": "Скрыть ответы",
+		"loadingReplies": "Загрузка ответов...",
+		"noReplies": "Пока нет ответов",
+		"loadRepliesError": "Не удалось загрузить ответы.",
+		"createReplyError": "Не удалось опубликовать ваш ответ.",
+		"missingTarget": "Не найден объект комментария.",
+		"you": "(вы)",
+		"mentionSuggestions": "Люди, которых можно упомянуть",
+		"loadEarlier": "Загрузить ранние комментарии",
+		"loadEarlierReplies": "Загрузить ранние ответы",
+		"attach": "Прикрепить файл",
+		"attachmentProcessing": "Проверка файла...",
+		"attachmentUploaded": "Загружено",
+		"attachmentUploadingSummary": "Загрузка файлов (осталось {{count}}). Не закрывайте эту страницу.",
+		"attachmentUploadFailed": "Ошибка загрузки",
+		"attachmentRetry": "Повторить",
+		"attachmentRemove": "Удалить {{name}}",
+		"attachmentDownload": "Скачать",
+		"attachmentDownloadAria": "Скачать {{name}}",
+		"attachmentDownloadError": "Не удалось скачать файл.",
+		"attachmentInvalidType": "Можно прикреплять только файлы PDF, DOCX, PNG и JPEG.",
+		"attachmentTooLarge": "Файлы должны быть 10 МБ или меньше.",
+		"attachmentEmpty": "Этот файл пуст.",
+		"attachmentLimit": "Можно прикрепить до {{count}} файлов."
 	},
 	"tile": {
 		"noteButtonAria": "Открыть заметки для этой плитки"

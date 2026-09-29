@@ -11,6 +11,7 @@ export const Routes = {
 	Discover: '/discover',
 	Articles: '/articles',
 	ArticlesGettingStarted: '/articles/getting-started-with-tiler',
+	Features: '/features',
 	Waitlist: '/waitlist',
 	SignIn: '/signin',
 	SignUp: '/signup',

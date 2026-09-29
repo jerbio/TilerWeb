@@ -8,6 +8,7 @@ import FeatureTransit from '@/assets/features/transit.png';
 import FeatureTimely from '@/assets/features/timely.png';
 import FeatureAutoLoc from '@/assets/features/auto-loc.png';
 import Section from '../components/layout/section';
+import SectionHeaders from '../components/layout/section_headers';
 import UpdatesSection from '../components/home/updates_section';
 import SEO from '@/core/common/components/SEO';
 
@@ -101,6 +102,13 @@ const Features: React.FC = () => {
 			<Section>
 				<BackgroundBlur />
 				<DottedLineImage src={DottedLine} alt="null" />
+				<SectionHeaders
+					headerText="Features that keep you on time"
+					subHeaderText="Smart scheduling, navigation, and task sharing — everything that helps you get more done without the calendar math."
+					align="center"
+					size="large"
+					headingLevel={1}
+				/>
 				<GridContainer>
 					{featureList.map((item, itemIndex) => (
 						<FeatureCard

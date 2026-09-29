@@ -24,12 +24,17 @@ const today = new Date().toISOString().split('T')[0];
  * `Routes` in src/core/constants/routes.ts. Private/authenticated routes
  * (timeline, tileshare, settings, admin, signin, signup) are intentionally
  * excluded — they carry no SEO value and are disallowed in robots.txt.
+ *
+ * `/waitlist` is also excluded on purpose: it is `noindex, follow` (see
+ * src/pages/Waitlist.tsx). It stays reachable and crawlable (not disallowed
+ * in robots.txt) so search engines process the noindex, but it is not
+ * advertised in the sitemap.
  */
 const staticRoutes = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
+	{ path: '/features', changefreq: 'monthly', priority: '0.9' },
 	{ path: '/discover', changefreq: 'monthly', priority: '0.9' },
 	{ path: '/articles', changefreq: 'weekly', priority: '0.8' },
-	{ path: '/waitlist', changefreq: 'monthly', priority: '0.7' },
 ];
 
 /** Convert a human date like "May 1, 2026" to ISO "2026-05-01" (no TZ shift). */

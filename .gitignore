@@ -32,6 +32,8 @@ coverage
 
 # Local dev HTTPS certificates (generated via `npm run certs:generate`)
 certs/
+# Vitest fake-localStorage side-effect files
+.vitest-localstorage*
 
 # Claude Code
 .claude

@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "主页",
+			"features": "功能",
 			"discover": "功能",
+			"articles": "文章",
 			"waitlist": "等候名单"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "取消",
 					"disconnectError": "无法断开此账户的连接。请重试。",
 					"disconnectProviderError": "暂时无法断开日历服务商的连接。请稍后重试。",
+					"toggleEnabled": "已启用",
+					"toggleDisabled": "已禁用",
 					"locationSection": "默认位置",
 					"locationDescription": "Tiler 将为此账户的新事件使用该位置。",
 					"locationUnset": "尚未设置默认位置。",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "搜索磁贴/块...",
 		"searchAriaLabel": "搜索磁贴或块",
 		"clearSearch": "清除搜索",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "已连接的账户：{{account}}",
+			"partialFailure": "部分已连接的日历搜索失败：{{sources}}",
+			"retrySearch": "重试",
+			"unavailable": "搜索暂时不可用。这是服务问题，而不是没有匹配结果。请稍后再试。",
+			"readOnly": "只读"
+		},
 		"loadMore": "加载更多",
 		"loading": "加载中…",
 		"notFoundMessage": "哎呀，我们找不到'{{query}}'。您想用这个标题创建一个磁贴吗？",
@@ -2007,6 +2021,7 @@
 			"progress": "进度",
 			"dueOn": "截止日：",
 			"dueBy": "截止时间：",
+			"due": "截止日期：",
 			"multiTileshare": "多个 tileshare",
 			"tileshare": "Tileshare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Tilette 详情"
 		},
+		"detail": {
+			"breadcrumbRoot": "Tileshare",
+			"multiTileshare": "多 Tileshare",
+			"singleTileshare": "单个 Tileshare",
+			"inCluster": "属于：{{name}}",
+			"progress": "进度",
+			"noDescription": "未提供描述",
+			"due": "截止日期：{{date}}",
+			"editAria": "编辑",
+			"addAria": "添加 Tilette",
+			"loadError": "无法加载此 Tileshare。请重试。",
+			"showingTilettes": "已显示 {{shown}} / {{total}} 个 Tilette",
+			"showingAssignees": "已显示 {{shown}} / {{total}} 位受让人",
+			"statusLabel": "状态：",
+			"status": {
+				"inProgress": "进行中",
+				"completed": "已完成"
+			},
+			"view": {
+				"list": "Tilette 列表视图",
+				"assignee": "受让人视图"
+			},
+			"viewAria": "Tilette 视图",
+			"openTiletteAria": "打开 Tilette",
+			"prev": "上一个",
+			"next": "下一个",
+			"deleteAria": "删除",
+			"edit": {
+				"clusterTitle": "编辑 Tileshare",
+				"tiletteTitle": "编辑 Tilette",
+				"fields": {
+					"name": {
+						"label": "名称",
+						"placeholder": "为您的任务命名"
+					},
+					"deadline": {
+						"label": "截止日期",
+						"placeholder": "添加截止日期"
+					},
+					"note": {
+						"label": "备注",
+						"placeholder": "添加备注（可选）"
+					}
+				},
+				"validation": {
+					"nameRequired": "请为您的任务命名",
+					"deadlineRequired": "请添加截止日期"
+				},
+				"cancel": "取消",
+				"save": "保存更改",
+				"saving": "正在保存更改...",
+				"success": "更改已保存",
+				"error": "无法保存您的更改。请重试。"
+			},
+			"delete": {
+				"title": "删除 Tileshare",
+				"body": "删除“{{name}}”？",
+				"warning": "这将为所有共享对象移除它，且无法撤销。",
+				"cancel": "取消",
+				"confirm": "删除",
+				"deleting": "正在删除...",
+				"success": "Tileshare 已删除",
+				"error": "无法删除此 Tileshare。请重试。"
+			},
+			"add": {
+				"back": "返回 Tileshare",
+				"title": "添加 Tilette",
+				"description": "向“{{name}}”添加另一个任务，并与您的同事共享。他们接受后，我们会将其添加到他们的日程中。",
+				"fields": {
+					"name": {
+						"label": "名称",
+						"placeholder": "为您的任务命名"
+					},
+					"deadline": {
+						"label": "截止日期",
+						"placeholder": "添加截止日期（可选）"
+					},
+					"note": {
+						"label": "备注",
+						"placeholder": "添加备注（可选）"
+					}
+				},
+				"shareTo": {
+					"label": "共享给：",
+					"placeholder": "电子邮件地址 / 电话号码（按 Enter 选择）"
+				},
+				"validation": {
+					"nameRequired": "请为您的任务命名",
+					"invalidRecipient": "{{recipient}} 不是有效的电子邮件地址或电话号码"
+				},
+				"cancel": "取消",
+				"submit": "添加 Tilette",
+				"creating": "正在添加 Tilette...",
+				"error": "无法添加该 Tilette。请重试。",
+				"success": {
+					"message": "您的 Tilette“{{name}}”已添加。",
+					"view": "查看 Tilette"
+				}
+			}
+		},
 		"invite": {
 			"title": "邀请"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "发件箱"
 		}
+	},
+	"comments": {
+		"count": "{{count}} 条评论",
+		"empty": "暂无评论",
+		"loading": "正在加载...",
+		"loadMore": "加载更多",
+		"retry": "重试",
+		"loadError": "无法加载评论。请重试。",
+		"loadMoreError": "无法加载更多评论。",
+		"createError": "无法发布您的评论。",
+		"editError": "无法保存您的编辑。",
+		"deleteError": "无法删除该评论。",
+		"placeholder": "写评论...",
+		"send": "发送",
+		"sending": "正在发送...",
+		"edit": "编辑",
+		"save": "保存",
+		"cancel": "取消",
+		"delete": "删除",
+		"edited": "已编辑",
+		"deletedPlaceholder": "此评论已被删除。",
+		"deletedAuthor": "已删除的用户",
+		"reply": "回复",
+		"replyPlaceholder": "写回复...",
+		"replies": "{{count}} 条回复",
+		"showReplies": "显示回复",
+		"hideReplies": "隐藏回复",
+		"loadingReplies": "正在加载回复...",
+		"noReplies": "暂无回复",
+		"loadRepliesError": "无法加载回复。",
+		"createReplyError": "无法发布您的回复。",
+		"missingTarget": "未找到评论目标。",
+		"you": "（你）",
+		"mentionSuggestions": "您可以提及的人",
+		"loadEarlier": "加载较早的评论",
+		"loadEarlierReplies": "加载较早的回复",
+		"attach": "添加附件",
+		"attachmentProcessing": "正在检查文件...",
+		"attachmentUploaded": "已上传",
+		"attachmentUploadingSummary": "正在上传文件（剩余 {{count}} 个）。请保持此页面打开。",
+		"attachmentUploadFailed": "上传失败",
+		"attachmentRetry": "重试",
+		"attachmentRemove": "移除 {{name}}",
+		"attachmentDownload": "下载",
+		"attachmentDownloadAria": "下载 {{name}}",
+		"attachmentDownloadError": "无法下载该文件。",
+		"attachmentInvalidType": "只能添加 PDF、DOCX、PNG 和 JPEG 文件。",
+		"attachmentTooLarge": "文件必须为 10 MB 或更小。",
+		"attachmentEmpty": "该文件是空文件。",
+		"attachmentLimit": "最多可添加 {{count}} 个文件。"
 	},
 	"tile": {
 		"noteButtonAria": "打开此任务块的笔记"

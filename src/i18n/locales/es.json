@@ -43,7 +43,9 @@
 		},
 		"navigation": {
 			"home": "Inicio",
+			"features": "Características",
 			"discover": "Características",
+			"articles": "Artículos",
 			"waitlist": "Lista de espera"
 		},
 		"voiceInput": {
@@ -1377,6 +1379,8 @@
 					"disconnectCancel": "Cancelar",
 					"disconnectError": "No se pudo desconectar esta cuenta. Inténtalo de nuevo.",
 					"disconnectProviderError": "No se pudo desconectar el proveedor de calendario ahora mismo. Inténtalo de nuevo en un momento.",
+					"toggleEnabled": "Activado",
+					"toggleDisabled": "Desactivado",
 					"locationSection": "Ubicación predeterminada",
 					"locationDescription": "Tiler usa esta ubicación para los nuevos eventos de esta cuenta.",
 					"locationUnset": "No hay ninguna ubicación predeterminada.",
@@ -1490,6 +1494,16 @@
 		"searchPlaceholder": "Buscar un mosaico/bloque...",
 		"searchAriaLabel": "Buscar un mosaico o bloque",
 		"clearSearch": "Borrar búsqueda",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "Cuenta conectada: {{account}}",
+			"partialFailure": "La búsqueda falló en algunos calendarios conectados: {{sources}}",
+			"retrySearch": "Reintentar",
+			"unavailable": "La búsqueda no está disponible temporalmente. Esto es un problema del servicio, no una falta de coincidencias. Por favor, inténtalo de nuevo más tarde.",
+			"readOnly": "Solo lectura"
+		},
 		"loadMore": "Cargar más",
 		"loading": "Cargando…",
 		"notFoundMessage": "Ups, no pudimos encontrar '{{query}}'. ¿Te gustaría crear un mosaico con este título?",
@@ -2007,6 +2021,7 @@
 			"progress": "Progreso",
 			"dueOn": "Vence el:",
 			"dueBy": "Fecha límite:",
+			"due": "Vence:",
 			"multiTileshare": "TileShare múltiple",
 			"tileshare": "Tileshare"
 		},
@@ -2031,6 +2046,106 @@
 		"tiletteDetail": {
 			"title": "Detalles de Tilette"
 		},
+		"detail": {
+			"breadcrumbRoot": "Tileshare",
+			"multiTileshare": "Tileshare múltiple",
+			"singleTileshare": "Tileshare único",
+			"inCluster": "En: {{name}}",
+			"progress": "Progreso",
+			"noDescription": "No se proporcionó descripción",
+			"due": "Vence: {{date}}",
+			"editAria": "Editar",
+			"addAria": "Agregar tilette",
+			"loadError": "No se pudo cargar este tileshare. Por favor, inténtalo de nuevo.",
+			"showingTilettes": "Mostrando {{shown}} de {{total}} Tilettes",
+			"showingAssignees": "Mostrando {{shown}} de {{total}} Asignados",
+			"statusLabel": "Estado:",
+			"status": {
+				"inProgress": "En curso",
+				"completed": "Completado"
+			},
+			"view": {
+				"list": "Vista de lista de Tilettes",
+				"assignee": "Vista por asignado"
+			},
+			"viewAria": "Vista de Tilette",
+			"openTiletteAria": "Abrir tilette",
+			"prev": "Anterior",
+			"next": "Siguiente",
+			"deleteAria": "Eliminar",
+			"edit": {
+				"clusterTitle": "Editar tileshare",
+				"tiletteTitle": "Editar tilette",
+				"fields": {
+					"name": {
+						"label": "Nombre",
+						"placeholder": "Nombra tu tarea"
+					},
+					"deadline": {
+						"label": "Fecha límite",
+						"placeholder": "Agregar una fecha límite"
+					},
+					"note": {
+						"label": "Nota",
+						"placeholder": "Agregar una nota (opcional)"
+					}
+				},
+				"validation": {
+					"nameRequired": "Por favor, nombra tu tarea",
+					"deadlineRequired": "Por favor, agrega una fecha límite"
+				},
+				"cancel": "Cancelar",
+				"save": "Guardar cambios",
+				"saving": "Guardando cambios…",
+				"success": "Cambios guardados",
+				"error": "No se pudieron guardar tus cambios. Por favor, inténtalo de nuevo."
+			},
+			"delete": {
+				"title": "Eliminar tileshare",
+				"body": "¿Eliminar «{{name}}»?",
+				"warning": "Esto lo elimina para todas las personas con las que se compartió y no se puede deshacer.",
+				"cancel": "Cancelar",
+				"confirm": "Eliminar",
+				"deleting": "Eliminando…",
+				"success": "Tileshare eliminado",
+				"error": "No se pudo eliminar este tileshare. Por favor, inténtalo de nuevo."
+			},
+			"add": {
+				"back": "Volver al tileshare",
+				"title": "Agregar una tilette",
+				"description": "Agrega otra tarea a «{{name}}» y compártela con tus colegas. Una vez que la acepten, la agregaremos a su horario.",
+				"fields": {
+					"name": {
+						"label": "Nombre",
+						"placeholder": "Nombra tu tarea"
+					},
+					"deadline": {
+						"label": "Fecha límite",
+						"placeholder": "Agregar una fecha límite (opcional)"
+					},
+					"note": {
+						"label": "Nota",
+						"placeholder": "Agregar una nota (opcional)"
+					}
+				},
+				"shareTo": {
+					"label": "Compartir con:",
+					"placeholder": "dirección de correo / número de teléfono (Enter para seleccionar)"
+				},
+				"validation": {
+					"nameRequired": "Por favor, nombra tu tarea",
+					"invalidRecipient": "{{recipient}} no es un correo electrónico ni un número de teléfono válidos"
+				},
+				"cancel": "Cancelar",
+				"submit": "Agregar tilette",
+				"creating": "Agregando tilette…",
+				"error": "No se pudo agregar la tilette. Por favor, inténtalo de nuevo.",
+				"success": {
+					"message": "Tu tilette «{{name}}» ha sido agregada.",
+					"view": "Ver tilette"
+				}
+			}
+		},
 		"invite": {
 			"title": "Invitar"
 		},
@@ -2040,6 +2155,56 @@
 		"outbox": {
 			"title": "Bandeja de salida"
 		}
+	},
+	"comments": {
+		"count": "{{count}} comentarios",
+		"empty": "Aún no hay comentarios",
+		"loading": "Cargando…",
+		"loadMore": "Cargar más",
+		"retry": "Reintentar",
+		"loadError": "No se pudieron cargar los comentarios. Por favor, inténtalo de nuevo.",
+		"loadMoreError": "No se pudieron cargar más comentarios.",
+		"createError": "No se pudo publicar tu comentario.",
+		"editError": "No se pudo guardar tu edición.",
+		"deleteError": "No se pudo eliminar el comentario.",
+		"placeholder": "Escribe un comentario…",
+		"send": "Enviar",
+		"sending": "Enviando…",
+		"edit": "Editar",
+		"save": "Guardar",
+		"cancel": "Cancelar",
+		"delete": "Eliminar",
+		"edited": "editó",
+		"deletedPlaceholder": "Este comentario fue eliminado.",
+		"deletedAuthor": "Usuario eliminado",
+		"reply": "Responder",
+		"replyPlaceholder": "Escribe una respuesta…",
+		"replies": "{{count}} respuestas",
+		"showReplies": "Mostrar respuestas",
+		"hideReplies": "Ocultar respuestas",
+		"loadingReplies": "Cargando respuestas…",
+		"noReplies": "Aún no hay respuestas",
+		"loadRepliesError": "No se pudieron cargar las respuestas.",
+		"createReplyError": "No se pudo publicar tu respuesta.",
+		"missingTarget": "No se encontró el destino del comentario.",
+		"you": "(tú)",
+		"mentionSuggestions": "Personas a las que puedes mencionar",
+		"loadEarlier": "Cargar comentarios anteriores",
+		"loadEarlierReplies": "Cargar respuestas anteriores",
+		"attach": "Adjuntar archivo",
+		"attachmentProcessing": "Comprobando el archivo…",
+		"attachmentUploaded": "Subido",
+		"attachmentUploadingSummary": "Subiendo archivos ({{count}} restantes). Mantén esta página abierta.",
+		"attachmentUploadFailed": "Error al subir",
+		"attachmentRetry": "Reintentar",
+		"attachmentRemove": "Quitar {{name}}",
+		"attachmentDownload": "Descargar",
+		"attachmentDownloadAria": "Descargar {{name}}",
+		"attachmentDownloadError": "No se pudo descargar el archivo.",
+		"attachmentInvalidType": "Solo se pueden adjuntar archivos PDF, DOCX, PNG y JPEG.",
+		"attachmentTooLarge": "Los archivos deben ser de 10 MB o menos.",
+		"attachmentEmpty": "Ese archivo está vacío.",
+		"attachmentLimit": "Puedes adjuntar hasta {{count}} archivos."
 	},
 	"tile": {
 		"noteButtonAria": "Abrir notas de este Tile"
