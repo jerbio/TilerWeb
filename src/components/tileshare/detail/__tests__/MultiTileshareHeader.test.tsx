@@ -17,12 +17,11 @@ vi.mock('@/core/theme/ThemeProvider', () => ({
 const DATE = dayjs('2025-07-27').valueOf();
 
 describe('MultiTileshareHeader', () => {
-	it('renders the name, subtitle key, progress and date', () => {
+	it('renders the name, subtitle key, description and date', () => {
 		render(
 			<MultiTileshareHeader
 				name="Q1 projects 2026"
 				description="Align the team."
-				progress={20}
 				date={DATE}
 			/>
 		);
@@ -30,7 +29,6 @@ describe('MultiTileshareHeader', () => {
 		expect(screen.getByText('Q1 projects 2026')).toBeInTheDocument();
 		expect(screen.getByText('tilesharedemo.detail.multiTileshare')).toBeInTheDocument();
 		expect(screen.getByText('Align the team.')).toBeInTheDocument();
-		expect(screen.getByText('20%')).toBeInTheDocument();
 		expect(screen.getByText('Sun, 27th July, 2025')).toBeInTheDocument();
 	});
 
@@ -43,7 +41,6 @@ describe('MultiTileshareHeader', () => {
 			<MultiTileshareHeader
 				name="Q1"
 				description={null}
-				progress={0}
 				date={DATE}
 				onEdit={onEdit}
 				onAdd={onAdd}
@@ -62,20 +59,14 @@ describe('MultiTileshareHeader', () => {
 		const user = setupUser();
 
 		const { unmount } = render(
-			<MultiTileshareHeader
-				name="Q1"
-				description={null}
-				progress={0}
-				date={DATE}
-				onDelete={onDelete}
-			/>
+			<MultiTileshareHeader name="Q1" description={null} date={DATE} onDelete={onDelete} />
 		);
 
 		await user.click(screen.getByRole('button', { name: 'tilesharedemo.detail.deleteAria' }));
 		expect(onDelete).toHaveBeenCalledOnce();
 
 		unmount();
-		render(<MultiTileshareHeader name="Q1" description={null} progress={0} date={DATE} />);
+		render(<MultiTileshareHeader name="Q1" description={null} date={DATE} />);
 		expect(
 			screen.queryByRole('button', { name: 'tilesharedemo.detail.deleteAria' })
 		).not.toBeInTheDocument();
@@ -83,12 +74,12 @@ describe('MultiTileshareHeader', () => {
 
 	// Assignees get a read-only header: no edit, delete or add.
 	it('renders no action buttons for a read-only viewer', () => {
-		render(<MultiTileshareHeader name="Q1" description={null} progress={0} date={DATE} />);
+		render(<MultiTileshareHeader name="Q1" description={null} date={DATE} />);
 		expect(screen.queryAllByRole('button')).toHaveLength(0);
 	});
 
 	it('falls back to an em dash title when name is null', () => {
-		render(<MultiTileshareHeader name={null} description={null} progress={0} date={DATE} />);
+		render(<MultiTileshareHeader name={null} description={null} date={DATE} />);
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('—');
 	});
 });

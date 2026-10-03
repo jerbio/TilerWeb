@@ -12,10 +12,9 @@ import { Routes } from '@/core/constants/routes';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
 import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { iconSurface } from '@/core/util/colorSurface';
-import { deriveTileletteStatus } from '@/core/util/tileshareProgress';
 import { designatedToAvatars } from '@/core/util/tileshareAssignees';
 import AvatarCluster from '@/core/common/components/AvatarCluster';
-import TiletteStatus from './TiletteStatus';
+import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
 
 type TiletteRowProps = {
 	tilette: TileShareTemplate;
@@ -47,7 +46,7 @@ const TiletteRow: React.FC<TiletteRowProps> = ({ tilette, clusterId }) => {
 			<Divider />
 			<BottomRow>
 				<StatusGroup>
-					<TiletteStatus status={deriveTileletteStatus(tilette)} />
+					<TiletteWorkProgress tilette={tilette} />
 				</StatusGroup>
 				<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={28} />
 			</BottomRow>

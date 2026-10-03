@@ -1,3 +1,9 @@
+import {
+	TileShareLockedTimeLineRequest,
+	TileSharePreview,
+	TileShareAssignmentResponse,
+	TileSharePreviewOptions,
+} from '@/core/common/types/tilesharePreview';
 import { InvitationStatus } from '@/core/common/types/tileshare';
 import { AppApi } from './appApi';
 import { ApiResponse } from '@/core/common/types/api';
@@ -38,6 +44,140 @@ function buildQuery(params?: Record<string, unknown>): string {
 }
 
 export class TileshareApi extends AppApi {
+	async previewAssignment(id: string, signal?: AbortSignal): Promise<TileSharePreview> {
+		const response = await this.apiRequest<ApiResponse<TileSharePreview>>(
+			'api/DesignatedTile/Preview',
+			{
+				method: 'POST',
+				body: JSON.stringify({
+					Id: id,
+					TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				}),
+				signal,
+				cache: 'no-store',
+			}
+		);
+		if (response.Error?.Code !== '0' || !response.Content)
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? { Code: 'invalid_response', Message: 'Invalid preview response.' }
+			);
+		return response.Content;
+	}
+
+	private async previewRequest<T>(
+		route: string,
+		body: Record<string, unknown>,
+		signal?: AbortSignal
+	): Promise<T> {
+		const response = await this.apiRequest<ApiResponse<T>>(route, {
+			method: 'POST',
+			body: JSON.stringify({
+				...body,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+			}),
+			signal,
+			cache: 'no-store',
+		});
+		if (response.Error?.Code !== '0' || !response.Content)
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? { Code: 'invalid_response', Message: 'Invalid preview response.' }
+			);
+		return response.Content;
+	}
+
+	getPreviewOptions(
+		id: string,
+		token: string,
+		sessionKey: string,
+		offset: number,
+		signal?: AbortSignal
+	) {
+		return this.previewRequest<TileSharePreviewOptions>(
+			'api/DesignatedTile/Preview/Options',
+			{ Id: id, PreviewToken: token, SessionKey: sessionKey, Offset: offset },
+			signal
+		);
+	}
+
+	revisePreview(
+		id: string,
+		token: string,
+		selection: { OptionId?: string; SessionKey?: string; Fixed?: boolean },
+		signal?: AbortSignal
+	) {
+		return this.previewRequest<TileSharePreview>(
+			'api/DesignatedTile/Preview/Revise',
+			{ Id: id, PreviewToken: token, ...selection },
+			signal
+		);
+	}
+
+	private async manageTilette(
+		route: string,
+		method: 'PUT' | 'DELETE',
+		body: Record<string, unknown>
+	) {
+		const response = await this.apiRequest<ApiResponse<unknown>>(route, {
+			method,
+			body: JSON.stringify({
+				...body,
+				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+			}),
+		});
+		if (response.Error?.Code !== '0')
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? { Code: 'invalid_response', Message: 'Invalid tilette response.' }
+			);
+		return response.Content;
+	}
+
+	addTiletteRecipient(tiletteId: string, contact: { Email?: string; PhoneNumber?: string }) {
+		return this.manageTilette('api/TileshareTemplate/contact', 'PUT', {
+			EntityId: tiletteId,
+			Contact: contact,
+		});
+	}
+
+	removeTiletteRecipient(tiletteId: string, assignmentId: string) {
+		return this.manageTilette('api/TileshareTemplate/contact', 'DELETE', {
+			TiletteId: tiletteId,
+			AssignmentId: assignmentId,
+		});
+	}
+
+	deleteTilette(id: string) {
+		return this.manageTilette('api/TileshareTemplate', 'DELETE', { Id: id });
+	}
+
+	async acceptAssignment(id: string, lockedTimeLineRequest?: TileShareLockedTimeLineRequest) {
+		const result = await this.respondToInvitation(
+			id,
+			InvitationStatus.Accepted,
+			lockedTimeLineRequest
+		);
+		if (!result.Content?.response || result.Content.response.id !== id)
+			throw new Error('Invalid assignment response.');
+		return result.Content.response;
+	}
+
+	async getAssignmentResponse(
+		id: string,
+		signal?: AbortSignal
+	): Promise<TileShareAssignmentResponse> {
+		const response = await this.apiRequest<ApiResponse<TileShareAssignmentResponse>>(
+			`api/DesignatedTile/Response${buildQuery({ id })}`,
+			{ signal, cache: 'no-store' }
+		);
+		if (response.Error?.Code !== '0' || !response.Content)
+			throw TilerResponseError.fromApiCodeResponse(
+				response.Error ?? {
+					Code: 'invalid_response',
+					Message: 'Invalid assignment response.',
+				}
+			);
+		return response.Content;
+	}
+
 	async setActivityDismissed(eventId: string, isDismissed: boolean) {
 		const response = await this.apiRequest<ApiResponse<null>>(
 			'api/TileShare/Activity/Dismissal',
@@ -78,11 +218,18 @@ export class TileshareApi extends AppApi {
 	}
 	async respondToInvitation(
 		id: string,
-		status: InvitationStatus.Accepted | InvitationStatus.Declined
+		status: InvitationStatus.Accepted | InvitationStatus.Declined,
+		lockedTimeLineRequest?: TileShareLockedTimeLineRequest
 	) {
-		const response = await this.apiRequest<ApiResponse<unknown>>('api/DesignatedTile/status', {
+		const response = await this.apiRequest<
+			ApiResponse<{ response?: TileShareAssignmentResponse }>
+		>('api/DesignatedTile/status', {
 			method: 'POST',
-			body: JSON.stringify({ Id: id, Status: status }),
+			body: JSON.stringify({
+				Id: id,
+				Status: status,
+				LockedTimeLineRequest: lockedTimeLineRequest,
+			}),
 		});
 		if (response.Error?.Code !== '0')
 			throw TilerResponseError.fromApiCodeResponse(

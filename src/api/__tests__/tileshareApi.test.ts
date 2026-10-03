@@ -95,6 +95,53 @@ describe('TileshareApi', () => {
 		fetchSpy.mockReset();
 	});
 
+	describe('tilette management requests', () => {
+		it.each([
+			[
+				'add',
+				'PUT',
+				'/api/TileshareTemplate/contact',
+				{ EntityId: 'tilette', Contact: { Email: 'ada@example.com' } },
+			],
+			[
+				'remove',
+				'DELETE',
+				'/api/TileshareTemplate/contact',
+				{ TiletteId: 'tilette', AssignmentId: 'assignment' },
+			],
+			['delete', 'DELETE', '/api/TileshareTemplate', { Id: 'tilette' }],
+		] as const)(
+			'sends the %s request and unwraps its response',
+			async (action, method, path, body) => {
+				fetchSpy.mockResolvedValueOnce(jsonResponse('saved'));
+				const result =
+					action === 'add'
+						? await api.addTiletteRecipient('tilette', { Email: 'ada@example.com' })
+						: action === 'remove'
+							? await api.removeTiletteRecipient('tilette', 'assignment')
+							: await api.deleteTilette('tilette');
+				expect(result).toBe('saved');
+				const call = fetchSpy.mock.calls[0];
+				expect(new URL(urlOf(call)).pathname).toBe(path);
+				const request =
+					call[0] instanceof Request
+						? call[0].clone()
+						: new Request(urlOf(call), call[1]);
+				expect(request.method).toBe(method);
+				expect(await request.json()).toMatchObject(body);
+			}
+		);
+		it('rejects an unsuccessful response envelope', async () => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(JSON.stringify({ Error: { Code: '1', Message: 'denied' } }), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' },
+				})
+			);
+			await expect(api.deleteTilette('tilette')).rejects.toThrow();
+		});
+	});
+
 	describe('activity response envelopes', () => {
 		it('unwraps activity content and preserves cursor and scope parameters', async () => {
 			const page = { items: [], nextCursor: 'next', historyAvailableFrom: 1 };
@@ -522,5 +569,43 @@ describe('TileshareApi', () => {
 			fetchSpy.mockRejectedValueOnce(new Error('Network error'));
 			await expect(api.createCluster(createParams)).rejects.toThrow();
 		});
+	});
+});
+
+describe('reviewed acceptance timeline', () => {
+	beforeEach(() => {
+		fetchSpy.mockReset();
+	});
+	it('posts flexible acceptance without preview or lock fields', async () => {
+		fetchSpy.mockResolvedValueOnce(
+			jsonResponse({ response: { id: 'assignment', invitationStatus: 'accepted' } })
+		);
+		await new TileshareApi().acceptAssignment('assignment');
+		const call = fetchSpy.mock.calls[fetchSpy.mock.calls.length - 1];
+		const request = call[0] instanceof Request ? call[0] : new Request(urlOf(call), call[1]);
+		expect(request.method).toBe('POST');
+		expect(await request.json()).toEqual({
+			Id: 'assignment',
+			Status: InvitationStatus.Accepted,
+		});
+	});
+	it('posts the selected lock timeline to the standard TilerFront status endpoint', async () => {
+		fetchSpy.mockResolvedValueOnce(
+			jsonResponse({ response: { id: 'assignment', invitationStatus: 'accepted' } })
+		);
+		const timeline = { StartTimeUnixMsUtc: 1791100800000, DurationInMs: 1800000 };
+		await new TileshareApi().acceptAssignment('assignment', timeline);
+		const call = fetchSpy.mock.calls[fetchSpy.mock.calls.length - 1];
+		expect(urlOf(call)).toContain('api/DesignatedTile/status');
+		const body = call[0] instanceof Request ? await call[0].text() : (call[1]?.body as string);
+		expect(JSON.parse(body)).toMatchObject({
+			Id: 'assignment',
+			Status: InvitationStatus.Accepted,
+			LockedTimeLineRequest: timeline,
+		});
+		expect(JSON.parse(body)).not.toHaveProperty('PreviewToken');
+		expect(JSON.parse(body)).not.toHaveProperty('OperationId');
+		expect(JSON.parse(body)).not.toHaveProperty('AcceptanceMode');
+		expect(JSON.parse(body)).not.toHaveProperty('SessionKey');
 	});
 });

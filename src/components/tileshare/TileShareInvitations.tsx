@@ -1,3 +1,4 @@
+import TiletteSchedulePreview from './TiletteSchedulePreview';
 import { InvitationStatus } from '@/core/common/types/tileshare';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -195,6 +196,11 @@ export default function TileShareInvitations({
 						</p>
 					)}
 					<Actions>
+						<TiletteSchedulePreview
+							assignmentId={invitation.assignmentId}
+							name={invitation.name}
+							disabled={!!busy || current.loading}
+						/>
 						<button
 							type="button"
 							disabled={!!busy || current.loading}

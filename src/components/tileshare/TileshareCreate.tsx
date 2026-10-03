@@ -1,3 +1,7 @@
+import {
+	DEFAULT_TILETTE_DURATION_MINUTES,
+	tiletteDurationInMs,
+} from '@/core/util/tileshareDuration';
 import React, { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +30,7 @@ type TileshareCreateProps = {
 };
 
 const initialTileshareFormState: TileshareFormState = {
+	durationMinutes: String(DEFAULT_TILETTE_DURATION_MINUTES),
 	name: '',
 	deadline: '',
 	location: '',
@@ -63,6 +68,8 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 		if (!formData.deadline) {
 			return t('tilesharedemo.dashboard.create.validation.deadlineRequired');
 		}
+		if (tiletteDurationInMs(formData.durationMinutes) === null)
+			return t('tileshareDuration.invalid', 'Enter a positive whole number of minutes.');
 		if (isSingle && formData.recipients.length === 0) {
 			return t('tilesharedemo.dashboard.create.validation.recipientRequired');
 		}
@@ -148,6 +155,20 @@ const TileshareCreate: React.FC<TileshareCreateProps> = ({ mode, onBack }) => {
 						value={formData.name}
 						onChange={handleFormInputChange('name')}
 					/>
+
+					{isSingle && (
+						<Input
+							name="durationMinutes"
+							type="number"
+							min={1}
+							step={1}
+							label={t('tileshareDuration.label', 'Duration (minutes)')}
+							placeholder={String(DEFAULT_TILETTE_DURATION_MINUTES)}
+							value={formData.durationMinutes}
+							onChange={handleFormInputChange('durationMinutes')}
+							disabled={submitting}
+						/>
+					)}
 
 					<DatePicker
 						value={formData.deadline}

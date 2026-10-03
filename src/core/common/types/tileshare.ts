@@ -179,6 +179,7 @@ export enum TileshareMode {
 }
 
 export type TileshareFormState = {
+	durationMinutes?: string;
 	name: string;
 	deadline: string;
 	location: string;

@@ -1,3 +1,5 @@
+import { useInRouterContext, useSearchParams } from 'react-router';
+import { Actions } from '@/core/constants/enums';
 import React, { useEffect, useMemo, useCallback } from 'react';
 import Calendar from '@/core/common/components/calendar/calendar';
 import usePrefetchedCalendarData from '@/core/common/hooks/usePrefetchedCalendarEvents';
@@ -37,6 +39,8 @@ export function CalendarWrapper({
 		viewOptions,
 		daysInView: viewOptions.daysInView,
 	});
+
+	const hasRouter = useInRouterContext();
 
 	// Auto-refetch calendar events when a schedule change is detected via WebSocket
 	useScheduleSocket(refetchEvents);
@@ -138,6 +142,9 @@ export function CalendarWrapper({
 
 	return (
 		<>
+			{hasRouter && (
+				<CalendarRouteFocus loading={loading} allowEventLookup={allowEventLookup} />
+			)}
 			{inReview && diff && (
 				<SimulationModeBanner
 					counts={diff.counts}
@@ -162,4 +169,51 @@ export function CalendarWrapper({
 			/>
 		</>
 	);
+}
+
+export function CalendarRouteFocus({
+	loading,
+	allowEventLookup,
+}: {
+	loading: boolean;
+	allowEventLookup: boolean;
+}) {
+	const [routeParams, setRouteParams] = useSearchParams();
+	const routeCalendarId = routeParams.get('calendarEventId');
+	const focusCalendar = useCalendarDispatch();
+	const focusedRoute = React.useRef<string | null>(null);
+	useEffect(() => {
+		if (!routeCalendarId) focusedRoute.current = null;
+		if (
+			loading ||
+			!routeCalendarId ||
+			focusedRoute.current === routeCalendarId ||
+			!allowEventLookup
+		)
+			return;
+		const timer = window.setTimeout(() => {
+			focusedRoute.current = routeCalendarId;
+			focusCalendar(
+				{
+					type: CalendarRequestType.FocusEvent,
+					entityId: routeCalendarId,
+					entityType: CalendarEntityType.CalendarEvent,
+					actionType: Actions.None,
+				},
+				() => {
+					setRouteParams(
+						(previous) => {
+							const next = new URLSearchParams(previous);
+							next.delete('calendarEventId');
+							return next;
+						},
+						{ replace: true, preventScrollReset: true }
+					);
+				}
+			);
+		}, 0);
+		return () => window.clearTimeout(timer);
+	}, [loading, routeCalendarId, allowEventLookup, focusCalendar, setRouteParams]);
+
+	return null;
 }

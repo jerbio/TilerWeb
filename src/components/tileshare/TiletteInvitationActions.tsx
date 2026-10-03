@@ -1,3 +1,4 @@
+import TiletteSchedulePreview from './TiletteSchedulePreview';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Check, X, PencilLine } from 'lucide-react';
@@ -102,9 +103,6 @@ function ResponseActions({
 	const active = useRef(true);
 	// Whether the in-flight/confirmed action changed an already-resolved response.
 	const wasChange = useRef(false);
-	const lastStatus = useRef<InvitationStatus.Accepted | InvitationStatus.Declined>(
-		InvitationStatus.Accepted
-	);
 	useEffect(() => {
 		active.current = true;
 		return () => {
@@ -140,7 +138,6 @@ function ResponseActions({
 		if (busy.current || (state !== 'pending' && !(state === 'resolved' && changeOpen))) return;
 		busy.current = true;
 		wasChange.current = isResolved(currentStatus);
-		lastStatus.current = status;
 		setState('saving');
 		setChangeOpen(false);
 		reportBusy?.(true);
@@ -149,7 +146,7 @@ function ResponseActions({
 			if (!active.current) return;
 			setState(status);
 			window.dispatchEvent(new Event('tileshare-changed'));
-			await refresh?.();
+			await refresh?.().catch(() => undefined);
 		} catch {
 			if (active.current) setState('uncertain');
 		} finally {
@@ -163,23 +160,25 @@ function ResponseActions({
 		setState('checking');
 		reportBusy?.(true);
 		try {
-			const page = await api.getInvitations({
-				ClusterId: clusterId,
-				TiletteId: tiletteId,
-				AssignmentId: assignmentId,
-			});
+			const assignment = await api.getAssignmentResponse(assignmentId);
 			if (!active.current) return;
-			const stillPending =
-				page.invitations?.some((i) => i.assignmentId === assignmentId) ?? false;
-			if (wasChange.current) {
-				// A resolved assignment leaves the pending list once its status is applied,
-				// so an empty list means the change went through.
-				setState(stillPending ? 'uncertain' : lastStatus.current);
+			if (
+				assignment.id !== assignmentId ||
+				assignment.tiletteId !== tiletteId ||
+				assignment.clusterId !== clusterId
+			) {
+				setState('unavailable');
+			} else if (
+				assignment.invitationStatus === InvitationStatus.Accepted ||
+				assignment.invitationStatus === InvitationStatus.Declined
+			) {
+				setState(assignment.invitationStatus);
 			} else {
-				setState(stillPending ? 'pending' : 'unavailable');
+				// A pending read cannot prove a timed-out request has stopped executing.
+				setState('uncertain');
 			}
 			window.dispatchEvent(new Event('tileshare-changed'));
-			await refresh?.();
+			await refresh?.().catch(() => undefined);
 		} catch {
 			if (active.current) setState('uncertain');
 		} finally {
@@ -203,6 +202,16 @@ function ResponseActions({
 			aria-label={`${t('tileshareInvitations.title', 'Invitations')}: ${name}`}
 			aria-busy={state === 'saving' || state === 'checking'}
 		>
+			{(state === 'pending' || state === 'resolved') &&
+				currentStatus !== InvitationStatus.Accepted && (
+					<TiletteSchedulePreview
+						assignmentId={assignmentId}
+						name={name}
+						onResponded={() => {
+							void refresh?.().catch(() => undefined);
+						}}
+					/>
+				)}
 			{(state === 'pending' || state === 'resolved' || state === 'saving') && (
 				<>
 					{/* The host row's RSVP badge already states the current status when embedded. */}

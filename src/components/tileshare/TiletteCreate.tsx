@@ -1,3 +1,7 @@
+import {
+	DEFAULT_TILETTE_DURATION_MINUTES,
+	tiletteDurationInMs,
+} from '@/core/util/tileshareDuration';
 import React, { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -63,6 +67,9 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	const dismissNotification = useUiStore((s) => s.notification.dismiss);
 
 	const [name, setName] = useState('');
+	const [durationMinutes, setDurationMinutes] = useState(
+		String(DEFAULT_TILETTE_DURATION_MINUTES)
+	);
 	const [deadline, setDeadline] = useState('');
 	const [note, setNote] = useState('');
 	const [recipients, setRecipients] = useState<Recipient[]>([]);
@@ -74,6 +81,8 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	/** First validation problem as a message, or null when valid. */
 	const getValidationError = (): string | null => {
 		if (!name.trim()) return t('tilesharedemo.detail.add.validation.nameRequired');
+		if (tiletteDurationInMs(durationMinutes) === null)
+			return t('tileshareDuration.invalid', 'Enter a positive whole number of minutes.');
 		const invalid = recipients.find((r) => !isValidRecipient(r.label));
 		if (invalid) {
 			return t('tilesharedemo.detail.add.validation.invalidRecipient', {
@@ -99,6 +108,7 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 		try {
 			const created = await tileshareService.createTilette({
 				ClusterId: clusterId,
+				DurationInMs: tiletteDurationInMs(durationMinutes)!,
 				Name: name.trim(),
 				NoteMiscData: note.trim() || undefined,
 				Contacts: recipients.map((r) => toContactModel(r.label, defaultCallingCode)),
@@ -164,6 +174,18 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 						placeholder={t('tilesharedemo.detail.add.fields.name.placeholder')}
 						value={name}
 						onChange={(e) => setName(e.target.value)}
+						disabled={submitting}
+					/>
+
+					<Input
+						name="durationMinutes"
+						type="number"
+						min={1}
+						step={1}
+						label={t('tileshareDuration.label', 'Duration (minutes)')}
+						placeholder={String(DEFAULT_TILETTE_DURATION_MINUTES)}
+						value={durationMinutes}
+						onChange={(e) => setDurationMinutes(e.target.value)}
 						disabled={submitting}
 					/>
 

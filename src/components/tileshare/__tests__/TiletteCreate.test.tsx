@@ -74,6 +74,32 @@ describe('TiletteCreate', () => {
 		).toBeInTheDocument();
 	});
 
+	it.each([
+		['90', 5400000],
+		['', 3600000],
+	])('submits duration input %s in milliseconds', async (value, duration) => {
+		renderForm();
+		const input = screen.getByRole('spinbutton');
+		expect(input).toHaveValue(60);
+		fireEvent.change(input, { target: { value } });
+		fireEvent.change(nameInput(), { target: { value: 'Duration test' } });
+		fireEvent.click(submit());
+		await waitFor(() =>
+			expect(createTilette).toHaveBeenCalledWith(
+				expect.objectContaining({ DurationInMs: duration })
+			)
+		);
+	});
+
+	it.each(['0', '-5', '1.5'])('rejects invalid duration %s', (value) => {
+		renderForm();
+		fireEvent.change(screen.getByRole('spinbutton'), { target: { value } });
+		fireEvent.change(nameInput(), { target: { value: 'Duration test' } });
+		fireEvent.click(submit());
+		expect(createTilette).not.toHaveBeenCalled();
+		expect(notificationMessages()).toContain('tileshareDuration.invalid');
+	});
+
 	it('creates with ClusterId and the trimmed name', async () => {
 		renderForm();
 

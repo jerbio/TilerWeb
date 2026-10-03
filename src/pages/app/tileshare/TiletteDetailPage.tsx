@@ -1,3 +1,5 @@
+import TiletteManagement from '@/components/tileshare/detail/TiletteManagement';
+import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
 import TiletteRsvpStatus, {
 	TileShareViewerContext,
 } from '@/components/tileshare/TiletteRsvpStatus';
@@ -5,7 +7,7 @@ import TiletteInvitationActions, {
 	TiletteInvitationRefreshContext,
 } from '@/components/tileshare/TiletteInvitationActions';
 import React, { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import TileShareDetailLayout from '@/components/tileshare/TileShareDetailLayout';
@@ -28,6 +30,7 @@ import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
 
 const TiletteDetailPage: React.FC = () => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 	const { id: clusterId, tiletteId } = useParams<{ id: string; tiletteId: string }>();
 	const { data: tilette, loading, error, refresh } = useTiletteDetail(tiletteId ?? null);
 	const { user } = useAuth();
@@ -105,7 +108,20 @@ const TiletteDetailPage: React.FC = () => {
 										})}
 										onEdit={isOwner ? () => setEditing(true) : undefined}
 									/>
+									<TiletteManagement
+										tilette={tilette}
+										isOwner={isOwner}
+										onChanged={refresh}
+										onDeleted={() =>
+											navigate(
+												clusterId
+													? Routes.Tileshare.detail(clusterId)
+													: Routes.Tileshare.root
+											)
+										}
+									/>
 									<RsvpRow>
+										<TiletteWorkProgress tilette={tilette} />
 										<TiletteRsvpStatus tilette={tilette} embedded />
 										<TiletteInvitationActions
 											tilette={tilette}

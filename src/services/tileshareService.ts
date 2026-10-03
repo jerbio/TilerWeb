@@ -1,3 +1,4 @@
+import { tiletteDurationInMs } from '@/core/util/tileshareDuration';
 import { TileshareApi } from '@/api/tileshareApi';
 import {
 	ClusterDetail,
@@ -49,9 +50,6 @@ export type TileshareCreateContext = {
 	defaultCallingCode: string;
 };
 
-/** Default task length used until the form collects a real duration. */
-const DEFAULT_TASK_DURATION_MS = 60 * 60 * 1000; // 1h
-
 /**
  * Routes a raw share-to value to the correct contact channel. The backend does
  * not auto-detect email vs phone, so we classify client-side and normalize
@@ -74,6 +72,8 @@ export function toCreateClusterParams(
 	mode: TileshareMode,
 	ctx: TileshareCreateContext
 ): CreateTileShareClusterParams {
+	const duration = tiletteDurationInMs(form.durationMinutes);
+	if (duration === null) throw new Error('Duration must be a positive whole number of minutes.');
 	const location = form.location.trim();
 	const note = form.note.trim();
 	const recipients = form.recipients.map((r) => r.trim()).filter(Boolean);
@@ -86,7 +86,7 @@ export function toCreateClusterParams(
 		IsMultiTilette: mode === TileshareMode.Multi,
 		IncludeMe: true,
 		EndTime: form.deadline ? dateTimeToUnix(form.deadline, '11:59 PM') : undefined,
-		DurationInMs: DEFAULT_TASK_DURATION_MS,
+		DurationInMs: duration,
 		Notes: note || undefined,
 		AddressData: location ? { Address: location, AddressIsVerified: false } : undefined,
 		Contacts: recipients.map((r) => toContact(r, ctx.defaultCallingCode)),
@@ -98,6 +98,18 @@ class TileshareService {
 
 	constructor(api: TileshareApi) {
 		this.api = api;
+	}
+
+	addTiletteRecipient(tiletteId: string, contact: ContactModel) {
+		return this.api.addTiletteRecipient(tiletteId, contact);
+	}
+
+	removeTiletteRecipient(tiletteId: string, assignmentId: string) {
+		return this.api.removeTiletteRecipient(tiletteId, assignmentId);
+	}
+
+	deleteTilette(id: string) {
+		return this.api.deleteTilette(id);
 	}
 
 	async getClusters(params?: ClusterPageParams) {

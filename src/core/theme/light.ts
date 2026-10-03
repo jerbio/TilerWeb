@@ -3,6 +3,16 @@ import palette from './palette';
 
 export const lightTheme: AppTheme = {
 	colors: {
+		preview: {
+			selectedBg: palette.colors.teal[50],
+			selectedText: palette.colors.teal[900],
+			selectedBorder: palette.colors.brand[600],
+			successBg: palette.colors.success[50],
+			warningBg: palette.colors.warning[50],
+			errorBg: palette.colors.error[50],
+			eventBg: palette.colors.indigo[50],
+			eventText: palette.colors.indigo[900],
+		},
 		plain: palette.colors.white,
 		backdrop: {
 			default: 'rgba(0, 0, 0, 0.5)',

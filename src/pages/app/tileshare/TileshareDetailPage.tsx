@@ -1,3 +1,5 @@
+import TiletteManagement from '@/components/tileshare/detail/TiletteManagement';
+import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
 import TiletteRsvpStatus, {
 	TileShareViewerContext,
 } from '@/components/tileshare/TiletteRsvpStatus';
@@ -13,7 +15,6 @@ import useAppStore from '@/global_state';
 import { useAuth } from '@/core/auth/useAuth';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useClusterDetail } from '@/hooks/useClusterDetail';
-import { computeClusterProgress } from '@/core/util/tileshareProgress';
 import { isTileshareOwner } from '@/core/util/tileshareOwnership';
 import { tileshareService } from '@/services';
 import { Routes } from '@/core/constants/routes';
@@ -145,9 +146,6 @@ const TileshareDetailPage: React.FC = () => {
 										<MultiTileshareHeader
 											name={cluster.name}
 											description={cluster.notes}
-											progress={computeClusterProgress(
-												data?.tilettes ?? null
-											)}
 											date={cluster.end}
 											onEdit={isOwner ? () => setEditing(true) : undefined}
 											onAdd={isOwner ? () => setAdding(true) : undefined}
@@ -174,6 +172,16 @@ const TileshareDetailPage: React.FC = () => {
 									/>
 								)}
 
+								{!cluster.isMultiTilette &&
+									data?.tilettes.map((tilette) => (
+										<TiletteManagement
+											key={`manage-${tilette.id}`}
+											tilette={tilette}
+											isOwner={isOwner}
+											onChanged={refresh}
+											onDeleted={refresh}
+										/>
+									))}
 								{!cluster.isMultiTilette &&
 									data?.tilettes.map((tilette) => (
 										<SingleTiletteResponse
@@ -240,6 +248,7 @@ const SingleTiletteResponse: React.FC<{ tilette: TileShareTemplate; clusterId: s
 	const [saving, setSaving] = useState(false);
 	return (
 		<ResponseSection>
+			<TiletteWorkProgress tilette={tilette} />
 			<TiletteRsvpStatus tilette={tilette} embedded />
 			<TiletteInvitationActions
 				tilette={tilette}

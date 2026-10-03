@@ -37,6 +37,7 @@ vi.mock('react-router', async () => {
 	return {
 		...actual,
 		useParams: () => useParamsMock.current,
+		useNavigate: () => vi.fn(),
 	};
 });
 

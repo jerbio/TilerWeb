@@ -1,3 +1,4 @@
+vi.mock('@/api/tileshareApi', () => ({ TileshareApi: class {} }));
 vi.mock('@/components/tileshare/TiletteInvitationActions', () => ({ default: () => null }));
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, setupUser } from '@/test/test-utils';
@@ -18,6 +19,7 @@ vi.mock('react-router', async () => {
 	const actual = await vi.importActual<typeof import('react-router')>('react-router');
 	return {
 		...actual,
+		useNavigate: () => vi.fn(),
 		Link: ({ children, to, ...rest }: { children: React.ReactNode; to: string }) => (
 			<a href={to} {...rest}>
 				{children}

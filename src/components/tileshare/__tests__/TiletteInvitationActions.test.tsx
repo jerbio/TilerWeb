@@ -31,6 +31,7 @@ vi.mock('@/api/tileshareApi', () => ({
 	TileshareApi: class {
 		respondToInvitation = mocks.respond;
 		getInvitations = mocks.read;
+		getAssignmentResponse = mocks.read;
 	},
 }));
 vi.mock('react-i18next', () => ({
@@ -255,19 +256,20 @@ describe('inline tilette invitation actions', () => {
 	});
 	it('requires a status refresh after an uncertain response rather than resending it', async () => {
 		mocks.respond.mockRejectedValue(new Error('timeout'));
-		mocks.read.mockResolvedValue({ invitations: [], nextCursor: null });
+		mocks.read.mockResolvedValue({
+			id: 'mine',
+			tiletteId: 'tilette',
+			clusterId: 'cluster',
+			invitationStatus: InvitationStatus.Declined,
+		});
 		render(<TiletteInvitationActions tilette={tilette} clusterId="cluster" />);
 		await setupUser().click(screen.getByRole('button', { name: 'Accept' }));
 		await screen.findByRole('alert');
 		expect(screen.queryByRole('button', { name: 'Accept' })).not.toBeInTheDocument();
 		await setupUser().click(screen.getByRole('button', { name: 'Refresh' }));
-		expect(mocks.read).toHaveBeenCalledExactlyOnceWith({
-			ClusterId: 'cluster',
-			TiletteId: 'tilette',
-			AssignmentId: 'mine',
-		});
+		expect(mocks.read).toHaveBeenCalledExactlyOnceWith('mine');
 		expect(mocks.respond).toHaveBeenCalledOnce();
-		await screen.findByText('This invitation is no longer pending.');
+		await screen.findByText('Invitation declined.');
 	});
 	it('changes an accepted response to declined through the change-response flow', async () => {
 		mocks.respond.mockResolvedValue({});
@@ -309,9 +311,14 @@ describe('inline tilette invitation actions', () => {
 			vi.useRealTimers();
 		}
 	});
-	it('treats an uncertain change as applied once the pending list is empty', async () => {
+	it('uses the actual assignment response instead of assuming an uncertain change was applied', async () => {
 		mocks.respond.mockRejectedValue(new Error('timeout'));
-		mocks.read.mockResolvedValue({ invitations: [], nextCursor: null });
+		mocks.read.mockResolvedValue({
+			id: 'mine',
+			tiletteId: 'tilette',
+			clusterId: 'cluster',
+			invitationStatus: InvitationStatus.Declined,
+		});
 		render(
 			<TiletteInvitationActions
 				tilette={resolvedTilette(InvitationStatus.Declined)}
@@ -324,7 +331,7 @@ describe('inline tilette invitation actions', () => {
 		await setupUser().click(screen.getByRole('button', { name: 'Refresh' }));
 		expect(mocks.respond).toHaveBeenCalledOnce();
 		expect(mocks.read).toHaveBeenCalledOnce();
-		await screen.findByText('Response updated to Accepted.');
+		await screen.findByText('Response updated to Declined.');
 	});
 	it('ignores a late response after changing accounts', async () => {
 		let resolve!: () => void;

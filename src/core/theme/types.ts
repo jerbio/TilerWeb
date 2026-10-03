@@ -32,6 +32,16 @@ export type ColorScaleHue =
 
 export type AppTheme = {
 	colors: {
+		preview: {
+			selectedBg: string;
+			selectedText: string;
+			selectedBorder: string;
+			successBg: string;
+			warningBg: string;
+			errorBg: string;
+			eventBg: string;
+			eventText: string;
+		};
 		plain: string;
 		backdrop: {
 			default: string;

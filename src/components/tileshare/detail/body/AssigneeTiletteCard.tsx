@@ -10,10 +10,9 @@ import { useTheme } from '@/core/theme/ThemeProvider';
 import { Routes } from '@/core/constants/routes';
 import { getTileletteColor } from '@/core/util/tileletteColor';
 import { filledSurface } from '@/core/util/colorSurface';
-import { deriveTileletteStatus } from '@/core/util/tileshareProgress';
 import { designatedToAvatars } from '@/core/util/tileshareAssignees';
 import AvatarCluster from '@/core/common/components/AvatarCluster';
-import TiletteStatus from './TiletteStatus';
+import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
 
 type AssigneeTiletteCardProps = {
 	tilette: TileShareTemplate;
@@ -41,7 +40,7 @@ const AssigneeTiletteCard: React.FC<AssigneeTiletteCardProps> = ({
 			>
 				<Name $color={surface.text}>{tilette.name ?? '—'}</Name>
 				<Footer>
-					<TiletteStatus status={deriveTileletteStatus(tilette)} showLabel={false} />
+					<TiletteWorkProgress tilette={tilette} assigneeId={assigneeId} />
 					<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={24} />
 				</Footer>
 			</CardLink>

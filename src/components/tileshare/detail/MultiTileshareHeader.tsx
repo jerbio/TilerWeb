@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { CalendarDays, Pencil, Plus, Timer, Trash2 } from 'lucide-react';
 import { MultiTileshareIcon } from '@/components/tileshare/icons';
 import Button from '@/core/common/components/button';
-import ProgressBar from '@/core/common/components/ProgressBar';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderDivider, HeaderSection } from './DetailHeaderCard';
@@ -14,8 +13,6 @@ import { RGB } from '@/core/util/colors';
 type MultiTileshareHeaderProps = {
 	name: string | null;
 	description: string | null;
-	/** Whole-percentage cluster progress (0–100), computed by the caller. */
-	progress: number;
 	/** Epoch used for the displayed date and time. */
 	date: number | null;
 	/** Icon accent colour. Defaults to the shared tileshare accent. */
@@ -29,7 +26,6 @@ type MultiTileshareHeaderProps = {
 const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 	name,
 	description,
-	progress,
 	date,
 	accent = TILESHARE_ACCENT,
 	onEdit,
@@ -101,11 +97,6 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 			<HeaderDivider />
 			<HeaderSection>
 				<Footer>
-					<FlexProgress
-						percentage={progress}
-						label={t('tilesharedemo.detail.progress')}
-					/>
-					<VDivider />
 					<Chip>
 						<CalendarDays size={16} />
 						<ChipText>{formatDetailDate(date)}</ChipText>
@@ -135,22 +126,6 @@ const Footer = styled.div`
 	@media (max-width: 640px) {
 		flex-direction: column;
 		align-items: stretch;
-	}
-`;
-
-const FlexProgress = styled(ProgressBar)`
-	flex: 1;
-	min-width: 0;
-`;
-
-const VDivider = styled.div`
-	width: 1px;
-	align-self: stretch;
-	background-color: ${({ theme }) => theme.colors.border.default};
-	flex-shrink: 0;
-
-	@media (max-width: 640px) {
-		display: none;
 	}
 `;
 

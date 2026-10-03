@@ -1,3 +1,4 @@
+vi.mock('@/api/tileshareApi', () => ({ TileshareApi: class {} }));
 vi.mock('@/components/tileshare/TiletteInvitationActions', () => ({ default: () => null }));
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
@@ -17,6 +18,7 @@ vi.mock('react-router', async () => {
 	const actual = await vi.importActual<typeof import('react-router')>('react-router');
 	return {
 		...actual,
+		useNavigate: () => vi.fn(),
 		Link: ({ children, to, ...rest }: { children: React.ReactNode; to: string }) => (
 			<a href={to} {...rest}>
 				{children}
@@ -47,10 +49,13 @@ const tilette: TileShareTemplate = {
 };
 
 describe('TiletteRow', () => {
-	it('renders the tilette name and stubbed in-progress status', () => {
+	it('renders the tilette name without inventing work progress before acceptance', () => {
 		render(<TiletteRow tilette={tilette} clusterId="clu-1" />);
 		expect(screen.getByText('Backend integration')).toBeInTheDocument();
-		expect(screen.getByText('tilesharedemo.detail.status.inProgress')).toBeInTheDocument();
+		expect(
+			screen.queryByText('tilesharedemo.detail.status.inProgress')
+		).not.toBeInTheDocument();
+		expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
 	});
 
 	it('links the arrow to the tilette detail route', () => {

@@ -218,12 +218,16 @@ describe('TileshareCreate', () => {
 			'jane@example.com{Enter}'
 		);
 
+		expect(screen.getByRole('spinbutton')).toHaveValue(60);
+		await user.clear(screen.getByRole('spinbutton'));
+		await user.type(screen.getByRole('spinbutton'), '90');
 		await user.click(screen.getByText('tilesharedemo.dashboard.create.single.submit'));
 
 		await waitFor(() => expect(createCluster).toHaveBeenCalledTimes(1));
 		expect(createCluster).toHaveBeenCalledWith(
 			expect.objectContaining({
 				Name: 'Finish taxes',
+				DurationInMs: 5400000,
 				IsMultiTilette: false,
 				IncludeMe: true,
 				UserName: 'me@example.com',
