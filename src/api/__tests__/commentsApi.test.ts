@@ -163,8 +163,14 @@ describe('CommentsApi', () => {
 			fetchSpy.mockResolvedValueOnce(json(envelope({ comment: mockComment })));
 			await api.updateComment('Comment+abc', { text: 'edited', idempotencyKey: 'k2' });
 			const call = fetchSpy.mock.calls[0];
-			expect(urlOf(call)).toContain('api/Comments/');
+			expect(urlOf(call)).toContain('api/Comments?id=Comment%2Babc');
 			expect(methodOf(call)).toBe('PUT');
+			const first = call[0];
+			const bodyStr =
+				first instanceof Request ? await first.text() : (call[1] as RequestInit).body;
+			const parsed = JSON.parse(bodyStr as string);
+			expect(parsed.text).toBe('edited');
+			expect(parsed.idempotencyKey).toBe('k2');
 		});
 	});
 
@@ -311,12 +317,12 @@ describe('CommentsApi', () => {
 			fetchSpy.mockResolvedValueOnce(new Response('', { status: 404 }));
 			await expect(api.downloadAttachment('01HATTACH')).rejects.toThrow();
 		});
-		
+
 		it('sends a DELETE to the comment id with a JSON body', async () => {
 			fetchSpy.mockResolvedValueOnce(json(envelope({ comment: mockComment })));
 			await api.deleteComment('Comment+abc', { idempotencyKey: 'k3' });
 			const call = fetchSpy.mock.calls[0];
-			expect(urlOf(call)).toContain('api/Comments/');
+			expect(urlOf(call)).toContain('api/Comments?id=Comment%2Babc');
 			expect(methodOf(call)).toBe('DELETE');
 		});
 	});
