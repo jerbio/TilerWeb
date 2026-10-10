@@ -1,5 +1,14 @@
 vi.mock('@/api/tileshareApi', () => ({ TileshareApi: class {} }));
-vi.mock('@/components/tileshare/TiletteInvitationActions', () => ({ default: () => null }));
+vi.mock('@/components/tileshare/TiletteInvitationActions', async () => {
+	const { createContext } = await import('react');
+	return {
+		default: () => null,
+		// StatusBoardView reads the refresh callback from this context on mount.
+		TiletteInvitationRefreshContext: createContext<(() => Promise<void>) | undefined>(
+			undefined
+		),
+	};
+});
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, setupUser } from '@/test/test-utils';
 import type { DesignatedUser, TileShareTemplate } from '@/core/common/types/tileshare';
@@ -123,5 +132,45 @@ describe('TiletteBody', () => {
 
 		expect(screen.getByText('tilesharedemo.detail.showingAssignees 1/3')).toBeInTheDocument();
 		expect(screen.getByText('Cara X.')).toBeInTheDocument();
+	});
+
+	it('shows the board tab', () => {
+		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
+		expect(
+			screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' })
+		).toBeInTheDocument();
+	});
+
+	it('switches to the board view and shows an empty completed lane', async () => {
+		const u = setupUser();
+		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
+
+		await u.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' }));
+
+		// Every assignee's RSVP is null, so both tilettes sit in the Todo lane and
+		// the In progress and Completed lanes show their empty state.
+		expect(screen.getByText('t1')).toBeInTheDocument();
+		expect(screen.getByText('t2')).toBeInTheDocument();
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
+	});
+
+	it('persists the selected view across a remount', async () => {
+		const u = setupUser();
+		const first = render(<TiletteBody clusterId="c" tilettes={tilettes} />);
+
+		await u.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' }));
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
+
+		first.unmount();
+		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
+	});
+
+	it('falls back to list when the stored view is invalid', () => {
+		localStorage.setItem('tilesharedemo.detail.view', 'bogus');
+		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
+
+		expect(screen.queryByText('tilesharedemo.detail.board.empty')).not.toBeInTheDocument();
+		expect(screen.getByText('tilesharedemo.detail.showingTilettes 2/2')).toBeInTheDocument();
 	});
 });

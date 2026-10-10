@@ -113,11 +113,12 @@ export type ClusterDetail = {
 };
 
 /**
- * Per-tilette completion status. Derived client-side for now — the backend
- * has no completion field yet, so {@link deriveTileletteStatus} returns a stub.
- * When the wire field lands, only that helper changes.
+ * Per-tilette completion status, derived client-side from the assignee data
+ * (RSVP state and completion percent) — see {@link deriveTileletteStatus}.
  */
 export enum TileletteStatus {
+	/** No assignee has accepted yet, so no work can be started. */
+	Todo = 'todo',
 	InProgress = 'in_progress',
 	Completed = 'completed',
 }

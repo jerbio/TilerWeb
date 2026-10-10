@@ -57,7 +57,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 	isNested,
 	participants,
 }) => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const [editing, setEditing] = useState(false);
 	const [draft, setDraft] = useState('');
 	const [editSelected, setEditSelected] = useState<SelectedMention[]>([]);
@@ -178,7 +178,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
 	const createdAt = comment.createdAt != null ? dayjs(comment.createdAt) : null;
 	const time = createdAt
-		? createdAt.format(createdAt.isSame(dayjs(), 'day') ? 'h:mm A' : 'MMM D, h:mm A')
+		? new Intl.DateTimeFormat(i18n?.language, {
+				hour: 'numeric',
+				minute: '2-digit',
+				...(!createdAt.isSame(dayjs(), 'day')
+					? { month: 'short' as const, day: 'numeric' as const }
+					: {}),
+			}).format(createdAt.toDate())
 		: null;
 	const isViewer = comment.author?.isViewer === true;
 	const avatar = (
@@ -197,14 +203,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
 					<Muted aria-hidden="true">•</Muted>
 					<Time
 						dateTime={createdAt.toISOString()}
-						title={createdAt.format('dddd, MMM D YYYY, h:mm A')}
+						title={createdAt.toDate().toLocaleString(i18n?.language)}
 					>
 						{time}
 					</Time>
 				</>
 			)}
 			{comment.editedAt != null && !isDeleted && (
-				<Muted title={dayjs(comment.editedAt).format('dddd, MMM D YYYY, h:mm A')}>
+				<Muted title={new Date(comment.editedAt).toLocaleString(i18n?.language)}>
 					{t('comments.edited')}
 				</Muted>
 			)}

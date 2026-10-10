@@ -9,20 +9,47 @@ import Tabs from '@/core/common/components/Tabs';
 import ViewHeader from './ViewHeader';
 import TiletteListView from './TiletteListView';
 import AssigneeView from './AssigneeView';
+import StatusBoardView from './StatusBoardView';
 
 type TiletteBodyProps = {
 	clusterId: string;
 	tilettes: TileShareTemplate[];
 };
 
-type View = 'list' | 'assignee';
+type View = 'list' | 'assignee' | 'board';
 
 const MIN_COLUMN_WIDTH = 230;
 const TILETTES_PER_PAGE = 10;
+const VIEW_STORAGE_KEY = 'tilesharedemo.detail.view';
+const VALID_VIEWS: View[] = ['list', 'assignee', 'board'];
+
+function readStoredView(): View | null {
+	try {
+		const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
+		if (stored && (VALID_VIEWS as string[]).includes(stored)) {
+			return stored as View;
+		}
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+function writeStoredView(view: View): void {
+	try {
+		window.localStorage.setItem(VIEW_STORAGE_KEY, view);
+	} catch {
+		// Ignore persistence failures (e.g. storage disabled or unavailable).
+	}
+}
 
 const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 	const { t } = useTranslation();
-	const [view, setView] = useState<View>('list');
+	const [view, setView] = useState<View>(() => readStoredView() ?? 'list');
+
+	useEffect(() => {
+		writeStoredView(view);
+	}, [view]);
 
 	// Measured on the always-mounted wrapper so the column count is available in
 	// both views (the assignee board itself only exists while that view is open).
@@ -50,15 +77,20 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 	} = usePagination(tilettes, TILETTES_PER_PAGE, [clusterId]);
 
 	const label =
-		view === 'list'
-			? t('tilesharedemo.detail.showingTilettes', {
-					shown: visibleTilettes.length,
-					total: tilettes.length,
-				})
-			: t('tilesharedemo.detail.showingAssignees', {
+		view === 'assignee'
+			? t('tilesharedemo.detail.showingAssignees', {
 					shown: visibleAssignees.length,
 					total: totalAssignees,
-				});
+				})
+			: view === 'board'
+				? t('tilesharedemo.detail.showingTilettes', {
+						shown: tilettes.length,
+						total: tilettes.length,
+					})
+				: t('tilesharedemo.detail.showingTilettes', {
+						shown: visibleTilettes.length,
+						total: tilettes.length,
+					});
 
 	return (
 		<Wrap ref={ref}>
@@ -72,6 +104,7 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 						tabs={[
 							{ id: 'list', label: t('tilesharedemo.detail.view.list') },
 							{ id: 'assignee', label: t('tilesharedemo.detail.view.assignee') },
+							{ id: 'board', label: t('tilesharedemo.detail.view.board') },
 						]}
 					/>
 				}
@@ -86,6 +119,8 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 					onPrev={() => setListPage((p) => Math.max(1, p - 1))}
 					onNext={() => setListPage((p) => Math.min(listPageCount, p + 1))}
 				/>
+			) : view === 'board' ? (
+				<StatusBoardView tilettes={tilettes} clusterId={clusterId} />
 			) : (
 				<AssigneeView
 					assignees={visibleAssignees}

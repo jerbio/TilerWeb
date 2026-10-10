@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { Check, Hourglass } from 'lucide-react';
+import { Check, Hourglass, Inbox } from 'lucide-react';
 import { TileletteStatus as Status } from '@/core/common/types/tileshare';
 
 type TiletteStatusProps = {
@@ -10,23 +10,28 @@ type TiletteStatusProps = {
 	showLabel?: boolean;
 };
 
-/** Status indicator: hourglass + "In progress" (amber) or check + "Completed" (green). */
+const icons: Record<Status, React.ElementType> = {
+	[Status.Todo]: Inbox,
+	[Status.InProgress]: Hourglass,
+	[Status.Completed]: Check,
+};
+
+const labelKeys: Record<Status, string> = {
+	[Status.Todo]: 'tilesharedemo.detail.status.todo',
+	[Status.InProgress]: 'tilesharedemo.detail.status.inProgress',
+	[Status.Completed]: 'tilesharedemo.detail.status.completed',
+};
+
+/** Status indicator: inbox + "Todo" (amber), hourglass + "In progress" (amber) or check + "Completed" (green). */
 const TiletteStatus: React.FC<TiletteStatusProps> = ({ status, showLabel = true }) => {
 	const { t } = useTranslation();
 	const completed = status === Status.Completed;
+	const Icon = icons[status];
 
 	return (
 		<Wrap $completed={completed}>
-			{completed ? <Check size={16} /> : <Hourglass size={16} />}
-			{showLabel && (
-				<Label>
-					{t(
-						completed
-							? 'tilesharedemo.detail.status.completed'
-							: 'tilesharedemo.detail.status.inProgress'
-					)}
-				</Label>
-			)}
+			<Icon size={16} />
+			{showLabel && <Label>{t(labelKeys[status])}</Label>}
 		</Wrap>
 	);
 };

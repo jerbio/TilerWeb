@@ -25,12 +25,17 @@ vi.mock('@/api/tileshareApi', () => ({
 	},
 }));
 vi.mock('@/core/auth/useAuth', () => ({ useAuth: () => ({ user: mocks.user }) }));
-vi.mock('react-i18next', () => ({
-	useTranslation: () => ({
-		t: (_key: string, fallback: string) => fallback,
-		i18n: { language: 'en' },
-	}),
-}));
+vi.mock('react-i18next', async () => {
+	const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next');
+	const { createInstance } = await import('i18next');
+	const i18n = createInstance();
+	await i18n.use(actual.initReactI18next).init({ lng: 'en', resources: {} });
+	return {
+		...actual,
+		useTranslation: () => ({ t: i18n.t.bind(i18n), i18n }),
+	};
+});
+
 const event = (id: string) => ({
 	eventId: id,
 	schemaVersion: 1,
@@ -48,6 +53,34 @@ beforeEach(() => {
 });
 
 describe('TileShareActivityTimeline', () => {
+	it.each([
+		['comment_added', 'commented on'],
+		['comment_replied', 'replied to a comment on'],
+		['comment_edited', 'edited a comment on'],
+		['comment_deleted', 'deleted a comment on'],
+	])('renders %s as a comment activity', async (eventType, action) => {
+		mocks.getActivity.mockResolvedValue({
+			items: [
+				{
+					...event('comment'),
+					eventType,
+					actorName: 'Murphy',
+					actorId: 'actor',
+					tiletteTitle: 'Design',
+				},
+			],
+			nextCursor: null,
+		});
+		render(
+			<MemoryRouter>
+				<TileShareActivityTimeline ClusterId="cluster" />
+			</MemoryRouter>
+		);
+		const link = await screen.findByRole('link');
+		expect(link).toHaveTextContent(`Murphy ${action}`);
+		expect(link).toHaveAttribute('href', '/tileshare/cluster/tilette/tilette');
+	});
+
 	it('renders an actor, activity sentence, title and accessible target in one row', async () => {
 		mocks.getActivity.mockResolvedValue({
 			items: [

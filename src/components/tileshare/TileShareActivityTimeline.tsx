@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { TileshareApi } from '@/api/tileshareApi';
 import { useAuth } from '@/core/auth/useAuth';
 import { TileShareActivity, TileShareActivityScope } from '@/core/common/types/tileshareActivity';
@@ -10,6 +10,7 @@ import {
 	ChevronRight,
 	CircleHelp,
 	Mail,
+	MessageSquare,
 	MoreHorizontal,
 	Pencil,
 	Plus,
@@ -23,6 +24,10 @@ import * as S from './TileShareActivityTimeline.styles';
 
 const api = new TileshareApi();
 const labels: Record<string, string> = {
+	comment_added: 'Comment added',
+	comment_replied: 'Comment reply added',
+	comment_edited: 'Comment edited',
+	comment_deleted: 'Comment deleted',
 	cluster_invitation: 'Invited to TileShare',
 	cluster_created: 'TileShare created',
 	cluster_deleted: 'TileShare deleted',
@@ -40,6 +45,13 @@ const labels: Record<string, string> = {
 	invitation_sent: 'Invitation sent',
 	invitation_send_failed: 'Invitation could not be sent',
 	invitation_send_unknown: 'Invitation send outcome unknown',
+};
+
+const commentSentences: Record<string, string> = {
+	comment_added: '<actor/> commented on <title/>',
+	comment_replied: '<actor/> replied to a comment on <title/>',
+	comment_edited: '<actor/> edited a comment on <title/>',
+	comment_deleted: '<actor/> deleted a comment on <title/>',
 };
 
 const actions: Record<string, string> = {
@@ -62,6 +74,7 @@ const actions: Record<string, string> = {
 	invitation_send_unknown: 'sent an invitation with an unknown outcome for',
 };
 function appearance(type: string) {
+	if (type.startsWith('comment_')) return { Icon: MessageSquare, tone: 'neutral' as const };
 	if (['assignment_accepted', 'assignment_completed'].includes(type))
 		return { Icon: Check, tone: 'success' as const };
 	if (['assignment_declined', 'recipient_removed', 'invitation_send_failed'].includes(type))
@@ -320,36 +333,50 @@ export default function TileShareActivityTimeline({
 							</S.Avatar>
 							<S.Copy>
 								<S.Sentence>
-									{actor && (
-										<>
-											<S.Actor>{actor}</S.Actor>{' '}
-										</>
-									)}
-									{known && actor && title ? (
-										<>
-											{t(
-												`tileshareActivity.actions.${item.eventType}`,
-												actions[item.eventType]
-											)}{' '}
-											<strong>&lsquo;{title}&rsquo;</strong>
-										</>
+									{known && actor && title && commentSentences[item.eventType] ? (
+										<Trans
+											t={t}
+											i18nKey={`tileshareActivity.sentences.${item.eventType}`}
+											defaults={commentSentences[item.eventType]}
+											components={{
+												actor: <S.Actor>{actor}</S.Actor>,
+												title: <strong>&lsquo;{title}&rsquo;</strong>,
+											}}
+										/>
 									) : (
 										<>
-											<span>
-												{known
-													? t(
-															`tileshareActivity.events.${item.eventType}`,
-															labels[item.eventType]
-														)
-													: t(
-															'tileshareActivity.unknown',
-															'Activity updated'
-														)}
-											</span>
-											{title && (
+											{actor && (
 												<>
-													{' '}
-													&middot; <strong>{title}</strong>
+													<S.Actor>{actor}</S.Actor>{' '}
+												</>
+											)}
+											{known && actor && title ? (
+												<>
+													{t(
+														`tileshareActivity.actions.${item.eventType}`,
+														actions[item.eventType]
+													)}{' '}
+													<strong>&lsquo;{title}&rsquo;</strong>
+												</>
+											) : (
+												<>
+													<span>
+														{known
+															? t(
+																	`tileshareActivity.events.${item.eventType}`,
+																	labels[item.eventType]
+																)
+															: t(
+																	'tileshareActivity.unknown',
+																	'Activity updated'
+																)}
+													</span>
+													{title && (
+														<>
+															{' '}
+															&middot; <strong>{title}</strong>
+														</>
+													)}
 												</>
 											)}
 										</>
