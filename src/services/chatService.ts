@@ -1,5 +1,6 @@
 import {
 	ChatMessageBody,
+	ChatSessionExecutionMode,
 	ChatMessagesParams,
 	PromptWithActions,
 	SimulationDto,
@@ -56,10 +57,12 @@ class ChatService {
 		userLatitude: string = '',
 		userLocationVerified: string = '',
 		requestId: string = '',
-		actionId: string = ''
+		actionId: string = '',
+		chatSessionExecutionMode: ChatSessionExecutionMode = ChatSessionExecutionMode.ConfirmFirst
 	) {
 		const requestBody: ChatMessageBody = {
 			EntityId: entityId,
+			ChatSessionExecutionMode: chatSessionExecutionMode,
 			ChatMessage: message,
 			SessionId: sessionId,
 			RequestId: requestId,
@@ -94,6 +97,18 @@ class ChatService {
 
 			throw normalizeError(error);
 		}
+	}
+
+	confirmTileShare(actionId: string, token: string, signal?: AbortSignal) {
+		return this.chatApi.confirmTileShare(actionId, token, signal);
+	}
+	selectDirectoryMatch(
+		actionId: string,
+		resultId: string,
+		matchId: string,
+		signal?: AbortSignal
+	) {
+		return this.chatApi.selectDirectoryMatch(actionId, resultId, matchId, signal);
 	}
 
 	async getActions(actionIds: string[] | string) {

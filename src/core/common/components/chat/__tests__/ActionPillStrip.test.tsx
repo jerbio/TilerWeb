@@ -53,6 +53,32 @@ function renderStrip(actions: VibeAction[]) {
 // ---------------------------------------------------------------------------
 
 describe('ActionPillStrip', () => {
+	it('does not offer schedule action pills for directory results', () => {
+		renderStrip([
+			makeAction('lookup', Actions.Directory_Search),
+			makeAction('projects', Actions.TileShare_Search_Projects),
+			makeAction('details', 'tileshare_get_project'),
+			makeAction('tilette-details', 'tileshare_get_tilette'),
+			makeAction('recipients', 'tileshare_list_recipients'),
+			makeAction('rename', Actions.TileShare_Rename_Project),
+			makeAction('rename-tilette', Actions.TileShare_Rename_Tilette),
+			makeAction('update-tilette', Actions.TileShare_Update_Tilette),
+			makeAction('notes', Actions.TileShare_Set_Tilette_Notes),
+			makeAction('delete-tilette', Actions.TileShare_Delete_Tilette),
+			makeAction('task'),
+		]);
+		expect(screen.queryByTestId('pill-update-tilette')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-lookup')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-projects')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-details')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-tilette-details')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-recipients')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-rename')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-rename-tilette')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-notes')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-delete-tilette')).not.toBeInTheDocument();
+		expect(screen.getByTestId('pill-task')).toBeInTheDocument();
+	});
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});

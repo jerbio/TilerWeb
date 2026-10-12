@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "टिप्पणी जोड़ी गई",
+			"comment_replied": "टिप्पणी का जवाब जोड़ा गया",
+			"comment_edited": "टिप्पणी संपादित की गई",
+			"comment_deleted": "टिप्पणी हटाई गई"
+		},
+		"sentences": {
+			"comment_added": "<actor/> ने <title/> पर टिप्पणी की",
+			"comment_replied": "<actor/> ने <title/> पर एक टिप्पणी का जवाब दिया",
+			"comment_edited": "<actor/> ने <title/> पर एक टिप्पणी संपादित की",
+			"comment_deleted": "<actor/> ने <title/> पर एक टिप्पणी हटाई"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "स्थिति:",
 			"status": {
 				"inProgress": "प्रगति पर",
+				"todo": "TODO",
 				"completed": "पूर्ण"
 			},
 			"view": {
 				"list": "Tilette सूची दृश्य",
-				"assignee": "जिम्मेदार दृश्य"
+				"assignee": "जिम्मेदार दृश्य",
+				"board": "बोर्ड दृश्य"
+			},
+			"board": {
+				"empty": "यहाँ अभी कोई Tilette नहीं है"
 			},
 			"viewAria": "Tilette दृश्य",
 			"openTiletteAria": "Tilette खोलें",

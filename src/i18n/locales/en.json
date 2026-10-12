@@ -52,11 +52,21 @@
 		"responseFailed": "The response could not be confirmed. Refresh to check its status before trying again."
 	},
 	"tileshareActivity": {
+		"sentences": {
+			"comment_added": "<actor/> commented on <title/>",
+			"comment_replied": "<actor/> replied to a comment on <title/>",
+			"comment_edited": "<actor/> edited a comment on <title/>",
+			"comment_deleted": "<actor/> deleted a comment on <title/>"
+		},
 		"showDismissed": "Show dismissed",
 		"dismiss": "Dismiss",
 		"restore": "Show in activities",
 		"dismissFailed": "The activity preference could not be saved. Try again.",
 		"events": {
+			"comment_added": "Comment added",
+			"comment_replied": "Comment reply added",
+			"comment_edited": "Comment edited",
+			"comment_deleted": "Comment deleted",
 			"invitation_send_unknown": "Invitation send outcome unknown",
 			"assignment_completed": "Occurrence completed",
 			"assignment_reopened": "Occurrence reopened"
@@ -568,6 +578,32 @@
 		"expanded": {
 			"mobileChatPlaceholder": "Chat with your calendar to update...",
 			"chat": {
+				"delegation": {
+					"label": "Delegation draft",
+					"note": "Draft only. Saving does not assign work or send invitations.",
+					"defaultDuration": "1 hour (default)",
+					"minutes": "minutes",
+					"saved": "Saved draft: no work assigned.",
+					"teamMode": "Team assignment mode still needs review.",
+					"edit": "Edit draft",
+					"prepare": "Prepare delegation draft",
+					"discard": "Discard draft",
+					"projectSearch": "Project name",
+					"search": "Search projects",
+					"projectSelected": "Selected project",
+					"moreProjects": "More projects",
+					"loading": "Loading projects...",
+					"empty": "No projects found.",
+					"task": "Task name",
+					"duration": "Duration (minutes)",
+					"deadline": "Deadline",
+					"save": "Save draft",
+					"cancelEdit": "Cancel editing",
+					"saving": "Saving draft...",
+					"loadError": "Could not load projects. Try searching again.",
+					"fieldsError": "Choose a project and provide a task, positive duration, and future deadline.",
+					"saveError": "Could not save the draft. Your edits are retained. Reload chat if the selection changed or the response was lost."
+				},
 				"newChat": "New Chat",
 				"clearSession": "Clear Session",
 				"title": "What would you like to do?",
@@ -2151,11 +2187,23 @@
 			"statusLabel": "Status:",
 			"status": {
 				"inProgress": "In progress",
+				"todo": "Todo",
 				"completed": "Completed"
 			},
 			"view": {
 				"list": "Tilette list view",
-				"assignee": "Assignee view"
+				"assignee": "Assignee view",
+				"board": "Board view"
+			},
+			"board": {
+				"empty": "No tilettes here yet",
+				"filterAria": "Board filter",
+				"filter": {
+					"all": "All",
+					"mine": "Just me"
+				},
+				"dropHint": "Drop here to accept",
+				"accepting": "Accepting…"
 			},
 			"viewAria": "Tilette view",
 			"openTiletteAria": "Open tilette",
@@ -2647,5 +2695,68 @@
 				]
 			}
 		}
-	}
+	},
+	"chat": {
+		"tileShare": {
+			"reviewAgain": "Review the current proposal before confirming again.",
+			"uncertain": "Creation could not be confirmed. Check status before trying again.",
+			"created": "TileShare created.",
+			"open": "Open TileShare",
+			"review": "Review TileShare creation",
+			"newProject": "Create project",
+			"newTilette": "Add tilette",
+			"project": "Project",
+			"starts": "Starts",
+			"deadline": "Deadline",
+			"minutes": "minutes",
+			"reviewNote": "Nothing is created until you confirm. Recipients still choose whether to accept; notifications are not sent by this action.",
+			"checking": "Checking...",
+			"confirm": "Confirm creation",
+			"check": "Check status"
+		},
+		"execution": {
+			"mode": "Chat execution",
+			"confirmFirst": "Confirm first",
+			"autoAct": "Auto act",
+			"autoNote": "Run supported chat actions automatically. Bulk and destructive changes still need review.",
+			"confirmNote": "Review chat changes before they run."
+		}
+	},
+	"chat.tileShare.renamed": "Project renamed.",
+	"chat.tileShare.renameReview": "Review project rename",
+	"chat.tileShare.renameProject": "Rename project",
+	"chat.tileShare.previousName": "Current name",
+	"chat.tileShare.renameNote": "Only the project name changes after confirmation.",
+	"chat.tileShare.confirmRename": "Confirm rename",
+	"chat.tileShare.renameUncertain": "Rename could not be confirmed. Check status before trying again.",
+	"chat.tileShare.tiletteRenamed": "Tilette renamed.",
+	"chat.tileShare.tiletteRenameReview": "Review tilette rename",
+	"chat.tileShare.renameTilette": "Rename tilette",
+	"chat.tileShare.tiletteRenameNote": "Only the shared tilette name changes. Personal calendar titles stay as they are.",
+	"chat.tileShare.notesUpdated": "Tilette notes updated.",
+	"chat.tileShare.notesReview": "Review tilette notes",
+	"chat.tileShare.editNotes": "Update tilette notes",
+	"chat.tileShare.previousNotes": "Current notes",
+	"chat.tileShare.proposedNotes": "Proposed notes",
+	"chat.tileShare.emptyNotes": "No notes",
+	"chat.tileShare.clearNotes": "Clear notes",
+	"chat.tileShare.notesNote": "The proposed text replaces the complete tilette notes after confirmation.",
+	"chat.tileShare.confirmNotes": "Confirm notes",
+	"chat.tileShare.notesUncertain": "Notes update could not be confirmed. Check status before trying again.",
+	"chat.tileShare.tiletteDeleted": "Tilette deleted.",
+	"chat.tileShare.deleteReview": "Review tilette deletion",
+	"chat.tileShare.deleteTilette": "Delete tilette",
+	"chat.tileShare.assignmentCount": "Assignments",
+	"chat.tileShare.linkedCalendarCount": "Linked calendar items",
+	"chat.tileShare.deleteNote": "This disables the tilette and linked calendar work. The project and other tilettes stay available. Assignment history is retained; undo is not provided here.",
+	"chat.tileShare.confirmDeletion": "Confirm deletion",
+	"chat.tileShare.deleteUncertain": "Deletion could not be confirmed. Check status before trying again.",
+	"chat.tileShare.openProject": "Open project",
+	"chat.tileShare.tiletteUpdated": "Tilette updated.",
+	"chat.tileShare.updateReview": "Review tilette update",
+	"chat.tileShare.updateTilette": "Update tilette",
+	"chat.tileShare.updateNote": "All displayed changes are saved together after confirmation. Supplied notes replace the complete note.",
+	"chat.tileShare.confirmUpdate": "Confirm update",
+	"chat.tileShare.updateRejected": "No changes were applied. Review the response and request a revised update.",
+	"chat.tileShare.updateUncertain": "Update could not be confirmed. Check status before trying again."
 }

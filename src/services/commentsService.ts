@@ -140,6 +140,7 @@ class CommentsService {
 				if (res.Error && res.Error.Code !== '0') {
 					throw TilerResponseError.fromApiCodeResponse(res.Error);
 				}
+				window.dispatchEvent(new Event('tileshare-changed'));
 				return res.Content.comment;
 			} catch (error) {
 				console.error('Error creating comment', error);
@@ -158,6 +159,7 @@ class CommentsService {
 				if (res.Error && res.Error.Code !== '0') {
 					throw TilerResponseError.fromApiCodeResponse(res.Error);
 				}
+				window.dispatchEvent(new Event('tileshare-changed'));
 				return res.Content.comment;
 			} catch (error) {
 				console.error('Error updating comment', error);
@@ -178,6 +180,7 @@ class CommentsService {
 					if (res.Error && res.Error.Code !== '0') {
 						throw TilerResponseError.fromApiCodeResponse(res.Error);
 					}
+					window.dispatchEvent(new Event('tileshare-changed'));
 				} catch (error) {
 					console.error('Error deleting comment', error);
 					throw normalizeError(error);

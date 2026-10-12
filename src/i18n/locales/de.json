@@ -1,4 +1,18 @@
-﻿{
+{
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Kommentar hinzugefügt",
+			"comment_replied": "Antwort auf einen Kommentar hinzugefügt",
+			"comment_edited": "Kommentar bearbeitet",
+			"comment_deleted": "Kommentar gelöscht"
+		},
+		"sentences": {
+			"comment_added": "<actor/> hat <title/> kommentiert",
+			"comment_replied": "<actor/> hat auf einen Kommentar zu <title/> geantwortet",
+			"comment_edited": "<actor/> hat einen Kommentar zu <title/> bearbeitet",
+			"comment_deleted": "<actor/> hat einen Kommentar zu <title/> gelöscht"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "Status:",
 			"status": {
 				"inProgress": "In Bearbeitung",
+				"todo": "Todo",
 				"completed": "Abgeschlossen"
 			},
 			"view": {
 				"list": "Listenansicht der Tilettes",
-				"assignee": "Ansicht nach Zuweisung"
+				"assignee": "Ansicht nach Zuweisung",
+				"board": "Boardansicht"
+			},
+			"board": {
+				"empty": "Noch keine Tilettes hier"
 			},
 			"viewAria": "Tilette-Ansicht",
 			"openTiletteAria": "Tilette öffnen",

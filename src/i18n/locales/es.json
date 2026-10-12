@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Comentario añadido",
+			"comment_replied": "Respuesta a un comentario añadida",
+			"comment_edited": "Comentario editado",
+			"comment_deleted": "Comentario eliminado"
+		},
+		"sentences": {
+			"comment_added": "<actor/> comentó en <title/>",
+			"comment_replied": "<actor/> respondió a un comentario en <title/>",
+			"comment_edited": "<actor/> editó un comentario en <title/>",
+			"comment_deleted": "<actor/> eliminó un comentario en <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "Estado:",
 			"status": {
 				"inProgress": "En curso",
+				"todo": "Por hacer",
 				"completed": "Completado"
 			},
 			"view": {
 				"list": "Vista de lista de Tilettes",
-				"assignee": "Vista por asignado"
+				"assignee": "Vista por asignado",
+				"board": "Vista de panel"
+			},
+			"board": {
+				"empty": "Aún no hay Tilettes aquí"
 			},
 			"viewAria": "Vista de Tilette",
 			"openTiletteAria": "Abrir tilette",

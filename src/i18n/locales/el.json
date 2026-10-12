@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Προστέθηκε σχόλιο",
+			"comment_replied": "Προστέθηκε απάντηση σε σχόλιο",
+			"comment_edited": "Το σχόλιο επεξεργάστηκε",
+			"comment_deleted": "Το σχόλιο διαγράφηκε"
+		},
+		"sentences": {
+			"comment_added": "<actor/> πρόσθεσε σχόλιο στο <title/>",
+			"comment_replied": "<actor/> απάντησε σε σχόλιο στο <title/>",
+			"comment_edited": "<actor/> επεξεργάστηκε ένα σχόλιο στο <title/>",
+			"comment_deleted": "<actor/> διέγραψε ένα σχόλιο στο <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "Κατάσταση:",
 			"status": {
 				"inProgress": "Εν εξελίξει",
+				"todo": "TODO",
 				"completed": "Ολοκληρώθηκε"
 			},
 			"view": {
 				"list": "Οπτικοποίηση λίστας tilette",
-				"assignee": "Οπτικοποίηση αποδέκτη"
+				"assignee": "Οπτικοποίηση αποδέκτη",
+				"board": "Οπτικοποίηση πίνακα"
+			},
+			"board": {
+				"empty": "Δεν υπάρχουν ακόμη tilette εδώ"
 			},
 			"viewAria": "Οπτικοποίηση tilette",
 			"openTiletteAria": "Άνοιγμα tilette",

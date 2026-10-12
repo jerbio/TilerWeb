@@ -357,3 +357,22 @@ describe('TileShareActivityTimeline', () => {
 		);
 	});
 });
+
+it('renders duration and start in edited activity metadata', async () => {
+	mocks.getActivity.mockResolvedValue({
+		items: [
+			{
+				...event('schedule-edit'),
+				eventType: 'tilette_edited',
+				metadata: { changedFields: ['start', 'duration'] },
+			},
+		],
+		nextCursor: null,
+	});
+	render(
+		<MemoryRouter>
+			<TileShareActivityTimeline ClusterId="cluster" />
+		</MemoryRouter>
+	);
+	expect(await screen.findByText('Start, Duration')).toBeVisible();
+});

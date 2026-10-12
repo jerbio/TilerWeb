@@ -1,4 +1,5 @@
 import {
+	TileShareExecutionResult,
 	ChatActionsResponse,
 	ChatSendMessageResponse,
 	ChatExecuteActionResponse,
@@ -13,6 +14,8 @@ import {
 	AutoSuggestionsResponse,
 } from '@/core/common/types/chat';
 import { ApiResponse } from '@/core/common/types/api';
+import { DirectorySearchPage } from '@/core/common/types/chat';
+import { TilerResponseError } from '@/core/common/types/errors';
 import { AppApi } from './appApi';
 import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
@@ -86,6 +89,33 @@ export class ChatApi extends AppApi {
 		});
 	}
 
+	public async selectDirectoryMatch(
+		actionId: string,
+		resultId: string,
+		matchId: string,
+		signal?: AbortSignal
+	): Promise<DirectorySearchPage> {
+		const response = await this.apiRequest<
+			ApiResponse<{ ActionId: string; DirectorySearch: DirectorySearchPage }>
+		>('api/Vibe/Directory/Selection', {
+			method: 'POST',
+			signal,
+			body: JSON.stringify({ ActionId: actionId, ResultId: resultId, MatchId: matchId }),
+		});
+		if (
+			response.Error?.Code !== '0' ||
+			!response.Content?.DirectorySearch ||
+			response.Content.ActionId !== actionId ||
+			response.Content.DirectorySearch.ResultId !== resultId ||
+			response.Content.DirectorySearch.Selection?.Id !== matchId
+		)
+			throw new TilerResponseError(
+				response.Error?.Code || 'invalid_response',
+				'Could not confirm the directory selection.'
+			);
+		return response.Content.DirectorySearch;
+	}
+
 	// Actions
 	public getActions(actionIds: string[] | string) {
 		const ids = Array.isArray(actionIds) ? actionIds : [actionIds];
@@ -95,6 +125,55 @@ export class ChatApi extends AppApi {
 		return this.apiRequest<ChatActionsResponse>('api/Vibe/Action?' + queryParam);
 	}
 
+	public async confirmTileShare(
+		actionId: string,
+		token: string,
+		signal?: AbortSignal
+	): Promise<TileShareExecutionResult> {
+		let result: TileShareExecutionResult | undefined;
+		try {
+			const response = await this.apiRequest<
+				ApiResponse<{ vibeRequest: { tileShareResult: TileShareExecutionResult } }>
+			>('api/Vibe/Request/Execute', {
+				method: 'POST',
+				signal,
+				body: JSON.stringify({
+					ActionId: actionId,
+					TileShareReviewToken: token,
+					TimeZone: deviceTimeZone().toString(),
+				}),
+			});
+			if (response.Error?.Code === '0')
+				result = response.Content?.vibeRequest?.tileShareResult;
+		} catch (error) {
+			// Preserve definitive rejections and changed reviews; neither authorizes a retry.
+			const conflict = error as ApiResponse<TileShareExecutionResult>;
+			if (
+				conflict?.Error?.Code === '409' &&
+				(conflict.Content?.State === 'Rejected' ||
+					(conflict.Content?.ReviewToken &&
+						['review_required', 'review_changed'].includes(
+							conflict.Content.ErrorCode ?? ''
+						)))
+			)
+				result = conflict.Content;
+			else throw error;
+		}
+		if (
+			!result ||
+			result.ActionId !== actionId ||
+			!(
+				result.State === 'Applied' ||
+				result.State === 'Rejected' ||
+				(result.State === 'NotAttempted' && result.ReviewToken && result.Review)
+			)
+		)
+			throw new TilerResponseError(
+				'invalid_response',
+				'Could not confirm TileShare creation.'
+			);
+		return result;
+	}
 	public executeActions(
 		requestId: string,
 		anonymousUserId?: string,

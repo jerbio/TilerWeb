@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Commentaire ajouté",
+			"comment_replied": "Réponse à un commentaire ajoutée",
+			"comment_edited": "Commentaire modifié",
+			"comment_deleted": "Commentaire supprimé"
+		},
+		"sentences": {
+			"comment_added": "<actor/> a commenté <title/>",
+			"comment_replied": "<actor/> a répondu à un commentaire sur <title/>",
+			"comment_edited": "<actor/> a modifié un commentaire sur <title/>",
+			"comment_deleted": "<actor/> a supprimé un commentaire sur <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "Statut :",
 			"status": {
 				"inProgress": "En cours",
+				"todo": "À faire",
 				"completed": "Terminé"
 			},
 			"view": {
 				"list": "Vue en liste de tuilettes",
-				"assignee": "Vue par assignataire"
+				"assignee": "Vue par assignataire",
+				"board": "Vue tableau"
+			},
+			"board": {
+				"empty": "Aucune tuilette ici pour le moment"
 			},
 			"viewAria": "Vue des tuilettes",
 			"openTiletteAria": "Ouvrir la tuilette",

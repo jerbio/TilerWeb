@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Комментарий добавлен",
+			"comment_replied": "Ответ на комментарий добавлен",
+			"comment_edited": "Комментарий изменён",
+			"comment_deleted": "Комментарий удалён"
+		},
+		"sentences": {
+			"comment_added": "<actor/>: добавлен комментарий к <title/>",
+			"comment_replied": "<actor/>: добавлен ответ на комментарий к <title/>",
+			"comment_edited": "<actor/>: изменён комментарий к <title/>",
+			"comment_deleted": "<actor/>: удалён комментарий к <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "Статус:",
 			"status": {
 				"inProgress": "В процессе",
+				"todo": "TODO",
 				"completed": "Завершено"
 			},
 			"view": {
 				"list": "Режим списка Tilette",
-				"assignee": "Режим по назначенным"
+				"assignee": "Режим по назначенным",
+				"board": "Режим доски"
+			},
+			"board": {
+				"empty": "Здесь пока нет Tilette"
 			},
 			"viewAria": "Режим Tilette",
 			"openTiletteAria": "Открыть Tilette",

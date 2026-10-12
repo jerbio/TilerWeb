@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "コメントが追加されました",
+			"comment_replied": "コメントへの返信が追加されました",
+			"comment_edited": "コメントが編集されました",
+			"comment_deleted": "コメントが削除されました"
+		},
+		"sentences": {
+			"comment_added": "<actor/>が<title/>にコメントしました",
+			"comment_replied": "<actor/>が<title/>のコメントに返信しました",
+			"comment_edited": "<actor/>が<title/>のコメントを編集しました",
+			"comment_deleted": "<actor/>が<title/>のコメントを削除しました"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "ステータス:",
 			"status": {
 				"inProgress": "進行中",
+				"todo": "TODO",
 				"completed": "完了"
 			},
 			"view": {
 				"list": "Tiletteのリスト表示",
-				"assignee": "割り当て先表示"
+				"assignee": "割り当て先表示",
+				"board": "ボード表示"
+			},
+			"board": {
+				"empty": "まだ Tilette はありません"
 			},
 			"viewAria": "Tiletteビュー",
 			"openTiletteAria": "Tiletteを開く",

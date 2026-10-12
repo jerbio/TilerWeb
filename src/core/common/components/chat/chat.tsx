@@ -1,3 +1,4 @@
+import TileShareReviewCard from './TileShareReviewCard';
 import React, { useCallback, useEffect, useLayoutEffect, useState, FormEvent, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ChevronLeftIcon, SendHorizontal, CircleStop, History, SquarePen } from 'lucide-react';
@@ -8,9 +9,9 @@ import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 import useAppStore, { ChatContextType, SessionType } from '@/global_state';
-import { PromptWithActions, VibeAction } from '@/core/common/types/chat';
+import { PromptWithActions, VibeAction, ChatSessionExecutionMode } from '@/core/common/types/chat';
 // VibeSession imported above with SessionHistory
-import { Status } from '@/core/constants/enums';
+import { Actions, Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
 import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
@@ -26,6 +27,7 @@ import { trackDemoEngaged } from '@/core/analytics';
 import { isDemoMode, getDemoData } from '@/config/demo_config';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import ActionPillStrip from '@/core/common/components/chat/ActionPillStrip';
+import DirectorySearchCard from './DirectorySearchCard';
 import SimulationStatusStrip from '@/core/common/components/chat/SimulationStatusStrip';
 import SimulationReviewPanel from '@/core/common/components/chat/SimulationReviewPanel';
 import useSimulationPolling from '@/hooks/useSimulationPolling';
@@ -332,11 +334,18 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const shouldAutoScrollToBottomRef = useRef(false);
 	const previousScrollHeightRef = useRef(0);
 	const previousScrollTopRef = useRef(0);
+	const [chatSessionExecutionMode, setChatSessionExecutionMode] = useState(
+		ChatSessionExecutionMode.ConfirmFirst
+	);
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<PromptWithActions[]>([]);
 	const [isSending, setIsSending] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
+	useEffect(
+		() => setChatSessionExecutionMode(ChatSessionExecutionMode.ConfirmFirst),
+		[activePersonaSession?.userInfo?.id, activePersonaSession?.userId]
+	);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isBatchLoading, setIsBatchLoading] = useState(false);
 	const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
@@ -1196,7 +1205,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		}
 	}, [messages]);
 
-	const shouldShowAcceptButton = useHasUnexecutedActions(requestId, messages);
+	const hasUnexecutedActions = useHasUnexecutedActions(requestId, messages);
+	const hasTileShareReview = messages.some(
+		(m) => m.requestId === requestId && m.actions?.some((a) => a.tileShareResult?.ReviewToken)
+	);
+	const shouldShowAcceptButton = hasUnexecutedActions && !hasTileShareReview;
 
 	// True when the SimulationStatusStrip is showing its Ready state and will
 	// render the inline "Accept Changes" button itself (Review + Accept on one
@@ -1256,7 +1269,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				anonymousUserId,
 				locationApiData.userLongitude,
 				locationApiData.userLatitude,
-				locationApiData.userLocationVerified
+				locationApiData.userLocationVerified,
+				'',
+				'',
+				chatSessionExecutionMode
 			);
 			if (
 				response?.Content?.vibeResponse?.tilerUser &&
@@ -1278,6 +1294,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					actions: (entry.actions ?? []).map((action: VibeAction) => ({
 						id: action.id,
 						descriptions: action.descriptions,
+						directorySearch: action.directorySearch,
+						tileShareResult: action.tileShareResult,
 						type: action.type,
 						creationTimeInMs: action.creationTimeInMs,
 						status: action.status,
@@ -1292,6 +1310,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 									creationTimeInMs: action.vibeRequest.creationTimeInMs,
 									activeAction: action.vibeRequest.activeAction,
 									isClosed: action.vibeRequest.isClosed ?? false,
+									state: action.vibeRequest.state,
+									supersededByRequestId: action.vibeRequest.supersededByRequestId,
 									beforeScheduleId: action.vibeRequest.beforeScheduleId || null,
 									afterScheduleId: action.vibeRequest.afterScheduleId || null,
 									actions: action.vibeRequest.actions || [],
@@ -1390,6 +1410,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	};
 
 	const handleNewChat = () => {
+		setChatSessionExecutionMode(ChatSessionExecutionMode.ConfirmFirst);
 		analytics.trackChatEvent('New Chat Started', {
 			personaId: selectedPersonaId,
 			previousSessionId: sessionId,
@@ -1438,6 +1459,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	};
 
 	const handleSessionSelect = (session: VibeSession) => {
+		setChatSessionExecutionMode(ChatSessionExecutionMode.ConfirmFirst);
 		// Skip if selecting the already-active session
 		if (session.id === sessionId) return;
 
@@ -1551,12 +1573,121 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 						{messages.map((message) => (
 							<MessageBubble key={message.id} $isUser={message.origin === 'user'}>
 								<div className="message-content">
-									<MarkdownRenderer content={message.content} />
+									{!(
+										message.origin !== 'user' &&
+										message.actions?.length > 0 &&
+										message.actions.every(
+											(action) =>
+												action.tileShareResult?.Review ||
+												action.tileShareResult?.State === 'Applied' ||
+												(action.type === Actions.Directory_Search &&
+													action.directorySearch)
+										)
+									) && <MarkdownRenderer content={message.content} />}
 								</div>
 
+								{message.origin !== 'user' &&
+									message.actions
+										?.filter(
+											(a) =>
+												a.type === Actions.Directory_Search &&
+												a.directorySearch
+										)
+										.map((action) => (
+											<DirectorySearchCard
+												key={`${anonymousUserId}:${sessionId}:${action.id}`}
+												action={action}
+												disabled={
+													isSending ||
+													isLoading ||
+													message.requestId !== requestId ||
+													isRequestTerminal(action.vibeRequest)
+												}
+												onSelect={(matchId, signal) =>
+													chatService.selectDirectoryMatch(
+														action.id,
+														action.directorySearch!.ResultId,
+														matchId,
+														signal
+													)
+												}
+												onChanged={(page) => {
+													const updated = {
+														...action,
+														directorySearch: page,
+													};
+													actionsByIdRef.current[action.id] = updated;
+													setMessages((previous) =>
+														previous.map((entry) => ({
+															...entry,
+															actions: entry.actions?.map((item) =>
+																item.id === action.id
+																	? updated
+																	: item
+															),
+														}))
+													);
+												}}
+											/>
+										))}
+								{message.origin !== 'user' &&
+									message.actions
+										?.filter((a) => a.tileShareResult)
+										.map((action) => (
+											<TileShareReviewCard
+												key={`${sessionId}:${action.id}:${action.tileShareResult?.ReviewToken ?? 'applied'}`}
+												result={action.tileShareResult!}
+												disabled={
+													isSending ||
+													isLoading ||
+													message.requestId !== requestId ||
+													isRequestTerminal(action.vibeRequest)
+												}
+												onConfirm={(token, signal) =>
+													chatService.confirmTileShare(
+														action.id,
+														token,
+														signal
+													)
+												}
+												onCheck={async () => {
+													const current = (
+														await chatService.getActions(action.id)
+													).find(
+														(a) => a.id === action.id
+													)?.tileShareResult;
+													if (!current)
+														throw new Error('Missing creation status');
+													return current;
+												}}
+												onChanged={(result) => {
+													const updated = {
+														...action,
+														tileShareResult: result,
+														status:
+															result.State === 'Applied'
+																? Status.Executed
+																: action.status,
+													};
+													actionsByIdRef.current[action.id] = updated;
+													setMessages((previous) =>
+														previous.map((entry) => ({
+															...entry,
+															actions: entry.actions?.map((item) =>
+																item.id === action.id
+																	? updated
+																	: item
+															),
+														}))
+													);
+												}}
+											/>
+										))}
 								{message.actions && (
 									<ActionPillStrip
-										actions={message.actions}
+										actions={message.actions.filter(
+											(action) => !action.tileShareResult
+										)}
 										simulation={simulation}
 										request={vibeRequest}
 										simulationActionById={
@@ -1658,6 +1789,46 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 				{!isMobileReview && (
 					<>
+						<label style={{ color: theme.colors.text.secondary, fontSize: 13 }}>
+							{t('chat.execution.mode', 'Chat execution')}{' '}
+							<select
+								aria-label={t('chat.execution.mode', 'Chat execution')}
+								value={chatSessionExecutionMode}
+								disabled={isSending || isLoading}
+								onChange={(event) =>
+									setChatSessionExecutionMode(
+										event.target.value === ChatSessionExecutionMode.AutoAct
+											? ChatSessionExecutionMode.AutoAct
+											: ChatSessionExecutionMode.ConfirmFirst
+									)
+								}
+								style={{
+									color: theme.colors.text.primary,
+									background: theme.colors.background.card,
+									border: `1px solid ${theme.colors.border.default}`,
+									borderRadius: 6,
+									padding: 6,
+								}}
+							>
+								<option value={ChatSessionExecutionMode.ConfirmFirst}>
+									{t('chat.execution.confirmFirst', 'Confirm first')}
+								</option>
+								<option value={ChatSessionExecutionMode.AutoAct}>
+									{t('chat.execution.autoAct', 'Auto act')}
+								</option>
+							</select>
+							<small style={{ display: 'block' }}>
+								{chatSessionExecutionMode === ChatSessionExecutionMode.AutoAct
+									? t(
+											'chat.execution.autoNote',
+											'Run supported chat actions automatically. Bulk and destructive changes still need review.'
+										)
+									: t(
+											'chat.execution.confirmNote',
+											'Review chat changes before they run.'
+										)}
+							</small>
+						</label>
 						<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
 							<Input.Textarea
 								value={message}

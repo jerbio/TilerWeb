@@ -1,4 +1,18 @@
-﻿{
+{
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "已添加评论",
+			"comment_replied": "已添加评论回复",
+			"comment_edited": "已编辑评论",
+			"comment_deleted": "已删除评论"
+		},
+		"sentences": {
+			"comment_added": "<actor/>评论了<title/>",
+			"comment_replied": "<actor/>回复了<title/>中的评论",
+			"comment_edited": "<actor/>编辑了<title/>中的评论",
+			"comment_deleted": "<actor/>删除了<title/>中的评论"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -2062,11 +2076,16 @@
 			"statusLabel": "状态：",
 			"status": {
 				"inProgress": "进行中",
+				"todo": "待办",
 				"completed": "已完成"
 			},
 			"view": {
 				"list": "Tilette 列表视图",
-				"assignee": "受让人视图"
+				"assignee": "受让人视图",
+				"board": "看板视图"
+			},
+			"board": {
+				"empty": "这里还没有 Tilette"
 			},
 			"viewAria": "Tilette 视图",
 			"openTiletteAria": "打开 Tilette",

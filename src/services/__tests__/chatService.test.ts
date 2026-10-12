@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { ChatSessionExecutionMode } from '@/core/common/types/chat';
 import ChatService from '../chatService';
 import type { ChatApi } from '@/api/chatApi';
 import type { ChatMessagesResponse } from '@/core/common/types/chat';
@@ -53,4 +54,28 @@ describe('ChatService', () => {
 
 		await expect(service.getMessages('session-789')).rejects.toThrow('Network error');
 	});
+});
+
+it('defaults TileShare to confirm first and forwards explicit auto act', async () => {
+	const api = { sendMessage: vi.fn().mockResolvedValue({ Content: {} }) } as unknown as ChatApi;
+	const service = new ChatService(api);
+	await service.sendMessage('Create Launch', '');
+	expect(api.sendMessage).toHaveBeenLastCalledWith(
+		expect.objectContaining({ ChatSessionExecutionMode: 'ConfirmFirst' })
+	);
+	await service.sendMessage(
+		'Create Launch',
+		'',
+		'',
+		'',
+		'',
+		'',
+		'',
+		'',
+		'',
+		ChatSessionExecutionMode.AutoAct
+	);
+	expect(api.sendMessage).toHaveBeenLastCalledWith(
+		expect.objectContaining({ ChatSessionExecutionMode: 'AutoAct' })
+	);
 });
