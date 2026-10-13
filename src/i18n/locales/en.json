@@ -57,9 +57,19 @@
 		"restore": "Show in activities",
 		"dismissFailed": "The activity preference could not be saved. Try again.",
 		"events": {
+			"comment_added": "Comment added",
+			"comment_replied": "Comment reply added",
+			"comment_edited": "Comment edited",
+			"comment_deleted": "Comment deleted",
 			"invitation_send_unknown": "Invitation send outcome unknown",
 			"assignment_completed": "Occurrence completed",
 			"assignment_reopened": "Occurrence reopened"
+		},
+		"sentences": {
+			"comment_added": "<actor/> commented on <title/>",
+			"comment_replied": "<actor/> replied to a comment on <title/>",
+			"comment_edited": "<actor/> edited a comment on <title/>",
+			"comment_deleted": "<actor/> deleted a comment on <title/>"
 		},
 		"channels": {
 			"email": "Email",

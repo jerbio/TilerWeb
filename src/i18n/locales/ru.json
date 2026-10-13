@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Комментарий добавлен",
+			"comment_replied": "Ответ на комментарий добавлен",
+			"comment_edited": "Комментарий изменён",
+			"comment_deleted": "Комментарий удалён"
+		},
+		"sentences": {
+			"comment_added": "<actor/> добавляет комментарий к <title/>",
+			"comment_replied": "<actor/> отвечает на комментарий к <title/>",
+			"comment_edited": "<actor/> редактирует комментарий к <title/>",
+			"comment_deleted": "<actor/> удаляет комментарий к <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {

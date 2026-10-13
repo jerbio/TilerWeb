@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "टिप्पणी जोड़ी गई",
+			"comment_replied": "टिप्पणी का उत्तर जोड़ा गया",
+			"comment_edited": "टिप्पणी संपादित की गई",
+			"comment_deleted": "टिप्पणी हटाई गई"
+		},
+		"sentences": {
+			"comment_added": "<actor/> ने <title/> पर टिप्पणी की",
+			"comment_replied": "<actor/> ने <title/> पर एक टिप्पणी का उत्तर दिया",
+			"comment_edited": "<actor/> ने <title/> पर एक टिप्पणी संपादित की",
+			"comment_deleted": "<actor/> ने <title/> पर एक टिप्पणी हटाई"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {

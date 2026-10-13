@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Dodano komentarz",
+			"comment_replied": "Dodano odpowiedź na komentarz",
+			"comment_edited": "Edytowano komentarz",
+			"comment_deleted": "Usunięto komentarz"
+		},
+		"sentences": {
+			"comment_added": "<actor/> dodaje komentarz do <title/>",
+			"comment_replied": "<actor/> odpowiada na komentarz do <title/>",
+			"comment_edited": "<actor/> edytuje komentarz do <title/>",
+			"comment_deleted": "<actor/> usuwa komentarz do <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {

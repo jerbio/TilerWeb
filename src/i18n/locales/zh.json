@@ -1,4 +1,18 @@
 ﻿{
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "已添加评论",
+			"comment_replied": "已添加评论回复",
+			"comment_edited": "已编辑评论",
+			"comment_deleted": "已删除评论"
+		},
+		"sentences": {
+			"comment_added": "<actor/>评论了<title/>",
+			"comment_replied": "<actor/>回复了<title/>的评论",
+			"comment_edited": "<actor/>编辑了<title/>的评论",
+			"comment_deleted": "<actor/>删除了<title/>的评论"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {

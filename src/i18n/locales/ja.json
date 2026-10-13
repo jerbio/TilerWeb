@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "コメントが追加されました",
+			"comment_replied": "コメントへの返信が追加されました",
+			"comment_edited": "コメントが編集されました",
+			"comment_deleted": "コメントが削除されました"
+		},
+		"sentences": {
+			"comment_added": "<actor/>が<title/>にコメントしました",
+			"comment_replied": "<actor/>が<title/>のコメントに返信しました",
+			"comment_edited": "<actor/>が<title/>のコメントを編集しました",
+			"comment_deleted": "<actor/>が<title/>のコメントを削除しました"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {

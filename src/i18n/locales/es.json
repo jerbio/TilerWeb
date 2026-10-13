@@ -1,4 +1,18 @@
 {
+	"tileshareActivity": {
+		"events": {
+			"comment_added": "Comentario añadido",
+			"comment_replied": "Respuesta a comentario añadida",
+			"comment_edited": "Comentario editado",
+			"comment_deleted": "Comentario eliminado"
+		},
+		"sentences": {
+			"comment_added": "<actor/> comentó en <title/>",
+			"comment_replied": "<actor/> respondió a un comentario en <title/>",
+			"comment_edited": "<actor/> editó un comentario en <title/>",
+			"comment_deleted": "<actor/> eliminó un comentario en <title/>"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
