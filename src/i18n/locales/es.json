@@ -2577,5 +2577,16 @@
 				]
 			}
 		}
-	}
+	},
+	"chat.tileShare.schedulePending": "Calculando los horarios del trabajo aceptado. Aún no se ha guardado ningún cambio.",
+	"chat.tileShare.scheduleNoFit": "No se ha aplicado ningún cambio. El trabajo restante no cabe entre las sesiones protegidas. Ajusta la duración o la fecha límite y solicita una actualización revisada.",
+	"chat.tileShare.scheduleFailed": "No se ha aplicado ningún cambio. El horario cambió o no se pudo completar el cálculo. Solicita una actualización revisada.",
+	"chat.tileShare.updateProject": "Actualizar proyecto",
+	"chat.tileShare.projectUpdateReview": "Revisar cambios del proyecto",
+	"chat.tileShare.projectUpdated": "Proyecto actualizado.",
+	"chat.tileShare.manageAccess": "Gestionar acceso al proyecto",
+	"chat.tileShare.manageRecipients": "Gestionar destinatarios",
+	"chat.tileShare.managementUpdated": "Cambios de destinatarios o acceso guardados.",
+	"chat.tileShare.managementNote": "Revisa los efectos sobre destinatarios y acceso. La suspensión y restauración del calendario se procesan en segundo plano.",
+	"chat.tileShare.accessReconciliation": "Acceso guardado. La suspensión o restauración del calendario se procesa en segundo plano."
 }

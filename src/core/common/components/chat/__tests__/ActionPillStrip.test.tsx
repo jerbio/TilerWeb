@@ -63,6 +63,7 @@ describe('ActionPillStrip', () => {
 			makeAction('rename', Actions.TileShare_Rename_Project),
 			makeAction('rename-tilette', Actions.TileShare_Rename_Tilette),
 			makeAction('update-tilette', Actions.TileShare_Update_Tilette),
+			makeAction('update-project', Actions.TileShare_Update_Project),
 			makeAction('notes', Actions.TileShare_Set_Tilette_Notes),
 			makeAction('delete-tilette', Actions.TileShare_Delete_Tilette),
 			makeAction('task'),

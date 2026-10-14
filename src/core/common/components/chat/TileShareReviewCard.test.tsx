@@ -396,3 +396,131 @@ it('a confirmed rejection does not offer uncertain-save recovery or resubmit', a
 	expect(screen.queryByRole('button', { name: 'Check status' })).not.toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Confirm creation' })).toBeDisabled();
 });
+
+it('queued schedule updates expose only a read-only status check', async () => {
+	const confirm = vi.fn();
+	const check = vi.fn().mockResolvedValue({ State: 'Applied', ActionId: 'a' });
+	const changed = vi.fn();
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				disabled
+				result={{ State: 'Pending', ActionId: 'a', Operation: 'UpdateTilette' } as any}
+				onConfirm={confirm}
+				onCheck={check}
+				onChanged={changed}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByRole('status')).toHaveTextContent(/No changes have been saved/);
+	fireEvent.click(screen.getByRole('button', { name: 'Check status' }));
+	await act(async () => {});
+	expect(confirm).not.toHaveBeenCalled();
+	expect(changed).toHaveBeenCalledWith({ State: 'Applied', ActionId: 'a' });
+});
+it('a failed schedule calculation is not an uncertain mutation', () => {
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				result={
+					{
+						State: 'Failed',
+						ActionId: 'a',
+						Operation: 'UpdateTilette',
+						ErrorCode: 'schedule_no_fit',
+					} as any
+				}
+				onConfirm={vi.fn()}
+				onCheck={vi.fn()}
+				onChanged={vi.fn()}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByRole('alert')).toHaveTextContent(/No changes were applied/);
+	expect(screen.queryByRole('button')).not.toBeInTheDocument();
+});
+
+it('reviews project name and notes together with one confirmation', async () => {
+	const confirm = vi
+		.fn()
+		.mockResolvedValue({ State: 'Applied', ActionId: 'a', Operation: 'UpdateProject' });
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				result={{
+					...result,
+					Review: {
+						Operation: 'UpdateProject',
+						Name: 'Weekly review',
+						PreviousName: 'Review',
+						ProjectName: 'Launch',
+						UpdatesName: true,
+						UpdatesNotes: true,
+						PreviousNotes: 'Old instructions',
+						Notes: '',
+						Tilettes: [],
+					},
+				}}
+				onConfirm={confirm}
+				onCheck={vi.fn()}
+				onChanged={vi.fn()}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByRole('region', { name: 'Review project update' })).toBeVisible();
+	expect(screen.getByText('Current name: Review')).toBeVisible();
+	expect(screen.getByText('Old instructions')).toBeVisible();
+	expect(screen.getByText('Clear notes')).toBeVisible();
+	expect(screen.queryByRole('button', { name: 'Confirm creation' })).not.toBeInTheDocument();
+	fireEvent.click(screen.getByRole('button', { name: 'Confirm update' }));
+	await act(async () => {});
+	expect(confirm).toHaveBeenCalledTimes(1);
+	expect(confirm).toHaveBeenCalledWith('exact', expect.any(AbortSignal));
+});
+
+it('reports a saved composite project update', () => {
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				result={{ State: 'Applied', ActionId: 'a', Operation: 'UpdateProject' }}
+				onConfirm={vi.fn()}
+				onCheck={vi.fn()}
+				onChanged={vi.fn()}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByText('Project updated.')).toBeVisible();
+	expect(screen.queryByText('TileShare created.')).not.toBeInTheDocument();
+});
+
+it.each(['UpdateRecipients', 'UpdateAccess'] as const)(
+	'shows %s effects with update confirmation',
+	async (Operation) => {
+		const confirm = vi.fn().mockResolvedValue({ State: 'Applied', ActionId: 'a', Operation });
+		render(
+			<ThemeProvider theme={darkTheme}>
+				<TileShareReviewCard
+					result={{
+						...result,
+						Operation,
+						Review: {
+							Name: 'Launch',
+							Operation,
+							Tilettes: [],
+							EffectsSummary:
+								'Participant: 1 calendar to suspend; independent grants survive.',
+						},
+					}}
+					onConfirm={confirm}
+					onCheck={vi.fn()}
+					onChanged={vi.fn()}
+				/>
+			</ThemeProvider>
+		);
+		expect(screen.getByText(/1 calendar to suspend/)).toBeVisible();
+		expect(screen.queryByRole('button', { name: 'Confirm creation' })).not.toBeInTheDocument();
+		fireEvent.click(screen.getByRole('button', { name: 'Confirm update' }));
+		await act(async () => {});
+		expect(confirm).toHaveBeenCalledWith('exact', expect.any(AbortSignal));
+	}
+);

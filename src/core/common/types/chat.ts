@@ -63,6 +63,9 @@ export type TileShareOperation =
 	| 'RenameProject'
 	| 'RenameTilette'
 	| 'UpdateTilette'
+	| 'UpdateProject'
+	| 'UpdateRecipients'
+	| 'UpdateAccess'
 	| 'SetTiletteNotes'
 	| 'DeleteTilette';
 
@@ -74,6 +77,7 @@ export interface TileShareReview {
 	UpdatesName?: boolean;
 	UpdatesNotes?: boolean;
 	ScheduleSummary?: string;
+	EffectsSummary?: string;
 	PreviousNotes?: string | null;
 	Notes?: string | null;
 	Name: string;
@@ -91,7 +95,8 @@ export interface TileShareReview {
 }
 export interface TileShareExecutionResult {
 	Operation?: TileShareOperation | null;
-	State: 'Applied' | 'NotAttempted' | 'Rejected' | 'Unknown';
+	State: 'Applied' | 'NotAttempted' | 'Rejected' | 'Unknown' | 'Pending' | 'Failed';
+	JobId?: string | null;
 	ActionId: string;
 	ReviewToken?: string | null;
 	Review?: TileShareReview | null;

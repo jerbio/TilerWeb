@@ -800,7 +800,7 @@
 				"eyebrow": "Effortless natural-language scheduling",
 				"titleLead": "Just say it.",
 				"titleAccent": "It's scheduled.",
-				"subtitle": "\u201cGym four times this week.\u201d \u201cPush my report to Thursday.\u201d Tiler understands and rebuilds the rest around it.",
+				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
 				"primaryCta": "Tell Tiler what you need",
 				"secondaryCta": "See how it works",
 				"nudgeCta": "Schedule this for real",
@@ -852,17 +852,17 @@
 						"memo": "Draft Q3 budget memo",
 						"pharmacy": "Call the pharmacy",
 						"review": "Review Ana's design file",
-						"gym": "Gym \u2014 legs",
+						"gym": "Gym — legs",
 						"train": "Book train to Leeds"
 					},
-					"caption": "Placed around a 9\u20135 day and a 40-minute commute."
+					"caption": "Placed around a 9–5 day and a 40-minute commute."
 				}
 			},
 			"self_healing": {
 				"eyebrow": "Automatic recovery from disruption",
 				"titleLead": "Your day fell apart at 10am.",
 				"titleAccent": "Your schedule already recovered.",
-				"subtitle": "Run late, skip a session, take an emergency call \u2014 Tiler rebuilds the rest of your week instantly.",
+				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
 				"primaryCta": "See it recover",
 				"secondaryCta": "See how it works",
 				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
@@ -880,11 +880,11 @@
 					"items": {
 						"morningReview": "Morning review",
 						"clientCall": "Client call",
-						"deepWork": "Deep work \u2014 draft",
+						"deepWork": "Deep work — draft",
 						"designSync": "Design sync",
 						"gym": "Gym"
 					},
-					"caption": "Gym kept \u00b7 Deep work protected \u00b7 Nothing dropped"
+					"caption": "Gym kept · Deep work protected · Nothing dropped"
 				}
 			},
 			"task_splitting": {
@@ -920,13 +920,13 @@
 						"draftTwo": "Draft ch. 2",
 						"edit": "Edit pass"
 					},
-					"caption": "6 sessions \u00b7 spread unevenly around your week"
+					"caption": "6 sessions · spread unevenly around your week"
 				}
 			},
 			"capacity_check": {
 				"eyebrow": "An honest capacity reality check",
 				"title": "Does it actually fit?",
-				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now \u2014 not Friday night.",
+				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
 				"primaryCta": "See if your week fits",
 				"secondaryCta": "See how it works",
 				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
@@ -1564,7 +1564,9 @@
 					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
 					"options": [
 						{
-							"tileshareActivity": { "title": "Activities" },
+							"tileshareActivity": {
+								"title": "Activities"
+							},
 							"value": "google",
 							"label": "Google Calendar"
 						},
@@ -2758,5 +2760,16 @@
 	"chat.tileShare.updateNote": "All displayed changes are saved together after confirmation. Supplied notes replace the complete note.",
 	"chat.tileShare.confirmUpdate": "Confirm update",
 	"chat.tileShare.updateRejected": "No changes were applied. Review the response and request a revised update.",
-	"chat.tileShare.updateUncertain": "Update could not be confirmed. Check status before trying again."
+	"chat.tileShare.updateUncertain": "Update could not be confirmed. Check status before trying again.",
+	"chat.tileShare.schedulePending": "Calculating accepted-work schedules. No changes have been saved yet.",
+	"chat.tileShare.scheduleNoFit": "No changes were applied. The remaining work could not fit around protected sessions. Adjust the duration or deadline and request a revised update.",
+	"chat.tileShare.scheduleFailed": "No changes were applied. The schedule changed or calculation could not complete. Request a revised update.",
+	"chat.tileShare.updateProject": "Update project",
+	"chat.tileShare.projectUpdateReview": "Review project update",
+	"chat.tileShare.projectUpdated": "Project updated.",
+	"chat.tileShare.manageAccess": "Manage project access",
+	"chat.tileShare.manageRecipients": "Manage recipients",
+	"chat.tileShare.managementUpdated": "Recipient or access changes saved.",
+	"chat.tileShare.managementNote": "Review the recipient and access effects above. Calendar access cleanup and restoration run in the background.",
+	"chat.tileShare.accessReconciliation": "Access is saved. Calendar cleanup or restoration runs in the background."
 }

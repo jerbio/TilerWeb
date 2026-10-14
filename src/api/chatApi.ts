@@ -150,7 +150,7 @@ export class ChatApi extends AppApi {
 			const conflict = error as ApiResponse<TileShareExecutionResult>;
 			if (
 				conflict?.Error?.Code === '409' &&
-				(conflict.Content?.State === 'Rejected' ||
+				(['Rejected', 'Failed'].includes(conflict.Content?.State ?? '') ||
 					(conflict.Content?.ReviewToken &&
 						['review_required', 'review_changed'].includes(
 							conflict.Content.ErrorCode ?? ''
@@ -165,6 +165,8 @@ export class ChatApi extends AppApi {
 			!(
 				result.State === 'Applied' ||
 				result.State === 'Rejected' ||
+				result.State === 'Pending' ||
+				result.State === 'Failed' ||
 				(result.State === 'NotAttempted' && result.ReviewToken && result.Review)
 			)
 		)

@@ -28,6 +28,27 @@ describe('ChatApi', () => {
 		vi.restoreAllMocks();
 	});
 
+	it.each(['Pending', 'Failed'] as const)(
+		'consumes %s schedule outcomes without retrying mutations',
+		async (State) => {
+			const result = { State, ActionId: 'a', Operation: 'UpdateTilette', JobId: 'job' };
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify(
+						State === 'Pending'
+							? {
+									Error: { Code: '0' },
+									Content: { vibeRequest: { tileShareResult: result } },
+								}
+							: { Error: { Code: '409' }, Content: result }
+					),
+					{ status: State === 'Pending' ? 200 : 409 }
+				)
+			);
+			expect(await api.confirmTileShare('a', 'review')).toEqual(result);
+			expect(fetchSpy).toHaveBeenCalledTimes(1);
+		}
+	);
 	it('returns a matched definitive rejection from the standard 409 envelope', async () => {
 		const rejected = { State: 'Rejected', ActionId: 'a', ErrorCode: 'locked_work_conflict' };
 		fetchSpy.mockResolvedValueOnce(

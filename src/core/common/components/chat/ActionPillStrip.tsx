@@ -76,6 +76,9 @@ const ActionPillStrip: React.FC<ActionPillStripProps> = ({
 			a.type !== Actions.TileShare_List_Recipients &&
 			a.type !== Actions.TileShare_Rename_Project &&
 			a.type !== Actions.TileShare_Delete_Tilette &&
+			a.type !== Actions.TileShare_Update_Project &&
+			a.type !== Actions.TileShare_Update_Recipients &&
+			a.type !== Actions.TileShare_Update_Access &&
 			a.type !== Actions.TileShare_Update_Tilette &&
 			a.type !== Actions.TileShare_Set_Tilette_Notes &&
 			a.type !== Actions.TileShare_Rename_Tilette

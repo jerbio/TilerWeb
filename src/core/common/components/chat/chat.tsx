@@ -1207,7 +1207,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 	const hasUnexecutedActions = useHasUnexecutedActions(requestId, messages);
 	const hasTileShareReview = messages.some(
-		(m) => m.requestId === requestId && m.actions?.some((a) => a.tileShareResult?.ReviewToken)
+		(m) => m.requestId === requestId && m.actions?.some((a) => a.tileShareResult)
 	);
 	const shouldShowAcceptButton = hasUnexecutedActions && !hasTileShareReview;
 
@@ -1667,7 +1667,11 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 														status:
 															result.State === 'Applied'
 																? Status.Executed
-																: action.status,
+																: result.State === 'Pending'
+																	? Status.Pending
+																	: result.State === 'Failed'
+																		? Status.Failed
+																		: action.status,
 													};
 													actionsByIdRef.current[action.id] = updated;
 													setMessages((previous) =>

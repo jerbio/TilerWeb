@@ -66,8 +66,21 @@ export default function TileShareReviewCard({
 	onChanged: (result: TileShareExecutionResult) => void;
 }) {
 	const { t } = useTranslation();
+	const isRecipients =
+		result.Operation === 'UpdateRecipients' || result.Review?.Operation === 'UpdateRecipients';
+	const isAccess =
+		result.Operation === 'UpdateAccess' || result.Review?.Operation === 'UpdateAccess';
+	const isManagement = isRecipients || isAccess;
+	const managementLabel = isAccess
+		? t('chat.tileShare.manageAccess', 'Manage project access')
+		: t('chat.tileShare.manageRecipients', 'Manage recipients');
+	const isProjectUpdate =
+		result.Operation === 'UpdateProject' || result.Review?.Operation === 'UpdateProject';
 	const isUpdate =
-		result.Operation === 'UpdateTilette' || result.Review?.Operation === 'UpdateTilette';
+		isManagement ||
+		isProjectUpdate ||
+		result.Operation === 'UpdateTilette' ||
+		result.Review?.Operation === 'UpdateTilette';
 	const isDelete =
 		result.Operation === 'DeleteTilette' || result.Review?.Operation === 'DeleteTilette';
 	const isNotes =
@@ -95,7 +108,13 @@ export default function TileShareReviewCard({
 		[]
 	);
 	const run = async (check = false) => {
-		if (pending.current || disabled || rejected || (!check && uncertain)) return;
+		if (
+			pending.current ||
+			(disabled && !(check && result.State === 'Pending')) ||
+			rejected ||
+			(!check && uncertain)
+		)
+			return;
 		const abort = new AbortController();
 		pending.current = abort;
 		setBusy(true);
@@ -105,6 +124,11 @@ export default function TileShareReviewCard({
 				? await onCheck()
 				: await onConfirm(result.ReviewToken!, abort.signal);
 			if (abort.signal.aborted) return;
+			if (next.ActionId === result.ActionId && ['Pending', 'Failed'].includes(next.State)) {
+				setUncertain(false);
+				onChanged(next);
+				return;
+			}
 			if (next.ActionId === result.ActionId && next.State === 'Rejected') {
 				setRejected(true);
 				setUncertain(false);
@@ -165,20 +189,63 @@ export default function TileShareReviewCard({
 			}
 		}
 	};
+	if (result.State === 'Pending')
+		return (
+			<Card role="status">
+				<p>
+					{t(
+						'chat.tileShare.schedulePending',
+						'Calculating accepted-work schedules. No changes have been saved yet.'
+					)}
+				</p>
+				{notice && <p role="alert">{notice}</p>}
+				<button type="button" disabled={busy} onClick={() => run(true)}>
+					{t('chat.tileShare.checkStatus', 'Check status')}
+				</button>
+			</Card>
+		);
+	if (result.State === 'Failed')
+		return (
+			<Card>
+				<p role="alert">
+					{result.ErrorCode === 'schedule_no_fit'
+						? t(
+								'chat.tileShare.scheduleNoFit',
+								'No changes were applied. The remaining work could not fit around protected sessions. Adjust the duration or deadline and request a revised update.'
+							)
+						: t(
+								'chat.tileShare.scheduleFailed',
+								'No changes were applied. The schedule changed or calculation could not complete. Request a revised update.'
+							)}
+				</p>
+			</Card>
+		);
 	if (result.State === 'Applied')
 		return (
 			<Card role="status">
-				{isUpdate
-					? t('chat.tileShare.tiletteUpdated', 'Tilette updated.')
-					: isDelete
-						? t('chat.tileShare.tiletteDeleted', 'Tilette deleted.')
-						: isNotes
-							? t('chat.tileShare.notesUpdated', 'Tilette notes updated.')
-							: isTiletteRename
-								? t('chat.tileShare.tiletteRenamed', 'Tilette renamed.')
-								: isRename
-									? t('chat.tileShare.renamed', 'Project renamed.')
-									: t('chat.tileShare.created', 'TileShare created.')}{' '}
+				{isManagement
+					? t('chat.tileShare.managementUpdated', 'Recipient or access changes saved.')
+					: isUpdate
+						? isProjectUpdate
+							? t('chat.tileShare.projectUpdated', 'Project updated.')
+							: t('chat.tileShare.tiletteUpdated', 'Tilette updated.')
+						: isDelete
+							? t('chat.tileShare.tiletteDeleted', 'Tilette deleted.')
+							: isNotes
+								? t('chat.tileShare.notesUpdated', 'Tilette notes updated.')
+								: isTiletteRename
+									? t('chat.tileShare.tiletteRenamed', 'Tilette renamed.')
+									: isRename
+										? t('chat.tileShare.renamed', 'Project renamed.')
+										: t('chat.tileShare.created', 'TileShare created.')}{' '}
+				{isAccess && (
+					<p>
+						{t(
+							'chat.tileShare.accessReconciliation',
+							'Access is saved. Calendar cleanup or restoration runs in the background.'
+						)}
+					</p>
+				)}
 				{result.Url?.startsWith('/tileshare/') && (
 					<a href={result.Url}>
 						{isDelete
@@ -200,33 +267,44 @@ export default function TileShareReviewCard({
 	return (
 		<Card
 			aria-label={
-				isUpdate
-					? t('chat.tileShare.updateReview', 'Review tilette update')
-					: isDelete
-						? t('chat.tileShare.deleteReview', 'Review tilette deletion')
-						: isNotes
-							? t('chat.tileShare.notesReview', 'Review tilette notes')
-							: isTiletteRename
-								? t('chat.tileShare.tiletteRenameReview', 'Review tilette rename')
-								: isRename
-									? t('chat.tileShare.renameReview', 'Review project rename')
-									: t('chat.tileShare.review', 'Review TileShare creation')
+				isManagement
+					? managementLabel
+					: isUpdate
+						? isProjectUpdate
+							? t('chat.tileShare.projectUpdateReview', 'Review project update')
+							: t('chat.tileShare.updateReview', 'Review tilette update')
+						: isDelete
+							? t('chat.tileShare.deleteReview', 'Review tilette deletion')
+							: isNotes
+								? t('chat.tileShare.notesReview', 'Review tilette notes')
+								: isTiletteRename
+									? t(
+											'chat.tileShare.tiletteRenameReview',
+											'Review tilette rename'
+										)
+									: isRename
+										? t('chat.tileShare.renameReview', 'Review project rename')
+										: t('chat.tileShare.review', 'Review TileShare creation')
 			}
 		>
 			<h4>
-				{isUpdate
-					? t('chat.tileShare.updateTilette', 'Update tilette')
-					: isDelete
-						? t('chat.tileShare.deleteTilette', 'Delete tilette')
-						: isNotes
-							? t('chat.tileShare.editNotes', 'Update tilette notes')
-							: isTiletteRename
-								? t('chat.tileShare.renameTilette', 'Rename tilette')
-								: isRename
-									? t('chat.tileShare.renameProject', 'Rename project')
-									: review.CreatesProject
-										? t('chat.tileShare.newProject', 'Create project')
-										: t('chat.tileShare.newTilette', 'Add tilette')}
+				{isManagement
+					? managementLabel
+					: isUpdate
+						? isProjectUpdate
+							? t('chat.tileShare.updateProject', 'Update project')
+							: t('chat.tileShare.updateTilette', 'Update tilette')
+						: isDelete
+							? t('chat.tileShare.deleteTilette', 'Delete tilette')
+							: isNotes
+								? t('chat.tileShare.editNotes', 'Update tilette notes')
+								: isTiletteRename
+									? t('chat.tileShare.renameTilette', 'Rename tilette')
+									: isRename
+										? t('chat.tileShare.renameProject', 'Rename project')
+										: review.CreatesProject
+											? t('chat.tileShare.newProject', 'Create project')
+											: t('chat.tileShare.newTilette', 'Add tilette')}
 				: {review.Name}
 			</h4>
 			{(isRename || (isUpdate && review.UpdatesName)) && (
@@ -263,6 +341,7 @@ export default function TileShareReviewCard({
 					</NoteText>
 				</>
 			)}
+			{review.EffectsSummary && <NoteText>{review.EffectsSummary}</NoteText>}
 			{review.ScheduleSummary && <NoteText>{review.ScheduleSummary}</NoteText>}
 			{review.StartTime != null && (
 				<small>
@@ -299,28 +378,32 @@ export default function TileShareReviewCard({
 			</ul>
 			<p>
 				{t(
-					isUpdate
-						? 'chat.tileShare.updateNote'
-						: isDelete
-							? 'chat.tileShare.deleteNote'
-							: isNotes
-								? 'chat.tileShare.notesNote'
-								: isTiletteRename
-									? 'chat.tileShare.tiletteRenameNote'
-									: isRename
-										? 'chat.tileShare.renameNote'
-										: 'chat.tileShare.reviewNote',
-					isUpdate
-						? 'All displayed changes are saved together after confirmation. Supplied notes replace the complete note.'
-						: isDelete
-							? 'This disables the tilette and linked calendar work. The project and other tilettes stay available. Assignment history is retained; undo is not provided here.'
-							: isNotes
-								? 'The proposed text replaces the complete tilette notes after confirmation.'
-								: isTiletteRename
-									? 'Only the shared tilette name changes. Personal calendar titles stay as they are.'
-									: isRename
-										? 'Only the project name changes after confirmation.'
-										: 'Nothing is created until you confirm. Recipients still choose whether to accept; notifications are not sent by this action.'
+					isManagement
+						? 'chat.tileShare.managementNote'
+						: isUpdate
+							? 'chat.tileShare.updateNote'
+							: isDelete
+								? 'chat.tileShare.deleteNote'
+								: isNotes
+									? 'chat.tileShare.notesNote'
+									: isTiletteRename
+										? 'chat.tileShare.tiletteRenameNote'
+										: isRename
+											? 'chat.tileShare.renameNote'
+											: 'chat.tileShare.reviewNote',
+					isManagement
+						? 'Review the recipient and access effects above. Calendar access cleanup and restoration run in the background.'
+						: isUpdate
+							? 'All displayed changes are saved together after confirmation. Supplied notes replace the complete note.'
+							: isDelete
+								? 'This disables the tilette and linked calendar work. The project and other tilettes stay available. Assignment history is retained; undo is not provided here.'
+								: isNotes
+									? 'The proposed text replaces the complete tilette notes after confirmation.'
+									: isTiletteRename
+										? 'Only the shared tilette name changes. Personal calendar titles stay as they are.'
+										: isRename
+											? 'Only the project name changes after confirmation.'
+											: 'Nothing is created until you confirm. Recipients still choose whether to accept; notifications are not sent by this action.'
 				)}
 			</p>
 			{(notice || result.ErrorCode === 'review_changed') && (
