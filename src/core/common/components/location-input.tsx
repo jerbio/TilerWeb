@@ -20,6 +20,7 @@ export type LocationInputController = {
 };
 
 type LocationInputProps = {
+	disabled?: boolean;
 	label?: React.ReactNode;
 	placeholder?: string;
 	controller: LocationInputController;
@@ -33,6 +34,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
 	controller,
 	containerStyle,
 	highlighted = false,
+	disabled = false,
 }) => {
 	const { t } = useTranslation();
 	const { location, isVerified } = controller;
@@ -45,24 +47,32 @@ const LocationInput: React.FC<LocationInputProps> = ({
 	const isDropdownPopulated = showLocationDropdown && locationResults.length > 0;
 
 	function selectLocation(loc: EventLocation) {
+		if (disabled) return;
 		controller.setFromSelection(loc);
 		setLocationResults([]);
 		setShowLocationDropdown(false);
 	}
 
 	function copyAddressOnly(loc: EventLocation) {
+		if (disabled) return;
 		controller.copyAddressOnly?.(loc);
 		setLocationResults([]);
 		setShowLocationDropdown(false);
 	}
 
 	function clearLocation() {
+		if (disabled) return;
 		controller.clearLocation();
 		setLocationResults([]);
 		setShowLocationDropdown(false);
 	}
 
 	useEffect(() => {
+		if (disabled) {
+			setIsSearching(false);
+			setShowLocationDropdown(false);
+			return;
+		}
 		if (!userEditedLocationRef.current) return;
 		userEditedLocationRef.current = false;
 		if (location.trim().length < 3) {
@@ -72,26 +82,33 @@ const LocationInput: React.FC<LocationInputProps> = ({
 			return;
 		}
 		setIsSearching(true);
+		let cancelled = false;
 		const timer = setTimeout(async () => {
 			try {
 				const results = await scheduleService.searchLocations(location);
+				if (cancelled) return;
 				setLocationResults(results);
 				setShowLocationDropdown(results.length > 0);
 			} catch {
+				if (cancelled) return;
 				setLocationResults([]);
 				setShowLocationDropdown(false);
 			} finally {
-				setIsSearching(false);
+				if (!cancelled) setIsSearching(false);
 			}
 		}, 300);
-		return () => clearTimeout(timer);
-	}, [location]);
+		return () => {
+			cancelled = true;
+			clearTimeout(timer);
+		};
+	}, [location, disabled]);
 
 	return (
 		<LocationFieldGroup style={containerStyle}>
 			<Input
 				label={label}
 				name="location"
+				disabled={disabled}
 				placeholder={placeholder}
 				value={location}
 				highlighted={highlighted}

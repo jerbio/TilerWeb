@@ -312,9 +312,8 @@ const List = styled.div`
 const ComposerDock = styled.div`
 	position: sticky;
 	bottom: 0;
-	padding: 0.75rem 0;
-	border-top: 1px solid ${({ theme }) => theme.colors.border.subtle};
-	background-color: ${({ theme }) => theme.colors.background.page};
+	padding-top: 0.5rem;
+	background-color: ${({ theme }) => theme.colors.background.card};
 `;
 
 const LoadMoreRow = styled.div`

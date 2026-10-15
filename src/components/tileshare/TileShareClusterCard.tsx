@@ -10,7 +10,8 @@ import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
 import Button from '@/core/common/components/button';
-import { TileShareCluster } from '@/core/common/types/tileshare';
+import { TileShareCluster, TileshareMode } from '@/core/common/types/tileshare';
+import { tileshareMode } from '@/core/util/tileshareMode';
 import { Link } from 'react-router';
 import { Routes } from '@/core/constants/routes';
 import Tooltip from '@/core/common/components/tooltip';
@@ -31,9 +32,10 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 				.map((email) => ({ name: email.trim(), email: email.trim() }))
 		: [];
 
-	const subtitle = cluster.isMultiTilette
-		? t('tilesharedemo.card.multiTileshare')
-		: t('tilesharedemo.card.tileshare');
+	const mode = tileshareMode(cluster);
+	const subtitle = mode
+		? t(`tileShareModes.${mode}.label`)
+		: t('tileshareList.title', 'TileShares');
 
 	const formattedDueOn = cluster.end ? dayjs(cluster.end).format('ddd, D MMM, YYYY') : '—';
 	const formattedDueBy = cluster.end ? unixToTimeString(cluster.end) : '—';
@@ -42,7 +44,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
 			<Left>
 				<IconBox $bg={surface.background} $fg={surface.foreground}>
-					{cluster.isMultiTilette ? (
+					{mode !== TileshareMode.Broadcast ? (
 						<MultiTileshareIcon size={18} />
 					) : (
 						<SingleTileshareIcon size={18} />
@@ -109,7 +111,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 
 const CardGrid = styled(Link)`
 	display: grid;
-	grid-template-columns: 7fr 1px 5fr;
+	grid-template-columns: minmax(0, 7fr) 1px minmax(0, 5fr);
 	grid-template-rows: auto;
 	background-color: ${({ theme }) => theme.colors.border.default};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
@@ -117,6 +119,21 @@ const CardGrid = styled(Link)`
 	overflow: hidden;
 	text-decoration: none;
 	color: inherit;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.025);
+	transition:
+		border-color 160ms ease,
+		box-shadow 160ms ease;
+	&:hover {
+		border-color: ${({ theme }) => theme.colors.input.borderHover};
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+	}
+	&:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.brand[400]};
+		outline-offset: 3px;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
 
 	@media (max-width: 640px) {
 		grid-template-columns: 1fr;
@@ -201,7 +218,7 @@ const DueWrapper = styled.div`
 	align-items: center;
 	gap: 0.5rem;
 	padding: 0.75rem;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	background: ${({ theme }) => theme.colors.input.bg};
 	border-radius: ${({ theme }) => theme.borderRadius.large};
 	width: 100%;
 `;
@@ -242,7 +259,7 @@ const DueLabel = styled.span`
 
 const DueValue = styled.span`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+	font-weight: 550;
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
 	white-space: nowrap;

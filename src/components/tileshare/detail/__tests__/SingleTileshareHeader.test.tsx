@@ -17,6 +17,18 @@ vi.mock('@/core/theme/ThemeProvider', () => ({
 const DATE = dayjs('2025-07-27').valueOf();
 
 describe('SingleTileshareHeader', () => {
+	it('renders saved tilette and Broadcast notes as Markdown', () => {
+		render(
+			<SingleTileshareHeader
+				name="Task"
+				description={'## Plan\n\n**Launch**\n\n- Review'}
+				dueDate={DATE}
+			/>
+		);
+		expect(screen.getByRole('heading', { name: 'Plan', level: 2 })).toBeInTheDocument();
+		expect(screen.getByText('Launch').tagName).toBe('STRONG');
+		expect(screen.getByRole('listitem')).toHaveTextContent('Review');
+	});
 	it('renders the name, subtitle key, description and due date', () => {
 		render(
 			<SingleTileshareHeader

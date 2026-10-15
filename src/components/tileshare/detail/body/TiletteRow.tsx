@@ -1,157 +1,161 @@
-import TiletteRsvpStatus from '@/components/tileshare/TiletteRsvpStatus';
-import TiletteInvitationActions from '@/components/tileshare/TiletteInvitationActions';
-import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
-import { TiletteIcon } from '@/components/tileshare/icons';
-import { useTheme } from '@/core/theme/ThemeProvider';
-import { Routes } from '@/core/constants/routes';
+import { useTranslation } from 'react-i18next';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
-import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
-import { iconSurface } from '@/core/util/colorSurface';
+import { Routes } from '@/core/constants/routes';
 import { designatedToAvatars } from '@/core/util/tileshareAssignees';
 import AvatarCluster from '@/core/common/components/AvatarCluster';
-import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
+import TiletteWorkProgress from '../../TiletteWorkProgress';
+import TiletteRsvpStatus from '../../TiletteRsvpStatus';
+import TiletteInvitationActions from '../../TiletteInvitationActions';
+import ShimmerOverlay from '../../ShimmerOverlay';
 
-type TiletteRowProps = {
+export default function TiletteRow({
+	tilette,
+	clusterId,
+}: {
 	tilette: TileShareTemplate;
 	clusterId: string;
-};
-
-/** One tilette in the list view: accent icon + name + arrow, then status + assignees. */
-const TiletteRow: React.FC<TiletteRowProps> = ({ tilette, clusterId }) => {
+}) {
 	const { t } = useTranslation();
-	const { isDarkMode } = useTheme();
-	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
-	// Shimmer the whole card while an RSVP response is saving in place.
 	const [saving, setSaving] = useState(false);
-
+	const route = Routes.Tileshare.tilette(clusterId, tilette.id ?? '');
 	return (
-		<Card $darkmode={isDarkMode} aria-busy={saving || undefined}>
-			<TopRow>
-				<IconBox $bg={surface.background} $fg={surface.foreground}>
-					<TiletteIcon size={18} />
-				</IconBox>
-				<Name>{tilette.name ?? '—'}</Name>
-				<ArrowLink
-					to={Routes.Tileshare.tilette(clusterId, tilette.id ?? '')}
-					aria-label={t('tilesharedemo.detail.openTiletteAria')}
-				>
-					<ArrowRight size={18} />
-				</ArrowLink>
-			</TopRow>
-			<Divider />
-			<BottomRow>
-				<StatusGroup>
-					<TiletteWorkProgress tilette={tilette} />
-				</StatusGroup>
-				<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={28} />
-			</BottomRow>
-			<RsvpRow>
-				<TiletteRsvpStatus tilette={tilette} embedded />
+		<Row role="listitem" aria-busy={saving || undefined}>
+			<Name to={route} title={tilette.name ?? undefined}>
+				{tilette.name ?? '—'}
+			</Name>
+			<Progress>
+				<TiletteWorkProgress tilette={tilette} compact />
+			</Progress>
+			<People>
+				<AvatarCluster
+					users={designatedToAvatars(tilette.designatedUsers)}
+					size={24}
+					max={2}
+				/>
+			</People>
+			<Response>
+				<TiletteRsvpStatus tilette={tilette} embedded compact />
 				<TiletteInvitationActions
 					tilette={tilette}
 					clusterId={clusterId}
-					embedded
+					compact
 					reportBusy={setSaving}
 				/>
-			</RsvpRow>
+			</Response>
+			<Arrow to={route} aria-label={t('tilesharedemo.detail.openTiletteAria')}>
+				<ArrowRight size={16} />
+			</Arrow>
 			{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
-		</Card>
+		</Row>
 	);
-};
+}
 
-const Card = styled.div<{ $darkmode: boolean }>`
+const Row = styled.div`
 	position: relative;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
-	overflow: hidden;
-	background-color: ${({ $darkmode, theme }) =>
-		$darkmode ? 'transparent' : theme.colors.background.card};
-`;
-
-const TopRow = styled.div`
-	display: flex;
+	display: grid;
 	align-items: center;
-	gap: 0.875rem;
-	padding: 1rem 1.25rem;
-`;
-
-const IconBox = styled.div<{ $bg: string; $fg: string }>`
-	width: 40px;
-	height: 40px;
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background-color: ${({ $bg }) => $bg};
-	color: ${({ $fg }) => $fg};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-`;
-
-const Name = styled.p`
-	flex: 1;
-	min-width: 0;
-	margin: 0;
-	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-	color: ${({ theme }) => theme.colors.text.primary};
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-`;
-
-const ArrowLink = styled(Link)`
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 40px;
-	height: 40px;
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	color: ${({ theme }) => theme.colors.brand[400]};
-	flex-shrink: 0;
-	transition: background-color 0.15s ease;
-
+	grid-template-columns: minmax(0, 1fr) 64px 32px;
+	gap: 8px 12px;
+	padding: 12px 16px;
+	min-height: 96px;
+	@container (max-width:400px) {
+		grid-template-columns: minmax(0, 1fr) auto;
+		min-height: 88px;
+	}
+	border-bottom: 1px solid ${({ theme }) => theme.colors.border.default};
+	&:last-child {
+		border-bottom: 0;
+		border-radius: 0 0 12px 12px;
+	}
 	&:hover {
-		background-color: ${({ theme }) => theme.colors.background.card2};
+		background: ${({ theme }) => theme.colors.background.card2};
+	}
+	@container (min-width:820px) {
+		grid-template-columns: minmax(180px, 1fr) 138px 64px 216px 32px;
+		min-height: 68px;
+		gap: 12px;
 	}
 `;
-
-const Divider = styled.hr`
-	border: none;
-	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
-	margin: 0;
+const Name = styled(Link)`
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	grid-column: 1;
+	grid-row: 1;
+	font-weight: 600;
+	color: ${({ theme }) => theme.colors.text.primary};
+	&:hover {
+		text-decoration: underline;
+	}
+	@container (max-width:400px) {
+		grid-column: 1 / 3;
+		padding-right: 64px;
+	}
 `;
-
-const BottomRow = styled.div`
+const Progress = styled.div`
+	min-width: 0;
+	grid-column: 1;
+	grid-row: 2;
+	@container (min-width:820px) {
+		grid-column: 2;
+		grid-row: 1;
+	}
+`;
+const People = styled.div`
+	grid-column: 2;
+	grid-row: 1;
+	justify-self: end;
+	@container (max-width:400px) {
+		grid-column: 2;
+	}
+	@container (min-width:820px) {
+		grid-column: 3;
+		justify-self: start;
+	}
+`;
+const Response = styled.div`
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-	padding: 1rem 1.25rem;
-`;
-
-const StatusGroup = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-`;
-
-/** One bordered row hosting the RSVP badge(s) and the inline invitation actions. */
-const RsvpRow = styled.div`
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
+	justify-content: flex-end;
 	gap: 8px;
-	padding: 12px 20px;
-	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
-	&:empty {
+	flex-wrap: wrap;
+	min-width: 0;
+	grid-column: 2 / 4;
+	grid-row: 2;
+	> details {
+		max-width: 100%;
+		margin-left: 0;
+	}
+	@container (min-width:820px) {
+		grid-column: 4;
+		grid-row: 1;
+	}
+	@container (max-width:400px) {
+		grid-column: 2;
+		grid-row: 2;
+	}
+`;
+const Arrow = styled(Link)`
+	grid-column: 3;
+	grid-row: 1;
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	&:hover {
+		color: ${({ theme }) => theme.colors.brand[400]};
+	}
+	@container (min-width:820px) {
+		grid-column: 5;
+	}
+	@container (max-width:400px) {
 		display: none;
 	}
 `;
-
-export default TiletteRow;

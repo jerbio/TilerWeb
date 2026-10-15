@@ -192,7 +192,7 @@ describe('TileshareService', () => {
 		};
 
 		it('maps single-mode form to a flat payload with trimmed fields', () => {
-			const params = toCreateClusterParams(baseForm, TileshareMode.Single, ctx);
+			const params = toCreateClusterParams(baseForm, TileshareMode.Broadcast, ctx);
 
 			expect(params.Name).toBe('Finish taxes');
 			expect(params.IsMultiTilette).toBe(false);
@@ -204,19 +204,19 @@ describe('TileshareService', () => {
 		});
 
 		it('sets IsMultiTilette true for multi mode', () => {
-			const params = toCreateClusterParams(baseForm, TileshareMode.Multi, ctx);
+			const params = toCreateClusterParams(baseForm, TileshareMode.Project, ctx);
 			expect(params.IsMultiTilette).toBe(true);
 		});
 
 		it('converts the deadline to an end-of-day epoch-ms EndTime', () => {
-			const params = toCreateClusterParams(baseForm, TileshareMode.Single, ctx);
+			const params = toCreateClusterParams(baseForm, TileshareMode.Broadcast, ctx);
 			expect(params.EndTime).toBe(dateTimeToUnix('2026-08-01', '11:59 PM'));
 		});
 
 		it('leaves EndTime undefined when no deadline is provided', () => {
 			const params = toCreateClusterParams(
 				{ ...baseForm, deadline: '' },
-				TileshareMode.Single,
+				TileshareMode.Broadcast,
 				ctx
 			);
 			expect(params.EndTime).toBeUndefined();
@@ -225,7 +225,7 @@ describe('TileshareService', () => {
 		it('wraps a location string into an AddressData object', () => {
 			const params = toCreateClusterParams(
 				{ ...baseForm, location: '123 Main St' },
-				TileshareMode.Single,
+				TileshareMode.Broadcast,
 				ctx
 			);
 			expect(params.AddressData).toEqual({
@@ -235,14 +235,14 @@ describe('TileshareService', () => {
 		});
 
 		it('omits AddressData when location is empty', () => {
-			const params = toCreateClusterParams(baseForm, TileshareMode.Single, ctx);
+			const params = toCreateClusterParams(baseForm, TileshareMode.Broadcast, ctx);
 			expect(params.AddressData).toBeUndefined();
 		});
 
 		it('classifies an email recipient into Contacts', () => {
 			const params = toCreateClusterParams(
 				{ ...baseForm, recipients: ['jane@example.com'] },
-				TileshareMode.Single,
+				TileshareMode.Broadcast,
 				ctx
 			);
 			expect(params.Contacts).toEqual([{ Email: 'jane@example.com' }]);
@@ -251,7 +251,7 @@ describe('TileshareService', () => {
 		it('normalizes a bare phone number with the default calling code', () => {
 			const params = toCreateClusterParams(
 				{ ...baseForm, recipients: ['3035551212'] },
-				TileshareMode.Single,
+				TileshareMode.Broadcast,
 				ctx
 			);
 			expect(params.Contacts).toEqual([{ PhoneNumber: '+13035551212' }]);
@@ -260,7 +260,7 @@ describe('TileshareService', () => {
 		it('preserves a phone number that already has a + area code', () => {
 			const params = toCreateClusterParams(
 				{ ...baseForm, recipients: ['+13035551212'] },
-				TileshareMode.Single,
+				TileshareMode.Broadcast,
 				ctx
 			);
 			expect(params.Contacts).toEqual([{ PhoneNumber: '+13035551212' }]);
@@ -269,7 +269,7 @@ describe('TileshareService', () => {
 		it('maps multiple recipients into a mixed Contacts array', () => {
 			const params = toCreateClusterParams(
 				{ ...baseForm, recipients: ['jane@example.com', '3035551212'] },
-				TileshareMode.Single,
+				TileshareMode.Broadcast,
 				ctx
 			);
 			expect(params.Contacts).toEqual([
@@ -279,13 +279,14 @@ describe('TileshareService', () => {
 		});
 
 		it('sends an empty Contacts array (never null) when no recipient given', () => {
-			const params = toCreateClusterParams(baseForm, TileshareMode.Single, ctx);
+			const params = toCreateClusterParams(baseForm, TileshareMode.Broadcast, ctx);
 			expect(params.Contacts).toEqual([]);
 		});
 	});
 
 	describe('createCluster', () => {
 		const createParams = {
+			Mode: TileshareMode.Broadcast,
 			UserName: 'test@example.com',
 			TimeZone: 'UTC',
 			TimeZoneOffset: 0,
@@ -440,6 +441,30 @@ describe('TileshareService', () => {
 	});
 
 	describe('updateCluster', () => {
+		it('allows a rename without a timeline but rejects a partial timeline', async () => {
+			const updateCluster = vi
+				.fn()
+				.mockResolvedValue({ Content: { cluster: mockCluster }, Error: { Code: '0' } });
+			const service = new TileshareService({ updateCluster } as unknown as TileshareApi);
+			await service.updateCluster({ Id: 'share', Name: 'New name' });
+			expect(updateCluster).toHaveBeenCalledExactlyOnceWith({
+				Id: 'share',
+				Name: 'New name',
+			});
+			await expect(service.updateCluster({ Id: 'share', EndTime: 42 })).rejects.toThrow();
+			expect(updateCluster).toHaveBeenCalledTimes(1);
+		});
+		it('rejects refused writes in a successful HTTP envelope', async () => {
+			const service = new TileshareService({
+				updateCluster: vi.fn().mockResolvedValue({
+					Error: { Code: '123', Message: 'refused' },
+					Content: { cluster: mockCluster },
+				}),
+			} as unknown as TileshareApi);
+			await expect(
+				service.updateCluster({ Id: 'share', Name: 'New name' })
+			).rejects.toThrow();
+		});
 		it('passes params and returns the unwrapped cluster', async () => {
 			const params = { Id: 'cluster-123', Name: 'Renamed', StartTime: 1, EndTime: 2 };
 			const apiMock = {
@@ -513,6 +538,15 @@ describe('TileshareService', () => {
 	});
 
 	describe('updateTilette', () => {
+		it('rejects refused writes in a successful HTTP envelope', async () => {
+			const service = new TileshareService({
+				updateTilette: vi.fn().mockResolvedValue({
+					Error: { Code: '123', Message: 'refused' },
+					Content: { tileShareTemplate: mockTemplate },
+				}),
+			} as unknown as TileshareApi);
+			await expect(service.updateTilette({ Id: 'task', Name: 'New name' })).rejects.toThrow();
+		});
 		it('passes params and returns the unwrapped tilette', async () => {
 			const params = { Id: 'tilette-1', Name: 'Renamed tilette' };
 			const apiMock = {

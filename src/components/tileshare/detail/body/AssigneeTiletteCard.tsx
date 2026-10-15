@@ -10,7 +10,7 @@ import { useTheme } from '@/core/theme/ThemeProvider';
 import { Routes } from '@/core/constants/routes';
 import { getTileletteColor } from '@/core/util/tileletteColor';
 import { filledSurface } from '@/core/util/colorSurface';
-import { designatedToAvatars } from '@/core/util/tileshareAssignees';
+import { designatedToAvatars, validDesignatedUsers } from '@/core/util/tileshareAssignees';
 import AvatarCluster from '@/core/common/components/AvatarCluster';
 import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
 
@@ -31,6 +31,9 @@ const AssigneeTiletteCard: React.FC<AssigneeTiletteCardProps> = ({
 	const surface = filledSurface(getTileletteColor(tilette.id), isDarkMode);
 	// Shimmer the whole card while an RSVP response is saving in place.
 	const [saving, setSaving] = useState(false);
+	const collaborators = validDesignatedUsers(tilette.designatedUsers).filter(
+		(user) => (user.userId ?? user.displayedIdentifier) !== assigneeId
+	);
 
 	return (
 		<Card $bg={surface.background} $border={surface.border} aria-busy={saving || undefined}>
@@ -39,18 +42,21 @@ const AssigneeTiletteCard: React.FC<AssigneeTiletteCardProps> = ({
 				aria-label={t('tilesharedemo.detail.openTiletteAria')}
 			>
 				<Name $color={surface.text}>{tilette.name ?? '—'}</Name>
-				<Footer>
-					<TiletteWorkProgress tilette={tilette} assigneeId={assigneeId} />
-					<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={24} />
-				</Footer>
 			</CardLink>
+			<Footer>
+				<TiletteWorkProgress tilette={tilette} assigneeId={assigneeId} compact />
+				{collaborators.length > 0 && (
+					<AvatarCluster users={designatedToAvatars(collaborators)} size={22} max={2} />
+				)}
+			</Footer>
 			<RsvpRow>
-				<TiletteRsvpStatus tilette={tilette} assigneeId={assigneeId} embedded />
+				<TiletteRsvpStatus tilette={tilette} assigneeId={assigneeId} embedded compact />
 				<TiletteInvitationActions
 					tilette={tilette}
 					clusterId={clusterId}
 					assigneeId={assigneeId}
 					embedded
+					compact
 					reportBusy={setSaving}
 				/>
 				{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
@@ -64,8 +70,9 @@ const Card = styled.div<{ $bg: string; $border: string }>`
 	display: flex;
 	flex-direction: column;
 	border-radius: ${({ theme }) => theme.borderRadius.large};
-	background-color: ${({ $bg }) => $bg};
-	border: 1px solid ${({ $border }) => $border};
+	background-color: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-top: 3px solid ${({ $border }) => $border};
 	text-decoration: none;
 	transition: filter 0.15s ease;
 
@@ -77,10 +84,12 @@ const Card = styled.div<{ $bg: string; $border: string }>`
 const CardLink = styled(Link)`
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
-	padding: 0.875rem;
+	padding: 10px 12px 8px;
 	color: inherit;
 	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
 `;
 
 const Name = styled.p<{ $color: string }>`
@@ -88,14 +97,18 @@ const Name = styled.p<{ $color: string }>`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-	color: ${({ $color }) => $color};
+	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const Footer = styled.div`
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: space-between;
 	gap: 0.5rem;
+	padding: 0 12px 8px;
+	&:empty {
+		display: none;
+	}
 `;
 
 /** One bordered row hosting the RSVP badge and the inline response actions. */
@@ -103,8 +116,11 @@ const RsvpRow = styled.div`
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 12px;
-	padding: 12px 20px;
+	gap: 8px;
+	padding: 8px 12px;
+	> button {
+		margin-left: auto;
+	}
 	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
 	&:empty {
 		display: none;

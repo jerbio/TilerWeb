@@ -1,28 +1,36 @@
-import {
-	DEFAULT_TILETTE_DURATION_MINUTES,
-	tiletteDurationInMs,
-} from '@/core/util/tileshareDuration';
-import React, { useState } from 'react';
+import { tiletteDurationInMs } from '@/core/util/tileshareDuration';
+import React, { useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { ChevronLeft } from 'lucide-react';
 import { TiletteIcon } from '@/components/tileshare/icons';
-import Input from '@/core/common/components/input';
-import DatePicker from '@/core/common/components/date_picker';
 import Button from '@/core/common/components/button';
-import MultiInput from '@/core/common/components/multi_input';
 import SuccessModal from '@/core/common/components/modals/success-modal';
+import TiletteDraftFields from './TiletteDraftFields';
+import { tileShareReveal, tileShareInteraction } from './tileshareMotion';
+import TileShareTheme from './TileShareTheme';
+import { tileShareControls } from './tileshareVisuals';
+import { newTiletteDraft, defaultTiletteDeadline } from '@/core/util/tileshareDraft';
+import { toAddressData } from '@/core/util/tileshareLocation';
 import { Routes } from '@/core/constants/routes';
 import { useAuth } from '@/core/auth/useAuth';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { tileshareService } from '@/services';
-import type { ContactModel, TileShareTemplate } from '@/core/common/types/tileshare';
+import { tileShareNotesService } from '@/services/tileShareNotesService';
+import {
+	TileshareMode,
+	type ContactModel,
+	type TileShareTemplate,
+} from '@/core/common/types/tileshare';
 import { classifyContact, isValidRecipient, normalizePhoneNumber } from '@/core/util/contact';
 import { DEFAULT_COUNTRY_CODE } from '@/core/constants/countryCodes';
 import dayjs from 'dayjs';
 
 type TiletteCreateProps = {
+	mode?: TileshareMode;
+	participants?: ContactModel[];
+	shareDeadline?: number | null;
 	clusterId: string;
 	/** Named in the header copy so it's clear which tileshare this joins. */
 	clusterName: string;
@@ -30,8 +38,6 @@ type TiletteCreateProps = {
 	/** Called after a successful create so the caller can refetch and leave. */
 	onCreated: (tilette: TileShareTemplate | null) => void;
 };
-
-type Recipient = { label: string; value: string };
 
 const CREATE_NOTIFICATION_ID = notificationId(NotificationAction.Update, 'tilette-create');
 /** Seconds the success modal stays up before auto-advancing to the new tilette. */
@@ -57,6 +63,9 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	clusterName,
 	onBack,
 	onCreated,
+	mode = TileshareMode.Project,
+	participants = [],
+	shareDeadline,
 }) => {
 	const theme = useTheme();
 	const { t } = useTranslation();
@@ -66,14 +75,12 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	const updateNotification = useUiStore((s) => s.notification.update);
 	const dismissNotification = useUiStore((s) => s.notification.dismiss);
 
-	const [name, setName] = useState('');
-	const [durationMinutes, setDurationMinutes] = useState(
-		String(DEFAULT_TILETTE_DURATION_MINUTES)
-	);
-	const [deadline, setDeadline] = useState('');
-	const [note, setNote] = useState('');
-	const [recipients, setRecipients] = useState<Recipient[]>([]);
+	const [draft, setDraft] = useState(newTiletteDraft);
+	const { name, durationMinutes, deadline, note } = draft;
+	const recipients = draft.recipients.map((label) => ({ label }));
 	const [submitting, setSubmitting] = useState(false);
+	const submitLock = useRef(false);
+	const [pendingTask, setPendingTask] = useState<TileShareTemplate | null | undefined>(undefined);
 	const [showSuccess, setShowSuccess] = useState(false);
 	const [createdId, setCreatedId] = useState<string | null>(null);
 	const [createdName, setCreatedName] = useState('');
@@ -93,7 +100,7 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	};
 
 	const handleSubmit = async () => {
-		if (submitting) return;
+		if (submitLock.current) return;
 
 		const validationError = getValidationError();
 		if (validationError) {
@@ -104,17 +111,43 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 		const defaultCallingCode = user?.countryCode?.trim() || String(DEFAULT_COUNTRY_CODE.code);
 
 		setSubmitting(true);
+		submitLock.current = true;
 		showNotification(CREATE_NOTIFICATION_ID, t('tilesharedemo.detail.add.creating'), 'loading');
 		try {
-			const created = await tileshareService.createTilette({
-				ClusterId: clusterId,
-				DurationInMs: tiletteDurationInMs(durationMinutes)!,
-				Name: name.trim(),
-				NoteMiscData: note.trim() || undefined,
-				Contacts: recipients.map((r) => toContactModel(r.label, defaultCallingCode)),
-				// Omitted times fall back to the cluster's own timeline.
-				EndTime: deadline ? dayjs(deadline).endOf('day').valueOf() : undefined,
-			});
+			const created =
+				pendingTask !== undefined
+					? pendingTask
+					: await tileshareService.createTilette({
+							ClusterId: clusterId,
+							DurationInMs: tiletteDurationInMs(durationMinutes)!,
+							Name: name.trim(),
+							NoteMiscData: note.trim() ? note : undefined,
+							Contacts:
+								mode === TileshareMode.Class
+									? participants
+									: recipients.map((r) =>
+											toContactModel(r.label, defaultCallingCode)
+										),
+							IncludeMe: false,
+							AddressData: toAddressData(draft.location),
+							EndTime: deadline
+								? dayjs(deadline).endOf('day').valueOf()
+								: (shareDeadline ??
+									dayjs(defaultTiletteDeadline()).endOf('day').valueOf()),
+						});
+			setPendingTask(created);
+			if (note.trim()) {
+				if (!created?.id)
+					throw new Error('The new tilette did not return an id for saving its notes.');
+				const current = await tileShareNotesService.getNotes(created.id);
+				const saved = await tileShareNotesService.updateNotes({
+					EventID: created.id,
+					UserNote: note,
+					Etag: current.Etag,
+				});
+				if (saved.concurrencyConflict || saved.truncated)
+					throw new Error('The tilette was created, but its notes need review.');
+			}
 			// The loading toast gives way to the success modal, matching the
 			// tileshare create flow — success isn't reported as a toast.
 			dismissNotification(CREATE_NOTIFICATION_ID);
@@ -129,6 +162,7 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 				'error'
 			);
 		} finally {
+			submitLock.current = false;
 			setSubmitting(false);
 		}
 	};
@@ -149,118 +183,97 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	};
 
 	return (
-		<Container>
-			<HeaderBar>
-				<BackButton type="button" onClick={onBack}>
-					<ChevronLeft size={18} />
-					{t('tilesharedemo.detail.add.back')}
-				</BackButton>
-			</HeaderBar>
+		<TileShareTheme>
+			<Container>
+				<HeaderBar>
+					<BackButton type="button" onClick={onBack}>
+						<ChevronLeft size={18} />
+						{t('tilesharedemo.detail.add.back')}
+					</BackButton>
+				</HeaderBar>
 
-			<Content>
-				<IconBox>
-					<TiletteIcon size={20} />
-				</IconBox>
+				<Content>
+					<IconBox>
+						<TiletteIcon size={20} />
+					</IconBox>
 
-				<Title>{t('tilesharedemo.detail.add.title')}</Title>
-				<Description>
-					{t('tilesharedemo.detail.add.description', { name: clusterName })}
-				</Description>
+					<Title>{t('tilesharedemo.detail.add.title')}</Title>
+					<Description>
+						{t('tilesharedemo.detail.add.description', { name: clusterName })}
+					</Description>
 
-				<Fields>
-					<Input
-						name="name"
-						label={t('tilesharedemo.detail.add.fields.name.label')}
-						placeholder={t('tilesharedemo.detail.add.fields.name.placeholder')}
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						disabled={submitting}
-					/>
-
-					<Input
-						name="durationMinutes"
-						type="number"
-						min={1}
-						step={1}
-						label={t('tileshareDuration.label', 'Duration (minutes)')}
-						placeholder={String(DEFAULT_TILETTE_DURATION_MINUTES)}
-						value={durationMinutes}
-						onChange={(e) => setDurationMinutes(e.target.value)}
-						disabled={submitting}
-					/>
-
-					<DatePicker
-						label={t('tilesharedemo.detail.add.fields.deadline.label')}
-						value={deadline}
-						onChange={setDeadline}
-						placeholder={t('tilesharedemo.detail.add.fields.deadline.placeholder')}
-						minDate={dayjs().format('YYYY-MM-DD')}
-					/>
-
-					<Input.Textarea
-						name="note"
-						label={t('tilesharedemo.detail.add.fields.note.label')}
-						placeholder={t('tilesharedemo.detail.add.fields.note.placeholder')}
-						value={note}
-						onChange={(e) => setNote(e.target.value)}
-						disabled={submitting}
-						rows={6}
-					/>
-
-					<ShareTo>
-						<ShareToLabel>{t('tilesharedemo.detail.add.shareTo.label')}</ShareToLabel>
-						<MultiInput
-							value={recipients}
-							onChange={setRecipients}
-							placeholder={t('tilesharedemo.detail.add.shareTo.placeholder')}
-							inputProps={{ name: 'shareTo', type: 'string' }}
+					<Fields>
+						{pendingTask !== undefined && !showSuccess && (
+							<p role="status">
+								{t(
+									'tileShareNotes.createdPending',
+									'The tilette was created. Its notes still need saving; retrying will not create another tilette.'
+								)}
+							</p>
+						)}
+						<TiletteDraftFields
+							value={draft}
+							onChange={setDraft}
+							mode={mode}
+							allowMoveShareDeadline={false}
+							disabled={submitting || pendingTask !== undefined}
+							shareDeadline={
+								shareDeadline
+									? dayjs(shareDeadline).format('YYYY-MM-DD')
+									: undefined
+							}
 						/>
-					</ShareTo>
-				</Fields>
+					</Fields>
 
-				<Footer>
-					<Separator />
-					<Actions>
-						<Button
-							type="button"
-							variant="ghost"
-							style={{ border: `1px solid ${theme.colors.border.default}` }}
-							onClick={onBack}
-						>
-							{t('tilesharedemo.detail.add.cancel')}
-						</Button>
-						<Button
-							type="button"
-							variant="brand"
-							onClick={handleSubmit}
-							disabled={submitting}
-						>
-							{submitting
-								? t('tilesharedemo.detail.add.creating')
-								: t('tilesharedemo.detail.add.submit')}
-						</Button>
-					</Actions>
-				</Footer>
-			</Content>
+					<Footer>
+						<Separator />
+						<Actions>
+							<Button
+								type="button"
+								variant="ghost"
+								style={{ border: `1px solid ${theme.colors.border.default}` }}
+								onClick={onBack}
+							>
+								{t('tilesharedemo.detail.add.cancel')}
+							</Button>
+							<Button
+								type="button"
+								variant="brand"
+								onClick={handleSubmit}
+								disabled={submitting}
+							>
+								{submitting
+									? t('tilesharedemo.detail.add.creating')
+									: pendingTask !== undefined
+										? t('tileShareNotes.retrySave', 'Retry saving notes')
+										: t('tilesharedemo.detail.add.submit')}
+							</Button>
+						</Actions>
+					</Footer>
+				</Content>
 
-			<SuccessModal
-				show={showSuccess}
-				setShow={handleSuccessClose}
-				closeTimeout={SUCCESS_MODAL_TIMEOUT_SECONDS}
-				actions={[
-					{
-						text: t('tilesharedemo.detail.add.success.view'),
-						onClick: () => handleSuccessClose(false),
-					},
-				]}
-			>
-				<p>{t('tilesharedemo.detail.add.success.message', { name: createdName })}</p>
-			</SuccessModal>
-		</Container>
+				<SuccessModal
+					motion
+					show={showSuccess}
+					setShow={handleSuccessClose}
+					closeTimeout={SUCCESS_MODAL_TIMEOUT_SECONDS}
+					actions={[
+						{
+							text: t('tilesharedemo.detail.add.success.view'),
+							onClick: () => handleSuccessClose(false),
+						},
+					]}
+				>
+					<p>{t('tilesharedemo.detail.add.success.message', { name: createdName })}</p>
+				</SuccessModal>
+			</Container>
+		</TileShareTheme>
 	);
 };
 
 const Container = styled.div`
+	${tileShareControls}
+	${tileShareReveal}
 	width: 100%;
 	height: 100%;
 	display: flex;
@@ -270,13 +283,21 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
+	background: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 18px;
+	margin-block: 28px;
 	width: 100%;
-	max-width: ${({ theme }) => theme.screens.md};
+	max-width: 680px;
 	margin-inline: auto;
-	padding: 2.5rem 1.5rem 2rem;
+	padding: 32px;
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	@media (max-width: 720px) {
+		width: calc(100% - 32px);
+		padding: 24px;
+		margin-block: 20px;
+	}
 `;
 
 const HeaderBar = styled.header`
@@ -291,6 +312,7 @@ const HeaderBar = styled.header`
 `;
 
 const BackButton = styled.button`
+	${tileShareInteraction}
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -337,19 +359,6 @@ const Fields = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-`;
-
-const ShareTo = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-`;
-
-const ShareToLabel = styled.label`
-	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const Footer = styled.div`

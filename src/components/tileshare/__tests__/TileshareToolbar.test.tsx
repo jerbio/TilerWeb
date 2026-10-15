@@ -16,8 +16,7 @@ describe('TileshareToolbar', () => {
 		render(
 			<TileshareToolbar
 				user={{ name: 'Alice Adams', email: 'alice@example.com' }}
-				onSelectSingle={vi.fn()}
-				onSelectMulti={vi.fn()}
+				onSelectMode={vi.fn()}
 			/>
 		);
 		expect(screen.getByText('AA')).toBeInTheDocument();
@@ -27,37 +26,26 @@ describe('TileshareToolbar', () => {
 
 	it('opens the create selection dropdown and triggers the chosen option', async () => {
 		const user = setupUser();
-		const onSelectSingle = vi.fn();
-		const onSelectMulti = vi.fn();
+		const onSelectMode = vi.fn();
 		render(
 			<TileshareToolbar
 				user={{ name: 'Alice Adams', email: null }}
-				onSelectSingle={onSelectSingle}
-				onSelectMulti={onSelectMulti}
+				onSelectMode={onSelectMode}
 			/>
 		);
 
-		expect(
-			screen.queryByText('tilesharedemo.dashboard.createSelection.single.label')
-		).not.toBeInTheDocument();
+		expect(screen.queryByText('tileShareModes.broadcast.label')).not.toBeInTheDocument();
 
 		await user.click(
 			screen.getByRole('button', { name: 'tilesharedemo.dashboard.toolbar.create' })
 		);
 
-		expect(
-			screen.getByText('tilesharedemo.dashboard.createSelection.single.label')
-		).toBeInTheDocument();
-		expect(
-			screen.getByText('tilesharedemo.dashboard.createSelection.multi.label')
-		).toBeInTheDocument();
+		expect(screen.getByText('tileShareModes.broadcast.label')).toBeInTheDocument();
+		expect(screen.getByText('tileShareModes.project.label')).toBeInTheDocument();
 
-		await user.click(screen.getByText('tilesharedemo.dashboard.createSelection.multi.label'));
+		await user.click(screen.getByText('tileShareModes.project.label'));
 
-		expect(onSelectMulti).toHaveBeenCalledTimes(1);
-		expect(onSelectSingle).not.toHaveBeenCalled();
-		expect(
-			screen.queryByText('tilesharedemo.dashboard.createSelection.single.label')
-		).not.toBeInTheDocument();
+		expect(onSelectMode).toHaveBeenCalledExactlyOnceWith('project');
+		expect(screen.queryByText('tileShareModes.broadcast.label')).not.toBeInTheDocument();
 	});
 });

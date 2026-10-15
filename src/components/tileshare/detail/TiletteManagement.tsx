@@ -2,20 +2,23 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Users, Trash2, UserPlus } from 'lucide-react';
-import Modal from '@/core/common/components/modals';
+import Modal from '../TileShareModal';
 import Button from '@/core/common/components/button';
-import { DesignatedUser, TileShareTemplate } from '@/core/common/types/tileshare';
+import { DesignatedUser, TileShareTemplate, TileshareMode } from '@/core/common/types/tileshare';
 import { classifyContact, isValidRecipient, normalizePhoneNumber } from '@/core/util/contact';
 import { tileshareService } from '@/services';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 type Props = {
+	mode?: TileshareMode | null;
 	tilette: TileShareTemplate;
 	isOwner: boolean;
 	onChanged: () => Promise<void>;
 	onDeleted: () => void | Promise<void>;
 };
 
-export default function TiletteManagement({ tilette, isOwner, onChanged, onDeleted }: Props) {
+export default function TiletteManagement({ tilette, isOwner, onChanged, onDeleted, mode }: Props) {
+	const participants = validDesignatedUsers(tilette.designatedUsers);
 	const { t } = useTranslation();
 	const [view, setView] = useState<'people' | 'remove' | 'delete' | null>(null);
 	const [recipient, setRecipient] = useState<DesignatedUser | null>(null);
@@ -83,10 +86,12 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 	return (
 		<>
 			<Toolbar aria-label={t('tileshareManagement.actions', 'Manage tilette')}>
-				<Button variant="ghost" onClick={() => open('people')}>
-					<Users size={16} /> {t('tileshareManagement.people', 'Manage people')}
-				</Button>
-				<DangerButton onClick={() => open('delete')}>
+				{mode !== TileshareMode.Class && (
+					<Button variant="ghost" onClick={() => open('people')}>
+						<Users size={16} /> {t('tileshareManagement.people', 'Manage people')}
+					</Button>
+				)}
+				<DangerButton $quiet onClick={() => open('delete')}>
 					<Trash2 size={16} /> {t('tileshareManagement.delete', 'Delete tilette')}
 				</DangerButton>
 			</Toolbar>
@@ -95,7 +100,7 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 				setShow={busy ? undefined : () => setView(null)}
 				headerText={title}
 			>
-				<Body role="dialog" aria-modal="true" aria-label={title}>
+				<Body>
 					{error && <ErrorText role="alert">{error}</ErrorText>}
 					{notice && <p role="status">{notice}</p>}
 					{view === 'people' ? (
@@ -150,7 +155,7 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 								</AddRow>
 							</form>
 							<List aria-label={t('tileshareManagement.recipients', 'Recipients')}>
-								{(tilette.designatedUsers ?? []).map((person) => (
+								{participants.map((person) => (
 									<li
 										key={
 											person.designatedTileTemplateId ??
@@ -182,7 +187,7 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 									</li>
 								))}
 							</List>
-							{!tilette.designatedUsers?.length && (
+							{!participants.length && (
 								<p>{t('tileshareManagement.empty', 'No recipients yet.')}</p>
 							)}
 						</>
@@ -260,6 +265,7 @@ const Toolbar = styled.div`
 	align-items: center;
 	flex-wrap: wrap;
 	gap: 12px;
+	min-width: 0;
 `;
 const Body = styled.div`
 	width: 100%;
@@ -301,16 +307,22 @@ const List = styled.ul`
 		color: ${({ theme }) => theme.colors.text.secondary};
 	}
 `;
-const DangerButton = styled.button`
+const DangerButton = styled.button<{ $quiet?: boolean }>`
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
 	padding: 10px 12px;
 	border-radius: 8px;
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	color: ${({ theme }) => theme.colors.text.error};
+	color: ${({ theme, $quiet }) =>
+		$quiet ? theme.colors.text.secondary : theme.colors.text.error};
 	background: transparent;
 	cursor: pointer;
+	${({ $quiet }) =>
+		$quiet && 'margin-left: auto; border-color: transparent; font-size: 13px; padding: 8px;'}
+	&:hover:not(:disabled) {
+		background: ${({ theme }) => theme.colors.button.ghost.bgHover};
+	}
 	&:disabled {
 		opacity: 0.5;
 		cursor: default;

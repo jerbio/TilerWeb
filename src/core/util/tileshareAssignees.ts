@@ -5,9 +5,16 @@ import type {
 } from '@/core/common/types/tileshare';
 import type { AvatarUser } from '@/core/common/components/AvatarCluster';
 
+/** Older responses can serialize a missing assignment list as [null]. */
+export function validDesignatedUsers(
+	users: readonly (DesignatedUser | null | undefined)[] | null | undefined
+): DesignatedUser[] {
+	return (users ?? []).filter((user): user is DesignatedUser => user != null);
+}
+
 /** Map a tilette's designated users to the avatar-cluster shape. */
 export function designatedToAvatars(designated: DesignatedUser[] | null): AvatarUser[] {
-	return (designated ?? []).map((d) => ({
+	return validDesignatedUsers(designated).map((d) => ({
 		name: d.userProfile?.fullName || d.userProfile?.firstName || d.displayedIdentifier,
 		email: d.userProfile?.email || d.displayedIdentifier,
 	}));
@@ -42,7 +49,7 @@ export function buildAssignees(tilettes: TileShareTemplate[]): Assignee[] {
 	const byId = new Map<string, Assignee>();
 
 	for (const tilette of tilettes) {
-		for (const designated of tilette.designatedUsers ?? []) {
+		for (const designated of validDesignatedUsers(tilette.designatedUsers)) {
 			const key = designated.userId ?? designated.displayedIdentifier;
 			if (!key) continue;
 

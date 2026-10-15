@@ -11,7 +11,11 @@ vi.mock('@/components/tileshare/TiletteInvitationActions', async () => {
 });
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, setupUser } from '@/test/test-utils';
-import type { DesignatedUser, TileShareTemplate } from '@/core/common/types/tileshare';
+import {
+	TileshareMode,
+	type DesignatedUser,
+	type TileShareTemplate,
+} from '@/core/common/types/tileshare';
 import TiletteBody from '../TiletteBody';
 
 vi.mock('react-i18next', () => ({
@@ -90,6 +94,15 @@ const tilettes = [
 ];
 
 describe('TiletteBody', () => {
+	it('defaults a Class to people and allows a display-only Project perspective', async () => {
+		const interaction = setupUser();
+		render(<TiletteBody clusterId="c" tilettes={tilettes} mode={TileshareMode.Class} />);
+		expect(screen.getByText('Alice X.')).toBeInTheDocument();
+		await interaction.click(screen.getByRole('tab', { name: 'Project view' }));
+		expect(screen.getByText('tilesharedemo.detail.showingTilettes 2/2')).toBeInTheDocument();
+		await interaction.click(screen.getByRole('tab', { name: 'Class view' }));
+		expect(screen.getByText('Alice X.')).toBeInTheDocument();
+	});
 	it('starts in list view showing the tilette count', () => {
 		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
 		expect(screen.getByText('tilesharedemo.detail.showingTilettes 2/2')).toBeInTheDocument();
@@ -136,16 +149,14 @@ describe('TiletteBody', () => {
 
 	it('shows the board tab', () => {
 		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
-		expect(
-			screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' })
-		).toBeInTheDocument();
+		expect(screen.getByRole('tab', { name: 'Board view' })).toBeInTheDocument();
 	});
 
 	it('switches to the board view and shows an empty completed lane', async () => {
 		const u = setupUser();
 		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
 
-		await u.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' }));
+		await u.click(screen.getByRole('tab', { name: 'Board view' }));
 
 		// Every assignee's RSVP is null, so both tilettes sit in the Todo lane and
 		// the In progress and Completed lanes show their empty state.
@@ -158,7 +169,7 @@ describe('TiletteBody', () => {
 		const u = setupUser();
 		const first = render(<TiletteBody clusterId="c" tilettes={tilettes} />);
 
-		await u.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' }));
+		await u.click(screen.getByRole('tab', { name: 'Board view' }));
 		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
 
 		first.unmount();

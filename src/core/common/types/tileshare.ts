@@ -16,6 +16,11 @@ export type TileshareUserProfile = {
 };
 
 export type TileShareCluster = {
+	/** Authoritative sharing mode. Never derive it from IsMultiTilette. */
+	mode?: TileshareMode | null;
+	addressData?: AddressDataModel | null;
+	location?: { address: string; description?: string; isVerified: boolean } | null;
+	participants?: ContactModel[];
 	id: string | null;
 	name: string | null;
 	/** Cluster description. Persisted on write; may be null until the read payload emits it. */
@@ -41,6 +46,8 @@ export type DesignatedUser = {
 };
 
 export type TileShareTemplate = {
+	addressData?: AddressDataModel | null;
+	location?: { address: string; description?: string; isVerified: boolean } | null;
 	id: string | null;
 	name: string | null;
 	creator: TileshareUserProfile | null;
@@ -150,6 +157,8 @@ export type AddressDataModel = {
 };
 
 export type CreateTileShareClusterParams = {
+	Mode: TileshareMode;
+	ClusterTemplateTileModels?: ClusterTemplateTileParams[];
 	UserName: string | null;
 	TimeZone: string | null;
 	TimeZoneOffset: number | null;
@@ -175,15 +184,49 @@ export type CreateTileShareClusterParams = {
 export type CreateTileShareClusterResponse = ApiResponse<TileShareCluster>;
 
 export enum TileshareMode {
-	Single = 'single',
-	Multi = 'multi',
+	Broadcast = 'broadcast',
+	Class = 'class',
+	Project = 'project',
 }
+
+export enum TiletteView {
+	List = 'list',
+	Assignee = 'assignee',
+	Board = 'board',
+}
+
+export type TileshareLocation = {
+	address: string;
+	description: string;
+	isVerified: boolean;
+};
+
+export type TiletteDraft = {
+	id: string;
+	name: string;
+	durationMinutes: string;
+	deadline: string;
+	note: string;
+	recipients: string[];
+	/** A later task deadline only moves the share when the owner opts in. */
+	moveShareDeadline?: boolean;
+	location: TileshareLocation;
+};
+
+/** A tilette created together with its share, before a ClusterId exists. */
+export type ClusterTemplateTileParams = Omit<CreateTileletteParams, 'ClusterId'> & {
+	OrderedIndex?: number;
+	IncludeMe?: boolean;
+};
 
 export type TileshareFormState = {
 	durationMinutes?: string;
 	name: string;
 	deadline: string;
 	location: string;
+	locationDescription?: string;
+	locationIsVerified?: boolean;
+	tilettes?: TiletteDraft[];
 	note: string;
 	recipients: string[];
 };
@@ -263,7 +306,7 @@ export type GetTileletteParams = {
  *
  * Unlike the tilette route, this handler does NOT merge with stored values: an
  * absent `StartTime` is written as `DateTimeOffset.MinValue`, wiping the
- * cluster's start. Both bounds are therefore required, not optional.
+ * cluster's start. Send both bounds when changing the timeline; omit both for a rename.
  */
 export type UpdateClusterParams = {
 	/**
@@ -275,9 +318,9 @@ export type UpdateClusterParams = {
 	Name?: string;
 	/** The cluster description. `ClusterNote` exists on the model but is ignored. */
 	Notes?: string;
-	/** Epoch ms. Always send both bounds — see the note above. */
-	StartTime: number;
-	EndTime: number;
+	/** Epoch ms. Send both bounds together when changing the timeline. */
+	StartTime?: number;
+	EndTime?: number;
 };
 
 /** An assignee on a tilette. The wire shape the server binds — not a bare string. */
@@ -298,6 +341,8 @@ export type ContactModel = {
  * the cluster afterwards rather than patching it locally.
  */
 export type CreateTileletteParams = {
+	AddressData?: AddressDataModel;
+	IncludeMe?: boolean;
 	ClusterId: string;
 	Name?: string;
 	Contacts?: ContactModel[];
@@ -315,6 +360,7 @@ export type CreateTileletteParams = {
  * safe. A missing Id is a 400; no write-access row for the caller is a 404.
  */
 export type UpdateTileletteParams = {
+	AddressData?: AddressDataModel;
 	Id: string;
 	Name?: string;
 	/** Writes miscData.UserNote, returned as `miscData.userNote`. */

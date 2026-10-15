@@ -20,6 +20,13 @@ const Row = styled.div`
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
+	flex-wrap: wrap;
+	flex-shrink: 0;
+	min-height: 64px;
+	padding: 12px 0;
+	@media (max-width: 600px) {
+		padding: 8px 0;
+	}
 `;
 
 const Count = styled.h2`

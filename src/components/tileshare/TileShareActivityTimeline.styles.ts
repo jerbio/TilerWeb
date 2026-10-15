@@ -219,9 +219,10 @@ export const Dismiss = styled.button`
 `;
 export const Notice = styled.div`
 	margin: 12px 0;
-	padding: 16px;
+	padding: 12px 14px;
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: 8px;
+	border-radius: 10px;
+	background: ${({ theme }) => theme.colors.input.bg};
 	color: ${({ theme }) => theme.colors.text.secondary};
 	font-size: 13px;
 	line-height: 1.6;
