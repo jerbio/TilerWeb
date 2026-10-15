@@ -77,8 +77,8 @@ export default function StatusBoardColumn({
 			setSilhouetteLeaving(false);
 			setDragOver(false);
 		}
-		prevJustAcceptedId.current = justAcceptedId;
-		prevAcceptingId.current = acceptingId;
+		prevJustAcceptedId.current = justAcceptedId ?? null;
+		prevAcceptingId.current = acceptingId ?? null;
 	}, [justAcceptedId, acceptingId, onDrop]);
 	// Highlight the lane body (the cards, or the empty slot) while a drag hovers.
 	const droppable = !!onDrop && dragOver;
@@ -278,13 +278,17 @@ const EmptySlot = styled.div<{ $droppable: boolean }>`
 	min-height: 140px;
 	padding: 18px 14px;
 	border: 1px dashed
-		({{ $droppable, theme }) => ($droppable ? theme.colors.border.strong : theme.colors.border.default)};
+		${({ $droppable, theme }) =>
+			$droppable ? theme.colors.border.strong : theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.large};
 	background: ${({ theme }) => theme.colors.background.card2};
-	color: ${({ $droppable, theme }) => ($droppable ? theme.colors.text.secondary : theme.colors.text.muted)};
+	color: ${({ $droppable, theme }) =>
+		$droppable ? theme.colors.text.secondary : theme.colors.text.muted};
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	text-align: center;
-	transition: border-color 150ms ease, color 150ms ease;
+	transition:
+		border-color 150ms ease,
+		color 150ms ease;
 `;
 
 /** The silhouette fades in and eases down when the lane starts accepting. */

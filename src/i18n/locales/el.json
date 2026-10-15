@@ -3,14 +3,14 @@
 		"events": {
 			"comment_added": "Προστέθηκε σχόλιο",
 			"comment_replied": "Προστέθηκε απάντηση σε σχόλιο",
-			"comment_edited": "Το σχόλιο επεξεργάστηκε",
+			"comment_edited": "Το σχόλιο τροποποιήθηκε",
 			"comment_deleted": "Το σχόλιο διαγράφηκε"
 		},
 		"sentences": {
-			"comment_added": "<actor/> πρόσθεσε σχόλιο στο <title/>",
-			"comment_replied": "<actor/> απάντησε σε σχόλιο στο <title/>",
-			"comment_edited": "<actor/> επεξεργάστηκε ένα σχόλιο στο <title/>",
-			"comment_deleted": "<actor/> διέγραψε ένα σχόλιο στο <title/>"
+			"comment_added": "<actor/> σχολίασε το <title/>",
+			"comment_replied": "<actor/> απάντησε σε ένα σχόλιο για το <title/>",
+			"comment_edited": "<actor/> τροποποίησε ένα σχόλιο για το <title/>",
+			"comment_deleted": "<actor/> διέγραψε ένα σχόλιο για το <title/>"
 		}
 	},
 	"common": {

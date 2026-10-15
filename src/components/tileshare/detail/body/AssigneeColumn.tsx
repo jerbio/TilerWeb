@@ -14,6 +14,7 @@ const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee, clusterId }) 
 	<Column>
 		<Header>
 			<HeaderName>{assignee.name}</HeaderName>
+			<Count>{assignee.tilettes.length}</Count>
 			<AvatarCluster users={[assignee.avatar]} size={28} />
 		</Header>
 		<Cards>
@@ -32,7 +33,9 @@ const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee, clusterId }) 
 const Column = styled.div`
 	display: flex;
 	flex-direction: column;
-	padding: 0 0.75rem;
+	min-width: 0;
+	border-radius: 12px;
+	background: ${({ theme }) => theme.colors.background.card2};
 `;
 
 const Header = styled.div`
@@ -41,14 +44,12 @@ const Header = styled.div`
 	justify-content: space-between;
 	gap: 0.5rem;
 	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-bottom: none;
-	background-color: ${({ theme }) => theme.colors.background.card};
 	border-radius: ${({ theme }) => theme.borderRadius.large}
 		${({ theme }) => theme.borderRadius.large} 0 0;
 `;
 
 const HeaderName = styled.span`
+	flex: 1;
 	min-width: 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
@@ -62,11 +63,14 @@ const HeaderName = styled.span`
 const Cards = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 0.875rem;
-	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	gap: 10px;
+	padding: 0 8px 8px;
 	border-radius: 0 0 ${({ theme }) => theme.borderRadius.large}
 		${({ theme }) => theme.borderRadius.large};
+`;
+const Count = styled.span`
+	font-size: 12px;
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 export default AssigneeColumn;

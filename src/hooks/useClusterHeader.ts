@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { tileshareService } from '@/services';
 import type { TileShareCluster } from '@/core/common/types/tileshare';
 
@@ -18,27 +18,36 @@ export function useClusterHeader(clusterId: string | null): UseClusterHeaderResu
 	const [data, setData] = useState<TileShareCluster | null>(null);
 	const [loading, setLoading] = useState<boolean>(clusterId !== null);
 	const [error, setError] = useState<Error | null>(null);
+	const hasLoaded = useRef(false);
 
 	const load = useCallback(async () => {
 		if (!clusterId) {
+			hasLoaded.current = false;
 			setData(null);
 			setLoading(false);
 			return;
 		}
-		setLoading(true);
-		setError(null);
+		const initial = !hasLoaded.current;
+		if (initial) {
+			setLoading(true);
+			setError(null);
+		}
 		try {
 			const next = await tileshareService.getClusterHeader(clusterId);
 			setData(next);
+			hasLoaded.current = true;
 		} catch (err) {
-			setError(err instanceof Error ? err : new Error(String(err)));
-			setData(null);
+			if (initial) {
+				setError(err instanceof Error ? err : new Error(String(err)));
+				setData(null);
+			} else console.error('Error refreshing cluster header', err);
 		} finally {
-			setLoading(false);
+			if (initial) setLoading(false);
 		}
 	}, [clusterId]);
 
 	useEffect(() => {
+		hasLoaded.current = false;
 		void load();
 	}, [load]);
 

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
@@ -5,6 +6,10 @@ import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { useUiStore } from '@/core/ui';
 import { Routes } from '@/core/constants/routes';
 import TiletteCreate from '../TiletteCreate';
+import { tileShareNotesService } from '@/services/tileShareNotesService';
+vi.mock('@/services/tileShareNotesService', () => ({
+	tileShareNotesService: { getNotes: vi.fn(), updateNotes: vi.fn() },
+}));
 
 const navigate = vi.fn();
 vi.mock('react-router', async () => {
@@ -60,6 +65,31 @@ const submit = () => screen.getByRole('button', { name: 'tilesharedemo.detail.ad
 const notificationMessages = () => useUiStore.getState().notification.items.map((n) => n.message);
 
 describe('TiletteCreate', () => {
+	it('saves notes after creation using the notes token and retries without creating again', async () => {
+		vi.mocked(tileShareNotesService.getNotes).mockResolvedValue({
+			Etag: 'read-token',
+		} as Awaited<ReturnType<typeof tileShareNotesService.getNotes>>);
+		vi.mocked(tileShareNotesService.updateNotes)
+			.mockRejectedValueOnce(new Error('offline'))
+			.mockResolvedValueOnce({ Etag: 'next' } as Awaited<
+				ReturnType<typeof tileShareNotesService.updateNotes>
+			>);
+		renderForm();
+		fireEvent.change(nameInput(), { target: { value: 'Task with notes' } });
+		fireEvent.change(
+			screen.getByPlaceholderText('tilesharedemo.detail.add.fields.note.placeholder'),
+			{ target: { value: '    code();\n' } }
+		);
+		fireEvent.click(submit());
+		fireEvent.click(await screen.findByRole('button', { name: 'tileShareNotes.retrySave' }));
+		await waitFor(() => expect(tileShareNotesService.updateNotes).toHaveBeenCalledTimes(2));
+		expect(createTilette).toHaveBeenCalledOnce();
+		expect(tileShareNotesService.updateNotes).toHaveBeenLastCalledWith({
+			EventID: 'tpl-1',
+			UserNote: '    code();\n',
+			Etag: 'read-token',
+		});
+	});
 	beforeEach(() => {
 		createTilette.mockReset();
 		navigate.mockReset();
@@ -74,30 +104,16 @@ describe('TiletteCreate', () => {
 		).toBeInTheDocument();
 	});
 
-	it.each([
-		['90', 5400000],
-		['', 3600000],
-	])('submits duration input %s in milliseconds', async (value, duration) => {
+	it('defaults duration to one hour without a duration field', async () => {
 		renderForm();
-		const input = screen.getByRole('spinbutton');
-		expect(input).toHaveValue(60);
-		fireEvent.change(input, { target: { value } });
+		expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
 		fireEvent.change(nameInput(), { target: { value: 'Duration test' } });
 		fireEvent.click(submit());
 		await waitFor(() =>
 			expect(createTilette).toHaveBeenCalledWith(
-				expect.objectContaining({ DurationInMs: duration })
+				expect.objectContaining({ DurationInMs: 3600000 })
 			)
 		);
-	});
-
-	it.each(['0', '-5', '1.5'])('rejects invalid duration %s', (value) => {
-		renderForm();
-		fireEvent.change(screen.getByRole('spinbutton'), { target: { value } });
-		fireEvent.change(nameInput(), { target: { value: 'Duration test' } });
-		fireEvent.click(submit());
-		expect(createTilette).not.toHaveBeenCalled();
-		expect(notificationMessages()).toContain('tileshareDuration.invalid');
 	});
 
 	it('creates with ClusterId and the trimmed name', async () => {
@@ -215,14 +231,16 @@ describe('TiletteCreate', () => {
 		);
 	});
 
-	it('leaves times unset when no deadline is given, falling back to the cluster', async () => {
+	it('defaults to tomorrow when the share has no deadline', async () => {
 		renderForm();
 
 		fireEvent.change(nameInput(), { target: { value: 'Backend work' } });
 		fireEvent.click(submit());
 
 		await waitFor(() => expect(createTilette).toHaveBeenCalledOnce());
-		expect(createTilette.mock.calls[0][0].EndTime).toBeUndefined();
+		expect(createTilette.mock.calls[0][0].EndTime).toBe(
+			dayjs().add(1, 'day').endOf('day').valueOf()
+		);
 	});
 
 	it('goes back without creating when cancelled', () => {

@@ -19,12 +19,15 @@ import { lightTheme } from '@/core/theme/light';
 import TileShareClusterCard from '../TileShareClusterCard';
 import { TILESHARE_ACCENT } from '../accents';
 import { iconSurface } from '@/core/util/colorSurface';
-import { TileShareCluster } from '@/core/common/types/tileshare';
+import { TileShareCluster, TileshareMode } from '@/core/common/types/tileshare';
 
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
 		t: (key: string, opts?: { count?: number }) => {
 			const translations: Record<string, string> = {
+				'tileShareModes.broadcast.label': 'Broadcast',
+				'tileShareModes.project.label': 'Project',
+				'tileShareModes.class.label': 'Class',
 				'tilesharedemo.card.tileshare': 'Tileshare',
 				'tilesharedemo.card.multiTileshare': 'Multi-Tileshare',
 				'tilesharedemo.card.due': 'Due:',
@@ -52,6 +55,7 @@ const mockCreator = {
 };
 
 const mockCluster: TileShareCluster = {
+	mode: TileshareMode.Broadcast,
 	id: 'cluster-1',
 	name: 'Design Sprint',
 	notes: null,
@@ -86,14 +90,18 @@ describe('TileShareClusterCard', () => {
 		expect(screen.getByText('Design Sprint')).toBeInTheDocument();
 	});
 
-	it('renders tileshare subtitle when isMultiTilette is false', () => {
+	it('renders Broadcast from mode', () => {
 		renderCard(mockCluster);
-		expect(screen.getByText('Tileshare')).toBeInTheDocument();
+		expect(screen.getByText('Broadcast')).toBeInTheDocument();
 	});
 
-	it('renders multi-tileshare subtitle when isMultiTilette is true', () => {
-		renderCard({ ...mockCluster, isMultiTilette: true });
-		expect(screen.getByText('Multi-Tileshare')).toBeInTheDocument();
+	it('uses Project mode even when the legacy flag is false', () => {
+		renderCard({ ...mockCluster, mode: TileshareMode.Project, isMultiTilette: false });
+		expect(screen.getByText('Project')).toBeInTheDocument();
+	});
+	it('distinguishes Class from Project', () => {
+		renderCard({ ...mockCluster, mode: TileshareMode.Class });
+		expect(screen.getByText('Class')).toBeInTheDocument();
 	});
 
 	it('renders the view button', () => {

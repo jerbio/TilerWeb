@@ -17,6 +17,18 @@ vi.mock('@/core/theme/ThemeProvider', () => ({
 const DATE = dayjs('2025-07-27').valueOf();
 
 describe('MultiTileshareHeader', () => {
+	it('renders saved Project and Class notes as Markdown', () => {
+		render(
+			<MultiTileshareHeader
+				name="Share"
+				description={'## Plan\n\n**Launch**\n\n- Review'}
+				date={DATE}
+			/>
+		);
+		expect(screen.getByRole('heading', { name: 'Plan', level: 2 })).toBeInTheDocument();
+		expect(screen.getByText('Launch').tagName).toBe('STRONG');
+		expect(screen.getByRole('listitem')).toHaveTextContent('Review');
+	});
 	it('renders the name, subtitle key, description and date', () => {
 		render(
 			<MultiTileshareHeader

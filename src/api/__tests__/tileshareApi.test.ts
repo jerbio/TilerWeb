@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TileshareApi } from '../tileshareApi';
-import { InvitationStatus } from '@/core/common/types/tileshare';
+import { InvitationStatus, TileshareMode } from '@/core/common/types/tileshare';
 
 vi.mock('@/config/config_getter', () => ({
 	Env: {
@@ -528,6 +528,7 @@ describe('TileshareApi', () => {
 
 	describe('createCluster', () => {
 		const createParams = {
+			Mode: TileshareMode.Broadcast,
 			UserName: 'test@example.com',
 			TimeZone: 'America/Denver',
 			TimeZoneOffset: 360,

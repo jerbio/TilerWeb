@@ -30,7 +30,7 @@ const AssigneeView: React.FC<AssigneeViewProps> = ({
 	onNext,
 }) => (
 	<Wrap>
-		<Board $columns={columns}>
+		<Board $columns={Math.max(1, Math.min(columns, assignees.length))}>
 			{assignees.map((assignee) => (
 				<AssigneeColumn key={assignee.id} assignee={assignee} clusterId={clusterId} />
 			))}
@@ -49,7 +49,8 @@ const Wrap = styled.div`
 
 const Board = styled.div<{ $columns: number }>`
 	display: grid;
-	grid-template-columns: repeat(${({ $columns }) => $columns}, minmax(0, 1fr));
+	grid-template-columns: repeat(${({ $columns }) => $columns}, minmax(0, 340px));
+	gap: 16px;
 	align-items: start;
 `;
 

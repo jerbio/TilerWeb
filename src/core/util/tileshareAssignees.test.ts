@@ -61,6 +61,12 @@ const monica = designated({
 });
 
 describe('buildAssignees', () => {
+	it('ignores null entries in assignment lanes and avatar clusters', () => {
+		const users = [null, jess, null] as DesignatedUser[];
+		expect(buildAssignees([tilette('t1', users)])).toHaveLength(1);
+		expect(designatedToAvatars(users)).toHaveLength(1);
+		expect(designatedToAvatars([null] as unknown as DesignatedUser[])).toEqual([]);
+	});
 	it('groups tilettes under each designated user', () => {
 		const result = buildAssignees([tilette('t1', [jess, monica]), tilette('t2', [jess])]);
 

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Check, X, Clock3, CircleHelp, CircleDot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DesignatedUser, InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 export const TileShareViewerContext = createContext<{ isOwner: boolean; viewerId: string | null }>({
 	isOwner: false,
@@ -55,16 +56,18 @@ export default function TiletteRsvpStatus({
 	tilette,
 	assigneeId,
 	embedded,
+	compact = false,
 }: {
 	tilette: TileShareTemplate;
 	assigneeId?: string;
 	/** Render inline (no border/padding) inside a host row, e.g. beside the invitation actions. */
 	embedded?: boolean;
+	compact?: boolean;
 }) {
 	const { t } = useTranslation();
 	const viewer = useContext(TileShareViewerContext);
 	if (!viewer.viewerId) return null;
-	const assignments = tilette.designatedUsers ?? [];
+	const assignments = validDesignatedUsers(tilette.designatedUsers);
 	if (!viewer.isOwner || assigneeId) {
 		const id = viewer.isOwner ? assigneeId : viewer.viewerId;
 		if (!viewer.isOwner && assigneeId && assigneeId !== viewer.viewerId) return null;
@@ -72,11 +75,13 @@ export default function TiletteRsvpStatus({
 		if (!assignment) return null;
 		return (
 			<Wrap $embedded={embedded}>
-				<Label>
-					{id === viewer.viewerId
-						? t('tileshareRsvp.yours', 'Your response')
-						: t('tileshareRsvp.response', 'Invitation response')}
-				</Label>
+				{!compact && (
+					<Label>
+						{id === viewer.viewerId
+							? t('tileshareRsvp.yours', 'Your response')
+							: t('tileshareRsvp.response', 'Invitation response')}
+					</Label>
+				)}
 				<Badge status={statusOf(assignment)} />
 			</Wrap>
 		);
@@ -87,6 +92,33 @@ export default function TiletteRsvpStatus({
 			count: assignments.filter((d) => statusOf(d) === status).length,
 		}))
 		.filter((g) => g.count > 0);
+	if (compact) {
+		return assignments.length ? (
+			<People>
+				<summary>
+					{t('tileShareDensity.accepted', '{{accepted}}/{{total}} accepted', {
+						accepted: assignments.filter(
+							(a) => a.rsvpStatus === InvitationStatus.Accepted
+						).length,
+						total: assignments.length,
+					})}
+				</summary>
+				<ul>
+					{assignments.map((assignment, index) => (
+						<li key={assignment.designatedTileTemplateId ?? index}>
+							<span>
+								{displayName(assignment) ||
+									t('tileshareRsvp.participant', 'Participant')}
+							</span>
+							<Badge status={statusOf(assignment)} />
+						</li>
+					))}
+				</ul>
+			</People>
+		) : (
+			<Label>{t('tileshareRsvp.noParticipants', 'No participants')}</Label>
+		);
+	}
 	return (
 		<Wrap $embedded={embedded}>
 			<Label>{t('tileshareRsvp.responses', 'Invitation responses')}</Label>

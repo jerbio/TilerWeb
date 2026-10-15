@@ -25,6 +25,26 @@ const basePayload = (overrides: Partial<NotesPayload> = {}): NotesPayload => ({
 });
 
 describe('useTileNotes', () => {
+	it('ignores an old target’s delayed read after navigation', async () => {
+		let complete!: (payload: NotesPayload) => void;
+		vi.mocked(notesService.getNotes)
+			.mockImplementationOnce(
+				() =>
+					new Promise((resolve) => {
+						complete = resolve;
+					})
+			)
+			.mockResolvedValueOnce(
+				basePayload({ EventId: 'next', UserNote: 'Next note', Etag: 'next' })
+			);
+		const { result, rerender } = renderHook(({ id }) => useTileNotes(id), {
+			initialProps: { id: 'old' },
+		});
+		rerender({ id: 'next' });
+		await waitFor(() => expect(result.current.payload?.UserNote).toBe('Next note'));
+		await act(async () => complete(basePayload({ UserNote: 'Old note' })));
+		expect(result.current.payload?.UserNote).toBe('Next note');
+	});
 	beforeEach(() => {
 		vi.mocked(notesService.getNotes).mockReset();
 		vi.mocked(notesService.updateNotes).mockReset();

@@ -15,6 +15,7 @@ type DetailHeaderCardProps = {
 	headerRight?: React.ReactNode;
 	/** Body rendered below the title-row divider (description, progress, …). */
 	children?: React.ReactNode;
+	compact?: boolean;
 };
 
 /**
@@ -33,13 +34,14 @@ const DetailHeaderCard: React.FC<DetailHeaderCardProps> = ({
 	subtitle,
 	headerRight,
 	children,
+	compact = false,
 }) => {
 	const { isDarkMode } = useTheme();
 	const surface = iconSurface(accent, isDarkMode);
 
 	return (
-		<Card $darkmode={isDarkMode}>
-			<TopRow>
+		<Card $darkmode={isDarkMode} data-tileshare-header>
+			<TopRow $compact={compact}>
 				<Left>
 					<IconBox $bg={surface.background} $fg={surface.foreground}>
 						{icon}
@@ -51,7 +53,7 @@ const DetailHeaderCard: React.FC<DetailHeaderCardProps> = ({
 				</Left>
 				{headerRight && <Right>{headerRight}</Right>}
 			</TopRow>
-			<HeaderDivider />
+			{children && <HeaderDivider />}
 			{children}
 		</Card>
 	);
@@ -61,14 +63,16 @@ const Card = styled.div<{ $darkmode: boolean }>`
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	overflow: hidden;
-	/* Outline-only in dark; white fill in light so the card reads on the page. */
-	background-color: ${({ $darkmode, theme }) =>
-		$darkmode ? 'transparent' : theme.colors.background.card};
+	background-color: ${({ theme }) => theme.colors.background.card};
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.025);
 `;
 
 /** Padded body section. Full-bleed dividers sit between sections, not inside. */
 export const HeaderSection = styled.div`
 	padding: 1.25rem 1.5rem;
+	@media (max-width: 600px) {
+		padding: 20px;
+	}
 `;
 
 /** Edge-to-edge divider connecting to the card outline. */
@@ -78,19 +82,23 @@ export const HeaderDivider = styled.hr`
 	margin: 0;
 `;
 
-const TopRow = styled.div`
+const TopRow = styled.div<{ $compact: boolean }>`
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	padding: 1.25rem 1.5rem;
+	padding: ${({ $compact }) => ($compact ? '16px 20px' : '24px')};
+	flex-wrap: wrap;
+	@media (max-width: 600px) {
+		padding: 20px;
+	}
 `;
 
 const Left = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	flex: 1;
-	min-width: 0;
+	flex: 1 1 200px;
+	min-width: min(100%, 180px);
 `;
 
 const Right = styled.div`
@@ -98,6 +106,8 @@ const Right = styled.div`
 	align-items: center;
 	gap: 0.75rem;
 	flex-shrink: 0;
+	flex-wrap: wrap;
+	max-width: 100%;
 `;
 
 const IconBox = styled.div<{ $bg: string; $fg: string }>`
@@ -118,17 +128,17 @@ const TitleBlock = styled.div`
 
 const Title = styled.h1`
 	margin: 0;
-	font-size: ${({ theme }) => theme.typography.fontSize.xl};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+	font-size: clamp(22px, 2vw, 28px);
+	font-weight: 650;
+	letter-spacing: -0.8px;
+	line-height: 1.25;
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	overflow-wrap: anywhere;
 `;
 
 const Subtitle = styled.p`
-	margin: 0;
+	margin: 6px 0 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
 `;

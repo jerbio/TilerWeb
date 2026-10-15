@@ -6,7 +6,7 @@ import TiletteRsvpStatus, {
 import TiletteInvitationActions, {
 	TiletteInvitationRefreshContext,
 } from '@/components/tileshare/TiletteInvitationActions';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -16,6 +16,7 @@ import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { useTiletteDetail } from '@/hooks/useTiletteDetail';
 import { useClusterHeader } from '@/hooks/useClusterHeader';
 import { isTileshareOwner } from '@/core/util/tileshareOwnership';
+import { tileshareMode } from '@/core/util/tileshareMode';
 import { tileshareService } from '@/services';
 import { Routes } from '@/core/constants/routes';
 import TileshareDetailBreadcrumb from '@/components/tileshare/detail/TileshareDetailBreadcrumb';
@@ -27,6 +28,8 @@ import EditTileshareModal, {
 import CommentThread from '@/components/comments/CommentThread';
 import { CommentTargetType } from '@/core/common/types/comment';
 import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
+import TiletteNotes from '@/components/tileshare/TiletteNotes';
+import { TiletteEditSession } from '@/services/tileShareEditing';
 
 const TiletteDetailPage: React.FC = () => {
 	const { t } = useTranslation();
@@ -38,11 +41,16 @@ const TiletteDetailPage: React.FC = () => {
 	const updateNotification = useUiStore((s) => s.notification.update);
 	const [editing, setEditing] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const editSession = useRef<TiletteEditSession | null>(null);
 	// Shimmer the detail section while an RSVP response is saving in place.
 	const [rsvpSaving, setRsvpSaving] = useState(false);
 	// The tilette lives under a multi cluster (this route's :id) — resolve the
 	// parent's name for the breadcrumb and the "In: {cluster}" header subtitle.
-	const { data: cluster, loading: clusterLoading } = useClusterHeader(clusterId ?? null);
+	const {
+		data: cluster,
+		loading: clusterLoading,
+		refresh: refreshCluster,
+	} = useClusterHeader(clusterId ?? null);
 
 	// A tilette is editable by whoever owns the cluster it belongs to, not by the
 	// assignee working on it.
@@ -53,28 +61,25 @@ const TiletteDetailPage: React.FC = () => {
 		: undefined;
 
 	const handleSave = async (values: EditTileshareValues) => {
-		if (!tilette?.id) return;
+		if (!tilette?.id || !cluster?.id || !isOwner)
+			throw new Error('Tilette editing is unavailable');
 		setSaving(true);
 		const nId = notificationId(NotificationAction.Update, `tilette-${tilette.id}`);
 		showNotification(nId, t('tilesharedemo.detail.edit.saving'), 'loading');
 		try {
-			await tileshareService.updateTilette({
-				Id: tilette.id,
-				Name: values.name,
-				NoteMiscData: values.description,
-				// The server keeps whichever bound is omitted, so the unchanged
-				// start is sent alongside the edited due date.
-				StartTime: tilette.start ?? undefined,
-				EndTime: values.dueDate,
-			});
+			editSession.current ??= new TiletteEditSession(tilette, cluster, tileshareService);
+			await editSession.current.save(values);
 			window.dispatchEvent(new Event('tileshare-changed'));
-			await refresh();
 			setEditing(false);
 			updateNotification(nId, t('tilesharedemo.detail.edit.success'), 'success');
 		} catch (err) {
 			console.error('Error updating tilette', err);
 			updateNotification(nId, t('tilesharedemo.detail.edit.error'), 'error');
+			throw err;
 		} finally {
+			// Refresh both even after a partial save; some backends also extend a share
+			// when accepted work moves later. Always display the persisted result.
+			await Promise.all([refresh(), refreshCluster()]);
 			setSaving(false);
 		}
 	};
@@ -102,13 +107,35 @@ const TiletteDetailPage: React.FC = () => {
 									<SingleTileshareHeader
 										name={tilette.name}
 										description={tilette.miscData?.userNote ?? null}
+										descriptionContent={
+											tilette.id ? (
+												<TiletteNotes
+													key={tilette.id}
+													id={tilette.id}
+													canEdit={isOwner}
+												/>
+											) : undefined
+										}
 										dueDate={tilette.end}
 										subtitle={t('tilesharedemo.detail.inCluster', {
 											name: parentName,
 										})}
-										onEdit={isOwner ? () => setEditing(true) : undefined}
+										onEdit={
+											isOwner && cluster
+												? () => {
+														editSession.current =
+															new TiletteEditSession(
+																tilette,
+																cluster,
+																tileshareService
+															);
+														setEditing(true);
+													}
+												: undefined
+										}
 									/>
 									<TiletteManagement
+										mode={cluster ? tileshareMode(cluster) : null}
 										tilette={tilette}
 										isOwner={isOwner}
 										onChanged={refresh}
@@ -135,12 +162,22 @@ const TiletteDetailPage: React.FC = () => {
 									</RsvpRow>
 								</Detail>
 								{tilette.id ? (
-									<CommentThread
-										targetType={CommentTargetType.TileshareTilette}
-										targetId={tilette.id}
-									/>
+									<Discussion>
+										<CommentThread
+											targetType={CommentTargetType.TileshareTilette}
+											targetId={tilette.id}
+										/>
+									</Discussion>
 								) : null}
 								<EditTileshareModal
+									context={{
+										kind: 'tilette',
+										shareDeadline: cluster?.end,
+										duration: tilette.duration,
+										start: tilette.start,
+										mode: cluster ? tileshareMode(cluster) : null,
+									}}
+									hideNotes
 									show={editing}
 									setShow={setEditing}
 									headerText={t('tilesharedemo.detail.edit.tiletteTitle')}
@@ -166,9 +203,7 @@ const Container = styled.div`
 	flex-direction: column;
 	gap: 1.5rem;
 	width: 100%;
-	height: 100%;
-	overflow-y: auto;
-	background-color: ${({ theme }) => theme.colors.background.page};
+	background: transparent;
 
 	& > * {
 		flex-shrink: 0;
@@ -188,10 +223,22 @@ const RsvpRow = styled.div`
 	align-items: center;
 	flex-wrap: wrap;
 	gap: 12px;
-	padding: 12px 20px;
-	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+	padding: 16px 20px;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 12px;
+	background: ${({ theme }) => theme.colors.background.card};
 	&:empty {
 		display: none;
+	}
+`;
+
+const Discussion = styled.section`
+	padding: 24px;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 16px;
+	background: ${({ theme }) => theme.colors.background.card};
+	@media (max-width: 600px) {
+		padding: 18px;
 	}
 `;
 

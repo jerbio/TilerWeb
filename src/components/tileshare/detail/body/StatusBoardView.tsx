@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/core/auth/useAuth';
 import { TileshareApi } from '@/api/tileshareApi';
 import { getBoardDragTiletteId } from './StatusBoardDrag';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 type Props = {
 	tilettes: TileShareTemplate[];
@@ -134,7 +135,7 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 			m.el.style.transition = 'none';
 			m.el.style.transform = `translateY(${m.from}px)`;
 		});
-		void scope.offsetHeight; // Commit the pre-positions so the next frame is a real transition.
+		void (boardRef.current ?? document.documentElement).offsetHeight; // Commit the pre-positions so the next frame is a real transition.
 		let done = false;
 		const finish = () => {
 			if (done) return;
@@ -186,7 +187,7 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 			if (!tiletteId || !user?.id) return;
 			const tilette = tilettes.find((entry) => entry.id === tiletteId);
 			if (!tilette || !canAcceptByDrag(tilette, user.id)) return;
-			const assignmentId = tilette.designatedUsers?.find(
+			const assignmentId = validDesignatedUsers(tilette.designatedUsers).find(
 				(d) => d.userId === user.id
 			)?.designatedTileTemplateId;
 			if (!assignmentId || accepting.current.has(assignmentId)) return;
@@ -289,8 +290,10 @@ const FilterRow = styled.div`
 
 const BoardGrid = styled.div`
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(280px, 1fr));
 	gap: 14px;
+	overflow-x: auto;
+	padding: 4px 4px 12px;
 	/* Stretch: every lane fills the board's full height, so an empty lane
 	 * (e.g. In progress) always offers room to drop a dragged tilette. */
 `;

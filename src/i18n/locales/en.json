@@ -1,4 +1,111 @@
-{
+﻿{
+	"tileShareDensity": {
+		"respond": "Respond",
+		"accepted": "{{accepted}}/{{total}} accepted",
+		"task": "Tilette",
+		"people": "People",
+		"response": "Response"
+	},
+	"tileShareVisual": {
+		"edit": "Edit",
+		"hours_one": "{{count}} hour",
+		"hours_other": "{{count}} hours"
+	},
+	"tileShareEdit": {
+		"lateTitle": "Due after the share deadline",
+		"durationLabel": "Duration",
+		"nameShort": "Use at least 3 characters.",
+		"nameLong": "Use no more than 100 characters.",
+		"nameHint": "Use 3–100 characters.",
+		"beforeStart": "The deadline must be on or after the start time.",
+		"time": "Deadline time",
+		"inherited": "This tilette uses the share’s deadline until you choose its own.",
+		"afterShare": "This tilette is due after the share’s deadline ({{deadline}}).",
+		"moveShare": "Also move the share’s deadline to {{deadline}}",
+		"durationFixed": "A tilette’s duration cannot change once it is shared.",
+		"duration": "{{minutes}} minutes",
+		"modeFixed": "The mode cannot change after sharing.",
+		"acceptedImpact_one": "{{count}} accepted tilette due later may be moved to this deadline.",
+		"acceptedImpact_other": "{{count}} accepted tilettes due later may be moved to this deadline.",
+		"unacceptedImpact_one": "{{count}} tilette that nobody has accepted keeps its later deadline.",
+		"unacceptedImpact_other": "{{count}} tilettes that nobody has accepted keep their later deadlines.",
+		"unchanged": "No changes to save.",
+		"retry": "Retry save",
+		"saveFailed": "Could not save right now. Your changes are kept. Try again.",
+		"shareFailed": "The tilette was saved, but the share deadline could not be updated. Retry to finish, or close to keep the saved tilette.",
+		"partialDiscard": "The tilette changes are already saved. Closing abandons the pending share deadline change.",
+		"discard": "Your unsaved changes to these details will be lost."
+	},
+	"tileShareNotes": {
+		"createdPending": "The tilette was created. Its notes still need saving; retrying will not create another tilette.",
+		"retrySave": "Retry saving notes",
+		"title": "Notes",
+		"edit": "Edit notes",
+		"empty": "No notes yet.",
+		"loadError": "Could not load notes.",
+		"saveError": "Could not save notes. Your edits are still here; try again.",
+		"useSaved": "Use saved note",
+		"truncated": "The note exceeded the server limit. Review the saved note before continuing."
+	},
+	"tileShareMarkdown": {
+		"write": "Write",
+		"preview": "Preview",
+		"formatting": "Note formatting",
+		"previewLabel": "Note preview",
+		"empty": "Nothing to preview yet.",
+		"hint": "Markdown supported: headings, bold, lists, links, and code."
+	},
+	"tileShareModes": {
+		"broadcast": {
+			"label": "Broadcast",
+			"title": "Create a Broadcast",
+			"description": "Share one task. Each recipient has their own assignment.",
+			"submit": "Create Broadcast"
+		},
+		"class": {
+			"label": "Class",
+			"title": "Create a Class",
+			"description": "Share a set of tilettes. Every participant receives every tilette.",
+			"submit": "Create Class"
+		},
+		"project": {
+			"label": "Project",
+			"title": "Create a Project",
+			"description": "Work together on a task set. Assign people to individual tilettes.",
+			"submit": "Create Project"
+		},
+		"location": "Location (optional)",
+		"addTilettesNow": "Add tilettes first (optional)",
+		"optionalTilettes": "Optional. You can also add tilettes after creating the share.",
+		"tiletteNumber": "Tilette {{number}}",
+		"addTilette": "Add tilette",
+		"removeTilette": "Remove tilette",
+		"moveUp": "Move up",
+		"moveDown": "Move down",
+		"deadlineDefault": "Uses the share deadline: {{deadline}}",
+		"everyone": "Assigned to every Class participant.",
+		"addRecipient": "Add recipient",
+		"removeRecipient": "Remove {{recipient}}",
+		"assignees": "Assignees (optional)",
+		"tiletteLocation": "Tilette location",
+		"perspective": "Share perspective",
+		"projectView": "Project view",
+		"classView": "Class view",
+		"unknown": "Sharing mode unavailable",
+		"participants": "Participants",
+		"participantContact": "Participant email or phone",
+		"classActions": "Class participants",
+		"addToAll": "Add to all tilettes",
+		"removeFromAll": "Remove from all tilettes",
+		"removeFromClassConfirm": "Remove this participant from every tilette in the Class?",
+		"emptyClass": "Add a tilette to start assigning work to participants.",
+		"acceptAll": "Accept all pending tilettes",
+		"declineAll": "Decline all pending tilettes",
+		"partialChange": "{{saved}} changes saved; {{failed}} need retry.",
+		"changesSaved": "Changes saved.",
+		"retryRemaining": "Retry remaining changes",
+		"refreshFailed": "Changes were sent, but the share could not refresh. Reload to check the saved assignments."
+	},
 	"tileshareList": {
 		"title": "TileShares",
 		"createdByMe": "Created by me",
@@ -70,6 +177,12 @@
 			"invitation_send_unknown": "Invitation send outcome unknown",
 			"assignment_completed": "Occurrence completed",
 			"assignment_reopened": "Occurrence reopened"
+		},
+		"sentences": {
+			"comment_added": "<actor/> commented on <title/>",
+			"comment_replied": "<actor/> replied to a comment on <title/>",
+			"comment_edited": "<actor/> edited a comment on <title/>",
+			"comment_deleted": "<actor/> deleted a comment on <title/>"
 		},
 		"channels": {
 			"email": "Email",
@@ -2188,6 +2301,7 @@
 			"showingAssignees": "Showing {{shown}} of {{total}} Assignees",
 			"statusLabel": "Status:",
 			"status": {
+				"todo": "To do",
 				"inProgress": "In progress",
 				"todo": "Todo",
 				"completed": "Completed"
@@ -2208,6 +2322,13 @@
 				"accepting": "Accepting…"
 			},
 			"viewAria": "Tilette view",
+			"board": {
+				"filterAria": "Board assignments",
+				"filter": { "all": "Everyone", "mine": "Just me" },
+				"empty": "No tilettes",
+				"accepting": "Accepting…",
+				"dropHint": "Drop here to accept your invitation"
+			},
 			"openTiletteAria": "Open tilette",
 			"prev": "Prev",
 			"next": "Next",
@@ -2774,5 +2895,36 @@
 	"chat.tileShare.accessReconciliation": "Access is saved. Calendar cleanup or restoration runs in the background.",
 	"chat.tileShare.planReview": "Review shared-work plan",
 	"chat.tileShare.planUpdated": "Reviewed changes saved together.",
-	"chat.tileShare.planNote": "All displayed targets are saved together after confirmation. If any target changes or access is lost, review a new proposal."
+	"chat.tileShare.planNote": "All displayed targets are saved together after confirmation. If any target changes or access is lost, review a new proposal.",
+	"tileShareComposer": {
+		"close": "Close",
+		"shareDeadline": "Share deadline",
+		"moveShareDeadline": "Also move the share deadline to {{deadline}}",
+		"count_one": "You have added {{count}} tilette",
+		"count_other": "You have added {{count}} tilettes",
+		"newTilette": "New tilette",
+		"emptyTitle": "Add tilettes to your share",
+		"emptyDescription": "Add tasks now, or create the share and add tasks later.",
+		"editTilette": "Edit {{name}}",
+		"removeTilette": "Remove {{name}}",
+		"locationNotSet": "Location not set",
+		"unassigned": "Unassigned",
+		"added": "{{name}} was added to this draft.",
+		"updated": "{{name}} was updated.",
+		"removed": "{{name}} was removed from this draft.",
+		"addTitle": "Create a tilette",
+		"editTitle": "Edit tilette",
+		"saveTilette": "Save tilette",
+		"classHint": "This tilette will be assigned to every Class participant when you create the share.",
+		"projectHint": "Add a task and optionally choose its assignees. Invitations are sent when you create the Project.",
+		"optionalDescription": "Want to include tasks during creation? You can add tilettes now or create the share first.",
+		"reviewTilettes": "Review tilettes ({{count}})",
+		"editDetails": "Edit details",
+		"cancelExit": "Cancel & Exit",
+		"discardTitle": "Discard changes?",
+		"discard": "Discard changes",
+		"keepEditing": "Keep editing",
+		"discardTask": "Your unsaved tilette edits will be lost. Other tilettes will remain in the draft.",
+		"discardShare": "Your share details and draft tilettes will be lost. No invitations have been sent."
+	}
 }

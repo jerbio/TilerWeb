@@ -1,8 +1,8 @@
-{
+﻿{
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "Kommentar hinzugefügt",
-			"comment_replied": "Antwort auf einen Kommentar hinzugefügt",
+			"comment_replied": "Antwort auf Kommentar hinzugefügt",
 			"comment_edited": "Kommentar bearbeitet",
 			"comment_deleted": "Kommentar gelöscht"
 		},

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import Modal from '@/core/common/components/modals';
+import Modal from '../TileShareModal';
 import Button from '@/core/common/components/button';
 
 type DeleteClusterDialogProps = {
@@ -36,6 +36,7 @@ const DeleteClusterDialog: React.FC<DeleteClusterDialogProps> = ({
 			footer={
 				<Actions>
 					<Button
+						disabled={deleting}
 						type="button"
 						variant="ghost"
 						size="medium"

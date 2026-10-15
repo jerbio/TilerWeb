@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { TileShareTemplate } from '@/core/common/types/tileshare';
+import { TileShareTemplate, TileshareMode, TiletteView } from '@/core/common/types/tileshare';
 import { buildAssignees } from '@/core/util/tileshareAssignees';
 import useResponsiveColumns from '@/hooks/useResponsiveColumns';
 import usePagination from '@/hooks/usePagination';
@@ -10,32 +10,32 @@ import ViewHeader from './ViewHeader';
 import TiletteListView from './TiletteListView';
 import AssigneeView from './AssigneeView';
 import StatusBoardView from './StatusBoardView';
+import TileShareTransition from '../../TileShareTransition';
 
 type TiletteBodyProps = {
+	mode?: TileshareMode | null;
 	clusterId: string;
 	tilettes: TileShareTemplate[];
 };
 
-type View = 'list' | 'assignee' | 'board';
+type Perspective = TileshareMode.Class | TileshareMode.Project;
 
-const MIN_COLUMN_WIDTH = 230;
+// Allow for the lane gap as well as a comfortable card width.
+const MIN_COLUMN_WIDTH = 316;
 const TILETTES_PER_PAGE = 10;
 const VIEW_STORAGE_KEY = 'tilesharedemo.detail.view';
-const VALID_VIEWS: View[] = ['list', 'assignee', 'board'];
+const VALID_VIEWS = Object.values(TiletteView);
 
-function readStoredView(): View | null {
+function readStoredView(): TiletteView | null {
 	try {
 		const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
-		if (stored && (VALID_VIEWS as string[]).includes(stored)) {
-			return stored as View;
-		}
-		return null;
+		return VALID_VIEWS.find((view) => view === stored) ?? null;
 	} catch {
 		return null;
 	}
 }
 
-function writeStoredView(view: View): void {
+function writeStoredView(view: TiletteView): void {
 	try {
 		window.localStorage.setItem(VIEW_STORAGE_KEY, view);
 	} catch {
@@ -43,9 +43,18 @@ function writeStoredView(view: View): void {
 	}
 }
 
-const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
+const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes, mode }) => {
 	const { t } = useTranslation();
-	const [view, setView] = useState<View>(() => readStoredView() ?? 'list');
+	const [view, setView] = useState<TiletteView>(() =>
+		mode === TileshareMode.Class ? TiletteView.Assignee : (readStoredView() ?? TiletteView.List)
+	);
+	const [perspective, setPerspective] = useState<Perspective>(() =>
+		mode === TileshareMode.Class ? TileshareMode.Class : TileshareMode.Project
+	);
+	const changePerspective = (next: Perspective) => {
+		setPerspective(next);
+		setView(next === TileshareMode.Class ? TiletteView.Assignee : TiletteView.List);
+	};
 
 	useEffect(() => {
 		writeStoredView(view);
@@ -77,12 +86,12 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 	} = usePagination(tilettes, TILETTES_PER_PAGE, [clusterId]);
 
 	const label =
-		view === 'assignee'
+		view === TiletteView.Assignee
 			? t('tilesharedemo.detail.showingAssignees', {
 					shown: visibleAssignees.length,
 					total: totalAssignees,
 				})
-			: view === 'board'
+			: view === TiletteView.Board
 				? t('tilesharedemo.detail.showingTilettes', {
 						shown: tilettes.length,
 						total: tilettes.length,
@@ -94,45 +103,82 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes }) => {
 
 	return (
 		<Wrap ref={ref}>
+			{(mode === TileshareMode.Class || mode === TileshareMode.Project) && (
+				<Tabs
+					aria-label={t('tileShareModes.perspective', 'Share perspective')}
+					value={perspective}
+					onChange={(value) => {
+						if (value === TileshareMode.Class || value === TileshareMode.Project)
+							changePerspective(value);
+					}}
+					tabs={[
+						{
+							id: TileshareMode.Project,
+							label: t('tileShareModes.projectView', 'Project view'),
+						},
+						{
+							id: TileshareMode.Class,
+							label: t('tileShareModes.classView', 'Class view'),
+						},
+					]}
+				/>
+			)}
 			<ViewHeader
 				label={label}
 				toggle={
 					<Tabs
 						aria-label={t('tilesharedemo.detail.viewAria')}
 						value={view}
-						onChange={(id) => setView(id as View)}
+						onChange={(id) => {
+							const nextView = VALID_VIEWS.find((view) => view === id);
+							if (!nextView) return;
+							setView(nextView);
+							setPerspective(
+								id === TiletteView.Assignee
+									? TileshareMode.Class
+									: TileshareMode.Project
+							);
+						}}
 						tabs={[
-							{ id: 'list', label: t('tilesharedemo.detail.view.list') },
-							{ id: 'assignee', label: t('tilesharedemo.detail.view.assignee') },
-							{ id: 'board', label: t('tilesharedemo.detail.view.board') },
+							{ id: TiletteView.List, label: t('tilesharedemo.detail.view.list') },
+							{
+								id: TiletteView.Assignee,
+								label: t('tilesharedemo.detail.view.assignee'),
+							},
+							{
+								id: TiletteView.Board,
+								label: t('tilesharedemo.detail.view.board', 'Board view'),
+							},
 						]}
 					/>
 				}
 			/>
-			{view === 'list' ? (
-				<TiletteListView
-					tilettes={visibleTilettes}
-					clusterId={clusterId}
-					showFooter={listPageCount > 1}
-					hasPrev={listPage > 1}
-					hasNext={listPage < listPageCount}
-					onPrev={() => setListPage((p) => Math.max(1, p - 1))}
-					onNext={() => setListPage((p) => Math.min(listPageCount, p + 1))}
-				/>
-			) : view === 'board' ? (
-				<StatusBoardView tilettes={tilettes} clusterId={clusterId} />
-			) : (
-				<AssigneeView
-					assignees={visibleAssignees}
-					clusterId={clusterId}
-					columns={columns}
-					showFooter={pageCount > 1}
-					hasPrev={safePage > 0}
-					hasNext={safePage < pageCount - 1}
-					onPrev={() => setPage((p) => Math.max(0, p - 1))}
-					onNext={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-				/>
-			)}
+			<TileShareTransition viewKey={view}>
+				{view === TiletteView.List ? (
+					<TiletteListView
+						tilettes={visibleTilettes}
+						clusterId={clusterId}
+						showFooter={listPageCount > 1}
+						hasPrev={listPage > 1}
+						hasNext={listPage < listPageCount}
+						onPrev={() => setListPage((p) => Math.max(1, p - 1))}
+						onNext={() => setListPage((p) => Math.min(listPageCount, p + 1))}
+					/>
+				) : view === TiletteView.Board ? (
+					<StatusBoardView tilettes={tilettes} clusterId={clusterId} />
+				) : (
+					<AssigneeView
+						assignees={visibleAssignees}
+						clusterId={clusterId}
+						columns={columns}
+						showFooter={pageCount > 1}
+						hasPrev={safePage > 0}
+						hasNext={safePage < pageCount - 1}
+						onPrev={() => setPage((p) => Math.max(0, p - 1))}
+						onNext={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+					/>
+				)}
+			</TileShareTransition>
 		</Wrap>
 	);
 };
