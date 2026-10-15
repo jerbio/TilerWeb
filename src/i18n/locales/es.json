@@ -2588,5 +2588,8 @@
 	"chat.tileShare.manageRecipients": "Gestionar destinatarios",
 	"chat.tileShare.managementUpdated": "Cambios de destinatarios o acceso guardados.",
 	"chat.tileShare.managementNote": "Revisa los efectos sobre destinatarios y acceso. La suspensión y restauración del calendario se procesan en segundo plano.",
-	"chat.tileShare.accessReconciliation": "Acceso guardado. La suspensión o restauración del calendario se procesa en segundo plano."
+	"chat.tileShare.accessReconciliation": "Acceso guardado. La suspensión o restauración del calendario se procesa en segundo plano.",
+	"chat.tileShare.planReview": "Revisar plan de trabajo compartido",
+	"chat.tileShare.planUpdated": "Los cambios revisados se guardaron juntos.",
+	"chat.tileShare.planNote": "Todos los elementos mostrados se guardan juntos después de confirmar. Si algún elemento cambia o pierdes el acceso, revisa una nueva propuesta."
 }

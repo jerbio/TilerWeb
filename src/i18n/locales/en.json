@@ -2771,5 +2771,8 @@
 	"chat.tileShare.manageRecipients": "Manage recipients",
 	"chat.tileShare.managementUpdated": "Recipient or access changes saved.",
 	"chat.tileShare.managementNote": "Review the recipient and access effects above. Calendar access cleanup and restoration run in the background.",
-	"chat.tileShare.accessReconciliation": "Access is saved. Calendar cleanup or restoration runs in the background."
+	"chat.tileShare.accessReconciliation": "Access is saved. Calendar cleanup or restoration runs in the background.",
+	"chat.tileShare.planReview": "Review shared-work plan",
+	"chat.tileShare.planUpdated": "Reviewed changes saved together.",
+	"chat.tileShare.planNote": "All displayed targets are saved together after confirmation. If any target changes or access is lost, review a new proposal."
 }

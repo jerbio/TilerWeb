@@ -22,6 +22,89 @@ const result = {
 		],
 	},
 };
+it('reviews each plan target and confirms the whole proposal once', async () => {
+	const confirm = vi.fn().mockResolvedValue({
+		State: 'Applied',
+		ActionId: 'a',
+		Operation: 'UpdatePlan',
+		PlanTargets: [],
+	});
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				result={{
+					...result,
+					Operation: 'UpdatePlan',
+					Review: {
+						Name: 'Update shared work',
+						Tilettes: [],
+						Operation: 'UpdatePlan',
+						Items: [
+							{
+								ProjectId: 'p',
+								PreviousName: 'Launch',
+								Name: 'Release',
+								UpdatesName: true,
+							},
+							{
+								ProjectId: 'p',
+								TiletteId: 't',
+								PreviousName: 'Report',
+								Name: 'Report',
+								UpdatesNotes: true,
+								PreviousNotes: 'Old instructions',
+								Notes: '',
+							},
+						],
+					},
+				}}
+				onConfirm={confirm}
+				onCheck={vi.fn()}
+				onChanged={vi.fn()}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByText('Review shared-work plan')).toBeVisible();
+	expect(screen.getByText(/Launch.*Release/)).toBeVisible();
+	expect(screen.getByText('Old instructions')).toBeVisible();
+	expect(screen.getByText('Clear notes')).toBeVisible();
+	expect(confirm).not.toHaveBeenCalled();
+	fireEvent.click(screen.getByRole('button', { name: 'Confirm update' }));
+	await act(async () => {});
+	expect(confirm).toHaveBeenCalledExactlyOnceWith('exact', expect.any(AbortSignal));
+});
+it('shows a saved plan as updates with each target link', () => {
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				result={{
+					State: 'Applied',
+					ActionId: 'a',
+					Operation: 'UpdatePlan',
+					PlanTargets: [
+						{ ProjectId: 'p', Name: 'Release', Url: '/tileshare/p', State: 'Applied' },
+						{
+							ProjectId: 'p',
+							TiletteId: 't',
+							Name: 'Report',
+							Url: '/tileshare/p/tilette/t',
+							State: 'Applied',
+						},
+					],
+				}}
+				onConfirm={vi.fn()}
+				onCheck={vi.fn()}
+				onChanged={vi.fn()}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByText('Reviewed changes saved together.')).toBeVisible();
+	expect(screen.getByRole('link', { name: 'Report' })).toHaveAttribute(
+		'href',
+		'/tileshare/p/tilette/t'
+	);
+	expect(screen.queryByText('TileShare created.')).not.toBeInTheDocument();
+});
 it('shows the effects and submits only after explicit confirmation', async () => {
 	const confirm = vi.fn().mockResolvedValue({ State: 'Applied', ActionId: 'a' });
 	const changed = vi.fn();

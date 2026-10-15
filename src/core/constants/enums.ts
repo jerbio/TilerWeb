@@ -8,6 +8,7 @@ export enum Actions {
 	TileShare_Delete_Tilette = 'tileshare_delete_tilette',
 	TileShare_Update_Tilette = 'tileshare_update_tilette',
 	TileShare_Update_Project = 'tileshare_update_project',
+	TileShare_Update_Plan = 'tileshare_update_plan',
 	TileShare_Update_Recipients = 'tileshare_update_recipients',
 	TileShare_Update_Access = 'tileshare_update_access',
 	TileShare_Set_Tilette_Notes = 'tileshare_set_tilette_notes',

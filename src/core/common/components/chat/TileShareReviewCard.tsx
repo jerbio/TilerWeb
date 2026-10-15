@@ -66,6 +66,7 @@ export default function TileShareReviewCard({
 	onChanged: (result: TileShareExecutionResult) => void;
 }) {
 	const { t } = useTranslation();
+	const isPlan = result.Operation === 'UpdatePlan' || result.Review?.Operation === 'UpdatePlan';
 	const isRecipients =
 		result.Operation === 'UpdateRecipients' || result.Review?.Operation === 'UpdateRecipients';
 	const isAccess =
@@ -77,6 +78,7 @@ export default function TileShareReviewCard({
 	const isProjectUpdate =
 		result.Operation === 'UpdateProject' || result.Review?.Operation === 'UpdateProject';
 	const isUpdate =
+		isPlan ||
 		isManagement ||
 		isProjectUpdate ||
 		result.Operation === 'UpdateTilette' ||
@@ -220,6 +222,23 @@ export default function TileShareReviewCard({
 				</p>
 			</Card>
 		);
+	if (result.State === 'Applied' && isPlan)
+		return (
+			<Card role="status">
+				<p>{t('chat.tileShare.planUpdated', 'Reviewed changes saved together.')}</p>
+				<ul>
+					{result.PlanTargets?.map((item, i) => (
+						<li key={i}>
+							{item.Url.startsWith('/tileshare/') ? (
+								<a href={item.Url}>{item.Name}</a>
+							) : (
+								item.Name
+							)}
+						</li>
+					))}
+				</ul>
+			</Card>
+		);
 	if (result.State === 'Applied')
 		return (
 			<Card role="status">
@@ -264,6 +283,70 @@ export default function TileShareReviewCard({
 	const review = result.Review;
 	if (!review || !result.ReviewToken) return null;
 	const time = (value?: number | null) => (value == null ? '' : new Date(value).toLocaleString());
+	if (isPlan)
+		return (
+			<Card aria-label={t('chat.tileShare.planReview', 'Review shared-work plan')}>
+				<h4>{t('chat.tileShare.planReview', 'Review shared-work plan')}</h4>
+				<div style={{ maxHeight: '28rem', overflow: 'auto' }}>
+					<ul>
+						{review.Items?.map((item, i) => (
+							<li key={i}>
+								<strong>
+									{item.ProjectName ? `${item.ProjectName} / ` : ''}
+									{item.PreviousName}
+									{item.UpdatesName ? ` → ${item.Name}` : ''}
+								</strong>
+								{item.UpdatesNotes && (
+									<>
+										<small>
+											{t('chat.tileShare.previousNotes', 'Current notes')}
+										</small>
+										<NoteText>
+											{item.PreviousNotes ||
+												t('chat.tileShare.emptyNotes', 'No notes')}
+										</NoteText>
+										<small>
+											{t('chat.tileShare.proposedNotes', 'Proposed notes')}
+										</small>
+										<NoteText>
+											{item.Notes ||
+												t('chat.tileShare.clearNotes', 'Clear notes')}
+										</NoteText>
+									</>
+								)}
+							</li>
+						))}
+					</ul>
+				</div>
+				<p>
+					{t(
+						'chat.tileShare.planNote',
+						'All displayed targets are saved together after confirmation. If any target changes or access is lost, review a new proposal.'
+					)}
+				</p>
+				{(notice || result.ErrorCode === 'review_changed') && (
+					<p role="alert">
+						{notice ||
+							t(
+								'chat.tileShare.reviewAgain',
+								'Review the current proposal before confirming again.'
+							)}
+					</p>
+				)}
+				<button
+					type="button"
+					disabled={busy || uncertain || rejected || disabled}
+					onClick={() => run()}
+				>
+					{t('chat.tileShare.confirmUpdate', 'Confirm update')}
+				</button>
+				{uncertain && (
+					<button type="button" disabled={busy} onClick={() => run(true)}>
+						{t('chat.tileShare.checkStatus', 'Check status')}
+					</button>
+				)}
+			</Card>
+		);
 	return (
 		<Card
 			aria-label={

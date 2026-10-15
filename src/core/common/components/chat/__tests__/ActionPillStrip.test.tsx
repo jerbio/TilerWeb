@@ -64,11 +64,13 @@ describe('ActionPillStrip', () => {
 			makeAction('rename-tilette', Actions.TileShare_Rename_Tilette),
 			makeAction('update-tilette', Actions.TileShare_Update_Tilette),
 			makeAction('update-project', Actions.TileShare_Update_Project),
+			makeAction('update-plan', Actions.TileShare_Update_Plan),
 			makeAction('notes', Actions.TileShare_Set_Tilette_Notes),
 			makeAction('delete-tilette', Actions.TileShare_Delete_Tilette),
 			makeAction('task'),
 		]);
 		expect(screen.queryByTestId('pill-update-tilette')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('pill-update-plan')).not.toBeInTheDocument();
 		expect(screen.queryByTestId('pill-lookup')).not.toBeInTheDocument();
 		expect(screen.queryByTestId('pill-projects')).not.toBeInTheDocument();
 		expect(screen.queryByTestId('pill-details')).not.toBeInTheDocument();
