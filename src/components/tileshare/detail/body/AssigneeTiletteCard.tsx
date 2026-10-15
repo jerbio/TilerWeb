@@ -64,8 +64,9 @@ const Card = styled.div<{ $bg: string; $border: string }>`
 	display: flex;
 	flex-direction: column;
 	border-radius: ${({ theme }) => theme.borderRadius.large};
-	background-color: ${({ $bg }) => $bg};
-	border: 1px solid ${({ $border }) => $border};
+	background-color: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-top: 3px solid ${({ $border }) => $border};
 	text-decoration: none;
 	transition: filter 0.15s ease;
 
@@ -77,7 +78,7 @@ const Card = styled.div<{ $bg: string; $border: string }>`
 const CardLink = styled(Link)`
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	gap: 0.875rem;
 	padding: 0.875rem;
 	color: inherit;
 	text-decoration: none;
@@ -88,12 +89,12 @@ const Name = styled.p<{ $color: string }>`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
-	color: ${({ $color }) => $color};
+	color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const Footer = styled.div`
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: space-between;
 	gap: 0.5rem;
 `;

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { useUiStore } from '@/core/ui';
@@ -40,6 +40,15 @@ const saveButton = () => screen.getByRole('button', { name: 'tilesharedemo.detai
 const notificationMessages = () => useUiStore.getState().notification.items.map((n) => n.message);
 
 describe('EditTileshareModal', () => {
+	it('preserves Markdown source, including code indentation, when saving from Preview', () => {
+		const source = '    code();\n\n**Next step**\n';
+		const { onSubmit } = renderModal();
+		fireEvent.change(noteInput(), { target: { value: source } });
+		fireEvent.click(screen.getByRole('button', { name: 'tileShareMarkdown.preview' }));
+		expect(screen.getByText('Next step').tagName).toBe('STRONG');
+		fireEvent.click(saveButton());
+		expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ description: source }));
+	});
 	beforeEach(() => {
 		useUiStore.getState().notification.clear();
 	});
@@ -81,6 +90,7 @@ describe('EditTileshareModal', () => {
 	it('keeps the original time of day when the due date is unchanged', () => {
 		const { onSubmit } = renderModal();
 
+		fireEvent.change(nameInput(), { target: { value: 'Renamed sprint' } });
 		fireEvent.click(saveButton());
 
 		const submitted = onSubmit.mock.calls[0][0].dueDate as number;
@@ -129,6 +139,8 @@ describe('EditTileshareModal', () => {
 
 		fireEvent.change(nameInput(), { target: { value: 'abandoned' } });
 		fireEvent.click(screen.getByRole('button', { name: 'tilesharedemo.detail.edit.cancel' }));
+		expect(setShow).not.toHaveBeenCalled();
+		fireEvent.click(screen.getByRole('button', { name: 'tileShareComposer.discard' }));
 		expect(setShow).toHaveBeenCalledWith(false);
 
 		const reopen = (show: boolean) =>
@@ -152,5 +164,79 @@ describe('EditTileshareModal', () => {
 		reopen(true);
 
 		expect(nameInput()).toHaveValue('Design Sprint');
+	});
+	it('does not submit unchanged details', () => {
+		const { onSubmit } = renderModal();
+		fireEvent.click(saveButton());
+		expect(onSubmit).not.toHaveBeenCalled();
+	});
+	it('shows short-name validation at the field and keeps the draft', () => {
+		const { onSubmit } = renderModal();
+		fireEvent.change(nameInput(), { target: { value: 'ab' } });
+		fireEvent.click(saveButton());
+		expect(screen.getByRole('alert')).toHaveTextContent('tileShareEdit.nameShort');
+		expect(onSubmit).not.toHaveBeenCalled();
+		expect(nameInput()).toHaveValue('ab');
+	});
+	it('offers an unchecked share-deadline change for a late tilette and clears it when no longer late', () => {
+		const shareEnd = dayjs('2026-03-10T12:00:00').valueOf();
+		const { onSubmit } = renderModal({
+			context: { kind: 'tilette', shareDeadline: shareEnd, duration: 3600000 },
+		});
+		expect(screen.getByText('tileShareEdit.afterShare')).toBeInTheDocument();
+		expect(screen.getByRole('checkbox')).not.toBeChecked();
+		fireEvent.click(screen.getByRole('checkbox'));
+		const date = screen.getByLabelText('tilesharedemo.detail.edit.fields.deadline.label');
+		fireEvent.change(date, { target: { value: '03/09/2026' } });
+		fireEvent.blur(date);
+		expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+		fireEvent.click(saveButton());
+		expect(onSubmit).toHaveBeenCalledWith(
+			expect.objectContaining({ moveShareDeadline: false })
+		);
+	});
+	it('can move only the share deadline when the tilette is already late', () => {
+		const { onSubmit } = renderModal({
+			context: { kind: 'tilette', shareDeadline: DUE - 86400000 },
+		});
+		fireEvent.click(screen.getByRole('checkbox'));
+		fireEvent.click(saveButton());
+		expect(onSubmit).toHaveBeenCalledWith(
+			expect.objectContaining({ dueDate: DUE, moveShareDeadline: true })
+		);
+	});
+	it('does not lose typed edits when a background refresh replaces the initial props', () => {
+		const { rerender } = renderModal();
+		fireEvent.change(nameInput(), { target: { value: 'My local draft' } });
+		rerender(
+			<ThemeProvider defaultTheme="dark">
+				<EditTileshareModal
+					show
+					setShow={vi.fn()}
+					headerText="edit.clusterTitle"
+					initial={{
+						name: 'Server changed name',
+						description: 'Server note',
+						dueDate: DUE + 10000,
+					}}
+					onSubmit={vi.fn()}
+				/>
+			</ThemeProvider>
+		);
+		expect(nameInput()).toHaveValue('My local draft');
+	});
+	it('keeps failures in the dialog and lets the user retry the same values', async () => {
+		const submit = vi
+			.fn()
+			.mockRejectedValueOnce(new Error('offline'))
+			.mockResolvedValueOnce(undefined);
+		renderModal({ onSubmit: submit });
+		fireEvent.change(nameInput(), { target: { value: 'My local draft' } });
+		fireEvent.click(saveButton());
+		expect(await screen.findByRole('alert')).toHaveTextContent('tileShareEdit.saveFailed');
+		expect(nameInput()).toHaveValue('My local draft');
+		fireEvent.click(screen.getByRole('button', { name: 'tileShareEdit.retry' }));
+		await waitFor(() => expect(submit).toHaveBeenCalledTimes(2));
+		expect(submit.mock.calls[1][0]).toEqual(submit.mock.calls[0][0]);
 	});
 });

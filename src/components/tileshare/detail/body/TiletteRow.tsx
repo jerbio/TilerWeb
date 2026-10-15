@@ -69,8 +69,7 @@ const Card = styled.div<{ $darkmode: boolean }>`
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
 	overflow: hidden;
-	background-color: ${({ $darkmode, theme }) =>
-		$darkmode ? 'transparent' : theme.colors.background.card};
+	background-color: ${({ theme }) => theme.colors.background.card};
 `;
 
 const TopRow = styled.div`

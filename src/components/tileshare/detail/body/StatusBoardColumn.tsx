@@ -77,8 +77,8 @@ export default function StatusBoardColumn({
 			setSilhouetteLeaving(false);
 			setDragOver(false);
 		}
-		prevJustAcceptedId.current = justAcceptedId;
-		prevAcceptingId.current = acceptingId;
+		prevJustAcceptedId.current = justAcceptedId ?? null;
+		prevAcceptingId.current = acceptingId ?? null;
 	}, [justAcceptedId, acceptingId, onDrop]);
 	// Highlight the lane body (the cards, or the empty slot) while a drag hovers.
 	const droppable = !!onDrop && dragOver;

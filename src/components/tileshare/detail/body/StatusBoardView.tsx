@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/core/auth/useAuth';
 import { TileshareApi } from '@/api/tileshareApi';
 import { getBoardDragTiletteId } from './StatusBoardDrag';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 type Props = {
 	tilettes: TileShareTemplate[];
@@ -134,7 +135,7 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 			m.el.style.transition = 'none';
 			m.el.style.transform = `translateY(${m.from}px)`;
 		});
-		void scope.offsetHeight; // Commit the pre-positions so the next frame is a real transition.
+		void (boardRef.current ?? document.documentElement).offsetHeight; // Commit the pre-positions so the next frame is a real transition.
 		let done = false;
 		const finish = () => {
 			if (done) return;
@@ -186,7 +187,7 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 			if (!tiletteId || !user?.id) return;
 			const tilette = tilettes.find((entry) => entry.id === tiletteId);
 			if (!tilette || !canAcceptByDrag(tilette, user.id)) return;
-			const assignmentId = tilette.designatedUsers?.find(
+			const assignmentId = validDesignatedUsers(tilette.designatedUsers).find(
 				(d) => d.userId === user.id
 			)?.designatedTileTemplateId;
 			if (!assignmentId || accepting.current.has(assignmentId)) return;

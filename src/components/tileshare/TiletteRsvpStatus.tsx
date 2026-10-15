@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Check, X, Clock3, CircleHelp, CircleDot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DesignatedUser, InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 export const TileShareViewerContext = createContext<{ isOwner: boolean; viewerId: string | null }>({
 	isOwner: false,
@@ -64,7 +65,7 @@ export default function TiletteRsvpStatus({
 	const { t } = useTranslation();
 	const viewer = useContext(TileShareViewerContext);
 	if (!viewer.viewerId) return null;
-	const assignments = tilette.designatedUsers ?? [];
+	const assignments = validDesignatedUsers(tilette.designatedUsers);
 	if (!viewer.isOwner || assigneeId) {
 		const id = viewer.isOwner ? assigneeId : viewer.viewerId;
 		if (!viewer.isOwner && assigneeId && assigneeId !== viewer.viewerId) return null;

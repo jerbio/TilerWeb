@@ -8,10 +8,12 @@ import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderSection } from './DetailHeaderCard';
 import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { RGB } from '@/core/util/colors';
+import TileShareNote from '../TileShareNote';
 
 type SingleTileshareHeaderProps = {
 	name: string | null;
 	description: string | null;
+	descriptionContent?: React.ReactNode;
 	/** Epoch used for the displayed due date. */
 	dueDate: number | null;
 	/** Subtitle under the title. Defaults to "Single tileshare"; tilettes pass "In: {cluster}". */
@@ -26,6 +28,7 @@ type SingleTileshareHeaderProps = {
 const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 	name,
 	description,
+	descriptionContent,
 	dueDate,
 	subtitle,
 	accent = TILESHARE_ACCENT,
@@ -65,6 +68,7 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 							}}
 						>
 							<Pencil size={18} />
+							{t('tileShareVisual.edit', 'Edit')}
 						</Button>
 					)}
 					{onDelete && (
@@ -86,13 +90,20 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 			}
 		>
 			<HeaderSection>
-				<Description>{description || t('tilesharedemo.detail.noDescription')}</Description>
+				<Description>
+					{descriptionContent ??
+						(description ? (
+							<TileShareNote content={description} />
+						) : (
+							t('tilesharedemo.detail.noDescription')
+						))}
+				</Description>
 			</HeaderSection>
 		</DetailHeaderCard>
 	);
 };
 
-const Description = styled.p`
+const Description = styled.div`
 	margin: 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
@@ -103,15 +114,16 @@ const DuePill = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	padding: 0.625rem 0.875rem;
+	padding: 8px 12px;
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.large};
+	border-radius: 10px;
+	background: ${({ theme }) => theme.colors.input.bg};
 	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const DueText = styled.span`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+	font-weight: 500;
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
 	white-space: nowrap;

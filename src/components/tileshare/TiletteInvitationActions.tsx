@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/core/auth/useAuth';
 import { TileshareApi } from '@/api/tileshareApi';
 import { InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 export const TiletteInvitationRefreshContext = createContext<(() => Promise<void>) | undefined>(
 	undefined
@@ -43,7 +44,7 @@ export default function TiletteInvitationActions({
 		return null;
 	// Match the signed-in participant's assignment in any RSVP state: unresolved
 	// assignments offer the invitation flow, resolved ones a "change response" flow.
-	const assignment = tilette.designatedUsers?.find(
+	const assignment = validDesignatedUsers(tilette.designatedUsers).find(
 		(d) => d.userId === user.id && d.designatedTileTemplateId
 	);
 	if (!assignment?.designatedTileTemplateId) return null;

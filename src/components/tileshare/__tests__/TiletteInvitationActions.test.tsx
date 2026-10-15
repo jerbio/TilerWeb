@@ -78,6 +78,39 @@ beforeEach(() => {
 });
 
 describe('inline tilette invitation actions', () => {
+	it('finds the participant’s invitation after null entries without acting on other participants', async () => {
+		mocks.respond.mockResolvedValue({});
+		render(
+			<TiletteInvitationActions
+				clusterId="cluster"
+				tilette={{
+					...tilette,
+					designatedUsers: [
+						null,
+						...tilette.designatedUsers!,
+						null,
+					] as TileShareTemplate['designatedUsers'],
+				}}
+			/>
+		);
+		await setupUser().click(screen.getByRole('button', { name: 'Accept' }));
+		await waitFor(() =>
+			expect(mocks.respond).toHaveBeenCalledExactlyOnceWith('mine', InvitationStatus.Accepted)
+		);
+	});
+	it('offers no invitation action for a null-only list', () => {
+		render(
+			<TiletteInvitationActions
+				clusterId="cluster"
+				tilette={{
+					...tilette,
+					designatedUsers: [null] as unknown as TileShareTemplate['designatedUsers'],
+				}}
+			/>
+		);
+		expect(screen.queryByRole('button')).not.toBeInTheDocument();
+		expect(mocks.respond).not.toHaveBeenCalled();
+	});
 	it('accepts the signed-in participant assignment directly from its cluster row', async () => {
 		const changed = vi.fn();
 		window.addEventListener('tileshare-changed', changed);

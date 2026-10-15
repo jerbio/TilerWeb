@@ -19,6 +19,8 @@ import { normalizeError } from '@/core/error';
 import { TilerResponseError } from '@/core/common/types/errors';
 import { classifyContact, normalizePhoneNumber } from '@/core/util/contact';
 import { dateTimeToUnix } from '@/core/util/eventTimeConversion';
+import { toAddressData } from '@/core/util/tileshareLocation';
+export { toAddressData } from '@/core/util/tileshareLocation';
 
 /**
  * Converts 1-based page params into the server's offset-based query.
@@ -55,18 +57,14 @@ export type TileshareCreateContext = {
  * not auto-detect email vs phone, so we classify client-side and normalize
  * phone numbers to `+<callingCode><digits>` form.
  */
-function toContact(value: string, defaultCallingCode: string): ContactModel {
+export function toContact(value: string, defaultCallingCode: string): ContactModel {
 	const trimmed = value.trim();
 	return classifyContact(trimmed) === 'phone'
 		? { PhoneNumber: normalizePhoneNumber(trimmed, defaultCallingCode) }
 		: { Email: trimmed };
 }
 
-/**
- * Maps the Create Tileshare form state to the server's TemplateClusterModel
- * payload: `deadline` -> end-of-day epoch ms `EndTime`, `location` -> AddressData
- * object, `shareTo` -> Contacts array (never null), `mode` -> IsMultiTilette.
- */
+/** Submit the share and its optional draft tilettes together. */
 export function toCreateClusterParams(
 	form: TileshareFormState,
 	mode: TileshareMode,
@@ -74,22 +72,66 @@ export function toCreateClusterParams(
 ): CreateTileShareClusterParams {
 	const duration = tiletteDurationInMs(form.durationMinutes);
 	if (duration === null) throw new Error('Duration must be a positive whole number of minutes.');
-	const location = form.location.trim();
-	const note = form.note.trim();
+	// Leading spaces and line breaks can be meaningful Markdown (for example, code blocks).
+	const note = form.note.trim() ? form.note : undefined;
 	const recipients = form.recipients.map((r) => r.trim()).filter(Boolean);
+	const contacts = recipients.map((r) => toContact(r, ctx.defaultCallingCode));
+	const address = toAddressData({
+		address: form.location,
+		description: form.locationDescription ?? '',
+		isVerified: form.locationIsVerified ?? false,
+	});
+	const deadline = form.deadline ? dateTimeToUnix(form.deadline, '11:59 PM') : undefined;
+	const tasks =
+		mode === TileshareMode.Broadcast
+			? [
+					{
+						Name: form.name.trim(),
+						DurationInMs: duration,
+						EndTime: deadline,
+						NoteMiscData: note || undefined,
+						AddressData: address,
+						Contacts: contacts,
+						IncludeMe: true,
+					},
+				]
+			: (form.tilettes ?? []).map((task, index) => {
+					const taskDuration = tiletteDurationInMs(task.durationMinutes);
+					if (!task.name.trim() || taskDuration === null)
+						throw new Error(
+							'Each tilette needs a name and a positive whole number of minutes.'
+						);
+					return {
+						Name: task.name.trim(),
+						DurationInMs: taskDuration,
+						OrderedIndex: index,
+						EndTime: task.deadline
+							? dateTimeToUnix(task.deadline, '11:59 PM')
+							: deadline,
+						NoteMiscData: task.note.trim() ? task.note : undefined,
+						AddressData: toAddressData(task.location),
+						Contacts:
+							mode === TileshareMode.Class
+								? contacts
+								: task.recipients.map((r) => toContact(r, ctx.defaultCallingCode)),
+						IncludeMe: false,
+					};
+				});
 
 	return {
 		UserName: ctx.userName,
 		TimeZone: ctx.timeZone,
 		TimeZoneOffset: ctx.timeZoneOffset,
 		Name: form.name.trim(),
-		IsMultiTilette: mode === TileshareMode.Multi,
+		Mode: mode,
+		IsMultiTilette: mode !== TileshareMode.Broadcast,
 		IncludeMe: true,
-		EndTime: form.deadline ? dateTimeToUnix(form.deadline, '11:59 PM') : undefined,
+		EndTime: deadline,
 		DurationInMs: duration,
 		Notes: note || undefined,
-		AddressData: location ? { Address: location, AddressIsVerified: false } : undefined,
-		Contacts: recipients.map((r) => toContact(r, ctx.defaultCallingCode)),
+		AddressData: address,
+		Contacts: contacts,
+		ClusterTemplateTileModels: tasks,
 	};
 }
 
@@ -227,7 +269,11 @@ class TileshareService {
 
 	async updateCluster(params: UpdateClusterParams) {
 		try {
+			if ((params.StartTime !== undefined) !== (params.EndTime !== undefined))
+				throw new Error('A share timeline update requires both bounds.');
 			const res = await this.api.updateCluster(params);
+			if (res.Error && String(res.Error.Code) !== '0')
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
 			return res.Content.cluster;
 		} catch (error) {
 			console.error('Error updating tileshare cluster', error);
@@ -254,6 +300,8 @@ class TileshareService {
 	async updateTilette(params: UpdateTileletteParams) {
 		try {
 			const res = await this.api.updateTilette(params);
+			if (res.Error && String(res.Error.Code) !== '0')
+				throw TilerResponseError.fromApiCodeResponse(res.Error);
 			return res.Content.tileShareTemplate;
 		} catch (error) {
 			console.error('Error updating tileshare tilette', error);

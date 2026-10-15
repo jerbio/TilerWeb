@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
 import { TileShareViewerContext } from './TiletteRsvpStatus';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 export default function TiletteWorkProgress({
 	tilette,
@@ -18,7 +19,8 @@ export default function TiletteWorkProgress({
 	const navigate = useNavigate();
 	const [opening, setOpening] = useState(false);
 	const [openError, setOpenError] = useState(false);
-	const own = tilette.designatedUsers?.find(
+	const designated = validDesignatedUsers(tilette.designatedUsers);
+	const own = designated.find(
 		(a) =>
 			a.userId === viewerId &&
 			(!assigneeId || assigneeId === viewerId) &&
@@ -41,7 +43,7 @@ export default function TiletteWorkProgress({
 			setOpening(false);
 		}
 	};
-	const assignments = (tilette.designatedUsers ?? []).filter(
+	const assignments = designated.filter(
 		(a) =>
 			a.rsvpStatus === InvitationStatus.Accepted &&
 			(assigneeId
@@ -60,25 +62,44 @@ export default function TiletteWorkProgress({
 	const progress = Math.round(
 		assignments.reduce((sum, a) => sum + a.completionPct!, 0) / assignments.length
 	);
+	const percentage = known
+		? new Intl.NumberFormat(i18n?.language, {
+				style: 'percent',
+				maximumFractionDigits: 0,
+			}).format(progress / 100)
+		: '—';
+	const label = known
+		? `${t('tilesharePreview.progress', 'Completion')}: ${percentage}`
+		: t('tilesharePreview.progressUnavailable', 'Progress unavailable');
 	return (
 		<ProgressWrap>
-			{known ? (
-				<>
-					<progress
-						value={progress}
-						max={100}
-						aria-label={t('tilesharePreview.progress', 'Completion')}
-					/>
-					<span>
-						{new Intl.NumberFormat(i18n?.language, {
-							style: 'percent',
-							maximumFractionDigits: 0,
-						}).format(progress / 100)}
-					</span>
-				</>
-			) : (
-				<span>{t('tilesharePreview.progressUnavailable', 'Progress unavailable')}</span>
-			)}
+			<Donut
+				$state={!known ? 'unknown' : progress === 0 ? 'empty' : 'started'}
+				role={known ? 'progressbar' : 'img'}
+				aria-label={known ? t('tilesharePreview.progress', 'Completion') : label}
+				aria-valuemin={known ? 0 : undefined}
+				aria-valuemax={known ? 100 : undefined}
+				aria-valuenow={known ? progress : undefined}
+				aria-valuetext={known ? percentage : undefined}
+				title={label}
+			>
+				<svg viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+					<circle className="track" cx="22" cy="22" r="19" />
+					{known && progress > 0 && (
+						<circle
+							className="completion"
+							cx="22"
+							cy="22"
+							r="19"
+							pathLength="100"
+							strokeDasharray={`${progress} 100`}
+							transform="rotate(-90 22 22)"
+						/>
+					)}
+				</svg>
+				<span aria-hidden="true">{percentage}</span>
+				{!known && <ScreenReaderText>{label}</ScreenReaderText>}
+			</Donut>
 			{isOwner && !assigneeId && (
 				<small>
 					{t('tilesharePreview.acceptedAssignments', '{{count}} accepted assignments', {
@@ -87,7 +108,16 @@ export default function TiletteWorkProgress({
 				</small>
 			)}
 			{own && (
-				<button type="button" disabled={opening} onClick={() => void openTile()}>
+				<button
+					type="button"
+					disabled={opening}
+					onClick={(event) => {
+						// Some cards link to details; this action opens the assigned calendar tile.
+						event.preventDefault();
+						event.stopPropagation();
+						void openTile();
+					}}
+				>
 					{t('tilesharePreview.openTile', 'Open tile')}
 				</button>
 			)}
@@ -107,27 +137,10 @@ const ProgressWrap = styled.div`
 	align-items: center;
 	flex-wrap: wrap;
 	gap: 8px;
-	flex: 1;
-	min-width: 120px;
+	flex: 0 1 auto;
+	min-width: 0;
+	max-width: 100%;
 	color: ${({ theme }) => theme.colors.text.primary};
-	progress {
-		appearance: none;
-		height: 8px;
-		width: min(240px, 70%);
-		border: 0;
-		border-radius: 8px;
-		overflow: hidden;
-		background: ${({ theme }) => theme.colors.background.card2};
-	}
-	progress::-webkit-progress-bar {
-		background: ${({ theme }) => theme.colors.background.card2};
-	}
-	progress::-webkit-progress-value {
-		background: ${({ theme }) => theme.colors.text.success};
-	}
-	progress::-moz-progress-bar {
-		background: ${({ theme }) => theme.colors.text.success};
-	}
 	button {
 		min-height: 44px;
 		padding: 8px 12px;
@@ -140,4 +153,54 @@ const ProgressWrap = styled.div`
 	small {
 		color: ${({ theme }) => theme.colors.text.secondary};
 	}
+`;
+
+const Donut = styled.div<{ $state: 'empty' | 'started' | 'unknown' }>`
+	position: relative;
+	width: 44px;
+	height: 44px;
+	flex: 0 0 44px;
+	display: grid;
+	place-items: center;
+	color: ${({ theme, $state }) =>
+		$state === 'empty'
+			? theme.colors.text.warning
+			: $state === 'unknown'
+				? theme.colors.text.secondary
+				: theme.colors.text.success};
+	svg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		fill: none;
+		stroke-width: 3;
+	}
+	.track {
+		stroke: ${({ theme, $state }) =>
+			$state === 'started' ? theme.colors.background.card2 : 'currentColor'};
+		opacity: ${({ $state }) => ($state === 'started' ? 1 : 0.5)};
+		stroke-dasharray: ${({ $state }) => ($state === 'unknown' ? '3 3' : 'none')};
+	}
+	.completion {
+		stroke: currentColor;
+	}
+	> span {
+		font-size: 11px;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		line-height: 1;
+	}
+`;
+
+const ScreenReaderText = styled.span`
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
 `;

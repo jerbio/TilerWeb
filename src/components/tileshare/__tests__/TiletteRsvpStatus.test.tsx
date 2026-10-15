@@ -47,6 +47,42 @@ const view = (isOwner: boolean, viewerId: string, data = tilette, assigneeId?: s
 	</TileShareViewerContext.Provider>
 );
 describe('tilette RSVP presentation', () => {
+	it('ignores null entries in owner counts and participant rows', () => {
+		render(
+			view(true, 'owner', {
+				...tilette,
+				designatedUsers: [
+					null,
+					tilette.designatedUsers![0],
+					null,
+				] as TileShareTemplate['designatedUsers'],
+			})
+		);
+		expect(screen.getAllByText('Accepted')[0].parentElement).toHaveTextContent('1Accepted');
+		expect(screen.getAllByRole('listitem')).toHaveLength(1);
+	});
+	it('treats a null-only assignment list as having no participants', () => {
+		render(
+			view(true, 'owner', {
+				...tilette,
+				designatedUsers: [null] as unknown as TileShareTemplate['designatedUsers'],
+			})
+		);
+		expect(screen.getByText('No participants')).toBeInTheDocument();
+		expect(screen.queryByText('Unknown response')).not.toBeInTheDocument();
+	});
+	it('finds the viewer’s response after a null entry', () => {
+		render(
+			view(false, 'one', {
+				...tilette,
+				designatedUsers: [
+					null,
+					...tilette.designatedUsers!,
+				] as TileShareTemplate['designatedUsers'],
+			})
+		);
+		expect(screen.getByText('Accepted')).toBeInTheDocument();
+	});
 	it.each([
 		['one', 'Accepted'],
 		['two', 'Declined'],

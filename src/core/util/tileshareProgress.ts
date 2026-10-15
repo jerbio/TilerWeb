@@ -3,6 +3,7 @@ import {
 	TileletteStatus,
 	TileShareTemplate,
 } from '@/core/common/types/tileshare';
+import { validDesignatedUsers } from './tileshareAssignees';
 
 /**
  * Derive a tilette's completion status from its assignee data.
@@ -13,7 +14,7 @@ import {
  * Completed; everything else — including an unassigned tilette — is In progress.
  */
 export function deriveTileletteStatus(tilette: TileShareTemplate): TileletteStatus {
-	const users = tilette.designatedUsers ?? [];
+	const users = validDesignatedUsers(tilette.designatedUsers);
 	if (users.length === 0) return TileletteStatus.InProgress;
 	if (users.some((user) => user.rsvpStatus !== InvitationStatus.Accepted)) {
 		return TileletteStatus.Todo;
@@ -41,7 +42,9 @@ export function deriveMyTileletteStatus(
 	tilette: TileShareTemplate,
 	userId: string
 ): TileletteStatus {
-	const mine = (tilette.designatedUsers ?? []).find((user) => user.userId === userId);
+	const mine = validDesignatedUsers(tilette.designatedUsers).find(
+		(user) => user.userId === userId
+	);
 	if (!mine) return TileletteStatus.InProgress;
 	if (mine.rsvpStatus !== InvitationStatus.Accepted) return TileletteStatus.Todo;
 	const fullyComplete =
@@ -56,7 +59,7 @@ export function deriveMyTileletteStatus(
  * visibility rule (the viewer appears in `designatedUsers`).
  */
 export function isMineAssignment(tilette: TileShareTemplate, userId: string): boolean {
-	return (tilette.designatedUsers ?? []).some((user) => user.userId === userId);
+	return validDesignatedUsers(tilette.designatedUsers).some((user) => user.userId === userId);
 }
 
 /**
@@ -67,7 +70,9 @@ export function isMineAssignment(tilette: TileShareTemplate, userId: string): bo
  * responses (Accepted/Declined) are never re-accepted by a drag.
  */
 export function canAcceptByDrag(tilette: TileShareTemplate, userId: string): boolean {
-	const mine = (tilette.designatedUsers ?? []).find((user) => user.userId === userId);
+	const mine = validDesignatedUsers(tilette.designatedUsers).find(
+		(user) => user.userId === userId
+	);
 	if (!mine?.designatedTileTemplateId) return false;
 	return (
 		mine.rsvpStatus === InvitationStatus.None || mine.rsvpStatus === InvitationStatus.Tentative

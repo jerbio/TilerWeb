@@ -231,7 +231,7 @@ const CommentComposer: React.FC<CommentComposerProps> = ({
 	};
 
 	return (
-		<form onSubmit={handleSubmit} data-testid="comment-composer">
+		<ComposerForm onSubmit={handleSubmit} data-testid="comment-composer">
 			<InputWrap>
 				<Input
 					ref={inputRef}
@@ -367,13 +367,25 @@ const CommentComposer: React.FC<CommentComposerProps> = ({
 					{submitting ? t('comments.sending') : t('comments.send')}
 				</Button>
 			</FootRow>
-		</form>
+		</ComposerForm>
 	);
 };
 
+const ComposerForm = styled.form`
+	margin: 0;
+	min-width: 0;
+	border: 1px solid ${({ theme }) => theme.colors.input.border};
+	border-radius: 12px;
+	background-color: ${({ theme }) => theme.colors.input.bg};
+	transition: border-color 120ms ease;
+	&:focus-within {
+		border-color: ${({ theme }) => theme.colors.brand[400]};
+	}
+`;
+
 const PendingList = styled.ul`
 	list-style: none;
-	margin: 0.5rem 0 0;
+	margin: 0.5rem 0.75rem;
 	padding: 0;
 	display: flex;
 	flex-direction: column;
@@ -389,7 +401,7 @@ const Suggestions = styled.ul`
 	z-index: 5;
 	left: 0;
 	bottom: calc(100% + 0.25rem);
-	min-width: 14rem;
+	width: min(20rem, 100%);
 	max-height: 14rem;
 	overflow-y: auto;
 	margin: 0;
@@ -455,7 +467,7 @@ const UploadSummary = styled.span`
 `;
 
 const FileError = styled.p`
-	margin: 0.25rem 0 0;
+	margin: 0.5rem 0.75rem;
 	font-size: ${({ theme }) => theme.typography.fontSize.xs};
 	color: ${({ theme }) => theme.colors.text.secondary};
 `;
@@ -463,6 +475,7 @@ const FileError = styled.p`
 const FootLeft = styled.div`
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 `;
 
@@ -485,19 +498,25 @@ const LinkButton = styled.button`
 `;
 
 const Input = styled.textarea`
+	display: block;
+	box-sizing: border-box;
 	width: 100%;
-	min-height: 56px;
+	min-height: 80px;
 	resize: vertical;
-	padding: 0.5rem 0.75rem;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background-color: ${({ theme }) => theme.colors.background.card};
+	padding: 0.75rem;
+	border: none;
+	border-radius: 12px 12px 0 0;
+	background-color: transparent;
 	color: ${({ theme }) => theme.colors.text.primary};
 	font: inherit;
+	line-height: 1.6;
+	&::placeholder {
+		color: ${({ theme }) => theme.colors.input.placeholder};
+	}
 
-	&:focus {
+	&&:focus,
+	&&:focus-visible {
 		outline: none;
-		border-color: ${({ theme }) => theme.colors.brand[300]};
 	}
 `;
 
@@ -505,7 +524,14 @@ const FootRow = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-top: 0.25rem;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	padding: 0.625rem 0.75rem;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.subtle};
+	> button {
+		margin-left: auto;
+		flex-shrink: 0;
+	}
 `;
 
 const CharCount = styled.span`

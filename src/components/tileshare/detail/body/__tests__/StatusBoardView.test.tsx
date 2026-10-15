@@ -567,6 +567,7 @@ describe('StatusBoardView', () => {
 		// Give t2 a pre-drop position; once the landing commit happens (flagged
 		// by data-just-accepted) it reports the settled position (jsdom's zeros).
 		const pre2: DOMRect = {
+			toJSON: () => ({}),
 			top: 190,
 			bottom: 282,
 			left: 24,
@@ -577,6 +578,7 @@ describe('StatusBoardView', () => {
 			y: 190,
 		};
 		const zero2: DOMRect = {
+			toJSON: () => ({}),
 			top: 0,
 			bottom: 92,
 			left: 24,

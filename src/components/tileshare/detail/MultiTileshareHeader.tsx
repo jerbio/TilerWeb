@@ -9,10 +9,13 @@ import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderDivider, HeaderSection } from './DetailHeaderCard';
 import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { RGB } from '@/core/util/colors';
+import TileShareNote from '../TileShareNote';
 
 type MultiTileshareHeaderProps = {
+	subtitle?: string;
 	name: string | null;
 	description: string | null;
+	descriptionContent?: React.ReactNode;
 	/** Epoch used for the displayed date and time. */
 	date: number | null;
 	/** Icon accent colour. Defaults to the shared tileshare accent. */
@@ -24,8 +27,10 @@ type MultiTileshareHeaderProps = {
 };
 
 const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
+	subtitle,
 	name,
 	description,
+	descriptionContent,
 	date,
 	accent = TILESHARE_ACCENT,
 	onEdit,
@@ -41,7 +46,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 			icon={<MultiTileshareIcon size={22} />}
 			accent={accent}
 			title={name ?? '—'}
-			subtitle={t('tilesharedemo.detail.multiTileshare')}
+			subtitle={subtitle ?? t('tilesharedemo.detail.multiTileshare')}
 			headerRight={
 				/* Assignees get a read-only header — no actions at all. */
 				hasActions ? (
@@ -59,6 +64,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 								}}
 							>
 								<Pencil size={18} />
+								{t('tileShareVisual.edit', 'Edit')}
 							</Button>
 						)}
 						{onDelete && (
@@ -85,6 +91,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 								aria-label={t('tilesharedemo.detail.addAria')}
 							>
 								<Plus size={18} />
+								{t('tileShareComposer.newTilette', 'New tilette')}
 							</Button>
 						)}
 					</>
@@ -92,7 +99,14 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 			}
 		>
 			<HeaderSection>
-				<Description>{description || t('tilesharedemo.detail.noDescription')}</Description>
+				<Description>
+					{descriptionContent ??
+						(description ? (
+							<TileShareNote content={description} />
+						) : (
+							t('tilesharedemo.detail.noDescription')
+						))}
+				</Description>
 			</HeaderSection>
 			<HeaderDivider />
 			<HeaderSection>
@@ -111,7 +125,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 	);
 };
 
-const Description = styled.p`
+const Description = styled.div`
 	margin: 0;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
@@ -130,6 +144,7 @@ const Footer = styled.div`
 `;
 
 const Chip = styled.div`
+	background: ${({ theme }) => theme.colors.input.bg};
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;

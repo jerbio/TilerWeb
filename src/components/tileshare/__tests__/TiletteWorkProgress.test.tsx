@@ -59,6 +59,16 @@ function show(assignments: DesignatedUser[], owner = false, assigneeId?: string)
 }
 beforeEach(() => vi.clearAllMocks());
 describe('accepted tilette progress', () => {
+	it('ignores null assignment entries while retaining valid progress', () => {
+		show([null, assignment('me', 25), null] as DesignatedUser[]);
+		expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
+		expect(screen.getByRole('button', { name: 'Open tile' })).toBeInTheDocument();
+	});
+	it('does not render phantom work for a null-only assignment list', () => {
+		show([null] as unknown as DesignatedUser[], true);
+		expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+		expect(screen.queryByRole('button')).not.toBeInTheDocument();
+	});
 	it('shows only the participant progress and opens their actual calendar tile', async () => {
 		mocks.response.mockResolvedValue({
 			id: 'me-assignment',
@@ -66,7 +76,7 @@ describe('accepted tilette progress', () => {
 			calendarId: 'calendar+mine',
 		});
 		show([assignment('me', 25), assignment('other', 90)]);
-		expect(screen.getByRole('progressbar')).toHaveAttribute('value', '25');
+		expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
 		await setupUser().click(screen.getByRole('button', { name: 'Open tile' }));
 		expect(mocks.response).toHaveBeenCalledWith('me-assignment');
 		await waitFor(() =>
@@ -84,13 +94,23 @@ describe('accepted tilette progress', () => {
 			],
 			true
 		);
-		expect(screen.getByRole('progressbar')).toHaveAttribute('value', '40');
+		expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '40');
 		expect(screen.queryByRole('button', { name: 'Open tile' })).not.toBeInTheDocument();
 	});
 	it('does not turn unknown completion into zero', () => {
 		show([assignment('a', 20), assignment('b', null)], true);
 		expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
 		expect(screen.getByText('Progress unavailable')).toBeInTheDocument();
+		expect(screen.getByRole('img', { name: 'Progress unavailable' })).toBeInTheDocument();
+	});
+	it.each([0, 50, 100])('shows %i%% inside an accessible completion donut', (progress) => {
+		show([assignment('me', progress)]);
+		const donut = screen.getByRole('progressbar', { name: 'Completion' });
+		expect(donut).toHaveAttribute('aria-valuemin', '0');
+		expect(donut).toHaveAttribute('aria-valuemax', '100');
+		expect(donut).toHaveAttribute('aria-valuenow', String(progress));
+		expect(donut).toHaveTextContent(`${progress}%`);
+		expect(donut.querySelector('svg')).toBeInTheDocument();
 	});
 	it('does not expose progress in another participant lane', () => {
 		show([assignment('other', 90)], false, 'other');

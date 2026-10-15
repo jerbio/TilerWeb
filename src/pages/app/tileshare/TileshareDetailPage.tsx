@@ -29,7 +29,10 @@ import EditTileshareModal, {
 import DeleteClusterDialog from '@/components/tileshare/detail/DeleteClusterDialog';
 import TiletteCreate from '@/components/tileshare/TiletteCreate';
 import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
-import { TileShareTemplate } from '@/core/common/types/tileshare';
+import { TileShareTemplate, TileshareMode } from '@/core/common/types/tileshare';
+import { tileshareMode, classParticipants } from '@/core/util/tileshareMode';
+import ClassShareActions from '@/components/tileshare/ClassShareActions';
+import TiletteNotes from '@/components/tileshare/TiletteNotes';
 
 const TileshareDetailPage: React.FC = () => {
 	const { t } = useTranslation();
@@ -48,24 +51,29 @@ const TileshareDetailPage: React.FC = () => {
 	const [adding, setAdding] = useState(false);
 
 	const cluster = data?.cluster;
+	const mode = cluster ? tileshareMode(cluster) : null;
 	// Assignees get the same pages read-only: no edit, delete or add affordances.
 	const isOwner = isTileshareOwner(cluster?.creator, user);
 
 	const handleSave = async (values: EditTileshareValues) => {
-		if (!cluster?.id) return;
+		if (!cluster?.id || !isOwner) throw new Error('Share editing is unavailable');
+		const nameChanged = values.name.trim() !== (cluster.name ?? '').trim();
+		const deadlineChanged = values.dueDate !== cluster.end;
+		if (!nameChanged && !deadlineChanged) return;
 		setSaving(true);
 		const nId = notificationId(NotificationAction.Update, `tileshare-cluster-${cluster.id}`);
 		showNotification(nId, t('tilesharedemo.detail.edit.saving'), 'loading');
 		try {
 			await tileshareService.updateCluster({
 				Id: cluster.id,
-				Name: values.name,
-				Notes: values.description,
-				// This route overwrites rather than merges: an omitted StartTime is
-				// stored as DateTimeOffset.MinValue. Both bounds go every time, and a
-				// cluster with no stored start falls back to its deadline.
-				StartTime: cluster.start ?? values.dueDate,
-				EndTime: values.dueDate,
+				...(nameChanged ? { Name: values.name.trim() } : {}),
+				// The cluster endpoint needs both bounds when changing its timeline.
+				...(deadlineChanged
+					? {
+							StartTime: cluster.start ?? cluster.end ?? values.dueDate,
+							EndTime: values.dueDate,
+						}
+					: {}),
 			});
 			window.dispatchEvent(new Event('tileshare-changed'));
 			await refresh();
@@ -74,6 +82,7 @@ const TileshareDetailPage: React.FC = () => {
 		} catch (err) {
 			console.error('Error updating tileshare cluster', err);
 			updateNotification(nId, t('tilesharedemo.detail.edit.error'), 'error');
+			throw err;
 		} finally {
 			setSaving(false);
 		}
@@ -114,6 +123,9 @@ const TileshareDetailPage: React.FC = () => {
 			<TiletteCreate
 				clusterId={cluster.id}
 				clusterName={cluster.name ?? ''}
+				mode={mode ?? undefined}
+				participants={classParticipants(data?.tilettes ?? [], cluster.participants)}
+				shareDeadline={cluster.end}
 				onBack={() => setAdding(false)}
 				onCreated={async () => {
 					// Creating flips the cluster to multi and recomputes its user
@@ -135,20 +147,40 @@ const TileshareDetailPage: React.FC = () => {
 							current={cluster?.name ?? ''}
 							loading={loading}
 						/>
-						{loading ? (
+						{loading && !cluster ? (
 							<DetailHeaderSkeleton />
 						) : error || !cluster ? (
 							<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
 						) : (
 							<>
-								{cluster.isMultiTilette ? (
+								{mode !== TileshareMode.Broadcast ? (
 									<>
 										<MultiTileshareHeader
+											subtitle={
+												mode
+													? t(`tileShareModes.${mode}.label`)
+													: t(
+															'tileShareModes.unknown',
+															'Sharing mode unavailable'
+														)
+											}
 											name={cluster.name}
 											description={cluster.notes}
+											descriptionContent={
+												cluster.id ? (
+													<TiletteNotes
+														key={cluster.id}
+														id={cluster.id}
+														target="cluster"
+														canEdit={isOwner}
+													/>
+												) : undefined
+											}
 											date={cluster.end}
 											onEdit={isOwner ? () => setEditing(true) : undefined}
-											onAdd={isOwner ? () => setAdding(true) : undefined}
+											onAdd={
+												isOwner && mode ? () => setAdding(true) : undefined
+											}
 											onDelete={
 												isOwner
 													? () => setConfirmingDelete(true)
@@ -156,12 +188,25 @@ const TileshareDetailPage: React.FC = () => {
 											}
 										/>
 										<TiletteBody
+											key={`${cluster.id}:${mode}`}
+											mode={mode}
 											clusterId={cluster.id ?? ''}
 											tilettes={data?.tilettes ?? []}
 										/>
 									</>
 								) : (
 									<SingleTileshareHeader
+										subtitle={t('tileShareModes.broadcast.label')}
+										descriptionContent={
+											cluster.id ? (
+												<TiletteNotes
+													key={cluster.id}
+													id={cluster.id}
+													target="cluster"
+													canEdit={isOwner}
+												/>
+											) : undefined
+										}
 										name={cluster.name}
 										description={cluster.notes}
 										dueDate={cluster.end}
@@ -172,7 +217,15 @@ const TileshareDetailPage: React.FC = () => {
 									/>
 								)}
 
-								{!cluster.isMultiTilette &&
+								{mode === TileshareMode.Class && (
+									<ClassShareActions
+										tilettes={data?.tilettes ?? []}
+										participants={cluster.participants}
+										isOwner={isOwner}
+										onChanged={refresh}
+									/>
+								)}
+								{mode === TileshareMode.Broadcast &&
 									data?.tilettes.map((tilette) => (
 										<TiletteManagement
 											key={`manage-${tilette.id}`}
@@ -182,7 +235,7 @@ const TileshareDetailPage: React.FC = () => {
 											onDeleted={refresh}
 										/>
 									))}
-								{!cluster.isMultiTilette &&
+								{mode === TileshareMode.Broadcast &&
 									data?.tilettes.map((tilette) => (
 										<SingleTiletteResponse
 											key={tilette.id}
@@ -192,6 +245,13 @@ const TileshareDetailPage: React.FC = () => {
 									))}
 
 								<EditTileshareModal
+									context={{
+										kind: 'share',
+										mode,
+										start: cluster.start,
+										tilettes: data?.tilettes,
+									}}
+									hideNotes
 									show={editing}
 									setShow={setEditing}
 									headerText={t('tilesharedemo.detail.edit.clusterTitle')}
@@ -224,9 +284,7 @@ const Container = styled.div`
 	flex-direction: column;
 	gap: 1.5rem;
 	width: 100%;
-	height: 100%;
-	overflow-y: auto;
-	background-color: ${({ theme }) => theme.colors.background.page};
+	background: transparent;
 
 	/* Keep the breadcrumb + header at their natural size; let the page scroll
 	   instead of the flex column squeezing them when a view is tall. */
