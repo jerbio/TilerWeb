@@ -141,7 +141,14 @@ const TileshareDetailPage: React.FC = () => {
 	return (
 		<TileShareViewerContext.Provider value={{ isOwner, viewerId: user?.id ?? null }}>
 			<TiletteInvitationRefreshContext.Provider value={refresh}>
-				<TileShareDetailLayout ClusterId={id}>
+				<TileShareDetailLayout
+					ClusterId={id}
+					stickyTitle={
+						cluster
+							? cluster.name || t('tileShareDensity.untitled', 'Untitled share')
+							: undefined
+					}
+				>
 					<Container>
 						<TileshareDetailBreadcrumb
 							current={cluster?.name ?? ''}
@@ -172,6 +179,7 @@ const TileshareDetailPage: React.FC = () => {
 														key={cluster.id}
 														id={cluster.id}
 														target="cluster"
+														compact
 														canEdit={isOwner}
 													/>
 												) : undefined

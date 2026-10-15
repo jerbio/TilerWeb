@@ -290,8 +290,10 @@ const FilterRow = styled.div`
 
 const BoardGrid = styled.div`
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(280px, 1fr));
 	gap: 14px;
+	overflow-x: auto;
+	padding: 4px 4px 12px;
 	/* Stretch: every lane fills the board's full height, so an empty lane
 	 * (e.g. In progress) always offers room to drop a dragged tilette. */
 `;

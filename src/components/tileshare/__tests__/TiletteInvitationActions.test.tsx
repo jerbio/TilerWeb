@@ -78,6 +78,33 @@ beforeEach(() => {
 });
 
 describe('inline tilette invitation actions', () => {
+	it('retains uncertain response protection when the compact dialog is closed and reopened', async () => {
+		mocks.respond.mockRejectedValue(new Error('timeout'));
+		render(<TiletteInvitationActions tilette={tilette} clusterId="cluster" compact />);
+		const user = setupUser();
+		await user.click(screen.getByRole('button', { name: 'Respond' }));
+		await user.click(screen.getByRole('button', { name: 'Accept' }));
+		await screen.findByRole('alert');
+		await user.click(screen.getAllByRole('button', { name: 'Close' })[1]);
+		await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+		await user.click(screen.getByRole('button', { name: 'Respond' }));
+		expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Accept' })).not.toBeInTheDocument();
+		expect(mocks.respond).toHaveBeenCalledOnce();
+	});
+	it('opens the alternate response immediately in the compact resolved dialog', async () => {
+		render(
+			<TiletteInvitationActions
+				tilette={resolvedTilette(InvitationStatus.Accepted)}
+				clusterId="cluster"
+				compact
+			/>
+		);
+		await setupUser().click(screen.getByRole('button', { name: 'Change response' }));
+		expect(screen.getByRole('dialog')).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Decline' })).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Accept' })).not.toBeInTheDocument();
+	});
 	it('finds the participant’s invitation after null entries without acting on other participants', async () => {
 		mocks.respond.mockResolvedValue({});
 		render(
@@ -122,6 +149,7 @@ describe('inline tilette invitation actions', () => {
 				</TiletteInvitationRefreshContext.Provider>
 			);
 			expect(mocks.read).not.toHaveBeenCalled();
+			await setupUser().click(screen.getByRole('button', { name: 'Respond' }));
 			await setupUser().click(screen.getByRole('button', { name: 'Accept' }));
 			await waitFor(() => expect(mocks.refresh).toHaveBeenCalledOnce());
 			expect(mocks.respond).toHaveBeenCalledExactlyOnceWith(
@@ -144,6 +172,7 @@ describe('inline tilette invitation actions', () => {
 			})
 		);
 		render(<TiletteRow tilette={tilette} clusterId="cluster" />);
+		await setupUser().click(screen.getByRole('button', { name: 'Respond' }));
 		await setupUser().click(screen.getByRole('button', { name: 'Accept' }));
 		expect(mocks.respond).toHaveBeenCalledOnce();
 		expect(screen.getByTestId('tilette-shimmer')).toBeInTheDocument();
@@ -159,6 +188,7 @@ describe('inline tilette invitation actions', () => {
 	it('declines from the current user lane without nesting buttons inside navigation links', async () => {
 		mocks.respond.mockResolvedValue({});
 		render(<AssigneeTiletteCard tilette={tilette} clusterId="cluster" assigneeId="viewer" />);
+		await setupUser().click(screen.getByRole('button', { name: 'Respond' }));
 		const decline = screen.getByRole('button', { name: 'Decline' });
 		expect(decline.closest('a')).toBeNull();
 		await setupUser().click(decline);

@@ -38,6 +38,16 @@ describe('TiletteNotes', () => {
 			screen.queryByRole('button', { name: 'tileShareNotes.edit' })
 		).not.toBeInTheDocument();
 	});
+	it('loads collapsed notes and lets the owner edit without expanding the summary', async () => {
+		const { container } = render(<TiletteNotes id="task" canEdit compact />);
+		const edit = await screen.findByRole('button', { name: 'tileShareNotes.edit' });
+		expect(container.querySelector('details')).not.toHaveAttribute('open');
+		fireEvent.click(edit);
+		expect(screen.getByRole('dialog')).toBeInTheDocument();
+		expect(screen.getByRole('textbox')).toHaveValue('**Saved note**');
+		expect(container.querySelector('details')).not.toHaveAttribute('open');
+		expect(tileShareNotesService.updateNotes).not.toHaveBeenCalled();
+	});
 	it('distinguishes an unavailable note from an empty note and allows retry', async () => {
 		vi.mocked(tileShareNotesService.getNotes).mockRejectedValueOnce(new Error('offline'));
 		render(<TiletteNotes id="task" canEdit />);

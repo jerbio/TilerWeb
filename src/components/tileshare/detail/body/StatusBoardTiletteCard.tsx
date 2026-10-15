@@ -73,17 +73,18 @@ const StatusBoardTiletteCard: React.FC<StatusBoardTiletteCardProps> = ({
 				aria-label={t('tilesharedemo.detail.openTiletteAria')}
 			>
 				<Name $color={surface.text}>{tilette.name ?? 'â€”'}</Name>
-				<Footer>
-					<TiletteWorkProgress tilette={tilette} />
-					<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={24} />
-				</Footer>
 			</CardLink>
+			<Footer>
+				<TiletteWorkProgress tilette={tilette} compact />
+				<AvatarCluster users={designatedToAvatars(tilette.designatedUsers)} size={24} />
+			</Footer>
 			<RsvpRow>
-				<TiletteRsvpStatus tilette={tilette} embedded />
+				<TiletteRsvpStatus tilette={tilette} embedded compact />
 				<TiletteInvitationActions
 					tilette={tilette}
 					clusterId={clusterId}
 					embedded
+					compact
 					reportBusy={setSaving}
 				/>
 				{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
@@ -172,10 +173,12 @@ const Card = styled.div<{ $bg: string; $border: string; $justAccepted?: boolean 
 const CardLink = styled(Link)`
 	display: flex;
 	flex-direction: column;
-	gap: 0.875rem;
-	padding: 0.875rem;
+	padding: 10px 12px 8px;
 	color: inherit;
 	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
 `;
 
 const Name = styled.p<{ $color: string }>`
@@ -191,6 +194,10 @@ const Footer = styled.div`
 	align-items: center;
 	justify-content: space-between;
 	gap: 0.5rem;
+	padding: 0 12px 8px;
+	&:empty {
+		display: none;
+	}
 `;
 
 /** One bordered row hosting the RSVP badge and the inline response actions. */
@@ -198,8 +205,11 @@ const RsvpRow = styled.div`
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 12px;
-	padding: 12px 20px;
+	gap: 8px;
+	padding: 8px 12px;
+	> button {
+		margin-left: auto;
+	}
 	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
 	&:empty {
 		display: none;

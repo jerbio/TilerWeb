@@ -10,9 +10,11 @@ import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 export default function TiletteWorkProgress({
 	tilette,
 	assigneeId,
+	compact = false,
 }: {
 	tilette: TileShareTemplate;
 	assigneeId?: string;
+	compact?: boolean;
 }) {
 	const { isOwner, viewerId } = useContext(TileShareViewerContext);
 	const { t, i18n } = useTranslation();
@@ -72,7 +74,7 @@ export default function TiletteWorkProgress({
 		? `${t('tilesharePreview.progress', 'Completion')}: ${percentage}`
 		: t('tilesharePreview.progressUnavailable', 'Progress unavailable');
 	return (
-		<ProgressWrap>
+		<ProgressWrap $compact={compact}>
 			<Donut
 				$state={!known ? 'unknown' : progress === 0 ? 'empty' : 'started'}
 				role={known ? 'progressbar' : 'img'}
@@ -100,7 +102,7 @@ export default function TiletteWorkProgress({
 				<span aria-hidden="true">{percentage}</span>
 				{!known && <ScreenReaderText>{label}</ScreenReaderText>}
 			</Donut>
-			{isOwner && !assigneeId && (
+			{isOwner && !assigneeId && !compact && (
 				<small>
 					{t('tilesharePreview.acceptedAssignments', '{{count}} accepted assignments', {
 						count: assignments.length,
@@ -132,7 +134,7 @@ export default function TiletteWorkProgress({
 		</ProgressWrap>
 	);
 }
-const ProgressWrap = styled.div`
+const ProgressWrap = styled.div<{ $compact: boolean }>`
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
@@ -141,6 +143,12 @@ const ProgressWrap = styled.div`
 	min-width: 0;
 	max-width: 100%;
 	color: ${({ theme }) => theme.colors.text.primary};
+	${({ $compact }) =>
+		$compact &&
+		`
+		> div[role] { width: 36px; height: 36px; flex-basis: 36px; }
+		&& button { min-height: 32px; padding: 6px 8px; font-size: 12px; white-space: nowrap; }
+	`}
 	button {
 		min-height: 44px;
 		padding: 8px 12px;

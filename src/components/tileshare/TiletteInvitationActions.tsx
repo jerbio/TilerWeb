@@ -7,6 +7,7 @@ import { useAuth } from '@/core/auth/useAuth';
 import { TileshareApi } from '@/api/tileshareApi';
 import { InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
+import TileShareDialog from './TileShareDialog';
 
 export const TiletteInvitationRefreshContext = createContext<(() => Promise<void>) | undefined>(
 	undefined
@@ -23,6 +24,7 @@ type Props = {
 	assigneeId?: string;
 	/** Render inline (no border/padding) inside a host row, e.g. beside the RSVP badge. */
 	embedded?: boolean;
+	compact?: boolean;
 	/** Report whether an RSVP request is in flight so the host can shimmer its surface. */
 	reportBusy?: (busy: boolean) => void;
 };
@@ -32,6 +34,7 @@ export default function TiletteInvitationActions({
 	clusterId,
 	assigneeId,
 	embedded,
+	compact,
 	reportBusy,
 }: Props) {
 	const { user } = useAuth();
@@ -55,6 +58,7 @@ export default function TiletteInvitationActions({
 		!isResolved(status)
 	)
 		return null;
+
 	return (
 		<ResponseActions
 			key={`${user.id}:${clusterId}:${tilette.id}:${assignment.designatedTileTemplateId}`}
@@ -64,6 +68,7 @@ export default function TiletteInvitationActions({
 			name={tilette.name ?? ''}
 			currentStatus={status}
 			embedded={embedded}
+			compact={compact}
 			reportBusy={reportBusy}
 		/>
 	);
@@ -77,6 +82,7 @@ function ResponseActions({
 	currentStatus,
 	embedded,
 	reportBusy,
+	compact = false,
 }: {
 	assignmentId: string;
 	tiletteId: string;
@@ -85,6 +91,7 @@ function ResponseActions({
 	currentStatus: string | null;
 	embedded?: boolean;
 	reportBusy?: (busy: boolean) => void;
+	compact?: boolean;
 }) {
 	const { t } = useTranslation();
 	const refresh = useContext(TiletteInvitationRefreshContext);
@@ -100,6 +107,7 @@ function ResponseActions({
 	>(isResolved(currentStatus) ? 'resolved' : 'pending');
 	// Change mode: the "Change response" button revealed Accept/Decline for a resolved response.
 	const [changeOpen, setChangeOpen] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
 	const busy = useRef(false);
 	const active = useRef(true);
 	// Whether the in-flight/confirmed action changed an already-resolved response.
@@ -196,7 +204,7 @@ function ResponseActions({
 			: currentStatus === InvitationStatus.Declined
 				? InvitationStatus.Declined
 				: null;
-	return (
+	const content = (
 		<Wrap
 			$embedded={embedded}
 			role="group"
@@ -327,6 +335,53 @@ function ResponseActions({
 			)}
 		</Wrap>
 	);
+	return compact ? (
+		<>
+			<CompactToggle
+				type="button"
+				aria-haspopup="dialog"
+				aria-expanded={dialogOpen}
+				onClick={() => {
+					setDialogOpen(true);
+					if (state === 'resolved') setChangeOpen(true);
+				}}
+				aria-label={
+					isResolved(currentStatus)
+						? t('tileshareInvitations.changeResponse', 'Change response')
+						: t('tileShareDensity.respond', 'Respond')
+				}
+			>
+				{isResolved(currentStatus) ? (
+					<PencilLine size={14} />
+				) : (
+					t('tileShareDensity.respond', 'Respond')
+				)}
+			</CompactToggle>
+			<TileShareDialog
+				open={dialogOpen}
+				title={t('tileshareInvitations.title', 'Invitations')}
+				subtitle={name}
+				size="compact"
+				dismissible={state !== 'saving' && state !== 'checking'}
+				onClose={() => {
+					if (!busy.current) setDialogOpen(false);
+				}}
+				footer={
+					<Button
+						type="button"
+						disabled={state === 'saving' || state === 'checking'}
+						onClick={() => setDialogOpen(false)}
+					>
+						{t('tileShareComposer.close', 'Close')}
+					</Button>
+				}
+			>
+				{content}
+			</TileShareDialog>
+		</>
+	) : (
+		content
+	);
 }
 const Wrap = styled.div<{ $embedded?: boolean }>`
 	display: flex;
@@ -421,6 +476,13 @@ const IconToggle = styled.button`
 		outline: 2px solid ${({ theme }) => theme.colors.text.primary};
 		outline-offset: 3px;
 	}
+`;
+const CompactToggle = styled(IconToggle)`
+	width: auto;
+	min-width: 32px;
+	padding: 0 8px;
+	font-size: 12px;
+	white-space: nowrap;
 `;
 /** Accept/Decline option, tinted with its status colour; the current response is filled. */
 const Option = styled.button<{ $tone: 'accept' | 'decline'; $selected?: boolean }>`

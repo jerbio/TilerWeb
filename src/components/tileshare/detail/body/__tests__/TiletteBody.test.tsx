@@ -149,16 +149,14 @@ describe('TiletteBody', () => {
 
 	it('shows the board tab', () => {
 		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
-		expect(
-			screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' })
-		).toBeInTheDocument();
+		expect(screen.getByRole('tab', { name: 'Board view' })).toBeInTheDocument();
 	});
 
 	it('switches to the board view and shows an empty completed lane', async () => {
 		const u = setupUser();
 		render(<TiletteBody clusterId="c" tilettes={tilettes} />);
 
-		await u.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' }));
+		await u.click(screen.getByRole('tab', { name: 'Board view' }));
 
 		// Every assignee's RSVP is null, so both tilettes sit in the Todo lane and
 		// the In progress and Completed lanes show their empty state.
@@ -171,7 +169,7 @@ describe('TiletteBody', () => {
 		const u = setupUser();
 		const first = render(<TiletteBody clusterId="c" tilettes={tilettes} />);
 
-		await u.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.board' }));
+		await u.click(screen.getByRole('tab', { name: 'Board view' }));
 		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
 
 		first.unmount();

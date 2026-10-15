@@ -1,4 +1,11 @@
 {
+	"tileShareDensity": {
+		"respond": "Respond",
+		"accepted": "{{accepted}}/{{total}} accepted",
+		"task": "Tilette",
+		"people": "People",
+		"response": "Response"
+	},
 	"tileShareVisual": {
 		"edit": "Edit",
 		"hours_one": "{{count}} hour",
@@ -2262,14 +2269,23 @@
 			"showingAssignees": "Showing {{shown}} of {{total}} Assignees",
 			"statusLabel": "Status:",
 			"status": {
+				"todo": "To do",
 				"inProgress": "In progress",
 				"completed": "Completed"
 			},
 			"view": {
 				"list": "Tilette list view",
-				"assignee": "Assignee view"
+				"assignee": "Assignee view",
+				"board": "Board view"
 			},
 			"viewAria": "Tilette view",
+			"board": {
+				"filterAria": "Board assignments",
+				"filter": { "all": "Everyone", "mine": "Just me" },
+				"empty": "No tilettes",
+				"accepting": "Accepting…",
+				"dropHint": "Drop here to accept your invitation"
+			},
 			"openTiletteAria": "Open tilette",
 			"prev": "Prev",
 			"next": "Next",

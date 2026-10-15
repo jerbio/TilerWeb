@@ -20,7 +20,8 @@ type TiletteBodyProps = {
 
 type Perspective = TileshareMode.Class | TileshareMode.Project;
 
-const MIN_COLUMN_WIDTH = 230;
+// Allow for the lane gap as well as a comfortable card width.
+const MIN_COLUMN_WIDTH = 316;
 const TILETTES_PER_PAGE = 10;
 const VIEW_STORAGE_KEY = 'tilesharedemo.detail.view';
 const VALID_VIEWS = Object.values(TiletteView);
@@ -144,7 +145,10 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes, mode }) 
 								id: TiletteView.Assignee,
 								label: t('tilesharedemo.detail.view.assignee'),
 							},
-							{ id: TiletteView.Board, label: t('tilesharedemo.detail.view.board') },
+							{
+								id: TiletteView.Board,
+								label: t('tilesharedemo.detail.view.board', 'Board view'),
+							},
 						]}
 					/>
 				}

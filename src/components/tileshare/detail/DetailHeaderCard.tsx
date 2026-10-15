@@ -15,6 +15,7 @@ type DetailHeaderCardProps = {
 	headerRight?: React.ReactNode;
 	/** Body rendered below the title-row divider (description, progress, …). */
 	children?: React.ReactNode;
+	compact?: boolean;
 };
 
 /**
@@ -33,13 +34,14 @@ const DetailHeaderCard: React.FC<DetailHeaderCardProps> = ({
 	subtitle,
 	headerRight,
 	children,
+	compact = false,
 }) => {
 	const { isDarkMode } = useTheme();
 	const surface = iconSurface(accent, isDarkMode);
 
 	return (
-		<Card $darkmode={isDarkMode}>
-			<TopRow>
+		<Card $darkmode={isDarkMode} data-tileshare-header>
+			<TopRow $compact={compact}>
 				<Left>
 					<IconBox $bg={surface.background} $fg={surface.foreground}>
 						{icon}
@@ -51,7 +53,7 @@ const DetailHeaderCard: React.FC<DetailHeaderCardProps> = ({
 				</Left>
 				{headerRight && <Right>{headerRight}</Right>}
 			</TopRow>
-			<HeaderDivider />
+			{children && <HeaderDivider />}
 			{children}
 		</Card>
 	);
@@ -80,11 +82,11 @@ export const HeaderDivider = styled.hr`
 	margin: 0;
 `;
 
-const TopRow = styled.div`
+const TopRow = styled.div<{ $compact: boolean }>`
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	padding: 24px;
+	padding: ${({ $compact }) => ($compact ? '16px 20px' : '24px')};
 	flex-wrap: wrap;
 	@media (max-width: 600px) {
 		padding: 20px;
@@ -95,8 +97,8 @@ const Left = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	flex: 1;
-	min-width: 0;
+	flex: 1 1 200px;
+	min-width: min(100%, 180px);
 `;
 
 const Right = styled.div`

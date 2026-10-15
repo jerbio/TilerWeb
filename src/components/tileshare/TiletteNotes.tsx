@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { ChevronRight } from 'lucide-react';
 import Button from '@/core/common/components/button';
 import { useTileNotes } from '@/hooks/useTileNotes';
 import { tileShareNotesService, clusterNotesService } from '@/services/tileShareNotesService';
@@ -13,10 +14,12 @@ export default function TiletteNotes({
 	id,
 	canEdit,
 	target = 'tilette',
+	compact = false,
 }: {
 	id: string;
 	canEdit: boolean;
 	target?: 'tilette' | 'cluster';
+	compact?: boolean;
 }) {
 	const { t } = useTranslation();
 	const { payload, isLoading, isSaving, error, conflict, refresh, save, clearConflict } =
@@ -39,8 +42,23 @@ export default function TiletteNotes({
 		if (result && !result.concurrencyConflict && !result.truncated) setDraft(null);
 	};
 	return (
-		<section aria-label={t('tileShareNotes.title', 'Notes')}>
-			<Top>
+		<NotesSection
+			as={compact ? 'details' : 'section'}
+			aria-label={t('tileShareNotes.title', 'Notes')}
+		>
+			<Top
+				as={compact ? 'summary' : 'div'}
+				onClick={(event: MouseEvent<HTMLElement>) => {
+					if (
+						compact &&
+						event.target instanceof Element &&
+						event.target.closest('button')
+					) {
+						event.preventDefault();
+						event.stopPropagation();
+					}
+				}}
+			>
 				<strong>{t('tileShareNotes.title', 'Notes')}</strong>
 				{canEdit && payload && !isLoading && (
 					<Button
@@ -56,6 +74,7 @@ export default function TiletteNotes({
 						{t('tileShareNotes.edit', 'Edit notes')}
 					</Button>
 				)}
+				{compact && <DisclosureIcon size={18} aria-hidden="true" focusable="false" />}
 			</Top>
 			{isLoading ? (
 				<p role="status">{t('notesEditor.loading', 'Loading notes…')}</p>
@@ -148,9 +167,47 @@ export default function TiletteNotes({
 					setDraft(null);
 				}}
 			/>
-		</section>
+		</NotesSection>
 	);
 }
+const DisclosureIcon = styled(ChevronRight)`
+	display: block;
+	flex: 0 0 18px;
+	color: ${({ theme }) => theme.colors.text.secondary};
+	transition: transform 140ms ease;
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
+`;
+const NotesSection = styled.section`
+	&:is(details) > summary > strong {
+		flex: 1;
+	}
+	&:is(details) > summary {
+		cursor: pointer;
+		margin-bottom: 0;
+		padding: 4px 0;
+		min-height: 32px;
+		list-style: none;
+	}
+	&:is(details) > summary::marker {
+		content: '';
+	}
+	&:is(details) > summary::-webkit-details-marker {
+		display: none;
+	}
+	&:is(details) > summary:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.brand[400]};
+		outline-offset: 3px;
+		border-radius: 6px;
+	}
+	&:is(details)[open] > summary {
+		margin-bottom: 12px;
+	}
+	&:is(details)[open] > summary > ${DisclosureIcon} {
+		transform: rotate(90deg);
+	}
+`;
 const Top = styled.div`
 	display: flex;
 	justify-content: space-between;
