@@ -76,6 +76,13 @@ declare global {
 // existing typo (`refereshDataFromSockets`); changing it would break the
 // jQuery-generated proxy method binding.
 export const Hubs = {
+	TileShareSchedule: {
+		name: 'tileShareScheduleHub',
+		events: {
+			ResponseChanged: 'scheduleResponseChanged',
+			Connected: 'scheduleResponseConnected',
+		},
+	},
 	VibeUpdate: {
 		name: 'vibeUpdateHub',
 		events: {

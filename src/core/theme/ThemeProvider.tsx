@@ -1,7 +1,24 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { createGlobalStyle, ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { darkTheme } from './dark';
 import { lightTheme } from './light';
+
+const GlobalThemeStyles = createGlobalStyle`
+	:root {
+		background-color: ${({ theme }) => theme.colors.background.page};
+		color: ${({ theme }) => theme.colors.text.primary};
+		--scrollbar-bg: transparent;
+		--scrollbar-border: transparent;
+		--scrollbar-thumb-bg: ${({ theme }) => theme.colors.text.muted};
+		--scrollbar-thumb-border: ${({ theme }) => theme.colors.text.muted};
+		--scrollbar-thumb-hover-bg: ${({ theme }) => theme.colors.text.secondary};
+		--scrollbar-thumb-hover-border: ${({ theme }) => theme.colors.text.secondary};
+	}
+	body {
+		background-color: ${({ theme }) => theme.colors.background.page};
+		color: ${({ theme }) => theme.colors.text.primary};
+	}
+`;
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export const ThemeMode = {
@@ -94,7 +111,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
 	return (
 		<ThemeContext.Provider value={{ isDarkMode, themeMode, toggleTheme, setThemeMode }}>
-			<StyledThemeProvider theme={themeObject}>{children}</StyledThemeProvider>
+			<StyledThemeProvider theme={themeObject}>
+				<GlobalThemeStyles />
+				{children}
+			</StyledThemeProvider>
 		</ThemeContext.Provider>
 	);
 };

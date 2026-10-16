@@ -40,7 +40,7 @@ const TileshareSent: React.FC = () => {
 									<TileShareClusterCard key={cluster.id} cluster={cluster} />
 								))}
 					</List>
-					<Pagination
+					<BottomPagination
 						mode="simple"
 						page={page}
 						onChange={setPage}
@@ -60,6 +60,15 @@ const Container = styled.div`
 	flex-direction: column;
 	gap: 1rem;
 	align-items: flex-start;
+`;
+
+/** Stays visible at the bottom of the page while the list scrolls underneath. */
+const BottomPagination = styled(Pagination)`
+	position: sticky;
+	bottom: 0;
+	z-index: 1;
+	padding: 0.75rem 0;
+	background-color: ${({ theme }) => theme.colors.background.page};
 `;
 
 const List = styled.div`

@@ -1,4 +1,210 @@
 {
+	"tileShareDensity": {
+		"respond": "Respond",
+		"accepted": "{{accepted}}/{{total}} accepted",
+		"task": "Tilette",
+		"people": "People",
+		"response": "Response"
+	},
+	"tileShareVisual": {
+		"edit": "Edit",
+		"hours_one": "{{count}} hour",
+		"hours_other": "{{count}} hours"
+	},
+	"tileShareEdit": {
+		"lateTitle": "Due after the share deadline",
+		"durationLabel": "Duration",
+		"nameShort": "Use at least 3 characters.",
+		"nameLong": "Use no more than 100 characters.",
+		"nameHint": "Use 3–100 characters.",
+		"beforeStart": "The deadline must be on or after the start time.",
+		"time": "Deadline time",
+		"inherited": "This tilette uses the share’s deadline until you choose its own.",
+		"afterShare": "This tilette is due after the share’s deadline ({{deadline}}).",
+		"moveShare": "Also move the share’s deadline to {{deadline}}",
+		"durationFixed": "A tilette’s duration cannot change once it is shared.",
+		"duration": "{{minutes}} minutes",
+		"modeFixed": "The mode cannot change after sharing.",
+		"acceptedImpact_one": "{{count}} accepted tilette due later may be moved to this deadline.",
+		"acceptedImpact_other": "{{count}} accepted tilettes due later may be moved to this deadline.",
+		"unacceptedImpact_one": "{{count}} tilette that nobody has accepted keeps its later deadline.",
+		"unacceptedImpact_other": "{{count}} tilettes that nobody has accepted keep their later deadlines.",
+		"unchanged": "No changes to save.",
+		"retry": "Retry save",
+		"saveFailed": "Could not save right now. Your changes are kept. Try again.",
+		"shareFailed": "The tilette was saved, but the share deadline could not be updated. Retry to finish, or close to keep the saved tilette.",
+		"partialDiscard": "The tilette changes are already saved. Closing abandons the pending share deadline change.",
+		"discard": "Your unsaved changes to these details will be lost."
+	},
+	"tileShareNotes": {
+		"createdPending": "The tilette was created. Its notes still need saving; retrying will not create another tilette.",
+		"retrySave": "Retry saving notes",
+		"title": "Notes",
+		"edit": "Edit notes",
+		"empty": "No notes yet.",
+		"loadError": "Could not load notes.",
+		"saveError": "Could not save notes. Your edits are still here; try again.",
+		"useSaved": "Use saved note",
+		"truncated": "The note exceeded the server limit. Review the saved note before continuing."
+	},
+	"tileShareMarkdown": {
+		"write": "Write",
+		"preview": "Preview",
+		"formatting": "Note formatting",
+		"previewLabel": "Note preview",
+		"empty": "Nothing to preview yet.",
+		"hint": "Markdown supported: headings, bold, lists, links, and code."
+	},
+	"tileShareModes": {
+		"broadcast": {
+			"label": "Broadcast",
+			"title": "Create a Broadcast",
+			"description": "Share one task. Each recipient has their own assignment.",
+			"submit": "Create Broadcast"
+		},
+		"class": {
+			"label": "Class",
+			"title": "Create a Class",
+			"description": "Share a set of tilettes. Every participant receives every tilette.",
+			"submit": "Create Class"
+		},
+		"project": {
+			"label": "Project",
+			"title": "Create a Project",
+			"description": "Work together on a task set. Assign people to individual tilettes.",
+			"submit": "Create Project"
+		},
+		"location": "Location (optional)",
+		"addTilettesNow": "Add tilettes first (optional)",
+		"optionalTilettes": "Optional. You can also add tilettes after creating the share.",
+		"tiletteNumber": "Tilette {{number}}",
+		"addTilette": "Add tilette",
+		"removeTilette": "Remove tilette",
+		"moveUp": "Move up",
+		"moveDown": "Move down",
+		"deadlineDefault": "Uses the share deadline: {{deadline}}",
+		"everyone": "Assigned to every Class participant.",
+		"addRecipient": "Add recipient",
+		"removeRecipient": "Remove {{recipient}}",
+		"assignees": "Assignees (optional)",
+		"tiletteLocation": "Tilette location",
+		"perspective": "Share perspective",
+		"projectView": "Project view",
+		"classView": "Class view",
+		"unknown": "Sharing mode unavailable",
+		"participants": "Participants",
+		"participantContact": "Participant email or phone",
+		"classActions": "Class participants",
+		"addToAll": "Add to all tilettes",
+		"removeFromAll": "Remove from all tilettes",
+		"removeFromClassConfirm": "Remove this participant from every tilette in the Class?",
+		"emptyClass": "Add a tilette to start assigning work to participants.",
+		"acceptAll": "Accept all pending tilettes",
+		"declineAll": "Decline all pending tilettes",
+		"partialChange": "{{saved}} changes saved; {{failed}} need retry.",
+		"changesSaved": "Changes saved.",
+		"retryRemaining": "Retry remaining changes",
+		"refreshFailed": "Changes were sent, but the share could not refresh. Reload to check the saved assignments."
+	},
+	"tileshareList": {
+		"title": "TileShares",
+		"createdByMe": "Created by me",
+		"sort": "Sort by",
+		"createdDesc": "Creation time: newest first",
+		"createdAsc": "Creation time: oldest first",
+		"deadlineAsc": "Deadline: earliest first",
+		"deadlineDesc": "Deadline: latest first",
+		"empty": "No TileShares match this filter.",
+		"failed": "Could not load TileShares.",
+		"retry": "Retry"
+	},
+	"tileshareRsvp": {
+		"accepted": "Accepted",
+		"declined": "Declined",
+		"none": "Awaiting response",
+		"tentative": "Tentative",
+		"unknown": "Unknown response",
+		"yours": "Your response",
+		"response": "Invitation response",
+		"responses": "Invitation responses",
+		"noParticipants": "No participants",
+		"viewPeople": "View responses",
+		"participant": "Participant"
+	},
+	"tileshareInvitations": {
+		"yourInvitation": "You are invited to this tilette.",
+		"unavailable": "This invitation is no longer pending.",
+		"title": "Invitations",
+		"refresh": "Refresh",
+		"all": "All invitations",
+		"loading": "Loading invitations?",
+		"failed": "Invitations could not be loaded. Refresh to try again.",
+		"empty": "No pending invitations.",
+		"pending": "pending tilettes",
+		"review": "Review invitations",
+		"from": "Invited by",
+		"due": "Due:",
+		"accept": "Accept",
+		"decline": "Decline",
+		"changeResponse": "Change response",
+		"cancel": "Cancel",
+		"currentAccepted": "Current response: Accepted.",
+		"currentDeclined": "Current response: Declined.",
+		"updatedAccepted": "Response updated to Accepted.",
+		"updatedDeclined": "Response updated to Declined.",
+		"responding": "Saving response?",
+		"next": "Next page",
+		"accepted": "Accepted. Your tile has been created.",
+		"declined": "Invitation declined.",
+		"responseFailed": "The response could not be confirmed. Refresh to check its status before trying again."
+	},
+	"tileshareActivity": {
+		"showDismissed": "Show dismissed",
+		"dismiss": "Dismiss",
+		"restore": "Show in activities",
+		"dismissFailed": "The activity preference could not be saved. Try again.",
+		"events": {
+			"comment_added": "Comment added",
+			"comment_replied": "Comment reply added",
+			"comment_edited": "Comment edited",
+			"comment_deleted": "Comment deleted",
+			"invitation_send_unknown": "Invitation send outcome unknown",
+			"assignment_completed": "Occurrence completed",
+			"assignment_reopened": "Occurrence reopened"
+		},
+		"sentences": {
+			"comment_added": "<actor/> commented on <title/>",
+			"comment_replied": "<actor/> replied to a comment on <title/>",
+			"comment_edited": "<actor/> edited a comment on <title/>",
+			"comment_deleted": "<actor/> deleted a comment on <title/>"
+		},
+		"channels": {
+			"email": "Email",
+			"sms": "SMS",
+			"push": "Push notification"
+		},
+		"explicitResend": "The invitation may have been sent. Resend explicitly if needed.",
+		"options": "Activity options",
+		"actions": {
+			"cluster_invitation": "invited you to",
+			"cluster_created": "created",
+			"cluster_deleted": "deleted",
+			"tilette_added": "added",
+			"tilette_edited": "updated",
+			"tilette_deleted": "deleted",
+			"tilette_restored": "restored",
+			"recipient_added": "added a participant to",
+			"recipient_removed": "removed a participant from",
+			"recipient_restored": "restored a participant to",
+			"assignment_accepted": "accepted",
+			"assignment_completed": "completed an occurrence of",
+			"assignment_reopened": "reopened an occurrence of",
+			"assignment_declined": "declined",
+			"invitation_sent": "sent an invitation to",
+			"invitation_send_failed": "could not send an invitation to",
+			"invitation_send_unknown": "sent an invitation with an unknown outcome for"
+		}
+	},
 	"common": {
 		"onboarding": {
 			"guide": {
@@ -43,7 +249,9 @@
 		},
 		"navigation": {
 			"home": "Home",
+			"features": "Features",
 			"discover": "Discover",
+			"articles": "Articles",
 			"waitlist": "Waitlist"
 		},
 		"voiceInput": {
@@ -694,7 +902,7 @@
 				"eyebrow": "Effortless natural-language scheduling",
 				"titleLead": "Just say it.",
 				"titleAccent": "It's scheduled.",
-				"subtitle": "\u201cGym four times this week.\u201d \u201cPush my report to Thursday.\u201d Tiler understands and rebuilds the rest around it.",
+				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
 				"primaryCta": "Tell Tiler what you need",
 				"secondaryCta": "See how it works",
 				"nudgeCta": "Schedule this for real",
@@ -746,17 +954,17 @@
 						"memo": "Draft Q3 budget memo",
 						"pharmacy": "Call the pharmacy",
 						"review": "Review Ana's design file",
-						"gym": "Gym \u2014 legs",
+						"gym": "Gym — legs",
 						"train": "Book train to Leeds"
 					},
-					"caption": "Placed around a 9\u20135 day and a 40-minute commute."
+					"caption": "Placed around a 9–5 day and a 40-minute commute."
 				}
 			},
 			"self_healing": {
 				"eyebrow": "Automatic recovery from disruption",
 				"titleLead": "Your day fell apart at 10am.",
 				"titleAccent": "Your schedule already recovered.",
-				"subtitle": "Run late, skip a session, take an emergency call \u2014 Tiler rebuilds the rest of your week instantly.",
+				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
 				"primaryCta": "See it recover",
 				"secondaryCta": "See how it works",
 				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
@@ -774,11 +982,11 @@
 					"items": {
 						"morningReview": "Morning review",
 						"clientCall": "Client call",
-						"deepWork": "Deep work \u2014 draft",
+						"deepWork": "Deep work — draft",
 						"designSync": "Design sync",
 						"gym": "Gym"
 					},
-					"caption": "Gym kept \u00b7 Deep work protected \u00b7 Nothing dropped"
+					"caption": "Gym kept · Deep work protected · Nothing dropped"
 				}
 			},
 			"task_splitting": {
@@ -814,13 +1022,13 @@
 						"draftTwo": "Draft ch. 2",
 						"edit": "Edit pass"
 					},
-					"caption": "6 sessions \u00b7 spread unevenly around your week"
+					"caption": "6 sessions · spread unevenly around your week"
 				}
 			},
 			"capacity_check": {
 				"eyebrow": "An honest capacity reality check",
 				"title": "Does it actually fit?",
-				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now \u2014 not Friday night.",
+				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
 				"primaryCta": "See if your week fits",
 				"secondaryCta": "See how it works",
 				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
@@ -1458,6 +1666,9 @@
 					"placeholder": "eg. Google Calendar, Outlook, Apple Calendar",
 					"options": [
 						{
+							"tileshareActivity": {
+								"title": "Activities"
+							},
 							"value": "google",
 							"label": "Google Calendar"
 						},
@@ -1509,9 +1720,19 @@
 		}
 	},
 	"timeline": {
-		"searchPlaceholder": "Search for a tile/block...",
-		"searchAriaLabel": "Search for a tile or block",
+		"searchPlaceholder": "Search events, tiles & blocks...",
+		"searchAriaLabel": "Search for events, tiles, or blocks",
 		"clearSearch": "Clear search",
+		"multiSource": {
+			"sourceTiler": "Tiler",
+			"sourceGoogle": "Google",
+			"sourceMicrosoft": "Microsoft",
+			"connectedAccount": "Connected account: {{account}}",
+			"partialFailure": "Some connected calendars failed to search: {{sources}}",
+			"retrySearch": "Retry",
+			"unavailable": "Search is temporarily unavailable. This is a service issue — not a lack of matches. Please try again later.",
+			"readOnly": "Read-only"
+		},
 		"loadMore": "Load more",
 		"loading": "Loading…",
 		"notFoundMessage": "Oops, we couldn't find '{{query}}'. Would you like to create a Tile from this title?",
@@ -2029,6 +2250,7 @@
 			"progress": "Progress",
 			"dueOn": "Due on:",
 			"dueBy": "Due by:",
+			"due": "Due:",
 			"multiTileshare": "Multi tileshare",
 			"tileshare": "Tileshare"
 		},
@@ -2053,6 +2275,115 @@
 		"tiletteDetail": {
 			"title": "Tilette Detail"
 		},
+		"detail": {
+			"breadcrumbRoot": "Tileshare",
+			"multiTileshare": "Multi tileshare",
+			"singleTileshare": "Single tileshare",
+			"inCluster": "In: {{name}}",
+			"progress": "Progress",
+			"noDescription": "No description provided",
+			"due": "Due: {{date}}",
+			"editAria": "Edit",
+			"addAria": "Add tilette",
+			"loadError": "We couldn't load this tileshare. Please try again.",
+			"showingTilettes": "Showing {{shown}} of {{total}} Tilettes",
+			"showingAssignees": "Showing {{shown}} of {{total}} Assignees",
+			"statusLabel": "Status:",
+			"status": {
+				"todo": "To do",
+				"inProgress": "In progress",
+				"completed": "Completed"
+			},
+			"view": {
+				"list": "Tilette list view",
+				"assignee": "Assignee view",
+				"board": "Board view"
+			},
+			"viewAria": "Tilette view",
+			"board": {
+				"filterAria": "Board assignments",
+				"filter": { "all": "Everyone", "mine": "Just me" },
+				"empty": "No tilettes",
+				"accepting": "Accepting…",
+				"dropHint": "Drop here to accept your invitation"
+			},
+			"openTiletteAria": "Open tilette",
+			"prev": "Prev",
+			"next": "Next",
+			"deleteAria": "Delete",
+			"edit": {
+				"clusterTitle": "Edit tileshare",
+				"tiletteTitle": "Edit tilette",
+				"fields": {
+					"name": {
+						"label": "Name",
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"label": "Deadline",
+						"placeholder": "Add a deadline"
+					},
+					"note": {
+						"label": "Note",
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"deadlineRequired": "Please add a deadline"
+				},
+				"cancel": "Cancel",
+				"save": "Save changes",
+				"saving": "Saving changes…",
+				"success": "Changes saved",
+				"error": "Couldn't save your changes. Please try again."
+			},
+			"delete": {
+				"title": "Delete tileshare",
+				"body": "Delete \"{{name}}\"?",
+				"warning": "This removes it for everyone it was shared with and cannot be undone.",
+				"cancel": "Cancel",
+				"confirm": "Delete",
+				"deleting": "Deleting…",
+				"success": "Tileshare deleted",
+				"error": "Couldn't delete this tileshare. Please try again."
+			},
+			"add": {
+				"back": "Back to tileshare",
+				"title": "Add a tilette",
+				"description": "Add another task to \"{{name}}\" and share it with your colleagues. Once they accept, we'll add it to their schedule.",
+				"fields": {
+					"name": {
+						"label": "Name",
+						"placeholder": "Name your task"
+					},
+					"deadline": {
+						"label": "Deadline",
+						"placeholder": "Add a deadline (optional)"
+					},
+					"note": {
+						"label": "Note",
+						"placeholder": "Add a note (optional)"
+					}
+				},
+				"shareTo": {
+					"label": "Share to:",
+					"placeholder": "email address / phone number (Enter to select)"
+				},
+				"validation": {
+					"nameRequired": "Please name your task",
+					"invalidRecipient": "{{recipient}} is not a valid email or phone number"
+				},
+				"cancel": "Cancel",
+				"submit": "Add tilette",
+				"creating": "Adding tilette…",
+				"error": "Couldn't add the tilette. Please try again.",
+				"success": {
+					"message": "Your tilette \"{{name}}\" has been added.",
+					"view": "View tilette"
+				}
+			}
+		},
 		"invite": {
 			"title": "Invite"
 		},
@@ -2062,6 +2393,56 @@
 		"outbox": {
 			"title": "Outbox"
 		}
+	},
+	"comments": {
+		"count": "{{count}} comments",
+		"empty": "No comments yet",
+		"loading": "Loading…",
+		"loadMore": "Load more",
+		"retry": "Retry",
+		"loadError": "Couldn't load comments. Please try again.",
+		"loadMoreError": "Couldn't load more comments.",
+		"createError": "Couldn't post your comment.",
+		"editError": "Couldn't save your edit.",
+		"deleteError": "Couldn't delete the comment.",
+		"placeholder": "Write a comment…",
+		"send": "Send",
+		"sending": "Sending…",
+		"edit": "Edit",
+		"save": "Save",
+		"cancel": "Cancel",
+		"delete": "Delete",
+		"edited": "edited",
+		"deletedPlaceholder": "This comment was deleted.",
+		"deletedAuthor": "Deleted user",
+		"reply": "Reply",
+		"replyPlaceholder": "Write a reply…",
+		"replies": "{{count}} replies",
+		"showReplies": "Show replies",
+		"hideReplies": "Hide replies",
+		"loadingReplies": "Loading replies…",
+		"noReplies": "No replies yet",
+		"loadRepliesError": "Couldn't load replies.",
+		"createReplyError": "Couldn't post your reply.",
+		"missingTarget": "Comment target not found.",
+		"you": "(you)",
+		"mentionSuggestions": "People you can mention",
+		"loadEarlier": "Load earlier comments",
+		"loadEarlierReplies": "Load earlier replies",
+		"attach": "Attach file",
+		"attachmentProcessing": "Checking file…",
+		"attachmentUploaded": "Uploaded",
+		"attachmentUploadingSummary": "Uploading files ({{count}} left). Keep this page open.",
+		"attachmentUploadFailed": "Upload failed",
+		"attachmentRetry": "Retry",
+		"attachmentRemove": "Remove {{name}}",
+		"attachmentDownload": "Download",
+		"attachmentDownloadAria": "Download {{name}}",
+		"attachmentDownloadError": "Couldn't download the file.",
+		"attachmentInvalidType": "Only PDF, DOCX, PNG and JPEG files can be attached.",
+		"attachmentTooLarge": "Files must be 10 MB or smaller.",
+		"attachmentEmpty": "That file is empty.",
+		"attachmentLimit": "You can attach up to {{count}} files."
 	},
 	"tile": {
 		"noteButtonAria": "Open notes for this tile"
@@ -2415,5 +2796,36 @@
 				]
 			}
 		}
+	},
+	"tileShareComposer": {
+		"close": "Close",
+		"shareDeadline": "Share deadline",
+		"moveShareDeadline": "Also move the share deadline to {{deadline}}",
+		"count_one": "You have added {{count}} tilette",
+		"count_other": "You have added {{count}} tilettes",
+		"newTilette": "New tilette",
+		"emptyTitle": "Add tilettes to your share",
+		"emptyDescription": "Add tasks now, or create the share and add tasks later.",
+		"editTilette": "Edit {{name}}",
+		"removeTilette": "Remove {{name}}",
+		"locationNotSet": "Location not set",
+		"unassigned": "Unassigned",
+		"added": "{{name}} was added to this draft.",
+		"updated": "{{name}} was updated.",
+		"removed": "{{name}} was removed from this draft.",
+		"addTitle": "Create a tilette",
+		"editTitle": "Edit tilette",
+		"saveTilette": "Save tilette",
+		"classHint": "This tilette will be assigned to every Class participant when you create the share.",
+		"projectHint": "Add a task and optionally choose its assignees. Invitations are sent when you create the Project.",
+		"optionalDescription": "Want to include tasks during creation? You can add tilettes now or create the share first.",
+		"reviewTilettes": "Review tilettes ({{count}})",
+		"editDetails": "Edit details",
+		"cancelExit": "Cancel & Exit",
+		"discardTitle": "Discard changes?",
+		"discard": "Discard changes",
+		"keepEditing": "Keep editing",
+		"discardTask": "Your unsaved tilette edits will be lost. Other tilettes will remain in the draft.",
+		"discardShare": "Your share details and draft tilettes will be lost. No invitations have been sent."
 	}
 }

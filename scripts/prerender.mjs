@@ -56,6 +56,14 @@ const MIME = {
 /** Paths that must NOT fall back to index.html (so app fetches fail fast, not with HTML). */
 const NON_SPA_PREFIXES = ['/api', '/account', '/signalr', '/Scripts'];
 
+/**
+ * Routes that are NOT in the sitemap but still get a prerendered HTML
+ * snapshot so their <head> meta is visible to crawlers without JS.
+ * /waitlist is `noindex, follow` — excluded from the sitemap on purpose,
+ * but the static HTML must still carry the noindex directive.
+ */
+const EXTRA_PRERENDER_ROUTES = ['/waitlist'];
+
 /** Read indexable route paths from the generated sitemap. */
 function getRoutesFromSitemap() {
 	try {
@@ -70,10 +78,10 @@ function getRoutesFromSitemap() {
 				}
 			})
 			.filter(Boolean);
-		return [...new Set(paths)];
+		return [...new Set([...paths, ...EXTRA_PRERENDER_ROUTES])];
 	} catch (error) {
 		console.warn(`⚠️  prerender: could not read sitemap (${error.message}). Using "/" only.`);
-		return ['/'];
+		return ['/', ...EXTRA_PRERENDER_ROUTES];
 	}
 }
 

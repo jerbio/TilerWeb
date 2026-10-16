@@ -4,21 +4,20 @@ import { a, useSpring } from '@react-spring/web';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Layers, MessageSquare } from 'lucide-react';
+import { TileshareMode } from '@/core/common/types/tileshare';
 
 type TileshareCreateSelectionProps = {
 	open: boolean;
 	anchorRef: React.RefObject<HTMLElement | null>;
 	onClose: () => void;
-	onSelectSingle: () => void;
-	onSelectMulti: () => void;
+	onSelectMode: (mode: TileshareMode) => void;
 };
 
 const TileshareCreateSelection: React.FC<TileshareCreateSelectionProps> = ({
 	open,
 	anchorRef,
 	onClose,
-	onSelectSingle,
-	onSelectMulti,
+	onSelectMode,
 }) => {
 	const { t } = useTranslation();
 	const [pos, setPos] = useState({ top: 0, right: 0 });
@@ -69,9 +68,6 @@ const TileshareCreateSelection: React.FC<TileshareCreateSelectionProps> = ({
 		action();
 	}
 
-	const singleDescription = t('tilesharedemo.dashboard.createSelection.single.description');
-	const multiDescription = t('tilesharedemo.dashboard.createSelection.multi.description');
-
 	return createPortal(
 		<Container
 			ref={menuRef}
@@ -84,27 +80,25 @@ const TileshareCreateSelection: React.FC<TileshareCreateSelectionProps> = ({
 				),
 			}}
 		>
-			<Selection onClick={() => handleSelect(onSelectSingle)}>
-				<div>
-					<MessageSquare size={20} />
-				</div>
-				<TextBlock>
-					<h3>{t('tilesharedemo.dashboard.createSelection.single.label')}</h3>
-					{singleDescription && <p>{singleDescription}</p>}
-				</TextBlock>
-				<ChevronRight size={18} />
-			</Selection>
-			<Seperator />
-			<Selection onClick={() => handleSelect(onSelectMulti)}>
-				<div>
-					<Layers size={20} />
-				</div>
-				<TextBlock>
-					<h3>{t('tilesharedemo.dashboard.createSelection.multi.label')}</h3>
-					{multiDescription && <p>{multiDescription}</p>}
-				</TextBlock>
-				<ChevronRight size={18} />
-			</Selection>
+			{Object.values(TileshareMode).map((mode, index) => (
+				<React.Fragment key={mode}>
+					{index > 0 && <Seperator />}
+					<Selection onClick={() => handleSelect(() => onSelectMode(mode))}>
+						<div>
+							{mode === TileshareMode.Broadcast ? (
+								<MessageSquare size={20} />
+							) : (
+								<Layers size={20} />
+							)}
+						</div>
+						<TextBlock>
+							<h3>{t(`tileShareModes.${mode}.label`)}</h3>
+							<p>{t(`tileShareModes.${mode}.description`)}</p>
+						</TextBlock>
+						<ChevronRight size={18} />
+					</Selection>
+				</React.Fragment>
+			))}
 		</Container>,
 		document.body
 	);
@@ -126,7 +120,8 @@ const Container = styled(a.div)`
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+	box-shadow: 0 8px 24px
+		color-mix(in srgb, ${({ theme }) => theme.colors.backdrop.default} 32%, transparent);
 	transform-origin: top right;
 `;
 

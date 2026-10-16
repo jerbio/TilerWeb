@@ -174,6 +174,7 @@ const Navigation: React.FC = () => {
 	const navLinks = [
 		{ name: t('common.navigation.home'), href: '/' },
 		{ name: t('common.navigation.discover'), href: '/discover' },
+		{ name: t('common.navigation.articles'), href: '/articles' },
 	];
 
 	function handleScroll() {
@@ -279,7 +280,14 @@ const Navigation: React.FC = () => {
 			<NavigationContainer>
 				<NavigationWrapper $isopen={isOpen} $shrink={!isAtTop}>
 					<NavigationItemsWrapper>
-						<Logo size={32} />
+						<NavLink key={'tilerRoot'} href={'/'}>
+							<div>
+								<Logo size={32} />
+								<NavLink key={'tilerRoot'} href={'/'}>
+									{'Tiler'}
+								</NavLink>
+							</div>
+						</NavLink>
 						<NavItems>
 							{navLinks.map((link) => (
 								<NavItem key={link.name}>

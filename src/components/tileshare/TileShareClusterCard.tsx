@@ -1,12 +1,17 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, CalendarDays, Clock, Layers, MessageSquare } from 'lucide-react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
+import { MultiTileshareIcon, SingleTileshareIcon } from '@/components/tileshare/icons';
+import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
+import { useTheme as useAppTheme } from '@/core/theme/ThemeProvider';
+import { iconSurface } from '@/core/util/colorSurface';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
 import Button from '@/core/common/components/button';
-import { TileShareCluster } from '@/core/common/types/tileshare';
+import { TileShareCluster, TileshareMode } from '@/core/common/types/tileshare';
+import { tileshareMode } from '@/core/util/tileshareMode';
 import { Link } from 'react-router';
 import { Routes } from '@/core/constants/routes';
 import Tooltip from '@/core/common/components/tooltip';
@@ -17,7 +22,9 @@ type TileShareClusterCardProps = {
 
 const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) => {
 	const theme = useTheme();
+	const { isDarkMode } = useAppTheme();
 	const { t } = useTranslation();
+	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
 
 	const avatarUsers: AvatarUser[] = cluster.truncatedUser
 		? cluster.truncatedUser
@@ -25,9 +32,10 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 				.map((email) => ({ name: email.trim(), email: email.trim() }))
 		: [];
 
-	const subtitle = cluster.isMultiTilette
-		? t('tilesharedemo.card.multiTileshare')
-		: t('tilesharedemo.card.tileshare');
+	const mode = tileshareMode(cluster);
+	const subtitle = mode
+		? t(`tileShareModes.${mode}.label`)
+		: t('tileshareList.title', 'TileShares');
 
 	const formattedDueOn = cluster.end ? dayjs(cluster.end).format('ddd, D MMM, YYYY') : '—';
 	const formattedDueBy = cluster.end ? unixToTimeString(cluster.end) : '—';
@@ -35,8 +43,12 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	return (
 		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
 			<Left>
-				<IconBox>
-					{cluster.isMultiTilette ? <Layers size={18} /> : <MessageSquare size={18} />}
+				<IconBox $bg={surface.background} $fg={surface.foreground}>
+					{mode !== TileshareMode.Broadcast ? (
+						<MultiTileshareIcon size={18} />
+					) : (
+						<SingleTileshareIcon size={18} />
+					)}
 				</IconBox>
 				<TitleBlock>
 					<Title>{cluster.name ?? '—'}</Title>
@@ -68,23 +80,16 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 
 			<Right>
 				<DueWrapper>
+					<DueItem />
+					<DueDivider />
 					<DueItem>
 						<DueIcon>
 							<CalendarDays size={16} />
 						</DueIcon>
+						<DueLabel>{t('tilesharedemo.card.due')}</DueLabel>
 						<DueContent>
-							<DueLabel>{t('tilesharedemo.card.dueOn')}</DueLabel>
+							<DueTime>{formattedDueBy}</DueTime>
 							<DueValue>{formattedDueOn}</DueValue>
-						</DueContent>
-					</DueItem>
-					<DueDivider />
-					<DueItem>
-						<DueIcon>
-							<Clock size={16} />
-						</DueIcon>
-						<DueContent>
-							<DueLabel>{t('tilesharedemo.card.dueBy')}</DueLabel>
-							<DueValue>{formattedDueBy}</DueValue>
 						</DueContent>
 					</DueItem>
 				</DueWrapper>
@@ -106,7 +111,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 
 const CardGrid = styled(Link)`
 	display: grid;
-	grid-template-columns: 7fr 1px 5fr;
+	grid-template-columns: minmax(0, 7fr) 1px minmax(0, 5fr);
 	grid-template-rows: auto;
 	background-color: ${({ theme }) => theme.colors.border.default};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
@@ -114,6 +119,21 @@ const CardGrid = styled(Link)`
 	overflow: hidden;
 	text-decoration: none;
 	color: inherit;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.025);
+	transition:
+		border-color 160ms ease,
+		box-shadow 160ms ease;
+	&:hover {
+		border-color: ${({ theme }) => theme.colors.input.borderHover};
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+	}
+	&:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.brand[400]};
+		outline-offset: 3px;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
 
 	@media (max-width: 640px) {
 		grid-template-columns: 1fr;
@@ -152,15 +172,15 @@ const Right = styled.div`
 	}
 `;
 
-const IconBox = styled.div`
+const IconBox = styled.div<{ $bg: string; $fg: string }>`
 	width: 40px;
 	height: 40px;
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background-color: ${({ theme }) => theme.colors.brand[500]};
+	background-color: ${({ $bg }) => $bg};
+	color: ${({ $fg }) => $fg};
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: ${({ theme }) => theme.colors.white};
 	flex-shrink: 0;
 `;
 
@@ -198,7 +218,7 @@ const DueWrapper = styled.div`
 	align-items: center;
 	gap: 0.5rem;
 	padding: 0.75rem;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	background: ${({ theme }) => theme.colors.input.bg};
 	border-radius: ${({ theme }) => theme.borderRadius.large};
 	width: 100%;
 `;
@@ -239,10 +259,14 @@ const DueLabel = styled.span`
 
 const DueValue = styled.span`
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
-	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+	font-weight: 550;
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
 	white-space: nowrap;
+`;
+
+const DueTime = styled(DueValue)`
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const AvatarRow = styled.div`

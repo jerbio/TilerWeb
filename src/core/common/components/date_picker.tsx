@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import styled, { createGlobalStyle } from 'styled-components';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,6 +12,7 @@ type CustomDatePickerProps = {
 	minDate?: string; // YYYY-MM-DD format, disables selection before this date
 	maxDate?: string; // YYYY-MM-DD format, disables selection after this date
 	portalId?: string;
+	disabled?: boolean;
 };
 
 const DatePicker: React.FC<CustomDatePickerProps> = ({
@@ -23,7 +24,23 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	minDate,
 	maxDate,
 	portalId,
+	disabled = false,
 }) => {
+	const inputId = useId();
+	const container = useRef<HTMLDivElement>(null);
+	const [dialogPortalId, setDialogPortalId] = useState<string>();
+	useLayoutEffect(() => {
+		const dialog = container.current?.closest('dialog');
+		if (!dialog) return;
+		// Keep the calendar in the native dialog's top layer, outside its scrolling body.
+		const host = document.createElement('div');
+		host.id = `${inputId}-calendar`;
+		host.setAttribute('data-tiler-datepicker-portal', '');
+		dialog.appendChild(host);
+		setDialogPortalId(host.id);
+		return () => host.remove();
+	}, [inputId]);
+	const effectivePortalId = dialogPortalId ?? portalId;
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
 			// Use local methods for consistency with display
@@ -68,11 +85,13 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 		: undefined;
 
 	return (
-		<Container>
-			{label && <Label>{label}</Label>}
-			{portalId && <DatePickerPortalStyles />}
+		<Container ref={container}>
+			{label && <Label htmlFor={inputId}>{label}</Label>}
+			{effectivePortalId && <DatePickerPortalStyles />}
 			<DatePickerWrapper $ghostInput={ghostInput}>
 				<ReactDatePicker
+					id={inputId}
+					disabled={disabled}
 					selected={selectedDate}
 					onChange={handleChange}
 					dateFormat="MM/dd/yyyy"
@@ -80,7 +99,7 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 					showPopperArrow={false}
 					minDate={minDateObj}
 					maxDate={maxDateObj}
-					portalId={portalId}
+					portalId={effectivePortalId}
 				/>
 			</DatePickerWrapper>
 		</Container>
@@ -234,7 +253,7 @@ const DatePickerWrapper = styled.div<{ $ghostInput: boolean }>`
 `;
 
 const DatePickerPortalStyles = createGlobalStyle`
-	#datepicker-portal {
+	#datepicker-portal, [data-tiler-datepicker-portal] {
 		.react-datepicker-popper {
 			z-index: 9999;
 		}

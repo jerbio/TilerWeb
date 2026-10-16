@@ -1,10 +1,6 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-
-const TileshareInvitePage: React.FC = () => {
-	const { t } = useTranslation();
-
-	return <div>{t('tilesharedemo.invite.title')}</div>;
-};
-
-export default TileshareInvitePage;
+import { useParams } from 'react-router';
+import TileShareInvitations from '@/components/tileshare/TileShareInvitations';
+export default function TileshareInvitePage() {
+	const { designatedTemplateId } = useParams<{ designatedTemplateId: string }>();
+	return <TileShareInvitations AssignmentId={designatedTemplateId} />;
+}

@@ -3,10 +3,25 @@ import palette from './palette';
 
 export const darkTheme: AppTheme = {
 	colors: {
+		preview: {
+			selectedBg: palette.colors.teal[900],
+			selectedText: palette.colors.teal[100],
+			selectedBorder: palette.colors.brand[400],
+			successBg: palette.colors.success[900],
+			warningBg: palette.colors.warning[900],
+			errorBg: palette.colors.error[900],
+			eventBg: palette.colors.indigo[900],
+			eventText: palette.colors.indigo[100],
+		},
 		plain: palette.colors.black,
 		backdrop: {
 			default: 'rgba(0, 0, 0, 0.5)',
 			glass: '#232323a7',
+		},
+		avatar: {
+			background: palette.colors.gray[800],
+			border: palette.colors.gray[600],
+			text: palette.colors.gray[200],
 		},
 		// Text colors
 		text: {
@@ -15,6 +30,8 @@ export const darkTheme: AppTheme = {
 			muted: palette.colors.gray[500],
 			inverse: palette.colors.white,
 			error: palette.colors.error[400],
+			success: palette.colors.success[400],
+			warning: palette.colors.warning[400],
 		},
 		// Background colors
 		background: {

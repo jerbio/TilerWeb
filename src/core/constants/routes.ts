@@ -11,6 +11,7 @@ export const Routes = {
 	Discover: '/discover',
 	Articles: '/articles',
 	ArticlesGettingStarted: '/articles/getting-started-with-tiler',
+	Features: '/features',
 	Waitlist: '/waitlist',
 	SignIn: '/signin',
 	SignUp: '/signup',
@@ -19,8 +20,11 @@ export const Routes = {
 	Timeline: '/timeline',
 	Tileshare: {
 		root: '/tileshare',
+		list: '/tileshare/projects',
 		active: '/tileshare/inbox',
 		sent: '/tileshare/outbox',
+		activity: '/tileshare/activity',
+		invitations: '/tileshare/invitations',
 		// Pattern routes - call() for navigation, use .pattern for <Route path=...>
 		detail: Object.assign((id: string) => `/tileshare/${id}`, {
 			pattern: '/tileshare/:id',
