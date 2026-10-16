@@ -141,13 +141,19 @@ export class ChatApi extends AppApi {
 	public supplyClarification(
 		vibeRequestId: string,
 		stepId: string,
-		parameters: Record<string, string>
+		parameters: Record<string, string>,
+		context?: { clarificationId?: string; anonymousUserId?: string }
 	) {
 		return this.apiRequest<ChatExecuteActionResponse>(
 			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/SupplyClarification`,
 			{
 				method: 'POST',
-				body: JSON.stringify({ StepId: stepId, Parameters: parameters }),
+				body: JSON.stringify({
+					StepId: stepId,
+					Parameters: parameters,
+					ClarificationId: context?.clarificationId,
+					AnonymousUserId: context?.anonymousUserId,
+				}),
 			}
 		);
 	}

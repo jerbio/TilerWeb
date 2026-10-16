@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { chatService } from '@/services';
+import ServerError from '@/core/error/server';
 import Button from '@/core/common/components/button';
 
 interface MissingParameter {
@@ -9,18 +10,24 @@ interface MissingParameter {
 	description: string;
 	isRequired: boolean;
 	suggestedValues?: string[];
+	inputType?: 'text' | 'date' | 'number';
+	choices?: Array<{ label: string; value: string }>;
 }
 
 interface ClarificationData {
 	stepId: string;
+	clarificationId?: string;
 	providerMessage: string;
 	missingParameters: MissingParameter[];
 }
 
 interface ClarificationPromptProps {
 	vibeRequestId: string;
+	anonymousUserId?: string;
 	clarification: ClarificationData;
 	onResolved: () => void;
+	onSubmitted?: () => void;
+	onProcessingChange?: (processing: boolean) => void;
 }
 
 const Container = styled.div`
@@ -103,11 +110,15 @@ type PromptState = 'ready' | 'submitting' | 'resolved' | 'dismissed' | 'error';
 
 const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 	vibeRequestId,
+	anonymousUserId,
 	clarification,
 	onResolved,
+	onSubmitted,
+	onProcessingChange,
 }) => {
 	const { t } = useTranslation();
 	const [state, setState] = useState<PromptState>('ready');
+	const [submissionError, setSubmissionError] = useState<string | null>(null);
 	const [values, setValues] = useState<Record<string, string>>(() => {
 		const initial: Record<string, string> = {};
 		clarification.missingParameters.forEach((p) => {
@@ -121,13 +132,49 @@ const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 	};
 
 	const handleSubmit = async () => {
+		setSubmissionError(null);
 		setState('submitting');
+		onProcessingChange?.(true);
 		try {
-			await chatService.supplyClarification(vibeRequestId, clarification.stepId, values);
+			if (clarification.clarificationId || anonymousUserId) {
+				await chatService.supplyClarification(vibeRequestId, clarification.stepId, values, {
+					clarificationId: clarification.clarificationId,
+					anonymousUserId,
+				});
+			} else {
+				await chatService.supplyClarification(vibeRequestId, clarification.stepId, values);
+			}
 			setState('resolved');
 			onResolved();
-		} catch {
+			onSubmitted?.();
+		} catch (error) {
+			// Only a recognized pre-resume rejection establishes that execution did not
+			// start. Network failures and unknown errors still require reconciliation.
+			const details =
+				error instanceof ServerError &&
+				error.status === 400 &&
+				error.details &&
+				typeof error.details === 'object'
+					? (error.details as Record<string, unknown>)
+					: undefined;
+			const code = details?.Code ?? details?.code;
+			const message = details?.Message ?? details?.message;
+			const knownRejection =
+				code === 'ClarificationAnswerRejected' || code === 'ClarificationQuestionChanged';
+			setSubmissionError(
+				knownRejection &&
+					typeof message === 'string' &&
+					message.length > 0 &&
+					message.length <= 600
+					? message
+					: t(
+							'home.expanded.chat.clarification.submitFailed',
+							'Unable to confirm the result. Your answer is retained. Refresh to check the current status before retrying.'
+						)
+			);
 			setState('ready');
+		} finally {
+			onProcessingChange?.(false);
 		}
 	};
 
@@ -159,14 +206,18 @@ const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 	return (
 		<Container>
 			<ProviderMessage>{clarification.providerMessage}</ProviderMessage>
+			{submissionError && <ProviderMessage role="alert">{submissionError}</ProviderMessage>}
 			{clarification.missingParameters.map((param) => (
 				<FieldGroup key={param.parameterName}>
-					<FieldLabel>
+					<FieldLabel
+						htmlFor={`${clarification.clarificationId ?? clarification.stepId}-${param.parameterName}`}
+					>
 						{param.description || param.parameterName}
 						{param.isRequired && <RequiredMark>*</RequiredMark>}
 					</FieldLabel>
-					{param.suggestedValues && param.suggestedValues.length > 0 ? (
+					{param.choices?.length || param.suggestedValues?.length ? (
 						<FieldSelect
+							id={`${clarification.clarificationId ?? clarification.stepId}-${param.parameterName}`}
 							value={values[param.parameterName] || ''}
 							onChange={(e) => handleChange(param.parameterName, e.target.value)}
 							disabled={state === 'submitting'}
@@ -174,15 +225,20 @@ const ClarificationPrompt: React.FC<ClarificationPromptProps> = ({
 							<option value="">
 								{t('home.expanded.chat.clarification.selectOption', 'Select...')}
 							</option>
-							{param.suggestedValues.map((sv) => (
-								<option key={sv} value={sv}>
-									{sv}
+							{(
+								param.choices ??
+								param.suggestedValues?.map((value) => ({ label: value, value })) ??
+								[]
+							).map((choice) => (
+								<option key={choice.value} value={choice.value}>
+									{choice.label}
 								</option>
 							))}
 						</FieldSelect>
 					) : (
 						<FieldInput
-							type="text"
+							id={`${clarification.clarificationId ?? clarification.stepId}-${param.parameterName}`}
+							type={param.inputType ?? 'text'}
 							placeholder={param.description || param.parameterName}
 							value={values[param.parameterName] || ''}
 							onChange={(e) => handleChange(param.parameterName, e.target.value)}

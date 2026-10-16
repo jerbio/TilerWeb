@@ -138,6 +138,25 @@ export type ChatVibeRequestResponse = ApiResponse<{
 
 export type ChatMessagesResponse = ApiResponse<{
 	chats: PromptWithActions[];
+	researchFailure?: { vibeRequestId: string; planId: string; message: string } | null;
+	pendingResearch?: Array<
+		| { kind: 'selection'; vibeRequestId: string }
+		| {
+				kind: 'clarification';
+				vibeRequestId: string;
+				clarification: {
+					stepId: string;
+					clarificationId?: string;
+					providerMessage: string;
+					missingParameters: Array<{
+						parameterName: string;
+						description: string;
+						isRequired: boolean;
+						suggestedValues?: string[];
+					}>;
+				};
+		  }
+	>;
 	// Plan §6.5.2 — backend embeds VibeRequests (with `preview`/`previews`
 	// hydrated) referenced by the prompts in this page so the frontend can
 	// prime simulation state without a per-request fan-out fetch.

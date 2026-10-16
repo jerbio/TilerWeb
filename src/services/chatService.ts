@@ -262,13 +262,15 @@ class ChatService {
 	async supplyClarification(
 		vibeRequestId: string,
 		stepId: string,
-		parameters: Record<string, string>
+		parameters: Record<string, string>,
+		context?: { clarificationId?: string; anonymousUserId?: string }
 	) {
 		try {
 			const response = await this.chatApi.supplyClarification(
 				vibeRequestId,
 				stepId,
-				parameters
+				parameters,
+				context
 			);
 			return response;
 		} catch (error) {

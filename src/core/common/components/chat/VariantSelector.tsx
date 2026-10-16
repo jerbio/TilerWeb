@@ -8,6 +8,7 @@ import Button from '@/core/common/components/button';
 interface VariantSelectorProps {
 	vibeRequestId: string;
 	onResolved: () => void;
+	onSubmitted?: () => void;
 }
 
 const Container = styled.div`
@@ -26,8 +27,9 @@ const CardsRow = styled.div`
 const Card = styled.div<{ $selected?: boolean }>`
 	flex: 1;
 	min-width: 200px;
-	border: 1px solid ${({ theme, $selected }) =>
-		$selected ? theme.colors.brand[400] : theme.colors.border.default};
+	border: 1px solid
+		${({ theme, $selected }) =>
+			$selected ? theme.colors.brand[400] : theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.medium};
 	padding: 1rem;
 	background: ${({ theme }) => theme.colors.background.card2};
@@ -68,7 +70,11 @@ const ResolvedMessage = styled.div`
 
 type SelectorState = 'loading' | 'ready' | 'applying' | 'resolved' | 'dismissed' | 'error';
 
-const VariantSelector: React.FC<VariantSelectorProps> = ({ vibeRequestId, onResolved }) => {
+const VariantSelector: React.FC<VariantSelectorProps> = ({
+	vibeRequestId,
+	onResolved,
+	onSubmitted,
+}) => {
 	const { t } = useTranslation();
 	const [previews, setPreviews] = useState<VariantPreview[]>([]);
 	const [state, setState] = useState<SelectorState>('loading');
@@ -88,7 +94,9 @@ const VariantSelector: React.FC<VariantSelectorProps> = ({ vibeRequestId, onReso
 			}
 		};
 		load();
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [vibeRequestId]);
 
 	const handleApply = async (preview: VariantPreview) => {
@@ -98,6 +106,7 @@ const VariantSelector: React.FC<VariantSelectorProps> = ({ vibeRequestId, onReso
 			await chatService.selectVariant(vibeRequestId, preview.id);
 			setState('resolved');
 			onResolved();
+			onSubmitted?.();
 		} catch {
 			setState('ready');
 			setSelectedId(null);
@@ -114,7 +123,9 @@ const VariantSelector: React.FC<VariantSelectorProps> = ({ vibeRequestId, onReso
 	}
 
 	if (state === 'dismissed') {
-		return <ResolvedMessage>{t('home.expanded.chat.variantSelector.dismissed')}</ResolvedMessage>;
+		return (
+			<ResolvedMessage>{t('home.expanded.chat.variantSelector.dismissed')}</ResolvedMessage>
+		);
 	}
 
 	if (state === 'loading') {
@@ -131,14 +142,16 @@ const VariantSelector: React.FC<VariantSelectorProps> = ({ vibeRequestId, onReso
 				{previews.map((preview, index) => {
 					const label = `Variant ${index + 1}`;
 					const actionDescriptions = preview.previewActions
-						?.map(pa => pa.action?.descriptions)
+						?.map((pa) => pa.action?.descriptions)
 						.filter(Boolean)
 						.join('; ');
 
 					return (
 						<Card key={preview.id} $selected={selectedId === preview.id}>
 							<CardTitle>{label}</CardTitle>
-							{actionDescriptions && <CardDescription>{actionDescriptions}</CardDescription>}
+							{actionDescriptions && (
+								<CardDescription>{actionDescriptions}</CardDescription>
+							)}
 							<Button
 								variant="primary"
 								onClick={() => handleApply(preview)}

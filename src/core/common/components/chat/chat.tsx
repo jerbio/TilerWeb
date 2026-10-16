@@ -350,8 +350,16 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<PromptWithActions[]>([]);
 	const [isSending, setIsSending] = useState(false);
+	const [resumingClarification, setResumingClarification] = useState<{
+		sessionId?: string;
+		requestId: string;
+		stepId: string;
+		clarificationId?: string;
+	} | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [sessionId, setSessionId] = useState<string>('');
+	const isResumingClarification =
+		resumingClarification !== null && resumingClarification.sessionId === sessionId;
 	const [isLoading, setIsLoading] = useState(false);
 	const [isBatchLoading, setIsBatchLoading] = useState(false);
 	const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
@@ -374,6 +382,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		vibeRequestId: string;
 		clarification: {
 			stepId: string;
+			clarificationId?: string;
 			providerMessage: string;
 			missingParameters: Array<{
 				parameterName: string;
@@ -1008,6 +1017,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 						if (requestId && research?.clarificationRequest) {
 							const cr = research.clarificationRequest as {
 								stepId: string;
+								clarificationId?: string;
 								providerMessage: string;
 								missingParameters: Array<{
 									parameterName: string;
@@ -1270,8 +1280,13 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		}
 	}, []);
 
+	const initialChatLoadRef = useRef(0);
 	const loadInitialChatMessages = useCallback(
 		async (sid?: string) => {
+			const loadVersion = ++initialChatLoadRef.current;
+			setClarificationSelection(null);
+			setVariantSelection(null);
+			setFailedResearchSteps([]);
 			setIsLoading(true);
 			setError(null);
 			setMessages([]);
@@ -1305,6 +1320,21 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					order: 'desc',
 					anonymousUserId: anonymousUserId || undefined,
 				});
+				if (loadVersion !== initialChatLoadRef.current) return;
+				if (data.Content.researchFailure) {
+					setFailedResearchSteps([data.Content.researchFailure.message]);
+				}
+				const pendingResearch = data.Content.pendingResearch ?? [];
+				const pendingClarification = pendingResearch.find(
+					(pending) => pending.kind === 'clarification'
+				);
+				if (pendingClarification?.kind === 'clarification') {
+					setClarificationSelection(pendingClarification);
+				}
+				const pendingSelection = pendingResearch.find(
+					(pending) => pending.kind === 'selection'
+				);
+				if (pendingSelection) setVariantSelection(pendingSelection);
 
 				const rawMessages = data.Content.chats || [];
 				// Plan §6.5.2 — hydrate the per-request cache from the
@@ -1839,14 +1869,27 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 				<div style={{ marginBottom: '0.25rem' }}></div>
 
 				<div>
-					{!inReview && isSending && (
-						<LoadingIndicator
-							message={webSocketStatus || t('home.expanded.chat.sendingRequest')}
-							wsStatus={wsStatusKey}
-							researchProgress={researchProgress}
-						/>
+					{!inReview && (isSending || isResumingClarification) && (
+						<div
+							role="status"
+							aria-label={t('home.expanded.chat.processing', 'Processing request')}
+						>
+							<LoadingIndicator
+								message={
+									webSocketStatus ||
+									(isResumingClarification
+										? t(
+												'home.expanded.chat.continuingResearch',
+												'Continuing research...'
+											)
+										: t('home.expanded.chat.sendingRequest'))
+								}
+								wsStatus={wsStatusKey}
+								researchProgress={researchProgress}
+							/>
+						</div>
 					)}
-					{!inReview && isSending && failedResearchSteps.length > 0 && (
+					{!inReview && failedResearchSteps.length > 0 && (
 						<div
 							data-testid="failed-research-steps"
 							style={{
@@ -1867,15 +1910,46 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 					)}
 					{variantSelection && (
 						<VariantSelector
+							key={variantSelection.vibeRequestId}
 							vibeRequestId={variantSelection.vibeRequestId}
 							onResolved={() => setVariantSelection(null)}
+							onSubmitted={() => void loadInitialChatMessages(sessionId)}
 						/>
 					)}
 					{clarificationSelection && (
 						<ClarificationPrompt
+							key={`${clarificationSelection.vibeRequestId}:${clarificationSelection.clarification.stepId}:${clarificationSelection.clarification.clarificationId ?? ''}`}
+							anonymousUserId={anonymousUserId}
 							vibeRequestId={clarificationSelection.vibeRequestId}
 							clarification={clarificationSelection.clarification}
 							onResolved={() => setClarificationSelection(null)}
+							onSubmitted={() => void loadInitialChatMessages(sessionId)}
+							onProcessingChange={(processing) => {
+								const requestId = clarificationSelection.vibeRequestId;
+								const stepId = clarificationSelection.clarification.stepId;
+								const clarificationId =
+									clarificationSelection.clarification.clarificationId;
+								if (processing) {
+									setWebSocketStatus(null);
+									setWsStatusKey(null);
+									setResearchProgress(null);
+									setResumingClarification({
+										sessionId,
+										requestId,
+										stepId,
+										clarificationId,
+									});
+								} else {
+									setResumingClarification((current) =>
+										current?.sessionId === sessionId &&
+										current.requestId === requestId &&
+										current.stepId === stepId &&
+										current.clarificationId === clarificationId
+											? null
+											: current
+									);
+								}
+							}}
 						/>
 					)}
 					{gateResolution && (

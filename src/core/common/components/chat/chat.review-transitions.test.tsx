@@ -146,6 +146,7 @@ const mockChatService = vi.hoisted(() => ({
 	sendMessage: vi.fn(),
 	getAutoSuggestions: vi.fn(async () => ({ suggestions: {}, isStale: false })),
 	refreshAutoSuggestions: vi.fn(async () => ({ suggestions: {}, isStale: false })),
+	supplyClarification: vi.fn(),
 }));
 
 // ---------------------------------------------------------------------------
@@ -366,6 +367,154 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('Chat review transitions', () => {
+	it.each(['success', 'failure'])(
+		'shows processing immediately during clarification and clears on %s',
+		async (outcome) => {
+			mockChatService.getMessages.mockResolvedValueOnce({
+				Content: {
+					chats: [MOCK_MESSAGE],
+					vibeRequests: [MOCK_VIBE_REQUEST],
+					pendingResearch: [
+						{
+							kind: 'clarification',
+							vibeRequestId: MOCK_REQUEST_ID,
+							clarification: {
+								stepId: 'origin',
+								providerMessage: 'Choose an airport',
+								missingParameters: [],
+							},
+						},
+					],
+				},
+			});
+			let resolveSubmission!: (value: unknown) => void;
+			let rejectSubmission!: (reason: Error) => void;
+			mockChatService.supplyClarification.mockReturnValueOnce(
+				new Promise((resolve, reject) => {
+					resolveSubmission = resolve;
+					rejectSubmission = reject;
+				})
+			);
+			renderChat();
+			await screen.findByText('Choose an airport');
+			fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+			expect(screen.getByRole('status', { name: 'Processing request' })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Submitting...' })).toBeDisabled();
+			await act(async () => {
+				if (outcome === 'success') resolveSubmission({ Content: {} });
+				else rejectSubmission(new Error('Request failed'));
+			});
+			await waitFor(() =>
+				expect(
+					screen.queryByRole('status', { name: 'Processing request' })
+				).not.toBeInTheDocument()
+			);
+			if (outcome === 'failure') expect(screen.getByRole('alert')).toBeInTheDocument();
+		}
+	);
+
+	it('shows the persisted research failure after reload without socket events', async () => {
+		mockChatService.getMessages.mockResolvedValue({
+			Content: {
+				chats: [MOCK_MESSAGE],
+				vibeRequests: [MOCK_VIBE_REQUEST],
+				pendingResearch: [],
+				researchFailure: {
+					vibeRequestId: MOCK_REQUEST_ID,
+					planId: 'plan-1',
+					message:
+						'Research stopped because a later step failed. Earlier findings may be incomplete.',
+				},
+			},
+		});
+		renderChat();
+		expect(
+			await screen.findByText(
+				'Research stopped because a later step failed. Earlier findings may be incomplete.'
+			)
+		).toBeInTheDocument();
+	});
+
+	it('restores a persisted question without sockets and submits to the owning request', async () => {
+		mockChatService.getMessages.mockResolvedValueOnce({
+			Content: {
+				chats: [MOCK_MESSAGE],
+				vibeRequests: [MOCK_VIBE_REQUEST],
+				pendingResearch: [
+					{
+						kind: 'clarification',
+						vibeRequestId: MOCK_REQUEST_ID,
+						clarification: {
+							stepId: 'dates',
+							clarificationId: 'question-1',
+							providerMessage: 'Choose your departure date',
+							missingParameters: [
+								{
+									parameterName: 'date',
+									description: 'Departure date',
+									isRequired: true,
+								},
+							],
+						},
+					},
+				],
+			},
+		});
+		mockChatService.supplyClarification.mockResolvedValue({ Content: {} });
+		renderChat();
+		expect(await screen.findByText('Choose your departure date')).toBeInTheDocument();
+		fireEvent.change(screen.getByPlaceholderText('Departure date'), {
+			target: { value: '2026-10-01' },
+		});
+		fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+		await waitFor(() =>
+			expect(mockChatService.supplyClarification).toHaveBeenCalledWith(
+				MOCK_REQUEST_ID,
+				'dates',
+				{ date: '2026-10-01' },
+				{ clarificationId: 'question-1', anonymousUserId: 'user-1' }
+			)
+		);
+		await waitFor(() => expect(mockChatService.getMessages).toHaveBeenCalledTimes(2));
+		expect(screen.queryByText('Choose your departure date')).not.toBeInTheDocument();
+	});
+
+	it('does not invent a question when the server reports no pending research', async () => {
+		renderChat();
+		await waitFor(() => expect(mockChatService.getMessages).toHaveBeenCalled());
+		expect(screen.queryByRole('button', { name: 'Submit' })).not.toBeInTheDocument();
+	});
+
+	it('restores the next question after submission instead of clearing the resumed gate', async () => {
+		const pendingResponse = (stepId: string) => ({
+			Content: {
+				chats: [MOCK_MESSAGE],
+				vibeRequests: [MOCK_VIBE_REQUEST],
+				pendingResearch: [
+					{
+						kind: 'clarification',
+						vibeRequestId: MOCK_REQUEST_ID,
+						clarification: {
+							stepId,
+							providerMessage: `Question ${stepId}`,
+							missingParameters: [],
+						},
+					},
+				],
+			},
+		});
+		mockChatService.getMessages
+			.mockResolvedValueOnce(pendingResponse('first'))
+			.mockResolvedValueOnce(pendingResponse('second'));
+		mockChatService.supplyClarification.mockResolvedValue({ Content: {} });
+		renderChat();
+		expect(await screen.findByText('Question first')).toBeInTheDocument();
+		fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+		expect(await screen.findByText('Question second')).toBeInTheDocument();
+		expect(screen.queryByText('Question first')).not.toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Submit' })).toBeEnabled();
+	});
+
 	// ── Apply now ────────────────────────────────────────────────────────────
 
 	describe('clicking "Apply now"', () => {
