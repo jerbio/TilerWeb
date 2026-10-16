@@ -81,6 +81,7 @@ export interface TileShareReview {
 		UpdatesNotes?: boolean;
 		PreviousNotes?: string | null;
 		Notes?: string | null;
+		ScheduleSummary?: string;
 	}[];
 	Operation?: TileShareOperation;
 	PreviousName?: string | null;
@@ -112,6 +113,7 @@ export interface TileShareExecutionResult {
 		Name: string;
 		Url: string;
 		State: string;
+		ErrorCode?: string | null;
 	}[];
 	Operation?: TileShareOperation | null;
 	State: 'Applied' | 'NotAttempted' | 'Rejected' | 'Unknown' | 'Pending' | 'Failed';

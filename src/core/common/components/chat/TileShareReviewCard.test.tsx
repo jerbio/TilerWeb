@@ -73,6 +73,81 @@ it('reviews each plan target and confirms the whole proposal once', async () => 
 	await act(async () => {});
 	expect(confirm).toHaveBeenCalledExactlyOnceWith('exact', expect.any(AbortSignal));
 });
+it('shows schedule effects on each target before one plan confirmation', () => {
+	render(
+		<ThemeProvider theme={darkTheme}>
+			<TileShareReviewCard
+				result={{
+					...result,
+					Operation: 'UpdatePlan',
+					Review: {
+						Name: 'Update work',
+						Operation: 'UpdatePlan',
+						Tilettes: [],
+						Items: [
+							{
+								ProjectId: 'p',
+								TiletteId: 't',
+								PreviousName: 'Report',
+								Name: 'Report',
+								UpdatesName: false,
+								UpdatesNotes: false,
+								ScheduleSummary:
+									'Duration: 60 minutes -> 90 minutes\nAccepted calendars to update: 2',
+							},
+						],
+					},
+				}}
+				onConfirm={vi.fn()}
+				onCheck={vi.fn()}
+				onChanged={vi.fn()}
+			/>
+		</ThemeProvider>
+	);
+	expect(screen.getByText(/Duration: 60 minutes -> 90 minutes/)).toBeVisible();
+	expect(screen.getAllByRole('button', { name: 'Confirm update' })).toHaveLength(1);
+});
+
+it.each(['Pending', 'Failed'] as const)(
+	'shows each %s plan target without offering a write retry',
+	(State) => {
+		const confirm = vi.fn();
+		render(
+			<ThemeProvider theme={darkTheme}>
+				<TileShareReviewCard
+					result={{
+						State,
+						ActionId: 'a',
+						Operation: 'UpdatePlan',
+						PlanTargets: [
+							{
+								ProjectId: 'p',
+								Name: 'Report',
+								Url: '/tileshare/p',
+								State: State === 'Pending' ? 'Pending' : 'NotAttempted',
+							},
+						],
+					}}
+					onConfirm={confirm}
+					onCheck={vi.fn()}
+					onChanged={vi.fn()}
+				/>
+			</ThemeProvider>
+		);
+		expect(screen.getByText(/Report/)).toBeVisible();
+		expect(
+			screen.getByText(
+				State === 'Pending' ? 'Waiting for combined calculation' : 'Not applied'
+			)
+		).toBeVisible();
+		expect(screen.queryByRole('button', { name: 'Confirm update' })).not.toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Check status' }) !== null).toBe(
+			State === 'Pending'
+		);
+		expect(confirm).not.toHaveBeenCalled();
+	}
+);
+
 it('shows a saved plan as updates with each target link', () => {
 	render(
 		<ThemeProvider theme={darkTheme}>

@@ -191,6 +191,27 @@ export default function TileShareReviewCard({
 			}
 		}
 	};
+	const planTargets =
+		isPlan && result.PlanTargets?.length ? (
+			<ul>
+				{result.PlanTargets.map((item, i) => (
+					<li key={i}>
+						{item.Name}
+						{item.State === 'Pending' && (
+							<small>
+								{t(
+									'chat.tileShare.planTargetPending',
+									'Waiting for combined calculation'
+								)}
+							</small>
+						)}
+						{item.State === 'NotAttempted' && (
+							<small>{t('chat.tileShare.planTargetNotApplied', 'Not applied')}</small>
+						)}
+					</li>
+				))}
+			</ul>
+		) : null;
 	if (result.State === 'Pending')
 		return (
 			<Card role="status">
@@ -201,6 +222,7 @@ export default function TileShareReviewCard({
 					)}
 				</p>
 				{notice && <p role="alert">{notice}</p>}
+				{planTargets}
 				<button type="button" disabled={busy} onClick={() => run(true)}>
 					{t('chat.tileShare.checkStatus', 'Check status')}
 				</button>
@@ -220,6 +242,7 @@ export default function TileShareReviewCard({
 								'No changes were applied. The schedule changed or calculation could not complete. Request a revised update.'
 							)}
 				</p>
+				{planTargets}
 			</Card>
 		);
 	if (result.State === 'Applied' && isPlan)
@@ -296,6 +319,9 @@ export default function TileShareReviewCard({
 									{item.PreviousName}
 									{item.UpdatesName ? ` → ${item.Name}` : ''}
 								</strong>
+								{item.ScheduleSummary && (
+									<NoteText>{item.ScheduleSummary}</NoteText>
+								)}
 								{item.UpdatesNotes && (
 									<>
 										<small>
