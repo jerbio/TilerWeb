@@ -28,6 +28,128 @@ describe('ChatApi', () => {
 		vi.restoreAllMocks();
 	});
 
+	it.each(['Pending', 'Failed'] as const)(
+		'consumes %s schedule outcomes without retrying mutations',
+		async (State) => {
+			const result = { State, ActionId: 'a', Operation: 'UpdateTilette', JobId: 'job' };
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify(
+						State === 'Pending'
+							? {
+									Error: { Code: '0' },
+									Content: { vibeRequest: { tileShareResult: result } },
+								}
+							: { Error: { Code: '409' }, Content: result }
+					),
+					{ status: State === 'Pending' ? 200 : 409 }
+				)
+			);
+			expect(await api.confirmTileShare('a', 'review')).toEqual(result);
+			expect(fetchSpy).toHaveBeenCalledTimes(1);
+		}
+	);
+	it('returns a matched definitive rejection from the standard 409 envelope', async () => {
+		const rejected = { State: 'Rejected', ActionId: 'a', ErrorCode: 'locked_work_conflict' };
+		fetchSpy.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					Error: { Code: '409', Message: 'Locked work conflict' },
+					Content: rejected,
+				}),
+				{ status: 409 }
+			)
+		);
+		expect(await api.confirmTileShare('a', 'exact')).toEqual(rejected);
+		expect(fetchSpy).toHaveBeenCalledTimes(1);
+	});
+	it('approves only the exact TileShare review and consumes standard conflicts without retry', async () => {
+		const updated = {
+			State: 'NotAttempted',
+			ActionId: 'a',
+			ReviewToken: 'new',
+			Review: { Name: 'Changed', Tilettes: [] },
+			ErrorCode: 'review_changed',
+		};
+		fetchSpy.mockResolvedValueOnce(
+			new Response(JSON.stringify({ Error: { Code: '409' }, Content: updated }), {
+				status: 409,
+			})
+		);
+		expect(await api.confirmTileShare('a', 'old')).toEqual(updated);
+		expect(fetchSpy).toHaveBeenCalledTimes(1);
+		expect(JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)).toEqual(
+			expect.objectContaining({ ActionId: 'a', TileShareReviewToken: 'old' })
+		);
+	});
+	it('rejects a successful envelope for a different TileShare action', async () => {
+		fetchSpy.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					Error: { Code: '0' },
+					Content: {
+						vibeRequest: { tileShareResult: { State: 'Applied', ActionId: 'other' } },
+					},
+				})
+			)
+		);
+		await expect(api.confirmTileShare('a', 'token')).rejects.toThrow();
+	});
+
+	it('confirms an exact directory selection using the standard envelope and cancellation signal', async () => {
+		const page = {
+			Kind: 'Contact',
+			ResultId: 'result',
+			Matches: [],
+			Selection: { Id: 'match' },
+			HasMore: false,
+		};
+		fetchSpy.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					Error: { Code: '0' },
+					Content: { ActionId: 'action', DirectorySearch: page },
+				})
+			)
+		);
+		const abort = new AbortController();
+		expect(await api.selectDirectoryMatch('action', 'result', 'match', abort.signal)).toEqual(
+			page
+		);
+		const [url, options] = fetchSpy.mock.calls[0];
+		expect(url).toContain('api/Vibe/Directory/Selection');
+		expect(options?.signal).toBe(abort.signal);
+		expect(JSON.parse(options?.body as string)).toEqual({
+			ActionId: 'action',
+			ResultId: 'result',
+			MatchId: 'match',
+		});
+	});
+
+	it.each(['error', 'mismatched'])(
+		'rejects a directory selection with an %s response',
+		async (failure) => {
+			fetchSpy.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({
+						Error: { Code: failure === 'error' ? '409' : '0' },
+						Content: {
+							ActionId: 'action',
+							DirectorySearch: { ResultId: 'result', Selection: { Id: 'wrong' } },
+						},
+					})
+				)
+			);
+			await expect(api.selectDirectoryMatch('action', 'result', 'match')).rejects.toThrow();
+		}
+	);
+
+	it('keeps project discovery and delegation orchestration out of the browser API', () => {
+		expect(api).not.toHaveProperty('getDelegationProjects');
+		expect(api).not.toHaveProperty('saveDelegationDraft');
+		expect(fetchSpy).not.toHaveBeenCalled();
+	});
+
 	it('builds base getMessages URL with SessionId', async () => {
 		fetchSpy.mockResolvedValueOnce(
 			new Response(JSON.stringify(mockMessagesResponse), { status: 200 })

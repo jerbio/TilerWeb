@@ -2076,11 +2076,16 @@
 			"statusLabel": "Statut :",
 			"status": {
 				"inProgress": "En cours",
+				"todo": "À faire",
 				"completed": "Terminé"
 			},
 			"view": {
 				"list": "Vue en liste de tuilettes",
-				"assignee": "Vue par assignataire"
+				"assignee": "Vue par assignataire",
+				"board": "Vue tableau"
+			},
+			"board": {
+				"empty": "Aucune tuilette ici pour le moment"
 			},
 			"viewAria": "Vue des tuilettes",
 			"openTiletteAria": "Ouvrir la tuilette",

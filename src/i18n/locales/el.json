@@ -2076,11 +2076,16 @@
 			"statusLabel": "Κατάσταση:",
 			"status": {
 				"inProgress": "Εν εξελίξει",
+				"todo": "TODO",
 				"completed": "Ολοκληρώθηκε"
 			},
 			"view": {
 				"list": "Οπτικοποίηση λίστας tilette",
-				"assignee": "Οπτικοποίηση αποδέκτη"
+				"assignee": "Οπτικοποίηση αποδέκτη",
+				"board": "Οπτικοποίηση πίνακα"
+			},
+			"board": {
+				"empty": "Δεν υπάρχουν ακόμη tilette εδώ"
 			},
 			"viewAria": "Οπτικοποίηση tilette",
 			"openTiletteAria": "Άνοιγμα tilette",

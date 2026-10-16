@@ -2076,11 +2076,16 @@
 			"statusLabel": "Stato:",
 			"status": {
 				"inProgress": "In corso",
+				"todo": "Da fare",
 				"completed": "Completato"
 			},
 			"view": {
 				"list": "Visualizzazione a elenco delle tilette",
-				"assignee": "Visualizzazione per assegnatario"
+				"assignee": "Visualizzazione per assegnatario",
+				"board": "Visualizzazione a tabella"
+			},
+			"board": {
+				"empty": "Ancora nessuna tilette qui"
 			},
 			"viewAria": "Visualizzazione tilette",
 			"openTiletteAria": "Apri tilette",

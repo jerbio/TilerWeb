@@ -2076,11 +2076,16 @@
 			"statusLabel": "状态：",
 			"status": {
 				"inProgress": "进行中",
+				"todo": "待办",
 				"completed": "已完成"
 			},
 			"view": {
 				"list": "Tilette 列表视图",
-				"assignee": "受让人视图"
+				"assignee": "受让人视图",
+				"board": "看板视图"
+			},
+			"board": {
+				"empty": "这里还没有 Tilette"
 			},
 			"viewAria": "Tilette 视图",
 			"openTiletteAria": "打开 Tilette",

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import ActionPill from './ActionPill';
+import { Actions } from '@/core/constants/enums';
 import {
 	SimulationActionDto,
 	SimulationDto,
@@ -65,7 +66,24 @@ const ActionPillStrip: React.FC<ActionPillStripProps> = ({
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
 
-	const visibleActions = actions.filter((a) => a.type !== CONVERSATIONAL_TYPE);
+	const visibleActions = actions.filter(
+		(a) =>
+			a.type !== CONVERSATIONAL_TYPE &&
+			a.type !== Actions.Directory_Search &&
+			a.type !== Actions.TileShare_Search_Projects &&
+			a.type !== Actions.TileShare_Get_Project &&
+			a.type !== Actions.TileShare_Get_Tilette &&
+			a.type !== Actions.TileShare_List_Recipients &&
+			a.type !== Actions.TileShare_Rename_Project &&
+			a.type !== Actions.TileShare_Delete_Tilette &&
+			a.type !== Actions.TileShare_Update_Project &&
+			a.type !== Actions.TileShare_Update_Plan &&
+			a.type !== Actions.TileShare_Update_Recipients &&
+			a.type !== Actions.TileShare_Update_Access &&
+			a.type !== Actions.TileShare_Update_Tilette &&
+			a.type !== Actions.TileShare_Set_Tilette_Notes &&
+			a.type !== Actions.TileShare_Rename_Tilette
+	);
 
 	if (visibleActions.length === 0) return null;
 

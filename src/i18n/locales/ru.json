@@ -2076,11 +2076,16 @@
 			"statusLabel": "Статус:",
 			"status": {
 				"inProgress": "В процессе",
+				"todo": "TODO",
 				"completed": "Завершено"
 			},
 			"view": {
 				"list": "Режим списка Tilette",
-				"assignee": "Режим по назначенным"
+				"assignee": "Режим по назначенным",
+				"board": "Режим доски"
+			},
+			"board": {
+				"empty": "Здесь пока нет Tilette"
 			},
 			"viewAria": "Режим Tilette",
 			"openTiletteAria": "Открыть Tilette",

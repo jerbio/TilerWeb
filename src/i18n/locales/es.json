@@ -2076,11 +2076,16 @@
 			"statusLabel": "Estado:",
 			"status": {
 				"inProgress": "En curso",
+				"todo": "Por hacer",
 				"completed": "Completado"
 			},
 			"view": {
 				"list": "Vista de lista de Tilettes",
-				"assignee": "Vista por asignado"
+				"assignee": "Vista por asignado",
+				"board": "Vista de panel"
+			},
+			"board": {
+				"empty": "Aún no hay Tilettes aquí"
 			},
 			"viewAria": "Vista de Tilette",
 			"openTiletteAria": "Abrir tilette",
@@ -2572,5 +2577,21 @@
 				]
 			}
 		}
-	}
+	},
+	"chat.tileShare.schedulePending": "Calculando los horarios del trabajo aceptado. Aún no se ha guardado ningún cambio.",
+	"chat.tileShare.scheduleNoFit": "No se ha aplicado ningún cambio. El trabajo restante no cabe entre las sesiones protegidas. Ajusta la duración o la fecha límite y solicita una actualización revisada.",
+	"chat.tileShare.scheduleFailed": "No se ha aplicado ningún cambio. El horario cambió o no se pudo completar el cálculo. Solicita una actualización revisada.",
+	"chat.tileShare.updateProject": "Actualizar proyecto",
+	"chat.tileShare.projectUpdateReview": "Revisar cambios del proyecto",
+	"chat.tileShare.projectUpdated": "Proyecto actualizado.",
+	"chat.tileShare.manageAccess": "Gestionar acceso al proyecto",
+	"chat.tileShare.manageRecipients": "Gestionar destinatarios",
+	"chat.tileShare.managementUpdated": "Cambios de destinatarios o acceso guardados.",
+	"chat.tileShare.managementNote": "Revisa los efectos sobre destinatarios y acceso. La suspensión y restauración del calendario se procesan en segundo plano.",
+	"chat.tileShare.accessReconciliation": "Acceso guardado. La suspensión o restauración del calendario se procesa en segundo plano.",
+	"chat.tileShare.planTargetPending": "Esperando el cálculo conjunto",
+	"chat.tileShare.planTargetNotApplied": "Sin aplicar",
+	"chat.tileShare.planReview": "Revisar plan de trabajo compartido",
+	"chat.tileShare.planUpdated": "Los cambios revisados se guardaron juntos.",
+	"chat.tileShare.planNote": "Todos los elementos mostrados se guardan juntos después de confirmar. Si algún elemento cambia o pierdes el acceso, revisa una nueva propuesta."
 }

@@ -2076,11 +2076,16 @@
 			"statusLabel": "ステータス:",
 			"status": {
 				"inProgress": "進行中",
+				"todo": "TODO",
 				"completed": "完了"
 			},
 			"view": {
 				"list": "Tiletteのリスト表示",
-				"assignee": "割り当て先表示"
+				"assignee": "割り当て先表示",
+				"board": "ボード表示"
+			},
+			"board": {
+				"empty": "まだ Tilette はありません"
 			},
 			"viewAria": "Tiletteビュー",
 			"openTiletteAria": "Tiletteを開く",

@@ -36,7 +36,8 @@ import React from 'react';
 
 import Chat from './chat';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
-import { SimulationState } from '@/core/common/types/chat';
+import { ChatSessionExecutionMode, SimulationState } from '@/core/common/types/chat';
+import { Actions, Status } from '@/core/constants/enums';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 
@@ -367,6 +368,87 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('Chat review transitions', () => {
+	it('sends both execution options and preserves directory and TileShare response cards', async () => {
+		const action = {
+			id: 'directory-1',
+			descriptions: 'Choose a recipient',
+			type: Actions.Directory_Search,
+			creationTimeInMs: 1,
+			status: Status.Pending,
+			beforeScheduleId: null,
+			afterScheduleId: null,
+			vibeRequest: MOCK_VIBE_REQUEST,
+		};
+		mockChatService.sendMessage.mockResolvedValueOnce({
+			Content: {
+				vibeResponse: {
+					prompts: {
+						response: {
+							...MOCK_MESSAGE,
+							id: 'msg-000000000000000002',
+							origin: 'model',
+							content: 'Review the shared work',
+							actions: [
+								{
+									...action,
+									directorySearch: {
+										Kind: 'Contact',
+										ResultId: 'search-1',
+										Matches: [{ Id: 'ada', Name: 'Ada', Revision: '1' }],
+										HasMore: false,
+									},
+								},
+								{
+									...action,
+									id: 'share-1',
+									type: Actions.Add_New_Project,
+									tileShareResult: {
+										State: 'NotAttempted',
+										ActionId: 'share-1',
+										ReviewToken: 'review-1',
+										Review: {
+											Name: 'Launch',
+											CreatesProject: true,
+											Tilettes: [],
+										},
+									},
+								},
+							],
+						},
+					},
+				},
+			},
+		});
+		renderChat();
+		await screen.findByText(MOCK_MESSAGE.content);
+		fireEvent.click(screen.getByRole('switch', { name: 'Deep thinking' }));
+		fireEvent.change(screen.getByRole('combobox', { name: 'Chat execution' }), {
+			target: { value: ChatSessionExecutionMode.AutoAct },
+		});
+		const textarea = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(textarea, { target: { value: 'Create shared work' } });
+		fireEvent.submit(textarea.closest('form')!);
+
+		await waitFor(() =>
+			expect(mockChatService.sendMessage).toHaveBeenCalledWith(
+				'Create shared work',
+				expect.any(String),
+				MOCK_SESSION_ID,
+				'user-1',
+				0,
+				0,
+				false,
+				'',
+				'',
+				true,
+				ChatSessionExecutionMode.AutoAct
+			)
+		);
+		expect(await screen.findByRole('button', { name: 'Ada' })).toBeEnabled();
+		expect(screen.getByRole('button', { name: 'Confirm creation' })).toBeEnabled();
+		expect(screen.queryByText('home.expanded.chat.acceptChanges')).not.toBeInTheDocument();
+	});
+
 	it.each(['success', 'failure'])(
 		'shows processing immediately during clarification and clears on %s',
 		async (outcome) => {

@@ -1,10 +1,10 @@
 {
 	"tileshareActivity": {
 		"events": {
-			"comment_added": "댓글 추가됨",
-			"comment_replied": "댓글 답글 추가됨",
-			"comment_edited": "댓글 수정됨",
-			"comment_deleted": "댓글 삭제됨"
+			"comment_added": "댓글이 추가되었습니다",
+			"comment_replied": "댓글에 답글이 추가되었습니다",
+			"comment_edited": "댓글이 수정되었습니다",
+			"comment_deleted": "댓글이 삭제되었습니다"
 		},
 		"sentences": {
 			"comment_added": "<actor/>님이 <title/>에 댓글을 남겼습니다",
@@ -2076,11 +2076,16 @@
 			"statusLabel": "상태:",
 			"status": {
 				"inProgress": "진행 중",
+				"todo": "TODO",
 				"completed": "완료됨"
 			},
 			"view": {
 				"list": "Tilette 목록 보기",
-				"assignee": "담당자 보기"
+				"assignee": "담당자 보기",
+				"board": "보드 보기"
+			},
+			"board": {
+				"empty": "아직 Tilette가 없습니다"
 			},
 			"viewAria": "Tilette 보기",
 			"openTiletteAria": "Tilette 열기",

@@ -7,10 +7,10 @@
 			"comment_deleted": "Usunięto komentarz"
 		},
 		"sentences": {
-			"comment_added": "<actor/> dodaje komentarz do <title/>",
-			"comment_replied": "<actor/> odpowiada na komentarz do <title/>",
-			"comment_edited": "<actor/> edytuje komentarz do <title/>",
-			"comment_deleted": "<actor/> usuwa komentarz do <title/>"
+			"comment_added": "<actor/>: dodano komentarz do <title/>",
+			"comment_replied": "<actor/>: dodano odpowiedź na komentarz do <title/>",
+			"comment_edited": "<actor/>: edytowano komentarz do <title/>",
+			"comment_deleted": "<actor/>: usunięto komentarz do <title/>"
 		}
 	},
 	"common": {
@@ -2076,11 +2076,16 @@
 			"statusLabel": "Status:",
 			"status": {
 				"inProgress": "W toku",
+				"todo": "Do zrobienia",
 				"completed": "Ukończony"
 			},
 			"view": {
 				"list": "Widok listy Tilette",
-				"assignee": "Widok przypisanych"
+				"assignee": "Widok przypisanych",
+				"board": "Widok tablicy"
+			},
+			"board": {
+				"empty": "Tu jeszcze nie ma Tilette"
 			},
 			"viewAria": "Widok Tilette",
 			"openTiletteAria": "Otwórz Tilette",

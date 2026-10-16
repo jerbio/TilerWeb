@@ -3,6 +3,11 @@ import { UserInfo } from '@/global_state';
 import { ApiResponse, PaginationParams } from './api';
 import { SubCalendarEvent } from './schedule';
 
+export enum ChatSessionExecutionMode {
+	ConfirmFirst = 'ConfirmFirst',
+	AutoAct = 'AutoAct',
+}
+
 export type ActionType = `${Actions}`;
 
 export interface PromptWithActions {
@@ -17,7 +22,112 @@ export interface PromptWithActions {
 	thinkingMode?: string;
 }
 
+export interface DirectorySearchMatch {
+	Id: string;
+	Name: string;
+	Revision: string;
+	EmailHint?: string | null;
+	PhoneHint?: string | null;
+	TeamPath?: { Id: string; Name: string }[] | null;
+}
+
+export interface DelegationProjectChoice {
+	Id: string;
+	Name: string;
+	Revision: string;
+}
+export interface DelegationDraft {
+	Revision: string;
+	State: 'Draft' | 'Cancelled';
+	Project: DelegationProjectChoice;
+	RecipientKind: 'Contact' | 'Team';
+	Recipient: DirectorySearchMatch;
+	Title: string;
+	DurationInMs: number;
+	DurationWasDefaulted: boolean;
+	DeadlineInMs: number;
+	TimeZone: string;
+}
+export interface DirectorySearchPage {
+	Kind: 'Contact' | 'Team';
+	ResultId: string;
+	Matches: DirectorySearchMatch[];
+	Selection?: DirectorySearchMatch | null;
+	Draft?: DelegationDraft | null;
+	NextAfterId?: string | null;
+	HasMore: boolean;
+}
+
+export type TileShareOperation =
+	| 'CreateProject'
+	| 'CreateTilette'
+	| 'RenameProject'
+	| 'RenameTilette'
+	| 'UpdateTilette'
+	| 'UpdateProject'
+	| 'UpdatePlan'
+	| 'UpdateRecipients'
+	| 'UpdateAccess'
+	| 'SetTiletteNotes'
+	| 'DeleteTilette';
+
+export interface TileShareReview {
+	Items?: {
+		ProjectId: string;
+		TiletteId?: string | null;
+		ProjectName?: string;
+		PreviousName: string;
+		Name: string;
+		UpdatesName?: boolean;
+		UpdatesNotes?: boolean;
+		PreviousNotes?: string | null;
+		Notes?: string | null;
+		ScheduleSummary?: string;
+	}[];
+	Operation?: TileShareOperation;
+	PreviousName?: string | null;
+	AssignmentCount?: number;
+	LinkedCalendarCount?: number;
+	UpdatesName?: boolean;
+	UpdatesNotes?: boolean;
+	ScheduleSummary?: string;
+	EffectsSummary?: string;
+	PreviousNotes?: string | null;
+	Notes?: string | null;
+	Name: string;
+	CreatesProject?: boolean;
+	ProjectName?: string | null;
+	StartTime?: number | null;
+	Deadline?: number | null;
+	Tilettes: {
+		Name: string;
+		DurationMinutes: number;
+		StartTime?: number | null;
+		Deadline?: number | null;
+		Recipients: { name: string; email?: string; phone?: string }[];
+	}[];
+}
+export interface TileShareExecutionResult {
+	PlanTargets?: {
+		ProjectId: string;
+		TiletteId?: string | null;
+		Name: string;
+		Url: string;
+		State: string;
+		ErrorCode?: string | null;
+	}[];
+	Operation?: TileShareOperation | null;
+	State: 'Applied' | 'NotAttempted' | 'Rejected' | 'Unknown' | 'Pending' | 'Failed';
+	JobId?: string | null;
+	ActionId: string;
+	ReviewToken?: string | null;
+	Review?: TileShareReview | null;
+	ErrorCode?: string | null;
+	Url?: string | null;
+}
 export interface VibeAction {
+	tileShareResult?: TileShareExecutionResult;
+	directorySearch?: DirectorySearchPage;
 	id: string;
 	descriptions: string;
 	type: ActionType;
@@ -168,6 +278,7 @@ export interface ChatMessagesParams extends PaginationParams {
 }
 
 export type ChatMessageBody = {
+	ChatSessionExecutionMode?: ChatSessionExecutionMode;
 	EntityId: string;
 	SessionId?: string;
 	RequestId?: string;

@@ -2076,11 +2076,16 @@
 			"statusLabel": "Status:",
 			"status": {
 				"inProgress": "In Bearbeitung",
+				"todo": "Todo",
 				"completed": "Abgeschlossen"
 			},
 			"view": {
 				"list": "Listenansicht der Tilettes",
-				"assignee": "Ansicht nach Zuweisung"
+				"assignee": "Ansicht nach Zuweisung",
+				"board": "Boardansicht"
+			},
+			"board": {
+				"empty": "Noch keine Tilettes hier"
 			},
 			"viewAria": "Tilette-Ansicht",
 			"openTiletteAria": "Tilette öffnen",

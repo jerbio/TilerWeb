@@ -2076,11 +2076,16 @@
 			"statusLabel": "स्थिति:",
 			"status": {
 				"inProgress": "प्रगति पर",
+				"todo": "TODO",
 				"completed": "पूर्ण"
 			},
 			"view": {
 				"list": "Tilette सूची दृश्य",
-				"assignee": "जिम्मेदार दृश्य"
+				"assignee": "जिम्मेदार दृश्य",
+				"board": "बोर्ड दृश्य"
+			},
+			"board": {
+				"empty": "यहाँ अभी कोई Tilette नहीं है"
 			},
 			"viewAria": "Tilette दृश्य",
 			"openTiletteAria": "Tilette खोलें",

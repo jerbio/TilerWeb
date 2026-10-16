@@ -401,7 +401,13 @@ export default function TileShareActivityTimeline({
 									<S.Detail>
 										{item.metadata.changedFields
 											.filter((field) =>
-												['name', 'note', 'deadline'].includes(field)
+												[
+													'name',
+													'note',
+													'deadline',
+													'start',
+													'duration',
+												].includes(field)
 											)
 											.map((field) =>
 												t(
@@ -410,6 +416,8 @@ export default function TileShareActivityTimeline({
 														name: 'Name',
 														note: 'Note',
 														deadline: 'Deadline',
+														start: 'Start',
+														duration: 'Duration',
 													}[field] ?? ''
 												)
 											)
