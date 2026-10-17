@@ -3,14 +3,10 @@ import { HelpCircle, Play, Check, Trash2, Pencil } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import {
-	CalendarEvent,
 	CalendarSearchItem,
 	CalendarSearchSource,
 	CalendarSearchSourceStatus,
 } from '@/core/common/types/schedule';
-import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
-import { useTheme } from '@/core/theme/ThemeProvider';
-import colorUtil from '@/core/util/colors';
 import TimeUtil from '@/core/util/time';
 
 export type SearchResultsActionConfirming = {
@@ -21,32 +17,26 @@ export type SearchResultsActionConfirming = {
 export type SearchResultsProps = {
 	/** Current query string (used in the "not found" message). */
 	query: string;
-	// Legacy (single-source) visibility + data.
+	// Result visibility and batch state.
 	showResults: boolean;
 	showNotFound: boolean;
-	results: CalendarEvent[];
 	hasMore: boolean;
 	isLoadingMore: boolean;
 	// Shared action state.
-	actionLoading: Record<string, string>;
 	confirmingAction: SearchResultsActionConfirming | null;
 	isInteractionBlocked: boolean;
 	// Shared action callbacks.
-	onEdit: (event: CalendarEvent) => void;
 	onSetAsNow: (eventId: string) => void;
 	onMarkComplete: (eventId: string) => void;
 	onDelete: (eventId: string, item?: CalendarSearchItem) => void;
 	onConfirmAction: () => void;
 	onCancelConfirm: () => void;
 	onLoadMore: () => void;
-	// Multi-source (Phase 4) visibility + data.
-	isMultiSource: boolean;
-	showMsResults: boolean;
-	showMsUnavailable: boolean;
-	showMsNotFound: boolean;
+	// Source-aware result data.
+	showUnavailable: boolean;
 	msItems: CalendarSearchItem[];
 	msSources: CalendarSearchSourceStatus[];
-	searchUnavailable: CalendarSearchUnavailableError | null;
+	searchUnavailable: Error | null;
 	// Multi-source callbacks.
 	onMultiSourceEdit: (item: CalendarSearchItem) => void;
 	onRetrySearch: () => void;
@@ -68,30 +58,24 @@ const sourceLabelKey = (source: string): string => {
 
 /**
  * Presentation-only rendering of the search results dropdown(s) for the
- * timeline search bar: legacy single-source rows, multi-source rows,
+ * timeline search bar: source-aware rows, batching,
  * partial-failure / unavailable prompts and the "not found" prompt.
  */
 export const SearchResults: React.FC<SearchResultsProps> = ({
 	query,
 	showResults,
 	showNotFound,
-	results,
 	hasMore,
 	isLoadingMore,
-	actionLoading,
 	confirmingAction,
 	isInteractionBlocked,
-	onEdit,
 	onSetAsNow,
 	onMarkComplete,
 	onDelete,
 	onConfirmAction,
 	onCancelConfirm,
 	onLoadMore,
-	isMultiSource,
-	showMsResults,
-	showMsUnavailable,
-	showMsNotFound,
+	showUnavailable,
 	msItems,
 	msSources,
 	searchUnavailable,
@@ -101,7 +85,6 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 	onCreate,
 }) => {
 	const { t } = useTranslation();
-	const { isDarkMode } = useTheme();
 
 	// Multi-source (Phase 4) derived state.
 	const msHasPartialFailure = msSources.some(
@@ -116,149 +99,14 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 		<>
 			{showResults && (
 				<ResultsDropdown data-testid="search-results-dropdown">
-					{results.map((event) => {
-						const rgb = {
-							r: event.colorRed ?? 0,
-							g: event.colorGreen ?? 0,
-							b: event.colorBlue ?? 0,
-						};
-						const adjusted = isDarkMode ? colorUtil.setLightness(rgb, 0.6) : rgb;
-						const eventId = event.id ?? '';
-						const itemAction = actionLoading[eventId];
-						const isConfirming = confirmingAction?.eventId === eventId;
-						return (
-							<ResultItem key={event.id} data-testid="search-result-item">
-								<ColorDot
-									data-testid="result-color-dot"
-									$r={adjusted.r}
-									$g={adjusted.g}
-									$b={adjusted.b}
-									$isBlock={!!event.isRigid}
-								/>
-								<ResultName>{event.name}</ResultName>
-								<ResultTime>{TimeUtil.relativeTime(event.start ?? 0)}</ResultTime>
-								{isConfirming ? (
-									<ConfirmInline data-testid="confirm-inline">
-										<ConfirmText>
-											{confirmingAction.action === 'complete'
-												? t('timeline.confirmCompleteTitle')
-												: t('timeline.confirmDeleteTitle')}
-										</ConfirmText>
-										<ConfirmButton
-											data-testid="confirm-yes"
-											onClick={(e) => {
-												e.stopPropagation();
-												onConfirmAction();
-											}}
-											$danger={confirmingAction.action === 'delete'}
-											$success={confirmingAction.action === 'complete'}
-										>
-											{t('timeline.confirmAction')}
-										</ConfirmButton>
-										<ConfirmButton
-											data-testid="confirm-cancel"
-											onClick={(e) => {
-												e.stopPropagation();
-												onCancelConfirm();
-											}}
-										>
-											{t('timeline.cancelAction')}
-										</ConfirmButton>
-									</ConfirmInline>
-								) : (
-									<ResultActions data-testid="result-actions">
-										<ActionButton
-											data-testid="action-edit"
-											title={t('timeline.editEvent')}
-											onClick={(e) => {
-												e.stopPropagation();
-												onEdit(event);
-											}}
-											disabled={isInteractionBlocked}
-										>
-											<Pencil size={12} />
-										</ActionButton>
-										<ActionButton
-											data-testid="action-set-as-now"
-											title={t('timeline.setAsNow')}
-											onClick={(e) => {
-												e.stopPropagation();
-												onSetAsNow(eventId);
-											}}
-											disabled={isInteractionBlocked}
-										>
-											{itemAction === 'now' ? (
-												<ActionSpinner />
-											) : (
-												<Play size={12} />
-											)}
-										</ActionButton>
-										<ActionButton
-											data-testid="action-mark-complete"
-											title={t('timeline.markComplete')}
-											onClick={(e) => {
-												e.stopPropagation();
-												onMarkComplete(eventId);
-											}}
-											disabled={isInteractionBlocked}
-										>
-											{itemAction === 'complete' ? (
-												<ActionSpinner />
-											) : (
-												<Check size={12} />
-											)}
-										</ActionButton>
-										<ActionButton
-											data-testid="action-delete"
-											title={t('timeline.markDeleted')}
-											onClick={(e) => {
-												e.stopPropagation();
-												onDelete(eventId);
-											}}
-											disabled={isInteractionBlocked}
-											$danger
-										>
-											{itemAction === 'delete' ? (
-												<ActionSpinner />
-											) : (
-												<Trash2 size={12} />
-											)}
-										</ActionButton>
-									</ResultActions>
-								)}
-							</ResultItem>
-						);
-					})}
-					{hasMore && (
-						<LoadMoreButton
-							data-testid="load-more-button"
-							onClick={onLoadMore}
-							disabled={isLoadingMore || isInteractionBlocked}
-						>
-							{isLoadingMore ? t('timeline.loading') : t('timeline.loadMore')}
-						</LoadMoreButton>
+					{showUnavailable && (
+						<PartialWarning data-testid="search-unavailable">
+							<PartialWarningText>{searchUnavailable?.message}</PartialWarningText>
+							<RetryButton onClick={onRetrySearch}>
+								{t('timeline.multiSource.retrySearch')}
+							</RetryButton>
+						</PartialWarning>
 					)}
-				</ResultsDropdown>
-			)}
-
-			{showNotFound && (
-				<NotFoundPrompt data-testid="search-not-found">
-					<NotFoundIcon>
-						<HelpCircle size={24} />
-					</NotFoundIcon>
-					<NotFoundText>{t('timeline.notFoundMessage', { query })}</NotFoundText>
-					<NotFoundActions>
-						<DismissButton onClick={onDismissNotFound}>
-							{t('timeline.notFoundDismiss')}
-						</DismissButton>
-						<CreateButton onClick={onCreate}>
-							{t('timeline.notFoundCreate')}
-						</CreateButton>
-					</NotFoundActions>
-				</NotFoundPrompt>
-			)}
-			{isMultiSource && showMsResults && (
-				<ResultsDropdown data-testid="search-results-dropdown">
 					{msHasPartialFailure && (
 						<PartialWarning data-testid="partial-warning">
 							<PartialWarningText>
@@ -272,7 +120,15 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 						</PartialWarning>
 					)}
 					{msItems.map((item) => (
-						<MultiSourceRow key={item.id} data-testid="search-result-item">
+						<MultiSourceRow
+							key={JSON.stringify([
+								item.source,
+								item.thirdPartyUserId,
+								item.thirdPartyEventId ?? item.id,
+								item.start,
+							])}
+							data-testid="search-result-item"
+						>
 							<MultiSourceRowLine>
 								<ResultName>{item.name}</ResultName>
 								<SourceBadge data-testid="source-badge">
@@ -388,18 +244,30 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 							</MultiSourceRowLine>
 						</MultiSourceRow>
 					))}
+					{hasMore && (
+						<LoadMoreButton
+							data-testid="load-more-button"
+							onClick={onLoadMore}
+							disabled={isLoadingMore || isInteractionBlocked}
+						>
+							{isLoadingMore ? t('timeline.loading') : t('timeline.loadMore')}
+						</LoadMoreButton>
+					)}
 				</ResultsDropdown>
 			)}
 
-			{isMultiSource && showMsUnavailable && (
+			{showUnavailable && !showResults && (
 				<UnavailablePrompt data-testid="search-unavailable">
 					<NotFoundText>
 						{searchUnavailable?.message || t('timeline.multiSource.unavailable')}
 					</NotFoundText>
+					<RetryButton onClick={onRetrySearch}>
+						{t('timeline.multiSource.retrySearch')}
+					</RetryButton>
 				</UnavailablePrompt>
 			)}
 
-			{isMultiSource && showMsNotFound && (
+			{showNotFound && (
 				<NotFoundPrompt data-testid="search-not-found">
 					<NotFoundIcon>
 						<HelpCircle size={24} />
@@ -434,24 +302,6 @@ const ResultsDropdown = styled.div`
 	overflow-y: auto;
 `;
 
-const ResultItem = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 10px 12px;
-	cursor: pointer;
-	color: ${({ theme }) => theme.colors.text.primary};
-	transition: background 0.1s ease;
-
-	&:hover {
-		background: ${({ theme }) => theme.colors.background.card2};
-	}
-
-	&:not(:last-child) {
-		border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
-	}
-`;
-
 const MultiSourceRow = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -482,15 +332,6 @@ const MsTrailing = styled.div`
 	align-items: center;
 	margin-left: auto;
 	flex-shrink: 0;
-`;
-
-const ColorDot = styled.span<{ $r: number; $g: number; $b: number; $isBlock: boolean }>`
-	width: 10px;
-	height: 10px;
-	border-radius: ${({ $isBlock }) => ($isBlock ? '3px' : '50%')};
-	flex-shrink: 0;
-	background-color: ${({ $r, $g, $b }) => `rgb(${$r}, ${$g}, ${$b})`};
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 `;
 
 const ResultName = styled.span`
@@ -540,21 +381,6 @@ const ActionButton = styled.button<{ $danger?: boolean }>`
 	&:disabled {
 		cursor: default;
 		opacity: 0.5;
-	}
-`;
-
-const ActionSpinner = styled.div`
-	width: 10px;
-	height: 10px;
-	border: 1.5px solid ${({ theme }) => theme.colors.border.default};
-	border-top-color: ${({ theme }) => theme.colors.text.secondary};
-	border-radius: 50%;
-	animation: action-spin 0.6s linear infinite;
-
-	@keyframes action-spin {
-		to {
-			transform: rotate(360deg);
-		}
 	}
 `;
 

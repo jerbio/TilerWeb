@@ -455,21 +455,9 @@ export type CalendarEventResponse = ApiResponse<CalendarEvent>;
 
 export type SubEventsOfCalendarResponse = ApiResponse<SubCalendarEvent[]>;
 
-/** Params for `GET /api/CalendarEvent/Name` — search tiles by name */
-export type CalendarEventSearchParams = {
-	data: string;
-	userName: string;
-	userId: string;
-	batchSize?: number;
-	index?: number;
-};
-
-/** Response shape for `GET /api/CalendarEvent/Name` */
-export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
-
 // ── Multi-source calendar event search (Phase 4) ─────────────────
 /**
- * Source vocabulary for the non-paginated `GET /api/CalendarEvent/Search`
+ * Source vocabulary for `GET /api/CalendarEvent/Search`
  * endpoint. Mirrors the server's `getDispatchCalendarType()` casing.
  */
 export enum CalendarSearchSource {
@@ -528,12 +516,18 @@ export type CalendarSearchItem = {
 
 /**
  * The canonical search envelope: top-level `items`, `sources`, `correlationId`.
- * Served as the standard PostBack wrapper's `Content`. NOT paginated.
+ * Served as the standard PostBack wrapper's `Content`, with merged-result batch metadata.
  */
 export type CalendarSearchEnvelope = {
 	items: CalendarSearchItem[];
 	sources: CalendarSearchSourceStatus[];
 	correlationId: string;
+	/** Batch metadata is optional for compatibility with older API deployments. */
+	index?: number;
+	batchSize?: number;
+	totalCount?: number;
+	hasMore?: boolean;
+	nextIndex?: number | null;
 };
 
 /** One failed third-party provider in a total-failure (502) body. */
@@ -568,6 +562,13 @@ export type CalendarSearchParams = {
 	query: string;
 	/** Restrict to specific sources; omitted to search all connected sources. */
 	sources?: CalendarSearchSource[];
+	/** Result count (1–150, server default 50) and zero-based merged-result offset. */
+	batchSize?: number;
+	index?: number;
+	/** UTC epoch milliseconds; supply both. Matches events overlapping [start, end). */
+	start?: number;
+	end?: number;
+	orderMode?: 'relevance' | 'providerorder';
 };
 
 /** Params for `POST /api/CalendarEvent/Update` */

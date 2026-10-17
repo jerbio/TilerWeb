@@ -18,7 +18,6 @@ import {
 	CalendarRequestType,
 } from '@/core/common/components/calendar/calendarRequestContext';
 import { Actions } from '@/core/constants/enums';
-import { useFlag } from '@/hooks/useFlag';
 import { getCalendarEventId } from '@/core/util/entityResolution';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
 import { SearchResults } from './search_results';
@@ -32,6 +31,9 @@ export type SearchBarProps = {
 	debounceMs?: number;
 	/** Number of results per page (default: 10) */
 	pageSize?: number;
+	/** Optional UTC epoch-millisecond overlap window; supply both bounds. */
+	start?: number;
+	end?: number;
 };
 
 /** Map a multi-source search item to the shape the edit path / onResults expect. */
@@ -78,14 +80,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	onSearch,
 	debounceMs = 300,
 	pageSize = 10,
+	start,
+	end,
 }) => {
 	const { t } = useTranslation();
 	const [query, setQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-	const [results, setResults] = useState<CalendarEvent[]>([]);
 	const [hasSearched, setHasSearched] = useState(false);
 	const [showDropdown, setShowDropdown] = useState(false);
-	const [currentPage, setCurrentPage] = useState(0);
+	const [nextIndex, setNextIndex] = useState<number | null>(null);
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [actionLoading, setActionLoading] = useState<Record<string, string>>({});
@@ -97,11 +100,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const [confirmingItem, setConfirmingItem] = useState<CalendarSearchItem | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const searchSeqRef = useRef(0);
-	const isMultiSource = useFlag('calendarSearchMultiSource');
+	const invalidateSearch = useCallback(() => {
+		searchSeqRef.current++;
+	}, []);
+	const loadingMoreRef = useRef(false);
 	const [msItems, setMsItems] = useState<CalendarSearchItem[]>([]);
 	const [msSources, setMsSources] = useState<CalendarSearchSourceStatus[]>([]);
-	const [searchUnavailable, setSearchUnavailable] =
-		useState<CalendarSearchUnavailableError | null>(null);
+	const [searchUnavailable, setSearchUnavailable] = useState<Error | null>(null);
 	const [correlationId, setCorrelationId] = useState<string | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
@@ -111,110 +116,90 @@ const SearchBar: React.FC<SearchBarProps> = ({
 	const updateNotification = useUiStore((s) => s.notification.update);
 
 	const performSearch = useCallback(
-		async (searchQuery: string) => {
-			if (!searchQuery.trim() || !authenticatedUser) {
-				setResults([]);
-				setHasSearched(false);
-				setShowDropdown(false);
-				setCurrentPage(0);
-				setHasMore(false);
-				onResults?.([]);
-				return;
-			}
-
-			setIsLoading(true);
-			try {
-				const searchResults = await scheduleService.searchCalendarEventsByName(
-					searchQuery,
-					authenticatedUser.username,
-					authenticatedUser.id,
-					{ batchSize: pageSize, index: 0 }
-				);
-				setResults(searchResults);
-				setHasSearched(true);
-				setShowDropdown(true);
-				setCurrentPage(0);
-				setHasMore(searchResults.length >= pageSize);
-				onResults?.(searchResults);
-			} catch (error) {
-				console.error('Search failed:', error);
-				setResults([]);
-				setHasSearched(true);
-				setShowDropdown(true);
-				setCurrentPage(0);
-				setHasMore(false);
-				onResults?.([]);
-			} finally {
-				setIsLoading(false);
-			}
-		},
-		[authenticatedUser, onResults, pageSize]
-	);
-
-	/**
-	 * Multi-source (Phase 4) search. Non-paginated. Uses a monotonically
-	 * increasing sequence token so stale / out-of-order responses are discarded
-	 * (S4-2) â€” a slow earlier query can never flash over a newer one.
-	 */
-	const performMultiSourceSearch = useCallback(
-		async (searchQuery: string) => {
+		async (searchQuery: string, index = 0, append = false) => {
+			const token = ++searchSeqRef.current;
 			if (!searchQuery.trim() || !authenticatedUser) {
 				setMsItems([]);
 				setMsSources([]);
 				setSearchUnavailable(null);
 				setHasSearched(false);
 				setShowDropdown(false);
+				setIsLoading(false);
+				setIsLoadingMore(false);
+				setHasMore(false);
+				setNextIndex(null);
+				loadingMoreRef.current = false;
 				onResults?.([]);
 				return;
 			}
-
-			const token = ++searchSeqRef.current;
-			setIsLoading(true);
+			if (append) {
+				loadingMoreRef.current = true;
+				setIsLoadingMore(true);
+			} else {
+				setIsLoading(true);
+				setIsLoadingMore(false);
+				loadingMoreRef.current = false;
+				setMsItems([]);
+				setMsSources([]);
+				setHasMore(false);
+				setNextIndex(null);
+				setHasSearched(false);
+				setShowDropdown(false);
+			}
 			setSearchUnavailable(null);
 			try {
-				const envelope = await scheduleService.searchCalendarEventsMultiSource(searchQuery);
-
-				// Stale / out-of-order response â€” discard silently.
+				const envelope = await scheduleService.searchCalendarEventsMultiSource(
+					searchQuery,
+					undefined,
+					{ batchSize: pageSize, index, start, end }
+				);
 				if (token !== searchSeqRef.current) return;
-
-				if (envelope === null) {
-					// Plain 404 (flag off server-side) â€” treat as no results.
-					setMsItems([]);
-					setMsSources([]);
-					setHasSearched(true);
-					setShowDropdown(true);
-					onResults?.([]);
-					return;
-				}
-
+				const combined = append ? [...msItems, ...envelope.items] : envelope.items;
+				const seen = new Set<string>();
+				const items = combined.filter((item) => {
+					const key = JSON.stringify([
+						item.source,
+						item.thirdPartyUserId,
+						item.thirdPartyEventId ?? item.id,
+						item.start,
+					]);
+					if (seen.has(key)) return false;
+					seen.add(key);
+					return true;
+				});
 				setCorrelationId(envelope.correlationId);
-				setMsItems(envelope.items);
+				setMsItems(items);
 				setMsSources(envelope.sources);
+				setHasMore(envelope.hasMore === true && envelope.nextIndex != null);
+				setNextIndex(envelope.nextIndex ?? null);
 				setHasSearched(true);
 				setShowDropdown(true);
-				onResults?.(envelope.items.map(searchItemToCalendarEvent));
+				onResults?.(items.map(searchItemToCalendarEvent));
 			} catch (error) {
-				if (token !== searchSeqRef.current) return; // stale â€” discard
-
+				if (token !== searchSeqRef.current) return;
 				if (error instanceof CalendarSearchUnavailableError) {
-					// Total failure (502) â€” typed unavailable state, never "no matches".
 					setCorrelationId(error.correlationId);
-					setMsItems([]);
-					setMsSources([]);
 					setSearchUnavailable(error);
 				} else {
-					console.error('Multi-source search failed:', error);
+					console.error('Calendar search failed:', error);
+					setSearchUnavailable(new Error(t('timeline.multiSource.unavailable')));
+				}
+				if (!append) {
 					setMsItems([]);
 					setMsSources([]);
+					onResults?.([]);
 				}
 				setHasSearched(true);
 				setShowDropdown(true);
-				onResults?.([]);
 			} finally {
-				if (token === searchSeqRef.current) setIsLoading(false);
+				if (token === searchSeqRef.current) {
+					setIsLoading(false);
+					setIsLoadingMore(false);
+					loadingMoreRef.current = false;
+				}
 			}
 		},
-		[authenticatedUser, onResults]
+		[authenticatedUser, onResults, pageSize, start, end, msItems, t]
 	);
 
 	/**
@@ -248,6 +233,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				// edit panel, which still receives the third-party fields.
 				openEditTile(searchItemToCalendarEvent(item));
 			}
+			invalidateSearch();
+			loadingMoreRef.current = false;
+			setIsLoading(false);
+			setIsLoadingMore(false);
 			setShowDropdown(false);
 			if (typeof window !== 'undefined') {
 				window.dispatchEvent(
@@ -261,71 +250,92 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				);
 			}
 		},
-		[dispatchCalendarRequest, openEditTile, correlationId]
+		[dispatchCalendarRequest, openEditTile, correlationId, invalidateSearch]
 	);
 
-	const loadMore = useCallback(async () => {
-		if (!query.trim() || !authenticatedUser || isLoadingMore) return;
+	const loadMore = useCallback(() => {
+		if (
+			!query.trim() ||
+			!authenticatedUser ||
+			isLoading ||
+			loadingMoreRef.current ||
+			!hasMore ||
+			nextIndex == null
+		)
+			return;
+		void performSearch(query, nextIndex, true);
+	}, [query, authenticatedUser, isLoading, hasMore, nextIndex, performSearch]);
 
-		const nextPage = currentPage + 1;
-		setIsLoadingMore(true);
-		try {
-			const moreResults = await scheduleService.searchCalendarEventsByName(
-				query,
-				authenticatedUser.username,
-				authenticatedUser.id,
-				{ batchSize: pageSize, index: nextPage * pageSize }
-			);
-			setResults((prev) => [...prev, ...moreResults]);
-			setCurrentPage(nextPage);
-			setHasMore(moreResults.length >= pageSize);
-			onResults?.([...results, ...moreResults]);
-		} catch (error) {
-			console.error('Load more failed:', error);
-		} finally {
-			setIsLoadingMore(false);
-		}
-	}, [query, authenticatedUser, currentPage, isLoadingMore, pageSize, onResults, results]);
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setQuery(value);
-		onSearch?.(value);
-
-		// Debounce the API search
-		if (debounceRef.current) {
-			clearTimeout(debounceRef.current);
-		}
-		debounceRef.current = setTimeout(() => {
-			if (isMultiSource) {
-				performMultiSourceSearch(value);
-			} else {
-				performSearch(value);
-			}
-		}, debounceMs);
-	};
-
-	const handleClear = () => {
+	const resetSearch = useCallback(() => {
+		invalidateSearch();
+		loadingMoreRef.current = false;
+		if (debounceRef.current) clearTimeout(debounceRef.current);
 		setQuery('');
-		setResults([]);
-		setHasSearched(false);
-		setShowDropdown(false);
-		setCurrentPage(0);
-		setHasMore(false);
-		setActionLoading({});
-		setConfirmingAction(null);
-		// Reset multi-source (Phase 4) state and invalidate any in-flight search.
-		searchSeqRef.current++;
 		setMsItems([]);
 		setMsSources([]);
 		setSearchUnavailable(null);
 		setCorrelationId(null);
+		setHasSearched(false);
+		setShowDropdown(false);
+		setNextIndex(null);
+		setHasMore(false);
+		setIsLoading(false);
+		setIsLoadingMore(false);
 		onSearch?.('');
 		onResults?.([]);
-		if (debounceRef.current) {
-			clearTimeout(debounceRef.current);
-		}
+	}, [onSearch, onResults, invalidateSearch]);
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		// Invalidate immediately, including the debounce interval and whitespace queries.
+		invalidateSearch();
+		loadingMoreRef.current = false;
+		setIsLoading(false);
+		setIsLoadingMore(false);
+		setHasMore(false);
+		setNextIndex(null);
+		setShowDropdown(false);
+		setConfirmingAction(null);
+		setConfirmingItem(null);
+		setQuery(value);
+		onSearch?.(value);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => void performSearch(value), debounceMs);
 	};
+
+	const handleClear = () => {
+		resetSearch();
+		setActionLoading({});
+		setConfirmingAction(null);
+		setConfirmingItem(null);
+	};
+
+	// A new timeline, user or page size restarts the current query at the first batch.
+	// Keep the query/callback in refs so result updates never resubmit a search.
+	const queryRef = useRef(query);
+	queryRef.current = query;
+	const performSearchRef = useRef(performSearch);
+	performSearchRef.current = performSearch;
+	useEffect(() => {
+		invalidateSearch();
+		loadingMoreRef.current = false;
+		setIsLoading(false);
+		setIsLoadingMore(false);
+		setHasMore(false);
+		setNextIndex(null);
+		setShowDropdown(false);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		if (queryRef.current.trim()) {
+			debounceRef.current = setTimeout(
+				() => void performSearchRef.current(queryRef.current),
+				debounceMs
+			);
+		}
+		return () => {
+			invalidateSearch();
+			if (debounceRef.current) clearTimeout(debounceRef.current);
+		};
+	}, [start, end, pageSize, authenticatedUser?.id, debounceMs, invalidateSearch]);
 
 	const handleDismissNotFound = () => {
 		setShowDropdown(false);
@@ -343,14 +353,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			const notifId = notificationId(NotificationAction.SetAsNow, eventId);
 			showNotification(notifId, t('calendarEvent.notifications.settingAsNow'), 'loading');
 			// Dismiss search bar immediately â€” don't wait for the request
-			setQuery('');
-			setResults([]);
-			setHasSearched(false);
-			setShowDropdown(false);
-			setCurrentPage(0);
-			setHasMore(false);
-			onSearch?.('');
-			onResults?.([]);
+			resetSearch();
 			try {
 				await scheduleService.setCalendarEventAsNow(eventId);
 				updateNotification(
@@ -369,7 +372,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				});
 			}
 		},
-		[showNotification, updateNotification, t, onSearch, onResults]
+		[showNotification, updateNotification, t, resetSearch]
 	);
 
 	const handleMarkComplete = useCallback((eventId: string) => {
@@ -403,14 +406,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				: t('calendarEvent.notifications.deleteSuccess');
 		showNotification(notifId, loadingMsg, 'loading');
 		// Dismiss search bar immediately â€” don't wait for the request
-		setQuery('');
-		setResults([]);
-		setHasSearched(false);
-		setShowDropdown(false);
-		setCurrentPage(0);
-		setHasMore(false);
-		onSearch?.('');
-		onResults?.([]);
+		resetSearch();
 		try {
 			if (action === 'complete') {
 				await scheduleService.markCalendarEventComplete(eventId);
@@ -437,15 +433,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				return next;
 			});
 		}
-	}, [
-		confirmingAction,
-		confirmingItem,
-		showNotification,
-		updateNotification,
-		t,
-		onSearch,
-		onResults,
-	]);
+	}, [confirmingAction, confirmingItem, showNotification, updateNotification, t, resetSearch]);
 
 	const handleCancelConfirm = useCallback(() => {
 		setConfirmingAction(null);
@@ -467,22 +455,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [showDropdown]);
 
-	const showResults = !isMultiSource && showDropdown && hasSearched && results.length > 0;
-	const showNotFound = !isMultiSource && showDropdown && hasSearched && results.length === 0;
 	const isAnyActionInProgress = Object.keys(actionLoading).length > 0;
 	const isInteractionBlocked = isAnyActionInProgress || !!confirmingAction;
-
-	// Multi-source (Phase 4) derived state.
-	const showMsResults =
-		isMultiSource && showDropdown && hasSearched && msItems.length > 0 && !searchUnavailable;
-	const showMsUnavailable = isMultiSource && showDropdown && !!searchUnavailable;
-	const showMsNotFound =
-		isMultiSource &&
+	const hasPartialFailure = msSources.some(
+		(s) => s.status === 'partial' || s.status === 'failed'
+	);
+	const showResults = showDropdown && hasSearched && (msItems.length > 0 || hasPartialFailure);
+	const showUnavailable = showDropdown && !!searchUnavailable;
+	const showNotFound =
 		showDropdown &&
 		hasSearched &&
 		msItems.length === 0 &&
 		!searchUnavailable &&
-		!msSources.some((s) => s.status === 'partial' || s.status === 'failed');
+		!hasPartialFailure;
 
 	return (
 		<SearchContainer ref={containerRef}>
@@ -511,31 +496,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				query={query}
 				showResults={showResults}
 				showNotFound={showNotFound}
-				results={results}
 				hasMore={hasMore}
 				isLoadingMore={isLoadingMore}
-				actionLoading={actionLoading}
 				confirmingAction={confirmingAction}
 				isInteractionBlocked={isInteractionBlocked}
-				onEdit={(event) => {
-					openEditTile(event);
-					setShowDropdown(false);
-				}}
 				onSetAsNow={handleSetAsNow}
 				onMarkComplete={handleMarkComplete}
 				onDelete={handleDelete}
 				onConfirmAction={handleConfirmAction}
 				onCancelConfirm={handleCancelConfirm}
 				onLoadMore={loadMore}
-				isMultiSource={isMultiSource}
-				showMsResults={showMsResults}
-				showMsUnavailable={showMsUnavailable}
-				showMsNotFound={showMsNotFound}
+				showUnavailable={showUnavailable}
 				msItems={msItems}
 				msSources={msSources}
 				searchUnavailable={searchUnavailable}
 				onMultiSourceEdit={handleMultiSourceEdit}
-				onRetrySearch={() => performMultiSourceSearch(query)}
+				onRetrySearch={() => performSearch(query)}
 				onDismissNotFound={handleDismissNotFound}
 				onCreate={handleCreate}
 			/>

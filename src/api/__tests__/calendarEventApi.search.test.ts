@@ -124,6 +124,24 @@ describe('CalendarEventApi.searchCalendarEvents', () => {
 		expect(requestedUrl().searchParams.get('sources')).toBe('tiler,google');
 	});
 
+	it('serializes batch offset, size, ordering and UTC timeline including zero', async () => {
+		fetchSpy.mockResolvedValueOnce(mockOkResponse());
+		await api.searchCalendarEvents({
+			query: 'coffee',
+			batchSize: 10,
+			index: 0,
+			start: 0,
+			end: 86400000,
+			orderMode: 'providerorder',
+		});
+		const params = requestedUrl().searchParams;
+		expect(params.get('batchSize')).toBe('10');
+		expect(params.get('index')).toBe('0');
+		expect(params.get('start')).toBe('0');
+		expect(params.get('end')).toBe('86400000');
+		expect(params.get('orderMode')).toBe('providerorder');
+	});
+
 	it('passes the raw PostBack response through for service-layer handling', async () => {
 		const resp: ApiResponse<CalendarSearchEnvelope> = {
 			Error: { Code: '0', Message: 'OK' },

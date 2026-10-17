@@ -1,7 +1,5 @@
 ﻿import {
 	CalendarEventResponse,
-	CalendarEventSearchParams,
-	CalendarEventSearchResponse,
 	CalendarEventUpdateParams,
 	SubEventsOfCalendarResponse,
 	CalendarSearchParams,
@@ -80,41 +78,18 @@ export class CalendarEventApi extends AppApi {
 	}
 
 	/**
-	 * Search calendar events by name.
-	 * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
-	 */
-	public searchByName(params: CalendarEventSearchParams) {
-		const urlEntries: Record<string, string> = {
-			Data: params.data,
-			UserName: params.userName,
-			UserID: params.userId,
-			MobileApp: 'true',
-			Version: 'v2',
-		};
-
-		if (params.batchSize != null) {
-			urlEntries['batchSize'] = String(params.batchSize);
-		}
-		if (params.index != null) {
-			urlEntries['index'] = String(params.index);
-		}
-
-		const urlParams = new URLSearchParams(urlEntries).toString();
-
-		return this.apiRequest<CalendarEventSearchResponse>(`api/CalendarEvent/Name?${urlParams}`);
-	}
-
-	/**
 	 * Multi-source calendar event search.
 	 * `GET /api/CalendarEvent/Search?query=...&sources=...`
 	 *
-	 * NOT paginated. Returns the raw PostBack response (envelope under
+	 * Returns a merged result batch in the raw PostBack response (envelope under
 	 * `Content`) so the service layer can unwrap it and map typed errors.
-	 * Total failure surfaces as a `502`; a missing flag surfaces as a plain
-	 * `404` (no body).
+	 * Total source failure surfaces as a typed `502`.
 	 */
 	public searchCalendarEvents(params: CalendarSearchParams) {
 		const urlEntries: Record<string, string> = { query: params.query };
+		for (const key of ['batchSize', 'index', 'start', 'end', 'orderMode'] as const) {
+			if (params[key] != null) urlEntries[key] = String(params[key]);
+		}
 
 		if (params.sources && params.sources.length > 0) {
 			urlEntries['sources'] = params.sources.join(',');

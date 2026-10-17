@@ -13,6 +13,7 @@ import {
 	CalendarEventUpdateParams,
 	TilePredictionResponse,
 	CalendarSearchEnvelope,
+	CalendarSearchParams,
 	CalendarSearchSource,
 	CalendarSearchErrorBody,
 } from '@/core/common/types/schedule';
@@ -206,54 +207,27 @@ class ScheduleService {
 	}
 
 	/**
-	 * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
-	 * Returns an array of CalendarEvent matching the search query.
-	 */
-	async searchCalendarEventsByName(
-		query: string,
-		userName: string,
-		userId: string,
-		pagination?: { batchSize?: number; index?: number }
-	) {
-		try {
-			const response = await this.calendarEventApi.searchByName({
-				data: query,
-				userName,
-				userId,
-				...pagination,
-			});
-
-			return response.Content;
-		} catch (error) {
-			console.error('Error searching calendar events by name', error);
-			throw normalizeError(error);
-		}
-	}
-
-	/**
 	 * Multi-source calendar event search (Phase 4).
 	 * `GET /api/CalendarEvent/Search?query=...&sources=...`
 	 *
 	 * Unwraps the PostBack `Content` envelope. Total failure (HTTP 502) maps to
-	 * a typed `CalendarSearchUnavailableError`; a plain `404` (feature flag off /
-	 * no body) maps to `null`. Never collapses a 502 into an empty result set.
+	 * a typed `CalendarSearchUnavailableError`. Other HTTP failures propagate;
+	 * an unavailable GA endpoint must never look like a successful empty search.
 	 */
 	async searchCalendarEventsMultiSource(
 		query: string,
-		sources?: CalendarSearchSource[]
-	): Promise<CalendarSearchEnvelope | null> {
+		sources?: CalendarSearchSource[],
+		options?: Omit<CalendarSearchParams, 'query' | 'sources'>
+	): Promise<CalendarSearchEnvelope> {
 		try {
 			const response = await this.calendarEventApi.searchCalendarEvents({
 				query,
 				sources,
+				...options,
 			});
 			return response.Content;
 		} catch (error) {
 			if (error instanceof ServerError) {
-				// Plain 404 (flag off / missing) — no body — is not a failure.
-				if (error.status === 404) {
-					return null;
-				}
 				// Total source failure — typed body under `details`.
 				if (error.status === 502) {
 					throw new CalendarSearchUnavailableError(
