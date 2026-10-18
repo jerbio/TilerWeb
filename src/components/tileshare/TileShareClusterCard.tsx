@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, CalendarDays } from 'lucide-react';
-import { MultiTileshareIcon, SingleTileshareIcon } from '@/components/tileshare/icons';
+import TileShareModeIcon from './TileShareModeIcon';
 import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { useTheme as useAppTheme } from '@/core/theme/ThemeProvider';
 import { iconSurface } from '@/core/util/colorSurface';
@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
 import Button from '@/core/common/components/button';
-import { TileShareCluster, TileshareMode } from '@/core/common/types/tileshare';
+import { TileShareCluster } from '@/core/common/types/tileshare';
 import { tileshareMode } from '@/core/util/tileshareMode';
 import { Link } from 'react-router';
 import { Routes } from '@/core/constants/routes';
@@ -44,11 +44,7 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
 			<Left>
 				<IconBox $bg={surface.background} $fg={surface.foreground}>
-					{mode !== TileshareMode.Broadcast ? (
-						<MultiTileshareIcon size={18} />
-					) : (
-						<SingleTileshareIcon size={18} />
-					)}
+					<TileShareModeIcon mode={mode} size={22} />
 				</IconBox>
 				<TitleBlock>
 					<Title>{cluster.name ?? '—'}</Title>

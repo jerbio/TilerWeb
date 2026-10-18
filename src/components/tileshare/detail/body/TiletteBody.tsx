@@ -11,6 +11,7 @@ import TiletteListView from './TiletteListView';
 import AssigneeView from './AssigneeView';
 import StatusBoardView from './StatusBoardView';
 import TileShareTransition from '../../TileShareTransition';
+import TileShareModeIcon from '../../TileShareModeIcon';
 
 type TiletteBodyProps = {
 	mode?: TileshareMode | null;
@@ -115,10 +116,12 @@ const TiletteBody: React.FC<TiletteBodyProps> = ({ clusterId, tilettes, mode }) 
 						{
 							id: TileshareMode.Project,
 							label: t('tileShareModes.projectView', 'Project view'),
+							icon: <TileShareModeIcon mode={TileshareMode.Project} size={16} />,
 						},
 						{
 							id: TileshareMode.Class,
 							label: t('tileShareModes.classView', 'Class view'),
+							icon: <TileShareModeIcon mode={TileshareMode.Class} size={16} />,
 						},
 					]}
 				/>

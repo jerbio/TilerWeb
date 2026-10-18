@@ -2,7 +2,8 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, Pencil, Plus, Timer, Trash2 } from 'lucide-react';
-import { MultiTileshareIcon } from '@/components/tileshare/icons';
+import TileShareModeIcon from '../TileShareModeIcon';
+import { TileshareMode } from '@/core/common/types/tileshare';
 import Button from '@/core/common/components/button';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import { formatDetailDate } from '@/core/util/tileshareDate';
@@ -12,6 +13,7 @@ import { RGB } from '@/core/util/colors';
 import TileShareNote from '../TileShareNote';
 
 type MultiTileshareHeaderProps = {
+	mode?: TileshareMode | null;
 	subtitle?: string;
 	name: string | null;
 	description: string | null;
@@ -27,6 +29,7 @@ type MultiTileshareHeaderProps = {
 };
 
 const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
+	mode,
 	subtitle,
 	name,
 	description,
@@ -44,7 +47,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 	return (
 		<DetailHeaderCard
 			compact
-			icon={<MultiTileshareIcon size={22} />}
+			icon={<TileShareModeIcon mode={mode} />}
 			accent={accent}
 			title={name ?? '—'}
 			subtitle={subtitle ?? t('tilesharedemo.detail.multiTileshare')}

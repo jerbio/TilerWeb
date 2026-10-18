@@ -163,6 +163,7 @@ const TileshareDetailPage: React.FC = () => {
 								{mode !== TileshareMode.Broadcast ? (
 									<>
 										<MultiTileshareHeader
+											mode={mode}
 											subtitle={
 												mode
 													? t(`tileShareModes.${mode}.label`)
@@ -204,6 +205,7 @@ const TileshareDetailPage: React.FC = () => {
 									</>
 								) : (
 									<SingleTileshareHeader
+										mode={mode}
 										subtitle={t('tileShareModes.broadcast.label')}
 										descriptionContent={
 											cluster.id ? (

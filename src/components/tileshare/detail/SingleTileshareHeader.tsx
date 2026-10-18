@@ -3,6 +3,8 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, Pencil, Trash2 } from 'lucide-react';
 import { SingleTileshareIcon } from '@/components/tileshare/icons';
+import TileShareModeIcon from '../TileShareModeIcon';
+import { TileshareMode } from '@/core/common/types/tileshare';
 import Button from '@/core/common/components/button';
 import { formatDetailDate } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderSection } from './DetailHeaderCard';
@@ -11,6 +13,8 @@ import { RGB } from '@/core/util/colors';
 import TileShareNote from '../TileShareNote';
 
 type SingleTileshareHeaderProps = {
+	/** Share headers supply a mode; individual tilettes keep their task glyph. */
+	mode?: TileshareMode | null;
 	name: string | null;
 	description: string | null;
 	descriptionContent?: React.ReactNode;
@@ -26,6 +30,7 @@ type SingleTileshareHeaderProps = {
 };
 
 const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
+	mode,
 	name,
 	description,
 	descriptionContent,
@@ -41,7 +46,13 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 
 	return (
 		<DetailHeaderCard
-			icon={<SingleTileshareIcon size={22} />}
+			icon={
+				mode === undefined ? (
+					<SingleTileshareIcon size={22} aria-hidden="true" />
+				) : (
+					<TileShareModeIcon mode={mode} />
+				)
+			}
 			accent={accent}
 			title={name ?? '—'}
 			subtitle={subtitle ?? t('tilesharedemo.detail.singleTileshare')}

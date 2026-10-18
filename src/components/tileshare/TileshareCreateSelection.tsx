@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { a, useSpring } from '@react-spring/web';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Layers, MessageSquare } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import TileShareModeIcon from './TileShareModeIcon';
 import { TileshareMode } from '@/core/common/types/tileshare';
 
 type TileshareCreateSelectionProps = {
@@ -85,11 +86,7 @@ const TileshareCreateSelection: React.FC<TileshareCreateSelectionProps> = ({
 					{index > 0 && <Seperator />}
 					<Selection onClick={() => handleSelect(() => onSelectMode(mode))}>
 						<div>
-							{mode === TileshareMode.Broadcast ? (
-								<MessageSquare size={20} />
-							) : (
-								<Layers size={20} />
-							)}
+							<TileShareModeIcon mode={mode} size={20} />
 						</div>
 						<TextBlock>
 							<h3>{t(`tileShareModes.${mode}.label`)}</h3>

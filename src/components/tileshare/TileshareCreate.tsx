@@ -2,7 +2,8 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { CalendarDays, ChevronLeft, Layers, MessageSquare } from 'lucide-react';
+import { CalendarDays, ChevronLeft } from 'lucide-react';
+import TileShareModeIcon from './TileShareModeIcon';
 import TileShareLocationFields from './TileShareLocationFields';
 import MarkdownNoteField from './MarkdownNoteField';
 import TiletteDraftComposer from './TiletteDraftComposer';
@@ -67,7 +68,6 @@ const TileshareCreate: React.FC<{ mode: TileshareMode; onBack: () => void }> = (
 	const [leaveAction, setLeaveAction] = useState<(() => void) | null>(null);
 	const dirty = JSON.stringify(formData) !== JSON.stringify(initial);
 	const isSingle = mode === TileshareMode.Broadcast;
-	const ModeIcon = isSingle ? MessageSquare : Layers;
 	const leave = () => {
 		if (submitting) return;
 		if (dirty && !showSuccess) setLeaveAction(() => onBack);
@@ -215,7 +215,7 @@ const TileshareCreate: React.FC<{ mode: TileshareMode; onBack: () => void }> = (
 						/>
 						<SummaryBar>
 							<Summary>
-								<Layers size={22} />
+								<TileShareModeIcon mode={mode} />
 								<strong>{formData.name}</strong>
 								<span>
 									<CalendarDays size={18} />
@@ -240,7 +240,7 @@ const TileshareCreate: React.FC<{ mode: TileshareMode; onBack: () => void }> = (
 				) : (
 					<Content>
 						<IconBox>
-							<ModeIcon size={28} />
+							<TileShareModeIcon mode={mode} size={28} />
 						</IconBox>
 						<Title>{t(`tileShareModes.${mode}.title`)}</Title>
 						<Description>{t(`tileShareModes.${mode}.description`)}</Description>
