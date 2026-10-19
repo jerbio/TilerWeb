@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, setupUser, waitFor } from '@/test/test-utils';
+import { render, screen, setupUser, waitFor, act } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import SearchBar from '../search_bar';
@@ -19,7 +19,6 @@ vi.mock('@/hooks/useFlag', () => ({
 }));
 
 const mockSearchMultiSource = vi.fn();
-const mockSearchByName = vi.fn();
 const mockSetCalendarEventAsNow = vi.fn();
 const mockMarkCalendarEventComplete = vi.fn();
 const mockDeleteCalendarEvent = vi.fn();
@@ -28,7 +27,6 @@ const mockDeleteScheduleEvent = vi.fn();
 vi.mock('@/services', () => ({
 	scheduleService: {
 		searchCalendarEventsMultiSource: (...args: unknown[]) => mockSearchMultiSource(...args),
-		searchCalendarEventsByName: (...args: unknown[]) => mockSearchByName(...args),
 		setCalendarEventAsNow: (...args: unknown[]) => mockSetCalendarEventAsNow(...args),
 		markCalendarEventComplete: (...args: unknown[]) => mockMarkCalendarEventComplete(...args),
 		deleteCalendarEvent: (...args: unknown[]) => mockDeleteCalendarEvent(...args),
@@ -167,44 +165,6 @@ const tilerItem: CalendarSearchItem = {
 	isReadOnly: false,
 	capabilities: { ...fullCaps },
 };
-
-const legacyResults: CalendarEvent[] = [
-	{
-		id: 'cal-1',
-		name: 'Buy Coffee today',
-		start: Date.now() - 2 * 24 * 60 * 60 * 1000,
-		end: Date.now() - 2 * 24 * 60 * 60 * 1000 + 3600000,
-		address: null,
-		addressDescription: null,
-		searchdDescription: null,
-		splitCount: 1,
-		completeCount: 0,
-		deletionCount: 0,
-		thirdpartyType: null,
-		thirdPartyId: null,
-		thirdPartyUserId: null,
-		colorOpacity: 1,
-		colorRed: 100,
-		colorGreen: 150,
-		colorBlue: 200,
-		isComplete: false,
-		isEnabled: true,
-		isRecurring: true,
-		locationId: null,
-		isReadOnly: false,
-		isProcrastinateEvent: false,
-		isRigid: false,
-		uiConfig: null,
-		repetition: null,
-		eachTileDuration: 3600000,
-		restrictionProfile: null,
-		emojis: null,
-		isWhatIf: false,
-		entityName: null,
-		blob: null,
-		subEvents: null,
-	},
-];
 
 const renderWithTheme = (ui: React.ReactElement) =>
 	render(<ThemeProvider theme={lightTheme}>{ui}</ThemeProvider>);
@@ -488,7 +448,7 @@ describe('SearchBar multi-source (Phase 4)', () => {
 		expect(mockDeleteScheduleEvent).not.toHaveBeenCalled();
 	});
 
-	it('renders no Load More / pagination in multi-source mode', async () => {
+	it('does not infer another batch from the number of returned items', async () => {
 		const many: CalendarSearchItem[] = Array.from({ length: 12 }, (_, i) => ({
 			...tilerItem,
 			id: `m-${i}`,
@@ -504,20 +464,191 @@ describe('SearchBar multi-source (Phase 4)', () => {
 		expect(screen.queryByTestId('load-more-button')).not.toBeInTheDocument();
 	});
 
-	it('flag-off preserves the legacy name-search path', async () => {
-		flagState.value = false;
-		mockSearchByName.mockResolvedValue(legacyResults);
+	it('uses server nextIndex and preserves the timeline across batches', async () => {
+		mockSearchMultiSource
+			.mockResolvedValueOnce({
+				items: [tilerItem],
+				sources: [],
+				correlationId: 'first',
+				hasMore: true,
+				nextIndex: 7,
+			})
+			.mockResolvedValueOnce({
+				items: [googleItem],
+				sources: [],
+				correlationId: 'second',
+				hasMore: false,
+				nextIndex: null,
+			});
+		const onResults = vi.fn();
+		const user = setupUser();
+		renderWithTheme(<SearchBar pageSize={2} start={1000} end={2000} onResults={onResults} />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(screen.getByTestId('load-more-button')).toBeInTheDocument());
+		await user.click(screen.getByTestId('load-more-button'));
+		await waitFor(() => expect(screen.getAllByTestId('search-result-item')).toHaveLength(2));
+		expect(mockSearchMultiSource).toHaveBeenLastCalledWith('golf', undefined, {
+			batchSize: 2,
+			index: 7,
+			start: 1000,
+			end: 2000,
+		});
+		expect(onResults.mock.lastCall?.[0]).toHaveLength(2);
+		expect(screen.queryByTestId('load-more-button')).not.toBeInTheDocument();
+	});
 
+	it('ignores an old batch when the query changes during the debounce interval', async () => {
+		let resolveBatch!: (value: CalendarSearchEnvelope) => void;
+		mockSearchMultiSource
+			.mockResolvedValueOnce({
+				items: [tilerItem],
+				sources: [],
+				correlationId: 'first',
+				hasMore: true,
+				nextIndex: 1,
+			})
+			.mockReturnValueOnce(
+				new Promise((resolve) => {
+					resolveBatch = resolve;
+				})
+			)
+			.mockResolvedValueOnce({
+				items: [googleItem],
+				sources: [],
+				correlationId: 'new',
+				hasMore: false,
+			});
+		const onResults = vi.fn();
+		const user = setupUser();
+		renderWithTheme(<SearchBar onResults={onResults} />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(screen.getByTestId('load-more-button')).toBeInTheDocument());
+		await user.click(screen.getByTestId('load-more-button'));
+		await user.type(input(), 'x');
+		await act(async () =>
+			resolveBatch({
+				items: [{ ...tilerItem, id: 'stale', name: 'Stale batch' }],
+				sources: [],
+				correlationId: 'stale',
+			})
+		);
+		expect(screen.queryByText('Stale batch')).not.toBeInTheDocument();
+		await waitFor(() => expect(screen.getByText('Golf')).toBeInTheDocument());
+		expect(onResults.mock.lastCall?.[0]).toHaveLength(1);
+	});
+
+	it('clearing a pending request stops loading and prevents results from reopening', async () => {
+		let resolveSearch!: (value: CalendarSearchEnvelope) => void;
+		mockSearchMultiSource.mockReturnValueOnce(
+			new Promise((resolve) => {
+				resolveSearch = resolve;
+			})
+		);
 		const user = setupUser();
 		renderWithTheme(<SearchBar />);
-		await user.type(input(), 'coffee');
-
-		await waitFor(() =>
-			expect(screen.getByTestId('search-results-dropdown')).toBeInTheDocument()
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(mockSearchMultiSource).toHaveBeenCalled());
+		await user.click(screen.getByTestId('search-clear'));
+		expect(screen.queryByTestId('search-loading')).not.toBeInTheDocument();
+		await act(async () =>
+			resolveSearch({ items: [tilerItem], sources: [], correlationId: 'late' })
 		);
-		expect(mockSearchByName).toHaveBeenCalled();
-		expect(mockSearchMultiSource).not.toHaveBeenCalled();
-		expect(screen.getAllByTestId('search-result-item')).toHaveLength(1);
+		expect(screen.queryByTestId('search-results-dropdown')).not.toBeInTheDocument();
+	});
+
+	it('shows partial failures even when surviving sources have no matches', async () => {
+		mockSearchMultiSource.mockResolvedValueOnce({
+			items: [],
+			correlationId: 'partial',
+			sources: [{ source: 'google', status: 'failed', category: 'timeout', retryable: true }],
+		});
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(screen.getByTestId('partial-warning')).toBeInTheDocument());
+		expect(screen.queryByTestId('search-not-found')).not.toBeInTheDocument();
+	});
+
+	it('shows generic failures as unavailable instead of no matches', async () => {
+		mockSearchMultiSource.mockRejectedValueOnce(new Error('HTTP 404'));
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(screen.getByTestId('search-unavailable')).toBeInTheDocument());
+		expect(screen.queryByTestId('search-not-found')).not.toBeInTheDocument();
+	});
+
+	it('keeps loaded results when a later batch fails and retries the same offset', async () => {
+		mockSearchMultiSource
+			.mockResolvedValueOnce({
+				items: [tilerItem],
+				sources: [],
+				correlationId: 'first',
+				hasMore: true,
+				nextIndex: 1,
+			})
+			.mockRejectedValueOnce(new Error('network'))
+			.mockResolvedValueOnce({
+				items: [googleItem],
+				sources: [],
+				correlationId: 'retry',
+				hasMore: false,
+			});
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(screen.getByTestId('load-more-button')).toBeInTheDocument());
+		await user.click(screen.getByTestId('load-more-button'));
+		await waitFor(() => expect(screen.getByTestId('search-unavailable')).toBeInTheDocument());
+		expect(screen.getByText('Workout')).toBeInTheDocument();
+		await user.click(screen.getByTestId('load-more-button'));
+		await waitFor(() => expect(screen.getAllByTestId('search-result-item')).toHaveLength(2));
+		expect(mockSearchMultiSource).toHaveBeenLastCalledWith('golf', undefined, {
+			batchSize: 10,
+			index: 1,
+			start: undefined,
+			end: undefined,
+		});
+	});
+
+	it('restarts at the first batch when the timeline changes', async () => {
+		mockSearchMultiSource.mockResolvedValue({
+			items: [tilerItem],
+			sources: [],
+			correlationId: 'window',
+			hasMore: true,
+			nextIndex: 1,
+		});
+		const user = setupUser();
+		const { rerender } = renderWithTheme(<SearchBar start={1000} end={2000} />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(screen.getByTestId('load-more-button')).toBeInTheDocument());
+		rerender(
+			<ThemeProvider theme={lightTheme}>
+				<SearchBar start={2000} end={3000} />
+			</ThemeProvider>
+		);
+		await waitFor(() =>
+			expect(mockSearchMultiSource).toHaveBeenLastCalledWith('golf', undefined, {
+				batchSize: 10,
+				index: 0,
+				start: 2000,
+				end: 3000,
+			})
+		);
+	});
+
+	it('uses GA search even when the removed feature flag is absent', async () => {
+		flagState.value = false;
+		mockSearchMultiSource.mockResolvedValue({
+			items: [tilerItem],
+			sources: [],
+			correlationId: 'ga',
+		});
+		const user = setupUser();
+		renderWithTheme(<SearchBar />);
+		await user.type(input(), 'golf');
+		await waitFor(() => expect(mockSearchMultiSource).toHaveBeenCalled());
 	});
 
 	it('shows inline confirmation for Complete/Delete on a writable multi-source row and cancels (S4-7)', async () => {

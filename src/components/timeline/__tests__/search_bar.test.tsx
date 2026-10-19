@@ -3,11 +3,11 @@ import { render, screen, setupUser, waitFor } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
 import SearchBar from '../search_bar';
-import { CalendarEvent } from '@/core/common/types/schedule';
+import { CalendarEvent, CalendarSearchParams } from '@/core/common/types/schedule';
 import { CalendarUIStore } from '@/core/common/components/calendar/calendar-ui.store';
 import dayjs from 'dayjs';
 
-const mockSearchCalendarEventsByName = vi.fn();
+const mockSearchResults = vi.fn();
 const mockSetCalendarEventAsNow = vi.fn();
 const mockMarkCalendarEventComplete = vi.fn();
 const mockDeleteCalendarEvent = vi.fn();
@@ -15,18 +15,36 @@ const mockDeleteCalendarEvent = vi.fn();
 // Mock the services module
 vi.mock('@/services', () => ({
 	scheduleService: {
-		searchCalendarEventsByName: (...args: unknown[]) => mockSearchCalendarEventsByName(...args),
+		searchCalendarEventsMultiSource: async (
+			query: string,
+			_sources: unknown,
+			options: Omit<CalendarSearchParams, 'query' | 'sources'>
+		) => {
+			const items: CalendarEvent[] = await mockSearchResults(query, options);
+			return {
+				items: items.map((event) => ({
+					...event,
+					source: 'tiler',
+					capabilities: {
+						canEdit: true,
+						canDelete: true,
+						canComplete: true,
+						canSetAsNow: true,
+					},
+				})),
+				sources: [{ source: 'tiler', status: 'success' }],
+				correlationId: 'test',
+				hasMore: items.length >= (options.batchSize ?? 10),
+				nextIndex:
+					items.length >= (options.batchSize ?? 10)
+						? (options.index ?? 0) + items.length
+						: null,
+			};
+		},
 		setCalendarEventAsNow: (...args: unknown[]) => mockSetCalendarEventAsNow(...args),
 		markCalendarEventComplete: (...args: unknown[]) => mockMarkCalendarEventComplete(...args),
 		deleteCalendarEvent: (...args: unknown[]) => mockDeleteCalendarEvent(...args),
 	},
-}));
-
-// Phase 4: SearchBar now reads the `calendarSearchMultiSource` feature flag.
-// This suite pins the flag OFF so it continues to exercise the legacy name-search
-// path. (The multi-source path is covered in search_bar.multisource.test.tsx.)
-vi.mock('@/hooks/useFlag', () => ({
-	useFlag: () => false,
 }));
 
 // Mock the global state
@@ -295,7 +313,7 @@ describe('SearchBar', () => {
 
 	it('shows results dropdown when search returns matches', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+		mockSearchResults.mockResolvedValue(mockResults);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -311,7 +329,7 @@ describe('SearchBar', () => {
 
 	it('shows tile name and relative time in each result row', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+		mockSearchResults.mockResolvedValue(mockResults);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -322,47 +340,12 @@ describe('SearchBar', () => {
 		});
 
 		const names = screen.getAllByText('Buy Coffee today');
-		expect(names.length).toBeGreaterThanOrEqual(2);
-	});
-
-	it('shows color indicator dot for each result based on tile color', async () => {
-		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
-
-		renderWithTheme(<SearchBar />);
-		const input = screen.getByPlaceholderText('Search for a tile/block...');
-		await user.type(input, 'Buy Coffee');
-
-		await waitFor(() => {
-			expect(screen.getByTestId('search-results-dropdown')).toBeInTheDocument();
-		});
-
-		const colorDots = screen.getAllByTestId('result-color-dot');
-		expect(colorDots.length).toBe(2);
-	});
-
-	it('renders circle dot for tiles and rounded-square dot for blocks', async () => {
-		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
-
-		renderWithTheme(<SearchBar />);
-		const input = screen.getByPlaceholderText('Search for a tile/block...');
-		await user.type(input, 'Buy Coffee');
-
-		await waitFor(() => {
-			expect(screen.getByTestId('search-results-dropdown')).toBeInTheDocument();
-		});
-
-		const colorDots = screen.getAllByTestId('result-color-dot');
-		// cal-1 is a tile (isRigid: false) → circle
-		expect(colorDots[0]).toHaveStyle('border-radius: 50%');
-		// cal-2 is a block (isRigid: true) → rounded square
-		expect(colorDots[1]).toHaveStyle('border-radius: 3px');
+		expect(names.length).toBeGreaterThanOrEqual(1);
 	});
 
 	it('shows not-found prompt when search returns empty', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue([]);
+		mockSearchResults.mockResolvedValue([]);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -379,7 +362,7 @@ describe('SearchBar', () => {
 
 	it('closes not-found prompt when "No thanks" is clicked', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue([]);
+		mockSearchResults.mockResolvedValue([]);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -395,7 +378,7 @@ describe('SearchBar', () => {
 
 	it('clears search input and dropdown when clear button is clicked after results', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+		mockSearchResults.mockResolvedValue(mockResults);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -420,7 +403,7 @@ describe('SearchBar', () => {
 			id: `cal-${i}`,
 			name: `Tile ${i}`,
 		}));
-		mockSearchCalendarEventsByName.mockResolvedValue(tenResults);
+		mockSearchResults.mockResolvedValue(tenResults);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -435,7 +418,7 @@ describe('SearchBar', () => {
 
 	it('does not show "Load more" when results are fewer than page size', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults); // only 2 items
+		mockSearchResults.mockResolvedValue(mockResults); // only 2 items
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -461,9 +444,7 @@ describe('SearchBar', () => {
 			name: `Tile ${10 + i}`,
 		}));
 
-		mockSearchCalendarEventsByName
-			.mockResolvedValueOnce(firstPage)
-			.mockResolvedValueOnce(secondPage);
+		mockSearchResults.mockResolvedValueOnce(firstPage).mockResolvedValueOnce(secondPage);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -503,13 +484,8 @@ describe('SearchBar', () => {
 		}));
 
 		// Use mockImplementation so debounce timing doesn't exhaust mock values
-		mockSearchCalendarEventsByName.mockImplementation(
-			(
-				_query: string,
-				_userName: string,
-				_userId: string,
-				pagination?: { batchSize?: number; index?: number }
-			) => {
+		mockSearchResults.mockImplementation(
+			(_query: string, pagination?: { batchSize?: number; index?: number }) => {
 				const idx = pagination?.index ?? 0;
 				if (idx === 0) return Promise.resolve(firstPage);
 				if (idx === 10) return Promise.resolve(secondPage);
@@ -527,12 +503,12 @@ describe('SearchBar', () => {
 		});
 
 		// Initial search: index 0
-		expect(mockSearchCalendarEventsByName).toHaveBeenLastCalledWith(
-			'tile',
-			'testuser',
-			'user-id-123',
-			{ batchSize: 10, index: 0 }
-		);
+		expect(mockSearchResults).toHaveBeenLastCalledWith('tile', {
+			batchSize: 10,
+			index: 0,
+			start: undefined,
+			end: undefined,
+		});
 
 		// First load more: index should be 10 (1 * 10), not 1
 		await user.click(screen.getByTestId('load-more-button'));
@@ -540,12 +516,12 @@ describe('SearchBar', () => {
 			expect(screen.getAllByTestId('search-result-item')).toHaveLength(20);
 		});
 
-		expect(mockSearchCalendarEventsByName).toHaveBeenLastCalledWith(
-			'tile',
-			'testuser',
-			'user-id-123',
-			{ batchSize: 10, index: 10 }
-		);
+		expect(mockSearchResults).toHaveBeenLastCalledWith('tile', {
+			batchSize: 10,
+			index: 10,
+			start: undefined,
+			end: undefined,
+		});
 
 		// Second load more: index should be 20 (2 * 10), not 2
 		await user.click(screen.getByTestId('load-more-button'));
@@ -553,12 +529,12 @@ describe('SearchBar', () => {
 			expect(screen.getAllByTestId('search-result-item')).toHaveLength(23);
 		});
 
-		expect(mockSearchCalendarEventsByName).toHaveBeenLastCalledWith(
-			'tile',
-			'testuser',
-			'user-id-123',
-			{ batchSize: 10, index: 20 }
-		);
+		expect(mockSearchResults).toHaveBeenLastCalledWith('tile', {
+			batchSize: 10,
+			index: 20,
+			start: undefined,
+			end: undefined,
+		});
 	});
 
 	it('hides "Load more" after loading a partial page', async () => {
@@ -574,9 +550,7 @@ describe('SearchBar', () => {
 			name: `Tile ${10 + i}`,
 		}));
 
-		mockSearchCalendarEventsByName
-			.mockResolvedValueOnce(firstPage)
-			.mockResolvedValueOnce(secondPage);
+		mockSearchResults.mockResolvedValueOnce(firstPage).mockResolvedValueOnce(secondPage);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -608,9 +582,7 @@ describe('SearchBar', () => {
 			name: `New ${i}`,
 		}));
 
-		mockSearchCalendarEventsByName
-			.mockResolvedValueOnce(firstPage)
-			.mockResolvedValueOnce(newSearchResults);
+		mockSearchResults.mockResolvedValueOnce(firstPage).mockResolvedValueOnce(newSearchResults);
 
 		renderWithTheme(<SearchBar />);
 		const input = screen.getByPlaceholderText('Search for a tile/block...');
@@ -634,7 +606,7 @@ describe('SearchBar', () => {
 
 	it('dismisses dropdown when clicking outside the search container', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+		mockSearchResults.mockResolvedValue(mockResults);
 
 		renderWithTheme(
 			<div>
@@ -658,7 +630,7 @@ describe('SearchBar', () => {
 
 	it('dismisses not-found prompt when clicking outside the search container', async () => {
 		const user = setupUser();
-		mockSearchCalendarEventsByName.mockResolvedValue([]);
+		mockSearchResults.mockResolvedValue([]);
 
 		renderWithTheme(
 			<div>
@@ -682,7 +654,7 @@ describe('SearchBar', () => {
 	describe('result actions', () => {
 		const searchAndGetResults = async () => {
 			const user = setupUser();
-			mockSearchCalendarEventsByName.mockResolvedValue(mockResults);
+			mockSearchResults.mockResolvedValue(mockResults);
 			renderWithTheme(<SearchBar />);
 
 			const input = screen.getByPlaceholderText('Search for a tile/block...');

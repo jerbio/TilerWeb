@@ -115,7 +115,7 @@ describe('ScheduleService.searchCalendarEventsMultiSource', () => {
 		expect(err.sources).toEqual(errorBody.sources);
 	});
 
-	it('maps a plain 404 to null', async () => {
+	it('propagates a missing GA endpoint as an error', async () => {
 		vi.mocked(calendarEventApi.searchCalendarEvents).mockRejectedValueOnce(
 			new ServerError(
 				'HTTP error! status: 404',
@@ -125,9 +125,30 @@ describe('ScheduleService.searchCalendarEventsMultiSource', () => {
 			)
 		);
 
-		const result = await service.searchCalendarEventsMultiSource('coffee');
+		await expect(service.searchCalendarEventsMultiSource('coffee')).rejects.toThrow();
+	});
 
-		expect(result).toBeNull();
+	it('forwards batching and timeline options and preserves response metadata', async () => {
+		const page = {
+			...envelope,
+			index: 20,
+			batchSize: 10,
+			hasMore: true,
+			nextIndex: 30,
+			totalCount: 42,
+		};
+		vi.mocked(calendarEventApi.searchCalendarEvents).mockResolvedValueOnce({
+			...okResponse,
+			Content: page,
+		});
+		const options = { batchSize: 10, index: 20, start: 1000, end: 2000 };
+		const result = await service.searchCalendarEventsMultiSource('coffee', undefined, options);
+		expect(calendarEventApi.searchCalendarEvents).toHaveBeenCalledWith({
+			query: 'coffee',
+			sources: undefined,
+			...options,
+		});
+		expect(result).toEqual(page);
 	});
 
 	it('throws a normalized error for other failures', async () => {
