@@ -144,7 +144,6 @@ const makeCluster = (overrides: Partial<TileShareCluster> = {}): TileShareCluste
 	isCompleted: null,
 	isDeleted: null,
 	isDismissed: null,
-	isMultiTilette: true,
 	creator: null,
 	tileShareTemplates: null,
 	truncatedUser: null,

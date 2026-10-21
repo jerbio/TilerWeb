@@ -64,7 +64,6 @@ const mockCluster: TileShareCluster = {
 	isCompleted: false,
 	isDeleted: false,
 	isDismissed: false,
-	isMultiTilette: false,
 	creator: mockCreator,
 	tileShareTemplates: [],
 	truncatedUser: 'bob@example.com, carol@example.com',
@@ -96,7 +95,7 @@ describe('TileShareClusterCard', () => {
 	});
 
 	it('uses Project mode even when the legacy flag is false', () => {
-		renderCard({ ...mockCluster, mode: TileshareMode.Project, isMultiTilette: false });
+		renderCard({ ...mockCluster, mode: TileshareMode.Project });
 		expect(screen.getByText('Project')).toBeInTheDocument();
 	});
 	it('distinguishes Class from Project', () => {

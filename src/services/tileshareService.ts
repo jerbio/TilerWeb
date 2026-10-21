@@ -124,7 +124,6 @@ export function toCreateClusterParams(
 		TimeZoneOffset: ctx.timeZoneOffset,
 		Name: form.name.trim(),
 		Mode: mode,
-		IsMultiTilette: mode !== TileshareMode.Broadcast,
 		IncludeMe: true,
 		EndTime: deadline,
 		DurationInMs: duration,

@@ -56,10 +56,10 @@ describe('TileShare modes and creation', () => {
 		}
 	);
 	it('does not infer a mode from legacy flags or task counts', () => {
-		expect(tileshareMode({ isMultiTilette: true } as TileShareCluster)).toBeNull();
-		expect(
-			tileshareMode({ mode: TileshareMode.Class, isMultiTilette: false } as TileShareCluster)
-		).toBe(TileshareMode.Class);
+		expect(tileshareMode({} as TileShareCluster)).toBeNull();
+		expect(tileshareMode({ mode: TileshareMode.Class } as TileShareCluster)).toBe(
+			TileshareMode.Class
+		);
 		expect(parseTileshareMode(' CLASS ')).toBe(TileshareMode.Class);
 		expect(parseTileshareMode('unexpected')).toBeNull();
 	});

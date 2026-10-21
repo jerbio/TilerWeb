@@ -442,7 +442,6 @@ describe('TileshareCreate', () => {
 			expect.objectContaining({
 				Name: 'Finish taxes',
 				DurationInMs: 3600000,
-				IsMultiTilette: false,
 				IncludeMe: true,
 				UserName: 'me@example.com',
 				Contacts: [{ Email: 'jane@example.com' }],
@@ -486,7 +485,7 @@ describe('TileshareCreate', () => {
 		);
 	});
 
-	it('submits a multi-mode payload with IsMultiTilette and empty contacts', async () => {
+	it('submits a multi-mode payload with empty contacts', async () => {
 		const user = setupUser();
 		const onBack = vi.fn();
 		render(<TileshareCreate mode={TileshareMode.Project} onBack={onBack} />);
@@ -508,7 +507,6 @@ describe('TileshareCreate', () => {
 		expect(createCluster).toHaveBeenCalledWith(
 			expect.objectContaining({
 				Name: 'Product launch prep',
-				IsMultiTilette: true,
 				Contacts: [],
 				EndTime: expect.any(Number),
 			})

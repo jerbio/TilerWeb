@@ -16,7 +16,7 @@ export type TileshareUserProfile = {
 };
 
 export type TileShareCluster = {
-	/** Authoritative sharing mode. Never derive it from IsMultiTilette. */
+	/** Authoritative sharing mode. */
 	mode?: TileshareMode | null;
 	addressData?: AddressDataModel | null;
 	location?: { address: string; description?: string; isVerified: boolean } | null;
@@ -30,7 +30,6 @@ export type TileShareCluster = {
 	isCompleted: boolean | null;
 	isDeleted: boolean | null;
 	isDismissed: boolean | null;
-	isMultiTilette: boolean | null;
 	creator: TileshareUserProfile | null;
 	tileShareTemplates: TileShareTemplate[] | null;
 	truncatedUser: string | null;
@@ -163,7 +162,6 @@ export type CreateTileShareClusterParams = {
 	TimeZone: string | null;
 	TimeZoneOffset: number | null;
 	Name: string;
-	IsMultiTilette: boolean;
 	IncludeMe: boolean;
 	/** epoch ms, optional earliest-start bound */
 	StartTime?: number;
@@ -337,7 +335,6 @@ export type ContactModel = {
  *
  * The id key is `ClusterId` — `TileShareClusterId` exists only on the GET's
  * search model and would bind as null here. Adding a tilette flips the cluster's
- * `isMultiTilette` to true and recomputes its truncated user list, so refetch
  * the cluster afterwards rather than patching it locally.
  */
 export type CreateTileletteParams = {

@@ -40,7 +40,6 @@ const mockCluster = {
 	isCompleted: null,
 	isDeleted: null,
 	isDismissed: null,
-	isMultiTilette: true,
 	creator: mockCreator,
 	tileShareTemplates: [mockTemplate],
 	truncatedUser: 'other@example.com',
@@ -195,17 +194,11 @@ describe('TileshareService', () => {
 			const params = toCreateClusterParams(baseForm, TileshareMode.Broadcast, ctx);
 
 			expect(params.Name).toBe('Finish taxes');
-			expect(params.IsMultiTilette).toBe(false);
 			expect(params.IncludeMe).toBe(true);
 			expect(params.UserName).toBe('test@example.com');
 			expect(params.TimeZone).toBe('UTC');
 			expect(params.TimeZoneOffset).toBe(0);
 			expect(params.DurationInMs).toBeGreaterThan(0);
-		});
-
-		it('sets IsMultiTilette true for multi mode', () => {
-			const params = toCreateClusterParams(baseForm, TileshareMode.Project, ctx);
-			expect(params.IsMultiTilette).toBe(true);
 		});
 
 		it('converts the deadline to an end-of-day epoch-ms EndTime', () => {
@@ -291,7 +284,6 @@ describe('TileshareService', () => {
 			TimeZone: 'UTC',
 			TimeZoneOffset: 0,
 			Name: 'Finish taxes',
-			IsMultiTilette: false,
 			IncludeMe: true,
 			Contacts: [],
 		};

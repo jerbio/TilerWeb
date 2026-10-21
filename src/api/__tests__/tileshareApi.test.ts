@@ -52,7 +52,6 @@ const mockCluster = {
 	isCompleted: null,
 	isDeleted: null,
 	isDismissed: null,
-	isMultiTilette: true,
 	creator: {
 		id: 'user-1',
 		username: 'testuser',
@@ -533,7 +532,6 @@ describe('TileshareApi', () => {
 			TimeZone: 'America/Denver',
 			TimeZoneOffset: 360,
 			Name: 'Finish tax documents',
-			IsMultiTilette: false,
 			IncludeMe: true,
 			EndTime: 1751932800000,
 			DurationInMs: 3600000,
@@ -562,7 +560,6 @@ describe('TileshareApi', () => {
 				urlArg instanceof Request ? await urlArg.text() : (options?.body as string);
 			const body = JSON.parse(bodyStr);
 			expect(body.Name).toBe('Finish tax documents');
-			expect(body.IsMultiTilette).toBe(false);
 			expect(body.Contacts).toEqual([{ Email: 'jane@example.com' }]);
 		});
 
