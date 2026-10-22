@@ -400,10 +400,19 @@ export type ScheduleCreateEventParams = {
 	getTimeSpan?: string;
 };
 
+export type CreatedScheduleEvent = SubCalendarEvent & {
+	calendarEvent?: CalendarEvent | null;
+};
+
+/** MobileApp responses include the schedule update and the newly created event. */
 export type ScheduleCreateEventResponse = ApiResponse<
-	SubCalendarEvent & {
-		calendarEvent: CalendarEvent;
-	}
+	| CreatedScheduleEvent
+	| {
+			tilerEvent: CreatedScheduleEvent;
+			subEvents: SubCalendarEvent[];
+			responseTimeline: Pick<EventTimeline, 'start' | 'end'>;
+			idempotencyKey?: string | null;
+	  }
 >;
 // ── Single-event lookup response types ─────────────────────────
 

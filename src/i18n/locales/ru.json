@@ -4,13 +4,46 @@
 			"comment_added": "Комментарий добавлен",
 			"comment_replied": "Ответ на комментарий добавлен",
 			"comment_edited": "Комментарий изменён",
-			"comment_deleted": "Комментарий удалён"
+			"comment_deleted": "Комментарий удалён",
+			"invitation_send_unknown": "Результат отправки приглашения неизвестен",
+			"assignment_completed": "Происшествие завершено",
+			"assignment_reopened": "Происшествие возобновлено"
 		},
 		"sentences": {
 			"comment_added": "<actor/> добавляет комментарий к <title/>",
 			"comment_replied": "<actor/> отвечает на комментарий к <title/>",
 			"comment_edited": "<actor/> редактирует комментарий к <title/>",
 			"comment_deleted": "<actor/> удаляет комментарий к <title/>"
+		},
+		"showDismissed": "Показать скрытые действия",
+		"dismiss": "Скрыть",
+		"restore": "Показать в мероприятиях",
+		"dismissFailed": "Не удалось сохранить настройки активности. Попробуйте еще раз.",
+		"channels": {
+			"email": "E-mail",
+			"sms": "SMS",
+			"push": "Push-уведомление"
+		},
+		"explicitResend": "Возможно, приглашение было отправлено. При необходимости повторите отправку явно.",
+		"options": "Варианты активности",
+		"actions": {
+			"cluster_invitation": "пригласил тебя в",
+			"cluster_created": "созданный",
+			"cluster_deleted": "удалено",
+			"tilette_added": "добавлен",
+			"tilette_edited": "обновлено",
+			"tilette_deleted": "удалено",
+			"tilette_restored": "восстановлен",
+			"recipient_added": "добавил участника в",
+			"recipient_removed": "удалил участника из",
+			"recipient_restored": "восстановил участника в",
+			"assignment_accepted": "принял",
+			"assignment_completed": "завершилось возникновение",
+			"assignment_reopened": "вновь открыл возникновение",
+			"assignment_declined": "отклоненный",
+			"invitation_sent": "отправил приглашение на",
+			"invitation_send_failed": "не удалось отправить приглашение",
+			"invitation_send_unknown": "отправил приглашение с неизвестным результатом для"
 		}
 	},
 	"common": {
@@ -107,11 +140,11 @@
 		"apps": {
 			"ios": {
 				"cta": "Загрузить в App Store",
-				"platform": "iOS App Store"
+				"platform": "Магазин приложений для iOS"
 			},
 			"android": {
 				"cta": "Загрузить в Google Play",
-				"platform": "Android Play Store"
+				"platform": "Android Play Маркет"
 			}
 		},
 		"legal": {
@@ -393,8 +426,8 @@
 			"tip": {
 				"description": "Нажмите <b><key/></b>, чтобы создать новую плитку",
 				"keys": {
-					"enter": "Enter",
-					"return": "Return"
+					"enter": "Входить",
+					"return": "Возвращаться"
 				}
 			},
 			"message": {
@@ -673,6 +706,32 @@
 						"financialModeling": "Построить финансовую модель",
 						"researchStudy": "Провести исследование"
 					}
+				},
+				"delegation": {
+					"label": "Проект делегирования",
+					"note": "Только черновик. При сохранении не назначается работа и не отправляются приглашения.",
+					"defaultDuration": "1 час (по умолчанию)",
+					"minutes": "минуты",
+					"saved": "Сохраненный черновик: работа не назначена.",
+					"teamMode": "Режим назначения команд все еще требует пересмотра.",
+					"edit": "Изменить черновик",
+					"prepare": "Подготовить проект делегирования",
+					"discard": "Отменить черновик",
+					"projectSearch": "Название проекта",
+					"search": "Поиск проектов",
+					"projectSelected": "Выбранный проект",
+					"moreProjects": "Больше проектов",
+					"loading": "Загрузка проектов...",
+					"empty": "Проекты не найдены.",
+					"task": "Название задачи",
+					"duration": "Продолжительность (минуты)",
+					"deadline": "Срок",
+					"save": "Сохранить черновик",
+					"cancelEdit": "Отменить редактирование",
+					"saving": "Сохранение черновика...",
+					"loadError": "Не удалось загрузить проекты. Попробуйте поискать еще раз.",
+					"fieldsError": "Выберите проект и укажите задачу, положительную продолжительность и будущий срок.",
+					"saveError": "Не удалось сохранить черновик. Ваши изменения сохраняются. Перезагрузите чат, если выбор изменился или ответ был потерян."
 				}
 			}
 		},
@@ -686,172 +745,172 @@
 		},
 		"heroExperiment": {
 			"nl_scheduling": {
-				"eyebrow": "Effortless natural-language scheduling",
-				"titleLead": "Just say it.",
-				"titleAccent": "It's scheduled.",
-				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
-				"primaryCta": "Tell Tiler what you need",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Schedule this for real",
-				"nudgeCaption": "That took one sentence. Yours will too.",
+				"eyebrow": "Удобное планирование на естественном языке",
+				"titleLead": "Просто скажи это.",
+				"titleAccent": "Это запланировано.",
+				"subtitle": "«Занимайся в спортзале четыре раза на этой неделе». «Перенеси мой отчет на четверг». Tiler понимает и перестраивает все остальное вокруг себя.",
+				"primaryCta": "Скажите Tiler, что вам нужно",
+				"secondaryCta": "Посмотрите, как это работает",
+				"nudgeCta": "Запланируйте это по-настоящему",
+				"nudgeCaption": "Это заняло одно предложение. Ваш тоже.",
 				"demo": {
-					"request": "Gym four times this week",
-					"schedule": "Schedule",
-					"scheduled": "Scheduled",
-					"thisWeek": "This week",
-					"rearranging": "rearranging",
-					"done": "done",
+					"request": "Тренажерный зал четыре раза на этой неделе",
+					"schedule": "Расписание",
+					"scheduled": "Запланировано",
+					"thisWeek": "На этой неделе",
+					"rearranging": "перестановка",
+					"done": "сделанный",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "Пн",
+						"tue": "Вт",
+						"wed": "Ср",
+						"thu": "Чт",
+						"fri": "Пт",
+						"sat": "Сб",
+						"sun": "Вс"
 					},
 					"items": {
-						"gym": "Gym",
-						"deepWork": "Deep work",
-						"standup": "Standup",
-						"report": "Report",
+						"gym": "Спортзал",
+						"deepWork": "Сосредоточенная работа",
+						"standup": "Короткая встреча команды",
+						"report": "Отчет",
 						"oneOnOne": "1:1",
-						"review": "Review",
-						"rest": "Rest"
+						"review": "Проверка",
+						"rest": "Отдых"
 					},
 					"legend": {
-						"placed": "placed",
-						"moving": "moving",
-						"moved": "report → Thu"
+						"placed": "запланировано",
+						"moving": "переносится",
+						"moved": "отчет → Чт"
 					}
 				}
 			},
 			"stop_deciding": {
-				"eyebrow": "Your day, planned for you",
-				"title": "Stop deciding when.",
-				"subtitle": "Add what you need to get done. Tiler builds your day around your working hours, your commute, and your deadlines.",
-				"primaryCta": "Build my first day",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Build my day",
-				"nudgeCaption": "You brought the list. Tiler brought the day.",
+				"eyebrow": "Ваш день, запланированный для вас",
+				"title": "Перестаньте решать, когда.",
+				"subtitle": "Добавьте то, что вам нужно сделать. Tiler строит ваш день вокруг рабочего времени, поездок на работу и сроков.",
+				"primaryCta": "Построй мой первый день",
+				"secondaryCta": "Посмотрите, как это работает",
+				"nudgeCta": "Построй мой день",
+				"nudgeCaption": "Вы принесли список. Tiler одержал победу.",
 				"demo": {
-					"listLabel": "Your list",
-					"scheduledLabel": "Today, scheduled",
+					"listLabel": "Ваш список",
+					"scheduledLabel": "Сегодня по расписанию",
 					"items": {
-						"memo": "Draft Q3 budget memo",
-						"pharmacy": "Call the pharmacy",
-						"review": "Review Ana's design file",
-						"gym": "Gym — legs",
-						"train": "Book train to Leeds"
+						"memo": "Проект бюджетной записки на третий квартал",
+						"pharmacy": "Позвоните в аптеку",
+						"review": "Просмотрите файл дизайна Аны",
+						"gym": "Тренажерный зал — ноги",
+						"train": "Забронировать поезд до Лидса"
 					},
-					"caption": "Placed around a 9–5 day and a 40-minute commute."
+					"caption": "Рассчитан на 9–5 дней и 40 минут в пути."
 				}
 			},
 			"self_healing": {
-				"eyebrow": "Automatic recovery from disruption",
-				"titleLead": "Your day fell apart at 10am.",
-				"titleAccent": "Your schedule already recovered.",
-				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
-				"primaryCta": "See it recover",
-				"secondaryCta": "See how it works",
-				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
-				"nudgeCta": "Keep this schedule",
-				"nudgeCaption": "Nothing was dropped. Nothing needed your attention.",
+				"eyebrow": "Автоматическое восстановление после сбоев",
+				"titleLead": "Твой день испортился в 10 утра.",
+				"titleAccent": "Ваше расписание уже восстановлено.",
+				"subtitle": "Опоздать, пропустить сеанс, позвонить в службу экстренной помощи — Tiler мгновенно восстанавливает остаток вашей недели.",
+				"primaryCta": "Смотри, как оно восстанавливается",
+				"secondaryCta": "Посмотрите, как это работает",
+				"footnote": "Никакой перепланировки. Никакой вины. Что-то пошло не так, и это уже было решено.",
+				"nudgeCta": "Держите это расписание",
+				"nudgeCaption": "Ничего не было сброшено. Ничто не требовало вашего внимания.",
 				"demo": {
-					"label": "Tuesday",
-					"status": "Rebuilt",
-					"rebuiltIn": "Rebuilt in 0.4s",
-					"clientCall": "Client call",
-					"onTrack": "on track",
-					"movedSameDay": "moved, same day",
-					"overran": "Ran 90 min late",
-					"wasAt": "was {{time}}",
+					"label": "Вторник",
+					"status": "Восстановлен",
+					"rebuiltIn": "Восстановлен за 0,4 с.",
+					"clientCall": "Звонок клиента",
+					"onTrack": "на ходу",
+					"movedSameDay": "переехал, в тот же день",
+					"overran": "Опоздал на 90 минут",
+					"wasAt": "был {{time}}",
 					"items": {
-						"morningReview": "Morning review",
-						"clientCall": "Client call",
-						"deepWork": "Deep work — draft",
-						"designSync": "Design sync",
-						"gym": "Gym"
+						"morningReview": "Утренний обзор",
+						"clientCall": "Звонок клиента",
+						"deepWork": "Глубокая работа — черновик",
+						"designSync": "Синхронизация дизайна",
+						"gym": "Спортзал"
 					},
-					"caption": "Gym kept · Deep work protected · Nothing dropped"
+					"caption": "Тренажерный зал сохранен · Глубокая работа защищена · Ничего не уронилось"
 				}
 			},
 			"task_splitting": {
-				"eyebrow": "Automatic decomposition of big work",
-				"titleLead": "One big task.",
-				"titleAccent": "Automatically split across your week.",
-				"subtitle": "Tell Tiler what's due and how long it'll take. It breaks the work into sessions and spreads them across your week.",
-				"primaryCta": "Split my first project",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Split my project",
-				"nudgeCaption": "One deadline in. Six sessions out.",
+				"eyebrow": "Автоматическая декомпозиция большой работы",
+				"titleLead": "Одна большая задача.",
+				"titleAccent": "Автоматически распределяется по неделе.",
+				"subtitle": "Сообщите Tiler, какой срок и сколько времени это займет. Он разбивает работу на сессии и распределяет их по всей неделе.",
+				"primaryCta": "Разделить мой первый проект",
+				"secondaryCta": "Посмотрите, как это работает",
+				"nudgeCta": "Разделить мой проект",
+				"nudgeCaption": "Один крайний срок истек. Шесть сессий позади.",
 				"demo": {
-					"label": "One task",
-					"status": "Split",
-					"task": "Thesis",
-					"total": "12 hrs",
-					"due": "Due Sun 14 Jun",
-					"dueFlag": "Due",
+					"label": "Одна задача",
+					"status": "Расколоть",
+					"task": "Диссертация",
+					"total": "12 часов",
+					"due": "Срок в воскресенье, 14 июня",
+					"dueFlag": "Должный",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "Пн",
+						"tue": "Вт",
+						"wed": "Ср",
+						"thu": "Чт",
+						"fri": "Пт",
+						"sat": "Сб",
+						"sun": "Вс"
 					},
 					"parts": {
-						"outline": "Outline",
-						"sources": "Sources",
-						"draftOne": "Draft ch. 1",
-						"notes": "Notes",
-						"draftTwo": "Draft ch. 2",
-						"edit": "Edit pass"
+						"outline": "Контур",
+						"sources": "Источники",
+						"draftOne": "Проект гл. 1",
+						"notes": "Заметки",
+						"draftTwo": "Проект гл. 2",
+						"edit": "Изменить пропуск"
 					},
-					"caption": "6 sessions · spread unevenly around your week"
+					"caption": "6 занятий · распределены неравномерно по неделе"
 				}
 			},
 			"capacity_check": {
-				"eyebrow": "An honest capacity reality check",
-				"title": "Does it actually fit?",
-				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
-				"primaryCta": "See if your week fits",
-				"secondaryCta": "See how it works",
-				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
-				"nudgeCta": "Check my real week",
-				"nudgeCaption": "Better to know on Monday than to discover it on Friday.",
+				"eyebrow": "Честная проверка реальности",
+				"title": "Действительно ли оно подходит?",
+				"subtitle": "Tiler переводит каждую задачу в режим реального времени. Если неделя не подходит, вы узнаете об этом сейчас, а не вечером в пятницу.",
+				"primaryCta": "Посмотрите, подходит ли вам неделя",
+				"secondaryCta": "Посмотрите, как это работает",
+				"footnote": "Большинство планировщиков позволяют вам перечислить больше, чем вы когда-либо сможете сделать. Этот занимается арифметикой.",
+				"nudgeCta": "Проверьте мою реальную неделю",
+				"nudgeCaption": "Лучше узнать в понедельник, чем узнать в пятницу.",
 				"demo": {
-					"label": "This week",
-					"capacity": "Over capacity",
-					"overflow": "Overflow",
-					"load": "38 hrs of work / 32 hrs available",
-					"wontFit": "6 hrs won't fit",
+					"label": "На этой неделе",
+					"capacity": "Избыточная мощность",
+					"overflow": "Переполнение",
+					"load": "38 часов работы / 32 часа в наличии",
+					"wontFit": "Не помещается 6 часов работы",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri"
+						"mon": "Пн",
+						"tue": "Вт",
+						"wed": "Ср",
+						"thu": "Чт",
+						"fri": "Пт"
 					},
 					"items": {
-						"standup": "Standup + planning",
-						"designReview": "Design review",
-						"deepWork": "Deep work",
-						"sync": "Sync",
-						"build": "Build",
-						"inbox": "Inbox",
-						"oneOnOnes": "1:1s",
-						"sprintPrep": "Sprint prep",
-						"writeup": "Writeup",
-						"retro": "Retro",
-						"implementation": "Implementation",
-						"qaHandoff": "QA handoff",
-						"demo": "Demo",
-						"wrapUp": "Wrap-up",
-						"review": "Review",
-						"urgentFix": "Urgent fix",
-						"clientCall": "Client call"
+						"standup": "Короткая встреча + планирование",
+						"designReview": "Обзор дизайна",
+						"deepWork": "Сосредоточенная работа",
+						"sync": "Координационная встреча",
+						"build": "Разработка",
+						"inbox": "Входящие",
+						"oneOnOnes": "Личные встречи",
+						"sprintPrep": "Подготовка к спринту",
+						"writeup": "Подготовка отчёта",
+						"retro": "Ретроспектива",
+						"implementation": "Выполнение",
+						"qaHandoff": "Передача контроля качества",
+						"demo": "Демонстрация",
+						"wrapUp": "Подведение итогов",
+						"review": "Проверка",
+						"urgentFix": "Срочное исправление",
+						"clientCall": "Звонок клиента"
 					}
 				}
 			}
@@ -1078,7 +1137,7 @@
 				"lunchBreak": "Обеденный перерыв",
 				"teamSync": "Синхронизация команды",
 				"projectReview": "Обзор проекта",
-				"happyHour": "Happy Hour",
+				"happyHour": "Счастливый час",
 				"breakfastWithFriends": "Завтрак с друзьями",
 				"groceryShopping": "Покупка продуктов",
 				"gymWorkouts": "Тренировка в спортзале"
@@ -1455,7 +1514,10 @@
 					"options": [
 						{
 							"value": "google",
-							"label": "Google Календарь"
+							"label": "Google Календарь",
+							"tileshareActivity": {
+								"title": "Деятельность"
+							}
 						},
 						{
 							"value": "outlook",
@@ -1791,28 +1853,28 @@
 				"headerRight": "Tiler",
 				"rows": [
 					{
-						"left": "You schedule everything manually",
-						"right": "AI builds your schedule from plain English"
+						"left": "Вы планируете все вручную",
+						"right": "ИИ строит ваше расписание с помощью простого английского языка"
 					},
 					{
-						"left": "No awareness of travel time",
-						"right": "Auto-calculates and adds travel buffers"
+						"left": "Нет информации о времени в пути",
+						"right": "Автоматически рассчитывает и добавляет буферы перемещения"
 					},
 					{
-						"left": "Static — won’t adapt when things change",
-						"right": "Detects ripples and reschedules instantly"
+						"left": "Статический — не адаптируется, когда что-то меняется.",
+						"right": "Обнаруживает пульсации и мгновенно меняет расписание"
 					},
 					{
-						"left": "No navigation or route planning",
-						"right": "Navigate your day tile-to-tile with real transit"
+						"left": "Никакой навигации и планирования маршрута.",
+						"right": "Перемещайтесь по частям дня с помощью реального транспорта"
 					},
 					{
-						"left": "Shared calendars only — no task assignment",
-						"right": "TileShare: assign and track tasks with anyone"
+						"left": "Только общие календари — без назначения задач",
+						"right": "TileShare: назначайте и отслеживайте задачи вместе с кем угодно"
 					},
 					{
-						"left": "Nothing confirmed — events just appear",
-						"right": "Confirmation-first — you approve all changes"
+						"left": "Ничего не подтверждено — события просто появляются",
+						"right": "Сначала подтверждение — вы одобряете все изменения"
 					}
 				]
 			}
@@ -2085,7 +2147,14 @@
 				"board": "Режим доски"
 			},
 			"board": {
-				"empty": "Здесь пока нет Tilette"
+				"empty": "Здесь пока нет Tilette",
+				"filterAria": "Задания совета",
+				"filter": {
+					"all": "Каждый",
+					"mine": "Только я"
+				},
+				"accepting": "Принятие…",
+				"dropHint": "Перейдите сюда, чтобы принять ваше приглашение"
 			},
 			"viewAria": "Режим Tilette",
 			"openTiletteAria": "Открыть Tilette",
@@ -2393,40 +2462,40 @@
 				"date": "1 мая 2026 г.",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "Большинство инструментов планирования относятся к вам как к оператору календаря. Вы перетаскиваете, опускаете, меняете размер, а затем жизнь меняется, и вы начинаете все сначала. Tiler использует другой подход: вы говорите, он планирует."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "Введите что-то вроде «Дантист в 9 утра в четверг, затем кофе с Прией в центре города около 11», а Tiler сделает все остальное. Продолжительность, время в пути, буферные промежутки, подтверждение. Все это."
 					},
 					{
-						"title": "How it works"
+						"title": "Как это работает"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "Опишите задачу",
+						"stepBody": "Введите то, что вам нужно сделать, на простом английском языке. Никакого специального синтаксиса, никаких выпадающих списков. «Занятия в спортзале завтра утром в течение часа» достаточно, чтобы начать.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Что понимает Tiler",
+							"text": "Относительное время («завтра»), продолжительность («час») и подсказки местоположения («центр города»). Никакой дополнительной настройки не требуется."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "ИИ заполняет пробелы",
+						"stepBody": "Tiler обосновывает ваш запрос, прежде чем ответить. Он определяет продолжительность поездки из контекста, проверяет ваши существующие обязательства и учитывает расходы на поездку. Если одна деталь действительно неясна, она задает один целевой вопрос, а не форму.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "Рассуждать, а не гадать",
+							"text": "Tiler делает перекрестные ссылки на ваше местоположение, существующие плитки и предпочтительные временные окна, прежде чем что-либо предлагать."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "Просмотрите, затем подтвердите",
+						"stepBody": "Tiler показывает предлагаемое расписание с полной информацией: время, место и путь. Вы подтверждаете, корректируете или запрашиваете альтернативы. Ничто не появится в вашем календаре без вашего согласия.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "Сначала подтверждение",
+							"text": "Tiler предлагает. Вы решаете. Вы сохраняете контроль, даже когда ИИ выполняет тяжелую работу."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "Вы живете этим. Tiler планирует это."
 					}
 				]
 			},
@@ -2440,40 +2509,40 @@
 				"date": "8 мая 2026 г.",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "Большинство календарей предполагают, что как только одно задание закончится, вы будете готовы к следующему. Но в реальной жизни есть дорога на работу. Tiler встраивает поездки на работу в ваше расписание, поэтому каждый блок на вашей временной шкале фактически отражает, где вам нужно быть."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "Добавьте встречу, поручение, чашечку кофе или встречу из школы. Tiler автоматически рассчитывает, как вы туда доберетесь и сколько времени это займет, а затем включает время в пути прямо в ваш день."
 					},
 					{
-						"title": "How it works"
+						"title": "Как это работает"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "Установите местоположение один раз",
+						"stepBody": "Вам не нужно каждый раз вводить точные адреса. Настройте свой дом, работу и другие обычные места один раз. С этого момента Tiler знает, откуда вы начинаете и куда направляетесь.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Метки местоположения Tiler понимает",
+							"text": "Дом · Работа · Центр города · Тренажерный зал · Рядом с офисом"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "Временные интервалы путешествия в вашей временной шкале",
+						"stepBody": "Каждый раз, когда вы добавляете задачу с местоположением, Tiler вставляет блок перемещения между ней и всем, что находится до или после. Он отображается в вашей хронике как отдельный сегмент, поэтому вы всегда знаете, когда вам нужно уйти.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "Реальные маршруты, а не оценки",
+							"text": "Tiler использует данные маршрутов в режиме реального времени, охватывающие вождение, транспорт и ходьбу, поэтому время в пути отражает то, как вы на самом деле передвигаетесь."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "Соседние задачи группируются автоматически",
+						"stepBody": "Когда несколько задач выполняются в одном районе города, Tiler группирует их вместе, чтобы вы не перемещались по городу зигзагами. Поручения рядом с тренажерным залом можно найти до или после тренировки. Посещение клиента недалеко от центра города сочетается с обедом неподалеку.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "Меньше путешествовать, больше делать",
+							"text": "Умная группировка означает меньше поездок, меньше времени, потраченного впустую в пути, и день проходит так, как надо."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "Чтобы что-то сделать, нужно не только найти время. Речь идет о том, чтобы оказаться в нужном месте."
 					}
 				]
 			},
@@ -2487,49 +2556,49 @@
 				"date": "22 июня 2026 г.",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "Изменение графика кажется рискованным. Переместите одну задачу, и вы не будете уверены, что еще изменится. Примите предложение и задайте себе вопрос, был ли это правильный выбор. Расписание отмены дает вам безопасную зону между намерением и обязательством."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Каждое изменение в Tiler, независимо от того, набрали ли вы запрос, приняли предложение или переместили плитку, сначала отображается в виде предварительного просмотра. Ваше расписание прямых трансляций останется нетронутым, пока вы не скажете об этом."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Как работает отмена расписания"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "Внести изменения",
+						"stepBody": "Переместите плитку, добавьте новую задачу или примите предложение ИИ. Вместо немедленного сохранения Tiler отправляет изменение в режим предварительного просмотра. Он отображается с пунктирной рамкой и меткой ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР, чтобы вы знали, что он еще не загружен.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "Ничего не сохраняется автоматически",
+							"text": "Пока вы просматриваете, ваше расписание в реальном времени заморожено. Никаких частичных сохранений и случайных перезаписей."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "Посмотрите, что именно изменилось",
+						"stepBody": "На плитке предварительного просмотра отображаются обновленное имя, местоположение, время и дата рядом с тем, что было раньше. Вы видите полную картину с первого взгляда, без необходимости мысленно отслеживать, что движется."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Нажмите «Отменить» или «Принять».",
+						"stepBody": "Не довольны результатом? Нажмите «Отменить», и исходное расписание мгновенно вернется к исходному состоянию. Доволен этим? Нажмите «Принять», и он зафиксируется. В любом случае вы сделали звонок.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Отмена всегда происходит мгновенно.",
+							"text": "Нет истории отмены для прокрутки. Одно касание, и ваше исходное состояние возвращается, независимо от того, насколько сильно оно было смещено в предварительном просмотре."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "Почему это важно"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "Большинство приложений-календарей немедленно применяют изменения и просят отменить их уже после того, как сработают уведомления, произойдет синхронизация и ущерб будет нанесен. Расписание отмены переворачивает это. По умолчанию используется предварительный просмотр, а не сохранение."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "Создан для насыщенных дней",
+						"text": "Когда у вас нет слабины в течение дня, неверный шаг может отразиться на всем. Расписание отмены дает вам возможность передохнуть и проверить, прежде чем какие-либо изменения вступят в силу."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "Независимо от того, переносите ли вы тренировку, переносите встречу или беретесь за задание, которое прислал вам коллега, этап предварительного просмотра занимает меньше секунды и может уберечь вас от звонка, о котором вы пожалеете."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "Измените свое мнение, прежде чем это имеет значение."
 					}
 				]
 			},
@@ -2543,39 +2612,316 @@
 				"date": "22 мая 2026 г.",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "Большинство передач задач завершаются потоком. Вы отправляете его, они читают, забывают запланировать, вы следите за ним. Tileshare вырезает середину. Поделитесь плиткой, и она попадет в их Tiler, как уже запланировано."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "Когда вы делитесь плиткой, она появляется как активная адаптивная задача в расписании получателя. Он находит лучшее свободное место вокруг своих существующих обязательств. Никакого размещения на обоих концах не требуется."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Как работает Tileshare"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "Поделитесь любой плиткой",
+						"stepBody": "В любом задании в расписании нажмите «Поделиться» и выберите контакт Tiler. Плитка отправляется со всем, что нужно получателю для ее выполнения.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "Что путешествует с плиткой",
+							"text": "Название задачи, предполагаемая продолжительность, крайний срок и теги местоположения. Личное расписание получателя остается полностью конфиденциальным."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "Это попадает в их расписание",
+						"stepBody": "Общая плитка появляется в Tiler получателя и находит лучший свободный слот в соответствии с его существующими обязательствами. Он адаптируется к их дню, а не наоборот."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "Отслеживайте его, не гоняясь",
+						"stepBody": "После отправки задачи вы можете увидеть, когда она была запланирована, когда будет выполнена и будет ли она перенесена. Никаких последующих сообщений. Никаких проверок статуса. Вы узнаете.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "Общая подотчетность, отсутствие трений",
+							"text": "Обе стороны видят одну и ту же плитку. Один завершает это. Другой видит, что это сделано. Делегирование, которое фактически замыкает цикл."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "Отправьте один раз. Знайте, что это будет сделано."
 					}
 				]
 			}
 		}
+	},
+	"tileShareDensity": {
+		"respond": "Отвечать",
+		"accepted": "{{accepted}}/{{total}} принято",
+		"task": "Tilette",
+		"people": "Люди",
+		"response": "Ответ"
+	},
+	"tileShareVisual": {
+		"edit": "Редактировать",
+		"hours_one": "{{count}} час",
+		"hours_other": "{{count}} часа",
+		"hours_few": "{{count}} часа",
+		"hours_many": "{{count}} часов"
+	},
+	"tileShareEdit": {
+		"lateTitle": "Срок оплаты после крайнего срока TileShare",
+		"durationLabel": "Продолжительность",
+		"nameShort": "Используйте не менее 3 символов.",
+		"nameLong": "Используйте не более 100 символов.",
+		"nameHint": "Используйте от 3 до 100 символов.",
+		"beforeStart": "Крайний срок должен совпадать с временем начала или позже него.",
+		"time": "Время крайнего срока",
+		"inherited": "Для этой задачи Tilette действует срок TileShare, пока вы не зададите отдельный срок.",
+		"afterShare": "Эта tilette должна быть выполнена после крайнего срока TileShare ({{deadline}}).",
+		"moveShare": "Также переместите крайний срок TileShare на {{deadline}}.",
+		"durationFixed": "Продолжительность tilette не может измениться после ее публикации.",
+		"duration": "{{minutes}} минут",
+		"modeFixed": "Режим не может измениться после публикации.",
+		"acceptedImpact_one": "{{count}} принятая задача Tilette с более поздним сроком может быть перенесена на этот срок.",
+		"acceptedImpact_other": "Срок {{count}} принятой задачи Tilette с более поздним сроком может быть перенесён на эту дату.",
+		"unacceptedImpact_one": "{{count}} задача Tilette, которую никто не принял, сохраняет более поздний срок.",
+		"unacceptedImpact_other": "Для {{count}} задачи Tilette, которую никто не принял, сохраняется более поздний срок.",
+		"unchanged": "Нет изменений для сохранения.",
+		"retry": "Повторить попытку сохранения",
+		"saveFailed": "Не удалось сохранить сейчас. Ваши изменения сохраняются. Попробуйте еще раз.",
+		"shareFailed": "Задача Tilette сохранена, но обновить срок TileShare не удалось. Повторите попытку, чтобы завершить операцию, или закройте окно, чтобы оставить сохранённую задачу.",
+		"partialDiscard": "Изменения задачи Tilette уже сохранены. При закрытии ожидающее изменение срока TileShare будет отменено.",
+		"discard": "Несохраненные изменения этих данных будут потеряны.",
+		"acceptedImpact_few": "{{count}} принятые задачи Tilette с более поздним сроком могут быть перенесены на этот срок.",
+		"acceptedImpact_many": "{{count}} принятых задач Tilette с более поздним сроком могут быть перенесены на этот срок.",
+		"unacceptedImpact_few": "{{count}} задачи Tilette, которые никто не принял, сохраняют более поздние сроки.",
+		"unacceptedImpact_many": "{{count}} задач Tilette, которые никто не принял, сохраняют более поздние сроки."
+	},
+	"tileShareNotes": {
+		"createdPending": "Задача Tilette создана. Заметки ещё нужно сохранить; повторная попытка не создаст ещё одну задачу.",
+		"retrySave": "Повторить попытку сохранения заметок.",
+		"title": "Заметки",
+		"edit": "Редактировать заметки",
+		"empty": "Примечаний пока нет.",
+		"loadError": "Не удалось загрузить заметки.",
+		"saveError": "Не удалось сохранить заметки. Ваши изменения все еще здесь; Попробуйте еще раз.",
+		"useSaved": "Использовать сохраненную заметку",
+		"truncated": "Заметка превысила лимит сервера. Прежде чем продолжить, просмотрите сохраненную заметку."
+	},
+	"tileShareMarkdown": {
+		"write": "Написать",
+		"preview": "Предпросмотр",
+		"formatting": "Форматирование заметок",
+		"previewLabel": "Предварительный просмотр заметки",
+		"empty": "Пока ничего для предварительного просмотра.",
+		"hint": "Поддерживается Markdown: заголовки, жирный шрифт, списки, ссылки и код."
+	},
+	"tileShareModes": {
+		"broadcast": {
+			"label": "Рассылка",
+			"title": "Создать рассылку",
+			"description": "Поделитесь одной задачей. У каждого получателя свое задание.",
+			"submit": "Создать рассылку"
+		},
+		"class": {
+			"label": "Сорт",
+			"title": "Создать класс",
+			"description": "Поделитесь набором tilettes. Каждый участник получает каждое задание.",
+			"submit": "Создать класс"
+		},
+		"project": {
+			"label": "Проект",
+			"title": "Создать проект",
+			"description": "Работайте вместе над набором задач. Назначайте исполнителей для каждой задачи Tilette.",
+			"submit": "Создать проект"
+		},
+		"location": "Местоположение (необязательно)",
+		"addTilettesNow": "Сначала добавьте tilettes (необязательно)",
+		"optionalTilettes": "Необязательный. Вы также можете добавлять tilettes после создания TileShare.",
+		"tiletteNumber": "Tilette {{number}}",
+		"addTilette": "Добавить Tilette",
+		"removeTilette": "Удалить tilette",
+		"moveUp": "Вверх",
+		"moveDown": "Двигаться вниз",
+		"deadlineDefault": "Использует крайний срок TileShare: {{deadline}}.",
+		"everyone": "Присваивается каждому участнику Класса.",
+		"addRecipient": "Добавить получателя",
+		"removeRecipient": "Удалить {{recipient}}",
+		"assignees": "Исполнители (необязательно)",
+		"tiletteLocation": "расположение Tilette",
+		"perspective": "TileShare перспектива",
+		"projectView": "Вид проекта",
+		"classView": "Представление класса",
+		"unknown": "Режим общего доступа недоступен.",
+		"participants": "Участники",
+		"participantContact": "Электронная почта или телефон участника",
+		"classActions": "Участники занятий",
+		"addToAll": "Добавить ко всем tilettes",
+		"removeFromAll": "Удалить из всех tilettes",
+		"removeFromClassConfirm": "Удалить этого участника из всех tilette в классе?",
+		"emptyClass": "Добавьте tilette, чтобы начать распределять работу между участниками.",
+		"acceptAll": "Принять все ожидающие tilettes",
+		"declineAll": "Отклонить все ожидающие tilettes",
+		"partialChange": "Сохранено изменений: {{saved}}. Требуют повторной попытки: {{failed}}.",
+		"changesSaved": "Изменения сохранены.",
+		"retryRemaining": "Повторить оставшиеся изменения",
+		"refreshFailed": "Изменения были отправлены, но TileShare не смог обновиться. Перезагрузите, чтобы проверить сохраненные задания."
+	},
+	"tileshareList": {
+		"title": "TileShares",
+		"createdByMe": "Создано мной",
+		"sort": "Сортировать по",
+		"createdDesc": "Время создания: сначала новые",
+		"createdAsc": "Время создания: сначала самые старые",
+		"deadlineAsc": "Срок: сначала раньше",
+		"deadlineDesc": "Срок: сначала последний",
+		"empty": "Ни один TileShares не соответствует этому фильтру.",
+		"failed": "Не удалось загрузить TileShares.",
+		"retry": "Повторить"
+	},
+	"tileshareRsvp": {
+		"accepted": "Принято",
+		"declined": "Отклонено",
+		"none": "Ожидание ответа",
+		"tentative": "Под вопросом",
+		"unknown": "Неизвестный ответ",
+		"yours": "Ваш ответ",
+		"response": "Ответ на приглашение",
+		"responses": "Ответы на приглашения",
+		"noParticipants": "Нет участников",
+		"viewPeople": "Посмотреть ответы",
+		"participant": "Участник"
+	},
+	"tileshareInvitations": {
+		"yourInvitation": "Вы приглашены на это задание.",
+		"unavailable": "Это приглашение больше не находится на рассмотрении.",
+		"title": "Приглашения",
+		"refresh": "Обновить",
+		"all": "Все приглашения",
+		"loading": "Загрузка приглашений…",
+		"failed": "Не удалось загрузить приглашения. Обновите, чтобы повторить попытку.",
+		"empty": "Нет ожидающих приглашений.",
+		"pending": "ожидающие tilettes",
+		"review": "Просмотрите приглашения",
+		"from": "Кто пригласил",
+		"due": "Срок:",
+		"accept": "Принять",
+		"decline": "Отклонить",
+		"changeResponse": "Изменить ответ",
+		"cancel": "Отмена",
+		"currentAccepted": "Текущий ответ: Принято.",
+		"currentDeclined": "Текущий ответ: Отклонено.",
+		"updatedAccepted": "Ответ обновлен на «Принято».",
+		"updatedDeclined": "Ответ изменен на «Отклонено».",
+		"responding": "Сохранение ответа…",
+		"next": "Следующая страница",
+		"accepted": "Принято. Ваша задача создана.",
+		"declined": "Приглашение отклонено.",
+		"responseFailed": "Ответ не удалось подтвердить. Обновите, чтобы проверить его статус, прежде чем повторить попытку."
+	},
+	"chat": {
+		"tileShare": {
+			"reviewAgain": "Прежде чем подтвердить еще раз, просмотрите текущее предложение.",
+			"uncertain": "Создание не удалось подтвердить. Проверьте статус, прежде чем повторить попытку.",
+			"created": "TileShare создан.",
+			"open": "Открыть TileShare",
+			"review": "Обзор создания TileShare",
+			"newProject": "Создать проект",
+			"newTilette": "Добавить Tilette",
+			"project": "Проект",
+			"starts": "Начинается",
+			"deadline": "Срок",
+			"minutes": "минуты",
+			"reviewNote": "Ничего не будет создано, пока вы не подтвердите. Получатели по-прежнему решают, принимать ли их; уведомления не отправляются этим действием.",
+			"checking": "Проверка...",
+			"confirm": "Подтвердить создание",
+			"check": "Проверить статус"
+		},
+		"execution": {
+			"mode": "Выполнение чата",
+			"confirmFirst": "Сначала подтвердите",
+			"autoAct": "Выполнять автоматически",
+			"autoNote": "Автоматически запускайте поддерживаемые действия в чате. Массовые и деструктивные изменения все еще требуют пересмотра.",
+			"confirmNote": "Просматривайте изменения чата перед их запуском."
+		}
+	},
+	"chat.tileShare.renamed": "Проект переименован.",
+	"chat.tileShare.renameReview": "Проверить переименование проекта",
+	"chat.tileShare.renameProject": "Переименовать проект",
+	"chat.tileShare.previousName": "Текущее имя",
+	"chat.tileShare.renameNote": "После подтверждения меняется только название проекта.",
+	"chat.tileShare.confirmRename": "Подтвердить переименование",
+	"chat.tileShare.renameUncertain": "Переименование не может быть подтверждено. Проверьте статус, прежде чем повторить попытку.",
+	"chat.tileShare.tiletteRenamed": "Tilette переименована.",
+	"chat.tileShare.tiletteRenameReview": "Переименование tilette проверки",
+	"chat.tileShare.renameTilette": "Переименовать tilette",
+	"chat.tileShare.tiletteRenameNote": "Изменяется только имя общей tilette. Заголовки личного календаря остаются без изменений.",
+	"chat.tileShare.notesUpdated": "примечания к Tilette обновлены.",
+	"chat.tileShare.notesReview": "Просмотр примечаний к tilette",
+	"chat.tileShare.editNotes": "Обновить примечания к tilette",
+	"chat.tileShare.previousNotes": "Текущие заметки",
+	"chat.tileShare.proposedNotes": "Предлагаемые примечания",
+	"chat.tileShare.emptyNotes": "Нет примечаний",
+	"chat.tileShare.clearNotes": "Очистить заметки",
+	"chat.tileShare.notesNote": "Предложенный текст заменяет полные примечания к tilette после подтверждения.",
+	"chat.tileShare.confirmNotes": "Подтвердите примечания",
+	"chat.tileShare.notesUncertain": "Обновление Notes не может быть подтверждено. Проверьте статус, прежде чем повторить попытку.",
+	"chat.tileShare.tiletteDeleted": "Tilette удалена.",
+	"chat.tileShare.deleteReview": "Проверка удаления tilette",
+	"chat.tileShare.deleteTilette": "Удалить tilette",
+	"chat.tileShare.assignmentCount": "Задания",
+	"chat.tileShare.linkedCalendarCount": "Связанные элементы календаря",
+	"chat.tileShare.deleteNote": "Это отключает работу tilettes и связанного календаря. Проект и другие tilettes остаются доступными. История назначений сохраняется; отмена здесь не предусмотрена.",
+	"chat.tileShare.confirmDeletion": "Подтвердить удаление",
+	"chat.tileShare.deleteUncertain": "Удаление не удалось подтвердить. Проверьте статус, прежде чем повторить попытку.",
+	"chat.tileShare.openProject": "Открыть проект",
+	"chat.tileShare.tiletteUpdated": "Tilette обновлена.",
+	"chat.tileShare.updateReview": "Просмотр обновления tilette",
+	"chat.tileShare.updateTilette": "Обновить tilette",
+	"chat.tileShare.updateNote": "Все отображаемые изменения сохраняются вместе после подтверждения. Прилагаемые примечания заменяют полную примечание.",
+	"chat.tileShare.confirmUpdate": "Подтвердить обновление",
+	"chat.tileShare.updateRejected": "Никаких изменений не было применено. Просмотрите ответ и запросите исправленное обновление.",
+	"chat.tileShare.updateUncertain": "Обновление не может быть подтверждено. Проверьте статус, прежде чем повторить попытку.",
+	"chat.tileShare.schedulePending": "Расчет графиков принятых работ. Изменения пока не сохранены.",
+	"chat.tileShare.scheduleNoFit": "Никаких изменений не было применено. Оставшаяся работа не могла уместиться в защищенных сеансах. Измените продолжительность или крайний срок и запросите пересмотренное обновление.",
+	"chat.tileShare.scheduleFailed": "Никаких изменений не было применено. Расписание изменилось или расчет не удалось завершить. Запросить исправленное обновление.",
+	"chat.tileShare.updateProject": "Обновить проект",
+	"chat.tileShare.projectUpdateReview": "Обзор обновлений проекта",
+	"chat.tileShare.projectUpdated": "Проект обновлен.",
+	"chat.tileShare.manageAccess": "Управление доступом к проекту",
+	"chat.tileShare.manageRecipients": "Управление получателями",
+	"chat.tileShare.managementUpdated": "Изменения получателя или доступа сохранены.",
+	"chat.tileShare.managementNote": "Просмотрите получателя и эффекты доступа выше. Очистка и восстановление доступа к календарю выполняются в фоновом режиме.",
+	"chat.tileShare.accessReconciliation": "Доступ сохранен. Очистка или восстановление календаря выполняется в фоновом режиме.",
+	"chat.tileShare.planTargetPending": "Ожидание комбинированного расчета",
+	"chat.tileShare.planTargetNotApplied": "Не применяется",
+	"chat.tileShare.planReview": "Просмотрите план совместной работы",
+	"chat.tileShare.planUpdated": "Проверенные изменения сохранены вместе.",
+	"chat.tileShare.planNote": "Все отображаемые цели сохраняются вместе после подтверждения. Если какие-либо цели изменились или доступ потерян, рассмотрите новое предложение.",
+	"tileShareComposer": {
+		"close": "Закрыть",
+		"shareDeadline": "TileShare срок",
+		"moveShareDeadline": "Также переместите крайний срок TileShare на {{deadline}}.",
+		"count_one": "Добавлено {{count}} задание Tilette",
+		"count_other": "Добавлено {{count}} задания Tilette",
+		"newTilette": "Новая tilette",
+		"emptyTitle": "Добавляйте tilettes в свой TileShare",
+		"emptyDescription": "Добавьте задачи сейчас или создайте TileShare и добавляйте задачи позже.",
+		"editTilette": "Редактировать {{name}}",
+		"removeTilette": "Удалить {{name}}",
+		"locationNotSet": "Местоположение не установлено",
+		"unassigned": "Неназначенный",
+		"added": "{{name}} был добавлен в этот черновик.",
+		"updated": "{{name}} был обновлен.",
+		"removed": "{{name}} был удален из этого черновика.",
+		"addTitle": "Создать tilette",
+		"editTitle": "Изменить Tilette",
+		"saveTilette": "Сохранить tilette",
+		"classHint": "Эта tilette будет назначена каждому участнику класса при создании TileShare.",
+		"projectHint": "Добавьте задачу и при необходимости выберите ее исполнителей. Приглашения рассылаются при создании Проекта.",
+		"optionalDescription": "Хотите включить задачи во время создания? Вы можете добавлять задачи сейчас или сначала создать TileShare.",
+		"reviewTilettes": "Проверить задачи Tilette ({{count}})",
+		"editDetails": "Изменить детали",
+		"cancelExit": "Отмена и выход",
+		"discardTitle": "Отменить изменения?",
+		"discard": "Отменить изменения",
+		"keepEditing": "Продолжить редактирование",
+		"discardTask": "Несохраненные изменения tilettes будут потеряны. Остальные tilettes останутся в проекте.",
+		"discardShare": "Ваши данные TileShare и черновики tilettes будут потеряны. Приглашения не были отправлены.",
+		"count_few": "Добавлено {{count}} задания Tilette",
+		"count_many": "Добавлено {{count}} заданий Tilette"
 	}
 }

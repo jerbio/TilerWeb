@@ -7,6 +7,15 @@ import '@testing-library/jest-dom/vitest';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { scheduleService } from '@/services';
 import { CalendarUIProvider } from '../../calendar-ui.provider';
+import { toast } from 'sonner';
+import {
+	INVALID_EVENT_RESPONSE,
+	parseCreatedScheduleEvent,
+} from '@/services/scheduleEventResponse';
+import { CalendarEntityType } from '../../calendarRequestContext';
+
+const { dispatchMock } = vi.hoisted(() => ({ dispatchMock: vi.fn() }));
+vi.mock('sonner', () => ({ toast: { error: vi.fn() } }));
 
 // Mock dependencies
 vi.mock('react-i18next', () => ({
@@ -24,7 +33,7 @@ vi.mock('@/services', () => ({
 	},
 }));
 vi.mock('@/core/common/components/calendar/CalendarRequestProvider', () => ({
-	useCalendarDispatch: () => vi.fn(),
+	useCalendarDispatch: () => dispatchMock,
 }));
 
 import CalendarCreateBlock from '..';
@@ -58,6 +67,52 @@ const mockCreateBlockResponse = {
 } as Awaited<ReturnType<typeof scheduleService.createEvent>>;
 
 describe('CalendarCreateBlock', () => {
+	it('shows the created name and navigates without a parent event', async () => {
+		vi.mocked(scheduleService.createEvent).mockResolvedValueOnce({
+			id: 'created-block',
+			name: 'Deep Work',
+			start: 1792544400000,
+			end: 1792548000000,
+		});
+		renderWithProviders(
+			<CalendarCreateBlock
+				formHandler={setupForm({ name: 'Deep Work' })}
+				refetchEvents={vi.fn()}
+			/>
+		);
+		await openModal();
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+		expect(await screen.findByText('Deep Work')).toBeInTheDocument();
+		await userEvent.click(screen.getByRole('button', { name: /viewInTimeline/i }));
+		expect(dispatchMock).toHaveBeenCalledWith(
+			expect.objectContaining({
+				entityId: 'created-block',
+				entityType: CalendarEntityType.SubcalendarEvent,
+			}),
+			expect.any(Function)
+		);
+	});
+
+	it('shows an incompatible response error and keeps the form available', async () => {
+		vi.mocked(scheduleService.createEvent).mockImplementationOnce(async () =>
+			parseCreatedScheduleEvent({ Error: { Code: '0' }, Content: { subEvents: [] } })
+		);
+		const refetchEvents = vi.fn();
+		renderWithProviders(
+			<CalendarCreateBlock
+				formHandler={setupForm({ name: 'Deep Work' })}
+				refetchEvents={refetchEvents}
+			/>
+		);
+		await openModal();
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+		await waitFor(() =>
+			expect(toast.error).toHaveBeenCalledWith(`Error: ${INVALID_EVENT_RESPONSE}`)
+		);
+		expect(refetchEvents).not.toHaveBeenCalled();
+		expect(screen.getByRole('button', { name: /submit/i })).toBeEnabled();
+	});
+
 	afterEach(() => {
 		vi.resetAllMocks();
 	});

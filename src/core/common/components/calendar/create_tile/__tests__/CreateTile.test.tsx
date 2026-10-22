@@ -7,6 +7,15 @@ import '@testing-library/jest-dom/vitest';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { scheduleService, userService } from '@/services';
 import { CalendarUIProvider } from '../../calendar-ui.provider';
+import { toast } from 'sonner';
+import {
+	INVALID_EVENT_RESPONSE,
+	parseCreatedScheduleEvent,
+} from '@/services/scheduleEventResponse';
+import { CalendarEntityType } from '../../calendarRequestContext';
+
+const { dispatchMock } = vi.hoisted(() => ({ dispatchMock: vi.fn() }));
+vi.mock('sonner', () => ({ toast: { error: vi.fn() } }));
 
 // Mock dependencies
 vi.mock('@/hooks/useFormHandler', () => () => ({
@@ -31,7 +40,7 @@ vi.mock('@/services', () => ({
 	userService: { getScheduleProfile: vi.fn() },
 }));
 vi.mock('@/core/common/components/calendar/CalendarRequestProvider', () => ({
-	useCalendarDispatch: () => vi.fn(),
+	useCalendarDispatch: () => dispatchMock,
 }));
 
 import CalendarCreateTile from '..';
@@ -81,6 +90,50 @@ const mockGetScheduleProfileResponse = {
 } as Awaited<ReturnType<typeof userService.getScheduleProfile>>;
 
 describe('CalendarCreateTile UI', () => {
+	it('shows the created name and navigates without a parent event', async () => {
+		vi.mocked(scheduleService.createEvent).mockResolvedValueOnce({
+			id: 'created-tile',
+			name: 'Scheduled study',
+			start: 1792544400000,
+			end: 1792548000000,
+		});
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler(mockValidFormState)}
+				refetchEvents={vi.fn()}
+			/>
+		);
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+		expect(await screen.findByText('Scheduled study')).toBeInTheDocument();
+		await userEvent.click(screen.getByRole('button', { name: /viewInTimeline/i }));
+		expect(dispatchMock).toHaveBeenCalledWith(
+			expect.objectContaining({
+				entityId: 'created-tile',
+				entityType: CalendarEntityType.SubcalendarEvent,
+			}),
+			expect.any(Function)
+		);
+	});
+
+	it('shows an incompatible response error and keeps the form available', async () => {
+		vi.mocked(scheduleService.createEvent).mockImplementationOnce(async () =>
+			parseCreatedScheduleEvent({ Error: { Code: '0' }, Content: { subEvents: [] } })
+		);
+		const refetchEvents = vi.fn();
+		await renderWithProviders(
+			<CalendarCreateTile
+				formHandler={getFormHandler(mockValidFormState)}
+				refetchEvents={refetchEvents}
+			/>
+		);
+		await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+		await waitFor(() =>
+			expect(toast.error).toHaveBeenCalledWith(`Error: ${INVALID_EVENT_RESPONSE}`)
+		);
+		expect(refetchEvents).not.toHaveBeenCalled();
+		expect(screen.getByRole('button', { name: /submit/i })).toBeEnabled();
+	});
+
 	afterEach(() => {
 		vi.resetAllMocks();
 	});

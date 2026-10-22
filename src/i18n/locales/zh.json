@@ -4,13 +4,46 @@
 			"comment_added": "已添加评论",
 			"comment_replied": "已添加评论回复",
 			"comment_edited": "已编辑评论",
-			"comment_deleted": "已删除评论"
+			"comment_deleted": "已删除评论",
+			"invitation_send_unknown": "邀请发送结果未知",
+			"assignment_completed": "事件已完成",
+			"assignment_reopened": "事件重新展开"
 		},
 		"sentences": {
 			"comment_added": "<actor/>评论了<title/>",
 			"comment_replied": "<actor/>回复了<title/>的评论",
 			"comment_edited": "<actor/>编辑了<title/>的评论",
 			"comment_deleted": "<actor/>删除了<title/>的评论"
+		},
+		"showDismissed": "显示已隐藏的动态",
+		"dismiss": "隐藏",
+		"restore": "在活动中展示",
+		"dismissFailed": "无法保存活动首选项。再试一次。",
+		"channels": {
+			"email": "电子邮件",
+			"sms": "SMS",
+			"push": "推送通知"
+		},
+		"explicitResend": "邀请可能已发送。如果需要，请明确重新发送。",
+		"options": "活动选项",
+		"actions": {
+			"cluster_invitation": "邀请你去",
+			"cluster_created": "已创建",
+			"cluster_deleted": "已删除",
+			"tilette_added": "额外",
+			"tilette_edited": "已更新",
+			"tilette_deleted": "已删除",
+			"tilette_restored": "恢复了",
+			"recipient_added": "添加了一名参与者",
+			"recipient_removed": "从以下位置删除了一名参与者",
+			"recipient_restored": "将参与者恢复到",
+			"assignment_accepted": "公认",
+			"assignment_completed": "完成了发生的",
+			"assignment_reopened": "重新开启发生的事件",
+			"assignment_declined": "拒绝",
+			"invitation_sent": "已发送邀请至",
+			"invitation_send_failed": "无法发送邀请至",
+			"invitation_send_unknown": "发送了结果未知的邀请"
 		}
 	},
 	"common": {
@@ -107,7 +140,7 @@
 		"apps": {
 			"ios": {
 				"cta": "在App Store上下载",
-				"platform": "iOS App Store"
+				"platform": "iOS 应用商店"
 			},
 			"android": {
 				"cta": "在Google Play上获取",
@@ -393,8 +426,8 @@
 			"tip": {
 				"description": "按 <b><key/></b> 创建新图块",
 				"keys": {
-					"enter": "Enter",
-					"return": "Return"
+					"enter": "进入",
+					"return": "返回"
 				}
 			},
 			"message": {
@@ -673,6 +706,32 @@
 						"financialModeling": "建立财务模型",
 						"researchStudy": "进行研究"
 					}
+				},
+				"delegation": {
+					"label": "代表团草案",
+					"note": "仅草稿。保存不会分配工作或发送邀请。",
+					"defaultDuration": "1 小时（默认）",
+					"minutes": "分钟",
+					"saved": "保存的草稿：未分配工作。",
+					"teamMode": "团队分配模式仍需审查。",
+					"edit": "编辑草稿",
+					"prepare": "准备代表团草案",
+					"discard": "丢弃草稿",
+					"projectSearch": "项目名称",
+					"search": "搜索项目",
+					"projectSelected": "选定项目",
+					"moreProjects": "更多项目",
+					"loading": "正在加载项目...",
+					"empty": "没有找到项目。",
+					"task": "任务名称",
+					"duration": "持续时间（分钟）",
+					"deadline": "截止日期",
+					"save": "保存草稿",
+					"cancelEdit": "取消编辑",
+					"saving": "正在保存草稿...",
+					"loadError": "无法加载项目。尝试再次搜索。",
+					"fieldsError": "选择一个项目并提供任务、明确的持续时间和未来的截止日期。",
+					"saveError": "无法保存草稿。您的编辑将被保留。如果选择更改或响应丢失，请重新加载聊天。"
 				}
 			}
 		},
@@ -686,172 +745,172 @@
 		},
 		"heroExperiment": {
 			"nl_scheduling": {
-				"eyebrow": "Effortless natural-language scheduling",
-				"titleLead": "Just say it.",
-				"titleAccent": "It's scheduled.",
-				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
-				"primaryCta": "Tell Tiler what you need",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Schedule this for real",
-				"nudgeCaption": "That took one sentence. Yours will too.",
+				"eyebrow": "轻松的自然语言调度",
+				"titleLead": "就说吧。",
+				"titleAccent": "已经预定了",
+				"subtitle": "“这周去健身房四次。” “把我的报告推迟到周四。” Tiler 理解并围绕它重建其余部分。",
+				"primaryCta": "告诉Tiler你需要什么",
+				"secondaryCta": "看看它是如何工作的",
+				"nudgeCta": "实际安排此活动",
+				"nudgeCaption": "就用了一句话。你的也会的。",
 				"demo": {
-					"request": "Gym four times this week",
-					"schedule": "Schedule",
-					"scheduled": "Scheduled",
-					"thisWeek": "This week",
-					"rearranging": "rearranging",
-					"done": "done",
+					"request": "本周去健身房四次",
+					"schedule": "日程",
+					"scheduled": "预定",
+					"thisWeek": "本星期",
+					"rearranging": "重新排列",
+					"done": "完毕",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "一",
+						"tue": "二",
+						"wed": "三",
+						"thu": "四",
+						"fri": "五",
+						"sat": "六",
+						"sun": "日"
 					},
 					"items": {
-						"gym": "Gym",
-						"deepWork": "Deep work",
-						"standup": "Standup",
-						"report": "Report",
+						"gym": "健身房",
+						"deepWork": "专注工作",
+						"standup": "团队站会",
+						"report": "报告",
 						"oneOnOne": "1:1",
-						"review": "Review",
-						"rest": "Rest"
+						"review": "审查",
+						"rest": "休息"
 					},
 					"legend": {
-						"placed": "placed",
-						"moving": "moving",
-						"moved": "report → Thu"
+						"placed": "已安排",
+						"moving": "调整中",
+						"moved": "报告 → 周四"
 					}
 				}
 			},
 			"stop_deciding": {
-				"eyebrow": "Your day, planned for you",
-				"title": "Stop deciding when.",
-				"subtitle": "Add what you need to get done. Tiler builds your day around your working hours, your commute, and your deadlines.",
-				"primaryCta": "Build my first day",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Build my day",
-				"nudgeCaption": "You brought the list. Tiler brought the day.",
+				"eyebrow": "你的一天，为你计划",
+				"title": "停止决定何时。",
+				"subtitle": "添加您需要完成的内容。 Tiler 根据您的工作时间、通勤时间和截止日期构建您的一天。",
+				"primaryCta": "打造我的第一天",
+				"secondaryCta": "看看它是如何工作的",
+				"nudgeCta": "打造我的一天",
+				"nudgeCaption": "你把名单带来了。 Tiler带来了这一天。",
 				"demo": {
-					"listLabel": "Your list",
-					"scheduledLabel": "Today, scheduled",
+					"listLabel": "你的清单",
+					"scheduledLabel": "今天，预定",
 					"items": {
-						"memo": "Draft Q3 budget memo",
-						"pharmacy": "Call the pharmacy",
-						"review": "Review Ana's design file",
-						"gym": "Gym — legs",
-						"train": "Book train to Leeds"
+						"memo": "第三季度预算备忘录草案",
+						"pharmacy": "致电药房",
+						"review": "审查 Ana 的设计文件",
+						"gym": "健身房——腿部",
+						"train": "预订前往利兹的火车"
 					},
-					"caption": "Placed around a 9–5 day and a 40-minute commute."
+					"caption": "大约需要 9-5 天，通勤时间为 40 分钟。"
 				}
 			},
 			"self_healing": {
-				"eyebrow": "Automatic recovery from disruption",
-				"titleLead": "Your day fell apart at 10am.",
-				"titleAccent": "Your schedule already recovered.",
-				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
-				"primaryCta": "See it recover",
-				"secondaryCta": "See how it works",
-				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
-				"nudgeCta": "Keep this schedule",
-				"nudgeCaption": "Nothing was dropped. Nothing needed your attention.",
+				"eyebrow": "从中断中自动恢复",
+				"titleLead": "上午 10 点，你的一天就崩溃了。",
+				"titleAccent": "你的日程安排已经恢复了。",
+				"subtitle": "迟到、缺课、接紧急电话——Tiler 可以立即重建您一周剩余的时间。",
+				"primaryCta": "看到它恢复了",
+				"secondaryCta": "看看它是如何工作的",
+				"footnote": "没有重新规划。没有罪恶感。出了点问题，已经处理好了。",
+				"nudgeCta": "保留这个时间表",
+				"nudgeCaption": "什么都没有掉落。没有什么需要你注意的。",
 				"demo": {
-					"label": "Tuesday",
-					"status": "Rebuilt",
-					"rebuiltIn": "Rebuilt in 0.4s",
-					"clientCall": "Client call",
-					"onTrack": "on track",
-					"movedSameDay": "moved, same day",
-					"overran": "Ran 90 min late",
-					"wasAt": "was {{time}}",
+					"label": "星期二",
+					"status": "重建",
+					"rebuiltIn": "0.4秒重建",
+					"clientCall": "客户来电",
+					"onTrack": "步入正轨",
+					"movedSameDay": "搬家，当天",
+					"overran": "迟到90分钟",
+					"wasAt": "是 {{time}}",
 					"items": {
-						"morningReview": "Morning review",
-						"clientCall": "Client call",
-						"deepWork": "Deep work — draft",
-						"designSync": "Design sync",
-						"gym": "Gym"
+						"morningReview": "早间回顾",
+						"clientCall": "客户来电",
+						"deepWork": "深度工作——草稿",
+						"designSync": "设计同步",
+						"gym": "健身房"
 					},
-					"caption": "Gym kept · Deep work protected · Nothing dropped"
+					"caption": "保留健身房 · 深度工作受到保护 · 没有掉落任何东西"
 				}
 			},
 			"task_splitting": {
-				"eyebrow": "Automatic decomposition of big work",
-				"titleLead": "One big task.",
-				"titleAccent": "Automatically split across your week.",
-				"subtitle": "Tell Tiler what's due and how long it'll take. It breaks the work into sessions and spreads them across your week.",
-				"primaryCta": "Split my first project",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Split my project",
-				"nudgeCaption": "One deadline in. Six sessions out.",
+				"eyebrow": "大工作自动分解",
+				"titleLead": "一项艰巨的任务。",
+				"titleAccent": "自动分配到您的一周。",
+				"subtitle": "告诉 Tiler 到期时间以及需要多长时间。它将工作分成几个部分，并将它们分散到你的一周中。",
+				"primaryCta": "拆分我的第一个项目",
+				"secondaryCta": "看看它是如何工作的",
+				"nudgeCta": "拆分我的项目",
+				"nudgeCaption": "还剩最后期限。六节课结束。",
 				"demo": {
-					"label": "One task",
-					"status": "Split",
-					"task": "Thesis",
-					"total": "12 hrs",
-					"due": "Due Sun 14 Jun",
-					"dueFlag": "Due",
+					"label": "一项任务",
+					"status": "分裂",
+					"task": "论文",
+					"total": "12小时",
+					"due": "6月14日截止日",
+					"dueFlag": "到期的",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "一",
+						"tue": "二",
+						"wed": "三",
+						"thu": "四",
+						"fri": "五",
+						"sat": "六",
+						"sun": "日"
 					},
 					"parts": {
-						"outline": "Outline",
-						"sources": "Sources",
-						"draftOne": "Draft ch. 1",
-						"notes": "Notes",
-						"draftTwo": "Draft ch. 2",
-						"edit": "Edit pass"
+						"outline": "大纲",
+						"sources": "来源",
+						"draftOne": "草稿章。 1",
+						"notes": "笔记",
+						"draftTwo": "草稿章。 2",
+						"edit": "编辑通行证"
 					},
-					"caption": "6 sessions · spread unevenly around your week"
+					"caption": "6 次课程 · 每周分布不均匀"
 				}
 			},
 			"capacity_check": {
-				"eyebrow": "An honest capacity reality check",
-				"title": "Does it actually fit?",
-				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
-				"primaryCta": "See if your week fits",
-				"secondaryCta": "See how it works",
-				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
-				"nudgeCta": "Check my real week",
-				"nudgeCaption": "Better to know on Monday than to discover it on Friday.",
+				"eyebrow": "诚实的能力现实检查",
+				"title": "真的适合吗？",
+				"subtitle": "Tiler 将每项任务实时进行。如果这周不合适，你现在就会发现——而不是周五晚上。",
+				"primaryCta": "看看你的一周是否适合",
+				"secondaryCta": "看看它是如何工作的",
+				"footnote": "大多数计划者都会让你列出比你能做的更多的事情。这个人做算术。",
+				"nudgeCta": "检查我真实的一周",
+				"nudgeCaption": "周一知道比周五发现要好。",
 				"demo": {
-					"label": "This week",
-					"capacity": "Over capacity",
-					"overflow": "Overflow",
-					"load": "38 hrs of work / 32 hrs available",
-					"wontFit": "6 hrs won't fit",
+					"label": "本星期",
+					"capacity": "产能过剩",
+					"overflow": "溢出",
+					"load": "38小时工作/32小时可用",
+					"wontFit": "有 6 小时的工作无法排入日程",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri"
+						"mon": "一",
+						"tue": "二",
+						"wed": "三",
+						"thu": "四",
+						"fri": "五"
 					},
 					"items": {
-						"standup": "Standup + planning",
-						"designReview": "Design review",
-						"deepWork": "Deep work",
-						"sync": "Sync",
-						"build": "Build",
-						"inbox": "Inbox",
-						"oneOnOnes": "1:1s",
-						"sprintPrep": "Sprint prep",
-						"writeup": "Writeup",
-						"retro": "Retro",
-						"implementation": "Implementation",
-						"qaHandoff": "QA handoff",
-						"demo": "Demo",
-						"wrapUp": "Wrap-up",
-						"review": "Review",
-						"urgentFix": "Urgent fix",
-						"clientCall": "Client call"
+						"standup": "站会与计划",
+						"designReview": "设计评审",
+						"deepWork": "专注工作",
+						"sync": "协调会议",
+						"build": "开发",
+						"inbox": "收件箱",
+						"oneOnOnes": "一对一会议",
+						"sprintPrep": "冲刺准备",
+						"writeup": "撰写报告",
+						"retro": "回顾会议",
+						"implementation": "执行",
+						"qaHandoff": "质量保证交接",
+						"demo": "演示",
+						"wrapUp": "总结",
+						"review": "审查",
+						"urgentFix": "紧急修复",
+						"clientCall": "客户来电"
 					}
 				}
 			}
@@ -1455,7 +1514,10 @@
 					"options": [
 						{
 							"value": "google",
-							"label": "Google日历"
+							"label": "Google日历",
+							"tileshareActivity": {
+								"title": "活动"
+							}
 						},
 						{
 							"value": "outlook",
@@ -1791,28 +1853,28 @@
 				"headerRight": "Tiler",
 				"rows": [
 					{
-						"left": "You schedule everything manually",
-						"right": "AI builds your schedule from plain English"
+						"left": "您手动安排一切",
+						"right": "人工智能用简单的英语制定你的日程安排"
 					},
 					{
-						"left": "No awareness of travel time",
-						"right": "Auto-calculates and adds travel buffers"
+						"left": "没有意识到出行时间",
+						"right": "自动计算并添加行程缓冲区"
 					},
 					{
-						"left": "Static — won’t adapt when things change",
-						"right": "Detects ripples and reschedules instantly"
+						"left": "静态——当事情发生变化时不会适应",
+						"right": "检测波动并立即重新安排"
 					},
 					{
-						"left": "No navigation or route planning",
-						"right": "Navigate your day tile-to-tile with real transit"
+						"left": "没有导航或路线规划",
+						"right": "通过真实的交通导航您的一天"
 					},
 					{
-						"left": "Shared calendars only — no task assignment",
-						"right": "TileShare: assign and track tasks with anyone"
+						"left": "仅共享日历 — 无任务分配",
+						"right": "TileShare：与任何人分配和跟踪任务"
 					},
 					{
-						"left": "Nothing confirmed — events just appear",
-						"right": "Confirmation-first — you approve all changes"
+						"left": "没有任何证实——事件只是出现",
+						"right": "确认第一——您批准所有更改"
 					}
 				]
 			}
@@ -2085,7 +2147,14 @@
 				"board": "看板视图"
 			},
 			"board": {
-				"empty": "这里还没有 Tilette"
+				"empty": "这里还没有 Tilette",
+				"filterAria": "董事会分配",
+				"filter": {
+					"all": "每个人",
+					"mine": "只有我"
+				},
+				"accepting": "接受…",
+				"dropHint": "请点击此处接受您的邀请"
 			},
 			"viewAria": "Tilette 视图",
 			"openTiletteAria": "打开 Tilette",
@@ -2393,40 +2462,40 @@
 				"date": "2026年5月1日",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "大多数日程安排工具都将您视为日历操作员。你拖、放、调整大小，然后生活就改变了，你重新开始。 Tiler采取了不同的方法：你说话，它安排。"
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "输入类似“周四上午 9 点看牙医，然后 11 点左右与市中心的 Priya 喝咖啡”，Tiler 会处理剩下的事情。持续时间、行程时间、缓冲间隙、确认。所有这一切。"
 					},
 					{
-						"title": "How it works"
+						"title": "它是如何运作的"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "描述任务",
+						"stepBody": "用简单的英语输入您需要执行的操作。没有特殊语法，没有下拉菜单。 “明天早上健身一小时”就足以开始。",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Tiler理解什么",
+							"text": "相对时间（“明天”）、持续时间（“一小时”）和位置提示（“市中心”）。无需额外设置。"
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "AI填补了空白",
+						"stepBody": "Tiler 在回复之前先解释您的请求。它根据上下文推断持续时间，检查您现有的承诺并计算旅行费用。如果某个细节确实不清楚，它会提出一个有针对性的问题，而不是一个表格。",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "推理，而不是猜测",
+							"text": "Tiler 在提出任何建议之前会交叉引用您的位置、现有图块和您的首选时间窗口。"
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "检查，然后确认",
+						"stepBody": "Tiler 向您显示建议的时间表，其中包含完整的详细信息：时间、地点和行程。您确认、调整或寻求替代方案。如果没有您的同意，任何事情都不会出现在您的日历上。",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "确认优先",
+							"text": "Tiler提议。你决定。即使人工智能承担繁重的工作，您仍能保持控制。"
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "你活下去。 Tiler 计划它。"
 					}
 				]
 			},
@@ -2440,40 +2509,40 @@
 				"date": "2026年5月8日",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "大多数日历都假设一项任务结束后，您就可以开始执行下一项任务。但现实生活是有通勤的。 Tiler 将通勤纳入您的日程安排中，因此时间轴中的每个区块实际上都反映了您需要去的地方。"
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "添加会议、差事、咖啡聚会或学校接送。 Tiler 会自动计算您如何到达目的地以及需要多长时间，然后将行程时间直接计入您的一天。"
 					},
 					{
-						"title": "How it works"
+						"title": "它是如何运作的"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "设置您的位置一次",
+						"stepBody": "您无需每次都输入准确的地址。设置好您的家、工作场所和任何常规地点一次。从那时起，Tiler知道你从哪里开始，要去哪里。",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "位置标签 Tiler 理解",
+							"text": "家 · 工作 · 市中心 · 健身房 · 办公室附近"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "将时间段纳入您的时间线",
+						"stepBody": "每次您添加带有位置的任务时，Tiler 都会在该任务与之前或之后的任务之间插入一个旅行块。它在您的时间轴中显示为自己的部分，因此您始终知道何时需要离开。",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "真实路线，而非预估路线",
+							"text": "Tiler 使用涵盖驾驶、公交和步行的实时路线数据，因此出行时间反映了您实际的出行方式。"
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "附近的任务会自动分组",
+						"stepBody": "当多个任务共享城镇的同一区域时，Tiler 会将它们分组在一起，这样您就不会在城市中曲折前进。健身房附近的差事会在锻炼之前或之后进行。市中心附近的客户拜访将与您在附近的午餐搭配。",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "减少旅行，完成更多工作",
+							"text": "智能分组意味着更少的行程、更少的交通浪费时间以及一天的美好时光。"
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "完成某件事不仅仅是找到时间。这是关于在正确的地方。"
 					}
 				]
 			},
@@ -2487,49 +2556,49 @@
 				"date": "2026年6月22日",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "改变你的日程安排感觉很冒险。移动一项任务后，您不确定其他任务也会发生变化。接受建议并想知道这是否是正确的选择。计划撤消为您提供了意图和承诺之间的安全区。"
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Tiler 中的每项更改，无论您输入请求、接受建议还是移动图块，都会首先显示为预览。在您同意之前，您的直播日程将保持不变。"
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "计划撤消的工作原理"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "做出改变",
+						"stepBody": "移动图块、添加新任务或接受 AI 建议。 Tiler 没有立即保存，而是将更改放入预览中。它显示有虚线边框和预览标签，因此您知道它尚未落地。",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "没有任何内容会自动保存",
+							"text": "当您查看时，您的实时日程安排会被冻结。没有部分保存，没有意外覆盖。"
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "准确查看发生了什么变化",
+						"stepBody": "预览图块显示更新后的名称、位置、时间和日期以及之前的内容。您一眼就能看到全貌，而无需在心里跟踪移动的内容。"
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "点击撤消或接受",
+						"stepBody": "对结果不满意？点击撤消，您原来的日程就会立即恢复。满意吗？点击“接受”，它就会锁定。无论哪种方式，您都拨打了电话。",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "撤消总是即时的",
+							"text": "没有可滚动浏览的撤消历史记录。只需轻按一下，无论预览中发生了多少变化，您都会恢复原来的状态。"
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "为什么这很重要"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "大多数日历应用程序会立即应用更改，并要求您在事后撤消，此时通知已触发，同步已发生，损坏已造成。计划撤消会翻转此操作。默认是预览，不保存。"
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "专为拥挤的日子而打造",
+						"text": "当你的一天没有懈怠时，错误的举动可能会波及一切。计划撤消让您在任何更改生效之前有时间喘口气并进行验证。"
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "无论您是要重新安排锻炼、改变会议时间，还是执行同事发给您的任务，预览步骤都只需不到一秒钟的时间，可以让您免于接到让您后悔的电话。"
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "在重要之前改变主意。"
 					}
 				]
 			},
@@ -2543,39 +2612,308 @@
 				"date": "2026年5月22日",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "大多数任务切换最终都会在一个线程中完成。你发送它，他们阅读它，他们忘记安排它，你跟进。 Tileshare 切掉中间。共享一块图块，它会落在他们的 Tiler 中，已经安排好了。"
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "当您共享磁贴时，它会作为收件人日程中的实时自适应任务到达。它围绕现有承诺找到最佳空缺位置。两端均无需放置。"
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Tileshare的工作原理"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "分享任意图块",
+						"stepBody": "从日程中的任何任务中，点击共享并选择 Tiler 联系人。该图块包含收件人完成任务所需的所有内容。",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "什么与瓷砖一起旅行",
+							"text": "任务名称、预计持续时间、截止日期和位置标签。收件人的个人日程完全保密。"
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "它出现在他们的日程中",
+						"stepBody": "共享磁贴出现在接收者的 Tiler 中，并找到围绕其现有承诺的最佳空位。它适应他们的时代，而不是相反。"
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "追踪而不追赶",
+						"stepBody": "任务发送后，您可以查看其计划时间、完成时间以及是否已移动。没有后续消息。没有状态检查。你会知道的。",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "共同承担责任，零摩擦",
+							"text": "双方都会看到相同的瓷砖。一个人完成它。另一个看到它完成了。委托实际上关闭了循环。"
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "发送一次。知道它完成了。"
 					}
 				]
 			}
 		}
+	},
+	"tileShareDensity": {
+		"respond": "回应",
+		"accepted": "{{accepted}}/{{total}} 已接受",
+		"task": "Tilette",
+		"people": "人们",
+		"response": "回复"
+	},
+	"tileShareVisual": {
+		"edit": "编辑",
+		"hours_one": "{{count}} 小时",
+		"hours_other": "{{count}} 小时"
+	},
+	"tileShareEdit": {
+		"lateTitle": "TileShare 截止日期后到期",
+		"durationLabel": "时长",
+		"nameShort": "至少使用 3 个字符。",
+		"nameLong": "使用不超过 100 个字符。",
+		"nameHint": "使用 3–100 个字符。",
+		"beforeStart": "截止时间必须在开始时间或之后。",
+		"time": "截止时间",
+		"inherited": "在单独设置截止时间之前，此 Tilette 将使用 TileShare 的截止时间。",
+		"afterShare": "此Tilette应在 TileShare 截止日期 ({{deadline}}) 之后到期。",
+		"moveShare": "同时将 TileShare 截止日期移至 {{deadline}}",
+		"durationFixed": "Tilette的持续时间一旦共享就无法更改。",
+		"duration": "{{minutes}} 分钟",
+		"modeFixed": "共享后模式无法更改。",
+		"acceptedImpact_one": "{{count}} 个已接受且截止时间较晚的 Tilette 可能会提前到此截止时间。",
+		"acceptedImpact_other": "{{count}} 个已接受且截止时间较晚的 Tilette 可能会提前到此截止时间。",
+		"unacceptedImpact_one": "{{count}} 个尚无人接受的 Tilette 将保留原来较晚的截止时间。",
+		"unacceptedImpact_other": "{{count}} 个尚无人接受的 Tilette 将保留原来较晚的截止时间。",
+		"unchanged": "没有要保存的更改。",
+		"retry": "重试保存",
+		"saveFailed": "现在无法保存。您的更改将被保留。再试一次。",
+		"shareFailed": "Tilette 已保存，但无法更新 TileShare 的截止时间。请重试以完成操作，或关闭以保留已保存的 Tilette。",
+		"partialDiscard": "Tilette 的更改已保存。关闭后，将放弃尚未完成的 TileShare 截止时间更改。",
+		"discard": "您对这些详细信息未保存的更改将会丢失。"
+	},
+	"tileShareNotes": {
+		"createdPending": "Tilette已创建。它的笔记仍然需要保存；重试不会创建另一个Tilette。",
+		"retrySave": "重试保存笔记",
+		"title": "笔记",
+		"edit": "编辑笔记",
+		"empty": "还没有笔记。",
+		"loadError": "无法加载笔记。",
+		"saveError": "无法保存笔记。您的编辑仍然在这里；再试一次。",
+		"useSaved": "使用保存的笔记",
+		"truncated": "该注释超出了服务器限制。在继续之前查看保存的注释。"
+	},
+	"tileShareMarkdown": {
+		"write": "撰写",
+		"preview": "预览",
+		"formatting": "注释格式",
+		"previewLabel": "笔记预览",
+		"empty": "还没有什么可预览的。",
+		"hint": "支持 Markdown：标题、粗体、列表、链接和代码。"
+	},
+	"tileShareModes": {
+		"broadcast": {
+			"label": "群发",
+			"title": "创建群发",
+			"description": "共享一项任务。每个收件人都有自己的任务。",
+			"submit": "创建群发"
+		},
+		"class": {
+			"label": "班级",
+			"title": "创建一个类",
+			"description": "共享一组Tilettes。每个参与者都会收到每个Tilettes。",
+			"submit": "创建类"
+		},
+		"project": {
+			"label": "项目",
+			"title": "创建一个项目",
+			"description": "共同完成一组任务，并为每个 Tilette 指定负责人。",
+			"submit": "创建项目"
+		},
+		"location": "地点（可选）",
+		"addTilettesNow": "首先添加Tilettes（可选）",
+		"optionalTilettes": "选修的。您还可以在创建 TileShare 后添加Tilettes。",
+		"tiletteNumber": "Tilette{{number}}",
+		"addTilette": "添加 Tilette",
+		"removeTilette": "删除Tilette",
+		"moveUp": "向上移动",
+		"moveDown": "下移",
+		"deadlineDefault": "使用 TileShare 截止日期：{{deadline}}",
+		"everyone": "分配给每个班级参与者。",
+		"addRecipient": "添加收件人",
+		"removeRecipient": "移除{{recipient}}",
+		"assignees": "负责人（可选）",
+		"tiletteLocation": "Tilette地点",
+		"perspective": "TileShare视角",
+		"projectView": "项目视图",
+		"classView": "班级视图",
+		"unknown": "共享模式不可用",
+		"participants": "参加者",
+		"participantContact": "参与者的电子邮件或电话",
+		"classActions": "班级参加者",
+		"addToAll": "添加到所有Tilettes",
+		"removeFromAll": "从所有Tilettes中删除",
+		"removeFromClassConfirm": "从课程中的每项Tilette中删除该参与者吗？",
+		"emptyClass": "添加Tilette以开始向参与者分配工作。",
+		"acceptAll": "接受所有待处理的Tilettes",
+		"declineAll": "拒绝所有待处理的Tilettes",
+		"partialChange": "已保存 {{saved}} 项更改；{{failed}} 项需要重试。",
+		"changesSaved": "更改已保存。",
+		"retryRemaining": "重试剩余的更改",
+		"refreshFailed": "更改已发送，但 TileShare 无法刷新。重新加载以检查保存的分配。"
+	},
+	"tileshareList": {
+		"title": "TileShares",
+		"createdByMe": "由我创建",
+		"sort": "排序方式",
+		"createdDesc": "创建时间：最新优先",
+		"createdAsc": "创建时间：最早的优先",
+		"deadlineAsc": "截止日期：最早者优先",
+		"deadlineDesc": "截止日期：最新优先",
+		"empty": "没有 TileShares 与此过滤器匹配。",
+		"failed": "无法加载 TileShares。",
+		"retry": "重试"
+	},
+	"tileshareRsvp": {
+		"accepted": "已接受",
+		"declined": "已拒绝",
+		"none": "等待回复",
+		"tentative": "暂定",
+		"unknown": "未知回应",
+		"yours": "您的回应",
+		"response": "邀请回复",
+		"responses": "邀请回复",
+		"noParticipants": "没有参加者",
+		"viewPeople": "查看回复",
+		"participant": "参加者"
+	},
+	"tileshareInvitations": {
+		"yourInvitation": "您被邀请执行此Tilette。",
+		"unavailable": "此邀请不再待处理。",
+		"title": "邀请函",
+		"refresh": "刷新",
+		"all": "所有邀请",
+		"loading": "正在加载邀请…",
+		"failed": "无法加载邀请。刷新再试一次。",
+		"empty": "没有待处理的邀请。",
+		"pending": "待处理的Tilettes",
+		"review": "审核邀请",
+		"from": "邀请者",
+		"due": "截止时间：",
+		"accept": "接受",
+		"decline": "拒绝",
+		"changeResponse": "更改回复",
+		"cancel": "取消",
+		"currentAccepted": "当前回复：已接受。",
+		"currentDeclined": "当前回复：已拒绝。",
+		"updatedAccepted": "响应已更新为已接受。",
+		"updatedDeclined": "回复已更新为“拒绝”。",
+		"responding": "正在保存回复…",
+		"next": "下一页",
+		"accepted": "已接受。已创建您的任务块。",
+		"declined": "邀请被拒绝。",
+		"responseFailed": "该回应无法得到证实。在重试之前刷新以检查其状态。"
+	},
+	"chat": {
+		"tileShare": {
+			"reviewAgain": "再次确认之前请先查看当前提案。",
+			"uncertain": "无法确认创造。重试之前请检查状态。",
+			"created": "TileShare 创建。",
+			"open": "打开TileShare",
+			"review": "回顾 TileShare 创建",
+			"newProject": "创建项目",
+			"newTilette": "添加 Tilette",
+			"project": "项目",
+			"starts": "开始",
+			"deadline": "截止日期",
+			"minutes": "分钟",
+			"reviewNote": "在您确认之前不会创建任何内容。收件人仍然可以选择是否接受；此操作不会发送通知。",
+			"checking": "检查...",
+			"confirm": "确认创建",
+			"check": "检查状态"
+		},
+		"execution": {
+			"mode": "聊天执行",
+			"confirmFirst": "先确认",
+			"autoAct": "自动执行",
+			"autoNote": "自动运行支持的聊天操作。大规模和破坏性的改变仍然需要审查。",
+			"confirmNote": "在聊天更改运行之前查看它们。"
+		}
+	},
+	"chat.tileShare.renamed": "项目更名。",
+	"chat.tileShare.renameReview": "审查项目重命名",
+	"chat.tileShare.renameProject": "重命名项目",
+	"chat.tileShare.previousName": "现名",
+	"chat.tileShare.renameNote": "确认后仅项目名称发生变化。",
+	"chat.tileShare.confirmRename": "确认重命名",
+	"chat.tileShare.renameUncertain": "无法确认重命名。重试之前请检查状态。",
+	"chat.tileShare.tiletteRenamed": "Tilette已重命名。",
+	"chat.tileShare.tiletteRenameReview": "检查Tilette重命名",
+	"chat.tileShare.renameTilette": "重命名Tilette",
+	"chat.tileShare.tiletteRenameNote": "仅共享Tilette名称发生变化。个人日历标题保持原样。",
+	"chat.tileShare.notesUpdated": "Tilette说明已更新。",
+	"chat.tileShare.notesReview": "查看Tilette注释",
+	"chat.tileShare.editNotes": "更新Tilette备注",
+	"chat.tileShare.previousNotes": "当前笔记",
+	"chat.tileShare.proposedNotes": "建议注释",
+	"chat.tileShare.emptyNotes": "无注释",
+	"chat.tileShare.clearNotes": "清晰的笔记",
+	"chat.tileShare.notesNote": "提议的文本在确认后将取代完整的Tilette注释。",
+	"chat.tileShare.confirmNotes": "确认备注",
+	"chat.tileShare.notesUncertain": "无法确认注释更新。重试之前请检查状态。",
+	"chat.tileShare.tiletteDeleted": "Tilette已删除。",
+	"chat.tileShare.deleteReview": "审核Tilette删除",
+	"chat.tileShare.deleteTilette": "删除Tilette",
+	"chat.tileShare.assignmentCount": "作业",
+	"chat.tileShare.linkedCalendarCount": "链接的日历项目",
+	"chat.tileShare.deleteNote": "这将禁用Tilettes和链接的日历工作。项目和其他Tilettes保持可用。保留分配历史记录；这里不提供撤消操作。",
+	"chat.tileShare.confirmDeletion": "确认删除",
+	"chat.tileShare.deleteUncertain": "无法确认删除。重试之前请检查状态。",
+	"chat.tileShare.openProject": "打开项目",
+	"chat.tileShare.tiletteUpdated": "Tilette已更新。",
+	"chat.tileShare.updateReview": "审核Tilette更新",
+	"chat.tileShare.updateTilette": "更新Tilette",
+	"chat.tileShare.updateNote": "确认后所有显示的更改都会一起保存。提供的注释将取代完整的注释。",
+	"chat.tileShare.confirmUpdate": "确认更新",
+	"chat.tileShare.updateRejected": "未应用任何更改。查看回复并请求修改更新。",
+	"chat.tileShare.updateUncertain": "无法确认更新。重试之前请检查状态。",
+	"chat.tileShare.schedulePending": "计算接受的工作时间表。尚未保存任何更改。",
+	"chat.tileShare.scheduleNoFit": "未应用任何更改。剩余的工作无法围绕受保护的会话进行。调整持续时间或截止日期并请求修订更新。",
+	"chat.tileShare.scheduleFailed": "未应用任何更改。计划已更改或计算无法完成。请求修订更新。",
+	"chat.tileShare.updateProject": "更新项目",
+	"chat.tileShare.projectUpdateReview": "审查项目更新",
+	"chat.tileShare.projectUpdated": "项目已更新。",
+	"chat.tileShare.manageAccess": "管理项目访问",
+	"chat.tileShare.manageRecipients": "管理收件人",
+	"chat.tileShare.managementUpdated": "已保存收件人或访问更改。",
+	"chat.tileShare.managementNote": "查看上面的收件人和访问效果。日历访问清理和恢复在后台运行。",
+	"chat.tileShare.accessReconciliation": "访问权限已保存。日历清理或恢复在后台运行。",
+	"chat.tileShare.planTargetPending": "等待合并计算",
+	"chat.tileShare.planTargetNotApplied": "未应用",
+	"chat.tileShare.planReview": "审查共享工作计划",
+	"chat.tileShare.planUpdated": "审阅的更改一起保存。",
+	"chat.tileShare.planNote": "所有显示的目标在确认后一起保存。如果任何目标发生变化或访问权限丢失，请查看新的提案。",
+	"tileShareComposer": {
+		"close": "关闭",
+		"shareDeadline": "TileShare 截止日期",
+		"moveShareDeadline": "同时将 TileShare 截止日期移至 {{deadline}}",
+		"count_one": "已添加 {{count}} 个 Tilette",
+		"count_other": "已添加 {{count}} 个 Tilette",
+		"newTilette": "新Tilette",
+		"emptyTitle": "将Tilettes添加到您的 TileShare",
+		"emptyDescription": "立即添加任务，或创建 TileShare 并稍后添加任务。",
+		"editTilette": "编辑{{name}}",
+		"removeTilette": "移除 {{name}}",
+		"locationNotSet": "位置未设置",
+		"unassigned": "未分配",
+		"added": "{{name}} 被添加到该草案中。",
+		"updated": "{{name}} 已更新。",
+		"removed": "{{name}} 已从此草案中删除。",
+		"addTitle": "创建Tilette",
+		"editTitle": "编辑 Tilette",
+		"saveTilette": "保存Tilette",
+		"classHint": "当您创建 TileShare 时，此Tilette将分配给每个班级参与者。",
+		"projectHint": "添加任务并可选择选择其受让人。当您创建项目时会发送邀请。",
+		"optionalDescription": "想要在创建过程中包含任务吗？您可以立即添加任务或先创建 TileShare。",
+		"reviewTilettes": "检查 Tilette（{{count}} 个）",
+		"editDetails": "编辑详细信息",
+		"cancelExit": "取消并退出",
+		"discardTitle": "放弃更改？",
+		"discard": "放弃更改",
+		"keepEditing": "继续编辑",
+		"discardTask": "您未保存的Tilettes编辑将会丢失。其他Tilettes将保留在草案中。",
+		"discardShare": "您的 TileShare 详细信息和草稿Tilettes将丢失。尚未发送任何邀请。"
 	}
 }

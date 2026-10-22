@@ -22,6 +22,7 @@ import ServerError from '@/core/error/server';
 import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import TimeUtil from '@/core/util/time';
 import { deviceTimeZone } from '@/core/common/utils/timeUtils';
+import { parseCreatedScheduleEvent } from './scheduleEventResponse';
 
 const defaultScheduleOptions: ScheduleLookupOptions = {
 	startRange: TimeUtil.now() - TimeUtil.inMilliseconds(3, 'd'),
@@ -49,7 +50,7 @@ class ScheduleService {
 	async createEvent(params: ScheduleCreateEventParams) {
 		try {
 			const res = await this.scheduleApi.createEvent(params);
-			return res.Content;
+			return parseCreatedScheduleEvent(res);
 		} catch (error) {
 			console.error('Error creating sub-calendar event', error);
 			throw normalizeError(error);

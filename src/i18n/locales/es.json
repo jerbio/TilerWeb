@@ -4,13 +4,46 @@
 			"comment_added": "Comentario añadido",
 			"comment_replied": "Respuesta a comentario añadida",
 			"comment_edited": "Comentario editado",
-			"comment_deleted": "Comentario eliminado"
+			"comment_deleted": "Comentario eliminado",
+			"invitation_send_unknown": "Se desconoce el resultado del envío de la invitación",
+			"assignment_completed": "Ocurrencia completada",
+			"assignment_reopened": "Suceso reabierto"
 		},
 		"sentences": {
 			"comment_added": "<actor/> comentó en <title/>",
 			"comment_replied": "<actor/> respondió a un comentario en <title/>",
 			"comment_edited": "<actor/> editó un comentario en <title/>",
 			"comment_deleted": "<actor/> eliminó un comentario en <title/>"
+		},
+		"showDismissed": "Mostrar actividades ocultas",
+		"dismiss": "Ocultar",
+		"restore": "Mostrar en actividades",
+		"dismissFailed": "No se pudo guardar la preferencia de actividad. Intentar otra vez.",
+		"channels": {
+			"email": "Correo Electrónico",
+			"sms": "SMS",
+			"push": "Notificación push"
+		},
+		"explicitResend": "Es posible que la invitación haya sido enviada. Vuelva a enviar explícitamente si es necesario.",
+		"options": "Opciones de actividad",
+		"actions": {
+			"cluster_invitation": "te invitó a",
+			"cluster_created": "creado",
+			"cluster_deleted": "eliminado",
+			"tilette_added": "agregado",
+			"tilette_edited": "actualizado",
+			"tilette_deleted": "eliminado",
+			"tilette_restored": "restaurado",
+			"recipient_added": "agregó un participante a",
+			"recipient_removed": "eliminado a un participante de",
+			"recipient_restored": "restauró a un participante a",
+			"assignment_accepted": "aceptado",
+			"assignment_completed": "completó una ocurrencia de",
+			"assignment_reopened": "reabrió un suceso de",
+			"assignment_declined": "rechazado",
+			"invitation_sent": "envió una invitación a",
+			"invitation_send_failed": "no se pudo enviar una invitación a",
+			"invitation_send_unknown": "envió una invitación con un resultado desconocido para"
 		}
 	},
 	"common": {
@@ -673,6 +706,32 @@
 						"financialModeling": "Crea un modelo financiero",
 						"researchStudy": "Realiza un estudio de investigación"
 					}
+				},
+				"delegation": {
+					"label": "Borrador de delegación",
+					"note": "Sólo borrador. Guardar no asigna trabajo ni envía invitaciones.",
+					"defaultDuration": "1 hora (predeterminado)",
+					"minutes": "minutos",
+					"saved": "Borrador guardado: no hay trabajo asignado.",
+					"teamMode": "El modo de asignación de equipos aún necesita revisión.",
+					"edit": "Editar borrador",
+					"prepare": "Preparar el borrador de la delegación.",
+					"discard": "Descartar borrador",
+					"projectSearch": "Nombre del proyecto",
+					"search": "Buscar proyectos",
+					"projectSelected": "Proyecto seleccionado",
+					"moreProjects": "Más proyectos",
+					"loading": "Cargando proyectos...",
+					"empty": "No se encontraron proyectos.",
+					"task": "Nombre de la tarea",
+					"duration": "Duración (minutos)",
+					"deadline": "Fecha límite",
+					"save": "Guardar borrador",
+					"cancelEdit": "Cancelar edición",
+					"saving": "Guardando borrador...",
+					"loadError": "No se pudieron cargar proyectos. Intente buscar nuevamente.",
+					"fieldsError": "Elija un proyecto y proporcione una tarea, una duración positiva y una fecha límite futura.",
+					"saveError": "No se pudo guardar el borrador. Tus ediciones se conservan. Vuelva a cargar el chat si la selección cambió o se perdió la respuesta."
 				}
 			}
 		},
@@ -686,172 +745,172 @@
 		},
 		"heroExperiment": {
 			"nl_scheduling": {
-				"eyebrow": "Effortless natural-language scheduling",
-				"titleLead": "Just say it.",
-				"titleAccent": "It's scheduled.",
-				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
-				"primaryCta": "Tell Tiler what you need",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Schedule this for real",
-				"nudgeCaption": "That took one sentence. Yours will too.",
+				"eyebrow": "Programación en lenguaje natural sin esfuerzo",
+				"titleLead": "Sólo dilo.",
+				"titleAccent": "Está programado.",
+				"subtitle": "\"Gimnasio cuatro veces esta semana\". \"Retrasar mi informe hasta el jueves\". Tiler comprende y reconstruye el resto a su alrededor.",
+				"primaryCta": "Dile a Tiler lo que necesitas",
+				"secondaryCta": "Mira como funciona",
+				"nudgeCta": "Programa esto de verdad",
+				"nudgeCaption": "Eso tomó una frase. El tuyo también lo hará.",
 				"demo": {
-					"request": "Gym four times this week",
-					"schedule": "Schedule",
-					"scheduled": "Scheduled",
-					"thisWeek": "This week",
-					"rearranging": "rearranging",
-					"done": "done",
+					"request": "Gimnasio cuatro veces esta semana",
+					"schedule": "Cronograma",
+					"scheduled": "Programado",
+					"thisWeek": "Esta semana",
+					"rearranging": "reorganizar",
+					"done": "hecho",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "Lun",
+						"tue": "Mar",
+						"wed": "Mié",
+						"thu": "Jue",
+						"fri": "Vie",
+						"sat": "Sáb",
+						"sun": "Dom"
 					},
 					"items": {
-						"gym": "Gym",
-						"deepWork": "Deep work",
-						"standup": "Standup",
-						"report": "Report",
+						"gym": "Gimnasio",
+						"deepWork": "Trabajo concentrado",
+						"standup": "Reunión breve de equipo",
+						"report": "Informe",
 						"oneOnOne": "1:1",
-						"review": "Review",
-						"rest": "Rest"
+						"review": "Revisión",
+						"rest": "Descansar"
 					},
 					"legend": {
-						"placed": "placed",
-						"moving": "moving",
-						"moved": "report → Thu"
+						"placed": "programado",
+						"moving": "reubicando",
+						"moved": "informe → jueves"
 					}
 				}
 			},
 			"stop_deciding": {
-				"eyebrow": "Your day, planned for you",
-				"title": "Stop deciding when.",
-				"subtitle": "Add what you need to get done. Tiler builds your day around your working hours, your commute, and your deadlines.",
-				"primaryCta": "Build my first day",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Build my day",
-				"nudgeCaption": "You brought the list. Tiler brought the day.",
+				"eyebrow": "Tu día, planeado para ti",
+				"title": "Deja de decidir cuándo.",
+				"subtitle": "Añade lo que necesitas para terminar. Tiler organiza su día en torno a sus horas de trabajo, sus desplazamientos y sus plazos.",
+				"primaryCta": "Construir mi primer día",
+				"secondaryCta": "Mira como funciona",
+				"nudgeCta": "Construye mi día",
+				"nudgeCaption": "Trajiste la lista. Tiler trajo el día.",
 				"demo": {
-					"listLabel": "Your list",
-					"scheduledLabel": "Today, scheduled",
+					"listLabel": "tu lista",
+					"scheduledLabel": "Hoy, programado",
 					"items": {
-						"memo": "Draft Q3 budget memo",
-						"pharmacy": "Call the pharmacy",
-						"review": "Review Ana's design file",
-						"gym": "Gym — legs",
-						"train": "Book train to Leeds"
+						"memo": "Borrador de memorando presupuestario del tercer trimestre",
+						"pharmacy": "llama a la farmacia",
+						"review": "Revisar el archivo de diseño de Ana.",
+						"gym": "Gimnasio - piernas",
+						"train": "Reservar tren a Leeds"
 					},
-					"caption": "Placed around a 9–5 day and a 40-minute commute."
+					"caption": "Ubicado alrededor de 9 a 5 días y un viaje de 40 minutos."
 				}
 			},
 			"self_healing": {
-				"eyebrow": "Automatic recovery from disruption",
-				"titleLead": "Your day fell apart at 10am.",
-				"titleAccent": "Your schedule already recovered.",
-				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
-				"primaryCta": "See it recover",
-				"secondaryCta": "See how it works",
-				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
-				"nudgeCta": "Keep this schedule",
-				"nudgeCaption": "Nothing was dropped. Nothing needed your attention.",
+				"eyebrow": "Recuperación automática de la interrupción",
+				"titleLead": "Tu día se vino abajo a las 10 a.m.",
+				"titleAccent": "Tu agenda ya se recuperó.",
+				"subtitle": "Llega tarde, salta una sesión, atiende una llamada de emergencia: Tiler reconstruye el resto de tu semana al instante.",
+				"primaryCta": "verlo recuperarse",
+				"secondaryCta": "Mira como funciona",
+				"footnote": "Sin replanificación. Sin culpa. Algo salió mal y ya fue solucionado.",
+				"nudgeCta": "Mantenga este horario",
+				"nudgeCaption": "No se cayó nada. Nada necesitaba tu atención.",
 				"demo": {
-					"label": "Tuesday",
-					"status": "Rebuilt",
-					"rebuiltIn": "Rebuilt in 0.4s",
-					"clientCall": "Client call",
-					"onTrack": "on track",
-					"movedSameDay": "moved, same day",
-					"overran": "Ran 90 min late",
-					"wasAt": "was {{time}}",
+					"label": "Martes",
+					"status": "Reconstruido",
+					"rebuiltIn": "Reconstruido en 0,4s",
+					"clientCall": "llamada del cliente",
+					"onTrack": "en camino",
+					"movedSameDay": "movido, el mismo día",
+					"overran": "Llegó 90 minutos tarde",
+					"wasAt": "era {{time}}",
 					"items": {
-						"morningReview": "Morning review",
-						"clientCall": "Client call",
-						"deepWork": "Deep work — draft",
-						"designSync": "Design sync",
-						"gym": "Gym"
+						"morningReview": "revisión de la mañana",
+						"clientCall": "llamada del cliente",
+						"deepWork": "Trabajo profundo - borrador",
+						"designSync": "Sincronización de diseño",
+						"gym": "Gimnasio"
 					},
-					"caption": "Gym kept · Deep work protected · Nothing dropped"
+					"caption": "Gimnasio mantenido · Trabajo profundo protegido · No se cayó nada"
 				}
 			},
 			"task_splitting": {
-				"eyebrow": "Automatic decomposition of big work",
-				"titleLead": "One big task.",
-				"titleAccent": "Automatically split across your week.",
-				"subtitle": "Tell Tiler what's due and how long it'll take. It breaks the work into sessions and spreads them across your week.",
-				"primaryCta": "Split my first project",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Split my project",
-				"nudgeCaption": "One deadline in. Six sessions out.",
+				"eyebrow": "Descomposición automática de grandes obras.",
+				"titleLead": "Una gran tarea.",
+				"titleAccent": "Dividido automáticamente a lo largo de su semana.",
+				"subtitle": "Dígale a Tiler cuál es el vencimiento y cuánto tiempo tomará. Divide el trabajo en sesiones y las distribuye a lo largo de la semana.",
+				"primaryCta": "Dividir mi primer proyecto",
+				"secondaryCta": "Mira como funciona",
+				"nudgeCta": "dividir mi proyecto",
+				"nudgeCaption": "Una fecha límite dentro. Seis sesiones fuera.",
 				"demo": {
-					"label": "One task",
-					"status": "Split",
-					"task": "Thesis",
-					"total": "12 hrs",
-					"due": "Due Sun 14 Jun",
-					"dueFlag": "Due",
+					"label": "una tarea",
+					"status": "Dividir",
+					"task": "Tesis",
+					"total": "12 horas",
+					"due": "Vencimiento el domingo 14 de junio",
+					"dueFlag": "Pendiente",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "Lun",
+						"tue": "Mar",
+						"wed": "Mié",
+						"thu": "Jue",
+						"fri": "Vie",
+						"sat": "Sáb",
+						"sun": "Dom"
 					},
 					"parts": {
-						"outline": "Outline",
-						"sources": "Sources",
-						"draftOne": "Draft ch. 1",
-						"notes": "Notes",
-						"draftTwo": "Draft ch. 2",
-						"edit": "Edit pass"
+						"outline": "Describir",
+						"sources": "Fuentes",
+						"draftOne": "Proyecto de cap. 1",
+						"notes": "Notas",
+						"draftTwo": "Proyecto de cap. 2",
+						"edit": "Editar pase"
 					},
-					"caption": "6 sessions · spread unevenly around your week"
+					"caption": "6 sesiones · repartidas de manera desigual a lo largo de la semana"
 				}
 			},
 			"capacity_check": {
-				"eyebrow": "An honest capacity reality check",
-				"title": "Does it actually fit?",
-				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
-				"primaryCta": "See if your week fits",
-				"secondaryCta": "See how it works",
-				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
-				"nudgeCta": "Check my real week",
-				"nudgeCaption": "Better to know on Monday than to discover it on Friday.",
+				"eyebrow": "Una verificación honesta de la realidad de la capacidad",
+				"title": "¿En realidad encaja?",
+				"subtitle": "Tiler sitúa cada tarea en tiempo real. Si la semana no encaja, lo descubrirás ahora, no el viernes por la noche.",
+				"primaryCta": "Mira si tu semana encaja",
+				"secondaryCta": "Mira como funciona",
+				"footnote": "La mayoría de los planificadores le permiten enumerar más de lo que jamás podrá hacer. Éste hace la aritmética.",
+				"nudgeCta": "Mira mi semana real",
+				"nudgeCaption": "Es mejor saberlo el lunes que descubrirlo el viernes.",
 				"demo": {
-					"label": "This week",
-					"capacity": "Over capacity",
-					"overflow": "Overflow",
-					"load": "38 hrs of work / 32 hrs available",
-					"wontFit": "6 hrs won't fit",
+					"label": "Esta semana",
+					"capacity": "Sobre capacidad",
+					"overflow": "Rebosar",
+					"load": "38 hrs de trabajo / 32 hrs disponibles",
+					"wontFit": "No caben 6 horas",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri"
+						"mon": "Lun",
+						"tue": "Mar",
+						"wed": "Mié",
+						"thu": "Jue",
+						"fri": "Vie"
 					},
 					"items": {
-						"standup": "Standup + planning",
-						"designReview": "Design review",
-						"deepWork": "Deep work",
-						"sync": "Sync",
-						"build": "Build",
-						"inbox": "Inbox",
-						"oneOnOnes": "1:1s",
-						"sprintPrep": "Sprint prep",
-						"writeup": "Writeup",
-						"retro": "Retro",
-						"implementation": "Implementation",
-						"qaHandoff": "QA handoff",
-						"demo": "Demo",
-						"wrapUp": "Wrap-up",
-						"review": "Review",
-						"urgentFix": "Urgent fix",
-						"clientCall": "Client call"
+						"standup": "Reunión breve + planificación",
+						"designReview": "Revisión de diseño",
+						"deepWork": "Trabajo concentrado",
+						"sync": "Coordinación",
+						"build": "Desarrollo",
+						"inbox": "Bandeja de entrada",
+						"oneOnOnes": "Reuniones individuales",
+						"sprintPrep": "Preparación para el sprint",
+						"writeup": "Redacción del informe",
+						"retro": "Retrospectiva",
+						"implementation": "Implementación",
+						"qaHandoff": "transferencia de control de calidad",
+						"demo": "Demostración",
+						"wrapUp": "Cierre",
+						"review": "Revisión",
+						"urgentFix": "Solución urgente",
+						"clientCall": "llamada del cliente"
 					}
 				}
 			}
@@ -933,7 +992,7 @@
 					},
 					"tiles": {
 						"travel": "Viaje a Starbucks",
-						"travelTime": "18 min",
+						"travelTime": "18 minutos",
 						"coffee": "Café - Mike"
 					}
 				},
@@ -947,7 +1006,7 @@
 					},
 					"tiles": {
 						"travel": "Viaje al aeropuerto",
-						"travelTime": "45 min",
+						"travelTime": "45 minutos",
 						"airport": "Check-in del aeropuerto",
 						"flight": "Salida del vuelo"
 					}
@@ -962,7 +1021,7 @@
 					},
 					"tiles": {
 						"travel": "Viaje al colegio",
-						"travelTime": "20 min",
+						"travelTime": "20 minutos",
 						"pickup": "Recogida del colegio"
 					}
 				},
@@ -976,7 +1035,7 @@
 					},
 					"tiles": {
 						"travel": "Viaje a la clínica",
-						"travelTime": "28 min",
+						"travelTime": "28 minutos",
 						"doctor": "Cita médica"
 					}
 				},
@@ -990,7 +1049,7 @@
 					},
 					"tiles": {
 						"travel": "Caminar al salón",
-						"travelTime": "8 min",
+						"travelTime": "8 minutos",
 						"haircut": "Cita para corte de pelo"
 					}
 				},
@@ -1004,7 +1063,7 @@
 					},
 					"tiles": {
 						"travel": "Viaje al restaurante",
-						"travelTime": "32 min",
+						"travelTime": "32 minutos",
 						"dinner": "Reserva para cenar"
 					}
 				}
@@ -1078,7 +1137,7 @@
 				"lunchBreak": "Pausa para almorzar",
 				"teamSync": "Sincronización de equipo",
 				"projectReview": "Revisión del proyecto",
-				"happyHour": "Happy Hour",
+				"happyHour": "Hora feliz",
 				"breakfastWithFriends": "Desayuno con amigos",
 				"groceryShopping": "Compras de supermercado",
 				"gymWorkouts": "Entrenamientos en el gimnasio"
@@ -1303,7 +1362,7 @@
 					"wed": "X",
 					"thu": "J",
 					"fri": "V",
-					"sat": "S"
+					"sat": "D"
 				},
 				"dayNames": {
 					"sun": "Domingo",
@@ -1455,7 +1514,10 @@
 					"options": [
 						{
 							"value": "google",
-							"label": "Google Calendar"
+							"label": "Google Calendar",
+							"tileshareActivity": {
+								"title": "Actividades"
+							}
 						},
 						{
 							"value": "outlook",
@@ -1623,7 +1685,7 @@
 			"selectDate": "Seleccionar fecha",
 			"duration": "Duración",
 			"hours": "h",
-			"minutes": "min",
+			"minutes": "mín.",
 			"durationHoursPreview": "{{count}}h",
 			"durationMinutesPreview": "{{count}}m",
 			"split": "Número de divisiones",
@@ -1791,28 +1853,28 @@
 				"headerRight": "Tiler",
 				"rows": [
 					{
-						"left": "You schedule everything manually",
-						"right": "AI builds your schedule from plain English"
+						"left": "Programas todo manualmente",
+						"right": "La IA crea tu agenda a partir de un inglés sencillo"
 					},
 					{
-						"left": "No awareness of travel time",
-						"right": "Auto-calculates and adds travel buffers"
+						"left": "Sin conocimiento del tiempo de viaje.",
+						"right": "Calcula automáticamente y agrega buffers de viaje"
 					},
 					{
-						"left": "Static — won’t adapt when things change",
-						"right": "Detects ripples and reschedules instantly"
+						"left": "Estático: no se adapta cuando las cosas cambian",
+						"right": "Detecta ondulaciones y reprograma al instante"
 					},
 					{
-						"left": "No navigation or route planning",
-						"right": "Navigate your day tile-to-tile with real transit"
+						"left": "Sin navegación ni planificación de rutas.",
+						"right": "Navega tu día mosaico a mosaico con tránsito real"
 					},
 					{
-						"left": "Shared calendars only — no task assignment",
-						"right": "TileShare: assign and track tasks with anyone"
+						"left": "Solo calendarios compartidos, sin asignación de tareas",
+						"right": "TileShare: asigna y realiza un seguimiento de tareas con cualquier persona"
 					},
 					{
-						"left": "Nothing confirmed — events just appear",
-						"right": "Confirmation-first — you approve all changes"
+						"left": "Nada confirmado: los eventos simplemente aparecen",
+						"right": "Primero la confirmación: usted aprueba todos los cambios"
 					}
 				]
 			}
@@ -2085,7 +2147,14 @@
 				"board": "Vista de panel"
 			},
 			"board": {
-				"empty": "Aún no hay Tilettes aquí"
+				"empty": "Aún no hay Tilettes aquí",
+				"filterAria": "Asignaciones de la junta",
+				"filter": {
+					"all": "Todos",
+					"mine": "Sólo yo"
+				},
+				"accepting": "Aceptando…",
+				"dropHint": "Déjate caer aquí para aceptar tu invitación."
 			},
 			"viewAria": "Vista de Tilette",
 			"openTiletteAria": "Abrir tilette",
@@ -2393,40 +2462,40 @@
 				"date": "1 de mayo de 2026",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "La mayoría de las herramientas de programación te tratan como a un operador de calendario. Arrastras, sueltas, cambias el tamaño y luego la vida cambia y empiezas de nuevo. Tiler adopta un enfoque diferente: tú hablas, él programa."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "Escriba algo como \"Dentista el jueves a las 9 a. m., luego café con Priya en el centro alrededor de las 11\" y Tiler se encarga del resto. Duración, tiempo de viaje, lagunas en el buffer, confirmación. Todo ello."
 					},
 					{
-						"title": "How it works"
+						"title": "como funciona"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "Describe la tarea",
+						"stepBody": "Escriba lo que necesita hacer en inglés sencillo. Sin sintaxis especial, sin menús desplegables. \"Una sesión de gimnasio mañana por la mañana durante una hora\" es suficiente para empezar.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Lo que entiende Tiler",
+							"text": "Hora relativa (\"mañana\"), duración (\"una hora\") y señales de ubicación (\"centro\"). No se necesita configuración adicional."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "La IA llena los vacíos",
+						"stepBody": "Tiler razona sobre su solicitud antes de responder. Deduce la duración del contexto, verifica sus compromisos existentes y contabiliza los viajes. Si un detalle no está realmente claro, se formula una pregunta específica, nunca un formulario.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "Razonar, no adivinar",
+							"text": "Tiler hace una referencia cruzada de su ubicación, sus mosaicos existentes y sus ventanas de tiempo preferidas antes de proponer algo."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "Revisar y luego confirmar",
+						"stepBody": "Tiler te muestra el cronograma propuesto con todos los detalles: hora, ubicación y recorrido. Usted confirma, ajusta o solicita alternativas. Nada llega a tu calendario sin tu autorización.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "Confirmación primero",
+							"text": "Tiler propone. Tú decides. Mantienes el control incluso cuando la IA hace el trabajo pesado."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "Lo vives. Tiler lo planea."
 					}
 				]
 			},
@@ -2440,40 +2509,40 @@
 				"date": "8 de mayo de 2026",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "La mayoría de los calendarios asumen que una vez que finaliza una tarea, estás listo para la siguiente. Pero la vida real tiene un viaje diario. Tiler incorpora ese viaje en tu agenda, por lo que cada bloque en tu línea de tiempo refleja dónde debes estar."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "Agregue una reunión, un recado, una reunión para ponerse al día con un café o una recogida en la escuela. Tiler calcula automáticamente cómo llegará allí y cuánto tiempo le llevará, luego incluye el tiempo de viaje directamente en su día."
 					},
 					{
-						"title": "How it works"
+						"title": "como funciona"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "Establece tus ubicaciones una vez",
+						"stepBody": "No es necesario ingresar direcciones exactas cada vez. Establece tu hogar, trabajo y cualquier lugar habitual una vez. A partir de ese momento, Tiler sabe desde dónde parte y hacia dónde se dirige.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "Etiquetas de ubicación Tiler entiende",
+							"text": "Inicio · Trabajo · Centro · El gimnasio · Cerca de la oficina"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "Espacios de tiempo de viaje en tu línea de tiempo",
+						"stepBody": "Cada vez que agrega una tarea con una ubicación, Tiler inserta un bloque de viaje entre ella y lo que venga antes o después. Aparece como su propio segmento en su línea de tiempo, para que siempre sepa cuándo debe irse.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "Rutas reales, no estimaciones.",
+							"text": "Tiler utiliza datos de rutas en vivo que cubren la conducción, el tránsito y la caminata para que el tiempo de viaje refleje cómo se desplaza realmente."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "Las tareas cercanas se agrupan automáticamente",
+						"stepBody": "Cuando varias tareas comparten la misma zona de la ciudad, Tiler las agrupa para que no tengas que zigzaguear por la ciudad. Los recados cerca de su gimnasio se realizan antes o después de su entrenamiento. La visita de un cliente cerca del centro se combina con su almuerzo cercano.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "Menos viajes, más hecho",
+							"text": "La agrupación inteligente significa menos viajes, menos tiempo perdido en tránsito y un día que transcurre como debería."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "Hacer algo no se trata sólo de encontrar tiempo. Se trata de estar en el lugar correcto."
 					}
 				]
 			},
@@ -2487,49 +2556,49 @@
 				"date": "22 de junio de 2026",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "Cambiar tu horario parece arriesgado. Mueve una tarea y no estás seguro de qué más cambia. Acepta una sugerencia y pregúntate si fue la decisión correcta. Programar Deshacer le brinda una zona segura entre la intención y el compromiso."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "Cada cambio en Tiler, ya sea que haya escrito una solicitud, haya aceptado una sugerencia o haya movido un mosaico, aparece primero como una vista previa. Tu programación en vivo permanece intacta hasta que tú lo digas."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "Cómo funciona Programar deshacer"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "hacer un cambio",
+						"stepBody": "Mueva un mosaico, agregue una nueva tarea o acepte una sugerencia de IA. En lugar de guardar inmediatamente, Tiler coloca el cambio en la vista previa. Se muestra con un borde discontinuo y una etiqueta VISTA PREVIA para que sepas que aún no ha llegado.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "Nada se guarda automáticamente",
+							"text": "Su programación en vivo se congela mientras la revisa. Sin guardados parciales ni sobrescrituras accidentales."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "Vea exactamente lo que cambió",
+						"stepBody": "El mosaico de vista previa muestra el nombre, la ubicación, la hora y la fecha actualizados junto con lo que había antes. Podrás ver la imagen completa de un vistazo sin tener que seguir mentalmente lo que se movió."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "Toca Deshacer o Aceptar",
+						"stepBody": "¿No estás contento con el resultado? Toque Deshacer y su programación original volverá instantáneamente. ¿Feliz con eso? Toque Aceptar y se bloqueará. De cualquier manera, realizó la llamada.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "Deshacer es siempre instantáneo",
+							"text": "No hay historial de deshacer para desplazarse. Un toque y volverá a su estado original exacto, sin importar cuánto haya cambiado en la vista previa."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "Por qué esto importa"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "La mayoría de las aplicaciones de calendario aplican los cambios inmediatamente y le piden que los deshaga después del hecho, momento en el que se activan las notificaciones, se realiza la sincronización y el daño ya está hecho. Programar Deshacer cambia esto. El valor predeterminado es obtener una vista previa, no guardar."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "Diseñado para días muy apretados",
+						"text": "Cuando tu día no tiene descanso, un movimiento en falso puede afectarlo todo. Programar deshacer le brinda un momento para respirar y verificar antes de que se active cualquier cambio."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "Ya sea que esté reprogramando un entrenamiento, cambiando una reunión o asumiendo una tarea que le envió un colega, el paso de vista previa toma menos de un segundo y puede salvarlo de una llamada de la que se arrepentirá."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "Cambia de opinión antes de que cuente."
 					}
 				]
 			},
@@ -2543,36 +2612,36 @@
 				"date": "22 de mayo de 2026",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "La mayoría de los traspasos de tareas terminan en un hilo. Lo envías, lo leen, se olvidan de programarlo, le haces seguimiento. Tileshare corta por la mitad. Comparte un mosaico y aterrizará en su Tiler, ya programado."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "Cuando comparte un mosaico, llega como una tarea adaptativa en vivo en la programación del destinatario. Encuentra el mejor espacio disponible en torno a sus compromisos existentes. No se requiere colocación en ninguno de los extremos."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Cómo funciona Tileshare"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "Comparte cualquier mosaico",
+						"stepBody": "Desde cualquier tarea en su agenda, toque Compartir y seleccione un contacto Tiler. El mosaico se envía con todo lo que el destinatario necesita para realizarlo.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "Lo que viaja con la teja",
+							"text": "Nombre de la tarea, duración estimada, fecha límite y etiquetas de ubicación. La agenda personal del destinatario permanece completamente privada."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "Aterriza en su agenda",
+						"stepBody": "El mosaico compartido aparece en el Tiler del destinatario y encuentra el mejor espacio disponible en torno a sus compromisos existentes. Se adapta a su día a día, no al revés."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "Síguelo sin perseguirlo",
+						"stepBody": "Una vez enviada la tarea, puede ver cuándo se programó, cuándo se completó y si se movió. No hay mensajes de seguimiento. Sin controles de estado. Lo sabrás.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "Responsabilidad compartida, cero fricciones",
+							"text": "Ambos lados ven el mismo mosaico. Uno lo completa. El otro lo ve hecho. Delegación que realmente cierra el círculo."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "Envíalo una vez. Sepa que se hace."
 					}
 				]
 			}
@@ -2593,5 +2662,262 @@
 	"chat.tileShare.planTargetNotApplied": "Sin aplicar",
 	"chat.tileShare.planReview": "Revisar plan de trabajo compartido",
 	"chat.tileShare.planUpdated": "Los cambios revisados se guardaron juntos.",
-	"chat.tileShare.planNote": "Todos los elementos mostrados se guardan juntos después de confirmar. Si algún elemento cambia o pierdes el acceso, revisa una nueva propuesta."
+	"chat.tileShare.planNote": "Todos los elementos mostrados se guardan juntos después de confirmar. Si algún elemento cambia o pierdes el acceso, revisa una nueva propuesta.",
+	"tileShareDensity": {
+		"respond": "Responder",
+		"accepted": "{{accepted}}/{{total}} aceptadas",
+		"task": "Tilette",
+		"people": "Gente",
+		"response": "Respuesta"
+	},
+	"tileShareVisual": {
+		"edit": "Editar",
+		"hours_one": "{{count}} hora",
+		"hours_other": "{{count}} horas",
+		"hours_many": "{{count}} horas"
+	},
+	"tileShareEdit": {
+		"lateTitle": "Vencimiento después de la fecha límite TileShare",
+		"durationLabel": "Duración",
+		"nameShort": "Utilice al menos 3 caracteres.",
+		"nameLong": "No utilice más de 100 caracteres.",
+		"nameHint": "Utilice entre 3 y 100 caracteres.",
+		"beforeStart": "La fecha límite debe ser a partir de la hora de inicio.",
+		"time": "Hora límite",
+		"inherited": "Esta tilette usa la fecha límite del TileShare hasta que elijas una propia.",
+		"afterShare": "Esta tilette vence después de la fecha límite de TileShare ({{deadline}}).",
+		"moveShare": "También mueva la fecha límite del TileShare a {{deadline}}.",
+		"durationFixed": "La duración de una tilette no puede cambiar una vez que se comparte.",
+		"duration": "{{minutes}} minutos",
+		"modeFixed": "El modo no puede cambiar después de compartir.",
+		"acceptedImpact_one": "{{count}} tilette aceptada con una fecha límite posterior puede adelantarse a esta fecha.",
+		"acceptedImpact_other": "{{count}} tilettes aceptadas con una fecha límite posterior pueden adelantarse a esta fecha.",
+		"unacceptedImpact_one": "{{count}} tilette que nadie ha aceptado conserva su fecha límite posterior.",
+		"unacceptedImpact_other": "{{count}} tilettes que nadie ha aceptado conservan su fecha límite posterior.",
+		"unchanged": "No hay cambios para guardar.",
+		"retry": "Reintentar guardar",
+		"saveFailed": "No se pudo guardar ahora. Tus cambios se conservan. Vuelve a intentarlo.",
+		"shareFailed": "La tilette se guardó, pero no se pudo actualizar la fecha límite del TileShare. Vuelve a intentarlo para completar el proceso o cierra para conservar la tilette guardada.",
+		"partialDiscard": "Los cambios de la tilette ya están guardados. Al cerrar, se descarta el cambio pendiente de la fecha límite del TileShare.",
+		"discard": "Se perderán los cambios no guardados en estos detalles.",
+		"acceptedImpact_many": "{{count}} tilettes aceptadas con una fecha límite posterior pueden adelantarse a esta fecha.",
+		"unacceptedImpact_many": "{{count}} tilettes que nadie ha aceptado conservan su fecha límite posterior."
+	},
+	"tileShareNotes": {
+		"createdPending": "La tilette fue creada. Aún es necesario guardar sus notas; volver a intentarlo no creará otra tilette.",
+		"retrySave": "Reintentar guardar notas",
+		"title": "Notas",
+		"edit": "Editar notas",
+		"empty": "Aún no hay notas.",
+		"loadError": "No se pudieron cargar notas.",
+		"saveError": "No se pudieron guardar notas. Tus ediciones todavía están aquí; intentar otra vez.",
+		"useSaved": "Usar nota guardada",
+		"truncated": "La nota superó el límite del servidor. Revise la nota guardada antes de continuar."
+	},
+	"tileShareMarkdown": {
+		"write": "Escribir",
+		"preview": "Vista previa",
+		"formatting": "Formato de notas",
+		"previewLabel": "Vista previa de nota",
+		"empty": "No hay nada que previsualizar todavía.",
+		"hint": "Compatible con Markdown: títulos, negrita, listas, enlaces y código."
+	},
+	"tileShareModes": {
+		"broadcast": {
+			"label": "Difusión",
+			"title": "Crear difusión",
+			"description": "Comparte una tarea. Cada destinatario tiene su propia tarea.",
+			"submit": "Crear difusión"
+		},
+		"class": {
+			"label": "Clase",
+			"title": "Crear una clase",
+			"description": "Comparte un conjunto de tilettes. Cada participante recibe cada tilettes.",
+			"submit": "Crear clase"
+		},
+		"project": {
+			"label": "Proyecto",
+			"title": "Crear un proyecto",
+			"description": "Trabaja en equipo en un conjunto de tareas. Asigna personas a cada tilette.",
+			"submit": "Crear proyecto"
+		},
+		"location": "Ubicación (opcional)",
+		"addTilettesNow": "Agregue tilettes primero (opcional)",
+		"optionalTilettes": "Opcional. También puede agregar tilettes después de crear el TileShare.",
+		"tiletteNumber": "Tilette {{number}}",
+		"addTilette": "Agregar tilette",
+		"removeTilette": "Quitar tilette",
+		"moveUp": "Subir",
+		"moveDown": "Bajar",
+		"deadlineDefault": "Utiliza la fecha límite TileShare: {{deadline}}",
+		"everyone": "Asignado a cada participante de la Clase.",
+		"addRecipient": "Añadir destinatario",
+		"removeRecipient": "Eliminar {{recipient}}",
+		"assignees": "Personas asignadas (opcional)",
+		"tiletteLocation": "ubicación de la Tilette",
+		"perspective": "Perspectiva TileShare",
+		"projectView": "Vista del proyecto",
+		"classView": "Vista de clase",
+		"unknown": "Modo compartir no disponible",
+		"participants": "Participantes",
+		"participantContact": "Correo electrónico o teléfono del participante",
+		"classActions": "Participantes de la clase",
+		"addToAll": "Agregar a todas las tilettes",
+		"removeFromAll": "Eliminar de todas las tilettes",
+		"removeFromClassConfirm": "¿Quitar a este participante de todas las tilette de la clase?",
+		"emptyClass": "Agregue una tilette para comenzar a asignar trabajo a los participantes.",
+		"acceptAll": "Aceptar todas las tilettes pendientes",
+		"declineAll": "Rechazar todas las tilettes pendientes",
+		"partialChange": "{{saved}} cambios guardados; {{failed}} requieren otro intento.",
+		"changesSaved": "Cambios guardados.",
+		"retryRemaining": "Reintentar los cambios restantes",
+		"refreshFailed": "Se enviaron cambios, pero el TileShare no se pudo actualizar. Vuelva a cargar para verificar las tareas guardadas."
+	},
+	"tileshareList": {
+		"title": "TileShares",
+		"createdByMe": "Creado por mi",
+		"sort": "Ordenar por",
+		"createdDesc": "Hora de creación: lo más nuevo primero",
+		"createdAsc": "Hora de creación: la más antigua primero",
+		"deadlineAsc": "Fecha límite: lo más pronto posible primero",
+		"deadlineDesc": "Fecha límite: último primero",
+		"empty": "Ningún TileShares coincide con este filtro.",
+		"failed": "No se pudo cargar TileShares.",
+		"retry": "Reintentar"
+	},
+	"tileshareRsvp": {
+		"accepted": "Aceptada",
+		"declined": "Rechazada",
+		"none": "Esperando respuesta",
+		"tentative": "Provisional",
+		"unknown": "Respuesta desconocida",
+		"yours": "Tu respuesta",
+		"response": "Respuesta a la invitación",
+		"responses": "Respuestas a la invitación",
+		"noParticipants": "Sin participantes",
+		"viewPeople": "Ver respuestas",
+		"participant": "Partícipe"
+	},
+	"tileshareInvitations": {
+		"yourInvitation": "Estás invitado a esta tilette.",
+		"unavailable": "Esta invitación ya no está pendiente.",
+		"title": "Invitaciones",
+		"refresh": "Actualizar",
+		"all": "Todas las invitaciones",
+		"loading": "Cargando invitaciones…",
+		"failed": "No se pudieron cargar las invitaciones. Actualiza para intentarlo de nuevo.",
+		"empty": "No hay invitaciones pendientes.",
+		"pending": "tilettes pendientes",
+		"review": "Revisar invitaciones",
+		"from": "Invitado por",
+		"due": "Vence:",
+		"accept": "Aceptar",
+		"decline": "Rechazar",
+		"changeResponse": "Cambiar respuesta",
+		"cancel": "Cancelar",
+		"currentAccepted": "Respuesta actual: Aceptada.",
+		"currentDeclined": "Respuesta actual: Rechazada.",
+		"updatedAccepted": "Respuesta actualizada a Aceptada.",
+		"updatedDeclined": "Respuesta actualizada a Rechazada.",
+		"responding": "Guardando respuesta…",
+		"next": "Página siguiente",
+		"accepted": "Aceptada. Se ha creado tu tile.",
+		"declined": "Invitación rechazada.",
+		"responseFailed": "La respuesta no pudo ser confirmada. Actualice para verificar su estado antes de volver a intentarlo."
+	},
+	"chat": {
+		"tileShare": {
+			"reviewAgain": "Revise la propuesta actual antes de confirmarla nuevamente.",
+			"uncertain": "No se pudo confirmar la creación. Verifique el estado antes de volver a intentarlo.",
+			"created": "TileShare creado.",
+			"open": "Abrir TileShare",
+			"review": "Revisar la creación de TileShare",
+			"newProject": "Crear proyecto",
+			"newTilette": "Agregar tilette",
+			"project": "Proyecto",
+			"starts": "Empieza",
+			"deadline": "Fecha límite",
+			"minutes": "minutos",
+			"reviewNote": "No se crea nada hasta que usted confirme. Los destinatarios aún eligen si aceptan o no; Esta acción no envía notificaciones.",
+			"checking": "De cheques...",
+			"confirm": "Confirmar creación",
+			"check": "comprobar estado"
+		},
+		"execution": {
+			"mode": "Ejecución de chat",
+			"confirmFirst": "Confirmar primero",
+			"autoAct": "Ejecutar automáticamente",
+			"autoNote": "Ejecute acciones de chat compatibles automáticamente. Los cambios masivos y destructivos aún necesitan revisión.",
+			"confirmNote": "Revise los cambios del chat antes de que se ejecuten."
+		}
+	},
+	"chat.tileShare.renamed": "Proyecto renombrado.",
+	"chat.tileShare.renameReview": "Revisar el cambio de nombre del proyecto",
+	"chat.tileShare.renameProject": "Cambiar nombre del proyecto",
+	"chat.tileShare.previousName": "Nombre actual",
+	"chat.tileShare.renameNote": "Sólo el nombre del proyecto cambia después de la confirmación.",
+	"chat.tileShare.confirmRename": "Confirmar cambio de nombre",
+	"chat.tileShare.renameUncertain": "No se pudo confirmar el cambio de nombre. Verifique el estado antes de volver a intentarlo.",
+	"chat.tileShare.tiletteRenamed": "Tilette renombrada.",
+	"chat.tileShare.tiletteRenameReview": "Revisar el cambio de nombre de la tilette",
+	"chat.tileShare.renameTilette": "Cambiar nombre de tilette",
+	"chat.tileShare.tiletteRenameNote": "Solo cambia el nombre de la tilette compartida. Los títulos del calendario personal permanecen como están.",
+	"chat.tileShare.notesUpdated": "Notas de Tilette actualizadas.",
+	"chat.tileShare.notesReview": "Revisar notas de tilette",
+	"chat.tileShare.editNotes": "Actualizar notas de tilette",
+	"chat.tileShare.previousNotes": "notas actuales",
+	"chat.tileShare.proposedNotes": "Notas propuestas",
+	"chat.tileShare.emptyNotes": "Sin notas",
+	"chat.tileShare.clearNotes": "Notas claras",
+	"chat.tileShare.notesNote": "El texto propuesto reemplaza las notas completas de la tilette después de la confirmación.",
+	"chat.tileShare.confirmNotes": "Confirmar notas",
+	"chat.tileShare.notesUncertain": "No se pudo confirmar la actualización de las notas. Verifique el estado antes de volver a intentarlo.",
+	"chat.tileShare.tiletteDeleted": "Tilette eliminada.",
+	"chat.tileShare.deleteReview": "Revisar la eliminación de tilette",
+	"chat.tileShare.deleteTilette": "Eliminar tilette",
+	"chat.tileShare.assignmentCount": "Asignaciones",
+	"chat.tileShare.linkedCalendarCount": "Elementos de calendario vinculados",
+	"chat.tileShare.deleteNote": "Esto deshabilita la tilettes y el trabajo del calendario vinculado. El proyecto y otras tilettes permanecen disponibles. Se conserva el historial de tilettes; Deshacer no se proporciona aquí.",
+	"chat.tileShare.confirmDeletion": "Confirmar eliminación",
+	"chat.tileShare.deleteUncertain": "No se pudo confirmar la eliminación. Verifique el estado antes de volver a intentarlo.",
+	"chat.tileShare.openProject": "Abrir proyecto",
+	"chat.tileShare.tiletteUpdated": "Tilette actualizada.",
+	"chat.tileShare.updateReview": "Revisar la actualización de la tilette",
+	"chat.tileShare.updateTilette": "tilette de actualización",
+	"chat.tileShare.updateNote": "Todos los cambios mostrados se guardan juntos después de la confirmación. Las notas suministradas reemplazan la nota completa.",
+	"chat.tileShare.confirmUpdate": "Confirmar actualización",
+	"chat.tileShare.updateRejected": "No se aplicaron cambios. Revise la respuesta y solicite una actualización revisada.",
+	"chat.tileShare.updateUncertain": "No se pudo confirmar la actualización. Verifique el estado antes de volver a intentarlo.",
+	"tileShareComposer": {
+		"close": "Cerrar",
+		"shareDeadline": "Fecha límite TileShare",
+		"moveShareDeadline": "También mueva la fecha límite TileShare a {{deadline}}",
+		"count_one": "Has añadido {{count}} tilette",
+		"count_other": "Has añadido {{count}} tilettes",
+		"newTilette": "Nueva tilette",
+		"emptyTitle": "Añade tilettes a tu TileShare",
+		"emptyDescription": "Agregue tareas ahora o cree el TileShare y agregue tareas más tarde.",
+		"editTilette": "Editar {{name}}",
+		"removeTilette": "Quitar {{name}}",
+		"locationNotSet": "Ubicación no establecida",
+		"unassigned": "No asignado",
+		"added": "{{name}} se agregó a este borrador.",
+		"updated": "{{name}} fue actualizado.",
+		"removed": "{{name}} fue eliminado de este borrador.",
+		"addTitle": "Crear una tilette",
+		"editTitle": "Editar tilette",
+		"saveTilette": "Guardar tilette",
+		"classHint": "Esta tilette se asignará a cada participante de la Clase cuando cree el TileShare.",
+		"projectHint": "Agregue una tarea y, opcionalmente, elija sus asignados. Las invitaciones se envían cuando creas el Proyecto.",
+		"optionalDescription": "¿Quieres incluir tareas durante la creación? Puede agregar tareas ahora o crear el TileShare primero.",
+		"reviewTilettes": "Revisar tilettes ({{count}})",
+		"editDetails": "Editar detalles",
+		"cancelExit": "Cancelar y salir",
+		"discardTitle": "¿Descartar cambios?",
+		"discard": "Descartar cambios",
+		"keepEditing": "Seguir editando",
+		"discardTask": "Se perderán las ediciones de tilettes no guardadas. Otras tilettes permanecerán en el borrador.",
+		"discardShare": "Se perderán los detalles de TileShare y los borradores de tilettes. No se han enviado invitaciones.",
+		"count_many": "Has añadido {{count}} tilettes"
+	}
 }

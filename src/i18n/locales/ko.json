@@ -4,13 +4,46 @@
 			"comment_added": "댓글이 추가되었습니다",
 			"comment_replied": "댓글에 답글이 추가되었습니다",
 			"comment_edited": "댓글이 수정되었습니다",
-			"comment_deleted": "댓글이 삭제되었습니다"
+			"comment_deleted": "댓글이 삭제되었습니다",
+			"invitation_send_unknown": "초대 전송 결과를 알 수 없음",
+			"assignment_completed": "발생 완료",
+			"assignment_reopened": "발생이 다시 열렸습니다."
 		},
 		"sentences": {
 			"comment_added": "<actor/>님이 <title/>에 댓글을 남겼습니다",
 			"comment_replied": "<actor/>님이 <title/>의 댓글에 답글을 남겼습니다",
 			"comment_edited": "<actor/>님이 <title/>의 댓글을 수정했습니다",
 			"comment_deleted": "<actor/>님이 <title/>의 댓글을 삭제했습니다"
+		},
+		"showDismissed": "숨긴 활동 표시",
+		"dismiss": "숨기기",
+		"restore": "활동에 표시",
+		"dismissFailed": "활동 기본 설정을 저장할 수 없습니다. 다시 시도해 보세요.",
+		"channels": {
+			"email": "이메일",
+			"sms": "SMS",
+			"push": "푸시 알림"
+		},
+		"explicitResend": "초대장이 전송되었을 수 있습니다. 필요한 경우 명시적으로 다시 보냅니다.",
+		"options": "활동 옵션",
+		"actions": {
+			"cluster_invitation": "당신을 초대했습니다",
+			"cluster_created": "생성됨",
+			"cluster_deleted": "삭제됨",
+			"tilette_added": "추가됨",
+			"tilette_edited": "업데이트됨",
+			"tilette_deleted": "삭제됨",
+			"tilette_restored": "복원됨",
+			"recipient_added": "참가자를 추가했습니다.",
+			"recipient_removed": "에서 참가자를 제거했습니다.",
+			"recipient_restored": "참가자를 다음으로 복원했습니다.",
+			"assignment_accepted": "수락됨",
+			"assignment_completed": "발생을 완료했습니다.",
+			"assignment_reopened": "다시 발생",
+			"assignment_declined": "거절하다",
+			"invitation_sent": "에게 초대장을 보냈습니다",
+			"invitation_send_failed": "에게 초대장을 보낼 수 없습니다.",
+			"invitation_send_unknown": "님이 다음에 대한 결과를 알 수 없는 초대장을 보냈습니다."
 		}
 	},
 	"common": {
@@ -393,8 +426,8 @@
 			"tip": {
 				"description": "새 타일을 만들려면 <b><key/></b> 키를 누르세요",
 				"keys": {
-					"enter": "Enter",
-					"return": "Return"
+					"enter": "입력하다",
+					"return": "반품"
 				}
 			},
 			"message": {
@@ -673,6 +706,32 @@
 						"financialModeling": "재무 모델 구축하기",
 						"researchStudy": "연구 조사 진행하기"
 					}
+				},
+				"delegation": {
+					"label": "위임 초안",
+					"note": "초안만 가능합니다. 저장해도 작업이 할당되거나 초대장이 전송되지 않습니다.",
+					"defaultDuration": "1시간(기본값)",
+					"minutes": "분",
+					"saved": "저장된 초안: 할당된 작업이 없습니다.",
+					"teamMode": "팀 할당 모드에는 여전히 검토가 필요합니다.",
+					"edit": "초안 수정",
+					"prepare": "위임 초안 준비",
+					"discard": "초안 삭제",
+					"projectSearch": "프로젝트 이름",
+					"search": "프로젝트 검색",
+					"projectSelected": "선택한 프로젝트",
+					"moreProjects": "더 많은 프로젝트",
+					"loading": "프로젝트 로드 중...",
+					"empty": "프로젝트를 찾을 수 없습니다.",
+					"task": "작업 이름",
+					"duration": "기간(분)",
+					"deadline": "마감일",
+					"save": "초안 저장",
+					"cancelEdit": "편집 취소",
+					"saving": "초안 저장 중...",
+					"loadError": "프로젝트를 로드할 수 없습니다. 다시 검색해 보세요.",
+					"fieldsError": "프로젝트를 선택하고 작업, 긍정적인 기간, 향후 마감일을 제공하세요.",
+					"saveError": "초안을 저장할 수 없습니다. 편집 내용은 유지됩니다. 선택 사항이 변경되었거나 응답이 손실된 경우 채팅을 다시 로드하세요."
 				}
 			}
 		},
@@ -686,172 +745,172 @@
 		},
 		"heroExperiment": {
 			"nl_scheduling": {
-				"eyebrow": "Effortless natural-language scheduling",
-				"titleLead": "Just say it.",
-				"titleAccent": "It's scheduled.",
-				"subtitle": "“Gym four times this week.” “Push my report to Thursday.” Tiler understands and rebuilds the rest around it.",
-				"primaryCta": "Tell Tiler what you need",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Schedule this for real",
-				"nudgeCaption": "That took one sentence. Yours will too.",
+				"eyebrow": "손쉬운 자연어 스케줄링",
+				"titleLead": "그냥 말해보세요.",
+				"titleAccent": "예정되어 있습니다.",
+				"subtitle": "“이번 주에 체육관을 4번이나 가요.” “보고서를 목요일로 미루세요.” Tiler는 주변의 나머지 부분을 이해하고 재구성합니다.",
+				"primaryCta": "필요한 것이 무엇인지 Tiler에게 말하세요",
+				"secondaryCta": "작동 방식 보기",
+				"nudgeCta": "진짜로 예약하세요",
+				"nudgeCaption": "한 문장이 필요했습니다. 당신도 마찬가지입니다.",
 				"demo": {
-					"request": "Gym four times this week",
-					"schedule": "Schedule",
-					"scheduled": "Scheduled",
-					"thisWeek": "This week",
-					"rearranging": "rearranging",
-					"done": "done",
+					"request": "이번 주에 체육관 4번",
+					"schedule": "일정",
+					"scheduled": "예정됨",
+					"thisWeek": "이번주",
+					"rearranging": "재배열",
+					"done": "완료",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "월",
+						"tue": "화",
+						"wed": "수",
+						"thu": "목",
+						"fri": "금",
+						"sat": "토",
+						"sun": "일"
 					},
 					"items": {
-						"gym": "Gym",
-						"deepWork": "Deep work",
-						"standup": "Standup",
-						"report": "Report",
+						"gym": "헬스장",
+						"deepWork": "집중 작업",
+						"standup": "팀 짧은 회의",
+						"report": "보고서",
 						"oneOnOne": "1:1",
-						"review": "Review",
-						"rest": "Rest"
+						"review": "검토",
+						"rest": "나머지"
 					},
 					"legend": {
-						"placed": "placed",
-						"moving": "moving",
-						"moved": "report → Thu"
+						"placed": "배치됨",
+						"moving": "재배치 중",
+						"moved": "보고 → 목"
 					}
 				}
 			},
 			"stop_deciding": {
-				"eyebrow": "Your day, planned for you",
-				"title": "Stop deciding when.",
-				"subtitle": "Add what you need to get done. Tiler builds your day around your working hours, your commute, and your deadlines.",
-				"primaryCta": "Build my first day",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Build my day",
-				"nudgeCaption": "You brought the list. Tiler brought the day.",
+				"eyebrow": "당신을 위해 계획된 하루",
+				"title": "언제인지 결정하지 마세요.",
+				"subtitle": "완료하는 데 필요한 것을 추가하세요. Tiler는 근무 시간, 출퇴근 시간, 마감일을 중심으로 하루를 구성합니다.",
+				"primaryCta": "나의 첫날을 만들어 보세요",
+				"secondaryCta": "작동 방식 보기",
+				"nudgeCta": "나의 하루를 만들어보세요",
+				"nudgeCaption": "목록을 가져오셨어요. Tiler가 그 날을 가져왔습니다.",
 				"demo": {
-					"listLabel": "Your list",
-					"scheduledLabel": "Today, scheduled",
+					"listLabel": "귀하의 목록",
+					"scheduledLabel": "오늘 예정",
 					"items": {
-						"memo": "Draft Q3 budget memo",
-						"pharmacy": "Call the pharmacy",
-						"review": "Review Ana's design file",
-						"gym": "Gym — legs",
-						"train": "Book train to Leeds"
+						"memo": "3분기 예산 메모 초안",
+						"pharmacy": "약국에 전화해",
+						"review": "Ana의 디자인 파일 검토",
+						"gym": "체육관 - 다리",
+						"train": "리즈행 기차 예약"
 					},
-					"caption": "Placed around a 9–5 day and a 40-minute commute."
+					"caption": "약 9~5일, 통근 시간은 40분 정도입니다."
 				}
 			},
 			"self_healing": {
-				"eyebrow": "Automatic recovery from disruption",
-				"titleLead": "Your day fell apart at 10am.",
-				"titleAccent": "Your schedule already recovered.",
-				"subtitle": "Run late, skip a session, take an emergency call — Tiler rebuilds the rest of your week instantly.",
-				"primaryCta": "See it recover",
-				"secondaryCta": "See how it works",
-				"footnote": "No re-planning. No guilt. Something went wrong and it was already handled.",
-				"nudgeCta": "Keep this schedule",
-				"nudgeCaption": "Nothing was dropped. Nothing needed your attention.",
+				"eyebrow": "중단으로부터 자동 복구",
+				"titleLead": "당신의 하루는 오전 10시에 무너졌습니다.",
+				"titleAccent": "귀하의 일정은 이미 복구되었습니다.",
+				"subtitle": "늦게 실행하고, 세션을 건너뛰고, 긴급 전화를 받으세요. Tiler는 남은 주의 시간을 즉시 재구성합니다.",
+				"primaryCta": "회복되는 모습을 보세요",
+				"secondaryCta": "작동 방식 보기",
+				"footnote": "재계획 없음. 죄책감이 없습니다. 문제가 발생하여 이미 처리되었습니다.",
+				"nudgeCta": "이 일정을 유지하세요",
+				"nudgeCaption": "아무것도 삭제되지 않았습니다. 주의가 필요한 것은 없습니다.",
 				"demo": {
-					"label": "Tuesday",
-					"status": "Rebuilt",
-					"rebuiltIn": "Rebuilt in 0.4s",
-					"clientCall": "Client call",
-					"onTrack": "on track",
-					"movedSameDay": "moved, same day",
-					"overran": "Ran 90 min late",
-					"wasAt": "was {{time}}",
+					"label": "화요일",
+					"status": "재건축",
+					"rebuiltIn": "0.4초 만에 재건됨",
+					"clientCall": "고객 통화",
+					"onTrack": "궤도에",
+					"movedSameDay": "이사, 당일",
+					"overran": "90분 늦게 달렸어",
+					"wasAt": "{{time}}였습니다",
 					"items": {
-						"morningReview": "Morning review",
-						"clientCall": "Client call",
-						"deepWork": "Deep work — draft",
-						"designSync": "Design sync",
-						"gym": "Gym"
+						"morningReview": "아침 복습",
+						"clientCall": "고객 통화",
+						"deepWork": "심층 작업 — 초안",
+						"designSync": "디자인 동기화",
+						"gym": "헬스장"
 					},
-					"caption": "Gym kept · Deep work protected · Nothing dropped"
+					"caption": "체육관 유지 · 심층 작업 보호 · 아무것도 떨어뜨리지 않음"
 				}
 			},
 			"task_splitting": {
-				"eyebrow": "Automatic decomposition of big work",
-				"titleLead": "One big task.",
-				"titleAccent": "Automatically split across your week.",
-				"subtitle": "Tell Tiler what's due and how long it'll take. It breaks the work into sessions and spreads them across your week.",
-				"primaryCta": "Split my first project",
-				"secondaryCta": "See how it works",
-				"nudgeCta": "Split my project",
-				"nudgeCaption": "One deadline in. Six sessions out.",
+				"eyebrow": "큰 작업의 자동 분해",
+				"titleLead": "하나의 큰 작업.",
+				"titleAccent": "한 주 동안 자동으로 분할됩니다.",
+				"subtitle": "Tiler에게 예정된 일정과 소요 시간을 알려주세요. 작업을 여러 세션으로 나누고 일주일 내내 분산시킵니다.",
+				"primaryCta": "첫 번째 프로젝트 분할",
+				"secondaryCta": "작동 방식 보기",
+				"nudgeCta": "내 프로젝트 분할",
+				"nudgeCaption": "마감일 1회, 세션 6회 종료.",
 				"demo": {
-					"label": "One task",
-					"status": "Split",
-					"task": "Thesis",
-					"total": "12 hrs",
-					"due": "Due Sun 14 Jun",
-					"dueFlag": "Due",
+					"label": "하나의 작업",
+					"status": "나뉘다",
+					"task": "명제",
+					"total": "12시간",
+					"due": "마감일 6월 14일",
+					"dueFlag": "로 인한",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri",
-						"sat": "Sat",
-						"sun": "Sun"
+						"mon": "월",
+						"tue": "화",
+						"wed": "수",
+						"thu": "목",
+						"fri": "금",
+						"sat": "토",
+						"sun": "일"
 					},
 					"parts": {
-						"outline": "Outline",
-						"sources": "Sources",
-						"draftOne": "Draft ch. 1",
-						"notes": "Notes",
-						"draftTwo": "Draft ch. 2",
-						"edit": "Edit pass"
+						"outline": "개요",
+						"sources": "출처",
+						"draftOne": "초안 채널. 1",
+						"notes": "메모",
+						"draftTwo": "초안 채널. 2",
+						"edit": "패스 수정"
 					},
-					"caption": "6 sessions · spread unevenly around your week"
+					"caption": "6개 세션 · 일주일 내내 고르지 않게 진행됨"
 				}
 			},
 			"capacity_check": {
-				"eyebrow": "An honest capacity reality check",
-				"title": "Does it actually fit?",
-				"subtitle": "Tiler places every task into real time. If the week doesn't fit, you find out now — not Friday night.",
-				"primaryCta": "See if your week fits",
-				"secondaryCta": "See how it works",
-				"footnote": "Most planners let you list more than you can ever do. This one does the arithmetic.",
-				"nudgeCta": "Check my real week",
-				"nudgeCaption": "Better to know on Monday than to discover it on Friday.",
+				"eyebrow": "정직한 용량 현실 점검",
+				"title": "실제로 맞나요?",
+				"subtitle": "Tiler는 모든 작업을 실시간으로 처리합니다. 주가 맞지 않으면 금요일 밤이 아니라 지금 알아보세요.",
+				"primaryCta": "당신의 주가 맞는지 확인하세요",
+				"secondaryCta": "작동 방식 보기",
+				"footnote": "대부분의 기획자는 지금까지 할 수 있는 것보다 더 많은 목록을 작성하도록 허용합니다. 이것은 산술을 수행합니다.",
+				"nudgeCta": "나의 실제 일주일을 확인해보세요",
+				"nudgeCaption": "금요일에 발견하는 것보다 월요일에 아는 것이 더 낫습니다.",
 				"demo": {
-					"label": "This week",
-					"capacity": "Over capacity",
-					"overflow": "Overflow",
-					"load": "38 hrs of work / 32 hrs available",
-					"wontFit": "6 hrs won't fit",
+					"label": "이번주",
+					"capacity": "용량 초과",
+					"overflow": "과다",
+					"load": "38시간 근무 / 32시간 이용 가능",
+					"wontFit": "6시간 분량의 작업을 배치할 수 없습니다",
 					"days": {
-						"mon": "Mon",
-						"tue": "Tue",
-						"wed": "Wed",
-						"thu": "Thu",
-						"fri": "Fri"
+						"mon": "월",
+						"tue": "화",
+						"wed": "수",
+						"thu": "목",
+						"fri": "금"
 					},
 					"items": {
-						"standup": "Standup + planning",
-						"designReview": "Design review",
-						"deepWork": "Deep work",
-						"sync": "Sync",
-						"build": "Build",
-						"inbox": "Inbox",
-						"oneOnOnes": "1:1s",
-						"sprintPrep": "Sprint prep",
-						"writeup": "Writeup",
-						"retro": "Retro",
-						"implementation": "Implementation",
-						"qaHandoff": "QA handoff",
-						"demo": "Demo",
-						"wrapUp": "Wrap-up",
-						"review": "Review",
-						"urgentFix": "Urgent fix",
-						"clientCall": "Client call"
+						"standup": "팀 짧은 회의 및 계획",
+						"designReview": "디자인 검토",
+						"deepWork": "집중 작업",
+						"sync": "업무 조율",
+						"build": "개발",
+						"inbox": "받은 편지함",
+						"oneOnOnes": "일대일 면담",
+						"sprintPrep": "스프린트 준비",
+						"writeup": "보고서 작성",
+						"retro": "회고",
+						"implementation": "구현",
+						"qaHandoff": "QA 핸드오프",
+						"demo": "데모",
+						"wrapUp": "마무리",
+						"review": "검토",
+						"urgentFix": "긴급 수정",
+						"clientCall": "고객 통화"
 					}
 				}
 			}
@@ -1455,7 +1514,10 @@
 					"options": [
 						{
 							"value": "google",
-							"label": "Google 캘린더"
+							"label": "Google 캘린더",
+							"tileshareActivity": {
+								"title": "활동"
+							}
 						},
 						{
 							"value": "outlook",
@@ -1791,28 +1853,28 @@
 				"headerRight": "Tiler",
 				"rows": [
 					{
-						"left": "You schedule everything manually",
-						"right": "AI builds your schedule from plain English"
+						"left": "모든 일정을 수동으로 예약합니다.",
+						"right": "AI가 일반 영어로 일정을 작성합니다."
 					},
 					{
-						"left": "No awareness of travel time",
-						"right": "Auto-calculates and adds travel buffers"
+						"left": "이동 시간에 대한 인식이 없음",
+						"right": "이동 버퍼를 자동 계산하고 추가합니다."
 					},
 					{
-						"left": "Static — won’t adapt when things change",
-						"right": "Detects ripples and reschedules instantly"
+						"left": "정적 — 상황이 변해도 적응하지 않습니다.",
+						"right": "파급 효과를 감지하고 즉시 일정을 변경합니다."
 					},
 					{
-						"left": "No navigation or route planning",
-						"right": "Navigate your day tile-to-tile with real transit"
+						"left": "내비게이션이나 경로 계획이 없습니다.",
+						"right": "실제 대중교통을 이용해 타일에서 타일까지 하루를 탐색하세요."
 					},
 					{
-						"left": "Shared calendars only — no task assignment",
-						"right": "TileShare: assign and track tasks with anyone"
+						"left": "공유 캘린더만 — 작업 할당 없음",
+						"right": "TileShare: 누구에게나 작업 할당 및 추적"
 					},
 					{
-						"left": "Nothing confirmed — events just appear",
-						"right": "Confirmation-first — you approve all changes"
+						"left": "확인된 바 없음 - 이벤트가 나타남",
+						"right": "확인 우선 — 모든 변경 사항을 승인합니다."
 					}
 				]
 			}
@@ -2085,7 +2147,14 @@
 				"board": "보드 보기"
 			},
 			"board": {
-				"empty": "아직 Tilette가 없습니다"
+				"empty": "아직 Tilette가 없습니다",
+				"filterAria": "이사회 할당",
+				"filter": {
+					"all": "모든 사람",
+					"mine": "나만"
+				},
+				"accepting": "수락…",
+				"dropHint": "초대를 수락하려면 여기로 오세요."
 			},
 			"viewAria": "Tilette 보기",
 			"openTiletteAria": "Tilette 열기",
@@ -2393,40 +2462,40 @@
 				"date": "2026년 5월 1일",
 				"sections": [
 					{
-						"text": "Most scheduling tools treat you like a calendar operator. You drag, you drop, you resize, and then life changes and you start over. Tiler takes a different approach: you talk, it schedules."
+						"text": "대부분의 일정 도구는 귀하를 달력 운영자처럼 취급합니다. 드래그하고, 드롭하고, 크기를 조정하면 생활이 바뀌고 처음부터 다시 시작하게 됩니다. Tiler는 다른 접근 방식을 취합니다. 즉, 말하면 일정이 정해집니다."
 					},
 					{
-						"text": "Type something like \"Dentist at 9 AM Thursday, then coffee with Priya downtown around 11\" and Tiler handles the rest. Duration, travel time, buffer gaps, confirmation. All of it."
+						"text": "\"목요일 오전 9시에 치과 의사, 11시쯤 시내에서 Priya와 함께 커피\"와 같이 입력하면 Tiler가 나머지를 처리합니다. 기간, 이동 시간, 버퍼 간격, 확인. 모든 것."
 					},
 					{
-						"title": "How it works"
+						"title": "작동 원리"
 					},
 					{
-						"stepTitle": "Describe the task",
-						"stepBody": "Type what you need to do in plain English. No special syntax, no dropdowns. \"Gym session tomorrow morning for an hour\" is enough to get started.",
+						"stepTitle": "작업 설명",
+						"stepBody": "해야 할 일을 쉬운 영어로 입력하세요. 특별한 구문이나 드롭다운이 없습니다. \"내일 아침 한 시간 동안 체육관 세션\"이면 시작하기에 충분합니다.",
 						"callout": {
-							"label": "What Tiler understands",
-							"text": "Relative time (\"tomorrow\"), duration (\"an hour\"), and location cues (\"downtown\"). No extra setup needed."
+							"label": "Tiler가 이해하는 것",
+							"text": "상대 시간(\"내일\"), 기간(\"한 시간\") 및 위치 신호(\"다운타운\"). 추가 설정이 필요하지 않습니다."
 						}
 					},
 					{
-						"stepTitle": "The AI fills in the gaps",
-						"stepBody": "Tiler reasons about your request before responding. It infers duration from context, checks your existing commitments, and accounts for travel. If one detail is genuinely unclear, it asks one targeted question, never a form.",
+						"stepTitle": "AI가 공백을 메운다",
+						"stepBody": "응답하기 전에 귀하의 요청에 대한 Tiler 이유를 확인하세요. 상황에 따라 기간을 추론하고, 기존 약속을 확인하고, 여행을 설명합니다. 한 가지 세부 사항이 실제로 명확하지 않은 경우 양식이 아닌 하나의 목표 질문을 묻습니다.",
 						"callout": {
-							"label": "Reasoning, not guessing",
-							"text": "Tiler cross-references your location, your existing tiles, and your preferred time windows before it proposes anything."
+							"label": "추측이 아닌 추론",
+							"text": "Tiler는 무엇이든 제안하기 전에 귀하의 위치, 기존 타일 및 선호하는 시간 창을 상호 참조합니다."
 						}
 					},
 					{
-						"stepTitle": "Review, then confirm",
-						"stepBody": "Tiler shows you the proposed schedule with full details: time, location, and travel. You confirm, adjust, or ask for alternatives. Nothing lands on your calendar without your say-so.",
+						"stepTitle": "검토 후 확인",
+						"stepBody": "Tiler는 시간, 위치, 여행 등 전체 세부정보와 함께 제안된 일정을 보여줍니다. 대안을 확인, 조정 또는 요청합니다. 귀하의 의견 없이는 귀하의 달력에 아무 것도 표시되지 않습니다.",
 						"callout": {
-							"label": "Confirmation-first",
-							"text": "Tiler proposes. You decide. You stay in control even as the AI does the heavy lifting."
+							"label": "확인 우선",
+							"text": "Tiler가 제안합니다. 당신이 결정합니다. AI가 무거운 작업을 수행하는 동안에도 제어권을 유지할 수 있습니다."
 						}
 					},
 					{
-						"quote": "You live it. Tiler plans it."
+						"quote": "당신은 그것을 살아요. Tiler가 그것을 계획하고 있습니다."
 					}
 				]
 			},
@@ -2440,40 +2509,40 @@
 				"date": "2026년 5월 8일",
 				"sections": [
 					{
-						"text": "Most calendars assume that once one task ends, you're ready for the next. But real life has a commute. Tiler builds that commute into your schedule, so every block in your timeline actually reflects where you need to be."
+						"text": "대부분의 캘린더에서는 한 작업이 끝나면 다음 작업을 수행할 준비가 된 것으로 가정합니다. 하지만 실제 생활에는 통근이 있습니다. Tiler는 통근 시간을 일정에 반영하므로 타임라인의 모든 블록이 실제로 필요한 위치를 반영합니다."
 					},
 					{
-						"text": "Add a meeting, an errand, a coffee catch-up, or a school pickup. Tiler automatically calculates how you'll get there and how long it takes, then slots travel time directly into your day."
+						"text": "회의, 심부름, 커피 모임, 학교 픽업 등을 추가하세요. Tiler는 도착 방법과 소요 시간을 자동으로 계산한 다음 슬롯 이동 시간을 하루에 직접 적용합니다."
 					},
 					{
-						"title": "How it works"
+						"title": "작동 원리"
 					},
 					{
-						"stepTitle": "Set your locations once",
-						"stepBody": "You don't need to enter exact addresses every time. Set your home, work, and any regular spots once. From then on, Tiler knows where you're starting from and where you're headed.",
+						"stepTitle": "위치를 한 번만 설정하세요.",
+						"stepBody": "매번 정확한 주소를 입력할 필요는 없습니다. 집, 직장, 단골 장소를 한 번에 설정하세요. 그때부터 Tiler는 사용자가 어디서 출발하고 어디로 향하는지 알게 됩니다.",
 						"callout": {
-							"label": "Location labels Tiler understands",
-							"text": "Home · Work · Downtown · The gym · Near the office"
+							"label": "위치 라벨 Tiler는 이해합니다",
+							"text": "집 · 직장 · 시내 · 체육관 · 사무실 근처"
 						}
 					},
 					{
-						"stepTitle": "Travel time slots into your timeline",
-						"stepBody": "Every time you add a task with a location, Tiler inserts a travel block between it and whatever comes before or after. It appears as its own segment in your timeline, so you always know when you need to leave.",
+						"stepTitle": "타임라인으로 이동 시간 슬롯",
+						"stepBody": "위치가 포함된 작업을 추가할 때마다 Tiler는 작업과 이전 또는 이후에 오는 항목 사이에 이동 블록을 삽입합니다. 타임라인에 자체 세그먼트로 표시되므로 언제 떠나야 하는지 항상 알 수 있습니다.",
 						"callout": {
-							"label": "Real routes, not estimates",
-							"text": "Tiler uses live routing data covering driving, transit, and walking so travel time reflects how you actually get around."
+							"label": "추정이 아닌 실제 경로",
+							"text": "Tiler는 운전, 대중교통, 도보를 포괄하는 실시간 경로 데이터를 사용하므로 이동 시간은 실제 이동 방법을 반영합니다."
 						}
 					},
 					{
-						"stepTitle": "Nearby tasks get grouped automatically",
-						"stepBody": "When multiple tasks share the same area of town, Tiler groups them together so you're not zigzagging across the city. Errands near your gym land before or after your workout. A client visit near downtown gets paired with your lunch nearby.",
+						"stepTitle": "주변 작업이 자동으로 그룹화됩니다.",
+						"stepBody": "여러 작업이 도시의 동일한 영역을 공유하는 경우 Tiler는 작업을 그룹화하므로 도시 전체를 지그재그로 이동하지 않아도 됩니다. 운동 전후에 체육관 근처에서 심부름을 합니다. 시내 근처의 고객 방문은 근처 점심 식사와 짝을 이룹니다.",
 						"callout": {
-							"label": "Less travel, more done",
-							"text": "Smart grouping means fewer trips, less wasted time in transit, and a day that flows the way it should."
+							"label": "여행은 줄이고, 더 많은 일을 하세요",
+							"text": "스마트 그룹화는 이동 횟수를 줄이고 이동 중에 낭비되는 시간을 줄이며 하루가 원하는 대로 흘러가는 것을 의미합니다."
 						}
 					},
 					{
-						"quote": "Getting something done isn't just about finding the time. It's about being in the right place."
+						"quote": "어떤 일을 완수한다는 것은 단지 시간을 찾는 것이 아닙니다. 그것은 올바른 장소에 있는 것에 관한 것입니다."
 					}
 				]
 			},
@@ -2487,49 +2556,49 @@
 				"date": "2026년 6월 22일",
 				"sections": [
 					{
-						"text": "Changing your schedule feels risky. Move one task and you're not sure what else shifts. Accept a suggestion and wonder if it was the right call. Schedule Undo gives you a safe zone between intention and commitment."
+						"text": "일정을 변경하는 것은 위험하다고 느껴집니다. 하나의 작업을 이동하면 다른 작업이 어떻게 바뀌는지 확신할 수 없습니다. 제안을 수락하고 그것이 올바른 전화였는지 궁금합니다. Schedule Undo는 의도와 약속 사이의 안전 지대를 제공합니다."
 					},
 					{
-						"text": "Every change in Tiler, whether you typed a request, accepted a suggestion, or moved a tile, first appears as a preview. Your live schedule stays untouched until you say so."
+						"text": "요청 입력, 제안 수락, 타일 이동 등 Tiler의 모든 변경 사항은 먼저 미리보기로 표시됩니다. 귀하가 그렇게 말할 때까지 귀하의 실시간 일정은 그대로 유지됩니다."
 					},
 					{
-						"title": "How Schedule Undo works"
+						"title": "일정 실행 취소 작동 방식"
 					},
 					{
-						"stepTitle": "Make a change",
-						"stepBody": "Move a tile, add a new task, or accept an AI suggestion. Instead of saving immediately, Tiler drops the change into preview. It shows with a dashed border and a PREVIEW label so you know it has not landed yet.",
+						"stepTitle": "변경하기",
+						"stepBody": "타일을 이동하거나, 새 작업을 추가하거나, AI 제안을 수락하세요. 즉시 저장하는 대신 Tiler는 변경 사항을 미리 보기로 삭제합니다. 점선 테두리와 미리보기 라벨이 표시되어 아직 도착하지 않았음을 알 수 있습니다.",
 						"callout": {
-							"label": "Nothing saves automatically",
-							"text": "Your live schedule is frozen while you review. No partial saves, no accidental overwrites."
+							"label": "자동으로 저장되는 항목은 없습니다.",
+							"text": "검토하는 동안 실시간 일정이 정지됩니다. 부분 저장이나 실수로 덮어쓰는 일이 없습니다."
 						}
 					},
 					{
-						"stepTitle": "See exactly what changed",
-						"stepBody": "The preview tile shows the updated name, location, time, and date alongside what was there before. You see the full picture at a glance without having to mentally track what moved."
+						"stepTitle": "정확히 무엇이 바뀌었는지 확인하세요",
+						"stepBody": "미리보기 타일에는 업데이트된 이름, 위치, 시간 및 날짜가 이전 내용과 함께 표시됩니다. 무엇이 움직였는지 머릿속으로 추적할 필요 없이 전체 그림을 한 눈에 볼 수 있습니다."
 					},
 					{
-						"stepTitle": "Tap Undo or Accept",
-						"stepBody": "Not happy with the result? Tap Undo and your original schedule snaps back instantly. Happy with it? Tap Accept and it locks in. Either way, you made the call.",
+						"stepTitle": "실행 취소 또는 수락을 탭하세요.",
+						"stepBody": "결과가 만족스럽지 않나요? 실행 취소를 탭하면 원래 일정이 즉시 복원됩니다. 만족하시나요? 수락을 탭하면 잠깁니다. 어느 쪽이든 전화를 걸었습니다.",
 						"callout": {
-							"label": "Undo is always instant",
-							"text": "No undo history to scroll through. One tap and your exact original state is back, no matter how much shifted in the preview."
+							"label": "실행 취소는 항상 즉각적입니다.",
+							"text": "스크롤할 실행 취소 기록이 없습니다. 미리보기에서 얼마나 많이 이동했든 탭 한 번만 하면 정확한 원래 상태가 다시 나타납니다."
 						}
 					},
 					{
-						"title": "Why this matters"
+						"title": "이것이 중요한 이유"
 					},
 					{
-						"text": "Most calendar apps apply changes immediately and ask you to undo after the fact, by which point notifications have fired, sync has happened, and the damage is done. Schedule Undo flips this. The default is preview, not save."
+						"text": "대부분의 캘린더 앱은 변경 사항을 즉시 적용하고 알림이 실행되고 동기화가 이루어지며 피해가 발생한 후에 실행 취소를 요청합니다. Schedule Undo는 이를 뒤집습니다. 기본값은 저장이 아닌 미리보기입니다."
 					},
 					{
-						"label": "Built for tightly packed days",
-						"text": "When your day has no slack, a wrong move can ripple across everything. Schedule Undo gives you a moment to breathe and verify before any change goes live."
+						"label": "빡빡한 일상을 위해 제작됨",
+						"text": "하루에 여유가 없을 때 잘못된 움직임이 모든 것에 파급을 일으킬 수 있습니다. 실행 취소 예약을 통해 변경 사항이 적용되기 전에 잠시 숨을 고르고 확인할 수 있습니다."
 					},
 					{
-						"text": "Whether you're rescheduling a workout, shifting a meeting, or taking on a task a colleague sent you, the preview step takes less than a second and can save you from a call you'd regret."
+						"text": "운동 일정을 변경하거나, 회의를 변경하거나, 동료가 보낸 작업을 수행할 때 미리 보기 단계는 1초도 걸리지 않으며 후회할 전화를 피할 수 있습니다."
 					},
 					{
-						"quote": "Change your mind before it counts."
+						"quote": "중요하기 전에 마음을 바꾸십시오."
 					}
 				]
 			},
@@ -2543,39 +2612,308 @@
 				"date": "2026년 5월 22일",
 				"sections": [
 					{
-						"text": "Most task handoffs end up in a thread. You send it, they read it, they forget to schedule it, you follow up. Tileshare cuts out the middle. Share a tile and it lands in their Tiler, already scheduled."
+						"text": "대부분의 작업 핸드오프는 스레드로 끝납니다. 당신이 그것을 보내면, 사람들은 그것을 읽고, 일정을 잡는 것을 잊어버리고, 당신이 후속 조치를 취합니다. Tileshare는 중간을 잘라냅니다. 타일을 공유하면 이미 예정된 Tiler에 도착합니다."
 					},
 					{
-						"text": "When you share a tile, it arrives as a live adaptive task in the recipient's schedule. It finds the best open slot around their existing commitments. No placement required on either end."
+						"text": "타일을 공유하면 수신자의 일정에 실시간 적응형 작업으로 도착합니다. 기존 약속에 가장 적합한 열린 슬롯을 찾습니다. 양쪽 끝에 배치가 필요하지 않습니다."
 					},
 					{
-						"title": "How Tileshare works"
+						"title": "Tileshare 작동 방식"
 					},
 					{
-						"stepTitle": "Share any tile",
-						"stepBody": "From any task in your schedule, tap Share and select a Tiler contact. The tile is sent with everything the recipient needs to get it done.",
+						"stepTitle": "타일 ​​공유",
+						"stepBody": "일정의 모든 작업에서 공유를 탭하고 Tiler 연락처를 선택하세요. 타일에는 수신자가 타일을 완료하는 데 필요한 모든 것이 포함되어 전송됩니다.",
 						"callout": {
-							"label": "What travels with the tile",
-							"text": "Task name, estimated duration, deadline, and location tags. The recipient's personal schedule stays completely private."
+							"label": "타일과 함께 이동하는 것",
+							"text": "작업 이름, 예상 기간, 마감일 및 위치 태그입니다. 수신자의 개인 일정은 완전히 비공개로 유지됩니다."
 						}
 					},
 					{
-						"stepTitle": "It lands in their schedule",
-						"stepBody": "The shared tile appears in the recipient's Tiler and finds the best open slot around their existing commitments. It adapts to their day, not the other way around."
+						"stepTitle": "그들의 일정에 맞춰",
+						"stepBody": "공유 타일은 수신자의 Tiler에 표시되며 기존 약정에 가장 적합한 열린 슬롯을 찾습니다. 그것은 그 사람의 하루에 적응하는 것이지 그 반대는 아닙니다."
 					},
 					{
-						"stepTitle": "Track it without chasing",
-						"stepBody": "Once the task is sent, you can see when it was scheduled, when it gets done, and if it gets moved. No follow-up messages. No status checks. You'll know.",
+						"stepTitle": "쫓지 않고 추적해 보세요",
+						"stepBody": "작업이 전송되면 예약된 시기, 완료 시기, 이동 여부를 확인할 수 있습니다. 후속 메시지가 없습니다. 상태 확인이 없습니다. 당신은 알게 될 것입니다.",
 						"callout": {
-							"label": "Shared accountability, zero friction",
-							"text": "Both sides see the same tile. One completes it. The other sees it done. Delegation that actually closes the loop."
+							"label": "책임 공유, 마찰 없음",
+							"text": "양쪽 모두 동일한 타일을 봅니다. 하나는 그것을 완료합니다. 다른 사람은 그것이 완료된 것을 봅니다. 실제로 루프를 닫는 위임입니다."
 						}
 					},
 					{
-						"quote": "Send it once. Know it gets done."
+						"quote": "한번 보내보세요. 그것이 완료된다는 것을 알아라."
 					}
 				]
 			}
 		}
+	},
+	"tileShareDensity": {
+		"respond": "대답하다",
+		"accepted": "{{accepted}}/{{total}}개 수락됨",
+		"task": "Tilette",
+		"people": "사람들",
+		"response": "응답"
+	},
+	"tileShareVisual": {
+		"edit": "편집",
+		"hours_one": "{{count}}시간",
+		"hours_other": "{{count}}시간"
+	},
+	"tileShareEdit": {
+		"lateTitle": "TileShare 마감일 이후 마감",
+		"durationLabel": "기간",
+		"nameShort": "3자 이상 사용하세요.",
+		"nameLong": "100자 이하를 사용하세요.",
+		"nameHint": "3~100자를 사용하세요.",
+		"beforeStart": "마감일은 시작 시간 또는 그 이후여야 합니다.",
+		"time": "마감 시각",
+		"inherited": "개별 마감일을 정할 때까지 이 Tilette에는 TileShare의 마감일이 적용됩니다.",
+		"afterShare": "이 Tilette은 TileShare 기한({{deadline}}) 이후에 완료됩니다.",
+		"moveShare": "또한 TileShare 기한을 {{deadline}}로 옮깁니다.",
+		"durationFixed": "Tilette이 공유되면 Tilette 기간을 변경할 수 없습니다.",
+		"duration": "{{minutes}}분",
+		"modeFixed": "공유 후에는 모드를 변경할 수 없습니다.",
+		"acceptedImpact_one": "수락되었으며 마감일이 더 늦은 Tilette {{count}}개의 마감일을 이 날짜로 앞당길 수 있습니다.",
+		"acceptedImpact_other": "수락되었으며 마감일이 더 늦은 Tilette {{count}}개의 마감일을 이 날짜로 앞당길 수 있습니다.",
+		"unacceptedImpact_one": "아무도 수락하지 않은 Tilette {{count}}개는 기존의 더 늦은 마감일을 유지합니다.",
+		"unacceptedImpact_other": "아무도 수락하지 않은 Tilette {{count}}개는 기존의 더 늦은 마감일을 유지합니다.",
+		"unchanged": "저장할 변경사항이 없습니다.",
+		"retry": "저장 다시 시도",
+		"saveFailed": "지금은 저장할 수 없습니다. 변경 사항이 유지됩니다. 다시 시도해 보세요.",
+		"shareFailed": "Tilette는 저장되었지만 TileShare의 마감일을 업데이트하지 못했습니다. 다시 시도하여 완료하거나 닫아서 저장된 Tilette를 유지하세요.",
+		"partialDiscard": "Tilette의 변경 사항은 이미 저장되었습니다. 닫으면 대기 중인 TileShare 마감일 변경을 취소합니다.",
+		"discard": "세부정보에 대한 저장되지 않은 변경사항은 손실됩니다."
+	},
+	"tileShareNotes": {
+		"createdPending": "Tilette가 생성되었습니다. 메모는 아직 저장해야 합니다. 다시 시도해도 Tilette가 중복 생성되지 않습니다.",
+		"retrySave": "메모 저장을 다시 시도하세요.",
+		"title": "메모",
+		"edit": "메모 편집",
+		"empty": "아직 메모가 없습니다.",
+		"loadError": "메모를 로드할 수 없습니다.",
+		"saveError": "메모를 저장할 수 없습니다. 귀하의 편집 내용은 아직 여기에 있습니다. 다시 시도해 보세요.",
+		"useSaved": "저장된 메모 사용",
+		"truncated": "메모가 서버 한도를 초과했습니다. 계속하기 전에 저장된 메모를 검토하세요."
+	},
+	"tileShareMarkdown": {
+		"write": "작성",
+		"preview": "미리 보기",
+		"formatting": "메모 서식",
+		"previewLabel": "메모 미리보기",
+		"empty": "아직 미리 볼 항목이 없습니다.",
+		"hint": "마크다운 지원: 제목, 굵게, 목록, 링크 및 코드."
+	},
+	"tileShareModes": {
+		"broadcast": {
+			"label": "일괄 배포",
+			"title": "일괄 배포 만들기",
+			"description": "하나의 작업을 공유하세요. 수신자마다 고유한 할당이 있습니다.",
+			"submit": "일괄 배포 만들기"
+		},
+		"class": {
+			"label": "수업",
+			"title": "수업 만들기",
+			"description": "일련의 Tilettes을 공유하세요. 모든 참가자는 모든 Tilettes을 받습니다.",
+			"submit": "수업 만들기"
+		},
+		"project": {
+			"label": "프로젝트",
+			"title": "프로젝트 만들기",
+			"description": "여러 작업을 함께 진행하세요. 각 Tilette에 담당자를 지정하세요.",
+			"submit": "프로젝트 생성"
+		},
+		"location": "위치(선택사항)",
+		"addTilettesNow": "Tilettes을 먼저 추가하세요(선택사항)",
+		"optionalTilettes": "선택 과목. TileShare를 생성한 후 Tilettes을 추가할 수도 있습니다.",
+		"tiletteNumber": "Tilette {{number}}",
+		"addTilette": "Tilette 추가",
+		"removeTilette": "Tilette 제거",
+		"moveUp": "위로 이동",
+		"moveDown": "아래로 이동",
+		"deadlineDefault": "TileShare 기한 사용: {{deadline}}",
+		"everyone": "모든 수업 참가자에게 할당됩니다.",
+		"addRecipient": "수신자 추가",
+		"removeRecipient": "{{recipient}} 제거",
+		"assignees": "담당자(선택 사항)",
+		"tiletteLocation": "Tilette 위치",
+		"perspective": "TileShare 관점",
+		"projectView": "프로젝트 보기",
+		"classView": "수업 보기",
+		"unknown": "공유 모드를 사용할 수 없습니다.",
+		"participants": "참가자들",
+		"participantContact": "참가자 이메일 또는 전화",
+		"classActions": "수업 참가자",
+		"addToAll": "모든 Tilettes에 추가",
+		"removeFromAll": "모든 Tilettes에서 제거",
+		"removeFromClassConfirm": "수업의 모든 Tilette에서 이 참가자를 삭제하시겠습니까?",
+		"emptyClass": "참가자에게 Tilette 할당을 시작하려면 Tilette을 추가하세요.",
+		"acceptAll": "보류 중인 모든 Tilettes 수락",
+		"declineAll": "보류 중인 모든 Tilettes을 거부합니다.",
+		"partialChange": "{{saved}}개 변경 사항이 저장되었습니다. {{failed}}개는 다시 시도해야 합니다.",
+		"changesSaved": "변경사항이 저장되었습니다.",
+		"retryRemaining": "나머지 변경사항 다시 시도",
+		"refreshFailed": "변경 사항이 전송되었지만 TileShare를 새로 고칠 수 없습니다. 저장된 할당을 확인하려면 새로고침하세요."
+	},
+	"tileshareList": {
+		"title": "TileShares",
+		"createdByMe": "내가 만든 것",
+		"sort": "정렬 기준",
+		"createdDesc": "생성 시간: 최신순",
+		"createdAsc": "생성 시간: 오래된 것부터",
+		"deadlineAsc": "마감일: 빠른 것부터",
+		"deadlineDesc": "마감일: 늦은 것부터",
+		"empty": "이 필터와 일치하는 TileShares가 없습니다.",
+		"failed": "TileShares를 로드할 수 없습니다.",
+		"retry": "다시 해 보다"
+	},
+	"tileshareRsvp": {
+		"accepted": "수락됨",
+		"declined": "거절됨",
+		"none": "응답을 기다리는 중",
+		"tentative": "미정",
+		"unknown": "알 수 없는 응답",
+		"yours": "귀하의 응답",
+		"response": "초대 응답",
+		"responses": "초대 응답",
+		"noParticipants": "참가자 없음",
+		"viewPeople": "응답 보기",
+		"participant": "참가자"
+	},
+	"tileshareInvitations": {
+		"yourInvitation": "당신은 이 임무에 초대되었습니다.",
+		"unavailable": "이 초대는 더 이상 대기 중이 아닙니다.",
+		"title": "초대장",
+		"refresh": "새로고침",
+		"all": "모든 초대장",
+		"loading": "초대 불러오는 중…",
+		"failed": "초대장을 로드할 수 없습니다. 다시 시도하려면 새로고침하세요.",
+		"empty": "대기 중인 초대가 없습니다.",
+		"pending": "보류 중인 Tilettes",
+		"review": "초대장 검토",
+		"from": "초대자",
+		"due": "마감:",
+		"accept": "수락",
+		"decline": "거절",
+		"changeResponse": "응답 변경",
+		"cancel": "취소",
+		"currentAccepted": "현재 응답: 승인됨.",
+		"currentDeclined": "현재 응답: 거절되었습니다.",
+		"updatedAccepted": "응답이 수락됨으로 업데이트되었습니다.",
+		"updatedDeclined": "응답이 거부됨으로 업데이트되었습니다.",
+		"responding": "응답 저장 중…",
+		"next": "다음 페이지",
+		"accepted": "수락됨. 타일이 생성되었습니다.",
+		"declined": "초대가 거부되었습니다.",
+		"responseFailed": "응답을 확인할 수 없습니다. 다시 시도하기 전에 새로고침하여 상태를 확인하세요."
+	},
+	"chat": {
+		"tileShare": {
+			"reviewAgain": "다시 확인하기 전에 현재 제안을 검토하세요.",
+			"uncertain": "생성을 확인할 수 없습니다. 다시 시도하기 전에 상태를 확인하세요.",
+			"created": "TileShare가 생성되었습니다.",
+			"open": "TileShare 열기",
+			"review": "TileShare 생성 검토",
+			"newProject": "프로젝트 생성",
+			"newTilette": "Tilette 추가",
+			"project": "프로젝트",
+			"starts": "시작",
+			"deadline": "마감일",
+			"minutes": "분",
+			"reviewNote": "확인하기 전까지는 아무것도 생성되지 않습니다. 수신자는 여전히 수락 여부를 선택합니다. 이 작업에서는 알림이 전송되지 않습니다.",
+			"checking": "확인 중...",
+			"confirm": "생성 확인",
+			"check": "상태 확인"
+		},
+		"execution": {
+			"mode": "채팅 실행",
+			"confirmFirst": "먼저 확인하세요",
+			"autoAct": "자동 실행",
+			"autoNote": "지원되는 채팅 작업을 자동으로 실행합니다. 대량 및 파괴적인 변경 사항은 여전히 ​​검토가 필요합니다.",
+			"confirmNote": "실행하기 전에 채팅 변경사항을 검토하세요."
+		}
+	},
+	"chat.tileShare.renamed": "프로젝트 이름이 변경되었습니다.",
+	"chat.tileShare.renameReview": "프로젝트 이름 변경 검토",
+	"chat.tileShare.renameProject": "프로젝트 이름 바꾸기",
+	"chat.tileShare.previousName": "현재 이름",
+	"chat.tileShare.renameNote": "확인 후에는 프로젝트 이름만 변경됩니다.",
+	"chat.tileShare.confirmRename": "이름 변경 확인",
+	"chat.tileShare.renameUncertain": "이름 변경을 확인할 수 없습니다. 다시 시도하기 전에 상태를 확인하세요.",
+	"chat.tileShare.tiletteRenamed": "Tilette 이름이 변경되었습니다.",
+	"chat.tileShare.tiletteRenameReview": "검토 Tilette 이름 변경",
+	"chat.tileShare.renameTilette": "Tilette 이름 바꾸기",
+	"chat.tileShare.tiletteRenameNote": "공유 Tilette 이름만 변경됩니다. 개인 캘린더 제목은 그대로 유지됩니다.",
+	"chat.tileShare.notesUpdated": "Tilette 메모가 업데이트되었습니다.",
+	"chat.tileShare.notesReview": "Tilette 메모 검토",
+	"chat.tileShare.editNotes": "Tilette 메모 업데이트",
+	"chat.tileShare.previousNotes": "현재 메모",
+	"chat.tileShare.proposedNotes": "제안된 메모",
+	"chat.tileShare.emptyNotes": "메모 없음",
+	"chat.tileShare.clearNotes": "메모 지우기",
+	"chat.tileShare.notesNote": "제안된 텍스트는 확인 후 전체 Tilette 메모를 대체합니다.",
+	"chat.tileShare.confirmNotes": "메모 확인",
+	"chat.tileShare.notesUncertain": "Notes 업데이트를 확인할 수 없습니다. 다시 시도하기 전에 상태를 확인하세요.",
+	"chat.tileShare.tiletteDeleted": "Tilette이 삭제되었습니다.",
+	"chat.tileShare.deleteReview": "검토 Tilette 삭제",
+	"chat.tileShare.deleteTilette": "할 일 삭제",
+	"chat.tileShare.assignmentCount": "과제",
+	"chat.tileShare.linkedCalendarCount": "연결된 일정 항목",
+	"chat.tileShare.deleteNote": "이렇게 하면 Tilettes 및 연결된 캘린더 Tilettes이 비활성화됩니다. 프로젝트 및 기타 Tilettes은 계속 사용 가능합니다. 할당 내역은 유지됩니다. 여기서는 실행 취소가 제공되지 않습니다.",
+	"chat.tileShare.confirmDeletion": "삭제 확인",
+	"chat.tileShare.deleteUncertain": "삭제를 확인할 수 없습니다. 다시 시도하기 전에 상태를 확인하세요.",
+	"chat.tileShare.openProject": "프로젝트 열기",
+	"chat.tileShare.tiletteUpdated": "Tilette이 업데이트되었습니다.",
+	"chat.tileShare.updateReview": "Tilette 업데이트 검토",
+	"chat.tileShare.updateTilette": "Tilette 업데이트",
+	"chat.tileShare.updateNote": "표시된 모든 변경 사항은 확인 후 함께 저장됩니다. 제공된 메모가 전체 메모를 대체합니다.",
+	"chat.tileShare.confirmUpdate": "업데이트 확인",
+	"chat.tileShare.updateRejected": "변경사항이 적용되지 않았습니다. 응답을 검토하고 수정된 업데이트를 요청하세요.",
+	"chat.tileShare.updateUncertain": "업데이트를 확인할 수 없습니다. 다시 시도하기 전에 상태를 확인하세요.",
+	"chat.tileShare.schedulePending": "허용된 작업 일정을 계산합니다. 아직 저장된 변경사항이 없습니다.",
+	"chat.tileShare.scheduleNoFit": "변경사항이 적용되지 않았습니다. 나머지 작업은 보호된 세션에 맞지 않습니다. 기간이나 기한을 조정하고 수정된 업데이트를 요청하세요.",
+	"chat.tileShare.scheduleFailed": "변경사항이 적용되지 않았습니다. 일정이 변경되었거나 계산을 완료할 수 없습니다. 수정된 업데이트를 요청하세요.",
+	"chat.tileShare.updateProject": "프로젝트 업데이트",
+	"chat.tileShare.projectUpdateReview": "프로젝트 업데이트 검토",
+	"chat.tileShare.projectUpdated": "프로젝트가 업데이트되었습니다.",
+	"chat.tileShare.manageAccess": "프로젝트 액세스 관리",
+	"chat.tileShare.manageRecipients": "수신자 관리",
+	"chat.tileShare.managementUpdated": "수신자 또는 액세스 변경사항이 저장되었습니다.",
+	"chat.tileShare.managementNote": "위의 수신자 및 액세스 효과를 검토하세요. 캘린더 액세스 정리 및 복원은 백그라운드에서 실행됩니다.",
+	"chat.tileShare.accessReconciliation": "액세스가 저장되었습니다. 일정 정리 또는 복원은 백그라운드에서 실행됩니다.",
+	"chat.tileShare.planTargetPending": "합산 계산을 기다리는 중",
+	"chat.tileShare.planTargetNotApplied": "적용되지 않음",
+	"chat.tileShare.planReview": "업무 공유 계획 검토",
+	"chat.tileShare.planUpdated": "함께 저장된 변경사항을 검토했습니다.",
+	"chat.tileShare.planNote": "표시된 모든 대상은 확인 후 함께 저장됩니다. 대상이 변경되거나 액세스 권한이 상실된 경우 새 제안을 검토하세요.",
+	"tileShareComposer": {
+		"close": "닫기",
+		"shareDeadline": "TileShare 마감일",
+		"moveShareDeadline": "또한 TileShare 기한을 {{deadline}}로 옮깁니다.",
+		"count_one": "Tilette {{count}}개를 추가했습니다",
+		"count_other": "Tilette {{count}}개를 추가했습니다",
+		"newTilette": "새 Tilette",
+		"emptyTitle": "TileShare에 Tilettes 추가",
+		"emptyDescription": "지금 작업을 추가하거나 TileShare를 생성하고 나중에 작업을 추가하세요.",
+		"editTilette": "{{name}} 편집",
+		"removeTilette": "{{name}} 제거",
+		"locationNotSet": "위치가 설정되지 않았습니다.",
+		"unassigned": "할당되지 않음",
+		"added": "이 초안에 {{name}}가 추가되었습니다.",
+		"updated": "{{name}}가 업데이트되었습니다.",
+		"removed": "{{name}}는 이 초안에서 제거되었습니다.",
+		"addTitle": "Tilette 만들기",
+		"editTitle": "Tilette 편집",
+		"saveTilette": "Tilette 저장",
+		"classHint": "이 Tilette은 TileShare를 생성할 때 모든 수업 참가자에게 할당됩니다.",
+		"projectHint": "작업을 추가하고 선택적으로 담당자를 선택하세요. 프로젝트를 생성하면 초대장이 전송됩니다.",
+		"optionalDescription": "생성 중에 작업을 포함하고 싶으십니까? 지금 작업을 추가하거나 먼저 TileShare를 생성할 수 있습니다.",
+		"reviewTilettes": "Tilette 검토({{count}}개)",
+		"editDetails": "세부정보 수정",
+		"cancelExit": "취소 및 종료",
+		"discardTitle": "변경사항을 취소하시겠습니까?",
+		"discard": "변경사항 취소",
+		"keepEditing": "계속 편집",
+		"discardTask": "저장하지 않은 Tilettes 편집 내용은 손실됩니다. 다른 Tilettes은 초안에 남아 있습니다.",
+		"discardShare": "TileShare 세부 정보 및 초안 Tilettes이 손실됩니다. 초대장이 전송되지 않았습니다."
 	}
 }

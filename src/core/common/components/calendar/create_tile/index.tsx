@@ -17,7 +17,7 @@ import {
 	DaySchedule,
 	ScheduleBooleanString,
 	ScheduleCreateEventParams,
-	ScheduleCreateEventResponse,
+	CreatedScheduleEvent,
 	ScheduleRepeatEndType,
 	ScheduleRepeatFrequency,
 	ScheduleRepeatStartType,
@@ -48,7 +48,7 @@ import {
 dayjs.extend(advancedFormat);
 
 export function viewCreatedEvent(
-	event: ScheduleCreateEventResponse['Content'],
+	event: CreatedScheduleEvent,
 	calendarDispatch: ReturnType<typeof useCalendarDispatch>,
 	actions: {
 		navigateToEvent: () => void;
@@ -56,12 +56,15 @@ export function viewCreatedEvent(
 		hideSuccess: () => void;
 	}
 ) {
-	if (!event || event.calendarEvent.id === null) return;
+	const entityId = event?.calendarEvent?.id ?? event?.id;
+	if (!entityId) return;
 	calendarDispatch(
 		{
 			type: CalendarRequestType.FocusEvent,
-			entityId: event.calendarEvent.id,
-			entityType: CalendarEntityType.CalendarEvent,
+			entityId,
+			entityType: event.calendarEvent?.id
+				? CalendarEntityType.CalendarEvent
+				: CalendarEntityType.SubcalendarEvent,
 			actionType: Actions.Add_New_Task,
 		},
 		(result: CalendarRequestResult) => {
@@ -71,10 +74,7 @@ export function viewCreatedEvent(
 				actions.navigateToEventComplete();
 				actions.hideSuccess();
 				if (result.status === CalendarRequestStatus.NotFound) {
-					console.warn(
-						'[CreateTile] Calendar could not find entity:',
-						event.calendarEvent.id
-					);
+					console.warn('[CreateTile] Calendar could not find entity:', entityId);
 				}
 			}
 		}
@@ -369,7 +369,12 @@ const CalendarCreateTile: React.FC<CalendarCreateTileProps> = ({
 						i18nKey="calendar.createTile.message.success"
 						components={{
 							b: <b />,
-							action: <span>{ui.state.success.tile?.calendarEvent.name}</span>,
+							action: (
+								<span>
+									{ui.state.success.tile?.name ??
+										ui.state.success.tile?.calendarEvent?.name}
+								</span>
+							),
 						}}
 					/>
 				</p>

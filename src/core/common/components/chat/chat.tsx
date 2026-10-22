@@ -1,4 +1,4 @@
-import TileShareReviewCard from './TileShareReviewCard';
+﻿import TileShareReviewCard from './TileShareReviewCard';
 import React, { useCallback, useEffect, useLayoutEffect, useState, FormEvent, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ChevronLeftIcon, SendHorizontal, CircleStop, History, SquarePen } from 'lucide-react';
@@ -1793,7 +1793,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 
 				{!isMobileReview && (
 					<>
-						<label style={{ color: theme.colors.text.secondary, fontSize: 13 }}>
+						{/* <label style={{ color: theme.colors.text.secondary, fontSize: 13 }}>
 							{t('chat.execution.mode', 'Chat execution')}{' '}
 							<select
 								aria-label={t('chat.execution.mode', 'Chat execution')}
@@ -1832,7 +1832,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 											'Review chat changes before they run.'
 										)}
 							</small>
-						</label>
+						</label> */}
 						<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
 							<Input.Textarea
 								value={message}

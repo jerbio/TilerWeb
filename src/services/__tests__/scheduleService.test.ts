@@ -6,6 +6,8 @@ import { CalendarEventApi } from '@/api/calendarEventApi';
 import { LocationApi } from '@/api/locationApi';
 import {
 	CalendarEvent,
+	ScheduleCreateEventParams,
+	ScheduleCreateEventResponse,
 	CalendarEventUpdateParams,
 	ScheduleProcrastinateAllParams,
 	ScheduleProcrastinateEventParams,
@@ -78,6 +80,30 @@ describe('ScheduleService', () => {
 			calendarEventApi,
 			locationApi
 		);
+	});
+
+	describe('createEvent', () => {
+		const event = { id: 'created', name: 'Study', start: 1792544400000, end: 1792548000000 };
+		const params = {} as ScheduleCreateEventParams;
+
+		it.each([event, { tilerEvent: event, subEvents: [] }])(
+			'returns the created event from either contract',
+			async (Content) => {
+				vi.mocked(scheduleApi.createEvent).mockResolvedValueOnce({
+					Error: { Code: '0' },
+					Content,
+				} as ScheduleCreateEventResponse);
+				expect(await service.createEvent(params)).toEqual(event);
+			}
+		);
+
+		it('rejects an unexpected contract before publishing success', async () => {
+			vi.mocked(scheduleApi.createEvent).mockResolvedValueOnce({
+				Error: { Code: '0' },
+				Content: { subEvents: [event] },
+			} as unknown as ScheduleCreateEventResponse);
+			await expect(service.createEvent(params)).rejects.toThrow('Check your schedule');
+		});
 	});
 
 	describe('setCalendarEventAsNow', () => {

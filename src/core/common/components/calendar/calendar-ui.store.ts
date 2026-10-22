@@ -1,10 +1,6 @@
 import { createStore } from 'zustand';
 import dayjs from 'dayjs';
-import {
-	CalendarEvent,
-	RestrictionProfile,
-	ScheduleCreateEventResponse,
-} from '../../types/schedule';
+import { CalendarEvent, RestrictionProfile, CreatedScheduleEvent } from '../../types/schedule';
 import { isScheduleReadOnly } from '@/hooks/useIsReadOnly';
 
 type CreateSelectionState = {
@@ -33,7 +29,7 @@ type CreateTileState = {
 	success: {
 		isOpen: boolean;
 		isNavigatingToTile: boolean;
-		tile?: ScheduleCreateEventResponse['Content'];
+		tile?: CreatedScheduleEvent;
 	};
 };
 
@@ -46,7 +42,7 @@ type CreateTileActions = {
 	startLoading: (tileName: string) => void;
 	endLoading: () => void;
 
-	showSuccess: (tile: ScheduleCreateEventResponse['Content']) => void;
+	showSuccess: (tile: CreatedScheduleEvent) => void;
 	hideSuccess: () => void;
 
 	navigateToTile: () => void;
@@ -71,7 +67,7 @@ type CreateBlockState = {
 	success: {
 		isOpen: boolean;
 		isNavigatingToBlock: boolean;
-		block?: ScheduleCreateEventResponse['Content'];
+		block?: CreatedScheduleEvent;
 	};
 };
 
@@ -84,7 +80,7 @@ type CreateBlockActions = {
 	startLoading: (blockName: string) => void;
 	endLoading: () => void;
 
-	showSuccess: (tile: ScheduleCreateEventResponse['Content']) => void;
+	showSuccess: (tile: CreatedScheduleEvent) => void;
 	hideSuccess: () => void;
 
 	navigateToBlock: () => void;
@@ -309,7 +305,7 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 						}))
 					),
 
-					showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
+					showSuccess: guarded((tile: CreatedScheduleEvent) =>
 						set((state) => ({
 							createTile: {
 								...state.createTile,
@@ -490,7 +486,7 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 						}))
 					),
 
-					showSuccess: guarded((tile: ScheduleCreateEventResponse['Content']) =>
+					showSuccess: guarded((tile: CreatedScheduleEvent) =>
 						set((state) => ({
 							createBlock: {
 								...state.createBlock,
