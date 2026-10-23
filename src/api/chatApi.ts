@@ -84,6 +84,7 @@ export class ChatApi extends AppApi {
 
 	public sendMessage(messageBody: ChatMessageBody) {
 		return this.apiRequest<ChatSendMessageResponse>('api/Vibe/Chat', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify(messageBody),
 		});
@@ -184,6 +185,7 @@ export class ChatApi extends AppApi {
 		userLocationVerified?: string
 	) {
 		return this.apiRequest<ChatExecuteActionResponse>('api/Vibe/Request/Execute', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify({
 				requestId,

@@ -8,6 +8,7 @@ import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
 import Chat from '@/core/common/components/chat/chat';
+import LocationSelector from '@/components/location/LocationSelector';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
 import { personaService } from '@/services';
@@ -414,13 +415,20 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 					data-persona-card-container
 				>
 					<Header>
-						<h2>{persona.name}</h2>
-						<MobileCloseButtonContainer>
-							<Button variant="ghost" height={32} onClick={() => handleClose(true)}>
-								<ChevronLeftIcon size={16} />
-								<span>Back</span>
-							</Button>
-						</MobileCloseButtonContainer>
+						<h2 title={persona.name}>{persona.name}</h2>
+						<HeaderActions>
+							{expanded && <LocationSelector compact />}
+							<MobileCloseButtonContainer>
+								<Button
+									variant="ghost"
+									height={32}
+									onClick={() => handleClose(true)}
+								>
+									<ChevronLeftIcon size={16} />
+									<span>Back</span>
+								</Button>
+							</MobileCloseButtonContainer>
+						</HeaderActions>
 					</Header>
 					<CardContent>
 						{contentTransition((style, item) => (
@@ -525,24 +533,34 @@ const CardContainer = styled(animated.section)<{ $display: boolean }>`
 
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
-	padding-top: 1.5rem;
+	gap: 0.75rem;
+	padding-top: 1rem;
 
 	@media screen and (min-width: ${palette.screens.lg}) {
-		padding-block: 1.5rem;
+		padding-block: 1rem;
 		padding-right: 2rem;
-		gap: 1.5rem;
-		flex-direction: column-reverse;
+		gap: 0.75rem;
 	}
 `;
 
 const Header = styled.header`
-	padding-left: 1rem;
+	position: relative;
+	z-index: 4;
+	padding-inline: 1rem;
 	display: flex;
+	flex-shrink: 0;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
+	gap: 0.5rem;
 
 	h2 {
+		flex: 1 1 100px;
+		margin: 0;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		line-height: 1.2;
 		font-weight: ${palette.typography.fontWeight.bold};
 		font-size: ${palette.typography.fontSize.xl};
@@ -550,19 +568,33 @@ const Header = styled.header`
 	}
 
 	@media screen and (min-width: ${palette.screens.lg}) {
+		padding-right: 0;
 		h2 {
 			font-size: ${palette.typography.fontSize.displayXs};
 		}
 	}
 `;
 
+const HeaderActions = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+	max-width: 100%;
+	margin-left: auto;
+`;
+
 const CardContent = styled.div`
 	flex: 1;
+	min-height: 0;
+	min-width: 0;
+	position: relative;
+	/* Contain mobile chat below the shared toolbar. */
 
 	display: grid;
 	gap: 1.5rem;
 	grid-template-columns: repeat(12, 1fr);
-	height: calc(100% - 12rem);
+	grid-template-rows: minmax(0, 1fr);
 `;
 
 const CalendarContainer = styled(animated.div)`
@@ -570,6 +602,8 @@ const CalendarContainer = styled(animated.div)`
 	grid-column: span 12;
 	overflow: hidden;
 	height: 100%;
+	min-height: 0;
+	min-width: 0;
 	background: ${palette.colors.gray[900]};
 	border-top: 1px solid ${palette.colors.gray[700]};
 
@@ -587,7 +621,9 @@ const CalendarContainer = styled(animated.div)`
 const ChatContainer = styled(animated.div)`
 	position: absolute;
 	z-index: 3;
-	inset: -2px;
+	inset: 0;
+	min-height: 0;
+	min-width: 0;
 	border: 2px solid #2a2a2a;
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);

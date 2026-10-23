@@ -1,4 +1,72 @@
-﻿{
+{
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "Location ignored for this request",
+			"description": "Travel times and nearby suggestions may be less accurate."
+		},
+		"title": "Location",
+		"setLocation": "Set location",
+		"notSelected": "No location selected",
+		"source": {
+			"address": "Selected address",
+			"device": "Device estimate"
+		},
+		"near": "Near {{address}}",
+		"approximate": "Approximate device location",
+		"accuracy": "Approximate · {{meters}} m accuracy",
+		"checked": "Location found: {{time}}",
+		"stage": {
+			"permission": "Waiting for browser location access…",
+			"locating": "Finding your location…",
+			"resolving": "Finding the address…"
+		},
+		"updateReady": "New location · Review",
+		"needsAttention": "Check location",
+		"close": "Close location selector",
+		"purpose": "Choose the location used by chat and scheduling as your starting point. Event venues are set separately.",
+		"chooseBeforeSend": "Your request will continue after you choose.",
+		"activeLabel": "Currently used for requests",
+		"withoutConsequences": "Travel suggestions may use defaults.",
+		"activeUntilConfirmed": "Requests keep using the current selection until you confirm a replacement.",
+		"persistenceFailed": "Location saved for this visit only.",
+		"issue": {
+			"blocked": "Location is blocked. Enter an address or allow access in browser settings.",
+			"unavailable": "Location unavailable. Try again or enter an address.",
+			"timeout": "Location took too long. Try again or enter an address.",
+			"addressUnavailable": "Couldn't find the address. Try again or enter one.",
+			"refreshNeeded": "Refresh your device location or choose an address."
+		},
+		"keepingSelection": "Your previously confirmed location is still being used.",
+		"currentLocation": "Use your current location",
+		"permissionExplanation": "Your browser may ask for location access.",
+		"detectionExplanation": "Desktop, laptop, and Wi-Fi location estimates can be approximate. Check the address before confirming.",
+		"refresh": "Update current location",
+		"useCurrent": "Use current location",
+		"cancel": "Cancel",
+		"chooseAddress": "Choose an address",
+		"searchPlaceholder": "Search for an address or place",
+		"searchHint": "Enter at least {{count}} characters.",
+		"searching": "Searching for addresses…",
+		"noMatches": "No matches. Try adding a city or postal code.",
+		"searchFailed": "Couldn't search. Try again.",
+		"retry": "Retry",
+		"matches": "Matching addresses",
+		"matched": "Use this address",
+		"unresolved": "Address not matched",
+		"review": "Review location before use",
+		"confirmExplanation": "Confirm that this is the place you intend. Finding a map match does not guarantee it is the right address.",
+		"confirm": "Use this address",
+		"keepSelection": "Keep current selection",
+		"continueWithout": "Continue without location",
+		"savedOnBrowser": "Confirmed choices are remembered on this browser. New device estimates require your confirmation; your selected address stays fixed until changed.",
+		"requestUsing": "Sending with location: {{address}}",
+		"requestWithout": "Sending without your location. Travel and nearby suggestions may use defaults.",
+		"pendingUpdate": "A new location is awaiting confirmation; it is not being sent.",
+		"change": "Change location",
+		"reviewBeforeUse": "Review address before use",
+		"using": "Using: {{address}}",
+		"changeAddress": "Choose another address"
+	},
 	"tileShareDensity": {
 		"respond": "Respond",
 		"accepted": "{{accepted}}/{{total}} accepted",

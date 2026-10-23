@@ -39,6 +39,8 @@ import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { SimulationState } from '@/core/common/types/chat';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
+import { locationService } from '@/services/locationService';
+import { LocationPicker } from '@/components/location/LocationSelector';
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -165,16 +167,14 @@ vi.mock('@/services', () => ({
 	chatService: mockChatService,
 }));
 
-vi.mock('@/services/locationService', () => ({
-	locationService: {
-		getCurrentLocation: vi.fn().mockResolvedValue({ latitude: 0, longitude: 0 }),
-		toApiFormat: vi.fn().mockReturnValue({
-			userLongitude: 0,
-			userLatitude: 0,
-			userLocationVerified: false,
-		}),
-	},
-}));
+vi.mock('@/services/locationService', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@/services/locationService')>();
+	const service = new actual.LocationService();
+	vi.spyOn(service, 'hasSelectionDecision').mockReturnValue(true);
+	vi.spyOn(service, 'openPicker');
+	vi.spyOn(service, 'requestSelectionDecision');
+	return { ...actual, locationService: service, default: service };
+});
 
 vi.mock('@/services/SocketService', () => ({
 	// Must be a class (not an arrow function) so `new SignalRService()` works.
@@ -229,16 +229,14 @@ vi.mock('@/core/common/components/chat/session-history/SessionHistory', () => ({
 	default: () => null,
 }));
 
-vi.mock('@/core/common/components/chat/user_location', () => ({
-	default: () => null,
-}));
-
 vi.mock('@/core/common/components/chat/MarkdownRenderer', () => ({
 	MarkdownRenderer: ({ content }: { content: string }) => <>{content}</>,
 }));
 
 vi.mock('@/core/common/components/chat/prompt-suggestions/PromptSuggestions', () => ({
-	default: () => null,
+	default: ({ onPromptClick }: { onPromptClick: (key: string, text: string) => void }) => (
+		<button onClick={() => onPromptClick('lunch', 'Find lunch near me')}>Sample prompt</button>
+	),
 }));
 
 vi.mock('@/core/common/components/error-popup/ErrorPopup', () => ({
@@ -256,7 +254,10 @@ vi.mock('@/core/common/components/email-confirmation/EmailConfirmationModal', ()
 function Providers({ children }: { children: React.ReactNode }) {
 	return (
 		<ThemeProvider>
-			<CalendarRequestProvider>{children}</CalendarRequestProvider>
+			<CalendarRequestProvider>
+				{children}
+				<LocationPicker />
+			</CalendarRequestProvider>
 		</ThemeProvider>
 	);
 }
@@ -336,12 +337,17 @@ async function waitForReviewMode() {
 const initialStoreState = useSimulationOverlayStore.getState();
 
 beforeEach(() => {
+	locationService.initialize();
+	locationService.closePicker();
+	locationService.store.setState(locationService.store.getInitialState(), true);
 	vi.clearAllMocks();
+	vi.mocked(locationService.hasSelectionDecision).mockReturnValue(true);
 	seedMockServices();
 	useSimulationOverlayStore.setState(initialStoreState, true);
 });
 
 afterEach(() => {
+	locationService.closePicker();
 	useSimulationOverlayStore.setState(initialStoreState, true);
 });
 
@@ -350,6 +356,203 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('Chat review transitions', () => {
+	it('preserves the message and opens location selection before sending without a decision', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Find lunch near me' } });
+		fireEvent.submit(input.closest('form')!);
+		expect(locationService.openPicker).toHaveBeenCalledWith(true);
+		expect(mockChatService.sendMessage).not.toHaveBeenCalled();
+		expect(input).toHaveValue('Find lunch near me');
+		expect(useSimulationOverlayStore.getState().inReview).toBe(true);
+	});
+
+	it('requires a location decision before accepting changes and preserves the review', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		renderChat();
+		await waitForReviewMode();
+		fireEvent.click(screen.getByRole('button', { name: /apply now/i }));
+		expect(locationService.openPicker).toHaveBeenCalledWith(true);
+		expect(mockChatService.sendChatAcceptChanges).not.toHaveBeenCalled();
+		expect(useSimulationOverlayStore.getState().inReview).toBe(true);
+	});
+
+	it('automatically sends the pending message once after address confirmation', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		mockChatService.sendMessage.mockResolvedValueOnce({
+			Content: {
+				vibeResponse: {
+					prompts: {
+						sent: { ...MOCK_MESSAGE, id: 'sent', content: 'Find lunch near me' },
+					},
+				},
+			},
+		});
+		renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Find lunch near me' } });
+		fireEvent.submit(input.closest('form')!);
+		fireEvent.submit(input.closest('form')!);
+		expect(locationService.requestSelectionDecision).toHaveBeenCalledOnce();
+		expect(mockChatService.sendMessage).not.toHaveBeenCalled();
+		act(() => {
+			locationService.previewAddress({
+				id: 'office',
+				address: '350 Fifth Avenue',
+				latitude: 40.7484,
+				longitude: -73.9857,
+				isVerified: true,
+				isDefault: false,
+				isNull: false,
+				description: '',
+				thirdPartyId: '',
+				userId: null,
+				source: 'google',
+				nickname: '',
+			});
+		});
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.confirm' }));
+		await waitFor(() => expect(mockChatService.sendMessage).toHaveBeenCalledOnce());
+		expect(mockChatService.sendMessage).toHaveBeenCalledWith(
+			'Find lunch near me',
+			'',
+			MOCK_SESSION_ID,
+			'user-1',
+			'-73.9857',
+			'40.7484',
+			'true',
+			'',
+			'',
+			expect.anything()
+		);
+		await waitFor(() => expect(input).toHaveValue(''));
+		expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+		expect(await screen.findByText('Find lunch near me')).toBeVisible();
+	});
+
+	it('automatically sends the pending message after continuing without location', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Plan my afternoon' } });
+		fireEvent.submit(input.closest('form')!);
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.continueWithout' }));
+		await waitFor(() => expect(mockChatService.sendMessage).toHaveBeenCalledOnce());
+		expect(mockChatService.sendMessage).toHaveBeenCalledWith(
+			'Plan my afternoon',
+			'',
+			MOCK_SESSION_ID,
+			'user-1',
+			'',
+			'',
+			'false',
+			'',
+			'',
+			expect.anything()
+		);
+	});
+
+	it('keeps a cancelled draft unsent even after a later location choice', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Keep this draft' } });
+		fireEvent.submit(input.closest('form')!);
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.close' }));
+		await act(async () => {
+			locationService.continueWithoutLocation();
+		});
+		expect(mockChatService.sendMessage).not.toHaveBeenCalled();
+		expect(input).toHaveValue('Keep this draft');
+		expect(useSimulationOverlayStore.getState().inReview).toBe(true);
+		fireEvent.submit(input.closest('form')!);
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.continueWithout' }));
+		await waitFor(() => expect(mockChatService.sendMessage).toHaveBeenCalledOnce());
+	});
+
+	it('resumes a pending acceptance after a location decision', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		renderChat();
+		await waitForReviewMode();
+		fireEvent.click(screen.getByRole('button', { name: /apply now/i }));
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.continueWithout' }));
+		await waitFor(() => expect(mockChatService.sendChatAcceptChanges).toHaveBeenCalledOnce());
+		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+	});
+
+	it('resumes a suggested prompt with its original text after the location choice', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		renderChat();
+		await screen.findByTestId('review-simulation-button');
+		fireEvent.click(screen.getByRole('button', { name: 'Sample prompt' }));
+		expect(mockChatService.sendMessage).not.toHaveBeenCalled();
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.continueWithout' }));
+		await waitFor(() => expect(mockChatService.sendMessage).toHaveBeenCalledOnce());
+		expect(mockChatService.sendMessage.mock.calls[0][0]).toBe('Find lunch near me');
+	});
+
+	it('preserves the draft on a resumed send failure and allows an explicit retry', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		mockChatService.sendMessage.mockRejectedValueOnce(new Error('Message could not be sent'));
+		renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Retry this message' } });
+		fireEvent.submit(input.closest('form')!);
+		fireEvent.click(screen.getByRole('button', { name: 'schedulingLocation.continueWithout' }));
+		await screen.findByText(/Message could not be sent/);
+		expect(input).toHaveValue('Retry this message');
+		expect(mockChatService.sendMessage).toHaveBeenCalledOnce();
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(true);
+		fireEvent.submit(input.closest('form')!);
+		await waitFor(() => expect(mockChatService.sendMessage).toHaveBeenCalledTimes(2));
+		await waitFor(() => expect(input).toHaveValue(''));
+	});
+
+	it('does not send the pending draft after switching personas', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		const originalSession = mockGetActivePersonaSession();
+		const view = renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Do not send in another persona' } });
+		fireEvent.submit(input.closest('form')!);
+		try {
+			mockGetActivePersonaSession.mockReturnValue({
+				...originalSession,
+				personaId: 'persona-2',
+			});
+			view.rerender(<Chat />);
+			await act(async () => {
+				locationService.continueWithoutLocation();
+			});
+			expect(mockChatService.sendMessage).not.toHaveBeenCalled();
+			expect(locationService.store.getState().pickerOpen).toBe(false);
+		} finally {
+			mockGetActivePersonaSession.mockReturnValue(originalSession);
+		}
+	});
+
+	it('cancels the pending send when chat unmounts', async () => {
+		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
+		const view = renderChat();
+		await waitForReviewMode();
+		const input = screen.getByPlaceholderText('home.expanded.chat.inputPlaceholder');
+		fireEvent.change(input, { target: { value: 'Do not send after closing chat' } });
+		fireEvent.submit(input.closest('form')!);
+		view.unmount();
+		await act(async () => {
+			locationService.continueWithoutLocation();
+		});
+		expect(mockChatService.sendMessage).not.toHaveBeenCalled();
+		expect(locationService.store.getState().pickerOpen).toBe(false);
+	});
+
 	// ── Apply now ────────────────────────────────────────────────────────────
 
 	describe('clicking "Apply now"', () => {

@@ -9,7 +9,8 @@ import NotFound from './pages/NotFound';
 import GettingStartedArticle from './pages/articles/GettingStartedArticle';
 import ArticlePage from './pages/ArticlePage';
 import Layout from './pages/Layout';
-import { Toaster } from 'sonner';
+import AppToaster from './core/ui/AppToaster';
+import { LocationPicker } from './components/location/LocationSelector';
 import Waitlist from './pages/Waitlist';
 import UserAuthentication from './pages/UserAuthentication';
 import Timeline from './pages/app/Timeline';
@@ -267,7 +268,8 @@ const App: React.FC = () => {
 								{/* Catch-all: unknown URLs render the 404 page */}
 								<Route path="*" element={<NotFound />} />
 							</BrowserRoutes>
-							<Toaster position="bottom-left" theme="system" />
+							<AppToaster />
+							<LocationPicker />
 							<NotificationToast />
 						</BrowserRouter>
 					</AuthProvider>

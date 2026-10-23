@@ -78,6 +78,8 @@ vi.mock('@/services', () => ({
 
 vi.mock('@/services/locationService', () => ({
 	locationService: {
+		hasSelectionDecision: vi.fn().mockReturnValue(true),
+		openPicker: vi.fn(),
 		getCurrentLocation: vi.fn().mockResolvedValue({}),
 		toApiFormat: vi.fn().mockReturnValue({
 			userLongitude: 0,
@@ -130,9 +132,6 @@ vi.mock('@/core/common/components/email-confirmation/EmailConfirmationModal', ()
 	default: () => null,
 }));
 vi.mock('@/core/common/components/chat/prompt-suggestions/PromptSuggestions', () => ({
-	default: () => null,
-}));
-vi.mock('@/core/common/components/chat/user_location', () => ({
 	default: () => null,
 }));
 vi.mock('@/core/common/components/loading-indicator', () => ({

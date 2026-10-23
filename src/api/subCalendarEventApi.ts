@@ -50,6 +50,7 @@ export class SubCalendarEventApi extends AppApi {
 			TimeZone: payload.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<SubCalendarEventLookupResponse>('api/SubCalendarEvent', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify(enrichedPayload),
 		});

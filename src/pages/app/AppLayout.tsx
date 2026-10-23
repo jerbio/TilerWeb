@@ -9,6 +9,7 @@ import React, { useRef, useEffect } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { featureFlags } from '@/core/constants/featureFlags';
+import LocationSelector from '@/components/location/LocationSelector';
 
 const AppLayout: React.FC = () => {
 	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
@@ -48,15 +49,20 @@ const AppLayout: React.FC = () => {
 					<NavLink key={'backToHome'} to={'/timeline'}>
 						<Logo size={30} />
 					</NavLink>
+					<LocationSelector />
 				</HeaderLeft>
 				<HeaderRight>
 					{tileshareEnabled && (
 						<Navigation>
 							{appRoutes.map((route, index) => (
 								<React.Fragment key={route.name}>
-									<Link to={route.path} style={{ textDecoration: 'none' }}>
+									<Link
+										to={route.path}
+										aria-label={route.name}
+										style={{ textDecoration: 'none' }}
+									>
 										<NavigationLink active={pathname.startsWith(route.path)}>
-											{route.name}
+											<span>{route.name}</span>
 											{route.icon}
 										</NavigationLink>
 									</Link>
@@ -102,7 +108,7 @@ const Separator = styled.div`
 	margin-inline: 0.25rem;
 `;
 
-const NavigationLink = styled.button<{ active: boolean }>`
+const NavigationLink = styled.span<{ active: boolean }>`
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 	font-size: ${(props) => props.theme.typography.fontSize.sm};
@@ -119,6 +125,13 @@ const NavigationLink = styled.button<{ active: boolean }>`
 	border-radius: ${(props) => props.theme.borderRadius.medium};
 	border: 1px solid
 		${(props) => (props.active ? props.theme.colors.border.default : 'transparent')};
+	@media (max-width: 600px) {
+		padding: 0 8px;
+		gap: 0;
+		span {
+			display: none;
+		}
+	}
 `;
 
 const Container = styled.div`
@@ -161,18 +174,31 @@ const Header = styled.header`
 	background-color: ${(props) => props.theme.colors.background.header};
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
 	padding-inline: 2rem;
+	flex-shrink: 0;
+	@media (max-width: 600px) {
+		padding-inline: 0.75rem;
+		gap: 0.5rem;
+	}
 `;
 
 const HeaderLeft = styled.div`
 	display: flex;
 	gap: 1rem;
 	align-items: center;
+	min-width: 0;
+	@media (max-width: 600px) {
+		gap: 0.5rem;
+	}
 `;
 
 const HeaderRight = styled.div`
 	display: flex;
 	gap: 1rem;
 	align-items: center;
+	flex-shrink: 0;
+	@media (max-width: 600px) {
+		gap: 0.5rem;
+	}
 `;
 
 export default AppLayout;

@@ -5,7 +5,6 @@ import { ChevronLeftIcon, SendHorizontal, CircleStop, History, SquarePen } from 
 import SessionHistory from '@/core/common/components/chat/session-history/SessionHistory';
 import { VibeSession } from '@/core/common/types/chat';
 import Button from '@/core/common/components/button';
-import Input from '../input';
 import Logo from '@/core/common/components/icons/logo';
 import { useTranslation } from 'react-i18next';
 import useAppStore, { ChatContextType, SessionType } from '@/global_state';
@@ -13,10 +12,10 @@ import { PromptWithActions, VibeAction, ChatSessionExecutionMode } from '@/core/
 // VibeSession imported above with SessionHistory
 import { Actions, Status } from '@/core/constants/enums';
 import { chatService } from '@/services';
-import UserLocation from '@/core/common/components/chat/user_location';
 import LoadingIndicator from '@/core/common/components/loading-indicator';
 import { MarkdownRenderer } from '@/core/common/components/chat/MarkdownRenderer';
 import { locationService } from '@/services/locationService';
+import { LocationDecision } from '@/core/constants/location';
 import { SignalRService, Hubs } from '@/services/SocketService';
 import { ChatLimitError } from '@/core/common/types/errors';
 import ErrorPopup from '@/core/common/components/error-popup/ErrorPopup';
@@ -238,26 +237,64 @@ const ChatContent = styled.div<{ $hidden?: boolean }>`
 `;
 
 const ChatForm = styled.form`
-	position: relative;
-	width: 100%; /* Ensure the form stretches fully */
+	width: 100%;
 	display: flex;
 	align-items: center;
-	gap: 0.5rem; /* Optional: Add spacing between elements */
-	margin-top: 8px; /* Add some space above the form */
+	flex-shrink: 0;
+	gap: 0.5rem;
+	margin-top: 8px;
+	padding: 6px;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: ${({ theme }) => theme.borderRadius.medium};
+	background: ${({ theme }) => theme.colors.input.bg};
+
+	&:focus-within {
+		border-color: ${({ theme }) => theme.colors.brand[500]};
+	}
+`;
+
+const ChatTextarea = styled.textarea`
+	flex: 1;
+	min-width: 0;
+	height: 36px;
+	padding: 8px 6px;
+	box-sizing: border-box;
+	border: 0;
+	outline: 0;
+	resize: none;
+	overflow-y: auto;
+	background: transparent;
+	color: ${({ theme }) => theme.colors.input.text};
+	font: inherit;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	line-height: 20px;
+
+	&::placeholder {
+		color: ${({ theme }) => theme.colors.input.placeholder};
+	}
 `;
 
 const ChatButton = styled.button`
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	right: 0.5rem;
-	height: 1.5rem;
-	width: 1.5rem;
+	flex: 0 0 36px;
+	height: 36px;
+	width: 36px;
 	display: grid;
 	place-items: center;
+	border: 0;
 	border-radius: ${({ theme }) => theme.borderRadius.xxLarge};
 	background-color: ${({ theme }) => theme.colors.button.brand.bg};
 	color: ${({ theme }) => theme.colors.button.brand.text};
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+
+	&:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.brand[400]};
+		outline-offset: 2px;
+	}
 `;
 
 const EmptyChat = styled.div`
@@ -334,6 +371,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const shouldAutoScrollToBottomRef = useRef(false);
 	const previousScrollHeightRef = useRef(0);
 	const previousScrollTopRef = useRef(0);
+	const pendingLocationDecisionRef = useRef<AbortController | null>(null);
 	const [chatSessionExecutionMode, setChatSessionExecutionMode] = useState(
 		ChatSessionExecutionMode.ConfirmFirst
 	);
@@ -403,7 +441,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	// with the chat panel. Local writes go through the store API only.
 	const inReview = useSimulationOverlayStore((s) => s.inReview);
 	// Mobile review takeover: when reviewing a tilecast on a small viewport,
-	// hide the chat header, message input, and location card so the review
+	// hide the chat header and message input so the review
 	// panel dominates the side panel and the calendar grid (rendered
 	// underneath the absolute-positioned side panel on mobile) becomes
 	// visible above. The Apply / Exit footer inside the review panel
@@ -739,6 +777,15 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	const anonymousUserId =
 		activePersonaSession?.userInfo?.id ?? activePersonaSession?.userId ?? '';
 	const entityId = chatContext.length > 0 ? chatContext[0].EntityId : '';
+
+	// A location choice must never resume a message in a different conversation.
+	useEffect(
+		() => () => {
+			pendingLocationDecisionRef.current?.abort();
+			pendingLocationDecisionRef.current = null;
+		},
+		[anonymousUserId, selectedPersonaId, entityId, sessionId, requestId]
+	);
 
 	const handleSetScheduleId = (id: string) => {
 		setScheduleId(id);
@@ -1222,10 +1269,26 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		simulation?.isStale !== true &&
 		!simulationResultError;
 
+	const waitForLocationDecision = async () => {
+		const controller = new AbortController();
+		pendingLocationDecisionRef.current = controller;
+		try {
+			const decision = await locationService.requestSelectionDecision(controller.signal);
+			return controller.signal.aborted ? LocationDecision.Cancelled : decision;
+		} finally {
+			if (pendingLocationDecisionRef.current === controller)
+				pendingLocationDecisionRef.current = null;
+		}
+	};
+
 	const handleSubmit = async (e: FormEvent, overrideMessage?: string) => {
 		e.preventDefault();
 		const textToSend = overrideMessage ?? message;
-		if (!textToSend.trim() || isSending) return;
+		if (!textToSend.trim() || isSending || pendingLocationDecisionRef.current) return;
+		if (!locationService.hasSelectionDecision()) {
+			if (overrideMessage !== undefined) setMessage(textToSend);
+			if ((await waitForLocationDecision()) === LocationDecision.Cancelled) return;
+		}
 
 		// Track message send
 		analytics.trackChatEvent('Message Sent', {
@@ -1363,6 +1426,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	};
 
 	const acceptAllChanges = async () => {
+		if (isSending || pendingLocationDecisionRef.current) return;
+		if (!locationService.hasSelectionDecision()) {
+			if ((await waitForLocationDecision()) === LocationDecision.Cancelled) return;
+		}
 		// Track accept changes action
 		analytics.trackChatEvent('Accept Changes', {
 			requestId: requestId || undefined,
@@ -1410,6 +1477,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 	};
 
 	const handleNewChat = () => {
+		pendingLocationDecisionRef.current?.abort();
 		setChatSessionExecutionMode(ChatSessionExecutionMode.ConfirmFirst);
 		analytics.trackChatEvent('New Chat Started', {
 			personaId: selectedPersonaId,
@@ -1462,6 +1530,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 		setChatSessionExecutionMode(ChatSessionExecutionMode.ConfirmFirst);
 		// Skip if selecting the already-active session
 		if (session.id === sessionId) return;
+		pendingLocationDecisionRef.current?.abort();
 
 		// Clear current state before loading new session
 		setMessages([]);
@@ -1834,7 +1903,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 							</small>
 						</label> */}
 						<ChatForm onSubmit={handleSubmit} data-onboarding-chat-input>
-							<Input.Textarea
+							<ChatTextarea
+								rows={1}
 								value={message}
 								onChange={(e) => setMessage(e.target.value)}
 								onKeyDown={(e) => {
@@ -1850,11 +1920,10 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 								}}
 								placeholder={t('home.expanded.chat.inputPlaceholder')}
 								disabled={isSending}
-								bordergradient={[theme.colors.brand[500]]}
-								height={50} // Set a fixed height for consistent alignment
 							/>
 							<ChatButton
 								type="submit"
+								aria-label={t('home.expanded.chat.sendMessage', 'Send message')}
 								disabled={isSending || !message.trim()}
 								data-onboarding-chat-button
 							>
@@ -1865,7 +1934,6 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
 								)}
 							</ChatButton>
 						</ChatForm>
-						<UserLocation />
 					</>
 				)}
 			</ChatContainer>

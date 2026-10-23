@@ -8,6 +8,7 @@
 import { ApiResponse, PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
 import { deviceTimeZone } from '@/core/common/utils/timeUtils';
+import { LocationVerification } from '@/core/constants/location';
 
 export type CalendarEventQueryOptions = PaginationParams;
 
@@ -155,10 +156,13 @@ export class CalendarEventApi extends AppApi {
 			...params,
 			UserLongitude: params.UserLongitude ?? loc.longitude?.toString() ?? '',
 			UserLatitude: params.UserLatitude ?? loc.latitude?.toString() ?? '',
-			UserLocationVerified: params.UserLocationVerified ?? (loc.verified ? 'true' : 'false'),
+			UserLocationVerified:
+				params.UserLocationVerified ??
+				(loc.verified ? LocationVerification.Verified : LocationVerification.Unverified),
 			TimeZone: params.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify(enriched),
 		});
