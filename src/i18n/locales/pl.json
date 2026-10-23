@@ -1,4 +1,72 @@
 {
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "Lokalizacja pominięta w tym żądaniu",
+			"description": "Czasy podróży i sugestie w pobliżu mogą być mniej dokładne."
+		},
+		"title": "Lokalizacja",
+		"setLocation": "Ustaw lokalizację",
+		"notSelected": "Nie wybrano lokalizacji",
+		"source": {
+			"address": "Wybrany adres",
+			"device": "Oszacowanie urządzenia"
+		},
+		"near": "W pobliżu: {{address}}",
+		"approximate": "Przybliżona lokalizacja urządzenia",
+		"accuracy": "Przybliżona · dokładność {{meters}} m",
+		"checked": "Lokalizacja znaleziona: {{time}}",
+		"stage": {
+			"permission": "Oczekiwanie na dostęp do lokalizacji w przeglądarce…",
+			"locating": "Ustalanie Twojej lokalizacji…",
+			"resolving": "Wyszukiwanie adresu…"
+		},
+		"updateReady": "Nowa lokalizacja · Sprawdź",
+		"needsAttention": "Sprawdź lokalizację",
+		"close": "Zamknij wybór lokalizacji",
+		"purpose": "Wybierz lokalizację, której czat i planowanie będą używać jako punktu początkowego. Miejsca wydarzeń ustawia się osobno.",
+		"chooseBeforeSend": "Twoje żądanie będzie kontynuowane po dokonaniu wyboru.",
+		"activeLabel": "Obecnie używana w żądaniach",
+		"withoutConsequences": "Sugestie podróży mogą korzystać z wartości domyślnych.",
+		"activeUntilConfirmed": "Żądania nadal korzystają z bieżącego wyboru, dopóki nie potwierdzisz nowej lokalizacji.",
+		"persistenceFailed": "Lokalizacja zapisana tylko na czas tej wizyty.",
+		"issue": {
+			"blocked": "Dostęp do lokalizacji jest zablokowany. Wpisz adres lub zezwól na dostęp w ustawieniach przeglądarki.",
+			"unavailable": "Lokalizacja niedostępna. Spróbuj ponownie lub wpisz adres.",
+			"timeout": "Ustalanie lokalizacji trwało zbyt długo. Spróbuj ponownie lub wpisz adres.",
+			"addressUnavailable": "Nie udało się znaleźć adresu. Spróbuj ponownie lub wpisz adres.",
+			"refreshNeeded": "Odśwież lokalizację urządzenia lub wybierz adres."
+		},
+		"keepingSelection": "Poprzednio potwierdzona lokalizacja jest nadal używana.",
+		"currentLocation": "Użyj swojej bieżącej lokalizacji",
+		"permissionExplanation": "Przeglądarka może poprosić o dostęp do lokalizacji.",
+		"detectionExplanation": "Lokalizacja ustalona przez komputer stacjonarny, laptop lub Wi-Fi może być przybliżona. Sprawdź adres przed potwierdzeniem.",
+		"refresh": "Zaktualizuj bieżącą lokalizację",
+		"useCurrent": "Użyj bieżącej lokalizacji",
+		"cancel": "Anuluj",
+		"chooseAddress": "Wybierz adres",
+		"searchPlaceholder": "Wyszukaj adres lub miejsce",
+		"searchHint": "Wpisz co najmniej {{count}} znaków.",
+		"searching": "Wyszukiwanie adresów…",
+		"noMatches": "Brak wyników. Spróbuj dodać miasto lub kod pocztowy.",
+		"searchFailed": "Wyszukiwanie nie powiodło się. Spróbuj ponownie.",
+		"retry": "Spróbuj ponownie",
+		"matches": "Pasujące adresy",
+		"matched": "Użyj tego adresu",
+		"unresolved": "Nie dopasowano adresu",
+		"review": "Sprawdź lokalizację przed użyciem",
+		"confirmExplanation": "Potwierdź, że to właściwe miejsce. Znalezienie pasującego miejsca na mapie nie gwarantuje, że adres jest poprawny.",
+		"confirm": "Użyj tego adresu",
+		"keepSelection": "Zachowaj bieżący wybór",
+		"continueWithout": "Kontynuuj bez lokalizacji",
+		"savedOnBrowser": "Potwierdzone wybory są zapamiętywane w tej przeglądarce. Nowe oszacowania urządzenia wymagają Twojego potwierdzenia; wybrany adres pozostaje bez zmian, dopóki go nie zmienisz.",
+		"requestUsing": "Wysyłanie z lokalizacją: {{address}}",
+		"requestWithout": "Wysyłanie bez Twojej lokalizacji. Sugestie podróży i miejsc w pobliżu mogą korzystać z wartości domyślnych.",
+		"pendingUpdate": "Nowa lokalizacja oczekuje na potwierdzenie i nie jest wysyłana.",
+		"change": "Zmień lokalizację",
+		"reviewBeforeUse": "Sprawdź adres przed użyciem",
+		"using": "Używana lokalizacja: {{address}}",
+		"changeAddress": "Wybierz inny adres"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "Dodano komentarz",

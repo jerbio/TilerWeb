@@ -1,4 +1,72 @@
 ﻿{
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "本次请求不使用位置信息",
+			"description": "出行时间和附近推荐的准确性可能会降低。"
+		},
+		"title": "位置",
+		"setLocation": "设置位置",
+		"notSelected": "未选择位置",
+		"source": {
+			"address": "所选地址",
+			"device": "设备估算"
+		},
+		"near": "{{address}}附近",
+		"approximate": "设备的大致位置",
+		"accuracy": "大致位置 · 精度为{{meters}}米",
+		"checked": "位置获取时间：{{time}}",
+		"stage": {
+			"permission": "正在等待浏览器的位置访问权限…",
+			"locating": "正在获取你的位置…",
+			"resolving": "正在查找地址…"
+		},
+		"updateReady": "新位置 · 查看",
+		"needsAttention": "检查位置",
+		"close": "关闭位置选择器",
+		"purpose": "选择聊天和日程安排使用的出发位置。活动场地需另行设置。",
+		"chooseBeforeSend": "选择后将继续处理你的请求。",
+		"activeLabel": "当前用于请求的位置",
+		"withoutConsequences": "出行建议可能使用默认值。",
+		"activeUntilConfirmed": "在你确认新位置之前，请求将继续使用当前选择。",
+		"persistenceFailed": "位置信息仅在本次访问期间保存。",
+		"issue": {
+			"blocked": "位置访问已被阻止。请输入地址或在浏览器设置中允许访问。",
+			"unavailable": "无法获取位置。请重试或输入地址。",
+			"timeout": "获取位置超时。请重试或输入地址。",
+			"addressUnavailable": "找不到地址。请重试或输入地址。",
+			"refreshNeeded": "请刷新设备位置或选择地址。"
+		},
+		"keepingSelection": "仍在使用你之前确认的位置。",
+		"currentLocation": "使用你的当前位置",
+		"permissionExplanation": "浏览器可能会请求位置访问权限。",
+		"detectionExplanation": "台式电脑、笔记本电脑和Wi-Fi提供的位置可能只是大致估算。请在确认前检查地址。",
+		"refresh": "更新当前位置",
+		"useCurrent": "使用当前位置",
+		"cancel": "取消",
+		"chooseAddress": "选择地址",
+		"searchPlaceholder": "搜索地址或地点",
+		"searchHint": "请输入至少{{count}}个字符。",
+		"searching": "正在搜索地址…",
+		"noMatches": "无匹配结果。请尝试添加城市或邮政编码。",
+		"searchFailed": "搜索失败，请重试。",
+		"retry": "重试",
+		"matches": "匹配的地址",
+		"matched": "使用此地址",
+		"unresolved": "地址未匹配",
+		"review": "使用前检查位置",
+		"confirmExplanation": "请确认这是你想选择的地点。在地图上找到匹配结果并不保证地址正确。",
+		"confirm": "使用此地址",
+		"keepSelection": "保留当前选择",
+		"continueWithout": "不使用位置并继续",
+		"savedOnBrowser": "已确认的选择会保存在此浏览器中。设备新估算的位置需要你确认；所选地址将保持不变，直到你更改为止。",
+		"requestUsing": "正在使用此位置发送：{{address}}",
+		"requestWithout": "正在发送，不包含你的位置信息。出行和附近推荐可能使用默认值。",
+		"pendingUpdate": "新位置正在等待确认，尚未发送。",
+		"change": "更改位置",
+		"reviewBeforeUse": "使用前检查地址",
+		"using": "正在使用：{{address}}",
+		"changeAddress": "选择其他地址"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "已添加评论",

@@ -1,4 +1,72 @@
 ﻿{
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "Standort für diese Anfrage ignoriert",
+			"description": "Fahrzeiten und Vorschläge in der Nähe sind möglicherweise weniger genau."
+		},
+		"title": "Standort",
+		"setLocation": "Standort festlegen",
+		"notSelected": "Kein Standort ausgewählt",
+		"source": {
+			"address": "Ausgewählte Adresse",
+			"device": "Geräteschätzung"
+		},
+		"near": "In der Nähe von {{address}}",
+		"approximate": "Ungefährer Gerätestandort",
+		"accuracy": "Ungefähr · Genauigkeit: {{meters}} m",
+		"checked": "Standort gefunden: {{time}}",
+		"stage": {
+			"permission": "Warten auf Standortzugriff im Browser…",
+			"locating": "Dein Standort wird ermittelt…",
+			"resolving": "Adresse wird ermittelt…"
+		},
+		"updateReady": "Neuer Standort · Prüfen",
+		"needsAttention": "Standort prüfen",
+		"close": "Standortauswahl schließen",
+		"purpose": "Wähle den Standort, den Chat und Planung als Ausgangspunkt verwenden. Veranstaltungsorte werden separat festgelegt.",
+		"chooseBeforeSend": "Deine Anfrage wird nach deiner Auswahl fortgesetzt.",
+		"activeLabel": "Derzeit für Anfragen verwendet",
+		"withoutConsequences": "Reisevorschläge verwenden möglicherweise Standardwerte.",
+		"activeUntilConfirmed": "Anfragen verwenden weiterhin die aktuelle Auswahl, bis du einen neuen Standort bestätigst.",
+		"persistenceFailed": "Standort nur für diesen Besuch gespeichert.",
+		"issue": {
+			"blocked": "Der Standortzugriff ist gesperrt. Gib eine Adresse ein oder erlaube den Zugriff in den Browsereinstellungen.",
+			"unavailable": "Standort nicht verfügbar. Versuche es erneut oder gib eine Adresse ein.",
+			"timeout": "Die Standortermittlung hat zu lange gedauert. Versuche es erneut oder gib eine Adresse ein.",
+			"addressUnavailable": "Die Adresse konnte nicht gefunden werden. Versuche es erneut oder gib eine Adresse ein.",
+			"refreshNeeded": "Aktualisiere deinen Gerätestandort oder wähle eine Adresse."
+		},
+		"keepingSelection": "Dein zuvor bestätigter Standort wird weiterhin verwendet.",
+		"currentLocation": "Deinen aktuellen Standort verwenden",
+		"permissionExplanation": "Dein Browser fragt möglicherweise nach Zugriff auf deinen Standort.",
+		"detectionExplanation": "Standortschätzungen auf Desktopcomputern, Laptops und über WLAN können ungenau sein. Prüfe die Adresse vor dem Bestätigen.",
+		"refresh": "Aktuellen Standort aktualisieren",
+		"useCurrent": "Aktuellen Standort verwenden",
+		"cancel": "Abbrechen",
+		"chooseAddress": "Adresse auswählen",
+		"searchPlaceholder": "Nach einer Adresse oder einem Ort suchen",
+		"searchHint": "Gib mindestens {{count}} Zeichen ein.",
+		"searching": "Adressen werden gesucht…",
+		"noMatches": "Keine Treffer. Ergänze einen Ort oder eine Postleitzahl.",
+		"searchFailed": "Suche fehlgeschlagen. Versuche es erneut.",
+		"retry": "Erneut versuchen",
+		"matches": "Passende Adressen",
+		"matched": "Diese Adresse verwenden",
+		"unresolved": "Adresse nicht zugeordnet",
+		"review": "Standort vor der Verwendung prüfen",
+		"confirmExplanation": "Bestätige, dass dies der gewünschte Ort ist. Ein Treffer auf der Karte garantiert nicht, dass die Adresse richtig ist.",
+		"confirm": "Diese Adresse verwenden",
+		"keepSelection": "Aktuelle Auswahl beibehalten",
+		"continueWithout": "Ohne Standort fortfahren",
+		"savedOnBrowser": "Bestätigte Auswahlen werden in diesem Browser gespeichert. Neue Geräteschätzungen erfordern deine Bestätigung; deine ausgewählte Adresse bleibt unverändert, bis du sie änderst.",
+		"requestUsing": "Wird mit Standort gesendet: {{address}}",
+		"requestWithout": "Wird ohne deinen Standort gesendet. Reisevorschläge und Vorschläge in der Nähe verwenden möglicherweise Standardwerte.",
+		"pendingUpdate": "Ein neuer Standort wartet auf Bestätigung und wird noch nicht gesendet.",
+		"change": "Standort ändern",
+		"reviewBeforeUse": "Adresse vor der Verwendung prüfen",
+		"using": "Verwendet: {{address}}",
+		"changeAddress": "Andere Adresse auswählen"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "Kommentar hinzugefügt",

@@ -637,8 +637,7 @@ const Overlay = styled.div`
 	justify-content: center;
 	padding: 20px;
 	@media (max-width: 600px) {
-		align-items: flex-end;
-		padding: 0;
+		padding: 16px;
 	}
 `;
 const Panel = styled.div`
@@ -654,12 +653,12 @@ const Panel = styled.div`
 	box-shadow: 0 16px 60px rgba(0, 0, 0, 0.35);
 	overflow: hidden;
 	@media (max-width: 600px) {
-		max-height: 85dvh;
-		border-radius: 16px 16px 0 0;
+		max-height: calc(100dvh - 32px);
 	}
 `;
 const PanelHeader = styled.div`
 	display: flex;
+	flex-shrink: 0;
 	align-items: center;
 	justify-content: space-between;
 	padding: 12px 16px;
@@ -671,6 +670,7 @@ const PanelHeader = styled.div`
 const PanelBody = styled.div`
 	display: flex;
 	flex-direction: column;
+	min-height: 0;
 	gap: 10px;
 	padding: 0 16px max(16px, env(safe-area-inset-bottom));
 	overflow-y: auto;

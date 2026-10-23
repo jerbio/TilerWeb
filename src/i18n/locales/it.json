@@ -1,4 +1,72 @@
 {
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "Posizione ignorata per questa richiesta",
+			"description": "I tempi di viaggio e i suggerimenti nelle vicinanze potrebbero essere meno precisi."
+		},
+		"title": "Posizione",
+		"setLocation": "Imposta posizione",
+		"notSelected": "Nessuna posizione selezionata",
+		"source": {
+			"address": "Indirizzo selezionato",
+			"device": "Stima del dispositivo"
+		},
+		"near": "Vicino a {{address}}",
+		"approximate": "Posizione approssimativa del dispositivo",
+		"accuracy": "Approssimativa · precisione di {{meters}} m",
+		"checked": "Posizione trovata: {{time}}",
+		"stage": {
+			"permission": "In attesa dell’accesso alla posizione nel browser…",
+			"locating": "Ricerca della tua posizione…",
+			"resolving": "Ricerca dell’indirizzo…"
+		},
+		"updateReady": "Nuova posizione · Verifica",
+		"needsAttention": "Verifica posizione",
+		"close": "Chiudi selettore della posizione",
+		"purpose": "Scegli la posizione che la chat e la pianificazione useranno come punto di partenza. I luoghi degli eventi vengono impostati separatamente.",
+		"chooseBeforeSend": "La tua richiesta proseguirà dopo la scelta.",
+		"activeLabel": "Attualmente usata per le richieste",
+		"withoutConsequences": "I suggerimenti di viaggio potrebbero usare valori predefiniti.",
+		"activeUntilConfirmed": "Le richieste continuano a usare la selezione attuale finché non confermi una nuova posizione.",
+		"persistenceFailed": "Posizione salvata solo per questa visita.",
+		"issue": {
+			"blocked": "L’accesso alla posizione è bloccato. Inserisci un indirizzo o consenti l’accesso nelle impostazioni del browser.",
+			"unavailable": "Posizione non disponibile. Riprova o inserisci un indirizzo.",
+			"timeout": "La ricerca della posizione ha richiesto troppo tempo. Riprova o inserisci un indirizzo.",
+			"addressUnavailable": "Impossibile trovare l’indirizzo. Riprova o inseriscine uno.",
+			"refreshNeeded": "Aggiorna la posizione del dispositivo o scegli un indirizzo."
+		},
+		"keepingSelection": "La posizione confermata in precedenza è ancora in uso.",
+		"currentLocation": "Usa la tua posizione attuale",
+		"permissionExplanation": "Il browser potrebbe chiedere l’accesso alla posizione.",
+		"detectionExplanation": "Le stime della posizione da computer fissi, portatili e Wi-Fi possono essere approssimative. Verifica l’indirizzo prima di confermare.",
+		"refresh": "Aggiorna posizione attuale",
+		"useCurrent": "Usa posizione attuale",
+		"cancel": "Annulla",
+		"chooseAddress": "Scegli un indirizzo",
+		"searchPlaceholder": "Cerca un indirizzo o un luogo",
+		"searchHint": "Inserisci almeno {{count}} caratteri.",
+		"searching": "Ricerca di indirizzi…",
+		"noMatches": "Nessuna corrispondenza. Prova ad aggiungere una città o un codice postale.",
+		"searchFailed": "Ricerca non riuscita. Riprova.",
+		"retry": "Riprova",
+		"matches": "Indirizzi corrispondenti",
+		"matched": "Usa questo indirizzo",
+		"unresolved": "Indirizzo senza corrispondenza",
+		"review": "Verifica la posizione prima di usarla",
+		"confirmExplanation": "Conferma che questo sia il luogo desiderato. Una corrispondenza sulla mappa non garantisce che l’indirizzo sia corretto.",
+		"confirm": "Usa questo indirizzo",
+		"keepSelection": "Mantieni selezione attuale",
+		"continueWithout": "Continua senza posizione",
+		"savedOnBrowser": "Le scelte confermate vengono ricordate in questo browser. Le nuove stime del dispositivo richiedono la tua conferma; l’indirizzo selezionato rimane invariato finché non lo cambi.",
+		"requestUsing": "Invio con la posizione: {{address}}",
+		"requestWithout": "Invio senza la tua posizione. I suggerimenti di viaggio e nelle vicinanze potrebbero usare valori predefiniti.",
+		"pendingUpdate": "Una nuova posizione è in attesa di conferma e non viene inviata.",
+		"change": "Cambia posizione",
+		"reviewBeforeUse": "Verifica l’indirizzo prima di usarlo",
+		"using": "In uso: {{address}}",
+		"changeAddress": "Scegli un altro indirizzo"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "Commento aggiunto",

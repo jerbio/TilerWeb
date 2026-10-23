@@ -1,4 +1,72 @@
 {
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "이 요청에서는 위치가 사용되지 않아요",
+			"description": "이동 시간과 주변 추천의 정확도가 낮아질 수 있어요."
+		},
+		"title": "위치",
+		"setLocation": "위치 설정",
+		"notSelected": "선택한 위치가 없어요",
+		"source": {
+			"address": "선택한 주소",
+			"device": "기기 추정 위치"
+		},
+		"near": "{{address}} 근처",
+		"approximate": "기기의 대략적인 위치",
+		"accuracy": "대략적인 위치 · 정확도 {{meters}}m",
+		"checked": "위치를 찾은 시간: {{time}}",
+		"stage": {
+			"permission": "브라우저의 위치 접근 허용을 기다리는 중…",
+			"locating": "현재 위치를 찾는 중…",
+			"resolving": "주소를 찾는 중…"
+		},
+		"updateReady": "새 위치 · 검토",
+		"needsAttention": "위치 확인",
+		"close": "위치 선택 닫기",
+		"purpose": "채팅과 일정 계획에서 출발점으로 사용할 위치를 선택하세요. 이벤트 장소는 별도로 설정해요.",
+		"chooseBeforeSend": "선택하면 요청이 계속 진행돼요.",
+		"activeLabel": "현재 요청에 사용 중",
+		"withoutConsequences": "이동 추천에 기본값이 사용될 수 있어요.",
+		"activeUntilConfirmed": "새 위치를 확정할 때까지 요청에는 현재 선택한 위치가 계속 사용돼요.",
+		"persistenceFailed": "이번 방문에만 위치가 저장됐어요.",
+		"issue": {
+			"blocked": "위치 접근이 차단됐어요. 주소를 입력하거나 브라우저 설정에서 접근을 허용하세요.",
+			"unavailable": "위치를 사용할 수 없어요. 다시 시도하거나 주소를 입력하세요.",
+			"timeout": "위치를 찾는 데 너무 오래 걸렸어요. 다시 시도하거나 주소를 입력하세요.",
+			"addressUnavailable": "주소를 찾지 못했어요. 다시 시도하거나 주소를 입력하세요.",
+			"refreshNeeded": "기기 위치를 새로고침하거나 주소를 선택하세요."
+		},
+		"keepingSelection": "이전에 확정한 위치를 계속 사용하고 있어요.",
+		"currentLocation": "현재 위치 사용하기",
+		"permissionExplanation": "브라우저에서 위치 접근 권한을 요청할 수 있어요.",
+		"detectionExplanation": "데스크톱, 노트북, Wi-Fi의 위치 추정은 대략적일 수 있어요. 확정하기 전에 주소를 확인하세요.",
+		"refresh": "현재 위치 업데이트",
+		"useCurrent": "현재 위치 사용",
+		"cancel": "취소",
+		"chooseAddress": "주소 선택",
+		"searchPlaceholder": "주소나 장소 검색",
+		"searchHint": "{{count}}자 이상 입력하세요.",
+		"searching": "주소 검색 중…",
+		"noMatches": "일치하는 결과가 없어요. 도시나 우편번호를 추가해 보세요.",
+		"searchFailed": "검색하지 못했어요. 다시 시도하세요.",
+		"retry": "다시 시도",
+		"matches": "일치하는 주소",
+		"matched": "이 주소 사용",
+		"unresolved": "일치하는 주소 없음",
+		"review": "사용 전 위치 검토",
+		"confirmExplanation": "원하는 장소가 맞는지 확인하세요. 지도에서 일치하는 결과를 찾았다고 해서 올바른 주소임이 보장되지는 않아요.",
+		"confirm": "이 주소 사용",
+		"keepSelection": "현재 선택 유지",
+		"continueWithout": "위치 없이 계속",
+		"savedOnBrowser": "확정한 선택은 이 브라우저에 저장돼요. 기기가 새로 추정한 위치는 확인이 필요하며, 선택한 주소는 직접 변경할 때까지 유지돼요.",
+		"requestUsing": "이 위치로 전송 중: {{address}}",
+		"requestWithout": "위치 없이 전송 중이에요. 이동 및 주변 추천에 기본값이 사용될 수 있어요.",
+		"pendingUpdate": "새 위치가 확인을 기다리고 있으며 전송되지 않아요.",
+		"change": "위치 변경",
+		"reviewBeforeUse": "사용 전 주소 검토",
+		"using": "사용 중: {{address}}",
+		"changeAddress": "다른 주소 선택"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "댓글이 추가되었습니다",

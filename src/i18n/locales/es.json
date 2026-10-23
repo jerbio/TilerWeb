@@ -1,4 +1,72 @@
 {
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "Ubicación ignorada para esta solicitud",
+			"description": "Los tiempos de viaje y las sugerencias cercanas pueden ser menos precisos."
+		},
+		"title": "Ubicación",
+		"setLocation": "Establecer ubicación",
+		"notSelected": "No se ha seleccionado ninguna ubicación",
+		"source": {
+			"address": "Dirección seleccionada",
+			"device": "Estimación del dispositivo"
+		},
+		"near": "Cerca de {{address}}",
+		"approximate": "Ubicación aproximada del dispositivo",
+		"accuracy": "Aproximada · precisión de {{meters}} m",
+		"checked": "Ubicación encontrada: {{time}}",
+		"stage": {
+			"permission": "Esperando acceso a la ubicación del navegador…",
+			"locating": "Buscando tu ubicación…",
+			"resolving": "Buscando la dirección…"
+		},
+		"updateReady": "Nueva ubicación · Revisar",
+		"needsAttention": "Revisar ubicación",
+		"close": "Cerrar selector de ubicación",
+		"purpose": "Elige la ubicación que el chat y la programación usarán como punto de partida. Los lugares de los eventos se establecen por separado.",
+		"chooseBeforeSend": "Tu solicitud continuará después de que elijas.",
+		"activeLabel": "En uso para las solicitudes",
+		"withoutConsequences": "Las sugerencias de viaje pueden usar valores predeterminados.",
+		"activeUntilConfirmed": "Las solicitudes seguirán usando la selección actual hasta que confirmes una nueva.",
+		"persistenceFailed": "La ubicación se guardó solo para esta visita.",
+		"issue": {
+			"blocked": "El acceso a la ubicación está bloqueado. Introduce una dirección o permite el acceso en la configuración del navegador.",
+			"unavailable": "Ubicación no disponible. Inténtalo de nuevo o introduce una dirección.",
+			"timeout": "La búsqueda de ubicación tardó demasiado. Inténtalo de nuevo o introduce una dirección.",
+			"addressUnavailable": "No se pudo encontrar la dirección. Inténtalo de nuevo o introduce una.",
+			"refreshNeeded": "Actualiza la ubicación de tu dispositivo o elige una dirección."
+		},
+		"keepingSelection": "Se sigue usando la ubicación que confirmaste anteriormente.",
+		"currentLocation": "Usar tu ubicación actual",
+		"permissionExplanation": "Tu navegador puede pedir acceso a la ubicación.",
+		"detectionExplanation": "Las estimaciones de ubicación de ordenadores de escritorio, portátiles y redes Wi-Fi pueden ser aproximadas. Revisa la dirección antes de confirmar.",
+		"refresh": "Actualizar ubicación actual",
+		"useCurrent": "Usar ubicación actual",
+		"cancel": "Cancelar",
+		"chooseAddress": "Elegir una dirección",
+		"searchPlaceholder": "Buscar una dirección o un lugar",
+		"searchHint": "Introduce al menos {{count}} caracteres.",
+		"searching": "Buscando direcciones…",
+		"noMatches": "No hay coincidencias. Prueba a añadir una ciudad o un código postal.",
+		"searchFailed": "No se pudo realizar la búsqueda. Inténtalo de nuevo.",
+		"retry": "Reintentar",
+		"matches": "Direcciones coincidentes",
+		"matched": "Usar esta dirección",
+		"unresolved": "Dirección sin coincidencia",
+		"review": "Revisar la ubicación antes de usarla",
+		"confirmExplanation": "Confirma que este es el lugar que quieres. Encontrar una coincidencia en el mapa no garantiza que sea la dirección correcta.",
+		"confirm": "Usar esta dirección",
+		"keepSelection": "Mantener selección actual",
+		"continueWithout": "Continuar sin ubicación",
+		"savedOnBrowser": "Las selecciones confirmadas se recuerdan en este navegador. Las nuevas estimaciones del dispositivo requieren tu confirmación; la dirección seleccionada se mantiene hasta que la cambies.",
+		"requestUsing": "Enviando con la ubicación: {{address}}",
+		"requestWithout": "Enviando sin tu ubicación. Las sugerencias de viaje y de lugares cercanos pueden usar valores predeterminados.",
+		"pendingUpdate": "Hay una nueva ubicación pendiente de confirmación; no se está enviando.",
+		"change": "Cambiar ubicación",
+		"reviewBeforeUse": "Revisar la dirección antes de usarla",
+		"using": "En uso: {{address}}",
+		"changeAddress": "Elegir otra dirección"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "Comentario añadido",

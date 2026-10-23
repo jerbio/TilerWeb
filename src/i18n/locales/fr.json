@@ -1,4 +1,72 @@
 {
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "Localisation ignorée pour cette demande",
+			"description": "Les temps de trajet et les suggestions à proximité peuvent être moins précis."
+		},
+		"title": "Localisation",
+		"setLocation": "Définir la localisation",
+		"notSelected": "Aucune localisation sélectionnée",
+		"source": {
+			"address": "Adresse sélectionnée",
+			"device": "Estimation de l’appareil"
+		},
+		"near": "À proximité de {{address}}",
+		"approximate": "Localisation approximative de l’appareil",
+		"accuracy": "Approximative · précision de {{meters}} m",
+		"checked": "Localisation trouvée : {{time}}",
+		"stage": {
+			"permission": "En attente de l’accès à la localisation dans le navigateur…",
+			"locating": "Recherche de votre localisation…",
+			"resolving": "Recherche de l’adresse…"
+		},
+		"updateReady": "Nouvelle localisation · Vérifier",
+		"needsAttention": "Vérifier la localisation",
+		"close": "Fermer le sélecteur de localisation",
+		"purpose": "Choisissez la localisation que le chat et la planification utiliseront comme point de départ. Les lieux des événements sont définis séparément.",
+		"chooseBeforeSend": "Votre demande reprendra une fois votre choix effectué.",
+		"activeLabel": "Actuellement utilisée pour les demandes",
+		"withoutConsequences": "Les suggestions de trajet peuvent utiliser des valeurs par défaut.",
+		"activeUntilConfirmed": "Les demandes continuent d’utiliser la sélection actuelle jusqu’à ce que vous confirmiez un remplacement.",
+		"persistenceFailed": "Localisation enregistrée uniquement pour cette visite.",
+		"issue": {
+			"blocked": "L’accès à la localisation est bloqué. Saisissez une adresse ou autorisez l’accès dans les paramètres du navigateur.",
+			"unavailable": "Localisation indisponible. Réessayez ou saisissez une adresse.",
+			"timeout": "La recherche de localisation a pris trop de temps. Réessayez ou saisissez une adresse.",
+			"addressUnavailable": "Impossible de trouver l’adresse. Réessayez ou saisissez-en une.",
+			"refreshNeeded": "Actualisez la localisation de votre appareil ou choisissez une adresse."
+		},
+		"keepingSelection": "La localisation que vous avez confirmée précédemment est toujours utilisée.",
+		"currentLocation": "Utiliser votre localisation actuelle",
+		"permissionExplanation": "Votre navigateur peut demander l’accès à votre localisation.",
+		"detectionExplanation": "Les estimations de localisation des ordinateurs de bureau, des ordinateurs portables et du Wi-Fi peuvent être approximatives. Vérifiez l’adresse avant de confirmer.",
+		"refresh": "Actualiser la localisation actuelle",
+		"useCurrent": "Utiliser la localisation actuelle",
+		"cancel": "Annuler",
+		"chooseAddress": "Choisir une adresse",
+		"searchPlaceholder": "Rechercher une adresse ou un lieu",
+		"searchHint": "Saisissez au moins {{count}} caractères.",
+		"searching": "Recherche d’adresses…",
+		"noMatches": "Aucun résultat. Essayez d’ajouter une ville ou un code postal.",
+		"searchFailed": "La recherche a échoué. Réessayez.",
+		"retry": "Réessayer",
+		"matches": "Adresses correspondantes",
+		"matched": "Utiliser cette adresse",
+		"unresolved": "Adresse sans correspondance",
+		"review": "Vérifier la localisation avant utilisation",
+		"confirmExplanation": "Confirmez qu’il s’agit bien du lieu souhaité. Une correspondance sur la carte ne garantit pas qu’il s’agit de la bonne adresse.",
+		"confirm": "Utiliser cette adresse",
+		"keepSelection": "Conserver la sélection actuelle",
+		"continueWithout": "Continuer sans localisation",
+		"savedOnBrowser": "Les choix confirmés sont mémorisés dans ce navigateur. Les nouvelles estimations de l’appareil nécessitent votre confirmation ; l’adresse sélectionnée reste inchangée jusqu’à ce que vous la modifiiez.",
+		"requestUsing": "Envoi avec la localisation : {{address}}",
+		"requestWithout": "Envoi sans votre localisation. Les suggestions de trajet et de lieux à proximité peuvent utiliser des valeurs par défaut.",
+		"pendingUpdate": "Une nouvelle localisation attend votre confirmation ; elle n’est pas envoyée.",
+		"change": "Changer de localisation",
+		"reviewBeforeUse": "Vérifier l’adresse avant utilisation",
+		"using": "Localisation utilisée : {{address}}",
+		"changeAddress": "Choisir une autre adresse"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "Commentaire ajouté",

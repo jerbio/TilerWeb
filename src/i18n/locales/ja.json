@@ -1,4 +1,72 @@
 {
+	"schedulingLocation": {
+		"requestNotice": {
+			"title": "このリクエストでは位置情報を使用しません",
+			"description": "移動時間や近くのおすすめの精度が低くなる場合があります。"
+		},
+		"title": "位置情報",
+		"setLocation": "位置情報を設定",
+		"notSelected": "場所が選択されていません",
+		"source": {
+			"address": "選択した住所",
+			"device": "端末による推定"
+		},
+		"near": "{{address}}の近く",
+		"approximate": "端末のおおよその現在地",
+		"accuracy": "概算 · 位置精度 {{meters}} m",
+		"checked": "位置情報の取得時刻：{{time}}",
+		"stage": {
+			"permission": "ブラウザでの位置情報の許可を待っています…",
+			"locating": "現在地を取得しています…",
+			"resolving": "住所を検索しています…"
+		},
+		"updateReady": "新しい位置情報 · 確認",
+		"needsAttention": "位置情報を確認",
+		"close": "位置情報の選択を閉じる",
+		"purpose": "チャットとスケジュール作成の出発地として使用する場所を選択してください。イベントの会場は別途設定します。",
+		"chooseBeforeSend": "選択後にリクエストを続行します。",
+		"activeLabel": "現在リクエストで使用中",
+		"withoutConsequences": "移動の提案に既定値が使用される場合があります。",
+		"activeUntilConfirmed": "新しい場所を確定するまで、リクエストには現在の選択を使用します。",
+		"persistenceFailed": "位置情報は今回のアクセス中のみ保存されます。",
+		"issue": {
+			"blocked": "位置情報へのアクセスがブロックされています。住所を入力するか、ブラウザの設定でアクセスを許可してください。",
+			"unavailable": "位置情報を取得できません。もう一度試すか、住所を入力してください。",
+			"timeout": "位置情報の取得がタイムアウトしました。もう一度試すか、住所を入力してください。",
+			"addressUnavailable": "住所が見つかりませんでした。もう一度試すか、住所を入力してください。",
+			"refreshNeeded": "端末の位置情報を更新するか、住所を選択してください。"
+		},
+		"keepingSelection": "以前に確定した位置情報を引き続き使用しています。",
+		"currentLocation": "現在地を使用する",
+		"permissionExplanation": "ブラウザから位置情報へのアクセス許可を求められる場合があります。",
+		"detectionExplanation": "デスクトップ、ノートパソコン、Wi-Fiによる位置情報はおおよその推定となる場合があります。確定する前に住所を確認してください。",
+		"refresh": "現在地を更新",
+		"useCurrent": "現在地を使用",
+		"cancel": "キャンセル",
+		"chooseAddress": "住所を選択",
+		"searchPlaceholder": "住所や場所を検索",
+		"searchHint": "{{count}}文字以上入力してください。",
+		"searching": "住所を検索しています…",
+		"noMatches": "一致する住所がありません。市区町村や郵便番号を追加してみてください。",
+		"searchFailed": "検索できませんでした。もう一度お試しください。",
+		"retry": "再試行",
+		"matches": "一致する住所",
+		"matched": "この住所を使用",
+		"unresolved": "住所が一致しません",
+		"review": "使用する前に場所を確認",
+		"confirmExplanation": "目的の場所であることを確認してください。地図上で一致する場所が見つかっても、正しい住所とは限りません。",
+		"confirm": "この住所を使用",
+		"keepSelection": "現在の選択を維持",
+		"continueWithout": "位置情報なしで続行",
+		"savedOnBrowser": "確定した選択はこのブラウザに保存されます。端末による新しい推定位置の使用には確認が必要です。選択した住所は変更するまで維持されます。",
+		"requestUsing": "この位置情報で送信中：{{address}}",
+		"requestWithout": "位置情報なしで送信中です。移動や近くのおすすめに既定値が使用される場合があります。",
+		"pendingUpdate": "新しい位置情報は確認待ちのため送信されません。",
+		"change": "位置情報を変更",
+		"reviewBeforeUse": "使用する前に住所を確認",
+		"using": "使用中：{{address}}",
+		"changeAddress": "別の住所を選択"
+	},
 	"tileshareActivity": {
 		"events": {
 			"comment_added": "コメントが追加されました",
