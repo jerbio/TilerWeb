@@ -3,6 +3,8 @@ import {
 	extractCalendarEventPrefix,
 	resolveEntityToTileId,
 	isCalendarEventId,
+	resolveThirdPartyToTileId,
+	resolveTileForFocus,
 } from './entityResolution';
 import { CalendarEntityType } from '@/core/common/components/calendar/calendarRequestContext';
 
@@ -161,5 +163,147 @@ describe('resolveEntityToTileId', () => {
 		const result = resolveEntityToTileId('tt_uu_0_0', CalendarEntityType.CalendarEvent, tied);
 		// Both have same start — should return one of them deterministically (first found)
 		expect(result).toBe('tt_uu_aaa_bbb');
+	});
+});
+
+// ── resolveThirdPartyToTileId ──────────────────────────────────────
+
+/** Minimal third-party event shape for the resolver tests */
+const makeTpEvent = (
+	id: string,
+	start: number,
+	metadata: {
+		thirdPartyType?: string | null;
+		thirdPartyId?: string | null;
+		thirdPartyUserId?: string | null;
+	} = {}
+) => ({ id, start, ...metadata });
+
+describe('resolveThirdPartyToTileId', () => {
+	const events = [
+		makeTpEvent('tp_7_aaa_bbb', 3000, {
+			thirdPartyType: 'outlook',
+			thirdPartyId: 'GP-1',
+			thirdPartyUserId: 'u1',
+		}),
+		makeTpEvent('tp_7_ccc_ddd', 1000, {
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-1',
+			thirdPartyUserId: 'u1',
+		}),
+		makeTpEvent('tp_7_eee_fff', 2000, {
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-2',
+			thirdPartyUserId: 'u2',
+		}),
+		makeTpEvent('tp_7_ggg_hhh', 1500, { thirdPartyId: 'gp-1' }),
+	];
+
+	it('resolves by thirdPartyId regardless of wire casing (id + type are case-insensitive)', () => {
+		expect(resolveThirdPartyToTileId({ thirdPartyId: 'gp-1' }, events)).toBe('tp_7_ccc_ddd');
+		expect(
+			resolveThirdPartyToTileId({ thirdPartyId: 'GP-1', thirdPartyType: 'Google' }, events)
+		).toBe('tp_7_ccc_ddd');
+	});
+
+	it('returns null when the reference has no thirdPartyId (id is the stable key)', () => {
+		expect(resolveThirdPartyToTileId({ thirdPartyType: 'google' }, events)).toBeNull();
+		expect(resolveThirdPartyToTileId({ thirdPartyUserId: 'u1' }, events)).toBeNull();
+		expect(resolveThirdPartyToTileId({ thirdPartyId: '' }, events)).toBeNull();
+		expect(resolveThirdPartyToTileId({ thirdPartyId: '  ' }, events)).toBeNull();
+		expect(resolveThirdPartyToTileId({}, events)).toBeNull();
+	});
+
+	it('returns null when no tile carries the referenced thirdPartyId', () => {
+		expect(resolveThirdPartyToTileId({ thirdPartyId: 'nope' }, events)).toBeNull();
+		expect(resolveThirdPartyToTileId({ thirdPartyId: null }, events)).toBeNull();
+	});
+
+	it('applies thirdPartyType as an AND filter (case-insensitive) when present', () => {
+		// gp-1 exists on an outlook-typed tile, a google-typed tile and a
+		// type-less tile; restrict to OUTLOOK (upper-case to prove the filter
+		// itself is case-insensitive) and only the outlook tile survives.
+		expect(
+			resolveThirdPartyToTileId({ thirdPartyId: 'gp-1', thirdPartyType: 'OUTLOOK' }, events)
+		).toBe('tp_7_aaa_bbb');
+		// A type filter that no matching tile satisfies → null (gp-2 is google).
+		expect(
+			resolveThirdPartyToTileId({ thirdPartyId: 'gp-2', thirdPartyType: 'outlook' }, events)
+		).toBeNull();
+	});
+
+	it('applies thirdPartyUserId as an AND filter when present', () => {
+		expect(
+			resolveThirdPartyToTileId({ thirdPartyId: 'gp-1', thirdPartyUserId: 'u1' }, events)
+		).toBe('tp_7_ccc_ddd');
+		expect(
+			resolveThirdPartyToTileId(
+				{ thirdPartyId: 'gp-1', thirdPartyUserId: 'someone-else' },
+				events
+			)
+		).toBeNull();
+	});
+
+	it('picks the earliest tile by start when multiple tiles share the reference', () => {
+		const all = [
+			makeTpEvent('tp_7_111_222', 5000, { thirdPartyId: 'gp-9' }),
+			makeTpEvent('tp_7_333_444', 4000, { thirdPartyId: 'GP-9' }),
+			makeTpEvent('tp_7_555_666', 100, { thirdPartyId: 'gp-9' }),
+		];
+		expect(resolveThirdPartyToTileId({ thirdPartyId: 'gp-9' }, all)).toBe('tp_7_555_666');
+	});
+
+	it('returns null for an empty event list', () => {
+		expect(resolveThirdPartyToTileId({ thirdPartyId: 'gp-1' }, [])).toBeNull();
+	});
+});
+
+// ── resolveTileForFocus ────────────────────────────────────────────
+
+describe('resolveTileForFocus', () => {
+	const events = [
+		makeTpEvent('s_7_aaa_bbb', 1000, {
+			thirdPartyType: 'google',
+			thirdPartyId: 'gp-evt-99',
+			thirdPartyUserId: 'u1',
+		}),
+	];
+
+	it('prefers third-party resolution over the (search-time) entityId', () => {
+		// `entityId` is a search-time id that never matches a tile.
+		expect(
+			resolveTileForFocus('search-uuid-1', CalendarEntityType.None, events, {
+				thirdPartyType: 'google',
+				thirdPartyId: 'gp-evt-99',
+				thirdPartyUserId: 'u1',
+			})
+		).toBe('s_7_aaa_bbb');
+	});
+
+	it('falls back to entity-ID resolution when no tile matches the third-party ref', () => {
+		const result = resolveTileForFocus(
+			's_7_aaa_bbb',
+			CalendarEntityType.SubcalendarEvent,
+			events,
+			{ thirdPartyId: 'does-not-exist' }
+		);
+		expect(result).toBe('s_7_aaa_bbb');
+	});
+
+	it('keeps classic behavior untouched when no third-party ref is supplied', () => {
+		expect(
+			resolveTileForFocus('s_7_aaa_bbb', CalendarEntityType.SubcalendarEvent, events)
+		).toBe('s_7_aaa_bbb');
+		expect(
+			resolveTileForFocus('zzz_zzz_zzz_zzz', CalendarEntityType.SubcalendarEvent, events)
+		).toBeNull();
+	});
+
+	it('returns null when neither the third-party ref nor the entityId matches', () => {
+		expect(
+			resolveTileForFocus('search-uuid-1', CalendarEntityType.SubcalendarEvent, events, {
+				thirdPartyId: 'does-not-exist',
+			})
+		).toBeNull();
 	});
 });

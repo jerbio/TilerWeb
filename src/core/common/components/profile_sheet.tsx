@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserInfo } from '@/global_state';
 import { animated, useSpring } from '@react-spring/web';
-import { LogOut, MessageSquarePlus, Settings, User } from 'lucide-react';
+import { LogOut, MessageSquarePlus, User } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import useAppStore from '@/global_state';
@@ -13,10 +13,9 @@ import FeedbackPopup from '@/components/feedback/FeedbackPopup';
 type ProfileSheetProps = {
 	user: UserInfo | null;
 	open: boolean;
-	ref: React.RefObject<HTMLDivElement>;
 };
 
-const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
+const ProfileSheet = React.forwardRef<HTMLDivElement, ProfileSheetProps>(({ open, user }, ref) => {
 	const logout = useAppStore((state) => state.logout);
 	const navigate = useNavigate();
 	const { t } = useTranslation();
@@ -66,11 +65,6 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 
 			<ProfileDivider />
 
-			<SettingsButton variant="ghost" onClick={() => navigate('/settings')}>
-				<Settings size={16} />
-				{t('timeline.userMenu.settings')}
-			</SettingsButton>
-
 			<FeedbackButton variant="ghost" onClick={() => setFeedbackOpen(true)}>
 				<MessageSquarePlus size={16} />
 				{t('feedback.menuItem')}
@@ -84,7 +78,7 @@ const ProfileSheet: React.FC<ProfileSheetProps> = ({ open, ref, user }) => {
 			<FeedbackPopup isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
 		</AnimatedProfileMenu>
 	);
-};
+});
 
 const AnimatedProfileMenu = styled(animated.div)`
 	padding: ${(props) => props.theme.space.small} 0;
@@ -168,8 +162,6 @@ const FeedbackButton = styled(Button)`
 	height: 42px;
 `;
 
-const SettingsButton = styled(Button)`
-	height: 42px;
-`;
+ProfileSheet.displayName = 'ProfileSheet';
 
 export default ProfileSheet;

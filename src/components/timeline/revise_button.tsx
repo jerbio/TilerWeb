@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import useAppStore from '@/global_state';
 import { scheduleService } from '@/services';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import type { ScheduleReviseParams } from '@/core/common/types/schedule';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 const REVISE_NOTIFICATION_ID = 'schedule-revise';
 
@@ -19,9 +21,11 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 	const getActivePersonaSession = useAppStore((s) => s.getActivePersonaSession);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
+	const isReadOnly = useIsReadOnly();
 
 	const handleRevise = useCallback(async () => {
 		if (isLoading) return;
+		if (isReadOnly) return;
 		setIsLoading(true);
 		onLoadingChange?.(true);
 
@@ -37,7 +41,7 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 				SocketId: true,
 				TimeZoneOffset: userInfo?.timeZoneDifference ?? 0,
 				Version: 'v2',
-				TimeZone: userInfo?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+				TimeZone: deviceTimeZone() ?? userInfo?.timeZone ?? 'UTC',
 				IsTimeZoneAdjusted: 'true',
 			};
 
@@ -52,6 +56,7 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 		}
 	}, [
 		isLoading,
+		isReadOnly,
 		getActivePersonaSession,
 		showNotification,
 		updateNotification,
@@ -62,7 +67,7 @@ const ReviseButton: React.FC<ReviseButtonProps> = ({ disabled, onLoadingChange }
 	return (
 		<ReviseIconButton
 			onClick={handleRevise}
-			disabled={isLoading || disabled}
+			disabled={isLoading || disabled || isReadOnly}
 			aria-label={t('timeline.revise.ariaLabel')}
 			title={t('timeline.revise.tooltip')}
 		>
@@ -92,7 +97,7 @@ const ReviseIconButton = styled.button`
 	color: ${(props) => props.theme.colors.button.primary.text};
 	background-color: ${({ theme }) => theme.colors.button.primary.bg};
 	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.button.primary.border};
+	border: 1px solid ${(props) => props.theme.colors.border.default};
 	display: flex;
 	align-items: center;
 	justify-content: center;

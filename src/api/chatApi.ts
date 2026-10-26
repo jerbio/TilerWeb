@@ -1,4 +1,5 @@
 import {
+	TileShareExecutionResult,
 	ChatActionsResponse,
 	ChatSendMessageResponse,
 	ChatExecuteActionResponse,
@@ -8,8 +9,27 @@ import {
 	ChatMessagesParams,
 	VibeSessionsResponse,
 	VibeSessionParams,
+	SimulationDto,
+	SimulationScheduleResult,
+	AutoSuggestionsResponse,
 } from '@/core/common/types/chat';
+import { ApiResponse } from '@/core/common/types/api';
+import { DirectorySearchPage } from '@/core/common/types/chat';
+import { TilerResponseError } from '@/core/common/types/errors';
 import { AppApi } from './appApi';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
+
+/**
+ * Optional query params for fetching the rendered simulation schedule.
+ * Mirrors the backend `GetVibePreviewModel` query shape.
+ */
+export type SimulationResultParams = {
+	startRange?: string | number;
+	endRange?: string | number;
+	timeZone?: string;
+	getTimeSpan?: string;
+	anonymousUserId?: string;
+};
 
 export class ChatApi extends AppApi {
 	// Messages
@@ -64,9 +84,37 @@ export class ChatApi extends AppApi {
 
 	public sendMessage(messageBody: ChatMessageBody) {
 		return this.apiRequest<ChatSendMessageResponse>('api/Vibe/Chat', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify(messageBody),
 		});
+	}
+
+	public async selectDirectoryMatch(
+		actionId: string,
+		resultId: string,
+		matchId: string,
+		signal?: AbortSignal
+	): Promise<DirectorySearchPage> {
+		const response = await this.apiRequest<
+			ApiResponse<{ ActionId: string; DirectorySearch: DirectorySearchPage }>
+		>('api/Vibe/Directory/Selection', {
+			method: 'POST',
+			signal,
+			body: JSON.stringify({ ActionId: actionId, ResultId: resultId, MatchId: matchId }),
+		});
+		if (
+			response.Error?.Code !== '0' ||
+			!response.Content?.DirectorySearch ||
+			response.Content.ActionId !== actionId ||
+			response.Content.DirectorySearch.ResultId !== resultId ||
+			response.Content.DirectorySearch.Selection?.Id !== matchId
+		)
+			throw new TilerResponseError(
+				response.Error?.Code || 'invalid_response',
+				'Could not confirm the directory selection.'
+			);
+		return response.Content.DirectorySearch;
 	}
 
 	// Actions
@@ -78,6 +126,57 @@ export class ChatApi extends AppApi {
 		return this.apiRequest<ChatActionsResponse>('api/Vibe/Action?' + queryParam);
 	}
 
+	public async confirmTileShare(
+		actionId: string,
+		token: string,
+		signal?: AbortSignal
+	): Promise<TileShareExecutionResult> {
+		let result: TileShareExecutionResult | undefined;
+		try {
+			const response = await this.apiRequest<
+				ApiResponse<{ vibeRequest: { tileShareResult: TileShareExecutionResult } }>
+			>('api/Vibe/Request/Execute', {
+				method: 'POST',
+				signal,
+				body: JSON.stringify({
+					ActionId: actionId,
+					TileShareReviewToken: token,
+					TimeZone: deviceTimeZone().toString(),
+				}),
+			});
+			if (response.Error?.Code === '0')
+				result = response.Content?.vibeRequest?.tileShareResult;
+		} catch (error) {
+			// Preserve definitive rejections and changed reviews; neither authorizes a retry.
+			const conflict = error as ApiResponse<TileShareExecutionResult>;
+			if (
+				conflict?.Error?.Code === '409' &&
+				(['Rejected', 'Failed'].includes(conflict.Content?.State ?? '') ||
+					(conflict.Content?.ReviewToken &&
+						['review_required', 'review_changed'].includes(
+							conflict.Content.ErrorCode ?? ''
+						)))
+			)
+				result = conflict.Content;
+			else throw error;
+		}
+		if (
+			!result ||
+			result.ActionId !== actionId ||
+			!(
+				result.State === 'Applied' ||
+				result.State === 'Rejected' ||
+				result.State === 'Pending' ||
+				result.State === 'Failed' ||
+				(result.State === 'NotAttempted' && result.ReviewToken && result.Review)
+			)
+		)
+			throw new TilerResponseError(
+				'invalid_response',
+				'Could not confirm TileShare creation.'
+			);
+		return result;
+	}
 	public executeActions(
 		requestId: string,
 		anonymousUserId?: string,
@@ -86,6 +185,7 @@ export class ChatApi extends AppApi {
 		userLocationVerified?: string
 	) {
 		return this.apiRequest<ChatExecuteActionResponse>('api/Vibe/Request/Execute', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify({
 				requestId,
@@ -93,6 +193,7 @@ export class ChatApi extends AppApi {
 				userLongitude,
 				userLatitude,
 				userLocationVerified,
+				TimeZone: deviceTimeZone().toString(),
 			}),
 		});
 	}
@@ -100,6 +201,67 @@ export class ChatApi extends AppApi {
 	public getVibeRequest(requestId: string) {
 		return this.apiRequest<ChatVibeRequestResponse>(
 			`api/Vibe/VibeRequest?RequestId=${encodeURIComponent(requestId)}`
+		);
+	}
+
+	/**
+	 * Fetch the active simulation row for a given vibe request.
+	 * Maps to GET api/Vibe/Request/{vibeRequestId}/Preview.
+	 */
+	public getSimulationForRequest(vibeRequestId: string, anonymousUserId?: string) {
+		const qs = anonymousUserId ? `?AnonymousUserId=${encodeURIComponent(anonymousUserId)}` : '';
+		return this.apiRequest<ApiResponse<SimulationDto>>(
+			`api/Vibe/Request/${encodeURIComponent(vibeRequestId)}/Preview${qs}`
+		);
+	}
+
+	/**
+	 * Fetch the rendered simulated schedule for a previewId.
+	 * Maps to GET api/Vibe/Preview?previewId=...&StartRange=...&EndRange=...
+	 */
+	public getSimulationResult(previewId: string, params?: SimulationResultParams) {
+		const parts = [`previewId=${encodeURIComponent(previewId)}`];
+		if (params?.startRange != null)
+			parts.push(`StartRange=${encodeURIComponent(String(params.startRange))}`);
+		if (params?.endRange != null)
+			parts.push(`EndRange=${encodeURIComponent(String(params.endRange))}`);
+		if (params?.timeZone) parts.push(`TimeZone=${encodeURIComponent(params.timeZone)}`);
+		if (params?.getTimeSpan)
+			parts.push(`getTimeSpan=${encodeURIComponent(params.getTimeSpan)}`);
+		if (params?.anonymousUserId) {
+			parts.push(`AnonymousUserId=${encodeURIComponent(params.anonymousUserId)}`);
+		}
+		return this.apiRequest<ApiResponse<SimulationScheduleResult>>(
+			`api/Vibe/Preview?${parts.join('&')}`
+		);
+	}
+
+	/**
+	 * Read stored auto suggestions. Never triggers generation server-side.
+	 * Omit sessionId to get the capability-discovery defaults for a language.
+	 */
+	public getAutoSuggestions(params?: {
+		sessionId?: string;
+		anonymousUserId?: string;
+		language?: string;
+	}) {
+		const parts: string[] = [];
+		if (params?.sessionId) parts.push(`SessionId=${encodeURIComponent(params.sessionId)}`);
+		if (params?.anonymousUserId) {
+			parts.push(`AnonymousUserId=${encodeURIComponent(params.anonymousUserId)}`);
+		}
+		if (params?.language) parts.push(`Language=${encodeURIComponent(params.language)}`);
+		const qs = parts.length ? `?${parts.join('&')}` : '';
+		return this.apiRequest<AutoSuggestionsResponse>(`api/Vibe/Session/AutoSuggestions${qs}`);
+	}
+
+	public refreshAutoSuggestions(sessionId: string, anonymousUserId?: string) {
+		return this.apiRequest<AutoSuggestionsResponse>(
+			'api/Vibe/Session/AutoSuggestions/Refresh',
+			{
+				method: 'POST',
+				body: JSON.stringify({ sessionId, anonymousUserId }),
+			}
 		);
 	}
 

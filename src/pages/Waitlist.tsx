@@ -26,6 +26,7 @@ const Waitlist: React.FC = () => {
 				title="Waitlist - Join Tiler Early Access"
 				description="Join the Tiler waitlist and be among the first to experience intelligent calendar and task management. Get early access to smart scheduling features."
 				keywords="tiler waitlist, early access, beta signup, calendar app signup, task management beta"
+				noindex
 				canonicalUrl="/waitlist"
 				structuredData={structuredData}
 			/>

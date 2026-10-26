@@ -1,5 +1,9 @@
 import palette from './palette';
 
+type ThemeValues<T> = {
+	[K in keyof T]: T[K] extends string ? string : T[K] extends object ? ThemeValues<T[K]> : T[K];
+};
+
 type ColorScale = {
 	25: string;
 	50: string;
@@ -32,10 +36,25 @@ export type ColorScaleHue =
 
 export type AppTheme = {
 	colors: {
+		preview: {
+			selectedBg: string;
+			selectedText: string;
+			selectedBorder: string;
+			successBg: string;
+			warningBg: string;
+			errorBg: string;
+			eventBg: string;
+			eventText: string;
+		};
 		plain: string;
 		backdrop: {
 			default: string;
 			glass: string;
+		};
+		avatar: {
+			background: string;
+			border: string;
+			text: string;
 		};
 		// Text colors
 		text: {
@@ -44,6 +63,8 @@ export type AppTheme = {
 			muted: string;
 			inverse: string;
 			error: string;
+			success: string;
+			warning: string;
 		};
 		// Background colors
 		background: {
@@ -63,12 +84,22 @@ export type AppTheme = {
 		highlight: {
 			text: string;
 		};
+		/** Shared fill for highlighted interactive surfaces. */
+		interaction?: { highlight: string };
 		// Toggle colors
 		toggle: {
 			bg: string;
 			bgChecked: string;
 			circle: string;
 			circleChecked: string;
+		};
+		// Tabs colors
+		tabs: {
+			border: string;
+			bg: string;
+			indicator: string;
+			text: string;
+			textActive: string;
 		};
 		// Radio Colors
 		radio: {
@@ -145,6 +176,39 @@ export type AppTheme = {
 			focusRing: string;
 			gradientNeutral: string;
 		};
+		// Empty state colors
+		emptyState: {
+			icon: string;
+			text: string;
+		};
+		// Pagination colors
+		pagination: {
+			bg: string;
+			bgHover: string;
+			bgActive: string;
+			border: string;
+			borderActive: string;
+			text: string;
+			textActive: string;
+			textDisabled: string;
+			ellipsis: string;
+		};
+		// Skeleton colors
+		skeleton: {
+			base: string;
+			highlight: string;
+		};
+		// Tag input colors
+		tagInput: {
+			chipBg: string;
+			chipBorder: string;
+			chipText: string;
+			remove: string;
+			removeHover: string;
+			addBg: string;
+			addBgHover: string;
+			addText: string;
+		};
 		// Utility colors
 		white: string;
 		black: string;
@@ -153,12 +217,12 @@ export type AppTheme = {
 	} & {
 		[key in ColorScaleHue]: ColorScale;
 	};
-	typography: typeof palette.typography;
-	buttonHeights: typeof palette.buttonHeights;
-	inputHeights: typeof palette.inputHeights;
+	typography: ThemeValues<typeof palette.typography>;
+	buttonHeights: ThemeValues<typeof palette.buttonHeights>;
+	inputHeights: ThemeValues<typeof palette.inputHeights>;
 	space: typeof palette.space;
 	inputs: typeof palette.inputs;
-	borderRadius: typeof palette.borderRadius;
+	borderRadius: ThemeValues<typeof palette.borderRadius>;
 	container: typeof palette.container;
 	screens: typeof palette.screens;
 };

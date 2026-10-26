@@ -11,6 +11,7 @@ type ModalProps = {
 	children?: React.ReactNode;
 	footer?: React.ReactNode;
 	closeTimeout?: number;
+	motion?: boolean;
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -21,6 +22,7 @@ const Modal: React.FC<ModalProps> = ({
 	headerStyle,
 	footer,
 	closeTimeout,
+	motion = false,
 }) => {
 	const theme = useTheme();
 	const intervalRef = React.useRef<number | null>(null);
@@ -58,8 +60,8 @@ const Modal: React.FC<ModalProps> = ({
 	}, [closeModal, timerExists, timeLeft]);
 
 	return createPortal(
-		<Overlay onClick={closeModal} $show={show}>
-			<ModalContainer onClick={(e) => e.stopPropagation()}>
+		<Overlay onClick={closeModal} $show={show} $motion={motion}>
+			<ModalContainer onClick={(e) => e.stopPropagation()} $show={show} $motion={motion}>
 				<Header style={headerStyle}>
 					<h3>{headerText}</h3>
 					{setShow && (
@@ -158,7 +160,7 @@ const CloseButton = styled.button`
 	}
 `;
 
-const Overlay = styled.div<{ $show: boolean }>`
+const Overlay = styled.div<{ $show: boolean; $motion: boolean }>`
 	opacity: ${(props) => (props.$show ? 1 : 0)};
 	pointer-events: ${(props) => (props.$show ? 'auto' : 'none')};
 	position: fixed;
@@ -172,14 +174,33 @@ const Overlay = styled.div<{ $show: boolean }>`
 	justify-content: center;
 	z-index: 10000;
 	transition: opacity 0.2s ease;
+	${({ $motion, $show }) =>
+		$motion &&
+		`
+		visibility: ${$show ? 'visible' : 'hidden'};
+		transition: opacity 180ms ease, visibility 0s ${$show ? '0ms' : '180ms'};
+	`}
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
 `;
 
-const ModalContainer = styled.div`
+const ModalContainer = styled.div<{ $show: boolean; $motion: boolean }>`
 	width: 100%;
 	max-width: 400px;
 	background: ${(props) => props.theme.colors.background.card};
 	border-radius: ${(props) => props.theme.borderRadius.large};
 	overflow: hidden;
+	${({ $motion, $show }) =>
+		$motion &&
+		`
+		transform: ${$show ? 'none' : 'translateY(12px) scale(0.98)'};
+		transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	`}
+	@media (prefers-reduced-motion: reduce) {
+		transform: none;
+		transition: none;
+	}
 `;
 
 const ModalBody = styled.div`

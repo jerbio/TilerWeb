@@ -200,6 +200,7 @@ const HeroSection: React.FC = () => {
 						subHeaderText={t('home.hero.subtitle')}
 						align="center"
 						size="large"
+						headingLevel={1}
 					/>
 					<FeaturesList>
 						<FeatureItem>

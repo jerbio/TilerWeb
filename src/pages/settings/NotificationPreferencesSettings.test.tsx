@@ -49,6 +49,7 @@ const createMockSettings = (
 	scheduleProfile: {
 		travelMedium: 'driving',
 		pinPreference: 'start',
+		intensityRate: 0.5,
 		sleepDuration: 8.0,
 		endTimeOfDay: '',
 	},

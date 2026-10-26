@@ -1,4 +1,5 @@
 import { ApiResponse, ApiCodeResponse } from './api';
+import { CalendarSearchErrorBody, CalendarSearchFailedSource } from './schedule';
 import i18n from '@/i18n/config';
 
 export interface ErrorInfo {
@@ -48,9 +49,39 @@ export class TilerResponseError extends Error {
 	}
 }
 
+/**
+ * Typed error for a TOTAL multi-source calendar search failure (HTTP 502).
+ * Carries the server's `CalendarSearchError` body fields so the UI can render
+ * a "temporarily unavailable" state (never "no matches") and map a
+ * user-reported issue to the correlation id / failing accounts.
+ */
+export class CalendarSearchUnavailableError extends Error {
+	public readonly error: string;
+	public readonly message: string;
+	public readonly category: string | null;
+	public readonly correlationId: string;
+	public readonly sources: CalendarSearchFailedSource[];
+
+	constructor(body: CalendarSearchErrorBody) {
+		super(body.message || 'Search is temporarily unavailable');
+		this.name = 'CalendarSearchUnavailableError';
+		this.error = body.error;
+		this.message = body.message;
+		this.category = body.category ?? null;
+		this.correlationId = body.correlationId;
+		this.sources = body.sources ?? [];
+	}
+}
+
 export const ERROR_CODES = {
 	CHAT_LIMIT_REACHED: '60000001',
 	USERNAME_ALREADY_EXISTS: '1004',
+	/**
+	 * Provider-side integration delete failed. The server answers HTTP 200
+	 * with this code (see IntegrationsController.DeleteIntegration), so the
+	 * failure must be detected from the envelope, not the status.
+	 */
+	INTEGRATION_DELETE_FAILED: '10000009',
 } as const;
 
 // Error message map for internationalization

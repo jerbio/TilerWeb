@@ -10,6 +10,7 @@ import Logo from '@/core/common/components/icons/logo';
 import CustomPersonaModal from './navigation/CustomPersonaModal';
 import { PersonaApi } from '@/api/personaApi';
 import analytics from '@/core/util/analytics';
+import { trackCtaClicked } from '@/core/analytics';
 
 const NavigationContainerSticky = styled.div`
 	display: flex;
@@ -173,6 +174,7 @@ const Navigation: React.FC = () => {
 	const navLinks = [
 		{ name: t('common.navigation.home'), href: '/' },
 		{ name: t('common.navigation.discover'), href: '/discover' },
+		{ name: t('common.navigation.articles'), href: '/articles' },
 	];
 
 	function handleScroll() {
@@ -194,6 +196,8 @@ const Navigation: React.FC = () => {
 			isModalOpen: isModalOpen,
 			isOnHomePage: window.location.pathname === '/',
 		});
+
+		trackCtaClicked({ label: 'Try Free', location: 'Navigation', destination: '/signin' });
 
 		setIsOpen(false); // Close mobile menu if open
 
@@ -276,7 +280,14 @@ const Navigation: React.FC = () => {
 			<NavigationContainer>
 				<NavigationWrapper $isopen={isOpen} $shrink={!isAtTop}>
 					<NavigationItemsWrapper>
-						<Logo size={32} />
+						<NavLink key={'tilerRoot'} href={'/'}>
+							<div>
+								<Logo size={32} />
+								<NavLink key={'tilerRoot'} href={'/'}>
+									{'Tiler'}
+								</NavLink>
+							</div>
+						</NavLink>
 						<NavItems>
 							{navLinks.map((link) => (
 								<NavItem key={link.name}>

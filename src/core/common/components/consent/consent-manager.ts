@@ -1,5 +1,6 @@
 // Consent Manager - Handles user consent preferences and analytics enablement
 import analytics from '@/core/util/analytics';
+import { syncGoogleConsent } from '@/core/analytics/googleConsent';
 import TimeUtil from '@/core/util/time';
 
 export type ConsentPreferences = {
@@ -127,6 +128,9 @@ class ConsentManager {
 		} else {
 			analytics.disable();
 		}
+
+		// No-op while the conversion tracker runs in bypass mode.
+		syncGoogleConsent(preferences);
 	}
 
 	/**

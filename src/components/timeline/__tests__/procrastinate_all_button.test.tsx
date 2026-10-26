@@ -1,10 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, setupUser, waitFor } from '@/test/test-utils';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
+import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import ProcrastinateAllButton from '../procrastinate_all_button';
 
 const mockProcrastinateAllSchedule = vi.fn();
+
+vi.mock('@/core/common/utils/timeUtils', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@/core/common/utils/timeUtils')>();
+	return { ...actual, deviceTimeZone: () => 'America/New_York' };
+});
 
 // Mock the services module
 vi.mock('@/services', () => ({
@@ -271,6 +277,26 @@ describe('ProcrastinateAllButton', () => {
 		await waitFor(() => {
 			expect(onLoadingChange).toHaveBeenCalledWith(true);
 			expect(onLoadingChange).toHaveBeenCalledWith(false);
+		});
+	});
+
+	describe('read-only mode', () => {
+		afterEach(() => {
+			useSimulationOverlayStore.setState({ inReview: false });
+		});
+
+		it('is disabled while the schedule is read-only', () => {
+			useSimulationOverlayStore.setState({ inReview: true });
+			renderProcrastinateAllButton();
+			expect(screen.getByRole('button', { name: 'Defer all events' })).toBeDisabled();
+		});
+
+		it('does not open the duration picker when clicked while read-only', async () => {
+			useSimulationOverlayStore.setState({ inReview: true });
+			const user = setupUser();
+			renderProcrastinateAllButton();
+			await user.click(screen.getByRole('button', { name: 'Defer all events' }));
+			expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 		});
 	});
 });

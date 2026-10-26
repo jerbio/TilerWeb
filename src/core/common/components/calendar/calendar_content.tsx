@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import { CalendarViewOptions } from './calendar.types';
 import { SubCalendarEvent } from '@/core/common/types/schedule';
 import CurrentTimeIndicator from './current_time_indicator';
+import type { SimulatedTileClassification } from '@/core/util/simulationDiff';
+import type { CalendarEntityType } from './calendarRequestContext';
 
 type CalendarContentProps = {
 	// Events to display in the calendar
@@ -31,6 +33,12 @@ type CalendarContentProps = {
 	focusedEventId?: string | null;
 	/** Called when a viable event tile on the grid is clicked */
 	onViableEventClicked?: () => void;
+	/** Plan §5.2 — per-tile simulation classification (composite-key map). */
+	simulationClassification?: Record<string, SimulatedTileClassification>;
+	/** Plan §5.3.2 — invoked when a simulation tile is clicked. */
+	onSimulatedTileClick?: (entityId: string, entityType: CalendarEntityType) => void;
+	/** Plan §5.2.7 — composite entity key of the currently selected action. */
+	selectedSimulationKey?: string | null;
 };
 
 const CalendarContent: React.FC<CalendarContentProps> = ({
@@ -46,6 +54,9 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 	styledEventsRef,
 	focusedEventId,
 	onViableEventClicked,
+	simulationClassification,
+	onSimulatedTileClick,
+	selectedSimulationKey,
 }) => {
 	return (
 		<Container>
@@ -79,6 +90,9 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 					styledEventsRef={styledEventsRef}
 					focusedEventId={focusedEventId}
 					onViableEventClicked={onViableEventClicked}
+					simulationClassification={simulationClassification}
+					onSimulatedTileClick={onSimulatedTileClick}
+					selectedSimulationKey={selectedSimulationKey}
 				/>
 			</StyledCalendarContent>
 		</Container>

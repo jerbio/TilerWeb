@@ -1,14 +1,18 @@
 import {
 	ChatMessageBody,
+	ChatSessionExecutionMode,
 	ChatMessagesParams,
 	PromptWithActions,
+	SimulationDto,
 	VibeSessionsResponse,
 	VibeSessionParams,
+	AutoSuggestions,
 } from '@/core/common/types/chat';
 import { ChatApi } from '@/api/chatApi';
 import { normalizeError } from '@/core/error';
 import { setStoredSessionId } from '@/core/storage/chatSession';
 import { parseServerError, ChatLimitError } from '@/core/common/types/errors';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 
 class ChatService {
 	private chatApi: ChatApi;
@@ -53,10 +57,12 @@ class ChatService {
 		userLatitude: string = '',
 		userLocationVerified: string = '',
 		requestId: string = '',
-		actionId: string = ''
+		actionId: string = '',
+		chatSessionExecutionMode: ChatSessionExecutionMode = ChatSessionExecutionMode.ConfirmFirst
 	) {
 		const requestBody: ChatMessageBody = {
 			EntityId: entityId,
+			ChatSessionExecutionMode: chatSessionExecutionMode,
 			ChatMessage: message,
 			SessionId: sessionId,
 			RequestId: requestId,
@@ -66,7 +72,7 @@ class ChatService {
 			UserLatitude: userLatitude,
 			UserLongitude: userLongitude,
 			UserLocationVerified: userLocationVerified,
-			TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+			TimeZone: deviceTimeZone().toString(),
 		};
 		try {
 			const response = await this.chatApi.sendMessage(requestBody);
@@ -91,6 +97,18 @@ class ChatService {
 
 			throw normalizeError(error);
 		}
+	}
+
+	confirmTileShare(actionId: string, token: string, signal?: AbortSignal) {
+		return this.chatApi.confirmTileShare(actionId, token, signal);
+	}
+	selectDirectoryMatch(
+		actionId: string,
+		resultId: string,
+		matchId: string,
+		signal?: AbortSignal
+	) {
+		return this.chatApi.selectDirectoryMatch(actionId, resultId, matchId, signal);
 	}
 
 	async getActions(actionIds: string[] | string) {
@@ -142,6 +160,85 @@ class ChatService {
 		} catch (error) {
 			console.error('Error fetching vibe request', error);
 			throw normalizeError(error);
+		}
+	}
+
+	async getSimulationForRequest(vibeRequestId: string, anonymousUserId?: string) {
+		try {
+			const response = await this.chatApi.getSimulationForRequest(
+				vibeRequestId,
+				anonymousUserId
+			);
+			// Server wraps the payload as `OkResponse("preview", ...)` →
+			// `{ Content: { preview: SimulationDto } }`. Normalize to
+			// `{ Content: SimulationDto }` here so every caller (polling,
+			// requestId effect, prefetch) sees the unwrapped shape and
+			// `simulation.state` is reachable.
+			const rawContent = response?.Content as
+				| { preview?: SimulationDto }
+				| SimulationDto
+				| null
+				| undefined;
+			const sim =
+				rawContent && typeof rawContent === 'object' && 'preview' in rawContent
+					? (rawContent.preview ?? null)
+					: ((rawContent as SimulationDto | null | undefined) ?? null);
+			return { ...response, Content: sim } as typeof response;
+		} catch (error) {
+			console.error('Error fetching simulation for request', error);
+			throw normalizeError(error);
+		}
+	}
+
+	async getSimulationResult(
+		previewId: string,
+		params?: Parameters<ChatApi['getSimulationResult']>[1]
+	) {
+		try {
+			return await this.chatApi.getSimulationResult(previewId, params);
+		} catch (error) {
+			console.error('Error fetching simulation result', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Returns stored suggestions plus whether they lag the session's latest exchange.
+	 * Failures resolve to an empty, non-stale set so an unavailable endpoint never
+	 * blocks the chat surface.
+	 */
+	async getAutoSuggestions(params?: {
+		sessionId?: string;
+		anonymousUserId?: string;
+		language?: string;
+	}): Promise<{ suggestions: AutoSuggestions; isStale: boolean }> {
+		try {
+			const response = await this.chatApi.getAutoSuggestions(params);
+			const payload = response?.Content?.autoSuggestions;
+			return {
+				suggestions: payload?.suggestions ?? {},
+				isStale: payload?.isStale ?? false,
+			};
+		} catch (error) {
+			console.error('Error fetching auto suggestions', error);
+			return { suggestions: {}, isStale: false };
+		}
+	}
+
+	async refreshAutoSuggestions(
+		sessionId: string,
+		anonymousUserId?: string
+	): Promise<{ suggestions: AutoSuggestions; isStale: boolean }> {
+		try {
+			const response = await this.chatApi.refreshAutoSuggestions(sessionId, anonymousUserId);
+			const payload = response?.Content?.autoSuggestions;
+			return {
+				suggestions: payload?.suggestions ?? {},
+				isStale: payload?.isStale ?? false,
+			};
+		} catch (error) {
+			console.error('Error refreshing auto suggestions', error);
+			return { suggestions: {}, isStale: false };
 		}
 	}
 

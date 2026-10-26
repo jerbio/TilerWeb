@@ -88,6 +88,38 @@ describe('LocationApi', () => {
 		});
 	});
 
+	describe('searchAnonymousByName', () => {
+		it('calls the anonymous endpoint with encoded query and optional confirmed anchor', async () => {
+			const request = vi
+				.spyOn(api, 'apiRequest')
+				.mockResolvedValue({ ...mockResponse, Content: [mockLocation] });
+			const controller = new AbortController();
+			await api.searchAnonymousByName(
+				'Main & Fifth',
+				{ location: 'New York', latitude: 40.7484, longitude: -73.9857, verified: true },
+				controller.signal
+			);
+			const [url, options] = request.mock.calls[0];
+			const requestUrl = new URL(url, 'https://test.example.com/');
+			expect(requestUrl.pathname).toBe('/api/Location/Anonymous/Name');
+			expect(requestUrl.searchParams.get('data')).toBe('Main & Fifth');
+			expect(requestUrl.searchParams.get('mobileApp')).toBe('true');
+			expect(requestUrl.searchParams.get('UserLatitude')).toBe('40.7484');
+			expect(requestUrl.searchParams.get('UserLocationVerified')).toBe('true');
+			expect(options?.signal).toBe(controller.signal);
+		});
+
+		it('omits anchor coordinates when no location has been confirmed', async () => {
+			const request = vi
+				.spyOn(api, 'apiRequest')
+				.mockResolvedValue({ ...mockResponse, Content: [] });
+			await api.searchAnonymousByName('Boston', { location: '', verified: false });
+			const url = new URL(request.mock.calls[0][0], 'https://test.example.com/');
+			expect(url.searchParams.has('UserLatitude')).toBe(false);
+			expect(url.searchParams.has('UserLongitude')).toBe(false);
+		});
+	});
+
 	describe('searchByName', () => {
 		const mockSearchResponse: LocationSearchResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },

@@ -3,10 +3,25 @@ import palette from './palette';
 
 export const lightTheme: AppTheme = {
 	colors: {
+		preview: {
+			selectedBg: palette.colors.teal[50],
+			selectedText: palette.colors.teal[900],
+			selectedBorder: palette.colors.brand[600],
+			successBg: palette.colors.success[50],
+			warningBg: palette.colors.warning[50],
+			errorBg: palette.colors.error[50],
+			eventBg: palette.colors.indigo[50],
+			eventText: palette.colors.indigo[900],
+		},
 		plain: palette.colors.white,
 		backdrop: {
 			default: 'rgba(0, 0, 0, 0.5)',
 			glass: '#f0f0f0a7',
+		},
+		avatar: {
+			background: palette.colors.gray[200],
+			border: palette.colors.gray[400],
+			text: palette.colors.gray[900],
 		},
 		// Text colors
 		text: {
@@ -15,6 +30,8 @@ export const lightTheme: AppTheme = {
 			muted: palette.colors.gray[500],
 			inverse: palette.colors.white,
 			error: palette.colors.error[600],
+			success: palette.colors.success[700],
+			warning: palette.colors.warning[700],
 		},
 		// Background colors
 		background: {
@@ -58,6 +75,14 @@ export const lightTheme: AppTheme = {
 			bgChecked: palette.colors.brand[400],
 			circle: palette.colors.white,
 			circleChecked: palette.colors.white,
+		},
+		// Tabs colors
+		tabs: {
+			border: palette.colors.gray[200],
+			bg: palette.colors.white,
+			indicator: palette.colors.gray[100],
+			text: palette.colors.gray[500],
+			textActive: palette.colors.gray[900],
 		},
 		// Radio Colors
 		radio: {
@@ -115,6 +140,39 @@ export const lightTheme: AppTheme = {
 			borderHover: palette.colors.gray[300],
 			focusRing: palette.colors.gray[200],
 			gradientNeutral: palette.colors.gray[300],
+		},
+		// Empty state colors
+		emptyState: {
+			icon: palette.colors.gray[400],
+			text: palette.colors.gray[500],
+		},
+		// Pagination colors
+		pagination: {
+			bg: palette.colors.white,
+			bgHover: palette.colors.gray[100],
+			bgActive: palette.colors.brand[500],
+			border: palette.colors.gray[200],
+			borderActive: palette.colors.brand[500],
+			text: palette.colors.gray[600],
+			textActive: palette.colors.white,
+			textDisabled: palette.colors.gray[300],
+			ellipsis: palette.colors.gray[400],
+		},
+		// Skeleton colors
+		skeleton: {
+			base: palette.colors.gray[200],
+			highlight: palette.colors.gray[50],
+		},
+		// Tag input colors
+		tagInput: {
+			chipBg: palette.colors.gray[100],
+			chipBorder: palette.colors.gray[200],
+			chipText: palette.colors.gray[700],
+			remove: palette.colors.gray[500],
+			removeHover: palette.colors.gray[900],
+			addBg: palette.colors.brand[500],
+			addBgHover: palette.colors.brand[600],
+			addText: palette.colors.white,
 		},
 		// hues
 		brand: palette.colors.brand,

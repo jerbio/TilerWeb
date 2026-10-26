@@ -1,15 +1,26 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Search, X, HelpCircle, Play, Check, Trash2, Pencil } from 'lucide-react';
+﻿import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Search, X } from 'lucide-react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { scheduleService } from '@/services';
 import useAppStore from '@/global_state';
-import { CalendarEvent } from '@/core/common/types/schedule';
+import {
+	CalendarEvent,
+	CalendarSearchItem,
+	CalendarSearchSource,
+	CalendarSearchSourceStatus,
+} from '@/core/common/types/schedule';
+import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import { useCalendarUI } from '@/core/common/components/calendar/calendar-ui.provider';
-import { useTheme } from '@/core/theme/ThemeProvider';
+import { useOptionalCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
+import {
+	CalendarEntityType,
+	CalendarRequestType,
+} from '@/core/common/components/calendar/calendarRequestContext';
+import { Actions } from '@/core/constants/enums';
+import { getCalendarEventId } from '@/core/util/entityResolution';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
-import colorUtil from '@/core/util/colors';
-import TimeUtil from '@/core/util/time';
+import { SearchResults } from './search_results';
 
 export type SearchBarProps = {
 	/** Called with search results when a search completes */
@@ -20,22 +31,64 @@ export type SearchBarProps = {
 	debounceMs?: number;
 	/** Number of results per page (default: 10) */
 	pageSize?: number;
+	/** Optional UTC epoch-millisecond overlap window; supply both bounds. */
+	start?: number;
+	end?: number;
 };
+
+/** Map a multi-source search item to the shape the edit path / onResults expect. */
+const searchItemToCalendarEvent = (item: CalendarSearchItem): CalendarEvent => ({
+	id: item.id,
+	start: item.start,
+	end: item.end,
+	name: item.name,
+	address: null,
+	addressDescription: null,
+	searchdDescription: null,
+	splitCount: null,
+	completeCount: null,
+	deletionCount: null,
+	// Forward third-party routing metadata so the edit path can dispatch to the
+	// correct provider (S4-6).
+	thirdpartyType: item.source,
+	thirdPartyId: item.thirdPartyEventId ?? null,
+	thirdPartyUserId: item.thirdPartyUserId ?? null,
+	colorOpacity: null,
+	colorRed: null,
+	colorGreen: null,
+	colorBlue: null,
+	isComplete: null,
+	isEnabled: null,
+	isRecurring: null,
+	locationId: null,
+	isReadOnly: item.isReadOnly ?? null,
+	isProcrastinateEvent: null,
+	isRigid: null,
+	uiConfig: null,
+	repetition: null,
+	eachTileDuration: null,
+	restrictionProfile: null,
+	emojis: null,
+	isWhatIf: null,
+	entityName: null,
+	blob: null,
+	subEvents: null,
+});
 
 const SearchBar: React.FC<SearchBarProps> = ({
 	onResults,
 	onSearch,
 	debounceMs = 300,
 	pageSize = 10,
+	start,
+	end,
 }) => {
 	const { t } = useTranslation();
-	const { isDarkMode } = useTheme();
 	const [query, setQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-	const [results, setResults] = useState<CalendarEvent[]>([]);
 	const [hasSearched, setHasSearched] = useState(false);
 	const [showDropdown, setShowDropdown] = useState(false);
-	const [currentPage, setCurrentPage] = useState(0);
+	const [nextIndex, setNextIndex] = useState<number | null>(null);
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [actionLoading, setActionLoading] = useState<Record<string, string>>({});
@@ -43,106 +96,246 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		eventId: string;
 		action: 'complete' | 'delete';
 	} | null>(null);
+	/** Multi-source row that triggered a pending delete, if any (third-party routing). */
+	const [confirmingItem, setConfirmingItem] = useState<CalendarSearchItem | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const searchSeqRef = useRef(0);
+	const invalidateSearch = useCallback(() => {
+		searchSeqRef.current++;
+	}, []);
+	const loadingMoreRef = useRef(false);
+	const [msItems, setMsItems] = useState<CalendarSearchItem[]>([]);
+	const [msSources, setMsSources] = useState<CalendarSearchSourceStatus[]>([]);
+	const [searchUnavailable, setSearchUnavailable] = useState<Error | null>(null);
+	const [correlationId, setCorrelationId] = useState<string | null>(null);
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
 	const openCreateSelection = useCalendarUI((state) => state.createSelection.actions.open);
 	const openEditTile = useCalendarUI((state) => state.editTile.actions.open);
+	const dispatchCalendarRequest = useOptionalCalendarDispatch();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
 
 	const performSearch = useCallback(
-		async (searchQuery: string) => {
+		async (searchQuery: string, index = 0, append = false) => {
+			const token = ++searchSeqRef.current;
 			if (!searchQuery.trim() || !authenticatedUser) {
-				setResults([]);
+				setMsItems([]);
+				setMsSources([]);
+				setSearchUnavailable(null);
 				setHasSearched(false);
 				setShowDropdown(false);
-				setCurrentPage(0);
+				setIsLoading(false);
+				setIsLoadingMore(false);
 				setHasMore(false);
+				setNextIndex(null);
+				loadingMoreRef.current = false;
 				onResults?.([]);
 				return;
 			}
-
-			setIsLoading(true);
-			try {
-				const searchResults = await scheduleService.searchCalendarEventsByName(
-					searchQuery,
-					authenticatedUser.username,
-					authenticatedUser.id,
-					{ batchSize: pageSize, index: 0 }
-				);
-				setResults(searchResults);
-				setHasSearched(true);
-				setShowDropdown(true);
-				setCurrentPage(0);
-				setHasMore(searchResults.length >= pageSize);
-				onResults?.(searchResults);
-			} catch (error) {
-				console.error('Search failed:', error);
-				setResults([]);
-				setHasSearched(true);
-				setShowDropdown(true);
-				setCurrentPage(0);
+			if (append) {
+				loadingMoreRef.current = true;
+				setIsLoadingMore(true);
+			} else {
+				setIsLoading(true);
+				setIsLoadingMore(false);
+				loadingMoreRef.current = false;
+				setMsItems([]);
+				setMsSources([]);
 				setHasMore(false);
-				onResults?.([]);
+				setNextIndex(null);
+				setHasSearched(false);
+				setShowDropdown(false);
+			}
+			setSearchUnavailable(null);
+			try {
+				const envelope = await scheduleService.searchCalendarEventsMultiSource(
+					searchQuery,
+					undefined,
+					{ batchSize: pageSize, index, start, end }
+				);
+				if (token !== searchSeqRef.current) return;
+				const combined = append ? [...msItems, ...envelope.items] : envelope.items;
+				const seen = new Set<string>();
+				const items = combined.filter((item) => {
+					const key = JSON.stringify([
+						item.source,
+						item.thirdPartyUserId,
+						item.thirdPartyEventId ?? item.id,
+						item.start,
+					]);
+					if (seen.has(key)) return false;
+					seen.add(key);
+					return true;
+				});
+				setCorrelationId(envelope.correlationId);
+				setMsItems(items);
+				setMsSources(envelope.sources);
+				setHasMore(envelope.hasMore === true && envelope.nextIndex != null);
+				setNextIndex(envelope.nextIndex ?? null);
+				setHasSearched(true);
+				setShowDropdown(true);
+				onResults?.(items.map(searchItemToCalendarEvent));
+			} catch (error) {
+				if (token !== searchSeqRef.current) return;
+				if (error instanceof CalendarSearchUnavailableError) {
+					setCorrelationId(error.correlationId);
+					setSearchUnavailable(error);
+				} else {
+					console.error('Calendar search failed:', error);
+					setSearchUnavailable(new Error(t('timeline.multiSource.unavailable')));
+				}
+				if (!append) {
+					setMsItems([]);
+					setMsSources([]);
+					onResults?.([]);
+				}
+				setHasSearched(true);
+				setShowDropdown(true);
 			} finally {
-				setIsLoading(false);
+				if (token === searchSeqRef.current) {
+					setIsLoading(false);
+					setIsLoadingMore(false);
+					loadingMoreRef.current = false;
+				}
 			}
 		},
-		[authenticatedUser, onResults, pageSize]
+		[authenticatedUser, onResults, pageSize, start, end, msItems, t]
 	);
 
-	const loadMore = useCallback(async () => {
-		if (!query.trim() || !authenticatedUser || isLoadingMore) return;
-
-		const nextPage = currentPage + 1;
-		setIsLoadingMore(true);
-		try {
-			const moreResults = await scheduleService.searchCalendarEventsByName(
-				query,
-				authenticatedUser.username,
-				authenticatedUser.id,
-				{ batchSize: pageSize, index: nextPage * pageSize }
-			);
-			setResults((prev) => [...prev, ...moreResults]);
-			setCurrentPage(nextPage);
-			setHasMore(moreResults.length >= pageSize);
-			onResults?.([...results, ...moreResults]);
-		} catch (error) {
-			console.error('Load more failed:', error);
-		} finally {
+	/**
+	 * Open the edit path from a multi-source result and emit
+	 * `calendar_search_edit_opened` (S4-6).
+	 *
+	 * - Tiler rows open the classic edit panel (`openEditTile`) with the row
+	 *   mapped to the `CalendarEvent` shape.
+	 * - Third-party rows (google / microsoft) dispatch a `FocusEvent` calendar
+	 *   request carrying the provider routing metadata; the calendar handler
+	 *   navigates to the tile and hands `CalendarEventInfo` the metadata it
+	 *   needs to dispatch edits to the correct provider.
+	 */
+	const handleMultiSourceEdit = useCallback(
+		(item: CalendarSearchItem) => {
+			if (item.source === CalendarSearchSource.Tiler) {
+				openEditTile(searchItemToCalendarEvent(item));
+			} else if (dispatchCalendarRequest) {
+				dispatchCalendarRequest({
+					type: CalendarRequestType.FocusEvent,
+					entityId: item.id,
+					entityType: CalendarEntityType.SubcalendarEvent,
+					actionType: Actions.None,
+					startHint: item.start,
+					thirdPartyType: item.source,
+					thirdPartyId: item.thirdPartyEventId ?? undefined,
+					thirdPartyUserId: item.thirdPartyUserId ?? undefined,
+				});
+			} else {
+				// No calendar bus (isolated mount) — degrade to the classic
+				// edit panel, which still receives the third-party fields.
+				openEditTile(searchItemToCalendarEvent(item));
+			}
+			invalidateSearch();
+			loadingMoreRef.current = false;
+			setIsLoading(false);
 			setIsLoadingMore(false);
-		}
-	}, [query, authenticatedUser, currentPage, isLoadingMore, pageSize, onResults, results]);
+			setShowDropdown(false);
+			if (typeof window !== 'undefined') {
+				window.dispatchEvent(
+					new CustomEvent('calendar_search_edit_opened', {
+						detail: {
+							correlationId,
+							source: item.source,
+							capabilities: item.capabilities,
+						},
+					})
+				);
+			}
+		},
+		[dispatchCalendarRequest, openEditTile, correlationId, invalidateSearch]
+	);
+
+	const loadMore = useCallback(() => {
+		if (
+			!query.trim() ||
+			!authenticatedUser ||
+			isLoading ||
+			loadingMoreRef.current ||
+			!hasMore ||
+			nextIndex == null
+		)
+			return;
+		void performSearch(query, nextIndex, true);
+	}, [query, authenticatedUser, isLoading, hasMore, nextIndex, performSearch]);
+
+	const resetSearch = useCallback(() => {
+		invalidateSearch();
+		loadingMoreRef.current = false;
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		setQuery('');
+		setMsItems([]);
+		setMsSources([]);
+		setSearchUnavailable(null);
+		setCorrelationId(null);
+		setHasSearched(false);
+		setShowDropdown(false);
+		setNextIndex(null);
+		setHasMore(false);
+		setIsLoading(false);
+		setIsLoadingMore(false);
+		onSearch?.('');
+		onResults?.([]);
+	}, [onSearch, onResults, invalidateSearch]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
+		// Invalidate immediately, including the debounce interval and whitespace queries.
+		invalidateSearch();
+		loadingMoreRef.current = false;
+		setIsLoading(false);
+		setIsLoadingMore(false);
+		setHasMore(false);
+		setNextIndex(null);
+		setShowDropdown(false);
+		setConfirmingAction(null);
+		setConfirmingItem(null);
 		setQuery(value);
 		onSearch?.(value);
-
-		// Debounce the API search
-		if (debounceRef.current) {
-			clearTimeout(debounceRef.current);
-		}
-		debounceRef.current = setTimeout(() => {
-			performSearch(value);
-		}, debounceMs);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => void performSearch(value), debounceMs);
 	};
 
 	const handleClear = () => {
-		setQuery('');
-		setResults([]);
-		setHasSearched(false);
-		setShowDropdown(false);
-		setCurrentPage(0);
-		setHasMore(false);
+		resetSearch();
 		setActionLoading({});
 		setConfirmingAction(null);
-		onSearch?.('');
-		onResults?.([]);
-		if (debounceRef.current) {
-			clearTimeout(debounceRef.current);
-		}
+		setConfirmingItem(null);
 	};
+
+	// A new timeline, user or page size restarts the current query at the first batch.
+	// Keep the query/callback in refs so result updates never resubmit a search.
+	const queryRef = useRef(query);
+	queryRef.current = query;
+	const performSearchRef = useRef(performSearch);
+	performSearchRef.current = performSearch;
+	useEffect(() => {
+		invalidateSearch();
+		loadingMoreRef.current = false;
+		setIsLoading(false);
+		setIsLoadingMore(false);
+		setHasMore(false);
+		setNextIndex(null);
+		setShowDropdown(false);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		if (queryRef.current.trim()) {
+			debounceRef.current = setTimeout(
+				() => void performSearchRef.current(queryRef.current),
+				debounceMs
+			);
+		}
+		return () => {
+			invalidateSearch();
+			if (debounceRef.current) clearTimeout(debounceRef.current);
+		};
+	}, [start, end, pageSize, authenticatedUser?.id, debounceMs, invalidateSearch]);
 
 	const handleDismissNotFound = () => {
 		setShowDropdown(false);
@@ -159,15 +352,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			setActionLoading((prev) => ({ ...prev, [eventId]: 'now' }));
 			const notifId = notificationId(NotificationAction.SetAsNow, eventId);
 			showNotification(notifId, t('calendarEvent.notifications.settingAsNow'), 'loading');
-			// Dismiss search bar immediately — don't wait for the request
-			setQuery('');
-			setResults([]);
-			setHasSearched(false);
-			setShowDropdown(false);
-			setCurrentPage(0);
-			setHasMore(false);
-			onSearch?.('');
-			onResults?.([]);
+			// Dismiss search bar immediately â€” don't wait for the request
+			resetSearch();
 			try {
 				await scheduleService.setCalendarEventAsNow(eventId);
 				updateNotification(
@@ -186,21 +372,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				});
 			}
 		},
-		[showNotification, updateNotification, t, onSearch, onResults]
+		[showNotification, updateNotification, t, resetSearch]
 	);
 
 	const handleMarkComplete = useCallback((eventId: string) => {
 		setConfirmingAction({ eventId, action: 'complete' });
 	}, []);
 
-	const handleDelete = useCallback((eventId: string) => {
+	const handleDelete = useCallback((eventId: string, item?: CalendarSearchItem) => {
 		setConfirmingAction({ eventId, action: 'delete' });
+		// Remember the multi-source row (if any) so the confirmed delete
+		// can route third-party events through `DELETE /api/Schedule/Event`.
+		setConfirmingItem(item ?? null);
 	}, []);
 
 	const handleConfirmAction = useCallback(async () => {
 		if (!confirmingAction) return;
 		const { eventId, action } = confirmingAction;
+		const confirmItem = confirmingItem;
 		setConfirmingAction(null);
+		setConfirmingItem(null);
 		setActionLoading((prev) => ({ ...prev, [eventId]: action }));
 		const notifAction =
 			action === 'complete' ? NotificationAction.Complete : NotificationAction.Delete;
@@ -214,18 +405,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				? t('calendarEvent.notifications.completeSuccess')
 				: t('calendarEvent.notifications.deleteSuccess');
 		showNotification(notifId, loadingMsg, 'loading');
-		// Dismiss search bar immediately — don't wait for the request
-		setQuery('');
-		setResults([]);
-		setHasSearched(false);
-		setShowDropdown(false);
-		setCurrentPage(0);
-		setHasMore(false);
-		onSearch?.('');
-		onResults?.([]);
+		// Dismiss search bar immediately â€” don't wait for the request
+		resetSearch();
 		try {
 			if (action === 'complete') {
 				await scheduleService.markCalendarEventComplete(eventId);
+			} else if (confirmItem && confirmItem.source !== CalendarSearchSource.Tiler) {
+				// Third-party rows delete through the schedule service so the
+				// provider event is removed from its source system.
+				await scheduleService.deleteScheduleEvent(
+					getCalendarEventId(confirmItem.id),
+					confirmItem.source,
+					confirmItem.thirdPartyEventId ?? '',
+					confirmItem.thirdPartyUserId ?? ''
+				);
 			} else {
 				await scheduleService.deleteCalendarEvent(eventId);
 			}
@@ -240,10 +433,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 				return next;
 			});
 		}
-	}, [confirmingAction, showNotification, updateNotification, t, onSearch, onResults]);
+	}, [confirmingAction, confirmingItem, showNotification, updateNotification, t, resetSearch]);
 
 	const handleCancelConfirm = useCallback(() => {
 		setConfirmingAction(null);
+		setConfirmingItem(null);
 	}, []);
 
 	// Click-outside handler to dismiss dropdown
@@ -261,10 +455,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [showDropdown]);
 
-	const showResults = showDropdown && hasSearched && results.length > 0;
-	const showNotFound = showDropdown && hasSearched && results.length === 0;
 	const isAnyActionInProgress = Object.keys(actionLoading).length > 0;
 	const isInteractionBlocked = isAnyActionInProgress || !!confirmingAction;
+	const hasPartialFailure = msSources.some(
+		(s) => s.status === 'partial' || s.status === 'failed'
+	);
+	const showResults = showDropdown && hasSearched && (msItems.length > 0 || hasPartialFailure);
+	const showUnavailable = showDropdown && !!searchUnavailable;
+	const showNotFound =
+		showDropdown &&
+		hasSearched &&
+		msItems.length === 0 &&
+		!searchUnavailable &&
+		!hasPartialFailure;
 
 	return (
 		<SearchContainer ref={containerRef}>
@@ -289,150 +492,29 @@ const SearchBar: React.FC<SearchBarProps> = ({
 			)}
 			{isLoading && <LoadingIndicator data-testid="search-loading" />}
 
-			{showResults && (
-				<ResultsDropdown data-testid="search-results-dropdown">
-					{results.map((event) => {
-						const rgb = {
-							r: event.colorRed ?? 0,
-							g: event.colorGreen ?? 0,
-							b: event.colorBlue ?? 0,
-						};
-						const adjusted = isDarkMode ? colorUtil.setLightness(rgb, 0.6) : rgb;
-						const eventId = event.id ?? '';
-						const itemAction = actionLoading[eventId];
-						const isConfirming = confirmingAction?.eventId === eventId;
-						return (
-							<ResultItem key={event.id} data-testid="search-result-item">
-								<ColorDot
-									data-testid="result-color-dot"
-									$r={adjusted.r}
-									$g={adjusted.g}
-									$b={adjusted.b}
-									$isBlock={!!event.isRigid}
-								/>
-								<ResultName>{event.name}</ResultName>
-								<ResultTime>{TimeUtil.relativeTime(event.start ?? 0)}</ResultTime>
-								{isConfirming ? (
-									<ConfirmInline data-testid="confirm-inline">
-										<ConfirmText>
-											{confirmingAction.action === 'complete'
-												? t('timeline.confirmCompleteTitle')
-												: t('timeline.confirmDeleteTitle')}
-										</ConfirmText>
-										<ConfirmButton
-											data-testid="confirm-yes"
-											onClick={(e) => {
-												e.stopPropagation();
-												handleConfirmAction();
-											}}
-											$danger={confirmingAction.action === 'delete'}
-											$success={confirmingAction.action === 'complete'}
-										>
-											{t('timeline.confirmAction')}
-										</ConfirmButton>
-										<ConfirmButton
-											data-testid="confirm-cancel"
-											onClick={(e) => {
-												e.stopPropagation();
-												handleCancelConfirm();
-											}}
-										>
-											{t('timeline.cancelAction')}
-										</ConfirmButton>
-									</ConfirmInline>
-								) : (
-									<ResultActions data-testid="result-actions">
-										<ActionButton
-											data-testid="action-edit"
-											title={t('timeline.editEvent')}
-											onClick={(e) => {
-												e.stopPropagation();
-												openEditTile(event);
-												setShowDropdown(false);
-											}}
-											disabled={isInteractionBlocked}
-										>
-											<Pencil size={12} />
-										</ActionButton>
-										<ActionButton
-											data-testid="action-set-as-now"
-											title={t('timeline.setAsNow')}
-											onClick={(e) => {
-												e.stopPropagation();
-												handleSetAsNow(eventId);
-											}}
-											disabled={isInteractionBlocked}
-										>
-											{itemAction === 'now' ? (
-												<ActionSpinner />
-											) : (
-												<Play size={12} />
-											)}
-										</ActionButton>
-										<ActionButton
-											data-testid="action-mark-complete"
-											title={t('timeline.markComplete')}
-											onClick={(e) => {
-												e.stopPropagation();
-												handleMarkComplete(eventId);
-											}}
-											disabled={isInteractionBlocked}
-										>
-											{itemAction === 'complete' ? (
-												<ActionSpinner />
-											) : (
-												<Check size={12} />
-											)}
-										</ActionButton>
-										<ActionButton
-											data-testid="action-delete"
-											title={t('timeline.markDeleted')}
-											onClick={(e) => {
-												e.stopPropagation();
-												handleDelete(eventId);
-											}}
-											disabled={isInteractionBlocked}
-											$danger
-										>
-											{itemAction === 'delete' ? (
-												<ActionSpinner />
-											) : (
-												<Trash2 size={12} />
-											)}
-										</ActionButton>
-									</ResultActions>
-								)}
-							</ResultItem>
-						);
-					})}
-					{hasMore && (
-						<LoadMoreButton
-							data-testid="load-more-button"
-							onClick={loadMore}
-							disabled={isLoadingMore || isInteractionBlocked}
-						>
-							{isLoadingMore ? t('timeline.loading') : t('timeline.loadMore')}
-						</LoadMoreButton>
-					)}
-				</ResultsDropdown>
-			)}
-
-			{showNotFound && (
-				<NotFoundPrompt data-testid="search-not-found">
-					<NotFoundIcon>
-						<HelpCircle size={24} />
-					</NotFoundIcon>
-					<NotFoundText>{t('timeline.notFoundMessage', { query })}</NotFoundText>
-					<NotFoundActions>
-						<DismissButton onClick={handleDismissNotFound}>
-							{t('timeline.notFoundDismiss')}
-						</DismissButton>
-						<CreateButton onClick={handleCreate}>
-							{t('timeline.notFoundCreate')}
-						</CreateButton>
-					</NotFoundActions>
-				</NotFoundPrompt>
-			)}
+			<SearchResults
+				query={query}
+				showResults={showResults}
+				showNotFound={showNotFound}
+				hasMore={hasMore}
+				isLoadingMore={isLoadingMore}
+				confirmingAction={confirmingAction}
+				isInteractionBlocked={isInteractionBlocked}
+				onSetAsNow={handleSetAsNow}
+				onMarkComplete={handleMarkComplete}
+				onDelete={handleDelete}
+				onConfirmAction={handleConfirmAction}
+				onCancelConfirm={handleCancelConfirm}
+				onLoadMore={loadMore}
+				showUnavailable={showUnavailable}
+				msItems={msItems}
+				msSources={msSources}
+				searchUnavailable={searchUnavailable}
+				onMultiSourceEdit={handleMultiSourceEdit}
+				onRetrySearch={() => performSearch(query)}
+				onDismissNotFound={handleDismissNotFound}
+				onCreate={handleCreate}
+			/>
 		</SearchContainer>
 	);
 };
@@ -509,239 +591,6 @@ const LoadingIndicator = styled.div`
 		to {
 			transform: rotate(360deg);
 		}
-	}
-`;
-
-const ResultsDropdown = styled.div`
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	margin-top: 4px;
-	background: ${({ theme }) => theme.colors.background.card};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	z-index: 50;
-	max-height: 300px;
-	overflow-y: auto;
-`;
-
-const ResultItem = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 10px 12px;
-	cursor: pointer;
-	color: ${({ theme }) => theme.colors.text.primary};
-	transition: background 0.1s ease;
-
-	&:hover {
-		background: ${({ theme }) => theme.colors.background.card2};
-	}
-
-	&:not(:last-child) {
-		border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle};
-	}
-`;
-
-const ColorDot = styled.span<{ $r: number; $g: number; $b: number; $isBlock: boolean }>`
-	width: 10px;
-	height: 10px;
-	border-radius: ${({ $isBlock }) => ($isBlock ? '3px' : '50%')};
-	flex-shrink: 0;
-	background-color: ${({ $r, $g, $b }) => `rgb(${$r}, ${$g}, ${$b})`};
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
-`;
-
-const ResultName = styled.span`
-	flex: 1;
-	font-size: 14px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-`;
-
-const ResultTime = styled.span`
-	font-size: 12px;
-	color: ${({ theme }) => theme.colors.text.muted};
-	white-space: nowrap;
-`;
-
-const ResultActions = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 2px;
-	flex-shrink: 0;
-`;
-
-const ActionButton = styled.button<{ $danger?: boolean }>`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 24px;
-	height: 24px;
-	border: none;
-	border-radius: 4px;
-	background: transparent;
-	color: ${({ theme, $danger }) => ($danger ? theme.colors.text.muted : theme.colors.text.muted)};
-	cursor: pointer;
-	padding: 0;
-	transition:
-		background 0.1s ease,
-		color 0.1s ease;
-
-	&:hover:not(:disabled) {
-		background: ${({ theme, $danger }) =>
-			$danger ? 'rgba(220, 38, 38, 0.1)' : theme.colors.background.card2};
-		color: ${({ $danger, theme }) => ($danger ? '#dc2626' : theme.colors.text.primary)};
-	}
-
-	&:disabled {
-		cursor: default;
-		opacity: 0.5;
-	}
-`;
-
-const ActionSpinner = styled.div`
-	width: 10px;
-	height: 10px;
-	border: 1.5px solid ${({ theme }) => theme.colors.border.default};
-	border-top-color: ${({ theme }) => theme.colors.text.secondary};
-	border-radius: 50%;
-	animation: action-spin 0.6s linear infinite;
-
-	@keyframes action-spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-`;
-
-const ConfirmInline = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	flex-shrink: 0;
-`;
-
-const ConfirmText = styled.span`
-	font-size: 11px;
-	color: ${({ theme }) => theme.colors.text.muted};
-	white-space: nowrap;
-`;
-
-const ConfirmButton = styled.button<{ $danger?: boolean; $success?: boolean }>`
-	padding: 2px 8px;
-	border: 1px solid
-		${({ theme, $danger, $success }) =>
-			$danger
-				? 'rgba(220, 38, 38, 0.4)'
-				: $success
-					? 'rgba(18, 183, 106, 0.4)'
-					: theme.colors.border.default};
-	border-radius: 4px;
-	background: ${({ $danger, $success }) =>
-		$danger ? 'rgba(220, 38, 38, 0.1)' : $success ? 'rgba(18, 183, 106, 0.1)' : 'transparent'};
-	color: ${({ theme, $danger, $success }) =>
-		$danger ? '#dc2626' : $success ? '#12b76a' : theme.colors.text.secondary};
-	font-size: 11px;
-	cursor: pointer;
-	white-space: nowrap;
-	transition: background 0.1s ease;
-
-	&:hover {
-		background: ${({ theme, $danger, $success }) =>
-			$danger
-				? 'rgba(220, 38, 38, 0.2)'
-				: $success
-					? 'rgba(18, 183, 106, 0.2)'
-					: theme.colors.background.card2};
-	}
-`;
-
-const LoadMoreButton = styled.button`
-	display: block;
-	width: 100%;
-	padding: 10px 12px;
-	border: none;
-	border-top: 1px solid ${({ theme }) => theme.colors.border.subtle};
-	background: transparent;
-	color: ${({ theme }) => theme.colors.text.secondary};
-	font-size: 13px;
-	cursor: pointer;
-	text-align: center;
-
-	&:hover {
-		background: ${({ theme }) => theme.colors.background.card2};
-	}
-
-	&:disabled {
-		cursor: default;
-		opacity: 0.6;
-	}
-`;
-
-const NotFoundPrompt = styled.div`
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	margin-top: 4px;
-	padding: 16px;
-	background: ${({ theme }) => theme.colors.background.card};
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	z-index: 50;
-	text-align: center;
-`;
-
-const NotFoundIcon = styled.div`
-	display: flex;
-	justify-content: center;
-	margin-bottom: 8px;
-	color: ${({ theme }) => theme.colors.text.muted};
-`;
-
-const NotFoundText = styled.p`
-	font-size: 14px;
-	color: ${({ theme }) => theme.colors.text.primary};
-	margin: 0 0 12px;
-	line-height: 1.4;
-`;
-
-const NotFoundActions = styled.div`
-	display: flex;
-	justify-content: center;
-	gap: 8px;
-`;
-
-const DismissButton = styled.button`
-	padding: 6px 16px;
-	border: 1px solid ${({ theme }) => theme.colors.border.default};
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background: transparent;
-	color: ${({ theme }) => theme.colors.text.secondary};
-	font-size: 13px;
-	cursor: pointer;
-
-	&:hover {
-		background: ${({ theme }) => theme.colors.background.card2};
-	}
-`;
-
-const CreateButton = styled.button`
-	padding: 6px 16px;
-	border: none;
-	border-radius: ${({ theme }) => theme.borderRadius.medium};
-	background: ${({ theme }) => theme.colors.text.primary};
-	color: ${({ theme }) => theme.colors.background.card};
-	font-size: 13px;
-	cursor: pointer;
-
-	&:hover {
-		opacity: 0.9;
 	}
 `;
 

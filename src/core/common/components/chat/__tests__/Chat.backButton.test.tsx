@@ -71,11 +71,15 @@ vi.mock('@/services', () => ({
 		sendMessage: vi.fn(),
 		sendChatAcceptChanges: vi.fn(),
 		getVibeRequest: vi.fn().mockResolvedValue(null),
+		getAutoSuggestions: vi.fn().mockResolvedValue({ suggestions: {}, isStale: false }),
+		refreshAutoSuggestions: vi.fn().mockResolvedValue({ suggestions: {}, isStale: false }),
 	},
 }));
 
 vi.mock('@/services/locationService', () => ({
 	locationService: {
+		hasSelectionDecision: vi.fn().mockReturnValue(true),
+		openPicker: vi.fn(),
 		getCurrentLocation: vi.fn().mockResolvedValue({}),
 		toApiFormat: vi.fn().mockReturnValue({
 			userLongitude: 0,
@@ -130,9 +134,6 @@ vi.mock('@/core/common/components/email-confirmation/EmailConfirmationModal', ()
 vi.mock('@/core/common/components/chat/prompt-suggestions/PromptSuggestions', () => ({
 	default: () => null,
 }));
-vi.mock('@/core/common/components/chat/user_location', () => ({
-	default: () => null,
-}));
 vi.mock('@/core/common/components/loading-indicator', () => ({
 	default: ({ message }: { message: string }) => <div>{message}</div>,
 }));
@@ -148,10 +149,15 @@ vi.mock('@/core/common/components/chat/MarkdownRenderer', () => ({
 // ---------------------------------------------------------------------------
 
 import Chat from '../chat';
+import { CalendarRequestProvider } from '../../calendar/CalendarRequestProvider';
 
 function renderChat(props: React.ComponentProps<typeof Chat> = {}) {
 	return render(<Chat {...props} />, {
-		wrapper: ({ children }) => <ThemeProvider>{children}</ThemeProvider>,
+		wrapper: ({ children }) => (
+			<ThemeProvider>
+				<CalendarRequestProvider>{children}</CalendarRequestProvider>
+			</ThemeProvider>
+		),
 	});
 }
 

@@ -13,6 +13,7 @@ type SuccessModalProps = {
 	setShow: (show: boolean) => void;
 	children?: React.ReactNode;
 	closeTimeout?: number;
+	motion?: boolean;
 	actions?: Array<{ text: string; onClick: () => void; disabled?: boolean }>;
 };
 
@@ -22,6 +23,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
 	children,
 	actions,
 	closeTimeout,
+	motion,
 }) => {
 	const { t } = useTranslation();
 	const { isDarkMode } = useTheme();
@@ -29,6 +31,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
 
 	return createPortal(
 		<Modal
+			motion={motion}
 			show={show}
 			setShow={setShow}
 			headerStyle={{ border: 'none' }}

@@ -46,6 +46,21 @@ const uiToApiTransportMap: Record<TransportModeUI, TransportModeAPI> = {
 	[TransportModeUI.Bus]: TransportModeAPI.Transit,
 };
 
+const MIN_INTENSITY_PERCENTAGE = 15;
+const MAX_INTENSITY_PERCENTAGE = 95;
+const DEFAULT_INTENSITY_PERCENTAGE = 50;
+
+const intensityRateToPercentage = (intensityRate: number) => {
+	if (!Number.isFinite(intensityRate)) {
+		return DEFAULT_INTENSITY_PERCENTAGE;
+	}
+
+	return Math.min(
+		MAX_INTENSITY_PERCENTAGE,
+		Math.max(MIN_INTENSITY_PERCENTAGE, Math.round(intensityRate * 100))
+	);
+};
+
 const PreferencesSettings: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useAuthNavigate();
@@ -61,6 +76,10 @@ const PreferencesSettings: React.FC = () => {
 	const [bedTimeEnd, setBedTimeEnd] = useState('');
 	const [originalBedTimeStart, setOriginalBedTimeStart] = useState('');
 	const [originalBedTimeEnd, setOriginalBedTimeEnd] = useState('');
+	const [intensityPercentage, setIntensityPercentage] = useState(DEFAULT_INTENSITY_PERCENTAGE);
+	const [originalIntensityPercentage, setOriginalIntensityPercentage] = useState(
+		DEFAULT_INTENSITY_PERCENTAGE
+	);
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
@@ -107,6 +126,10 @@ const PreferencesSettings: React.FC = () => {
 				setBedTimeEnd(endTime);
 				setOriginalBedTimeStart(startTime);
 				setOriginalBedTimeEnd(endTime);
+
+				const intensity = intensityRateToPercentage(sp.intensityRate);
+				setIntensityPercentage(intensity);
+				setOriginalIntensityPercentage(intensity);
 
 				// Work hours restriction
 				const workSched = restrictionProfileToSchedule(
@@ -185,6 +208,10 @@ const PreferencesSettings: React.FC = () => {
 			changedScheduleProfile.TravelMedium = uiToApiTransportMap[transportMode];
 		}
 
+		if (intensityPercentage !== originalIntensityPercentage) {
+			changedScheduleProfile.IntensityRate = intensityPercentage / 100;
+		}
+
 		// Check if bed time changed
 		const bedTimeChanged =
 			bedTimeStart !== originalBedTimeStart || bedTimeEnd !== originalBedTimeEnd;
@@ -232,6 +259,10 @@ const PreferencesSettings: React.FC = () => {
 				setBedTimeEnd(endTime);
 				setOriginalBedTimeStart(startTime);
 				setOriginalBedTimeEnd(endTime);
+
+				const intensity = intensityRateToPercentage(scheduleProfile.intensityRate);
+				setIntensityPercentage(intensity);
+				setOriginalIntensityPercentage(intensity);
 			}
 
 			// Save restriction profiles if changed
@@ -402,6 +433,54 @@ const PreferencesSettings: React.FC = () => {
 			</Section>
 
 			<Section>
+				<IntensityHeader>
+					<div>
+						<SectionTitleWithDescription>
+							{t('settings.sections.tilePreferences.scheduleFullness')}
+						</SectionTitleWithDescription>
+						<SectionDescription id="schedule-fullness-description">
+							{t('settings.sections.tilePreferences.scheduleFullnessDescription')}
+						</SectionDescription>
+					</div>
+					<IntensityValue aria-live="polite">{intensityPercentage}%</IntensityValue>
+				</IntensityHeader>
+				<IntensityTrack>
+					<IntensityDeadZone $edge="start" aria-hidden="true" />
+					<IntensitySlider
+						id="schedule-fullness"
+						type="range"
+						min={MIN_INTENSITY_PERCENTAGE}
+						max={MAX_INTENSITY_PERCENTAGE}
+						step={5}
+						value={intensityPercentage}
+						$percentage={intensityPercentage}
+						onChange={(event) => setIntensityPercentage(Number(event.target.value))}
+						disabled={isLoading || isSaving}
+						aria-label={t('settings.sections.tilePreferences.scheduleFullness')}
+						aria-describedby="schedule-fullness-description schedule-fullness-limits"
+						aria-valuetext={t(
+							'settings.sections.tilePreferences.scheduleFullnessValue',
+							{
+								percentage: intensityPercentage,
+							}
+						)}
+					/>
+					<IntensityDeadZone $edge="end" aria-hidden="true" />
+				</IntensityTrack>
+				<IntensityScale aria-hidden="true">
+					<span>{t('settings.sections.tilePreferences.scheduleFullnessLighter')}</span>
+					<span>{t('settings.sections.tilePreferences.scheduleFullnessBalanced')}</span>
+					<span>{t('settings.sections.tilePreferences.scheduleFullnessFuller')}</span>
+				</IntensityScale>
+				<IntensityLimitMessage id="schedule-fullness-limits">
+					{t('settings.sections.tilePreferences.scheduleFullnessLimits', {
+						minimum: MIN_INTENSITY_PERCENTAGE,
+						maximum: MAX_INTENSITY_PERCENTAGE,
+					})}
+				</IntensityLimitMessage>
+			</Section>
+
+			<Section>
 				<SectionTitle>
 					{t('settings.sections.tilePreferences.defineTimeRestrictions')}
 				</SectionTitle>
@@ -531,6 +610,113 @@ const SectionTitle = styled.h3`
 	color: ${({ theme }) => theme.colors.text.primary};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
 	margin: 0 0 1.5rem 0;
+`;
+
+const SectionTitleWithDescription = styled(SectionTitle)`
+	margin-bottom: 0.5rem;
+`;
+
+const SectionDescription = styled.p`
+	max-width: 620px;
+	margin: 0;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const IntensityHeader = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1.5rem;
+	margin-bottom: 1.5rem;
+`;
+
+const IntensityValue = styled.output`
+	min-width: 4rem;
+	text-align: right;
+	font-size: ${({ theme }) => theme.typography.fontSize.lg};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+	color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const IntensityTrack = styled.div`
+	display: grid;
+	grid-template-columns:
+		${MIN_INTENSITY_PERCENTAGE}fr
+		${MAX_INTENSITY_PERCENTAGE - MIN_INTENSITY_PERCENTAGE}fr
+		${100 - MAX_INTENSITY_PERCENTAGE}fr;
+	align-items: center;
+	height: 22px;
+`;
+
+const IntensityDeadZone = styled.div<{ $edge: 'start' | 'end' }>`
+	height: 6px;
+	background: ${({ theme }) => theme.colors.gray[700]};
+	border-radius: ${({ $edge }) => ($edge === 'start' ? '3px 0 0 3px' : '0 3px 3px 0')};
+	opacity: 0.65;
+`;
+
+const IntensitySlider = styled.input<{ $percentage: number }>`
+	width: 100%;
+	height: 6px;
+	margin: 0;
+	appearance: none;
+	border-radius: 3px;
+	background: linear-gradient(
+		to right,
+		${({ theme }) => theme.colors.brand[500]} 0%,
+		${({ theme }) => theme.colors.brand[500]}
+			${({ $percentage }) => (($percentage - 15) / 80) * 100}%,
+		${({ theme }) => theme.colors.gray[600]}
+			${({ $percentage }) => (($percentage - 15) / 80) * 100}%,
+		${({ theme }) => theme.colors.gray[600]} 100%
+	);
+	cursor: pointer;
+
+	&::-webkit-slider-thumb {
+		width: 22px;
+		height: 22px;
+		appearance: none;
+		border: 3px solid ${({ theme }) => theme.colors.brand[500]};
+		border-radius: 50%;
+		background: ${({ theme }) => theme.colors.background.card};
+		cursor: pointer;
+	}
+
+	&::-moz-range-thumb {
+		width: 16px;
+		height: 16px;
+		border: 3px solid ${({ theme }) => theme.colors.brand[500]};
+		border-radius: 50%;
+		background: ${({ theme }) => theme.colors.background.card};
+		cursor: pointer;
+	}
+
+	&:focus-visible {
+		outline: 3px solid ${({ theme }) => theme.colors.brand[300]};
+		outline-offset: 6px;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+`;
+
+const IntensityScale = styled.div`
+	display: flex;
+	justify-content: space-between;
+	margin-right: ${100 - MAX_INTENSITY_PERCENTAGE}%;
+	margin-left: ${MIN_INTENSITY_PERCENTAGE}%;
+	margin-top: 0.75rem;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const IntensityLimitMessage = styled.p`
+	margin: 0.75rem 0 0;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const RadioGroup = styled.div`

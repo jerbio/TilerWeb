@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CalendarEventApi } from '../calendarEventApi';
 import {
 	CalendarEvent,
 	CalendarEventResponse,
-	CalendarEventSearchResponse,
 	CalendarEventUpdateParams,
 	ThirdPartyType,
 } from '@/core/common/types/schedule';
@@ -36,166 +35,131 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
 describe('CalendarEventApi', () => {
 	let api: CalendarEventApi;
+	let _origResolvedOptions: Intl.DateTimeFormat['resolvedOptions'];
 
-	const mockSearchResults: CalendarEventSearchResponse = {
-		Error: { Code: '0', Message: 'SUCCESS' },
-		Content: [
-			{
-				id: '30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0',
-				start: 1769925600000,
-				end: 1770532200000,
-				name: 'work out',
-				address: '',
-				addressDescription: '',
-				searchdDescription: '',
-				splitCount: 4,
-				completeCount: 0,
-				deletionCount: 0,
-				thirdpartyType: ThirdPartyType.Tiler,
-				thirdPartyId: null,
-				thirdPartyUserId: null,
-				colorOpacity: null,
-				colorRed: null,
-				colorGreen: null,
-				colorBlue: null,
-				isComplete: false,
-				isEnabled: true,
-				isRecurring: true,
-				locationId: '7147101b-b226-4bf0-95f5-b9a6959c4689',
-				isReadOnly: false,
-				isProcrastinateEvent: false,
-				isRigid: false,
-				uiConfig: {
-					id: '9dc0da1f-f7f9-42db-aefd-f491352d0c64',
-				} as CalendarEvent['uiConfig'],
-				repetition: null,
-				eachTileDuration: 5400000,
-				restrictionProfile: null,
-				emojis: null,
-				isWhatIf: false,
-				entityName: 'CalendarEvent',
-				blob: { type: 0, note: '', id: 'bb6b9d9e-1a33-4173-93a9-1f64cc7879e9' },
-				subEvents: null,
-			},
-		],
-		ServerStatus: null,
+	const mockCalendarEvent: CalendarEvent = {
+		id: '30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0',
+		start: 1769925600000,
+		end: 1770532200000,
+		name: 'work out',
+		address: '',
+		addressDescription: '',
+		searchdDescription: '',
+		splitCount: 4,
+		completeCount: 0,
+		deletionCount: 0,
+		thirdpartyType: ThirdPartyType.Tiler,
+		thirdPartyId: null,
+		thirdPartyUserId: null,
+		colorOpacity: null,
+		colorRed: null,
+		colorGreen: null,
+		colorBlue: null,
+		isComplete: false,
+		isEnabled: true,
+		isRecurring: true,
+		locationId: '7147101b-b226-4bf0-95f5-b9a6959c4689',
+		isReadOnly: false,
+		isProcrastinateEvent: false,
+		isRigid: false,
+		uiConfig: {
+			id: '9dc0da1f-f7f9-42db-aefd-f491352d0c64',
+		} as CalendarEvent['uiConfig'],
+		repetition: null,
+		eachTileDuration: 5400000,
+		restrictionProfile: null,
+		emojis: null,
+		isWhatIf: false,
+		entityName: 'CalendarEvent',
+		blob: { type: 0, note: '', id: 'bb6b9d9e-1a33-4173-93a9-1f64cc7879e9' },
+		subEvents: null,
 	};
 
 	beforeEach(() => {
+		// Override Intl timezone so TimeZone assertions are deterministic across machines
+		_origResolvedOptions = Intl.DateTimeFormat.prototype.resolvedOptions;
+		Intl.DateTimeFormat.prototype.resolvedOptions = function () {
+			return { timeZone: 'UTC' } as unknown as Intl.ResolvedDateTimeFormatOptions;
+		};
 		api = new CalendarEventApi();
 		fetchSpy.mockReset();
 	});
 
-	describe('searchByName', () => {
-		it('sends GET request to /api/CalendarEvent/Name with correct query params', async () => {
+	afterEach(() => {
+		Intl.DateTimeFormat.prototype.resolvedOptions = _origResolvedOptions;
+	});
+
+	describe('getSubEventsOfCalendar query building', () => {
+		const emptySubEvents = {
+			Error: { Code: '0', Message: 'SUCCESS' },
+			Content: [],
+			ServerStatus: null,
+		};
+
+		const callGetSubEvents = async (
+			eventId: string,
+			options?: Parameters<CalendarEventApi['getSubEventsOfCalendar']>[1]
+		) => {
 			fetchSpy.mockResolvedValueOnce(
-				new Response(JSON.stringify(mockSearchResults), {
+				new Response(JSON.stringify(emptySubEvents), {
 					status: 200,
 					headers: { 'Content-Type': 'application/json' },
 				})
 			);
-
-			await api.searchByName({
-				data: 'drinks',
-				userName: 'ashtondemo',
-				userId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d',
-			});
-
-			expect(fetchSpy).toHaveBeenCalledOnce();
+			await api.getSubEventsOfCalendar(eventId, options);
 			const [urlArg] = fetchSpy.mock.calls[0];
-			// fetch may receive a string or Request object depending on MSW interception
-			const urlStr = typeof urlArg === 'string' ? urlArg : (urlArg as Request).url;
+			return typeof urlArg === 'string' ? urlArg : (urlArg as Request).url;
+		};
 
-			expect(urlStr).toContain('api/CalendarEvent/Name');
-			expect(urlStr).toContain('Data=drinks');
-			expect(urlStr).toContain('UserName=ashtondemo');
-			expect(urlStr).toContain('UserID=ee1d526c-6426-46c1-903f-bfa27d578c6d');
+		it('hits /api/CalendarEvent/SubEvents with the EventID and mobileApp flag', async () => {
+			const url = await callGetSubEvents('root_1');
+			expect(url).toContain('api/CalendarEvent/SubEvents');
+			expect(url).toContain('EventID=root_1');
+			expect(url).toContain('mobileApp=true');
 		});
 
-		it('returns parsed response on success', async () => {
-			fetchSpy.mockResolvedValueOnce(
-				new Response(JSON.stringify(mockSearchResults), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				})
-			);
-
-			const result = await api.searchByName({
-				data: 'drinks',
-				userName: 'ashtondemo',
-				userId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d',
+		it('forwards batchSize and orderingEngine for the bootstrap page', async () => {
+			const url = await callGetSubEvents('root_1', {
+				batchSize: 20,
+				orderingEngine: 'ProximityToNow',
 			});
-
-			expect(result.Content).toHaveLength(1);
-			expect(result.Content[0].name).toBe('work out');
+			expect(url).toContain('batchSize=20');
+			expect(url).toContain('OrderingEngine=ProximityToNow');
 		});
 
-		it('sends batchSize and index query params when provided', async () => {
-			fetchSpy.mockResolvedValueOnce(
-				new Response(JSON.stringify(mockSearchResults), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				})
-			);
-
-			await api.searchByName({
-				data: 'work out',
-				userName: 'ashtondemo',
-				userId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d',
-				batchSize: 10,
-				index: 2,
+		it('forwards the AfterSubEventId cursor (scroll right / load more)', async () => {
+			const url = await callGetSubEvents('root_1', {
+				batchSize: 20,
+				orderingEngine: 'Id',
+				afterSubEventId: 'sub_42',
 			});
-
-			const [urlArg] = fetchSpy.mock.calls[0];
-			const urlStr = typeof urlArg === 'string' ? urlArg : (urlArg as Request).url;
-
-			expect(urlStr).toContain('batchSize=10');
-			expect(urlStr).toContain('index=2');
+			expect(url).toContain('OrderingEngine=Id');
+			expect(url).toContain('AfterSubEventId=sub_42');
+			expect(url).not.toContain('BeforeSubEventId');
 		});
 
-		it('omits batchSize and index when not provided', async () => {
-			fetchSpy.mockResolvedValueOnce(
-				new Response(JSON.stringify(mockSearchResults), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				})
-			);
-
-			await api.searchByName({
-				data: 'work out',
-				userName: 'ashtondemo',
-				userId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d',
+		it('forwards the BeforeSubEventId cursor (scroll left / prepend)', async () => {
+			const url = await callGetSubEvents('root_1', {
+				batchSize: 20,
+				orderingEngine: 'Id',
+				beforeSubEventId: 'sub_7',
 			});
-
-			const [urlArg] = fetchSpy.mock.calls[0];
-			const urlStr = typeof urlArg === 'string' ? urlArg : (urlArg as Request).url;
-
-			expect(urlStr).not.toContain('batchSize');
-			expect(urlStr).not.toContain('index');
+			expect(url).toContain('BeforeSubEventId=sub_7');
+			expect(url).not.toContain('AfterSubEventId');
 		});
 
-		it('throws on HTTP error', async () => {
-			fetchSpy.mockResolvedValueOnce(
-				new Response(JSON.stringify({ Error: { Code: '500', Message: 'Server error' } }), {
-					status: 500,
-					headers: { 'Content-Type': 'application/json' },
-				})
-			);
-
-			await expect(
-				api.searchByName({
-					data: 'bad-query',
-					userName: 'ashtondemo',
-					userId: 'ee1d526c-6426-46c1-903f-bfa27d578c6d',
-				})
-			).rejects.toThrow();
+		it('omits engine and cursor params when not supplied', async () => {
+			const url = await callGetSubEvents('root_1');
+			expect(url).not.toContain('OrderingEngine');
+			expect(url).not.toContain('AfterSubEventId');
+			expect(url).not.toContain('BeforeSubEventId');
 		});
 	});
 
 	describe('setAsNow', () => {
 		const mockResponse: CalendarEventResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },
-			Content: mockSearchResults.Content[0],
+			Content: mockCalendarEvent,
 			ServerStatus: null,
 		};
 
@@ -219,7 +183,7 @@ describe('CalendarEventApi', () => {
 			expect(request.url).toContain('api/CalendarEvent/Now');
 			expect(request.method).toBe('POST');
 			const body = await request.json();
-			expect(body).toEqual({ ID: 'event-id-123' });
+			expect(body).toEqual({ ID: 'event-id-123', TimeZone: 'UTC' });
 		});
 
 		it('returns parsed response on success', async () => {
@@ -250,7 +214,7 @@ describe('CalendarEventApi', () => {
 	describe('markAsComplete', () => {
 		const mockResponse: CalendarEventResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },
-			Content: mockSearchResults.Content[0],
+			Content: mockCalendarEvent,
 			ServerStatus: null,
 		};
 
@@ -274,7 +238,7 @@ describe('CalendarEventApi', () => {
 			expect(request.url).toContain('api/CalendarEvent/Complete');
 			expect(request.method).toBe('POST');
 			const body = await request.json();
-			expect(body).toEqual({ EventID: 'event-id-456' });
+			expect(body).toEqual({ EventID: 'event-id-456', TimeZone: 'UTC' });
 		});
 
 		it('returns parsed response on success', async () => {
@@ -305,7 +269,7 @@ describe('CalendarEventApi', () => {
 	describe('deleteCalendarEvent', () => {
 		const mockResponse: CalendarEventResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },
-			Content: mockSearchResults.Content[0],
+			Content: mockCalendarEvent,
 			ServerStatus: null,
 		};
 
@@ -330,7 +294,7 @@ describe('CalendarEventApi', () => {
 			expect(request.url).not.toContain('api/CalendarEvent/');
 			expect(request.method).toBe('DELETE');
 			const body = await request.json();
-			expect(body).toEqual({ EventID: 'event-id-789' });
+			expect(body).toEqual({ EventID: 'event-id-789', TimeZone: 'UTC' });
 		});
 
 		it('returns parsed response on success', async () => {
@@ -361,7 +325,7 @@ describe('CalendarEventApi', () => {
 	describe('updateCalendarEvent', () => {
 		const mockResponse: CalendarEventResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },
-			Content: mockSearchResults.Content[0],
+			Content: mockCalendarEvent,
 			ServerStatus: null,
 		};
 
@@ -405,6 +369,7 @@ describe('CalendarEventApi', () => {
 			const body = await request.json();
 			expect(body).toEqual({
 				...updateParams,
+				TimeZone: 'UTC',
 				UserLongitude: String(mockLocation.longitude),
 				UserLatitude: String(mockLocation.latitude),
 				UserLocationVerified: String(mockLocation.verified),
@@ -439,7 +404,7 @@ describe('CalendarEventApi', () => {
 	describe('getCalendarEvent', () => {
 		const mockResponse: CalendarEventResponse = {
 			Error: { Code: '0', Message: 'SUCCESS' },
-			Content: mockSearchResults.Content[0],
+			Content: mockCalendarEvent,
 			ServerStatus: null,
 		};
 

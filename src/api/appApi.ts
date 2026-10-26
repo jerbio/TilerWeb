@@ -1,8 +1,14 @@
 import ServerError from '@/core/error/server';
 import { Env } from '../config/config_getter';
 import locationService from '../services/locationService';
+import { prepareRequestLocation } from './requestLocation';
 
-type RequestOptions = RequestInit & {
+type LocationRequestOptions = RequestInit & {
+	/** Also covers requests that try to use location but have no location fields. */
+	usesUserLocation?: boolean;
+};
+
+type RequestOptions = LocationRequestOptions & {
 	headers?: Headers;
 	responseType?: 'json' | 'text'; // Optional: specify response type, defaults to 'json'
 };
@@ -17,7 +23,7 @@ export class AppApi {
 
 	async apiRequest<T>(endpoint: string, options?: RequestOptions): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
-		const { responseType, ...fetchOptions } = options || {};
+		const { responseType, usesUserLocation, ...fetchOptions } = options || {};
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: new Headers({
@@ -29,7 +35,12 @@ export class AppApi {
 		};
 
 		try {
-			const res = await fetch(requestEndpoint, requestOptions);
+			const prepared = prepareRequestLocation(
+				requestEndpoint,
+				requestOptions,
+				usesUserLocation
+			);
+			const res = await fetch(prepared.endpoint, prepared.options);
 			if (!res.ok) {
 				// Try to parse error response body for structured error info
 				try {
@@ -42,7 +53,8 @@ export class AppApi {
 					throw new ServerError(
 						`HTTP error! status: ${res.status}`,
 						requestEndpoint,
-						errorBody
+						errorBody,
+						res.status
 					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
@@ -52,7 +64,12 @@ export class AppApi {
 					) {
 						throw jsonError;
 					}
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						undefined,
+						res.status
+					);
 				}
 			}
 
@@ -74,12 +91,12 @@ export class AppApi {
 		}
 	}
 
-	async apiRequestFormData<T>(endpoint: string, options?: RequestInit): Promise<T> {
+	async apiRequestFormData<T>(endpoint: string, options?: LocationRequestOptions): Promise<T> {
 		const requestEndpoint = this.getUri(endpoint);
 
 		// Destructure to exclude headers from the spread
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { headers: _headers, ...restOptions } = options || {};
+		const { headers: _headers, usesUserLocation, ...restOptions } = options || {};
 
 		const requestOptions: RequestInit = {
 			method: 'POST',
@@ -90,7 +107,12 @@ export class AppApi {
 		// Don't set Content-Type header for FormData - browser will set it with boundary
 
 		try {
-			const res = await fetch(requestEndpoint, requestOptions);
+			const prepared = prepareRequestLocation(
+				requestEndpoint,
+				requestOptions,
+				usesUserLocation
+			);
+			const res = await fetch(prepared.endpoint, prepared.options);
 			if (!res.ok) {
 				// Try to parse error response body for structured error info
 				try {
@@ -103,7 +125,8 @@ export class AppApi {
 					throw new ServerError(
 						`HTTP error! status: ${res.status}`,
 						requestEndpoint,
-						errorBody
+						errorBody,
+						res.status
 					);
 				} catch (jsonError) {
 					// If JSON parsing fails, throw a standard ServerError
@@ -113,7 +136,12 @@ export class AppApi {
 					) {
 						throw jsonError;
 					}
-					throw new ServerError(`HTTP error! status: ${res.status}`, requestEndpoint);
+					throw new ServerError(
+						`HTTP error! status: ${res.status}`,
+						requestEndpoint,
+						undefined,
+						res.status
+					);
 				}
 			}
 			return (await res.json()) as T;
@@ -132,7 +160,7 @@ export class AppApi {
 	}
 
 	/**
-	 * Fetch the current user location for injection into schedule-mutating requests.
+	 * Read the confirmed location for schedule-mutating requests; never access geolocation.
 	 * Subclasses call this rather than depending on locationService directly.
 	 */
 	protected getLocationData() {

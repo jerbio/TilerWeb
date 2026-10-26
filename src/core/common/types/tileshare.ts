@@ -234,6 +234,8 @@ export type SortOrder = 'asc' | 'desc';
 /** Default server page size (ServerContants.batchPageSize). */
 export const DEFAULT_CLUSTER_PAGE_SIZE = 50;
 
+export type ClusterDeadlineFilter = 'All' | 'Overdue' | 'Range' | 'NoDeadline';
+
 export type GetClustersParams = {
 	/**
 	 * `true` for clusters the caller created, `false` for ones shared with them.
@@ -242,6 +244,12 @@ export type GetClustersParams = {
 	IsOutbox?: boolean;
 	/** Include owned and received clusters in one server-paginated list. */
 	IncludeCreated?: boolean;
+	Search?: string;
+	DeadlineFilter?: ClusterDeadlineFilter;
+	/** Inclusive UTC epoch milliseconds. */
+	DeadlineFrom?: number;
+	/** Exclusive UTC epoch milliseconds. */
+	DeadlineBefore?: number;
 	SortBy?: 'CreationTime' | 'Deadline';
 	IsInbox?: boolean;
 	/** Record offset passed to .Skip() — NOT a page number. */
@@ -266,6 +274,10 @@ export type ClusterPageParams = {
 	sortOrder?: SortOrder;
 	sortBy?: 'CreationTime' | 'Deadline';
 	createdByMe?: boolean;
+	search?: string;
+	deadlineFilter?: ClusterDeadlineFilter;
+	deadlineFrom?: number;
+	deadlineBefore?: number;
 };
 
 /**

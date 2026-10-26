@@ -2,7 +2,7 @@ import { ScheduleApi } from '@/api/scheduleApi';
 import { SubCalendarEventApi } from '@/api/subCalendarEventApi';
 import { CalendarEventApi } from '@/api/calendarEventApi';
 import { LocationApi } from '@/api/locationApi';
-import { CalendarEventQueryOptions } from '@/api/calendarEventApi';
+import { CalendarEventQueryOptions, SubEventsQueryOptions } from '@/api/calendarEventApi';
 import {
 	ScheduleCreateEventParams,
 	ScheduleLookupOptions,
@@ -12,9 +12,17 @@ import {
 	ScheduleShuffleParams,
 	CalendarEventUpdateParams,
 	TilePredictionResponse,
+	CalendarSearchEnvelope,
+	CalendarSearchParams,
+	CalendarSearchSource,
+	CalendarSearchErrorBody,
 } from '@/core/common/types/schedule';
 import { normalizeError } from '@/core/error';
+import ServerError from '@/core/error/server';
+import { CalendarSearchUnavailableError } from '@/core/common/types/errors';
 import TimeUtil from '@/core/util/time';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
+import { parseCreatedScheduleEvent } from './scheduleEventResponse';
 
 const defaultScheduleOptions: ScheduleLookupOptions = {
 	startRange: TimeUtil.now() - TimeUtil.inMilliseconds(3, 'd'),
@@ -42,7 +50,7 @@ class ScheduleService {
 	async createEvent(params: ScheduleCreateEventParams) {
 		try {
 			const res = await this.scheduleApi.createEvent(params);
-			return res.Content;
+			return parseCreatedScheduleEvent(res);
 		} catch (error) {
 			console.error('Error creating sub-calendar event', error);
 			throw normalizeError(error);
@@ -118,7 +126,7 @@ class ScheduleService {
 	 * `GET /api/CalendarEvent/SubEvents?EventID=...`
 	 * Returns an array of ScheduleSubCalendarEvent.
 	 */
-	async getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
+	async getSubEventsOfCalendar(eventId: string, options?: SubEventsQueryOptions) {
 		try {
 			const response = await this.calendarEventApi.getSubEventsOfCalendar(eventId, options);
 			return response.Content;
@@ -151,7 +159,7 @@ class ScheduleService {
 				SubCalendarEventStart: updates.start,
 				SubCalendarEventEnd: updates.end,
 				CalendarEventEnd: updates.calendarEnd,
-				TimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				TimeZone: deviceTimeZone(),
 				ThirdPartyEventID: updates.thirdPartyEventId,
 				ThirdPartyUserID: updates.thirdPartyUserId,
 				CalendarType: updates.calendarType,
@@ -164,27 +172,71 @@ class ScheduleService {
 	}
 
 	/**
-	 * Search calendar events by name.
-	 * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
-	 * Returns an array of CalendarEvent matching the search query.
+	 * Accept or decline a third-party (external calendar) SubCalendarEvent.
+	 * Reuses `POST /api/SubCalendarEvent` with the `RsvpStatusUpdate` field.
+	 * Sends the event's current start/end times alongside the RSVP so the backend
+	 * receives the full time range (matching the mobile client).
+	 * Returns the updated SubCalendarEvent payload (server is authoritative).
 	 */
-	async searchCalendarEventsByName(
-		query: string,
-		userName: string,
-		userId: string,
-		pagination?: { batchSize?: number; index?: number }
+	async updateSubCalendarEventRsvp(
+		eventId: string,
+		rsvp: 'Accepted' | 'Declined',
+		options: {
+			start?: number;
+			end?: number;
+			thirdPartyEventId?: string;
+			thirdPartyUserId?: string;
+			calendarType?: string;
+		}
 	) {
 		try {
-			const response = await this.calendarEventApi.searchByName({
-				data: query,
-				userName,
-				userId,
-				...pagination,
+			const response = await this.subCalendarEventApi.updateSubCalendarEvent({
+				Id: eventId,
+				RsvpStatusUpdate: rsvp,
+				SubCalendarEventStart: options.start,
+				SubCalendarEventEnd: options.end,
+				ThirdPartyEventID: options.thirdPartyEventId,
+				ThirdPartyUserID: options.thirdPartyUserId,
+				CalendarType: options.calendarType,
+				TimeZone: deviceTimeZone(),
 			});
-
 			return response.Content;
 		} catch (error) {
-			console.error('Error searching calendar events by name', error);
+			console.error('Error updating SubCalendarEvent RSVP', error);
+			throw normalizeError(error);
+		}
+	}
+
+	/**
+	 * Multi-source calendar event search (Phase 4).
+	 * `GET /api/CalendarEvent/Search?query=...&sources=...`
+	 *
+	 * Unwraps the PostBack `Content` envelope. Total failure (HTTP 502) maps to
+	 * a typed `CalendarSearchUnavailableError`. Other HTTP failures propagate;
+	 * an unavailable GA endpoint must never look like a successful empty search.
+	 */
+	async searchCalendarEventsMultiSource(
+		query: string,
+		sources?: CalendarSearchSource[],
+		options?: Omit<CalendarSearchParams, 'query' | 'sources'>
+	): Promise<CalendarSearchEnvelope> {
+		try {
+			const response = await this.calendarEventApi.searchCalendarEvents({
+				query,
+				sources,
+				...options,
+			});
+			return response.Content;
+		} catch (error) {
+			if (error instanceof ServerError) {
+				// Total source failure — typed body under `details`.
+				if (error.status === 502) {
+					throw new CalendarSearchUnavailableError(
+						(error.details ?? {}) as CalendarSearchErrorBody
+					);
+				}
+			}
+			console.error('Error searching calendar events (multi-source)', error);
 			throw normalizeError(error);
 		}
 	}

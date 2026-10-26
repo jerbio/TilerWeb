@@ -247,7 +247,12 @@ const CalendarCreateBlock: React.FC<CalendarCreateBlockProps> = ({
 						i18nKey="calendar.createBlock.message.success"
 						components={{
 							b: <b />,
-							name: <span>{ui.state.success.block?.calendarEvent.name}</span>,
+							name: (
+								<span>
+									{ui.state.success.block?.name ??
+										ui.state.success.block?.calendarEvent?.name}
+								</span>
+							),
 						}}
 					/>
 				</p>

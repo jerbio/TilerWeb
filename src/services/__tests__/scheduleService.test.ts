@@ -6,6 +6,8 @@ import { CalendarEventApi } from '@/api/calendarEventApi';
 import { LocationApi } from '@/api/locationApi';
 import {
 	CalendarEvent,
+	ScheduleCreateEventParams,
+	ScheduleCreateEventResponse,
 	CalendarEventUpdateParams,
 	ScheduleProcrastinateAllParams,
 	ScheduleProcrastinateEventParams,
@@ -80,78 +82,27 @@ describe('ScheduleService', () => {
 		);
 	});
 
-	describe('searchCalendarEventsByName', () => {
-		it('returns calendar events matching the search query', async () => {
-			vi.mocked(calendarEventApi.searchByName).mockResolvedValueOnce({
-				Error: { Code: '0', Message: 'SUCCESS' },
-				Content: [mockCalendarEvent],
-				ServerStatus: null,
-			});
+	describe('createEvent', () => {
+		const event = { id: 'created', name: 'Study', start: 1792544400000, end: 1792548000000 };
+		const params = {} as ScheduleCreateEventParams;
 
-			const results = await service.searchCalendarEventsByName(
-				'work out',
-				'ashtondemo',
-				'user-id-123'
-			);
+		it.each([event, { tilerEvent: event, subEvents: [] }])(
+			'returns the created event from either contract',
+			async (Content) => {
+				vi.mocked(scheduleApi.createEvent).mockResolvedValueOnce({
+					Error: { Code: '0' },
+					Content,
+				} as ScheduleCreateEventResponse);
+				expect(await service.createEvent(params)).toEqual(event);
+			}
+		);
 
-			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
-				data: 'work out',
-				userName: 'ashtondemo',
-				userId: 'user-id-123',
-			});
-			expect(results).toHaveLength(1);
-			expect(results[0].id).toBe('30d305cd-18ee-4c0e-bba0-9e5a6dfab2ed_7_0_0');
-			expect(results[0].name).toBe('work out');
-			expect(results[0].start).toBe(1769925600000);
-			expect(results[0].isRecurring).toBe(true);
-			expect(results[0].locationId).toBe('7147101b-b226-4bf0-95f5-b9a6959c4689');
-		});
-
-		it('passes pagination params to the API when provided', async () => {
-			vi.mocked(calendarEventApi.searchByName).mockResolvedValueOnce({
-				Error: { Code: '0', Message: 'SUCCESS' },
-				Content: [mockCalendarEvent],
-				ServerStatus: null,
-			});
-
-			await service.searchCalendarEventsByName('work out', 'ashtondemo', 'user-id-123', {
-				batchSize: 10,
-				index: 1,
-			});
-
-			expect(calendarEventApi.searchByName).toHaveBeenCalledWith({
-				data: 'work out',
-				userName: 'ashtondemo',
-				userId: 'user-id-123',
-				batchSize: 10,
-				index: 1,
-			});
-		});
-
-		it('returns empty array when no results', async () => {
-			vi.mocked(calendarEventApi.searchByName).mockResolvedValueOnce({
-				Error: { Code: '0', Message: 'SUCCESS' },
-				Content: [],
-				ServerStatus: null,
-			});
-
-			const results = await service.searchCalendarEventsByName(
-				'nonexistent',
-				'ashtondemo',
-				'user-id-123'
-			);
-
-			expect(results).toEqual([]);
-		});
-
-		it('throws normalized error on API failure', async () => {
-			vi.mocked(calendarEventApi.searchByName).mockRejectedValueOnce(
-				new Error('Network error')
-			);
-
-			await expect(
-				service.searchCalendarEventsByName('drinks', 'ashtondemo', 'user-id-123')
-			).rejects.toThrow();
+		it('rejects an unexpected contract before publishing success', async () => {
+			vi.mocked(scheduleApi.createEvent).mockResolvedValueOnce({
+				Error: { Code: '0' },
+				Content: { subEvents: [event] },
+			} as unknown as ScheduleCreateEventResponse);
+			await expect(service.createEvent(params)).rejects.toThrow('Check your schedule');
 		});
 	});
 
@@ -688,6 +639,67 @@ describe('ScheduleService', () => {
 					TimeZone: expect.any(String),
 				})
 			);
+		});
+	});
+
+	describe('updateSubCalendarEventRsvp', () => {
+		const mockSubCalendarEvent = {
+			id: 'sub-event-123',
+			rsvpStatus: 'Accepted',
+		} as unknown as SubCalendarEvent;
+
+		it('sends RsvpStatusUpdate with third-party identifiers and returns Content', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			const result = await service.updateSubCalendarEventRsvp('sub-event-123', 'Accepted', {
+				start: 1769930000000,
+				end: 1769933600000,
+				thirdPartyEventId: 'google-event-abc',
+				thirdPartyUserId: 'google-user-xyz',
+				calendarType: 'google',
+			});
+
+			expect(subCalendarEventApi.updateSubCalendarEvent).toHaveBeenCalledWith(
+				expect.objectContaining({
+					Id: 'sub-event-123',
+					RsvpStatusUpdate: 'Accepted',
+					SubCalendarEventStart: 1769930000000,
+					SubCalendarEventEnd: 1769933600000,
+					ThirdPartyEventID: 'google-event-abc',
+					ThirdPartyUserID: 'google-user-xyz',
+					CalendarType: 'google',
+					TimeZone: expect.any(String),
+				})
+			);
+			expect(result).toEqual(mockSubCalendarEvent);
+		});
+
+		it('supports Declined status', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockResolvedValueOnce({
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: mockSubCalendarEvent,
+				ServerStatus: null,
+			});
+
+			await service.updateSubCalendarEventRsvp('sub-event-123', 'Declined', {});
+
+			const calledWith = vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mock
+				.calls[0][0];
+			expect(calledWith.RsvpStatusUpdate).toBe('Declined');
+		});
+
+		it('throws normalized error on API failure', async () => {
+			vi.mocked(subCalendarEventApi.updateSubCalendarEvent).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			await expect(
+				service.updateSubCalendarEventRsvp('sub-event-123', 'Accepted', {})
+			).rejects.toThrow();
 		});
 	});
 

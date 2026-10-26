@@ -39,7 +39,8 @@ export interface UseTileNotesResult {
  */
 export function useTileNotes(
 	eventId: string | null,
-	scope: NotesScope = 'auto'
+	scope: NotesScope = 'auto',
+	service: Pick<typeof notesService, 'getNotes' | 'updateNotes'> = notesService
 ): UseTileNotesResult {
 	const [payload, setPayload] = useState<NotesPayload | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(eventId !== null);
@@ -50,12 +51,12 @@ export function useTileNotes(
 	// Always read the freshest etag inside save() — even after a conflict — so
 	// the next attempt uses what the server just returned.
 	const payloadRef = useRef<NotesPayload | null>(null);
-	useEffect(() => {
-		payloadRef.current = payload;
-	}, [payload]);
+	const generation = useRef(0);
 
 	const load = useCallback(async () => {
+		const request = ++generation.current;
 		if (!eventId) {
+			payloadRef.current = null;
 			setPayload(null);
 			setIsLoading(false);
 			return;
@@ -63,32 +64,47 @@ export function useTileNotes(
 		setIsLoading(true);
 		setError(null);
 		try {
-			const next = await notesService.getNotes(eventId, scope);
+			const next = await service.getNotes(eventId, scope);
+			if (request !== generation.current) return;
+			payloadRef.current = next;
 			setPayload(next);
 		} catch (err) {
+			if (request !== generation.current) return;
+			payloadRef.current = null;
 			setError(err instanceof Error ? err : new Error(String(err)));
 			setPayload(null);
 		} finally {
-			setIsLoading(false);
+			if (request === generation.current) setIsLoading(false);
 		}
-	}, [eventId, scope]);
+	}, [eventId, scope, service]);
 
 	useEffect(() => {
+		payloadRef.current = null;
+		setPayload(null);
+		setConflict(null);
+		setIsSaving(false);
 		void load();
+		const requests = generation;
+		return () => {
+			requests.current++;
+		};
 	}, [load]);
 
 	const save = useCallback(
 		async (userNote: string): Promise<NotesPayload | null> => {
 			if (!eventId) return null;
+			const request = generation.current;
 			setIsSaving(true);
 			setError(null);
 			try {
-				const result = await notesService.updateNotes({
+				const result = await service.updateNotes({
 					EventID: eventId,
 					Scope: scope,
 					UserNote: userNote,
 					Etag: payloadRef.current?.Etag ?? '',
 				});
+				if (request !== generation.current) return null;
+				payloadRef.current = result;
 				setPayload(result);
 				if (result.concurrencyConflict) {
 					setConflict({ server: result, localDraft: userNote });
@@ -97,13 +113,14 @@ export function useTileNotes(
 				}
 				return result;
 			} catch (err) {
+				if (request !== generation.current) return null;
 				setError(err instanceof Error ? err : new Error(String(err)));
 				return null;
 			} finally {
-				setIsSaving(false);
+				if (request === generation.current) setIsSaving(false);
 			}
 		},
-		[eventId, scope]
+		[eventId, scope, service]
 	);
 
 	const clearConflict = useCallback(() => setConflict(null), []);

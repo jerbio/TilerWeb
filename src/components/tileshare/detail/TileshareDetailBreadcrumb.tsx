@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Routes } from '@/core/constants/routes';
 
@@ -19,10 +19,17 @@ const TileshareDetailBreadcrumb: React.FC<TileshareDetailBreadcrumbProps> = ({
 	loading,
 }) => {
 	const { t } = useTranslation();
+	const { state } = useLocation();
+	const returnTo = state?.tileShareListReturnTo;
+	const rootHref =
+		typeof returnTo === 'string' &&
+		(returnTo === Routes.Tileshare.list || returnTo.startsWith(Routes.Tileshare.list + '?'))
+			? returnTo
+			: Routes.Tileshare.root;
 
 	return (
 		<Nav aria-label="Breadcrumb">
-			<Crumb to={Routes.Tileshare.root}>{t('tilesharedemo.detail.breadcrumbRoot')}</Crumb>
+			<Crumb to={rootHref}>{t('tilesharedemo.detail.breadcrumbRoot')}</Crumb>
 			<Separator aria-hidden>/</Separator>
 			{parent && (
 				<>

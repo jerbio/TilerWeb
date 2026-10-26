@@ -70,6 +70,27 @@ export interface FocusEventRequest {
 	actionType: ActionType;
 	/** Optional schedule context for staleness detection */
 	scheduleContext?: ScheduleContext;
+	/**
+	 * Optional authoritative start time (unix ms) of the target tile, supplied
+	 * by callers that already know it (e.g. the sub-events side panel, whose
+	 * list comes from `/CalendarEvent/SubEvents`). When present, the calendar
+	 * navigates straight to this day instead of re-deriving the date via a
+	 * `/SubCalendarEvent` REST lookup that can disagree with the grid's own
+	 * start. Other callers omit it and keep the lookup path.
+	 */
+	startHint?: number;
+	/**
+	 * Optional third-party routing metadata (provider, provider event id,
+	 * connected-account id) supplied by callers such as the timeline SearchBar
+	 * when the focused tile represents a provider-synced event. When present,
+	 * the calendar handler merges these into the selected event before opening
+	 * `CalendarEventInfo` so the edit panel can dispatch to the right provider.
+	 * All three are optional — callers that don't supply them keep the existing
+	 * tile values.
+	 */
+	thirdPartyType?: string;
+	thirdPartyId?: string;
+	thirdPartyUserId?: string;
 }
 
 /**

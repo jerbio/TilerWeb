@@ -29,6 +29,7 @@ export enum NotificationAction {
 	Revise = 'revise',
 	Procrastinate = 'procrastinate',
 	ProcrastinateAll = 'procrastinate-all',
+	CreateTileshare = 'create-tileshare',
 }
 
 /** Build a deterministic notification ID from an action and entity ID */

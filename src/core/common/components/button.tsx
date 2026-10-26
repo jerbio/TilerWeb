@@ -131,7 +131,10 @@ const StyledButton = styled.button<StyledButtonProps>`
 					: props.$variant === 'ghost'
 						? props.theme.colors.button.ghost.text
 						: props.theme.colors.white};
-	border-radius: ${(props) => props.theme.borderRadius.little};
+	border-radius: ${(props) =>
+		props.$size === 'small'
+			? props.theme.borderRadius.little
+			: props.theme.borderRadius.medium};
 	font-weight: ${(props) => props.theme.typography.fontWeight.medium};
 	line-height: 1;
 	display: inline-flex;
@@ -180,10 +183,10 @@ const StyledButton = styled.button<StyledButtonProps>`
 	${(props) =>
 		props.$variant === 'pill' &&
 		css`
-			background-color: #2a2a2a;
+			background-color: ${(props) => props.theme.colors.background.card};
 			margin-top: 0.25rem;
 			margin-right: 0.25rem;
-			color: ${(props) => props.theme.colors.text};
+			color: ${(props) => props.theme.colors.text.primary};
 			font-size: 0.875rem;
 			padding: 0.25rem 0.5rem;
 			border-radius: 999px;

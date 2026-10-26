@@ -1,18 +1,36 @@
 ﻿import {
 	CalendarEventResponse,
-	CalendarEventSearchParams,
-	CalendarEventSearchResponse,
 	CalendarEventUpdateParams,
 	SubEventsOfCalendarResponse,
+	CalendarSearchParams,
+	CalendarSearchEnvelope,
 } from '../core/common/types/schedule';
-import { PaginationParams } from '../core/common/types/api';
+import { ApiResponse, PaginationParams } from '../core/common/types/api';
 import { AppApi } from './appApi';
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
+import { LocationVerification } from '@/core/constants/location';
 
 export type CalendarEventQueryOptions = PaginationParams;
 
+/** Sub-event ordering engine understood by the server. */
+export type SubEventOrderingEngine = 'ProximityToNow' | 'Id' | 'ClusteredIndex';
+
+/**
+ * Options for the keyset-paged sub-events endpoint. Extends pagination with the ordering
+ * engine and the two continuation cursors:
+ * - `afterSubEventId`  → page immediately after that sub-event (scroll right / load more).
+ * - `beforeSubEventId` → page immediately before that sub-event (scroll left / prepend).
+ * Supply at most one cursor; omit both for the bootstrap (nearest-to-now) page.
+ */
+export interface SubEventsQueryOptions extends CalendarEventQueryOptions {
+	orderingEngine?: SubEventOrderingEngine;
+	afterSubEventId?: string;
+	beforeSubEventId?: string;
+}
+
 export class CalendarEventApi extends AppApi {
 	/** Build query-string params shared by both endpoints. */
-	private buildParams(eventId: string, options?: CalendarEventQueryOptions): string {
+	private buildParams(eventId: string, options?: SubEventsQueryOptions): string {
 		const params: Record<string, string> = { EventID: eventId };
 
 		if (options?.batchSize != null) {
@@ -23,6 +41,15 @@ export class CalendarEventApi extends AppApi {
 		}
 		if (options?.order) {
 			params['order'] = options.order;
+		}
+		if (options?.orderingEngine) {
+			params['OrderingEngine'] = options.orderingEngine;
+		}
+		if (options?.afterSubEventId) {
+			params['AfterSubEventId'] = options.afterSubEventId;
+		}
+		if (options?.beforeSubEventId) {
+			params['BeforeSubEventId'] = options.beforeSubEventId;
 		}
 		params['mobileApp'] = 'true';
 
@@ -44,7 +71,7 @@ export class CalendarEventApi extends AppApi {
 	 *
 	 * Returns an array of ScheduleSubCalendarEvent.
 	 */
-	public getSubEventsOfCalendar(eventId: string, options?: CalendarEventQueryOptions) {
+	public getSubEventsOfCalendar(eventId: string, options?: SubEventsQueryOptions) {
 		const urlParams = this.buildParams(eventId, options);
 		return this.apiRequest<SubEventsOfCalendarResponse>(
 			`api/CalendarEvent/SubEvents?${urlParams}`
@@ -52,28 +79,28 @@ export class CalendarEventApi extends AppApi {
 	}
 
 	/**
-	 * Search calendar events by name.
-	 * `GET /api/CalendarEvent/Name?Data=...&UserName=...&UserID=...`
+	 * Multi-source calendar event search.
+	 * `GET /api/CalendarEvent/Search?query=...&sources=...`
+	 *
+	 * Returns a merged result batch in the raw PostBack response (envelope under
+	 * `Content`) so the service layer can unwrap it and map typed errors.
+	 * Total source failure surfaces as a typed `502`.
 	 */
-	public searchByName(params: CalendarEventSearchParams) {
-		const urlEntries: Record<string, string> = {
-			Data: params.data,
-			UserName: params.userName,
-			UserID: params.userId,
-			MobileApp: 'true',
-			Version: 'v2',
-		};
-
-		if (params.batchSize != null) {
-			urlEntries['batchSize'] = String(params.batchSize);
+	public searchCalendarEvents(params: CalendarSearchParams) {
+		const urlEntries: Record<string, string> = { query: params.query };
+		for (const key of ['batchSize', 'index', 'start', 'end', 'orderMode'] as const) {
+			if (params[key] != null) urlEntries[key] = String(params[key]);
 		}
-		if (params.index != null) {
-			urlEntries['index'] = String(params.index);
+
+		if (params.sources && params.sources.length > 0) {
+			urlEntries['sources'] = params.sources.join(',');
 		}
 
 		const urlParams = new URLSearchParams(urlEntries).toString();
 
-		return this.apiRequest<CalendarEventSearchResponse>(`api/CalendarEvent/Name?${urlParams}`);
+		return this.apiRequest<ApiResponse<CalendarSearchEnvelope>>(
+			`api/CalendarEvent/Search?${urlParams}`
+		);
 	}
 
 	/**
@@ -83,7 +110,10 @@ export class CalendarEventApi extends AppApi {
 	public setAsNow(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Now', {
 			method: 'POST',
-			body: JSON.stringify({ ID: eventId }),
+			body: JSON.stringify({
+				ID: eventId,
+				TimeZone: deviceTimeZone().toString(),
+			}),
 		});
 	}
 
@@ -94,7 +124,10 @@ export class CalendarEventApi extends AppApi {
 	public markAsComplete(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Complete', {
 			method: 'POST',
-			body: JSON.stringify({ EventID: eventId }),
+			body: JSON.stringify({
+				EventID: eventId,
+				TimeZone: deviceTimeZone().toString(),
+			}),
 		});
 	}
 
@@ -105,7 +138,10 @@ export class CalendarEventApi extends AppApi {
 	public deleteCalendarEvent(eventId: string) {
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent', {
 			method: 'DELETE',
-			body: JSON.stringify({ EventID: eventId }),
+			body: JSON.stringify({
+				EventID: eventId,
+				TimeZone: deviceTimeZone().toString(),
+			}),
 		});
 	}
 
@@ -120,9 +156,13 @@ export class CalendarEventApi extends AppApi {
 			...params,
 			UserLongitude: params.UserLongitude ?? loc.longitude?.toString() ?? '',
 			UserLatitude: params.UserLatitude ?? loc.latitude?.toString() ?? '',
-			UserLocationVerified: params.UserLocationVerified ?? (loc.verified ? 'true' : 'false'),
+			UserLocationVerified:
+				params.UserLocationVerified ??
+				(loc.verified ? LocationVerification.Verified : LocationVerification.Unverified),
+			TimeZone: params.TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<CalendarEventResponse>('api/CalendarEvent/Update', {
+			usesUserLocation: true,
 			method: 'POST',
 			body: JSON.stringify(enriched),
 		});

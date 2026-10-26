@@ -1,22 +1,20 @@
-import { Env } from '@/config/config_getter';
 import Logo from '@/core/common/components/icons/logo';
 import ProfileSheet from '@/core/common/components/profile_sheet';
 import appRoutes from '@/core/common/data/appRoutes';
 import appLayoutConfig from '@/core/constants/app_layout_config';
-import { useTheme } from '@/core/theme/ThemeProvider';
 import { useFlag } from '@/hooks/useFlag';
 import useAppStore from '@/global_state';
-import { Moon, Sun, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { featureFlags } from '@/core/constants/featureFlags';
+import LocationSelector from '@/components/location/LocationSelector';
 
 const AppLayout: React.FC = () => {
 	const [profileSheetOpen, setProfileSheetOpen] = React.useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLDivElement>(null);
-	const { isDarkMode, toggleTheme } = useTheme();
 
 	// Close menu when clicking outside
 	useEffect(() => {
@@ -48,16 +46,23 @@ const AppLayout: React.FC = () => {
 		<Container>
 			<Header>
 				<HeaderLeft>
-					<Logo size={30} />
+					<NavLink key={'backToHome'} to={'/timeline'}>
+						<Logo size={30} />
+					</NavLink>
+					<LocationSelector />
 				</HeaderLeft>
 				<HeaderRight>
 					{tileshareEnabled && (
 						<Navigation>
 							{appRoutes.map((route, index) => (
 								<React.Fragment key={route.name}>
-									<Link to={route.path} style={{ textDecoration: 'none' }}>
+									<Link
+										to={route.path}
+										aria-label={route.name}
+										style={{ textDecoration: 'none' }}
+									>
 										<NavigationLink active={pathname.startsWith(route.path)}>
-											{route.name}
+											<span>{route.name}</span>
 											{route.icon}
 										</NavigationLink>
 									</Link>
@@ -65,11 +70,6 @@ const AppLayout: React.FC = () => {
 								</React.Fragment>
 							))}
 						</Navigation>
-					)}
-					{Env.isDevelopment() && (
-						<ThemeToggle onClick={toggleTheme}>
-							{isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-						</ThemeToggle>
 					)}
 					<ProfileTrigger
 						ref={triggerRef}
@@ -108,7 +108,7 @@ const Separator = styled.div`
 	margin-inline: 0.25rem;
 `;
 
-const NavigationLink = styled.button<{ active: boolean }>`
+const NavigationLink = styled.span<{ active: boolean }>`
 	font-family: ${(props) => props.theme.typography.fontFamily.urban};
 	font-weight: ${(props) => props.theme.typography.fontWeight.semibold};
 	font-size: ${(props) => props.theme.typography.fontSize.sm};
@@ -125,6 +125,13 @@ const NavigationLink = styled.button<{ active: boolean }>`
 	border-radius: ${(props) => props.theme.borderRadius.medium};
 	border: 1px solid
 		${(props) => (props.active ? props.theme.colors.border.default : 'transparent')};
+	@media (max-width: 600px) {
+		padding: 0 8px;
+		gap: 0;
+		span {
+			display: none;
+		}
+	}
 `;
 
 const Container = styled.div`
@@ -133,19 +140,6 @@ const Container = styled.div`
 	isolation: isolate;
 	display: flex;
 	flex-direction: column;
-`;
-
-const ThemeToggle = styled.button`
-	height: 44px;
-	width: 44px;
-	overflow: hidden;
-	color: ${(props) => props.theme.colors.button.primary.text};
-	background-color: ${({ theme }) => theme.colors.button.primary.bg};
-	border-radius: ${(props) => props.theme.borderRadius.large};
-	border: 1px solid ${(props) => props.theme.colors.border.default};
-	display: flex;
-	align-items: center;
-	justify-content: center;
 `;
 
 const ProfileTrigger = styled.div`
@@ -180,18 +174,31 @@ const Header = styled.header`
 	background-color: ${(props) => props.theme.colors.background.header};
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.default};
 	padding-inline: 2rem;
+	flex-shrink: 0;
+	@media (max-width: 600px) {
+		padding-inline: 0.75rem;
+		gap: 0.5rem;
+	}
 `;
 
 const HeaderLeft = styled.div`
 	display: flex;
 	gap: 1rem;
 	align-items: center;
+	min-width: 0;
+	@media (max-width: 600px) {
+		gap: 0.5rem;
+	}
 `;
 
 const HeaderRight = styled.div`
 	display: flex;
 	gap: 1rem;
 	align-items: center;
+	flex-shrink: 0;
+	@media (max-width: 600px) {
+		gap: 0.5rem;
+	}
 `;
 
 export default AppLayout;

@@ -14,6 +14,7 @@ vi.mock('@/services', () => ({
 		setScheduleEventAsNow: vi.fn(),
 		procrastinateScheduleEvent: vi.fn(),
 		updateSubCalendarEvent: vi.fn(),
+		updateSubCalendarEventRsvp: vi.fn(),
 		deleteScheduleEvent: vi.fn(),
 	},
 }));
@@ -549,6 +550,7 @@ describe('CalendarEventInfo – Action Buttons', () => {
 			);
 
 			fireEvent.click(screen.getByTitle('Delete'));
+			fireEvent.click(screen.getByLabelText('Confirm delete'));
 
 			await waitFor(() => {
 				expect(scheduleService.deleteScheduleEvent).toHaveBeenCalledWith(
@@ -558,6 +560,230 @@ describe('CalendarEventInfo – Action Buttons', () => {
 					'google-user-456'
 				);
 			});
+		});
+
+		it('shows a confirmation overlay before deleting a third-party event', async () => {
+			vi.mocked(scheduleService.deleteScheduleEvent).mockResolvedValueOnce(
+				{} as ReturnType<typeof scheduleService.deleteScheduleEvent> extends Promise<
+					infer T
+				>
+					? T
+					: never
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+			expect(
+				screen.getByText('This will also delete it from your connected calendar service.')
+			).toBeInTheDocument();
+
+			fireEvent.click(screen.getByLabelText('Confirm delete'));
+
+			await waitFor(() => {
+				expect(scheduleService.deleteScheduleEvent).toHaveBeenCalledWith(
+					expect.any(String),
+					ThirdPartyType.Google,
+					'google-event-123',
+					'google-user-456'
+				);
+			});
+		});
+
+		it('cancels the delete confirmation overlay when Cancel is clicked', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+
+			fireEvent.click(screen.getByText('Cancel'));
+
+			expect(screen.queryByText('Delete this event?')).not.toBeInTheDocument();
+			expect(screen.getByTitle('Delete')).toBeInTheDocument();
+		});
+
+		it('cancels the delete confirmation overlay when Escape is pressed', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={createMockEvent({
+						thirdPartyType: ThirdPartyType.Google,
+						thirdPartyId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+					})}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Delete'));
+			expect(screen.getByText('Delete this event?')).toBeInTheDocument();
+
+			fireEvent.keyDown(document, { key: 'Escape' });
+
+			expect(screen.queryByText('Delete this event?')).not.toBeInTheDocument();
+			expect(screen.getByTitle('Delete')).toBeInTheDocument();
+		});
+	});
+
+	describe('Third-party RSVP (accept/decline)', () => {
+		const thirdPartyEvent = (rsvpStatus: string) =>
+			createMockEvent({
+				thirdPartyType: ThirdPartyType.Google,
+				thirdPartyId: 'google-event-123',
+				thirdPartyUserId: 'google-user-456',
+				rsvpStatus,
+			});
+
+		it('shows Accept and Decline buttons for an actionable third-party event', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('NeedsAction')}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			expect(screen.getByTitle('Accept')).toBeInTheDocument();
+			expect(screen.getByTitle('Decline')).toBeInTheDocument();
+			expect(screen.getByTitle('Delete')).toBeInTheDocument();
+		});
+
+		it('does not show Accept/Decline for a Tiler event', () => {
+			renderWithProviders(
+				<CalendarEventInfo event={createMockEvent()} onEventAction={mockOnEventAction} />
+			);
+
+			expect(screen.queryByTitle('Accept')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Decline')).not.toBeInTheDocument();
+		});
+
+		it('does not show Accept/Decline when rsvp status is not applicable', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('None')}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			expect(screen.queryByTitle('Accept')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Decline')).not.toBeInTheDocument();
+		});
+
+		it('calls updateSubCalendarEventRsvp with Accepted and third-party ids on Accept', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEventRsvp).mockResolvedValueOnce(
+				thirdPartyEvent('Accepted') as SubCalendarEvent
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('NeedsAction')}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Accept'));
+
+			await waitFor(() => {
+				expect(scheduleService.updateSubCalendarEventRsvp).toHaveBeenCalledWith(
+					'sub-event-id-123',
+					'Accepted',
+					expect.objectContaining({
+						start: 1711296000000,
+						end: 1711303200000,
+						thirdPartyEventId: 'google-event-123',
+						thirdPartyUserId: 'google-user-456',
+						calendarType: ThirdPartyType.Google,
+					})
+				);
+			});
+			expect(mockOnEventAction).toHaveBeenCalled();
+		});
+
+		it('calls updateSubCalendarEventRsvp with Declined on Decline', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEventRsvp).mockResolvedValueOnce(
+				thirdPartyEvent('Declined') as SubCalendarEvent
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('NeedsAction')}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Decline'));
+
+			await waitFor(() => {
+				expect(scheduleService.updateSubCalendarEventRsvp).toHaveBeenCalledWith(
+					'sub-event-id-123',
+					'Declined',
+					expect.anything()
+				);
+			});
+		});
+
+		it('does not call onEventAction when the RSVP update fails', async () => {
+			vi.mocked(scheduleService.updateSubCalendarEventRsvp).mockRejectedValueOnce(
+				new Error('Network error')
+			);
+
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('NeedsAction')}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			fireEvent.click(screen.getByTitle('Accept'));
+
+			await waitFor(() => {
+				expect(scheduleService.updateSubCalendarEventRsvp).toHaveBeenCalled();
+			});
+			expect(mockOnEventAction).not.toHaveBeenCalled();
+		});
+
+		it('allows changing an already-accepted event to declined', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('Accepted')}
+					onEventAction={mockOnEventAction}
+				/>
+			);
+
+			// Both buttons remain available so the user can change their response
+			expect(screen.getByTitle('Accept')).toBeInTheDocument();
+			expect(screen.getByTitle('Decline')).toBeInTheDocument();
+		});
+
+		it('hides Accept/Decline in readOnly mode', () => {
+			renderWithProviders(
+				<CalendarEventInfo
+					event={thirdPartyEvent('NeedsAction')}
+					onEventAction={mockOnEventAction}
+					readOnly
+				/>
+			);
+
+			expect(screen.queryByTitle('Accept')).not.toBeInTheDocument();
+			expect(screen.queryByTitle('Decline')).not.toBeInTheDocument();
 		});
 	});
 

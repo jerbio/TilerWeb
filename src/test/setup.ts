@@ -58,6 +58,16 @@ if (!window.matchMedia) {
 	});
 }
 
+// JSDOM does not implement ResizeObserver; components that measure their own
+// width for responsive layout (e.g. the assignee board) rely on it.
+if (!window.ResizeObserver) {
+	window.ResizeObserver = class {
+		observe() {}
+		unobserve() {}
+		disconnect() {}
+	};
+}
+
 // Mock static assets with unique identifiers to allow verification
 vi.mock('@/assets/add_block.svg', () => ({ default: 'mock:add_block.svg' }));
 vi.mock('@/assets/add_new_tile.svg', () => ({ default: 'mock:add_new_tile.svg' }));

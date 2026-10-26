@@ -34,6 +34,21 @@
 	color: #888;
 }
 
+/* Stretch the native action button's tap target across the location warning.
+   Sonner keeps its close button above this target so dismissal stays separate. */
+.location-ignored-toast [data-action]::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	cursor: pointer;
+}
+
+.location-ignored-toast [data-action]:focus-visible::after {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
 /* Swiper JS */
 .swiper-slide {
 	z-index: -1 !important;

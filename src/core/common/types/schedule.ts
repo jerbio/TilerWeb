@@ -127,6 +127,73 @@ export enum ThirdPartyType {
 	Unknown = 'unknown',
 }
 
+/**
+ * RSVP response state for a third-party (external calendar) event. Mirrors the
+ * mobile app's `RsvpStatus` enum. The backend ships this under the `rsvpStatus`
+ * field (string, casing may vary) — use {@link normalizeRsvpStatus} to parse.
+ */
+export enum RsvpStatus {
+	Accepted = 'accepted',
+	Declined = 'declined',
+	Tentative = 'tentative',
+	NeedsAction = 'needsAction',
+	NotApplicable = 'notApplicable',
+}
+
+/** Parse a wire `rsvpStatus` string into an {@link RsvpStatus} (case-insensitive). */
+export function normalizeRsvpStatus(value?: string | null): RsvpStatus | undefined {
+	if (value == null || value === '') return undefined;
+	switch (value.toString().toLowerCase()) {
+		case 'accepted':
+			return RsvpStatus.Accepted;
+		case 'declined':
+			return RsvpStatus.Declined;
+		case 'tentative':
+			return RsvpStatus.Tentative;
+		case 'needsaction':
+		case 'needs_action':
+			return RsvpStatus.NeedsAction;
+		case 'notapplicable':
+		case 'not_applicable':
+		case 'none':
+			return RsvpStatus.NotApplicable;
+		default:
+			return RsvpStatus.NotApplicable;
+	}
+}
+
+/**
+ * Whether an RSVP status is actionable — i.e. the user can accept or decline (or
+ * change a prior response). `NotApplicable`/undefined are not actionable.
+ */
+export function isActionableRsvp(status?: RsvpStatus): boolean {
+	return (
+		status === RsvpStatus.NeedsAction ||
+		status === RsvpStatus.Tentative ||
+		status === RsvpStatus.Accepted ||
+		status === RsvpStatus.Declined
+	);
+}
+
+/**
+ * Known video/conferencing source keys emitted by the backend under
+ * `otherData.videoUrls`. The key set mirrors the C# `VideoSource` enum
+ * (lowercased on the wire).
+ */
+export type VideoLinkSource = 'zoom' | 'google' | 'outlook' | 'other';
+
+/** Map of source → URLs. Each source may carry zero, one, or more URLs. */
+export type EventVideoLinks = Partial<Record<VideoLinkSource, string[]>>;
+
+/**
+ * Free-form bag of extra fields the backend ships under `otherData`. We model
+ * the keys we render (`videoUrls`) and leave the rest open for forward-compat.
+ */
+export type EventOtherData = {
+	videoUrls?: EventVideoLinks;
+	[key: string]: unknown;
+};
+
 export type SubCalendarEvent = {
 	id: string;
 	start: number;
@@ -156,6 +223,11 @@ export type SubCalendarEvent = {
 	thirdPartyType?: ThirdPartyType | string;
 	thirdPartyUserId?: string | null;
 	thirdPartyId?: string;
+	/**
+	 * RSVP response for third-party events (wire field: `rsvpStatus`). Absent for
+	 * native Tiler tiles. Parse with {@link normalizeRsvpStatus}.
+	 */
+	rsvpStatus?: RsvpStatus | string;
 	priority?: number;
 	tileShareDesignatedId?: null;
 	projectionType?: ['SimpleObject'];
@@ -185,6 +257,11 @@ export type SubCalendarEvent = {
 	SubCalCalEventStart?: number;
 	SubCalCalEventEnd?: number;
 	travelDetail?: TravelDetail;
+	/**
+	 * Loose bag of additional fields the backend may surface (e.g. attached
+	 * video/meeting links). Absent when there is nothing to render.
+	 */
+	otherData?: EventOtherData;
 };
 
 export type ScheduleLookupTravelDetail = TravelPath | null;
@@ -323,10 +400,19 @@ export type ScheduleCreateEventParams = {
 	getTimeSpan?: string;
 };
 
+export type CreatedScheduleEvent = SubCalendarEvent & {
+	calendarEvent?: CalendarEvent | null;
+};
+
+/** MobileApp responses include the schedule update and the newly created event. */
 export type ScheduleCreateEventResponse = ApiResponse<
-	SubCalendarEvent & {
-		calendarEvent: CalendarEvent;
-	}
+	| CreatedScheduleEvent
+	| {
+			tilerEvent: CreatedScheduleEvent;
+			subEvents: SubCalendarEvent[];
+			responseTimeline: Pick<EventTimeline, 'start' | 'end'>;
+			idempotencyKey?: string | null;
+	  }
 >;
 // ── Single-event lookup response types ─────────────────────────
 
@@ -378,17 +464,121 @@ export type CalendarEventResponse = ApiResponse<CalendarEvent>;
 
 export type SubEventsOfCalendarResponse = ApiResponse<SubCalendarEvent[]>;
 
-/** Params for `GET /api/CalendarEvent/Name` — search tiles by name */
-export type CalendarEventSearchParams = {
-	data: string;
-	userName: string;
-	userId: string;
-	batchSize?: number;
-	index?: number;
+// ── Multi-source calendar event search (Phase 4) ─────────────────
+/**
+ * Source vocabulary for `GET /api/CalendarEvent/Search`
+ * endpoint. Mirrors the server's `getDispatchCalendarType()` casing.
+ */
+export enum CalendarSearchSource {
+	Tiler = 'tiler',
+	Google = 'google',
+	Microsoft = 'microsoft',
+}
+
+/**
+ * Per-source execution status for the multi-source search envelope.
+ * - `success`   — every calendar in the source returned results.
+ * - `partial`   — surviving events shipped but some calendars failed.
+ * - `failed`    — the source could not execute at all.
+ */
+export type CalendarSearchSourceStatus = {
+	source: string;
+	status: 'success' | 'partial' | 'failed';
+	/** `native-query` or `default-filter`, reported by the source itself. */
+	queryMode?: string;
+	/** Sanitized failure category; present for `failed`/`partial`. */
+	category?: string;
+	/** Whether the client may retry this source; present for `failed`/`partial`. */
+	retryable?: boolean;
+	/** Number of per-calendar failures; present only when `partial`. */
+	failureCount?: number;
 };
 
-/** Response shape for `GET /api/CalendarEvent/Name` */
-export type CalendarEventSearchResponse = ApiResponse<CalendarEvent[]>;
+/**
+ * Per-result actionable capabilities. A read-only event exposes none of them.
+ */
+export type CalendarSearchCapabilities = {
+	canEdit: boolean;
+	canDelete: boolean;
+	canComplete: boolean;
+	canSetAsNow: boolean;
+};
+
+/** One multi-source search result row (Gate-A wire shape). */
+export type CalendarSearchItem = {
+	/** Tiler-facing `EventID`, identical to the one schedule retrieval produces. */
+	id: string;
+	name: string;
+	/** Start time as Unix epoch milliseconds (UTC). */
+	start: number;
+	/** End time as Unix epoch milliseconds (UTC). */
+	end: number;
+	/** `tiler` / `google` / `microsoft`. */
+	source: string;
+	/** Provider event id for third-party results; null for native Tiler. */
+	thirdPartyEventId?: string | null;
+	/** Connected provider account for third-party results; null for native Tiler. */
+	thirdPartyUserId?: string | null;
+	isReadOnly?: boolean;
+	capabilities: CalendarSearchCapabilities;
+};
+
+/**
+ * The canonical search envelope: top-level `items`, `sources`, `correlationId`.
+ * Served as the standard PostBack wrapper's `Content`, with merged-result batch metadata.
+ */
+export type CalendarSearchEnvelope = {
+	items: CalendarSearchItem[];
+	sources: CalendarSearchSourceStatus[];
+	correlationId: string;
+	/** Batch metadata is optional for compatibility with older API deployments. */
+	index?: number;
+	batchSize?: number;
+	totalCount?: number;
+	hasMore?: boolean;
+	nextIndex?: number | null;
+};
+
+/** One failed third-party provider in a total-failure (502) body. */
+export type CalendarSearchFailedSource = {
+	/** Provider vocabulary (`google` / `microsoft`). */
+	provider: string;
+	/** Connected-account email (the user's own first-party account). */
+	email?: string;
+	/** Sanitized failure category. */
+	category?: string;
+};
+
+/**
+ * Typed error body for a TOTAL search source failure (HTTP 502).
+ * Deliberately NOT the search envelope — an empty "no matches" envelope would
+ * misreport a total failure as a successful empty search.
+ */
+export type CalendarSearchErrorBody = {
+	/** Stable machine-readable code (`search_unavailable`). */
+	error: string;
+	message: string;
+	/** Sanitized failure category of the failed sources. */
+	category?: string;
+	/** The request's correlation id (matches the logs). */
+	correlationId: string;
+	/** Every failed third-party provider; omitted when no provider was involved. */
+	sources?: CalendarSearchFailedSource[];
+};
+
+/** Params for `GET /api/CalendarEvent/Search` */
+export type CalendarSearchParams = {
+	query: string;
+	/** Restrict to specific sources; omitted to search all connected sources. */
+	sources?: CalendarSearchSource[];
+	/** Result count (1–150, server default 50) and zero-based merged-result offset. */
+	batchSize?: number;
+	index?: number;
+	/** UTC epoch milliseconds; supply both. Matches events overlapping [start, end). */
+	start?: number;
+	end?: number;
+	orderMode?: 'relevance' | 'providerorder';
+};
 
 /** Params for `POST /api/CalendarEvent/Update` */
 

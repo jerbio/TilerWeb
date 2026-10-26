@@ -18,12 +18,21 @@ import FeaturesSection from '../components/discover/FeaturesSection';
 const Discover: React.FC = () => {
 	const { t } = useTranslation();
 
+	const structuredData = {
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		name: t('discover.seo.title'),
+		description: t('discover.seo.description'),
+		url: 'https://tiler.app/discover',
+	};
+
 	return (
 		<>
 			<SEO
 				title={t('discover.seo.title')}
 				description={t('discover.seo.description')}
 				canonicalUrl="/discover"
+				structuredData={structuredData}
 			/>
 			<Section>
 				<BackgroundBlur />

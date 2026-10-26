@@ -1,3 +1,4 @@
+import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 import {
 	ScheduleCreateEventParams,
 	ScheduleCreateEventResponse,
@@ -12,12 +13,13 @@ import {
 } from '../core/common/types/schedule';
 import TimeUtil from '../core/util/time';
 import { AppApi } from './appApi';
+import { LocationVerification } from '@/core/constants/location';
 
 export class ScheduleApi extends AppApi {
 	/**
 	 * Wraps every schedule-mutating request with automatic user-location injection.
 	 * Spreads location fields after caller params so they always reflect the
-	 * device's current position, and defaults Version to 'v2'.
+	 * user's confirmed selection, and defaults Version to 'v2'.
 	 */
 	private async scheduleRequest<T>(method: string, endpoint: string, params: object): Promise<T> {
 		const loc = await this.getLocationData();
@@ -26,9 +28,13 @@ export class ScheduleApi extends AppApi {
 			...params,
 			UserLongitude: loc.longitude?.toString() ?? '',
 			UserLatitude: loc.latitude?.toString() ?? '',
-			UserLocationVerified: loc.verified ? 'true' : 'false',
+			UserLocationVerified: loc.verified
+				? LocationVerification.Verified
+				: LocationVerification.Unverified,
+			TimeZone: (params as Record<string, unknown>).TimeZone ?? deviceTimeZone().toString(),
 		};
 		return this.apiRequest<T>(endpoint, {
+			usesUserLocation: true,
 			method,
 			body: JSON.stringify(enriched),
 		});
@@ -154,10 +160,14 @@ export class ScheduleApi extends AppApi {
 			MobileApp: 'true',
 			UserLongitude: loc.longitude?.toString() ?? '',
 			UserLatitude: loc.latitude?.toString() ?? '',
-			UserLocationVerified: loc.verified ? 'true' : 'false',
+			UserLocationVerified: loc.verified
+				? LocationVerification.Verified
+				: LocationVerification.Unverified,
+			TimeZone: deviceTimeZone().toString(),
 		}).toString();
 		return this.apiRequest<TilePredictionApiResponse>(
-			`api/Schedule/NewTilePrediction?${urlParams}`
+			`api/Schedule/NewTilePrediction?${urlParams}`,
+			{ usesUserLocation: true }
 		);
 	}
 }

@@ -10,6 +10,11 @@ interface SectionHeadersProps {
 	imageAlt?: string;
 	align?: 'left' | 'center' | 'right';
 	size?: 'base' | 'large';
+	/**
+	 * Semantic level of the main heading. Defaults to `2` (existing behaviour);
+	 * pass `1` for the single page-level H1 (e.g. hero sections).
+	 */
+	headingLevel?: 1 | 2;
 }
 
 const Container = styled.div<{ $align: 'left' | 'center' | 'right' }>`
@@ -79,10 +84,11 @@ const SectionHeaders: React.FC<SectionHeadersProps> = ({
 	imageAlt,
 	align = 'center',
 	size = 'base',
+	headingLevel = 2,
 }) => {
 	return (
 		<Container $align={align}>
-			<Header size={size}>
+			<Header size={size} as={headingLevel === 1 ? 'h1' : 'h2'}>
 				{headerText}
 				{spanText && (
 					<>

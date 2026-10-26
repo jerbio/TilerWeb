@@ -3,11 +3,7 @@ import { act } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { CalendarUIStore, createCalendarUIStore } from '../calendar-ui.store';
 import { StoreApi } from 'zustand';
-import {
-	CalendarEvent,
-	ScheduleCreateEventResponse,
-	ThirdPartyType,
-} from '@/core/common/types/schedule';
+import { CalendarEvent, CreatedScheduleEvent, ThirdPartyType } from '@/core/common/types/schedule';
 
 const demoMode = false;
 let store: StoreApi<CalendarUIStore>;
@@ -116,7 +112,7 @@ describe('calendar-ui.store', () => {
 	it('shows and hides success', () => {
 		const tile = { id: 't1', name: 'Tile1' };
 		act(() => {
-			getActions().showSuccess(tile as ScheduleCreateEventResponse['Content']);
+			getActions().showSuccess(tile as CreatedScheduleEvent);
 		});
 		expect(getState().success.isOpen).toBe(true);
 		expect(getState().success.tile).toEqual(tile);
