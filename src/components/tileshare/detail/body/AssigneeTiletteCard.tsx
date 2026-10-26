@@ -1,0 +1,130 @@
+import TiletteRsvpStatus from '@/components/tileshare/TiletteRsvpStatus';
+import TiletteInvitationActions from '@/components/tileshare/TiletteInvitationActions';
+import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { TileShareTemplate } from '@/core/common/types/tileshare';
+import { useTheme } from '@/core/theme/ThemeProvider';
+import { Routes } from '@/core/constants/routes';
+import { getTileletteColor } from '@/core/util/tileletteColor';
+import { filledSurface } from '@/core/util/colorSurface';
+import { designatedToAvatars, validDesignatedUsers } from '@/core/util/tileshareAssignees';
+import AvatarCluster from '@/core/common/components/AvatarCluster';
+import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
+
+type AssigneeTiletteCardProps = {
+	tilette: TileShareTemplate;
+	clusterId: string;
+	assigneeId: string;
+};
+
+/** A colour-filled tilette card inside an assignee column, linking to the tilette detail page. */
+const AssigneeTiletteCard: React.FC<AssigneeTiletteCardProps> = ({
+	tilette,
+	clusterId,
+	assigneeId,
+}) => {
+	const { t } = useTranslation();
+	const { isDarkMode } = useTheme();
+	const surface = filledSurface(getTileletteColor(tilette.id), isDarkMode);
+	// Shimmer the whole card while an RSVP response is saving in place.
+	const [saving, setSaving] = useState(false);
+	const collaborators = validDesignatedUsers(tilette.designatedUsers).filter(
+		(user) => (user.userId ?? user.displayedIdentifier) !== assigneeId
+	);
+
+	return (
+		<Card $bg={surface.background} $border={surface.border} aria-busy={saving || undefined}>
+			<CardLink
+				to={Routes.Tileshare.tilette(clusterId, tilette.id ?? '')}
+				aria-label={t('tilesharedemo.detail.openTiletteAria')}
+			>
+				<Name $color={surface.text}>{tilette.name ?? '—'}</Name>
+			</CardLink>
+			<Footer>
+				<TiletteWorkProgress tilette={tilette} assigneeId={assigneeId} compact />
+				{collaborators.length > 0 && (
+					<AvatarCluster users={designatedToAvatars(collaborators)} size={22} max={2} />
+				)}
+			</Footer>
+			<RsvpRow>
+				<TiletteRsvpStatus tilette={tilette} assigneeId={assigneeId} embedded compact />
+				<TiletteInvitationActions
+					tilette={tilette}
+					clusterId={clusterId}
+					assigneeId={assigneeId}
+					embedded
+					compact
+					reportBusy={setSaving}
+				/>
+				{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
+			</RsvpRow>
+		</Card>
+	);
+};
+
+const Card = styled.div<{ $bg: string; $border: string }>`
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border-radius: ${({ theme }) => theme.borderRadius.large};
+	background-color: ${({ theme }) => theme.colors.background.card};
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-top: 3px solid ${({ $border }) => $border};
+	text-decoration: none;
+	transition: filter 0.15s ease;
+
+	&:hover {
+		filter: brightness(1.08);
+	}
+`;
+
+const CardLink = styled(Link)`
+	display: flex;
+	flex-direction: column;
+	padding: 10px 12px 8px;
+	color: inherit;
+	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
+`;
+
+const Name = styled.p<{ $color: string }>`
+	margin: 0;
+	font-size: ${({ theme }) => theme.typography.fontSize.sm};
+	font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
+	color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const Footer = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0 12px 8px;
+	&:empty {
+		display: none;
+	}
+`;
+
+/** One bordered row hosting the RSVP badge and the inline response actions. */
+const RsvpRow = styled.div`
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 8px 12px;
+	> button {
+		margin-left: auto;
+	}
+	border-top: 1px solid ${({ theme }) => theme.colors.border.default};
+	&:empty {
+		display: none;
+	}
+`;
+
+export default AssigneeTiletteCard;
