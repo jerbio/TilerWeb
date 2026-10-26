@@ -35,20 +35,22 @@ vi.mock('@/core/common/components/Pagination', () => ({
 		page,
 		onChange,
 		disabled,
+		hasNext,
 	}: {
 		page: number;
 		onChange: (page: number) => void;
 		disabled: boolean;
+		hasNext: boolean;
 	}) => (
-		<button disabled={disabled} onClick={() => onChange(page + 1)}>
+		<button disabled={disabled || !hasNext} onClick={() => onChange(page + 1)}>
 			Next
 		</button>
 	),
 }));
-function open() {
+function open(entry = '/tileshare/projects') {
 	return render(
 		<ThemeProvider theme={darkTheme}>
-			<MemoryRouter initialEntries={['/tileshare/projects']}>
+			<MemoryRouter initialEntries={[entry]}>
 				<Routes>
 					<Route path="/tileshare" element={<Dashboard />}>
 						<Route path="projects" element={<List />} />
@@ -63,10 +65,91 @@ beforeEach(() => {
 	mocks.clusters.mockResolvedValue([
 		{ id: 'mine', name: 'Created project' },
 		{ id: 'shared', name: 'Received project' },
+		...Array.from({ length: 18 }, (_, i) => ({ id: `extra-${i}`, name: `Project ${i}` })),
 	]);
 	mocks.activity.mockResolvedValue({ items: [], nextCursor: null });
 });
 describe('TileShare dashboard', () => {
+	it.each([1, 5, 19])(
+		'omits pagination when all %i results fit on the first page',
+		async (count) => {
+			mocks.clusters.mockResolvedValue(
+				Array.from({ length: count }, (_, i) => ({
+					id: `only-${i}`,
+					name: `Only share ${i}`,
+				}))
+			);
+			open();
+			await screen.findByText('Only share 0');
+			expect(screen.queryByText('Next')).not.toBeInTheDocument();
+		}
+	);
+	it('disables Next on a short final page while keeping page navigation available', async () => {
+		mocks.clusters
+			.mockResolvedValueOnce(
+				Array.from({ length: 20 }, (_, i) => ({ id: String(i), name: `First page ${i}` }))
+			)
+			.mockResolvedValueOnce([{ id: 'last', name: 'Last share' }]);
+		open();
+		await screen.findByText('First page 0');
+		fireEvent.click(screen.getByText('Next'));
+		await screen.findByText('Last share');
+		expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+	});
+
+	it('combines debounced name search with deadline filters and resets pagination', async () => {
+		open();
+		await screen.findByText('Received project');
+		fireEvent.click(screen.getByText('Next'));
+		await waitFor(() =>
+			expect(mocks.clusters).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2 }))
+		);
+		fireEvent.change(screen.getByRole('searchbox', { name: 'Search by name' }), {
+			target: { value: '  Launch  ' },
+		});
+		await waitFor(() =>
+			expect(mocks.clusters).toHaveBeenLastCalledWith(
+				expect.objectContaining({ page: 1, search: 'Launch' })
+			)
+		);
+		fireEvent.click(screen.getByRole('button', { name: 'Deadline' }));
+		fireEvent.mouseDown(screen.getByRole('option', { name: 'No deadline' }));
+		await waitFor(() =>
+			expect(mocks.clusters).toHaveBeenLastCalledWith(
+				expect.objectContaining({ page: 1, search: 'Launch', deadlineFilter: 'NoDeadline' })
+			)
+		);
+		fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+		await waitFor(() =>
+			expect(mocks.clusters).toHaveBeenLastCalledWith(
+				expect.objectContaining({ page: 1, search: undefined })
+			)
+		);
+		expect(screen.getByRole('button', { name: 'Deadline' })).toHaveTextContent('Any deadline');
+	});
+	it('restores filters from the URL and does not fetch an invalid custom range', async () => {
+		open(
+			'/tileshare/projects?search=Launch&deadline=custom&from=2026-10-25&to=2026-10-24&createdByMe=1&sort=deadlineAsc'
+		);
+		expect(screen.getByRole('searchbox')).toHaveValue('Launch');
+		expect(screen.getByRole('status')).toHaveTextContent('Choose at least one date');
+		expect(mocks.clusters).not.toHaveBeenCalled();
+		fireEvent.change(screen.getByLabelText('Through'), { target: { value: '2026-10-25' } });
+		await waitFor(() =>
+			expect(mocks.clusters).toHaveBeenLastCalledWith(
+				expect.objectContaining({
+					page: 1,
+					search: 'Launch',
+					createdByMe: true,
+					sortBy: 'Deadline',
+					deadlineFilter: 'Range',
+					deadlineFrom: new Date(2026, 9, 25).getTime(),
+					deadlineBefore: new Date(2026, 9, 26).getTime(),
+				})
+			)
+		);
+	});
+
 	it('combines projects and only requests activities while expanded', async () => {
 		open();
 		await screen.findByText('Received project');
@@ -96,9 +179,8 @@ describe('TileShare dashboard', () => {
 				expect.objectContaining({ page: 1, createdByMe: true })
 			)
 		);
-		fireEvent.change(screen.getByRole('combobox', { name: 'Sort by' }), {
-			target: { value: 'deadlineAsc' },
-		});
+		fireEvent.click(screen.getByRole('button', { name: 'Sort by' }));
+		fireEvent.mouseDown(screen.getByRole('option', { name: 'Soonest deadline' }));
 		await waitFor(() =>
 			expect(mocks.clusters).toHaveBeenLastCalledWith(
 				expect.objectContaining({

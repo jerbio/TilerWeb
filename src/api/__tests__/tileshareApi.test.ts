@@ -212,7 +212,13 @@ describe('TileshareApi', () => {
 				)
 			);
 
-			const result = await api.getClusters({ IsOutbox: true });
+			const result = await api.getClusters({
+				IsOutbox: true,
+				Search: 'Launch & plan + 100%',
+				DeadlineFilter: 'Range',
+				DeadlineFrom: 100,
+				DeadlineBefore: 200,
+			});
 
 			expect(fetchSpy).toHaveBeenCalledOnce();
 			const [urlArg, options] = fetchSpy.mock.calls[0];
@@ -224,6 +230,11 @@ describe('TileshareApi', () => {
 						: String(urlArg);
 			expect(urlStr).toContain('api/TileShareCluster');
 			expect(urlStr).toContain('IsOutbox=true');
+			const query = new URL(urlStr).searchParams;
+			expect(query.get('Search')).toBe('Launch & plan + 100%');
+			expect(query.get('DeadlineFilter')).toBe('Range');
+			expect(query.get('DeadlineFrom')).toBe('100');
+			expect(query.get('DeadlineBefore')).toBe('200');
 			const method = urlArg instanceof Request ? urlArg.method : options?.method;
 			expect(method ?? 'GET').toBe('GET');
 			expect(result.Content.clusters).toHaveLength(1);
