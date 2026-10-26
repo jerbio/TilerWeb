@@ -121,6 +121,27 @@ export default function ClassShareActions({
 			}))
 		);
 	};
+	const alreadyParticipating =
+		!!user?.email &&
+		people.some((c) =>
+			contactKeys(c).some(
+				(k) =>
+					k === `id:${user.id}` ||
+					k === `email:${user.email?.toLowerCase()}`
+			)
+		);
+	const participate = () => {
+		if (!user?.email) return;
+		const me = toContact(user.email, user.countryCode || '1');
+		void run(
+			tilettes
+				.filter((task) => task.id && !matches(me, task.designatedUsers).length)
+				.map((task) => ({
+					key: task.id!,
+					send: () => tileshareService.addTiletteRecipient(task.id!, me),
+				}))
+		);
+	};
 	const blocked = busy || remaining.length > 0;
 	return (
 		<section
@@ -129,6 +150,11 @@ export default function ClassShareActions({
 		>
 			{isOwner ? (
 				<>
+					{!alreadyParticipating && !!tilettes.length && (
+						<Button variant="primary" disabled={blocked} onClick={participate}>
+							{t('tileShareModes.participate', 'Participate')}
+						</Button>
+					)}
 					<h3>{t('tileShareModes.participants', 'Participants')}</h3>
 					<Input
 						label={t('tileShareModes.participantContact', 'Participant email or phone')}
