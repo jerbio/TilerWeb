@@ -17,7 +17,9 @@ export default function usePrefetchedCalendarData({
 }) {
 	const MAX_CACHE_ENTRIES = 12;
 
-	const latestLookupRequestRef = useRef<string | null>(null);
+	const latestLookupRequestRef = useRef(0);
+	const cacheGenerationRef = useRef(0);
+	const mountedRef = useRef(true);
 	const scheduleCacheRef = useRef<Map<string, Array<SubCalendarEvent>>>(new Map());
 
 	const [events, setEvents] = useState<Array<SubCalendarEvent>>([]);
@@ -31,9 +33,36 @@ export default function usePrefetchedCalendarData({
 			: state.authenticatedPersonaSession
 	);
 	const scheduleId = activePersonaSession?.scheduleId;
+	const personaId = activePersonaSession?.personaId || 'unknown-persona';
+	const scope = JSON.stringify([personaId, userId, scheduleId]);
+	const scopeRef = useRef(scope);
+	if (scopeRef.current !== scope) {
+		scopeRef.current = scope;
+		cacheGenerationRef.current++;
+		latestLookupRequestRef.current++;
+		scheduleCacheRef.current.clear();
+	}
+	useEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+			cacheGenerationRef.current++;
+			latestLookupRequestRef.current++;
+		};
+	}, []);
+	useEffect(() => {
+		setEvents([]);
+	}, [scope]);
 
 	async function refetchEvents() {
-		if (!userId) return;
+		if (!userId || daysInView <= 0) return;
+		const request = ++latestLookupRequestRef.current;
+		const generation = ++cacheGenerationRef.current;
+		const current = () =>
+			mountedRef.current &&
+			scopeRef.current === scope &&
+			latestLookupRequestRef.current === request &&
+			cacheGenerationRef.current === generation;
 
 		setLoading(true);
 
@@ -44,19 +73,23 @@ export default function usePrefetchedCalendarData({
 		const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
 
 		// Re-fetch the current visible range
-		const refreshedEvents = await fetchSchedule(userId, start, end, false);
-
-		setEvents(refreshedEvents);
-		setLoading(false);
+		try {
+			const refreshedEvents = await fetchSchedule(userId, start, end, false, generation);
+			if (!current()) return;
+			setEvents(refreshedEvents);
+		} finally {
+			if (current()) setLoading(false);
+		}
+		if (!current()) return;
 
 		// Re-prefetch adjacent ranges so swiping is still instant
 		const nextStart = end;
 		const nextEnd = nextStart + TimeUtil.inMilliseconds(daysInView, 'd');
-		fetchSchedule(userId, nextStart, nextEnd, false);
+		void fetchSchedule(userId, nextStart, nextEnd, false, generation).catch(() => {});
 
 		const prevEnd = start;
 		const prevStart = prevEnd - TimeUtil.inMilliseconds(daysInView, 'd');
-		fetchSchedule(userId, prevStart, prevEnd, false);
+		void fetchSchedule(userId, prevStart, prevEnd, false, generation).catch(() => {});
 	}
 
 	function makeCacheKey(
@@ -81,9 +114,9 @@ export default function usePrefetchedCalendarData({
 		id: string,
 		startRange: number,
 		endRange: number,
-		useCache = true
+		useCache = true,
+		generation = cacheGenerationRef.current
 	) {
-		const personaId = activePersonaSession?.personaId || 'unknown-persona';
 		const cacheKey = makeCacheKey(id, startRange, endRange, scheduleId || null, personaId);
 
 		if (isDemoMode()) {
@@ -103,8 +136,14 @@ export default function usePrefetchedCalendarData({
 			endRange,
 		});
 
-		scheduleCacheRef.current.set(cacheKey, lookup.subCalendarEvents);
-		enforceMaxCacheSize();
+		if (
+			mountedRef.current &&
+			scopeRef.current === scope &&
+			cacheGenerationRef.current === generation
+		) {
+			scheduleCacheRef.current.set(cacheKey, lookup.subCalendarEvents);
+			enforceMaxCacheSize();
+		}
 		return lookup.subCalendarEvents;
 	}
 
@@ -114,34 +153,41 @@ export default function usePrefetchedCalendarData({
 		const start = viewOptions.startDay.valueOf();
 		const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
 
-		const requestKey = makeCacheKey(
-			userId,
-			start,
-			end,
-			scheduleId,
-			activePersonaSession?.personaId || 'unknown-persona'
-		);
-		latestLookupRequestRef.current = requestKey;
+		const request = ++latestLookupRequestRef.current;
+		const generation = cacheGenerationRef.current;
+		const current = () =>
+			mountedRef.current &&
+			scopeRef.current === scope &&
+			latestLookupRequestRef.current === request;
 
 		setLoading(true);
 
 		// Fetch current range
-		fetchSchedule(userId, start, end).then((evts) => {
-			if (latestLookupRequestRef.current !== requestKey) return;
-			setEvents(evts);
-			setLoading(false);
-		});
+		fetchSchedule(userId, start, end)
+			.then((evts) => {
+				if (!current()) return;
+				setEvents(evts);
+			})
+			.catch(() => {
+				/* Retain the last visible schedule when a read fails. */
+			})
+			.finally(() => {
+				if (current()) setLoading(false);
+			});
 
 		// Prefetch next
 		const nextStart = end;
 		const nextEnd = nextStart + TimeUtil.inMilliseconds(daysInView, 'd');
-		fetchSchedule(userId, nextStart, nextEnd, false);
+		void fetchSchedule(userId, nextStart, nextEnd, false, generation).catch(() => {});
 
 		// Prefetch previous
 		const prevEnd = start;
 		const prevStart = prevEnd - TimeUtil.inMilliseconds(daysInView, 'd');
-		fetchSchedule(userId, prevStart, prevEnd, false);
-	}, [userId, viewOptions.startDay, daysInView, scheduleId]);
+		void fetchSchedule(userId, prevStart, prevEnd, false, generation).catch(() => {});
+		return () => {
+			latestLookupRequestRef.current++;
+		};
+	}, [userId, viewOptions.startDay, daysInView, scheduleId, personaId]);
 
 	return { events, loading, refetchEvents };
 }

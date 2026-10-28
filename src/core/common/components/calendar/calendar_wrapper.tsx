@@ -5,6 +5,7 @@ import Calendar from '@/core/common/components/calendar/calendar';
 import usePrefetchedCalendarData from '@/core/common/hooks/usePrefetchedCalendarEvents';
 import useCalendarView from '@/core/common/hooks/useCalendarView';
 import { useScheduleSocket } from '@/hooks/useScheduleSocket';
+import { CalendarSyncNotice } from './CalendarSyncNotice';
 import { useCalendarUI } from './calendar-ui.provider';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { buildSimulationDiff, entityKey } from '@/core/util/simulationDiff';
@@ -43,7 +44,7 @@ export function CalendarWrapper({
 	const hasRouter = useInRouterContext();
 
 	// Auto-refetch calendar events when a schedule change is detected via WebSocket
-	useScheduleSocket(refetchEvents);
+	const calendarSync = useScheduleSocket(refetchEvents);
 
 	// ---- Phase 5: simulation overlay subscription -----------------------
 	// `chat.tsx` publishes review state to the overlay store; we react by
@@ -142,6 +143,7 @@ export function CalendarWrapper({
 
 	return (
 		<>
+			{calendarSync && <CalendarSyncNotice {...calendarSync} />}
 			{hasRouter && (
 				<CalendarRouteFocus loading={loading} allowEventLookup={allowEventLookup} />
 			)}

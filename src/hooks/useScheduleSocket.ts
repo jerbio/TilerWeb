@@ -1,61 +1,68 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { SignalRService, Hubs, type SubscriptionHandle } from '@/services/SocketService';
-import useAppStore from '@/global_state';
+import { useEffect, useRef, useState } from 'react';
+import { SignalRService, Hubs } from '@/services/SocketService';
+import { CalendarSyncClient, type CalendarSyncState } from '@/services/calendarSyncClient';
+import { CalendarSyncApi } from '@/api/calendarSyncApi';
+import useAppStore, { SessionType } from '@/global_state';
 
-/**
- * Hook that listens for schedule changes via the SignalR `scheduleChange` hub.
- * When a schedule change is detected, it calls the provided `onScheduleChange` callback.
- *
- * The hook manages the WebSocket lifecycle (connect on mount, dispose on unmount)
- * and automatically reconnects when the userId changes.
- *
- * @param onScheduleChange - Callback invoked when a schedule change is received from the server.
- */
-export function useScheduleSocket(onScheduleChange: () => void) {
-	const socketRef = useRef<SignalRService | null>(null);
-	const handleRef = useRef<SubscriptionHandle | null>(null);
-
-	// Get userId from the active persona session
-	const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
-	const activePersonaSession = getActivePersonaSession();
-	const userId = activePersonaSession?.userId;
-
-	// Stable callback ref to avoid re-subscribing when the callback identity changes
+/** Uses the existing socket, refreshing committed changes and recovering missed updates after reconnect. */
+export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) {
+	const userId = useAppStore((state) =>
+		state.activeSessionType === SessionType.AUTHENTICATED
+			? state.authenticatedPersonaSession?.userId
+			: undefined
+	);
+	const [status, setStatus] = useState<CalendarSyncState | null>(null);
+	const [recoveryError, setRecoveryError] = useState(false);
+	const [refreshError, setRefreshError] = useState(false);
+	const clientRef = useRef<CalendarSyncClient | null>(null);
 	const onChangeRef = useRef(onScheduleChange);
 	onChangeRef.current = onScheduleChange;
 
-	const handleScheduleChange = useCallback((data: unknown) => {
-		console.log('[useScheduleSocket] Schedule change detected via WebSocket:', data);
-		onChangeRef.current();
-	}, []);
-
 	useEffect(() => {
+		setStatus(null);
+		setRecoveryError(false);
+		setRefreshError(false);
 		if (!userId) return;
-
-		// Create the SignalR service and start the connection
 		const service = new SignalRService(userId);
-		service.createConnection();
-
-		// Subscribe to schedule change events
-		const handle = service.subscribe(
+		const api = new CalendarSyncApi();
+		const client = new CalendarSyncClient({
+			readStatus: () => api.getStatus(),
+			refresh: () => onChangeRef.current(),
+			status: setStatus,
+			recoveryError: setRecoveryError,
+			refreshError: setRefreshError,
+		});
+		clientRef.current = client;
+		service.subscribe(
+			Hubs.ScheduleChange.name,
+			Hubs.ScheduleChange.events.CalendarSyncUpdated,
+			(data) => client.receive(data)
+		);
+		service.subscribe(
 			Hubs.ScheduleChange.name,
 			Hubs.ScheduleChange.events.RefreshData,
-			handleScheduleChange
+			(data) => client.receiveRefresh(data)
 		);
-
-		socketRef.current = service;
-		handleRef.current = handle;
-
+		service.onConnected(() => {
+			void client.recover();
+		});
+		// Reading on mount also covers an unavailable socket; reconnect recovery then closes any subsequent gap.
+		void client.recover();
+		service.createConnection();
 		return () => {
-			// Cleanup: unsubscribe and dispose the connection
-			if (socketRef.current && handleRef.current) {
-				socketRef.current.unsubscribe(handleRef.current);
-			}
-			if (socketRef.current) {
-				socketRef.current.dispose();
-				socketRef.current = null;
-			}
-			handleRef.current = null;
+			client.dispose();
+			service.dispose();
+			if (clientRef.current === client) clientRef.current = null;
 		};
-	}, [userId, handleScheduleChange]);
+	}, [userId]);
+
+	return {
+		status,
+		recoveryError,
+		refreshError,
+		retry: () => {
+			clientRef.current?.refresh();
+			void clientRef.current?.recover();
+		},
+	};
 }

@@ -288,6 +288,15 @@
 		}
 	},
 	"calendar": {
+		"sync": {
+			"processing": "Aggiornamento del calendario in corso…",
+			"retrying": "Non è stato possibile completare gli aggiornamenti del calendario. Nuovo tentativo in corso…",
+			"failed": "Non è stato possibile completare gli aggiornamenti del calendario.",
+			"reconnect": "Ricollega il calendario nelle Impostazioni per riprendere gli aggiornamenti.",
+			"statusFailed": "Impossibile verificare gli aggiornamenti del calendario.",
+			"refreshFailed": "Non è stato possibile aggiornare la vista del calendario.",
+			"retry": "Riprova"
+		},
 		"nonViable": {
 			"title": "Eventi non programmabili",
 			"infoTooltip": "Questi eventi non hanno potuto essere programmati a causa di conflitti di orario o vincoli."

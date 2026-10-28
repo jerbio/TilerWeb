@@ -538,6 +538,9 @@ describe('SignalRService — hub handlers wired before .start()', () => {
 		expect(mock.clientMethodsAtStart[Hubs.ScheduleChange.name]).toContain(
 			Hubs.ScheduleChange.events.RefreshData
 		);
+		expect(mock.clientMethodsAtStart[Hubs.ScheduleChange.name]).toContain(
+			Hubs.ScheduleChange.events.CalendarSyncUpdated
+		);
 	});
 
 	it('pre-wires all known Hubs catalog events so server pushes are negotiated', () => {
@@ -571,5 +574,93 @@ describe('SignalRService — hub handlers wired before .start()', () => {
 		expect(cb).toHaveBeenCalledWith({
 			data: { vibe: { status: 'process_action_start' } },
 		});
+	});
+});
+
+describe('SignalRService connection recovery', () => {
+	it('notifies each consumer on initial connection and reconnect, removing disposed consumers', () => {
+		const a = new SignalRService('user-1');
+		const b = new SignalRService('user-1');
+		const recoveredA = vi.fn();
+		const recoveredB = vi.fn();
+		a.onConnected(recoveredA);
+		b.onConnected(recoveredB);
+		a.createConnection();
+		b.createConnection();
+		expect(recoveredA).toHaveBeenCalledTimes(1);
+		expect(recoveredB).toHaveBeenCalledTimes(1);
+		mock.simulateReconnect();
+		expect(recoveredA).toHaveBeenCalledTimes(2);
+		expect(recoveredB).toHaveBeenCalledTimes(2);
+		a.dispose();
+		mock.simulateReconnect();
+		expect(recoveredA).toHaveBeenCalledTimes(2);
+		expect(recoveredB).toHaveBeenCalledTimes(3);
+		b.dispose();
+	});
+
+	it('recovers late subscribers on an established shared connection', async () => {
+		const a = new SignalRService('user-1');
+		a.createConnection();
+		const b = new SignalRService('user-1');
+		const recovered = vi.fn();
+		b.onConnected(recovered);
+		b.createConnection();
+		await Promise.resolve();
+		expect(recovered).toHaveBeenCalledOnce();
+		a.dispose();
+		b.dispose();
+	});
+
+	it('does not notify a late subscriber disposed before its queued callback', async () => {
+		const a = new SignalRService('user-1');
+		a.createConnection();
+		const b = new SignalRService('user-1');
+		const recovered = vi.fn();
+		b.onConnected(recovered);
+		b.createConnection();
+		b.dispose();
+		await Promise.resolve();
+		expect(recovered).not.toHaveBeenCalled();
+		a.dispose();
+	});
+
+	it('rejoins and recovers after a full disconnected connection restart', () => {
+		vi.useFakeTimers();
+		try {
+			const service = new SignalRService('user-1');
+			const recovered = vi.fn();
+			service.onConnected(recovered);
+			service.createConnection();
+			window.$.connection.hub.state = CONNECTION_STATE.disconnected;
+			mock.disconnectedHandlers.forEach((callback) => callback());
+			vi.advanceTimersByTime(5000);
+			expect(mock.startCount).toBe(2);
+			expect(recovered).toHaveBeenCalledTimes(2);
+			expect(
+				mock.getProxy(Hubs.VibeUpdate.name).server[Hubs.VibeUpdate.server.JoinUserGroup]
+			).toHaveBeenCalledTimes(2);
+			service.dispose();
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+
+	it('stops a connection whose final consumer leaves while startup is pending', () => {
+		let complete!: () => void;
+		window.$.connection.hub.start = () => ({
+			done: (callback) => {
+				complete = callback;
+				return { fail: () => {} };
+			},
+		});
+		const service = new SignalRService('user-1');
+		const recovered = vi.fn();
+		service.onConnected(recovered);
+		service.createConnection();
+		service.dispose();
+		complete();
+		expect(mock.stopCount).toBe(1);
+		expect(recovered).not.toHaveBeenCalled();
 	});
 });

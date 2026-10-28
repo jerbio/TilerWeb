@@ -288,6 +288,15 @@
 		}
 	},
 	"calendar": {
+		"sync": {
+			"processing": "Aktualizowanie kalendarza…",
+			"retrying": "Nie udało się ukończyć aktualizacji kalendarza. Ponawianie próby…",
+			"failed": "Nie udało się ukończyć aktualizacji kalendarza.",
+			"reconnect": "Połącz ponownie kalendarz w Ustawieniach, aby wznowić aktualizacje.",
+			"statusFailed": "Nie udało się sprawdzić aktualizacji kalendarza.",
+			"refreshFailed": "Nie udało się odświeżyć widoku kalendarza.",
+			"retry": "Spróbuj ponownie"
+		},
 		"nonViable": {
 			"title": "Zdarzenia niewykonalne",
 			"infoTooltip": "Tych zdarzeń nie udało się zaplanować z powodu konfliktów czasowych lub ograniczeń."

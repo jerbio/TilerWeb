@@ -288,6 +288,15 @@
 		}
 	},
 	"calendar": {
+		"sync": {
+			"processing": "正在更新您的日历…",
+			"retrying": "无法完成日历更新。正在重试…",
+			"failed": "无法完成日历更新。",
+			"reconnect": "请在设置中重新连接您的日历以恢复更新。",
+			"statusFailed": "无法检查日历更新。",
+			"refreshFailed": "无法刷新您的日历视图。",
+			"retry": "重试"
+		},
 		"nonViable": {
 			"title": "无法安排的事件",
 			"infoTooltip": "由于时间冲突或限制，无法安排这些事件。"

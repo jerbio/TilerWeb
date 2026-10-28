@@ -288,6 +288,15 @@
 		}
 	},
 	"calendar": {
+		"sync": {
+			"processing": "Mise à jour de votre calendrier…",
+			"retrying": "Les mises à jour du calendrier n’ont pas pu être effectuées. Nouvelle tentative en cours…",
+			"failed": "Les mises à jour du calendrier n’ont pas pu être effectuées.",
+			"reconnect": "Reconnectez votre calendrier dans les Paramètres pour reprendre les mises à jour.",
+			"statusFailed": "Impossible de vérifier les mises à jour du calendrier.",
+			"refreshFailed": "La vue de votre calendrier n’a pas pu être actualisée.",
+			"retry": "Réessayer"
+		},
 		"nonViable": {
 			"title": "Événements non réalisables",
 			"infoTooltip": "Ces événements n'ont pas pu être planifiés en raison de conflits d'horaires ou de contraintes."

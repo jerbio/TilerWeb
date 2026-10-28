@@ -288,6 +288,15 @@
 		}
 	},
 	"calendar": {
+		"sync": {
+			"processing": "Ihr Kalender wird aktualisiert…",
+			"retrying": "Die Kalenderaktualisierungen konnten nicht abgeschlossen werden. Ein neuer Versuch wird gestartet…",
+			"failed": "Die Kalenderaktualisierungen konnten nicht abgeschlossen werden.",
+			"reconnect": "Verbinden Sie Ihren Kalender in den Einstellungen erneut, um die Aktualisierungen fortzusetzen.",
+			"statusFailed": "Die Kalenderaktualisierungen konnten nicht überprüft werden.",
+			"refreshFailed": "Ihre Kalenderansicht konnte nicht aktualisiert werden.",
+			"retry": "Erneut versuchen"
+		},
 		"nonViable": {
 			"title": "Nicht umsetzbare Termine",
 			"infoTooltip": "Diese Termine konnten aufgrund von Zeitkonflikten oder Einschränkungen nicht geplant werden."

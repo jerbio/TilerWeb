@@ -97,6 +97,7 @@ export const Hubs = {
 		name: 'scheduleChange',
 		events: {
 			RefreshData: 'refereshDataFromSockets',
+			CalendarSyncUpdated: 'calendarSyncUpdated',
 		},
 	},
 } as const;
@@ -184,6 +185,27 @@ export class SignalRConnectionManager {
 	private subscriptions = new Map<string, Map<string, (data: unknown) => void>>();
 	private wiredHandlers = new Set<string>();
 	private lifecycleWired = false;
+	private connectedListeners = new Set<() => void>();
+
+	/** Observes initial connection and both reconnect paths without creating another socket. */
+	onConnected(callback: () => void): () => void {
+		this.connectedListeners.add(callback);
+		if (this.isConnected())
+			queueMicrotask(() => {
+				if (this.connectedListeners.has(callback)) callback();
+			});
+		return () => this.connectedListeners.delete(callback);
+	}
+
+	private notifyConnected(): void {
+		for (const callback of [...this.connectedListeners]) {
+			try {
+				callback();
+			} catch {
+				sigWarn('Connection recovery callback failed');
+			}
+		}
+	}
 
 	/** Acquire a reference to the shared connection. Starts the hub on first
 	 *  acquire; subsequent acquires only bump the ref count. Each unique
@@ -415,8 +437,11 @@ export class SignalRConnectionManager {
 					users: Array.from(this.userRefCounts.keys()),
 				});
 				this.rejoinUserGroup();
+				this.notifyConnected();
 			});
 			window.$.connection.hub.disconnected(() => {
+				this.started = false;
+				this.startInFlight = false;
 				sigWarn('disconnected', { refCount: this.refCount });
 				// Attempt to restart connection after 5 seconds if we still have
 				// active consumers.
@@ -428,7 +453,7 @@ export class SignalRConnectionManager {
 							window.$.signalR.connectionState.disconnected
 					) {
 						sigLog('disconnected -> auto-restart .start()');
-						window.$.connection.hub.start();
+						this.startHub();
 					}
 				}, 5000);
 			});
@@ -460,15 +485,20 @@ export class SignalRConnectionManager {
 					transport: ['webSockets', 'serverSentEvents', 'longPolling'],
 				})
 				.done(() => {
-					this.started = true;
 					this.startInFlight = false;
-					const toJoin = this.pendingJoins;
+					if (this.refCount === 0) {
+						window.$.connection.hub.stop();
+						return;
+					}
+					this.started = true;
+					const toJoin = Array.from(this.userRefCounts.keys());
 					this.pendingJoins = [];
 					sigLog('start().done() — connection established', {
 						state: window.$.connection.hub.state,
 						pendingJoins: toJoin,
 					});
 					toJoin.forEach((uid) => this.joinSingleUser(uid));
+					this.notifyConnected();
 				})
 				.fail((error: Error) => {
 					this.startInFlight = false;
@@ -516,9 +546,21 @@ export class SignalRConnectionManager {
 
 export class SignalRService {
 	private readonly handles = new Map<string, SubscriptionHandle>();
+	private readonly connectionHandles = new Set<() => void>();
 	private acquired = false;
 
 	constructor(private userId: string) {}
+
+	/** Registers recovery for this consumer; disposal removes only its own callback. */
+	onConnected(callback: () => void): () => void {
+		const remove = SignalRConnectionManager.get().onConnected(callback);
+		const unsubscribe = () => {
+			remove();
+			this.connectionHandles.delete(unsubscribe);
+		};
+		this.connectionHandles.add(unsubscribe);
+		return unsubscribe;
+	}
 
 	/** Acquire the shared connection. Idempotent per instance. */
 	createConnection(): void {
@@ -566,6 +608,8 @@ export class SignalRService {
 	/** Remove all subscriptions made via this instance and release the
 	 *  shared connection reference. Safe to call multiple times. */
 	dispose(): void {
+		this.connectionHandles.forEach((remove) => remove());
+		this.connectionHandles.clear();
 		sigLog('SignalRService.dispose()', {
 			userId: this.userId,
 			handles: this.handles.size,
