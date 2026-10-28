@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, CalendarDays } from 'lucide-react';
 import TileShareModeIcon from './TileShareModeIcon';
@@ -9,7 +9,6 @@ import { iconSurface } from '@/core/util/colorSurface';
 import dayjs from 'dayjs';
 import { unixToTimeString } from '@/core/util/eventTimeConversion';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
-import Button from '@/core/common/components/button';
 import { TileShareCluster } from '@/core/common/types/tileshare';
 import { tileshareMode } from '@/core/util/tileshareMode';
 import { Link } from 'react-router';
@@ -18,10 +17,10 @@ import Tooltip from '@/core/common/components/tooltip';
 
 type TileShareClusterCardProps = {
 	cluster: TileShareCluster;
+	returnTo?: string;
 };
 
-const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) => {
-	const theme = useTheme();
+const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster, returnTo }) => {
 	const { isDarkMode } = useAppTheme();
 	const { t } = useTranslation();
 	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
@@ -41,7 +40,10 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 	const formattedDueBy = cluster.end ? unixToTimeString(cluster.end) : '—';
 
 	return (
-		<CardGrid to={Routes.Tileshare.detail(cluster.id ?? '')}>
+		<CardGrid
+			to={Routes.Tileshare.detail(cluster.id ?? '')}
+			state={returnTo ? { tileShareListReturnTo: returnTo } : undefined}
+		>
 			<Left>
 				<IconBox $bg={surface.background} $fg={surface.foreground}>
 					<TileShareModeIcon mode={mode} size={22} />
@@ -60,63 +62,60 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster }) 
 						)}
 					</SubHeader>
 				</TitleBlock>
-				<Button
-					height={40}
-					style={{
-						color: theme.colors.brand[300],
-						border: `1px solid ${theme.colors.border.default}`,
-					}}
-					variant={'ghost'}
-					size="small"
-					aria-label="View"
-				>
-					<ArrowRight size={20} />
-				</Button>
 			</Left>
 
 			<Right>
-				<DueWrapper>
-					<DueItem />
-					<DueDivider />
-					<DueItem>
-						<DueIcon>
-							<CalendarDays size={16} />
-						</DueIcon>
-						<DueLabel>{t('tilesharedemo.card.due')}</DueLabel>
-						<DueContent>
+				<Participants>
+					{avatarUsers.length > 0 && (
+						<AvatarCluster
+							users={avatarUsers}
+							size={28}
+							renderWrapper={(user, i, avatar) => (
+								<Tooltip
+									key={i}
+									text={user.email ?? user.name ?? ''}
+									position="top"
+								>
+									{avatar}
+								</Tooltip>
+							)}
+						/>
+					)}
+				</Participants>
+				<DueItem>
+					<DueIcon>
+						<CalendarDays size={16} />
+					</DueIcon>
+					<DueContent>
+						<DueSummary>
+							<DueLabel>{t('tilesharedemo.card.due')}</DueLabel>
 							<DueTime>{formattedDueBy}</DueTime>
-							<DueValue>{formattedDueOn}</DueValue>
-						</DueContent>
-					</DueItem>
-				</DueWrapper>
-
-				<AvatarRow>
-					<AvatarCluster
-						users={avatarUsers}
-						renderWrapper={(user, i, avatar) => (
-							<Tooltip key={i} text={user.email ?? user.name ?? ''} position="top">
-								{avatar}
-							</Tooltip>
-						)}
-					/>
-				</AvatarRow>
+						</DueSummary>
+						<DueValue>{formattedDueOn}</DueValue>
+					</DueContent>
+				</DueItem>
 			</Right>
+			<OpenIndicator aria-hidden="true">
+				<ArrowRight size={20} />
+			</OpenIndicator>
 		</CardGrid>
 	);
 };
 
 const CardGrid = styled(Link)`
 	display: grid;
-	grid-template-columns: minmax(0, 7fr) 1px minmax(0, 5fr);
-	grid-template-rows: auto;
-	background-color: ${({ theme }) => theme.colors.border.default};
+	grid-template-columns: minmax(0, 1fr) auto 24px;
+	align-items: center;
+	gap: 20px;
+	padding: 16px 20px;
+	background-color: ${({ theme }) => theme.colors.background.card};
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.xLarge};
-	overflow: hidden;
 	text-decoration: none;
 	color: inherit;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.025);
 	transition:
+		background-color 160ms ease,
 		border-color 160ms ease,
 		box-shadow 160ms ease;
 	&:hover {
@@ -127,44 +126,66 @@ const CardGrid = styled(Link)`
 		outline: 2px solid ${({ theme }) => theme.colors.brand[400]};
 		outline-offset: 3px;
 	}
+	&:hover,
+	&:focus-visible {
+		background-color: ${({ theme }) =>
+			theme.colors.interaction?.highlight ?? theme.colors.background.card};
+	}
 	@media (prefers-reduced-motion: reduce) {
 		transition: none;
 	}
 
-	@media (max-width: 640px) {
-		grid-template-columns: 1fr;
-		grid-template-rows: auto 1px auto;
+	@media (max-width: 760px) {
+		grid-template-columns: minmax(0, 1fr) 24px;
+		gap: 12px;
+		padding: 16px;
 	}
 `;
 
 const Left = styled.div`
-	background-color: ${({ theme }) => theme.colors.background.card};
-	padding: 1rem 1.25rem;
 	grid-column: 1;
 	grid-row: 1;
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
-
-	@media (max-width: 640px) {
-		grid-column: 1;
-		grid-row: 1;
-	}
+	min-width: 0;
 `;
 
 const Right = styled.div`
-	background-color: ${({ theme }) => theme.colors.background.card};
-	padding: 1rem 1.25rem;
+	grid-column: 2;
+	grid-row: 1;
+	display: grid;
+	grid-template-columns: 6.5rem 12rem;
+	align-items: center;
+	gap: 24px;
+
+	@media (max-width: 760px) {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		grid-template-columns: 6.5rem minmax(0, 12rem);
+		justify-content: space-between;
+		gap: 12px;
+	}
+	@media (max-width: 360px) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+`;
+
+const Participants = styled.div`
+	display: flex;
+	align-items: center;
+	min-height: 28px;
+`;
+
+const OpenIndicator = styled.span`
 	grid-column: 3;
 	grid-row: 1;
 	display: flex;
-	flex-direction: column;
+	align-items: center;
 	justify-content: center;
-	gap: 0.75rem;
-
-	@media (max-width: 640px) {
-		grid-column: 1;
-		grid-row: 3;
+	color: ${({ theme }) => theme.colors.brand[300]};
+	@media (max-width: 760px) {
+		grid-column: 2;
 	}
 `;
 
@@ -181,6 +202,9 @@ const IconBox = styled.div<{ $bg: string; $fg: string }>`
 `;
 
 const TitleBlock = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 	flex: 1;
 	min-width: 0;
 `;
@@ -199,38 +223,27 @@ const SubHeader = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+	min-width: 0;
 	span {
 		color: ${({ theme }) => theme.colors.text.muted};
 	}
 `;
 
 const Subtitle = styled.p`
+	margin: 0;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};
 	color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const DueWrapper = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.75rem;
-	background: ${({ theme }) => theme.colors.input.bg};
-	border-radius: ${({ theme }) => theme.borderRadius.large};
-	width: 100%;
-`;
-
-const DueDivider = styled.div`
-	width: 1px;
-	align-self: stretch;
-	background-color: ${({ theme }) => theme.colors.border.default};
-	flex-shrink: 0;
 `;
 
 const DueItem = styled.div`
 	display: flex;
 	align-items: flex-start;
 	gap: 0.5rem;
-	flex: 1;
+	min-width: 0;
 `;
 
 const DueIcon = styled.div`
@@ -243,6 +256,13 @@ const DueContent = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
+	min-width: 0;
+`;
+
+const DueSummary = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 6px;
 `;
 
 const DueLabel = styled.span`
@@ -251,6 +271,8 @@ const DueLabel = styled.span`
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.secondary};
 	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 `;
 
 const DueValue = styled.span`
@@ -259,16 +281,12 @@ const DueValue = styled.span`
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	color: ${({ theme }) => theme.colors.text.primary};
 	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 `;
 
 const DueTime = styled(DueValue)`
 	color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const AvatarRow = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
 `;
 
 export default TileShareClusterCard;

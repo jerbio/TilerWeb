@@ -13,6 +13,33 @@ const renderWithTheme = (ui: React.ReactElement) =>
 	render(<ThemeProvider defaultTheme="dark">{ui}</ThemeProvider>);
 
 describe('Select', () => {
+	it('supports keyboard selection and restores focus to the trigger', () => {
+		const onChange = vi.fn();
+		renderWithTheme(
+			<Select value="all" onChange={onChange} options={options} aria-label="Deadline" />
+		);
+		const trigger = screen.getByRole('button', { name: 'Deadline' });
+		fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+		const list = screen.getByRole('listbox');
+		expect(list).toHaveFocus();
+		fireEvent.keyDown(list, { key: 'ArrowDown' });
+		fireEvent.keyDown(list, { key: 'Enter' });
+		expect(onChange).toHaveBeenCalledWith('active');
+		expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+		expect(trigger).toHaveFocus();
+	});
+	it('closes with Escape without changing the selection', () => {
+		const onChange = vi.fn();
+		renderWithTheme(<Select value="all" onChange={onChange} options={options} />);
+		const trigger = screen.getByRole('button');
+		fireEvent.click(trigger);
+		fireEvent.keyDown(screen.getByRole('listbox'), { key: 'End' });
+		fireEvent.keyDown(screen.getByRole('listbox'), { key: 'Escape' });
+		expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+		expect(onChange).not.toHaveBeenCalled();
+		expect(trigger).toHaveFocus();
+	});
+
 	describe('Rendering', () => {
 		it('shows the label of the selected option', () => {
 			renderWithTheme(<Select value="all" onChange={vi.fn()} options={options} />);

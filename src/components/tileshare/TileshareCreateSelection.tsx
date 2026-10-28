@@ -134,8 +134,10 @@ const Selection = styled.button`
 		text-align: left;
 	}
 
-	&:hover {
-		background-color: ${({ theme }) => `${theme.colors.brand[300]}05`};
+	&:hover,
+	&:focus-visible {
+		background-color: ${({ theme }) =>
+			theme.colors.interaction?.highlight ?? `${theme.colors.brand[300]}05`};
 		& > :first-child {
 			background-color: ${({ theme }) => `${theme.colors.brand[500]}10`};
 			border-color: ${({ theme }) => `${theme.colors.brand[500]}20`};

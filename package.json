@@ -6,6 +6,8 @@
 	"scripts": {
 		"prepare": "husky",
 		"dev": "vite",
+		"certs:generate": "node scripts/generate-dev-certs.mjs",
+		"certs:trust": "node scripts/generate-dev-certs.mjs --trust",
 		"prebuild": "node scripts/update-sitemap.js",
 		"build": "tsc -b && vite build",
 		"postbuild": "node scripts/prerender.mjs",

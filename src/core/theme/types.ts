@@ -84,6 +84,8 @@ export type AppTheme = {
 		highlight: {
 			text: string;
 		};
+		/** Shared fill for highlighted interactive surfaces. */
+		interaction?: { highlight: string };
 		// Toggle colors
 		toggle: {
 			bg: string;

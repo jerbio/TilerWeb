@@ -11,13 +11,19 @@ export type FetchPage<T> = (params: { page: number; pageSize: ItemsPerPage }) =>
  * The backend pages by record offset and returns no total count, so there is no
  * `totalPages` — navigation is prev/next driven by `hasNext`.
  *
- * A short page is NOT the end of the list: the server applies Skip/Take before
+ * By default a short page is NOT the end of the list: legacy endpoints apply Skip/Take before
  * a join that can drop and then de-duplicate rows, so mid-list pages routinely
  * come back with fewer than `pageSize` items. Only an empty page marks the end.
  * Landing on one steps back to the last page that had items and remembers where
  * the list ran out, so the user is never stranded on a blank page.
+ * Set `shortPageIsLast` for endpoints that filter and de-duplicate before paging,
+ * such as the combined TileShare list, where a short page really is the end.
  */
-function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsPerPage) {
+function useServerPagination<T>(
+	fetchPage: FetchPage<T>,
+	defaultPageSize: ItemsPerPage,
+	{ shortPageIsLast = false }: { shortPageIsLast?: boolean } = {}
+) {
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSizeState] = useState<ItemsPerPage>(defaultPageSize);
 	const [items, setItems] = useState<T[]>([]);
@@ -54,7 +60,10 @@ function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsP
 				}
 
 				setItems(data);
-				setHasNext(data.length > 0 && emptyPageRef.current !== page + 1);
+				setHasNext(
+					(shortPageIsLast ? data.length >= pageSize : data.length > 0) &&
+						emptyPageRef.current !== page + 1
+				);
 			} catch (error) {
 				if (cancelled) return;
 				console.error('Error fetching paginated data', error);
@@ -70,7 +79,7 @@ function useServerPagination<T>(fetchPage: FetchPage<T>, defaultPageSize: ItemsP
 		return () => {
 			cancelled = true;
 		};
-	}, [page, pageSize]);
+	}, [page, pageSize, shortPageIsLast]);
 
 	const setPageSize = (size: ItemsPerPage) => {
 		// Page boundaries move, so where the list ran out no longer applies.

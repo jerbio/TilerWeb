@@ -40,6 +40,10 @@ function toClusterQuery(params?: ClusterPageParams): Partial<GetClustersParams> 
 	}
 	if (sortOrder !== undefined) query.SortOrder = sortOrder;
 	if (sortBy !== undefined) query.SortBy = sortBy;
+	if (params.search?.trim()) query.Search = params.search.trim();
+	if (params.deadlineFilter !== undefined) query.DeadlineFilter = params.deadlineFilter;
+	if (params.deadlineFrom !== undefined) query.DeadlineFrom = params.deadlineFrom;
+	if (params.deadlineBefore !== undefined) query.DeadlineBefore = params.deadlineBefore;
 
 	return query;
 }

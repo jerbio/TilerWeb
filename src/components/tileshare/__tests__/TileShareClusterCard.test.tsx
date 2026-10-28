@@ -103,9 +103,10 @@ describe('TileShareClusterCard', () => {
 		expect(screen.getByText('Class')).toBeInTheDocument();
 	});
 
-	it('renders the view button', () => {
+	it('opens the share through one link without a nested button', () => {
 		renderCard(mockCluster);
-		expect(screen.getByRole('button', { name: 'View' })).toBeInTheDocument();
+		expect(screen.getByRole('link')).toHaveAttribute('href', '/tileshare/cluster-1');
+		expect(screen.queryByRole('button')).not.toBeInTheDocument();
 	});
 
 	it('renders a single merged due label', () => {

@@ -17,6 +17,27 @@ const renderWithTheme = (ui: React.ReactElement) =>
 	render(<ThemeProvider defaultTheme="dark">{ui}</ThemeProvider>);
 
 describe('useServerPagination', () => {
+	it('stops on a short page when the endpoint filters before pagination', async () => {
+		const fetchPage = vi.fn().mockResolvedValue(makePage(1));
+		const { result } = renderHook(() =>
+			useServerPagination(fetchPage, 10, { shortPageIsLast: true })
+		);
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		expect(result.current.items).toEqual([1]);
+		expect(result.current.hasNext).toBe(false);
+		expect(fetchPage).toHaveBeenCalledTimes(1);
+	});
+	it('offers a full next page and stops on the final short page', async () => {
+		const fetchPage = vi.fn().mockResolvedValueOnce(makePage(10)).mockResolvedValueOnce([11]);
+		const { result } = renderHook(() =>
+			useServerPagination(fetchPage, 10, { shortPageIsLast: true })
+		);
+		await waitFor(() => expect(result.current.hasNext).toBe(true));
+		act(() => result.current.setPage(2));
+		await waitFor(() => expect(result.current.items).toEqual([11]));
+		expect(result.current.hasNext).toBe(false);
+	});
+
 	it('fetches the first page on mount with the default page size', async () => {
 		const fetchPage = vi.fn().mockResolvedValue(makePage(10));
 		const { result } = renderHook(() => useServerPagination(fetchPage, 10));

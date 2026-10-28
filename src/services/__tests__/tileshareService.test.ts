@@ -62,6 +62,37 @@ const mockDesignatedTile = {
 };
 
 describe('TileshareService', () => {
+	it('passes name and deadline filters alongside the page offset', async () => {
+		const getClusters = vi
+			.fn()
+			.mockResolvedValue({ Content: { clusters: [] }, Error: { Code: '0' } });
+		const service = new TileshareService({ getClusters } as unknown as TileshareApi);
+		await service.getClusters({
+			page: 3,
+			pageSize: 20,
+			search: '  Launch & plan  ',
+			deadlineFilter: 'Range',
+			deadlineFrom: 100,
+			deadlineBefore: 200,
+		});
+		expect(getClusters).toHaveBeenLastCalledWith({
+			IncludeCreated: true,
+			IsOutbox: false,
+			Index: 40,
+			PageSize: 20,
+			Search: 'Launch & plan',
+			DeadlineFilter: 'Range',
+			DeadlineFrom: 100,
+			DeadlineBefore: 200,
+		});
+		await service.getClusters({ search: '   ', deadlineFilter: 'NoDeadline' });
+		expect(getClusters).toHaveBeenLastCalledWith({
+			IncludeCreated: true,
+			IsOutbox: false,
+			DeadlineFilter: 'NoDeadline',
+		});
+	});
+
 	it('requests a combined server page with ownership and deadline ordering', async () => {
 		const getClusters = vi
 			.fn()

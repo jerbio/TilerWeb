@@ -65,6 +65,22 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 ### Running the App
 
+For trusted local HTTPS on Windows, run these once before starting Vite:
+
+```powershell
+npm run certs:generate
+npm run certs:trust
+```
+
+This creates a local CA and a certificate valid for 30 years for `localhost`,
+`127.0.0.1`, and `::1`, then trusts the CA for your Windows user account.
+Vite uses these files from the git-ignored `certs/` directory instead of its
+temporary self-signed certificate. The CA private key is never saved.
+Restart Vite after generating certificates, and restart the browser if it was open
+during trust installation. On other operating systems, import `certs/rootCA.pem`
+into the system trust store manually. Without these files, Vite falls back to its
+untrusted basic SSL certificate. `NO_SSL` still disables local HTTPS.
+
 ```bash
 # Start development server
 npm run dev

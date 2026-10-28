@@ -1,7 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { Routes } from '@/core/constants/routes';
 import TileshareDetailBreadcrumb from '../TileshareDetailBreadcrumb';
+
+const navigation = vi.hoisted(() => ({ state: null as null | { tileShareListReturnTo: string } }));
+beforeEach(() => {
+	navigation.state = null;
+});
 
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string) => key }),
@@ -11,6 +16,7 @@ vi.mock('react-router', async () => {
 	const actual = await vi.importActual<typeof import('react-router')>('react-router');
 	return {
 		...actual,
+		useLocation: () => ({ state: navigation.state }),
 		Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
 			<a href={to}>{children}</a>
 		),
@@ -18,6 +24,15 @@ vi.mock('react-router', async () => {
 });
 
 describe('TileshareDetailBreadcrumb', () => {
+	it('returns to the filtered list when a share was opened from it', () => {
+		const href = '/tileshare/projects?search=Launch&deadline=overdue&createdByMe=1';
+		navigation.state = { tileShareListReturnTo: href };
+		render(<TileshareDetailBreadcrumb current="Launch" />);
+		expect(
+			screen.getByRole('link', { name: 'tilesharedemo.detail.breadcrumbRoot' })
+		).toHaveAttribute('href', href);
+	});
+
 	it('renders the root crumb as a link to the tileshare root', () => {
 		render(<TileshareDetailBreadcrumb current="Q1 projects 2026" />);
 

@@ -1,4 +1,4 @@
-{
+﻿{
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Location ignored for this request",
@@ -176,12 +176,28 @@
 	},
 	"tileshareList": {
 		"title": "TileShares",
+		"search": "Search by name",
+		"filters": "Filter TileShares",
+		"searchPlaceholder": "Search TileShares…",
+		"deadline": "Deadline",
+		"filterDeadline": {
+			"all": "Any deadline",
+			"overdue": "Overdue",
+			"today": "Today",
+			"next7Days": "Next 7 days",
+			"custom": "Custom range",
+			"noDeadline": "No deadline"
+		},
+		"from": "From",
+		"to": "Through",
+		"clearFilters": "Clear filters",
+		"invalidRange": "Choose at least one date. The end date must be on or after the start date.",
 		"createdByMe": "Created by me",
 		"sort": "Sort by",
-		"createdDesc": "Creation time: newest first",
-		"createdAsc": "Creation time: oldest first",
-		"deadlineAsc": "Deadline: earliest first",
-		"deadlineDesc": "Deadline: latest first",
+		"createdDesc": "Newest first",
+		"createdAsc": "Oldest first",
+		"deadlineAsc": "Soonest deadline",
+		"deadlineDesc": "Latest deadline",
 		"empty": "No TileShares match this filter.",
 		"failed": "Could not load TileShares.",
 		"retry": "Retry"

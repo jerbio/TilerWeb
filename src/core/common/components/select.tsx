@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useLayoutEffect,
+	useRef,
+	useState,
+	type KeyboardEvent,
+} from 'react';
 import styled from 'styled-components';
 import { ChevronDown } from 'lucide-react';
 import palette from '@/core/theme/palette';
@@ -42,6 +50,9 @@ function Select<T extends string = string>({
 	'aria-label': ariaLabel,
 }: SelectProps<T>) {
 	const [open, setOpen] = useState(false);
+	const [highlightedIndex, setHighlightedIndex] = useState(0);
+	const listId = useId();
+	const triggerRef = useRef<HTMLButtonElement>(null);
 	const [placement, setPlacement] = useState<Placement>({
 		direction: 'down',
 		maxHeight: Infinity,
@@ -78,6 +89,7 @@ function Select<T extends string = string>({
 	useLayoutEffect(() => {
 		if (!open) return;
 		updatePlacement();
+		dropdownRef.current?.focus();
 
 		// `true` so scrolling any ancestor container repositions the dropdown too.
 		window.addEventListener('scroll', updatePlacement, true);
@@ -102,11 +114,52 @@ function Select<T extends string = string>({
 	const handleSelect = (optionValue: T) => {
 		onChange(optionValue);
 		setOpen(false);
+		triggerRef.current?.focus();
+	};
+	const openList = () => {
+		setHighlightedIndex(
+			Math.max(
+				0,
+				options.findIndex((o) => o.value === value)
+			)
+		);
+		setOpen(true);
+	};
+	const onListKeyDown = (event: KeyboardEvent) => {
+		if (event.key === 'Tab') {
+			setOpen(false);
+			return;
+		}
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			setOpen(false);
+			triggerRef.current?.focus();
+			return;
+		}
+		if (!options.length) return;
+		if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+			event.preventDefault();
+			const next =
+				event.key === 'Home'
+					? 0
+					: event.key === 'End'
+						? options.length - 1
+						: (highlightedIndex +
+								(event.key === 'ArrowDown' ? 1 : -1) +
+								options.length) %
+							options.length;
+			setHighlightedIndex(next);
+			dropdownRef.current?.children[next]?.scrollIntoView?.({ block: 'nearest' });
+		} else if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			if (options[highlightedIndex]) handleSelect(options[highlightedIndex].value);
+		}
 	};
 
 	return (
 		<Container ref={containerRef} className={className}>
 			<Trigger
+				ref={triggerRef}
 				type="button"
 				$sized={sized}
 				$open={open}
@@ -114,7 +167,19 @@ function Select<T extends string = string>({
 				aria-haspopup="listbox"
 				aria-expanded={open}
 				aria-label={ariaLabel}
-				onClick={() => !disabled && setOpen((prev) => !prev)}
+				aria-controls={open ? listId : undefined}
+				onClick={() => {
+					if (!disabled) {
+						if (open) setOpen(false);
+						else openList();
+					}
+				}}
+				onKeyDown={(event) => {
+					if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+						event.preventDefault();
+						openList();
+					}
+				}}
 			>
 				<TriggerLabel $hasValue={!!selected}>
 					{selected ? selected.label : (placeholder ?? '')}
@@ -127,18 +192,30 @@ function Select<T extends string = string>({
 			{open && (
 				<Dropdown
 					ref={dropdownRef}
+					id={listId}
 					role="listbox"
+					tabIndex={-1}
+					aria-label={ariaLabel}
+					aria-activedescendant={
+						options[highlightedIndex] ? `${listId}-${highlightedIndex}` : undefined
+					}
+					onKeyDown={onListKeyDown}
 					$align={align}
 					$direction={placement.direction}
 					$maxHeight={placement.maxHeight}
 				>
-					{options.map((option) => (
+					{options.map((option, index) => (
 						<DropdownItem
 							key={option.value}
+							id={`${listId}-${index}`}
 							role="option"
 							aria-selected={option.value === value}
 							$active={option.value === value}
-							onMouseDown={() => handleSelect(option.value)}
+							$highlighted={index === highlightedIndex}
+							onMouseDown={(event) => {
+								event.preventDefault();
+								handleSelect(option.value);
+							}}
 						>
 							{option.label}
 						</DropdownItem>
@@ -242,21 +319,27 @@ const Dropdown = styled.div<{
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 	/* Clips the items to the rounded corners; scrolls only once max-height bites. */
 	overflow: hidden auto;
+	outline: none;
 `;
 
-const DropdownItem = styled.div<{ $active: boolean }>`
+const DropdownItem = styled.div<{ $active: boolean; $highlighted: boolean }>`
 	padding: 8px ${palette.space.small};
 	font-size: ${palette.typography.fontSize.sm};
 	font-weight: ${({ $active }) =>
 		$active ? palette.typography.fontWeight.semibold : palette.typography.fontWeight.normal};
 	color: ${({ theme, $active }) =>
 		$active ? theme.colors.tabs.textActive : theme.colors.text.primary};
-	background: ${({ theme, $active }) => ($active ? theme.colors.tabs.indicator : 'transparent')};
+	background: ${({ theme, $active, $highlighted }) =>
+		$highlighted || $active
+			? (theme.colors.interaction?.highlight ??
+				($highlighted ? theme.colors.background.card2 : theme.colors.tabs.indicator))
+			: 'transparent'};
 	cursor: pointer;
 	transition: background 0.1s ease;
 
 	&:hover {
-		background: ${({ theme }) => theme.colors.background.card2};
+		background: ${({ theme }) =>
+			theme.colors.interaction?.highlight ?? theme.colors.background.card2};
 	}
 `;
 

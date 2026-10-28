@@ -15,6 +15,9 @@ export function tileShareTheme(parent: AppTheme = lightTheme): ShareTheme {
 		tileShare: true,
 		colors: {
 			...parent.colors,
+			interaction: {
+				highlight: `color-mix(in srgb, ${parent.colors.brand[300]} 2%, ${parent.colors.background.card})`,
+			},
 			plain: parent.colors.background.card,
 			button: {
 				...parent.colors.button,
