@@ -197,7 +197,10 @@ export class CalendarSyncClient {
 		else this.refresh(); // Existing non-sync schedule notifications retain their behavior.
 	}
 
-	async recover(): Promise<void> {
+	async recover({
+		refresh = true,
+		seedCursor = true,
+	}: { refresh?: boolean; seedCursor?: boolean } = {}): Promise<void> {
 		if (this.disposed) return;
 		const version = ++this.recoveryVersion;
 		const messages = this.messageVersion;
@@ -207,11 +210,12 @@ export class CalendarSyncClient {
 			this.options.recoveryError(false);
 			if (!status) return;
 			if (messages === this.messageVersion) {
-				this.cursor.seed(status);
+				if (seedCursor) this.cursor.seed(status);
 				this.options.status(status);
 			}
-			// A missed completion still matters when a newer generation is now running or failed.
-			this.refresh();
+			// Callers loading events separately can read metadata alone. Otherwise a
+			// missed completion still matters while newer work is running or failed.
+			if (refresh) this.refresh();
 		} catch {
 			if (
 				!this.disposed &&

@@ -113,6 +113,37 @@ function setup() {
 }
 
 describe('calendar sync client recovery and refresh coordination', () => {
+	it('loads mount metadata without invalidating the calendar read already started by the view', async () => {
+		const { client, readStatus, refresh, status, recoveryError } = setup();
+		await client.recover({ refresh: false });
+		await flushSyncClient();
+		expect(readStatus).toHaveBeenCalledOnce();
+		expect(status).toHaveBeenCalledExactlyOnceWith(syncStatus());
+		expect(recoveryError).toHaveBeenLastCalledWith(false);
+		expect(refresh).not.toHaveBeenCalled();
+	});
+	it('keeps completion notifications eligible when independent metadata cannot confirm view freshness', async () => {
+		const { client, refresh, status } = setup();
+		await client.recover({ refresh: false, seedCursor: false });
+		await flushSyncClient();
+		expect(status).toHaveBeenCalledWith(syncStatus());
+		expect(refresh).not.toHaveBeenCalled();
+		client.receive(syncUpdate());
+		client.receiveRefresh({ calendarSync: syncUpdate() });
+		await flushSyncClient();
+		expect(refresh).toHaveBeenCalledOnce();
+	});
+	it('still refreshes on initial connection and later reconnects with identical sync metadata', async () => {
+		const { client, refresh } = setup();
+		await client.recover({ refresh: false });
+		await client.recover();
+		await flushSyncClient();
+		expect(refresh).toHaveBeenCalledOnce();
+		// Sync metadata does not record every native edit made during a disconnect.
+		await client.recover();
+		await flushSyncClient();
+		expect(refresh).toHaveBeenCalledTimes(2);
+	});
 	it('refreshes external-only changes once for both completion callbacks', async () => {
 		const { client, refresh, status } = setup();
 		const update = syncUpdate();

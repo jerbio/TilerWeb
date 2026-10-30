@@ -71,6 +71,7 @@ describe('CalendarWrapper', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mocks.useScheduleSocket.mockReturnValue({ ready: true });
 		mocks.useCalendarView.mockReturnValue({
 			viewOptions,
 			setViewOptions: mocks.setViewOptions,
@@ -90,8 +91,11 @@ describe('CalendarWrapper', () => {
 			userId: 'user-1',
 			viewOptions,
 			daysInView: 3,
+			enabled: true,
 		});
-		expect(mocks.useScheduleSocket).toHaveBeenCalledWith(mocks.refetchEvents);
+		expect(mocks.useScheduleSocket).toHaveBeenCalledWith(expect.any(Function));
+		mocks.useScheduleSocket.mock.calls[0][0]();
+		expect(mocks.refetchEvents).toHaveBeenCalledOnce();
 		expect(mocks.calendar).toHaveBeenCalledWith(
 			expect.objectContaining({
 				allowEventLookup: false,
@@ -106,5 +110,13 @@ describe('CalendarWrapper', () => {
 		await waitFor(() => {
 			expect(screen.getByTestId('view-info')).toHaveTextContent('2026-05-05:3');
 		});
+	});
+
+	it('waits for startup readiness before enabling calendar requests', () => {
+		mocks.useScheduleSocket.mockReturnValue({ ready: false });
+		renderWrapper();
+		expect(mocks.usePrefetchedCalendarData).toHaveBeenCalledWith(
+			expect.objectContaining({ enabled: false })
+		);
 	});
 });

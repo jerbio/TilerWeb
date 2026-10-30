@@ -1,10 +1,20 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { useRef } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import dayjs from 'dayjs';
 import { useScheduleSocket } from './useScheduleSocket';
-import { deferred, syncStatus, syncUpdate } from '@/services/calendarSyncClient.fixtures';
+import usePrefetchedCalendarData from '@/core/common/hooks/usePrefetchedCalendarEvents';
+import type { SubCalendarEvent } from '@/core/common/types/schedule';
+import {
+	deferred,
+	flushSyncClient,
+	syncStatus,
+	syncUpdate,
+} from '@/services/calendarSyncClient.fixtures';
 
 const mocks = vi.hoisted(() => ({
 	read: vi.fn(),
+	lookup: vi.fn(),
 	services: [] as Array<{
 		subs: Map<string, (value: unknown) => void>;
 		connected: (() => void) | null;
@@ -21,6 +31,10 @@ vi.mock('@/api/calendarSyncApi', () => ({
 		getStatus = () => mocks.read();
 	},
 }));
+vi.mock('@/services', () => ({
+	scheduleService: { lookupScheduleByUserId: (...args: unknown[]) => mocks.lookup(...args) },
+}));
+vi.mock('@/config/demo_config', () => ({ isDemoMode: () => false }));
 vi.mock('@/services/SocketService', () => ({
 	Hubs: {
 		ScheduleChange: {
@@ -53,9 +67,26 @@ vi.mock('@/services/SocketService', () => ({
 	},
 }));
 
+const startDay = dayjs('2026-10-30T00:00:00Z');
+function useConnectedCalendar() {
+	const refresh = useRef<ReturnType<typeof usePrefetchedCalendarData>['refetchEvents'] | null>(
+		null
+	);
+	const sync = useScheduleSocket(() => refresh.current?.());
+	const calendar = usePrefetchedCalendarData({
+		userId: mocks.state.authenticatedPersonaSession.userId,
+		viewOptions: { startDay, daysInView: 7 },
+		daysInView: 7,
+		enabled: sync.ready,
+	});
+	refresh.current = calendar.refetchEvents;
+	return { calendar, sync };
+}
+
 describe('schedule socket hook', () => {
 	beforeEach(() => {
 		mocks.read.mockReset().mockResolvedValue(null);
+		mocks.lookup.mockReset().mockResolvedValue({ subCalendarEvents: [] });
 		mocks.services.length = 0;
 		mocks.state.activeSessionType = 'authenticated';
 		mocks.state.authenticatedPersonaSession = { userId: 'owner' };
@@ -77,9 +108,158 @@ describe('schedule socket hook', () => {
 		expect(socket.disposed).toBe(true);
 	});
 
+	it('uses the first connection for initial loading and refreshes on later reconnects', async () => {
+		mocks.read.mockResolvedValue(syncStatus());
+		const refresh = vi.fn().mockResolvedValue(undefined);
+		const { result } = renderHook(() => useScheduleSocket(refresh));
+		await waitFor(() => expect(result.current.status).toEqual(syncStatus()));
+		expect(refresh).not.toHaveBeenCalled();
+		expect(result.current.ready).toBe(false);
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(result.current.ready).toBe(true));
+		expect(mocks.read).toHaveBeenCalledOnce();
+		expect(refresh).not.toHaveBeenCalled();
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(refresh).toHaveBeenCalledOnce());
+		expect(mocks.read).toHaveBeenCalledTimes(2);
+	});
+
+	it('loads each of the three startup ranges once after the initial connection is ready', async () => {
+		const initial = deferred<{ subCalendarEvents: SubCalendarEvent[] }>();
+		const events = (id: string) => [{ id }] as SubCalendarEvent[];
+		mocks.read.mockResolvedValue(syncStatus());
+		mocks.lookup.mockReturnValueOnce(initial.promise);
+		const { result } = renderHook(useConnectedCalendar);
+		await waitFor(() => expect(result.current.sync.status).toEqual(syncStatus()));
+		expect(mocks.lookup).not.toHaveBeenCalled();
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(mocks.lookup).toHaveBeenCalledTimes(3));
+		await act(async () => initial.resolve({ subCalendarEvents: events('fresh') }));
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		expect(result.current.calendar.events).toEqual(events('fresh'));
+		expect(mocks.lookup).toHaveBeenCalledTimes(3);
+		expect(mocks.read).toHaveBeenCalledOnce();
+		const ranges = mocks.lookup.mock.calls.map(([, range]) => JSON.stringify(range));
+		expect(new Set(ranges).size).toBe(3);
+	});
+
+	it('includes startup changes in the first load and still refreshes for later notifications', async () => {
+		const { result } = renderHook(useConnectedCalendar);
+		await act(async () => {
+			mocks.services[0].subs.get('calendarSyncUpdated')!(syncUpdate());
+			mocks.services[0].subs.get('refereshDataFromSockets')!({
+				refreshData: { trigger: true },
+			});
+			await flushSyncClient();
+		});
+		expect(mocks.lookup).not.toHaveBeenCalled();
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		expect(mocks.lookup).toHaveBeenCalledTimes(3);
+		act(() =>
+			mocks.services[0].subs.get('refereshDataFromSockets')!({
+				refreshData: { trigger: true },
+			})
+		);
+		await waitFor(() => expect(mocks.lookup).toHaveBeenCalledTimes(6));
+	});
+
+	it.each(['disabled', 'failed'] as const)(
+		'loads once and catches up on reconnect when status is %s',
+		async (status) => {
+			if (status === 'failed') mocks.read.mockRejectedValue(new Error('unavailable'));
+			const { result } = renderHook(useConnectedCalendar);
+			act(() => mocks.services[0].connected!());
+			await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+			expect(mocks.lookup).toHaveBeenCalledTimes(3);
+			act(() => mocks.services[0].connected!());
+			await waitFor(() => expect(mocks.lookup).toHaveBeenCalledTimes(6));
+		}
+	);
+
+	it('loads after a bounded wait without a socket and refreshes when the connection arrives late', async () => {
+		vi.useFakeTimers();
+		const { result, unmount } = renderHook(useConnectedCalendar);
+		try {
+			await act(async () => {
+				await vi.advanceTimersByTimeAsync(1999);
+			});
+			expect(mocks.lookup).not.toHaveBeenCalled();
+			await act(async () => {
+				await vi.advanceTimersByTimeAsync(1);
+			});
+			expect(result.current.calendar.loading).toBe(false);
+			expect(mocks.lookup).toHaveBeenCalledTimes(3);
+			await act(async () => {
+				mocks.services[0].connected!();
+				await flushSyncClient();
+			});
+			expect(mocks.lookup).toHaveBeenCalledTimes(6);
+		} finally {
+			unmount();
+			vi.useRealTimers();
+		}
+	});
+
+	it('discards a superseded reconnect response without refreshing again', async () => {
+		const older = deferred<ReturnType<typeof syncStatus>>();
+		const { result } = renderHook(useConnectedCalendar);
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		mocks.read.mockReturnValueOnce(older.promise);
+		act(() => mocks.services[0].connected!());
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(mocks.lookup).toHaveBeenCalledTimes(6));
+		await act(async () => older.resolve(syncStatus()));
+		expect(mocks.lookup).toHaveBeenCalledTimes(6);
+	});
+
+	it('loads anonymous calendars immediately without waiting for a socket', async () => {
+		mocks.state.activeSessionType = 'anonymous';
+		const { result } = renderHook(useConnectedCalendar);
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		expect(mocks.services).toHaveLength(0);
+		expect(mocks.lookup).toHaveBeenCalledTimes(3);
+	});
+
+	it('refreshes immediately after reconnect without waiting for metadata or refreshing again when it arrives', async () => {
+		const { result } = renderHook(useConnectedCalendar);
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		const pending = deferred<ReturnType<typeof syncStatus>>();
+		mocks.read.mockReturnValueOnce(pending.promise);
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(mocks.lookup).toHaveBeenCalledTimes(6));
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		expect(result.current.sync.status).toBeNull();
+		await act(async () => pending.resolve(syncStatus()));
+		expect(result.current.sync.status).toEqual(syncStatus());
+		expect(mocks.lookup).toHaveBeenCalledTimes(6);
+	});
+
+	it('loads immediately on first connection while mount metadata hangs, without fetching status again', async () => {
+		const pending = deferred<ReturnType<typeof syncStatus>>();
+		mocks.read.mockReturnValue(pending.promise);
+		const { result } = renderHook(useConnectedCalendar);
+		act(() => mocks.services[0].connected!());
+		expect(result.current.sync.ready).toBe(true);
+		expect(mocks.lookup).toHaveBeenCalledTimes(3);
+		await waitFor(() => expect(result.current.calendar.loading).toBe(false));
+		expect(mocks.read).toHaveBeenCalledOnce();
+		await act(async () => pending.resolve(syncStatus()));
+		expect(mocks.lookup).toHaveBeenCalledTimes(3);
+		expect(result.current.sync.status).toEqual(syncStatus());
+		// Metadata may describe a completion committed after the initial lookup.
+		// Receiving its socket notification must still refresh the calendar.
+		act(() => mocks.services[0].subs.get('calendarSyncUpdated')!(syncUpdate()));
+		await waitFor(() => expect(mocks.lookup).toHaveBeenCalledTimes(6));
+	});
+
 	it('recovers missed updates on reconnect even when the native revision did not change', async () => {
 		const refresh = vi.fn();
 		const { result } = renderHook(() => useScheduleSocket(refresh));
+		act(() => mocks.services[0].connected!());
+		await waitFor(() => expect(result.current.ready).toBe(true));
 		mocks.read.mockResolvedValueOnce(syncStatus());
 		act(() => mocks.services[0].connected!());
 		await waitFor(() => expect(refresh).toHaveBeenCalledOnce());
@@ -123,6 +303,7 @@ describe('schedule socket hook', () => {
 		});
 		expect(previous.disposed).toBe(true);
 		expect(result.current.status).toBeNull();
+		expect(result.current.ready).toBe(false);
 		expect(refresh).not.toHaveBeenCalled();
 	});
 

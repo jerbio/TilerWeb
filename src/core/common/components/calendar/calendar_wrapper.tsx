@@ -35,16 +35,19 @@ export function CalendarWrapper({
 		setViewInfo({ startDay: viewOptions.startDay, daysInView: viewOptions.daysInView });
 	}, [viewOptions.startDay, viewOptions.daysInView, setViewInfo]);
 
+	const refreshCalendar = React.useRef<
+		ReturnType<typeof usePrefetchedCalendarData>['refetchEvents'] | null
+	>(null);
+	const calendarSync = useScheduleSocket(() => refreshCalendar.current?.());
 	const { events, loading, refetchEvents } = usePrefetchedCalendarData({
 		userId,
 		viewOptions,
 		daysInView: viewOptions.daysInView,
+		enabled: calendarSync.ready,
 	});
+	refreshCalendar.current = refetchEvents;
 
 	const hasRouter = useInRouterContext();
-
-	// Auto-refetch calendar events when a schedule change is detected via WebSocket
-	const calendarSync = useScheduleSocket(refetchEvents);
 
 	// ---- Phase 5: simulation overlay subscription -----------------------
 	// `chat.tsx` publishes review state to the overlay store; we react by

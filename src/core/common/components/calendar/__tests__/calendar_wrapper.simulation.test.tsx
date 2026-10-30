@@ -56,7 +56,7 @@ vi.mock('@/core/common/hooks/useCalendarView', () => ({
 }));
 
 vi.mock('@/hooks/useScheduleSocket', () => ({
-	useScheduleSocket: vi.fn(),
+	useScheduleSocket: vi.fn(() => ({ ready: true })),
 }));
 
 import { CalendarWrapper } from '../calendar_wrapper';

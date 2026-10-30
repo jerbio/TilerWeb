@@ -10,10 +10,12 @@ export default function usePrefetchedCalendarData({
 	userId,
 	viewOptions,
 	daysInView,
+	enabled = true,
 }: {
 	userId: string | null;
 	viewOptions: { startDay: dayjs.Dayjs; daysInView: number };
 	daysInView: number;
+	enabled?: boolean;
 }) {
 	const MAX_CACHE_ENTRIES = 12;
 
@@ -55,7 +57,7 @@ export default function usePrefetchedCalendarData({
 	}, [scope]);
 
 	async function refetchEvents() {
-		if (!userId || daysInView <= 0) return;
+		if (!enabled || !userId || daysInView <= 0) return;
 		const request = ++latestLookupRequestRef.current;
 		const generation = ++cacheGenerationRef.current;
 		const current = () =>
@@ -148,7 +150,7 @@ export default function usePrefetchedCalendarData({
 	}
 
 	useEffect(() => {
-		if (!userId || daysInView <= 0) return;
+		if (!enabled || !userId || daysInView <= 0) return;
 
 		const start = viewOptions.startDay.valueOf();
 		const end = start + TimeUtil.inMilliseconds(daysInView, 'd');
@@ -187,7 +189,7 @@ export default function usePrefetchedCalendarData({
 		return () => {
 			latestLookupRequestRef.current++;
 		};
-	}, [userId, viewOptions.startDay, daysInView, scheduleId, personaId]);
+	}, [enabled, userId, viewOptions.startDay, daysInView, scheduleId, personaId]);
 
-	return { events, loading, refetchEvents };
+	return { events, loading: loading || !enabled, refetchEvents };
 }
