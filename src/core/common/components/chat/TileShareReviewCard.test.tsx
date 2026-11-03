@@ -563,7 +563,7 @@ it('queued schedule updates expose only a read-only status check', async () => {
 		<ThemeProvider theme={darkTheme}>
 			<TileShareReviewCard
 				disabled
-				result={{ State: 'Pending', ActionId: 'a', Operation: 'UpdateTilette' } as any}
+				result={{ State: 'Pending', ActionId: 'a', Operation: 'UpdateTilette' }}
 				onConfirm={confirm}
 				onCheck={check}
 				onChanged={changed}
@@ -580,14 +580,12 @@ it('a failed schedule calculation is not an uncertain mutation', () => {
 	render(
 		<ThemeProvider theme={darkTheme}>
 			<TileShareReviewCard
-				result={
-					{
-						State: 'Failed',
-						ActionId: 'a',
-						Operation: 'UpdateTilette',
-						ErrorCode: 'schedule_no_fit',
-					} as any
-				}
+				result={{
+					State: 'Failed',
+					ActionId: 'a',
+					Operation: 'UpdateTilette',
+					ErrorCode: 'schedule_no_fit',
+				}}
 				onConfirm={vi.fn()}
 				onCheck={vi.fn()}
 				onChanged={vi.fn()}
