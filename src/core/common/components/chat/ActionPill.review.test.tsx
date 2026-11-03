@@ -25,7 +25,8 @@ vi.mock('@/global_state', () => ({
 
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
-		t: (_k: string, fb: string) => fb,
+		t: (_k: string, fb: string | { description: string }) =>
+			typeof fb === 'object' ? `Go to tile: ${fb.description}` : fb,
 		i18n: { language: 'en' },
 	}),
 }));

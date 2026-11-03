@@ -206,9 +206,9 @@ const StyledButton = styled.button<StyledButtonProps>`
 
 			/* Add smooth transitions for elegant expansion */
 			transition:
-				max-width 3s ease-out,
+				max-width 0.3s ease-out,
 				box-shadow 0.5s ease,
-				transform 3s ease-out;
+				transform 0.3s ease-out;
 
 			/* Only truncate the action description */
 			& .action-description {

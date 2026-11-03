@@ -12,7 +12,7 @@ import {
 	VibeAction,
 	VibeRequest,
 } from '@/core/common/types/chat';
-import { Status } from '@/core/constants/enums';
+import { Actions, Status } from '@/core/constants/enums';
 import { useCalendarDispatch } from '@/core/common/components/calendar/CalendarRequestProvider';
 import {
 	CalendarEntityType,
@@ -31,6 +31,9 @@ const PillWrapper = styled.span<{
 	$navigatable: boolean;
 }>`
 	display: inline-flex;
+	min-width: 0;
+	max-width: 100%;
+	align-items: stretch;
 	border-radius: 999px;
 	margin: 2px 4px 2px 0;
 	${(p) =>
@@ -40,12 +43,55 @@ const PillWrapper = styled.span<{
 		`}
 `;
 
-const NavGlyph = styled.span`
+const NavigateButton = styled.button`
 	display: inline-flex;
 	align-items: center;
-	margin-left: 0.25rem;
+	justify-content: center;
+	align-self: center;
+	min-width: 32px;
+	min-height: 32px;
+	margin-top: 0.25rem;
+	padding: 4px;
+	border: 1px solid ${({ theme }) => theme.colors.border.default};
+	border-radius: 999px;
+	background: ${({ theme }) => theme.colors.background.card};
 	color: ${(p) => p.theme.colors.text.secondary};
 	flex-shrink: 0;
+	cursor: pointer;
+
+	&:hover {
+		background: ${({ theme }) => theme.colors.button.ghost.bgHover};
+	}
+
+	&:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.brand[400]};
+		outline-offset: 2px;
+	}
+`;
+
+// Chat-specific sizing leaves the shared button's appearance and behavior intact.
+const ChatActionButton = styled(Button)`
+	&& {
+		min-width: 0;
+		max-width: 100%;
+		line-height: 1.4;
+
+		.action-description,
+		&:hover .action-description {
+			overflow: hidden;
+			white-space: normal;
+			overflow-wrap: anywhere;
+			text-align: left;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+		}
+
+		&:hover {
+			max-width: 100%;
+			transform: none;
+		}
+	}
 `;
 
 interface ActionPillProps {
@@ -58,10 +104,11 @@ interface ActionPillProps {
 	request?: VibeRequest | null;
 	/**
 	 * Called when the user clicks a pill that should enter simulation mode
-	 * (Ready simulation with a matching SimulationActionDto). Parent decides
-	 * how to react — typically: enter review, focus the simulated entity.
+	 * Parent opens review (or waits for the preview) and focuses this action.
 	 */
 	onSelect?: (action: VibeAction, simulationAction?: SimulationActionDto) => void;
+	/** Cancel a pending review entry before navigating the live calendar. */
+	onNavigate?: () => void;
 }
 
 const ActionPill: React.FC<ActionPillProps> = ({
@@ -70,6 +117,7 @@ const ActionPill: React.FC<ActionPillProps> = ({
 	simulationAction,
 	request,
 	onSelect,
+	onNavigate,
 }) => {
 	const { t } = useTranslation();
 	const calendarDispatch = useCalendarDispatch();
@@ -104,6 +152,27 @@ const ActionPill: React.FC<ActionPillProps> = ({
 		!isNonFocusable &&
 		!!action.entityId &&
 		!!action.entityType;
+	const isCreation =
+		action.type === Actions.Add_New_Task ||
+		action.type === Actions.Add_New_Appointment ||
+		action.type === Actions.Add_New_Project ||
+		action.type === Actions.WhatIf_AddedNewTask ||
+		action.type === Actions.WhatIf_AddANewAppointment;
+	// Pending edits/removals still reference an existing live tile. Pending
+	// creations only have a proposed entity, which must be viewed in review.
+	const canNavigate =
+		!isStale &&
+		(!isRemoved || isPending) &&
+		!(isPending && isCreation) &&
+		!isNonFocusable &&
+		!!action.entityId &&
+		!!action.entityType;
+	const canReview =
+		!!onSelect &&
+		!isRequestTerminal(request) &&
+		simulation?.state !== SimulationState.Failed &&
+		simulation?.state !== SimulationState.Invalidated &&
+		(!!simulationAction || (isPending && !!request));
 
 	/** Show status overlay for a brief duration */
 	const [overlayLoading, setOverlayLoading] = useState(false);
@@ -123,8 +192,22 @@ const ActionPill: React.FC<ActionPillProps> = ({
 	}, []);
 
 	const handleClick = () => {
-		// Branch 1 — action is on current schedule with a real entityId. Existing
-		// focus path wins regardless of simulation state.
+		// The action opens the proposed change; the adjacent arrow always
+		// locates the live entity independently of preview readiness.
+		if (canReview) {
+			onSelect?.(action, simulationAction);
+			if (simulation?.state !== SimulationState.Ready) {
+				showOverlay(
+					t(
+						'home.expanded.chat.reviewWhenReady',
+						'Review will open when this preview is ready.'
+					),
+					'info'
+				);
+			}
+			return;
+		}
+
 		if (!isClickable) {
 			// Removed tiles — nothing to focus
 			if (isRemoved) {
@@ -141,12 +224,6 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					),
 					'warning'
 				);
-				return;
-			}
-
-			// Branch 2 — Ready simulation with a resolved preview action.
-			if (simulation?.state === SimulationState.Ready && simulationAction && onSelect) {
-				onSelect(action, simulationAction);
 				return;
 			}
 
@@ -208,9 +285,13 @@ const ActionPill: React.FC<ActionPillProps> = ({
 			if (!action.entityId || !action.entityType) return;
 		}
 
-		// At this point either isClickable was true (entityId/entityType guaranteed)
-		// or the branches above returned. Narrow for TypeScript.
+		handleNavigate();
+	};
+
+	const handleNavigate = () => {
+		if (!canNavigate) return;
 		if (!action.entityId || !action.entityType) return;
+		onNavigate?.();
 
 		calendarDispatch(
 			{
@@ -282,23 +363,26 @@ const ActionPill: React.FC<ActionPillProps> = ({
 			<PillWrapper
 				$reviewable={isReviewable}
 				$selected={isSelectedChip}
-				$navigatable={isClickable}
+				$navigatable={canNavigate}
 				data-testid="action-pill-wrapper"
 				data-action-id={action.id}
 				data-reviewable={isReviewable ? 'true' : 'false'}
 				data-selected={isSelectedChip ? 'true' : 'false'}
-				data-navigatable={isClickable ? 'true' : 'false'}
+				data-navigatable={canNavigate ? 'true' : 'false'}
 				data-in-review={inReview ? 'true' : 'false'}
 				data-has-simulation-action={simulationAction ? 'true' : 'false'}
 			>
-				<Button
+				<ChatActionButton
+					type="button"
 					variant="pill"
+					aria-label={action.descriptions}
+					title={action.descriptions}
 					dotstatus={action.status}
 					onClick={handleClick}
 					style={{
-						cursor: isClickable ? 'pointer' : 'default',
+						cursor: canReview || isClickable ? 'pointer' : 'default',
 						opacity:
-							isRemoved || isStale
+							!canReview && (isRemoved || isStale)
 								? 0.6
 								: isDemoLimited
 									? 0.8
@@ -310,12 +394,20 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					<ActionIcon action={action} />
 					<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
 					<span className="action-description">{action.descriptions}</span>
-					{isClickable && (
-						<NavGlyph aria-hidden="true">
-							<ChevronRight size={14} strokeWidth={2.25} />
-						</NavGlyph>
-					)}
-				</Button>
+				</ChatActionButton>
+				{canNavigate && (
+					<NavigateButton
+						type="button"
+						onClick={handleNavigate}
+						aria-label={t('home.expanded.chat.goToTileAction', {
+							description: action.descriptions,
+						})}
+						title={t('home.expanded.chat.goToTile', 'Go to tile')}
+						aria-busy={isNavigating || undefined}
+					>
+						<ChevronRight size={16} strokeWidth={2.25} aria-hidden="true" />
+					</NavigateButton>
+				)}
 			</PillWrapper>
 			<StatusOverlay
 				message={overlayMessage ?? ''}

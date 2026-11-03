@@ -24,10 +24,10 @@ import TimeUtil from '@/core/util/time';
 import { deviceTimeZone } from '@/core/common/utils/timeUtils';
 import { parseCreatedScheduleEvent } from './scheduleEventResponse';
 
-const defaultScheduleOptions: ScheduleLookupOptions = {
+const defaultScheduleOptions = (): ScheduleLookupOptions => ({
 	startRange: TimeUtil.now() - TimeUtil.inMilliseconds(3, 'd'),
 	endRange: TimeUtil.now() + TimeUtil.inMilliseconds(3, 'd'),
-};
+});
 
 class ScheduleService {
 	private scheduleApi: ScheduleApi;
@@ -59,7 +59,7 @@ class ScheduleService {
 
 	async lookupScheduleById(
 		scheduleId: string,
-		options: ScheduleLookupOptions = defaultScheduleOptions
+		options: ScheduleLookupOptions = defaultScheduleOptions()
 	) {
 		try {
 			const schedule = await this.scheduleApi.lookupScheduleById(scheduleId, options);
@@ -72,7 +72,7 @@ class ScheduleService {
 
 	async lookupScheduleByUserId(
 		userId: string,
-		options: ScheduleLookupOptions = defaultScheduleOptions
+		options: ScheduleLookupOptions = defaultScheduleOptions()
 	) {
 		try {
 			const schedule = await this.scheduleApi.lookupScheduleByUserId(userId, options);

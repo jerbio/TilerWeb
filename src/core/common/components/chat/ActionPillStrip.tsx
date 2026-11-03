@@ -30,6 +30,7 @@ interface ActionPillStripProps {
 	/** Pre-resolved map from actionId → SimulationActionDto, produced by caller. */
 	simulationActionById?: Record<string, SimulationActionDto>;
 	onSelect?: (action: VibeAction, simulationAction?: SimulationActionDto) => void;
+	onNavigate?: () => void;
 }
 
 const MoreButton = styled.button`
@@ -62,6 +63,7 @@ const ActionPillStrip: React.FC<ActionPillStripProps> = ({
 	request,
 	simulationActionById,
 	onSelect,
+	onNavigate,
 }) => {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
@@ -104,6 +106,7 @@ const ActionPillStrip: React.FC<ActionPillStripProps> = ({
 					request={request}
 					simulationAction={simulationActionById?.[action.id]}
 					onSelect={onSelect}
+					onNavigate={onNavigate}
 				/>
 			))}
 			{hasOverflow && !expanded && (

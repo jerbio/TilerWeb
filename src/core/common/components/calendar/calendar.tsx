@@ -17,6 +17,7 @@ import analytics from '@/core/util/analytics';
 import TimeUtil from '@/core/util/time';
 import CalendarEventInfo from './calendar_event_info';
 import SimulatedCalendarEventInfo from './SimulatedCalendarEventInfo';
+import { getCalendarPopoverLayout } from './calendarPopoverLayout';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { getMobileReviewSheetHeightPx } from '@/pages/reviewSheetSizing';
 import { a, useChain, useSpringRef, useTransition } from '@react-spring/web';
@@ -332,7 +333,9 @@ const Calendar = ({
 	// placement and scroll-into-view logic can keep the active tile out
 	// from under the sheet.
 	const reviewSheetInsetPx = useMemo(() => {
-		if (!inSimulationReview || !isMobileReviewLayout) return 0;
+		if (!isMobileReviewLayout) return 0;
+		// Leave room for the mobile chat / return control below event details.
+		if (!inSimulationReview) return 72;
 		return getMobileReviewSheetHeightPx(reviewStop, window.innerHeight);
 	}, [inSimulationReview, isMobileReviewLayout, reviewStop]);
 	bottomInsetPxRef.current = reviewSheetInsetPx;
@@ -369,10 +372,6 @@ const Calendar = ({
 	];
 
 	const calculateEventInfoCoordinates = (event: StyledEvent) => {
-		const INFO_MODAL_HEIGHT = parseInt(calendarConfig.INFO_MODAL_HEIGHT);
-		const INFO_MODAL_GAP = parseInt(calendarConfig.INFO_MODAL_GAP);
-		const INFO_MODAL_WIDTH_DEFAULT = parseInt(calendarConfig.INFO_MODAL_WIDTH);
-
 		const vScrollOffset = contentContainerRef.current?.scrollTop || 0;
 		const totalHeaderHeight = parseInt(calendarConfig.HEADER_HEIGHT);
 		const innerAbsoluteX = event.springStyles.x + parseInt(calendarConfig.TIMELINE_WIDTH);
@@ -382,25 +381,6 @@ const Calendar = ({
 		const containerRect = contentContainerRef.current?.getBoundingClientRect();
 		const containerWidth = containerRect?.width || 0;
 		const containerHeight = containerRect?.height || 0;
-
-		// On mobile (typically 1-column view), the default 300px modal can
-		// exceed the visible width — cap it to the container so the popout
-		// never gets clipped off-screen. Desktop keeps the fixed width.
-		const INFO_MODAL_WIDTH = isMobile
-			? Math.min(INFO_MODAL_WIDTH_DEFAULT, Math.max(0, containerWidth - 2 * INFO_MODAL_GAP))
-			: INFO_MODAL_WIDTH_DEFAULT;
-
-		// Position to the right of the event by default
-		// If not enough space, position to the left
-		let calculatedX = innerAbsoluteX + innerAbsoluteWidth + INFO_MODAL_GAP;
-		if (calculatedX + INFO_MODAL_WIDTH > containerWidth) {
-			// Not enough space on the right, position to the left
-			calculatedX = innerAbsoluteX - INFO_MODAL_WIDTH - INFO_MODAL_GAP; // 12px gap
-			if (calculatedX < 0) {
-				// Still not enough space, clamp to left edge
-				calculatedX = 0;
-			}
-		}
 
 		// Position vertically aligned to the top of the event by default
 		// If not enough space at the bottom, adjust upwards
@@ -423,29 +403,16 @@ const Calendar = ({
 			const eventIndex = eventsForTheDay.findIndex((e) => e.id === event.id);
 			calculatedY += eventIndex * 66;
 		}
-		// Total height of CalendarContainer = content area + header.
-		// Subtract the mobile review sheet height (when active) so the
-		// popout never gets clipped behind it.
-		const calendarContainerHeight = containerHeight + totalHeaderHeight - reviewSheetInsetPx;
-
-		if (calculatedY + INFO_MODAL_HEIGHT > calendarContainerHeight) {
-			// Not enough space at the bottom, adjust upwards
-			calculatedY = calendarContainerHeight - INFO_MODAL_HEIGHT;
-		}
-		if (calculatedY < totalHeaderHeight + INFO_MODAL_GAP) {
-			// Still not enough space, clamp to top edge
-			calculatedY = totalHeaderHeight + INFO_MODAL_GAP;
-		}
-
-		// Cap modal height to available vertical space
-		const maxHeight = Math.min(INFO_MODAL_HEIGHT, calendarContainerHeight - calculatedY);
-
-		setCalendarEventInfoPos({
-			x: calculatedX,
-			y: calculatedY,
-			maxHeight,
-			width: INFO_MODAL_WIDTH,
-		});
+		setCalendarEventInfoPos(
+			getCalendarPopoverLayout({
+				anchorX: innerAbsoluteX,
+				anchorY: calculatedY,
+				anchorWidth: innerAbsoluteWidth,
+				containerWidth,
+				containerHeight,
+				bottomInset: reviewSheetInsetPx,
+			})
+		);
 	};
 
 	useEffect(() => {
@@ -463,8 +430,17 @@ const Calendar = ({
 			setSelectedEventInfo((prev) => (prev ? { ...prev } : null));
 		};
 		container.addEventListener('scroll', onScroll);
+		let previousRect = container.getBoundingClientRect();
+		const observer = new ResizeObserver(() => {
+			const rect = container.getBoundingClientRect();
+			if (rect.width === previousRect.width && rect.height === previousRect.height) return;
+			previousRect = rect;
+			onScroll();
+		});
+		observer.observe(container);
 		return () => {
 			container.removeEventListener('scroll', onScroll);
+			observer.disconnect();
 		};
 	}, [selectedEventInfo, reviewSheetInsetPx]);
 
@@ -947,6 +923,7 @@ const Calendar = ({
 };
 
 const CalendarContainer = styled.div<{ $isMounted: boolean }>`
+	isolation: isolate;
 	overflow: hidden;
 	border-radius: 0 ${({ theme }) => theme.borderRadius.large}
 		${({ theme }) => theme.borderRadius.large} 0;

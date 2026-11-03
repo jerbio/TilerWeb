@@ -51,6 +51,7 @@ export class ScheduleApi extends AppApi {
 	private lookupSchedule(params: Record<string, string>) {
 		const urlParams = new URLSearchParams({
 			mobileApp: true.toString(),
+			TimeZone: deviceTimeZone(),
 			...params,
 		}).toString();
 

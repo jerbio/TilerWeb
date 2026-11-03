@@ -12,6 +12,8 @@ import {
 	CalendarEntityType,
 	CalendarRequestResult,
 	CalendarRequestStatus,
+	CalendarRequestHandler,
+	CalendarRequestType,
 } from '@/core/common/components/calendar/calendarRequestContext';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
 import React from 'react';
@@ -44,7 +46,8 @@ vi.mock('@/global_state', () => ({
 
 vi.mock('react-i18next', () => ({
 	useTranslation: () => ({
-		t: (_key: string, fallback: string) => fallback,
+		t: (_key: string, fallback: string | { description: string }) =>
+			typeof fallback === 'object' ? `Go to tile: ${fallback.description}` : fallback,
 		i18n: { language: 'en' },
 	}),
 }));
@@ -108,6 +111,11 @@ const MockCalendarListener: React.FC<{ autoResponse: CalendarRequestResult }> = 
 	return null;
 };
 
+const CaptureCalendarRequests = ({ onRequest }: { onRequest: CalendarRequestHandler }) => {
+	useCalendarRequestListener(onRequest);
+	return null;
+};
+
 /**
  * Render ActionPill with a mock listener that responds with the given result.
  * Use this to test result-driven UI states (navigating, demo_mode, etc).
@@ -167,7 +175,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ afterScheduleId: 'schedule-v2' });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('pointer');
 		});
 
@@ -176,7 +184,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ afterScheduleId: 'schedule-v1' });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -193,7 +201,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -205,7 +213,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ type: Actions.Remove_Existing_Task });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -219,7 +227,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ afterScheduleId: 'schedule-v2' });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await user.click(button);
 
 			// Button should be clickable (pointer cursor)
@@ -231,7 +239,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ afterScheduleId: 'schedule-v1' });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('default');
 		});
 
@@ -240,7 +248,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ type: Actions.Remove_Existing_Task });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('default');
 			expect(button.style.opacity).toBe('0.6');
 		});
@@ -254,7 +262,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('default');
 		});
 
@@ -266,7 +274,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('default');
 		});
 	});
@@ -283,7 +291,7 @@ describe('ActionPill schedule consistency', () => {
 			setCurrentScheduleId('schedule-v3');
 			renderActionPill(session1Action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			// Should not be clickable -- stale
 			expect(button.style.cursor).toBe('default');
 		});
@@ -297,7 +305,7 @@ describe('ActionPill schedule consistency', () => {
 			setCurrentScheduleId('schedule-v3');
 			renderActionPill(session2Action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('pointer');
 		});
 
@@ -308,7 +316,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			// When scheduleId is null, we still allow click for backwards compat
 			// (unknown state -> clickable if entity info is present)
 			// This tests that the component handles null gracefully
@@ -322,7 +330,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			// Unknown state -- allow click since we can't determine staleness
 			expect(button.style.cursor).toBe('pointer');
 		});
@@ -334,7 +342,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ afterScheduleId: 'schedule-v1' });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.opacity).toBe('0.6');
 		});
 
@@ -342,7 +350,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ afterScheduleId: 'schedule-v2' });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.opacity).toBe('1');
 		});
 
@@ -350,7 +358,7 @@ describe('ActionPill schedule consistency', () => {
 			const action = createAction({ type: Actions.Remove_Existing_Task });
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.opacity).toBe('0.6');
 		});
 	});
@@ -363,7 +371,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('pointer');
 		});
 
@@ -375,7 +383,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('pointer');
 		});
 
@@ -386,7 +394,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('default');
 		});
 
@@ -398,7 +406,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('default');
 		});
 
@@ -411,7 +419,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 			renderActionPill(action);
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await user.click(button);
 
 			// Should not trigger any dispatch -- no console warnings about entity lookup
@@ -429,7 +437,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -446,7 +454,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -463,7 +471,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -477,7 +485,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button2 = screen.getByRole('button');
+			const button2 = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button2);
 			});
@@ -496,7 +504,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button);
 			});
@@ -509,7 +517,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button2 = screen.getByRole('button');
+			const button2 = screen.getByRole('button', { name: 'Add morning standup' });
 			await act(async () => {
 				await user.click(button2);
 			});
@@ -527,7 +535,7 @@ describe('ActionPill schedule consistency', () => {
 				entityId: 'entity-abc',
 			});
 
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 
 			// First click
 			await act(async () => {
@@ -551,17 +559,21 @@ describe('ActionPill schedule consistency', () => {
 					a: VibeAction,
 					sa?: import('@/core/common/types/chat').SimulationActionDto
 				) => void;
+				onNavigate?: () => void;
+				onRequest?: CalendarRequestHandler;
 			} = {}
 		) =>
 			render(
 				<ThemeProvider>
 					<CalendarRequestProvider>
+						{extra.onRequest && <CaptureCalendarRequests onRequest={extra.onRequest} />}
 						<ActionPill
 							action={action}
 							simulation={sim}
 							simulationAction={extra.simulationAction}
 							request={extra.request}
 							onSelect={extra.onSelect}
+							onNavigate={extra.onNavigate}
 						/>
 					</CalendarRequestProvider>
 				</ThemeProvider>
@@ -596,6 +608,60 @@ describe('ActionPill schedule consistency', () => {
 			previewActions: [],
 		});
 
+		it.each([SimulationState.Queued, SimulationState.Processing, SimulationState.Ready])(
+			'the side button navigates a pending edit independently of a %s preview',
+			async (state) => {
+				const user = setupUser();
+				const onRequest = vi.fn();
+				const onSelect = vi.fn();
+				const onNavigate = vi.fn();
+				renderWithSim(
+					{ ...pendingAction(), type: Actions.Update_Existing_Task },
+					baseSim(state),
+					{
+						request: baseRequest(),
+						onRequest,
+						onSelect,
+						onNavigate,
+					}
+				);
+				await user.click(screen.getByRole('button', { name: /^Go to tile:/ }));
+				expect(onRequest).toHaveBeenCalledWith(
+					expect.objectContaining({
+						request: expect.objectContaining({
+							type: CalendarRequestType.FocusEvent,
+							entityId: 'entity-abc',
+							entityType: CalendarEntityType.SubcalendarEvent,
+						}),
+					})
+				);
+				expect(onNavigate).toHaveBeenCalledOnce();
+				expect(onSelect).not.toHaveBeenCalled();
+			}
+		);
+
+		it('offers live navigation for a pending removal until it is applied', async () => {
+			const user = setupUser();
+			const onRequest = vi.fn();
+			renderWithSim(
+				{ ...pendingAction(), type: Actions.Remove_Existing_Task },
+				baseSim(SimulationState.Processing),
+				{
+					request: baseRequest(),
+					onRequest,
+				}
+			);
+			await user.click(screen.getByRole('button', { name: /^Go to tile:/ }));
+			expect(onRequest).toHaveBeenCalledOnce();
+		});
+
+		it('does not offer live navigation for a newly proposed tile', () => {
+			renderWithSim(pendingAction(), baseSim(SimulationState.Processing), {
+				request: baseRequest(),
+			});
+			expect(screen.queryByRole('button', { name: /^Go to tile:/ })).not.toBeInTheDocument();
+		});
+
 		it('Ready + simulationAction → calls onSelect, no toast', async () => {
 			const user = setupUser();
 			const onSelect = vi.fn();
@@ -611,7 +677,7 @@ describe('ActionPill schedule consistency', () => {
 				onSelect,
 			});
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
 			expect(onSelect).toHaveBeenCalledTimes(1);
 			expect(onSelect).toHaveBeenCalledWith(
@@ -621,7 +687,7 @@ describe('ActionPill schedule consistency', () => {
 			expect(screen.queryByText('Accept changes to see this tile')).not.toBeInTheDocument();
 		});
 
-		it('Processing → toast "still being simulated", no onSelect', async () => {
+		it('Processing queues review through onSelect', async () => {
 			const user = setupUser();
 			const onSelect = vi.fn();
 			renderWithSim(pendingAction(), baseSim(SimulationState.Processing), {
@@ -629,10 +695,15 @@ describe('ActionPill schedule consistency', () => {
 				onSelect,
 			});
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
-			expect(screen.getByText(/still being simulated/i)).toBeInTheDocument();
-			expect(onSelect).not.toHaveBeenCalled();
+			expect(
+				screen.getByText(/Review will open when this preview is ready/i)
+			).toBeInTheDocument();
+			expect(onSelect).toHaveBeenCalledWith(
+				expect.objectContaining({ id: 'action-1' }),
+				undefined
+			);
 		});
 
 		it('Queued → toast "still being simulated"', async () => {
@@ -641,7 +712,7 @@ describe('ActionPill schedule consistency', () => {
 				request: baseRequest(),
 			});
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
 			expect(screen.getByText(/still being simulated/i)).toBeInTheDocument();
 		});
@@ -650,7 +721,7 @@ describe('ActionPill schedule consistency', () => {
 			const user = setupUser();
 			renderWithSim(pendingAction(), null, { request: baseRequest() });
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
 			expect(screen.getByText(/simulation starting/i)).toBeInTheDocument();
 			// And NOT the legacy copy.
@@ -663,7 +734,7 @@ describe('ActionPill schedule consistency', () => {
 				request: baseRequest(),
 			});
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
 			expect(screen.getByText(/simulation unavailable/i)).toBeInTheDocument();
 		});
@@ -674,7 +745,7 @@ describe('ActionPill schedule consistency', () => {
 				request: baseRequest(),
 			});
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
 			expect(screen.getByText(/out of date/i)).toBeInTheDocument();
 		});
@@ -685,15 +756,15 @@ describe('ActionPill schedule consistency', () => {
 				request: baseRequest({ isClosed: true }),
 			});
 			await act(async () => {
-				await user.click(screen.getByRole('button'));
+				await user.click(screen.getByRole('button', { name: 'Add morning standup' }));
 			});
 			expect(screen.getByText('Accept changes to see this tile')).toBeInTheDocument();
 		});
 
-		it('executed action with current entityId still routes to existing focus path even when sim is Ready', async () => {
+		it('action opens its ready preview while the side button remains available for live navigation', async () => {
 			const user = setupUser();
 			const onSelect = vi.fn();
-			// Action is on current schedule and executed → branch 1 wins.
+			// Action is on the current schedule with a matching preview → branch 1 wins.
 			const action = createAction({ afterScheduleId: 'schedule-v2' });
 			renderWithSim(action, baseSim(SimulationState.Ready), {
 				simulationAction: {
@@ -705,13 +776,13 @@ describe('ActionPill schedule consistency', () => {
 				request: baseRequest(),
 				onSelect,
 			});
-			const button = screen.getByRole('button');
+			const button = screen.getByRole('button', { name: 'Add morning standup' });
 			expect(button.style.cursor).toBe('pointer');
 			await act(async () => {
 				await user.click(button);
 			});
-			// Existing path dispatches FocusEvent — not onSelect.
-			expect(onSelect).not.toHaveBeenCalled();
+			expect(onSelect).toHaveBeenCalledTimes(1);
+			expect(screen.getByRole('button', { name: /^Go to tile:/ })).toBeInTheDocument();
 		});
 	});
 });

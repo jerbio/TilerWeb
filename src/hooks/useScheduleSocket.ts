@@ -16,9 +16,11 @@ export function useScheduleSocket(onScheduleChange: () => void) {
 	const handleRef = useRef<SubscriptionHandle | null>(null);
 
 	// Get userId from the active persona session
-	const getActivePersonaSession = useAppStore((state) => state.getActivePersonaSession);
-	const activePersonaSession = getActivePersonaSession();
-	const userId = activePersonaSession?.userId;
+	const userId = useAppStore((state) =>
+		state.activeSessionType === 'anonymous'
+			? state.anonymousPersonaSession?.userId
+			: state.authenticatedPersonaSession?.userId
+	);
 
 	// Stable callback ref to avoid re-subscribing when the callback identity changes
 	const onChangeRef = useRef(onScheduleChange);

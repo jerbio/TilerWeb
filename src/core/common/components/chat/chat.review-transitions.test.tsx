@@ -36,11 +36,20 @@ import React from 'react';
 
 import Chat from './chat';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
-import { SimulationState } from '@/core/common/types/chat';
+import { SimulationState, VibeAction } from '@/core/common/types/chat';
+import { Actions, Status } from '@/core/constants/enums';
 import { ThemeProvider } from '@/core/theme/ThemeProvider';
-import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
+import {
+	CalendarRequestProvider,
+	useCalendarRequestListener,
+} from '@/core/common/components/calendar/CalendarRequestProvider';
+import {
+	CalendarEntityType,
+	CalendarRequestType,
+} from '@/core/common/components/calendar/calendarRequestContext';
 import { locationService } from '@/services/locationService';
 import { LocationPicker } from '@/components/location/LocationSelector';
+import useSimulationPolling from '@/hooks/useSimulationPolling';
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -93,7 +102,8 @@ vi.mock('react-i18next', () => {
 	// Define `t` ONCE so every call to useTranslation() returns the same
 	// stable reference. If `t` were an inline arrow, it would be a new object
 	// on each render, making useCallback([..., t]) unstable → infinite loop.
-	const t = (_k: string, fallback?: string) => fallback ?? _k;
+	const t = (_k: string, fallback?: string | { description: string }) =>
+		typeof fallback === 'object' ? `Go to tile: ${fallback.description}` : (fallback ?? _k);
 	const i18nObj = { language: 'en' };
 	return {
 		// i18n config (src/i18n/config.ts) calls .use(initReactI18next)
@@ -120,6 +130,7 @@ const mockGetActivePersonaSession = vi.hoisted(() =>
 );
 const mockUpdateActivePersonaSession = vi.hoisted(() => vi.fn());
 const mockSetScheduleId = vi.hoisted(() => vi.fn());
+const mockCalendarRequest = vi.fn();
 
 const mockChatService = vi.hoisted(() => ({
 	getVibeSessions: vi.fn(),
@@ -255,6 +266,7 @@ function Providers({ children }: { children: React.ReactNode }) {
 	return (
 		<ThemeProvider>
 			<CalendarRequestProvider>
+				<CalendarListener />
 				{children}
 				<LocationPicker />
 			</CalendarRequestProvider>
@@ -262,8 +274,67 @@ function Providers({ children }: { children: React.ReactNode }) {
 	);
 }
 
-function renderChat() {
-	return render(<Chat />, { wrapper: Providers });
+function CalendarListener() {
+	useCalendarRequestListener(({ request }) => mockCalendarRequest(request));
+	return null;
+}
+
+const REVIEW_ACTIONS: VibeAction[] = ['first', 'second'].map((id) => ({
+	id,
+	descriptions: `Update ${id} tile`,
+	type: Actions.Update_Existing_Task,
+	creationTimeInMs: 1,
+	status: Status.Pending,
+	entityId: `live-${id}`,
+	entityType: CalendarEntityType.SubcalendarEvent,
+	beforeScheduleId: null,
+	afterScheduleId: null,
+	vibeRequest: null,
+}));
+
+const ACTION_SIMULATION = {
+	...MOCK_SIMULATION,
+	previewActions: REVIEW_ACTIONS.map((action) => ({
+		actionId: action.id,
+		entityId: `preview-${action.id}`,
+		entityType: CalendarEntityType.SubcalendarEvent,
+		vibePreviewId: MOCK_SIM_ID,
+		action,
+	})),
+};
+
+function seedActionReview(state = SimulationState.Ready) {
+	mockChatService.getMessages.mockResolvedValue({
+		Content: {
+			chats: [
+				{ ...MOCK_MESSAGE, origin: 'model', actionIds: REVIEW_ACTIONS.map((a) => a.id) },
+			],
+			vibeRequests: [{ ...MOCK_VIBE_REQUEST, actions: REVIEW_ACTIONS }],
+		},
+	});
+	mockChatService.getActions.mockResolvedValue(REVIEW_ACTIONS);
+	mockChatService.getSimulationForRequest.mockResolvedValue({
+		Content: {
+			preview: { ...ACTION_SIMULATION, state },
+		},
+	});
+}
+
+function deferredPreview() {
+	let resolve!: (value: { Content: typeof MOCK_SIMULATION_RESULT }) => void;
+	const promise = new Promise<{ Content: typeof MOCK_SIMULATION_RESULT }>((r) => {
+		resolve = r;
+	});
+	mockChatService.getSimulationResult.mockReturnValueOnce(promise);
+	return async () => {
+		await act(async () => {
+			resolve({ Content: MOCK_SIMULATION_RESULT });
+		});
+	};
+}
+
+function renderChat(props: React.ComponentProps<typeof Chat> = {}) {
+	return render(<Chat {...props} />, { wrapper: Providers });
 }
 
 /**
@@ -349,6 +420,7 @@ beforeEach(() => {
 afterEach(() => {
 	locationService.closePicker();
 	useSimulationOverlayStore.setState(initialStoreState, true);
+	vi.unstubAllGlobals();
 });
 
 // ---------------------------------------------------------------------------
@@ -356,6 +428,113 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('Chat review transitions', () => {
+	it.each([800, 1280])(
+		'reveals the calendar from a live navigation tap only below the desktop breakpoint (%ipx)',
+		async (width) => {
+			vi.stubGlobal('innerWidth', width);
+			seedActionReview();
+			const onNavigateToCalendar = vi.fn();
+			renderChat({ onNavigateToCalendar });
+			fireEvent.click(
+				await screen.findByRole('button', { name: 'Go to tile: Update second tile' })
+			);
+			expect(mockCalendarRequest).toHaveBeenCalledWith(
+				expect.objectContaining({ entityId: 'live-second' })
+			);
+			expect(onNavigateToCalendar).toHaveBeenCalledTimes(width < 1024 ? 1 : 0);
+			expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+		}
+	);
+	it('opens a cached review at the tapped action and focuses its preview tile', async () => {
+		seedActionReview();
+		renderChat();
+		await waitFor(() => expect(mockChatService.getSimulationResult).toHaveBeenCalledOnce());
+		fireEvent.click(await screen.findByRole('button', { name: 'Update second tile' }));
+		await waitFor(() => expect(useSimulationOverlayStore.getState().inReview).toBe(true));
+		expect(useSimulationOverlayStore.getState().selectedActionId).toBe('second');
+		await waitFor(() =>
+			expect(mockCalendarRequest).toHaveBeenCalledWith(
+				expect.objectContaining({
+					type: CalendarRequestType.FocusEvent,
+					entityId: 'preview-second',
+				})
+			)
+		);
+	});
+
+	it('waits for an existing download and opens review at the most recently tapped action', async () => {
+		seedActionReview();
+		const finishDownload = deferredPreview();
+		renderChat();
+		await screen.findByTestId('review-simulation-button');
+		fireEvent.click(screen.getByRole('button', { name: 'Update first tile' }));
+		fireEvent.click(screen.getByRole('button', { name: 'Update second tile' }));
+		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+		expect(mockChatService.getSimulationResult).toHaveBeenCalledOnce();
+		await finishDownload();
+		await waitFor(() => expect(useSimulationOverlayStore.getState().inReview).toBe(true));
+		expect(useSimulationOverlayStore.getState().selectedActionId).toBe('second');
+		await waitFor(() =>
+			expect(mockCalendarRequest).toHaveBeenCalledWith(
+				expect.objectContaining({ entityId: 'preview-second' })
+			)
+		);
+	});
+
+	it('queues the tapped action during generation and opens its preview when it becomes ready', async () => {
+		seedActionReview(SimulationState.Processing);
+		renderChat();
+		await screen.findByText('Generating simulation…');
+		fireEvent.click(screen.getByRole('button', { name: 'Update second tile' }));
+		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+		const calls = vi.mocked(useSimulationPolling).mock.calls;
+		const onSimulation = calls[calls.length - 1][2];
+		act(() => onSimulation(ACTION_SIMULATION));
+		await waitFor(() => expect(useSimulationOverlayStore.getState().inReview).toBe(true));
+		expect(useSimulationOverlayStore.getState().selectedActionId).toBe('second');
+		await waitFor(() =>
+			expect(mockCalendarRequest).toHaveBeenCalledWith(
+				expect.objectContaining({ entityId: 'preview-second' })
+			)
+		);
+	});
+
+	it('navigates the live tile while a review download is pending and cancels automatic review entry', async () => {
+		seedActionReview();
+		const finishDownload = deferredPreview();
+		renderChat();
+		await screen.findByTestId('review-simulation-button');
+		fireEvent.click(screen.getByRole('button', { name: 'Update second tile' }));
+		fireEvent.click(screen.getByRole('button', { name: 'Go to tile: Update second tile' }));
+		expect(mockCalendarRequest).toHaveBeenCalledWith(
+			expect.objectContaining({ entityId: 'live-second' })
+		);
+		await finishDownload();
+		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+	});
+
+	it('does not open a downloaded preview after starting a new chat', async () => {
+		seedActionReview();
+		const finishDownload = deferredPreview();
+		renderChat();
+		await screen.findByTestId('review-simulation-button');
+		fireEvent.click(screen.getByRole('button', { name: 'Update second tile' }));
+		fireEvent.click(screen.getByRole('button', { name: 'home.expanded.chat.newChat' }));
+		await finishDownload();
+		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+	});
+
+	it('does not enter review after unmounting during a preview download', async () => {
+		seedActionReview();
+		const finishDownload = deferredPreview();
+		const view = renderChat();
+		await screen.findByTestId('review-simulation-button');
+		fireEvent.click(screen.getByRole('button', { name: 'Update second tile' }));
+		view.unmount();
+		await finishDownload();
+		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
+	});
+
 	it('preserves the message and opens location selection before sending without a decision', async () => {
 		vi.mocked(locationService.hasSelectionDecision).mockReturnValue(false);
 		renderChat();

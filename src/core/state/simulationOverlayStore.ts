@@ -60,6 +60,7 @@ export interface SimulationOverlayState {
 		simulation: SimulationDto;
 		simulationResult: SimulationScheduleResult;
 		vibeRequest: VibeRequest;
+		selectedActionId?: string;
 	}) => void;
 	exitReview: () => void;
 	setComparisonView: (v: ComparisonView) => void;
@@ -82,7 +83,7 @@ const useSimulationOverlayStore = create<SimulationOverlayState>((set) => ({
 	reviewStop: 'full',
 	activeKindFilter: null,
 
-	enterReview: ({ simulation, simulationResult, vibeRequest }) => {
+	enterReview: ({ simulation, simulationResult, vibeRequest, selectedActionId }) => {
 		// Plan §5.3 — auto-select the first reviewable action so chips,
 		// calendar overlay, review panel rows, and the Previous/Next
 		// stepper all share a non-null starting selection. Source from
@@ -103,7 +104,7 @@ const useSimulationOverlayStore = create<SimulationOverlayState>((set) => ({
 			simulationResult,
 			vibeRequest,
 			comparisonView: 'simulation',
-			selectedActionId: firstId,
+			selectedActionId: selectedActionId ?? firstId,
 			reviewStop: 'full',
 		});
 	},
