@@ -17,22 +17,40 @@ function useCalendarView(
 	});
 
 	useEffect(() => {
-		const viewWidth = viewRef.current?.offsetWidth || 0;
-		const daysInView = Math.floor(viewWidth / parseInt(calendarConfig.MIN_CELL_WIDTH));
-		const centerToday = !hasInitializedView.current && daysInView > 0;
-		if (centerToday) hasInitializedView.current = true;
+		const view = viewRef.current;
+		if (!view) return;
+		const measure = () => {
+			// The header reserves the same scrollbar gutter as the grid. Measure
+			// its usable width so tiles, travel bands and day headings agree.
+			const viewWidth = view.clientWidth;
+			if (viewWidth <= 0) return;
+			const daysInView = Math.max(
+				1,
+				Math.floor(viewWidth / parseInt(calendarConfig.MIN_CELL_WIDTH))
+			);
+			const centerToday = !hasInitializedView.current;
+			if (centerToday) hasInitializedView.current = true;
 
-		setViewOptions((prev) => ({
-			...prev,
-			width: viewWidth,
-			daysInView,
-			startDay: centerToday
-				? dayjs()
-						.startOf('day')
-						.subtract(Math.floor(daysInView / 2), 'day')
-				: prev.startDay,
-		}));
-	}, [containerWidth, viewRef.current, chatExpanded]);
+			setViewOptions((prev) => {
+				if (prev.width === viewWidth && prev.daysInView === daysInView && !centerToday)
+					return prev;
+				return {
+					...prev,
+					width: viewWidth,
+					daysInView,
+					startDay: centerToday
+						? dayjs()
+								.startOf('day')
+								.subtract(Math.floor(daysInView / 2), 'day')
+						: prev.startDay,
+				};
+			});
+		};
+		measure();
+		const observer = new ResizeObserver(measure);
+		observer.observe(view);
+		return () => observer.disconnect();
+	}, [containerWidth, viewRef, chatExpanded]);
 
 	return {
 		viewOptions,

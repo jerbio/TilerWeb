@@ -944,6 +944,9 @@ const CalendarHeaderWrapper = styled.div`
 	z-index: 1;
 	display: flex;
 	flex-direction: column;
+	/* Match the grid's scrollbar space without adding a second scroller. */
+	overflow: hidden;
+	scrollbar-gutter: stable;
 `;
 
 const CalendarHeader = styled.div`
@@ -954,6 +957,7 @@ const CalendarHeader = styled.div`
 
 const CalendarHeaderActions = styled.div`
 	width: ${calendarConfig.TIMELINE_WIDTH};
+	flex-shrink: 0;
 	height: 100%;
 	display: flex;
 	align-items: center;
@@ -992,10 +996,12 @@ const CalendarHeaderDateList = styled.ul`
 	flex-direction: row;
 	height: 100%;
 	flex: 1;
+	min-width: 0;
 `;
 
 const CalendarHeaderDateItem = styled.li<{ $isToday: boolean }>`
 	flex: 1;
+	min-width: 0;
 	font-family: ${({ theme }) => theme.typography.fontFamily.urban};
 	font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
 	font-size: ${({ theme }) => theme.typography.fontSize.lg};
@@ -1028,6 +1034,7 @@ const CalendarContentContainer = styled.div`
 	position: absolute;
 	overflow-x: hidden;
 	overflow-y: scroll;
+	scrollbar-gutter: stable;
 	top: ${calendarConfig.HEADER_HEIGHT};
 	bottom: 0;
 	left: 0;

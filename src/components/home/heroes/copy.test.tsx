@@ -141,27 +141,33 @@ describe('translation readiness', () => {
 });
 
 /**
- * The deferred-translation approach is only safe if i18next actually falls back.
- * Without this, a non-English visitor would see raw dotted keys in the hero.
+ * Missing translations must fall back to English instead of displaying dotted
+ * keys. Use an explicitly untranslated fixture so this remains valid as the
+ * real locale resources gain hero translations.
  */
 describe('English fallback for untranslated locales', () => {
 	it('serves English hero copy to a locale that has no heroExperiment block', async () => {
+		const germanWithoutHeroCopy = {
+			...de,
+			home: { ...de.home, heroExperiment: undefined },
+		};
 		const instance = i18next.createInstance();
 		await instance.init({
 			lng: 'de',
 			fallbackLng: 'en',
-			resources: { en: { translation: en }, de: { translation: de } },
+			resources: { en: { translation: en }, de: { translation: germanWithoutHeroCopy } },
 			interpolation: { escapeValue: false },
 		});
 
 		const key = 'home.heroExperiment.self_healing.titleLead';
 		const value = instance.t(key);
 
+		expect(instance.getResource('de', 'translation', 'home.heroExperiment')).toBeUndefined();
 		expect(value).not.toBe(key);
 		expect(value).toBe(lookup(key));
 	});
 
-	it('still serves German for keys German does have', async () => {
+	it('uses available German translations before falling back to English', async () => {
 		const instance = i18next.createInstance();
 		await instance.init({
 			lng: 'de',
@@ -173,5 +179,8 @@ describe('English fallback for untranslated locales', () => {
 		// Guards against a fallback misconfiguration that would silently make the
 		// whole site English.
 		expect(instance.t('home.hero.title')).not.toBe(lookup('home.hero.title'));
+		expect(instance.t('home.heroExperiment.self_healing.titleLead')).toBe(
+			de.home.heroExperiment.self_healing.titleLead
+		);
 	});
 });

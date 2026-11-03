@@ -36,8 +36,7 @@ const CalendarContentDummy: React.FC<CalendarContentProps> = ({
 };
 
 const Container = styled.div`
-	overflow-x: hidden;
-	overflow-y: scroll;
+	/* Use the same single scroller as the active calendar slide. */
 	height: 100%;
 	width: 100%;
 `;
