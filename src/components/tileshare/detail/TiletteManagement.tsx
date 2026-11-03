@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { Users, Trash2, UserPlus } from 'lucide-react';
+import { Users, Trash2, UserPlus, UserCheck } from 'lucide-react';
 import Modal from '../TileShareModal';
 import Button from '@/core/common/components/button';
 import { DesignatedUser, TileShareTemplate, TileshareMode } from '@/core/common/types/tileshare';
 import { classifyContact, isValidRecipient, normalizePhoneNumber } from '@/core/util/contact';
 import { tileshareService } from '@/services';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
+import { useAuth } from '@/core/auth/useAuth';
 
 type Props = {
 	mode?: TileshareMode | null;
@@ -20,6 +21,12 @@ type Props = {
 export default function TiletteManagement({ tilette, isOwner, onChanged, onDeleted, mode }: Props) {
 	const participants = validDesignatedUsers(tilette.designatedUsers);
 	const { t } = useTranslation();
+	const { user } = useAuth();
+	const alreadyAssigned =
+		!!user &&
+		participants.some(
+			(u) => u.userId === user.id || u.userProfile?.email === user.email
+		);
 	const [view, setView] = useState<'people' | 'remove' | 'delete' | null>(null);
 	const [recipient, setRecipient] = useState<DesignatedUser | null>(null);
 	const [contact, setContact] = useState('');
@@ -89,6 +96,27 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 				{mode !== TileshareMode.Class && (
 					<Button variant="ghost" onClick={() => open('people')}>
 						<Users size={16} /> {t('tileshareManagement.people', 'Manage people')}
+					</Button>
+				)}
+				{mode === TileshareMode.Project && !alreadyAssigned && user?.email && (
+					<Button
+						variant="primary"
+						disabled={busy}
+						onClick={() =>
+							void run(
+								() =>
+									tileshareService.addTiletteRecipient(tilette.id!, {
+										Email: user.email!,
+									}),
+								async () => {
+									setNotice(t('tileshareManagement.assignedToMe', 'Assigned to you.'));
+									await refresh();
+								}
+							)
+						}
+					>
+						<UserCheck size={16} />{' '}
+						{t('tileshareManagement.assignToMe', 'Assign To Me')}
 					</Button>
 				)}
 				<DangerButton $quiet onClick={() => open('delete')}>
