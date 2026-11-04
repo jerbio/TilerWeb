@@ -10,6 +10,7 @@ import React, { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { UserCheck } from 'lucide-react';
 import TileShareDetailLayout from '@/components/tileshare/TileShareDetailLayout';
 import { useAuth } from '@/core/auth/useAuth';
 import { useUiStore, notificationId, NotificationAction } from '@/core/ui';
@@ -18,6 +19,11 @@ import { useClusterHeader } from '@/hooks/useClusterHeader';
 import { isTileshareOwner } from '@/core/util/tileshareOwnership';
 import { tileshareMode } from '@/core/util/tileshareMode';
 import { tileshareService } from '@/services';
+import { TileshareApi } from '@/api/tileshareApi';
+import { InvitationStatus, TileshareMode } from '@/core/common/types/tileshare';
+import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
+
+const tileshareApi = new TileshareApi();
 import { Routes } from '@/core/constants/routes';
 import TileshareDetailBreadcrumb from '@/components/tileshare/detail/TileshareDetailBreadcrumb';
 import SingleTileshareHeader from '@/components/tileshare/detail/SingleTileshareHeader';
@@ -44,6 +50,7 @@ const TiletteDetailPage: React.FC = () => {
 	const editSession = useRef<TiletteEditSession | null>(null);
 	// Shimmer the detail section while an RSVP response is saving in place.
 	const [rsvpSaving, setRsvpSaving] = useState(false);
+	const [assignBusy, setAssignBusy] = useState(false);
 	// The tilette lives under a multi cluster (this route's :id) — resolve the
 	// parent's name for the breadcrumb and the "In: {cluster}" header subtitle.
 	const {
@@ -55,6 +62,38 @@ const TiletteDetailPage: React.FC = () => {
 	// A tilette is editable by whoever owns the cluster it belongs to, not by the
 	// assignee working on it.
 	const isOwner = isTileshareOwner(cluster?.creator, user);
+	const mode = cluster ? tileshareMode(cluster) : null;
+	const alreadyAssigned =
+		!!user &&
+		validDesignatedUsers(tilette?.designatedUsers).some(
+			(u) => u.userId === user.id || u.userProfile?.email === user.email
+		);
+
+	const assignAndAccept = async () => {
+		if (!tilette?.id || !user?.email || assignBusy) return;
+		setAssignBusy(true);
+		setRsvpSaving(true);
+		try {
+			await tileshareService.addTiletteRecipient(tilette.id, { Email: user.email });
+			const updated = await tileshareService.getTileletteDetail(tilette.id);
+			const assignment = validDesignatedUsers(updated?.designatedUsers).find(
+				(d) => d.userId === user.id || d.userProfile?.email === user.email
+			);
+			if (assignment?.designatedTileTemplateId) {
+				await tileshareApi.respondToInvitation(
+					assignment.designatedTileTemplateId,
+					InvitationStatus.Accepted
+				);
+			}
+			window.dispatchEvent(new Event('tileshare-changed'));
+			await refresh();
+		} catch (err) {
+			console.error('Assign and accept failed', err);
+		} finally {
+			setAssignBusy(false);
+			setRsvpSaving(false);
+		}
+	};
 	const parentName = cluster?.name ?? '';
 	const parent = clusterId
 		? { label: parentName, href: Routes.Tileshare.detail(clusterId) }
@@ -135,7 +174,7 @@ const TiletteDetailPage: React.FC = () => {
 										}
 									/>
 									<TiletteManagement
-										mode={cluster ? tileshareMode(cluster) : null}
+										mode={mode}
 										tilette={tilette}
 										isOwner={isOwner}
 										onChanged={refresh}
@@ -156,6 +195,19 @@ const TiletteDetailPage: React.FC = () => {
 											embedded
 											reportBusy={setRsvpSaving}
 										/>
+										{mode === TileshareMode.Project &&
+											isOwner &&
+											!alreadyAssigned &&
+											user?.email && (
+												<AssignButton
+													type="button"
+													disabled={assignBusy}
+													onClick={() => void assignAndAccept()}
+												>
+													<UserCheck size={16} aria-hidden="true" />
+													{t('tileshareManagement.assignToMe', 'Assign To Me')}
+												</AssignButton>
+										)}
 										{rsvpSaving && (
 											<ShimmerOverlay data-testid="tilette-shimmer" />
 										)}
@@ -229,6 +281,27 @@ const RsvpRow = styled.div`
 	background: ${({ theme }) => theme.colors.background.card};
 	&:empty {
 		display: none;
+	}
+`;
+
+const AssignButton = styled.button`
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: 1px solid ${({ theme }) => theme.colors.brand[500]};
+	background: ${({ theme }) => theme.colors.brand[500]};
+	color: #fff;
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+	&:disabled {
+		opacity: 0.5;
+		cursor: wait;
+	}
+	&:hover:not(:disabled) {
+		opacity: 0.9;
 	}
 `;
 
