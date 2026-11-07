@@ -46,6 +46,7 @@ import { featureFlags } from './core/constants/featureFlags';
 import { AdminRoute } from './core/auth/AdminRoute';
 import AdminLayout from './pages/admin/AdminLayout';
 import FeatureFlagsAdmin from './pages/admin/feature-flags/FeatureFlagsAdmin';
+import CalendarExportDiagnostics from './pages/admin/CalendarExportDiagnostics';
 import { Routes } from '@/core/constants/routes';
 
 // Component to track page views on route changes
@@ -262,6 +263,10 @@ const App: React.FC = () => {
 										<Route
 											path={Routes.Admin.featureFlags}
 											element={<FeatureFlagsAdmin />}
+										/>
+										<Route
+											path={Routes.Admin.calendarExports}
+											element={<CalendarExportDiagnostics />}
 										/>
 									</Route>
 								</Route>

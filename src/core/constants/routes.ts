@@ -55,6 +55,7 @@ export const Routes = {
 	Admin: {
 		root: '/admin',
 		featureFlags: '/admin/feature-flags',
+		calendarExports: '/admin/calendar-exports',
 	},
 } as const;
 

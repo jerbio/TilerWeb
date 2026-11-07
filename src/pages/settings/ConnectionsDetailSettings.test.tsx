@@ -26,6 +26,7 @@ import {
 import SettingsLayout from './SettingsLayout';
 import ConnectionsSettings from './ConnectionsSettings';
 import ConnectionsDetailSettings from './ConnectionsDetailSettings';
+vi.mock('./GoogleCalendarExportSettings', () => ({ GoogleCalendarExportSettings: () => null }));
 
 // ---------------------------------------------------------------------------
 // Phase 4 (P4-3) tests: connection detail page.

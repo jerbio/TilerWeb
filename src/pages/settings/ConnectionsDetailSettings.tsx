@@ -14,6 +14,7 @@ import Toggle from '@/core/common/components/Toggle';
 import Modal from '@/core/common/components/modals';
 import analytics from '@/core/util/analytics';
 import { Loader2, MapPin } from 'lucide-react';
+import { GoogleCalendarExportSettings } from './GoogleCalendarExportSettings';
 
 /**
  * Integration detail page (P4-3).
@@ -519,6 +520,12 @@ const ConnectionsDetailSettings: React.FC = () => {
 				<Title>{providerName}</Title>
 				{accountEmail ? <AccountEmail>{accountEmail}</AccountEmail> : null}
 			</Header>
+			{provider === 'google' && integrationId && (
+				<GoogleCalendarExportSettings
+					key={integrationId}
+					authenticationId={integrationId}
+				/>
+			)}
 
 			<Section>
 				<SectionTitle>

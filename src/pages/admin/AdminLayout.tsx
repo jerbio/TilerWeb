@@ -7,6 +7,11 @@ import useAuthNavigate from '@/hooks/useNavigateHome';
 
 const adminSections = [
 	{
+		title: 'Calendar publishing',
+		description: 'Inspect Google export coverage and retries',
+		path: '/admin/calendar-exports',
+	},
+	{
 		title: 'Feature Flags',
 		description: 'Toggle features on or off globally',
 		path: '/admin/feature-flags',
@@ -26,6 +31,18 @@ const AdminLayout: React.FC = () => {
 				<Logo size={48} />
 				<AdminBadge>Admin</AdminBadge>
 			</Header>
+			<nav aria-label="Admin tools">
+				{adminSections.map((section) => (
+					<button
+						key={section.path}
+						type="button"
+						onClick={() => navigate(section.path)}
+						style={{ marginRight: 12 }}
+					>
+						{section.title}
+					</button>
+				))}
+			</nav>
 
 			{!isDetailPage ? (
 				<Content>
