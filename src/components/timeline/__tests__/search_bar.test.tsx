@@ -87,10 +87,16 @@ vi.mock('@/core/common/components/calendar/calendar-ui.provider', () => ({
 				state: {
 					isOpen: false,
 					event: null,
+					isDirty: false,
+					isSaving: false,
+					pendingEvent: null,
 				},
 				actions: {
 					open: vi.fn(),
 					close: vi.fn(),
+					setFormState: vi.fn(),
+					confirmSwitch: vi.fn(),
+					cancelSwitch: vi.fn(),
 				},
 			},
 			viewInfo: {

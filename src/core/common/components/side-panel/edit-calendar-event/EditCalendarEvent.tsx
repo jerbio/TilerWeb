@@ -93,6 +93,7 @@ interface EditCalendarEventProps {
 	personalProfileId: string | null;
 	/** Initial verified state for the event's location, resolved by the loader. */
 	isLocationVerified?: boolean;
+	onFormStateChange?: (eventId: string, isDirty: boolean, isSaving: boolean) => void;
 	onClose: () => void;
 }
 
@@ -117,6 +118,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 	workProfileId,
 	personalProfileId,
 	isLocationVerified: initLocationVerified = false,
+	onFormStateChange,
 	onClose,
 }) => {
 	const { t, i18n } = useTranslation();
@@ -293,6 +295,10 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 		return Object.keys(init).some((k) => init[k] !== current[k]);
 	})();
 
+	useEffect(() => {
+		onFormStateChange?.(event.id ?? '', isDirty, isSaving);
+	}, [event.id, isDirty, isSaving, onFormStateChange]);
+
 	// Debounced location search - only when the user types in the input
 	useEffect(() => {
 		if (!userEditedAddressRef.current) return;
@@ -455,7 +461,11 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 	return (
 		<Container>
 			<Header>
-				<BackButton onClick={onClose} aria-label={t('calendarEvent.edit.back')}>
+				<BackButton
+					onClick={onClose}
+					disabled={isSaving}
+					aria-label={t('calendarEvent.edit.back')}
+				>
 					<ArrowLeft size={18} />
 				</BackButton>
 				<Title>
@@ -468,6 +478,7 @@ const EditCalendarEvent: React.FC<EditCalendarEventProps> = ({
 					)}
 				</Title>
 				<NotesButton
+					disabled={isSaving}
 					onClick={() => openNotes(event)}
 					aria-label={t('calendarEvent.edit.openNotes', 'Open notes')}
 					title={t('calendarEvent.edit.openNotes', 'Open notes')}

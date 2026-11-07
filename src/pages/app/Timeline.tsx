@@ -22,6 +22,7 @@ import {
 import appLayoutConfig from '@/core/constants/app_layout_config';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { getMobileReviewSheetSizingCss } from '@/pages/reviewSheetSizing';
+import TileShareDiscardDialog from '@/components/tileshare/TileShareDiscardDialog';
 
 const Timeline: React.FC = () => {
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
@@ -78,6 +79,10 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 	const editTileIsOpen = useCalendarUI((s) => s.editTile.state.isOpen);
 	const editTileEvent = useCalendarUI((s) => s.editTile.state.event);
 	const closeEditTile = useCalendarUI((s) => s.editTile.actions.close);
+	const setEditFormState = useCalendarUI((s) => s.editTile.actions.setFormState);
+	const pendingEditEvent = useCalendarUI((s) => s.editTile.state.pendingEvent);
+	const confirmEditSwitch = useCalendarUI((s) => s.editTile.actions.confirmSwitch);
+	const cancelEditSwitch = useCalendarUI((s) => s.editTile.actions.cancelSwitch);
 
 	// React to editNotes store changes and push/pop notes panel
 	const editNotesIsOpen = useCalendarUI((s) => s.editNotes.state.isOpen);
@@ -92,6 +97,7 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 				content: (
 					<EditCalendarEventLoader
 						event={editTileEvent!}
+						onFormStateChange={setEditFormState}
 						onClose={() => closePanelAndStore()}
 					/>
 				),
@@ -195,6 +201,16 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 
 	return (
 		<>
+			{pendingEditEvent && (
+				<TileShareDiscardDialog
+					onDiscard={confirmEditSwitch}
+					onKeep={cancelEditSwitch}
+					message={t(
+						'tileShareEdit.discard',
+						'Your unsaved changes to these details will be lost.'
+					)}
+				/>
+			)}
 			<CalendarRequestProvider>
 				<TimelineHeader />
 

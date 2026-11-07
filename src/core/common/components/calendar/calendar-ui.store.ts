@@ -2,6 +2,7 @@ import { createStore } from 'zustand';
 import dayjs from 'dayjs';
 import { CalendarEvent, RestrictionProfile, CreatedScheduleEvent } from '../../types/schedule';
 import { isScheduleReadOnly } from '@/hooks/useIsReadOnly';
+import { normalizeRootId } from '@/core/common/utils/tilerEventUtils';
 
 type CreateSelectionState = {
 	isOpen: boolean;
@@ -90,11 +91,17 @@ type CreateBlockActions = {
 type EditTileState = {
 	isOpen: boolean;
 	event: CalendarEvent | null;
+	isDirty: boolean;
+	isSaving: boolean;
+	pendingEvent: CalendarEvent | null;
 };
 
 type EditTileActions = {
 	open: (event: CalendarEvent) => void;
 	close: () => void;
+	setFormState: (eventId: string, isDirty: boolean, isSaving: boolean) => void;
+	confirmSwitch: () => void;
+	cancelSwitch: () => void;
 };
 
 type EditNotesState = {
@@ -526,23 +533,95 @@ export const createCalendarUIStore = (demoMode: boolean) =>
 				state: {
 					isOpen: false,
 					event: null,
+					isDirty: false,
+					isSaving: false,
+					pendingEvent: null,
 				},
 
 				actions: {
 					open: guarded((event: CalendarEvent) =>
-						set((state) => ({
-							editTile: {
-								...state.editTile,
-								state: { isOpen: true, event },
-							},
-						}))
+						set((state) => {
+							const current = state.editTile.state;
+							// A save must finish against its original editor before switching.
+							if (current.isSaving) return state;
+							const sameEvent =
+								current.event &&
+								normalizeRootId(current.event.id ?? '') ===
+									normalizeRootId(event.id ?? '');
+							return {
+								editTile: {
+									...state.editTile,
+									state: sameEvent
+										? { ...current, pendingEvent: null }
+										: current.isDirty
+											? { ...current, pendingEvent: event }
+											: {
+													isOpen: true,
+													event,
+													isDirty: false,
+													isSaving: false,
+													pendingEvent: null,
+												},
+								},
+							};
+						})
 					),
 
 					close: guarded(() =>
 						set((state) => ({
 							editTile: {
 								...state.editTile,
-								state: { isOpen: false, event: null },
+								state: {
+									isOpen: false,
+									event: null,
+									isDirty: false,
+									isSaving: false,
+									pendingEvent: null,
+								},
+							},
+						}))
+					),
+					setFormState: guarded((eventId: string, isDirty: boolean, isSaving: boolean) =>
+						set((state) => {
+							const current = state.editTile.state;
+							if (
+								!current.event ||
+								normalizeRootId(current.event.id ?? '') !== normalizeRootId(eventId)
+							)
+								return state;
+							if (current.isDirty === isDirty && current.isSaving === isSaving)
+								return state;
+							return {
+								editTile: {
+									...state.editTile,
+									state: { ...current, isDirty, isSaving },
+								},
+							};
+						})
+					),
+					confirmSwitch: guarded(() =>
+						set((state) => {
+							const current = state.editTile.state;
+							if (!current.pendingEvent || current.isSaving) return state;
+							return {
+								editTile: {
+									...state.editTile,
+									state: {
+										isOpen: true,
+										event: current.pendingEvent,
+										isDirty: false,
+										isSaving: false,
+										pendingEvent: null,
+									},
+								},
+							};
+						})
+					),
+					cancelSwitch: guarded(() =>
+						set((state) => ({
+							editTile: {
+								...state.editTile,
+								state: { ...state.editTile.state, pendingEvent: null },
 							},
 						}))
 					),

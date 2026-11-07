@@ -137,6 +137,48 @@ describe('calendar-ui.store', () => {
 	});
 
 	describe('editTile', () => {
+		it('compares parent identities so selecting another occurrence preserves the draft', () => {
+			getEditActions().open({ ...mockCalendarEvent, id: 'evt-1_7_0_0' });
+			getEditActions().setFormState('evt-1_7_0_0', true, false);
+			getEditActions().open({ ...mockCalendarEvent, id: 'evt-1_1_2_3' });
+			expect(getEditState().event?.id).toBe('evt-1_7_0_0');
+			expect(getEditState().isDirty).toBe(true);
+			expect(getEditState().pendingEvent).toBeNull();
+		});
+
+		it('keeps the latest requested event pending until discard is confirmed', () => {
+			getEditActions().open(mockCalendarEvent);
+			getEditActions().setFormState(mockCalendarEvent.id!, true, false);
+			getEditActions().open({ ...mockCalendarEvent, id: 'evt-2' });
+			getEditActions().open({ ...mockCalendarEvent, id: 'evt-3' });
+			expect(getEditState().event?.id).toBe(mockCalendarEvent.id);
+			expect(getEditState().pendingEvent?.id).toBe('evt-3');
+			getEditActions().confirmSwitch();
+			expect(getEditState().event?.id).toBe('evt-3');
+			expect(getEditState().isDirty).toBe(false);
+			expect(getEditState().pendingEvent).toBeNull();
+			// A late report from the old form cannot dirty the new editor.
+			getEditActions().setFormState(mockCalendarEvent.id!, true, true);
+			expect(getEditState().isDirty).toBe(false);
+			expect(getEditState().isSaving).toBe(false);
+		});
+
+		it('clears pending selection and dirty state when the editor closes', () => {
+			getEditActions().open(mockCalendarEvent);
+			getEditActions().setFormState(mockCalendarEvent.id!, true, false);
+			getEditActions().open({ ...mockCalendarEvent, id: 'evt-2' });
+			getEditActions().close();
+			expect(getEditState()).toEqual({
+				isOpen: false,
+				event: null,
+				isDirty: false,
+				isSaving: false,
+				pendingEvent: null,
+			});
+			getEditActions().confirmSwitch();
+			expect(getEditState().isOpen).toBe(false);
+		});
+
 		it('starts closed with null event', () => {
 			expect(getEditState().isOpen).toBe(false);
 			expect(getEditState().event).toBeNull();
