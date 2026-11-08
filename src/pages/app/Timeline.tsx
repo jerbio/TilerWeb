@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { animated, useTransition } from '@react-spring/web';
@@ -7,6 +7,7 @@ import useAppStore from '@/global_state';
 import { CalendarWrapper } from '@/core/common/components/calendar/calendar_wrapper';
 import { CalendarRequestProvider } from '@/core/common/components/calendar/CalendarRequestProvider';
 import Chat from '@/core/common/components/chat/chat';
+import BackToChatButton from '@/core/common/components/chat/BackToChatButton';
 import { SidePanel, useSidePanelStack } from '@/core/common/components/side-panel';
 import { useEditTilePanelSync } from '@/core/common/components/side-panel/useEditTilePanelSync';
 import { useEditNotesPanelSync } from '@/core/common/components/side-panel/useEditNotesPanelSync';
@@ -21,6 +22,7 @@ import {
 import appLayoutConfig from '@/core/constants/app_layout_config';
 import useSimulationOverlayStore from '@/core/state/simulationOverlayStore';
 import { getMobileReviewSheetSizingCss } from '@/pages/reviewSheetSizing';
+import TileShareDiscardDialog from '@/components/tileshare/TileShareDiscardDialog';
 
 const Timeline: React.FC = () => {
 	const authenticatedUser = useAppStore((state) => state.authenticatedUser);
@@ -42,6 +44,7 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 	const { t } = useTranslation();
 	const theme = useTheme();
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
+	const [canReturnToChat, setCanReturnToChat] = useState(false);
 	const isDesktop = !useIsMobile(parseInt(theme.screens.lg, 10));
 	const showChat = isDesktop || mobileChatVisible;
 	// When the user is reviewing a tilecast on a small viewport we shrink
@@ -58,12 +61,28 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 		stack: panelStack,
 		push: pushPanel,
 		pop: popPanel,
-	} = useSidePanelStack([{ content: <Chat onClose={() => setMobileChatVisible(false)} /> }]);
+	} = useSidePanelStack([
+		{
+			content: (
+				<Chat
+					onClose={() => setMobileChatVisible(false)}
+					onNavigateToCalendar={() => {
+						setCanReturnToChat(true);
+						setMobileChatVisible(false);
+					}}
+				/>
+			),
+		},
+	]);
 
 	// React to editTile store changes and push/pop edit panel
 	const editTileIsOpen = useCalendarUI((s) => s.editTile.state.isOpen);
 	const editTileEvent = useCalendarUI((s) => s.editTile.state.event);
 	const closeEditTile = useCalendarUI((s) => s.editTile.actions.close);
+	const setEditFormState = useCalendarUI((s) => s.editTile.actions.setFormState);
+	const pendingEditEvent = useCalendarUI((s) => s.editTile.state.pendingEvent);
+	const confirmEditSwitch = useCalendarUI((s) => s.editTile.actions.confirmSwitch);
+	const cancelEditSwitch = useCalendarUI((s) => s.editTile.actions.cancelSwitch);
 
 	// React to editNotes store changes and push/pop notes panel
 	const editNotesIsOpen = useCalendarUI((s) => s.editNotes.state.isOpen);
@@ -78,6 +97,7 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 				content: (
 					<EditCalendarEventLoader
 						event={editTileEvent!}
+						onFormStateChange={setEditFormState}
 						onClose={() => closePanelAndStore()}
 					/>
 				),
@@ -127,18 +147,26 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 						width={expandedWidth}
 					/>
 					<CalendarContainerActionButtons>
-						{!mobileReview && (
-							<MobileChatInputWrapper>
-								<MessageCircleIcon>
-									<MessageCircle size={18} />
-								</MessageCircleIcon>
-								<MobileChatInput
-									onClick={() => setMobileChatVisible(!mobileChatVisible)}
-									placeholder={t('calendar.mobileChatInput.placeholder')}
-									readOnly
+						{!mobileReview &&
+							(canReturnToChat ? (
+								<BackToChatButton
+									onReturn={() => {
+										setCanReturnToChat(false);
+										setMobileChatVisible(true);
+									}}
 								/>
-							</MobileChatInputWrapper>
-						)}
+							) : (
+								<MobileChatInputWrapper>
+									<MessageCircleIcon>
+										<MessageCircle size={18} />
+									</MessageCircleIcon>
+									<MobileChatInput
+										onClick={() => setMobileChatVisible(!mobileChatVisible)}
+										placeholder={t('calendar.mobileChatInput.placeholder')}
+										readOnly
+									/>
+								</MobileChatInputWrapper>
+							))}
 					</CalendarContainerActionButtons>
 					{isDesktop && (
 						<SidePanelExpandToggle
@@ -161,9 +189,8 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 			content: <SidePanel stack={panelStack} />,
 		},
 	];
-	const visibleContent = useMemo(() => (showChat ? content : [content[0]]), [showChat, content]);
-
-	const contentTransition = useTransition(visibleContent, {
+	// Keep chat mounted while hidden so navigation preserves drafts and scroll.
+	const contentTransition = useTransition(content, {
 		keys: (item) => item.key,
 		from: { opacity: 0, scale: 1.05 },
 		enter: { opacity: 1, scale: 1 },
@@ -174,6 +201,16 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 
 	return (
 		<>
+			{pendingEditEvent && (
+				<TileShareDiscardDialog
+					onDiscard={confirmEditSwitch}
+					onKeep={cancelEditSwitch}
+					message={t(
+						'tileShareEdit.discard',
+						'Your unsaved changes to these details will be lost.'
+					)}
+				/>
+			)}
 			<CalendarRequestProvider>
 				<TimelineHeader />
 
@@ -186,7 +223,12 @@ const TimelineInner: React.FC<{ userId: string }> = ({ userId }) => {
 									key={item.key}
 									$sidepanelexpanded={sidePanelExpanded}
 									{...(item.key === 'side-panel'
-										? { $mobilereview: mobileReview, $reviewstop: reviewStop }
+										? {
+												$mobilereview: mobileReview,
+												$reviewstop: reviewStop,
+												$chatvisible: showChat,
+												'aria-hidden': !showChat,
+											}
 										: {})}
 								>
 									{item.content}
@@ -229,15 +271,21 @@ const TimelineContentContainer = styled.div`
 `;
 
 const CardContent = styled.div`
+	position: relative;
 	flex: 1;
+	min-height: 0;
+	min-width: 0;
 	display: grid;
 	gap: 1.5rem;
-	grid-template-columns: repeat(12, 1fr);
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	grid-template-rows: minmax(0, 1fr);
 	height: calc(100% - 3rem);
 `;
 
 const CalendarContainer = styled(animated.div)<{ $sidepanelexpanded: boolean }>`
 	position: relative;
+	min-width: 0;
+	min-height: 0;
 	grid-column: span 12;
 	height: 100%;
 	background: ${(props) => props.theme.colors.calendar.bg};
@@ -258,6 +306,7 @@ const SidePanelContainer = styled(animated.div)<{
 	$sidepanelexpanded: boolean;
 	$mobilereview?: boolean;
 	$reviewstop?: 'hidden' | 'peek' | 'mid' | 'full';
+	$chatvisible?: boolean;
 }>`
 	position: absolute;
 	z-index: 3;
@@ -266,7 +315,9 @@ const SidePanelContainer = styled(animated.div)<{
 	background: linear-gradient(to bottom, #1a1a1acc, #000000cc);
 	backdrop-filter: blur(6px);
 	border-radius: ${(props) => props.theme.borderRadius.xxLarge};
-	display: ${(props) => (props.$sidepanelexpanded ? 'none' : 'block')};
+	display: ${(props) =>
+		props.$sidepanelexpanded || props.$chatvisible === false ? 'none' : 'block'};
+	min-width: 0;
 	overflow: hidden;
 
 	${(props) => {

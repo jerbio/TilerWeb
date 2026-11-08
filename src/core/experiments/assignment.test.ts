@@ -185,6 +185,7 @@ describe('distribution', () => {
 		const rand = mulberry32(20260825);
 		const counts = new Map<string, number>();
 		const total = 10_000;
+		const enabled = HERO_ROSTER.filter((entry) => entry.enabled);
 
 		for (let i = 0; i < total; i += 1) {
 			const { variant } = resolveVariant({
@@ -195,13 +196,13 @@ describe('distribution', () => {
 			counts.set(variant, (counts.get(variant) ?? 0) + 1);
 		}
 
-		expect(counts.size).toBe(HERO_ROSTER.length);
+		expect([...counts.keys()].sort()).toEqual(enabled.map((entry) => entry.key).sort());
 
 		// Derived from the roster, not hardcoded: adding an arm changes what "even"
 		// means, and a fixed bound would fail for the right answer.
-		const evenShare = 1 / HERO_ROSTER.length;
+		const evenShare = 1 / enabled.length;
 		const tolerance = 0.02;
-		const expected = total / HERO_ROSTER.length;
+		const expected = total / enabled.length;
 		for (const [, count] of counts) {
 			const share = count / total;
 			expect(share).toBeGreaterThan(evenShare - tolerance);

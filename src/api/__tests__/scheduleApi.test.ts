@@ -60,6 +60,30 @@ describe('ScheduleApi', () => {
 		Intl.DateTimeFormat.prototype.resolvedOptions = _origResolvedOptions;
 	});
 
+	describe('lookup ranges', () => {
+		it.each(['user', 'schedule'] as const)(
+			'sends the explicit range and device timezone when looking up by %s',
+			async (kind) => {
+				fetchSpy.mockResolvedValueOnce(
+					new Response(JSON.stringify(mockShuffleResponse), { status: 200 })
+				);
+				const range = { startRange: 1793253600000, endRange: 1794207600000 };
+				if (kind === 'user') await api.lookupScheduleByUserId('user-1', range);
+				else await api.lookupScheduleById('schedule-1', range);
+				const input = fetchSpy.mock.calls[0][0];
+				const url = new URL(input instanceof Request ? input.url : String(input));
+				expect(url.pathname).toBe('/api/Schedule/Lookup');
+				expect(url.searchParams.get('startRange')).toBe(String(range.startRange));
+				expect(url.searchParams.get('endRange')).toBe(String(range.endRange));
+				expect(url.searchParams.get('TimeZone')).toBe('UTC');
+				expect(url.searchParams.get('mobileApp')).toBe('true');
+				expect(url.searchParams.get(kind === 'user' ? 'lookupUserId' : 'scheduleId')).toBe(
+					`${kind}-1`
+				);
+			}
+		);
+	});
+
 	describe('shuffle', () => {
 		const shuffleParams: ScheduleShuffleParams = {
 			UserLongitude: String(mockLocation.longitude),

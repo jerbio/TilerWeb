@@ -10,6 +10,7 @@ import EditCalendarEvent from './EditCalendarEvent';
 interface EditCalendarEventLoaderProps {
 	event: CalendarEvent;
 	onClose: () => void;
+	onFormStateChange?: (eventId: string, isDirty: boolean, isSaving: boolean) => void;
 }
 
 interface LoadedData {
@@ -19,7 +20,17 @@ interface LoadedData {
 	isLocationVerified: boolean;
 }
 
-const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event, onClose }) => {
+// A new event gets a fresh load and form, including all local field state and
+// the dirty baseline. Key the loading boundary so the old form never flashes.
+const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = (props) => (
+	<LoadCalendarEvent key={normalizeRootId(props.event.id ?? '')} {...props} />
+);
+
+const LoadCalendarEvent: React.FC<EditCalendarEventLoaderProps> = ({
+	event,
+	onClose,
+	onFormStateChange,
+}) => {
 	const { t } = useTranslation();
 	const [isLoading, setIsLoading] = useState(true);
 	const [loadedData, setLoadedData] = useState<LoadedData | null>(null);
@@ -85,7 +96,7 @@ const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event
 
 	if (isLoading) {
 		return (
-			<LoadingContainer data-testid="edit-event-loading">
+			<LoadingContainer data-testid="edit-event-loading" role="status">
 				<Spinner size={24} />
 				<LoadingText>{t('calendarEvent.edit.loading')}</LoadingText>
 			</LoadingContainer>
@@ -99,6 +110,7 @@ const EditCalendarEventLoader: React.FC<EditCalendarEventLoaderProps> = ({ event
 			workProfileId={data.workProfileId}
 			personalProfileId={data.personalProfileId}
 			isLocationVerified={data.isLocationVerified}
+			onFormStateChange={onFormStateChange}
 			onClose={onClose}
 		/>
 	);

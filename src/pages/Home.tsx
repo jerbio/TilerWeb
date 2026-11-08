@@ -124,7 +124,7 @@ const Home: React.FC = () => {
 			<HeroExperiment />
 			<AppDownloadSection />
 			<VideoIframeSection
-				src="https://www.youtube.com/embed/87RGNntLBRY"
+				src="https://www.youtube.com/embed/h4P9ePC9Ibs"
 				title={t('home.video.title')}
 				width={1024}
 				allowFullScreen={true}

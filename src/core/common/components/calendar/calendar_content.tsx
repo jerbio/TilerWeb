@@ -100,8 +100,7 @@ const CalendarContent: React.FC<CalendarContentProps> = ({
 };
 
 const Container = styled.div`
-	overflow-x: hidden;
-	overflow-y: scroll;
+	/* CalendarContentContainer owns vertical scrolling and its scrollbar. */
 	height: 100%;
 	width: 100%;
 `;

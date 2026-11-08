@@ -27,6 +27,7 @@ export enum CalendarRequestStatus {
 /** Discriminant values for each calendar request kind */
 export enum CalendarRequestType {
 	FocusEvent = 'focus_event',
+	ClearSelection = 'clear_selection',
 	NavigateToDate = 'navigate_to_date',
 	GoToToday = 'go_to_today',
 	NavigateWeek = 'navigate_week',
@@ -125,6 +126,7 @@ export interface NavigateWeekRequest {
 /** Discriminated union of every request the calendar can handle */
 export type CalendarRequest =
 	| FocusEventRequest
+	| { type: CalendarRequestType.ClearSelection }
 	| NavigateToDateRequest
 	| GoToTodayRequest
 	| NavigateWeekRequest;

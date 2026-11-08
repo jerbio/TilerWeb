@@ -8,6 +8,7 @@ import palette from '@/core/theme/palette';
 import Button from '@/core/common/components/button';
 import { Persona } from '@/core/common/types/persona';
 import Chat from '@/core/common/components/chat/chat';
+import BackToChatButton from '@/core/common/components/chat/BackToChatButton';
 import LocationSelector from '@/components/location/LocationSelector';
 import useIsMobile from '@/core/common/hooks/useIsMobile';
 import { PersonaUsers, PersonaUserSetter } from '@/core/common/hooks/usePersonaUsers';
@@ -46,6 +47,7 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const [mobileChatVisible, setMobileChatVisible] = useState(false);
+	const [canReturnToChat, setCanReturnToChat] = useState(false);
 	const [showOnboarding, setShowOnboarding] = useState(false);
 	const [demoModeKey, setDemoModeKey] = useState(0); // Force re-render when demo mode changes
 	const isDesktop = !useIsMobile(parseInt(palette.screens.lg, 10));
@@ -355,17 +357,26 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 						userId={personaUserId}
 					/>
 					<CalendarContainerActionButtons>
-						<MobileChatInputWrapper>
-							<MessageCircleIcon>
-								<MessageCircle size={18} />
-							</MessageCircleIcon>
-							<MobileChatInput
-								onClick={() => setMobileChatVisible(!mobileChatVisible)}
-								placeholder={t('home.expanded.mobileChatPlaceholder')}
-								readOnly
-								data-onboarding-mobile-chat-input
+						{canReturnToChat ? (
+							<BackToChatButton
+								onReturn={() => {
+									setCanReturnToChat(false);
+									setMobileChatVisible(true);
+								}}
 							/>
-						</MobileChatInputWrapper>
+						) : (
+							<MobileChatInputWrapper>
+								<MessageCircleIcon>
+									<MessageCircle size={18} />
+								</MessageCircleIcon>
+								<MobileChatInput
+									onClick={() => setMobileChatVisible(!mobileChatVisible)}
+									placeholder={t('home.expanded.mobileChatPlaceholder')}
+									readOnly
+									data-onboarding-mobile-chat-input
+								/>
+							</MobileChatInputWrapper>
+						)}
 					</CalendarContainerActionButtons>
 				</React.Fragment>
 			),
@@ -373,7 +384,16 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 		{
 			key: 'chat',
 			container: ChatContainer,
-			content: <Chat key={`chat-${demoModeKey}`} onClose={() => handleClose(isDesktop)} />,
+			content: (
+				<Chat
+					key={`chat-${demoModeKey}`}
+					onClose={() => handleClose(isDesktop)}
+					onNavigateToCalendar={() => {
+						setCanReturnToChat(true);
+						setMobileChatVisible(false);
+					}}
+				/>
+			),
 		},
 	];
 
@@ -386,18 +406,15 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 	});
 
 	const contentTransRef = useSpringRef();
-	const contentTransition = useTransition(
-		expanded ? (showChat ? content : content.slice(0, 1)) : [],
-		{
-			keys: (item) => item.key,
-			ref: contentTransRef,
-			from: { opacity: 0, scale: 1.05 },
-			enter: { opacity: 1, scale: 1 },
-			leave: { opacity: 0, scale: 1 },
-			trail: expanded ? 200 : 0,
-			config: { tension: expanded ? 200 : 300 },
-		}
-	);
+	const contentTransition = useTransition(expanded ? content : [], {
+		keys: (item) => item.key,
+		ref: contentTransRef,
+		from: { opacity: 0, scale: 1.05 },
+		enter: { opacity: 1, scale: 1 },
+		leave: { opacity: 0, scale: 1 },
+		trail: expanded ? 200 : 0,
+		config: { tension: expanded ? 200 : 300 },
+	});
 
 	useChain(
 		expanded ? [cardSpringRef, contentTransRef] : [contentTransRef, cardSpringRef],
@@ -432,7 +449,13 @@ const PersonaCardExpanded: React.FC<PersonaExpandedCardProps> = ({
 					</Header>
 					<CardContent>
 						{contentTransition((style, item) => (
-							<item.container style={style} key={item.key}>
+							<item.container
+								style={style}
+								key={item.key}
+								{...(item.key === 'chat'
+									? { $chatvisible: showChat, 'aria-hidden': !showChat }
+									: {})}
+							>
 								{item.content}
 							</item.container>
 						))}
@@ -593,7 +616,7 @@ const CardContent = styled.div`
 
 	display: grid;
 	gap: 1.5rem;
-	grid-template-columns: repeat(12, 1fr);
+	grid-template-columns: repeat(12, minmax(0, 1fr));
 	grid-template-rows: minmax(0, 1fr);
 `;
 
@@ -618,7 +641,8 @@ const CalendarContainer = styled(animated.div)`
 	}
 `;
 
-const ChatContainer = styled(animated.div)`
+const ChatContainer = styled(animated.div)<{ $chatvisible?: boolean }>`
+	display: ${({ $chatvisible }) => ($chatvisible === false ? 'none' : 'block')};
 	position: absolute;
 	z-index: 3;
 	inset: 0;

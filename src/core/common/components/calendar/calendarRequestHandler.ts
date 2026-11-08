@@ -198,10 +198,24 @@ function focusOnStyledEvent(
 export function createCalendarRequestHandler(
 	deps: CalendarRequestHandlerDeps
 ): (envelope: CalendarRequestEnvelope) => void {
+	let focusVersion = 0;
 	return (envelope) => {
 		const { request, onResult } = envelope;
 
+		if (request.type === CalendarRequestType.ClearSelection) {
+			focusVersion += 1;
+			deps.pendingFocusRef.current = null;
+			if (deps.focusTimeoutRef.current) clearTimeout(deps.focusTimeoutRef.current);
+			if (deps.focusRetryTimeoutRef?.current) clearTimeout(deps.focusRetryTimeoutRef.current);
+			deps.setSelectedEventInfo(null);
+			deps.setSelectedEvent(null);
+			deps.setFocusedEventId(null);
+			deps.setShowNonViableEvents(null);
+			return;
+		}
+
 		if (request.type === CalendarRequestType.FocusEvent) {
+			const version = ++focusVersion;
 			const { entityId, entityType } = request;
 
 			// Third-party routing metadata (e.g. from the timeline SearchBar) —
@@ -342,6 +356,7 @@ export function createCalendarRequestHandler(
 						}
 					},
 				}).then((startMs) => {
+					if (version !== focusVersion) return;
 					if (startMs == null) {
 						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
 						return;

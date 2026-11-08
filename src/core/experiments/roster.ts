@@ -7,7 +7,7 @@ import type { HeroVariantDefinition } from './types';
  * so rows recorded against it stay interpretable.
  */
 export const HERO_ROSTER: readonly HeroVariantDefinition[] = [
-	{ key: 'control', enabled: true },
+	{ key: 'control', enabled: false },
 	{ key: 'nl_scheduling', enabled: true },
 	{ key: 'stop_deciding', enabled: true },
 	{ key: 'self_healing', enabled: true },

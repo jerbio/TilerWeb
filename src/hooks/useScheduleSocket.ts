@@ -2,14 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { SignalRService, Hubs } from '@/services/SocketService';
 import { CalendarSyncClient, type CalendarSyncState } from '@/services/calendarSyncClient';
 import { CalendarSyncApi } from '@/api/calendarSyncApi';
-import useAppStore, { SessionType } from '@/global_state';
+import useAppStore from '@/global_state';
 
 /** Uses the existing socket, refreshing committed changes and recovering missed updates after reconnect. */
 export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) {
+	const authenticated = useAppStore((state) => state.activeSessionType === 'authenticated');
 	const userId = useAppStore((state) =>
-		state.activeSessionType === SessionType.AUTHENTICATED
-			? state.authenticatedPersonaSession?.userId
-			: undefined
+		state.activeSessionType === 'anonymous'
+			? state.anonymousPersonaSession?.userId
+			: state.authenticatedPersonaSession?.userId
 	);
 	const [status, setStatus] = useState<CalendarSyncState | null>(null);
 	const [recoveryError, setRecoveryError] = useState(false);
@@ -26,6 +27,36 @@ export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) 
 		setReadyOwner(null);
 		if (!userId) return;
 		let disposed = false;
+		if (!authenticated) {
+			// Anonymous schedules receive ordinary pushes without authenticated sync metadata
+			// or a socket-readiness delay on their initial calendar lookup.
+			const service = new SignalRService(userId);
+			const handle = service.subscribe(
+				Hubs.ScheduleChange.name,
+				Hubs.ScheduleChange.events.RefreshData,
+				() => {
+					if (disposed) return;
+					try {
+						void Promise.resolve(onChangeRef.current()).then(
+							() => {
+								if (!disposed) setRefreshError(false);
+							},
+							() => {
+								if (!disposed) setRefreshError(true);
+							}
+						);
+					} catch {
+						setRefreshError(true);
+					}
+				}
+			);
+			service.createConnection();
+			return () => {
+				disposed = true;
+				service.unsubscribe(handle);
+				service.dispose();
+			};
+		}
 		let initialLoadReleased = false;
 		const releaseInitialLoad = () => {
 			if (disposed || initialLoadReleased) return;
@@ -81,10 +112,10 @@ export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) 
 			service.dispose();
 			if (clientRef.current === client) clientRef.current = null;
 		};
-	}, [userId]);
+	}, [userId, authenticated]);
 
 	return {
-		ready: !userId || readyOwner === userId,
+		ready: !authenticated || !userId || readyOwner === userId,
 		status,
 		recoveryError,
 		refreshError,

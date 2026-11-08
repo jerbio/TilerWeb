@@ -69,6 +69,47 @@ beforeEach(() => {
 	vi.clearAllMocks();
 });
 
+describe('returning to chat', () => {
+	it('dismisses event details and cancels pending calendar focus', () => {
+		const deps = makeDeps();
+		deps.pendingFocusRef.current = {
+			entityId: 'soccer',
+			entityType: CalendarEntityType.CalendarEvent,
+		};
+		createCalendarRequestHandler(deps)({
+			request: { type: CalendarRequestType.ClearSelection },
+		});
+		expect(deps.pendingFocusRef.current).toBeNull();
+		expect(deps.setSelectedEventInfo).toHaveBeenCalledWith(null);
+		expect(deps.setSelectedEvent).toHaveBeenCalledWith(null);
+		expect(deps.setFocusedEventId).toHaveBeenCalledWith(null);
+	});
+
+	it('ignores an event lookup that finishes after returning to chat', async () => {
+		let resolve!: (value: { start: number; isEnabled: boolean }) => void;
+		mockLookupSubCalendarEventById.mockReturnValueOnce(
+			new Promise((r) => {
+				resolve = r;
+			})
+		);
+		const deps = makeDeps();
+		const handler = createCalendarRequestHandler(deps);
+		handler({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'soccer',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+			},
+		});
+		handler({ request: { type: CalendarRequestType.ClearSelection } });
+		resolve({ start: Date.UTC(2026, 9, 21, 19), isEnabled: true });
+		await vi.waitFor(() => expect(mockLookupSubCalendarEventById).toHaveResolved());
+		expect(deps.pendingFocusRef.current).toBeNull();
+		expect(deps.setViewOptions).not.toHaveBeenCalled();
+	});
+});
+
 // ── startHint short-circuit ────────────────────────────────────────
 
 describe('createCalendarRequestHandler — startHint', () => {

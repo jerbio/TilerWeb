@@ -8,6 +8,7 @@ import {
 	CalendarEvent,
 	ScheduleCreateEventParams,
 	ScheduleCreateEventResponse,
+	ScheduleLookupResponse,
 	CalendarEventUpdateParams,
 	ScheduleProcrastinateAllParams,
 	ScheduleProcrastinateEventParams,
@@ -80,6 +81,33 @@ describe('ScheduleService', () => {
 			calendarEventApi,
 			locationApi
 		);
+	});
+
+	describe('default lookup ranges', () => {
+		it('computes defaults at request time rather than at module load', async () => {
+			vi.useFakeTimers();
+			const response: ScheduleLookupResponse = {
+				Error: { Code: '0', Message: 'SUCCESS' },
+				Content: { subCalendarEvents: [] },
+				ServerStatus: null,
+			};
+			vi.mocked(scheduleApi.lookupScheduleByUserId).mockResolvedValue(response);
+			vi.mocked(scheduleApi.lookupScheduleById).mockResolvedValue(response);
+			const first = new Date('2026-11-03T12:00:00Z').valueOf();
+			const day = 24 * 60 * 60 * 1000;
+			vi.setSystemTime(first);
+			await service.lookupScheduleByUserId('user-1');
+			expect(scheduleApi.lookupScheduleByUserId).toHaveBeenLastCalledWith('user-1', {
+				startRange: first - 3 * day,
+				endRange: first + 3 * day,
+			});
+			vi.setSystemTime(first + day);
+			await service.lookupScheduleById('schedule-1');
+			expect(scheduleApi.lookupScheduleById).toHaveBeenLastCalledWith('schedule-1', {
+				startRange: first - 2 * day,
+				endRange: first + 4 * day,
+			});
+		});
 	});
 
 	describe('createEvent', () => {
