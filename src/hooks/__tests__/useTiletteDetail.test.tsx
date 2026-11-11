@@ -64,7 +64,7 @@ describe('useTiletteDetail', () => {
 		const { result } = renderHook(() => useTiletteDetail('t1'));
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		await act(async () => {
-			await result.current.refresh();
+			await expect(result.current.refresh()).rejects.toThrow();
 		});
 		expect(result.current.data).toEqual(tilette('one'));
 		expect(result.current.error).toBeNull();

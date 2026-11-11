@@ -63,6 +63,7 @@ export default function TileShareDetailLayout({
 }
 
 const Layout = styled.div`
+	box-sizing: border-box;
 	${tileShareReveal}
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) 300px;
@@ -72,7 +73,7 @@ const Layout = styled.div`
 	margin: 0 auto;
 	padding: 28px 32px;
 	min-height: 100%;
-	@media (max-width: 960px) {
+	@media (max-width: 1279px) {
 		grid-template-columns: minmax(0, 1fr);
 	}
 	@media (max-width: 600px) {
@@ -134,7 +135,7 @@ const Panel = styled.aside`
 	border: 1px solid ${({ theme }) => theme.colors.border.default};
 	border-radius: 16px;
 	overflow-wrap: anywhere;
-	@media (max-width: 960px) {
+	@media (max-width: 1279px) {
 		padding: 20px;
 	}
 `;

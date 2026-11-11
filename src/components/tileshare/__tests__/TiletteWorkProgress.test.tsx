@@ -105,7 +105,7 @@ describe('accepted tilette progress', () => {
 	});
 	it.each([0, 50, 100])('shows %i%% inside an accessible completion donut', (progress) => {
 		show([assignment('me', progress)]);
-		const donut = screen.getByRole('progressbar', { name: 'Completion' });
+		const donut = screen.getByRole('progressbar', { name: 'Your completion' });
 		expect(donut).toHaveAttribute('aria-valuemin', '0');
 		expect(donut).toHaveAttribute('aria-valuemax', '100');
 		expect(donut).toHaveAttribute('aria-valuenow', String(progress));

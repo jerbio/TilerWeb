@@ -103,6 +103,8 @@ export function useTileNotes(
 					UserNote: userNote,
 					Etag: payloadRef.current?.Etag ?? '',
 				});
+				if (!result.concurrencyConflict && !result.truncated)
+					window.dispatchEvent(new Event('tileshare-changed'));
 				if (request !== generation.current) return null;
 				payloadRef.current = result;
 				setPayload(result);

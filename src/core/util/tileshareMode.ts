@@ -51,6 +51,8 @@ export function classParticipants(
 			const identifier = user.displayedIdentifier ?? '';
 			people.push({
 				Id: user.userId ?? undefined,
+				FirstName: profile?.firstName ?? undefined,
+				LastName: profile?.lastName ?? undefined,
 				Email: profile?.email ?? (identifier.includes('@') ? identifier : undefined),
 				PhoneNumber:
 					profile?.phoneNumber ??
@@ -63,13 +65,27 @@ export function classParticipants(
 	for (const person of people) {
 		const identity = contactKeys(person);
 		if (!identity.length) continue;
-		const existing = identity.map((key) => keys.get(key)).find(Boolean);
-		const merged = existing ?? { ...person };
-		if (existing) {
-			merged.Id ??= person.Id;
-			merged.Email ??= person.Email;
-			merged.PhoneNumber ??= person.PhoneNumber;
-		} else result.push(merged);
+		const matches = [
+			...new Set(
+				identity
+					.map((key) => keys.get(key))
+					.filter((value): value is ContactModel => !!value)
+			),
+		];
+		const merged = matches[0] ?? { ...person };
+		if (!matches.length) result.push(merged);
+		for (const source of [...matches.slice(1), person]) {
+			merged.Id ??= source.Id;
+			merged.FirstName ??= source.FirstName;
+			merged.LastName ??= source.LastName;
+			merged.Email ??= source.Email;
+			merged.PhoneNumber ??= source.PhoneNumber;
+		}
+		// A later assignment can connect an id-only roster entry to an email-only one.
+		for (const duplicate of matches.slice(1)) {
+			result.splice(result.indexOf(duplicate), 1);
+			for (const [key, value] of keys) if (value === duplicate) keys.set(key, merged);
+		}
 		identity.forEach((key) => keys.set(key, merged));
 	}
 	return result;

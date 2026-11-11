@@ -6,8 +6,7 @@ import TileShareModeIcon from './TileShareModeIcon';
 import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { useTheme as useAppTheme } from '@/core/theme/ThemeProvider';
 import { iconSurface } from '@/core/util/colorSurface';
-import dayjs from 'dayjs';
-import { unixToTimeString } from '@/core/util/eventTimeConversion';
+import { formatDetailDate, formatDetailTime } from '@/core/util/tileshareDate';
 import AvatarCluster, { type AvatarUser } from '@/core/common/components/AvatarCluster';
 import { TileShareCluster } from '@/core/common/types/tileshare';
 import { tileshareMode } from '@/core/util/tileshareMode';
@@ -22,7 +21,7 @@ type TileShareClusterCardProps = {
 
 const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster, returnTo }) => {
 	const { isDarkMode } = useAppTheme();
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const surface = iconSurface(TILESHARE_ACCENT, isDarkMode);
 
 	const avatarUsers: AvatarUser[] = cluster.truncatedUser
@@ -36,8 +35,8 @@ const TileShareClusterCard: React.FC<TileShareClusterCardProps> = ({ cluster, re
 		? t(`tileShareModes.${mode}.label`)
 		: t('tileshareList.title', 'TileShares');
 
-	const formattedDueOn = cluster.end ? dayjs(cluster.end).format('ddd, D MMM, YYYY') : '—';
-	const formattedDueBy = cluster.end ? unixToTimeString(cluster.end) : '—';
+	const formattedDueOn = formatDetailDate(cluster.end, i18n?.language);
+	const formattedDueBy = formatDetailTime(cluster.end, i18n?.language);
 
 	return (
 		<CardGrid

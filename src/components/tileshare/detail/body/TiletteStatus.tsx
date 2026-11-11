@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { Check, Hourglass, Inbox } from 'lucide-react';
+import { Check, Hourglass, Inbox, Send } from 'lucide-react';
 import { TileletteStatus as Status } from '@/core/common/types/tileshare';
 
 type TiletteStatusProps = {
@@ -11,18 +11,20 @@ type TiletteStatusProps = {
 };
 
 const icons: Record<Status, React.ElementType> = {
-	[Status.Todo]: Inbox,
+	[Status.Unassigned]: Inbox,
+	[Status.Delegated]: Send,
 	[Status.InProgress]: Hourglass,
 	[Status.Completed]: Check,
 };
 
 const labelKeys: Record<Status, string> = {
-	[Status.Todo]: 'tilesharedemo.detail.status.todo',
+	[Status.Unassigned]: 'tilesharedemo.detail.status.unassigned',
+	[Status.Delegated]: 'tilesharedemo.detail.status.delegated',
 	[Status.InProgress]: 'tilesharedemo.detail.status.inProgress',
 	[Status.Completed]: 'tilesharedemo.detail.status.completed',
 };
 
-/** Status indicator: inbox + "Todo" (amber), hourglass + "In progress" (amber) or check + "Completed" (green). */
+/** Shared work-stage indicator for the board and filter choices. */
 const TiletteStatus: React.FC<TiletteStatusProps> = ({ status, showLabel = true }) => {
 	const { t } = useTranslation();
 	const completed = status === Status.Completed;

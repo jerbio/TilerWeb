@@ -2,7 +2,7 @@ import { tiletteDurationInMs } from '@/core/util/tileshareDuration';
 import React, { useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { ChevronLeft } from 'lucide-react';
 import { TiletteIcon } from '@/components/tileshare/icons';
 import Button from '@/core/common/components/button';
@@ -70,6 +70,7 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 	const theme = useTheme();
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const { state: navigationState } = useLocation();
 	const { user } = useAuth();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
@@ -176,7 +177,7 @@ const TiletteCreate: React.FC<TiletteCreateProps> = ({
 		setShowSuccess(next);
 		if (next) return;
 		if (createdId) {
-			navigate(Routes.Tileshare.tilette(clusterId, createdId));
+			navigate(Routes.Tileshare.tilette(clusterId, createdId), { state: navigationState });
 			return;
 		}
 		onCreated(null);

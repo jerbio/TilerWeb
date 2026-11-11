@@ -11,6 +11,6 @@ export function setBoardDragData(e: DragEvent, tiletteId: string): void {
 
 /** Read the dragged tilette id off a drop, or null if the drag isn't ours. */
 export function getBoardDragTiletteId(e: DragEvent): string | null {
-	const id = e.dataTransfer.getData(BOARD_DRAG_TYPE);
+	const id = e.dataTransfer?.getData?.(BOARD_DRAG_TYPE);
 	return id || null;
 }

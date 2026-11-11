@@ -39,7 +39,9 @@ export default function TiletteNotes({
 	const submit = async () => {
 		if (draft === null || isSaving || conflict) return;
 		const result = await save(draft);
-		if (result && !result.concurrencyConflict && !result.truncated) setDraft(null);
+		if (result && !result.concurrencyConflict && !result.truncated) {
+			setDraft(null);
+		}
 	};
 	return (
 		<NotesSection

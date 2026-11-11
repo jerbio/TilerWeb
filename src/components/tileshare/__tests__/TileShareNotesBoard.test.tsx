@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, setupUser } from '@/test/test-utils';
 import TiletteNotes from '../TiletteNotes';
-import TiletteBody from '../detail/body/TiletteBody';
+import ProjectShareExperience from '../ProjectShareExperience';
 import { tileShareNotesService } from '@/services/tileShareNotesService';
 
 vi.mock('react-i18next', async (importOriginal) => ({
@@ -32,20 +32,20 @@ describe('Board and Notes style isolation', () => {
 		const { container } = render(
 			<>
 				<TiletteNotes id="share" canEdit={false} compact />
-				<TiletteBody clusterId="share" tilettes={[]} />
+				<ProjectShareExperience clusterId="share" tilettes={[]} />
 			</>
 		);
 		await screen.findByText('Saved notes');
 		const summary = container.querySelector('summary')!;
 		expect(getComputedStyle(summary).display).toBe('flex');
 		const user = setupUser();
-		await user.click(screen.getByRole('tab', { name: 'Board view' }));
+		await user.click(screen.getByRole('tab', { name: 'Board' }));
 		const emptyLanes = screen.getAllByText('tilesharedemo.detail.board.empty');
-		expect(emptyLanes).toHaveLength(3);
+		expect(emptyLanes).toHaveLength(4);
 		for (const lane of emptyLanes) expect(getComputedStyle(lane).borderTopStyle).toBe('dashed');
 		expect(container.querySelector('summary')).toBe(summary);
 		expect(getComputedStyle(summary).display).toBe('flex');
-		await user.click(screen.getByRole('tab', { name: 'tilesharedemo.detail.view.list' }));
+		await user.click(screen.getByRole('tab', { name: 'Tilettes' }));
 		expect(getComputedStyle(summary).display).toBe('flex');
 		expect(summary.parentElement).not.toHaveAttribute('open');
 		expect(tileShareNotesService.getNotes).toHaveBeenCalledOnce();

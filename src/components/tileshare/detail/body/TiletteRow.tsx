@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
@@ -20,11 +20,12 @@ export default function TiletteRow({
 	clusterId: string;
 }) {
 	const { t } = useTranslation();
+	const { state } = useLocation();
 	const [saving, setSaving] = useState(false);
 	const route = Routes.Tileshare.tilette(clusterId, tilette.id ?? '');
 	return (
 		<Row role="listitem" aria-busy={saving || undefined}>
-			<Name to={route} title={tilette.name ?? undefined}>
+			<Name to={route} state={state} title={tilette.name ?? undefined}>
 				{tilette.name ?? '—'}
 			</Name>
 			<Progress>
@@ -46,7 +47,7 @@ export default function TiletteRow({
 					reportBusy={setSaving}
 				/>
 			</Response>
-			<Arrow to={route} aria-label={t('tilesharedemo.detail.openTiletteAria')}>
+			<Arrow to={route} state={state} aria-label={t('tilesharedemo.detail.openTiletteAria')}>
 				<ArrowRight size={16} />
 			</Arrow>
 			{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}

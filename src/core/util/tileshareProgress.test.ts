@@ -46,25 +46,25 @@ const accepted = (completionPct: number, userId = 'user-1') =>
 	assignee(InvitationStatus.Accepted, completionPct, userId);
 
 describe('deriveTileletteStatus', () => {
-	it('returns InProgress for a tilette without assignees', () => {
-		expect(deriveTileletteStatus(makeTilette('a'))).toBe(TileletteStatus.InProgress);
+	it('returns Unassigned for a tilette without assignees', () => {
+		expect(deriveTileletteStatus(makeTilette('a'))).toBe(TileletteStatus.Unassigned);
 	});
 
-	it('returns InProgress when there are no designated users', () => {
-		expect(deriveTileletteStatus(makeTilette('a', []))).toBe(TileletteStatus.InProgress);
+	it('returns Unassigned when there are no designated users', () => {
+		expect(deriveTileletteStatus(makeTilette('a', []))).toBe(TileletteStatus.Unassigned);
 	});
 
-	it('returns Todo while every assignee has declined or not yet responded', () => {
+	it('returns Delegated while every assignee has declined or not yet responded', () => {
 		const tilette = makeTilette('a', [
 			assignee(InvitationStatus.None, 100),
 			assignee(InvitationStatus.Declined, null),
 		]);
-		expect(deriveTileletteStatus(tilette)).toBe(TileletteStatus.Todo);
+		expect(deriveTileletteStatus(tilette)).toBe(TileletteStatus.Delegated);
 	});
 
-	it('returns Todo when one assignee has not accepted, even at 100% completion', () => {
+	it('returns InProgress for mixed accepted and pending assignments, even at 100% completion', () => {
 		const tilette = makeTilette('a', [accepted(100), assignee(InvitationStatus.None, 100)]);
-		expect(deriveTileletteStatus(tilette)).toBe(TileletteStatus.Todo);
+		expect(deriveTileletteStatus(tilette)).toBe(TileletteStatus.InProgress);
 	});
 
 	it('returns InProgress when the assignee has accepted but work is unfinished', () => {
@@ -89,30 +89,30 @@ describe('deriveTileletteStatus', () => {
 });
 
 describe('deriveMyTileletteStatus', () => {
-	it('returns InProgress when the viewer has no assignment on the tilette', () => {
+	it('falls back to collective status when the viewer has no assignment on the tilette', () => {
 		const tilette = makeTilette('a', [accepted(100, 'other')]);
-		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.InProgress);
+		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Completed);
 	});
 
-	it('returns InProgress for a tilette without assignees', () => {
+	it('returns Unassigned for a tilette without assignees', () => {
 		expect(deriveMyTileletteStatus(makeTilette('a'), 'user-1')).toBe(
-			TileletteStatus.InProgress
+			TileletteStatus.Unassigned
 		);
 	});
 
-	it('returns Todo while the viewer has not responded, even at 100% completion', () => {
+	it('returns Delegated while the viewer has not responded, even at 100% completion', () => {
 		const tilette = makeTilette('a', [assignee(InvitationStatus.None, 100)]);
-		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Todo);
+		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Delegated);
 	});
 
-	it('returns Todo for a Tentative viewer response', () => {
+	it('returns Delegated for a Tentative viewer response', () => {
 		const tilette = makeTilette('a', [assignee(InvitationStatus.Tentative, 40)]);
-		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Todo);
+		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Delegated);
 	});
 
-	it('returns Todo for a Declined viewer response', () => {
+	it('returns Delegated for a Declined viewer response', () => {
 		const tilette = makeTilette('a', [assignee(InvitationStatus.Declined, 0)]);
-		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Todo);
+		expect(deriveMyTileletteStatus(tilette, 'user-1')).toBe(TileletteStatus.Delegated);
 	});
 
 	it("ignores other assignees' completion once the viewer accepted", () => {
@@ -203,7 +203,7 @@ describe('computeClusterProgress', () => {
 		expect(computeClusterProgress([])).toBe(0);
 	});
 
-	it('returns 0 when every tilette is unfinished (Todo or In progress)', () => {
+	it('returns 0 when every tilette is unfinished (Delegated or In progress)', () => {
 		const tilettes = [makeTilette('a', [accepted(0)]), makeTilette('b', [accepted(50)])];
 		expect(computeClusterProgress(tilettes)).toBe(0);
 	});

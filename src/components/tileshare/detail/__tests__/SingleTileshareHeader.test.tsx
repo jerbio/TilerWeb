@@ -42,9 +42,7 @@ describe('SingleTileshareHeader', () => {
 		expect(screen.getByText('tilesharedemo.detail.singleTileshare')).toBeInTheDocument();
 		expect(screen.getByText('Align the team.')).toBeInTheDocument();
 		// due is interpolated with the formatted date
-		expect(
-			screen.getByText('tilesharedemo.detail.due Sun, 27th July, 2025')
-		).toBeInTheDocument();
+		expect(screen.getByText('tilesharedemo.detail.due Sun, July 27, 2025')).toBeInTheDocument();
 	});
 
 	it('renders a custom subtitle when provided', () => {
@@ -111,7 +109,7 @@ describe('SingleTileshareHeader', () => {
 	it('renders no actions and no divider for a read-only viewer', () => {
 		render(<SingleTileshareHeader name="Design Sprint" description={null} dueDate={DATE} />);
 
-		const due = screen.getByText('tilesharedemo.detail.due Sun, 27th July, 2025');
+		const due = screen.getByText('tilesharedemo.detail.due Sun, July 27, 2025');
 		expect(screen.queryAllByRole('button')).toHaveLength(0);
 		// The pill is the sole occupant of the header's action slot.
 		const slot = due.closest('div')?.parentElement;
@@ -128,7 +126,7 @@ describe('SingleTileshareHeader', () => {
 			/>
 		);
 
-		const due = screen.getByText('tilesharedemo.detail.due Sun, 27th July, 2025');
+		const due = screen.getByText('tilesharedemo.detail.due Sun, July 27, 2025');
 		const slot = due.closest('div')?.parentElement;
 		// pill + divider + edit button
 		expect(slot?.children).toHaveLength(3);

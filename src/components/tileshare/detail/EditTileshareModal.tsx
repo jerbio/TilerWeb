@@ -18,6 +18,7 @@ import {
 } from '@/core/util/tileshareEdit';
 import { ShareDeadlineUpdateError } from '@/services/tileShareEditing';
 import { AlertTriangle, Clock3 } from 'lucide-react';
+import { formatDuration } from '@/core/util/tileshareDate';
 
 export type EditTileshareValues = TileShareEditValues;
 type Initial = { name: string | null; description: string | null; dueDate: number | null };
@@ -52,7 +53,7 @@ export default function EditTileshareModal({
 	context,
 	onSubmit,
 }: Props) {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const showNotification = useUiStore((s) => s.notification.show);
 	const wasOpen = useRef(false);
 	const lock = useRef(false);
@@ -247,9 +248,10 @@ export default function EditTileshareModal({
 									'tileShareEdit.afterShare',
 									'This tilette is due after the share’s deadline ({{deadline}}).',
 									{
-										deadline: dayjs(context?.shareDeadline).format(
-											'MMM D, YYYY h:mm A'
-										),
+										deadline: new Intl.DateTimeFormat(i18n?.language, {
+											dateStyle: 'medium',
+											timeStyle: 'short',
+										}).format(context!.shareDeadline!),
 									}
 								)}
 							</p>
@@ -262,7 +264,12 @@ export default function EditTileshareModal({
 								{t(
 									'tileShareEdit.moveShare',
 									'Also move the share’s deadline to {{deadline}}',
-									{ deadline: dayjs(dueDate!).format('MMM D, YYYY h:mm A') }
+									{
+										deadline: new Intl.DateTimeFormat(i18n?.language, {
+											dateStyle: 'medium',
+											timeStyle: 'short',
+										}).format(dueDate!),
+									}
 								)}
 							</label>
 						</Callout>
@@ -277,19 +284,7 @@ export default function EditTileshareModal({
 										<>
 											{' '}
 											{' · '}
-											{context.duration % 3600000 === 0
-												? t('tileShareVisual.hours', '{{count}} hour(s)', {
-														count: context.duration / 3600000,
-													})
-												: t(
-														'tileShareEdit.duration',
-														'{{minutes}} minutes',
-														{
-															minutes: Math.round(
-																context.duration / 60000
-															),
-														}
-													)}
+											{formatDuration(context.duration, i18n?.language)}
 										</>
 									)}
 								</strong>

@@ -1,6 +1,6 @@
 import { render, RenderOptions } from '@testing-library/react';
 import { ReactElement, ReactNode } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 import { Toaster } from 'sonner';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from 'styled-components';

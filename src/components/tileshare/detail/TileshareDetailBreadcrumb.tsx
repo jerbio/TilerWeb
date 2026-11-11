@@ -28,7 +28,7 @@ const TileshareDetailBreadcrumb: React.FC<TileshareDetailBreadcrumbProps> = ({
 			: Routes.Tileshare.root;
 
 	return (
-		<Nav aria-label="Breadcrumb">
+		<Nav aria-label={t('shareExperience.breadcrumb', 'Breadcrumb')}>
 			<Crumb to={rootHref}>{t('tilesharedemo.detail.breadcrumbRoot')}</Crumb>
 			<Separator aria-hidden>/</Separator>
 			{parent && (
@@ -36,7 +36,9 @@ const TileshareDetailBreadcrumb: React.FC<TileshareDetailBreadcrumbProps> = ({
 					{loading ? (
 						<Skeleton $width="7rem" aria-hidden />
 					) : (
-						<Crumb to={parent.href}>{parent.label}</Crumb>
+						<Crumb to={parent.href} state={state}>
+							{parent.label}
+						</Crumb>
 					)}
 					<Separator aria-hidden>/</Separator>
 				</>

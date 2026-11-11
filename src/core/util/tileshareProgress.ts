@@ -1,4 +1,5 @@
 import {
+	DesignatedUser,
 	InvitationStatus,
 	TileletteStatus,
 	TileShareTemplate,
@@ -8,19 +9,18 @@ import { validDesignatedUsers } from './tileshareAssignees';
 /**
  * Derive a tilette's completion status from its assignee data.
  *
- * Precedence: an unaccepted invitation means no work can have started, so it
- * wins over a 100% completion reading. Only when every assignee has accepted
- * and every accepted assignee reports 100% completion is the tilette
- * Completed; everything else — including an unassigned tilette — is In progress.
+ * Assignment, acceptance, and completion are separate stages. Mixed responses
+ * are In progress once anybody accepts; completion requires every assignment.
  */
 export function deriveTileletteStatus(tilette: TileShareTemplate): TileletteStatus {
 	const users = validDesignatedUsers(tilette.designatedUsers);
-	if (users.length === 0) return TileletteStatus.InProgress;
-	if (users.some((user) => user.rsvpStatus !== InvitationStatus.Accepted)) {
-		return TileletteStatus.Todo;
+	if (users.length === 0) return TileletteStatus.Unassigned;
+	if (!users.some((user) => user.rsvpStatus === InvitationStatus.Accepted)) {
+		return TileletteStatus.Delegated;
 	}
 	const fullyComplete = users.every(
 		(user) =>
+			user.rsvpStatus === InvitationStatus.Accepted &&
 			user.completionPct != null &&
 			Number.isFinite(user.completionPct) &&
 			user.completionPct >= 100
@@ -33,10 +33,10 @@ export function deriveTileletteStatus(tilette: TileShareTemplate): TileletteStat
  *
  * Only the viewer's own assignment counts: a not-yet-accepted invitation
  * (None, Tentative or Declined) means the viewer's work cannot have started, so
- * the tilette is Todo. Once the viewer has accepted, 100% completion makes it
+ * the tilette is Delegated. Once the viewer has accepted, 100% completion makes it
  * Completed; an accepted but unfinished (or unknown-completion) tilette is In
- * progress. A viewer with no assignment on the tilette falls back to In
- * progress, matching the unassigned tilette rule of {@link deriveTileletteStatus}.
+ * progress. Personal views exclude work without a viewer assignment; other
+ * callers fall back to the collective status when the viewer is not assigned.
  */
 export function deriveMyTileletteStatus(
 	tilette: TileShareTemplate,
@@ -45,8 +45,12 @@ export function deriveMyTileletteStatus(
 	const mine = validDesignatedUsers(tilette.designatedUsers).find(
 		(user) => user.userId === userId
 	);
-	if (!mine) return TileletteStatus.InProgress;
-	if (mine.rsvpStatus !== InvitationStatus.Accepted) return TileletteStatus.Todo;
+	if (!mine) return deriveTileletteStatus(tilette);
+	return deriveAssignmentStatus(mine);
+}
+
+export function deriveAssignmentStatus(mine: DesignatedUser): TileletteStatus {
+	if (mine.rsvpStatus !== InvitationStatus.Accepted) return TileletteStatus.Delegated;
 	const fullyComplete =
 		mine.completionPct != null &&
 		Number.isFinite(mine.completionPct) &&
@@ -63,7 +67,7 @@ export function isMineAssignment(tilette: TileShareTemplate, userId: string): bo
 }
 
 /**
- * Whether dragging the tilette from the Todo lane to In progress should accept
+ * Whether dragging the tilette from Delegated to In progress should accept
  * the viewer's invitation. Requires an assignment the viewer can respond to
  * (`designatedTileTemplateId`) whose RSVP is still open (None or Tentative) —
  * mirroring the guard used by the inline invitation actions. Already-resolved
@@ -75,14 +79,16 @@ export function canAcceptByDrag(tilette: TileShareTemplate, userId: string): boo
 	);
 	if (!mine?.designatedTileTemplateId) return false;
 	return (
-		mine.rsvpStatus === InvitationStatus.None || mine.rsvpStatus === InvitationStatus.Tentative
+		mine.rsvpStatus === InvitationStatus.None ||
+		mine.rsvpStatus === InvitationStatus.Tentative ||
+		mine.rsvpStatus === InvitationStatus.Pending
 	);
 }
 
 /**
  * Cluster progress as a whole percentage (0–100), rolled up from the collective
- * tilette statuses. Only Completed tilettes count toward the total; Todo and
- * In progress tilettes both count as unfinished. Returns 0 for an empty
+ * tilette statuses. Only Completed tilettes count toward the total; all other
+ * stages count as unfinished. Returns 0 for an empty
  * (or null) list.
  *
  * `resolveStatus` defaults to {@link deriveTileletteStatus}; it's injectable so

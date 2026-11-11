@@ -3,7 +3,7 @@ import TiletteInvitationActions from '@/components/tileshare/TiletteInvitationAc
 import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { TileShareTemplate } from '@/core/common/types/tileshare';
 import { useTheme } from '@/core/theme/ThemeProvider';
@@ -27,6 +27,7 @@ const AssigneeTiletteCard: React.FC<AssigneeTiletteCardProps> = ({
 	assigneeId,
 }) => {
 	const { t } = useTranslation();
+	const { state } = useLocation();
 	const { isDarkMode } = useTheme();
 	const surface = filledSurface(getTileletteColor(tilette.id), isDarkMode);
 	// Shimmer the whole card while an RSVP response is saving in place.
@@ -39,6 +40,7 @@ const AssigneeTiletteCard: React.FC<AssigneeTiletteCardProps> = ({
 		<Card $bg={surface.background} $border={surface.border} aria-busy={saving || undefined}>
 			<CardLink
 				to={Routes.Tileshare.tilette(clusterId, tilette.id ?? '')}
+				state={state}
 				aria-label={t('tilesharedemo.detail.openTiletteAria')}
 			>
 				<Name $color={surface.text}>{tilette.name ?? '—'}</Name>

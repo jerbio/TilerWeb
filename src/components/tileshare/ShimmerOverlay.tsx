@@ -24,6 +24,9 @@ const ShimmerOverlay = styled.div`
 	background-size: 200% 100%;
 	animation: ${sweep} 1.6s linear infinite;
 	opacity: 0.4;
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
 `;
 
 export default ShimmerOverlay;

@@ -41,7 +41,7 @@ describe('MultiTileshareHeader', () => {
 		expect(screen.getByText('Q1 projects 2026')).toBeInTheDocument();
 		expect(screen.getByText('tilesharedemo.detail.multiTileshare')).toBeInTheDocument();
 		expect(screen.getByText('Align the team.')).toBeInTheDocument();
-		expect(screen.getByText('Sun, 27th July, 2025')).toBeInTheDocument();
+		expect(screen.getByText('Sun, July 27, 2025')).toBeInTheDocument();
 	});
 
 	it('fires onEdit and onAdd when the action buttons are clicked', async () => {

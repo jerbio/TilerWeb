@@ -4,7 +4,7 @@ import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
-import { TileShareViewerContext } from './TiletteRsvpStatus';
+import { TileShareViewerContext, TileShareWorkScopeContext } from './TiletteRsvpStatus';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 
 export default function TiletteWorkProgress({
@@ -17,6 +17,8 @@ export default function TiletteWorkProgress({
 	compact?: boolean;
 }) {
 	const { isOwner, viewerId } = useContext(TileShareViewerContext);
+	const scope = useContext(TileShareWorkScopeContext);
+	assigneeId ??= scope === 'mine' ? (viewerId ?? undefined) : undefined;
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const [opening, setOpening] = useState(false);
@@ -49,7 +51,8 @@ export default function TiletteWorkProgress({
 		(a) =>
 			a.rsvpStatus === InvitationStatus.Accepted &&
 			(assigneeId
-				? a.userId === assigneeId && (isOwner || assigneeId === viewerId)
+				? (a.userId ?? a.displayedIdentifier) === assigneeId &&
+					(isOwner || assigneeId === viewerId)
 				: isOwner || a.userId === viewerId)
 	);
 	if (!assignments.length) return null;
@@ -70,15 +73,28 @@ export default function TiletteWorkProgress({
 				maximumFractionDigits: 0,
 			}).format(progress / 100)
 		: '—';
+	const progressLabel =
+		!isOwner || assigneeId === viewerId
+			? t('shareExperience.yourCompletion', 'Your completion')
+			: assigneeId
+				? t('tilesharePreview.progress', 'Completion')
+				: t(
+						'shareExperience.averageCompletion',
+						'Average completion (accepted assignments)'
+					);
 	const label = known
-		? `${t('tilesharePreview.progress', 'Completion')}: ${percentage}`
+		? t('shareExperience.progressValue', '{{label}}: {{value}}', {
+				label: progressLabel,
+				value: percentage,
+			})
 		: t('tilesharePreview.progressUnavailable', 'Progress unavailable');
 	return (
 		<ProgressWrap $compact={compact}>
+			<small>{progressLabel}</small>
 			<Donut
 				$state={!known ? 'unknown' : progress === 0 ? 'empty' : 'started'}
 				role={known ? 'progressbar' : 'img'}
-				aria-label={known ? t('tilesharePreview.progress', 'Completion') : label}
+				aria-label={known ? progressLabel : label}
 				aria-valuemin={known ? 0 : undefined}
 				aria-valuemax={known ? 100 : undefined}
 				aria-valuenow={known ? progress : undefined}

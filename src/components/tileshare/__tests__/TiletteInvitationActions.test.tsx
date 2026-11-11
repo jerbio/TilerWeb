@@ -18,6 +18,7 @@ import TiletteInvitationActions, {
 } from '../TiletteInvitationActions';
 import TiletteRow from '../detail/body/TiletteRow';
 import AssigneeTiletteCard from '../detail/body/AssigneeTiletteCard';
+import { TileShareMutations } from '../TileShareMutations';
 
 const mocks = vi.hoisted(() => ({
 	user: { id: 'viewer' },
@@ -78,6 +79,48 @@ beforeEach(() => {
 });
 
 describe('inline tilette invitation actions', () => {
+	it('retains a pending response across view replacement and refreshes after the old card unmounts', async () => {
+		let resolve!: () => void;
+		mocks.respond.mockImplementation(
+			() =>
+				new Promise<void>((done) => {
+					resolve = done;
+				})
+		);
+		const content = (key: string) => (
+			<TileShareMutations>
+				<TiletteInvitationRefreshContext.Provider value={mocks.refresh}>
+					<TiletteInvitationActions key={key} tilette={tilette} clusterId="cluster" />
+				</TiletteInvitationRefreshContext.Provider>
+			</TileShareMutations>
+		);
+		const view = render(content('list'));
+		await setupUser().click(screen.getByRole('button', { name: 'Accept' }));
+		view.rerender(content('board'));
+		expect(screen.getByRole('group', { name: 'Invitations: UX Tiler' })).toHaveAttribute(
+			'aria-busy',
+			'true'
+		);
+		await act(async () => resolve());
+		await waitFor(() => expect(mocks.refresh).toHaveBeenCalledOnce());
+		expect(mocks.respond).toHaveBeenCalledOnce();
+		expect(screen.getByRole('status')).toHaveTextContent('Accepted');
+	});
+	it('retains uncertain-response protection after switching views', async () => {
+		mocks.respond.mockRejectedValue(new Error('timeout'));
+		const content = (key: string) => (
+			<TileShareMutations>
+				<TiletteInvitationActions key={key} tilette={tilette} clusterId="cluster" />
+			</TileShareMutations>
+		);
+		const view = render(content('list'));
+		await setupUser().click(screen.getByRole('button', { name: 'Accept' }));
+		await screen.findByRole('alert');
+		view.rerender(content('board'));
+		expect(screen.queryByRole('button', { name: 'Accept' })).not.toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+		expect(mocks.respond).toHaveBeenCalledOnce();
+	});
 	it('retains uncertain response protection when the compact dialog is closed and reopened', async () => {
 		mocks.respond.mockRejectedValue(new Error('timeout'));
 		render(<TiletteInvitationActions tilette={tilette} clusterId="cluster" compact />);

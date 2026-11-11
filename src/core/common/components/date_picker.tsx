@@ -2,6 +2,30 @@ import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import styled, { createGlobalStyle } from 'styled-components';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useTranslation } from 'react-i18next';
+import { de, el, enGB, enUS, es, fr, hi, it, ja, ko, pl, ru, zhCN } from 'date-fns/locale';
+
+const calendarLocales = { de, el, en: enUS, es, fr, hi, it, ja, ko, pl, ru, zh: zhCN };
+
+function LocalizedCalendarContainer({
+	className,
+	children,
+}: {
+	className?: string;
+	children?: React.ReactNode;
+}) {
+	const { t } = useTranslation();
+	return (
+		<LocalizedCalendar
+			className={className}
+			role="dialog"
+			aria-modal="true"
+			aria-label={t('datePicker.calendar', 'Choose date')}
+		>
+			{children}
+		</LocalizedCalendar>
+	);
+}
 
 type CustomDatePickerProps = {
 	label?: string;
@@ -26,6 +50,29 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	portalId,
 	disabled = false,
 }) => {
+	const { t, i18n } = useTranslation();
+	const language = i18n?.language ?? 'en';
+	const calendarLocale =
+		language.toLowerCase() === 'en-gb'
+			? enGB
+			: (calendarLocales[language.split('-')[0] as keyof typeof calendarLocales] ?? enUS);
+	const dateFormat = new Intl.DateTimeFormat(language, {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	})
+		.formatToParts(new Date(2026, 10, 17))
+		.map((part) => {
+			if (part.type === 'year') return 'yyyy';
+			if (part.type === 'month') return 'MM';
+			if (part.type === 'day') return 'dd';
+			return `'${part.value.replace(/'/g, "''")}'`;
+		})
+		.join('');
+	const [announcement, setAnnouncement] = useState<{
+		kind: 'selected' | 'month';
+		date: Date;
+	} | null>(null);
 	const inputId = useId();
 	const container = useRef<HTMLDivElement>(null);
 	const [dialogPortalId, setDialogPortalId] = useState<string>();
@@ -43,12 +90,14 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	const effectivePortalId = dialogPortalId ?? portalId;
 	const handleChange = (date: Date | Date[] | null): void => {
 		if (date && !Array.isArray(date)) {
+			setAnnouncement({ kind: 'selected', date });
 			// Use local methods for consistency with display
 			const year = date.getFullYear();
 			const month = String(date.getMonth() + 1).padStart(2, '0');
 			const day = String(date.getDate()).padStart(2, '0');
 			onChange(`${year}-${month}-${day}`);
 		} else {
+			setAnnouncement(null);
 			onChange('');
 		}
 	};
@@ -65,22 +114,18 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 	// Parse minDate if provided
 	const minDateObj = minDate
 		? new Date(
-				Date.UTC(
-					parseInt(minDate.split('-')[0]),
-					parseInt(minDate.split('-')[1]) - 1,
-					parseInt(minDate.split('-')[2])
-				)
+				parseInt(minDate.split('-')[0]),
+				parseInt(minDate.split('-')[1]) - 1,
+				parseInt(minDate.split('-')[2])
 			)
 		: undefined;
 
 	// Parse maxDate if provided
 	const maxDateObj = maxDate
 		? new Date(
-				Date.UTC(
-					parseInt(maxDate.split('-')[0]),
-					parseInt(maxDate.split('-')[1]) - 1,
-					parseInt(maxDate.split('-')[2])
-				)
+				parseInt(maxDate.split('-')[0]),
+				parseInt(maxDate.split('-')[1]) - 1,
+				parseInt(maxDate.split('-')[2])
 			)
 		: undefined;
 
@@ -94,7 +139,19 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 					disabled={disabled}
 					selected={selectedDate}
 					onChange={handleChange}
-					dateFormat="MM/dd/yyyy"
+					dateFormat={dateFormat}
+					locale={calendarLocale}
+					calendarClassName="tiler-localized-datepicker"
+					calendarContainer={LocalizedCalendarContainer}
+					previousMonthAriaLabel={t('datePicker.previousMonth', 'Previous month')}
+					previousMonthButtonLabel={t('datePicker.previousMonth', 'Previous month')}
+					nextMonthAriaLabel={t('datePicker.nextMonth', 'Next month')}
+					nextMonthButtonLabel={t('datePicker.nextMonth', 'Next month')}
+					monthAriaLabelPrefix={t('datePicker.month', 'Month')}
+					chooseDayAriaLabelPrefix={t('datePicker.chooseDay', 'Choose')}
+					disabledDayAriaLabelPrefix={t('datePicker.unavailableDay', 'Unavailable')}
+					renderDayContents={(day) => new Intl.NumberFormat(language).format(day)}
+					onMonthChange={(month) => setAnnouncement({ kind: 'month', date: month })}
 					placeholderText={placeholder}
 					showPopperArrow={false}
 					minDate={minDateObj}
@@ -102,6 +159,19 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 					portalId={effectivePortalId}
 				/>
 			</DatePickerWrapper>
+			<Announcement role="status" aria-live="polite">
+				{announcement &&
+					(announcement.kind === 'selected'
+						? t('datePicker.selectedDate', 'Selected date: {{date}}', {
+								date: new Intl.DateTimeFormat(language, {
+									dateStyle: 'full',
+								}).format(announcement.date),
+							})
+						: new Intl.DateTimeFormat(language, {
+								month: 'long',
+								year: 'numeric',
+							}).format(announcement.date))}
+			</Announcement>
 		</Container>
 	);
 };
@@ -109,6 +179,25 @@ const DatePicker: React.FC<CustomDatePickerProps> = ({
 const Container = styled.div`
 	display: flex;
 	flex-direction: column;
+	.react-datepicker__aria-live {
+		display: none;
+	}
+`;
+
+// The library's live messages are English-only. Replace them with the localized
+// status above, including calendars rendered into a dialog's portal.
+const LocalizedCalendar = styled.div`
+	.react-datepicker__aria-live {
+		display: none;
+	}
+`;
+const Announcement = styled.span`
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
 `;
 
 const Label = styled.label`
