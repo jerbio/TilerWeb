@@ -36,12 +36,17 @@ const Container = styled.section`
 	}
 `;
 
-/** Manual, read-only inspection under AdminRoute. Publication details never appear in user settings. */
+/** Engineering inspection and explicit worker retries under AdminRoute. Publication details never appear in user settings. */
 export default function CalendarExportDiagnostics() {
 	const [userId, setUserId] = useState('');
 	const [records, setRecords] = useState<CalendarExportDiagnostic[] | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
+	const [inspectedUserId, setInspectedUserId] = useState<string | null>(null);
+	const [retrying, setRetrying] = useState(false);
+	const [retryNotice, setRetryNotice] = useState<string | null>(null);
+	const [retryError, setRetryError] = useState(false);
+	const retryPending = useRef(false);
 	const sequence = useRef(0);
 	const api = useRef(new CalendarExportDiagnosticsApi());
 	useEffect(
@@ -58,13 +63,49 @@ export default function CalendarExportDiagnostics() {
 		setLoading(true);
 		setError(false);
 		setRecords(null);
+		setInspectedUserId(null);
+		setRetryNotice(null);
+		setRetryError(false);
 		try {
 			const result = await api.current.list(target);
-			if (request === sequence.current) setRecords(result);
+			if (request === sequence.current) {
+				setRecords(result);
+				setInspectedUserId(target);
+			}
 		} catch {
 			if (request === sequence.current) setError(true);
 		} finally {
 			if (request === sequence.current) setLoading(false);
+		}
+	}
+
+	async function retry() {
+		const target = inspectedUserId;
+		if (!target || target !== userId.trim() || retryPending.current) return;
+		retryPending.current = true;
+		const request = ++sequence.current;
+		setRetrying(true);
+		setRetryNotice(null);
+		setRetryError(false);
+		setError(false);
+		try {
+			const result = await api.current.retry(target);
+			if (request !== sequence.current) return;
+			setRetryNotice(
+				`Sync retry queued. Enabled exports made due: ${result.scheduledExports}. Exports already running: ${result.activeExports}.${result.nativeAlreadyProcessing ? ' The current sync will finish before the new generation runs.' : ''}`
+			);
+			// A failed status refresh must not turn an acknowledged queue action into an apparent retry failure.
+			try {
+				const refreshed = await api.current.list(target);
+				if (request === sequence.current) setRecords(refreshed);
+			} catch {
+				if (request === sequence.current) setError(true);
+			}
+		} catch {
+			if (request === sequence.current) setRetryError(true);
+		} finally {
+			retryPending.current = false;
+			if (request === sequence.current) setRetrying(false);
 		}
 	}
 	const date = (value: string | null) => (value ? new Date(value).toLocaleString() : '—');
@@ -84,18 +125,42 @@ export default function CalendarExportDiagnostics() {
 					id="export-user"
 					value={userId}
 					maxLength={128}
+					disabled={retrying}
 					onChange={(event) => {
 						sequence.current++;
 						setUserId(event.target.value);
 						setRecords(null);
 						setError(false);
 						setLoading(false);
+						setInspectedUserId(null);
+						setRetryNotice(null);
+						setRetryError(false);
 					}}
 				/>
-				<button type="submit" disabled={loading || !userId.trim()}>
+				<button type="submit" disabled={loading || retrying || !userId.trim()}>
 					{loading ? 'Loading…' : 'Inspect / refresh'}
 				</button>
 			</form>
+			{inspectedUserId && (
+				<p>
+					<button
+						type="button"
+						disabled={loading || retrying}
+						onClick={() => void retry()}
+					>
+						{retrying ? 'Queuing retry…' : 'Retry sync and export'}
+					</button>{' '}
+					Queues a fresh Google read and schedule evaluation, then retries enabled
+					exports.
+				</p>
+			)}
+			{retryNotice && <p role="status">{retryNotice}</p>}
+			{retryError && (
+				<p role="alert">
+					Could not confirm the retry request. Inspect the latest state before trying
+					again.
+				</p>
+			)}
 			{error && (
 				<p role="alert">
 					Diagnostics could not be loaded. Check admin access and try again.
