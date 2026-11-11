@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import colorUtil, { RGB } from '@/core/util/colors';
+import { useTranslation } from 'react-i18next';
 
 export type AvatarUser = {
 	name: string | null;
@@ -37,6 +38,7 @@ const AvatarCluster: React.FC<AvatarClusterProps> = ({
 	renderWrapper,
 }) => {
 	const { isDarkMode } = useTheme();
+	const { i18n } = useTranslation();
 
 	const visible = users.slice(0, max);
 	const overflow = users.length - max;
@@ -57,7 +59,11 @@ const AvatarCluster: React.FC<AvatarClusterProps> = ({
 				);
 				return renderWrapper ? renderWrapper(user, i, avatar) : avatar;
 			})}
-			{overflow > 0 && <OverflowBadge $size={size}>+{overflow}</OverflowBadge>}
+			{overflow > 0 && (
+				<OverflowBadge $size={size}>
+					+{new Intl.NumberFormat(i18n?.language).format(overflow)}
+				</OverflowBadge>
+			)}
 		</Cluster>
 	);
 };

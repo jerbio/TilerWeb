@@ -1,21 +1,49 @@
 import dayjs from 'dayjs';
 
-/** English ordinal suffix for a day-of-month (1 -> "1st", 22 -> "22nd"). */
-function ordinal(day: number): string {
-	const suffixes = ['th', 'st', 'nd', 'rd'];
-	const mod100 = day % 100;
-	return `${day}${suffixes[(mod100 - 20) % 10] ?? suffixes[mod100] ?? suffixes[0]}`;
+/** Keep date order, names, and clock conventions in the user's locale. */
+export function formatDetailDate(
+	epoch: number | null | undefined,
+	locale = dayjs.locale()
+): string {
+	if (epoch == null || !Number.isFinite(epoch) || !dayjs(epoch).isValid()) return '—';
+	return new Intl.DateTimeFormat(locale, {
+		weekday: 'short',
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+	}).format(epoch);
+}
+export function formatDetailTime(
+	epoch: number | null | undefined,
+	locale = dayjs.locale()
+): string {
+	if (epoch == null || !Number.isFinite(epoch) || !dayjs(epoch).isValid()) return '—';
+	return new Intl.DateTimeFormat(locale, { timeStyle: 'short' }).format(epoch);
 }
 
-/**
- * Long, ordinal date for tileshare detail headers, e.g. "Mon, 27th July, 2025".
- *
- * Built manually rather than via dayjs' `Do` token so it doesn't depend on the
- * `advancedFormat` plugin being registered globally.
- */
-export function formatDetailDate(epoch: number | null | undefined): string {
-	if (epoch == null) return '—';
-	const d = dayjs(epoch);
-	if (!d.isValid()) return '—';
-	return d.format('ddd, [__DAY__] MMMM, YYYY').replace('__DAY__', ordinal(d.date()));
+export function formatMinutes(milliseconds: number, locale?: string): string {
+	return new Intl.NumberFormat(locale, {
+		style: 'unit',
+		unit: 'minute',
+		unitDisplay: 'long',
+		maximumFractionDigits: 1,
+	}).format(milliseconds / 60000);
+}
+
+/** A date-only deadline has no timezone; never shift it to the preceding day. */
+export function formatDeadlineDate(value: string, locale = dayjs.locale()): string {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '—';
+	const date = new Date(`${value}T12:00:00Z`);
+	if (!Number.isFinite(date.valueOf()) || date.toISOString().slice(0, 10) !== value) return '—';
+	return new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(date);
+}
+
+export function formatDuration(milliseconds: number, locale?: string): string {
+	return milliseconds % 3600000 === 0
+		? new Intl.NumberFormat(locale, {
+				style: 'unit',
+				unit: 'hour',
+				unitDisplay: 'long',
+			}).format(milliseconds / 3600000)
+		: formatMinutes(milliseconds, locale);
 }

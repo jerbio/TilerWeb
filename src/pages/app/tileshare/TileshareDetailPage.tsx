@@ -31,15 +31,21 @@ import TiletteCreate from '@/components/tileshare/TiletteCreate';
 import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
 import { TileShareTemplate, TileshareMode } from '@/core/common/types/tileshare';
 import { tileshareMode, classParticipants } from '@/core/util/tileshareMode';
-import ClassShareActions from '@/components/tileshare/ClassShareActions';
+import ProjectShareExperience from '@/components/tileshare/ProjectShareExperience';
+import ClassShareExperience from '@/components/tileshare/ClassShareExperience';
+import ShareRefreshNotice from '@/components/tileshare/ShareRefreshNotice';
+import { TileShareMutations } from '@/components/tileshare/TileShareMutations';
 import TiletteNotes from '@/components/tileshare/TiletteNotes';
 
 const TileshareDetailPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { id } = useParams<{ id: string }>();
-	const { data, loading, error, refresh } = useClusterDetail(id ?? null);
 	const { user } = useAuth();
+	const { data, loading, error, refresh, refreshing, refreshError } = useClusterDetail(
+		id ?? null,
+		user?.id
+	);
 	const getActivePersonaSession = useAppStore((s) => s.getActivePersonaSession);
 	const showNotification = useUiStore((s) => s.notification.show);
 	const updateNotification = useUiStore((s) => s.notification.update);
@@ -76,7 +82,7 @@ const TileshareDetailPage: React.FC = () => {
 					: {}),
 			});
 			window.dispatchEvent(new Event('tileshare-changed'));
-			await refresh();
+			await refresh().catch(() => undefined);
 			setEditing(false);
 			updateNotification(nId, t('tilesharedemo.detail.edit.success'), 'success');
 		} catch (err) {
@@ -131,7 +137,7 @@ const TileshareDetailPage: React.FC = () => {
 					// Creating flips the cluster to multi and recomputes its user
 					// list server-side, so take the fresh copy rather than patching.
 					window.dispatchEvent(new Event('tileshare-changed'));
-					await refresh();
+					await refresh().catch(() => undefined);
 					setAdding(false);
 				}}
 			/>
@@ -139,153 +145,173 @@ const TileshareDetailPage: React.FC = () => {
 	}
 
 	return (
-		<TileShareViewerContext.Provider value={{ isOwner, viewerId: user?.id ?? null }}>
-			<TiletteInvitationRefreshContext.Provider value={refresh}>
-				<TileShareDetailLayout
-					ClusterId={id}
-					stickyTitle={
-						cluster
-							? cluster.name || t('tileShareDensity.untitled', 'Untitled share')
-							: undefined
-					}
-				>
-					<Container>
-						<TileshareDetailBreadcrumb
-							current={cluster?.name ?? ''}
-							loading={loading}
-						/>
-						{loading && !cluster ? (
-							<DetailHeaderSkeleton />
-						) : error || !cluster ? (
-							<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
-						) : (
-							<>
-								{mode !== TileshareMode.Broadcast ? (
-									<>
-										<MultiTileshareHeader
+		<TileShareMutations key={`${id}:${user?.id}`}>
+			<TileShareViewerContext.Provider value={{ isOwner, viewerId: user?.id ?? null }}>
+				<TiletteInvitationRefreshContext.Provider value={refresh}>
+					<TileShareDetailLayout
+						ClusterId={id}
+						stickyTitle={
+							cluster
+								? cluster.name || t('tileShareDensity.untitled', 'Untitled share')
+								: undefined
+						}
+					>
+						<Container>
+							<ShareRefreshNotice
+								error={refreshError}
+								refreshing={refreshing}
+								refresh={refresh}
+							/>
+							<TileshareDetailBreadcrumb
+								current={cluster?.name ?? ''}
+								loading={loading}
+							/>
+							{loading && !cluster ? (
+								<DetailHeaderSkeleton />
+							) : error || !cluster ? (
+								<ErrorText>{t('tilesharedemo.detail.loadError')}</ErrorText>
+							) : (
+								<>
+									{mode !== TileshareMode.Broadcast ? (
+										<>
+											<MultiTileshareHeader
+												mode={mode}
+												subtitle={
+													mode
+														? t(`tileShareModes.${mode}.label`)
+														: t(
+																'tileShareModes.unknown',
+																'Sharing mode unavailable'
+															)
+												}
+												name={cluster.name}
+												description={cluster.notes}
+												descriptionContent={
+													cluster.id ? (
+														<TiletteNotes
+															key={cluster.id}
+															id={cluster.id}
+															target="cluster"
+															compact
+															canEdit={isOwner}
+														/>
+													) : undefined
+												}
+												date={cluster.end}
+												onEdit={
+													isOwner ? () => setEditing(true) : undefined
+												}
+												onAdd={
+													isOwner && mode
+														? () => setAdding(true)
+														: undefined
+												}
+												onDelete={
+													isOwner
+														? () => setConfirmingDelete(true)
+														: undefined
+												}
+											/>
+											{mode === TileshareMode.Project ? (
+												<ProjectShareExperience
+													clusterId={cluster.id ?? ''}
+													tilettes={data?.tilettes ?? []}
+												/>
+											) : mode === TileshareMode.Class ? (
+												<ClassShareExperience
+													clusterId={cluster.id ?? ''}
+													tilettes={data?.tilettes ?? []}
+													participants={cluster.participants}
+													refresh={refresh}
+													onAdd={
+														isOwner ? () => setAdding(true) : undefined
+													}
+												/>
+											) : (
+												<TiletteBody
+													clusterId={cluster.id ?? ''}
+													tilettes={data?.tilettes ?? []}
+												/>
+											)}
+										</>
+									) : (
+										<SingleTileshareHeader
 											mode={mode}
-											subtitle={
-												mode
-													? t(`tileShareModes.${mode}.label`)
-													: t(
-															'tileShareModes.unknown',
-															'Sharing mode unavailable'
-														)
-											}
-											name={cluster.name}
-											description={cluster.notes}
+											subtitle={t('tileShareModes.broadcast.label')}
 											descriptionContent={
 												cluster.id ? (
 													<TiletteNotes
 														key={cluster.id}
 														id={cluster.id}
 														target="cluster"
-														compact
 														canEdit={isOwner}
 													/>
 												) : undefined
 											}
-											date={cluster.end}
+											name={cluster.name}
+											description={cluster.notes}
+											dueDate={cluster.end}
 											onEdit={isOwner ? () => setEditing(true) : undefined}
-											onAdd={
-												isOwner && mode ? () => setAdding(true) : undefined
-											}
 											onDelete={
 												isOwner
 													? () => setConfirmingDelete(true)
 													: undefined
 											}
 										/>
-										<TiletteBody
-											key={`${cluster.id}:${mode}`}
-											mode={mode}
-											clusterId={cluster.id ?? ''}
-											tilettes={data?.tilettes ?? []}
-										/>
-									</>
-								) : (
-									<SingleTileshareHeader
-										mode={mode}
-										subtitle={t('tileShareModes.broadcast.label')}
-										descriptionContent={
-											cluster.id ? (
-												<TiletteNotes
-													key={cluster.id}
-													id={cluster.id}
-													target="cluster"
-													canEdit={isOwner}
-												/>
-											) : undefined
-										}
-										name={cluster.name}
-										description={cluster.notes}
-										dueDate={cluster.end}
-										onEdit={isOwner ? () => setEditing(true) : undefined}
-										onDelete={
-											isOwner ? () => setConfirmingDelete(true) : undefined
-										}
-									/>
-								)}
+									)}
 
-								{mode === TileshareMode.Class && (
-									<ClassShareActions
-										tilettes={data?.tilettes ?? []}
-										participants={cluster.participants}
-										isOwner={isOwner}
-										onChanged={refresh}
-									/>
-								)}
-								{mode === TileshareMode.Broadcast &&
-									data?.tilettes.map((tilette) => (
-										<TiletteManagement
-											key={`manage-${tilette.id}`}
-											tilette={tilette}
-											isOwner={isOwner}
-											onChanged={refresh}
-											onDeleted={refresh}
-										/>
-									))}
-								{mode === TileshareMode.Broadcast &&
-									data?.tilettes.map((tilette) => (
-										<SingleTiletteResponse
-											key={tilette.id}
-											tilette={tilette}
-											clusterId={cluster.id ?? ''}
-										/>
-									))}
+									{mode === TileshareMode.Broadcast &&
+										data?.tilettes.map((tilette) => (
+											<TiletteManagement
+												key={`manage-${tilette.id}`}
+												tilette={tilette}
+												isOwner={isOwner}
+												onChanged={refresh}
+												onDeleted={refresh}
+											/>
+										))}
+									{mode === TileshareMode.Broadcast &&
+										data?.tilettes.map((tilette) => (
+											<SingleTiletteResponse
+												key={tilette.id}
+												tilette={tilette}
+												clusterId={cluster.id ?? ''}
+											/>
+										))}
 
-								<EditTileshareModal
-									context={{
-										kind: 'share',
-										mode,
-										start: cluster.start,
-										tilettes: data?.tilettes,
-									}}
-									hideNotes
-									show={editing}
-									setShow={setEditing}
-									headerText={t('tilesharedemo.detail.edit.clusterTitle')}
-									initial={{
-										name: cluster.name,
-										description: cluster.notes,
-										dueDate: cluster.end,
-									}}
-									saving={saving}
-									onSubmit={handleSave}
-								/>
-								<DeleteClusterDialog
-									show={confirmingDelete}
-									setShow={setConfirmingDelete}
-									name={cluster.name ?? ''}
-									deleting={deleting}
-									onConfirm={handleDelete}
-								/>
-							</>
-						)}
-					</Container>
-				</TileShareDetailLayout>
-			</TiletteInvitationRefreshContext.Provider>
-		</TileShareViewerContext.Provider>
+									<EditTileshareModal
+										context={{
+											kind: 'share',
+											mode,
+											start: cluster.start,
+											tilettes: data?.tilettes,
+										}}
+										hideNotes
+										show={editing}
+										setShow={setEditing}
+										headerText={t('tilesharedemo.detail.edit.clusterTitle')}
+										initial={{
+											name: cluster.name,
+											description: cluster.notes,
+											dueDate: cluster.end,
+										}}
+										saving={saving}
+										onSubmit={handleSave}
+									/>
+									<DeleteClusterDialog
+										show={confirmingDelete}
+										setShow={setConfirmingDelete}
+										name={cluster.name ?? ''}
+										deleting={deleting}
+										onConfirm={handleDelete}
+									/>
+								</>
+							)}
+						</Container>
+					</TileShareDetailLayout>
+				</TiletteInvitationRefreshContext.Provider>
+			</TileShareViewerContext.Provider>
+		</TileShareMutations>
 	);
 };
 

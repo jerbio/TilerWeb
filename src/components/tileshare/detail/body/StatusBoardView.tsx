@@ -27,21 +27,28 @@ import { useAuth } from '@/core/auth/useAuth';
 import { TileshareApi } from '@/api/tileshareApi';
 import { getBoardDragTiletteId } from './StatusBoardDrag';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
+import { useInvitationStore } from '../../TileShareMutations';
+import { ProjectBoardActionContext } from '../../ProjectBoardActionContext';
 
 type Props = {
 	tilettes: TileShareTemplate[];
 	clusterId: string;
+	scope?: BoardFilter;
 };
 
 type BoardFilter = 'all' | 'mine';
 
 const api = new TileshareApi();
 
-export default function StatusBoardView({ tilettes, clusterId }: Props) {
+export default function StatusBoardView({ tilettes, clusterId, scope }: Props) {
 	const { t } = useTranslation();
 	const { user } = useAuth();
 	const refresh = useContext(TiletteInvitationRefreshContext);
-	const [filter, setFilter] = useState<BoardFilter>('all');
+	const [localFilter, setFilter] = useState<BoardFilter>('all');
+	const filter = scope ?? localFilter;
+	const mutations = useInvitationStore();
+	const actions = useContext(ProjectBoardActionContext);
+	const [draggedId, setDraggedId] = useState<string | null>(null);
 	// Guards against double-firing the accept while a drag request is in flight.
 	const accepting = useRef<Set<string>>(new Set());
 	// Id of the tilette whose accept request is in flight; the card shows a
@@ -51,7 +58,7 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 	// settle-in animation the moment it re-renders in the In progress lane.
 	const [justAcceptedId, setJustAcceptedId] = useState<string | null>(null);
 	const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-	// Ghost left behind in the Todo lane where the accepted card used to be.
+	// Ghost left behind in the Delegated lane where the accepted card used to be.
 	// It collapses over 300ms (while the destination lane grows) so the
 	// remaining cards glide down instead of snapping up.
 	const [leaving, setLeaving] = useState<{ id: string; index: number; height: number } | null>(
@@ -92,14 +99,17 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 		[filter, user?.id]
 	);
 
-	const todo: TileShareTemplate[] = [];
+	const unassigned: TileShareTemplate[] = [];
+	const delegated: TileShareTemplate[] = [];
 	const inProgress: TileShareTemplate[] = [];
 	const completed: TileShareTemplate[] = [];
 
 	for (const tilette of visible) {
 		const status = resolveStatus(tilette);
-		if (status === TileletteStatus.Todo) {
-			todo.push(tilette);
+		if (status === TileletteStatus.Unassigned) {
+			unassigned.push(tilette);
+		} else if (status === TileletteStatus.Delegated) {
+			delegated.push(tilette);
 		} else if (status === TileletteStatus.Completed) {
 			completed.push(tilette);
 		} else {
@@ -164,7 +174,7 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 		};
 	}, [justAcceptedId]);
 
-	// Dragging a Todo tilette onto the In progress lane accepts the viewer's
+	// Dragging a Delegated tilette onto the In progress lane accepts the viewer's
 	// invitation (silent — no confirmation dialog). It only fires when the
 	// viewer's own RSVP is still open (None or Tentative) and can be responded
 	// to; everything else (not assigned, already resolved) is a no-op.
@@ -186,18 +196,28 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 			};
 			if (!tiletteId || !user?.id) return;
 			const tilette = tilettes.find((entry) => entry.id === tiletteId);
-			if (!tilette || !canAcceptByDrag(tilette, user.id)) return;
+			if (
+				!tilette ||
+				resolveStatus(tilette) !== TileletteStatus.Delegated ||
+				!canAcceptByDrag(tilette, user.id)
+			)
+				return;
 			const assignmentId = validDesignatedUsers(tilette.designatedUsers).find(
 				(d) => d.userId === user.id
 			)?.designatedTileTemplateId;
 			if (!assignmentId || accepting.current.has(assignmentId)) return;
+			if (
+				['accepted', 'declined'].includes(mutations.get(assignmentId) ?? '') ||
+				!mutations.start(assignmentId, 'saving')
+			)
+				return;
 
 			// Snapshot the card's lane slot + height while it is still mounted
-			// in Todo, so the lane can leave a same-size ghost where it moved from.
+			// in Delegated, so the lane can leave a same-size ghost where it moved from.
 			let fromIndex = 0;
 			for (const entry of visible) {
 				if (entry.id === tiletteId) break;
-				if (resolveStatus(entry) === TileletteStatus.Todo) fromIndex += 1;
+				if (resolveStatus(entry) === TileletteStatus.Delegated) fromIndex += 1;
 			}
 			const cardEl = document.querySelector<HTMLElement>(
 				`[data-board-card-id="${tiletteId}"]`
@@ -220,39 +240,84 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 			setAcceptingId(tiletteId);
 			try {
 				await api.respondToInvitation(assignmentId, InvitationStatus.Accepted);
+				mutations.set(assignmentId, 'accepted');
 				// Notify anything else listening (the activity feed, the list) and
-				// refetch the page's cluster detail so the card leaves Todo.
+				// refetch the page's cluster detail so the card leaves Delegated.
 				window.dispatchEvent(new Event('tileshare-changed'));
 				await refresh?.().catch(() => {});
-				flagJustAccepted(tiletteId, { index: fromIndex, height: fromHeight });
+				if (boardRef.current)
+					flagJustAccepted(tiletteId, { index: fromIndex, height: fromHeight });
 			} catch {
+				mutations.set(assignmentId, 'uncertain');
 				// The refresh keeps the existing data, so the card simply stays in
-				// Todo; the user can retry the drag or use the inline actions.
+				// Delegated; the user can retry the drag or use the inline actions.
 			} finally {
 				accepting.current.delete(assignmentId);
 				setAcceptingId(null);
 			}
 		},
-		[tilettes, user?.id, refresh, visible, resolveStatus]
+		[tilettes, user?.id, refresh, visible, resolveStatus, mutations]
 	);
 
+	const dropFor = (target: TileletteStatus) => {
+		const dragged = visible.find((task) => task.id === draggedId);
+		if (!actions || !dragged || !actions.canDrop(dragged, target)) return undefined;
+		return (event: React.DragEvent) => {
+			event.preventDefault();
+			const id = getBoardDragTiletteId(event);
+			const task = visible.find((task) => task.id === id);
+			if (task && actions.canDrop(task, target)) actions.choose(task, target);
+			setDraggedId(null);
+		};
+	};
 	return (
-		<Board ref={boardRef}>
-			<FilterRow>
-				<Tabs
-					aria-label={t('tilesharedemo.detail.board.filterAria')}
-					value={filter}
-					onChange={(id) => setFilter(id as BoardFilter)}
-					tabs={[
-						{ id: 'all', label: t('tilesharedemo.detail.board.filter.all') },
-						{ id: 'mine', label: t('tilesharedemo.detail.board.filter.mine') },
-					]}
-				/>
-			</FilterRow>
-			<BoardGrid>
+		<Board
+			ref={boardRef}
+			onDragStart={(event) => setDraggedId(getBoardDragTiletteId(event))}
+			onDragEnd={() => setDraggedId(null)}
+		>
+			<p>
+				{t(
+					filter === 'mine'
+						? 'shareExperience.yourCompletion'
+						: 'shareExperience.teamStatus',
+					filter === 'mine' ? 'Your completion' : 'Team status'
+				)}
+			</p>
+			{scope === undefined && (
+				<FilterRow>
+					<Tabs
+						aria-label={t('tilesharedemo.detail.board.filterAria')}
+						value={filter}
+						onChange={(id) => setFilter(id as BoardFilter)}
+						tabs={[
+							{ id: 'all', label: t('tilesharedemo.detail.board.filter.all') },
+							{ id: 'mine', label: t('tilesharedemo.detail.board.filter.mine') },
+						]}
+					/>
+				</FilterRow>
+			)}
+			<BoardGrid
+				role="region"
+				aria-label={t('tileShareBoard.columns', 'Work status board')}
+				tabIndex={0}
+			>
 				<StatusBoardColumn
-					status={TileletteStatus.Todo}
-					tilettes={todo}
+					status={TileletteStatus.Unassigned}
+					tilettes={unassigned}
+					clusterId={clusterId}
+					draggable={!!actions}
+					onDrop={dropFor(TileletteStatus.Unassigned)}
+					dropHint={t(
+						'tileShareBoard.dropRemove',
+						'Drop to review removal of all assignments'
+					)}
+				/>
+				<StatusBoardColumn
+					status={TileletteStatus.Delegated}
+					onDrop={dropFor(TileletteStatus.Delegated)}
+					dropHint={t('tileShareBoard.dropAssign', 'Drop to choose participants')}
+					tilettes={delegated}
 					clusterId={clusterId}
 					draggable
 					acceptingId={acceptingId}
@@ -263,12 +328,14 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 					status={TileletteStatus.InProgress}
 					tilettes={inProgress}
 					clusterId={clusterId}
-					onDrop={handleAcceptDrop}
+					onDrop={actions ? dropFor(TileletteStatus.InProgress) : handleAcceptDrop}
+					draggable={!!actions}
 					acceptingId={acceptingId}
 					justAcceptedId={justAcceptedId}
 				/>
 				<StatusBoardColumn
 					status={TileletteStatus.Completed}
+					draggable={!!actions}
 					tilettes={completed}
 					clusterId={clusterId}
 				/>
@@ -278,7 +345,9 @@ export default function StatusBoardView({ tilettes, clusterId }: Props) {
 }
 
 const Board = styled.div`
+	container: tile-share-board / inline-size;
 	display: flex;
+	min-width: 0;
 	flex-direction: column;
 	gap: 12px;
 `;
@@ -290,10 +359,19 @@ const FilterRow = styled.div`
 
 const BoardGrid = styled.div`
 	display: grid;
-	grid-template-columns: repeat(3, minmax(280px, 1fr));
+	min-width: 0;
+	grid-template-columns: repeat(4, minmax(240px, 1fr));
 	gap: 14px;
 	overflow-x: auto;
 	padding: 4px 4px 12px;
+	@container tile-share-board (min-width: 880px) {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+	&:focus-visible {
+		outline: 2px solid ${({ theme }) => theme.colors.button.brand.bg};
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
 	/* Stretch: every lane fills the board's full height, so an empty lane
 	 * (e.g. In progress) always offers room to drop a dragged tilette. */
 `;

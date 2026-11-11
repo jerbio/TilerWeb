@@ -1,11 +1,11 @@
 import TiletteRsvpStatus from '@/components/tileshare/TiletteRsvpStatus';
 import TiletteInvitationActions from '@/components/tileshare/TiletteInvitationActions';
 import ShimmerOverlay from '@/components/tileshare/ShimmerOverlay';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { TileShareTemplate } from '@/core/common/types/tileshare';
+import { TileletteStatus, TileShareTemplate } from '@/core/common/types/tileshare';
 import { useTheme } from '@/core/theme/ThemeProvider';
 import { Routes } from '@/core/constants/routes';
 import { getTileletteColor } from '@/core/util/tileletteColor';
@@ -16,6 +16,10 @@ import { useAuth } from '@/core/auth/useAuth';
 import { setBoardDragData } from './StatusBoardDrag';
 import AvatarCluster from '@/core/common/components/AvatarCluster';
 import TiletteWorkProgress from '@/components/tileshare/TiletteWorkProgress';
+import {
+	ProjectBoardActionButtons,
+	ProjectBoardActionContext,
+} from '../../ProjectBoardActionContext';
 
 type StatusBoardTiletteCardProps = {
 	tilette: TileShareTemplate;
@@ -37,14 +41,18 @@ const StatusBoardTiletteCard: React.FC<StatusBoardTiletteCardProps> = ({
 	justAccepted,
 }) => {
 	const { t } = useTranslation();
+	const { state } = useLocation();
 	const { isDarkMode } = useTheme();
 	const { user } = useAuth();
+	const actions = useContext(ProjectBoardActionContext);
 	const surface = filledSurface(getTileletteColor(tilette.id), isDarkMode);
 	// Shimmer the whole card while an RSVP response is saving in place.
 	const [saving, setSaving] = useState(false);
-	// Only the viewer's own open invitation (None/Tentative, Todo lane) can be
+	// Only the viewer's own open invitation (None/Tentative, Delegated lane) can be
 	// accepted by dragging the card onto the In progress lane.
-	const canDrag = !!draggable && !!user?.id && !!tilette.id && canAcceptByDrag(tilette, user.id);
+	const canDrag = actions
+		? Object.values(TileletteStatus).some((target) => actions.canDrop(tilette, target))
+		: !!draggable && !!user?.id && !!tilette.id && canAcceptByDrag(tilette, user.id);
 
 	return (
 		<Card
@@ -69,6 +77,7 @@ const StatusBoardTiletteCard: React.FC<StatusBoardTiletteCardProps> = ({
 			// the browser walk up to the Card as the drag source. */}
 			<CardLink
 				to={Routes.Tileshare.tilette(clusterId, tilette.id ?? '')}
+				state={state}
 				draggable={false}
 				aria-label={t('tilesharedemo.detail.openTiletteAria')}
 			>
@@ -89,6 +98,7 @@ const StatusBoardTiletteCard: React.FC<StatusBoardTiletteCardProps> = ({
 				/>
 				{saving && <ShimmerOverlay data-testid="tilette-shimmer" />}
 			</RsvpRow>
+			<ProjectBoardActionButtons task={tilette} />
 			{accepting && (
 				<>
 					<ShimmerOverlay data-testid="board-accepting-shimmer" />
@@ -145,6 +155,8 @@ const AcceptingBadge = styled.span<{ $dark: boolean }>`
 `;
 
 const Card = styled.div<{ $bg: string; $border: string; $justAccepted?: boolean }>`
+	min-width: 0;
+	overflow-wrap: anywhere;
 	position: relative;
 	display: flex;
 	flex-direction: column;

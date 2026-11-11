@@ -18,6 +18,8 @@ type DialogProps = {
 	dismissible?: boolean;
 	size?: 'compact' | 'standard' | 'wide';
 	subtitle?: string;
+	returnFocusTo?: HTMLElement | null;
+	fallbackFocusTo?: HTMLElement | null;
 };
 
 export default function TileShareDialog({ open = true, ...content }: DialogProps) {
@@ -40,13 +42,18 @@ function DialogContent({
 	dismissible = true,
 	size = 'standard',
 	subtitle,
+	returnFocusTo,
+	fallbackFocusTo,
 }: DialogProps & { closing: boolean }) {
 	const ref = useRef<HTMLDialogElement>(null);
+	const focusTarget = useRef(returnFocusTo);
+	const fallbackTarget = useRef(fallbackFocusTo);
 	const titleId = useId();
 	const { t } = useTranslation();
 	useEffect(() => {
 		const dialog = ref.current!;
-		const previous = document.activeElement as HTMLElement | null;
+		const previous = focusTarget.current ?? (document.activeElement as HTMLElement | null);
+		const fallback = fallbackTarget.current;
 		if (typeof dialog.showModal === 'function') dialog.showModal();
 		else dialog.setAttribute('open', '');
 		const first = dialog.querySelector<HTMLElement>(
@@ -55,7 +62,9 @@ function DialogContent({
 		(first ?? dialog.querySelector<HTMLElement>('button:not([disabled])'))?.focus();
 		return () => {
 			if (typeof dialog.close === 'function') dialog.close();
-			if (previous?.isConnected) previous.focus({ preventScroll: true });
+			const target =
+				previous?.isConnected && !previous.hasAttribute('disabled') ? previous : fallback;
+			if (target?.isConnected) target.focus({ preventScroll: true });
 		};
 	}, []);
 	useEffect(() => {

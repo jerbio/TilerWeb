@@ -13,7 +13,7 @@ type Props = {
 	 *  May return a promise (the accept round-trip); the landing silhouette
 	 *  stays visible until the caller's card has settled. */
 	onDrop?: (e: React.DragEvent) => void | Promise<void>;
-	/** When true the cards become drag sources (only the Todo lane can drag). */
+	/** When true the cards become drag sources (only the Delegated lane can drag). */
 	draggable?: boolean;
 	/** Id of the tilette whose accept request is in flight (shows the indicator). */
 	acceptingId?: string | null;
@@ -21,6 +21,7 @@ type Props = {
 	justAcceptedId?: string | null;
 	/** A tilette that just left this lane; a collapsing ghost holds its old slot. */
 	leaving?: { id: string; index: number; height: number } | null;
+	dropHint?: string;
 };
 
 export default function StatusBoardColumn({
@@ -32,8 +33,9 @@ export default function StatusBoardColumn({
 	acceptingId,
 	justAcceptedId,
 	leaving,
+	dropHint,
 }: Props) {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const [dragOver, setDragOver] = useState(false);
 	// dragenter / dragleave both fire as the pointer crosses child-element
 	// boundaries (the cards, the silhouette, the header) inside the lane, so a
@@ -41,6 +43,12 @@ export default function StatusBoardColumn({
 	// on while the pointer is anywhere within the column and only clears it once
 	// the pointer has left the whole subtree — even if it then sits still.
 	const depth = useRef(0);
+	useEffect(() => {
+		if (!onDrop) {
+			depth.current = 0;
+			setDragOver(false);
+		}
+	}, [onDrop]);
 	// The lane body silhouette is a stand-in for the incoming card, so it must
 	// not vanish the instant the drop fires (that was the top-of-lane jump).
 	// It holds its slot while the accept round-trip runs, then cross-fades out
@@ -134,6 +142,7 @@ export default function StatusBoardColumn({
 
 	return (
 		<Column
+			data-board-stage={status}
 			onDrop={handleDrop}
 			// dragover must be allowed (preventDefault) for the browser to fire drop.
 			onDragOver={onDrop ? (e: React.DragEvent) => e.preventDefault() : undefined}
@@ -142,7 +151,7 @@ export default function StatusBoardColumn({
 		>
 			<ColumnHeader>
 				<TiletteStatus status={status} showLabel />
-				<Count>{tilettes.length}</Count>
+				<Count>{new Intl.NumberFormat(i18n?.language).format(tilettes.length)}</Count>
 			</ColumnHeader>
 			{tilettes.length === 0 ? (
 				// The empty slot is the drop surface itself: it keeps a
@@ -172,7 +181,7 @@ export default function StatusBoardColumn({
 									<SkeletonLine $width="70%" />
 								</DropPlaceholder>
 								<DropHintText>
-									{t('tilesharedemo.detail.board.dropHint')}
+									{dropHint ?? t('tilesharedemo.detail.board.dropHint')}
 								</DropHintText>
 							</>
 						)
@@ -246,7 +255,7 @@ const Column = styled.div`
 	gap: 10px;
 	min-width: 0;
 	/* Even when every lane is short (or a lane is empty) there is room to hover and drop. */
-	min-height: 220px;
+	min-height: 152px;
 `;
 
 const ColumnHeader = styled.div`
@@ -264,24 +273,24 @@ const Count = styled.span`
 `;
 
 /**
- * Empty lane body. When the lane accepts drops (In progress) this slot is the
- * drop surface itself, so it keeps a card-height footprint and highlights
- * while a drag hovers it.
+ * Keep the visible empty state compact. The entire stretched column remains
+ * a drop target, and an allowed hover expands the slot to show the landing area.
  */
 const EmptySlot = styled.div<{ $droppable: boolean }>`
-	flex: 1;
+	flex: 0 0 auto;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	gap: 10px;
-	min-height: 140px;
-	padding: 18px 14px;
+	min-height: ${({ $droppable }) => ($droppable ? '140px' : '80px')};
+	padding: 12px;
 	border: 1px dashed
 		${({ $droppable, theme }) =>
 			$droppable ? theme.colors.border.strong : theme.colors.border.default};
 	border-radius: ${({ theme }) => theme.borderRadius.large};
-	background: ${({ theme }) => theme.colors.background.card2};
+	background: ${({ $droppable, theme }) =>
+		$droppable ? theme.colors.background.card2 : 'transparent'};
 	color: ${({ $droppable, theme }) =>
 		$droppable ? theme.colors.text.secondary : theme.colors.text.muted};
 	font-size: ${({ theme }) => theme.typography.fontSize.sm};

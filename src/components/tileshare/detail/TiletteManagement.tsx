@@ -8,6 +8,7 @@ import { DesignatedUser, TileShareTemplate, TileshareMode } from '@/core/common/
 import { classifyContact, isValidRecipient, normalizePhoneNumber } from '@/core/util/contact';
 import { tileshareService } from '@/services';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
+import { useParticipantRemoval } from '../useParticipantRemoval';
 
 type Props = {
 	mode?: TileshareMode | null;
@@ -18,13 +19,16 @@ type Props = {
 };
 
 export default function TiletteManagement({ tilette, isOwner, onChanged, onDeleted, mode }: Props) {
-	const participants = validDesignatedUsers(tilette.designatedUsers);
+	const removal = useParticipantRemoval(onChanged);
+	const participants = validDesignatedUsers(tilette.designatedUsers).filter(
+		(person) => !removal.wasRemoved(person.designatedTileTemplateId)
+	);
 	const { t } = useTranslation();
-	const [view, setView] = useState<'people' | 'remove' | 'delete' | null>(null);
-	const [recipient, setRecipient] = useState<DesignatedUser | null>(null);
+	const [view, setView] = useState<'people' | 'delete' | null>(null);
 	const [contact, setContact] = useState('');
 	const [busy, setBusy] = useState(false);
 	const pending = useRef(false);
+	const toolbar = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState('');
 	const [notice, setNotice] = useState('');
 	const nameOf = (person: DesignatedUser) =>
@@ -38,7 +42,7 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 		setView(next);
 	};
 	const run = async (action: () => Promise<unknown>, success: () => void | Promise<void>) => {
-		if (pending.current || !isOwner || !tilette.id) return;
+		if (pending.current || removal.blocked || !isOwner || !tilette.id) return;
 		pending.current = true;
 		setBusy(true);
 		setError('');
@@ -78,23 +82,27 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 	const title =
 		view === 'delete'
 			? t('tileshareManagement.delete', 'Delete tilette')
-			: view === 'remove'
-				? t('tileshareManagement.remove', 'Remove recipient')
-				: t('tileshareManagement.peopleTitle', 'People on {{name}}', {
-						name: tilette.name,
-					});
+			: t('tileshareManagement.peopleTitle', 'People on {{name}}', {
+					name: tilette.name,
+				});
 	return (
 		<>
-			<Toolbar aria-label={t('tileshareManagement.actions', 'Manage tilette')}>
+			<Toolbar ref={toolbar} aria-label={t('tileshareManagement.actions', 'Manage tilette')}>
 				{mode !== TileshareMode.Class && (
-					<Button variant="ghost" onClick={() => open('people')}>
+					<Button
+						variant="ghost"
+						disabled={removal.blocked}
+						onClick={() => open('people')}
+					>
 						<Users size={16} /> {t('tileshareManagement.people', 'Manage people')}
 					</Button>
 				)}
-				<DangerButton $quiet onClick={() => open('delete')}>
+				<DangerButton $quiet disabled={removal.blocked} onClick={() => open('delete')}>
 					<Trash2 size={16} /> {t('tileshareManagement.delete', 'Delete tilette')}
 				</DangerButton>
 			</Toolbar>
+			{removal.feedback}
+			{removal.dialog}
 			<Modal
 				show={view !== null}
 				setShow={busy ? undefined : () => setView(null)}
@@ -170,15 +178,27 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 												)}
 										</div>
 										<DangerButton
-											disabled={busy || !person.designatedTileTemplateId}
+											disabled={busy || removal.blocked}
 											aria-label={t(
 												'tileshareManagement.removePerson',
 												'Remove {{name}}',
 												{ name: nameOf(person) }
 											)}
 											onClick={() => {
-												setRecipient(person);
-												open('remove');
+												open(null);
+												removal.review({
+													recipient: nameOf(person),
+													single: true,
+													returnFocusTo:
+														toolbar.current?.querySelector('button'),
+													assignments: [
+														{
+															tiletteId: tilette.id!,
+															assignmentId:
+																person.designatedTileTemplateId,
+														},
+													],
+												});
 											}}
 										>
 											<Trash2 size={16} />{' '}
@@ -194,62 +214,31 @@ export default function TiletteManagement({ tilette, isOwner, onChanged, onDelet
 					) : (
 						<>
 							<p>
-								{view === 'delete'
-									? t(
-											'tileshareManagement.deletePrompt',
-											'Delete "{{name}}" for all recipients? Its linked calendar work will be disabled. The project will remain.',
-											{ name: tilette.name }
-										)
-									: t(
-											'tileshareManagement.removePrompt',
-											'Remove {{name}} from this tilette? Their linked calendar work will be disabled. Other tilettes will remain unchanged.',
-											{ name: recipient ? nameOf(recipient) : '' }
-										)}
+								{t(
+									'tileshareManagement.deletePrompt',
+									'Delete "{{name}}" for all recipients? Its linked calendar work will be disabled. The share will remain.',
+									{ name: tilette.name }
+								)}
 							</p>
 							<Toolbar>
-								<Button
-									variant="ghost"
-									disabled={busy}
-									onClick={() => open(view === 'remove' ? 'people' : null)}
-								>
+								<Button variant="ghost" disabled={busy} onClick={() => open(null)}>
 									{t('tileshareManagement.cancel', 'Cancel')}
 								</Button>
 								<DangerButton
 									disabled={busy}
 									onClick={() => {
-										if (view === 'delete')
-											void run(
-												() => tileshareService.deleteTilette(tilette.id!),
-												async () => {
-													setView(null);
-													await onDeleted();
-												}
-											);
-										else if (recipient?.designatedTileTemplateId)
-											void run(
-												() =>
-													tileshareService.removeTiletteRecipient(
-														tilette.id!,
-														recipient.designatedTileTemplateId!
-													),
-												async () => {
-													setView('people');
-													setNotice(
-														t(
-															'tileshareManagement.removed',
-															'Recipient removed.'
-														)
-													);
-													await refresh();
-												}
-											);
+										void run(
+											() => tileshareService.deleteTilette(tilette.id!),
+											async () => {
+												setView(null);
+												await onDeleted();
+											}
+										);
 									}}
 								>
 									{busy
 										? t('tileshareManagement.saving', 'Saving...')
-										: view === 'delete'
-											? t('tileshareManagement.delete', 'Delete tilette')
-											: t('tileshareManagement.remove', 'Remove recipient')}
+										: t('tileshareManagement.delete', 'Delete tilette')}
 								</DangerButton>
 							</Toolbar>
 						</>

@@ -161,7 +161,9 @@ describe('TiletteCreate', () => {
 			screen.getByRole('button', { name: 'tilesharedemo.detail.add.success.view' })
 		);
 
-		expect(navigate).toHaveBeenCalledWith(Routes.Tileshare.tilette('cluster-1', 'tpl-1'));
+		expect(navigate).toHaveBeenCalledWith(Routes.Tileshare.tilette('cluster-1', 'tpl-1'), {
+			state: null,
+		});
 	});
 
 	it('falls back to the caller when the created tilette has no id', async () => {

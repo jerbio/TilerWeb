@@ -1,3 +1,4 @@
+import { formatMinutes } from '@/core/util/tileshareDate';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useSearchParams } from 'react-router';
@@ -429,7 +430,7 @@ export function PreviewDialog({
 					) : (
 						<Loading>
 							{t(
-								`tilesharePreview.unavailable.${data?.unsupportedReason}`,
+								`tilesharePreview.unavailable.${data?.unsupportedReason && Object.prototype.hasOwnProperty.call(unavailableReasons, data.unsupportedReason) ? data.unsupportedReason : 'generic'}`,
 								unavailableReasons[data?.unsupportedReason ?? ''] ??
 									'A schedule preview is not available for this tilette.'
 							)}
@@ -482,10 +483,7 @@ export function PreviewDialog({
 												)}
 									</p>
 									{block.duration != null && (
-										<p>
-											{block.duration / 60000}{' '}
-											{t('tilesharePreview.minutes', 'minutes')}
-										</p>
+										<p>{formatMinutes(block.duration, locale)}</p>
 									)}
 									{block.allowedStart != null && block.allowedEnd != null && (
 										<p>
@@ -511,7 +509,9 @@ export function PreviewDialog({
 							<div key={finding ? 'options' : 'overview'}>
 								<PreviewNote>
 									{t(
-										'tilesharePreview.explanation',
+										finding
+											? 'tilesharePreview.explanationOptions'
+											: 'tilesharePreview.explanationOverview',
 										finding
 											? 'Choose another suggested time, then accept or accept and lock the highlighted session.'
 											: 'See how this tilette fits your schedule. Nothing is added until you accept.'
@@ -577,13 +577,11 @@ export function PreviewDialog({
 															</b>
 															<span>
 																{data.timeZone} -{' '}
-																{(highlighted.duration ??
-																	highlighted.end -
-																		highlighted.start) /
-																	60000}{' '}
-																{t(
-																	'tilesharePreview.minutes',
-																	'minutes'
+																{formatMinutes(
+																	highlighted.duration ??
+																		highlighted.end -
+																			highlighted.start,
+																	locale
 																)}
 															</span>
 															{!isInPreviewWindow(
@@ -609,7 +607,9 @@ export function PreviewDialog({
 													) : (
 														<span>
 															{t(
-																'tilesharePreview.selectCandidate',
+																data.isViable
+																	? 'tilesharePreview.selectCandidateAvailable'
+																	: 'tilesharePreview.selectCandidateUnavailable',
 																data.isViable
 																	? 'Select a scheduled tilette session to choose a fixed time.'
 																	: 'No complete schedule is available. Review the session details or generate a new preview.'
@@ -673,13 +673,7 @@ export function PreviewDialog({
 															)}
 														</dt>
 														<dd>
-															{new Intl.NumberFormat(locale, {
-																maximumFractionDigits: 1,
-															}).format(data.duration / 60000)}{' '}
-															{t(
-																'tilesharePreview.minutes',
-																'minutes'
-															)}
+															{formatMinutes(data.duration, locale)}
 														</dd>
 													</div>
 												)}
@@ -805,10 +799,9 @@ export function PreviewDialog({
 															</p>
 															{session.duration != null && (
 																<p>
-																	{session.duration / 60000}{' '}
-																	{t(
-																		'tilesharePreview.minutes',
-																		'minutes'
+																	{formatMinutes(
+																		session.duration,
+																		locale
 																	)}
 																</p>
 															)}
@@ -906,17 +899,9 @@ export function PreviewDialog({
 																)}
 																{session.duration != null && (
 																	<span>
-																		{new Intl.NumberFormat(
-																			locale,
-																			{
-																				maximumFractionDigits: 1,
-																			}
-																		).format(
-																			session.duration / 60000
-																		)}{' '}
-																		{t(
-																			'tilesharePreview.minutes',
-																			'minutes'
+																		{formatMinutes(
+																			session.duration,
+																			locale
 																		)}
 																	</span>
 																)}
@@ -1378,7 +1363,7 @@ function CalendarGrid({
 										type="button"
 										$proposed={block.isProposed}
 										aria-pressed={selected === block.id}
-										title={`${block.name ?? 'Calendar event'} - ${new Intl.DateTimeFormat(i18n?.language, { timeZone: zone, timeStyle: 'short' }).format(block.start)}`}
+										title={`${block.name ?? t('tilesharePreview.untitled', 'Calendar event')} - ${new Intl.DateTimeFormat(i18n?.language, { timeZone: zone, timeStyle: 'short' }).format(block.start)}`}
 										onClick={() => onSelect(block)}
 										style={{
 											top: (top * hourHeight) / 60 + 4,
@@ -1398,8 +1383,10 @@ function CalendarGrid({
 										</strong>
 										<span>
 											<Clock size={12} />{' '}
-											{(block.duration ?? block.end - block.start) / 60000}{' '}
-											{t('tilesharePreview.minutes', 'minutes')}
+											{formatMinutes(
+												block.duration ?? block.end - block.start,
+												i18n?.language
+											)}
 										</span>
 										{block.isProposed && (
 											<span>

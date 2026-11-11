@@ -31,13 +31,17 @@ export type Assignee = {
 };
 
 /** "Jessica J." from first name + last initial, with graceful fallbacks. */
-function formatAssigneeName(profile: TileshareUserProfile | null, fallback: string | null): string {
+function formatAssigneeName(
+	profile: TileshareUserProfile | null,
+	fallback: string | null,
+	unknown: string
+): string {
 	const first = profile?.firstName?.trim();
 	if (first) {
 		const lastInitial = profile?.lastName?.trim()?.[0];
 		return lastInitial ? `${first} ${lastInitial}.` : first;
 	}
-	return profile?.fullName?.trim() || fallback || 'Unknown';
+	return profile?.fullName?.trim() || fallback || unknown;
 }
 
 /**
@@ -45,7 +49,7 @@ function formatAssigneeName(profile: TileshareUserProfile | null, fallback: stri
  * Each designated user becomes one lane holding the tilettes they're on,
  * deduped by userId (or displayed identifier when userId is missing).
  */
-export function buildAssignees(tilettes: TileShareTemplate[]): Assignee[] {
+export function buildAssignees(tilettes: TileShareTemplate[], unknown = 'Unknown'): Assignee[] {
 	const byId = new Map<string, Assignee>();
 
 	for (const tilette of tilettes) {
@@ -56,7 +60,7 @@ export function buildAssignees(tilettes: TileShareTemplate[]): Assignee[] {
 			let assignee = byId.get(key);
 			if (!assignee) {
 				const profile = designated.userProfile;
-				const name = formatAssigneeName(profile, designated.displayedIdentifier);
+				const name = formatAssigneeName(profile, designated.displayedIdentifier, unknown);
 				assignee = {
 					id: key,
 					name,

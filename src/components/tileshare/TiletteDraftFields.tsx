@@ -5,6 +5,7 @@ import DatePicker from '@/core/common/components/date_picker';
 import TagInput from '@/core/common/components/TagInput';
 import { TiletteDraft, TileshareMode } from '@/core/common/types/tileshare';
 import { defaultTiletteDeadline } from '@/core/util/tileshareDraft';
+import { formatDeadlineDate } from '@/core/util/tileshareDate';
 import TileShareLocationFields from './TileShareLocationFields';
 import MarkdownNoteField from './MarkdownNoteField';
 
@@ -23,7 +24,7 @@ export default function TiletteDraftFields({
 	disabled?: boolean;
 	allowMoveShareDeadline?: boolean;
 }) {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const id = useId();
 	const update = (patch: Partial<TiletteDraft>) => onChange({ ...value, ...patch });
 	return (
@@ -45,14 +46,18 @@ export default function TiletteDraftFields({
 				onChange={(deadline) => update({ deadline, moveShareDeadline: false })}
 			/>
 			{!value.deadline && shareDeadline && (
-				<small>{t('tileShareModes.deadlineDefault', { deadline: shareDeadline })}</small>
+				<small>
+					{t('tileShareModes.deadlineDefault', {
+						deadline: formatDeadlineDate(shareDeadline, i18n?.language),
+					})}
+				</small>
 			)}
 			{value.deadline && shareDeadline && value.deadline > shareDeadline && (
 				<p role="status">
 					{t(
 						'tileShareEdit.afterShare',
 						'This tilette is due after the share’s deadline ({{deadline}}).',
-						{ deadline: shareDeadline }
+						{ deadline: formatDeadlineDate(shareDeadline, i18n?.language) }
 					)}
 				</p>
 			)}
@@ -68,7 +73,9 @@ export default function TiletteDraftFields({
 								update({ moveShareDeadline: event.target.checked })
 							}
 						/>
-						{t('tileShareComposer.moveShareDeadline', { deadline: value.deadline })}
+						{t('tileShareComposer.moveShareDeadline', {
+							deadline: formatDeadlineDate(value.deadline, i18n?.language),
+						})}
 					</label>
 				)}
 			<TileShareLocationFields

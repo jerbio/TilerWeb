@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Assignee } from '@/core/util/tileshareAssignees';
 import AvatarCluster from '@/core/common/components/AvatarCluster';
 import AssigneeTiletteCard from './AssigneeTiletteCard';
+import { useTranslation } from 'react-i18next';
 
 type AssigneeColumnProps = {
 	assignee: Assignee;
@@ -10,25 +11,30 @@ type AssigneeColumnProps = {
 };
 
 /** One assignee lane: a name/avatar header over that person's tilette cards. */
-const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee, clusterId }) => (
-	<Column>
-		<Header>
-			<HeaderName>{assignee.name}</HeaderName>
-			<Count>{assignee.tilettes.length}</Count>
-			<AvatarCluster users={[assignee.avatar]} size={28} />
-		</Header>
-		<Cards>
-			{assignee.tilettes.map((tilette) => (
-				<AssigneeTiletteCard
-					key={tilette.id}
-					tilette={tilette}
-					clusterId={clusterId}
-					assigneeId={assignee.id}
-				/>
-			))}
-		</Cards>
-	</Column>
-);
+const AssigneeColumn: React.FC<AssigneeColumnProps> = ({ assignee, clusterId }) => {
+	const { i18n } = useTranslation();
+	return (
+		<Column>
+			<Header>
+				<HeaderName>{assignee.name}</HeaderName>
+				<Count>
+					{new Intl.NumberFormat(i18n?.language).format(assignee.tilettes.length)}
+				</Count>
+				<AvatarCluster users={[assignee.avatar]} size={28} />
+			</Header>
+			<Cards>
+				{assignee.tilettes.map((tilette) => (
+					<AssigneeTiletteCard
+						key={tilette.id}
+						tilette={tilette}
+						clusterId={clusterId}
+						assigneeId={assignee.id}
+					/>
+				))}
+			</Cards>
+		</Column>
+	);
+};
 
 const Column = styled.div`
 	display: flex;

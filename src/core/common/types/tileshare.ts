@@ -123,8 +123,9 @@ export type ClusterDetail = {
  * (RSVP state and completion percent) — see {@link deriveTileletteStatus}.
  */
 export enum TileletteStatus {
-	/** No assignee has accepted yet, so no work can be started. */
-	Todo = 'todo',
+	Unassigned = 'unassigned',
+	/** Participants are assigned, but nobody has accepted yet. */
+	Delegated = 'delegated',
 	InProgress = 'in_progress',
 	Completed = 'completed',
 }

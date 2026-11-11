@@ -9,6 +9,7 @@ export const TileShareViewerContext = createContext<{ isOwner: boolean; viewerId
 	isOwner: false,
 	viewerId: null,
 });
+export const TileShareWorkScopeContext = createContext<'all' | 'mine'>('all');
 const statuses = [
 	InvitationStatus.Accepted,
 	InvitationStatus.Declined,
@@ -17,6 +18,7 @@ const statuses = [
 ] as const;
 type Status = (typeof statuses)[number] | 'unknown';
 function statusOf(assignment: DesignatedUser): Status {
+	if (assignment.rsvpStatus === InvitationStatus.Pending) return InvitationStatus.None;
 	return statuses.find((status) => status === assignment.rsvpStatus) ?? 'unknown';
 }
 const labels: Record<Status, string> = {
@@ -34,12 +36,14 @@ const icons = {
 	unknown: CircleHelp,
 };
 function Badge({ status, count }: { status: Status; count?: number }) {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const Icon = icons[status];
 	return (
 		<Chip $status={status}>
 			<Icon size={14} aria-hidden="true" />
-			{count !== undefined && <span>{count}</span>}
+			{count !== undefined && (
+				<span>{new Intl.NumberFormat(i18n?.language).format(count)}</span>
+			)}
 			<span>{t(`tileshareRsvp.${status}`, labels[status])}</span>
 		</Chip>
 	);
@@ -66,6 +70,8 @@ export default function TiletteRsvpStatus({
 }) {
 	const { t } = useTranslation();
 	const viewer = useContext(TileShareViewerContext);
+	const scope = useContext(TileShareWorkScopeContext);
+	assigneeId ??= scope === 'mine' ? (viewer.viewerId ?? undefined) : undefined;
 	if (!viewer.viewerId) return null;
 	const assignments = validDesignatedUsers(tilette.designatedUsers);
 	if (!viewer.isOwner || assigneeId) {

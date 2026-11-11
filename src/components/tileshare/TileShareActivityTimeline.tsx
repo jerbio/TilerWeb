@@ -73,6 +73,13 @@ const actions: Record<string, string> = {
 	invitation_send_failed: 'could not send an invitation to',
 	invitation_send_unknown: 'sent an invitation with an unknown outcome for',
 };
+const sentences: Record<string, string> = {
+	...Object.fromEntries(
+		Object.entries(actions).map(([type, action]) => [type, `<actor/> ${action} <title/>`])
+	),
+	...commentSentences,
+};
+
 function appearance(type: string) {
 	if (type.startsWith('comment_')) return { Icon: MessageSquare, tone: 'neutral' as const };
 	if (['assignment_accepted', 'assignment_completed'].includes(type))
@@ -165,7 +172,13 @@ export default function TileShareActivityTimeline({
 					items: [],
 					cursor: null,
 					loading: false,
-					error: denied ? 'access' : navigator.onLine === false ? 'offline' : 'failed',
+					error: denied
+						? 'access'
+						: navigator.onLine === false
+							? 'offline'
+							: error instanceof ServerError && error.status === 503
+								? 'serviceUnavailable'
+								: 'failed',
 				});
 			}
 		},
@@ -217,6 +230,7 @@ export default function TileShareActivityTimeline({
 		access: 'This activity is no longer available to you.',
 		offline: 'You are offline. Reconnect to load activity.',
 		failed: 'Activity could not be loaded.',
+		serviceUnavailable: 'Activity is temporarily unavailable. Please try again later.',
 	};
 	return (
 		<S.Timeline
@@ -333,11 +347,11 @@ export default function TileShareActivityTimeline({
 							</S.Avatar>
 							<S.Copy>
 								<S.Sentence>
-									{known && actor && title && commentSentences[item.eventType] ? (
+									{known && actor && title && sentences[item.eventType] ? (
 										<Trans
 											t={t}
 											i18nKey={`tileshareActivity.sentences.${item.eventType}`}
-											defaults={commentSentences[item.eventType]}
+											defaults={sentences[item.eventType]}
 											components={{
 												actor: <S.Actor>{actor}</S.Actor>,
 												title: <strong>&lsquo;{title}&rsquo;</strong>,

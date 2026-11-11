@@ -8,6 +8,7 @@ import { TileshareApi } from '@/api/tileshareApi';
 import { InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
 import TileShareDialog from './TileShareDialog';
+import { useInvitationMutation } from './TileShareMutations';
 
 export const TiletteInvitationRefreshContext = createContext<(() => Promise<void>) | undefined>(
 	undefined
@@ -38,6 +39,8 @@ export default function TiletteInvitationActions({
 	reportBusy,
 }: Props) {
 	const { user } = useAuth();
+	const currentViewer = useRef(user?.id);
+	currentViewer.current = user?.id;
 	if (
 		!user?.id ||
 		!tilette.id ||
@@ -54,6 +57,7 @@ export default function TiletteInvitationActions({
 	const status = assignment.rsvpStatus;
 	if (
 		status !== InvitationStatus.None &&
+		status !== InvitationStatus.Pending &&
 		status !== InvitationStatus.Tentative &&
 		!isResolved(status)
 	)
@@ -67,6 +71,7 @@ export default function TiletteInvitationActions({
 			clusterId={clusterId}
 			name={tilette.name ?? ''}
 			currentStatus={status}
+			isCurrentViewer={() => currentViewer.current === user.id}
 			embedded={embedded}
 			compact={compact}
 			reportBusy={reportBusy}
@@ -80,6 +85,7 @@ function ResponseActions({
 	clusterId,
 	name,
 	currentStatus,
+	isCurrentViewer,
 	embedded,
 	reportBusy,
 	compact = false,
@@ -89,22 +95,17 @@ function ResponseActions({
 	clusterId: string;
 	name: string;
 	currentStatus: string | null;
+	isCurrentViewer: () => boolean;
 	embedded?: boolean;
 	reportBusy?: (busy: boolean) => void;
 	compact?: boolean;
 }) {
 	const { t } = useTranslation();
 	const refresh = useContext(TiletteInvitationRefreshContext);
-	const [state, setState] = useState<
-		| 'pending'
-		| 'resolved'
-		| 'saving'
-		| 'uncertain'
-		| 'checking'
-		| 'accepted'
-		| 'declined'
-		| 'unavailable'
-	>(isResolved(currentStatus) ? 'resolved' : 'pending');
+	const { state, setState, start } = useInvitationMutation(
+		assignmentId,
+		isResolved(currentStatus) ? 'resolved' : 'pending'
+	);
 	// Change mode: the "Change response" button revealed Accept/Decline for a resolved response.
 	const [changeOpen, setChangeOpen] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -124,13 +125,20 @@ function ResponseActions({
 		if (busy.current) return;
 		setChangeOpen(false);
 		setState((s) =>
-			s === 'accepted' || s === 'declined'
+			s === 'accepted' ||
+			s === 'declined' ||
+			s === 'saving' ||
+			s === 'checking' ||
+			(s === 'uncertain' && !isResolved(currentStatus))
 				? s
 				: isResolved(currentStatus)
 					? 'resolved'
 					: 'pending'
 		);
-	}, [currentStatus]);
+	}, [currentStatus, setState]);
+	useEffect(() => {
+		reportBusy?.(state === 'saving' || state === 'checking');
+	}, [state, reportBusy]);
 	// The confirmed-response toast is transient: after five seconds it collapses back
 	// to the badge view so the host's RSVP status is not repeated indefinitely.
 	const currentStatusRef = useRef(currentStatus);
@@ -139,12 +147,14 @@ function ResponseActions({
 		if (state !== 'accepted' && state !== 'declined') return;
 		const id = window.setTimeout(() => {
 			if (!active.current) return;
-			setState(isResolved(currentStatusRef.current) ? 'resolved' : 'pending');
+			// A failed refresh must not turn a confirmed save back into a resubmittable invite.
+			setState((previous) => (isResolved(currentStatusRef.current) ? 'resolved' : previous));
 		}, 5000);
 		return () => window.clearTimeout(id);
-	}, [state]);
+	}, [state, setState]);
 	const respond = async (status: InvitationStatus.Accepted | InvitationStatus.Declined) => {
 		if (busy.current || (state !== 'pending' && !(state === 'resolved' && changeOpen))) return;
+		if (!start()) return;
 		busy.current = true;
 		wasChange.current = isResolved(currentStatus);
 		setState('saving');
@@ -152,25 +162,24 @@ function ResponseActions({
 		reportBusy?.(true);
 		try {
 			await api.respondToInvitation(assignmentId, status);
-			if (!active.current) return;
 			setState(status);
 			window.dispatchEvent(new Event('tileshare-changed'));
-			await refresh?.().catch(() => undefined);
+			if (isCurrentViewer()) await refresh?.().catch(() => undefined);
 		} catch {
-			if (active.current) setState('uncertain');
+			setState('uncertain');
 		} finally {
 			busy.current = false;
-			reportBusy?.(false);
+			if (active.current) reportBusy?.(false);
 		}
 	};
 	const check = async () => {
 		if (busy.current) return;
+		if (!start('checking')) return;
 		busy.current = true;
 		setState('checking');
 		reportBusy?.(true);
 		try {
 			const assignment = await api.getAssignmentResponse(assignmentId);
-			if (!active.current) return;
 			if (
 				assignment.id !== assignmentId ||
 				assignment.tiletteId !== tiletteId ||
@@ -187,12 +196,12 @@ function ResponseActions({
 				setState('uncertain');
 			}
 			window.dispatchEvent(new Event('tileshare-changed'));
-			await refresh?.().catch(() => undefined);
+			if (isCurrentViewer()) await refresh?.().catch(() => undefined);
 		} catch {
-			if (active.current) setState('uncertain');
+			setState('uncertain');
 		} finally {
 			busy.current = false;
-			reportBusy?.(false);
+			if (active.current) reportBusy?.(false);
 		}
 	};
 	// The Accept/Decline options are visible while an invitation is pending or the

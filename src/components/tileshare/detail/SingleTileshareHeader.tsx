@@ -41,7 +41,7 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 	onDelete,
 }) => {
 	const theme = useTheme();
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const hasActions = !!onEdit || !!onDelete;
 
 	return (
@@ -61,7 +61,9 @@ const SingleTileshareHeader: React.FC<SingleTileshareHeaderProps> = ({
 					<DuePill>
 						<CalendarDays size={16} />
 						<DueText>
-							{t('tilesharedemo.detail.due', { date: formatDetailDate(dueDate) })}
+							{t('tilesharedemo.detail.due', {
+								date: formatDetailDate(dueDate, i18n?.language),
+							})}
 						</DueText>
 					</DuePill>
 					{/* Assignees see the due pill alone — no divider, no actions. */}

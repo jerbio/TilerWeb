@@ -53,6 +53,22 @@ beforeEach(() => {
 });
 
 describe('TileShareActivityTimeline', () => {
+	it('distinguishes service unavailability and can retry after service recovery', async () => {
+		mocks.getActivity
+			.mockRejectedValueOnce(new ServerError('Unavailable', 'activity', undefined, 503))
+			.mockResolvedValue({ items: [], nextCursor: null });
+		render(
+			<MemoryRouter>
+				<TileShareActivityTimeline ClusterId="cluster" />
+			</MemoryRouter>
+		);
+		expect(await screen.findByRole('alert')).toHaveTextContent(
+			'Activity is temporarily unavailable. Please try again later.'
+		);
+		await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
+		await screen.findByText('No activity yet.');
+		expect(mocks.getActivity).toHaveBeenCalledTimes(2);
+	});
 	it.each([
 		['comment_added', 'commented on'],
 		['comment_replied', 'replied to a comment on'],

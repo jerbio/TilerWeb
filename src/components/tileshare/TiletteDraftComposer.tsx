@@ -20,6 +20,7 @@ import TiletteDraftFields from './TiletteDraftFields';
 import TileShareDialog from './TileShareDialog';
 import TileShareDiscardDialog from './TileShareDiscardDialog';
 import { tileShareReveal, tileShareInteraction } from './tileshareMotion';
+import { formatDetailDate } from '@/core/util/tileshareDate';
 
 export default function TiletteDraftComposer({
 	value,
@@ -38,11 +39,13 @@ export default function TiletteDraftComposer({
 	participants?: string[];
 	disabled?: boolean;
 }) {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const [editing, setEditing] = useState<{ value: TiletteDraft; initial: string } | null>(null);
 	const [discard, setDiscard] = useState(false);
-	const [error, setError] = useState('');
-	const [notice, setNotice] = useState('');
+	const [error, setError] = useState<{ key: string; values?: Record<string, string> } | null>(
+		null
+	);
+	const [notice, setNotice] = useState<{ key: string; name: string } | null>(null);
 	const open = (task = newTiletteDraft()) => {
 		const copy = {
 			...task,
@@ -51,7 +54,7 @@ export default function TiletteDraftComposer({
 			moveShareDeadline: false,
 		};
 		setEditing({ value: copy, initial: JSON.stringify(copy) });
-		setError('');
+		setError(null);
 	};
 	const close = () => {
 		if (editing && JSON.stringify(editing.value) !== editing.initial) setDiscard(true);
@@ -61,16 +64,17 @@ export default function TiletteDraftComposer({
 		if (!editing || disabled) return;
 		const task = { ...editing.value, name: editing.value.name.trim() };
 		if (!task.name) {
-			setError(t('tilesharedemo.detail.add.validation.nameRequired'));
+			setError({ key: 'tilesharedemo.detail.add.validation.nameRequired' });
 			return;
 		}
 		const invalid =
 			mode === TileshareMode.Project &&
 			task.recipients.find((recipient) => !isValidRecipient(recipient));
 		if (invalid) {
-			setError(
-				t('tilesharedemo.detail.add.validation.invalidRecipient', { recipient: invalid })
-			);
+			setError({
+				key: 'tilesharedemo.detail.add.validation.invalidRecipient',
+				values: { recipient: invalid },
+			});
 			return;
 		}
 		const exists = value.some((item) => item.id === task.id);
@@ -79,9 +83,10 @@ export default function TiletteDraftComposer({
 		);
 		if (task.moveShareDeadline && task.deadline > shareDeadline)
 			onMoveShareDeadline(task.deadline);
-		setNotice(
-			t(exists ? 'tileShareComposer.updated' : 'tileShareComposer.added', { name: task.name })
-		);
+		setNotice({
+			key: exists ? 'tileShareComposer.updated' : 'tileShareComposer.added',
+			name: task.name,
+		});
 		setEditing(null);
 	};
 	const move = (index: number, offset: number) => {
@@ -128,7 +133,12 @@ export default function TiletteDraftComposer({
 							<Metadata>
 								<span>
 									<CalendarDays size={16} />
-									{task.deadline || shareDeadline}
+									{formatDetailDate(
+										new Date(
+											`${task.deadline || shareDeadline}T12:00:00`
+										).valueOf(),
+										i18n?.language
+									)}
 								</span>
 								<span>
 									<MapPin size={16} />
@@ -147,7 +157,8 @@ export default function TiletteDraftComposer({
 									{recipients.length
 										? recipients.slice(0, 2).join(', ')
 										: t('tileShareComposer.unassigned')}
-									{recipients.length > 2 && ` +${recipients.length - 2}`}
+									{recipients.length > 2 &&
+										` +${new Intl.NumberFormat(i18n?.language).format(recipients.length - 2)}`}
 								</span>
 							</People>
 							<CardActions>
@@ -175,9 +186,10 @@ export default function TiletteDraftComposer({
 									})}
 									onClick={() => {
 										onChange(value.filter((item) => item.id !== task.id));
-										setNotice(
-											t('tileShareComposer.removed', { name: task.name })
-										);
+										setNotice({
+											key: 'tileShareComposer.removed',
+											name: task.name,
+										});
 									}}
 								>
 									<Trash2 size={16} />
@@ -195,7 +207,7 @@ export default function TiletteDraftComposer({
 					</AddCard>
 				)}
 			</Grid>
-			<Notice role="status">{notice}</Notice>
+			<Notice role="status">{notice && t(notice.key, { name: notice.name })}</Notice>
 			<TileShareDialog
 				open={!!editing}
 				title={t(
@@ -222,7 +234,9 @@ export default function TiletteDraftComposer({
 							: 'tileShareComposer.projectHint'
 					)}
 				</p>
-				{error && <ErrorMessage role="alert">{error}</ErrorMessage>}
+				{error && (
+					<ErrorMessage role="alert">{t(error.key, error.values ?? {})}</ErrorMessage>
+				)}
 				{editing && (
 					<TiletteDraftFields
 						value={editing.value}

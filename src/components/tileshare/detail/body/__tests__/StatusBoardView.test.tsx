@@ -104,26 +104,27 @@ beforeEach(() => {
 });
 
 describe('StatusBoardView', () => {
-	it('renders the Todo, In progress and Completed columns', () => {
+	it('renders Unassigned, Delegated, In progress and Completed columns', () => {
 		render(<StatusBoardView tilettes={[tilette('t1')]} clusterId="c" />);
-		expect(screen.getByText('tilesharedemo.detail.status.todo')).toBeInTheDocument();
+		expect(screen.getByText('tilesharedemo.detail.status.unassigned')).toBeInTheDocument();
+		expect(screen.getByText('tilesharedemo.detail.status.delegated')).toBeInTheDocument();
 		expect(screen.getByText('tilesharedemo.detail.status.inProgress')).toBeInTheDocument();
 		expect(screen.getByText('tilesharedemo.detail.status.completed')).toBeInTheDocument();
 	});
 
-	it('places every tilette in the In progress lane while the status is stubbed', () => {
+	it('places tilettes without participants in the Unassigned lane', () => {
 		render(<StatusBoardView tilettes={[tilette('t1'), tilette('t2')]} clusterId="c" />);
 		expect(screen.getByText('t1')).toBeInTheDocument();
 		expect(screen.getByText('t2')).toBeInTheDocument();
 	});
 
-	it('shows the empty state in the Todo and Completed lanes when no tilette is there', () => {
+	it('shows the empty state in the Delegated and Completed lanes when no tilette is there', () => {
 		render(<StatusBoardView tilettes={[tilette('t1')]} clusterId="c" />);
 		const emptyStates = screen.getAllByText('tilesharedemo.detail.board.empty');
-		expect(emptyStates).toHaveLength(2);
+		expect(emptyStates).toHaveLength(3);
 	});
 
-	it('places an unaccepted tilette in the Todo lane even at 100% completion', () => {
+	it('places an unaccepted tilette in the Delegated lane even at 100% completion', () => {
 		render(
 			<StatusBoardView
 				tilettes={[tilette('t1', [assignee(InvitationStatus.None, 100)]), tilette('t2')]}
@@ -133,7 +134,7 @@ describe('StatusBoardView', () => {
 		expect(screen.getByText('t1')).toBeInTheDocument();
 		expect(screen.getByText('t2')).toBeInTheDocument();
 		// Only the Completed lane is empty.
-		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(1);
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
 	});
 
 	it('places a tilette whose assignees accepted and hit 100% in the Completed lane', () => {
@@ -144,8 +145,8 @@ describe('StatusBoardView', () => {
 			/>
 		);
 		expect(screen.getByText('t1')).toBeInTheDocument();
-		// Todo and In progress lanes are empty.
-		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
+		// Delegated and In progress lanes are empty.
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(3);
 	});
 
 	it('offers the empty In progress lane as a visible drop target while a drag hovers it', () => {
@@ -155,20 +156,20 @@ describe('StatusBoardView', () => {
 				clusterId="c"
 			/>
 		);
-		// t1 sits in Todo; In progress and Completed lanes are both empty.
-		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
+		// t1 sits in Delegated; In progress and Completed lanes are both empty.
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(3);
 		expect(screen.queryByTestId('board-drop-silhouette')).not.toBeInTheDocument();
 		const lane = columnOf('tilesharedemo.detail.status.inProgress');
 		fireEvent.dragEnter(lane);
 		expect(screen.getByText('tilesharedemo.detail.board.dropHint')).toBeInTheDocument();
 		// The hovered empty lane swaps its empty state for the drop hint.
-		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(1);
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
 		// ...and shows a card silhouette marking where the tilette will land.
 		expect(screen.getByTestId('board-drop-silhouette')).toBeInTheDocument();
 		fireEvent.dragLeave(lane);
 		expect(screen.queryByText('tilesharedemo.detail.board.dropHint')).not.toBeInTheDocument();
 		expect(screen.queryByTestId('board-drop-silhouette')).not.toBeInTheDocument();
-		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(2);
+		expect(screen.getAllByText('tilesharedemo.detail.board.empty')).toHaveLength(3);
 	});
 
 	it('shows a card silhouette at the top of a non-empty In progress lane while a drag hovers it', () => {
@@ -267,13 +268,13 @@ describe('StatusBoardView', () => {
 			screen.getByRole('tab', { name: 'tilesharedemo.detail.board.filter.mine' })
 		);
 		// Tentative still counts as an open invitation even at 100%.
-		expect(columnOf('tilesharedemo.detail.status.todo')).toHaveTextContent('todo-1');
+		expect(columnOf('tilesharedemo.detail.status.delegated')).toHaveTextContent('todo-1');
 		expect(columnOf('tilesharedemo.detail.status.inProgress')).toHaveTextContent('progress-1');
 		expect(columnOf('tilesharedemo.detail.status.completed')).toHaveTextContent('done-1');
 		expect(screen.queryByText('hidden-1')).not.toBeInTheDocument();
 	});
 
-	it("marks only the viewer's open Todo invitation as draggable", () => {
+	it("marks only the viewer's open Delegated invitation as draggable", () => {
 		render(
 			<StatusBoardView
 				tilettes={[
@@ -319,7 +320,7 @@ describe('StatusBoardView', () => {
 		expect(setData).toHaveBeenCalledWith(BOARD_DRAG_TYPE, 't1');
 	});
 
-	it('silently accepts the invitation when a Todo tilette is dropped on In progress', async () => {
+	it('silently accepts the invitation when a Delegated tilette is dropped on In progress', async () => {
 		const changed = vi.fn();
 		window.addEventListener('tileshare-changed', changed);
 		try {
@@ -418,7 +419,7 @@ describe('StatusBoardView', () => {
 		await waitFor(() =>
 			expect(screen.getByTestId('board-landing-row')).toContainElement(cardOf('t1'))
 		);
-		// A collapsing ghost holds t1's old slot in the Todo lane (before t2).
+		// A collapsing ghost holds t1's old slot in the Delegated lane (before t2).
 		const ghost = screen.getByTestId('board-leaving-placeholder');
 		expect(ghost.parentElement!.firstElementChild).toBe(ghost);
 		// ...and clears itself once the shrink/grow pair has finished.
@@ -480,7 +481,7 @@ describe('StatusBoardView', () => {
 		expect(mocks.respond).not.toHaveBeenCalled();
 	});
 
-	it('keeps the data and allows a retry when the accept request fails', async () => {
+	it('keeps the data and prevents another drag while the failed response is uncertain', async () => {
 		mocks.respond.mockRejectedValue(new Error('offline'));
 		const changed = vi.fn();
 		window.addEventListener('tileshare-changed', changed);
@@ -500,7 +501,7 @@ describe('StatusBoardView', () => {
 			fireEvent.drop(columnOf('tilesharedemo.detail.status.inProgress'), {
 				dataTransfer: { getData: () => 't1' },
 			});
-			await waitFor(() => expect(mocks.respond).toHaveBeenCalledTimes(2));
+			expect(mocks.respond).toHaveBeenCalledTimes(1);
 			expect(changed).not.toHaveBeenCalled();
 			expect(mocks.refresh).not.toHaveBeenCalled();
 		} finally {
@@ -517,7 +518,7 @@ describe('StatusBoardView', () => {
 					release = resolve;
 				})
 		);
-		// t1 is the draggable Todo tilette; t2 keeps the In progress lane
+		// t1 is the draggable Delegated tilette; t2 keeps the In progress lane
 		// non-empty so its drop silhouette lives in the card list.
 		render(
 			<TiletteInvitationRefreshContext.Provider value={mocks.refresh}>

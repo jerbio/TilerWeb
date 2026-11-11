@@ -5,8 +5,7 @@ import { CalendarDays, Pencil, Plus, Timer, Trash2 } from 'lucide-react';
 import TileShareModeIcon from '../TileShareModeIcon';
 import { TileshareMode } from '@/core/common/types/tileshare';
 import Button from '@/core/common/components/button';
-import { unixToTimeString } from '@/core/util/eventTimeConversion';
-import { formatDetailDate } from '@/core/util/tileshareDate';
+import { formatDetailDate, formatDetailTime } from '@/core/util/tileshareDate';
 import DetailHeaderCard, { HeaderSection } from './DetailHeaderCard';
 import { TILESHARE_ACCENT } from '@/components/tileshare/accents';
 import { RGB } from '@/core/util/colors';
@@ -41,7 +40,7 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 	onDelete,
 }) => {
 	const theme = useTheme();
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const hasActions = !!onEdit || !!onDelete || !!onAdd;
 
 	return (
@@ -56,9 +55,9 @@ const MultiTileshareHeader: React.FC<MultiTileshareHeaderProps> = ({
 				<>
 					<Footer>
 						<CalendarDays size={16} />
-						<ChipText>{formatDetailDate(date)}</ChipText>
+						<ChipText>{formatDetailDate(date, i18n?.language)}</ChipText>
 						<Timer size={14} />
-						<ChipText>{date ? unixToTimeString(date) : '—'}</ChipText>
+						<ChipText>{formatDetailTime(date, i18n?.language)}</ChipText>
 					</Footer>
 					{hasActions && (
 						<>

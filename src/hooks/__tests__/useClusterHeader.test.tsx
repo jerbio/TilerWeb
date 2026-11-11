@@ -12,9 +12,12 @@ describe('parent header refresh during owner edits', () => {
 		const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
 		const { result } = renderHook(() => useClusterHeader('share'));
 		await waitFor(() => expect(result.current.loading).toBe(false));
-		await act(() => result.current.refresh());
+		await act(async () => {
+			await expect(result.current.refresh()).rejects.toThrow('offline');
+		});
 		expect(result.current.data).toEqual(share);
 		expect(result.current.error).toBeNull();
+		expect(result.current.refreshError?.message).toBe('offline');
 		expect(result.current.loading).toBe(false);
 		errorLog.mockRestore();
 	});

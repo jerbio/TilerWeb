@@ -66,12 +66,76 @@ describe('useClusterDetail', () => {
 		const { result } = renderHook(() => useClusterDetail('c1'));
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		await act(async () => {
-			await result.current.refresh();
+			await expect(result.current.refresh()).rejects.toThrow('network');
 		});
 		expect(result.current.data).toEqual(detail('one'));
 		expect(result.current.error).toBeNull();
 		expect(result.current.loading).toBe(false);
+		expect(result.current.refreshError?.message).toBe('network');
 		errorSpy.mockRestore();
+	});
+	it('queues one trailing refresh for changes arriving during a request', async () => {
+		const pending = deferred<ClusterDetail>();
+		mocks.getClusterDetail
+			.mockReset()
+			.mockReturnValueOnce(pending.promise)
+			.mockResolvedValueOnce(detail('fresh'));
+		const { result } = renderHook(() => useClusterDetail('c1'));
+		act(() => {
+			window.dispatchEvent(new Event('tileshare-changed'));
+			window.dispatchEvent(new Event('tileshare-changed'));
+		});
+		await act(async () => {
+			pending.resolve(detail('old'));
+		});
+		await waitFor(() => expect(result.current.data?.cluster.name).toBe('fresh'));
+		expect(mocks.getClusterDetail).toHaveBeenCalledTimes(2);
+	});
+	it('ignores a previous share’s late response', async () => {
+		const pending = deferred<ClusterDetail>();
+		mocks.getClusterDetail
+			.mockReset()
+			.mockReturnValueOnce(pending.promise)
+			.mockResolvedValueOnce(detail('new share'));
+		const { result, rerender } = renderHook(({ id }) => useClusterDetail(id), {
+			initialProps: { id: 'old' },
+		});
+		rerender({ id: 'new' });
+		await waitFor(() => expect(result.current.data?.cluster.name).toBe('new share'));
+		await act(async () => {
+			pending.resolve(detail('old share'));
+		});
+		expect(result.current.data?.cluster.name).toBe('new share');
+	});
+	it('refreshes when returning to the document without replacing its content', async () => {
+		mocks.getClusterDetail
+			.mockReset()
+			.mockResolvedValueOnce(detail('old'))
+			.mockResolvedValueOnce(detail('updated'));
+		const { result } = renderHook(() => useClusterDetail('c1'));
+		await waitFor(() => expect(result.current.data?.cluster.name).toBe('old'));
+		Object.defineProperty(document, 'visibilityState', {
+			value: 'visible',
+			configurable: true,
+		});
+		act(() => document.dispatchEvent(new Event('visibilitychange')));
+		await waitFor(() => expect(result.current.data?.cluster.name).toBe('updated'));
+	});
+	it('does not apply an old user’s result to the same share', async () => {
+		const pending = deferred<ClusterDetail>();
+		mocks.getClusterDetail
+			.mockReset()
+			.mockReturnValueOnce(pending.promise)
+			.mockResolvedValueOnce(detail('current user'));
+		const { result, rerender } = renderHook(({ viewer }) => useClusterDetail('c1', viewer), {
+			initialProps: { viewer: 'old' },
+		});
+		rerender({ viewer: 'new' });
+		await waitFor(() => expect(result.current.data?.cluster.name).toBe('current user'));
+		await act(async () => {
+			pending.resolve(detail('old user'));
+		});
+		expect(result.current.data?.cluster.name).toBe('current user');
 	});
 
 	it('surfaces an error and no data when the initial fetch fails', async () => {
