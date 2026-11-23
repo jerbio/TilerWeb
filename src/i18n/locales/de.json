@@ -1,4 +1,4 @@
-﻿{
+{
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Standort für diese Anfrage ignoriert",
@@ -340,6 +340,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "Dein Zeitplan wird anhand von Google Kalender aktualisiert…",
+			"interrupted": "Die Kalenderaktualisierung wurde unterbrochen. Wiederherstellung wird geprüft.",
 			"processing": "Ihr Kalender wird aktualisiert…",
 			"retrying": "Die Kalenderaktualisierungen konnten nicht abgeschlossen werden. Ein neuer Versuch wird gestartet…",
 			"failed": "Die Kalenderaktualisierungen konnten nicht abgeschlossen werden.",
@@ -1423,6 +1425,16 @@
 		"goBack": "Zurück"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "In Google Kalender veröffentlichen",
+			"description": "Veröffentliche geplante Kacheln in einem eigenen Tiler-Kalender in diesem Konto. Der Zeitraum wird automatisch erweitert. Änderungen und Löschungen an exportierten Terminen in Google werden auch in Tiler übernommen.",
+			"enable": "Meinen Tiler-Zeitplan veröffentlichen",
+			"days": "Tage vor und nach jetzt",
+			"save": "Veröffentlichungseinstellungen speichern",
+			"saving": "Wird gespeichert…",
+			"error": "Die Veröffentlichungseinstellungen konnten nicht geladen oder gespeichert werden. Bitte versuche es erneut.",
+			"retry": "Erneut versuchen"
+		},
 		"title": "Einstellungen",
 		"back": "Zurück",
 		"logout": "Abmelden",

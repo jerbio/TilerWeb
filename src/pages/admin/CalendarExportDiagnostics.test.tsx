@@ -3,11 +3,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@/test/test-utils';
 import CalendarExportDiagnostics from './CalendarExportDiagnostics';
 
-const api = vi.hoisted(() => ({ list: vi.fn(), retry: vi.fn() }));
+const api = vi.hoisted(() => ({
+	list: vi.fn(),
+	retry: vi.fn(),
+	audit: vi.fn(),
+	repair: vi.fn(),
+	reuseDestination: vi.fn(),
+	cleanupDestinations: vi.fn(),
+}));
 vi.mock('@/api/calendarExportDiagnosticsApi', () => ({
 	CalendarExportDiagnosticsApi: class {
 		list = api.list;
 		retry = api.retry;
+		audit = api.audit;
+		repair = api.repair;
+		reuseDestination = api.reuseDestination;
+		cleanupDestinations = api.cleanupDestinations;
 	},
 }));
 const record = {
@@ -35,10 +46,122 @@ const acknowledgment = {
 };
 
 describe('CalendarExportDiagnostics', () => {
+	it('makes uncertain creation visible for engineering review', async () => {
+		api.list.mockResolvedValueOnce([{ ...record, destinationLifecycle: 'Creating' }]);
+		render(<CalendarExportDiagnostics />);
+		fireEvent.change(screen.getByLabelText('Tiler user ID'), { target: { value: 'user' } });
+		fireEvent.click(screen.getByRole('button', { name: 'Inspect / refresh' }));
+		expect(await screen.findByText(/Creation outcome requires review/)).toBeInTheDocument();
+		expect(api.retry).not.toHaveBeenCalled();
+	});
+	it('shows lingering destinations and queues reviewed association without native retry', async () => {
+		api.audit.mockResolvedValueOnce([
+			{
+				configurationId: 'configuration',
+				counts: {},
+				discrepancies: [],
+				destinations: [
+					{
+						calendarId: 'legacy-calendar',
+						authenticationId: 'account',
+						configurationId: 'old',
+						classification: 'LegacyUnverified',
+						ownershipEvidence: 'MarkerOnly',
+						eventCount: 2,
+						verifiedCopies: 0,
+						unresolvedEvents: 2,
+						cleanupEligible: false,
+					},
+				],
+			},
+		]);
+		api.reuseDestination.mockResolvedValueOnce(undefined);
+		render(<CalendarExportDiagnostics />);
+		fireEvent.change(screen.getByLabelText('Tiler user ID'), { target: { value: 'user' } });
+		fireEvent.click(screen.getByRole('button', { name: 'Inspect / refresh' }));
+		fireEvent.click(await screen.findByRole('button', { name: 'Audit' }));
+		expect(await screen.findByText('legacy-calendar')).toBeInTheDocument();
+		fireEvent.click(screen.getByRole('button', { name: 'Reuse destination' }));
+		await waitFor(() =>
+			expect(api.reuseDestination).toHaveBeenCalledExactlyOnceWith(
+				'user',
+				'account',
+				'legacy-calendar'
+			)
+		);
+		expect(api.retry).not.toHaveBeenCalled();
+	});
 	beforeEach(() => {
 		vi.clearAllMocks();
 		api.list.mockResolvedValue([record]);
 		api.retry.mockResolvedValue(acknowledgment);
+		api.audit.mockResolvedValue([
+			{
+				configurationId: 'configuration',
+				repairStart: '2026-11-01T00:00:00Z',
+				repairEnd: '2026-11-15T00:00:00Z',
+				counts: { CompletedNative: 1 },
+				discrepancies: [
+					{
+						nativeEventId: 'native',
+						providerEventId: 'google',
+						reason: 'CompletedNative',
+						repairEligible: true,
+					},
+				],
+			},
+		]);
+		api.repair.mockResolvedValue(acknowledgment);
+	});
+	it('audits without queuing repair or native synchronization and displays reasons', async () => {
+		render(<CalendarExportDiagnostics />);
+		fireEvent.change(screen.getByLabelText('Tiler user ID'), { target: { value: 'user' } });
+		fireEvent.click(screen.getByRole('button', { name: 'Inspect / refresh' }));
+		fireEvent.click(await screen.findByRole('button', { name: 'Audit' }));
+		expect(
+			await screen.findByRole('region', { name: 'Export audit results' })
+		).toHaveTextContent('CompletedNative');
+		expect(api.audit).toHaveBeenCalledExactlyOnceWith('user');
+		expect(api.repair).not.toHaveBeenCalled();
+		expect(api.retry).not.toHaveBeenCalled();
+	});
+	it('queues repair independently of native retry and refreshes diagnostics', async () => {
+		render(<CalendarExportDiagnostics />);
+		fireEvent.change(screen.getByLabelText('Tiler user ID'), { target: { value: 'user' } });
+		fireEvent.click(screen.getByRole('button', { name: 'Inspect / refresh' }));
+		fireEvent.click(await screen.findByRole('button', { name: 'Repair now' }));
+		expect(await screen.findByRole('status')).toHaveTextContent('Export repair queued');
+		expect(api.repair).toHaveBeenCalledExactlyOnceWith('user');
+		expect(api.retry).not.toHaveBeenCalled();
+		await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
+	});
+	it('blocks overlapping admin actions while an audit is pending', async () => {
+		let finish!: (value: unknown) => void;
+		api.audit.mockReturnValueOnce(
+			new Promise((resolve) => {
+				finish = resolve;
+			})
+		);
+		render(<CalendarExportDiagnostics />);
+		fireEvent.change(screen.getByLabelText('Tiler user ID'), { target: { value: 'user' } });
+		fireEvent.click(screen.getByRole('button', { name: 'Inspect / refresh' }));
+		fireEvent.click(await screen.findByRole('button', { name: 'Audit' }));
+		expect(screen.getByRole('button', { name: 'Repair now' })).toBeDisabled();
+		expect(screen.getByRole('button', { name: 'Retry sync and export' })).toBeDisabled();
+		expect(screen.getByLabelText('Tiler user ID')).toBeDisabled();
+		await act(async () => finish([]));
+	});
+	it('never repeats an uncertain repair request automatically', async () => {
+		api.repair.mockRejectedValueOnce(new Error('unavailable'));
+		render(<CalendarExportDiagnostics />);
+		fireEvent.change(screen.getByLabelText('Tiler user ID'), { target: { value: 'user' } });
+		fireEvent.click(screen.getByRole('button', { name: 'Inspect / refresh' }));
+		fireEvent.click(await screen.findByRole('button', { name: 'Repair now' }));
+		expect(await screen.findByRole('alert')).toHaveTextContent(
+			'Could not confirm the repair request'
+		);
+		expect(api.repair).toHaveBeenCalledTimes(1);
+		expect(api.retry).not.toHaveBeenCalled();
 	});
 	it('queues the inspected user only after an explicit click and then refreshes diagnostics', async () => {
 		render(<CalendarExportDiagnostics />);

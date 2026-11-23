@@ -1,18 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SignalRService, Hubs } from '@/services/SocketService';
-import { CalendarSyncClient, type CalendarSyncState } from '@/services/calendarSyncClient';
+import {
+	CalendarSyncClient,
+	type CalendarSyncActivity,
+	type CalendarSyncState,
+} from '@/services/calendarSyncClient';
 import { CalendarSyncApi } from '@/api/calendarSyncApi';
 import useAppStore from '@/global_state';
 
 /** Uses the existing socket, refreshing committed changes and recovering missed updates after reconnect. */
-export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) {
+export function useScheduleSocket(
+	onScheduleChange: () => void | boolean | Promise<void | boolean>
+) {
 	const authenticated = useAppStore((state) => state.activeSessionType === 'authenticated');
 	const userId = useAppStore((state) =>
 		state.activeSessionType === 'anonymous'
 			? state.anonymousPersonaSession?.userId
 			: state.authenticatedPersonaSession?.userId
 	);
+	const [activity, setActivity] = useState<CalendarSyncActivity | null>(null);
+	const [stateOwner, setStateOwner] = useState<string | null>(null);
 	const [status, setStatus] = useState<CalendarSyncState | null>(null);
+	const [showFailure, setShowFailure] = useState(false);
 	const [recoveryError, setRecoveryError] = useState(false);
 	const [refreshError, setRefreshError] = useState(false);
 	const [readyOwner, setReadyOwner] = useState<string | null>(null);
@@ -22,6 +31,9 @@ export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) 
 
 	useEffect(() => {
 		setStatus(null);
+		setShowFailure(false);
+		setActivity(null);
+		setStateOwner(userId ?? null);
 		setRecoveryError(false);
 		setRefreshError(false);
 		setReadyOwner(null);
@@ -73,6 +85,8 @@ export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) 
 			readStatus: () => api.getStatus(),
 			refresh: () => onChangeRef.current(),
 			status: setStatus,
+			failureVisibility: setShowFailure,
+			activity: setActivity,
 			recoveryError: setRecoveryError,
 			refreshError: setRefreshError,
 		});
@@ -114,14 +128,19 @@ export function useScheduleSocket(onScheduleChange: () => void | Promise<void>) 
 		};
 	}, [userId, authenticated]);
 
+	const retry = useCallback(() => {
+		clientRef.current?.refresh();
+		void clientRef.current?.recover();
+	}, []);
+	const ownsState = stateOwner === userId;
 	return {
 		ready: !authenticated || !userId || readyOwner === userId,
-		status,
-		recoveryError,
-		refreshError,
-		retry: () => {
-			clientRef.current?.refresh();
-			void clientRef.current?.recover();
-		},
+		ownerId: authenticated ? (userId ?? null) : null,
+		status: ownsState ? status : null,
+		showFailure: ownsState && showFailure,
+		activity: ownsState ? activity : null,
+		recoveryError: ownsState && recoveryError,
+		refreshError: ownsState && refreshError,
+		retry,
 	};
 }

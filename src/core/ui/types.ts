@@ -1,6 +1,12 @@
 export type NotificationType = 'loading' | 'success' | 'error' | 'info';
 
-export interface AppNotification {
+export interface NotificationOptions {
+	/** Active system activity cannot be dismissed by the user or evicted by ordinary notifications. */
+	dismissible?: boolean;
+	action?: { label: string; onClick: () => void };
+}
+
+export interface AppNotification extends NotificationOptions {
 	/** Unique identifier — allows targeted updates (e.g. from WebSocket) */
 	id: string;
 	/** Display message */

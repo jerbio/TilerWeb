@@ -1,10 +1,14 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, screen, waitFor } from '@testing-library/react';
+import { render } from '@/test/test-utils';
 import { useRef } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import dayjs from 'dayjs';
 import { useScheduleSocket } from './useScheduleSocket';
 import usePrefetchedCalendarData from '@/core/common/hooks/usePrefetchedCalendarEvents';
 import type { SubCalendarEvent } from '@/core/common/types/schedule';
+import { CalendarSyncNotice } from '@/core/common/components/calendar/CalendarSyncNotice';
+import NotificationToast from '@/core/ui/NotificationToast';
+import useUiStore from '@/core/ui/uiStore';
 import {
 	deferred,
 	flushSyncClient,
@@ -35,6 +39,9 @@ vi.mock('@/services', () => ({
 	scheduleService: { lookupScheduleByUserId: (...args: unknown[]) => mocks.lookup(...args) },
 }));
 vi.mock('@/config/demo_config', () => ({ isDemoMode: () => false }));
+vi.mock('react-i18next', () => ({
+	useTranslation: () => ({ t: (_key: string, fallback: string) => fallback }),
+}));
 vi.mock('@/services/SocketService', () => ({
 	Hubs: {
 		ScheduleChange: {
@@ -90,6 +97,97 @@ describe('schedule socket hook', () => {
 		mocks.services.length = 0;
 		mocks.state.activeSessionType = 'authenticated';
 		mocks.state.authenticatedPersonaSession = { userId: 'owner' };
+		useUiStore.getState().notification.clear();
+	});
+
+	it('keeps recovered failure history separate from a current failure notice', async () => {
+		mocks.read.mockResolvedValue(
+			syncStatus({ state: 'failed', errorCode: 'CalculationFailed', willRetry: false })
+		);
+		const { result, unmount } = renderHook(() => useScheduleSocket(vi.fn()));
+		await waitFor(() => expect(result.current.status?.state).toBe('failed'));
+		expect(result.current.showFailure).toBe(false);
+		act(() =>
+			mocks.services[0].subs.get('calendarSyncUpdated')!(
+				syncUpdate('started', { attempt: 2 })
+			)
+		);
+		act(() =>
+			mocks.services[0].subs.get('calendarSyncUpdated')!(
+				syncUpdate('failed', { attempt: 2, willRetry: false })
+			)
+		);
+		expect(result.current.showFailure).toBe(true);
+		unmount();
+	});
+
+	it('does not recreate the historical toast on page remount but shows a new calculation failure', async () => {
+		mocks.read.mockResolvedValue(
+			syncStatus({
+				state: 'failed',
+				generation: 27,
+				requestedGeneration: 27,
+				completedGeneration: 26,
+				attempt: 5,
+				errorCode: 'CalculationFailed',
+				willRetry: false,
+			})
+		);
+		function Calendar() {
+			const sync = useScheduleSocket(vi.fn());
+			return (
+				<>
+					<CalendarSyncNotice {...sync} />
+					<NotificationToast />
+				</>
+			);
+		}
+		const first = render(<Calendar />);
+		await act(flushSyncClient);
+		expect(screen.queryByTestId('notification-toast')).not.toBeInTheDocument();
+		first.unmount();
+		const second = render(<Calendar />);
+		await act(flushSyncClient);
+		expect(screen.queryByTestId('notification-toast')).not.toBeInTheDocument();
+		const socket = mocks.services[1];
+		act(() =>
+			socket.subs.get('calendarSyncUpdated')!({
+				...syncUpdate('started', { generation: 28 }),
+				state: 'progress',
+				activity: 'recalculating',
+				sequence: 2,
+			})
+		);
+		expect(screen.getByTestId('notification-icon-loading')).toBeInTheDocument();
+		act(() =>
+			socket.subs.get('calendarSyncUpdated')!(
+				syncUpdate('failed', {
+					generation: 28,
+					sequence: 3,
+					errorCode: 'CalculationFailed',
+					willRetry: false,
+				})
+			)
+		);
+		expect(screen.getByText('Calendar updates could not be completed.')).toBeInTheDocument();
+		expect(screen.queryByTestId('notification-icon-loading')).not.toBeInTheDocument();
+		second.unmount();
+	});
+
+	it('does not carry a current failure notice across an account change', async () => {
+		const { result, rerender, unmount } = renderHook(() => useScheduleSocket(vi.fn()));
+		act(() =>
+			mocks.services[0].subs.get('calendarSyncUpdated')!(
+				syncUpdate('failed', { willRetry: false })
+			)
+		);
+		expect(result.current.showFailure).toBe(true);
+		mocks.state.authenticatedPersonaSession = { userId: 'other-owner' };
+		rerender();
+		expect(result.current.showFailure).toBe(false);
+		await act(flushSyncClient);
+		expect(result.current.showFailure).toBe(false);
+		unmount();
 	});
 
 	it('listens for status and refresh on one shared service and deduplicates completion', async () => {

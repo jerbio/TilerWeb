@@ -340,6 +340,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "Google 캘린더의 변경 사항으로 일정을 업데이트하는 중…",
+			"interrupted": "캘린더 업데이트가 중단되었습니다. 복구 상태를 확인하고 있습니다.",
 			"processing": "캘린더를 업데이트하고 있습니다…",
 			"retrying": "캘린더 업데이트를 완료하지 못했습니다. 다시 시도하고 있습니다…",
 			"failed": "캘린더 업데이트를 완료하지 못했습니다.",
@@ -1423,6 +1425,16 @@
 		"goBack": "뒤로 가기"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "Google Calendar에 게시",
+			"description": "이 계정의 Tiler 전용 캘린더에 예약된 타일을 게시합니다. 게시 기간은 자동으로 연장됩니다. Google에서 내보낸 일정을 변경하거나 삭제하면 Tiler에도 반영됩니다.",
+			"enable": "내 Tiler 일정 게시",
+			"days": "현재 시점 전후의 일수",
+			"save": "게시 설정 저장",
+			"saving": "저장 중…",
+			"error": "게시 설정을 불러오거나 저장하지 못했습니다. 다시 시도해 주세요.",
+			"retry": "다시 시도"
+		},
 		"title": "설정",
 		"back": "뒤로",
 		"logout": "로그아웃",

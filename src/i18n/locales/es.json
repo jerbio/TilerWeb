@@ -340,6 +340,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "Actualizando tu horario desde Google Calendar…",
+			"interrupted": "La actualización del calendario se interrumpió. Comprobando la recuperación.",
 			"processing": "Actualizando tu calendario…",
 			"retrying": "No se pudieron completar las actualizaciones del calendario. Intentándolo de nuevo…",
 			"failed": "No se pudieron completar las actualizaciones del calendario.",
@@ -1423,6 +1425,16 @@
 		"goBack": "Volver"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "Publicar en Google Calendar",
+			"description": "Publica los bloques programados en un calendario exclusivo de Tiler en esta cuenta. El intervalo se amplía automáticamente. Los cambios y las eliminaciones que hagas en los eventos exportados en Google también se aplican en Tiler.",
+			"enable": "Publicar mi horario de Tiler",
+			"days": "Días antes y después de ahora",
+			"save": "Guardar ajustes de publicación",
+			"saving": "Guardando…",
+			"error": "No se pudieron cargar o guardar los ajustes de publicación. Inténtalo de nuevo.",
+			"retry": "Intentar de nuevo"
+		},
 		"title": "Configuración",
 		"back": "Atrás",
 		"logout": "Cerrar sesión",

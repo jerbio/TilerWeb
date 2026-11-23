@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, Loader2, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 import useUiStore from './uiStore';
@@ -20,54 +20,40 @@ const iconForType = (type: NotificationType) => {
 const NotificationToast: React.FC = () => {
 	const notifications = useUiStore((s) => s.notification.items);
 	const dismiss = useUiStore((s) => s.notification.dismiss);
-	const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-
-	const scheduleAutoDismiss = useCallback(
-		(id: string, ms: number) => {
-			// Clear any existing timer for this id
-			const existing = timersRef.current.get(id);
-			if (existing) clearTimeout(existing);
-
-			const timer = setTimeout(() => {
-				dismiss(id);
-				timersRef.current.delete(id);
-			}, ms);
-			timersRef.current.set(id, timer);
-		},
-		[dismiss]
+	const timersRef = useRef(
+		new Map<string, { timer: ReturnType<typeof setTimeout>; updatedAt: number }>()
 	);
 
 	useEffect(() => {
-		notifications.forEach((n) => {
-			if (n.autoDismissMs !== null && !timersRef.current.has(n.id)) {
-				scheduleAutoDismiss(n.id, n.autoDismissMs);
-			}
-		});
-
-		// Clean up timers for notifications that no longer exist
-		const currentIds = new Set(notifications.map((n) => n.id));
-		timersRef.current.forEach((timer, id) => {
+		const timers = timersRef.current;
+		const currentIds = new Set(notifications.map((notification) => notification.id));
+		timers.forEach(({ timer }, id) => {
 			if (!currentIds.has(id)) {
 				clearTimeout(timer);
-				timersRef.current.delete(id);
+				timers.delete(id);
 			}
 		});
-	}, [notifications, scheduleAutoDismiss]);
-
-	// When a notification transitions (e.g. loading → success), reschedule timer
-	useEffect(() => {
-		notifications.forEach((n) => {
-			if (n.autoDismissMs !== null) {
-				// Always reschedule when updatedAt changes
-				scheduleAutoDismiss(n.id, n.autoDismissMs);
+		notifications.forEach((notification) => {
+			const existing = timers.get(notification.id);
+			if (notification.autoDismissMs === null || notification.dismissible === false) {
+				if (existing) clearTimeout(existing.timer);
+				timers.delete(notification.id);
+			} else if (!existing || existing.updatedAt !== notification.updatedAt) {
+				if (existing) clearTimeout(existing.timer);
+				const timer = setTimeout(() => {
+					timers.delete(notification.id);
+					dismiss(notification.id);
+				}, notification.autoDismissMs);
+				timers.set(notification.id, { timer, updatedAt: notification.updatedAt });
 			}
 		});
-	}, [notifications.map((n) => `${n.id}:${n.updatedAt}`).join(','), scheduleAutoDismiss]);
+	}, [notifications, dismiss]);
 
-	// Cleanup all timers on unmount
 	useEffect(() => {
+		const timers = timersRef.current;
 		return () => {
-			timersRef.current.forEach((timer) => clearTimeout(timer));
+			timers.forEach(({ timer }) => clearTimeout(timer));
+			timers.clear();
 		};
 	}, []);
 
@@ -76,16 +62,29 @@ const NotificationToast: React.FC = () => {
 	return (
 		<ToastContainer data-testid="notification-toast-container">
 			{notifications.map((n) => (
-				<Toast key={n.id} $type={n.type} data-testid="notification-toast">
+				<Toast
+					key={n.id}
+					$type={n.type}
+					data-testid="notification-toast"
+					role="status"
+					aria-live="polite"
+				>
 					<IconWrapper $type={n.type}>{iconForType(n.type)}</IconWrapper>
 					<ToastMessage data-testid="notification-message">{n.message}</ToastMessage>
-					<DismissBtn
-						data-testid="notification-dismiss"
-						onClick={() => dismiss(n.id)}
-						aria-label="Dismiss notification"
-					>
-						<X size={14} />
-					</DismissBtn>
+					{n.action && (
+						<ActionBtn type="button" onClick={n.action.onClick}>
+							{n.action.label}
+						</ActionBtn>
+					)}
+					{n.dismissible !== false && (
+						<DismissBtn
+							data-testid="notification-dismiss"
+							onClick={() => dismiss(n.id)}
+							aria-label="Dismiss notification"
+						>
+							<X size={14} />
+						</DismissBtn>
+					)}
 				</Toast>
 			))}
 		</ToastContainer>
@@ -189,3 +188,13 @@ const DismissBtn = styled.button`
 `;
 
 export default NotificationToast;
+
+const ActionBtn = styled.button`
+	border: none;
+	background: transparent;
+	color: ${({ theme }) => theme.colors.text.primary};
+	cursor: pointer;
+	font-size: 12px;
+	text-decoration: underline;
+	flex-shrink: 0;
+`;

@@ -1,6 +1,13 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render as renderComponent, screen, waitFor } from '@testing-library/react';
+import { ThemeProvider } from 'styled-components';
+import { darkTheme } from '@/core/theme/dark';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GoogleCalendarExportSettings } from './GoogleCalendarExportSettings';
+
+const render = (ui: Parameters<typeof renderComponent>[0]) =>
+	renderComponent(ui, {
+		wrapper: ({ children }) => <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>,
+	});
 
 const api = vi.hoisted(() => ({ list: vi.fn(), configure: vi.fn() }));
 vi.mock('@/api/googleCalendarExportApi', () => ({
@@ -36,14 +43,19 @@ describe('GoogleCalendarExportSettings', () => {
 	});
 	it('requires explicit opt-in and persists the horizon on the selected linked account', async () => {
 		render(<GoogleCalendarExportSettings authenticationId="account" />);
-		const enabled = await screen.findByRole('checkbox');
-		expect(enabled).not.toBeChecked();
+		const enabled = await screen.findByRole('button', { name: 'Publish my Tiler schedule' });
+		expect(enabled).toHaveAttribute('aria-pressed', 'false');
 		expect(screen.getByRole('spinbutton')).toHaveValue(7);
 		expect(api.configure).not.toHaveBeenCalled();
 		fireEvent.click(enabled);
 		fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '14' } });
 		fireEvent.click(screen.getByRole('button', { name: 'Save publishing settings' }));
 		await waitFor(() => expect(api.configure).toHaveBeenCalledWith('account', true, 14));
+	});
+	it('explains that the saved days cover both sides of the current time', async () => {
+		render(<GoogleCalendarExportSettings authenticationId="account" />);
+		const days = await screen.findByRole('spinbutton', { name: 'Days before and after now' });
+		expect(days).toHaveValue(7);
 	});
 	it('hides the controls when the server rollout is disabled', async () => {
 		api.list.mockResolvedValue(null);
@@ -61,7 +73,9 @@ describe('GoogleCalendarExportSettings', () => {
 			}),
 		]);
 		render(<GoogleCalendarExportSettings authenticationId="account" />);
-		expect(await screen.findByRole('checkbox')).toBeChecked();
+		expect(
+			await screen.findByRole('button', { name: 'Publish my Tiler schedule' })
+		).toHaveAttribute('aria-pressed', 'true');
 		expect(screen.getByRole('spinbutton')).toHaveValue(14);
 		expect(screen.queryByRole('status')).not.toBeInTheDocument();
 		expect(screen.queryByText(/Published through/)).not.toBeInTheDocument();
@@ -69,7 +83,7 @@ describe('GoogleCalendarExportSettings', () => {
 	it('does not save out-of-range horizons and preserves a failed save for retry', async () => {
 		api.configure.mockRejectedValue(new Error('unavailable'));
 		render(<GoogleCalendarExportSettings authenticationId="account" />);
-		await screen.findByRole('checkbox');
+		await screen.findByRole('button', { name: 'Publish my Tiler schedule' });
 		fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '0' } });
 		expect(screen.getByRole('button', { name: 'Save publishing settings' })).toBeDisabled();
 		fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '10' } });
@@ -88,16 +102,19 @@ describe('GoogleCalendarExportSettings', () => {
 			.mockResolvedValueOnce([]);
 		const view = render(<GoogleCalendarExportSettings key="old" authenticationId="old" />);
 		view.rerender(<GoogleCalendarExportSettings key="new" authenticationId="new" />);
-		await screen.findByRole('checkbox');
+		await screen.findByRole('button', { name: 'Publish my Tiler schedule' });
 		await act(async () =>
 			finish([status({ authenticationId: 'old', enabled: true, horizonDays: 30 })])
 		);
-		expect(screen.getByRole('checkbox')).not.toBeChecked();
+		expect(screen.getByRole('button', { name: 'Publish my Tiler schedule' })).toHaveAttribute(
+			'aria-pressed',
+			'false'
+		);
 		expect(screen.getByRole('spinbutton')).toHaveValue(7);
 	});
 	it('does not poll publication outcomes or refresh on visibility changes', async () => {
 		render(<GoogleCalendarExportSettings authenticationId="account" />);
-		await screen.findByRole('checkbox');
+		await screen.findByRole('button', { name: 'Publish my Tiler schedule' });
 		vi.useFakeTimers();
 		try {
 			await act(async () => {

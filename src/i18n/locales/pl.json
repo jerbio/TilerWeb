@@ -340,6 +340,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "Aktualizowanie harmonogramu na podstawie Kalendarza Google…",
+			"interrupted": "Aktualizacja kalendarza została przerwana. Sprawdzanie możliwości wznowienia.",
 			"processing": "Aktualizowanie kalendarza…",
 			"retrying": "Nie udało się ukończyć aktualizacji kalendarza. Ponawianie próby…",
 			"failed": "Nie udało się ukończyć aktualizacji kalendarza.",
@@ -1423,6 +1425,16 @@
 		"goBack": "Wróć"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "Publikuj w Kalendarzu Google",
+			"description": "Publikuj zaplanowane kafelki w osobnym kalendarzu Tiler na tym koncie. Okres jest automatycznie wydłużany. Zmiany i usunięcia wyeksportowanych wydarzeń w Google są również uwzględniane w Tiler.",
+			"enable": "Publikuj mój harmonogram Tiler",
+			"days": "Liczba dni przed i po bieżącym czasie",
+			"save": "Zapisz ustawienia publikowania",
+			"saving": "Zapisywanie…",
+			"error": "Nie udało się wczytać lub zapisać ustawień publikowania. Spróbuj ponownie.",
+			"retry": "Spróbuj ponownie"
+		},
 		"title": "Ustawienia",
 		"back": "Wstecz",
 		"logout": "Wyloguj się",

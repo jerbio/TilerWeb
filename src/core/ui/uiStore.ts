@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
 	AppNotification,
 	NotificationType,
+	NotificationOptions,
 	MAX_VISIBLE_NOTIFICATIONS,
 	DEFAULT_AUTO_DISMISS_MS,
 } from './types';
@@ -18,7 +19,8 @@ interface NotificationSlice {
 		id: string,
 		message: string,
 		type: NotificationType,
-		autoDismissMs?: number | null
+		autoDismissMs?: number | null,
+		options?: NotificationOptions
 	) => void;
 	/**
 	 * Update an existing notification (e.g. transition loading → success).
@@ -28,7 +30,8 @@ interface NotificationSlice {
 		id: string,
 		message: string,
 		type: NotificationType,
-		autoDismissMs?: number | null
+		autoDismissMs?: number | null,
+		options?: NotificationOptions
 	) => void;
 	/** Dismiss (remove) a notification by id. */
 	dismiss: (id: string) => void;
@@ -49,7 +52,7 @@ const useUiStore = create<UiState>((set) => ({
 	notification: {
 		items: [],
 
-		show: (id, message, type, autoDismissMs?) => {
+		show: (id, message, type, autoDismissMs?, options?) => {
 			set((state) => {
 				const current = state.notification.items;
 				const existing = current.findIndex((n) => n.id === id);
@@ -57,7 +60,12 @@ const useUiStore = create<UiState>((set) => ({
 					id,
 					message,
 					type,
-					autoDismissMs: resolveAutoDismiss(type, autoDismissMs),
+					autoDismissMs:
+						options?.dismissible === false
+							? null
+							: resolveAutoDismiss(type, autoDismissMs),
+					dismissible: options?.dismissible ?? true,
+					action: options?.action,
 					updatedAt: Date.now(),
 				};
 
@@ -69,15 +77,17 @@ const useUiStore = create<UiState>((set) => ({
 					next = [...current, notification];
 				}
 
-				if (next.length > MAX_VISIBLE_NOTIFICATIONS) {
-					next = next.slice(next.length - MAX_VISIBLE_NOTIFICATIONS);
+				while (next.length > MAX_VISIBLE_NOTIFICATIONS) {
+					const removable = next.findIndex((item) => item.dismissible !== false);
+					if (removable < 0) break;
+					next.splice(removable, 1);
 				}
 
 				return { notification: { ...state.notification, items: next } };
 			});
 		},
 
-		update: (id, message, type, autoDismissMs?) => {
+		update: (id, message, type, autoDismissMs?, options?) => {
 			set((state) => {
 				const current = state.notification.items;
 				const idx = current.findIndex((n) => n.id === id);
@@ -88,7 +98,12 @@ const useUiStore = create<UiState>((set) => ({
 					...next[idx],
 					message,
 					type,
-					autoDismissMs: resolveAutoDismiss(type, autoDismissMs),
+					autoDismissMs:
+						(options?.dismissible ?? next[idx].dismissible) === false
+							? null
+							: resolveAutoDismiss(type, autoDismissMs),
+					dismissible: options?.dismissible ?? next[idx].dismissible ?? true,
+					action: options ? options.action : next[idx].action,
 					updatedAt: Date.now(),
 				};
 				return { notification: { ...state.notification, items: next } };

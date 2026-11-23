@@ -46,6 +46,9 @@ export function CalendarWrapper({
 		enabled: calendarSync.ready,
 	});
 	refreshCalendar.current = refetchEvents;
+	const refreshWithoutResult = useCallback(async () => {
+		await refetchEvents();
+	}, [refetchEvents]);
 
 	const hasRouter = useInRouterContext();
 
@@ -166,7 +169,7 @@ export function CalendarWrapper({
 				events={renderedEvents}
 				eventsLoading={loading}
 				viewRef={viewRef}
-				refetchEvents={refetchEvents}
+				refetchEvents={refreshWithoutResult}
 				allowEventLookup={allowEventLookup}
 				simulationClassification={showOverlay ? diff!.classification : undefined}
 				onSimulatedTileClick={showOverlay ? onSimulatedTileClick : undefined}

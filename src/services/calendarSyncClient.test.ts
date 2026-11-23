@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	CalendarSyncClient,
 	CalendarSyncCursor,
@@ -108,11 +108,90 @@ function setup() {
 		status: vi.fn(),
 		recoveryError: vi.fn(),
 		refreshError: vi.fn(),
+		failureVisibility: vi.fn(),
 	};
 	return { ...options, client: new CalendarSyncClient(options) };
 }
 
 describe('calendar sync client recovery and refresh coordination', () => {
+	it('keeps a historical failed snapshot as status without announcing a new failure', async () => {
+		const { client, readStatus, status, failureVisibility } = setup();
+		const failed = syncStatus({
+			state: 'failed',
+			errorCode: 'CalculationFailed',
+			willRetry: false,
+			generation: 27,
+			requestedGeneration: 27,
+			completedGeneration: 26,
+			attempt: 5,
+			updatedAt: '2026-11-11T19:02:23Z',
+		});
+		readStatus.mockResolvedValue(failed);
+		await client.recover({ refresh: false, seedCursor: false });
+		expect(status).toHaveBeenLastCalledWith(failed);
+		expect(failureVisibility).toHaveBeenLastCalledWith(false);
+		await client.recover({ refresh: false, seedCursor: false });
+		client.receive(
+			syncUpdate('failed', {
+				generation: 27,
+				attempt: 5,
+				errorCode: 'CalculationFailed',
+				willRetry: false,
+			})
+		);
+		expect(failureVisibility.mock.calls.every(([visible]) => visible === false)).toBe(true);
+		client.dispose();
+	});
+
+	it('announces a failure recovered after observing an active attempt', async () => {
+		const { client, readStatus, failureVisibility } = setup();
+		client.receive(syncUpdate('started'));
+		readStatus.mockResolvedValue(
+			syncStatus({ state: 'failed', errorCode: 'CalculationFailed', willRetry: false })
+		);
+		await client.recover({ refresh: false });
+		expect(failureVisibility).toHaveBeenLastCalledWith(true);
+		client.dispose();
+	});
+
+	it('announces a newer missed failure on reconnect after establishing an earlier baseline', async () => {
+		const { client, readStatus, failureVisibility } = setup();
+		await client.recover({ refresh: false, seedCursor: false });
+		readStatus.mockResolvedValue(
+			syncStatus({
+				state: 'failed',
+				generation: 2,
+				requestedGeneration: 2,
+				errorCode: 'ProviderUnavailable',
+				willRetry: false,
+			})
+		);
+		await client.recover({ refresh: false, seedCursor: false });
+		expect(failureVisibility).toHaveBeenLastCalledWith(true);
+		client.dispose();
+	});
+
+	it('shows live failures and clears their presentation when a new attempt starts', async () => {
+		const { client, failureVisibility } = setup();
+		client.receive(syncUpdate('failed', { willRetry: false }));
+		expect(failureVisibility).toHaveBeenLastCalledWith(true);
+		client.receive(syncUpdate('started', { attempt: 2 }));
+		expect(failureVisibility).toHaveBeenLastCalledWith(false);
+		client.dispose();
+	});
+
+	it('does not carry a previously shown failure into a newly mounted client', async () => {
+		const previous = setup();
+		previous.client.receive(syncUpdate('failed', { willRetry: false }));
+		previous.client.dispose();
+		const next = setup();
+		next.readStatus.mockResolvedValue(
+			syncStatus({ state: 'failed', errorCode: 'ProviderUnavailable', willRetry: false })
+		);
+		await next.client.recover({ refresh: false });
+		expect(next.failureVisibility).toHaveBeenLastCalledWith(false);
+		next.client.dispose();
+	});
 	it('loads mount metadata without invalidating the calendar read already started by the view', async () => {
 		const { client, readStatus, refresh, status, recoveryError } = setup();
 		await client.recover({ refresh: false });
@@ -336,5 +415,173 @@ describe('calendar sync client recovery and refresh coordination', () => {
 		expect(status).not.toHaveBeenCalled();
 		expect(refresh).not.toHaveBeenCalled();
 		expect(readStatus).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe('recalculation activity', () => {
+	const progress = () => ({
+		...syncUpdate('started'),
+		state: 'progress',
+		activity: 'recalculating',
+		sequence: 2,
+	});
+	it('accepts progress without refreshing and ignores older progress after completion', async () => {
+		const { client, status, refresh } = setup();
+		client.receive(syncUpdate('started', { sequence: 1 }));
+		client.receive(progress());
+		expect(status).toHaveBeenLastCalledWith(progress());
+		expect(refresh).not.toHaveBeenCalled();
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		client.receive(progress());
+		await flushSyncClient();
+		expect(status).toHaveBeenLastCalledWith(syncUpdate('completed', { sequence: 3 }));
+		expect(refresh).toHaveBeenCalledOnce();
+		client.dispose();
+	});
+	it('keeps activity until the completed schedule is actually refreshed', async () => {
+		const pending = deferred<void>();
+		const { client, refresh, activity } = setupActivity();
+		refresh.mockReturnValue(pending.promise);
+		client.receive(progress());
+		expect(activity).toHaveBeenLastCalledWith('recalculating');
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		await flushSyncClient();
+		expect(activity).toHaveBeenLastCalledWith('recalculating');
+		pending.resolve();
+		await flushSyncClient();
+		expect(activity).toHaveBeenLastCalledWith(null);
+		client.dispose();
+	});
+});
+
+function setupActivity() {
+	const options = {
+		readStatus: vi.fn().mockResolvedValue(syncStatus()),
+		refresh: vi.fn<() => Promise<void | boolean>>().mockResolvedValue(undefined),
+		status: vi.fn(),
+		recoveryError: vi.fn(),
+		refreshError: vi.fn(),
+		activity: vi.fn(),
+	};
+	return { ...options, client: new CalendarSyncClient(options) };
+}
+
+describe('activity recovery and visible refresh fencing', () => {
+	afterEach(() => vi.useRealTimers());
+	const progress = (generation = 1) => ({
+		...syncUpdate('started', { generation }),
+		state: 'progress',
+		activity: 'recalculating',
+		sequence: 2,
+	});
+
+	it('does not show activity for a started attempt followed by metadata-only completion', async () => {
+		const { client, activity } = setupActivity();
+		client.receive(syncUpdate('started'));
+		client.receive(syncUpdate());
+		await flushSyncClient();
+		expect(activity).not.toHaveBeenCalled();
+		client.dispose();
+	});
+	it('polls pending work after five seconds and stops after a recovered completion', async () => {
+		vi.useFakeTimers();
+		const { client, activity, readStatus } = setupActivity();
+		readStatus.mockResolvedValue(syncStatus({ sequence: 3 }));
+		client.receive(progress());
+		await vi.advanceTimersByTimeAsync(4999);
+		expect(readStatus).not.toHaveBeenCalled();
+		await vi.advanceTimersByTimeAsync(1);
+		expect(readStatus).toHaveBeenCalledOnce();
+		expect(activity).toHaveBeenLastCalledWith(null);
+		await vi.advanceTimersByTimeAsync(15000);
+		expect(readStatus).toHaveBeenCalledOnce();
+		client.dispose();
+	});
+	it('restores live activity from status and clears it when the lease expires', async () => {
+		const { client, activity, readStatus } = setupActivity();
+		readStatus.mockResolvedValue(
+			syncStatus({ state: 'processing', activity: 'recalculating', sequence: 2 })
+		);
+		await client.recover({ refresh: false });
+		expect(activity).toHaveBeenLastCalledWith('recalculating');
+		readStatus.mockResolvedValue(
+			syncStatus({ state: 'processing', activity: null, activityExpired: true, sequence: 2 })
+		);
+		await client.recover({ refresh: false });
+		expect(activity).toHaveBeenLastCalledWith(null);
+		client.dispose();
+	});
+	it('retains activity on a failed refresh and clears it after a successful read retry', async () => {
+		const { client, activity, refresh, refreshError } = setupActivity();
+		refresh.mockRejectedValueOnce(new Error('read failed'));
+		client.receive(progress());
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		await flushSyncClient();
+		expect(refreshError).toHaveBeenLastCalledWith(true);
+		expect(activity).toHaveBeenLastCalledWith('recalculating');
+		client.refresh();
+		await flushSyncClient();
+		expect(refreshError).toHaveBeenLastCalledWith(false);
+		expect(activity).toHaveBeenLastCalledWith(null);
+		client.dispose();
+	});
+	it('retries superseded reads after yielding and never clears activity from that read', async () => {
+		vi.useFakeTimers();
+		const { client, activity, refresh } = setupActivity();
+		refresh.mockResolvedValueOnce(false);
+		client.receive(progress());
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		await flushSyncClient();
+		expect(activity).toHaveBeenLastCalledWith('recalculating');
+		expect(refresh).toHaveBeenCalledOnce();
+		await vi.advanceTimersByTimeAsync(100);
+		expect(refresh).toHaveBeenCalledTimes(2);
+		expect(activity).toHaveBeenLastCalledWith(null);
+		client.dispose();
+	});
+	it('cannot dismiss a newer calculation when an older display refresh finishes', async () => {
+		const first = deferred<void>(),
+			second = deferred<void>();
+		const { client, activity, refresh } = setupActivity();
+		refresh.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+		client.receive(progress());
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		await flushSyncClient();
+		client.receive(progress(2));
+		client.receive(syncUpdate('completed', { generation: 2, sequence: 6 }));
+		first.resolve();
+		await flushSyncClient();
+		expect(activity).toHaveBeenLastCalledWith('recalculating');
+		second.resolve();
+		await flushSyncClient();
+		expect(activity).toHaveBeenLastCalledWith(null);
+		client.dispose();
+	});
+	it('does not let a slow recovery snapshot resurrect completed activity', async () => {
+		const pending = deferred<ReturnType<typeof syncStatus>>();
+		const { client, activity, readStatus } = setupActivity();
+		client.receive(progress());
+		readStatus.mockReturnValue(pending.promise);
+		const recovering = client.recover({ refresh: false });
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		await flushSyncClient();
+		pending.resolve(
+			syncStatus({ state: 'processing', activity: 'recalculating', sequence: 2 })
+		);
+		await recovering;
+		expect(activity).toHaveBeenLastCalledWith(null);
+		client.dispose();
+	});
+	it('cancels polling and deferred refresh retries on disposal', async () => {
+		vi.useFakeTimers();
+		const { client, readStatus, refresh } = setupActivity();
+		refresh.mockResolvedValueOnce(false);
+		client.receive(progress());
+		client.receive(syncUpdate('completed', { sequence: 3 }));
+		await flushSyncClient();
+		client.dispose();
+		await vi.advanceTimersByTimeAsync(15000);
+		expect(readStatus).not.toHaveBeenCalled();
+		expect(refresh).toHaveBeenCalledOnce();
 	});
 });

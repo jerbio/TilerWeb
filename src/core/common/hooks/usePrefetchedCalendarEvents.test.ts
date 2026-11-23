@@ -82,7 +82,7 @@ describe('calendar schedule loading', () => {
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		const refresh = deferred();
 		lookup.mockReturnValueOnce(refresh.promise);
-		let refreshing!: Promise<void>;
+		let refreshing!: Promise<boolean>;
 		act(() => {
 			refreshing = result.current.refetchEvents();
 		});
@@ -101,7 +101,7 @@ describe('calendar schedule loading', () => {
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		const old = deferred();
 		lookup.mockReturnValueOnce(old.promise);
-		let oldRefresh!: Promise<void>;
+		let oldRefresh!: Promise<boolean>;
 		act(() => {
 			oldRefresh = result.current.refetchEvents();
 		});

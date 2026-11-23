@@ -81,7 +81,7 @@ export default function usePrefetchedCalendarData({
 			if (!enabled || !userId || daysInView <= 0) {
 				setEvents([]);
 				setLoading(false);
-				return;
+				return false;
 			}
 			const current = () =>
 				mountedRef.current &&
@@ -104,7 +104,11 @@ export default function usePrefetchedCalendarData({
 
 			try {
 				const refreshedEvents = await visibleRequest;
-				if (current()) setEvents(refreshedEvents);
+				if (current()) {
+					setEvents(refreshedEvents);
+					return true;
+				}
+				return false;
 			} finally {
 				// Keep the saved view on failure and propagate explicit refresh failures
 				// to the sync client so its retry/error feedback stays accurate.

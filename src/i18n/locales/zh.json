@@ -1,4 +1,4 @@
-﻿{
+{
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "本次请求不使用位置信息",
@@ -340,6 +340,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "正在根据 Google 日历更新您的日程…",
+			"interrupted": "日历更新已中断。正在检查恢复状态。",
 			"processing": "正在更新您的日历…",
 			"retrying": "无法完成日历更新。正在重试…",
 			"failed": "无法完成日历更新。",
@@ -1423,6 +1425,16 @@
 		"goBack": "返回"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "发布到 Google 日历",
+			"description": "将已安排的任务块发布到此账号中的 Tiler 专用日历。时间范围会自动延伸。在 Google 中更改或删除已导出的日程也会同步更新 Tiler。",
+			"enable": "发布我的 Tiler 日程",
+			"days": "当前时间前后的天数",
+			"save": "保存发布设置",
+			"saving": "正在保存…",
+			"error": "无法加载或保存发布设置，请重试。",
+			"retry": "重试"
+		},
 		"title": "设置",
 		"back": "返回",
 		"logout": "退出登录",

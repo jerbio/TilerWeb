@@ -340,6 +340,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "Mise à jour de votre planning depuis Google Agenda…",
+			"interrupted": "La mise à jour du calendrier a été interrompue. Vérification de la reprise.",
 			"processing": "Mise à jour de votre calendrier…",
 			"retrying": "Les mises à jour du calendrier n’ont pas pu être effectuées. Nouvelle tentative en cours…",
 			"failed": "Les mises à jour du calendrier n’ont pas pu être effectuées.",
@@ -1423,6 +1425,16 @@
 		"goBack": "Retour"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "Publier dans Google Agenda",
+			"description": "Publiez les blocs planifiés dans un agenda Tiler dédié à ce compte. La période s’étend automatiquement. Les modifications et suppressions que vous effectuez sur les événements exportés dans Google sont également appliquées dans Tiler.",
+			"enable": "Publier mon planning Tiler",
+			"days": "Jours avant et après maintenant",
+			"save": "Enregistrer les paramètres de publication",
+			"saving": "Enregistrement…",
+			"error": "Impossible de charger ou d’enregistrer les paramètres de publication. Veuillez réessayer.",
+			"retry": "Réessayer"
+		},
 		"title": "Paramètres",
 		"back": "Retour",
 		"logout": "Déconnexion",

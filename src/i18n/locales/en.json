@@ -1,4 +1,4 @@
-﻿{
+{
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Location ignored for this request",
@@ -516,6 +516,8 @@
 	},
 	"calendar": {
 		"sync": {
+			"recalculating": "Updating your schedule from Google Calendar\u2026",
+			"interrupted": "Calendar updating was interrupted. Checking for recovery.",
 			"processing": "Updating your calendar…",
 			"retrying": "Calendar updates could not be completed. Trying again…",
 			"failed": "Calendar updates could not be completed.",
@@ -1599,6 +1601,16 @@
 		"goBack": "Go back"
 	},
 	"settings": {
+		"googleExport": {
+			"title": "Publish to Google Calendar",
+			"description": "Publish scheduled tiles to a dedicated Tiler calendar in this account. The window extends automatically. Changes and deletions you make to exported events in Google also update Tiler.",
+			"enable": "Publish my Tiler schedule",
+			"days": "Days before and after now",
+			"save": "Save publishing settings",
+			"saving": "Saving…",
+			"error": "Publishing settings could not be loaded or saved. Please try again.",
+			"retry": "Try again"
+		},
 		"title": "Settings",
 		"back": "Back",
 		"logout": "Log out",

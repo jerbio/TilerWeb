@@ -101,7 +101,7 @@ describe('CalendarWrapper', () => {
 				allowEventLookup: false,
 				events,
 				eventsLoading: true,
-				refetchEvents: mocks.refetchEvents,
+				refetchEvents: expect.any(Function),
 				setViewOptions: mocks.setViewOptions,
 				viewOptions,
 			})

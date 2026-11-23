@@ -38,6 +38,36 @@ describe('NotificationToast', () => {
 		expect(screen.getByTestId('notification-icon-loading')).toBeInTheDocument();
 	});
 
+	it('keeps a nondismissible activity visible without a close button or timeout', () => {
+		act(() => {
+			useUiStore
+				.getState()
+				.notification.show('calendar-sync', 'Updating from Google', 'loading', null, {
+					dismissible: false,
+				});
+		});
+		renderWithTheme(<NotificationToast />);
+		expect(screen.queryByTestId('notification-dismiss')).not.toBeInTheDocument();
+		act(() => {
+			vi.advanceTimersByTime(60000);
+		});
+		expect(screen.getByText('Updating from Google')).toBeInTheDocument();
+	});
+
+	it('does not evict active recalculation when other notifications arrive', () => {
+		act(() => {
+			useUiStore
+				.getState()
+				.notification.show('calendar-sync', 'Updating from Google', 'loading', null, {
+					dismissible: false,
+				});
+			for (let index = 0; index < 8; index++)
+				useUiStore.getState().notification.show(`ordinary-${index}`, 'Done', 'success');
+		});
+		renderWithTheme(<NotificationToast />);
+		expect(screen.getByText('Updating from Google')).toBeInTheDocument();
+	});
+
 	it('renders multiple notifications stacked', () => {
 		act(() => {
 			useUiStore.getState().notification.show('t1', 'Loading...', 'loading');
