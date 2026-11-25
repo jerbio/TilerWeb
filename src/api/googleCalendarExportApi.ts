@@ -24,6 +24,17 @@ function settings(value: unknown): GoogleCalendarExportSettings {
 }
 
 export class GoogleCalendarExportApi extends AppApi {
+	/** Coalesces an export request into the signed-in user's existing scheduled work. Call after a successful native save; publication remains asynchronous. */
+	async requestUpdate(): Promise<boolean> {
+		const response = await this.apiRequest<{ queued: unknown }>(
+			'api/CalendarSync/GoogleExport/Request',
+			{ method: 'POST' }
+		);
+		if (typeof response?.queued !== 'boolean')
+			throw new Error('Invalid Google export request response.');
+		return response.queued;
+	}
+
 	/** Disabled rollouts return null; other failures remain visible and retryable. */
 	async list(): Promise<GoogleCalendarExportSettings[] | null> {
 		try {
