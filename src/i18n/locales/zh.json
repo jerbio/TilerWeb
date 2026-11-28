@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "正在查找你的日程块…",
+		"loading": "正在加载你的日历…",
+		"loadingDate": "正在加载{{date}}的日历…",
+		"opening": "正在打开日程块详情…",
+		"loadingPreview": "正在加载预览…",
+		"deleted": "此事件已删除。",
+		"completed": "此事件已完成。",
+		"demo": "你正在使用功能有限的演示模式。注册即可使用全部功能！",
+		"stale": "此日程块已更改。请刷新日历后重试。",
+		"notFound": "未能在日历中找到此日程块。请重试。",
+		"error": "无法打开此日程块。请重试。",
+		"retry": "重试",
+		"dismiss": "关闭"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "本次请求不使用位置信息",

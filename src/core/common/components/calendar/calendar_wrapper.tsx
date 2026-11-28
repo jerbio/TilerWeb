@@ -12,7 +12,12 @@ import { buildSimulationDiff, entityKey } from '@/core/util/simulationDiff';
 import { buildSimulationActionLookups } from '@/core/util/simulationSelectors';
 import SimulationModeBanner from './SimulationModeBanner';
 import { SubCalendarEvent } from '@/core/common/types/schedule';
-import { CalendarEntityType, CalendarRequestType } from './calendarRequestContext';
+import {
+	CalendarEntityType,
+	CalendarRequestStatus,
+	CalendarRequestType,
+} from './calendarRequestContext';
+import CalendarNavigationFeedback from './CalendarNavigationFeedback';
 import { useCalendarDispatch } from './CalendarRequestProvider';
 
 export function CalendarWrapper({
@@ -208,9 +213,16 @@ export function CalendarRouteFocus({
 					entityType: CalendarEntityType.CalendarEvent,
 					actionType: Actions.None,
 				},
-				() => {
+				(result) => {
+					if (
+						result.status === CalendarRequestStatus.Navigating ||
+						result.status === CalendarRequestStatus.Cancelled
+					)
+						return;
 					setRouteParams(
 						(previous) => {
+							if (previous.get('calendarEventId') !== routeCalendarId)
+								return previous;
 							const next = new URLSearchParams(previous);
 							next.delete('calendarEventId');
 							return next;
@@ -223,5 +235,7 @@ export function CalendarRouteFocus({
 		return () => window.clearTimeout(timer);
 	}, [loading, routeCalendarId, allowEventLookup, focusCalendar, setRouteParams]);
 
-	return null;
+	return routeCalendarId && loading && focusedRoute.current !== routeCalendarId ? (
+		<CalendarNavigationFeedback state={{ phase: 'loading_calendar' }} />
+	) : null;
 }

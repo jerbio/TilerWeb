@@ -453,6 +453,7 @@ const Chat: React.FC<ChatProps> = ({ onClose, onNavigateToCalendar }) => {
 	const isMobileViewport = useIsMobile(parseInt(theme.screens.lg, 10));
 	const isMobileReview = isMobileViewport && inReview;
 	const [isLoadingSimulationResult, setIsLoadingSimulationResult] = useState(false);
+	const [loadingReviewActionId, setLoadingReviewActionId] = useState<string | null>(null);
 	const [simulationResultError, setSimulationResultError] = useState<string | null>(null);
 	const [pendingReviewAction, setPendingReviewAction] = useState<{
 		requestId: string;
@@ -463,6 +464,7 @@ const Chat: React.FC<ChatProps> = ({ onClose, onNavigateToCalendar }) => {
 		reviewEntryVersionRef.current += 1;
 		setPendingReviewAction(null);
 		setIsLoadingSimulationResult(false);
+		setLoadingReviewActionId(null);
 	}, []);
 	// Invalidate downloads on session/persona changes and unmount. A late
 	// response must never open an old review over a different conversation.
@@ -636,9 +638,11 @@ const Chat: React.FC<ChatProps> = ({ onClose, onNavigateToCalendar }) => {
 					});
 				}
 				setIsLoadingSimulationResult(false);
+				setLoadingReviewActionId(null);
 				return;
 			}
 			setIsLoadingSimulationResult(true);
+			setLoadingReviewActionId(actionId ?? null);
 			try {
 				const content = await ensureSimulationResult(simulation);
 				if (!isCurrentEntry()) return;
@@ -662,7 +666,10 @@ const Chat: React.FC<ChatProps> = ({ onClose, onNavigateToCalendar }) => {
 				// mode is NOT entered, satisfying the auto-exit requirement.
 				setSimulationResultError(err instanceof Error ? err.message : 'fetch_failed');
 			} finally {
-				if (reviewEntryVersionRef.current === version) setIsLoadingSimulationResult(false);
+				if (reviewEntryVersionRef.current === version) {
+					setIsLoadingSimulationResult(false);
+					setLoadingReviewActionId(null);
+				}
 			}
 		},
 		[simulation, simulationResult, ensureSimulationResult]
@@ -1873,6 +1880,11 @@ const Chat: React.FC<ChatProps> = ({ onClose, onNavigateToCalendar }) => {
 												: undefined
 										}
 										onNavigate={navigateToCalendar}
+										loadingActionId={
+											message.requestId === requestId
+												? loadingReviewActionId
+												: null
+										}
 									/>
 								)}
 							</MessageBubble>

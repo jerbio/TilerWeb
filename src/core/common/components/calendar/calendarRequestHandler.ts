@@ -201,12 +201,16 @@ export function createCalendarRequestHandler(
 	let focusVersion = 0;
 	return (envelope) => {
 		const { request, onResult } = envelope;
+		// Every new gesture supersedes old lookups and queued focus attempts.
+		deps.pendingFocusRef.current = null;
+		if (deps.focusRetryTimeoutRef?.current) {
+			clearTimeout(deps.focusRetryTimeoutRef.current);
+			deps.focusRetryTimeoutRef.current = null;
+		}
+		if (request.type !== CalendarRequestType.FocusEvent) focusVersion++;
 
 		if (request.type === CalendarRequestType.ClearSelection) {
-			focusVersion += 1;
-			deps.pendingFocusRef.current = null;
 			if (deps.focusTimeoutRef.current) clearTimeout(deps.focusTimeoutRef.current);
-			if (deps.focusRetryTimeoutRef?.current) clearTimeout(deps.focusRetryTimeoutRef.current);
 			deps.setSelectedEventInfo(null);
 			deps.setSelectedEvent(null);
 			deps.setFocusedEventId(null);
@@ -267,7 +271,12 @@ export function createCalendarRequestHandler(
 					deps.setShowNonViableEvents(null);
 					deps.setSelectedEventInfo(null);
 					deps.setSelectedEvent(null);
-					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
+					onResult?.({
+						status: CalendarRequestStatus.Navigating,
+						entityId,
+						phase: 'loading_calendar',
+						date: cachedEvent.start,
+					});
 					deps.pendingFocusRef.current = {
 						entityId,
 						entityType,
@@ -291,7 +300,12 @@ export function createCalendarRequestHandler(
 					deps.setShowNonViableEvents(null);
 					deps.setSelectedEventInfo(null);
 					deps.setSelectedEvent(null);
-					onResult?.({ status: CalendarRequestStatus.Navigating, entityId });
+					onResult?.({
+						status: CalendarRequestStatus.Navigating,
+						entityId,
+						phase: 'loading_calendar',
+						date: request.startHint,
+					});
 					deps.pendingFocusRef.current = {
 						entityId,
 						entityType,
@@ -321,6 +335,7 @@ export function createCalendarRequestHandler(
 				// Track completion / deletion state from within the lookup callbacks
 				let isEventComplete = false;
 				let isEventDeleted = false;
+				let lookupFailed = false;
 
 				findEventDate({
 					entityId,
@@ -332,6 +347,7 @@ export function createCalendarRequestHandler(
 							if (event.isComplete) isEventComplete = true;
 							return event;
 						} catch {
+							lookupFailed = true;
 							return null;
 						}
 					},
@@ -352,13 +368,21 @@ export function createCalendarRequestHandler(
 								})),
 							};
 						} catch {
+							lookupFailed = true;
 							return null;
 						}
 					},
 				}).then((startMs) => {
 					if (version !== focusVersion) return;
 					if (startMs == null) {
-						onResult?.({ status: CalendarRequestStatus.Deleted, entityId });
+						onResult?.(
+							lookupFailed
+								? {
+										status: CalendarRequestStatus.Error,
+										code: 'lookup_failed',
+									}
+								: { status: CalendarRequestStatus.NotFound, entityId }
+						);
 						return;
 					}
 
@@ -382,6 +406,12 @@ export function createCalendarRequestHandler(
 
 					// Navigate the calendar view to the event's date
 					const targetStartDay = dayjs(startMs).startOf('day');
+					onResult?.({
+						status: CalendarRequestStatus.Navigating,
+						entityId,
+						phase: 'loading_calendar',
+						date: startMs,
+					});
 					deps.setViewOptions((prev) => ({
 						...prev,
 						startDay: targetStartDay,

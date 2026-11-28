@@ -468,7 +468,19 @@ describe('Chat review transitions', () => {
 		renderChat();
 		await screen.findByTestId('review-simulation-button');
 		fireEvent.click(screen.getByRole('button', { name: 'Update first tile' }));
+		expect(screen.getByRole('button', { name: 'Update first tile' })).toHaveAttribute(
+			'aria-busy',
+			'true'
+		);
+		expect(screen.getByText('Loading your preview…')).toBeInTheDocument();
 		fireEvent.click(screen.getByRole('button', { name: 'Update second tile' }));
+		expect(screen.getByRole('button', { name: 'Update first tile' })).not.toHaveAttribute(
+			'aria-busy'
+		);
+		expect(screen.getByRole('button', { name: 'Update second tile' })).toHaveAttribute(
+			'aria-busy',
+			'true'
+		);
 		expect(useSimulationOverlayStore.getState().inReview).toBe(false);
 		expect(mockChatService.getSimulationResult).toHaveBeenCalledOnce();
 		await finishDownload();

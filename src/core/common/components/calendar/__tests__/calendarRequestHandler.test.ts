@@ -69,6 +69,66 @@ beforeEach(() => {
 	vi.clearAllMocks();
 });
 
+describe('navigation progress and lookup failures', () => {
+	it('announces finding the tile before lookup, then the actual calendar date', async () => {
+		let resolve!: (value: { start: number; isEnabled: boolean }) => void;
+		mockLookupSubCalendarEventById.mockReturnValueOnce(
+			new Promise((r) => {
+				resolve = r;
+			})
+		);
+		const deps = makeDeps();
+		const onResult = vi.fn();
+		createCalendarRequestHandler(deps)({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'target',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+			},
+			onResult,
+		});
+		expect(onResult).toHaveBeenLastCalledWith({
+			status: CalendarRequestStatus.Navigating,
+			entityId: 'target',
+		});
+		expect(deps.setViewOptions).not.toHaveBeenCalled();
+		const start = Date.UTC(2026, 10, 28, 12);
+		resolve({ start, isEnabled: true });
+		await vi.waitFor(() =>
+			expect(onResult).toHaveBeenLastCalledWith({
+				status: CalendarRequestStatus.Navigating,
+				entityId: 'target',
+				phase: 'loading_calendar',
+				date: start,
+			})
+		);
+	});
+
+	it('reports a failed lookup as an error rather than a deleted event', async () => {
+		mockLookupSubCalendarEventById.mockRejectedValueOnce(new Error('offline'));
+		const onResult = vi.fn();
+		createCalendarRequestHandler(makeDeps())({
+			request: {
+				type: CalendarRequestType.FocusEvent,
+				entityId: 'target',
+				entityType: CalendarEntityType.SubcalendarEvent,
+				actionType: Actions.None,
+			},
+			onResult,
+		});
+		await vi.waitFor(() =>
+			expect(onResult).toHaveBeenLastCalledWith({
+				status: CalendarRequestStatus.Error,
+				code: 'lookup_failed',
+			})
+		);
+		expect(onResult).not.toHaveBeenCalledWith(
+			expect.objectContaining({ status: CalendarRequestStatus.Deleted })
+		);
+	});
+});
+
 describe('returning to chat', () => {
 	it('dismisses event details and cancels pending calendar focus', () => {
 		const deps = makeDeps();
@@ -143,6 +203,8 @@ describe('createCalendarRequestHandler — startHint', () => {
 		expect(onResult).toHaveBeenCalledWith({
 			status: CalendarRequestStatus.Navigating,
 			entityId: 'root_7_aaa_bbb',
+			phase: 'loading_calendar',
+			date: HINT_MS,
 		});
 
 		// setViewOptions is driven to the hint's day.

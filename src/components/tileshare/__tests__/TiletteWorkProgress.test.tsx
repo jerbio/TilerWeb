@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '@/core/theme/light';
@@ -32,7 +32,7 @@ const assignment = (
 	userProfile: null,
 });
 function Location() {
-	return <output data-testid="location">{useLocation().search}</output>;
+	return <div data-testid="location">{useLocation().search}</div>;
 }
 function show(assignments: DesignatedUser[], owner = false, assigneeId?: string) {
 	const tilette: TileShareTemplate = {
@@ -59,6 +59,59 @@ function show(assignments: DesignatedUser[], owner = false, assigneeId?: string)
 }
 beforeEach(() => vi.clearAllMocks());
 describe('accepted tilette progress', () => {
+	it('ends a stalled assignment lookup with an error and a usable retry action', async () => {
+		vi.useFakeTimers();
+		mocks.response.mockImplementationOnce(
+			(_id: string, signal: AbortSignal) =>
+				new Promise((_resolve, reject) => {
+					signal.addEventListener('abort', () => reject(new Error('aborted')));
+				})
+		);
+		show([assignment('me', 25)]);
+		fireEvent.click(screen.getByRole('button', { name: 'Open tile' }));
+		await act(async () => {
+			await vi.advanceTimersByTimeAsync(30000);
+		});
+		expect(screen.getByRole('alert')).toHaveTextContent('Try again');
+		expect(screen.getByRole('button', { name: 'Open tile' })).toBeEnabled();
+	});
+
+	it('aborts an opening lookup when the TileShare UI unmounts', () => {
+		mocks.response.mockReturnValueOnce(new Promise(() => {}));
+		const view = show([assignment('me', 25)]);
+		fireEvent.click(screen.getByRole('button', { name: 'Open tile' }));
+		const signal = mocks.response.mock.calls[0][1] as AbortSignal;
+		view.unmount();
+		expect(signal.aborted).toBe(true);
+	});
+	it('acknowledges a slow lookup immediately and prevents duplicate opening requests', async () => {
+		let resolve!: (value: unknown) => void;
+		mocks.response.mockReturnValueOnce(
+			new Promise((r) => {
+				resolve = r;
+			})
+		);
+		show([assignment('me', 25)]);
+		await setupUser().click(screen.getByRole('button', { name: 'Open tile' }));
+		const opening = screen.getByRole('button', { name: 'Finding your tile…' });
+		expect(opening).toBeDisabled();
+		expect(opening).toHaveAttribute('aria-busy', 'true');
+		expect(screen.getByRole('status')).toHaveTextContent('Finding your tile');
+		await setupUser().click(opening);
+		expect(mocks.response).toHaveBeenCalledTimes(1);
+		await act(async () =>
+			resolve({ calendarId: 'calendar', invitationStatus: InvitationStatus.Accepted })
+		);
+		expect(screen.getByTestId('location')).toHaveTextContent('calendarEventId=calendar');
+	});
+
+	it('restores the action and displays an error when opening fails', async () => {
+		mocks.response.mockRejectedValueOnce(new Error('Network unavailable'));
+		show([assignment('me', 25)]);
+		await setupUser().click(screen.getByRole('button', { name: 'Open tile' }));
+		expect(await screen.findByRole('alert')).toHaveTextContent('Try again');
+		expect(screen.getByRole('button', { name: 'Open tile' })).toBeEnabled();
+	});
 	it('ignores null assignment entries while retaining valid progress', () => {
 		show([null, assignment('me', 25), null] as DesignatedUser[]);
 		expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
@@ -78,7 +131,7 @@ describe('accepted tilette progress', () => {
 		show([assignment('me', 25), assignment('other', 90)]);
 		expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
 		await setupUser().click(screen.getByRole('button', { name: 'Open tile' }));
-		expect(mocks.response).toHaveBeenCalledWith('me-assignment');
+		expect(mocks.response).toHaveBeenCalledWith('me-assignment', expect.any(AbortSignal));
 		await waitFor(() =>
 			expect(screen.getByTestId('location')).toHaveTextContent(
 				'calendarEventId=calendar%2Bmine'

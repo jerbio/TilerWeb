@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "Recherche de votre tuile…",
+		"loading": "Chargement de votre calendrier…",
+		"loadingDate": "Chargement du calendrier pour le {{date}}…",
+		"opening": "Ouverture des détails de la tuile…",
+		"loadingPreview": "Chargement de votre aperçu…",
+		"deleted": "Cet événement a été supprimé.",
+		"completed": "Cet événement est terminé.",
+		"demo": "Vous utilisez le mode démo avec des fonctionnalités limitées. Inscrivez-vous pour profiter de toutes les fonctionnalités !",
+		"stale": "Cette tuile a été modifiée. Actualisez votre calendrier et réessayez.",
+		"notFound": "Cette tuile est introuvable dans le calendrier. Réessayez.",
+		"error": "Impossible d’ouvrir la tuile. Veuillez réessayer.",
+		"retry": "Réessayer",
+		"dismiss": "Fermer"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Localisation ignorée pour cette demande",

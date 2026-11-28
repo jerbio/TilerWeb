@@ -491,7 +491,7 @@ describe('ActionPill schedule consistency', () => {
 			});
 
 			// Should be in navigating state, not demo mode
-			expect(screen.getByText(/Navigating/)).toBeInTheDocument();
+			expect(screen.getByText('Finding your tile…')).toBeInTheDocument();
 			expect(button2.style.opacity).toBe('0.75');
 		});
 

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router';
 import { TileshareApi } from '@/api/tileshareApi';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import { LoaderCircle } from 'lucide-react';
 import { InvitationStatus, TileShareTemplate } from '@/core/common/types/tileshare';
 import { TileShareViewerContext, TileShareWorkScopeContext } from './TiletteRsvpStatus';
 import { validDesignatedUsers } from '@/core/util/tileshareAssignees';
@@ -23,6 +24,16 @@ export default function TiletteWorkProgress({
 	const navigate = useNavigate();
 	const [opening, setOpening] = useState(false);
 	const [openError, setOpenError] = useState(false);
+	const openingRequest = useRef<AbortController | null>(null);
+	const openingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(
+		() => () => {
+			openingRequest.current?.abort();
+			openingRequest.current = null;
+			if (openingTimeout.current) clearTimeout(openingTimeout.current);
+		},
+		[]
+	);
 	const designated = validDesignatedUsers(tilette.designatedUsers);
 	const own = designated.find(
 		(a) =>
@@ -31,20 +42,31 @@ export default function TiletteWorkProgress({
 			a.rsvpStatus === InvitationStatus.Accepted
 	);
 	const openTile = async () => {
-		if (opening || !own?.designatedTileTemplateId) return;
+		if (openingRequest.current || !own?.designatedTileTemplateId) return;
 		setOpening(true);
 		setOpenError(false);
+		const controller = new AbortController();
+		openingRequest.current = controller;
+		const timeout = setTimeout(() => controller.abort(), 30000);
+		openingTimeout.current = timeout;
 		try {
 			const result = await new TileshareApi().getAssignmentResponse(
-				own.designatedTileTemplateId
+				own.designatedTileTemplateId,
+				controller.signal
 			);
+			if (openingRequest.current !== controller || controller.signal.aborted) return;
 			if (result.calendarId && result.invitationStatus === InvitationStatus.Accepted)
 				navigate(`/timeline?calendarEventId=${encodeURIComponent(result.calendarId)}`);
 			else setOpenError(true);
 		} catch {
-			setOpenError(true);
+			if (openingRequest.current === controller) setOpenError(true);
 		} finally {
-			setOpening(false);
+			clearTimeout(timeout);
+			if (openingRequest.current === controller) {
+				openingTimeout.current = null;
+				openingRequest.current = null;
+				setOpening(false);
+			}
 		}
 	};
 	const assignments = designated.filter(
@@ -129,6 +151,7 @@ export default function TiletteWorkProgress({
 				<button
 					type="button"
 					disabled={opening}
+					aria-busy={opening || undefined}
 					onClick={(event) => {
 						// Some cards link to details; this action opens the assigned calendar tile.
 						event.preventDefault();
@@ -136,8 +159,16 @@ export default function TiletteWorkProgress({
 						void openTile();
 					}}
 				>
-					{t('tilesharePreview.openTile', 'Open tile')}
+					{opening && <OpeningSpinner size={16} aria-hidden="true" />}
+					{opening
+						? t('calendarNavigation.locating', 'Finding your tile…')
+						: t('tilesharePreview.openTile', 'Open tile')}
 				</button>
+			)}
+			{opening && (
+				<ScreenReaderText role="status">
+					{t('calendarNavigation.locating', 'Finding your tile…')}
+				</ScreenReaderText>
 			)}
 			{openError && (
 				<span role="alert">
@@ -150,6 +181,15 @@ export default function TiletteWorkProgress({
 		</ProgressWrap>
 	);
 }
+const spin = keyframes`to { transform: rotate(360deg); }`;
+const OpeningSpinner = styled(LoaderCircle)`
+	margin-right: 6px;
+	vertical-align: middle;
+	animation: ${spin} 1s linear infinite;
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
+`;
 const ProgressWrap = styled.div<{ $compact: boolean }>`
 	display: flex;
 	align-items: center;

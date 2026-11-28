@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-import { ChevronRight } from 'lucide-react';
+import styled, { css, keyframes } from 'styled-components';
+import { ChevronRight, LoaderCircle } from 'lucide-react';
 import Button from '@/core/common/components/button';
 import ActionIcon from '@/core/common/components/chat/ActionIcon';
 import StatusOverlay, { StatusOverlayVariant } from '@/core/common/components/chat/StatusOverlay';
@@ -41,6 +41,14 @@ const PillWrapper = styled.span<{
 		css`
 			cursor: pointer;
 		`}
+`;
+
+const navigationSpin = keyframes`to { transform: rotate(360deg); }`;
+const NavigateSpinner = styled(LoaderCircle)`
+	animation: ${navigationSpin} 1s linear infinite;
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
 `;
 
 const NavigateButton = styled.button`
@@ -109,6 +117,7 @@ interface ActionPillProps {
 	onSelect?: (action: VibeAction, simulationAction?: SimulationActionDto) => void;
 	/** Cancel a pending review entry before navigating the live calendar. */
 	onNavigate?: () => void;
+	isLoadingReview?: boolean;
 }
 
 const ActionPill: React.FC<ActionPillProps> = ({
@@ -118,6 +127,7 @@ const ActionPill: React.FC<ActionPillProps> = ({
 	request,
 	onSelect,
 	onNavigate,
+	isLoadingReview = false,
 }) => {
 	const { t } = useTranslation();
 	const calendarDispatch = useCalendarDispatch();
@@ -289,8 +299,10 @@ const ActionPill: React.FC<ActionPillProps> = ({
 	};
 
 	const handleNavigate = () => {
-		if (!canNavigate) return;
+		if (!canNavigate || isNavigating) return;
 		if (!action.entityId || !action.entityType) return;
+		setIsNavigating(true);
+		dismissOverlay();
 		onNavigate?.();
 
 		calendarDispatch(
@@ -305,50 +317,8 @@ const ActionPill: React.FC<ActionPillProps> = ({
 				},
 			},
 			(result: CalendarRequestResult) => {
-				if (result.status === CalendarRequestStatus.Navigating) {
-					setIsNavigating(true);
-					setIsDemoLimited(false);
-					showOverlay(
-						t('home.expanded.chat.navigating', 'Navigating to tile...'),
-						'info',
-						true
-					);
-				} else if (result.status === CalendarRequestStatus.DemoMode) {
-					setIsDemoLimited(true);
-					setIsNavigating(false);
-					showOverlay(
-						t(
-							'home.expanded.chat.demoMode',
-							'You are in demo mode with limited features. Sign up to unlock the full experience!'
-						),
-						'warning'
-					);
-				} else if (result.status === CalendarRequestStatus.Completed) {
-					setIsNavigating(false);
-					setIsDemoLimited(false);
-					showOverlay(
-						t('home.expanded.chat.tileCompleted', 'This event has been completed'),
-						'info'
-					);
-				} else if (result.status === CalendarRequestStatus.Deleted) {
-					setIsNavigating(false);
-					setIsDemoLimited(false);
-					showOverlay(
-						t('home.expanded.chat.tileDeleted', 'This event has been deleted'),
-						'warning'
-					);
-				} else {
-					// Any terminal result (found, not_found, error) clears navigating state
-					setIsNavigating(false);
-					setIsDemoLimited(false);
-					dismissOverlay();
-					if (result.status === CalendarRequestStatus.NotFound) {
-						// console.warn(
-						// 	'[ActionPill] Calendar could not find entity:',
-						// 	action.entityId
-						// );
-					}
-				}
+				setIsNavigating(result.status === CalendarRequestStatus.Navigating);
+				setIsDemoLimited(result.status === CalendarRequestStatus.DemoMode);
 			}
 		);
 	};
@@ -379,6 +349,8 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					title={action.descriptions}
 					dotstatus={action.status}
 					onClick={handleClick}
+					aria-busy={isNavigating || isLoadingReview || undefined}
+					disabled={isNavigating}
 					style={{
 						cursor: canReview || isClickable ? 'pointer' : 'default',
 						opacity:
@@ -392,6 +364,11 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					}}
 				>
 					<ActionIcon action={action} />
+					{isLoadingReview && (
+						<span role="status">
+							{t('calendarNavigation.loadingPreview', 'Loading your preview…')}
+						</span>
+					)}
 					<span style={{ marginLeft: '4px', marginRight: '4px' }}>-</span>
 					<span className="action-description">{action.descriptions}</span>
 				</ChatActionButton>
@@ -399,13 +376,18 @@ const ActionPill: React.FC<ActionPillProps> = ({
 					<NavigateButton
 						type="button"
 						onClick={handleNavigate}
+						disabled={isNavigating}
 						aria-label={t('home.expanded.chat.goToTileAction', {
 							description: action.descriptions,
 						})}
 						title={t('home.expanded.chat.goToTile', 'Go to tile')}
 						aria-busy={isNavigating || undefined}
 					>
-						<ChevronRight size={16} strokeWidth={2.25} aria-hidden="true" />
+						{isNavigating ? (
+							<NavigateSpinner size={16} aria-hidden="true" />
+						) : (
+							<ChevronRight size={16} strokeWidth={2.25} aria-hidden="true" />
+						)}
 					</NavigateButton>
 				)}
 			</PillWrapper>

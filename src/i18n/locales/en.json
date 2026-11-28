@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "Finding your tile…",
+		"loading": "Loading your calendar…",
+		"loadingDate": "Loading the calendar for {{date}}…",
+		"opening": "Opening tile details…",
+		"loadingPreview": "Loading your preview…",
+		"deleted": "This event has been deleted.",
+		"completed": "This event has been completed.",
+		"demo": "You are in demo mode with limited features. Sign up to unlock the full experience!",
+		"stale": "This tile has changed. Refresh your calendar and try again.",
+		"notFound": "This tile could not be found on the calendar. Try again.",
+		"error": "The tile could not be opened. Please try again.",
+		"retry": "Try again",
+		"dismiss": "Dismiss"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Location ignored for this request",

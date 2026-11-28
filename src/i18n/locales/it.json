@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "Ricerca del tuo riquadro…",
+		"loading": "Caricamento del tuo calendario…",
+		"loadingDate": "Caricamento del calendario per il {{date}}…",
+		"opening": "Apertura dei dettagli del riquadro…",
+		"loadingPreview": "Caricamento della tua anteprima…",
+		"deleted": "Questo evento è stato eliminato.",
+		"completed": "Questo evento è stato completato.",
+		"demo": "Stai usando la modalità demo con funzionalità limitate. Registrati per accedere a tutte le funzionalità!",
+		"stale": "Questo riquadro è stato modificato. Aggiorna il calendario e riprova.",
+		"notFound": "Questo riquadro non è stato trovato nel calendario. Riprova.",
+		"error": "Impossibile aprire il riquadro. Riprova.",
+		"retry": "Riprova",
+		"dismiss": "Chiudi"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Posizione ignorata per questa richiesta",

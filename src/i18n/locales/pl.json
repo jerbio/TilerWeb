@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "Wyszukiwanie kafelka…",
+		"loading": "Wczytywanie kalendarza…",
+		"loadingDate": "Wczytywanie kalendarza na {{date}}…",
+		"opening": "Otwieranie szczegółów kafelka…",
+		"loadingPreview": "Wczytywanie podglądu…",
+		"deleted": "To wydarzenie zostało usunięte.",
+		"completed": "To wydarzenie zostało ukończone.",
+		"demo": "Korzystasz z trybu demonstracyjnego z ograniczonymi funkcjami. Zarejestruj się, aby uzyskać dostęp do wszystkich funkcji!",
+		"stale": "Ten kafelek został zmieniony. Odśwież kalendarz i spróbuj ponownie.",
+		"notFound": "Nie znaleziono tego kafelka w kalendarzu. Spróbuj ponownie.",
+		"error": "Nie udało się otworzyć kafelka. Spróbuj ponownie.",
+		"retry": "Spróbuj ponownie",
+		"dismiss": "Zamknij"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Lokalizacja pominięta w tym żądaniu",

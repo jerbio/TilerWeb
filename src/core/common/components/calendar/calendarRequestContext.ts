@@ -22,6 +22,7 @@ export enum CalendarRequestStatus {
 	Completed = 'completed',
 	Deleted = 'deleted',
 	Error = 'error',
+	Cancelled = 'cancelled',
 }
 
 /** Discriminant values for each calendar request kind */
@@ -33,16 +34,32 @@ export enum CalendarRequestType {
 	NavigateWeek = 'navigate_week',
 }
 
+export type CalendarNavigationPhase = 'locating' | 'loading_calendar' | 'opening';
+
+/** Machine-readable failures; user-facing copy belongs in the translation resources. */
+export type CalendarRequestErrorCode =
+	| 'timeout'
+	| 'open_failed'
+	| 'calendar_unavailable'
+	| 'lookup_failed';
+
 /** Result reported back to the dispatcher after the calendar processes a request */
 export type CalendarRequestResult =
 	| { status: CalendarRequestStatus.Found; entityId: string }
 	| { status: CalendarRequestStatus.NotFound; entityId: string }
-	| { status: CalendarRequestStatus.Navigating; entityId: string }
+	| {
+			status: CalendarRequestStatus.Navigating;
+			entityId: string;
+			phase?: CalendarNavigationPhase;
+			/** Target day, when it has been resolved (unix milliseconds). */
+			date?: number;
+	  }
 	| { status: CalendarRequestStatus.Stale; entityId: string }
+	| { status: CalendarRequestStatus.Cancelled; entityId: string }
 	| { status: CalendarRequestStatus.DemoMode; entityId: string }
 	| { status: CalendarRequestStatus.Completed; entityId: string }
 	| { status: CalendarRequestStatus.Deleted; entityId: string }
-	| { status: CalendarRequestStatus.Error; message: string };
+	| { status: CalendarRequestStatus.Error; code: CalendarRequestErrorCode };
 
 /**
  * Schedule context attached to a request so the calendar listener

@@ -31,6 +31,7 @@ interface ActionPillStripProps {
 	simulationActionById?: Record<string, SimulationActionDto>;
 	onSelect?: (action: VibeAction, simulationAction?: SimulationActionDto) => void;
 	onNavigate?: () => void;
+	loadingActionId?: string | null;
 }
 
 const MoreButton = styled.button`
@@ -64,6 +65,7 @@ const ActionPillStrip: React.FC<ActionPillStripProps> = ({
 	simulationActionById,
 	onSelect,
 	onNavigate,
+	loadingActionId,
 }) => {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
@@ -107,6 +109,7 @@ const ActionPillStrip: React.FC<ActionPillStripProps> = ({
 					simulationAction={simulationActionById?.[action.id]}
 					onSelect={onSelect}
 					onNavigate={onNavigate}
+					isLoadingReview={loadingActionId === action.id}
 				/>
 			))}
 			{hasOverflow && !expanded && (

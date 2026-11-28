@@ -101,6 +101,14 @@ const Calendar = ({
 	// Focused event state — drives the pulse animation, auto-clears after timeout
 	const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
 	const focusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const focusRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(
+		() => () => {
+			if (focusRetryTimeoutRef.current) clearTimeout(focusRetryTimeoutRef.current);
+			if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+		},
+		[]
+	);
 
 	// ── Phase 4: Pending focus after navigation ───────────────────
 	// Stores the request to retry once events finish reloading after a date navigation
@@ -126,6 +134,7 @@ const Calendar = ({
 			pendingFocusRef,
 			contentContainerRef,
 			focusTimeoutRef,
+			focusRetryTimeoutRef,
 			eventsRef,
 			allowEventLookup,
 			setShowNonViableEvents,
@@ -151,6 +160,7 @@ const Calendar = ({
 				pendingFocusRef,
 				contentContainerRef,
 				focusTimeoutRef,
+				focusRetryTimeoutRef,
 				setShowNonViableEvents,
 				setSelectedEventInfo,
 				setSelectedEvent,
@@ -159,7 +169,10 @@ const Calendar = ({
 			});
 		}, 150);
 
-		return () => clearTimeout(retryTimer);
+		return () => {
+			clearTimeout(retryTimer);
+			if (focusRetryTimeoutRef.current) clearTimeout(focusRetryTimeoutRef.current);
+		};
 	}, [eventsLoading, events]);
 
 	// Track calendar view mount

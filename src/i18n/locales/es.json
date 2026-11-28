@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "Buscando tu bloque…",
+		"loading": "Cargando tu calendario…",
+		"loadingDate": "Cargando el calendario para el {{date}}…",
+		"opening": "Abriendo los detalles del bloque…",
+		"loadingPreview": "Cargando tu vista previa…",
+		"deleted": "Este evento se ha eliminado.",
+		"completed": "Este evento se ha completado.",
+		"demo": "Estás en modo de demostración con funciones limitadas. ¡Regístrate para disfrutar de todas las funciones!",
+		"stale": "Este bloque ha cambiado. Actualiza tu calendario e inténtalo de nuevo.",
+		"notFound": "No se ha encontrado este bloque en el calendario. Inténtalo de nuevo.",
+		"error": "No se ha podido abrir el bloque. Inténtalo de nuevo.",
+		"retry": "Intentar de nuevo",
+		"dismiss": "Cerrar"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Ubicación ignorada para esta solicitud",

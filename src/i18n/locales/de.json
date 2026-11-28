@@ -1,4 +1,19 @@
 {
+	"calendarNavigation": {
+		"locating": "Deine Kachel wird gesucht…",
+		"loading": "Dein Kalender wird geladen…",
+		"loadingDate": "Kalender für den {{date}} wird geladen…",
+		"opening": "Kacheldetails werden geöffnet…",
+		"loadingPreview": "Deine Vorschau wird geladen…",
+		"deleted": "Dieser Termin wurde gelöscht.",
+		"completed": "Dieser Termin wurde abgeschlossen.",
+		"demo": "Du verwendest den Demomodus mit eingeschränkten Funktionen. Registriere dich, um alle Funktionen freizuschalten!",
+		"stale": "Diese Kachel wurde geändert. Aktualisiere deinen Kalender und versuche es erneut.",
+		"notFound": "Diese Kachel wurde im Kalender nicht gefunden. Versuche es erneut.",
+		"error": "Die Kachel konnte nicht geöffnet werden. Bitte versuche es erneut.",
+		"retry": "Erneut versuchen",
+		"dismiss": "Schließen"
+	},
 	"schedulingLocation": {
 		"requestNotice": {
 			"title": "Standort für diese Anfrage ignoriert",

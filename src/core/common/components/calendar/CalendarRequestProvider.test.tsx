@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, renderHook, act } from '@testing-library/react';
+import { render, renderHook, act, screen, fireEvent } from '@testing-library/react';
 import React, { useImperativeHandle, forwardRef } from 'react';
+import '@/i18n/config';
 import {
 	CalendarRequestProvider,
 	useCalendarDispatch,
@@ -101,6 +102,98 @@ function renderBusMultiListener(handlers: Array<(e: CalendarRequestEnvelope) => 
 	};
 }
 
+describe('calendar navigation feedback', () => {
+	it('keeps progress above the page and advances through real navigation stages', () => {
+		vi.useFakeTimers();
+		const handler = vi.fn();
+		const { dispatch } = renderBus(handler);
+		dispatch(createFocusRequest());
+		const envelope = handler.mock.calls[0][0] as CalendarRequestEnvelope;
+		expect(screen.getByRole('status')).toHaveTextContent('Finding your tile');
+		expect(screen.getByTestId('calendar-navigation-feedback').parentElement).toBe(
+			document.body
+		);
+		act(() =>
+			envelope.onResult?.({
+				status: CalendarRequestStatus.Navigating,
+				entityId: 'entity-1',
+				phase: 'loading_calendar',
+				date: Date.UTC(2026, 10, 28, 12),
+			})
+		);
+		expect(screen.getByRole('status')).toHaveTextContent(/Loading the calendar for/);
+		expect(screen.getByRole('status')).not.toHaveTextContent('{{date}}');
+		expect(screen.queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument();
+		act(() =>
+			envelope.onResult?.({ status: CalendarRequestStatus.Found, entityId: 'entity-1' })
+		);
+		expect(screen.getByRole('status')).toHaveTextContent('Opening tile details');
+		act(() => vi.advanceTimersByTime(300));
+		expect(screen.queryByTestId('calendar-navigation-feedback')).not.toBeInTheDocument();
+	});
+
+	it('shows a retryable failure and retries the same target', () => {
+		const handler = vi.fn();
+		const onResult = vi.fn();
+		const { dispatch } = renderBus(handler);
+		dispatch(createFocusRequest(), onResult);
+		act(() =>
+			handler.mock.calls[0][0].onResult({
+				status: CalendarRequestStatus.NotFound,
+				entityId: 'entity-1',
+			})
+		);
+		expect(screen.getByRole('alert')).toHaveTextContent('could not be found');
+		fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+		expect(handler).toHaveBeenCalledTimes(2);
+		expect(handler.mock.calls[1][0].request).toEqual(createFocusRequest());
+		expect(screen.getByRole('status')).toHaveTextContent('Finding your tile');
+	});
+
+	it('times out, cancels pending focus, and ignores late completion', () => {
+		vi.useFakeTimers();
+		const handler = vi.fn();
+		const onResult = vi.fn();
+		const { dispatch } = renderBus(handler);
+		dispatch(createFocusRequest(), onResult);
+		const oldEnvelope = handler.mock.calls[0][0] as CalendarRequestEnvelope;
+		act(() => vi.advanceTimersByTime(30000));
+		expect(handler).toHaveBeenLastCalledWith({
+			request: { type: CalendarRequestType.ClearSelection },
+		});
+		expect(screen.getByRole('alert')).toHaveTextContent('could not be opened');
+		act(() =>
+			oldEnvelope.onResult?.({ status: CalendarRequestStatus.Found, entityId: 'entity-1' })
+		);
+		expect(onResult).toHaveBeenCalledTimes(1);
+		expect(onResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Error,
+			code: 'timeout',
+		});
+		expect(screen.getByRole('alert')).toBeInTheDocument();
+	});
+
+	it('releases the previous caller and ignores its responses after a new selection', () => {
+		const handler = vi.fn();
+		const oldResult = vi.fn();
+		const { dispatch } = renderBus(handler);
+		dispatch(createFocusRequest(), oldResult);
+		const oldEnvelope = handler.mock.calls[0][0] as CalendarRequestEnvelope;
+		dispatch(createFocusRequest({ entityId: 'second' }));
+		expect(oldResult).toHaveBeenCalledWith({
+			status: CalendarRequestStatus.Cancelled,
+			entityId: 'entity-1',
+		});
+		act(() =>
+			oldEnvelope.onResult?.({ status: CalendarRequestStatus.Deleted, entityId: 'entity-1' })
+		);
+		expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+		expect(screen.getByRole('status')).toHaveTextContent('Finding your tile');
+		dispatch({ type: CalendarRequestType.ClearSelection });
+		expect(screen.queryByTestId('calendar-navigation-feedback')).not.toBeInTheDocument();
+	});
+});
+
 // -- CalendarRequestProvider dispatch/subscribe ----------------
 
 describe('CalendarRequestProvider', () => {
@@ -126,10 +219,12 @@ describe('CalendarRequestProvider', () => {
 
 			// The handler receives the envelope with onResult
 			const envelope: CalendarRequestEnvelope = handler.mock.calls[0][0];
-			expect(envelope.onResult).toBe(onResult);
+			expect(envelope.onResult).toEqual(expect.any(Function));
 
 			// Calendar calls onResult
-			envelope.onResult!({ status: CalendarRequestStatus.Found, entityId: 'entity-1' });
+			act(() =>
+				envelope.onResult!({ status: CalendarRequestStatus.Found, entityId: 'entity-1' })
+			);
 			expect(onResult).toHaveBeenCalledWith({
 				status: CalendarRequestStatus.Found,
 				entityId: 'entity-1',
